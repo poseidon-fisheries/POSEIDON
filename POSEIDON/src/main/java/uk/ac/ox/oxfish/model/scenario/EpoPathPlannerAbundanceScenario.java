@@ -19,6 +19,7 @@ import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
 import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
 import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.List;
 
@@ -37,16 +38,26 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
             getSpeciesCodesSupplier(),
             new AbundancePurseSeineGearFactory(
                 new SelectivityAbundanceFadInitializerFactory(
+                    // see https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1545974455
+                    // for Weibull parameter values, obtained by fitting the distributions to observer data
                     new WeibullPerSpeciesCarryingCapacitiesFactory(
                         ImmutableMap.of(
-                            "Bigeye tuna", new CalibratedParameter(0.0001, 1.69958, 0.0001, 2.0, 1.0E-4),
-                            "Skipjack tuna", new CalibratedParameter(0.65, 3, 0.0001, 3, 2),
-                            "Yellowfin tuna", new CalibratedParameter(0.08, 3.75, 0.0001, 4, 2)
+                            "Bigeye tuna", new FixedDoubleParameter(0.6346391),
+                            "Skipjack tuna", new FixedDoubleParameter(0.7705004),
+                            "Yellowfin tuna", new FixedDoubleParameter(0.7026296)
                         ),
                         ImmutableMap.of(
-                            "Bigeye tuna", new CalibratedParameter(1200, 11000, 16375),
-                            "Skipjack tuna", new CalibratedParameter(16500, 1E5, 43382),
-                            "Yellowfin tuna", new CalibratedParameter(5000, 100000, 71500)
+                            "Bigeye tuna", new FixedDoubleParameter(8.9333883),
+                            "Skipjack tuna", new FixedDoubleParameter(18.4077481),
+                            "Yellowfin tuna", new FixedDoubleParameter(5.7959415)
+                        ),
+                        ImmutableMap.of(
+                            "Bigeye tuna", new FixedDoubleParameter(.4879391),
+                            "Skipjack tuna", new FixedDoubleParameter(.0949),
+                            "Yellowfin tuna", new FixedDoubleParameter(.2552899)
+                        ),
+                        new CalibratedParameter(
+                            1, 1.5, 0, 2, 1
                         )
                     ),
                     getAbundanceFiltersFactory(),

@@ -51,7 +51,7 @@ public class CompressedBiomassFadInitializerFactory
             makeFishAttractor(fishState, rng),
             getFishReleaseProbabilityInPercent().applyAsDouble(rng) / 100d,
             fishState::getStep,
-            new GlobalCarryingCapacityInitializer(0, getTotalCarryingCapacity())
+            new GlobalCarryingCapacityInitializer(getTotalCarryingCapacity())
         );
     }
 

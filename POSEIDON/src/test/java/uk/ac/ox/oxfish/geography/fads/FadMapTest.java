@@ -57,7 +57,7 @@ public class FadMapTest {
             new DummyFishBiomassAttractor(globalBiology.getSize()),
             0,
             () -> 0,
-            new GlobalCarryingCapacityInitializer(0, new FixedDoubleParameter(2.0))
+            new GlobalCarryingCapacityInitializer(new FixedDoubleParameter(2.0))
         );
         final FadMap fadMap = new FadMap(
             nauticalMap,

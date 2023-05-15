@@ -195,7 +195,7 @@ public class BiomassResetterTest {
             fishBiomassAttractor,
             0,
             () -> 0,
-            new GlobalCarryingCapacityInitializer(0, new FixedDoubleParameter(carryingCapacity))
+            new GlobalCarryingCapacityInitializer(new FixedDoubleParameter(carryingCapacity))
         );
 
         when(fishState.getBiology()).thenReturn(globalBiology);
@@ -233,7 +233,7 @@ public class BiomassResetterTest {
         fadMap.step(fishState);
 
         final ImmutableList<LocalBiology> fadBiologies =
-            fadMap.allFads().map(fad -> ((AggregatingFad) fad).getBiology()).collect(toImmutableList());
+            fadMap.allFads().map(fad -> fad.getBiology()).collect(toImmutableList());
         final ImmutableMap<Species, Double> initialFadBiomasses =
             totalBiomasses(globalBiology, fadBiologies);
 

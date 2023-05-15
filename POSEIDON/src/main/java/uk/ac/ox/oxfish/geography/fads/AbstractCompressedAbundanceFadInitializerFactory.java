@@ -18,7 +18,7 @@ public abstract class AbstractCompressedAbundanceFadInitializerFactory
 
     private AbundanceFiltersFactory abundanceFiltersFactory;
 
-    public AbstractCompressedAbundanceFadInitializerFactory(
+    AbstractCompressedAbundanceFadInitializerFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory,
         final Supplier<SpeciesCodes> speciesCodesSupplier,
         final String... speciesNames
@@ -51,7 +51,7 @@ public abstract class AbstractCompressedAbundanceFadInitializerFactory
             makeFishAttractor(fishState, rng),
             getFishReleaseProbabilityInPercent().applyAsDouble(rng) / 100d,
             fishState::getStep,
-            new GlobalCarryingCapacityInitializer(0, getTotalCarryingCapacity())
+            new GlobalCarryingCapacityInitializer(getTotalCarryingCapacity())
         );
     }
 

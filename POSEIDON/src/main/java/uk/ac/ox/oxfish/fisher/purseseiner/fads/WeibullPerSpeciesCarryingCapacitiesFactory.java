@@ -3,9 +3,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.*;
 
 import java.util.Map;
 
@@ -13,20 +11,26 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
 public class WeibullPerSpeciesCarryingCapacitiesFactory
-    extends AbstractCarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> {
+    implements uk.ac.ox.oxfish.geography.fads.CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> {
 
     private Map<String, DoubleParameter> shapeParameters;
     private Map<String, DoubleParameter> scaleParameters;
+    private Map<String, DoubleParameter> proportionOfZeros;
+    private DoubleParameter scalingFactor;
 
     public WeibullPerSpeciesCarryingCapacitiesFactory() {
     }
 
     public WeibullPerSpeciesCarryingCapacitiesFactory(
         final Map<String, DoubleParameter> shapeParameters,
-        final Map<String, DoubleParameter> scaleParameters
+        final Map<String, DoubleParameter> scaleParameters,
+        final Map<String, DoubleParameter> proportionOfZeros,
+        final DoubleParameter scalingFactor
     ) {
         this.shapeParameters = shapeParameters;
         this.scaleParameters = scaleParameters;
+        this.proportionOfZeros = proportionOfZeros;
+        this.scalingFactor = scalingFactor;
     }
 
     public Map<String, DoubleParameter> getShapeParameters() {
@@ -51,7 +55,6 @@ public class WeibullPerSpeciesCarryingCapacitiesFactory
     ) {
         final MersenneTwisterFast rng = fishState.getRandom();
         return new PerSpeciesCarryingCapacityInitializer(
-            getProbabilityOfFadBeingDud().applyAsDouble(rng),
             fishState
                 .getBiology()
                 .getSpecies()
@@ -69,12 +72,34 @@ public class WeibullPerSpeciesCarryingCapacitiesFactory
     ) {
         final String speciesName = species.getName();
         if (scaleParameters.containsKey(speciesName) && shapeParameters.containsKey(speciesName)) {
-            return new WeibullDoubleParameter(
-                shapeParameters.get(speciesName).applyAsDouble(rng),
-                scaleParameters.get(speciesName).applyAsDouble(rng)
+            return new ScaledDoubleParameter(
+                new ZeroInflatedDoubleParameter(
+                    new WeibullDoubleParameter(
+                        shapeParameters.get(speciesName).applyAsDouble(rng),
+                        scaleParameters.get(speciesName).applyAsDouble(rng)
+                    ),
+                    getProportionOfZeros().get(speciesName).applyAsDouble(rng)
+                ),
+                getScalingFactor().applyAsDouble(rng)
             );
         } else {
             return new FixedDoubleParameter(-1);
         }
+    }
+
+    public Map<String, DoubleParameter> getProportionOfZeros() {
+        return proportionOfZeros;
+    }
+
+    public DoubleParameter getScalingFactor() {
+        return scalingFactor;
+    }
+
+    public void setScalingFactor(final DoubleParameter scalingFactor) {
+        this.scalingFactor = scalingFactor;
+    }
+
+    public void setProportionOfZeros(final Map<String, DoubleParameter> proportionOfZeros) {
+        this.proportionOfZeros = proportionOfZeros;
     }
 }

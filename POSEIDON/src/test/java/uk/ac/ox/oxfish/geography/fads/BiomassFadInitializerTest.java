@@ -33,7 +33,7 @@ public class BiomassFadInitializerTest {
             new DummyFishBiomassAttractor(globalBiology.getSize()),
             0,
             () -> 0,
-            new GlobalCarryingCapacityInitializer(0, new FixedDoubleParameter(Double.POSITIVE_INFINITY))
+            new GlobalCarryingCapacityInitializer(new FixedDoubleParameter(Double.POSITIVE_INFINITY))
         );
         final FadMap fadMap =
             new FadMap(

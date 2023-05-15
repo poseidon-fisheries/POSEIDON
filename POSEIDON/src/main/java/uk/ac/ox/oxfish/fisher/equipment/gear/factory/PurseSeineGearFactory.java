@@ -42,9 +42,9 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
 
     private static final LocationFisherValuesByActionCache locationValuesCache =
         new LocationFisherValuesByActionCache();
-    private DoubleParameter maxAllowableShear =
-        // TODO: This could be obtained empirically
-        new CalibratedParameter(0.8, 1.0, 0, 2.6, 0.9);
+
+    // Obtained empirically, see: https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1545969444
+    private DoubleParameter maxAllowableShear = new FixedDoubleParameter(1.1149486);
     private Set<Observer<FadDeploymentAction>> fadDeploymentObservers = new LinkedHashSet<>();
     private final CacheByFishState<Set<Observer<FadDeploymentAction>>> fadDeploymentObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(fadDeploymentObservers));

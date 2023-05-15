@@ -4,25 +4,18 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 public class GlobalCarryingCapacityInitializer
-    extends AbstractCarryingCapacityInitializer<GlobalCarryingCapacity> {
+    implements CarryingCapacityInitializer<GlobalCarryingCapacity> {
 
     private final DoubleParameter carryingCapacity;
 
     public GlobalCarryingCapacityInitializer(
-        final double probabilityOfFadBeingDud,
         final DoubleParameter carryingCapacity
     ) {
-        super(probabilityOfFadBeingDud);
         this.carryingCapacity = carryingCapacity;
     }
 
     @Override
-    protected GlobalCarryingCapacity makeDud() {
-        return new GlobalCarryingCapacity(0);
-    }
-
-    @Override
-    protected GlobalCarryingCapacity makeCarryingCapacity(final MersenneTwisterFast rng) {
+    public GlobalCarryingCapacity apply(final MersenneTwisterFast rng) {
         return new GlobalCarryingCapacity(
             carryingCapacity.applyAsDouble(rng)
         );

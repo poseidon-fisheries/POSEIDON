@@ -7,14 +7,13 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
 public class MaximumPerSpeciesCarryingCapacitiesFactory
-    extends AbstractCarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> {
+    implements uk.ac.ox.oxfish.geography.fads.CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> {
 
     @Override
     public CarryingCapacityInitializer<PerSpeciesCarryingCapacity> apply(
         final FishState fishState
     ) {
         return new PerSpeciesCarryingCapacityInitializer(
-            getProbabilityOfFadBeingDud().applyAsDouble(fishState.getRandom()),
             fishState.getBiology().getSpecies().stream().collect(toImmutableMap(
                 identity(),
                 species -> new FixedDoubleParameter(Double.MAX_VALUE)

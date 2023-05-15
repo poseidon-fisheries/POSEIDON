@@ -7,36 +7,20 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
 
 public class PerSpeciesCarryingCapacityInitializer
-    extends AbstractCarryingCapacityInitializer<PerSpeciesCarryingCapacity> {
+    implements CarryingCapacityInitializer<PerSpeciesCarryingCapacity> {
 
     private final Map<? extends Species, ? extends DoubleParameter> carryingCapacities;
 
     public PerSpeciesCarryingCapacityInitializer(
-        final double probabilityOfFadBeingDud,
         final Map<? extends Species, ? extends DoubleParameter> carryingCapacities
     ) {
-        super(probabilityOfFadBeingDud);
         this.carryingCapacities = carryingCapacities;
     }
 
     @Override
-    protected PerSpeciesCarryingCapacity makeDud() {
-        return new PerSpeciesCarryingCapacity(
-            carryingCapacities
-                .keySet()
-                .stream()
-                .collect(toImmutableMap(
-                    identity(),
-                    species -> 0.0
-                ))
-        );
-    }
-
-    @Override
-    protected PerSpeciesCarryingCapacity makeCarryingCapacity(final MersenneTwisterFast rng) {
+    public PerSpeciesCarryingCapacity apply(final MersenneTwisterFast rng) {
         return new PerSpeciesCarryingCapacity(
             carryingCapacities
                 .entrySet()
