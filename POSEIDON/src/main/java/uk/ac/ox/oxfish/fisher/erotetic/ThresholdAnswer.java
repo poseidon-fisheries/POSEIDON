@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.erotetic;
 
-import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -28,31 +27,34 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 /**
  * Simple filter: only take elements that are above the threshold but only as long as you have minimumNumberOfObservations
  * observations
  * Created by carrknight on 4/10/16.
  */
-public class ThresholdAnswer<T> implements EroteticAnswer<T>
-{
+public class ThresholdAnswer<T> implements EroteticAnswer<T> {
 
     private final int minimumNumberOfObservations;
-
+    private final String featureName;
+    private final boolean goodAboveThreshold;
     private double minimumThreshold;
 
-    private final String featureName;
-
-    private final boolean goodAboveThreshold;
-
-    public ThresholdAnswer(int minimumNumberOfObservations,
-                           double minimumThreshold,
-                           String featureName) {
+    public ThresholdAnswer(
+        final int minimumNumberOfObservations,
+        final double minimumThreshold,
+        final String featureName
+    ) {
         this(minimumNumberOfObservations, minimumThreshold, featureName, true);
     }
 
     public ThresholdAnswer(
-            int minimumNumberOfObservations, double minimumThreshold, String featureName, boolean goodAboveThreshold) {
+        final int minimumNumberOfObservations,
+        final double minimumThreshold,
+        final String featureName,
+        final boolean goodAboveThreshold
+    ) {
         this.minimumNumberOfObservations = minimumNumberOfObservations;
         this.featureName = featureName;
         this.goodAboveThreshold = goodAboveThreshold;
@@ -61,6 +63,7 @@ public class ThresholdAnswer<T> implements EroteticAnswer<T>
 
     /**
      * Grabs the list of current options and returns the list of all options that are acceptable
+     *
      * @param currentOptions list of options, possibly already filtered by others. It is <b>unmodifiable</b>
      * @param representation the set of all feature extractors available
      * @param state          the model   @return a list of acceptable options or null if there is pure indifference among them
@@ -68,69 +71,70 @@ public class ThresholdAnswer<T> implements EroteticAnswer<T>
      */
     @Override
     public List<T> answer(
-            List<T> currentOptions, FeatureExtractors<T> representation, FishState state, Fisher fisher) {
+        final List<T> currentOptions,
+        final FeatureExtractors<T> representation,
+        final FishState state,
+        final Fisher fisher
+    ) {
 
-        Map<T, Double> features = representation.extractFeature(featureName,
-                                                                    currentOptions,
-                                                                    state, fisher);
-        return thresholdAnswer(currentOptions,
-                               features,
-                               t -> minimumThreshold,
-                               minimumNumberOfObservations,
-                               goodAboveThreshold);
+        final Map<T, Double> features = representation.extractFeature(featureName,
+            currentOptions,
+            state, fisher
+        );
+        return thresholdAnswer(
+            currentOptions,
+            features,
+            t -> minimumThreshold,
+            minimumNumberOfObservations,
+            goodAboveThreshold
+        );
     }
 
     /**
      * generic method to be shared between ThresholdAnswer and FeatureThresholdAnswer
-     @param currentOptions list of options, possibly already filtered by others. It is <b>unmodifiable</b>
-      * @param thresholdExtractor the function returning the threshold for any option we are testing
+     *
+     * @param currentOptions              list of options, possibly already filtered by others. It is <b>unmodifiable</b>
+     * @param thresholdExtractor          the function returning the threshold for any option we are testing
      * @param minimumNumberOfObservations the minimum number of observations we need before this answer applies
-     * @param <T> the type of candidate we are thresholding on
+     * @param <T>                         the type of candidate we are thresholding on
      * @return the list of all the acceptable candidates (or null if none apply)
      */
-    public static <T> List<T> thresholdAnswer (List<T> currentOptions,
-                                               Map<T, Double> features,
-                                               Function<T,Double> thresholdExtractor,
-                                               int minimumNumberOfObservations,
-                                               boolean goodAboveThreshold)
-    {
+    public static <T> List<T> thresholdAnswer(
+        final List<T> currentOptions,
+        final Map<T, Double> features,
+        final Function<T, Double> thresholdExtractor,
+        final int minimumNumberOfObservations,
+        final boolean goodAboveThreshold
+    ) {
 
         //no feature, indifference
-        if(features == null || features.isEmpty())
-        {
-            if(Log.TRACE)
-                Log.trace("Threshold filter found no features and is therefore indifferent");
+        if (features == null || features.isEmpty()) {
+            Logger.getGlobal().fine("Threshold filter found no features and is therefore indifferent");
             return null;
         }
 
 
         //not enough features, indifferent
-        List<T> actualOptions = new LinkedList<>(currentOptions);
+        final List<T> actualOptions = new LinkedList<>(currentOptions);
         actualOptions.retainAll(features.keySet());
-        if(actualOptions.size() < minimumNumberOfObservations)
-        {
-            if(Log.TRACE)
-                Log.trace("Threshold filter found " + actualOptions.size() +
-                                  " options with features: too few compared to the minimum of " + minimumNumberOfObservations);
+        if (actualOptions.size() < minimumNumberOfObservations) {
+            Logger.getGlobal().fine(() -> "Threshold filter found " + actualOptions.size() +
+                " options with features: too few compared to the minimum of " + minimumNumberOfObservations);
             return null;
-        }
-        else
-        {
+        } else {
             //you have enough! take only the ones that pass the threshold
-            LinkedList<T> passTheTest = new LinkedList<>();
-            for(Map.Entry<T,Double> feature : features.entrySet())
-            {
-                double minimumThreshold = thresholdExtractor.apply(feature.getKey());
-                if(Double.isFinite(minimumThreshold) &&
-                        actualOptions.contains(feature.getKey()))
-                    if( (goodAboveThreshold  && feature.getValue() >= minimumThreshold ) ||
-                            (!goodAboveThreshold  && feature.getValue() <= minimumThreshold )   )
-                    passTheTest.add(feature.getKey());
+            final LinkedList<T> passTheTest = new LinkedList<>();
+            for (final Map.Entry<T, Double> feature : features.entrySet()) {
+                final double minimumThreshold = thresholdExtractor.apply(feature.getKey());
+                if (Double.isFinite(minimumThreshold) &&
+                    actualOptions.contains(feature.getKey()))
+                    if ((goodAboveThreshold && feature.getValue() >= minimumThreshold) ||
+                        (!goodAboveThreshold && feature.getValue() <= minimumThreshold))
+                        passTheTest.add(feature.getKey());
             }
-            if(Log.TRACE)
-                Log.trace("Threshold filter  found " + passTheTest +
-                                  " as acceptable, a total of " + passTheTest.size() + " options out of " +
-                                  features.size() + " available");
+            Logger.getGlobal().fine(() -> "Threshold filter  found " + passTheTest +
+                " as acceptable, a total of " + passTheTest.size() + " options out of " +
+                features.size() + " available");
             return passTheTest;
         }
     }
@@ -140,7 +144,7 @@ public class ThresholdAnswer<T> implements EroteticAnswer<T>
      * ignored
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
     }
 
@@ -166,7 +170,7 @@ public class ThresholdAnswer<T> implements EroteticAnswer<T>
      *
      * @param minimumThreshold Value to set for property 'minimumThreshold'.
      */
-    public void setMinimumThreshold(double minimumThreshold) {
+    public void setMinimumThreshold(final double minimumThreshold) {
         this.minimumThreshold = minimumThreshold;
     }
 }

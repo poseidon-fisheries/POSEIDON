@@ -20,53 +20,50 @@
 
 package uk.ac.ox.oxfish.utility;
 
-import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 /**
  * Just a logger formatter that prints out as date the model date rather than the clock time
  * Created by carrknight on 6/30/15.
  */
-public class FishStateLogger extends Log.Logger{
-
-    private FileWriter writer;
-
-    private final Path path;
+public class FishStateLogger extends Logger {
 
     private final FishState model;
+    private final Path path;
+    private final Logger logger;
+    private FileWriter writer;
 
-    public FishStateLogger(FishState model, Path pathToFile) throws IOException {
+    public FishStateLogger(final FishState model, final Path pathToFile) throws IOException {
+        super("uk.ac.ox.oxfish.utility.FishStateLogger", null);
+        this.logger = Logger.getLogger(getName());
         this.model = model;
-        path = pathToFile;
+        this.path = pathToFile;
     }
 
     @Override
-    public void log(int level, String category, String message, Throwable ex) {
+    public void log(final LogRecord logRecord) {
 
-
-
-        StringBuilder builder = new StringBuilder(256);
+        final StringBuilder builder = new StringBuilder(256);
         builder.append(model.timeString());
         builder.append(',');
-        builder.append(level);
+        builder.append(logRecord.getLevel());
         builder.append(',');
-        builder.append(category);
-        builder.append(",");
-        builder.append(message);
-
+        builder.append(logRecord.getMessage());
 
         System.out.println(builder);
         try {
-            if(writer==null)
+            if (writer == null)
                 writer = new FileWriter(path.toFile());
             writer.write(builder.toString());
             writer.write('\n');
             writer.flush();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }

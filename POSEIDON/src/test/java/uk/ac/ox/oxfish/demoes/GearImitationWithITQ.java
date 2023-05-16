@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.demoes;
 
 
-import com.esotericsoftware.minlog.Log;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -40,12 +39,12 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.assertTrue;
 
 
-public class GearImitationWithITQ
-{
+public class GearImitationWithITQ {
 
     @Test
     public void ITQDrivePeopleToSwitchToBetterGear() throws Exception {
@@ -53,50 +52,36 @@ public class GearImitationWithITQ
 //this fails about once every 30 tests. So I am going to make it best of two
 
 
-
         try {
-            MultiITQFactory multiFactory = new MultiITQFactory();
+            final MultiITQFactory multiFactory = new MultiITQFactory();
             //quota ratios: 90-10
             multiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4500));
             multiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(500));
-            long seed = System.currentTimeMillis();
-            Log.info("seed is : " + seed);
+            final long seed = System.currentTimeMillis();
+            Logger.getGlobal().info("seed is : " + seed);
             gearImitationTestRun(multiFactory, true, seed);
-        }catch (AssertionError error)
-        {
-            MultiITQFactory multiFactory = new MultiITQFactory();
+        } catch (final AssertionError error) {
+            final MultiITQFactory multiFactory = new MultiITQFactory();
             //quota ratios: 90-10
             multiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4500));
             multiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(500));
-            long seed = System.currentTimeMillis();
-            Log.info("seed is : " + seed);
+            final long seed = System.currentTimeMillis();
+            Logger.getGlobal().info("seed is : " + seed);
             gearImitationTestRun(multiFactory, true, seed);
         }
 
 
     }
 
-    @Test
-    public void UnprotectedVersusProtectedGearSwitch() throws Exception {
-
-
-        MultiITQStringFactory multiFactory = new MultiITQStringFactory();
-        //only blue are protected by quota
-        multiFactory.setYearlyQuotaMaps("1:500");
-
-        gearImitationTestRun(multiFactory, false, System.currentTimeMillis());
-
-
-    }
-
     public FishState gearImitationTestRun(
-            AlgorithmFactory<? extends  MultiQuotaRegulation> multiFactory, boolean checkRed,
-            final long seed) throws IOException {
-        FishYAML yaml = new FishYAML();
-        String scenarioYaml = String.join("\n", Files.readAllLines(
-                Paths.get("inputs","first_paper","gear_itq.yaml")));
-        PrototypeScenario scenario =  yaml.loadAs(scenarioYaml,PrototypeScenario.class);
-        FishState state = new FishState();
+        final AlgorithmFactory<? extends MultiQuotaRegulation> multiFactory, final boolean checkRed,
+        final long seed
+    ) throws IOException {
+        final FishYAML yaml = new FishYAML();
+        final String scenarioYaml = String.join("\n", Files.readAllLines(
+            Paths.get("inputs", "first_paper", "gear_itq.yaml")));
+        final PrototypeScenario scenario = yaml.loadAs(scenarioYaml, PrototypeScenario.class);
+        final FishState state = new FishState();
         state.setScenario(scenario);
 
         scenario.setRegulation(multiFactory);
@@ -104,32 +89,32 @@ public class GearImitationWithITQ
         //set up the gear adaptation:
         state.registerStartable(new Startable() {
             @Override
-            public void start(FishState model) {
+            public void start(final FishState model) {
 
                 //start collecting red catchability and blue catchability
                 model.getYearlyDataSet().registerGatherer("Red Catchability", state1 -> {
-                    double size = state1.getFishers().size();
+                    final double size = state1.getFishers().size();
                     if (size == 0)
                         return Double.NaN;
                     else {
                         double total = 0;
-                        for (Fisher fisher1 : state1.getFishers())
+                        for (final Fisher fisher1 : state1.getFishers())
                             total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[0]
-                                    ;
+                                ;
                         return total / size;
                     }
                 }, Double.NaN);
 
 
                 model.getYearlyDataSet().registerGatherer("Blue Catchability", state1 -> {
-                    double size = state1.getFishers().size();
+                    final double size = state1.getFishers().size();
                     if (size == 0)
                         return Double.NaN;
                     else {
                         double total = 0;
-                        for (Fisher fisher1 : state1.getFishers())
+                        for (final Fisher fisher1 : state1.getFishers())
                             total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[1]
-                                    ;
+                                ;
                         return total / size;
                     }
                 }, Double.NaN);
@@ -151,22 +136,22 @@ public class GearImitationWithITQ
             state.schedule.step(state);
         Double blue = state.getYearlyDataSet().getLatestObservation("Blue Catchability");
         Double red = state.getYearlyDataSet().getLatestObservation("Red Catchability");
-        if(state.getDayOfTheYear()==1)
-            Log.info("Red catchability: " + red + " --- Blue Catchability: " + blue);
+        if (state.getDayOfTheYear() == 1)
+            Logger.getGlobal().info("Red catchability: " + red + " --- Blue Catchability: " + blue);
         state.schedule.step(state);
-        double earlyRedLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(0) + " " +
-                                                                                        AbstractMarket.LANDINGS_COLUMN_NAME);
-        double earlyBlueLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(1) + " " +
-                                                                                         AbstractMarket.LANDINGS_COLUMN_NAME);
+        final double earlyRedLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(0) + " " +
+            AbstractMarket.LANDINGS_COLUMN_NAME);
+        final double earlyBlueLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(1) + " " +
+            AbstractMarket.LANDINGS_COLUMN_NAME);
 
         System.out.println("Early Landings: " + earlyRedLandings + " --- " + earlyBlueLandings);
         //blue start as a choke species
-        double totalBlueQuotas = 500 * 100;
+        final double totalBlueQuotas = 500 * 100;
         //   Assert.assertTrue(earlyBlueLandings > .8 * totalBlueQuotas);
         //red is underutilized
-        if(checkRed) {
-            double totalRedQuotas = 4500 * 100;
-            System.out.println("red landings are " + earlyRedLandings/totalRedQuotas + " of the total quota" );
+        if (checkRed) {
+            final double totalRedQuotas = 4500 * 100;
+            System.out.println("red landings are " + earlyRedLandings / totalRedQuotas + " of the total quota");
             //         Assert.assertTrue(earlyRedLandings < .5 * totalRedQuotas);
         }
 
@@ -177,17 +162,17 @@ public class GearImitationWithITQ
             state.schedule.step(state);
             blue = state.getYearlyDataSet().getLatestObservation("Blue Catchability");
             red = state.getYearlyDataSet().getLatestObservation("Red Catchability");
-            if(state.getDayOfTheYear()==1) {
-                Log.info("Red catchability: " + red + " --- Blue Catchability: " + blue);
+            if (state.getDayOfTheYear() == 1) {
+                Logger.getGlobal().info("Red catchability: " + red + " --- Blue Catchability: " + blue);
 
                 lateRedLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(0) + " " +
-                                                                                        AbstractMarket.LANDINGS_COLUMN_NAME);
+                    AbstractMarket.LANDINGS_COLUMN_NAME);
                 lateBlueLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(1) + " " +
-                                                                                         AbstractMarket.LANDINGS_COLUMN_NAME);
+                    AbstractMarket.LANDINGS_COLUMN_NAME);
                 System.out.println("Late Landings: " +
-                                           (lateRedLandings/( (4500 * 100))) +
-                                           " --- " +
-                                           (lateBlueLandings/( (500 * 100))));
+                    (lateRedLandings / ((4500 * 100))) +
+                    " --- " +
+                    (lateBlueLandings / ((500 * 100))));
             }
         }
 
@@ -203,30 +188,42 @@ public class GearImitationWithITQ
 
         //by year 20 the quotas are very well used!
         lateRedLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(0) + " " +
-                                                                                       AbstractMarket.LANDINGS_COLUMN_NAME);
+            AbstractMarket.LANDINGS_COLUMN_NAME);
         lateBlueLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(1) + " " +
-                                                                                        AbstractMarket.LANDINGS_COLUMN_NAME);
+            AbstractMarket.LANDINGS_COLUMN_NAME);
         System.out.println("Late Landings: " +
-                                   lateRedLandings +
-                                   " --- " +
-                                   lateBlueLandings);
+            lateRedLandings +
+            " --- " +
+            lateBlueLandings);
         System.out.println(
-                "Late Quota Efficiency: " +
-                        (!checkRed ? Double.NaN : lateRedLandings / (4500 * 100)) +
-                        " --- " +
-                        lateBlueLandings / totalBlueQuotas);
+            "Late Quota Efficiency: " +
+                (!checkRed ? Double.NaN : lateRedLandings / (4500 * 100)) +
+                " --- " +
+                lateBlueLandings / totalBlueQuotas);
 
         //much better efficiency by the end of the simulation
         Assert.assertTrue(lateBlueLandings > .75 * totalBlueQuotas);
-        if(checkRed)
-        {
-            double totalRedQuotas = 4500 * 100;
+        if (checkRed) {
+            final double totalRedQuotas = 4500 * 100;
 
             Assert.assertTrue(
-                    lateRedLandings > .7 * totalRedQuotas); //this is actually almost always above 90% after 20 years
+                lateRedLandings > .7 * totalRedQuotas); //this is actually almost always above 90% after 20 years
         }
 
         return state;
+
+    }
+
+    @Test
+    public void UnprotectedVersusProtectedGearSwitch() throws Exception {
+
+
+        final MultiITQStringFactory multiFactory = new MultiITQStringFactory();
+        //only blue are protected by quota
+        multiFactory.setYearlyQuotaMaps("1:500");
+
+        gearImitationTestRun(multiFactory, false, System.currentTimeMillis());
+
 
     }
 

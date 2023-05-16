@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -43,6 +42,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 /**
  * Creates individual quotas and a quota market like ITQMonoFactory but this works for multiple species
@@ -154,8 +154,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
         final Function<Integer, Integer> unitsTradedPerMatch
     ) {
 
-        if (Log.TRACE)
-            Log.trace("Building ITQ Markets for the following quotas: " + Arrays.toString(quotas));
+        Logger.getGlobal().fine(() -> "Building ITQ Markets for the following quotas: " + Arrays.toString(quotas));
 
 
         //for each species

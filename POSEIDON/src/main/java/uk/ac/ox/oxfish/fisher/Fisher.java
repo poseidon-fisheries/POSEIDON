@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
@@ -68,6 +67,7 @@ import uk.ac.ox.oxfish.utility.adaptation.AdaptationDailyScheduler;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 import static java.util.stream.Collectors.joining;
 
@@ -78,7 +78,7 @@ import static java.util.stream.Collectors.joining;
  * Strategies are instead the fisher way to deal with decision points (should I go fish or not? Where do I go?)
  * Created by carrknight on 4/2/15.
  */
-public class Fisher implements Steppable, Startable{
+public class Fisher implements Steppable, Startable {
 
 
     /***
@@ -89,41 +89,32 @@ public class Fisher implements Steppable, Startable{
      *
      */
 
+    //ten thousands liter of fuel means that you don't really need to worry about checking for fuel emergency
+    private static final int LARGE_AMOUNT_OF_GAS = 10000;
     /**
      * the id of the fisher. Hopefully unique
      */
     private final int fisherID;
-
-
     /**
      * "tags" that can be added or removed at will. They have no explicit meaning or effect.
      */
     private final List<String> tags = new LinkedList<>();
-
     /**
      * contains most transitory variables related to the fisher
      */
     private final FisherStatus status;
-
     /**
      * a container of all the long term information that the fisher stores
      */
     private final FisherMemory memory;
-
     /**
-     * a link to the model. Grabbed when start() is called. It's not used or shared except when a new strategy is plugged in
-     * at which point this reference is used to call the strategy's start method
+     * contains all the equipment variables (gear, boat,hold)
      */
-    private FishState state;
-
-
+    private final FisherEquipment equipment;
     /**
-     * when true the agent can ignore the rules (depending on what the strategies tell him to do)
+     * collection of adaptation algorithms to fire every 2 months
      */
-    private boolean cheater = false;
-
-    //ten thousands liter of fuel means that you don't really need to worry about checking for fuel emergency
-    private static final int LARGE_AMOUNT_OF_GAS = 10000;
+    private final AdaptationDailyScheduler bimonthlyAdaptation = new AdaptationDailyScheduler(60);
 
 
     /***
@@ -133,11 +124,10 @@ public class Fisher implements Steppable, Startable{
      *     |___\__, |\_,_|_| .__/_|_|_\___|_||_\__|
      *            |_|      |_|
      */
-
     /**
-     * contains all the equipment variables (gear, boat,hold)
+     * collection of adaptation algorithms to fire every 365  days
      */
-    private final FisherEquipment equipment;
+    private final AdaptationDailyScheduler yearlyAdaptation = new AdaptationDailyScheduler(365);
 
     /***
      *      ___ _            _            _
@@ -146,172 +136,135 @@ public class Fisher implements Steppable, Startable{
      *     |___/\__|_| \__,_|\__\___\__, |_\___/__/
      *                              |___/
      */
-
-    /**
-     * the strategy deciding whether to leave port or not
-     */
-    private DepartingStrategy departingStrategy;
-
-
-    /**
-     * The strategy deciding where to go
-     */
-    private DestinationStrategy destinationStrategy;
-
-    /**
-     * the decision process of the fisher to choose whether to fish when arrived and for how long to do it
-     */
-    private FishingStrategy fishingStrategy;
-
-
-    /**
-     * the check the agent makes to decide whether it's time to go back home given the weather
-     */
-    private WeatherEmergencyStrategy weatherStrategy;
-
-
-    /**
-     * the strategy to choose what gear to use when going out.
-     */
-    private GearStrategy gearStrategy;
-
-
-
-    private DiscardingStrategy discardingStrategy;
-
-    /**
-     * the turnOff switch to call when the fisher is turned off
-     */
-    private Stoppable receipt;
-
-
-    /**
-     * collection of adaptation algorithms to fire every 2 months
-     */
-    private final AdaptationDailyScheduler bimonthlyAdaptation = new AdaptationDailyScheduler(60);
-
-    /**
-     * collection of adaptation algorithms to fire every 365  days
-     */
-    private final AdaptationDailyScheduler yearlyAdaptation = new AdaptationDailyScheduler(365);
-
     /**
      * collection of adaptation algorithms to fire every trip
      */
     private final AdaptationPerTripScheduler tripAdaptation = new AdaptationPerTripScheduler();
+    /**
+     * a link to the model. Grabbed when start() is called. It's not used or shared except when a new strategy is plugged in
+     * at which point this reference is used to call the strategy's start method
+     */
+    private FishState state;
+    /**
+     * when true the agent can ignore the rules (depending on what the strategies tell him to do)
+     */
+    private boolean cheater = false;
+    /**
+     * the strategy deciding whether to leave port or not
+     */
+    private DepartingStrategy departingStrategy;
+    /**
+     * The strategy deciding where to go
+     */
+    private DestinationStrategy destinationStrategy;
+    /**
+     * the decision process of the fisher to choose whether to fish when arrived and for how long to do it
+     */
+    private FishingStrategy fishingStrategy;
+    /**
+     * the check the agent makes to decide whether it's time to go back home given the weather
+     */
+    private WeatherEmergencyStrategy weatherStrategy;
+    /**
+     * the strategy to choose what gear to use when going out.
+     */
+    private GearStrategy gearStrategy;
+    private DiscardingStrategy discardingStrategy;
+    /**
+     * the turnOff switch to call when the fisher is turned off
+     */
+    private Stoppable receipt;
+    private final LinkedList<DockingListener> dockingListeners = new LinkedList<>();
 
+
+    public Fisher(
+        final int id, final Port port,
+        final MersenneTwisterFast random,
+        final Regulation regulation,
+        final ReputationalRestrictions reputationalRestrictions,
+        final RegionalRestrictions communityRestrictions,
+        //strategies:
+        final DepartingStrategy departingStrategy,
+        final DestinationStrategy destinationStrategy,
+        final FishingStrategy fishingStrategy,
+        final GearStrategy gearStrategy,
+        final DiscardingStrategy discardingStrategy,
+        final WeatherEmergencyStrategy weatherStrategy,
+        //equipment:
+        final Boat boat, final Hold hold, final Gear gear,
+        final int numberOfSpecies
+    ) {
+        // TODO Auto-generated constructor stub
+        this(id, port, random, regulation, departingStrategy, destinationStrategy,
+            fishingStrategy, gearStrategy, discardingStrategy, weatherStrategy, boat, hold, gear, numberOfSpecies
+        );
+        this.status.setCommunalStandards(communityRestrictions);
+        this.status.setReputationalRisk(reputationalRestrictions);
+    }
 
 
     /**
      * Creates a fisher by giving it all its sub-components
-     * @param id the id-number of the fisher
-     * @param homePort the home port
-     * @param random a randomizer
-     * @param regulation the rules the fisher follows
-     * @param departingStrategy how the fisher decides how to leave the port
+     *
+     * @param id                  the id-number of the fisher
+     * @param homePort            the home port
+     * @param random              a randomizer
+     * @param regulation          the rules the fisher follows
+     * @param departingStrategy   how the fisher decides how to leave the port
      * @param destinationStrategy how the fisher decides where to go
-     * @param fishingStrategy how the fisher decides how much to fish
+     * @param fishingStrategy     how the fisher decides how much to fish
      * @param gearStrategy
      * @param discardingStrategy
      * @param weatherStrategy
-     * @param boat the boat the fisher uses
-     * @param hold the space available to load fish
-     * @param gear what is used for fishing
+     * @param boat                the boat the fisher uses
+     * @param hold                the space available to load fish
+     * @param gear                what is used for fishing
      * @param numberOfSpecies
      */
     public Fisher(
-            int id,
-            Port homePort, MersenneTwisterFast random,
-            Regulation regulation,
-            //strategies:
-            DepartingStrategy departingStrategy,
-            DestinationStrategy destinationStrategy,
-            FishingStrategy fishingStrategy,
-            GearStrategy gearStrategy,
-            DiscardingStrategy discardingStrategy,
-            WeatherEmergencyStrategy weatherStrategy,
-            //equipment:
-            Boat boat, Hold hold, Gear gear,
-            int numberOfSpecies) {
+        final int id,
+        final Port homePort, final MersenneTwisterFast random,
+        final Regulation regulation,
+        //strategies:
+        final DepartingStrategy departingStrategy,
+        final DestinationStrategy destinationStrategy,
+        final FishingStrategy fishingStrategy,
+        final GearStrategy gearStrategy,
+        final DiscardingStrategy discardingStrategy,
+        final WeatherEmergencyStrategy weatherStrategy,
+        //equipment:
+        final Boat boat, final Hold hold, final Gear gear,
+        final int numberOfSpecies
+    ) {
         this.fisherID = id;
 
         //set up variables
-        this.status = new FisherStatus(random, regulation,homePort);
-        this.equipment = new FisherEquipment(boat,hold,gear);
+        this.status = new FisherStatus(random, regulation, homePort);
+        this.equipment = new FisherEquipment(boat, hold, gear);
         this.memory = new FisherMemory();
 
         homePort.dock(this);//we dock
         //strategies
         this.departingStrategy = departingStrategy;
-        this.destinationStrategy =destinationStrategy;
+        this.destinationStrategy = destinationStrategy;
         this.fishingStrategy = fishingStrategy;
-        this.gearStrategy=gearStrategy;
+        this.gearStrategy = gearStrategy;
         this.weatherStrategy = weatherStrategy;
         this.discardingStrategy = discardingStrategy;
 
         //predictors
-        Predictor[] dailyCatchesPredictor = new Predictor[numberOfSpecies];
+        final Predictor[] dailyCatchesPredictor = new Predictor[numberOfSpecies];
         status.setDailyCatchesPredictor(dailyCatchesPredictor);
-        Predictor[] profitPerUnitPredictor = new Predictor[numberOfSpecies];
+        final Predictor[] profitPerUnitPredictor = new Predictor[numberOfSpecies];
         status.setProfitPerUnitPredictor(profitPerUnitPredictor);
-        for(int i=0; i<dailyCatchesPredictor.length; i++)
-        {
+        for (int i = 0; i < dailyCatchesPredictor.length; i++) {
             dailyCatchesPredictor[i] = new FixedPredictor(Double.NaN);
             profitPerUnitPredictor[i] = new FixedPredictor(Double.NaN);
         }
 
     }
 
-
-    public Fisher(int id, Port port,
-                  MersenneTwisterFast random,
-                  Regulation regulation,
-                  ReputationalRestrictions reputationalRestrictions,
-                  RegionalRestrictions communityRestrictions,
-                  //strategies:
-                  DepartingStrategy departingStrategy,
-                  DestinationStrategy destinationStrategy,
-                  FishingStrategy fishingStrategy,
-                  GearStrategy gearStrategy,
-                  DiscardingStrategy discardingStrategy,
-                  WeatherEmergencyStrategy weatherStrategy,
-                  //equipment:
-                  Boat boat, Hold hold, Gear gear,
-                  int numberOfSpecies) {
-        // TODO Auto-generated constructor stub
-        this(id,port,random,regulation,departingStrategy,destinationStrategy,
-                fishingStrategy,gearStrategy,discardingStrategy,weatherStrategy,boat, hold, gear, numberOfSpecies);
-        this.status.setCommunalStandards(communityRestrictions);
-        this.status.setReputationalRisk(reputationalRestrictions);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public SeaTile getLocation()
-    {
-        return status.getLocation();
-    }
-
-
-    public void start(FishState state)
-    {
+    public void start(final FishState state) {
 
         this.state = state;
         this.status.setNetwork(state.getSocialNetwork());
@@ -322,34 +275,47 @@ public class Fisher implements Steppable, Startable{
         memory.start(state, this);
 
         //start the regulations
-        getRegulation().start(state,this);
+        getRegulation().start(state, this);
 
         //start the strategies
-        destinationStrategy.start(state,this);
-        fishingStrategy.start(state,this);
-        departingStrategy.start(state,this);
-        gearStrategy.start(state,this);
-        weatherStrategy.start(state,this);
-        discardingStrategy.start(state,this);
+        destinationStrategy.start(state, this);
+        fishingStrategy.start(state, this);
+        departingStrategy.start(state, this);
+        gearStrategy.start(state, this);
+        weatherStrategy.start(state, this);
+        discardingStrategy.start(state, this);
 
         //start the adaptations
-        bimonthlyAdaptation.start(state,this);
+        bimonthlyAdaptation.start(state, this);
         yearlyAdaptation.start(state, this);
         tripAdaptation.start(state, this);
 
         //start the predictors
-        for(int i=0; i<status.getDailyCatchesPredictor().length; i++)
-        {
+        for (int i = 0; i < status.getDailyCatchesPredictor().length; i++) {
             status.getDailyCatchesPredictor()[i].start(state, this);
-            status.getProfitPerUnitPredictor()[i].start(state,this);
+            status.getProfitPerUnitPredictor()[i].start(state, this);
 
         }
-        status.getDailyProfitsPredictor().start(state,this);
+        status.getDailyProfitsPredictor().start(state, this);
 
 
     }
 
+    public Regulation getRegulation() {
+        return status.getRegulation();
+    }
 
+    public void setRegulation(final Regulation regulation) {
+
+
+        if (state != null) {
+            getRegulation().turnOff(this);
+            regulation.start(state, this);
+        }
+
+
+        this.status.setRegulation(regulation);
+    }
 
     /**
      * tell the startable to turnoff,
@@ -377,105 +343,153 @@ public class Fisher implements Steppable, Startable{
         yearlyAdaptation.turnOff(this);
         tripAdaptation.turnOff(this);
 
-        getSocialNetwork().removeFisher(this,state);
+        getSocialNetwork().removeFisher(this, state);
+    }
+
+    public SocialNetwork getSocialNetwork() {
+        return state.getSocialNetwork();
     }
 
     @Override
-    public void step(SimState simState) {
-        FishState model = (FishState) simState;
+    public void step(final SimState simState) {
+        final FishState model = (FishState) simState;
 
-        if(Log.TRACE) {
-            Log.trace("Fisher " + fisherID + " is going to start his step");
-        }
+        Logger.getGlobal().fine("Fisher " + fisherID + " is going to start his step");
 
         //tell equipment!
         equipment.getBoat().newStep();
 
         //run the state machine
         double hoursLeft = model.getHoursPerStep();
-        while(true)
-        {
+        while (true) {
             //pre-action accounting
             updateFuelEmergencyFlag(model.getMap());
-            double hoursLeftBeforeAction = hoursLeft;
+            final double hoursLeftBeforeAction = hoursLeft;
 
             //take an action
-            ActionResult result = status.getAction().act(model, this, status.getRegulation(), hoursLeft);
+            final ActionResult result = status.getAction().act(model, this, status.getRegulation(), hoursLeft);
             hoursLeft = result.getHoursLeft();
             //if you have been moving or you were staying still somewhere away from port
-            if(status.getAction() instanceof Moving || !isAtPort())
-                increaseHoursAtSea(hoursLeftBeforeAction-hoursLeft);
+            if (status.getAction() instanceof Moving || !isAtPort())
+                increaseHoursAtSea(hoursLeftBeforeAction - hoursLeft);
             else
-                increaseHoursAtPort(hoursLeftBeforeAction-hoursLeft);
+                increaseHoursAtPort(hoursLeftBeforeAction - hoursLeft);
 
             //set up next action
             status.setAction(result.getNextState());
 
 
-
             //if you are out of time, continue tomorrow
-            if(hoursLeft <= 0)
-            {
-                assert  Math.abs(hoursLeft)<.001 : hoursLeft; //shouldn't be negative!
+            if (hoursLeft <= 0) {
+                assert Math.abs(hoursLeft) < .001 : hoursLeft; //shouldn't be negative!
                 break;
             }
         }
 
 
-
     }
 
     /**
-     * weird name to avoid beans
+     * called to check if there is so little fuel we must go back home
      */
-    public MersenneTwisterFast grabRandomizer() {
-        return status.getRandom();
+    private void updateFuelEmergencyFlag(final NauticalMap map) {
+
+        status.setWeatherEmergencyOverride(weatherStrategy.updateWeatherEmergencyFlag(
+            status.isWeatherEmergencyOverride(),
+            this,
+            getLocation()
+        ));
+
+
+        if (getFuelLeft() >= LARGE_AMOUNT_OF_GAS) //if you have boats this large, I am just going to assume you don't care about fuel
+            return;
+
+        if (!status.isFuelEmergencyOverride())
+            status.setFuelEmergencyOverride(!equipment.getBoat().isFuelEnoughForTrip(
+                map.distance(status.getLocation(), getHomePort().getLocation()), 1.2));
+
+
     }
 
-
-    public SeaTile getDestination() {
-        return status.getDestination();
+    public boolean isAtPort() {
+        return this.status.isAtPort();
     }
 
+    private void increaseHoursAtSea(final double hoursIncrease) {
+        Preconditions.checkArgument(hoursIncrease >= 0, hoursIncrease);
+        Preconditions.checkArgument(status.getHoursAtPort() == 0);
+        status.setHoursAtSea(status.getHoursAtSea() + hoursIncrease);
+    }
+
+    private void increaseHoursAtPort(final double hoursIncrease) {
+        if (hoursIncrease > 0) { //0 could be an "arriving at port" before docking. Ignore that one
+            Preconditions.checkArgument(hoursIncrease >= 0);
+            Preconditions.checkArgument(status.getHoursAtSea() == 0);
+            status.setHoursAtPort(status.getHoursAtPort() + hoursIncrease);
+        }
+    }
+
+    public SeaTile getLocation() {
+        return status.getLocation();
+    }
+
+    public double getFuelLeft() {
+        return equipment.getBoat().getLitersOfFuelInTank();
+    }
 
     public Port getHomePort() {
         return status.getHomePort();
+    }
+
+    /**
+     * Setter for property 'homePort'.
+     *
+     * @param homePort Value to set for property 'homePort'.
+     */
+    public void setHomePort(final Port homePort) {
+        status.setHomePort(homePort);
+    }
+
+    public SeaTile getDestination() {
+        return status.getDestination();
     }
 
     public Boat getBoat() {
         return equipment.getBoat();
     }
 
-    public void setHold(Hold hold) {
-        equipment.setHold(hold);
+    public void setBoat(final Boat boat) {
+        equipment.setBoat(boat);
     }
 
     /**
      * how much time it takes to travel this many kilometers
+     *
      * @param kilometersToTravel how many kilometers to move through
      * @return how many hours it takes to move "kilometersToTravel" (in hours)
      */
-    public double hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(double kilometersToTravel) {
+    public double hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(final double kilometersToTravel) {
         return equipment.getBoat().hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(kilometersToTravel);
     }
 
     /**
      * like hypotheticalTravelTimeToMoveThisMuchAtFullSpeed but adds to it the hours this boat has already travelled
+     *
      * @param segmentLengthInKilometers the length of the new step
      * @return current travel time + travel time of the new segment (in hours)
      */
-    public double totalTravelTimeAfterAddingThisSegment(double segmentLengthInKilometers) {
+    public double totalTravelTimeAfterAddingThisSegment(final double segmentLengthInKilometers) {
         return equipment.getBoat().totalTravelTimeAfterAddingThisSegment(segmentLengthInKilometers);
     }
 
     /**
      * set new location, consume time and tell the map about our new location
-     * @param newPosition the new position
-     * @param map the map on which we are moving
+     *
+     * @param newPosition       the new position
+     * @param map               the map on which we are moving
      * @param distanceTravelled
      */
-    public void move(SeaTile newPosition, NauticalMap map, FishState state, double distanceTravelled)
-    {
+    public void move(final SeaTile newPosition, final NauticalMap map, final FishState state, final double distanceTravelled) {
         Preconditions.checkArgument(newPosition != status.getLocation()); //i am not already here!
         Preconditions.checkArgument(distanceTravelled > 0); //i am not already here!
         equipment.getBoat().recordTravel(distanceTravelled); //tell the boat
@@ -484,20 +498,26 @@ public class Fisher implements Steppable, Startable{
         getCurrentTrip().addToDistanceTravelled(distanceTravelled);
         //arrive at new position
         status.setLocation(newPosition);
-        map.recordFisherLocation(this,newPosition.getGridX(),newPosition.getGridY());
+        map.recordFisherLocation(this, newPosition.getGridX(), newPosition.getGridY());
 
         //this condition doesn't hold anymore because time travelled is "conserved" between steps
         //   Preconditions.checkState(boat.getHoursTravelledToday() <= state.getHoursPerStep(), boat.getHoursTravelledToday() +  " and ");
         Preconditions.checkState(newPosition == status.getLocation());
     }
 
-
-    public void consumeFuel(double litersConsumed)
-    {
+    public void consumeFuel(final double litersConsumed) {
         equipment.getBoat().consumeFuel(litersConsumed);
         getCurrentTrip().recordGasConsumption(litersConsumed);
-        assert  equipment.getBoat().getFuelCapacityInLiters()>=0 || isFuelEmergencyOverride() :
-                "a boat has lspiRun into negative fuel territory";
+        assert equipment.getBoat().getFuelCapacityInLiters() >= 0 || isFuelEmergencyOverride() :
+            "a boat has lspiRun into negative fuel territory";
+    }
+
+    public TripRecord getCurrentTrip() {
+        return memory.getTripLogger().getCurrentTrip();
+    }
+
+    public boolean isFuelEmergencyOverride() {
+        return status.isFuelEmergencyOverride();
     }
 
     /**
@@ -511,29 +531,26 @@ public class Fisher implements Steppable, Startable{
         status.setHoursAtPort(0);
     }
 
-    public boolean isAtPort() {
-        return this.status.isAtPort();
+    public double getHoursAtPort() {
+        return status.getHoursAtPort();
     }
 
-
-    public boolean isAtPortAndDocked(){
+    public boolean isAtPortAndDocked() {
         return isAtPort() && getHomePort().isDocked(this);
     }
 
-    private LinkedList<DockingListener> dockingListeners = new LinkedList<>();
-    public void addDockingListener(DockingListener listener){
+    public void addDockingListener(final DockingListener listener) {
         dockingListeners.add(listener);
     }
-    public void removeDockingListener(DockingListener listener)
-    {
+
+    public void removeDockingListener(final DockingListener listener) {
         dockingListeners.remove(listener);
     }
-
 
     /**
      * anchors at home-port and sets the trip to "over"
      */
-    public void dock(){
+    public void dock() {
         assert isAtPort();
         assert status.getHoursAtPort() == 0;
         status.getHomePort().dock(this);
@@ -545,153 +562,148 @@ public class Fisher implements Steppable, Startable{
         memory.getYearlyCounter().count(FisherYearlyTimeSeries.FUEL_CONSUMPTION, litersBought);
 
         //now pay for it
-        double gasExpenditure = litersBought * status.getHomePort().getGasPricePerLiter();
+        final double gasExpenditure = litersBought * status.getHomePort().getGasPricePerLiter();
         spendForTrip(gasExpenditure);
         memory.getYearlyCounter().count(FisherYearlyTimeSeries.FUEL_EXPENDITURE, gasExpenditure);
-        if(status.getHoursAtSea()>0) //if you have been somewhere at all
+        if (status.getHoursAtSea() > 0) //if you have been somewhere at all
         {
             memory.getYearlyCounter().count(FisherYearlyTimeSeries.TRIPS, 1);
             //log all areas as just visited!
-            for(SeaTile tile : getCurrentTrip().getTilesFished())
-                memory.registerVisit(tile, (int) state.getDay());
+            for (final SeaTile tile : getCurrentTrip().getTilesFished())
+                memory.registerVisit(tile, state.getDay());
         }
 
         //notify listeners
-        for(DockingListener listener : dockingListeners)
-        {
-            listener.dockingEvent(this,getHomePort());
+        for (final DockingListener listener : dockingListeners) {
+            listener.dockingEvent(this, getHomePort());
         }
 
         //spend money on all new costs
-        for(Cost realCosts : status.getAdditionalTripCosts()) {
-            double cost = realCosts.cost(this, state, getCurrentTrip(), getCurrentTrip().getEarnings(),status.getHoursAtSea() );
+        for (final Cost realCosts : status.getAdditionalTripCosts()) {
+            final double cost = realCosts.cost(
+                this,
+                state,
+                getCurrentTrip(),
+                getCurrentTrip().getEarnings(),
+                status.getHoursAtSea()
+            );
             spendForTrip(cost);
         }
         //account for opportunity costs
-        for(Cost opportunityCost : status.getOpportunityCosts()) {
-            double cost = opportunityCost.cost(this, state, getCurrentTrip(), getCurrentTrip().getEarnings(),status.getHoursAtSea() );
+        for (final Cost opportunityCost : status.getOpportunityCosts()) {
+            final double cost = opportunityCost.cost(
+                this,
+                state,
+                getCurrentTrip(),
+                getCurrentTrip().getEarnings(),
+                status.getHoursAtSea()
+            );
             recordOpportunityCosts(cost);
         }
 
 
         //finish trip!
-        if(status.getHoursAtSea()>0) {
-            TripRecord finished = memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort(), this);
+        if (status.getHoursAtSea() > 0) {
+            final TripRecord finished = memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort(), this);
             //account for the costs
-            memory.getYearlyCounter().count(FisherYearlyTimeSeries.VARIABLE_COSTS,finished.getTotalCosts());
-            memory.getYearlyCounter().count(FisherYearlyTimeSeries.EARNINGS,finished.getEarnings());
+            memory.getYearlyCounter().count(FisherYearlyTimeSeries.VARIABLE_COSTS, finished.getTotalCosts());
+            memory.getYearlyCounter().count(FisherYearlyTimeSeries.EARNINGS, finished.getEarnings());
 
-        }
-        else{
+        } else {
             memory.getTripLogger().resetTrip();
         }
 
         status.setHoursAtSea(0);
-        assert  isAtPort();
+        assert isAtPort();
 
     }
 
     /**
-     * The fisher asks himself if he wants to leave the warm comfort of his bed.
-     * @return true if the fisherman wants to leave port.
-     * @param model the model
+     * consumes money and record the expenditure in the trip record. Useful for things like gas expenditure and other immediate
+     * needs of the current trip in progress
+     *
+     * @param moneySpent
      */
-    public boolean shouldFisherLeavePort(FishState model) {
+    public void spendForTrip(final double moneySpent) {
+        spendExogenously(moneySpent);
+        memory.getTripLogger().recordCosts(moneySpent);
+        getDailyCounter().count(FisherYearlyTimeSeries.CASH_FLOW_COLUMN, -moneySpent);
+
+    }
+
+    /**
+     * tell the logger you incurred some travel costs without actually touching the bank balance. This is useful for accounting
+     * for things like opportunity costs
+     *
+     * @param implicitCost implicit expenditure
+     */
+    private void recordOpportunityCosts(final double implicitCost) {
+        memory.getTripLogger().recordOpportunityCosts(implicitCost);
+    }
+
+    /**
+     * consumes the money but doesn't record the cost in the trip record. This is useful for expenditures like
+     * bank interest payments, quota buying and selling and other things that are not due to the immediate needs of the trip
+     * being taken
+     *
+     * @param moneySpent
+     */
+    public void spendExogenously(final double moneySpent) {
+        status.setBankBalance(status.getBankBalance() - moneySpent);
+        getDailyCounter().count(FisherYearlyTimeSeries.CASH_FLOW_COLUMN, -moneySpent);
+
+    }
+
+    public FisherDailyCounter getDailyCounter() {
+        return memory.getDailyCounter();
+    }
+
+    /**
+     * The fisher asks himself if he wants to leave the warm comfort of his bed.
+     *
+     * @param model the model
+     * @return true if the fisherman wants to leave port.
+     */
+    public boolean shouldFisherLeavePort(final FishState model) {
         assert isAtPort();
         assert !isFuelEmergencyOverride();
-        return !status.isAnyEmergencyFlagOn() && departingStrategy.shouldFisherLeavePort(this, model,model.getRandom());
+        return !status.isAnyEmergencyFlagOn() && departingStrategy.shouldFisherLeavePort(
+            this,
+            model,
+            model.getRandom()
+        );
     }
 
     /**
      * tell the fisher to check his destination and update it if necessary. If the regulation forbid us to be at sea
      * the destination is always port
-     * @param model the model link
+     *
+     * @param model         the model link
      * @param currentAction what action is the fisher currently taking that prompted to check for destination   @return the destination
-     * */
-    public void updateDestination(FishState model, Action currentAction) {
+     */
+    public void updateDestination(final FishState model, final Action currentAction) {
 
 
         //if you are not allowed at sea or you are running out of gas, go home
-        if(
-                (!status.getRegulation().allowedAtSea(this, model) && !cheater )
-                        || status.isAnyEmergencyFlagOn())
+        if (
+            (!status.getRegulation().allowedAtSea(this, model) && !cheater)
+                || status.isAnyEmergencyFlagOn())
             status.setDestination(status.getHomePort().getLocation());
         else
             status.setDestination(
-                    destinationStrategy.chooseDestination(this, status.getRandom(), model, currentAction));
+                destinationStrategy.chooseDestination(this, status.getRandom(), model, currentAction));
         Preconditions.checkNotNull(status.getDestination(), "Destination can never be null!");
     }
 
-    /**
-     * called to check if there is so little fuel we must go back home
-     */
-    private void updateFuelEmergencyFlag(NauticalMap map)
-    {
-
-        status.setWeatherEmergencyOverride(weatherStrategy.updateWeatherEmergencyFlag(status.isWeatherEmergencyOverride(),
-                this,
-                getLocation()));
-
-
-        if(getFuelLeft()>= LARGE_AMOUNT_OF_GAS) //if you have boats this large, I am just going to assume you don't care about fuel
-            return;
-
-        if(!status.isFuelEmergencyOverride())
-            status.setFuelEmergencyOverride(!equipment.getBoat().isFuelEnoughForTrip(
-                    map.distance(status.getLocation(), getHomePort().getLocation()), 1.2));
-
-
-    }
-
-    public boolean isAllowedAtSea()
-    {
-        if(state == null) //you aren't allowed if you haven't started
+    public boolean isAllowedAtSea() {
+        if (state == null) //you aren't allowed if you haven't started
             return false;
         else
-            return getRegulation().allowedAtSea(this,state);
-    }
-
-    public void setBoat(Boat boat) {
-        equipment.setBoat(boat);
+            return getRegulation().allowedAtSea(this, state);
     }
 
     public double getHoursTravelledToday() {
         return equipment.getBoat().getHoursTravelledToday();
-    }
-
-    public void setDestinationStrategy(DestinationStrategy newStrategy) {
-
-        DestinationStrategy old = this.destinationStrategy;
-        this.destinationStrategy = newStrategy;
-
-        if(state != null) //if we have started already
-        {
-            old.turnOff(this); //turn off old strategy
-            destinationStrategy.start(state,this);
-        }
-    }
-
-    public void setDepartingStrategy(DepartingStrategy newStrategy) {
-        DepartingStrategy old = this.departingStrategy;
-        this.departingStrategy = newStrategy;
-        if(state != null) //if we have started already
-        {
-            old.turnOff(this); //turn off old strategy
-            departingStrategy.start(state,this);
-        }
-    }
-
-
-    public void setDiscardingStrategy(DiscardingStrategy newStrategy) {
-
-        DiscardingStrategy old = this.discardingStrategy;
-        this.discardingStrategy = newStrategy;
-
-        if(state != null) //if we have started already
-        {
-            old.turnOff(this); //turn off old strategy
-            discardingStrategy.start(state,this);
-        }
     }
 
     /**
@@ -703,58 +715,76 @@ public class Fisher implements Steppable, Startable{
         return discardingStrategy;
     }
 
+    public void setDiscardingStrategy(final DiscardingStrategy newStrategy) {
+
+        final DiscardingStrategy old = this.discardingStrategy;
+        this.discardingStrategy = newStrategy;
+
+        if (state != null) //if we have started already
+        {
+            old.turnOff(this); //turn off old strategy
+            discardingStrategy.start(state, this);
+        }
+    }
+
     public DepartingStrategy getDepartingStrategy() {
         return departingStrategy;
+    }
+
+    public void setDepartingStrategy(final DepartingStrategy newStrategy) {
+        final DepartingStrategy old = this.departingStrategy;
+        this.departingStrategy = newStrategy;
+        if (state != null) //if we have started already
+        {
+            old.turnOff(this); //turn off old strategy
+            departingStrategy.start(state, this);
+        }
     }
 
     public DestinationStrategy getDestinationStrategy() {
         return destinationStrategy;
     }
 
+    public void setDestinationStrategy(final DestinationStrategy newStrategy) {
+
+        final DestinationStrategy old = this.destinationStrategy;
+        this.destinationStrategy = newStrategy;
+
+        if (state != null) //if we have started already
+        {
+            old.turnOff(this); //turn off old strategy
+            destinationStrategy.start(state, this);
+        }
+    }
+
     public FishingStrategy getFishingStrategy() {
         return fishingStrategy;
     }
 
-    public void setFishingStrategy(FishingStrategy newStrategy) {
+    public void setFishingStrategy(final FishingStrategy newStrategy) {
 
-        FishingStrategy old = this.fishingStrategy;
+        final FishingStrategy old = this.fishingStrategy;
         this.fishingStrategy = newStrategy;
-        if(state != null) //if we have started already
+        if (state != null) //if we have started already
         {
             old.turnOff(this); //turn off old strategy
-            fishingStrategy.start(state,this);
+            fishingStrategy.start(state, this);
         }
-    }
-
-    public boolean shouldIFish(FishState state)
-    {
-        return !status.isAnyEmergencyFlagOn() && fishingStrategy.shouldFish(this,
-                state.getRandom(),
-                state,
-                getCurrentTrip());
-
-    }
-
-    /**
-     * store the catch
-     * @param caught the catch
-     */
-    public void load(Catch caught) {
-        equipment.getHold().load(caught);
     }
 
     /**
      * how many pounds of a specific species are we carrying
+     *
      * @param species the species
      * @return lbs of species carried
      */
-    public double getTotalWeightOfCatchInHold(Species species) {
+    public double getTotalWeightOfCatchInHold(final Species species) {
         return equipment.getHold().getWeightOfCatchInHold(species);
     }
 
-
     /**
      * how much can this fish hold
+     *
      * @return the maximum load
      */
     public double getMaximumHold() {
@@ -763,39 +793,25 @@ public class Fisher implements Steppable, Startable{
 
     /**
      * unload all the cargo
+     *
      * @return the cargo as a catch object
      */
     public Catch unload() {
         return equipment.getHold().unload();
     }
 
-
-
-    private boolean doubleCheckCounters(Species species){
-
-        double landings = getDailyCounter().getCatchesPerSpecie(species.getIndex());
-        double sum = 0;
-        for(int i=0; i<species.getNumberOfBins(); i++)
-            sum += getDailyCounter().getSpecificLandings(species,i);
-//        System.out.println(landings);
-//        System.out.println(sum);
-        return Math.abs(sum-landings)<.01;
-
-    }
-
-
     /**
      * tell the fisher to use its gear to fish at current location. It stores everything in the hold
-     * @param modelBiology the global biology object
+     *
+     * @param modelBiology      the global biology object
      * @param hoursSpentFishing hours spent on this activity
-     * @param state the model
+     * @param state             the model
      * @return the fish caught and stored (barring overcapacity)
      */
-    public void fishHere(GlobalBiology modelBiology, int hoursSpentFishing, FishState state)
-    {
+    public void fishHere(final GlobalBiology modelBiology, final int hoursSpentFishing, final FishState state) {
 
         //compute the catches (but kill nothing yet)
-        fishHere(modelBiology,hoursSpentFishing,state,status.getLocation());
+        fishHere(modelBiology, hoursSpentFishing, state, status.getLocation());
 
 
     }
@@ -803,24 +819,31 @@ public class Fisher implements Steppable, Startable{
     /**
      * tell the fisher to use its gear to fish at local biology provided by the caller. This is useful if you
      * are not specifically referring to catching stuff straight out of the SeaTile
-     * @param modelBiology the global biology object
+     *
+     * @param modelBiology      the global biology object
      * @param hoursSpentFishing hours spent on this activity
-     * @param state the model
-     * @param localBiology this is what will need to "react" to the amount caught
+     * @param state             the model
+     * @param localBiology      this is what will need to "react" to the amount caught
      * @return the fish caught and stored (barring overcapacity)
      */
-    public Pair<Catch, Catch> fishHere(GlobalBiology modelBiology, int hoursSpentFishing, FishState state, LocalBiology localBiology)
-    {
+    public Pair<Catch, Catch> fishHere(
+        final GlobalBiology modelBiology,
+        final int hoursSpentFishing,
+        final FishState state,
+        final LocalBiology localBiology
+    ) {
         //preamble
-        SeaTile here = status.getLocation();
+        final SeaTile here = status.getLocation();
         assert here.isWater() : "can't fish on land!";
         //Preconditions.checkState(here.isWater(), );
         //compute the catches (but kill nothing yet)
-        Pair<Catch, Catch> catchesAndKept = computeCatchesHere(status.getLocation(),
-                localBiology,
-                hoursSpentFishing,
-                modelBiology,
-                state);
+        final Pair<Catch, Catch> catchesAndKept = computeCatchesHere(
+            status.getLocation(),
+            localBiology,
+            hoursSpentFishing,
+            modelBiology,
+            state
+        );
         //make local react to catches (involves killing, usually)
         removeFishAfterFishing(modelBiology, catchesAndKept.getFirst(), catchesAndKept.getSecond(), localBiology);
         //pull the fish up, store it, and burn fuel
@@ -828,39 +851,40 @@ public class Fisher implements Steppable, Startable{
         return catchesAndKept;
     }
 
-
-
-    private Pair<Catch,Catch> computeCatchesHere(SeaTile context,
-                                                 LocalBiology biology,
-                                                 int hoursSpentFishing, GlobalBiology modelBiology, FishState state)
-    {
+    private Pair<Catch, Catch> computeCatchesHere(
+        final SeaTile context,
+        final LocalBiology biology,
+        final int hoursSpentFishing, final GlobalBiology modelBiology, final FishState state
+    ) {
         //transfer fish from local to here
-        Catch catchOfTheDay = equipment.getGear().fish(this,
-                biology,
-                context ,
-                hoursSpentFishing,
-                modelBiology);
-        Catch kept = discardingStrategy.chooseWhatToKeep(
-                context,
-                this,
-                catchOfTheDay,
-                hoursSpentFishing,
-                getRegulation(),
-                state,
-                grabRandomizer()
+        final Catch catchOfTheDay = equipment.getGear().fish(this,
+            biology,
+            context,
+            hoursSpentFishing,
+            modelBiology
         );
-        return new Pair<>(catchOfTheDay,kept);
+        final Catch kept = discardingStrategy.chooseWhatToKeep(
+            context,
+            this,
+            catchOfTheDay,
+            hoursSpentFishing,
+            getRegulation(),
+            state,
+            grabRandomizer()
+        );
+        return new Pair<>(catchOfTheDay, kept);
     }
 
     private void removeFishAfterFishing(
-            GlobalBiology modelBiology, Catch catchOfTheDay, Catch notDiscarded, LocalBiology biology) {
-        if(catchOfTheDay.totalCatchWeight()> FishStateUtilities.EPSILON) {
+        final GlobalBiology modelBiology, final Catch catchOfTheDay, final Catch notDiscarded, final LocalBiology biology
+    ) {
+        if (catchOfTheDay.totalCatchWeight() > FishStateUtilities.EPSILON) {
             biology.reactToThisAmountOfBiomassBeingFished(catchOfTheDay, notDiscarded, modelBiology);
             //now count catches (which isn't necessarilly landings)
-            for(Species species : modelBiology.getSpecies()) {
+            for (final Species species : modelBiology.getSpecies()) {
                 getDailyCounter().countCatches(species, catchOfTheDay.getWeightCaught(species));
 
-                if(catchOfTheDay.hasAbundanceInformation() && species.getNumberOfBins() > 0) {
+                if (catchOfTheDay.hasAbundanceInformation() && species.getNumberOfBins() > 0) {
                     getDailyCounter().countLandinngPerBin(species, catchOfTheDay);
                     assert doubleCheckCounters(species);
 
@@ -870,212 +894,186 @@ public class Fisher implements Steppable, Startable{
         }
     }
 
-    private void recordAndHaulCatch(int hoursSpentFishing, SeaTile here, Catch catchOfTheDay, Catch notDiscarded, FishState model) {
+    private void recordAndHaulCatch(
+        final int hoursSpentFishing,
+        final SeaTile here,
+        final Catch catchOfTheDay,
+        final Catch notDiscarded,
+        final FishState model
+    ) {
         //learn, record and collect
         //record it
-        FishingRecord record = new FishingRecord(hoursSpentFishing,
-                here, catchOfTheDay);
+        final FishingRecord record = new FishingRecord(hoursSpentFishing,
+            here, catchOfTheDay
+        );
         memory.getTripLogger().recordFishing(record);
 
         //now let regulations and the hold deal with it
-        status.getRegulation().reactToFishing(here, this, catchOfTheDay, notDiscarded , hoursSpentFishing, model);
+        status.getRegulation().reactToFishing(here, this, catchOfTheDay, notDiscarded, hoursSpentFishing, model);
         load(notDiscarded);
 
         //consume gas
-        final double litersBurned = equipment.getGear().getFuelConsumptionPerHourOfFishing(this,
-                equipment.getBoat(),
-                here) * hoursSpentFishing;
-        if(litersBurned>0)
+        final double litersBurned = equipment.getGear().getFuelConsumptionPerHourOfFishing(
+            this,
+            equipment.getBoat(),
+            here
+        ) * hoursSpentFishing;
+        if (litersBurned > 0)
             consumeFuel(litersBurned);
 
         memory.getYearlyCounter().count(FisherYearlyTimeSeries.EFFORT, hoursSpentFishing);
         memory.getDailyCounter().count(FisherYearlyTimeSeries.EFFORT, hoursSpentFishing);
     }
 
+    /**
+     * weird name to avoid beans
+     */
+    public MersenneTwisterFast grabRandomizer() {
+        return status.getRandom();
+    }
+
+    private boolean doubleCheckCounters(final Species species) {
+
+        final double landings = getDailyCounter().getCatchesPerSpecie(species.getIndex());
+        double sum = 0;
+        for (int i = 0; i < species.getNumberOfBins(); i++)
+            sum += getDailyCounter().getSpecificLandings(species, i);
+//        System.out.println(landings);
+//        System.out.println(sum);
+        return Math.abs(sum - landings) < .01;
+
+    }
+
+    /**
+     * store the catch
+     *
+     * @param caught the catch
+     */
+    public void load(final Catch caught) {
+        equipment.getHold().load(caught);
+    }
+
     public Gear getGear() {
         return equipment.getGear();
     }
 
-    public void setGear(Gear gear) {
+    public void setGear(final Gear gear) {
         equipment.setGear(gear);
     }
 
     /**
-     *
      * @return true if destination == location
      */
-    public boolean isAtDestination()
-    {
+    public boolean isAtDestination() {
         return status.getDestination().equals(status.getLocation());
     }
-
-    public Regulation getRegulation() {
-        return status.getRegulation();
-    }
-
-    public void setRegulation(Regulation regulation) {
-
-
-        if(state != null)
-        {
-            getRegulation().turnOff(this);
-            regulation.start(state,this);
-        }
-
-
-        this.status.setRegulation(regulation);
-    }
-
 
     public TimeSeries<Fisher> getYearlyData() {
         return memory.getYearlyTimeSeries();
 
     }
 
-    public FisherDailyTimeSeries getDailyData() {
-        return memory.getDailyTimeSeries();
-    }
-
     /**
      * shortcut for getYearlyData().getLatestObservation(columnName)
      */
-    public double getLatestYearlyObservation(String columnName) {
+    public double getLatestYearlyObservation(final String columnName) {
         return memory.getYearlyTimeSeries().getLatestObservation(columnName);
     }
 
-    public double getBankBalance(){
+    public double getBankBalance() {
         return status.getBankBalance();
     }
 
-    public void earn(double moneyEarned)
-    {
+    public void earn(final double moneyEarned) {
         status.setBankBalance(status.getBankBalance() + moneyEarned);
         getDailyCounter().count(FisherYearlyTimeSeries.CASH_FLOW_COLUMN, moneyEarned);
 
     }
 
     /**
-     * consumes money and record the expenditure in the trip record. Useful for things like gas expenditure and other immediate
-     * needs of the current trip in progress
-     * @param moneySpent
-     */
-    public void spendForTrip(double moneySpent)
-    {
-        spendExogenously(moneySpent);
-        memory.getTripLogger().recordCosts(moneySpent);
-        getDailyCounter().count(FisherYearlyTimeSeries.CASH_FLOW_COLUMN, -moneySpent);
-
-    }
-
-
-    /**
-     * tell the logger you incurred some travel costs without actually touching the bank balance. This is useful for accounting
-     * for things like opportunity costs
-     * @param implicitCost implicit expenditure
-     */
-    private void recordOpportunityCosts(double implicitCost)
-    {
-        memory.getTripLogger().recordOpportunityCosts(implicitCost);
-    }
-
-
-    /**
-     * consumes the money but doesn't record the cost in the trip record. This is useful for expenditures like
-     * bank interest payments, quota buying and selling and other things that are not due to the immediate needs of the trip
-     * being taken
-     * @param moneySpent
-     */
-    public void spendExogenously(double moneySpent){
-        status.setBankBalance(status.getBankBalance() - moneySpent);
-        getDailyCounter().count(FisherYearlyTimeSeries.CASH_FLOW_COLUMN, -moneySpent);
-
-    }
-
-
-    /**
      * grabs the data and learns about profits and such
+     *
      * @param info information about a trade
      */
-    public void processTradeData(TradeInfo info){
+    public void processTradeData(final TradeInfo info) {
 
-        Species species = info.getSpecies();
+        final Species species = info.getSpecies();
 
         memory.getDailyCounter().countLanding(species, info.getBiomassTraded());
         memory.getDailyCounter().countEarnings(species, info.getMoneyExchanged());
         memory.getTripLogger().recordEarnings(species.getIndex(), info.getBiomassTraded(),
-                info.getMoneyExchanged());
+            info.getMoneyExchanged()
+        );
 
     }
 
-    public double balanceXDaysAgo(int daysAgo)
-    {
+    public double balanceXDaysAgo(final int daysAgo) {
         //    Preconditions.checkArgument(dailyTimeSeries.numberOfObservations() >daysAgo);
         return getDailyData().getColumn(FisherYearlyTimeSeries.CASH_COLUMN).getDatumXStepsAgo(daysAgo);
     }
 
+    public FisherDailyTimeSeries getDailyData() {
+        return memory.getDailyTimeSeries();
+    }
 
-    public void addYearlyAdaptation(Adaptation a)
-    {
+    public void addYearlyAdaptation(final Adaptation a) {
         yearlyAdaptation.registerAdaptation(a);
     }
 
-    public void addBiMonthlyAdaptation(Adaptation a)
-    {
+    public void addBiMonthlyAdaptation(final Adaptation a) {
         bimonthlyAdaptation.registerAdaptation(a);
     }
 
-    public void addPerTripAdaptation(Adaptation a)
-    {
+    public void addPerTripAdaptation(final Adaptation a) {
         tripAdaptation.registerAdaptation(a);
     }
 
-
-    public void removeYearlyAdaptation(Adaptation a)
-    {
+    public void removeYearlyAdaptation(final Adaptation a) {
         yearlyAdaptation.removeAdaptation(a);
     }
 
-    public void removeBiMonthlyAdaptation(Adaptation a)
-    {
+    public void removeBiMonthlyAdaptation(final Adaptation a) {
         bimonthlyAdaptation.removeAdaptation(a);
     }
 
-    public void removePerTripAdaptation(Adaptation a)
-    {
+    public void removePerTripAdaptation(final Adaptation a) {
         tripAdaptation.removeAdaptation(a);
     }
 
-
-    public TripRecord getCurrentTrip() {
-        return memory.getTripLogger().getCurrentTrip();
-    }
-
-    public void addTripListener(TripListener listener) {
+    public void addTripListener(final TripListener listener) {
         memory.getTripLogger().addTripListener(listener);
     }
 
-    public void removeTripListener(TripListener listener) {
+    public void removeTripListener(final TripListener listener) {
         memory.getTripLogger().removeTripListener(listener);
     }
-
 
     public List<TripRecord> getFinishedTrips() {
         return memory.getTripLogger().getFinishedTrips();
     }
 
-    public List<SharedTripRecord> getSharedTrips(){
+    public List<SharedTripRecord> getSharedTrips() {
         return memory.getSharedTrips();
     }
 
-    public List<SharedTripRecord> getTripsSharedWith(Fisher friend){
-        Collection<Fisher> friends = this.getDirectedFriends();
-        if(friends.contains(friend))
+    public List<SharedTripRecord> getTripsSharedWith(final Fisher friend) {
+        final Collection<Fisher> friends = this.getDirectedFriends();
+        if (friends.contains(friend))
             return memory.getTripsSharedWith(friend);
         else
             return new ArrayList<SharedTripRecord>();
     }
 
-    public void shareTrip(TripRecord trip, boolean allFriends, Collection<Fisher> sharedFriends ){
+    /**
+     * return all neighbors of this agent where there a directed edge from this fisher to his neighbors
+     *
+     * @return a collection of agents
+     */
+    public Collection<Fisher> getDirectedFriends() {
+        return status.getNetwork().getDirectedNeighbors(this);
+    }
+
+    public void shareTrip(final TripRecord trip, final boolean allFriends, final Collection<Fisher> sharedFriends) {
         memory.shareTrip(trip, allFriends, sharedFriends);
     }
 
@@ -1089,27 +1087,22 @@ public class Fisher implements Steppable, Startable{
     }
 
     /**
-     * return all neighbors of this agent in the social network ignoring the direction of the edges
+     * Getter for property 'tags'.
+     *
+     * @return Value for property 'tags'.
      */
-    public Collection<Fisher> getAllFriends()
-    {
-        return status.getNetwork().getAllNeighbors(this);
+    public List<String> getTags() {
+        return tags;
     }
 
     /**
-     * return all neighbors of this agent where there a directed edge from this fisher to his neighbors
-     * @return a collection of agents
+     * return all neighbors of this agent in the social network ignoring the direction of the edges
      */
-    public Collection<Fisher> getDirectedFriends()
-    {
-        return status.getNetwork().getDirectedNeighbors(this);
+    public Collection<Fisher> getAllFriends() {
+        return status.getNetwork().getAllNeighbors(this);
     }
 
-    public TripRecord getLastFinishedTrip() {
-        return memory.getTripLogger().getLastFinishedTrip();
-    }
-
-    public double getYearlyCounterColumn(String columnName) {
+    public double getYearlyCounterColumn(final String columnName) {
         return memory.getYearlyCounter().getColumn(columnName);
     }
 
@@ -1117,107 +1110,55 @@ public class Fisher implements Steppable, Startable{
         return memory.getYearlyCounter();
     }
 
-    public boolean isFuelEmergencyOverride() {
-        return status.isFuelEmergencyOverride();
-    }
-
-    public double getFuelLeft() {
-        return equipment.getBoat().getLitersOfFuelInTank();
-    }
-
     public int getID() {
         return fisherID;
     }
 
-
-
-
-    public double getHoursAtSea() {
-        return status.getHoursAtSea();
-    }
-
-    private void increaseHoursAtSea(double hoursIncrease)
-    {
-        Preconditions.checkArgument(hoursIncrease >= 0, hoursIncrease);
-        Preconditions.checkArgument(status.getHoursAtPort() == 0);
-        status.setHoursAtSea(status.getHoursAtSea() + hoursIncrease);
-    }
-
-
-    private void increaseHoursAtPort(double hoursIncrease)
-    {
-        if(hoursIncrease > 0) { //0 could be an "arriving at port" before docking. Ignore that one
-            Preconditions.checkArgument(hoursIncrease >= 0);
-            Preconditions.checkArgument(status.getHoursAtSea() == 0);
-            status.setHoursAtPort(status.getHoursAtPort() + hoursIncrease);
-        }
-    }
-
-    public boolean isGoingToPort()
-    {
+    public boolean isGoingToPort() {
         return status.isGoingToPort();
     }
-
 
     /**
      * basically changes the size of the maximum load but takes care of transferring whatever we were holding to the
      * new hold
+     *
      * @param newHold
      */
-    public void changeHold(Hold newHold)
-    {
+    public void changeHold(final Hold newHold) {
 
         //unload old hold
-        Catch oldHaul = equipment.getHold().unload();
+        final Catch oldHaul = equipment.getHold().unload();
 
         equipment.setHold(newHold);
         //load the new hold
         equipment.getHold().load(oldHaul);
     }
 
-
-    public double getHoursAtPort() {
-        return status.getHoursAtPort();
-    }
-
-    public FisherDailyCounter getDailyCounter() {
-        return memory.getDailyCounter();
-    }
-
-
-    public double predictUnitProfit(int specieIndex)
-    {
+    public double predictUnitProfit(final int specieIndex) {
         return status.getProfitPerUnitPredictor()[specieIndex].predict();
     }
 
-
-    public double predictDailyCatches(int specieIndex)
-    {
+    public double predictDailyCatches(final int specieIndex) {
         return status.getDailyCatchesPredictor()[specieIndex].predict();
     }
 
-    public double probabilityDailyCatchesBelowLevel(int specieIndex, double level)
-    {
+    public double probabilityDailyCatchesBelowLevel(final int specieIndex, final double level) {
         return status.getDailyCatchesPredictor()[specieIndex].probabilityBelowThis(level);
     }
 
-    public double probabilitySumDailyCatchesBelow(int specieIndex, double level, int daysToSum)
-    {
-        return status.getDailyCatchesPredictor()[specieIndex].probabilitySumBelowThis(level,daysToSum);
+    public double probabilitySumDailyCatchesBelow(final int specieIndex, final double level, final int daysToSum) {
+        return status.getDailyCatchesPredictor()[specieIndex].probabilitySumBelowThis(level, daysToSum);
     }
 
-
-    public double predictDailyProfits()
-    {
+    public double predictDailyProfits() {
         return status.getDailyProfitsPredictor().predict();
     }
 
-    public void assignDailyProfitsPredictor(Predictor dailyProfitsPredictor) {
+    public void assignDailyProfitsPredictor(final Predictor dailyProfitsPredictor) {
 
-        if(state != null)
-        {
+        if (state != null) {
             this.status.getDailyProfitsPredictor().turnOff(this);
-            dailyProfitsPredictor.start(state,this);
+            dailyProfitsPredictor.start(state, this);
         }
 
         status.setDailyProfitsPredictor(dailyProfitsPredictor);
@@ -1225,10 +1166,8 @@ public class Fisher implements Steppable, Startable{
 
     }
 
-    public void setDailyCatchesPredictor(int specieIndex, Predictor newPredictor)
-    {
-        if(state!=null)
-        {
+    public void setDailyCatchesPredictor(final int specieIndex, final Predictor newPredictor) {
+        if (state != null) {
             newPredictor.start(state, this);
             status.getDailyCatchesPredictor()[specieIndex].turnOff(this);
         }
@@ -1236,16 +1175,13 @@ public class Fisher implements Steppable, Startable{
 
     }
 
-    public void resetDailyCatchesPredictors()
-    {
-        for(Predictor predictor : status.getDailyCatchesPredictor())
+    public void resetDailyCatchesPredictors() {
+        for (final Predictor predictor : status.getDailyCatchesPredictor())
             predictor.reset();
     }
 
-    public void setProfitPerUnitPredictor(int specieIndex, Predictor newPredictor)
-    {
-        if(state!=null)
-        {
+    public void setProfitPerUnitPredictor(final int specieIndex, final Predictor newPredictor) {
+        if (state != null) {
             newPredictor.start(state, this);
             status.getProfitPerUnitPredictor()[specieIndex].turnOff(this);
         }
@@ -1253,16 +1189,17 @@ public class Fisher implements Steppable, Startable{
 
     }
 
+    public WeatherEmergencyStrategy getWeatherStrategy() {
+        return weatherStrategy;
+    }
+
+    public void setWeatherStrategy(final WeatherEmergencyStrategy weatherStrategy) {
 
 
-    public void setWeatherStrategy(WeatherEmergencyStrategy weatherStrategy) {
-
-
-        WeatherEmergencyStrategy old = this.weatherStrategy;
+        final WeatherEmergencyStrategy old = this.weatherStrategy;
 
         this.weatherStrategy = weatherStrategy;
-        if(state!=null)
-        {
+        if (state != null) {
             old.turnOff(this);
 
             weatherStrategy.start(state, this);
@@ -1270,35 +1207,31 @@ public class Fisher implements Steppable, Startable{
 
     }
 
-    public WeatherEmergencyStrategy getWeatherStrategy() {
-        return weatherStrategy;
-    }
-
-
-    public Fisher replaceFriend(Fisher friendToReplace,
-                                boolean ignoreDirection) {
-        return status.getNetwork().replaceFriend(this,
-                friendToReplace,
-                ignoreDirection,
-                state.getRandom(),
-                state.getFishers());
+    public Fisher replaceFriend(
+        final Fisher friendToReplace,
+        final boolean ignoreDirection
+    ) {
+        return status.getNetwork().replaceFriend(
+            this,
+            friendToReplace,
+            ignoreDirection,
+            state.getRandom(),
+            state.getFishers()
+        );
     }
 
     /**
      * force the destination to be port, this is used only if your current destination is unreachable (because it's land or landlocked)
      */
-    public void setDestinationForPort()
-    {
+    public void setDestinationForPort() {
         status.setDestination(getHomePort().getLocation());
     }
 
-
     /**
-     *
      * @param location
      * @return
      */
-    public TripRecord rememberLastTripHere(SeaTile location) {
+    public TripRecord rememberLastTripHere(final SeaTile location) {
         return memory.rememberLastTripHere(location);
     }
 
@@ -1308,23 +1241,25 @@ public class Fisher implements Steppable, Startable{
 
     /**
      * Ask the fisher what is the best tile with respect to trips made
+     *
      * @param comparator how should the fisher compare each tile remembered
      */
     public SeaTile getBestSpotForTripsRemembered(
-            Comparator<LocationMemory<TripRecord>> comparator) {
+        final Comparator<LocationMemory<TripRecord>> comparator
+    ) {
         return memory.getBestSpotForTripsRemembered(comparator);
     }
 
     public void addFeatureExtractor(
-            String nameOfFeature,
-            FeatureExtractor<SeaTile> extractor) {
+        final String nameOfFeature,
+        final FeatureExtractor<SeaTile> extractor
+    ) {
         memory.addFeatureExtractor(nameOfFeature, extractor);
     }
 
-    public FeatureExtractor<SeaTile> removeFeatureExtractor(String nameOfFeature) {
+    public FeatureExtractor<SeaTile> removeFeatureExtractor(final String nameOfFeature) {
         return memory.removeFeatureExtractor(nameOfFeature);
     }
-
 
     /**
      * Getter for property 'tileRepresentation'.
@@ -1335,26 +1270,26 @@ public class Fisher implements Steppable, Startable{
         return memory.getTileRepresentation();
     }
 
-
     /**
      * can the agent fish at this location?
-     * @param tile the tile the fisher is trying to fish on
+     *
+     * @param tile  the tile the fisher is trying to fish on
      * @param model a link to the model
      * @return true if the fisher can fish
      */
-    public boolean isAllowedToFishHere(SeaTile tile, FishState model) {
+    public boolean isAllowedToFishHere(final SeaTile tile, final FishState model) {
         return status.isAllowedToFishHere(this, tile, model);
     }
 
-    public boolean isAllowedReputationToFishHere(SeaTile tile, FishState model){
+    public boolean isAllowedReputationToFishHere(final SeaTile tile, final FishState model) {
         return status.isAllowedReputationToFishHere(this, tile, model);
     }
 
-    public int countTerritories(){
+    public int countTerritories() {
         return status.countTerritories();
     }
 
-    public boolean isAllowedByCommunityStandardsToFishHere(SeaTile tile, FishState model){
+    public boolean isAllowedByCommunityStandardsToFishHere(final SeaTile tile, final FishState model) {
         return status.isAllowedByCommunityStandardsToFishHere(this, tile, model);
     }
 
@@ -1372,68 +1307,32 @@ public class Fisher implements Steppable, Startable{
      *
      * @param gearStrategy Value to set for property 'gearStrategy'.
      */
-    public void setGearStrategy(GearStrategy gearStrategy) {
+    public void setGearStrategy(final GearStrategy gearStrategy) {
 
-        if(state != null && this.gearStrategy != gearStrategy)
+        if (state != null && this.gearStrategy != gearStrategy)
             this.gearStrategy.turnOff(this);
 
 
-
         this.gearStrategy = gearStrategy;
-        if(state!=null)
-            this.gearStrategy.start(state,this);
+        if (state != null)
+            this.gearStrategy.start(state, this);
 
     }
 
     /**
      * Check if you want to change your gear now!
-     * @param random randomizer
-     * @param model the model
+     *
+     * @param random        randomizer
+     * @param model         the model
      * @param currentAction the current action
      */
-    public void updateGear( MersenneTwisterFast random,
-                            FishState model,
-                            Action currentAction)
-    {
+    public void updateGear(
+        final MersenneTwisterFast random,
+        final FishState model,
+        final Action currentAction
+    ) {
         Preconditions.checkState(isAtPort(), "Changing Gear out of Port. Not expected!");
-        gearStrategy.updateGear(this,random,model,currentAction);
-    }
-
-
-    /**
-     * Getter for property 'tags'.
-     *
-     * @return Value for property 'tags'.
-     */
-    public List<String> getTags() {
-        return tags;
-    }
-
-    /**
-     * Getter for property 'cheater'.
-     *
-     * @return Value for property 'cheater'.
-     */
-    public boolean isCheater() {
-        return cheater;
-    }
-
-    /**
-     * Setter for property 'cheater'.
-     *
-     * @param cheater Value to set for property 'cheater'.
-     */
-    public void setCheater(boolean cheater) {
-        this.cheater = cheater;
-    }
-
-    /**
-     * Getter for property 'additionalTripCosts'.
-     *
-     * @return Value for property 'additionalTripCosts'.
-     */
-    public LinkedList<Cost> getAdditionalTripCosts() {
-        return status.getAdditionalTripCosts();
+        gearStrategy.updateGear(this, random, model, currentAction);
     }
 
     /**
@@ -1445,56 +1344,59 @@ public class Fisher implements Steppable, Startable{
         return status.getOpportunityCosts();
     }
 
-    public double getExpectedFuelConsumption(double distanceKM){
+    public double getExpectedFuelConsumption(final double distanceKM) {
         return equipment.getBoat().expectedFuelConsumption(distanceKM);
     }
-
 
     public int numberOfDailyObservations() {
         return memory.numberOfDailyObservations();
     }
 
-
     /**
      * keep that memory in the database. The key cannot be currently in use!
-     * @param key the key for the object
+     *
+     * @param key  the key for the object
      * @param item the object to store
      */
-    public void memorize(String key, Object item) {
+    public void memorize(final String key, final Object item) {
         memory.memorize(key, item);
     }
 
     /**
      * removes the memory associated with that key
+     *
      * @param key
      */
-    public void forget(String key) {
+    public void forget(final String key) {
         memory.forget(key);
     }
 
     /**
      * returns the object associated with this key
+     *
      * @param key
      */
-    public Object remember(String key) {
+    public Object remember(final String key) {
         return memory.remember(key);
     }
 
     /**
      * registers visit (if the memory exists)
+     *
      * @param group
      * @param day
      */
-    public void registerVisit(int group, int day) {
+    public void registerVisit(final int group, final int day) {
         memory.registerVisit(group, day);
     }
 
     /**
      * registers visit (if the memory exists)
+     *
      * @param tile
      * @param day
      */
-    public void registerVisit(SeaTile tile, int day) {
+    public void registerVisit(final SeaTile tile, final int day) {
         memory.registerVisit(tile, day);
     }
 
@@ -1502,14 +1404,9 @@ public class Fisher implements Steppable, Startable{
         return memory.getDiscretizedLocationMemory();
     }
 
-    public void setDiscretizedLocationMemory(DiscretizedLocationMemory discretizedLocationMemory) {
+    public void setDiscretizedLocationMemory(final DiscretizedLocationMemory discretizedLocationMemory) {
         memory.setDiscretizedLocationMemory(discretizedLocationMemory);
     }
-
-    public SocialNetwork getSocialNetwork() {
-        return state.getSocialNetwork();
-    }
-
 
     /**
      * Getter for property 'exogenousEmergencyOverride'.
@@ -1525,7 +1422,7 @@ public class Fisher implements Steppable, Startable{
      *
      * @param exogenousEmergencyOverride Value to set for property 'exogenousEmergencyOverride'.
      */
-    public void setExogenousEmergencyOverride(boolean exogenousEmergencyOverride) {
+    public void setExogenousEmergencyOverride(final boolean exogenousEmergencyOverride) {
         status.setExogenousEmergencyOverride(exogenousEmergencyOverride);
     }
 
@@ -1533,58 +1430,83 @@ public class Fisher implements Steppable, Startable{
         return equipment.getTotalWeightOfCatchInHold();
     }
 
-    public double getWeightOfCatchInHold(Species species) {
+    public double getWeightOfCatchInHold(final Species species) {
         return equipment.getWeightOfCatchInHold(species);
     }
 
-
-    /**
-     * Setter for property 'homePort'.
-     *
-     * @param homePort Value to set for property 'homePort'.
-     */
-    public void setHomePort(Port homePort) {
-        status.setHomePort(homePort);
-    }
-
-    public void teleport(SeaTile tile)
-    {
+    public void teleport(final SeaTile tile) {
         status.setLocation(tile);
     }
 
     /**
      * grabs the state reference from the fisher
+     *
      * @return
      */
-    public FishState grabState(){
+    public FishState grabState() {
         return state;
     }
 
-    public boolean canAndWantToFishHere()
-    {
-        return (getRegulation().canFishHere(this,getLocation(), state) || isCheater())
-                &&
-                this.shouldIFish(state);
+    public boolean canAndWantToFishHere() {
+        return (getRegulation().canFishHere(this, getLocation(), state) || isCheater())
+            &&
+            this.shouldIFish(state);
+    }
+
+    /**
+     * Getter for property 'cheater'.
+     *
+     * @return Value for property 'cheater'.
+     */
+    public boolean isCheater() {
+        return cheater;
+    }
+
+    public boolean shouldIFish(final FishState state) {
+        return !status.isAnyEmergencyFlagOn() && fishingStrategy.shouldFish(
+            this,
+            state.getRandom(),
+            state,
+            getCurrentTrip()
+        );
+
+    }
+
+    /**
+     * Setter for property 'cheater'.
+     *
+     * @param cheater Value to set for property 'cheater'.
+     */
+    public void setCheater(final boolean cheater) {
+        this.cheater = cheater;
     }
 
     public Hold getHold() {
         return equipment.getHold();
     }
 
-    public double getCountedLandingsPerBin(Species species, int bin) {
+    public void setHold(final Hold hold) {
+        equipment.setHold(hold);
+    }
+
+    public double getCountedLandingsPerBin(final Species species, final int bin) {
         return getDailyCounter().getSpecificLandings(species, bin);
     }
 
     public double getHoursAtSeaThisYear() {
         return memory.getHoursAtSeaThisYear() + getHoursAtSea();
     }
-    public boolean isTerritory(SeaTile tile){
-        if(status.getReputationalRisk()==null)
+
+    public double getHoursAtSea() {
+        return status.getHoursAtSea();
+    }
+
+    public boolean isTerritory(final SeaTile tile) {
+        if (status.getReputationalRisk() == null)
             return false;
         else
             return status.getReputationalRisk().isTerritory(tile);
     }
-
 
     /**
      * Getter for property 'additionalVariables'.
@@ -1595,34 +1517,50 @@ public class Fisher implements Steppable, Startable{
         return status.getAdditionalVariables();
     }
 
-
     /**
      * you've been active if you are currently out at sea or you have finished at least a trip
      * in the past 365 days!
+     *
      * @return
      */
-    public boolean hasBeenActiveThisYear(){
+    public boolean hasBeenActiveThisYear() {
 
-        if(getLastFinishedTrip() == null)
+        if (getLastFinishedTrip() == null)
             return false;
 
-        return getLastFinishedTrip().getTripDay()> state.getDay()-364 ||
-                (!getCurrentTrip().isCompleted() && getHoursAtSea()>0 );
+        return getLastFinishedTrip().getTripDay() > state.getDay() - 364 ||
+            (!getCurrentTrip().isCompleted() && getHoursAtSea() > 0);
     }
 
+    public TripRecord getLastFinishedTrip() {
+        return memory.getTripLogger().getLastFinishedTrip();
+    }
 
-    public double getExpectedAdditionalCosts(double additionalTripHours,
-                                             double additionalEffortHours,
-                                             double additionalKmTravelled){
+    public double getExpectedAdditionalCosts(
+        final double additionalTripHours,
+        final double additionalEffortHours,
+        final double additionalKmTravelled
+    ) {
 
 
-        double totalCost = GasCost.expectedAdditionalGasCosts(this,additionalKmTravelled);
-        for (Cost otherCosts : getAdditionalTripCosts()) {
-            totalCost += otherCosts.expectedAdditionalCosts(this,
-                    additionalTripHours,
-                    additionalEffortHours,
-                    additionalKmTravelled);
+        double totalCost = GasCost.expectedAdditionalGasCosts(this, additionalKmTravelled);
+        for (final Cost otherCosts : getAdditionalTripCosts()) {
+            totalCost += otherCosts.expectedAdditionalCosts(
+                this,
+                additionalTripHours,
+                additionalEffortHours,
+                additionalKmTravelled
+            );
         }
         return totalCost;
+    }
+
+    /**
+     * Getter for property 'additionalTripCosts'.
+     *
+     * @return Value for property 'additionalTripCosts'.
+     */
+    public LinkedList<Cost> getAdditionalTripCosts() {
+        return status.getAdditionalTripCosts();
     }
 }

@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.actions;
 
-import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -31,63 +30,60 @@ import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
+import java.util.logging.Logger;
+
 /**
  * Landing, selling all the hold and docking
  * Created by carrknight on 5/4/15.
  */
-public class Docking implements Action{
+public class Docking implements Action {
 
 
     /**
      * dock to port and sell catch
      *
-     * @param model       a link to the model, in case you need to grab global objects
-     * @param agent       a link to the fisher in case you need to get or set agent's variables
+     * @param model      a link to the model, in case you need to grab global objects
+     * @param agent      a link to the fisher in case you need to get or set agent's variables
      * @param regulation the regulation governing the agent
      * @return the next action to take and whether or not to take it now
      */
     @Override
     public ActionResult act(
-            FishState model, Fisher agent, Regulation regulation, double hoursLeft)
-    {
+        final FishState model, final Fisher agent, final Regulation regulation, final double hoursLeft
+    ) {
 
-        Port port = agent.getHomePort();
+        final Port port = agent.getHomePort();
         assert agent.getLocation().equals(port.getLocation());
         assert agent.isAtDestination();
         assert !port.isDocked(agent); //shouldn't have docked already!
 
 
+        final GlobalBiology biology = model.getBiology();
+
+        final MarketMap marketMap = port.getMarketMap(agent);
+        for (final Species species : biology.getSpecies()) {
 
 
-
-        GlobalBiology biology = model.getBiology();
-
-        MarketMap marketMap =port.getMarketMap(agent);
-        for(Species species : biology.getSpecies())
-        {
-
-
-            if(agent.getTotalWeightOfCatchInHold(species)>0) {
+            if (agent.getTotalWeightOfCatchInHold(species) > 0) {
                 //this should take care of everything including transferring cash
-                TradeInfo tradeInfo = marketMap.sellFish(agent.getHold(), species, agent, regulation, model);
+                final TradeInfo tradeInfo = marketMap.sellFish(agent.getHold(), species, agent, regulation, model);
                 //bean counting happens here:
                 agent.processTradeData(tradeInfo);
             }
         }
 
         //sell your stuff
-        Catch toSell = agent.unload();
+        final Catch toSell = agent.unload();
         //log it
-        if(Log.TRACE)
-            Log.trace(agent + " returns to port with catch: " + toSell);
+        Logger.getGlobal().fine(() -> agent + " returns to port with catch: " + toSell);
         //anchor/refill
         agent.dock();
 
         assert agent.getLocation().equals(port.getLocation());
         assert agent.isAtDestination();
         assert port.isDocked(agent); //shouldn't have docked already!
-        assert agent.getTotalWeightOfCatchInHold() ==  0.0;
+        assert agent.getTotalWeightOfCatchInHold() == 0.0;
         //now stay at port
-        return new ActionResult(new AtPort(),hoursLeft);
+        return new ActionResult(new AtPort(), hoursLeft);
     }
 }

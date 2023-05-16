@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.demoes;
 
-import com.esotericsoftware.minlog.Log;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
@@ -29,25 +28,27 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.util.logging.Logger;
+
 import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 12/15/15.
  */
-public class TooLateToRemoveFishers
-{
+public class TooLateToRemoveFishers {
 
 
     @Test
     public void tooLateToRemoveFishers() throws Exception {
-        FishState state = new FishState(System.currentTimeMillis());
+        final FishState state = new FishState(System.currentTimeMillis());
 
-        Log.info("This demo replicates the dynamics in: http://carrknight.github.io/assets/oxfish/entryexit.html");
-        Log.info("You add a bunch of fishers, and after removing them the biomass is still screwed");
-        PrototypeScenario scenario = new PrototypeScenario();
+        Logger.getGlobal()
+            .info("This demo replicates the dynamics in: http://carrknight.github.io/assets/oxfish/entryexit.html");
+        Logger.getGlobal().info("You add a bunch of fishers, and after removing them the biomass is still screwed");
+        final PrototypeScenario scenario = new PrototypeScenario();
         ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setGrower(new SimpleLogisticGrowerFactory(.3));
         scenario.setFishers(50);
-        SimpleMapInitializerFactory simpleMapInitializerFactory = new SimpleMapInitializerFactory();
+        final SimpleMapInitializerFactory simpleMapInitializerFactory = new SimpleMapInitializerFactory();
         simpleMapInitializerFactory.setCoastalRoughness(new FixedDoubleParameter(0));
         scenario.setMapInitializer(simpleMapInitializerFactory);
 
@@ -69,7 +70,7 @@ public class TooLateToRemoveFishers
             state.schedule.step(state);
         }
         Double biomass = state.getLatestYearlyObservation("Biomass Species 0");
-        Log.info("The actual remaining biomass is: " + biomass);
+        Logger.getGlobal().info("The actual remaining biomass is: " + biomass);
         assertTrue(biomass < 1000000);
 
         //for the next 5 years remove the fishers
@@ -84,9 +85,9 @@ public class TooLateToRemoveFishers
             state.schedule.step(state);
         }
 
-        Log.info("I am assuming that the biomass is below 10% the virgin level of 10million");
+        Logger.getGlobal().info("I am assuming that the biomass is below 10% the virgin level of 10million");
         biomass = state.getLatestYearlyObservation("Biomass Species 0");
-        Log.info("The actual remaining biomass is: " + biomass);
+        Logger.getGlobal().info("The actual remaining biomass is: " + biomass);
         assertTrue(biomass < 1000000);
     }
 

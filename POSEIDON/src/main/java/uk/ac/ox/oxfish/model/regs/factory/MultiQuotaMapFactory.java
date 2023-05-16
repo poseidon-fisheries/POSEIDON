@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
@@ -32,107 +31,43 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 /**
  * Creates either a multi-itq or a multi-tac reading from file
  * Created by carrknight on 4/5/16.
  */
-public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulation>{
+public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulation> {
 
 
-
-    private HashMap<String,Double> initialQuotas = new HashMap<>();
-
+    //even though we only one use delegate we keep both available
+    private final MultiITQStringFactory itqFactory = new MultiITQStringFactory();
+    private final MultiTACStringFactory tacFactory = new MultiTACStringFactory();
+    private final MultiIQStringFactory iqFactory = new MultiIQStringFactory();
+    private HashMap<String, Double> initialQuotas = new HashMap<>();
     private String convertedInitialQuotas;
-
     private String convertedQuotaExchangedPerMatch;
-
     private boolean respectMPA = true;
-
-    public enum QuotaType {
-
-
-        ITQ,
-
-        TAC,
-
-        IQ
-
-
-    }
-
     private QuotaType quotaType = QuotaType.ITQ;
-
     /**
      * the size of quota units (kg) traded each match;
      * This can be either a simple number (at which point all quotas are traded at the same tick volume) or a map like
      * "0:100,2:50" at which point the volume traded per match is different for each species
      */
 
-    private HashMap<String,Double> quotaExchangedPerMatch = new HashMap<>();
-
-
+    private HashMap<String, Double> quotaExchangedPerMatch = new HashMap<>();
     private boolean multipleTradesAllowed = false;
-
-    //even though we only one use delegate we keep both available
-    private MultiITQStringFactory itqFactory = new MultiITQStringFactory();
-
-    private MultiTACStringFactory tacFactory  = new MultiTACStringFactory();
-
-    private MultiIQStringFactory iqFactory = new MultiIQStringFactory();
-
 
     public MultiQuotaMapFactory() {
     }
 
-    public MultiQuotaMapFactory(QuotaType quotaType, Pair<String,Double>... pairs) {
+
+    public MultiQuotaMapFactory(final QuotaType quotaType, final Pair<String, Double>... pairs) {
 
         this.quotaType = quotaType;
-        for(Pair<String,Double> pair : pairs)
-            initialQuotas.put(pair.getFirst(),pair.getSecond());
+        for (final Pair<String, Double> pair : pairs)
+            initialQuotas.put(pair.getFirst(), pair.getSecond());
     }
-
-    /**
-     * we parse the file into a string that can be fed to delegate factories
-     */
-    public static String representMapAsString(List<Species> species, final HashMap<String, Double> toConvert){
-
-        //we will use the string builder to build the string representation of the quota file
-        StringBuilder representer = new StringBuilder();
-
-        //check that there are some fish being protected or what's the point?
-        Preconditions.checkState(!toConvert.isEmpty());
-        for(Map.Entry<String,Double> quota : toConvert.entrySet())
-        {
-
-
-            //find which species it belongs to
-            Optional<Species> matchingSpecies = species.stream().filter(species1 ->
-                                                                                species1.getName().equalsIgnoreCase(
-                                                                                        quota.getKey().trim())).findAny();
-            //we didn't find a corresponding species, that's possibly a problem so warn
-            if(!matchingSpecies.isPresent() && Log.WARN)
-                Log.warn("Could not find " + quota.getKey() + " in the list of model species, I will ignore its quota");
-            else
-            {
-                int index = matchingSpecies.get().getIndex();
-                if(representer.length()>0)
-                    representer.append(",");
-                representer.append(index).append(":").append(quota.getValue());
-            }
-
-        }
-        return representer.toString();
-
-
-
-
-
-
-    }
-
-
-
 
     /**
      * Applies this function to the given argument.
@@ -141,41 +76,43 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
      * @return the function result
      */
     @Override
-    public MultiQuotaRegulation apply(FishState fishState) {
+    public MultiQuotaRegulation apply(final FishState fishState) {
         //turn maps into strings so that they can be fed to the factories
-        if(convertedInitialQuotas == null) {
-            convertedInitialQuotas =representMapAsString(fishState.getSpecies(), initialQuotas);
+        if (convertedInitialQuotas == null) {
+            convertedInitialQuotas = representMapAsString(fishState.getSpecies(), initialQuotas);
 
             itqFactory.setYearlyQuotaMaps(convertedInitialQuotas);
             tacFactory.setYearlyQuotaMaps(convertedInitialQuotas);
             iqFactory.setYearlyQuotaMaps(convertedInitialQuotas);
         }
-        assert convertedInitialQuotas!=null;
+        assert convertedInitialQuotas != null;
 
 
-        switch(quotaType){
+        switch (quotaType) {
             case ITQ:
-                if(convertedQuotaExchangedPerMatch == null)
-                {
-                    convertedQuotaExchangedPerMatch = representMapAsString(fishState.getSpecies(),quotaExchangedPerMatch);
+                if (convertedQuotaExchangedPerMatch == null) {
+                    convertedQuotaExchangedPerMatch = representMapAsString(
+                        fishState.getSpecies(),
+                        quotaExchangedPerMatch
+                    );
                     itqFactory.setMinimumQuotaTraded(convertedQuotaExchangedPerMatch);
 
                 }
-                assert convertedQuotaExchangedPerMatch!=null;
+                assert convertedQuotaExchangedPerMatch != null;
 
                 itqFactory.setAllowMultipleTrades(multipleTradesAllowed);
-                MultiQuotaRegulation regulation = itqFactory.apply(fishState);
+                final MultiQuotaRegulation regulation = itqFactory.apply(fishState);
                 //set up a startable that divide it by the number of fishers
                 fishState.registerStartable(new ITQScaler(regulation));
                 regulation.setRespectMPA(respectMPA);
                 return regulation;
 
             case TAC:
-                MultiQuotaRegulation tac = tacFactory.apply(fishState);
+                final MultiQuotaRegulation tac = tacFactory.apply(fishState);
                 tac.setRespectMPA(respectMPA);
                 return tac;
             case IQ:
-                MultiQuotaRegulation iq = iqFactory.apply(fishState); //create but scale
+                final MultiQuotaRegulation iq = iqFactory.apply(fishState); //create but scale
                 fishState.registerStartable(new ITQScaler(iq));
                 iq.setRespectMPA(respectMPA);
                 return iq;
@@ -185,23 +122,50 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
         }
 
 
+    }
+
+    /**
+     * we parse the file into a string that can be fed to delegate factories
+     */
+    public static String representMapAsString(final List<Species> species, final HashMap<String, Double> toConvert) {
+
+        //we will use the string builder to build the string representation of the quota file
+        final StringBuilder representer = new StringBuilder();
+
+        //check that there are some fish being protected or what's the point?
+        Preconditions.checkState(!toConvert.isEmpty());
+        for (final Map.Entry<String, Double> quota : toConvert.entrySet()) {
 
 
+            //find which species it belongs to
+            final Optional<Species> matchingSpecies = species.stream().filter(species1 ->
+                species1.getName().equalsIgnoreCase(
+                    quota.getKey().trim())).findAny();
+            //we didn't find a corresponding species, that's possibly a problem so warn
+            if (!matchingSpecies.isPresent())
+                Logger.getGlobal().warning(() ->
+                    "Could not find " + quota.getKey() + " in the list of model species, I will ignore its quota"
+                );
+            else {
+                final int index = matchingSpecies.get().getIndex();
+                if (representer.length() > 0)
+                    representer.append(",");
+                representer.append(index).append(":").append(quota.getValue());
+            }
 
-
+        }
+        return representer.toString();
 
 
     }
-
 
     public boolean isMultipleTradesAllowed() {
         return multipleTradesAllowed;
     }
 
-    public void setMultipleTradesAllowed(boolean multipleTradesAllowed) {
+    public void setMultipleTradesAllowed(final boolean multipleTradesAllowed) {
         this.multipleTradesAllowed = multipleTradesAllowed;
     }
-
 
     /**
      * Getter for property 'quotaExchangedPerMatch'.
@@ -217,7 +181,7 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
      *
      * @param quotaExchangedPerMatch Value to set for property 'quotaExchangedPerMatch'.
      */
-    public void setQuotaExchangedPerMatch(HashMap<String, Double> quotaExchangedPerMatch) {
+    public void setQuotaExchangedPerMatch(final HashMap<String, Double> quotaExchangedPerMatch) {
         this.quotaExchangedPerMatch = quotaExchangedPerMatch;
     }
 
@@ -225,7 +189,7 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
         return initialQuotas;
     }
 
-    public void setInitialQuotas(HashMap<String, Double> quotas) {
+    public void setInitialQuotas(final HashMap<String, Double> quotas) {
         this.initialQuotas = quotas;
     }
 
@@ -247,9 +211,6 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
         return convertedQuotaExchangedPerMatch;
     }
 
-
-
-
     /**
      * Getter for property 'quotaType'.
      *
@@ -264,7 +225,7 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
      *
      * @param quotaType Value to set for property 'quotaType'.
      */
-    public void setQuotaType(QuotaType quotaType) {
+    public void setQuotaType(final QuotaType quotaType) {
         this.quotaType = quotaType;
     }
 
@@ -282,7 +243,19 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
      *
      * @param respectMPA Value to set for property 'respectMPA'.
      */
-    public void setRespectMPA(boolean respectMPA) {
+    public void setRespectMPA(final boolean respectMPA) {
         this.respectMPA = respectMPA;
+    }
+
+    public enum QuotaType {
+
+
+        ITQ,
+
+        TAC,
+
+        IQ
+
+
     }
 }

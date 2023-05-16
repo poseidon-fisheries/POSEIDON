@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.utility.parameters;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -35,6 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 /**
  * Reads a list of ports and returns an hashmap of it
@@ -43,6 +43,7 @@ import java.util.function.Function;
 public class PortReader {
 
 
+    public static final int MAXIMUM_NEIGHBORHOOD = 5;
     /**
      * map connecting names to ports
      */
@@ -54,48 +55,50 @@ public class PortReader {
      * <i>Port,Fishers,Eastings,Northings,probability</i>
      * <br>
      */
-    public LinkedHashMap<Port,Integer> readFile(
-            Path pathToFile, NauticalMap map,
-            Function<SeaTile, MarketMap> marketmap,
-            GasPriceMaker gasPriceMaker, FishState model)
-            throws IOException {
+    public LinkedHashMap<Port, Integer> readFile(
+        final Path pathToFile, final NauticalMap map,
+        final Function<SeaTile, MarketMap> marketmap,
+        final GasPriceMaker gasPriceMaker, final FishState model
+    )
+        throws IOException {
 
-        List<String> fileLines = Files.readAllLines(pathToFile);
-        Preconditions.checkArgument(fileLines.size()>=2);
+        final List<String> fileLines = Files.readAllLines(pathToFile);
+        Preconditions.checkArgument(fileLines.size() >= 2);
 
-        LinkedHashMap<Port,Integer> toReturn = new LinkedHashMap<>();
+        final LinkedHashMap<Port, Integer> toReturn = new LinkedHashMap<>();
         //the first line is heading
-        Iterator<String> rowIterator = fileLines.iterator();
+        final Iterator<String> rowIterator = fileLines.iterator();
         rowIterator.next();
         //for each row
-        while (rowIterator.hasNext())
-        {
+        while (rowIterator.hasNext()) {
             //read name and location
-            String line = rowIterator.next();
-            if(line.startsWith("#") || line.trim().isEmpty()) //ignore commented out
+            final String line = rowIterator.next();
+            if (line.startsWith("#") || line.trim().isEmpty()) //ignore commented out
                 continue;
-            String[] splitLine = line.split(",");
-            String portName = splitLine[0].trim();
-            Port port = ports.
-                    computeIfAbsent(
-                            portName,
-                            new Function<String, Port>() {
-                                @Override
-                                public Port apply(String s) {
-                                    SeaTile location = computePortLocation(
-                                        map, portName,
-                                        Double.parseDouble(splitLine[2]),
-                                        Double.parseDouble(splitLine[3])
-                                    );
-                                    //build the port
-                                    Port toReturn = new Port(portName, location, marketmap.apply(location),
-                                                          gasPriceMaker.supplyInitialPrice(location,portName));
-                                    gasPriceMaker.start(toReturn,model);
-                                    return toReturn;
-                                }
-                            });
-            toReturn.put(port,Integer.parseInt(splitLine[1]));
-            ports.put(portName,port);
+            final String[] splitLine = line.split(",");
+            final String portName = splitLine[0].trim();
+            final Port port = ports.
+                computeIfAbsent(
+                    portName,
+                    new Function<String, Port>() {
+                        @Override
+                        public Port apply(final String s) {
+                            final SeaTile location = computePortLocation(
+                                map, portName,
+                                Double.parseDouble(splitLine[2]),
+                                Double.parseDouble(splitLine[3])
+                            );
+                            //build the port
+                            final Port toReturn = new Port(portName, location, marketmap.apply(location),
+                                gasPriceMaker.supplyInitialPrice(location, portName)
+                            );
+                            gasPriceMaker.start(toReturn, model);
+                            return toReturn;
+                        }
+                    }
+                );
+            toReturn.put(port, Integer.parseInt(splitLine[1]));
+            ports.put(portName, port);
 
         }
 
@@ -104,8 +107,8 @@ public class PortReader {
 
     }
 
-    private SeaTile computePortLocation(NauticalMap map, String portName, double lon, double lat) {
-        SeaTile location = map.getSeaTile(new Coordinate(lon, lat));
+    private SeaTile computePortLocation(final NauticalMap map, final String portName, final double lon, final double lat) {
+        final SeaTile location = map.getSeaTile(new Coordinate(lon, lat));
         Preconditions.checkArgument(
             location != null,
             "Port " + portName + " is outside the map! "
@@ -118,80 +121,73 @@ public class PortReader {
         return correctLocation(location, map, portName);
     }
 
-    public static final int MAXIMUM_NEIGHBORHOOD = 5;
-
-
-
-    /**
-     * a tile is good for port iff:
-     * 1- is on land
-     * 2- has at least one sea neighboring tile
-     * @param tile the tile we'd like to place our port on
-     * @param map the nautical map
-     * @return
-     */
-    public static boolean isCorrectLocationForPort(SeaTile tile, NauticalMap map)
-    {
-        if(tile.isLand())
-        {
-            LinkedList<SeaTile> neighbors = new LinkedList<SeaTile>(map.getMooreNeighbors(tile, 1));
-            return neighbors.stream().anyMatch(SeaTile::isWater);
-        }
-
-        return false;
-    }
-
     /**
      * check (and possibly move) the port if the seatile is in water (or not at sea)
+     *
      * @param originalSeatile
      * @param map
      * @return
      */
-    public static SeaTile correctLocation(SeaTile originalSeatile, NauticalMap map, String portName)
-    {
+    public static SeaTile correctLocation(final SeaTile originalSeatile, final NauticalMap map, final String portName) {
         //if it's fine, don't move it
-        if(isCorrectLocationForPort(originalSeatile,map))
+        if (isCorrectLocationForPort(originalSeatile, map))
             return originalSeatile;
 
 
-        if(Log.DEBUG)
-            Log.debug(portName + " should be located at " + originalSeatile.getGridX() +"," +
-                              originalSeatile.getGridY() + " but that's not a valid location");
+        Logger.getGlobal().fine(portName + " should be located at " + originalSeatile.getGridX() + "," +
+            originalSeatile.getGridY() + " but that's not a valid location");
         //look in the neighborhood
-        LinkedList<SeaTile> alreadyExplored = new LinkedList<>();
-        for(int i = 1; i< MAXIMUM_NEIGHBORHOOD; i++)
-        {
-            LinkedList<SeaTile> neighbors = new LinkedList<SeaTile>(map.getMooreNeighbors(originalSeatile, i));
+        final LinkedList<SeaTile> alreadyExplored = new LinkedList<>();
+        for (int i = 1; i < MAXIMUM_NEIGHBORHOOD; i++) {
+            final LinkedList<SeaTile> neighbors = new LinkedList<SeaTile>(map.getMooreNeighbors(originalSeatile, i));
             neighbors.removeAll(alreadyExplored);
-            Optional<SeaTile> acceptableNeighbor = neighbors.stream().filter(seaTile -> isCorrectLocationForPort(seaTile, map)).
-                    sorted(
-                            (o1, o2) -> {
-                                int comparison = Integer.compare(o1.getGridX(),o2.getGridX());
-                                if(comparison==0)
-                                    return Integer.compare(o1.getGridY(),o2.getGridY());
-                                return comparison;
-                            })
-                    .findFirst();
+            final Optional<SeaTile> acceptableNeighbor = neighbors.stream()
+                .filter(seaTile -> isCorrectLocationForPort(seaTile, map)).
+                sorted(
+                    (o1, o2) -> {
+                        final int comparison = Integer.compare(o1.getGridX(), o2.getGridX());
+                        if (comparison == 0)
+                            return Integer.compare(o1.getGridY(), o2.getGridY());
+                        return comparison;
+                    })
+                .findFirst();
             //found something acceptable?
-            if(acceptableNeighbor.isPresent())
-            {
+            if (acceptableNeighbor.isPresent()) {
                 //log and return
-                SeaTile newTile = acceptableNeighbor.get();
-                if(Log.DEBUG)
-                    Log.debug(portName + " has been moved to " + newTile.getGridX() + "," +
-                                      newTile.getGridY());
+                final SeaTile newTile = acceptableNeighbor.get();
+                Logger.getGlobal().fine(portName + " has been moved to " + newTile.getGridX() + "," +
+                    newTile.getGridY());
                 return newTile;
             }
             //keep track of already explored neighbors so you don't have to search them again
             alreadyExplored.addAll(neighbors);
         }
 
-        Log.error("Could not find space where to place " + portName + " that was on the coast within a neighborhood " +
-                          "of size: " +
-                          MAXIMUM_NEIGHBORHOOD);
+        Logger.getGlobal()
+            .severe("Could not find space where to place " + portName + " that was on the coast within a neighborhood " +
+                "of size: " +
+                MAXIMUM_NEIGHBORHOOD);
         throw new RuntimeException("Failed to place port");
 
 
+    }
+
+    /**
+     * a tile is good for port iff:
+     * 1- is on land
+     * 2- has at least one sea neighboring tile
+     *
+     * @param tile the tile we'd like to place our port on
+     * @param map  the nautical map
+     * @return
+     */
+    public static boolean isCorrectLocationForPort(final SeaTile tile, final NauticalMap map) {
+        if (tile.isLand()) {
+            final LinkedList<SeaTile> neighbors = new LinkedList<SeaTile>(map.getMooreNeighbors(tile, 1));
+            return neighbors.stream().anyMatch(SeaTile::isWater);
+        }
+
+        return false;
     }
 
     /**

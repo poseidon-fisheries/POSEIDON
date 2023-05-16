@@ -20,8 +20,9 @@
 
 package uk.ac.ox.oxfish.biology;
 
-import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
+
+import java.util.logging.Logger;
 
 /**
  * An abstract local biology class that marks the children as being based on Biomass rather than abudance.
@@ -34,40 +35,42 @@ public abstract class AbstractBiomassBasedBiology implements LocalBiology {
     boolean warned = false;
 
     @Override
-    public StructuredAbundance getAbundance(Species species) {
+    public StructuredAbundance getAbundance(final Species species) {
 
         return new StructuredAbundance(turnBiomassIntoFakeNumberArray(
-                getBiomass(species),
-                species
+            getBiomass(species),
+            species
         ));
-    }
-
-    public void warnIfNeeded() {
-        if(Log.WARN && !warned)
-            Log.warn("Calling a number based biology method on a biomass based local biology. This is usually not desired");
     }
 
     /**
      * given that there is this much biomass, how many fish are there if they are all age 0? Return it as an array.
      * (if the weight at age 0 is 0 then return 1 as the number of fish)
+     *
      * @param biomass total biomass available
      * @param species link to fish biomass
      * @return an array of fish where all the fish are age 0 and their number is biomass/weight rounded down
      */
-    private double[] turnBiomassIntoFakeNumberArray(double biomass, Species species)
-    {
+    private double[] turnBiomassIntoFakeNumberArray(final double biomass, final Species species) {
         warnIfNeeded();
 
-        double[] toReturn = new double[species.getNumberOfBins()];
-        if(biomass == 0)
+        final double[] toReturn = new double[species.getNumberOfBins()];
+        if (biomass == 0)
             return toReturn;
-        double weight = species.getWeight(0,0);
-        if(weight>0)
-            toReturn[0] = (biomass/weight);
+        final double weight = species.getWeight(0, 0);
+        if (weight > 0)
+            toReturn[0] = (biomass / weight);
         else
             toReturn[0] = 1;
         return toReturn;
 
+    }
+
+    public void warnIfNeeded() {
+        if (!warned)
+            Logger.getGlobal()
+                .warning(
+                    "Calling a number based biology method on a biomass based local biology. This is usually not desired");
     }
 
 }

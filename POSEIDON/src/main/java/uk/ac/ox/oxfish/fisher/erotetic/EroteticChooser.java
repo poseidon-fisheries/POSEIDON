@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.erotetic;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -29,6 +28,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 /**
@@ -47,48 +47,51 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
 
     /**
      * Grabs the list of current options and returns the list of all options that are acceptable
-     * @param options list of options, possibly already filtered by others. It is <b>unmodifiable</b>
+     *
+     * @param options        list of options, possibly already filtered by others. It is <b>unmodifiable</b>
      * @param representation the set of all feature extractors available
      * @param state          the model   @return a list of acceptable options or null if there is pure indifference among them
      * @param fisher
      */
     public T answer(
-            List<? extends T> options,
-            FeatureExtractors<T> representation, FishState state,
-            Fisher fisher) {
+        List<? extends T> options,
+        final FeatureExtractors<T> representation, final FishState state,
+        final Fisher fisher
+    ) {
         Preconditions.checkArgument(!options.isEmpty(), "Cannot choose if there are no options");
-        if(options.size()==1) //if only one option is avaiable, then return it!
+        if (options.size() == 1) //if only one option is avaiable, then return it!
             return options.get(0);
-        for(EroteticAnswer<T> filter : eroteticAnswers)
-        {
+        for (final EroteticAnswer<T> filter : eroteticAnswers) {
             //filter
-            List<? extends T> newOptions = filter.answer(Collections.unmodifiableList(options),
-                                                         representation,
-                                                         state, fisher);
+            final List<? extends T> newOptions = filter.answer(Collections.unmodifiableList(options),
+                representation,
+                state, fisher
+            );
             //if filter returns null or is empty, means it is indifferent!
-            if(newOptions == null || newOptions.isEmpty())
+            if (newOptions == null || newOptions.isEmpty())
                 continue;
-            else if(newOptions.size()==1) //if only one option is chosen, then return it!
+            else if (newOptions.size() == 1) //if only one option is chosen, then return it!
             {
-                if(Log.TRACE)
-                    Log.trace("ended up choosing " + newOptions.get(0));
+                Logger.getGlobal().fine(() -> "ended up choosing " + newOptions.get(0));
                 return newOptions.get(0);
-            }
-            else //otherwise continue in your filtering
+            } else //otherwise continue in your filtering
                 options = newOptions;
         }
-        assert options != null && options.size()>1; //otherwise the for loop would have returned
+        assert options != null && options.size() > 1; //otherwise the for loop would have returned
         //use default chooser!
-        List<? extends T> finalChoice = defaultFilter.answer(Collections.unmodifiableList(options),
-                                                             representation,
-                                                             state,
-                                                             fisher);
-        Preconditions.checkArgument(finalChoice != null && finalChoice.size()==1, "Default chooser didn't select one option");
-        if(Log.TRACE)
-            Log.trace("ended up choosing " + finalChoice.get(0));
+        final List<? extends T> finalChoice = defaultFilter.answer(
+            Collections.unmodifiableList(options),
+            representation,
+            state,
+            fisher
+        );
+        Preconditions.checkArgument(
+            finalChoice != null && finalChoice.size() == 1,
+            "Default chooser didn't select one option"
+        );
+        Logger.getGlobal().fine(() -> "ended up choosing " + finalChoice.get(0));
         return finalChoice.get(0);
     }
-
 
 
     /**
@@ -106,7 +109,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * or returns {@code null} if this list is empty.
      *
      * @return the first element of this list, or {@code null} if
-     *     this list is empty
+     * this list is empty
      * @since 1.6
      */
     public EroteticAnswer<T> pollFirst() {
@@ -120,7 +123,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * @return {@code true} (as specified by {@link Deque#offerFirst})
      * @since 1.6
      */
-    public boolean offerFirst(EroteticAnswer<T> tEroteticAnswer) {
+    public boolean offerFirst(final EroteticAnswer<T> tEroteticAnswer) {
         return eroteticAnswers.offerFirst(tEroteticAnswer);
     }
 
@@ -129,31 +132,29 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * operator to that element.  Errors or runtime exceptions thrown by
      * the operator are relayed to the caller.
      *
-     * @implSpec
-     * The default implementation is equivalent to, for this {@code list}:
+     * @param operator the operator to apply to each element
+     * @throws UnsupportedOperationException if this list is unmodifiable.
+     *                                       Implementations may throw this exception if an element
+     *                                       cannot be replaced or if, in general, modification is not
+     *                                       supported
+     * @throws NullPointerException          if the specified operator is null or
+     *                                       if the operator result is a null value and this list does
+     *                                       not permit null elements
+     *                                       (<a href="Collection.html#optional-restrictions">optional</a>)
+     * @implSpec The default implementation is equivalent to, for this {@code list}:
      * <pre>{@code
      *     final ListIterator<E> li = list.listIterator();
      *     while (li.hasNext()) {
      *         li.set(operator.apply(li.next()));
      *     }
      * }</pre>
-     *
+     * <p>
      * If the list's list-iterator does not support the {@code set} operation
      * then an {@code UnsupportedOperationException} will be thrown when
      * replacing the first element.
-     *
-     * @param operator the operator to apply to each element
-     * @throws UnsupportedOperationException if this list is unmodifiable.
-     *         Implementations may throw this exception if an element
-     *         cannot be replaced or if, in general, modification is not
-     *         supported
-     * @throws NullPointerException if the specified operator is null or
-     *         if the operator result is a null value and this list does
-     *         not permit null elements
-     *         (<a href="Collection.html#optional-restrictions">optional</a>)
      * @since 1.8
      */
-    public void replaceAll(UnaryOperator<EroteticAnswer<T>> operator) {
+    public void replaceAll(final UnaryOperator<EroteticAnswer<T>> operator) {
         eroteticAnswers.replaceAll(operator);
     }
 
@@ -164,7 +165,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * @return {@code true} (as specified by {@link Queue#offer})
      * @since 1.5
      */
-    public boolean offer(EroteticAnswer<T> tEroteticAnswer) {
+    public boolean offer(final EroteticAnswer<T> tEroteticAnswer) {
         return eroteticAnswers.offer(tEroteticAnswer);
     }
 
@@ -175,7 +176,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      *
      * @param tEroteticAnswer the element to add
      */
-    public void addLast(EroteticAnswer<T> tEroteticAnswer) {
+    public void addLast(final EroteticAnswer<T> tEroteticAnswer) {
         eroteticAnswers.addLast(tEroteticAnswer);
     }
 
@@ -184,7 +185,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * or returns {@code null} if this list is empty.
      *
      * @return the last element of this list, or {@code null} if
-     *     this list is empty
+     * this list is empty
      * @since 1.6
      */
     public EroteticAnswer<T> pollLast() {
@@ -210,7 +211,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * @param tEroteticAnswer the element to push
      * @since 1.6
      */
-    public void push(EroteticAnswer<T> tEroteticAnswer) {
+    public void push(final EroteticAnswer<T> tEroteticAnswer) {
         eroteticAnswers.push(tEroteticAnswer);
     }
 
@@ -223,9 +224,9 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      *
      * @param o element to search for
      * @return the index of the first occurrence of the specified element in
-     *         this list, or -1 if this list does not contain the element
+     * this list, or -1 if this list does not contain the element
      */
-    public int indexOf(Object o) {
+    public int indexOf(final Object o) {
         return eroteticAnswers.indexOf(o);
     }
 
@@ -242,7 +243,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * @param o element to be removed from this list, if present
      * @return {@code true} if this list contained the specified element
      */
-    public boolean remove(Object o) {
+    public boolean remove(final Object o) {
         return eroteticAnswers.remove(o);
     }
 
@@ -261,18 +262,16 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * is specified).  Exceptions thrown by the action are relayed to the
      * caller.
      *
-     * @implSpec
-     * <p>The default implementation behaves as if:
+     * @param action The action to be performed for each element
+     * @throws NullPointerException if the specified action is null
+     * @implSpec <p>The default implementation behaves as if:
      * <pre>{@code
      *     for (T t : this)
      *         action.accept(t);
      * }</pre>
-     *
-     * @param action The action to be performed for each element
-     * @throws NullPointerException if the specified action is null
      * @since 1.8
      */
-    public void forEach(Consumer<? super EroteticAnswer<T>> action) {
+    public void forEach(final Consumer<? super EroteticAnswer<T>> action) {
         eroteticAnswers.forEach(action);
     }
 
@@ -285,7 +284,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * @return the element previously at the specified position
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public EroteticAnswer<T> remove(int index) {
+    public EroteticAnswer<T> remove(final int index) {
         return eroteticAnswers.remove(index);
     }
 
@@ -308,9 +307,9 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      *
      * @param o element to search for
      * @return the index of the last occurrence of the specified element in
-     *         this list, or -1 if this list does not contain the element
+     * this list, or -1 if this list does not contain the element
      */
-    public int lastIndexOf(Object o) {
+    public int lastIndexOf(final Object o) {
         return eroteticAnswers.lastIndexOf(o);
     }
 
@@ -318,7 +317,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * Returns a list-iterator of the elements in this list (in proper
      * sequence), starting at the specified position in the list.
      * Obeys the general contract of {@code List.listIterator(int)}.<p>
-     *
+     * <p>
      * The list-iterator is <i>fail-fast</i>: if the list is structurally
      * modified at any time after the Iterator is created, in any way except
      * through the list-iterator's own {@code remove} or {@code add}
@@ -331,11 +330,11 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * @param index index of the first element to be returned from the
      *              list-iterator (by a call to {@code next})
      * @return a ListIterator of the elements in this list (in proper
-     *         sequence), starting at the specified position in the list
+     * sequence), starting at the specified position in the list
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @see List#listIterator(int)
      */
-    public ListIterator<EroteticAnswer<T>> listIterator(int index) {
+    public ListIterator<EroteticAnswer<T>> listIterator(final int index) {
         return eroteticAnswers.listIterator(index);
     }
 
@@ -356,7 +355,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * @param tEroteticAnswer element to be appended to this list
      * @return {@code true} (as specified by {@link Collection#add})
      */
-    public boolean add(EroteticAnswer<T> tEroteticAnswer) {
+    public boolean add(final EroteticAnswer<T> tEroteticAnswer) {
         return eroteticAnswers.add(tEroteticAnswer);
     }
 
@@ -376,7 +375,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * or returns {@code null} if this list is empty.
      *
      * @return the last element of this list, or {@code null}
-     *         if this list is empty
+     * if this list is empty
      * @since 1.6
      */
     public EroteticAnswer<T> peekLast() {
@@ -388,7 +387,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * predicate.  Errors or runtime exceptions thrown during iteration or by
      * the predicate are relayed to the caller.
      */
-    public boolean removeIf(Predicate<? super EroteticAnswer<T>> filter) {
+    public boolean removeIf(final Predicate<? super EroteticAnswer<T>> filter) {
         return eroteticAnswers.removeIf(filter);
     }
 
@@ -397,7 +396,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      *
      * @param tEroteticAnswer the element to add
      */
-    public void addFirst(EroteticAnswer<T> tEroteticAnswer) {
+    public void addFirst(final EroteticAnswer<T> tEroteticAnswer) {
         eroteticAnswers.addFirst(tEroteticAnswer);
     }
 
@@ -441,7 +440,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * @return {@code true} if the list contained the specified element
      * @since 1.6
      */
-    public boolean removeLastOccurrence(Object o) {
+    public boolean removeLastOccurrence(final Object o) {
         return eroteticAnswers.removeLastOccurrence(o);
     }
 
@@ -450,7 +449,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * or returns {@code null} if this list is empty.
      *
      * @return the first element of this list, or {@code null}
-     *         if this list is empty
+     * if this list is empty
      * @since 1.6
      */
     public EroteticAnswer<T> peekFirst() {
@@ -469,12 +468,12 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * Replaces the element at the specified position in this list with the
      * specified element.
      *
-     * @param index index of the element to replace
+     * @param index   index of the element to replace
      * @param element element to be stored at the specified position
      * @return the element previously at the specified position
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public EroteticAnswer<T> set(int index, EroteticAnswer<T> element) {
+    public EroteticAnswer<T> set(final int index, final EroteticAnswer<T> element) {
         return eroteticAnswers.set(index, element);
     }
 
@@ -487,7 +486,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * @return {@code true} if the list contained the specified element
      * @since 1.6
      */
-    public boolean removeFirstOccurrence(Object o) {
+    public boolean removeFirstOccurrence(final Object o) {
         return eroteticAnswers.removeFirstOccurrence(o);
     }
 
@@ -501,12 +500,12 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      *
      * @param index index at which to insert the first element
      *              from the specified collection
-     * @param c collection containing elements to be added to this list
+     * @param c     collection containing elements to be added to this list
      * @return {@code true} if this list changed as a result of the call
      * @throws IndexOutOfBoundsException {@inheritDoc}
-     * @throws NullPointerException if the specified collection is null
+     * @throws NullPointerException      if the specified collection is null
      */
-    public boolean addAll(int index, Collection<? extends EroteticAnswer<T>> c) {
+    public boolean addAll(final int index, final Collection<? extends EroteticAnswer<T>> c) {
         return eroteticAnswers.addAll(index, c);
     }
 
@@ -522,7 +521,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * @return {@code true} if this list changed as a result of the call
      * @throws NullPointerException if the specified collection is null
      */
-    public boolean addAll(Collection<? extends EroteticAnswer<T>> c) {
+    public boolean addAll(final Collection<? extends EroteticAnswer<T>> c) {
         return eroteticAnswers.addAll(c);
     }
 
@@ -535,7 +534,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * @param o element whose presence in this list is to be tested
      * @return {@code true} if this list contains the specified element
      */
-    public boolean contains(Object o) {
+    public boolean contains(final Object o) {
         return eroteticAnswers.contains(o);
     }
 
@@ -548,12 +547,10 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * {@code CONCURRENT}, or <em>late-binding</em>. (See {@link #spliterator()}
      * for details.)
      *
-     * @implSpec
-     * The default implementation creates a parallel {@code Stream} from the
-     * collection's {@code Spliterator}.
-     *
      * @return a possibly parallel {@code Stream} over the elements in this
      * collection
+     * @implSpec The default implementation creates a parallel {@code Stream} from the
+     * collection's {@code Spliterator}.
      * @since 1.8
      */
     public Stream<EroteticAnswer<T>> parallelStream() {
@@ -575,15 +572,22 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      *
      * <p>This list must be modifiable, but need not be resizable.
      *
-     * @implSpec
-     * The default implementation obtains an array containing all elements in
+     * @param c the {@code Comparator} used to compare list elements.
+     *          A {@code null} value indicates that the elements'
+     *          {@linkplain Comparable natural ordering} should be used
+     * @throws ClassCastException            if the list contains elements that are not
+     *                                       <i>mutually comparable</i> using the specified comparator
+     * @throws UnsupportedOperationException if the list's list-iterator does
+     *                                       not support the {@code set} operation
+     * @throws IllegalArgumentException      (<a href="Collection.html#optional-restrictions">optional</a>)
+     *                                       if the comparator is found to violate the {@link Comparator}
+     *                                       contract
+     * @implSpec The default implementation obtains an array containing all elements in
      * this list, sorts the array, and iterates over this list resetting each
      * element from the corresponding position in the array. (This avoids the
      * n<sup>2</sup> log(n) performance that would result from attempting
      * to sort a linked list in place.)
-     *
-     * @implNote
-     * This implementation is a stable, adaptive, iterative mergesort that
+     * @implNote This implementation is a stable, adaptive, iterative mergesort that
      * requires far fewer than n lg(n) comparisons when the input array is
      * partially sorted, while offering the performance of a traditional
      * mergesort when the input array is randomly ordered.  If the input array
@@ -604,21 +608,9 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * Sorting and Information Theoretic Complexity", in Proceedings of the
      * Fourth Annual ACM-SIAM Symposium on Discrete Algorithms, pp 467-474,
      * January 1993.
-     *
-     * @param c the {@code Comparator} used to compare list elements.
-     *          A {@code null} value indicates that the elements'
-     *          {@linkplain Comparable natural ordering} should be used
-     * @throws ClassCastException if the list contains elements that are not
-     *         <i>mutually comparable</i> using the specified comparator
-     * @throws UnsupportedOperationException if the list's list-iterator does
-     *         not support the {@code set} operation
-     * @throws IllegalArgumentException
-     *         (<a href="Collection.html#optional-restrictions">optional</a>)
-     *         if the comparator is found to violate the {@link Comparator}
-     *         contract
      * @since 1.8
      */
-    public void sort(Comparator<? super EroteticAnswer<T>> c) {
+    public void sort(final Comparator<? super EroteticAnswer<T>> c) {
         eroteticAnswers.sort(c);
     }
 
@@ -630,11 +622,9 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * {@code CONCURRENT}, or <em>late-binding</em>. (See {@link #spliterator()}
      * for details.)
      *
-     * @implSpec
-     * The default implementation creates a sequential {@code Stream} from the
-     * collection's {@code Spliterator}.
-     *
      * @return a sequential {@code Stream} over the elements in this collection
+     * @implSpec The default implementation creates a sequential {@code Stream} from the
+     * collection's {@code Spliterator}.
      * @since 1.8
      */
     public Stream<EroteticAnswer<T>> stream() {
@@ -648,7 +638,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * @return {@code true} (as specified by {@link Deque#offerLast})
      * @since 1.6
      */
-    public boolean offerLast(EroteticAnswer<T> tEroteticAnswer) {
+    public boolean offerLast(final EroteticAnswer<T> tEroteticAnswer) {
         return eroteticAnswers.offerLast(tEroteticAnswer);
     }
 
@@ -669,7 +659,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * <p>This method is equivalent to {@link #removeFirst()}.
      *
      * @return the element at the front of this list (which is the top
-     *         of the stack represented by this list)
+     * of the stack represented by this list)
      * @throws NoSuchElementException if this list is empty
      * @since 1.6
      */
@@ -682,11 +672,11 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * Shifts the element currently at that position (if any) and any
      * subsequent elements to the right (adds one to their indices).
      *
-     * @param index index at which the specified element is to be inserted
+     * @param index   index at which the specified element is to be inserted
      * @param element element to be inserted
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public void add(int index, EroteticAnswer<T> element) {
+    public void add(final int index, final EroteticAnswer<T> element) {
         eroteticAnswers.add(index, element);
     }
 
@@ -697,7 +687,7 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * @return the element at the specified position in this list
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public EroteticAnswer<T> get(int index) {
+    public EroteticAnswer<T> get(final int index) {
         return eroteticAnswers.get(index);
     }
 
@@ -715,15 +705,14 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * and this collection contains one or more elements in common with the
      * specified collection.
      *
+     * @param c
      * @throws UnsupportedOperationException {@inheritDoc}
      * @throws ClassCastException            {@inheritDoc}
      * @throws NullPointerException          {@inheritDoc}
-     *
      * @see #remove(Object)
      * @see #contains(Object)
-     * @param c
      */
-    public boolean removeAll(Collection<?> c) {
+    public boolean removeAll(final Collection<?> c) {
         return eroteticAnswers.removeAll(c);
     }
 
@@ -741,15 +730,14 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * and this collection contains one or more elements not present in the
      * specified collection.
      *
+     * @param c
      * @throws UnsupportedOperationException {@inheritDoc}
      * @throws ClassCastException            {@inheritDoc}
      * @throws NullPointerException          {@inheritDoc}
-     *
      * @see #remove(Object)
      * @see #contains(Object)
-     * @param c
      */
-    public boolean retainAll(Collection<?> c) {
+    public boolean retainAll(final Collection<?> c) {
         return eroteticAnswers.retainAll(c);
     }
 
@@ -761,19 +749,19 @@ public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
      * if it's contained in this collection.  If all elements are so
      * contained <tt>true</tt> is returned, otherwise <tt>false</tt>.
      *
-     * @throws ClassCastException            {@inheritDoc}
-     * @throws NullPointerException          {@inheritDoc}
-     * @see #contains(Object)
      * @param c
+     * @throws ClassCastException   {@inheritDoc}
+     * @throws NullPointerException {@inheritDoc}
+     * @see #contains(Object)
      */
-    public boolean containsAll(Collection<?> c) {
+    public boolean containsAll(final Collection<?> c) {
         return eroteticAnswers.containsAll(c);
     }
 
     /**
      * Returns an iterator over the elements in this list (in proper
      * sequence).<p>
-     *
+     * <p>
      * This implementation merely returns a list iterator over the list.
      *
      * @return an iterator over the elements in this list (in proper sequence)

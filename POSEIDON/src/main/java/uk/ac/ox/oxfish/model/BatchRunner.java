@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
@@ -31,15 +30,17 @@ import uk.ac.ox.oxfish.utility.Pair;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 
 /**
  * Created by carrknight on 9/24/16.
  */
-public class BatchRunner
-{
+public class BatchRunner {
 
 
     /**
@@ -73,18 +74,15 @@ public class BatchRunner
      * random seed
      */
     private final long initialSeed;
-
+    private final Integer heatmapGathererStartYear;
     /**
      * the number of runs
      */
     private int runsDone = 0;
-
-    private final Integer heatmapGathererStartYear;
-
     /**
      * this is an helper for anything else that we need to do to a scenario
      */
-    private Consumer<Scenario>  scenarioSetup;
+    private Consumer<Scenario> scenarioSetup;
 
     /**
      * this is a hook for anything you want to do to FishState after the scenario is loaded but BEFORE start is called
@@ -105,19 +103,23 @@ public class BatchRunner
     //the problem with adding plugins through scenario is that they may screw up the seed as the stack has to randomize it
     //the solution then is simply not to start anything until the right year arrives. This will make the seed
     //still inconsistent after the startable... starts, but at least until then it's okay
-    private             LinkedList<Pair<Integer,
-            AlgorithmFactory<? extends AdditionalStartable>>>  outsidePlugins = new LinkedList<>();
+    private LinkedList<Pair<Integer,
+        AlgorithmFactory<? extends AdditionalStartable>>> outsidePlugins = new LinkedList<>();
+    private boolean scaleSeedWithRunsDone = true;
+    private StringBuffer tidyDailyDataWriter;
+    private List<String> dailyColumnsToPrint = new LinkedList<>();
 
     public BatchRunner(
-            Path yamlFile, int yearsToRun,@Nullable List<String> columnsToPrint,
-            @Nullable Path outputFolder, Path policyFile, long initialSeed,
-            Integer heatmapGathererStartYear) {
+        final Path yamlFile, final int yearsToRun, @Nullable final List<String> columnsToPrint,
+        @Nullable final Path outputFolder, final Path policyFile, final long initialSeed,
+        final Integer heatmapGathererStartYear
+    ) {
         this.yamlFile = yamlFile;
         this.initialSeed = initialSeed;
         this.yearsToRun = yearsToRun;
         this.columnsToPrint = new LinkedList<>();
-        if(columnsToPrint!=null) {
-            for (String column : columnsToPrint)
+        if (columnsToPrint != null) {
+            for (final String column : columnsToPrint)
                 this.columnsToPrint.add(column.trim());
         }
         this.outputFolder = outputFolder;
@@ -125,75 +127,75 @@ public class BatchRunner
         this.heatmapGathererStartYear = heatmapGathererStartYear;
     }
 
-    private boolean scaleSeedWithRunsDone = true;
-
     public boolean isScaleSeedWithRunsDone() {
         return scaleSeedWithRunsDone;
     }
 
-    public void setScaleSeedWithRunsDone(boolean scaleSeedWithRunsDone) {
+    public void setScaleSeedWithRunsDone(final boolean scaleSeedWithRunsDone) {
         this.scaleSeedWithRunsDone = scaleSeedWithRunsDone;
     }
 
-    public StringBuffer run(@Nullable StringBuffer writer) throws IOException {
+    public StringBuffer run(@Nullable final StringBuffer writer) throws IOException {
 
 
-        String simulationName = guessSimulationName() +"_"+runsDone;
+        final String simulationName = guessSimulationName() + "_" + runsDone;
 
 
-        long startTime = System.currentTimeMillis();
-        FishState model = FishStateUtilities.run(simulationName, getYamlFile(),
-                outputFolder == null ? null : getOutputFolder().resolve(simulationName),
-                scaleSeedWithRunsDone ? initialSeed + runsDone : initialSeed,
-                Log.LEVEL_INFO,
-                true, policyFile == null ?
-                        null : policyFile.toString(),
-                yearsToRun, false,
-                heatmapGathererStartYear,
-                getScenarioSetup(),
-                beforeStartSetup,
-                outsidePlugins,
-                modelInterruptors
+        final long startTime = System.currentTimeMillis();
+        final FishState model = FishStateUtilities.run(simulationName, getYamlFile(),
+            outputFolder == null ? null : getOutputFolder().resolve(simulationName),
+            scaleSeedWithRunsDone ? initialSeed + runsDone : initialSeed,
+            Level.INFO.getName(),
+            true, policyFile == null ?
+                null : policyFile.toString(),
+            yearsToRun, false,
+            heatmapGathererStartYear,
+            getScenarioSetup(),
+            beforeStartSetup,
+            outsidePlugins,
+            modelInterruptors
         );
-        System.out.println("Run took: " + (System.currentTimeMillis()-startTime)/1000 + " seconds");
+        System.out.println("Run took: " + (System.currentTimeMillis() - startTime) / 1000 + " seconds");
 
         //print individually
-        ArrayList<DataColumn> columns = new ArrayList<>();
-        if(columnsToPrint==null | columnsToPrint.isEmpty())
-            for (DataColumn column : model.getYearlyDataSet().getColumns()) {
+        final ArrayList<DataColumn> columns = new ArrayList<>();
+        if (columnsToPrint == null | columnsToPrint.isEmpty())
+            for (final DataColumn column : model.getYearlyDataSet().getColumns()) {
                 columnsToPrint.add(column.getName());
             }
 
         System.out.println(columnsToPrint);
-        for(String column : columnsToPrint) {
-            DataColumn columnToPrint = model.getYearlyDataSet().getColumn(column);
+        for (final String column : columnsToPrint) {
+            final DataColumn columnToPrint = model.getYearlyDataSet().getColumn(column);
 
-            if(columnToPrint!=null) {
+            if (columnToPrint != null) {
                 Preconditions.checkState(columnToPrint != null, "Can't find column " + column);
                 columns.add(columnToPrint);
             }
         }
 
 
-        if(outputFolder!=null) {
+        if (outputFolder != null) {
             FishStateUtilities.printCSVColumnsToFile(
-                    outputFolder.resolve(simulationName + "_run" + runsDone + ".csv").toFile(),
-                    columns.toArray(new DataColumn[columns.size()])
+                outputFolder.resolve(simulationName + "_run" + runsDone + ".csv").toFile(),
+                columns.toArray(new DataColumn[columns.size()])
             );
         }
         //print it tidyly if needed
-        int yearsActuallyRan = model.getYearlyDataSet().numberOfObservations();
-        if(writer!=null)
-            for(DataColumn column : columns)
-                for(int year=0; year<yearsActuallyRan; year++) {
+        final int yearsActuallyRan = model.getYearlyDataSet().numberOfObservations();
+        if (writer != null)
+            for (final DataColumn column : columns)
+                for (int year = 0; year < yearsActuallyRan; year++) {
                     writer.append(runsDone).append(",").append(year).append(",");
-                    if(columnModifier!=null)
-                        columnModifier.consume(writer,
-                                model,
-                                year);
+                    if (columnModifier != null)
+                        columnModifier.consume(
+                            writer,
+                            model,
+                            year
+                        );
 
                     writer.append(column.getName()).append(
-                            ",").append(column.get(year)).append("\n");
+                        ",").append(column.get(year)).append("\n");
 
                 }
         //if needed, push out also
@@ -206,70 +208,8 @@ public class BatchRunner
 
     }
 
-
-    private StringBuffer tidyDailyDataWriter;
-
-    private List<String> dailyColumnsToPrint = new LinkedList<>();
-
-
-    private void outputDailyDataToWrite(FishState model){
-        //don't bother if there isn't anything to write
-        if(tidyDailyDataWriter == null || dailyColumnsToPrint==null || dailyColumnsToPrint.isEmpty())
-            return;
-
-        //columns!
-        LinkedList<DataColumn> columns = new LinkedList<>();
-        System.out.println(dailyColumnsToPrint);
-        for(String column : dailyColumnsToPrint) {
-            DataColumn columnToPrint = model.getDailyDataSet().getColumn(column);
-
-            if(columnToPrint!=null) {
-                Preconditions.checkState(columnToPrint != null,
-                        "Can't find column " + column);
-                columns.add(columnToPrint);
-            }
-        }
-
-        int daysSimulated = model.getDailyDataSet().numberOfObservations();
-        for(DataColumn column : columns)
-            for(int day=0; day<daysSimulated; day++) {
-                tidyDailyDataWriter.append(runsDone).append(",").append(day).append(",");
-                if(columnModifier!=null)
-                    columnModifier.consume(tidyDailyDataWriter,
-                            model,
-                            day);
-                tidyDailyDataWriter.append(column.getName()).append(
-                        ",").append(column.get(day)).append("\n");
-
-            }
-
-
-
-    }
-
-    public StringBuffer getTidyDailyDataWriter() {
-        return tidyDailyDataWriter;
-    }
-
-    public void setTidyDailyDataWriter(StringBuffer tidyDailyDataWriter) {
-        this.tidyDailyDataWriter = tidyDailyDataWriter;
-    }
-
-    public List<String> getDailyColumnsToPrint() {
-        return dailyColumnsToPrint;
-    }
-
-    public void setDailyColumnsToPrint(List<String> dailyColumnsToPrint) {
-        this.dailyColumnsToPrint = dailyColumnsToPrint;
-    }
-
     public String guessSimulationName() {
         return yamlFile.getFileName().toString().split("\\.")[0];
-    }
-
-
-    public Path getFolderWhereSingleFilesAreDumped(){
-        return getOutputFolder().resolve(guessSimulationName());
     }
 
     /**
@@ -279,6 +219,91 @@ public class BatchRunner
      */
     public Path getYamlFile() {
         return yamlFile;
+    }
+
+    /**
+     * Getter for property 'outputFolder'.
+     *
+     * @return Value for property 'outputFolder'.
+     */
+    public Path getOutputFolder() {
+        return outputFolder;
+    }
+
+    /**
+     * Getter for property 'scenarioSetup'.
+     *
+     * @return Value for property 'scenarioSetup'.
+     */
+    public Consumer<Scenario> getScenarioSetup() {
+        return scenarioSetup;
+    }
+
+    private void outputDailyDataToWrite(final FishState model) {
+        //don't bother if there isn't anything to write
+        if (tidyDailyDataWriter == null || dailyColumnsToPrint == null || dailyColumnsToPrint.isEmpty())
+            return;
+
+        //columns!
+        final LinkedList<DataColumn> columns = new LinkedList<>();
+        System.out.println(dailyColumnsToPrint);
+        for (final String column : dailyColumnsToPrint) {
+            final DataColumn columnToPrint = model.getDailyDataSet().getColumn(column);
+
+            if (columnToPrint != null) {
+                Preconditions.checkState(
+                    columnToPrint != null,
+                    "Can't find column " + column
+                );
+                columns.add(columnToPrint);
+            }
+        }
+
+        final int daysSimulated = model.getDailyDataSet().numberOfObservations();
+        for (final DataColumn column : columns)
+            for (int day = 0; day < daysSimulated; day++) {
+                tidyDailyDataWriter.append(runsDone).append(",").append(day).append(",");
+                if (columnModifier != null)
+                    columnModifier.consume(
+                        tidyDailyDataWriter,
+                        model,
+                        day
+                    );
+                tidyDailyDataWriter.append(column.getName()).append(
+                    ",").append(column.get(day)).append("\n");
+
+            }
+
+
+    }
+
+    /**
+     * Setter for property 'scenarioSetup'.
+     *
+     * @param scenarioSetup Value to set for property 'scenarioSetup'.
+     */
+    public void setScenarioSetup(final Consumer<Scenario> scenarioSetup) {
+        this.scenarioSetup = scenarioSetup;
+    }
+
+    public StringBuffer getTidyDailyDataWriter() {
+        return tidyDailyDataWriter;
+    }
+
+    public void setTidyDailyDataWriter(final StringBuffer tidyDailyDataWriter) {
+        this.tidyDailyDataWriter = tidyDailyDataWriter;
+    }
+
+    public List<String> getDailyColumnsToPrint() {
+        return dailyColumnsToPrint;
+    }
+
+    public void setDailyColumnsToPrint(final List<String> dailyColumnsToPrint) {
+        this.dailyColumnsToPrint = dailyColumnsToPrint;
+    }
+
+    public Path getFolderWhereSingleFilesAreDumped() {
+        return getOutputFolder().resolve(guessSimulationName());
     }
 
     /**
@@ -297,16 +322,6 @@ public class BatchRunner
      */
     public List<String> getColumnsToPrint() {
         return columnsToPrint;
-    }
-
-
-    /**
-     * Getter for property 'outputFolder'.
-     *
-     * @return Value for property 'outputFolder'.
-     */
-    public Path getOutputFolder() {
-        return outputFolder;
     }
 
     /**
@@ -328,25 +343,6 @@ public class BatchRunner
     }
 
     /**
-     * Getter for property 'scenarioSetup'.
-     *
-     * @return Value for property 'scenarioSetup'.
-     */
-    public Consumer<Scenario> getScenarioSetup() {
-        return scenarioSetup;
-    }
-
-    /**
-     * Setter for property 'scenarioSetup'.
-     *
-     * @param scenarioSetup Value to set for property 'scenarioSetup'.
-     */
-    public void setScenarioSetup(Consumer<Scenario> scenarioSetup) {
-        this.scenarioSetup = scenarioSetup;
-    }
-
-
-    /**
      * Getter for property 'columnModifier'.
      *
      * @return Value for property 'columnModifier'.
@@ -360,22 +356,15 @@ public class BatchRunner
      *
      * @param columnModifier Value to set for property 'columnModifier'.
      */
-    public void setColumnModifier(ColumnModifier columnModifier) {
+    public void setColumnModifier(final ColumnModifier columnModifier) {
         this.columnModifier = columnModifier;
     }
-
-    static public interface ColumnModifier{
-
-        void consume(StringBuffer writer, FishState model, Integer year);
-
-    }
-
 
     public Consumer<FishState> getBeforeStartSetup() {
         return beforeStartSetup;
     }
 
-    public void setBeforeStartSetup(Consumer<FishState> beforeStartSetup) {
+    public void setBeforeStartSetup(final Consumer<FishState> beforeStartSetup) {
         this.beforeStartSetup = beforeStartSetup;
     }
 
@@ -383,17 +372,25 @@ public class BatchRunner
         return modelInterruptors;
     }
 
-    public void setModelInterruptors(List<Predicate<FishState>> modelInterruptors) {
+    public void setModelInterruptors(final List<Predicate<FishState>> modelInterruptors) {
         this.modelInterruptors = modelInterruptors;
     }
 
-    public             LinkedList<Pair<Integer,
-            AlgorithmFactory<? extends AdditionalStartable>>>  getOutsidePlugins() {
+    public LinkedList<Pair<Integer,
+        AlgorithmFactory<? extends AdditionalStartable>>> getOutsidePlugins() {
         return outsidePlugins;
     }
 
-    public void setOutsidePlugins(            LinkedList<Pair<Integer,
-            AlgorithmFactory<? extends AdditionalStartable>>>  outsidePlugins) {
+    public void setOutsidePlugins(
+        final LinkedList<Pair<Integer,
+            AlgorithmFactory<? extends AdditionalStartable>>> outsidePlugins
+    ) {
         this.outsidePlugins = outsidePlugins;
+    }
+
+    public interface ColumnModifier {
+
+        void consume(StringBuffer writer, FishState model, Integer year);
+
     }
 }

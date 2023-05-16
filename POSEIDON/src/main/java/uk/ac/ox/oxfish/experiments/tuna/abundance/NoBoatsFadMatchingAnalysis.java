@@ -32,48 +32,54 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
 
 public class NoBoatsFadMatchingAnalysis {
 
     private final static double[] BEST_SOLUTION =
-            //fad duds
-            //new double[]{6.010, 9.067, 3.156,-3.473, 2.145,-10.000,-0.516, 2.314, 4.069,-8.192,-7.080,-7.547, 10.000,-5.177};
-    //weibull
-            new double[]{-8.396,-8.842,-5.499, 1.593, 6.768,-9.674,-0.747, 10.000,-3.828,-10.000, 9.576};
+        //fad duds
+        //new double[]{6.010, 9.067, 3.156,-3.473, 2.145,-10.000,-0.516, 2.314, 4.069,-8.192,-7.080,-7.547, 10.000,-5.177};
+        //weibull
+        new double[]{-8.396, -8.842, -5.499, 1.593, 6.768, -9.674, -0.747, 10.000, -3.828, -10.000, 9.576};
 
     private static final Path CALIBRATION_FILE =
-            //fad duds:
+        //fad duds:
 //            Paths.get(
 //            "docs","20220208 noboats_tuna","calibration","new_currents","carrknight",
 //            "2022-03-02_15.01.42_withduds3mo","calibration_withfads.yaml"
 //    );
-    //weibull:
-    Paths.get("docs/20220208 noboats_tuna/calibration/new_currents/carrknight/2022-03-07_20.56.45_weibull/calibration_weibull.yaml");
+        //weibull:
+        Paths.get(
+            "docs/20220208 noboats_tuna/calibration/new_currents/carrknight/2022-03-07_20.56.45_weibull/calibration_weibull.yaml");
 
-    public static void main(String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException {
 
-        FishYAML yaml = new FishYAML();
-        GenericOptimization optimization = yaml.loadAs(new FileReader(CALIBRATION_FILE.toFile()),
-                                                              GenericOptimization.class);
-
-
-        Scenario bestScenario = GenericOptimization.buildScenario(
-                BEST_SOLUTION,
-                Paths.get(optimization.getScenarioFile()).toFile(),
-                optimization.getParameters()
+        final FishYAML yaml = new FishYAML();
+        final GenericOptimization optimization = yaml.loadAs(
+            new FileReader(CALIBRATION_FILE.toFile()),
+            GenericOptimization.class
         );
-        ((ExogenousFadSetterCSVFactory) ((EpoFadsOnlyAbundanceScenario) bestScenario).getFadSetterFactory()).setKeepLog(true);
 
-        yaml.dump(bestScenario,new FileWriter(CALIBRATION_FILE.getParent().resolve("best_scenario.yaml").toFile()));
 
-        FishStateUtilities.run("logged",CALIBRATION_FILE.getParent().resolve("best_scenario.yaml"),
-                               CALIBRATION_FILE.getParent().resolve("best_run"),
-                               0L,
-                               0,
-                               false,
-                               null,2,
-                               false,
-                               -1,null,null,null,null);
+        final Scenario bestScenario = GenericOptimization.buildScenario(
+            BEST_SOLUTION,
+            Paths.get(optimization.getScenarioFile()).toFile(),
+            optimization.getParameters()
+        );
+        ((ExogenousFadSetterCSVFactory) ((EpoFadsOnlyAbundanceScenario) bestScenario).getFadSetterFactory()).setKeepLog(
+            true);
+
+        yaml.dump(bestScenario, new FileWriter(CALIBRATION_FILE.getParent().resolve("best_scenario.yaml").toFile()));
+
+        FishStateUtilities.run("logged", CALIBRATION_FILE.getParent().resolve("best_scenario.yaml"),
+            CALIBRATION_FILE.getParent().resolve("best_run"),
+            0L,
+            Level.ALL.getName(),
+            false,
+            null, 2,
+            false,
+            -1, null, null, null, null
+        );
 
 
     }

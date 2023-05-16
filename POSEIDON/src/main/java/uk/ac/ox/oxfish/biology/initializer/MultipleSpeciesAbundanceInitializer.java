@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.initializer;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
@@ -41,13 +40,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 /**
  * Create multiple species, each abundance (count) based rather than biomass based
  * Created by carrknight on 3/17/16.
  */
-public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInitializer
-{
+public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInitializer {
 
     public static final String FAKE_SPECIES_NAME = "Others";
 
@@ -56,7 +55,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
     /**
      * the path to the biology folder, which must contain a count.csv and a meristic.yaml file
      */
-    private final LinkedHashMap<String,Path> biologicalDirectories;
+    private final LinkedHashMap<String, Path> biologicalDirectories;
 
 
     /**
@@ -76,12 +75,35 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      * for everything else that is not directly modeled?
      */
     private final boolean addOtherSpecies;
+    /**
+     * defines the proportion of fish going to any sea-tile. No checks are made that the
+     * proportions sum up to one so be careful!
+     */
+    private final HashMap<Species,
+        Function<SeaTile, Double>> allocators = new LinkedHashMap<>();
+    /**
+     * list of all the abundance based local biologies
+     */
+    private final LinkedHashMap<SeaTile, AbundanceLocalBiology> locals = new LinkedHashMap<>();
+    /**
+     * contains all the mortality+recruitment processes of each species
+     */
+    private final LinkedHashMap<Species, SingleSpeciesNaturalProcesses> naturalProcesses = new LinkedHashMap<>();
+    /**
+     * holds the "total count" of fish as initially read from data
+     */
+    private final LinkedHashMap<Species, double[][]> initialAbundance = new LinkedHashMap<>();
+    /**
+     * holds the weight given to each biology object when first created
+     */
+    private final LinkedHashMap<Species, HashMap<AbundanceLocalBiology, Double>> initialWeights = new LinkedHashMap<>();
     private String countFileName = "count.csv";
 
     public MultipleSpeciesAbundanceInitializer(
-            LinkedHashMap<String, Path> biologicalDirectories, double scaling,
-            boolean fixedRecruitmentDistribution, final boolean mortality100Percent, boolean addOtherSpecies,
-            boolean rounding) {
+        final LinkedHashMap<String, Path> biologicalDirectories, final double scaling,
+        final boolean fixedRecruitmentDistribution, final boolean mortality100Percent, final boolean addOtherSpecies,
+        final boolean rounding
+    ) {
         this.biologicalDirectories = biologicalDirectories;
         this.scaling = scaling;
         this.fixedRecruitmentDistribution = fixedRecruitmentDistribution;
@@ -90,120 +112,14 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
         this.rounding = rounding;
     }
 
-    /**
-     * defines the proportion of fish going to any sea-tile. No checks are made that the
-     * proportions sum up to one so be careful!
-     */
-    private final HashMap<Species,
-            Function<SeaTile, Double>> allocators = new LinkedHashMap<>();
-
-
-
-    /**
-     * list of all the abundance based local biologies
-     */
-    private final LinkedHashMap<SeaTile,AbundanceLocalBiology> locals = new LinkedHashMap<>();
-
-
-    /**
-     * contains all the mortality+recruitment processes of each species
-     */
-    private final LinkedHashMap<Species,SingleSpeciesNaturalProcesses> naturalProcesses = new LinkedHashMap<>();
-
-
-    /**
-     * holds the "total count" of fish as initially read from data
-     */
-    private final LinkedHashMap<Species, double[][]> initialAbundance = new LinkedHashMap<>();
-
-    /**
-     * the generate local made static so the MultipleSpeciesInitializer can use it too
-     *
-     * @param biology global biology file
-     * @param seaTile seatile
-     * @param locals a map seatiles---> abundance local biologies that gets filled if this is not a land tile
-     * @return empty biology on land, abundance biology in water
-     */
-    public static LocalBiology generateAbundanceBiologyExceptOnLand(
-            GlobalBiology biology, SeaTile seaTile, HashMap<SeaTile, AbundanceLocalBiology> locals) {
-        if (seaTile.isLand())
-            return new EmptyLocalBiology();
-
-
-
-
-        AbundanceLocalBiology local = new AbundanceLocalBiology(biology);
-        locals.put(seaTile,local);
-        return local;
-    }
-
-    /**
-     * read up a folder that contains meristics.yaml and turn it into a species object
-     * @param biologicalDirectory the folder containing meristics.yaml
-     * @param speciesName the name of the species
-     * @return the new species
-     * @throws IOException
-     */
-    public static Species generateSpeciesFromFolder(Path biologicalDirectory, String speciesName) throws IOException {
-        FishYAML yaml = new FishYAML();
-        String meristicFile = String.join("\n", Files.readAllLines(biologicalDirectory.resolve("meristics.yaml")));
-        MeristicsInput input = yaml.loadAs(meristicFile, MeristicsInput.class);
-        return new Species(speciesName, input);
-    }
-
-
-
-
-    public static SingleSpeciesNaturalProcesses initializeNaturalProcesses(
-
-            FishState model, Species species,
-            Map<SeaTile, AbundanceLocalBiology> locals,
-            StockAssessmentCaliforniaMeristics meristics,
-            boolean preserveLastAge,
-            int yearDelay,
-            boolean rounding
-    ){
-
-        AgingProcess agingProcess = new StandardAgingProcess(preserveLastAge);
-        SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
-                yearDelay > 0 ?
-                        new RecruitmentBySpawningBiomassDelayed(
-                                meristics.getVirginRecruits(),
-                                meristics.getSteepness(),
-                                meristics.getCumulativePhi(),
-                                meristics.isAddRelativeFecundityToSpawningBiomass(),
-                                meristics.getMaturity(),
-                                meristics.getRelativeFecundity(), FishStateUtilities.FEMALE,
-                                yearDelay) :
-                        new RecruitmentBySpawningBiomass(
-                                meristics.getVirginRecruits(),
-                                meristics.getSteepness(),
-                                meristics.getCumulativePhi(),
-                                meristics.isAddRelativeFecundityToSpawningBiomass(),
-                                meristics.getMaturity(),
-                                meristics.getRelativeFecundity(), FishStateUtilities.FEMALE, false),
-                species,
-                rounding, agingProcess,
-                new NoAbundanceDiffusion(),
-                new ExponentialMortalityProcess(meristics),
-                false);
-        for (Map.Entry<SeaTile, AbundanceLocalBiology> entry : locals.entrySet()) {
-            processes.add(entry.getValue(),entry.getKey());
-        }
-        model.registerStartable(processes);
-        return processes;
-
-    }
-
-    public double[][] getInitialAbundance (Species species)
-    {
+    public double[][] getInitialAbundance(final Species species) {
         return initialAbundance.get(species);
     }
 
-
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -212,12 +128,37 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
-        return generateAbundanceBiologyExceptOnLand(biology,seaTile,
-                                                                                      locals);
+        final GlobalBiology biology,
+        final SeaTile seaTile,
+        final MersenneTwisterFast random,
+        final int mapHeightInCells,
+        final int mapWidthInCells,
+        final NauticalMap map
+    ) {
+        return generateAbundanceBiologyExceptOnLand(biology, seaTile,
+            locals
+        );
     }
 
+    /**
+     * the generate local made static so the MultipleSpeciesInitializer can use it too
+     *
+     * @param biology global biology file
+     * @param seaTile seatile
+     * @param locals  a map seatiles---> abundance local biologies that gets filled if this is not a land tile
+     * @return empty biology on land, abundance biology in water
+     */
+    public static LocalBiology generateAbundanceBiologyExceptOnLand(
+        final GlobalBiology biology, final SeaTile seaTile, final HashMap<SeaTile, AbundanceLocalBiology> locals
+    ) {
+        if (seaTile.isLand())
+            return new EmptyLocalBiology();
+
+
+        final AbundanceLocalBiology local = new AbundanceLocalBiology(biology);
+        locals.put(seaTile, local);
+        return local;
+    }
 
     /**
      * creates the global biology object for the model
@@ -227,28 +168,34 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      * @return a global biology object
      */
     @Override
-    public GlobalBiology generateGlobal(MersenneTwisterFast random, FishState modelBeingInitialized) {
+    public GlobalBiology generateGlobal(final MersenneTwisterFast random, final FishState modelBeingInitialized) {
 
-        List<Species> speciesList = new LinkedList<>();
+        final List<Species> speciesList = new LinkedList<>();
 
         try {
-            for(Map.Entry<String,Path> directory : biologicalDirectories.entrySet())
-            {
+            for (final Map.Entry<String, Path> directory : biologicalDirectories.entrySet()) {
                 speciesList.add(
-                        generateSpeciesFromFolder(directory.getValue(),
-                                                  directory.getKey()));
+                    generateSpeciesFromFolder(
+                        directory.getValue(),
+                        directory.getKey()
+                    ));
 
 
             }
             //need to add an additional species to catch "all"
-            if(addOtherSpecies)
-                speciesList.add(new Species(FAKE_SPECIES_NAME, StockAssessmentCaliforniaMeristics.FAKE_MERISTICS, true));
+            if (addOtherSpecies)
+                speciesList.add(new Species(
+                    FAKE_SPECIES_NAME,
+                    StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,
+                    true
+                ));
 
 
             return new GlobalBiology(speciesList.toArray(new Species[speciesList.size()]));
-        }catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
-            Log.error("Failed to instantiate the species because I couldn't find the meristics.yaml file in the folder provided");
+            Logger.getGlobal().severe(
+                "Failed to instantiate the species because I couldn't find the meristics.yaml file in the folder provided");
 
         }
         System.exit(-1);
@@ -256,6 +203,26 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 
     }
 
+    /**
+     * read up a folder that contains meristics.yaml and turn it into a species object
+     *
+     * @param biologicalDirectory the folder containing meristics.yaml
+     * @param speciesName         the name of the species
+     * @return the new species
+     * @throws IOException
+     */
+    public static Species generateSpeciesFromFolder(
+        final Path biologicalDirectory,
+        final String speciesName
+    ) throws IOException {
+        final FishYAML yaml = new FishYAML();
+        final String meristicFile = String.join(
+            "\n",
+            Files.readAllLines(biologicalDirectory.resolve("meristics.yaml"))
+        );
+        final MeristicsInput input = yaml.loadAs(meristicFile, MeristicsInput.class);
+        return new Species(speciesName, input);
+    }
 
     /**
      * after all the tiles have been instantiated this method gets called once to put anything together or to smooth
@@ -268,29 +235,30 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
+        final GlobalBiology biology, final NauticalMap map, final MersenneTwisterFast random, final FishState model
+    ) {
 
         try {
-            for (Species species : biology.getSpecies())
-            {
+            for (final Species species : biology.getSpecies()) {
 
-                if(addOtherSpecies && biologicalDirectories.get(species.getName()) == null)
-                {
-                    Preconditions.checkState(species.getName().equals(FAKE_SPECIES_NAME),
-                                             "Do not have biological directory for species " + species.getName());
-                    naturalProcesses.put(species,new MockNaturalProcess(species));
+                if (addOtherSpecies && biologicalDirectories.get(species.getName()) == null) {
+                    Preconditions.checkState(
+                        species.getName().equals(FAKE_SPECIES_NAME),
+                        "Do not have biological directory for species " + species.getName()
+                    );
+                    naturalProcesses.put(species, new MockNaturalProcess(species));
                     continue;
                 }
 
-                InitialAbundanceFromFileFactory factory =
-                        new InitialAbundanceFromFileFactory(
-                                biologicalDirectories.get(species.getName()).resolve(countFileName)
-                        );
-                double[][] totalCount = factory.apply(model).getInitialAbundance();
-                initialAbundance.put(species,totalCount);
+                final InitialAbundanceFromFileFactory factory =
+                    new InitialAbundanceFromFileFactory(
+                        biologicalDirectories.get(species.getName()).resolve(countFileName)
+                    );
+                final double[][] totalCount = factory.apply(model).getInitialAbundance();
+                initialAbundance.put(species, totalCount);
 
                 //prepare the map biology-->ratio of fish to put there
-                LinkedHashMap<AbundanceLocalBiology, Double> currentWeightMap = new LinkedHashMap<>(locals.size());
+                final LinkedHashMap<AbundanceLocalBiology, Double> currentWeightMap = new LinkedHashMap<>(locals.size());
                 initialWeights.put(species, currentWeightMap);
                 //we start with location--->ratio of fish so we need to go location--->biology through the allocator
                 turnLocationRatioMaptoBiologyRatioMap(species, currentWeightMap);
@@ -303,31 +271,35 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
                 resetAllLocalBiologies(species, totalCount, currentWeightMap);
 
                 //start the natural process (use single species abundance since it's easier)
-                SingleSpeciesNaturalProcesses process = initializeNaturalProcesses(
-                        model,species,locals, ((StockAssessmentCaliforniaMeristics) species.getMeristics()),
-                        preserveLastAge,
-                        0,
-                        rounding);
+                final SingleSpeciesNaturalProcesses process = initializeNaturalProcesses(
+                    model, species, locals, ((StockAssessmentCaliforniaMeristics) species.getMeristics()),
+                    preserveLastAge,
+                    0,
+                    rounding
+                );
                 //if you want to keep recruits to spawn in the same places this is the time to do it
-                if(fixedRecruitmentDistribution) {
+                if (fixedRecruitmentDistribution) {
                     process.setRecruitsAllocator(
-                            new BiomassAllocator() {
-                                @Override
-                                public double allocate(SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
-                                    return currentWeightMap.get(locals.get(tile));
-                                }
+                        new BiomassAllocator() {
+                            @Override
+                            public double allocate(
+                                final SeaTile tile,
+                                final NauticalMap map,
+                                final MersenneTwisterFast random
+                            ) {
+                                return currentWeightMap.get(locals.get(tile));
                             }
+                        }
                     );
                 }
-                naturalProcesses.put(species,process);
+                naturalProcesses.put(species, process);
             }
 
             //now go back and set as wastelands all tiles that have 0 fish
             tileloop:
-            for(SeaTile tile : map.getAllSeaTilesExcludingLandAsList())
-            {
-                for(Species species : biology.getSpecies())
-                    if(tile.getBiomass(species)>0)
+            for (final SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
+                for (final Species species : biology.getSpecies())
+                    if (tile.getBiomass(species) > 0)
                         continue tileloop;
                 //if you are here, the place is barren; let's just switch to a empty local biomass
                 tile.setBiology(new EmptyLocalBiology());
@@ -336,10 +308,10 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 
             //done!
             biologicalDirectories.clear();
-        }
-        catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
-            Log.error("Failed to locate or read count.csv correctly. Could not instantiate the local biology");
+            Logger.getGlobal()
+                .severe("Failed to locate or read count.csv correctly. Could not instantiate the local biology");
             System.exit(-1);
         }
 
@@ -347,19 +319,126 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
     }
 
     private void turnLocationRatioMaptoBiologyRatioMap(
-            Species species, HashMap<AbundanceLocalBiology, Double> currentWeightMap) {
-        Function<SeaTile, Double> allocator = allocators.get(species);
+        final Species species, final HashMap<AbundanceLocalBiology, Double> currentWeightMap
+    ) {
+        final Function<SeaTile, Double> allocator = allocators.get(species);
         Preconditions.checkArgument(allocator != null);
         //fill in the location
-        for(Map.Entry<SeaTile,AbundanceLocalBiology> local : locals.entrySet())
-        {
+        for (final Map.Entry<SeaTile, AbundanceLocalBiology> local : locals.entrySet()) {
 
             //find the ratio by allocator
-            double ratio = allocator.apply(local.getKey());
-            currentWeightMap.put(local.getValue(),ratio);
+            final double ratio = allocator.apply(local.getKey());
+            currentWeightMap.put(local.getValue(), ratio);
         }
     }
 
+    public void resetAllLocalBiologies(
+        final Species speciesToReset, final double[][] newTotalFishCount,
+        final HashMap<AbundanceLocalBiology, Double> biologyToProportionOfFishThere
+    ) {
+        if (speciesToReset.getName().equals(FAKE_SPECIES_NAME))
+            return;
+
+        final LinkedHashMap<AbundanceLocalBiology, Double> ratiosLocalCopy = new LinkedHashMap<>(
+            biologyToProportionOfFishThere);
+        for (final Map.Entry<AbundanceLocalBiology, Double> ratio : biologyToProportionOfFishThere.entrySet()) {
+            //if this is not present in the local list
+            if (!locals.containsValue(ratio.getKey())) {
+                //it must be that we assumed this was a wasteland and will still be so!
+                Preconditions.checkArgument(ratio.getValue() == 0);
+                //remove it from the local copy!
+                ratiosLocalCopy.remove(ratio.getKey());
+            }
+
+        }
+
+        Preconditions.checkArgument(
+            locals.values().containsAll(ratiosLocalCopy.keySet()),
+            "Some local biologies in the proportion map are not present in the initializer list"
+        );
+        Preconditions.checkArgument(
+            ratiosLocalCopy.keySet().containsAll(locals.values()),
+            "Some local biologies in the masterlist are not present in the proportion map"
+        );
+
+        final double[] maleRemainder = new double[speciesToReset.getNumberOfBins()];
+        final double[] femaleRemainder = new double[speciesToReset.getNumberOfBins()];
+        for (final Map.Entry<AbundanceLocalBiology, Double> ratio : ratiosLocalCopy.entrySet()) {
+
+            //get the ratio back
+            final AbundanceLocalBiology local = ratio.getKey();
+            final StructuredAbundance abundance = local.getAbundance(speciesToReset);
+            Preconditions.checkArgument(abundance.getSubdivisions() == 2, "coded for ");
+            for (int i = 0; i < speciesToReset.getNumberOfBins(); i++) {
+
+
+                final double doubleMale = scaling * newTotalFishCount[FishStateUtilities.MALE][i] * ratio.getValue() +
+                    maleRemainder[i];
+
+                abundance.asMatrix()[FishStateUtilities.MALE][i] = doubleMale;
+                final double doubleFemale = scaling * newTotalFishCount[FishStateUtilities.FEMALE][i] * ratio.getValue() +
+                    femaleRemainder[i];
+                abundance.asMatrix()[FishStateUtilities.FEMALE][i] = doubleFemale;
+
+
+                if (rounding) {
+                    abundance.asMatrix()[FishStateUtilities.MALE][i] = (int) abundance.asMatrix()[FishStateUtilities.MALE][i];
+                    maleRemainder[i] = (doubleMale - abundance.asMatrix()[FishStateUtilities.MALE][i]);
+                    abundance.asMatrix()[FishStateUtilities.FEMALE][i] = (int) abundance.asMatrix()[FishStateUtilities.FEMALE][i];
+                    femaleRemainder[i] = (doubleFemale - abundance.asMatrix()[FishStateUtilities.FEMALE][i]);
+
+                }
+
+
+            }
+        }
+        Logger.getGlobal().fine(() -> speciesToReset + " resetted to total biomass: " +
+            locals.values().stream().mapToDouble(value -> value.getBiomass(speciesToReset)).sum());
+    }
+
+    public static SingleSpeciesNaturalProcesses initializeNaturalProcesses(
+
+        final FishState model, final Species species,
+        final Map<SeaTile, AbundanceLocalBiology> locals,
+        final StockAssessmentCaliforniaMeristics meristics,
+        final boolean preserveLastAge,
+        final int yearDelay,
+        final boolean rounding
+    ) {
+
+        final AgingProcess agingProcess = new StandardAgingProcess(preserveLastAge);
+        final SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
+            yearDelay > 0 ?
+                new RecruitmentBySpawningBiomassDelayed(
+                    meristics.getVirginRecruits(),
+                    meristics.getSteepness(),
+                    meristics.getCumulativePhi(),
+                    meristics.isAddRelativeFecundityToSpawningBiomass(),
+                    meristics.getMaturity(),
+                    meristics.getRelativeFecundity(), FishStateUtilities.FEMALE,
+                    yearDelay
+                ) :
+                new RecruitmentBySpawningBiomass(
+                    meristics.getVirginRecruits(),
+                    meristics.getSteepness(),
+                    meristics.getCumulativePhi(),
+                    meristics.isAddRelativeFecundityToSpawningBiomass(),
+                    meristics.getMaturity(),
+                    meristics.getRelativeFecundity(), FishStateUtilities.FEMALE, false
+                ),
+            species,
+            rounding, agingProcess,
+            new NoAbundanceDiffusion(),
+            new ExponentialMortalityProcess(meristics),
+            false
+        );
+        for (final Map.Entry<SeaTile, AbundanceLocalBiology> entry : locals.entrySet()) {
+            processes.add(entry.getValue(), entry.getKey());
+        }
+        model.registerStartable(processes);
+        return processes;
+
+    }
 
     /**
      * you must at all time be ready to reset local biology to its pristine state
@@ -367,105 +446,34 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      * @param species species you want the biomass resetted
      */
     @Override
-    public void resetLocalBiology(Species species) {
+    public void resetLocalBiology(final Species species) {
 
-        resetAllLocalBiologies(species,
-                               initialAbundance.get(species),
-                               initialWeights.get(species));
+        resetAllLocalBiologies(
+            species,
+            initialAbundance.get(species),
+            initialWeights.get(species)
+        );
 
     }
-
-    public void resetAllLocalBiologies(
-            Species speciesToReset, double[][] newTotalFishCount,
-            HashMap<AbundanceLocalBiology, Double> biologyToProportionOfFishThere)
-    {
-        if(speciesToReset.getName().equals(FAKE_SPECIES_NAME))
-            return;
-
-        LinkedHashMap<AbundanceLocalBiology,Double> ratiosLocalCopy = new LinkedHashMap<>(biologyToProportionOfFishThere);
-        for (Map.Entry<AbundanceLocalBiology, Double> ratio : biologyToProportionOfFishThere.entrySet()) {
-            //if this is not present in the local list
-            if(!locals.values().contains(ratio.getKey()))
-            {
-                //it must be that we assumed this was a wasteland and will still be so!
-                Preconditions.checkArgument(ratio.getValue()==0);
-                //remove it from the local copy!
-                ratiosLocalCopy.remove(ratio.getKey());
-            }
-
-        }
-
-        Preconditions.checkArgument(locals.values().containsAll(ratiosLocalCopy.keySet()),
-                                    "Some local biologies in the proportion map are not present in the initializer list");
-        Preconditions.checkArgument(ratiosLocalCopy.keySet().containsAll(locals.values()),
-                                    "Some local biologies in the masterlist are not present in the proportion map");
-
-        double maleRemainder[] = new double[speciesToReset.getNumberOfBins()];
-        double femaleRemainder[] = new double[speciesToReset.getNumberOfBins()];
-        for(Map.Entry<AbundanceLocalBiology,Double> ratio : ratiosLocalCopy.entrySet())
-        {
-
-            //get the ratio back
-            AbundanceLocalBiology local = ratio.getKey();
-            StructuredAbundance abundance = local.getAbundance(speciesToReset);
-            Preconditions.checkArgument(abundance.getSubdivisions()==2, "coded for ");
-            for(int i=0; i<speciesToReset.getNumberOfBins(); i++)
-            {
-
-
-                double doubleMale = scaling * newTotalFishCount[FishStateUtilities.MALE][i] * ratio.getValue()  +
-                        maleRemainder[i];
-
-                abundance.asMatrix()[FishStateUtilities.MALE][i] = doubleMale;
-                double doubleFemale = scaling * newTotalFishCount[FishStateUtilities.FEMALE][i] * ratio.getValue()  +
-                        femaleRemainder[i];
-                abundance.asMatrix()[FishStateUtilities.FEMALE][i] = doubleFemale;
-
-
-                if(rounding)
-                {
-                    abundance.asMatrix()[FishStateUtilities.MALE][i] = (int) abundance.asMatrix()[FishStateUtilities.MALE][i];
-                    maleRemainder[i] =  (doubleMale-abundance.asMatrix()[FishStateUtilities.MALE][i]);
-                    abundance.asMatrix()[FishStateUtilities.FEMALE][i] = (int) abundance.asMatrix()[FishStateUtilities.FEMALE][i];
-                    femaleRemainder[i] =  (doubleFemale-abundance.asMatrix()[FishStateUtilities.FEMALE][i]);
-
-                }
-
-
-
-            }
-        }
-        if(Log.DEBUG)
-            Log.debug(speciesToReset + " resetted to total biomass: " +
-                         locals.values().stream().mapToDouble(value -> value.getBiomass(speciesToReset)).sum());
-    }
-
-    /**
-     * holds the weight given to each biology object when first created
-     */
-    private final LinkedHashMap<Species,HashMap<AbundanceLocalBiology,Double>> initialWeights = new LinkedHashMap<>();
-
-
-
-
 
     /**
      * puts the function describing the % of biomass that will initially be allocated to this sea-tile
      */
     public Function<SeaTile, Double> putAllocator(
-            Species key,
-            Function< SeaTile, Double> value) {
+        final Species key,
+        final Function<SeaTile, Double> value
+    ) {
         return allocators.put(key, value);
     }
 
-    public int getNumberOfFishableTiles(){
+    public int getNumberOfFishableTiles() {
         return locals.size();
     }
 
     /**
-
+     *
      */
-    public HashMap<AbundanceLocalBiology,Double> getInitialWeights(Species species) {
+    public HashMap<AbundanceLocalBiology, Double> getInitialWeights(final Species species) {
         return initialWeights.get(species);
     }
 
@@ -483,7 +491,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      *
      * @return Value for property 'naturalProcesses'.
      */
-    public SingleSpeciesNaturalProcesses getNaturalProcesses(Species species) {
+    public SingleSpeciesNaturalProcesses getNaturalProcesses(final Species species) {
         return naturalProcesses.get(species);
     }
 
@@ -501,7 +509,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      *
      * @param countFileName Value to set for property 'countFileName'.
      */
-    public void setCountFileName(String countFileName) {
+    public void setCountFileName(final String countFileName) {
         this.countFileName = countFileName;
     }
 }

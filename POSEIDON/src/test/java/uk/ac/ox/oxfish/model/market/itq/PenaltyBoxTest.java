@@ -20,11 +20,13 @@
 
 package uk.ac.ox.oxfish.model.market.itq;
 
-import com.esotericsoftware.minlog.Log;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -34,21 +36,21 @@ public class PenaltyBoxTest {
 
     @Test
     public void penaltyBoxTest() throws Exception {
-        Log.info("Here I check that people stay the right amount of time in the penalty box");
+        Logger.getGlobal().info("Here I check that people stay the right amount of time in the penalty box");
 
-        Fisher one  = mock(Fisher.class);
-        Fisher two  = mock(Fisher.class);
+        final Fisher one = mock(Fisher.class);
+        final Fisher two = mock(Fisher.class);
 
-        PenaltyBox box = new PenaltyBox(10);
+        final PenaltyBox box = new PenaltyBox(10);
         box.registerTrader(one);
         assertTrue(box.has(one));
-        assertTrue(!box.has(two));
+        assertFalse(box.has(two));
 
         //step it 5 times
-        for(int i=0; i<5; i++)
+        for (int i = 0; i < 5; i++)
             box.step(mock(FishState.class));
         assertTrue(box.has(one));
-        assertTrue(!box.has(two));
+        assertFalse(box.has(two));
 
         //add two to the list
         box.registerTrader(two);
@@ -56,10 +58,10 @@ public class PenaltyBoxTest {
         assertTrue(box.has(two));
 
         //step it 5 times
-        for(int i=0; i<5; i++)
+        for (int i = 0; i < 5; i++)
             box.step(mock(FishState.class));
         //one should be out, two should be in
-        assertTrue(!box.has(one));
+        assertFalse(box.has(one));
         assertTrue(box.has(two));
     }
 }

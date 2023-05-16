@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.gear;
 
-import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
@@ -44,6 +43,7 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -53,158 +53,163 @@ import static uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing.D
  * Uses one gear at a time, updating it at scheduled times. Whenever it updates, it resets fishers' predictor
  * Created by carrknight on 6/13/16.
  */
-public class PeriodicUpdateGearStrategy implements GearStrategy
-{
+public class PeriodicUpdateGearStrategy implements GearStrategy {
 
 
-    /**
-     * this is always null except when it's time to change gear (this works as a flag to also reset predictors)
-     */
-    private Gear toReturn = null;
-
+    final static public String tag = "PERIODIC_UPDATE_GEAR";
+    @Nullable
+    final List<Gear> options;
     /**
      * if true the gear is updated every year. Otherwise it is updated every month
      */
     final private boolean yearly;
-
-
-    final static public String tag = "PERIODIC_UPDATE_GEAR";
-
-    @Nullable
-    final List<Gear> options;
-
+    final private ExploreImitateAdaptation<? extends Gear> gearAdaptation;
+    /**
+     * this is always null except when it's time to change gear (this works as a flag to also reset predictors)
+     */
+    private Gear toReturn = null;
+    /**
+     * link to the fisher. Grabbed at start() only. Doubles as a flag of "being started"
+     */
+    private Fisher fisher;
 
     /**
      * given an exploration step, builds the adaptation algorithm around it
-     * @param yearly whether to choose every year or every 2 months
+     *
+     * @param yearly          whether to choose every year or every 2 months
      * @param explorationStep how an agent explores
-     * @param probability the probability of exploring, imitating and so on
+     * @param probability     the probability of exploring, imitating and so on
      */
     public PeriodicUpdateGearStrategy(
-            boolean yearly,
-            RandomStep<Gear> explorationStep,
-            AdaptationProbability probability
+        final boolean yearly,
+        final RandomStep<Gear> explorationStep,
+        final AdaptationProbability probability
     ) {
-        options=null;
+        options = null;
         this.yearly = yearly;
         this.gearAdaptation = new ExploreImitateAdaptation<>(
-                new Predicate<Fisher>() {
-                    @Override
-                    public boolean test(Fisher fisher1) {
-                        return true;
-                    }
-                },
-                new BeamHillClimbing<>(true,
-                                       true, DEFAULT_DYNAMIC_NETWORK,
-                                       explorationStep),
-                new Actuator<Fisher,Gear>() {
-                    @Override
-                    public void apply(Fisher fisher, Gear change, FishState model) {
+            new Predicate<Fisher>() {
+                @Override
+                public boolean test(final Fisher fisher1) {
+                    return true;
+                }
+            },
+            new BeamHillClimbing<>(true,
+                true, DEFAULT_DYNAMIC_NETWORK,
+                explorationStep
+            ),
+            new Actuator<Fisher, Gear>() {
+                @Override
+                public void apply(final Fisher fisher, final Gear change, final FishState model) {
 
-                        toReturn = change.makeCopy();
-                    }
-                },
-                new Sensor<Fisher,Gear>() {
-                    @Override
-                    public Gear scan(Fisher fisher) {
-                        return fisher.getGear();
-                    }
-                },
-                yearly ? new CashFlowObjective(365) : new CashFlowObjective(60),
-                probability, new Predicate<Gear>() {
+                    toReturn = change.makeCopy();
+                }
+            },
+            new Sensor<Fisher, Gear>() {
+                @Override
+                public Gear scan(final Fisher fisher) {
+                    return fisher.getGear();
+                }
+            },
+            yearly ? new CashFlowObjective(365) : new CashFlowObjective(60),
+            probability, new Predicate<Gear>() {
             @Override
-            public boolean test(Gear a) {
+            public boolean test(final Gear a) {
                 return true;
             }
         }
         );
     }
 
+
     /**
      * given a set of options, generates the adaptation algorithm around it
-     * @param yearly whether to choose every year or every 2 months
-     * @param options the list of gear that is selectable
+     *
+     * @param yearly      whether to choose every year or every 2 months
+     * @param options     the list of gear that is selectable
      * @param probability the probability of exploring, imitating and so on
      */
     public PeriodicUpdateGearStrategy(
-            boolean yearly,
-            List<Gear> options,
-            AdaptationProbability probability)
-    {
+        final boolean yearly,
+        final List<Gear> options,
+        final AdaptationProbability probability
+    ) {
         this.options = options;
         this.yearly = yearly;
         this.gearAdaptation = new ExploreImitateAdaptation<>(
-                new Predicate<Fisher>() {
-                    @Override
-                    public boolean test(Fisher fisher1) {
-                        return true;
-                    }
-                },
-                new DiscreteRandomAlgorithm<>(options),
-                new Actuator<Fisher,Gear>() {
-                    @Override
-                    public void apply(Fisher fisher,
-                                      Gear change,
-                                      FishState model) {
-                        tagYourself(fisher, change, options);
-                        toReturn = change.makeCopy();
-                    }
-                },
-                new Sensor<Fisher,Gear>() {
-                    @Override
-                    public Gear scan(Fisher fisher) {
-                        return fisher.getGear();
-                    }
-                },
-                yearly ? new CashFlowObjective(365) : new CashFlowObjective(60),
-                probability, new Predicate<Gear>() {
+            new Predicate<Fisher>() {
+                @Override
+                public boolean test(final Fisher fisher1) {
+                    return true;
+                }
+            },
+            new DiscreteRandomAlgorithm<>(options),
+            new Actuator<Fisher, Gear>() {
+                @Override
+                public void apply(
+                    final Fisher fisher,
+                    final Gear change,
+                    final FishState model
+                ) {
+                    tagYourself(fisher, change, options);
+                    toReturn = change.makeCopy();
+                }
+            },
+            new Sensor<Fisher, Gear>() {
+                @Override
+                public Gear scan(final Fisher fisher) {
+                    return fisher.getGear();
+                }
+            },
+            yearly ? new CashFlowObjective(365) : new CashFlowObjective(60),
+            probability, new Predicate<Gear>() {
             @Override
-            public boolean test(Gear a) {
+            public boolean test(final Gear a) {
                 return true;
             }
         },
-                //copy only from others who have one of these gears!
-                new Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>>() {
-                    @Override
-                    public Collection<Fisher> apply(
-                            Pair<Fisher, MersenneTwisterFast> input) {
-                        return input.getFirst().getDirectedFriends().stream().filter(
-                                new Predicate<Fisher>() {
+            //copy only from others who have one of these gears!
+            new Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>>() {
+                @Override
+                public Collection<Fisher> apply(
+                    final Pair<Fisher, MersenneTwisterFast> input
+                ) {
+                    return input.getFirst().getDirectedFriends().stream().filter(
+                        new Predicate<Fisher>() {
+                            @Override
+                            public boolean test(final Fisher friend) {
+                                return options.stream().anyMatch(new Predicate<Gear>() {
                                     @Override
-                                    public boolean test(Fisher friend) {
-                                        return options.stream().anyMatch(new Predicate<Gear>() {
-                                            @Override
-                                            public boolean test(Gear gear) {
-                                                return friend.getGear().isSame(gear);
-                                            }
-                                        });
+                                    public boolean test(final Gear gear) {
+                                        return friend.getGear().isSame(gear);
                                     }
-                                }
-                        ).collect(Collectors.toList());
-                    }
+                                });
+                            }
+                        }
+                    ).collect(Collectors.toList());
                 }
+            }
         );
     }
 
-    public void tagYourself(Fisher fisher, Gear change, List<Gear> options) {
+    public void tagYourself(final Fisher fisher, final Gear change, final List<Gear> options) {
         final List<String> newTags = fisher.getTags().stream().filter(new Predicate<String>() {
             @Override
-            public boolean test(String s) {
+            public boolean test(final String s) {
                 return !s.startsWith(tag);
             }
         }).collect(Collectors.toList());
 
-        OptionalInt indexOpt = IntStream.range(0, options.size())
-                .filter(i ->
-                        change.isSame(options.get(i)))
-                .findFirst();
+        final OptionalInt indexOpt = IntStream.range(0, options.size())
+            .filter(i ->
+                change.isSame(options.get(i)))
+            .findFirst();
         newTags.add(tag + "_" + indexOpt.orElse(-1));
         options.get(0).isSame(change);
         options.get(1).isSame(change);
         fisher.getTags().clear();
         fisher.getTags().addAll(newTags);
     }
-
 
     /**
      * choose gear to use for this trip
@@ -217,59 +222,46 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
      */
     @Override
     public void updateGear(
-            Fisher fisher,
-            MersenneTwisterFast random,
-            FishState model,
-            Action currentAction) {
-        if(toReturn != null)
-        {
-            if(Log.TRACE)
-                Log.trace(fisher + " changing gear from " + fisher.getGear() +
-                                  " to " + toReturn);
+        final Fisher fisher,
+        final MersenneTwisterFast random,
+        final FishState model,
+        final Action currentAction
+    ) {
+        if (toReturn != null) {
+            Logger.getGlobal().fine(() -> fisher + " changing gear from " + fisher.getGear() + " to " + toReturn);
             fisher.resetDailyCatchesPredictors();
 
             //if it's a decorator, I am going to assume you want to replace it, as is
-            if(toReturn instanceof GearDecorator) {
-                assert !(((GearDecorator) toReturn).getDelegate() instanceof  GearDecorator);
+            if (toReturn instanceof GearDecorator) {
+                assert !(((GearDecorator) toReturn).getDelegate() instanceof GearDecorator);
                 //this assert might be wrong at some point but for now let's just assume
                 // that if you swap a gear decorator out for another one you are
                 // just targeting one level
                 fisher.setGear(toReturn);
-            }
-            else {
-                DecoratorGearPair pair = DecoratorGearPair.getActualGear(fisher.getGear());
+            } else {
+                final DecoratorGearPair pair = DecoratorGearPair.getActualGear(fisher.getGear());
                 //i am assuming you are swapping gears of the same type; if that's not true at some point
                 //then delete this assert
                 assert pair.getDecorated().getClass().equals(toReturn.getClass());
-                if(pair.getDeepestDecorator()==null)
+                if (pair.getDeepestDecorator() == null)
                     fisher.setGear(toReturn);
                 else
                     pair.getDeepestDecorator().setDelegate(toReturn);
             }
-            toReturn=null;
+            toReturn = null;
         }
     }
 
-
-    /**
-     * link to the fisher. Grabbed at start() only. Doubles as a flag of "being started"
-     */
-    private Fisher fisher;
-
-    final private ExploreImitateAdaptation<? extends Gear> gearAdaptation;
-
     @Override
-    public void start(FishState model, Fisher fisher)
-    {
-        this.fisher=fisher;
+    public void start(final FishState model, final Fisher fisher) {
+        this.fisher = fisher;
 
-        if(options!=null && !options.isEmpty())
+        if (options != null && !options.isEmpty())
             tagYourself(fisher, fisher.getGear(), options);
 
 
-
         //if started, adapt!
-        if(yearly)
+        if (yearly)
             fisher.addYearlyAdaptation(gearAdaptation);
         else
             fisher.addBiMonthlyAdaptation(gearAdaptation);
@@ -277,8 +269,8 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
-        if(this.fisher !=null) //if started, remov adaptations
+    public void turnOff(final Fisher fisher) {
+        if (this.fisher != null) //if started, remov adaptations
         {
             if (yearly)
                 this.fisher.removeYearlyAdaptation(gearAdaptation);

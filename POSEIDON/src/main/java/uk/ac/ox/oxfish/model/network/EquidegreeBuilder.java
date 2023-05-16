@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model.network;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
@@ -33,6 +32,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Builds network where everyone has the same out-degree of edges
@@ -72,13 +72,14 @@ public class EquidegreeBuilder extends AbstractNetworkBuilder {
             Preconditions.checkArgument(
                 false, "Cannot create social network with no fishers to connect");
 
-        Log.trace("random before populating " + state.getRandom().nextDouble());
+        Logger.getGlobal().fine("random before populating " + state.getRandom().nextDouble());
         for (final Fisher fisher : fishers) {
             int degree = computeDegree(state.getRandom());
             if (populationSize <= degree) {
 
                 degree = populationSize - 1;
-                Log.warn("The social network had to reduce the desired degree level to " + degree + " because the population size is too small");
+                Logger.getGlobal()
+                    .warning("The social network had to reduce the desired degree level to " + degree + " because the population size is too small");
 
             }
             final List<Fisher> friends = new LinkedList<>();
@@ -112,11 +113,13 @@ public class EquidegreeBuilder extends AbstractNetworkBuilder {
 
             }
 
-            if (friends.size() < degree && Log.DEBUG) {
+            if (friends.size() < degree) {
                 assert friends.size() == candidates.size();
-                Log.debug(fisher + " couldn't have " + degree + "friends because the total number of valid candidates" +
-                    " were " + candidates.size() +
-                    ", and the total number of friends the fisher actually has is " + friends.size());
+                final int finalDegree = degree;
+                Logger.getGlobal()
+                    .fine(() -> fisher + " couldn't have " + finalDegree + "friends because the total number of valid candidates" +
+                        " were " + candidates.size() +
+                        ", and the total number of friends the fisher actually has is " + friends.size());
             }
 
 
@@ -133,6 +136,10 @@ public class EquidegreeBuilder extends AbstractNetworkBuilder {
 
     }
 
+    private int computeDegree(final MersenneTwisterFast random) {
+        return (int) degree.applyAsDouble(random);
+    }
+
     private void addSetOfFriends(
         final DirectedGraph<Fisher, FriendshipEdge> network,
         final Fisher fisher,
@@ -144,11 +151,6 @@ public class EquidegreeBuilder extends AbstractNetworkBuilder {
             else
                 network.addEdge(new FriendshipEdge(), friend, fisher, EdgeType.DIRECTED);
         }
-    }
-
-
-    private int computeDegree(final MersenneTwisterFast random) {
-        return (int) degree.applyAsDouble(random);
     }
 
     public DoubleParameter getDegree() {

@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model.market;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -31,6 +30,8 @@ import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+
+import java.util.logging.Logger;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
 
@@ -69,19 +70,19 @@ public abstract class AbstractMarket implements MarketWithCounter {
         return species;
     }
 
-    public void setSpecies(Species species) {
+    public void setSpecies(final Species species) {
         this.species = species;
     }
 
     /**
      * starts gathering data. If called multiple times all the calls after the first are ignored
+     *
      * @param state the model
      */
     @Override
-    public void start(FishState state)
-    {
-        Preconditions.checkArgument(species!=null, " market doesn't know the species to trade in");
-        if(started) //don't start twice
+    public void start(final FishState state) {
+        Preconditions.checkArgument(species != null, " market doesn't know the species to trade in");
+        if (started) //don't start twice
             return;
 
         //start the counter
@@ -91,26 +92,29 @@ public abstract class AbstractMarket implements MarketWithCounter {
         dailyCounter.addColumn(PRICE_COLUMN_NAME);
 
         //start the data-set where we are going to store the history of the counter
-        dailyObservations.start(state,this);
+        dailyObservations.start(state, this);
         //the gatherers reset the counters as a side effect
         dailyObservations.registerGatherer(EARNINGS_COLUMN_NAME, new Gatherer<Market>() {
-                                               @Override
-                                               public Double apply(Market market) {
-                                                   return dailyCounter.getColumn(EARNINGS_COLUMN_NAME);
-                                               }
-                                           },
-                                           Double.NaN, dailyObservations.getCurrency(), "Earnings");
+                @Override
+                public Double apply(final Market market) {
+                    return dailyCounter.getColumn(EARNINGS_COLUMN_NAME);
+                }
+            },
+            Double.NaN, dailyObservations.getCurrency(), "Earnings"
+        );
 
         dailyObservations.registerGatherer(LANDINGS_COLUMN_NAME, new Gatherer<Market>() {
-                                               @Override
-                                               public Double apply(Market market) {
-                                                   return dailyCounter.getColumn(LANDINGS_COLUMN_NAME);
-                                               }
-                                           },
-                                           Double.NaN, KILOGRAM, "Biomass");
+                @Override
+                public Double apply(final Market market) {
+                    return dailyCounter.getColumn(LANDINGS_COLUMN_NAME);
+                }
+            },
+            Double.NaN, KILOGRAM, "Biomass"
+        );
 
         dailyObservations.registerGatherer(PRICE_COLUMN_NAME, Market::getMarginalPrice,
-                                           Double.NaN, dailyObservations.getCurrency(), "Price");
+            Double.NaN, dailyObservations.getCurrency(), "Price"
+        );
 
         started = true;
 
@@ -129,33 +133,34 @@ public abstract class AbstractMarket implements MarketWithCounter {
      * Sells the a specific amount of fish here by calling sellFishImplementation and then store the trade result details
      *
      * @param hold
-     * @param fisher      the seller
+     * @param fisher     the seller
      * @param regulation the regulation object the seller abides to
-     * @param state       the model
+     * @param state      the model
      */
     @Override
     final public TradeInfo sellFish(
-            Hold hold, Fisher fisher, Regulation regulation,
-            FishState state, Species species) {
-        Preconditions.checkArgument(species== this.species, "trading the wrong species!");
-        TradeInfo receipt = sellFishImplementation(
-                hold,
-                fisher, regulation, state, species);
+        final Hold hold, final Fisher fisher, final Regulation regulation,
+        final FishState state, final Species species
+    ) {
+        Preconditions.checkArgument(species == this.species, "trading the wrong species!");
+        final TradeInfo receipt = sellFishImplementation(
+            hold,
+            fisher, regulation, state, species
+        );
         recordTrade(receipt);
         return receipt;
     }
 
     protected abstract TradeInfo sellFishImplementation(
-            Hold hold, Fisher fisher, Regulation regulation, FishState state, Species species);
+        Hold hold, Fisher fisher, Regulation regulation, FishState state, Species species
+    );
 
 
-    public void recordTrade(TradeInfo info)
-    {
-        if(Log.TRACE && info.getBiomassTraded() >  0)
-            Log.trace("recorded the following trade: " + info);
-        dailyCounter.count(EARNINGS_COLUMN_NAME,info.getMoneyExchanged());
+    public void recordTrade(final TradeInfo info) {
+        if (info.getBiomassTraded() > 0)
+            Logger.getGlobal().fine(() -> "recorded the following trade: " + info);
+        dailyCounter.count(EARNINGS_COLUMN_NAME, info.getMoneyExchanged());
         dailyCounter.count(LANDINGS_COLUMN_NAME, info.getBiomassTraded());
-
 
 
     }

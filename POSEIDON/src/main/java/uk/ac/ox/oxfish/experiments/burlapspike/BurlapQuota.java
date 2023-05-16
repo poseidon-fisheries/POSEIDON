@@ -27,7 +27,6 @@ import burlap.mdp.core.action.Action;
 import burlap.mdp.core.action.SimpleAction;
 import burlap.mdp.core.state.State;
 import burlap.mdp.core.state.vardomain.VariableDomain;
-import com.esotericsoftware.minlog.Log;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -39,6 +38,8 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static uk.ac.ox.oxfish.experiments.burlapspike.BurlapShodan.episodesToCSV;
 
@@ -48,35 +49,34 @@ import static uk.ac.ox.oxfish.experiments.burlapspike.BurlapShodan.episodesToCSV
 public class BurlapQuota {
 
 
-    public static void main(String[] args) throws IOException, NoSuchFieldException, IllegalAccessException {
+    public static void main(final String[] args) throws IOException, NoSuchFieldException, IllegalAccessException {
 
 
-        Log.set(Log.LEVEL_INFO);
+        Logger.getGlobal().setLevel(Level.INFO);
 
-        Path containerPath = Paths.get("runs", "burlap_quota");
+        final Path containerPath = Paths.get("runs", "burlap_quota");
         containerPath.toFile().mkdirs();
         containerPath.resolve("data").toFile().mkdirs();
         containerPath.resolve("results").toFile().mkdirs();
         containerPath.resolve("saves").toFile().mkdirs();
 
-        PrototypeScenario scenario = new PrototypeScenario();
+        final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setFishers(300);
-        SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
+        final SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
         mapInitializer.setCoastalRoughness(new FixedDoubleParameter(0d));
         scenario.setPortPositionX(40);
         scenario.setPortPositionY(25);
         scenario.setMapInitializer(mapInitializer);
 
 
-
         //imagine a 10% yearly interest rate this means that yearly the discount rate is:
         // 1/(1+.1/12)
         //which is about 99%
         NormalizedVariableFeatures features =
-                new NormalizedVariableFeatures().
-                        variableDomain(ShodanStateOil.BIOMASS, new VariableDomain(0, 10500000)).
-                        variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
-                        variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
+            new NormalizedVariableFeatures().
+                variableDomain(ShodanStateOil.BIOMASS, new VariableDomain(0, 10500000)).
+                variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
+                variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
 
 
         /*
@@ -171,17 +171,19 @@ public class BurlapQuota {
 */
 
         BurlapShodan.sarsaRunFourier(1,
-                                     "100_sarsa_biomass_9lambda_fourier",
-                                     4,
-                                     .005,
-                                     .9,
-                                     features,
-                                     scenario,
-                                     containerPath, (Steppable) simState -> {},
-                                     null,
-                                     ShodanStateOil.BIOMASS,
-                                     ShodanStateOil.DAY_OF_THE_YEAR,
-                                     ShodanStateOil.MONTHS_LEFT);
+            "100_sarsa_biomass_9lambda_fourier",
+            4,
+            .005,
+            .9,
+            features,
+            scenario,
+            containerPath, (Steppable) simState -> {
+            },
+            null,
+            ShodanStateOil.BIOMASS,
+            ShodanStateOil.DAY_OF_THE_YEAR,
+            ShodanStateOil.MONTHS_LEFT
+        );
 /*
 
         BurlapShodan.qRunFourier(1,
@@ -270,10 +272,10 @@ public class BurlapQuota {
 
 
         features =
-                new NormalizedVariableFeatures().
-                        variableDomain(ShodanStateOil.AVERAGE_DISTANCE_TO_PORT, new VariableDomain(0, 440)).
-                        variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
-                        variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
+            new NormalizedVariableFeatures().
+                variableDomain(ShodanStateOil.AVERAGE_DISTANCE_TO_PORT, new VariableDomain(0, 440)).
+                variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
+                variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
 
 
 
@@ -305,11 +307,11 @@ public class BurlapQuota {
 
 
         features =
-                new NormalizedVariableFeatures().
-                        variableDomain(ShodanStateOil.AVERAGE_DISTANCE_TO_PORT, new VariableDomain(0, 440)).
-                        variableDomain(ShodanStateOil.AVERAGE_YEARLY_EFFORTS, new VariableDomain(0, 6215.0)).
-                        variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
-                        variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
+            new NormalizedVariableFeatures().
+                variableDomain(ShodanStateOil.AVERAGE_DISTANCE_TO_PORT, new VariableDomain(0, 440)).
+                variableDomain(ShodanStateOil.AVERAGE_YEARLY_EFFORTS, new VariableDomain(0, 6215.0)).
+                variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
+                variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
 
 /*
         BurlapShodan.sarsaRunFourier(1,
@@ -328,11 +330,11 @@ public class BurlapQuota {
 */
 
         features =
-                new NormalizedVariableFeatures().
-                        variableDomain(ShodanStateOil.AVERAGE_DISTANCE_TO_PORT, new VariableDomain(0, 440)).
-                        variableDomain(ShodanStateOil.AVERAGE_YEARLY_CASHFLOW, new VariableDomain(-5, 300)).
-                        variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
-                        variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
+            new NormalizedVariableFeatures().
+                variableDomain(ShodanStateOil.AVERAGE_DISTANCE_TO_PORT, new VariableDomain(0, 440)).
+                variableDomain(ShodanStateOil.AVERAGE_YEARLY_CASHFLOW, new VariableDomain(-5, 300)).
+                variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
+                variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
 /*
         BurlapShodan.sarsaRunFourier(1,
                                      "100_sarsa_cashDistance_6lambda_fourier2",
@@ -411,9 +413,9 @@ public class BurlapQuota {
 
 
         features =
-                new NormalizedVariableFeatures().
-                        variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
-                        variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
+            new NormalizedVariableFeatures().
+                variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
+                variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
 
         /*
         BurlapShodan.sarsaRunNormalized(1,
@@ -432,53 +434,52 @@ public class BurlapQuota {
     }
 
 
-    public static  void quotaSweep(){
+    public static void quotaSweep() {
 
-        for(double quota = 0; quota<2000000; quota+=100000){
+        for (double quota = 0; quota < 2000000; quota += 100000) {
 
 
-            PrototypeScenario scenario = new PrototypeScenario();
+            final PrototypeScenario scenario = new PrototypeScenario();
             scenario.setFishers(300);
-            SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
+            final SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
             mapInitializer.setCoastalRoughness(new FixedDoubleParameter(0d));
             scenario.setPortPositionX(40);
             scenario.setPortPositionY(25);
             scenario.setMapInitializer(mapInitializer);
-            ShodanEnvironment environment= new ShodanEnvironment(scenario, new Steppable() {
+            final ShodanEnvironment environment = new ShodanEnvironment(scenario, new Steppable() {
                 @Override
-                public void step(SimState simState) {
+                public void step(final SimState simState) {
 
                 }
             });
 
-            Policy policy = new Policy() {
+            final Policy policy = new Policy() {
                 @Override
-                public Action action(State s) {
+                public Action action(final State s) {
                     return new SimpleAction("open");
                 }
 
                 @Override
-                public double actionProb(State s, Action a) {
+                public double actionProb(final State s, final Action a) {
                     return 1d;
                 }
 
                 @Override
-                public boolean definedFor(State s) {
+                public boolean definedFor(final State s) {
                     return true;
                 }
             };
 
 
-            TACMonoFactory factory = new TACMonoFactory();
+            final TACMonoFactory factory = new TACMonoFactory();
             factory.setQuota(new FixedDoubleParameter(quota));
             environment.resetEnvironment(0);
-            for (Fisher fisher : environment.getState().getFishers()) {
+            for (final Fisher fisher : environment.getState().getFishers()) {
                 fisher.setRegulation(factory.apply(environment.getState()));
             }
-            PolicyUtils.rollout(policy,environment);
+            PolicyUtils.rollout(policy, environment);
             System.out.println(quota + " = " + environment.totalReward());
         }
-
 
 
     }

@@ -20,26 +20,25 @@
 
 package uk.ac.ox.oxfish.fisher.erotetic;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Simplest strategy, ignores all representations and just pick at random from all the options
  * Created by carrknight on 4/10/16.
  */
-public class RandomAnswer<T> implements EroteticAnswer<T>
-{
+public class RandomAnswer<T> implements EroteticAnswer<T> {
 
     /**
      * ignored
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
     }
 
@@ -53,16 +52,19 @@ public class RandomAnswer<T> implements EroteticAnswer<T>
 
     /**
      * Grabs the list of current options and returns the list of all options that are acceptable
+     *
      * @param currentOptions list of options, possibly already filtered by others. It is <b>unmodifiable</b>
      * @param representation
      * @param state          the model   @return a list of acceptable options or null if there is pure indifference among them
-     * @param fisher   */
+     * @param fisher
+     */
     @Override
     public List<T> answer(
-            List<T> currentOptions, FeatureExtractors<T> representation, FishState state, Fisher fisher) {
+        final List<T> currentOptions, final FeatureExtractors<T> representation, final FishState state, final Fisher fisher
+    ) {
         Preconditions.checkArgument(!currentOptions.isEmpty());
-        if(Log.TRACE)
-            Log.trace(" picking a random option");
+
+        Logger.getGlobal().fine(" picking a random option");
 
         return Collections.singletonList(currentOptions.get(state.getRandom().nextInt(currentOptions.size())));
     }

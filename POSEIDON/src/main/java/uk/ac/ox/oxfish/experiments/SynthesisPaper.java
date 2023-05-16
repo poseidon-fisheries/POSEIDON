@@ -21,8 +21,6 @@
 package uk.ac.ox.oxfish.experiments;
 
 
-import com.esotericsoftware.minlog.Log;
-import uk.ac.ox.oxfish.fisher.selfanalysis.factory.CutoffPerTripObjectiveFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -39,7 +37,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.SocialAnnealingProbabilityFactory;
-import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ThresholdProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -49,30 +46,36 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SynthesisPaper {
 
 
-    public static void main(String[] args) throws IOException {
-        Log.set(com.esotericsoftware.minlog.Log.LEVEL_INFO);
+    public static void main(final String[] args) throws IOException {
+        Logger.getGlobal().setLevel(Level.INFO);
 
         //figure 2
 
-        avoidTheLine(100,
-                     Paths.get("inputs","paper_synthesis"),
-                     Paths.get("runs","paper_synthesis"));
+        avoidTheLine(
+            100,
+            Paths.get("inputs", "paper_synthesis"),
+            Paths.get("runs", "paper_synthesis")
+        );
 
         //figure 3
-        socialAnnealing(100,
-                        Paths.get("inputs","paper_synthesis"),
-                        Paths.get("runs","paper_synthesis")
+        socialAnnealing(
+            100,
+            Paths.get("inputs", "paper_synthesis"),
+            Paths.get("runs", "paper_synthesis")
         );
 
 
-        exploreExploitBaseline(100,
-                               Paths.get("inputs","paper_synthesis"),
-                               Paths.get("runs","paper_synthesis")
-                               );
+        exploreExploitBaseline(
+            100,
+            Paths.get("inputs", "paper_synthesis"),
+            Paths.get("runs", "paper_synthesis")
+        );
 
         //figure 4
 
@@ -84,19 +87,21 @@ public class SynthesisPaper {
      * run multiple times a scenario with 2 species where one is only
      * loosely protected by an MPA in the first scenario and by both an MPA and an ITQ
      * in the second instance
+     *
      * @param runsPerScenario number of runs per regulation
      * @param inputFolder
      * @param outputFolder
      */
-    public static void  avoidTheLine(
-            int runsPerScenario, Path inputFolder,
-            Path outputFolder) throws IOException {
+    public static void avoidTheLine(
+        final int runsPerScenario, final Path inputFolder,
+        final Path outputFolder
+    ) throws IOException {
 
 
-        Log.info("DEMO-1");
-        String scenarioYaml = String.join("\n", Files.readAllLines(inputFolder.resolve("avoid_the_line.yaml")));
+        Logger.getGlobal().info("DEMO-1");
+        final String scenarioYaml = String.join("\n", Files.readAllLines(inputFolder.resolve("avoid_the_line.yaml")));
 
-        Path container = outputFolder.resolve("demo1");
+        final Path container = outputFolder.resolve("demo1");
         container.toFile().mkdirs();
 
 
@@ -107,7 +112,7 @@ public class SynthesisPaper {
             }
         };
 
-        demo1Sweep(runsPerScenario, scenarioYaml, container, regulation,"mpa");
+        demo1Sweep(runsPerScenario, scenarioYaml, container, regulation, "mpa");
 
 
         regulation = new Supplier<AlgorithmFactory<? extends Regulation>>() {
@@ -117,135 +122,48 @@ public class SynthesisPaper {
             }
         };
 
-        demo1Sweep(runsPerScenario, scenarioYaml, container, regulation,"anarchy");
+        demo1Sweep(runsPerScenario, scenarioYaml, container, regulation, "anarchy");
 
         regulation = new Supplier<AlgorithmFactory<? extends Regulation>>() {
             @Override
             public AlgorithmFactory<? extends Regulation> get() {
-                MultiITQStringFactory factory = new MultiITQStringFactory();
+                final MultiITQStringFactory factory = new MultiITQStringFactory();
                 factory.setYearlyQuotaMaps("1:500");
                 return factory;
             }
         };
 
-        demo1Sweep(runsPerScenario, scenarioYaml, container, regulation,"itq");
+        demo1Sweep(runsPerScenario, scenarioYaml, container, regulation, "itq");
 
 
     }
 
-    public static void demo1Sweep(
-            int numberOfRuns, String readScenario, Path outputFolder,
-            Supplier<AlgorithmFactory<? extends Regulation>> regulation, final String name) throws IOException {
-        for(int run = 0; run< numberOfRuns; run++) {
-            FishYAML reader = new FishYAML();
-            PrototypeScenario scenario = reader.loadAs(readScenario, PrototypeScenario.class);
-            Log.info("\tMPA CASE " + run);
-            scenario.setRegulation(regulation.get());
+    public static void socialAnnealing(final int runsPerScenario, final Path inputFolder, final Path outputFolder) throws IOException {
 
-            FishState state = new FishState(run);
-            state.setScenario(scenario);
+        final String readScenario = String.join("\n", Files.readAllLines(inputFolder.resolve("basic.yaml")));
 
-            //add tows on the line counter (the neighborhood is size 2 because that's the size of the border where
-            //blue fish live and is not protected)
-            DataColumn borders = state.getDailyDataSet().registerGatherer("Tows on the Line",
-                                                                          (Gatherer<FishState>) state1 -> {
-
-                                                                              double lineSum = 0;
-                                                                              NauticalMap map = state1.getMap();
-                                                                              for (SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
-                                                                                  int trawlsHere = map.getDailyTrawlsMap().get(
-                                                                                          tile.getGridX(),
-                                                                                          tile.getGridY());
-                                                                                  if (!tile.isProtected() &&
-                                                                                          map.getMooreNeighbors(tile,
-                                                                                                                2).stream().anyMatch(
-                                                                                                  o -> ((SeaTile) o).isProtected())) {
-                                                                                      lineSum += trawlsHere;
-                                                                                  }
-                                                                              }
-
-                                                                              return lineSum;
-
-                                                                          }
-                    , Double.NaN);
-            //now just count all tows
-            DataColumn totals = state.getDailyDataSet().registerGatherer("Tows",
-                                                                         (Gatherer<FishState>) state1 -> {
-
-                                                                             double lineSum = 0;
-                                                                             NauticalMap map = state1.getMap();
-                                                                             for (SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
-                                                                                 int trawlsHere = map.getDailyTrawlsMap().get(
-                                                                                         tile.getGridX(),
-                                                                                         tile.getGridY());
-                                                                                 lineSum += trawlsHere;
-                                                                             }
-                                                                             return lineSum;
-                                                                         }
-                    , Double.NaN);
-
-
-            //collect a picture of heatmap for the first run
-            TowHeatmapGatherer mapper = null;
-            if(run==0) {
-                mapper = new TowHeatmapGatherer(0);
-                state.registerStartable(mapper);
-            }
-
-
-
-
-            state.start();
-            while(state.getYear()<20)
-                state.schedule.step(state);
-
-
-            if(run==0) {
-                String grid = FishStateUtilities.gridToCSV(mapper.getTowHeatmap());
-                Files.write(outputFolder.resolve("grid" + name + ".csv"), grid.getBytes());
-            }
-
-            DataColumn[] dataColumns = name != "itq" ? new DataColumn[]{totals,
-                    borders} : new DataColumn[]{totals,borders,
-                    state.getDailyDataSet().getColumn("ITQ Trades Of Species 1"),
-                    state.getDailyDataSet().getColumn("ITQ Prices Of Species 1")
-            };
-            FishStateUtilities.printCSVColumnsToFile(outputFolder.resolve(name + "_" + run + ".csv").toFile(),
-                                                     dataColumns);
-
-
-        }
-    }
-
-
-
-
-    public static void socialAnnealing(int runsPerScenario, Path inputFolder, Path outputFolder) throws IOException {
-
-        String readScenario = String.join("\n", Files.readAllLines(inputFolder.resolve("basic.yaml")));
-
-        FileWriter writer = new FileWriter(outputFolder.resolve("demo2_annealing.csv").toFile());
+        final FileWriter writer = new FileWriter(outputFolder.resolve("demo2_annealing.csv").toFile());
         writer.write("multiplier,run,final_biomass\n");
         writer.flush();
 
         //baseline
-        for (double multiplier = 0.1; multiplier < 2; multiplier=FishStateUtilities.round(multiplier+.1)) {
+        for (double multiplier = 0.1; multiplier < 2; multiplier = FishStateUtilities.round(multiplier + .1)) {
             for (int run = 0; run < runsPerScenario; run++) {
-                FishYAML reader = new FishYAML();
-                PrototypeScenario scenario = reader.loadAs(readScenario, PrototypeScenario.class);
-                SocialAnnealingProbabilityFactory probability = new SocialAnnealingProbabilityFactory();
+                final FishYAML reader = new FishYAML();
+                final PrototypeScenario scenario = reader.loadAs(readScenario, PrototypeScenario.class);
+                final SocialAnnealingProbabilityFactory probability = new SocialAnnealingProbabilityFactory();
                 probability.setMultiplier(new FixedDoubleParameter(multiplier));
                 ((PerTripImitativeDestinationFactory) scenario.getDestinationStrategy()).setProbability(
-                        probability
+                    probability
                 );
-                Log.info("\tAnnealing multiplier " + multiplier + " exploration "  + run);
+                Logger.getGlobal().info("\tAnnealing multiplier " + multiplier + " exploration " + run);
 
-                FishState state = new FishState(run);
+                final FishState state = new FishState(run);
                 state.setScenario(scenario);
                 state.start();
                 while (state.getYear() < 10)
                     state.schedule.step(state);
-                Double lastBiomass = state.getDailyDataSet().getLatestObservation("Biomass Species 0");
+                final Double lastBiomass = state.getDailyDataSet().getLatestObservation("Biomass Species 0");
                 writer.write(multiplier + "," + run + "," + lastBiomass + "\n");
                 writer.flush();
 
@@ -254,33 +172,128 @@ public class SynthesisPaper {
         writer.close();
     }
 
-    public static void exploreExploitBaseline(int runsPerScenario, Path inputFolder, Path outputFolder) throws IOException {
+    public static void exploreExploitBaseline(
+        final int runsPerScenario,
+        final Path inputFolder,
+        final Path outputFolder
+    ) throws IOException {
 
-        String readScenario = String.join("\n", Files.readAllLines(inputFolder.resolve("basic.yaml")));
+        final String readScenario = String.join("\n", Files.readAllLines(inputFolder.resolve("basic.yaml")));
 
-        FileWriter writer = new FileWriter(outputFolder.resolve("demo2_eei.csv").toFile());
+        final FileWriter writer = new FileWriter(outputFolder.resolve("demo2_eei.csv").toFile());
         writer.write("multiplier,run,final_biomass\n");
         writer.flush();
 
         //baseline
         for (int run = 0; run < runsPerScenario; run++) {
-            FishYAML reader = new FishYAML();
-            PrototypeScenario scenario = reader.loadAs(readScenario, PrototypeScenario.class);
-            PerTripImitativeDestinationFactory profitMaximizer = new PerTripImitativeDestinationFactory();
+            final FishYAML reader = new FishYAML();
+            final PrototypeScenario scenario = reader.loadAs(readScenario, PrototypeScenario.class);
+            final PerTripImitativeDestinationFactory profitMaximizer = new PerTripImitativeDestinationFactory();
             scenario.setDestinationStrategy(profitMaximizer);
-            profitMaximizer.setProbability(new FixedProbabilityFactory(.2,1));
-            FishState state = new FishState(run);
+            profitMaximizer.setProbability(new FixedProbabilityFactory(.2, 1));
+            final FishState state = new FishState(run);
             state.setScenario(scenario);
             state.start();
             while (state.getYear() < 10)
                 state.schedule.step(state);
-            Double lastBiomass = state.getDailyDataSet().getLatestObservation("Biomass Species 0");
+            final Double lastBiomass = state.getDailyDataSet().getLatestObservation("Biomass Species 0");
             writer.write("eei" + "," + run + "," + lastBiomass + "\n");
             writer.flush();
 
 
         }
         writer.close();
+    }
+
+    public static void demo1Sweep(
+        final int numberOfRuns, final String readScenario, final Path outputFolder,
+        final Supplier<AlgorithmFactory<? extends Regulation>> regulation, final String name
+    ) throws IOException {
+        for (int run = 0; run < numberOfRuns; run++) {
+            final FishYAML reader = new FishYAML();
+            final PrototypeScenario scenario = reader.loadAs(readScenario, PrototypeScenario.class);
+            Logger.getGlobal().info("\tMPA CASE " + run);
+            scenario.setRegulation(regulation.get());
+
+            final FishState state = new FishState(run);
+            state.setScenario(scenario);
+
+            //add tows on the line counter (the neighborhood is size 2 because that's the size of the border where
+            //blue fish live and is not protected)
+            final DataColumn borders = state.getDailyDataSet().registerGatherer("Tows on the Line",
+                (Gatherer<FishState>) state1 -> {
+
+                    double lineSum = 0;
+                    final NauticalMap map = state1.getMap();
+                    for (final SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
+                        final int trawlsHere = map.getDailyTrawlsMap().get(
+                            tile.getGridX(),
+                            tile.getGridY()
+                        );
+                        if (!tile.isProtected() &&
+                            map.getMooreNeighbors(
+                                tile,
+                                2
+                            ).stream().anyMatch(
+                                o -> ((SeaTile) o).isProtected())) {
+                            lineSum += trawlsHere;
+                        }
+                    }
+
+                    return lineSum;
+
+                }
+                , Double.NaN
+            );
+            //now just count all tows
+            final DataColumn totals = state.getDailyDataSet().registerGatherer("Tows",
+                (Gatherer<FishState>) state1 -> {
+
+                    double lineSum = 0;
+                    final NauticalMap map = state1.getMap();
+                    for (final SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
+                        final int trawlsHere = map.getDailyTrawlsMap().get(
+                            tile.getGridX(),
+                            tile.getGridY()
+                        );
+                        lineSum += trawlsHere;
+                    }
+                    return lineSum;
+                }
+                , Double.NaN
+            );
+
+
+            //collect a picture of heatmap for the first run
+            TowHeatmapGatherer mapper = null;
+            if (run == 0) {
+                mapper = new TowHeatmapGatherer(0);
+                state.registerStartable(mapper);
+            }
+
+
+            state.start();
+            while (state.getYear() < 20)
+                state.schedule.step(state);
+
+
+            if (run == 0) {
+                final String grid = FishStateUtilities.gridToCSV(mapper.getTowHeatmap());
+                Files.write(outputFolder.resolve("grid" + name + ".csv"), grid.getBytes());
+            }
+
+            final DataColumn[] dataColumns = name != "itq" ? new DataColumn[]{totals,
+                borders} : new DataColumn[]{totals, borders,
+                state.getDailyDataSet().getColumn("ITQ Trades Of Species 1"),
+                state.getDailyDataSet().getColumn("ITQ Prices Of Species 1")
+            };
+            FishStateUtilities.printCSVColumnsToFile(
+                outputFolder.resolve(name + "_" + run + ".csv").toFile(),
+                dataColumns
+            );
+
+
+        }
     }
 
 }

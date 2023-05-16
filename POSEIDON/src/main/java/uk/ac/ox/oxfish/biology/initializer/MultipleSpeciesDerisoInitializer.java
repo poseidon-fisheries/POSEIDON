@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.initializer;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
@@ -40,18 +39,18 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
+import java.util.logging.Logger;
 
 /**
  * Created by carrknight on 6/14/17.
  */
 
-public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitializer
-{
+public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitializer {
     public static final String FAKE_SPECIES_NAME = "Others";
     /**
      * the path to the biology folder, which must contain a count.csv and a meristic.yaml file
      */
-    private final LinkedHashMap<String,Path> biologicalDirectories;
+    private final LinkedHashMap<String, Path> biologicalDirectories;
 
 
     /**
@@ -59,74 +58,43 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      * for everything else that is not directly modeled?
      */
     private final boolean addOtherSpecies;
-    private String derisoYamlFileName = "deriso.yaml";
-
-
-    /**
-     * Multiple species initializer for Deriso!
-     * @param biologicalDirectories
-     * @param addOtherSpecies
-     */
-    public MultipleSpeciesDerisoInitializer(
-            LinkedHashMap<String, Path> biologicalDirectories,
-            boolean addOtherSpecies) {
-        this.biologicalDirectories = biologicalDirectories;
-        this.addOtherSpecies = addOtherSpecies;
-    }
-
     /**
      * defines the proportion of fish going to any sea-tile. No checks are made that the
      * proportions sum up to one so be careful!
      */
     private final LinkedHashMap<Species,
-            Function<SeaTile, Double>> allocators = new LinkedHashMap<>();
-
-
-    private final LinkedHashMap<SeaTile,VariableBiomassBasedBiology> localBiologies = new LinkedHashMap<>();
-
+        Function<SeaTile, Double>> allocators = new LinkedHashMap<>();
+    private final LinkedHashMap<SeaTile, VariableBiomassBasedBiology> localBiologies = new LinkedHashMap<>();
     /**
      * contains all the mortality+recruitment processes of each species
      */
-    private final LinkedHashMap<Species,DerisoSchnuteCommonGrower>
-            naturalProcesses = new LinkedHashMap<>();
-
+    private final LinkedHashMap<Species, DerisoSchnuteCommonGrower>
+        naturalProcesses = new LinkedHashMap<>();
     /**
      * the deriso parameters for all the species
      */
     private final LinkedHashMap<Species, DerisoParameters> parameters = new LinkedHashMap<>();
-
-
     /**
      * stored and used during reset only!
      */
-    private LinkedHashMap<Species,LinkedHashMap<VariableBiomassBasedBiology,Double>> originalWeights = new LinkedHashMap<>();
+    private final LinkedHashMap<Species, LinkedHashMap<VariableBiomassBasedBiology, Double>> originalWeights = new LinkedHashMap<>();
+    private String derisoYamlFileName = "deriso.yaml";
+    private LinkedHashMap<Species, Double> movementRate = new LinkedHashMap<>();
 
-
-
-    private LinkedHashMap<Species,Double> movementRate = new LinkedHashMap<>();
 
     /**
-     * read up a folder that contains deriso.yaml and turn it into a species
-     * @param biologicalDirectory the folder containing deriso.yaml
-     * @param speciesName the name of the species
-     * @return the new species
-     * @throws IOException
+     * Multiple species initializer for Deriso!
+     *
+     * @param biologicalDirectories
+     * @param addOtherSpecies
      */
-    private Species generateSpeciesFromFolder(Path biologicalDirectory,
-                                              String speciesName)
-            throws IOException {
-        FishYAML yaml = new FishYAML();
-        FileReader io = new FileReader(biologicalDirectory.resolve(derisoYamlFileName).toFile());
-        DerisoParameters parameter = yaml.loadAs(
-                io,
-                DerisoParameters.class);
-        io.close();
-        parameter.updateLastRecruits();
-        Species species = new Species(speciesName);
-        parameters.put(species,parameter);
-        return species;
+    public MultipleSpeciesDerisoInitializer(
+        final LinkedHashMap<String, Path> biologicalDirectories,
+        final boolean addOtherSpecies
+    ) {
+        this.biologicalDirectories = biologicalDirectories;
+        this.addOtherSpecies = addOtherSpecies;
     }
-
 
     /**
      * creates the global biology object for the model
@@ -136,31 +104,35 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      * @return a global biology object
      */
     @Override
-    public GlobalBiology generateGlobal(MersenneTwisterFast random, FishState modelBeingInitialized) {
+    public GlobalBiology generateGlobal(final MersenneTwisterFast random, final FishState modelBeingInitialized) {
 
-        List<Species> speciesList = new LinkedList<>();
+        final List<Species> speciesList = new LinkedList<>();
 
         try {
-            for(Map.Entry<String,Path> directory : biologicalDirectories.entrySet())
-            {
+            for (final Map.Entry<String, Path> directory : biologicalDirectories.entrySet()) {
                 speciesList.add(
-                        generateSpeciesFromFolder(directory.getValue(),
-                                                  directory.getKey())
+                    generateSpeciesFromFolder(
+                        directory.getValue(),
+                        directory.getKey()
+                    )
                 );
 
 
             }
             //need to add an additional species to catch "all"
-            if(addOtherSpecies)
-                speciesList.add(new Species(FAKE_SPECIES_NAME,
-                                            StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,
-                                            true));
+            if (addOtherSpecies)
+                speciesList.add(new Species(
+                    FAKE_SPECIES_NAME,
+                    StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,
+                    true
+                ));
 
 
             return new GlobalBiology(speciesList.toArray(new Species[speciesList.size()]));
-        }catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
-            Log.error("Failed to instantiate the species because I couldn't find the meristics.yaml file in the folder provided");
+            Logger.getGlobal().severe(
+                "Failed to instantiate the species because I couldn't find the meristics.yaml file in the folder provided");
 
         }
         System.exit(-1);
@@ -169,8 +141,35 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
     }
 
     /**
+     * read up a folder that contains deriso.yaml and turn it into a species
+     *
+     * @param biologicalDirectory the folder containing deriso.yaml
+     * @param speciesName         the name of the species
+     * @return the new species
+     * @throws IOException
+     */
+    private Species generateSpeciesFromFolder(
+        final Path biologicalDirectory,
+        final String speciesName
+    )
+        throws IOException {
+        final FishYAML yaml = new FishYAML();
+        final FileReader io = new FileReader(biologicalDirectory.resolve(derisoYamlFileName).toFile());
+        final DerisoParameters parameter = yaml.loadAs(
+            io,
+            DerisoParameters.class
+        );
+        io.close();
+        parameter.updateLastRecruits();
+        final Species species = new Species(speciesName);
+        parameters.put(species, parameter);
+        return species;
+    }
+
+    /**
      * generates a bunch of empty local
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -179,21 +178,24 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
+        final GlobalBiology biology,
+        final SeaTile seaTile,
+        final MersenneTwisterFast random,
+        final int mapHeightInCells,
+        final int mapWidthInCells,
+        final NauticalMap map
+    ) {
 
 
         if (seaTile.isLand())
             return new EmptyLocalBiology();
-        else
-        {
+        else {
 
-            BiomassLocalBiology local = new BiomassLocalBiology(0, biology.getSize(), random);
-            localBiologies.put(seaTile,local);
+            final BiomassLocalBiology local = new BiomassLocalBiology(0, biology.getSize(), random);
+            localBiologies.put(seaTile, local);
             return local;
 
         }
-
 
 
     }
@@ -209,138 +211,178 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
+        final GlobalBiology biology, final NauticalMap map, final MersenneTwisterFast random, final FishState model
+    ) {
 
         try {
-            for (Species species : biology.getSpecies()) {
+            for (final Species species : biology.getSpecies()) {
 
                 //if the species is the imaginary one, then ignore.
                 if (addOtherSpecies && biologicalDirectories.get(species.getName()) == null) {
-                    Preconditions.checkState(species.getName().equals(FAKE_SPECIES_NAME),
-                                             "Do not have biological directory for species " + species.getName());
+                    Preconditions.checkState(
+                        species.getName().equals(FAKE_SPECIES_NAME),
+                        "Do not have biological directory for species " + species.getName()
+                    );
                     continue;
                 }
 
                 //we have a mapping tile---> weight
                 //we want a mapping biology-->weight
-                LinkedHashMap<VariableBiomassBasedBiology, Double> weights =
-                        new LinkedHashMap<>(localBiologies.size());
+                final LinkedHashMap<VariableBiomassBasedBiology, Double> weights =
+                    new LinkedHashMap<>(localBiologies.size());
 
 
-                Function<SeaTile, Double> allocator = allocators.get(species);
+                final Function<SeaTile, Double> allocator = allocators.get(species);
                 Preconditions.checkArgument(allocator != null);
                 //for every biology allocate it its weight (for this species)
-                for (Map.Entry<SeaTile, VariableBiomassBasedBiology> local : localBiologies.entrySet()) {
-                    double ratio = allocator.apply(local.getKey());
+                for (final Map.Entry<SeaTile, VariableBiomassBasedBiology> local : localBiologies.entrySet()) {
+                    final double ratio = allocator.apply(local.getKey());
                     weights.put(local.getValue(), ratio);
                 }
 
                 //we should have covered all locations by now
                 assert localBiologies.values().containsAll(weights.keySet());
                 assert weights.keySet().containsAll(localBiologies.values());
-                originalWeights.put(species,weights);
+                originalWeights.put(species, weights);
 
                 //now assign biomass and carrying capacity to each biology
                 resetLocalBiology(species, weights);
-                DerisoParameters parameter;
-                double virginBiomass;
-                double currentBiomass;
+                final DerisoParameters parameter;
+                final double virginBiomass;
+                final double currentBiomass;
 
 
                 //scale virgin biomass/empirical biomasses now
                 parameter = parameters.get(species);
-                double totalWeight = weights.values().stream().mapToDouble(value -> value).sum();
+                final double totalWeight = weights.values().stream().mapToDouble(value -> value).sum();
                 virginBiomass = parameter.getVirginBiomass() * totalWeight;
-                LinkedList<Double> scaledEmpiricalBiomasses = new LinkedList<>(parameter.getEmpiricalYearlyBiomasses());
+                final LinkedList<Double> scaledEmpiricalBiomasses = new LinkedList<>(parameter.getEmpiricalYearlyBiomasses());
                 scaledEmpiricalBiomasses.replaceAll(original -> original * totalWeight);
-                currentBiomass = scaledEmpiricalBiomasses.get(scaledEmpiricalBiomasses.size()-1);
+                currentBiomass = scaledEmpiricalBiomasses.get(scaledEmpiricalBiomasses.size() - 1);
 
                 //hopefully biomass sums up in the end!
 
-                assert Math.abs(localBiologies.values().stream().mapToDouble(new ToDoubleFunction<VariableBiomassBasedBiology>() {
+                assert Math.abs(localBiologies.values()
+                    .stream()
+                    .mapToDouble(new ToDoubleFunction<VariableBiomassBasedBiology>() {
 
-                    @Override
-                    public double applyAsDouble(VariableBiomassBasedBiology value) {
-                        return value.getCarryingCapacity(species);
-                    }
-                }).sum() -virginBiomass) < FishStateUtilities.EPSILON;
-                assert Math.abs(localBiologies.values().stream().mapToDouble(new ToDoubleFunction<VariableBiomassBasedBiology>() {
-                    @Override
-                    public double applyAsDouble(VariableBiomassBasedBiology value) {
-                        return value.getBiomass(species);
-                    }
-                }).sum() - currentBiomass)<.01;
+                        @Override
+                        public double applyAsDouble(final VariableBiomassBasedBiology value) {
+                            return value.getCarryingCapacity(species);
+                        }
+                    })
+                    .sum() - virginBiomass) < FishStateUtilities.EPSILON;
+                assert Math.abs(localBiologies.values()
+                    .stream()
+                    .mapToDouble(new ToDoubleFunction<VariableBiomassBasedBiology>() {
+                        @Override
+                        public double applyAsDouble(final VariableBiomassBasedBiology value) {
+                            return value.getBiomass(species);
+                        }
+                    })
+                    .sum() - currentBiomass) < .01;
 
 
                 parameter.updateLastRecruits();
 
                 //schedule the damn grower!
-                DerisoSchnuteCommonGrower grower = new DerisoSchnuteCommonGrower(
-                        scaledEmpiricalBiomasses,
-                        parameter.getHistoricalYearlySurvival(),
-                        parameter.getRho(),
-                        parameter.getNaturalSurvivalRate(),
-                        parameter.getRecruitmentSteepness(),
-                        parameter.getRecruitmentLag(),
-                        species.getIndex(),
-                        parameter.getWeightAtRecruitment(),
-                        parameter.getWeightAtRecruitmentMinus1(),
-                        parameter.getLastRecruits()
+                final DerisoSchnuteCommonGrower grower = new DerisoSchnuteCommonGrower(
+                    scaledEmpiricalBiomasses,
+                    parameter.getHistoricalYearlySurvival(),
+                    parameter.getRho(),
+                    parameter.getNaturalSurvivalRate(),
+                    parameter.getRecruitmentSteepness(),
+                    parameter.getRecruitmentLag(),
+                    species.getIndex(),
+                    parameter.getWeightAtRecruitment(),
+                    parameter.getWeightAtRecruitmentMinus1(),
+                    parameter.getLastRecruits()
                 );
                 //register all valid biologies to be grown
-                for (Map.Entry<SeaTile, VariableBiomassBasedBiology> bio : localBiologies.entrySet()) {
-                    if(bio.getValue().getCarryingCapacity(species)>0)
+                for (final Map.Entry<SeaTile, VariableBiomassBasedBiology> bio : localBiologies.entrySet()) {
+                    if (bio.getValue().getCarryingCapacity(species) > 0)
                         grower.getBiologies().add(bio.getValue());
                 }
 
 
                 model.registerStartable(grower);
-                naturalProcesses.put(species,grower);
+                naturalProcesses.put(species, grower);
 
             }
             //clear out all empty biologies
-            List<SeaTile> toClear = new LinkedList<>();
-            for (Map.Entry<SeaTile, VariableBiomassBasedBiology> bio : localBiologies.entrySet())
-            {
+            final List<SeaTile> toClear = new LinkedList<>();
+            for (final Map.Entry<SeaTile, VariableBiomassBasedBiology> bio : localBiologies.entrySet()) {
                 double sum = 0;
-                for(int i=0; i<biology.getSize(); i++)
+                for (int i = 0; i < biology.getSize(); i++)
                     sum += bio.getValue().getCarryingCapacity(i);
-                if(sum<=0)
-                {
+                if (sum <= 0) {
                     bio.getKey().setBiology(new EmptyLocalBiology());
                     toClear.add(bio.getKey());
                 }
             }
-            for(SeaTile bio : toClear)
+            for (final SeaTile bio : toClear)
                 localBiologies.remove(bio);
 
 
             //movement rates
-            BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map,
-                                                                             random,
-                                                                             biology);
+            final BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(
+                map,
+                random,
+                biology
+            );
 
-            for (Map.Entry<Species, Double> movement : movementRate.entrySet()) {
-                assert movement.getValue()>0;
-                diffuser.getMovementRules().put(movement.getKey(),
-                                                new SmoothMovementRule(
-                                                        movement.getValue(),
-                                                        .001d
-                                                ));
+            for (final Map.Entry<Species, Double> movement : movementRate.entrySet()) {
+                assert movement.getValue() > 0;
+                diffuser.getMovementRules().put(
+                    movement.getKey(),
+                    new SmoothMovementRule(
+                        movement.getValue(),
+                        .001d
+                    )
+                );
 
             }
             model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
 
             //done!
             biologicalDirectories.clear();
-        }
-        catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
-            Log.error("Failed to locate or read deriso parameters correctly. Could not instantiate the local biology");
+            Logger.getGlobal()
+                .severe("Failed to locate or read deriso parameters correctly. Could not instantiate the local biology");
             System.exit(-1);
         }
     }
 
+    /**
+     * allocates biomass and carrying capacity all around
+     *
+     * @param species
+     * @param weights
+     */
+    private void resetLocalBiology(
+        final Species species,
+        final LinkedHashMap<VariableBiomassBasedBiology, Double> weights
+    ) {
+        if (species.isImaginary())
+            return;
+        final DerisoParameters parameter = parameters.get(species);
+        final double virginBiomass = parameter.getVirginBiomass();
+        final double currentBiomass = parameter.getEmpiricalYearlyBiomasses().get(
+            parameter.getEmpiricalYearlyBiomasses().size() - 1);
+        for (final Map.Entry<VariableBiomassBasedBiology, Double> bio : weights.entrySet()) {
+            // these asserts are only true the first time you call this method
+            // assert bio.getKey().getCarryingCapacity(species) == 0;
+            // assert bio.getKey().getBiomass(species) == 0;
+            bio.getKey().setCarryingCapacity(
+                species,
+                weights.get(bio.getKey()) *
+                    virginBiomass
+            );
+            // assert bio.getKey().getBiomass(species) == 0;
+            bio.getKey().setCurrentBiomass(species, weights.get(bio.getKey()) * currentBiomass);
+        }
+    }
 
     /**
      * you must at all time be ready to reset local biology to its pristine state
@@ -348,32 +390,8 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      * @param species species you want the biomass resetted
      */
     @Override
-    public void resetLocalBiology(Species species) {
-        resetLocalBiology(species,originalWeights.get(species));
-    }
-
-    /**
-     * allocates biomass and carrying capacity all around
-     * @param species
-     * @param weights
-     */
-    private void resetLocalBiology(Species species, LinkedHashMap<VariableBiomassBasedBiology, Double> weights) {
-        if(species.isImaginary())
-            return;
-        DerisoParameters parameter = parameters.get(species);
-        double virginBiomass = parameter.getVirginBiomass();
-        double currentBiomass = parameter.getEmpiricalYearlyBiomasses().get(
-                parameter.getEmpiricalYearlyBiomasses().size()-1);
-        for (Map.Entry<VariableBiomassBasedBiology, Double> bio : weights.entrySet()) {
-           // these asserts are only true the first time you call this method
-            // assert bio.getKey().getCarryingCapacity(species) == 0;
-           // assert bio.getKey().getBiomass(species) == 0;
-            bio.getKey().setCarryingCapacity(species,
-                                             weights.get(bio.getKey()) *
-                                                     virginBiomass);
-           // assert bio.getKey().getBiomass(species) == 0;
-            bio.getKey().setCurrentBiomass(species, weights.get(bio.getKey()) * currentBiomass);
-        }
+    public void resetLocalBiology(final Species species) {
+        resetLocalBiology(species, originalWeights.get(species));
     }
 
     /**
@@ -384,7 +402,8 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      */
     @Override
     public Function<SeaTile, Double> putAllocator(
-            Species key, Function<SeaTile, Double> value) {
+        final Species key, final Function<SeaTile, Double> value
+    ) {
         return allocators.put(key, value);
     }
 
@@ -407,7 +426,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      *
      * @param movementRate Value to set for property 'movementRate'.
      */
-    public void setMovementRate(LinkedHashMap<Species, Double> movementRate) {
+    public void setMovementRate(final LinkedHashMap<Species, Double> movementRate) {
         this.movementRate = movementRate;
     }
 
@@ -426,7 +445,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      *
      * @param derisoYamlFileName Value to set for property 'derisoYamlFileName'.
      */
-    public void setDerisoYamlFileName(String derisoYamlFileName) {
+    public void setDerisoYamlFileName(final String derisoYamlFileName) {
         this.derisoYamlFileName = derisoYamlFileName;
     }
 }

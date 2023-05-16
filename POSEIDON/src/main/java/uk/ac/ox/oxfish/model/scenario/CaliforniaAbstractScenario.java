@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -98,6 +97,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 /**
  * Created by carrknight on 6/15/17.
@@ -105,92 +105,59 @@ import java.util.function.Consumer;
 public abstract class CaliforniaAbstractScenario implements Scenario {
 
 
-    /**
-     * if this is set to anything but 1 then it scales the <b> number </b> of fish for every tile
-     * whose y is above 60 by this factor
-     */
-    private double californiaScaling = 1.0;
-
-    private Path mainDirectory = Paths.get("inputs", "california");
-
-
     public static final double DEFAULT_CATCHABILITY = 0.00156832676d;
     /*
-       * fuel efficiency per hour is 57l according to Toft et al
-       */
+     * fuel efficiency per hour is 57l according to Toft et al
+     */
     protected final static Double LITERS_OF_GAS_CONSUMED_PER_HOUR = 57d;
-
-    private boolean resetBiologyAtYear1 = true;
-
     protected AlgorithmFactory<? extends Regulation> regulationPostReset =
 
 
-            //2011 numbers:
-            new MultiQuotaMapFactory(MultiQuotaMapFactory.QuotaType.ITQ,
-                                     new Pair<>("Yelloweye rockfish", 600d),
-                                     //        new Pair<>("Canary rockfish",41100d),
-                                     new Pair<>("Dover sole", 22234500d),
-                                     new Pair<>("Longspine Thornyhead", 1966250d),
-                                     new Pair<>("Sablefish", 2724935d), //averaged out till 2014, and with south included
-                                     new Pair<>("Shortspine thornyhead", 1481600.056d)
-            );
-    private String spatialFileName = "spatial.csv";
-
-
-    {
-        HashMap<String, Double> quotaExchangedPerMatch = new HashMap<>();
-        quotaExchangedPerMatch.put("Yelloweye rockfish", 6d);
-        quotaExchangedPerMatch.put("Dover sole", 500d);
-        quotaExchangedPerMatch.put("Longspine Thornyhead", 500d);
-        quotaExchangedPerMatch.put("Sablefish", 500d);
-        quotaExchangedPerMatch.put("Shortspine thornyhead", 500d);
-        ((MultiQuotaMapFactory) regulationPostReset).setQuotaExchangedPerMatch(
-                quotaExchangedPerMatch
+        //2011 numbers:
+        new MultiQuotaMapFactory(
+            MultiQuotaMapFactory.QuotaType.ITQ,
+            new Pair<>("Yelloweye rockfish", 600d),
+            //        new Pair<>("Canary rockfish",41100d),
+            new Pair<>("Dover sole", 22234500d),
+            new Pair<>("Longspine Thornyhead", 1966250d),
+            new Pair<>("Sablefish", 2724935d), //averaged out till 2014, and with south included
+            new Pair<>("Shortspine thornyhead", 1481600.056d)
         );
-    }
-
-
     /**
      * regulation to use before the biology reset. (if there is no reset, then this regulation stands forever)
      */
     protected AlgorithmFactory<? extends Regulation> regulationPreReset =
 
-            new AnarchyFactory();
-
-
-    private String californiaBathymetryFile = "california.csv";
-
-
-    private AlgorithmFactory<? extends LogbookInitializer> logbook =
-            new NoLogbookFactory();
-
+        new AnarchyFactory();
     /**
      * gear maker
      */
     protected AlgorithmFactory<? extends Gear> gear =
-            new GarbageGearFactory();
+        new GarbageGearFactory();
     protected LinkedHashMap<String, String> exogenousCatches = new LinkedHashMap<>();
-
-    {
-        //these numbers are just the total catches on the noaa website minus DTS catches from catcher vessel report
-        //all for the year 2010
-        exogenousCatches.put("Dover Sole", Double.toString(676.9 * 1000));
-        exogenousCatches.put("Sablefish", Double.toString(4438.2 * 1000));
-
-    }
-
+    /**
+     * if this is set to anything but 1 then it scales the <b> number </b> of fish for every tile
+     * whose y is above 60 by this factor
+     */
+    private double californiaScaling = 1.0;
+    private Path mainDirectory = Paths.get("inputs", "california");
+    private boolean resetBiologyAtYear1 = true;
+    private String spatialFileName = "spatial.csv";
+    private String californiaBathymetryFile = "california.csv";
+    private AlgorithmFactory<? extends LogbookInitializer> logbook =
+        new NoLogbookFactory();
     /**
      * filename containing all the ports
      */
     private String portFileName = "dts_ports_2011.csv";
     private int gridWidth = 50;
     private NetworkBuilder networkBuilder =
-            new EquidegreeBuilder();
+        new EquidegreeBuilder();
     /**
      * boat length in meters
      */
     private DoubleParameter boatLength = new FixedDoubleParameter(
-            22.573488); //assuming meters: this is from the data request
+        22.573488); //assuming meters: this is from the data request
     /**
      * boat breadth in meters
      */
@@ -201,17 +168,76 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
     // the Echo Belle has GRT of 54 tonnes, but how much is the net is just a guess
     private DoubleParameter holdSizePerBoat = new FixedDoubleParameter(8000);
     private DoubleParameter fuelTankInLiters = new FixedDoubleParameter(
-            45519.577); //this is from data request, transformed in liters from gallons
+        45519.577); //this is from data request, transformed in liters from gallons
     private DoubleParameter cruiseSpeedInKph = new FixedDoubleParameter(
-            16.0661); //this is 8.675 knots from the data request
+        16.0661); //this is 8.675 knots from the data request
     //new thinking:
     //liters per hour 57 (toft)
     //kph 16.0661
     //liter per km : 57/16.0661
     private DoubleParameter literPerKilometer = new FixedDoubleParameter(3.547842974);
-
     private AlgorithmFactory<? extends GasPriceMaker> gasPriceMaker =
-            new FixedGasFactory(0.89991382);
+        new FixedGasFactory(0.89991382);
+    /**
+     * factory to produce departing strategy
+     */
+    private AlgorithmFactory<? extends DepartingStrategy> departingStrategy =
+        new FixedRestTimeDepartingFactory();
+    /**
+     * factory to produce departing strategy
+     */
+    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy =
+        new PerTripImitativeDestinationFactory();
+    /**
+     * factory to produce fishing strategy
+     */
+    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy =
+        new MaximumStepsFactory();
+    private AlgorithmFactory<? extends GearStrategy> gearStrategy =
+        new FixedGearStrategyFactory();
+    private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
+        new IgnoreWeatherFactory();
+
+    /*{
+        ((PerTripImitativeDestinationFactory) destinationStrategy).setAutomaticallyIgnoreAreasWhereFishNeverGrows(true);
+    }*/
+    private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy = new NoDiscardingFactory();
+    private boolean usePremadeInput = false;
+    /**
+     * anything from crew to ice to insurance to maintenance. Paid as a lump-sum cost at the end of each trip
+     */
+    // https://dataexplorer.northwestscience.fisheries.noaa.gov/fisheye/PerformanceMetrics/
+    //median variable cost per day in  in 2011 was  4,684$  to which we remove the fuel costs of 1,049
+    //if you do this on average for the years we have data (2011-2015) we get 165$ an hour
+    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(165.066666666667);
+    private LinkedHashMap<Port, Integer> numberOfFishersPerPort;
+    //these prices are averages from the catcher vessel report
+    //2010
+    private String priceMap = "Dover Sole:0.6698922,Sablefish:4.3235295," +
+        "Shortspine Thornyhead:1.0428510," +
+        "Longspine Thornyhead:1.0428510," +
+        "Yelloweye Rockfish:1.0754502"
+        + "," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME + ":1.7646181";
+
+    {
+        final HashMap<String, Double> quotaExchangedPerMatch = new HashMap<>();
+        quotaExchangedPerMatch.put("Yelloweye rockfish", 6d);
+        quotaExchangedPerMatch.put("Dover sole", 500d);
+        quotaExchangedPerMatch.put("Longspine Thornyhead", 500d);
+        quotaExchangedPerMatch.put("Sablefish", 500d);
+        quotaExchangedPerMatch.put("Shortspine thornyhead", 500d);
+        ((MultiQuotaMapFactory) regulationPostReset).setQuotaExchangedPerMatch(
+            quotaExchangedPerMatch
+        );
+    }
+
+    {
+        //these numbers are just the total catches on the noaa website minus DTS catches from catcher vessel report
+        //all for the year 2010
+        exogenousCatches.put("Dover Sole", Double.toString(676.9 * 1000));
+        exogenousCatches.put("Sablefish", Double.toString(4438.2 * 1000));
+
+    }
 
     {
         //read from data!
@@ -219,25 +245,10 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
         ((CsvTimeSeriesGasFactory) gasPriceMaker).setScaling(0.219969157);
         ((CsvTimeSeriesGasFactory) gasPriceMaker).setLoopThroughTheCSV(false);
         ((CsvTimeSeriesGasFactory) gasPriceMaker).setCsvFile(
-                Paths.get("inputs","california","2010_gasprice.csv")
+            Paths.get("inputs", "california", "2010_gasprice.csv")
         );
 
     }
-
-    /**
-     * factory to produce departing strategy
-     */
-    private AlgorithmFactory<? extends DepartingStrategy> departingStrategy =
-            new FixedRestTimeDepartingFactory();
-    /**
-     * factory to produce departing strategy
-     */
-    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy =
-            new PerTripImitativeDestinationFactory();
-
-    /*{
-        ((PerTripImitativeDestinationFactory) destinationStrategy).setAutomaticallyIgnoreAreasWhereFishNeverGrows(true);
-    }*/
 
     //pre-ITQ:
     /*
@@ -264,58 +275,29 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
     //post-ITQ:
     {
         this.destinationStrategy = new BarebonesContinuousDestinationFactory();
-        CentroidMapFileFactory discretizer = new CentroidMapFileFactory();
+        final CentroidMapFileFactory discretizer = new CentroidMapFileFactory();
         discretizer.setFilePath(mainDirectory.resolve("logit").resolve("centroids_utm10N.csv").toString());
         discretizer.setAutomaticallyIgnoreWastelands(true);
         ((BarebonesContinuousDestinationFactory) destinationStrategy).setDiscretizer(
-                discretizer
+            discretizer
         );
         ((BarebonesContinuousDestinationFactory) destinationStrategy).setDistanceInKm(
-                new FixedDoubleParameter(-0.0135515257873626)
+            new FixedDoubleParameter(-0.0135515257873626)
         );
         ((BarebonesContinuousDestinationFactory) destinationStrategy).setHabitIntercept(
-                new FixedDoubleParameter(0.282719257782064)
+            new FixedDoubleParameter(0.282719257782064)
         );
         ((BarebonesContinuousDestinationFactory) destinationStrategy).setHabitPeriodInDays(
-                new FixedDoubleParameter(365)
+            new FixedDoubleParameter(365)
         );
 
     }
-
-
-    /**
-     * factory to produce fishing strategy
-     */
-    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy =
-            new MaximumStepsFactory();
-    private AlgorithmFactory<? extends GearStrategy> gearStrategy =
-            new FixedGearStrategyFactory();
-    private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
-            new IgnoreWeatherFactory();
-    private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy = new NoDiscardingFactory();
-    private boolean usePremadeInput = false;
-    /**
-     * anything from crew to ice to insurance to maintenance. Paid as a lump-sum cost at the end of each trip
-     */
-    // https://dataexplorer.northwestscience.fisheries.noaa.gov/fisheye/PerformanceMetrics/
-    //median variable cost per day in  in 2011 was  4,684$  to which we remove the fuel costs of 1,049
-    //if you do this on average for the years we have data (2011-2015) we get 165$ an hour
-    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(165.066666666667);
-    private LinkedHashMap<Port,Integer> numberOfFishersPerPort;
-    //these prices are averages from the catcher vessel report
-    //2010
-    private String priceMap = "Dover Sole:0.6698922,Sablefish:4.3235295," +
-            "Shortspine Thornyhead:1.0428510," +
-            "Longspine Thornyhead:1.0428510," +
-            "Yelloweye Rockfish:1.0754502"
-            +"," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME+":1.7646181"
-
-            ;
     /*
     //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
     private String priceMap = "Dover Sole:1.208,Sablefish:3.589,Shortspine Thornyhead:3.292,Longspine Thornyhead:0.7187,Yelloweye Rockfish:1.587"
             +"," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME+":1.0";
     */
+
     /**
      * this is the very first method called by the model when it is started. The scenario needs to instantiate all the
      * essential objects for the model to take place
@@ -324,34 +306,34 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      * @return a scenario-result object containing the map, the list of agents and the biology object
      */
     @Override
-    public ScenarioEssentials start(FishState model) {
+    public ScenarioEssentials start(final FishState model) {
 
-        GlobalBiology biology;
-        NauticalMap map;
+        final GlobalBiology biology;
+        final NauticalMap map;
 
         try {
-            Path bioDirectory = mainDirectory.resolve("biology");
+            final Path bioDirectory = mainDirectory.resolve("biology");
 
-            DirectoryStream<Path> folders = Files.newDirectoryStream(bioDirectory);
-            LinkedHashMap<String,Path> spatialFiles = new LinkedHashMap<>();
-            LinkedHashMap<String, Path> folderMap = new LinkedHashMap<>();
+            final DirectoryStream<Path> folders = Files.newDirectoryStream(bioDirectory);
+            final LinkedHashMap<String, Path> spatialFiles = new LinkedHashMap<>();
+            final LinkedHashMap<String, Path> folderMap = new LinkedHashMap<>();
 
             //sort it alphabetically to insure folders are consistently ranked
-            List<Path> sortedFolders = new LinkedList<>();
+            final List<Path> sortedFolders = new LinkedList<>();
             folders.forEach(sortedFolders::add);
-            Collections.sort(sortedFolders, (o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getFileName().toString(),
-                                                                                              o2.getFileName().toString()));
+            Collections.sort(sortedFolders, (o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(
+                o1.getFileName().toString(),
+                o2.getFileName().toString()
+            ));
             folders.close();
 
             //each folder is supposedly a species
-            for(Path folder : sortedFolders)
-            {
+            for (final Path folder : sortedFolders) {
 
 
-                Path file = folder.resolve(spatialFileName);
-                if(file.toFile().exists())
-                {
-                    String name = folder.getFileName().toString();
+                final Path file = folder.resolve(spatialFileName);
+                if (file.toFile().exists()) {
+                    final String name = folder.getFileName().toString();
                     spatialFiles.put(name, file);
 
                     /*
@@ -363,103 +345,105 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                                                 "The folder "+ name +
                                                         "  doesn't contain the abundance count.csv");
 */
-                    folderMap.put(folder.getFileName().toString(),folder);
-                }
-                else
-                {
-                    if(Log.WARN)
-                        Log.warn(folder.getFileName() + " does not have a spatial.txt file and so cannot be distributed on the map. " +
-                                         "It will be ignored");
+                    folderMap.put(folder.getFileName().toString(), folder);
+                } else {
+
+                    Logger.getGlobal().warning(() ->
+                        folder.getFileName() +
+                            " does not have a spatial.txt file and so cannot be distributed on the map. " +
+                            "It will be ignored"
+                    );
                 }
 
             }
 
 
-
-
-
             SampledMap sampledMap = null;
-            if(usePremadeInput) {
-                FileInputStream in = new FileInputStream(mainDirectory.resolve("premade.data").toFile());
-                ObjectInputStream stream = new ObjectInputStream(in);
+            if (usePremadeInput) {
+                final FileInputStream in = new FileInputStream(mainDirectory.resolve("premade.data").toFile());
+                final ObjectInputStream stream = new ObjectInputStream(in);
                 try {
                     sampledMap = (SampledMap) stream.readObject();
-                }
-                catch (Exception e){
-                    Log.error("Failed to read the premade california scenario.");
-                    Log.error(e.toString());
+                } catch (final Exception e) {
+                    Logger.getGlobal().severe("Failed to read the premade california scenario.");
+                    Logger.getGlobal().severe(e.toString());
                     System.exit(-1);
                 }
 
                 stream.close();
                 in.close();
 
-            }
-            else
-                sampledMap = new SampledMap(mainDirectory.resolve(californiaBathymetryFile),
-                                            gridWidth,
-                                            spatialFiles);
+            } else
+                sampledMap = new SampledMap(
+                    mainDirectory.resolve(californiaBathymetryFile),
+                    gridWidth,
+                    spatialFiles
+                );
 
             //we want a grid of numbers but we have a grid where every cell has many observations
-            int gridHeight = sampledMap.getGridHeight();
-            ObjectGrid2D altitudeGrid = new ObjectGrid2D(gridWidth, gridHeight);
-            Table<Integer,Integer,LinkedList<Double>> sampledAltitudeGrid = sampledMap.getAltitudeGrid();
+            final int gridHeight = sampledMap.getGridHeight();
+            final ObjectGrid2D altitudeGrid = new ObjectGrid2D(gridWidth, gridHeight);
+            final Table<Integer, Integer, LinkedList<Double>> sampledAltitudeGrid = sampledMap.getAltitudeGrid();
 
             //so for altitude we just average them out
-            for(int x=0;x<gridWidth;x++)
-                for(int y=0;y<gridHeight;y++)
-                {
-                    OptionalDouble average = sampledAltitudeGrid.get(x, y).
-                            stream().mapToDouble(
+            for (int x = 0; x < gridWidth; x++)
+                for (int y = 0; y < gridHeight; y++) {
+                    final OptionalDouble average = sampledAltitudeGrid.get(x, y).
+                        stream().mapToDouble(
                             value -> value).filter(
                             aDouble -> aDouble > -9999).average();
                     altitudeGrid.set(x, y,
-                                     new SeaTile(x, y, average.orElseGet(() -> 1000d), new TileHabitat(0)));
+                        new SeaTile(x, y, average.orElseGet(() -> 1000d), new TileHabitat(0))
+                    );
                 }
 
             biology = buildBiology(model, folderMap);
 
-            GeomGridField unitedMap = new GeomGridField(altitudeGrid);
+            final GeomGridField unitedMap = new GeomGridField(altitudeGrid);
             unitedMap.setMBR(sampledMap.getMbr());
 
             //create the map
-            CartesianUTMDistance distance = new CartesianUTMDistance();
+            final CartesianUTMDistance distance = new CartesianUTMDistance();
             map = new NauticalMap(unitedMap, new GeomVectorField(),
-                                  distance,
-                                  new AStarPathfinder(distance));
+                distance,
+                new AStarPathfinder(distance)
+            );
             //for all species, find the total observations you get
 
 
             //this table contains for each x-y an array telling for each specie what is the average observation at x,y
-            final Table<Integer,Integer,double[]> averagesTable = HashBasedTable.create(gridWidth, gridHeight);
+            final Table<Integer, Integer, double[]> averagesTable = HashBasedTable.create(gridWidth, gridHeight);
             //go through the map
-            for(int x=0;x<gridWidth;x++) {
+            for (int x = 0; x < gridWidth; x++) {
                 for (int y = 0; y < gridHeight; y++) {
-                    double[] averages = new double[biology.getSize()];
+                    final double[] averages = new double[biology.getSize()];
                     averagesTable.put(x, y, averages);
-                    SeaTile seaTile = map.getSeaTile(x, y);
+                    final SeaTile seaTile = map.getSeaTile(x, y);
                     seaTile.assignLocalWeather(new ConstantWeather(0, 0, 0));
                     seaTile.setBiology(
-                            getBiologyInitializer()
-                                    .generateLocal(biology, seaTile, model.getRandom(), gridHeight, gridWidth,map ));
+                        getBiologyInitializer()
+                            .generateLocal(biology, seaTile, model.getRandom(), gridHeight, gridWidth, map));
                     //if it's sea (don't bother counting otherwise)
-                    if (seaTile.isWater())
-                    {
+                    if (seaTile.isWater()) {
                         int i = 0;
                         //each specie grid value is an ObjectGrid2D whose cells are themselves list of observations
                         //for each species
-                        for (Map.Entry<String, Table<Integer,Integer,LinkedList<Double>>> specieGrid :
-                                sampledMap.getBiologyGrids().entrySet()) {
-                            assert biology.getSpecie(i).getName().equals(specieGrid.getKey()); //check we got the correct one
+                        for (final Map.Entry<String, Table<Integer, Integer, LinkedList<Double>>> specieGrid :
+                            sampledMap.getBiologyGrids().entrySet()) {
+                            assert biology.getSpecie(i)
+                                .getName()
+                                .equals(specieGrid.getKey()); //check we got the correct one
                             //average
-                            OptionalDouble average = specieGrid.getValue().get(x,
-                                                                               y).stream().mapToDouble(
-                                    value -> value).average();
+                            final OptionalDouble average = specieGrid.getValue().get(
+                                x,
+                                y
+                            ).stream().mapToDouble(
+                                value -> value).average();
                             averages[i] = average.orElse(0);
                             //scale californian cells a bit. I need to do it here since otherwise the change would be lost
                             //at reset time
-                            if(y>=60 && californiaScaling != 1.0)
-                                averages[i]*=californiaScaling;
+                            if (y >= 60 && californiaScaling != 1.0)
+                                averages[i] *= californiaScaling;
                             i++;
                         }
                     }
@@ -469,24 +453,22 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
             }
             //now that we have the averages, we can compute their sum:
             final double[] sums = new double[biology.getSize()];
-            for(double[] average : averagesTable.values())
-                for(int i=0; i<sums.length; i++)
+            for (final double[] average : averagesTable.values())
+                for (int i = 0; i < sums.length; i++)
                     sums[i] += average[i];
 
             //and now finally we can turn all that into allocators
-            for(Species current : biology.getSpecies())
+            for (final Species current : biology.getSpecies())
                 getBiologyInitializer().putAllocator(current, input ->
-                        (averagesTable.get(input.getGridX(), input.getGridY())[current.getIndex()])
-                                /
-                                sums[current.getIndex()]);
+                    (averagesTable.get(input.getGridX(), input.getGridY())[current.getIndex()])
+                        /
+                        sums[current.getIndex()]);
 
             getBiologyInitializer().processMap(biology, map, model.getRandom(), model);
 
 
-
-
             //set yourself up to reset the biology at the given year if needed
-            if(resetBiologyAtYear1) {
+            if (resetBiologyAtYear1) {
 
                 //protect all biomass
 /*
@@ -499,11 +481,10 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
  */
 
 
-
                 model.scheduleOnceInXDays(new Steppable() {
                     @Override
-                    public void step(SimState simState) {
-                        Log.info("Resetting all local biologies");
+                    public void step(final SimState simState) {
+                        Logger.getGlobal().info("Resetting all local biologies");
 
                         //stop protecting
                         /*
@@ -513,99 +494,101 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                                     ,
                                     false);
                           */
-                        for (Species current : biology.getSpecies()) {
+                        for (final Species current : biology.getSpecies()) {
                             getBiologyInitializer().resetLocalBiology(current);
 
                         }
                     }
                 }, StepOrder.DAWN, 366);
                 model.scheduleOnceAtTheBeginningOfYear(
-                        new Steppable() {
-                            @Override
-                            public void step(SimState simState) {
-                                Log.info("Resetting all rules");
+                    new Steppable() {
+                        @Override
+                        public void step(final SimState simState) {
+                            Logger.getGlobal().info("Resetting all rules");
 
-                                for(Fisher fisher : model.getFishers())
-                                    fisher.setRegulation(regulationPostReset.apply(model));
-                            }
-                        },
-                        StepOrder.DAWN,
-                        1
+                            for (final Fisher fisher : model.getFishers())
+                                fisher.setRegulation(regulationPostReset.apply(model));
+                        }
+                    },
+                    StepOrder.DAWN,
+                    1
                 );
 
             }
 
 
-            if(Log.TRACE)
-                Log.trace("height: " +map.getHeight());
+            Logger.getGlobal().fine(() -> "height: " + map.getHeight());
 
 
-
-            PortReader reader = new PortReader();
+            final PortReader reader = new PortReader();
             numberOfFishersPerPort = reader.readFile(
-                    mainDirectory.resolve(portFileName),
-                    map,
-                    (location) -> {
-                        MarketMap markets = new MarketMap(biology);
-                        //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
+                mainDirectory.resolve(portFileName),
+                map,
+                (location) -> {
+                    final MarketMap markets = new MarketMap(biology);
+                    //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
 
-                        Map<String, String> prices = Splitter.on(",").withKeyValueSeparator(":").split(priceMap.trim());
-                        for(Map.Entry<String,String> price : prices.entrySet()) {
-                            markets.addMarket(biology.getSpecie(price.getKey()), new FixedPriceMarket(Double.valueOf(price.getValue())));
-                            if(Log.DEBUG)
-                                Log.debug(price.getKey() + " will have price " + price.getValue());
-                        }
-                        return markets;
+                    final Map<String, String> prices = Splitter.on(",")
+                        .withKeyValueSeparator(":")
+                        .split(priceMap.trim());
+                    for (final Map.Entry<String, String> price : prices.entrySet()) {
+                        markets.addMarket(
+                            biology.getSpecie(price.getKey()),
+                            new FixedPriceMarket(Double.valueOf(price.getValue()))
+                        );
+                        Logger.getGlobal().fine(() -> price.getKey() + " will have price " + price.getValue());
+                    }
+                    return markets;
 
-                    },
-                    gasPriceMaker.apply(model),
-                    model);
+                },
+                gasPriceMaker.apply(model),
+                model
+            );
 
-            for(Port port : numberOfFishersPerPort.keySet())
+            for (final Port port : numberOfFishersPerPort.keySet())
                 map.addPort(port);
 
 
-
-            System.out.println("height " + map.distance(0,0,0,1) );
-            System.out.println("width " + map.distance(0,0,1,0) );
-
+            System.out.println("height " + map.distance(0, 0, 0, 1));
+            System.out.println("width " + map.distance(0, 0, 1, 0));
 
 
             //add exogenous catches
             //first turn map of strings into map of species
-            LinkedHashMap<Species,Double>  recast = new LinkedHashMap<>();
-            for (Map.Entry<String, String> exogenous : exogenousCatches.entrySet()) {
-                recast.put(biology.getSpecie(exogenous.getKey()),Double.parseDouble(exogenous.getValue()));
+            final LinkedHashMap<Species, Double> recast = new LinkedHashMap<>();
+            for (final Map.Entry<String, String> exogenous : exogenousCatches.entrySet()) {
+                recast.put(biology.getSpecie(exogenous.getKey()), Double.parseDouble(exogenous.getValue()));
             }
             //start it!
 
-            ExogenousCatches catches = turnIntoExogenousCatchesObject(recast);
+            final ExogenousCatches catches = turnIntoExogenousCatchesObject(recast);
             model.registerStartable(catches);
 
 
             return new ScenarioEssentials(biology, map);
 
 
-
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Some files were missing!");
         }
 
 
-
     }
-
-    @NotNull
-    abstract protected ExogenousCatches turnIntoExogenousCatchesObject(LinkedHashMap<Species, Double> recast) ;
 
     /**
      * build the biology part!
+     *
      * @param model
      * @param folderMap
      * @return
      */
     protected abstract GlobalBiology buildBiology(FishState model, LinkedHashMap<String, Path> folderMap);
+
+    public abstract AllocatedBiologyInitializer getBiologyInitializer();
+
+    @NotNull
+    abstract protected ExogenousCatches turnIntoExogenousCatchesObject(LinkedHashMap<Species, Double> recast);
 
     /**
      * called shortly after the essentials are set, it is time now to return a list of all the agents
@@ -614,51 +597,56 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      * @return a list of agents
      */
     @Override
-    public ScenarioPopulation populateModel(FishState model) {
+    public ScenarioPopulation populateModel(final FishState model) {
 
-        LinkedList<Fisher> fisherList = new LinkedList<>();
+        final LinkedList<Fisher> fisherList = new LinkedList<>();
 
-        GlobalBiology biology = model.getBiology();
-        NauticalMap map = model.getMap();
-        MersenneTwisterFast random = model.getRandom();
+        final GlobalBiology biology = model.getBiology();
+        final NauticalMap map = model.getMap();
+        final MersenneTwisterFast random = model.getRandom();
 
 
         //create logbook initializer
-        LogbookInitializer log = logbook.apply(model);
+        final LogbookInitializer log = logbook.apply(model);
         log.start(model);
 
-        int fisherCounter=0;
-        Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(true,
-                                                                            biology);
-        for(Map.Entry<Port,Integer> entry : numberOfFishersPerPort.entrySet())
+        int fisherCounter = 0;
+        final Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(
+            true,
+            biology
+        );
+        for (final Map.Entry<Port, Integer> entry : numberOfFishersPerPort.entrySet())
 
-            for(int id=0;id<entry.getValue();id++)
-            {
+            for (int id = 0; id < entry.getValue(); id++) {
                 final double speed = cruiseSpeedInKph.applyAsDouble(random);
                 final double capacity = holdSizePerBoat.applyAsDouble(random);
                 final double engineWeight = 10000;
                 final double mileage = literPerKilometer.applyAsDouble(random);
                 final double fuelCapacity = fuelTankInLiters.applyAsDouble(random);
 
-                Gear fisherGear = gear.apply(model);
+                final Gear fisherGear = gear.apply(model);
 
 
-                Fisher newFisher = new Fisher(fisherCounter, entry.getKey(),
-                                              random,
-                                              regulationPreReset.apply(model),
-                                              departingStrategy.apply(model),
-                                              destinationStrategy.apply(model),
-                                              fishingStrategy.apply(model),
-                                              gearStrategy.apply(model),
-                                              discardingStrategy.apply(model),
-                                              weatherStrategy.apply(model),
-                                              new Boat(10, 10,
-                                                       new Engine(engineWeight,
-                                                                  mileage,
-                                                                  speed),
-                                                       new FuelTank(fuelCapacity)),
-                                              new Hold(capacity, biology),
-                                              fisherGear, model.getSpecies().size());
+                final Fisher newFisher = new Fisher(fisherCounter, entry.getKey(),
+                    random,
+                    regulationPreReset.apply(model),
+                    departingStrategy.apply(model),
+                    destinationStrategy.apply(model),
+                    fishingStrategy.apply(model),
+                    gearStrategy.apply(model),
+                    discardingStrategy.apply(model),
+                    weatherStrategy.apply(model),
+                    new Boat(10, 10,
+                        new Engine(
+                            engineWeight,
+                            mileage,
+                            speed
+                        ),
+                        new FuelTank(fuelCapacity)
+                    ),
+                    new Hold(capacity, biology),
+                    fisherGear, model.getSpecies().size()
+                );
                 fisherCounter++;
 
 
@@ -666,75 +654,115 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
                 fisherList.add(newFisher);
 
-                log.add(newFisher,model);
+                log.add(newFisher, model);
                 //add other trip costs
                 newFisher.getAdditionalTripCosts().add(
-                        new HourlyCost(hourlyTravellingCosts.applyAsDouble(random))
+                    new HourlyCost(hourlyTravellingCosts.applyAsDouble(random))
                 );
             }
 
 
-
         //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
         //while the model is running
-        FisherFactory fisherFactory = new FisherFactory(
-                () -> numberOfFishersPerPort.keySet().iterator().next(),
-                new AlgorithmFactory<Regulation>() {
-                    @Override
-                    public Regulation apply(FishState state) {
-                        if(state.getYear()<1 || !resetBiologyAtYear1)
-                            return getRegulationPreReset().apply(state);
-                        else
-                            return getRegulationPostReset().apply(state);
-                    }
-                },
-                departingStrategy,
-                destinationStrategy,
-                fishingStrategy,
-                discardingStrategy,
-                gearStrategy,
-                weatherStrategy,
-                () -> new Boat(10, 10, new Engine(0,
-                                                  literPerKilometer.applyAsDouble(random),
-                                                  cruiseSpeedInKph.applyAsDouble(random)),
-                               new FuelTank(fuelTankInLiters.applyAsDouble(random))),
-                () -> new Hold(holdSizePerBoat.applyAsDouble(random), biology),
-                gear,
+        final FisherFactory fisherFactory = new FisherFactory(
+            () -> numberOfFishersPerPort.keySet().iterator().next(),
+            new AlgorithmFactory<Regulation>() {
+                @Override
+                public Regulation apply(final FishState state) {
+                    if (state.getYear() < 1 || !resetBiologyAtYear1)
+                        return getRegulationPreReset().apply(state);
+                    else
+                        return getRegulationPostReset().apply(state);
+                }
+            },
+            departingStrategy,
+            destinationStrategy,
+            fishingStrategy,
+            discardingStrategy,
+            gearStrategy,
+            weatherStrategy,
+            () -> new Boat(10, 10, new Engine(
+                0,
+                literPerKilometer.applyAsDouble(random),
+                cruiseSpeedInKph.applyAsDouble(random)
+            ),
+                new FuelTank(fuelTankInLiters.applyAsDouble(random))
+            ),
+            () -> new Hold(holdSizePerBoat.applyAsDouble(random), biology),
+            gear,
 
-                fisherCounter);
+            fisherCounter
+        );
         fisherFactory.getAdditionalSetups().add(predictorSetup);
         fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
             @Override
-            public void accept(Fisher fisher) {
-                log.add(fisher,model);
+            public void accept(final Fisher fisher) {
+                log.add(fisher, model);
             }
         });
 
 
-        if(fisherList.size() <=1)
+        if (fisherList.size() <= 1)
             networkBuilder = new EmptyNetworkBuilder();
-
 
 
         //allow friendships only within people from the same port!
         networkBuilder.addPredicate((from, to) -> from.getHomePort().equals(to.getHomePort()));
 
-        if(Log.DEBUG)
-        {
+        final List<SeaTile> allSeaTilesAsList = map.getAllSeaTilesAsList();
+        for (final Species species : biology.getSpecies())
+            Logger.getGlobal().fine(() -> species.getName() + ", index " + species.getIndex() + " biomass is : " +
+                allSeaTilesAsList.stream().mapToDouble(value -> value.getBiomass(species)).sum());
 
-            List<SeaTile> allSeaTilesAsList = map.getAllSeaTilesAsList();
-            for(Species species : biology.getSpecies() )
-                Log.debug(species.getName() + ", index " + species.getIndex() + " biomass is : " +
-                                  allSeaTilesAsList.stream().mapToDouble(value -> value.getBiomass(species)).sum());
-        }
-
-        HashMap<String, FisherFactory> factory = new HashMap<>();
-        factory.put(FishState.DEFAULT_POPULATION_NAME,
-                    fisherFactory);
+        final HashMap<String, FisherFactory> factory = new HashMap<>();
+        factory.put(
+            FishState.DEFAULT_POPULATION_NAME,
+            fisherFactory
+        );
 
         return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), factory);
 
 
+    }
+
+    /**
+     * Getter for property 'regulation'.
+     *
+     * @return Value for property 'regulation'.
+     */
+    public AlgorithmFactory<? extends Regulation> getRegulationPreReset() {
+        return regulationPreReset;
+    }
+
+    /**
+     * Setter for property 'regulation'.
+     *
+     * @param regulationPreReset Value to set for property 'regulation'.
+     */
+    public void setRegulationPreReset(
+        final AlgorithmFactory<? extends Regulation> regulationPreReset
+    ) {
+        this.regulationPreReset = regulationPreReset;
+    }
+
+    /**
+     * Getter for property 'regulationPostReset'.
+     *
+     * @return Value for property 'regulationPostReset'.
+     */
+    public AlgorithmFactory<? extends Regulation> getRegulationPostReset() {
+        return regulationPostReset;
+    }
+
+    /**
+     * Setter for property 'regulationPostReset'.
+     *
+     * @param regulationPostReset Value to set for property 'regulationPostReset'.
+     */
+    public void setRegulationPostReset(
+        final AlgorithmFactory<? extends Regulation> regulationPostReset
+    ) {
+        this.regulationPostReset = regulationPostReset;
     }
 
     /**
@@ -751,7 +779,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param gridWidth Value to set for property 'gridWidth'.
      */
-    public void setGridWidth(int gridWidth) {
+    public void setGridWidth(final int gridWidth) {
         this.gridWidth = gridWidth;
     }
 
@@ -769,7 +797,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param networkBuilder Value to set for property 'networkBuilder'.
      */
-    public void setNetworkBuilder(NetworkBuilder networkBuilder) {
+    public void setNetworkBuilder(final NetworkBuilder networkBuilder) {
         this.networkBuilder = networkBuilder;
     }
 
@@ -787,7 +815,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param boatLength Value to set for property 'boatLength'.
      */
-    public void setBoatLength(DoubleParameter boatLength) {
+    public void setBoatLength(final DoubleParameter boatLength) {
         this.boatLength = boatLength;
     }
 
@@ -805,7 +833,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param boatWidth Value to set for property 'boatWidth'.
      */
-    public void setBoatWidth(DoubleParameter boatWidth) {
+    public void setBoatWidth(final DoubleParameter boatWidth) {
         this.boatWidth = boatWidth;
     }
 
@@ -823,7 +851,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param holdSizePerBoat Value to set for property 'holdSizePerBoat'.
      */
-    public void setHoldSizePerBoat(DoubleParameter holdSizePerBoat) {
+    public void setHoldSizePerBoat(final DoubleParameter holdSizePerBoat) {
         this.holdSizePerBoat = holdSizePerBoat;
     }
 
@@ -841,7 +869,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param fuelTankInLiters Value to set for property 'fuelTankInLiters'.
      */
-    public void setFuelTankInLiters(DoubleParameter fuelTankInLiters) {
+    public void setFuelTankInLiters(final DoubleParameter fuelTankInLiters) {
         this.fuelTankInLiters = fuelTankInLiters;
     }
 
@@ -859,7 +887,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param cruiseSpeedInKph Value to set for property 'cruiseSpeedInKph'.
      */
-    public void setCruiseSpeedInKph(DoubleParameter cruiseSpeedInKph) {
+    public void setCruiseSpeedInKph(final DoubleParameter cruiseSpeedInKph) {
         this.cruiseSpeedInKph = cruiseSpeedInKph;
     }
 
@@ -877,10 +905,9 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param literPerKilometer Value to set for property 'literPerKilometer'.
      */
-    public void setLiterPerKilometer(DoubleParameter literPerKilometer) {
+    public void setLiterPerKilometer(final DoubleParameter literPerKilometer) {
         this.literPerKilometer = literPerKilometer;
     }
-
 
     /**
      * Getter for property 'gasPriceMaker'.
@@ -897,7 +924,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      * @param gasPriceMaker Value to set for property 'gasPriceMaker'.
      */
     public void setGasPriceMaker(
-            AlgorithmFactory<? extends GasPriceMaker> gasPriceMaker) {
+        final AlgorithmFactory<? extends GasPriceMaker> gasPriceMaker
+    ) {
         this.gasPriceMaker = gasPriceMaker;
     }
 
@@ -910,7 +938,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param gear Value to set for property 'gear'.
      */
-    public void setGear(AlgorithmFactory<? extends Gear> gear) {
+    public void setGear(final AlgorithmFactory<? extends Gear> gear) {
         this.gear = gear;
     }
 
@@ -929,7 +957,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      * @param departingStrategy Value to set for property 'departingStrategy'.
      */
     public void setDepartingStrategy(
-            AlgorithmFactory<? extends DepartingStrategy> departingStrategy) {
+        final AlgorithmFactory<? extends DepartingStrategy> departingStrategy
+    ) {
         this.departingStrategy = departingStrategy;
     }
 
@@ -948,7 +977,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      * @param destinationStrategy Value to set for property 'destinationStrategy'.
      */
     public void setDestinationStrategy(
-            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
+        final AlgorithmFactory<? extends DestinationStrategy> destinationStrategy
+    ) {
         this.destinationStrategy = destinationStrategy;
     }
 
@@ -967,7 +997,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      * @param fishingStrategy Value to set for property 'fishingStrategy'.
      */
     public void setFishingStrategy(
-            AlgorithmFactory<? extends FishingStrategy> fishingStrategy) {
+        final AlgorithmFactory<? extends FishingStrategy> fishingStrategy
+    ) {
         this.fishingStrategy = fishingStrategy;
     }
 
@@ -986,34 +1017,16 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      * @param weatherStrategy Value to set for property 'weatherStrategy'.
      */
     public void setWeatherStrategy(
-            AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy) {
+        final AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy
+    ) {
         this.weatherStrategy = weatherStrategy;
-    }
-
-    /**
-     * Getter for property 'regulation'.
-     *
-     * @return Value for property 'regulation'.
-     */
-    public AlgorithmFactory<? extends Regulation> getRegulationPreReset() {
-        return regulationPreReset;
-    }
-
-    /**
-     * Setter for property 'regulation'.
-     *
-     * @param regulationPreReset Value to set for property 'regulation'.
-     */
-    public void setRegulationPreReset(
-            AlgorithmFactory<? extends Regulation> regulationPreReset) {
-        this.regulationPreReset = regulationPreReset;
     }
 
     public boolean isUsePremadeInput() {
         return usePremadeInput;
     }
 
-    public void setUsePremadeInput(boolean usePremadeInput) {
+    public void setUsePremadeInput(final boolean usePremadeInput) {
         this.usePremadeInput = usePremadeInput;
     }
 
@@ -1031,7 +1044,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param mainDirectory Value to set for property 'mainDirectory'.
      */
-    public void setMainDirectory(Path mainDirectory) {
+    public void setMainDirectory(final Path mainDirectory) {
         this.mainDirectory = mainDirectory;
     }
 
@@ -1049,7 +1062,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param hourlyTravellingCosts Value to set for property 'hourlyTravellingCosts'.
      */
-    public void setHourlyTravellingCosts(DoubleParameter hourlyTravellingCosts) {
+    public void setHourlyTravellingCosts(final DoubleParameter hourlyTravellingCosts) {
         this.hourlyTravellingCosts = hourlyTravellingCosts;
     }
 
@@ -1057,7 +1070,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
         return priceMap;
     }
 
-    public void setPriceMap(String priceMap) {
+    public void setPriceMap(final String priceMap) {
         this.priceMap = priceMap;
     }
 
@@ -1066,7 +1079,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
     }
 
     public void setGearStrategy(
-            AlgorithmFactory<? extends GearStrategy> gearStrategy) {
+        final AlgorithmFactory<? extends GearStrategy> gearStrategy
+    ) {
         this.gearStrategy = gearStrategy;
     }
 
@@ -1084,7 +1098,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param portFileName Value to set for property 'portFileName'.
      */
-    public void setPortFileName(String portFileName) {
+    public void setPortFileName(final String portFileName) {
         this.portFileName = portFileName;
     }
 
@@ -1102,7 +1116,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param exogenousCatches Value to set for property 'exogenousCatches'.
      */
-    public void setExogenousCatches(LinkedHashMap<String, String> exogenousCatches) {
+    public void setExogenousCatches(final LinkedHashMap<String, String> exogenousCatches) {
         this.exogenousCatches = exogenousCatches;
     }
 
@@ -1120,13 +1134,9 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param californiaScaling Value to set for property 'californiaScaling'.
      */
-    public void setCaliforniaScaling(double californiaScaling) {
+    public void setCaliforniaScaling(final double californiaScaling) {
         this.californiaScaling = californiaScaling;
     }
-
-
-    public abstract AllocatedBiologyInitializer getBiologyInitializer();
-
 
     /**
      * Getter for property 'logbook'.
@@ -1143,7 +1153,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      * @param logbook Value to set for property 'logbook'.
      */
     public void setLogbook(
-            AlgorithmFactory<? extends LogbookInitializer> logbook) {
+        final AlgorithmFactory<? extends LogbookInitializer> logbook
+    ) {
         this.logbook = logbook;
     }
 
@@ -1161,27 +1172,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param resetBiologyAtYear1 Value to set for property 'resetBiologyAtYear1'.
      */
-    public void setResetBiologyAtYear1(boolean resetBiologyAtYear1) {
+    public void setResetBiologyAtYear1(final boolean resetBiologyAtYear1) {
         this.resetBiologyAtYear1 = resetBiologyAtYear1;
-    }
-
-    /**
-     * Getter for property 'regulationPostReset'.
-     *
-     * @return Value for property 'regulationPostReset'.
-     */
-    public AlgorithmFactory<? extends Regulation> getRegulationPostReset() {
-        return regulationPostReset;
-    }
-
-    /**
-     * Setter for property 'regulationPostReset'.
-     *
-     * @param regulationPostReset Value to set for property 'regulationPostReset'.
-     */
-    public void setRegulationPostReset(
-            AlgorithmFactory<? extends Regulation> regulationPostReset) {
-        this.regulationPostReset = regulationPostReset;
     }
 
     /**
@@ -1199,7 +1191,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      * @param discardingStrategy Value to set for property 'discardingStrategy'.
      */
     public void setDiscardingStrategy(
-            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy) {
+        final AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy
+    ) {
         this.discardingStrategy = discardingStrategy;
     }
 
@@ -1217,7 +1210,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param spatialFileName Value to set for property 'spatialFileName'.
      */
-    public void setSpatialFileName(String spatialFileName) {
+    public void setSpatialFileName(final String spatialFileName) {
         this.spatialFileName = spatialFileName;
     }
 
@@ -1236,7 +1229,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param californiaBathymetryFile Value to set for property 'californiaBathymetryFile'.
      */
-    public void setCaliforniaBathymetryFile(String californiaBathymetryFile) {
+    public void setCaliforniaBathymetryFile(final String californiaBathymetryFile) {
         this.californiaBathymetryFile = californiaBathymetryFile;
     }
 }

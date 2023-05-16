@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -82,24 +81,23 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
+import java.util.logging.Logger;
 
 /**
  * Created by carrknight on 7/25/16.
  */
-public class TwoPopulationsScenario implements Scenario{
-
+public class TwoPopulationsScenario implements Scenario {
 
 
     private AlgorithmFactory<? extends BiologyInitializer> biologyInitializer =
-            new DiffusingLogisticFactory();
+        new DiffusingLogisticFactory();
 
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer =
-            new ConstantWeatherFactory();
+        new ConstantWeatherFactory();
 
 
     private AlgorithmFactory<? extends MapInitializer> mapInitializer =
-            new SimpleMapInitializerFactory();
-
+        new SimpleMapInitializerFactory();
 
 
     /**
@@ -108,8 +106,6 @@ public class TwoPopulationsScenario implements Scenario{
     private int smallFishers = 100;
 
     private int largeFishers = 10;
-
-
 
 
     /**
@@ -123,7 +119,6 @@ public class TwoPopulationsScenario implements Scenario{
      * positions the port(s)
      */
     private AlgorithmFactory<? extends PortInitializer> ports = new RandomPortFactory();
-
 
 
     /**
@@ -164,49 +159,49 @@ public class TwoPopulationsScenario implements Scenario{
      * factory to produce departing strategy
      */
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategySmall =
-            new FixedRestTimeDepartingFactory();
+        new FixedRestTimeDepartingFactory();
 
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategyLarge =
-            new FixedRestTimeDepartingFactory();
+        new FixedRestTimeDepartingFactory();
 
     /**
      * factory to produce destination strategy
      */
     private AlgorithmFactory<? extends DestinationStrategy> destinationStrategySmall =
-            new PerTripImitativeDestinationFactory();
+        new PerTripImitativeDestinationFactory();
 
     private AlgorithmFactory<? extends DestinationStrategy> destinationStrategyLarge =
-            new PerTripImitativeDestinationFactory();
+        new PerTripImitativeDestinationFactory();
 
 
     private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategySmall =
-            new NoDiscardingFactory();
+        new NoDiscardingFactory();
 
     private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategyLarge =
-            new NoDiscardingFactory();
+        new NoDiscardingFactory();
     /**
      * factory to produce fishing strategy
      */
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategyLarge =
-            new MaximumStepsFactory();
+        new MaximumStepsFactory();
 
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategySmall =
-            new MaximumStepsFactory();
+        new MaximumStepsFactory();
 
 
     private AlgorithmFactory<? extends GearStrategy> gearStrategy =
-            new FixedGearStrategyFactory();
+        new FixedGearStrategyFactory();
 
 
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
-            new IgnoreWeatherFactory();
+        new IgnoreWeatherFactory();
 
 
     private boolean separateRegulations = true;
 
-    private AlgorithmFactory<? extends Regulation> regulationSmall =  new ProtectedAreasOnlyFactory();
+    private AlgorithmFactory<? extends Regulation> regulationSmall = new ProtectedAreasOnlyFactory();
 
-    private AlgorithmFactory<? extends Regulation> regulationLarge =  new ProtectedAreasOnlyFactory();
+    private AlgorithmFactory<? extends Regulation> regulationLarge = new ProtectedAreasOnlyFactory();
 
 
     private boolean allowTwoPopulationFriendships = false;
@@ -214,7 +209,7 @@ public class TwoPopulationsScenario implements Scenario{
     private boolean allowFriendshipsBetweenPorts = false;
 
     private NetworkBuilder networkBuilder =
-            new EquidegreeBuilder();
+        new EquidegreeBuilder();
 
 
     private AlgorithmFactory<? extends HabitatInitializer> habitatInitializer = new AllSandyHabitatFactory();
@@ -228,13 +223,7 @@ public class TwoPopulationsScenario implements Scenario{
     private DoubleParameter hourlyTravellingCostSmall = new FixedDoubleParameter(0);
 
 
-    private List<StartingMPA> startingMPAs  = new LinkedList<>();
-    {
-        //best first: startingMPAs.add(new StartingMPA(5,33,35,18));
-        //best third:
-        //startingMPAs.add(new StartingMPA(0,26,34,40));
-    }
-
+    private List<StartingMPA> startingMPAs = new LinkedList<>();
     /**
      * If flag set to true, small boats will come from port 1, large boats from port 2.
      * Careful, if you set this to true and there is only one port you'll get an exception
@@ -244,11 +233,16 @@ public class TwoPopulationsScenario implements Scenario{
      * if this is not NaN then it is used as the random seed to feed into the map-making function. This allows for randomness
      * in the biology/fishery
      */
-    private Long mapMakerDedicatedRandomSeed =  null;
+    private Long mapMakerDedicatedRandomSeed = null;
+
+    {
+        //best first: startingMPAs.add(new StartingMPA(5,33,35,18));
+        //best third:
+        //startingMPAs.add(new StartingMPA(0,26,34,40));
+    }
 
     public TwoPopulationsScenario() {
     }
-
 
 
     /**
@@ -259,71 +253,68 @@ public class TwoPopulationsScenario implements Scenario{
      * @return a scenario-result object containing the map, the list of agents and the biology object
      */
     @Override
-    public ScenarioEssentials start(FishState model) {
+    public ScenarioEssentials start(final FishState model) {
 
-        MersenneTwisterFast random = model.random;
+        final MersenneTwisterFast random = model.random;
 
         MersenneTwisterFast mapMakerRandom = model.random;
-        if(mapMakerDedicatedRandomSeed != null)
+        if (mapMakerDedicatedRandomSeed != null)
             mapMakerRandom = new MersenneTwisterFast(mapMakerDedicatedRandomSeed);
         //force the mapMakerRandom as the new random until the start is completed.
         model.random = mapMakerRandom;
 
 
-
-
-        BiologyInitializer biology = biologyInitializer.apply(model);
-        WeatherInitializer weather = weatherInitializer.apply(model);
+        final BiologyInitializer biology = biologyInitializer.apply(model);
+        final WeatherInitializer weather = weatherInitializer.apply(model);
 
         //create global biology
-        GlobalBiology global = biology.generateGlobal(mapMakerRandom, model);
+        final GlobalBiology global = biology.generateGlobal(mapMakerRandom, model);
 
 
-        MapInitializer mapMaker = mapInitializer.apply(model);
-        NauticalMap map = mapMaker.makeMap(random, global, model);
+        final MapInitializer mapMaker = mapInitializer.apply(model);
+        final NauticalMap map = mapMaker.makeMap(random, global, model);
 
         //set habitats
-        HabitatInitializer habitat = habitatInitializer.apply(model);
+        final HabitatInitializer habitat = habitatInitializer.apply(model);
         habitat.applyHabitats(map, mapMakerRandom, model);
 
 
         //this next static method calls biology.initialize, weather.initialize and the like
         NauticalMapFactory.initializeMap(map, random, biology,
-                                         weather,
-                                         global, model);
+            weather,
+            global, model
+        );
 
 
         //create fixed price market
-        MarketMap marketMap = new MarketMap(global);
+        final MarketMap marketMap = new MarketMap(global);
         /*
       market prices for each species
      */
 
 
-
-        for(Species species : global.getSpecies())
+        for (final Species species : global.getSpecies())
             marketMap.addMarket(species, market.apply(model));
 
-        PortInitializer portInitializer = ports.apply(model);
+        final PortInitializer portInitializer = ports.apply(model);
         portInitializer.buildPorts(map,
-                                   mapMakerRandom,
-                                   seaTile -> marketMap, model,
-                                   new FixedGasPrice(gasPricePerLiter.applyAsDouble(mapMakerRandom)));
+            mapMakerRandom,
+            seaTile -> marketMap, model,
+            new FixedGasPrice(gasPricePerLiter.applyAsDouble(mapMakerRandom))
+        );
 
 
         //create initial mpas
-        if(startingMPAs != null)
-            for(StartingMPA mpa : startingMPAs)
-            {
-                if(Log.INFO)
-                    Log.info("building MPA at " + mpa.getTopLeftX() + ", " + mpa.getTopLeftY());
+        if (startingMPAs != null)
+            for (final StartingMPA mpa : startingMPAs) {
+                Logger.getGlobal().info(() -> "building MPA at " + mpa.getTopLeftX() + ", " + mpa.getTopLeftY());
                 mpa.buildMPA(map);
             }
 
         //substitute back the original randomizer
         model.random = random;
 
-        return new ScenarioEssentials(global,map);
+        return new ScenarioEssentials(global, map);
     }
 
 
@@ -334,234 +325,250 @@ public class TwoPopulationsScenario implements Scenario{
      * @return a list of agents
      */
     @Override
-    public ScenarioPopulation populateModel(FishState model) {
+    public ScenarioPopulation populateModel(final FishState model) {
 
-        LinkedList<Fisher> fisherList = new LinkedList<>();
+        final LinkedList<Fisher> fisherList = new LinkedList<>();
         final NauticalMap map = model.getMap();
         final GlobalBiology biology = model.getBiology();
         final MersenneTwisterFast random = model.random;
 
-        Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
-        for(Port port : ports)
+        final Port[] ports = map.getPorts().toArray(new Port[map.getPorts().size()]);
+        for (final Port port : ports)
             port.setGasPricePerLiter(gasPricePerLiter.applyAsDouble(random));
 
 
-
         //create the fisher factory object, this is for the small fishers
-        FisherFactory smallFisherFactory = new FisherFactory(
-                getSmallPortSupplier(random, ports),
-                regulationSmall,
-                departingStrategySmall,
-                destinationStrategySmall,
-                fishingStrategySmall,
-                discardingStrategySmall,
-                gearStrategy,
-                weatherStrategy,
-                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.applyAsDouble(random),
-                                                                   smallLitersPerKilometer.applyAsDouble(random),
-                                                                   smallSpeed.applyAsDouble(random)),
-                                                new FuelTank(smallFuelTankSize.applyAsDouble(random))),
-                (Supplier<Hold>) () -> new Hold(smallHoldSize.applyAsDouble(random),biology),
-                gearSmall,
+        final FisherFactory smallFisherFactory = new FisherFactory(
+            getSmallPortSupplier(random, ports),
+            regulationSmall,
+            departingStrategySmall,
+            destinationStrategySmall,
+            fishingStrategySmall,
+            discardingStrategySmall,
+            gearStrategy,
+            weatherStrategy,
+            () -> new Boat(10, 10, new Engine(
+                enginePower.applyAsDouble(random),
+                smallLitersPerKilometer.applyAsDouble(random),
+                smallSpeed.applyAsDouble(random)
+            ),
+                new FuelTank(smallFuelTankSize.applyAsDouble(random))
+            ),
+            () -> new Hold(smallHoldSize.applyAsDouble(random), biology),
+            gearSmall,
 
-                0);
+            0
+        );
 
         //create a factory for the large boats too
-        FisherFactory largeFishersFactory = new FisherFactory(
-                getLargePortSupplier(random, ports),
-                separateRegulations ? regulationLarge : regulationSmall,
-                departingStrategyLarge,
-                destinationStrategyLarge,
-                fishingStrategyLarge,
-                discardingStrategyLarge,
-                gearStrategy,
-                weatherStrategy,
-                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.applyAsDouble(random),
-                                                                   largeLitersPerKilometer.applyAsDouble(random),
-                                                                   largeSpeed.applyAsDouble(random)),
-                                                new FuelTank(largeFuelTankSize.applyAsDouble(random))),
-                (Supplier<Hold>) () -> new Hold(largeHoldSize.applyAsDouble(random), biology),
-                gearLarge,
+        final FisherFactory largeFishersFactory = new FisherFactory(
+            getLargePortSupplier(random, ports),
+            separateRegulations ? regulationLarge : regulationSmall,
+            departingStrategyLarge,
+            destinationStrategyLarge,
+            fishingStrategyLarge,
+            discardingStrategyLarge,
+            gearStrategy,
+            weatherStrategy,
+            () -> new Boat(10, 10, new Engine(
+                enginePower.applyAsDouble(random),
+                largeLitersPerKilometer.applyAsDouble(random),
+                largeSpeed.applyAsDouble(random)
+            ),
+                new FuelTank(largeFuelTankSize.applyAsDouble(random))
+            ),
+            () -> new Hold(largeHoldSize.applyAsDouble(random), biology),
+            gearLarge,
 
-                0);
+            0
+        );
 
 
         //adds predictors to the fisher if the usepredictors flag is up.
         //without predictors agents do not participate in ITQs
-        Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(usePredictors, biology);
+        final Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(usePredictors, biology);
 
         smallFisherFactory.getAdditionalSetups().add(predictorSetup);
         largeFishersFactory.getAdditionalSetups().add(predictorSetup);
         //add tags
         smallFisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
             @Override
-            public void accept(Fisher fisher) {
+            public void accept(final Fisher fisher) {
                 fisher.getTags().add("small");
                 fisher.getTags().add("yellow");
                 fisher.getTags().add("canoe");
                 //add hourly cost
                 fisher.getAdditionalTripCosts().add(
-                        new HourlyCost(hourlyTravellingCostSmall.applyAsDouble(model.getRandom()))
+                    new HourlyCost(hourlyTravellingCostSmall.applyAsDouble(model.getRandom()))
                 );
             }
         });
         largeFishersFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
             @Override
-            public void accept(Fisher fisher) {
+            public void accept(final Fisher fisher) {
                 fisher.getTags().add("large");
                 fisher.getTags().add("ship");
                 fisher.getTags().add("red");
                 fisher.getAdditionalTripCosts().add(
-                        new HourlyCost(hourlyTravellingCostLarge.applyAsDouble(model.getRandom()))
+                    new HourlyCost(hourlyTravellingCostLarge.applyAsDouble(model.getRandom()))
                 );
             }
         });
 
 
-
-
-
         //add the small fishers
-        for(int i=0;i<smallFishers;i++)
-        {
-            Fisher newFisher = smallFisherFactory.buildFisher(model);
+        for (int i = 0; i < smallFishers; i++) {
+            final Fisher newFisher = smallFisherFactory.buildFisher(model);
             fisherList.add(newFisher);
         }
 
         //set the id so that all fishers have a different id
         largeFishersFactory.setNextID(smallFisherFactory.getNextID());
-        for(int i=0;i<largeFishers;i++)
-        {
-            Fisher newFisher = largeFishersFactory.buildFisher(model);
+        for (int i = 0; i < largeFishers; i++) {
+            final Fisher newFisher = largeFishersFactory.buildFisher(model);
             fisherList.add(newFisher);
         }
 
 
         //don't let large boats befriend small boats
-        if(!allowTwoPopulationFriendships) {
+        if (!allowTwoPopulationFriendships) {
             networkBuilder.addPredicate(new NetworkPredicate() {
                 @Override
-                public boolean test(Fisher from, Fisher to) {
+                public boolean test(final Fisher from, final Fisher to) {
                     return (from.getTags().contains("small") && to.getTags().contains("small")) ||
-                            (from.getTags().contains("large") && to.getTags().contains("large"));
+                        (from.getTags().contains("large") && to.getTags().contains("large"));
                 }
             });
         }
 
-        if(!allowFriendshipsBetweenPorts) {
+        if (!allowFriendshipsBetweenPorts) {
             //no friends from separate ports
             networkBuilder.addPredicate(new NetworkPredicate() {
                 @Override
-                public boolean test(Fisher from, Fisher to) {
+                public boolean test(final Fisher from, final Fisher to) {
                     return from.getHomePort().equals(to.getHomePort());
                 }
             });
         }
 
         model.getYearlyDataSet().registerGatherer("Small Fishers Total Income",
-                                                  fishState ->
-                                                          fishState.getFishers().stream().
-                                                                  filter(fisher -> fisher.getTags().contains("small")).
-                                                                  mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                          FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
+            fishState ->
+                fishState.getFishers().stream().
+                    filter(fisher -> fisher.getTags().contains("small")).
+                    mapToDouble(value -> value.getLatestYearlyObservation(
+                        FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN
+        );
 
         model.getYearlyDataSet().registerGatherer("Large Fishers Total Income",
-                                                  fishState -> fishState.getFishers().stream().
-                                                          filter(fisher -> !fisher.getTags().contains("small")).
-                                                          mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                  FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
+            fishState -> fishState.getFishers().stream().
+                filter(fisher -> !fisher.getTags().contains("small")).
+                mapToDouble(value -> value.getLatestYearlyObservation(
+                    FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN
+        );
 
 
-        for(Species species : biology.getSpecies())
-        {
-            model.getYearlyDataSet().registerGatherer("Small Fishers " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
-                                                      fishState -> fishState.getFishers().stream().
-                                                              filter(fisher -> fisher.getTags().contains("small")).
-                                                              mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                      species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
+        for (final Species species : biology.getSpecies()) {
+            model.getYearlyDataSet()
+                .registerGatherer("Small Fishers " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
+                    fishState -> fishState.getFishers().stream().
+                        filter(fisher -> fisher.getTags().contains("small")).
+                        mapToDouble(value -> value.getLatestYearlyObservation(
+                            species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN
+                );
 
-            model.getYearlyDataSet().registerGatherer("Large Fishers " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
-                                                      fishState -> fishState.getFishers().stream().
-                                                              filter(fisher -> !fisher.getTags().contains("small")).
-                                                              mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                      species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
-
+            model.getYearlyDataSet()
+                .registerGatherer("Large Fishers " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
+                    fishState -> fishState.getFishers().stream().
+                        filter(fisher -> !fisher.getTags().contains("small")).
+                        mapToDouble(value -> value.getLatestYearlyObservation(
+                            species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN
+                );
 
 
         }
 
         //count effort too!
-        DataColumn smallEffort
-                = model.getDailyDataSet().registerGatherer("Small Fishers Total Effort",
-                                                           new Gatherer<FishState>() {
-                                                               @Override
-                                                               public Double apply(FishState ignored) {
-                                                                   return model.getFishers().stream().
-                                                                           filter(fisher -> fisher.getTags().contains(
-                                                                                   "small")).
-                                                                           mapToDouble(
-                                                                                   new ToDoubleFunction<Fisher>() {
-                                                                                       @Override
-                                                                                       public double applyAsDouble(
-                                                                                               Fisher value) {
-                                                                                           return value.getDailyCounter().getColumn(
-                                                                                                   FisherYearlyTimeSeries.EFFORT);
-                                                                                       }
-                                                                                   }).sum();
-                                                               }
-                                                           }, 0d);
+        final DataColumn smallEffort
+            = model.getDailyDataSet().registerGatherer("Small Fishers Total Effort",
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(final FishState ignored) {
+                    return model.getFishers().stream().
+                        filter(fisher -> fisher.getTags().contains(
+                            "small")).
+                        mapToDouble(
+                            new ToDoubleFunction<Fisher>() {
+                                @Override
+                                public double applyAsDouble(
+                                    final Fisher value
+                                ) {
+                                    return value.getDailyCounter().getColumn(
+                                        FisherYearlyTimeSeries.EFFORT);
+                                }
+                            }).sum();
+                }
+            }, 0d
+        );
         model.getYearlyDataSet().registerGatherer("Small Fishers Total Effort",
-                                                  FishStateUtilities.generateYearlySum(smallEffort),Double.NaN);
-        DataColumn largeEffort
-                = model.getDailyDataSet().registerGatherer("Large Fishers Total Effort",
-                                                           new Gatherer<FishState>() {
-                                                               @Override
-                                                               public Double apply(FishState ignored) {
-                                                                   return model.getFishers().stream().
-                                                                           filter(fisher -> fisher.getTags().contains(
-                                                                                   "large")).
-                                                                           mapToDouble(
-                                                                                   new ToDoubleFunction<Fisher>() {
-                                                                                       @Override
-                                                                                       public double applyAsDouble(
-                                                                                               Fisher value) {
-                                                                                           return value.getDailyCounter().getColumn(
-                                                                                                   FisherYearlyTimeSeries.EFFORT);
-                                                                                       }
-                                                                                   }).sum();
-                                                               }
-                                                           }, 0d);
+            FishStateUtilities.generateYearlySum(smallEffort), Double.NaN
+        );
+        final DataColumn largeEffort
+            = model.getDailyDataSet().registerGatherer("Large Fishers Total Effort",
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(final FishState ignored) {
+                    return model.getFishers().stream().
+                        filter(fisher -> fisher.getTags().contains(
+                            "large")).
+                        mapToDouble(
+                            new ToDoubleFunction<Fisher>() {
+                                @Override
+                                public double applyAsDouble(
+                                    final Fisher value
+                                ) {
+                                    return value.getDailyCounter().getColumn(
+                                        FisherYearlyTimeSeries.EFFORT);
+                                }
+                            }).sum();
+                }
+            }, 0d
+        );
         model.getYearlyDataSet().registerGatherer("Large Fishers Total Effort",
-                                                  FishStateUtilities.generateYearlySum(largeEffort),Double.NaN);
+            FishStateUtilities.generateYearlySum(largeEffort), Double.NaN
+        );
 
-        HashMap<String, FisherFactory> factory = new HashMap<>();
-        factory.put("large",
-                    largeFishersFactory);
-        factory.put("small",
-                    smallFisherFactory);
+        final HashMap<String, FisherFactory> factory = new HashMap<>();
+        factory.put(
+            "large",
+            largeFishersFactory
+        );
+        factory.put(
+            "small",
+            smallFisherFactory
+        );
 
-        if(fisherList.size() <=1)
-            return new ScenarioPopulation(fisherList, new SocialNetwork(new EmptyNetworkBuilder()), factory );
+        if (fisherList.size() <= 1)
+            return new ScenarioPopulation(fisherList, new SocialNetwork(new EmptyNetworkBuilder()), factory);
         else {
             return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), factory);
         }
     }
 
-    protected Supplier<Port> getLargePortSupplier(MersenneTwisterFast random, Port[] ports) {
-        return separatePorts ? () -> ports[1] :() -> ports[random.nextInt(ports.length)];
+    protected Supplier<Port> getSmallPortSupplier(final MersenneTwisterFast random, final Port[] ports) {
+        return separatePorts ? () -> ports[0] : () -> ports[random.nextInt(ports.length)];
     }
 
-    protected Supplier<Port> getSmallPortSupplier(MersenneTwisterFast random, Port[] ports) {
-        return separatePorts ? () -> ports[0] :() -> ports[random.nextInt(ports.length)];
+    protected Supplier<Port> getLargePortSupplier(final MersenneTwisterFast random, final Port[] ports) {
+        return separatePorts ? () -> ports[1] : () -> ports[random.nextInt(ports.length)];
     }
-
 
     public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializer() {
         return biologyInitializer;
     }
 
     public void setBiologyInitializer(
-            AlgorithmFactory<? extends BiologyInitializer> biologyInitializer) {
+        final AlgorithmFactory<? extends BiologyInitializer> biologyInitializer
+    ) {
         this.biologyInitializer = biologyInitializer;
     }
 
@@ -570,7 +577,8 @@ public class TwoPopulationsScenario implements Scenario{
     }
 
     public void setWeatherInitializer(
-            AlgorithmFactory<? extends WeatherInitializer> weatherInitializer) {
+        final AlgorithmFactory<? extends WeatherInitializer> weatherInitializer
+    ) {
         this.weatherInitializer = weatherInitializer;
     }
 
@@ -579,7 +587,8 @@ public class TwoPopulationsScenario implements Scenario{
     }
 
     public void setMapInitializer(
-            AlgorithmFactory<? extends MapInitializer> mapInitializer) {
+        final AlgorithmFactory<? extends MapInitializer> mapInitializer
+    ) {
         this.mapInitializer = mapInitializer;
     }
 
@@ -587,7 +596,7 @@ public class TwoPopulationsScenario implements Scenario{
         return smallFishers;
     }
 
-    public void setSmallFishers(int smallFishers) {
+    public void setSmallFishers(final int smallFishers) {
         this.smallFishers = smallFishers;
     }
 
@@ -595,7 +604,7 @@ public class TwoPopulationsScenario implements Scenario{
         return largeFishers;
     }
 
-    public void setLargeFishers(int largeFishers) {
+    public void setLargeFishers(final int largeFishers) {
         this.largeFishers = largeFishers;
     }
 
@@ -603,7 +612,7 @@ public class TwoPopulationsScenario implements Scenario{
         return usePredictors;
     }
 
-    public void setUsePredictors(boolean usePredictors) {
+    public void setUsePredictors(final boolean usePredictors) {
         this.usePredictors = usePredictors;
     }
 
@@ -612,7 +621,7 @@ public class TwoPopulationsScenario implements Scenario{
         return smallSpeed;
     }
 
-    public void setSmallSpeed(DoubleParameter smallSpeed) {
+    public void setSmallSpeed(final DoubleParameter smallSpeed) {
         this.smallSpeed = smallSpeed;
     }
 
@@ -620,7 +629,7 @@ public class TwoPopulationsScenario implements Scenario{
         return largeSpeed;
     }
 
-    public void setLargeSpeed(DoubleParameter largeSpeed) {
+    public void setLargeSpeed(final DoubleParameter largeSpeed) {
         this.largeSpeed = largeSpeed;
     }
 
@@ -628,7 +637,7 @@ public class TwoPopulationsScenario implements Scenario{
         return smallHoldSize;
     }
 
-    public void setSmallHoldSize(DoubleParameter smallHoldSize) {
+    public void setSmallHoldSize(final DoubleParameter smallHoldSize) {
         this.smallHoldSize = smallHoldSize;
     }
 
@@ -636,18 +645,16 @@ public class TwoPopulationsScenario implements Scenario{
         return largeHoldSize;
     }
 
-    public void setLargeHoldSize(DoubleParameter largeHoldSize) {
+    public void setLargeHoldSize(final DoubleParameter largeHoldSize) {
         this.largeHoldSize = largeHoldSize;
     }
-
-
 
 
     public DoubleParameter getEnginePower() {
         return enginePower;
     }
 
-    public void setEnginePower(DoubleParameter enginePower) {
+    public void setEnginePower(final DoubleParameter enginePower) {
         this.enginePower = enginePower;
     }
 
@@ -656,7 +663,7 @@ public class TwoPopulationsScenario implements Scenario{
         return smallFuelTankSize;
     }
 
-    public void setSmallFuelTankSize(DoubleParameter smallFuelTankSize) {
+    public void setSmallFuelTankSize(final DoubleParameter smallFuelTankSize) {
         this.smallFuelTankSize = smallFuelTankSize;
     }
 
@@ -664,7 +671,7 @@ public class TwoPopulationsScenario implements Scenario{
         return largeFuelTankSize;
     }
 
-    public void setLargeFuelTankSize(DoubleParameter largeFuelTankSize) {
+    public void setLargeFuelTankSize(final DoubleParameter largeFuelTankSize) {
         this.largeFuelTankSize = largeFuelTankSize;
     }
 
@@ -672,7 +679,7 @@ public class TwoPopulationsScenario implements Scenario{
         return smallLitersPerKilometer;
     }
 
-    public void setSmallLitersPerKilometer(DoubleParameter smallLitersPerKilometer) {
+    public void setSmallLitersPerKilometer(final DoubleParameter smallLitersPerKilometer) {
         this.smallLitersPerKilometer = smallLitersPerKilometer;
     }
 
@@ -680,7 +687,7 @@ public class TwoPopulationsScenario implements Scenario{
         return largeLitersPerKilometer;
     }
 
-    public void setLargeLitersPerKilometer(DoubleParameter largeLitersPerKilometer) {
+    public void setLargeLitersPerKilometer(final DoubleParameter largeLitersPerKilometer) {
         this.largeLitersPerKilometer = largeLitersPerKilometer;
     }
 
@@ -688,7 +695,7 @@ public class TwoPopulationsScenario implements Scenario{
         return gasPricePerLiter;
     }
 
-    public void setGasPricePerLiter(DoubleParameter gasPricePerLiter) {
+    public void setGasPricePerLiter(final DoubleParameter gasPricePerLiter) {
         this.gasPricePerLiter = gasPricePerLiter;
     }
 
@@ -697,7 +704,8 @@ public class TwoPopulationsScenario implements Scenario{
     }
 
     public void setDepartingStrategySmall(
-            AlgorithmFactory<? extends DepartingStrategy> departingStrategySmall) {
+        final AlgorithmFactory<? extends DepartingStrategy> departingStrategySmall
+    ) {
         this.departingStrategySmall = departingStrategySmall;
     }
 
@@ -706,7 +714,8 @@ public class TwoPopulationsScenario implements Scenario{
     }
 
     public void setDepartingStrategyLarge(
-            AlgorithmFactory<? extends DepartingStrategy> departingStrategyLarge) {
+        final AlgorithmFactory<? extends DepartingStrategy> departingStrategyLarge
+    ) {
         this.departingStrategyLarge = departingStrategyLarge;
     }
 
@@ -715,7 +724,8 @@ public class TwoPopulationsScenario implements Scenario{
     }
 
     public void setDestinationStrategySmall(
-            AlgorithmFactory<? extends DestinationStrategy> destinationStrategySmall) {
+        final AlgorithmFactory<? extends DestinationStrategy> destinationStrategySmall
+    ) {
         this.destinationStrategySmall = destinationStrategySmall;
     }
 
@@ -724,7 +734,8 @@ public class TwoPopulationsScenario implements Scenario{
     }
 
     public void setDestinationStrategyLarge(
-            AlgorithmFactory<? extends DestinationStrategy> destinationStrategyLarge) {
+        final AlgorithmFactory<? extends DestinationStrategy> destinationStrategyLarge
+    ) {
         this.destinationStrategyLarge = destinationStrategyLarge;
     }
 
@@ -733,7 +744,8 @@ public class TwoPopulationsScenario implements Scenario{
     }
 
     public void setFishingStrategyLarge(
-            AlgorithmFactory<? extends FishingStrategy> fishingStrategyLarge) {
+        final AlgorithmFactory<? extends FishingStrategy> fishingStrategyLarge
+    ) {
         this.fishingStrategyLarge = fishingStrategyLarge;
     }
 
@@ -742,7 +754,8 @@ public class TwoPopulationsScenario implements Scenario{
     }
 
     public void setGearStrategy(
-            AlgorithmFactory<? extends GearStrategy> gearStrategy) {
+        final AlgorithmFactory<? extends GearStrategy> gearStrategy
+    ) {
         this.gearStrategy = gearStrategy;
     }
 
@@ -751,7 +764,8 @@ public class TwoPopulationsScenario implements Scenario{
     }
 
     public void setWeatherStrategy(
-            AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy) {
+        final AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy
+    ) {
         this.weatherStrategy = weatherStrategy;
     }
 
@@ -760,7 +774,8 @@ public class TwoPopulationsScenario implements Scenario{
     }
 
     public void setRegulationSmall(
-            AlgorithmFactory<? extends Regulation> regulationSmall) {
+        final AlgorithmFactory<? extends Regulation> regulationSmall
+    ) {
         this.regulationSmall = regulationSmall;
     }
 
@@ -769,7 +784,8 @@ public class TwoPopulationsScenario implements Scenario{
     }
 
     public void setRegulationLarge(
-            AlgorithmFactory<? extends Regulation> regulationLarge) {
+        final AlgorithmFactory<? extends Regulation> regulationLarge
+    ) {
         this.regulationLarge = regulationLarge;
     }
 
@@ -777,7 +793,7 @@ public class TwoPopulationsScenario implements Scenario{
         return networkBuilder;
     }
 
-    public void setNetworkBuilder(NetworkBuilder networkBuilder) {
+    public void setNetworkBuilder(final NetworkBuilder networkBuilder) {
         this.networkBuilder = networkBuilder;
     }
 
@@ -786,7 +802,8 @@ public class TwoPopulationsScenario implements Scenario{
     }
 
     public void setHabitatInitializer(
-            AlgorithmFactory<? extends HabitatInitializer> habitatInitializer) {
+        final AlgorithmFactory<? extends HabitatInitializer> habitatInitializer
+    ) {
         this.habitatInitializer = habitatInitializer;
     }
 
@@ -794,7 +811,7 @@ public class TwoPopulationsScenario implements Scenario{
         return market;
     }
 
-    public void setMarket(AlgorithmFactory<? extends Market> market) {
+    public void setMarket(final AlgorithmFactory<? extends Market> market) {
         this.market = market;
     }
 
@@ -802,7 +819,7 @@ public class TwoPopulationsScenario implements Scenario{
         return startingMPAs;
     }
 
-    public void setStartingMPAs(List<StartingMPA> startingMPAs) {
+    public void setStartingMPAs(final List<StartingMPA> startingMPAs) {
         this.startingMPAs = startingMPAs;
     }
 
@@ -810,7 +827,7 @@ public class TwoPopulationsScenario implements Scenario{
         return mapMakerDedicatedRandomSeed;
     }
 
-    public void setMapMakerDedicatedRandomSeed(Long mapMakerDedicatedRandomSeed) {
+    public void setMapMakerDedicatedRandomSeed(final Long mapMakerDedicatedRandomSeed) {
         this.mapMakerDedicatedRandomSeed = mapMakerDedicatedRandomSeed;
     }
 
@@ -830,7 +847,8 @@ public class TwoPopulationsScenario implements Scenario{
      * @param gearSmall Value to set for property 'gearSmall'.
      */
     public void setGearSmall(
-            AlgorithmFactory<? extends Gear> gearSmall) {
+        final AlgorithmFactory<? extends Gear> gearSmall
+    ) {
         this.gearSmall = gearSmall;
     }
 
@@ -849,7 +867,8 @@ public class TwoPopulationsScenario implements Scenario{
      * @param gearLarge Value to set for property 'gearLarge'.
      */
     public void setGearLarge(
-            AlgorithmFactory<? extends Gear> gearLarge) {
+        final AlgorithmFactory<? extends Gear> gearLarge
+    ) {
         this.gearLarge = gearLarge;
     }
 
@@ -867,7 +886,7 @@ public class TwoPopulationsScenario implements Scenario{
      *
      * @param separateRegulations Value to set for property 'separateRegulations'.
      */
-    public void setSeparateRegulations(boolean separateRegulations) {
+    public void setSeparateRegulations(final boolean separateRegulations) {
         this.separateRegulations = separateRegulations;
     }
 
@@ -886,7 +905,8 @@ public class TwoPopulationsScenario implements Scenario{
      * @param ports Value to set for property 'ports'.
      */
     public void setPorts(
-            AlgorithmFactory<? extends PortInitializer> ports) {
+        final AlgorithmFactory<? extends PortInitializer> ports
+    ) {
         this.ports = ports;
     }
 
@@ -904,7 +924,7 @@ public class TwoPopulationsScenario implements Scenario{
      *
      * @param separatePorts Value to set for property 'separatePorts'.
      */
-    public void setSeparatePorts(boolean separatePorts) {
+    public void setSeparatePorts(final boolean separatePorts) {
         this.separatePorts = separatePorts;
     }
 
@@ -922,7 +942,7 @@ public class TwoPopulationsScenario implements Scenario{
      *
      * @param allowTwoPopulationFriendships Value to set for property 'allowTwoPopulationFriendships'.
      */
-    public void setAllowTwoPopulationFriendships(boolean allowTwoPopulationFriendships) {
+    public void setAllowTwoPopulationFriendships(final boolean allowTwoPopulationFriendships) {
         this.allowTwoPopulationFriendships = allowTwoPopulationFriendships;
     }
 
@@ -941,7 +961,8 @@ public class TwoPopulationsScenario implements Scenario{
      * @param fishingStrategySmall Value to set for property 'fishingStrategySmall'.
      */
     public void setFishingStrategySmall(
-            AlgorithmFactory<? extends FishingStrategy> fishingStrategySmall) {
+        final AlgorithmFactory<? extends FishingStrategy> fishingStrategySmall
+    ) {
         this.fishingStrategySmall = fishingStrategySmall;
     }
 
@@ -959,7 +980,7 @@ public class TwoPopulationsScenario implements Scenario{
      *
      * @param hourlyTravellingCostLarge Value to set for property 'hourlyTravellingCostLarge'.
      */
-    public void setHourlyTravellingCostLarge(DoubleParameter hourlyTravellingCostLarge) {
+    public void setHourlyTravellingCostLarge(final DoubleParameter hourlyTravellingCostLarge) {
         this.hourlyTravellingCostLarge = hourlyTravellingCostLarge;
     }
 
@@ -977,7 +998,7 @@ public class TwoPopulationsScenario implements Scenario{
      *
      * @param hourlyTravellingCostSmall Value to set for property 'hourlyTravellingCostSmall'.
      */
-    public void setHourlyTravellingCostSmall(DoubleParameter hourlyTravellingCostSmall) {
+    public void setHourlyTravellingCostSmall(final DoubleParameter hourlyTravellingCostSmall) {
         this.hourlyTravellingCostSmall = hourlyTravellingCostSmall;
     }
 
@@ -996,7 +1017,8 @@ public class TwoPopulationsScenario implements Scenario{
      * @param discardingStrategySmall Value to set for property 'discardingStrategySmall'.
      */
     public void setDiscardingStrategySmall(
-            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategySmall) {
+        final AlgorithmFactory<? extends DiscardingStrategy> discardingStrategySmall
+    ) {
         this.discardingStrategySmall = discardingStrategySmall;
     }
 
@@ -1015,7 +1037,8 @@ public class TwoPopulationsScenario implements Scenario{
      * @param discardingStrategyLarge Value to set for property 'discardingStrategyLarge'.
      */
     public void setDiscardingStrategyLarge(
-            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategyLarge) {
+        final AlgorithmFactory<? extends DiscardingStrategy> discardingStrategyLarge
+    ) {
         this.discardingStrategyLarge = discardingStrategyLarge;
     }
 
@@ -1033,7 +1056,7 @@ public class TwoPopulationsScenario implements Scenario{
      *
      * @param allowFriendshipsBetweenPorts Value to set for property 'allowFriendshipsBetweenPorts'.
      */
-    public void setAllowFriendshipsBetweenPorts(boolean allowFriendshipsBetweenPorts) {
+    public void setAllowFriendshipsBetweenPorts(final boolean allowFriendshipsBetweenPorts) {
         this.allowFriendshipsBetweenPorts = allowFriendshipsBetweenPorts;
     }
 }
