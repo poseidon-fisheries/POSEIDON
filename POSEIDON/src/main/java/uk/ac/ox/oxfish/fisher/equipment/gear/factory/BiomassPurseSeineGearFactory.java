@@ -20,6 +20,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.BiomassPurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -27,9 +28,10 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class BiomassPurseSeineGearFactory extends PurseSeineGearFactory {
 
     public BiomassPurseSeineGearFactory(
-        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
+        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory,
+        final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory
     ) {
-        super(fadInitializerFactory);
+        super(fadInitializerFactory, fishValueCalculatorFactory);
     }
 
     public BiomassPurseSeineGearFactory() {

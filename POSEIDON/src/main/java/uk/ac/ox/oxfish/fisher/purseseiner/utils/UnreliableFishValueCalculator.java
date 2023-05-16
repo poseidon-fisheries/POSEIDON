@@ -1,34 +1,21 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
+
+import java.util.function.DoubleUnaryOperator;
 
 public class UnreliableFishValueCalculator implements FishValueCalculator {
 
     private final FishValueCalculator delegate;
-    private final MersenneTwisterFast rng;
-    private final double standardDeviation;
 
-    public UnreliableFishValueCalculator(
-        final Fisher fisher,
-        final double standardDeviation
-    ) {
-        this(fisher.grabState().getBiology(), fisher.grabRandomizer(), standardDeviation);
-    }
+    private final DoubleUnaryOperator errorOperator;
 
     public UnreliableFishValueCalculator(
         final GlobalBiology globalBiology,
-        final MersenneTwisterFast rng,
-        final double standardDeviation
+        final DoubleUnaryOperator errorOperator
     ) {
         this.delegate = new ReliableFishValueCalculator(globalBiology);
-        this.rng = rng;
-        this.standardDeviation = standardDeviation;
-    }
-
-    private double addError(final double value) {
-        return Math.max(0, value + value * rng.nextGaussian() * standardDeviation);
+        this.errorOperator = errorOperator;
     }
 
     @Override
@@ -38,7 +25,7 @@ public class UnreliableFishValueCalculator implements FishValueCalculator {
 
     @Override
     public double valueOf(final double[] biomasses, final double[] prices) {
-        return addError(delegate.valueOf(biomasses, prices));
+        return errorOperator.applyAsDouble(delegate.valueOf(biomasses, prices));
     }
 
 }

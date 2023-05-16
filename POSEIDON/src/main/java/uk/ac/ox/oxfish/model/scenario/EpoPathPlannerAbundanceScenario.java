@@ -13,6 +13,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
@@ -76,7 +78,12 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                             )
                         )
                     )
-                )
+                ),
+                // ref: https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1549923263
+                new UnreliableFishValueCalculatorFactory(new LogNormalErrorOperatorFactory(
+                    new CalibratedParameter(-.2, .2, -.4, .4),
+                    new CalibratedParameter(.2, .3, .01, .5)
+                ))
             ),
             new EPOPlannedStrategyFlexibleFactory(
                 getTargetYear(),

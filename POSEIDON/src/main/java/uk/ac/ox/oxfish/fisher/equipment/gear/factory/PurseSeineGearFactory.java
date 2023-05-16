@@ -12,8 +12,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.caches.LocationFisherValuesByActionCac
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
@@ -24,7 +24,6 @@ import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
 import uk.ac.ox.oxfish.model.regs.fads.DelLicenseRegulationFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -73,16 +72,25 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private InputPath locationValuesFile;
     private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory;
-    private DoubleParameter fishValueCalculatorStandardDeviation =
-        new CalibratedParameter(0, 1, 0, 1, 0);
+    private AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory;
 
     public PurseSeineGearFactory() {
     }
 
     public PurseSeineGearFactory(
-        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory
+        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory,
+        final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory
     ) {
         this.fadInitializerFactory = fadInitializerFactory;
+        this.fishValueCalculatorFactory = fishValueCalculatorFactory;
+    }
+
+    public AlgorithmFactory<? extends FishValueCalculator> getFishValueCalculatorFactory() {
+        return fishValueCalculatorFactory;
+    }
+
+    public void setFishValueCalculatorFactory(final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory) {
+        this.fishValueCalculatorFactory = fishValueCalculatorFactory;
     }
 
     public void setLocationValuesFile(final InputPath locationValuesFile) {
@@ -95,14 +103,6 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
 
     public void setMaxAllowableShear(final DoubleParameter maxAllowableShear) {
         this.maxAllowableShear = maxAllowableShear;
-    }
-
-    public DoubleParameter getFishValueCalculatorStandardDeviation() {
-        return fishValueCalculatorStandardDeviation;
-    }
-
-    public void setFishValueCalculatorStandardDeviation(final DoubleParameter fishValueCalculatorStandardDeviation) {
-        this.fishValueCalculatorStandardDeviation = fishValueCalculatorStandardDeviation;
     }
 
     public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {
@@ -172,11 +172,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
             dolphinSetObserversCache.get(fishState),
             Optional.of(biomassLostMonitor),
             actionSpecificRegulations,
-            new UnreliableFishValueCalculator(
-                globalBiology,
-                rng,
-                fishValueCalculatorStandardDeviation.applyAsDouble(rng)
-            )
+            fishValueCalculatorFactory.apply(fishState)
         );
         return fadManager;
     }

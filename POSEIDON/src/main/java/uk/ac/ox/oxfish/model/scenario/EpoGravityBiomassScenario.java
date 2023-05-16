@@ -30,8 +30,11 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinat
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.geography.fads.CompressedBiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 
 import java.util.List;
 
@@ -69,7 +72,11 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
                         "Yellowfin tuna", 0.30133562299610883,
                         "Skipjack tuna", 1.25
                     )
-                )
+                ),
+                new UnreliableFishValueCalculatorFactory(new LogNormalErrorOperatorFactory(
+                    new CalibratedParameter(-.2, .2, -.4, .4),
+                    new CalibratedParameter(.2, .3, .01, .5)
+                ))
             ),
             new GravityDestinationStrategyFactory(
                 getTargetYear(),
