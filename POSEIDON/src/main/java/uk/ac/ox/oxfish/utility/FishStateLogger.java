@@ -36,12 +36,10 @@ public class FishStateLogger extends Logger {
 
     private final FishState model;
     private final Path path;
-    private final Logger logger;
     private FileWriter writer;
 
-    public FishStateLogger(final FishState model, final Path pathToFile) throws IOException {
+    public FishStateLogger(final FishState model, final Path pathToFile) {
         super("uk.ac.ox.oxfish.utility.FishStateLogger", null);
-        this.logger = Logger.getLogger(getName());
         this.model = model;
         this.path = pathToFile;
     }

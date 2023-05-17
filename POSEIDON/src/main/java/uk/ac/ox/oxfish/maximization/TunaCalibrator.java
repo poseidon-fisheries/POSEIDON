@@ -13,13 +13,8 @@ import eva2.optimization.strategies.ClusterBasedNichingEA;
 import eva2.optimization.strategies.NelderMeadSimplex;
 import eva2.optimization.strategies.ParticleSwarmOptimizationGCPSO;
 import eva2.problems.SimpleProblemWrapper;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.message.ObjectArrayMessage;
 import org.jetbrains.annotations.NotNull;
-import sim.engine.SimState;
 import uk.ac.ox.oxfish.maximization.generic.AbstractLastStepFixedDataTarget;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -40,7 +35,6 @@ import static java.lang.Integer.parseInt;
 import static java.lang.Runtime.getRuntime;
 import static java.nio.file.Files.createDirectories;
 import static java.util.Arrays.stream;
-import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
 
 @SuppressWarnings("UnstableApiUsage")
 public class TunaCalibrator {
@@ -86,19 +80,6 @@ public class TunaCalibrator {
 
 
         final TunaCalibrator tunaCalibrator = new TunaCalibrator();
-
-        //tunaCalibrator.setBestGuess(ImmutableList.of());
-
-        addCsvLogger(
-            Level.DEBUG,
-            "calibration_error",
-            "time,error"
-        );
-        addCsvLogger(
-            Level.DEBUG,
-            "run_timer",
-            "thread,run,step,time"
-        );
 
         // Parse all given numeric arguments and use the max one to set the number of fitness
         // calls and the min one to set the population size. If there is only one, it's
@@ -295,17 +276,6 @@ public class TunaCalibrator {
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    public static void logCurrentTime(final SimState simState) {
-        LogManager.getLogger("run_timer").debug(() ->
-            new ObjectArrayMessage(
-                Thread.currentThread().getId(),
-                ((FishState) simState).getUniqueID(),
-                ((FishState) simState).getStep(),
-                System.currentTimeMillis()
-            )
-        );
     }
 
     @SuppressWarnings("unused")

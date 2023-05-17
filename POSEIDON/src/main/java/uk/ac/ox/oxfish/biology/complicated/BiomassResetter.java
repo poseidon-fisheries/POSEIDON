@@ -20,13 +20,8 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
-import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
-
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.ObjectArrayMessage;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
@@ -36,8 +31,6 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 
 public class BiomassResetter implements BiologyResetter {
-
-    private static final Logger logger = LogManager.getLogger("biomass_events");
 
     /**
      * biomass allocator: I expect this to be normalized!
@@ -50,7 +43,7 @@ public class BiomassResetter implements BiologyResetter {
 
     private FadMap fadMap = null;
 
-    public BiomassResetter(BiomassAllocator normalizedAllocator, Species species) {
+    public BiomassResetter(final BiomassAllocator normalizedAllocator, final Species species) {
         this.normalizedAllocator = normalizedAllocator;
         this.species = species;
     }
@@ -61,19 +54,9 @@ public class BiomassResetter implements BiologyResetter {
      * @param fishState
      */
     @Override
-    public void recordHowMuchBiomassThereIs(FishState fishState) {
+    public void recordHowMuchBiomassThereIs(final FishState fishState) {
         fadMap = fishState.getFadMap();
         recordedBiomass = fishState.getMap().getTotalBiomass(species);
-
-        logger.debug(new ObjectArrayMessage(
-            fishState.getStep(),
-            DAWN,
-            "MEMORIZE_FOR_RESET",
-            species,
-            recordedBiomass,
-            recordedBiomass
-        ));
-
     }
 
     /**
@@ -84,37 +67,41 @@ public class BiomassResetter implements BiologyResetter {
      * @param random
      */
     @Override
-    public void resetAbundance(NauticalMap map, MersenneTwisterFast random) {
+    public void resetAbundance(final NauticalMap map, final MersenneTwisterFast random) {
 
-        Preconditions.checkState(Double.isFinite(recordedBiomass),"can't reset without recording!");
+        Preconditions.checkState(Double.isFinite(recordedBiomass), "can't reset without recording!");
 
         final double totalBiomassToAllocate = (fadMap == null)
             ? recordedBiomass
             : recordedBiomass - fadMap.getTotalBiomass(species);
 
-        for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
+        for (final SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
 
-            if(!seaTile.isFishingEvenPossibleHere()) {
+            if (!seaTile.isFishingEvenPossibleHere()) {
 
-                Preconditions.checkArgument(normalizedAllocator.allocate(seaTile,map,random)==0 |
-                                                    Double.isNaN(normalizedAllocator.allocate(seaTile,map,random)),
-                                            "Allocating biomass on previously unfishable areas is not allowed; " +
-                                                    "keep them empty but don't use always empty local biologies " + "\n" +
-                                                    normalizedAllocator.allocate(seaTile,map,random));
+                Preconditions.checkArgument(
+                    normalizedAllocator.allocate(seaTile, map, random) == 0 |
+                        Double.isNaN(normalizedAllocator.allocate(seaTile, map, random)),
+                    "Allocating biomass on previously unfishable areas is not allowed; " +
+                        "keep them empty but don't use always empty local biologies " + "\n" +
+                        normalizedAllocator.allocate(seaTile, map, random)
+                );
 
                 continue;
             }
-            VariableBiomassBasedBiology biology =
-                    ((VariableBiomassBasedBiology) seaTile.getBiology());
+            final VariableBiomassBasedBiology biology =
+                ((VariableBiomassBasedBiology) seaTile.getBiology());
 
-            double newBiomass = Math.min(
-                    totalBiomassToAllocate *
-                            normalizedAllocator.allocate(seaTile, map, random),
-                    biology.getCarryingCapacity(species)
+            final double newBiomass = Math.min(
+                totalBiomassToAllocate *
+                    normalizedAllocator.allocate(seaTile, map, random),
+                biology.getCarryingCapacity(species)
 
             );
-            biology.setCurrentBiomass(species,
-                    newBiomass);
+            biology.setCurrentBiomass(
+                species,
+                newBiomass
+            );
         }
 
     }

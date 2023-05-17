@@ -20,12 +20,7 @@
 
 package uk.ac.ox.oxfish.model.event;
 
-import static uk.ac.ox.oxfish.model.StepOrder.BIOLOGY_PHASE;
-
 import com.google.common.base.Preconditions;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.ObjectArrayMessage;
 import org.jfree.util.Log;
 import sim.engine.SimState;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -44,81 +39,71 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractYearlyTargetExogenousCatches extends AbstractExogenousCatches {
 
-    private static final Logger logger = LogManager.getLogger("biomass_events");
+    private static final int MAX_STEPS = 10000;
+    protected final LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg;
 
-    protected final LinkedHashMap<Species,Double> exogenousYearlyCatchesInKg;
-
-    private static int MAX_STEPS = 10000;
-
-    public AbstractYearlyTargetExogenousCatches(LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg,
-                                                String dataColumnName) {
+    public AbstractYearlyTargetExogenousCatches(
+        final LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg,
+        final String dataColumnName
+    ) {
         super(dataColumnName);
         this.exogenousYearlyCatchesInKg = exogenousYearlyCatchesInKg;
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         System.out.println("catching exogenously now " + ((FishState) simState).getDay());
-        FishState model = (FishState) simState;
-        List<? extends LocalBiology> allTiles = getAllCatchableBiologies(model);
+        final FishState model = (FishState) simState;
+        final List<? extends LocalBiology> allTiles = getAllCatchableBiologies(model);
 
         lastExogenousCatchesMade.clear();
 
 
-        for (Map.Entry<Species, Double> catches : exogenousYearlyCatchesInKg.entrySet())
-        {
+        for (final Map.Entry<Species, Double> catches : exogenousYearlyCatchesInKg.entrySet()) {
             double totalBiomassCaught = 0;
-            Double totalToCatch = catches.getValue();
+            final Double totalToCatch = catches.getValue();
             double toCatch = totalToCatch;
             final Species target = catches.getKey();
             //worry only about tiles that have this fish
-            List<? extends LocalBiology> tiles =  allTiles.stream().filter(
-                    seaTile -> getFishableBiomass(target, seaTile) > FishStateUtilities.EPSILON).collect(Collectors.toList());
+            final List<? extends LocalBiology> tiles = allTiles.stream()
+                .filter(
+                    seaTile -> getFishableBiomass(target, seaTile) > FishStateUtilities.EPSILON)
+                .collect(Collectors.toList());
 
             final double biomassBefore = ((FishState) simState).getTotalBiomass(catches.getKey());
 
             int steps = 0;
             //as long as there is fish to catch and places with fish
-            while(steps < MAX_STEPS && toCatch > FishStateUtilities.EPSILON && !tiles.isEmpty() )
-            {
+            while (steps < MAX_STEPS && toCatch > FishStateUtilities.EPSILON && !tiles.isEmpty()) {
 
                 //grab a tile at random
-                LocalBiology tile = tiles.get(model.getRandom().nextInt(tiles.size()));
+                final LocalBiology tile = tiles.get(model.getRandom().nextInt(tiles.size()));
 
 
                 //each tile we pick, grab this much fish out
-                double step = Math.min(totalToCatch / (double) tiles.size(),toCatch);
-                Catch fish = mortalityEvent(model, target, tile, step);
+                final double step = Math.min(totalToCatch / (double) tiles.size(), toCatch);
+                final Catch fish = mortalityEvent(model, target, tile, step);
 
                 //should only fish one species!
-                double biomassCaught = fish.getWeightCaught(target);
-                assert biomassCaught ==fish.totalCatchWeight();
+                final double biomassCaught = fish.getWeightCaught(target);
+                assert biomassCaught == fish.totalCatchWeight();
                 //account for it
-                toCatch-= biomassCaught;
+                toCatch -= biomassCaught;
                 totalBiomassCaught += biomassCaught;
-                if(biomassCaught <= FishStateUtilities.EPSILON //if there is too little fish to catch (it's all rounding errors)
-                || getFishableBiomass(target, tile) <= FishStateUtilities.EPSILON) //or you consumed it all
+                if (biomassCaught <= FishStateUtilities.EPSILON //if there is too little fish to catch (it's all rounding errors)
+                    || getFishableBiomass(target, tile) <= FishStateUtilities.EPSILON) //or you consumed it all
                     tiles.remove(tile); //then don't worry about this tile anymore!
 
 
                 steps++;
             }
 
-            if(steps==MAX_STEPS)
+            if (steps == MAX_STEPS)
                 Log.warn("Failed to fish enough in the exogenous phase");
 
-            lastExogenousCatchesMade.put(target,totalBiomassCaught);
+            lastExogenousCatchesMade.put(target, totalBiomassCaught);
 
             final double biomassAfter = ((FishState) simState).getTotalBiomass(catches.getKey());
-
-            logger.debug(() -> new ObjectArrayMessage(
-                ((FishState) simState).getStep(),
-                BIOLOGY_PHASE,
-                "CATCH_EXOGENOUSLY",
-                catches.getKey(),
-                biomassBefore,
-                biomassAfter
-            ));
 
         }
 
@@ -126,17 +111,18 @@ public abstract class AbstractYearlyTargetExogenousCatches extends AbstractExoge
 
     /**
      * simulate exogenous catch (must call the react to catch function within this)
+     *
      * @param simState the model
-     * @param target species to kill
-     * @param tile where to kill it
-     * @param step how much at most to kill
+     * @param target   species to kill
+     * @param tile     where to kill it
+     * @param step     how much at most to kill
      * @return
      */
     abstract protected Catch mortalityEvent(FishState simState, Species target, LocalBiology tile, double step);
 
 
-    public void updateExogenousCatches(Species species,Double targetYearlyLandings ){
+    public void updateExogenousCatches(final Species species, final Double targetYearlyLandings) {
         Preconditions.checkArgument(exogenousYearlyCatchesInKg.containsKey(species));
-        exogenousYearlyCatchesInKg.put(species,targetYearlyLandings);
+        exogenousYearlyCatchesInKg.put(species, targetYearlyLandings);
     }
 }

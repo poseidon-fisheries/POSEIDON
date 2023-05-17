@@ -37,10 +37,8 @@ import uk.ac.ox.oxfish.geography.fads.FadZapperFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
-import uk.ac.ox.oxfish.maximization.TunaCalibrator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.regions.CustomRegionalDivision;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
@@ -55,7 +53,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
-import static uk.ac.ox.oxfish.maximization.TunaCalibrator.logCurrentTime;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public abstract class EpoScenario<B extends LocalBiology>
@@ -215,8 +212,6 @@ public abstract class EpoScenario<B extends LocalBiology>
     @Override
     public ScenarioEssentials start(final FishState fishState) {
         System.out.println("Starting model...");
-        logCurrentTime(fishState);
-        fishState.scheduleEveryDay(TunaCalibrator::logCurrentTime, StepOrder.DAWN);
 
         final NauticalMap nauticalMap =
             getMapInitializerFactory()

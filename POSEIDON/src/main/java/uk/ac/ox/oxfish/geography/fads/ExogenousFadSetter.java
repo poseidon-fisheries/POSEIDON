@@ -1,23 +1,16 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import com.google.common.base.Preconditions;
-import com.vividsolutions.jts.geom.Coordinate;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.message.ObjectArrayMessage;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.List;
-
-import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
 
 /**
  * an exogenous generator of fad set events which are unconnected to both fishers and FadManagers
@@ -40,14 +33,6 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
      */
     private Stoppable stoppable;
 
-    public static void initFadRemovalLog() {
-        addCsvLogger(
-            Level.DEBUG,
-            "fad_removals",
-            "step_deployed,lon_deployed,lat_deployed,step_removed,lon_removed,lat_removed"
-        );
-    }
-
     @Override
     public void step(final SimState simState) {
         final FishState model = ((FishState) simState);
@@ -59,7 +44,6 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
         );
         //set on them
         for (final Fad fad : allFadsToSetOn) {
-            logFadRemoval(fad, model);
             setOnFad(fad);
         }
         //done!
@@ -70,27 +54,6 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
         FishState model,
         int day
     );
-
-    private static void logFadRemoval(
-        final Fad fad,
-        final FishState fishState
-    ) {
-        LogManager.getLogger("fad_removals").debug(() -> {
-            final NauticalMap map = fishState.getMap();
-            final Coordinate coordinatesDeployed =
-                map.getCoordinates(map.getSeaTile(fad.getLocationDeployed()));
-            final Coordinate coordinatesRemoved =
-                map.getCoordinates(fad.getLocation());
-            return new ObjectArrayMessage(
-                fad.getStepDeployed(),
-                coordinatesDeployed.x,
-                coordinatesDeployed.y,
-                fishState.getStep(),
-                coordinatesRemoved.x,
-                coordinatesRemoved.y
-            );
-        });
-    }
 
     /**
      * remove fad from circulation

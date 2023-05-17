@@ -1,13 +1,5 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
-import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.ObjectArrayMessage;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -17,15 +9,18 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
+
 /**
  * the plugin/additionalStartable version of AbundanceResetter + BiomassSnapshot
  */
 public class SnapshotBiologyResetter implements AdditionalStartable {
 
-    private static final Logger logger = LogManager.getLogger("biomass_events");
-
-    private final HashMap<BiologyResetter,SnapshotBiomassAllocator> resetters;
-
+    private final HashMap<BiologyResetter, SnapshotBiomassAllocator> resetters;
 
 
     private final int yearsBeforeReset;
@@ -38,113 +33,108 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
     private final boolean restoreOriginalLocations;
 
 
-    private SnapshotBiologyResetter(int yearsBeforeReset,
-                                    HashMap<BiologyResetter,SnapshotBiomassAllocator> resetters,
-                                    boolean restoreOriginalLocations)
-    {
+    private SnapshotBiologyResetter(
+        final int yearsBeforeReset,
+        final HashMap<BiologyResetter, SnapshotBiomassAllocator> resetters,
+        final boolean restoreOriginalLocations
+    ) {
         this.yearsBeforeReset = yearsBeforeReset;
         this.resetters = resetters;
-        this.restoreOriginalLocations=restoreOriginalLocations;
+        this.restoreOriginalLocations = restoreOriginalLocations;
     }
 
 
     public static SnapshotBiologyResetter abundanceResetter(
-            GlobalBiology biology,
-            int yearsBeforeReset,
-            boolean restoreOriginalLocations,
-            boolean restoreOriginalLengthDistribution){
+        final GlobalBiology biology,
+        final int yearsBeforeReset,
+        final boolean restoreOriginalLocations,
+        final boolean restoreOriginalLengthDistribution
+    ) {
 
 
-        LinkedHashMap<BiologyResetter,SnapshotBiomassAllocator> resetters = new LinkedHashMap<>();
-        for (Species species : biology.getSpecies()) {
-            if(species.isImaginary())
+        final LinkedHashMap<BiologyResetter, SnapshotBiomassAllocator> resetters = new LinkedHashMap<>();
+        for (final Species species : biology.getSpecies()) {
+            if (species.isImaginary())
                 continue;
-            SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
+            final SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
             resetters.put(
 
-                    restoreOriginalLengthDistribution ?
-                        new AbundanceResetter(snapper,species) :
-                             new AbundanceScalingResetter(snapper,species)
-                    ,
-                    snapper);
+                restoreOriginalLengthDistribution ?
+                    new AbundanceResetter(snapper, species) :
+                    new AbundanceScalingResetter(snapper, species)
+                ,
+                snapper);
         }
         return new SnapshotBiologyResetter(yearsBeforeReset, resetters, restoreOriginalLocations);
     }
 
-    public static SnapshotBiologyResetter biomassResetter(GlobalBiology biology,
-                                                            int yearsBeforeReset,
-                                                          boolean restoreOriginalLocations){
+    public static SnapshotBiologyResetter biomassResetter(
+        final GlobalBiology biology,
+        final int yearsBeforeReset,
+        final boolean restoreOriginalLocations
+    ) {
 
 
-        LinkedHashMap<BiologyResetter,SnapshotBiomassAllocator> resetters = new LinkedHashMap<>();
-        for (Species species : biology.getSpecies()) {
-            if(species.isImaginary())
+        final LinkedHashMap<BiologyResetter, SnapshotBiomassAllocator> resetters = new LinkedHashMap<>();
+        for (final Species species : biology.getSpecies()) {
+            if (species.isImaginary())
                 continue;
-            SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
-            resetters.put(new BiomassResetter(snapper,species),snapper);
+            final SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
+            resetters.put(new BiomassResetter(snapper, species), snapper);
         }
-        return new SnapshotBiologyResetter(yearsBeforeReset,resetters,restoreOriginalLocations);
+        return new SnapshotBiologyResetter(yearsBeforeReset, resetters, restoreOriginalLocations);
     }
 
-    
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         //record biology on day 1
         model.scheduleOnce(new Steppable() {
             @Override
-            public void step(SimState simState) {
-                for (Map.Entry<BiologyResetter, SnapshotBiomassAllocator> resetter : resetters.entrySet()) {
+            public void step(final SimState simState) {
+                for (final Map.Entry<BiologyResetter, SnapshotBiomassAllocator> resetter : resetters.entrySet()) {
                     resetter.getKey().recordHowMuchBiomassThereIs(model);
 
-                    if(restoreOriginalLocations)
+                    if (restoreOriginalLocations)
                         resetter.getValue().takeSnapshort(
-                                model.getMap(),
-                                resetter.getKey().getSpecies());
+                            model.getMap(),
+                            resetter.getKey().getSpecies()
+                        );
 
                 }
 
             }
-        },StepOrder.DAWN);
-
+        }, StepOrder.DAWN);
 
 
         //reset it at year X
         model.scheduleOnceAtTheBeginningOfYear(
-                new Steppable() {
-                    @Override
-                    public void step(SimState simState) {
-                        System.out.println("Resetted biomass at day " + model.getDay());
+            new Steppable() {
+                @Override
+                public void step(final SimState simState) {
+                    System.out.println("Resetted biomass at day " + model.getDay());
 
-                        for (Map.Entry<BiologyResetter, SnapshotBiomassAllocator>
-                                resetter : resetters.entrySet()) {
-                            if(!restoreOriginalLocations) {
-                                resetter.getValue().takeSnapshort(
-                                        model.getMap(),
-                                        resetter.getKey().getSpecies());
-                            }
-
-                            final double biomassBefore = ((FishState) simState)
-                                .getTotalBiomass(resetter.getKey().getSpecies());
-
-                            resetter.getKey().resetAbundance(model.getMap(), model.getRandom());
-
-                            logger.debug(new ObjectArrayMessage(
-                                ((FishState) simState).getStep(),
-                                DATA_RESET,
-                                "RESET",
-                                resetter.getKey().getSpecies(),
-                                biomassBefore,
-                                (((FishState) simState).getTotalBiomass(resetter.getKey()
-                                    .getSpecies()))
-                            ));
+                    for (final Map.Entry<BiologyResetter, SnapshotBiomassAllocator>
+                        resetter : resetters.entrySet()) {
+                        if (!restoreOriginalLocations) {
+                            resetter.getValue().takeSnapshort(
+                                model.getMap(),
+                                resetter.getKey().getSpecies()
+                            );
                         }
 
+                        final double biomassBefore = ((FishState) simState)
+                            .getTotalBiomass(resetter.getKey().getSpecies());
+
+                        resetter.getKey().resetAbundance(model.getMap(), model.getRandom());
 
                     }
-                },
-                DATA_RESET,
-                yearsBeforeReset
+
+
+                }
+            },
+            DATA_RESET,
+            yearsBeforeReset
         );
 
 //        //reset it twice: you want to make sure it gets captured by data

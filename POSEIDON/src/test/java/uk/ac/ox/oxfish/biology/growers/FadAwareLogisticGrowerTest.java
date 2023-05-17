@@ -28,20 +28,12 @@ import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 
-import static org.apache.logging.log4j.Level.DEBUG;
 import static org.junit.Assert.assertEquals;
-import static uk.ac.ox.oxfish.utility.CsvLogger.addCsvLogger;
 
 public class FadAwareLogisticGrowerTest {
 
     @Test
     public void jonLandings() {
-
-        addCsvLogger(
-            DEBUG,
-            "biomass_events",
-            "step,stepOrder,process,species,biomassBefore,biomassAfter"
-        );
 
         final EpoGravityBiomassScenario scenario = new EpoGravityBiomassScenario();
         scenario.useDummyData();

@@ -21,15 +21,12 @@ package uk.ac.ox.oxfish.model.scenario;
 import junit.framework.TestCase;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static uk.ac.ox.oxfish.geography.fads.ExogenousFadSetter.initFadRemovalLog;
-
 public class FadsOnlyEpoGravityAbundanceScenarioTest extends TestCase {
 
     public void testRunTwoYearsWithoutCrashing() {
         final EpoFadsOnlyAbundanceScenario scenario = new EpoFadsOnlyAbundanceScenario();
         scenario.useDummyData();
         final FishState fishState = new FishState();
-        initFadRemovalLog();
         fishState.setScenario(scenario);
         fishState.start();
         do {

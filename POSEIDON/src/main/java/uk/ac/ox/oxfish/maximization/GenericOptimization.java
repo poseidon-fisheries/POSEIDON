@@ -21,8 +21,6 @@
 package uk.ac.ox.oxfish.maximization;
 
 import eva2.problems.simple.SimpleProblemDouble;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.message.ObjectArrayMessage;
 import uk.ac.ox.oxfish.maximization.generic.DataTarget;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
@@ -231,19 +229,12 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
                 finalError = translateNANto;
             }
 
-            LogManager.getLogger("calibration_error.csv").debug(
-                new ObjectArrayMessage(System.currentTimeMillis(), finalError)
-            );
-
             System.out.println(Arrays.toString(x) + " ---> " + finalError);
             return new double[]{finalError};
 
         } catch (final Exception e) {
             e.printStackTrace();
             System.out.println("was NAN!");
-            LogManager.getLogger("calibration_error.csv").debug(
-                new ObjectArrayMessage(System.currentTimeMillis(), translateNANto)
-            );
             System.out.println(Arrays.toString(x) + " ---> " + translateNANto);
 
             return new double[]{translateNANto};
