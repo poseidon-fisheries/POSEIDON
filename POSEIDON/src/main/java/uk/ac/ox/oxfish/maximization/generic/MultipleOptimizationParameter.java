@@ -10,14 +10,11 @@ import static uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter.q
 
 /**
  * like simple optimization parameter, but puts the same number at multiple addresses
- *
- *
  */
 public class MultipleOptimizationParameter implements OptimizationParameter {
 
 
-
-    private List<String> addressesToModify =  new LinkedList<>(); //"literPerKilometer";
+    private List<String> addressesToModify = new LinkedList<>(); //"literPerKilometer";
 
 
     /**
@@ -60,33 +57,39 @@ public class MultipleOptimizationParameter implements OptimizationParameter {
 
     @Override
     public String parametrize(Scenario scenario, double[] inputs) {
-        double realValue =minimum+((maximum-minimum)/(10-(-10)))*(inputs[0] - (-10));
+        double realValue = minimum + ((maximum - minimum) / (10 - (-10))) * (inputs[0] - (-10));
 
 
-        if(isStrict())
-        {
-            if(realValue<minimum)
+        if (isStrict()) {
+            if (realValue < minimum)
                 realValue = minimum;
-            if(realValue>maximum)
+            if (realValue > maximum)
                 realValue = maximum;
         }
 
 
-        if(realValue < 0 & alwaysPositive)
+        if (realValue < 0 & alwaysPositive)
             realValue = 0;
 
 
-
         for (String addressToModify : addressesToModify) {
-            if(!rawNumber)
+            if (!rawNumber)
                 quickParametrize(scenario, realValue, addressToModify);
             else
-                quickParametrizeRawNumber(scenario,realValue,addressToModify);
+                quickParametrizeRawNumber(scenario, realValue, addressToModify);
 
         }
 
         return String.valueOf(realValue);
 
+    }
+
+    public boolean isStrict() {
+        return strict;
+    }
+
+    public void setStrict(boolean strict) {
+        this.strict = strict;
     }
 
     @Override
@@ -124,14 +127,6 @@ public class MultipleOptimizationParameter implements OptimizationParameter {
 
     public void setAlwaysPositive(boolean alwaysPositive) {
         this.alwaysPositive = alwaysPositive;
-    }
-
-    public boolean isStrict() {
-        return strict;
-    }
-
-    public void setStrict(boolean strict) {
-        this.strict = strict;
     }
 
     public boolean isRawNumber() {

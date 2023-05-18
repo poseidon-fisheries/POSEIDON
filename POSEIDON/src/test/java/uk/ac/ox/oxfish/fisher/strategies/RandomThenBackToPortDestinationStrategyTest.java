@@ -49,6 +49,24 @@ import static org.mockito.Mockito.when;
 public class RandomThenBackToPortDestinationStrategyTest {
 
 
+    public static FishState generateSimpleSquareMap(int size) {
+        ObjectGrid2D grid2D = new ObjectGrid2D(size, size);
+
+        for (int i = 0; i < size; i++)
+            for (int j = 0; j < size; j++) {
+                grid2D.field[i][j] = new SeaTile(i, j, -100, new TileHabitat(0d));
+            }
+
+        NauticalMap map = new NauticalMap(new GeomGridField(grid2D), new GeomVectorField(),
+            new EquirectangularDistance(0.0, 1), new StraightLinePathfinder()
+        );
+        FishState model = mock(FishState.class);
+        when(model.getMap()).thenReturn(map);
+        when(model.getStepsPerDay()).thenReturn(1);
+        when(model.getHoursPerStep()).thenReturn(24d);
+        return model;
+    }
+
     @Test
     public void neverPicksLand() throws Exception {
 
@@ -76,17 +94,40 @@ public class RandomThenBackToPortDestinationStrategyTest {
         when(fisher.isGoingToPort()).thenReturn(true);
         RandomThenBackToPortDestinationStrategy strategy = new RandomThenBackToPortDestinationStrategy();
         Action action = new AtPort();
-        for(int i=0; i<100; i++)
-        {
+        for (int i = 0; i < 100; i++) {
             SeaTile destination = strategy.chooseDestination(fisher,
-                                                             random, model, action);
-            assertEquals(destination.getGridX(),0);
+                random, model, action
+            );
+            assertEquals(destination.getGridX(), 0);
             assertTrue(destination.isWater());
         }
 
 
     }
 
+    public static FishState generateSimple2x2Map(final int distancePerCell) {
+        ObjectGrid2D grid2D = new ObjectGrid2D(2, 2);
+        //2x2, first column sea, second  column land
+        SeaTile seaTile = new SeaTile(0, 0, -100, new TileHabitat(0d));
+        grid2D.field[0][0] = seaTile;
+        seaTile.setBiology(mock(LocalBiology.class));
+
+        SeaTile tile2 = new SeaTile(0, 1, -100, new TileHabitat(0d));
+        grid2D.field[0][1] = tile2;
+        tile2.setBiology(mock(LocalBiology.class));
+
+        grid2D.field[1][0] = new SeaTile(1, 0, 100, new TileHabitat(0d));
+        grid2D.field[1][1] = new SeaTile(1, 1, 100, new TileHabitat(0d));
+        //great
+        NauticalMap map = new NauticalMap(new GeomGridField(grid2D), new GeomVectorField(),
+            new CartesianDistance(1), new StraightLinePathfinder()
+        );
+        FishState model = mock(FishState.class);
+        when(model.getMap()).thenReturn(map);
+        when(model.getStepsPerDay()).thenReturn(distancePerCell);
+        when(model.getHoursPerStep()).thenReturn(24d);
+        return model;
+    }
 
     @Test
     public void keepsGoing() throws Exception {
@@ -103,26 +144,25 @@ public class RandomThenBackToPortDestinationStrategyTest {
         MersenneTwisterFast random = new MersenneTwisterFast();
         Fisher fisher = mock(Fisher.class);
         //FISHER IS AT SEA
-        when(fisher.getDestination()).thenReturn(map.getSeaTile(0,0)); //he's going to 0,0
-        when(fisher.getLocation()).thenReturn(map.getSeaTile(0,1)); //he's at 0,1
+        when(fisher.getDestination()).thenReturn(map.getSeaTile(0, 0)); //he's going to 0,0
+        when(fisher.getLocation()).thenReturn(map.getSeaTile(0, 1)); //he's at 0,1
         when(fisher.getHomePort()).thenReturn(port);
 
         //he should decide to keep going 0,0
 
         //choose 20 times
         RandomThenBackToPortDestinationStrategy strategy = new RandomThenBackToPortDestinationStrategy();
-        for(int i=0; i<520; i++)
-        {
+        for (int i = 0; i < 520; i++) {
             SeaTile destination = strategy.chooseDestination(fisher,
-                                                               random, model, null);
-            assertEquals(destination.getGridX(),0);
-            assertEquals(destination.getGridY(),0);
+                random, model, null
+            );
+            assertEquals(destination.getGridX(), 0);
+            assertEquals(destination.getGridY(), 0);
             assertEquals(destination, fisher.getDestination());
         }
 
 
     }
-
 
     //reaches destination, should choose to go to port
     @Test
@@ -140,64 +180,24 @@ public class RandomThenBackToPortDestinationStrategyTest {
         MersenneTwisterFast random = new MersenneTwisterFast();
         Fisher fisher = mock(Fisher.class);
         //FISHER IS AT SEA
-        when(fisher.getDestination()).thenReturn(map.getSeaTile(0,0)); //he's going to 0,0
-        when(fisher.getLocation()).thenReturn(map.getSeaTile(0,0)); //he's arrived
+        when(fisher.getDestination()).thenReturn(map.getSeaTile(0, 0)); //he's going to 0,0
+        when(fisher.getLocation()).thenReturn(map.getSeaTile(0, 0)); //he's arrived
         when(fisher.getHomePort()).thenReturn(port);
 
         //he should decide to keep going 0,0
 
         //choose 20 times
         RandomThenBackToPortDestinationStrategy strategy = new RandomThenBackToPortDestinationStrategy();
-        for(int i=0; i<520; i++)
-        {
+        for (int i = 0; i < 520; i++) {
             SeaTile destination = strategy.chooseDestination(fisher,
-                                                               random, model, null);
-            assertEquals(destination.getGridX(),1);
-            assertEquals(destination.getGridY(),1);
-            assertEquals(destination,port.getLocation());
+                random, model, null
+            );
+            assertEquals(destination.getGridX(), 1);
+            assertEquals(destination.getGridY(), 1);
+            assertEquals(destination, port.getLocation());
         }
 
 
-    }
-    public static FishState generateSimple2x2Map(final int distancePerCell) {
-        ObjectGrid2D grid2D = new ObjectGrid2D(2,2);
-        //2x2, first column sea, second  column land
-        SeaTile seaTile = new SeaTile(0, 0, -100, new TileHabitat(0d));
-        grid2D.field[0][0] = seaTile;
-        seaTile.setBiology(mock(LocalBiology.class));
-
-        SeaTile tile2 = new SeaTile(0, 1, -100, new TileHabitat(0d));
-        grid2D.field[0][1] = tile2;
-        tile2.setBiology(mock(LocalBiology.class));
-
-        grid2D.field[1][0] = new SeaTile(1,0,100, new TileHabitat(0d));
-        grid2D.field[1][1] = new SeaTile(1,1,100, new TileHabitat(0d));
-        //great
-        NauticalMap map = new NauticalMap(new GeomGridField(grid2D),new GeomVectorField(),
-                                          new CartesianDistance(1),new StraightLinePathfinder());
-        FishState model = mock(FishState.class);
-        when(model.getMap()).thenReturn(map);
-        when(model.getStepsPerDay()).thenReturn(distancePerCell);
-        when(model.getHoursPerStep()).thenReturn(24d);
-        return model;
-    }
-
-    public static FishState generateSimpleSquareMap(int size) {
-        ObjectGrid2D grid2D = new ObjectGrid2D(size,size);
-
-        for(int i=0; i<size; i++)
-            for(int j=0; j<size; j++)
-            {
-                grid2D.field[i][j] = new SeaTile(i,j,-100, new TileHabitat(0d));
-            }
-
-        NauticalMap map = new NauticalMap(new GeomGridField(grid2D),new GeomVectorField(),
-                                          new EquirectangularDistance(0.0,1),new StraightLinePathfinder());
-        FishState model = mock(FishState.class);
-        when(model.getMap()).thenReturn(map);
-        when(model.getStepsPerDay()).thenReturn(1);
-        when(model.getHoursPerStep()).thenReturn(24d);
-        return model;
     }
 
 }

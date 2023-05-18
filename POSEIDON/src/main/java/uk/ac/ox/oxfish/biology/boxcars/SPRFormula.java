@@ -8,9 +8,10 @@ import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 public interface SPRFormula {
 
 
-    public double computeSPR(SPRAgent sprAgent,
-                             StructuredAbundance abundance);
-
+    public double computeSPR(
+        SPRAgent sprAgent,
+        StructuredAbundance abundance
+    );
 
 
 }

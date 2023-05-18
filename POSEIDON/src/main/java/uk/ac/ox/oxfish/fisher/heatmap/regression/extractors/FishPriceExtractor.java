@@ -40,7 +40,8 @@ public class FishPriceExtractor implements ObservationExtractor {
 
     @Override
     public double extract(
-            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-        return agent.getHomePort().getMarginalPrice(species,agent);
+        SeaTile tile, double timeOfObservation, Fisher agent, FishState model
+    ) {
+        return agent.getHomePort().getMarginalPrice(species, agent);
     }
 }

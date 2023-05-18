@@ -36,8 +36,7 @@ import java.util.Map;
  * MPAs with a fine associated for each hour you spend in it
  * Created by carrknight on 2/13/17.
  */
-public class FinedProtectedAreas implements Regulation{
-
+public class FinedProtectedAreas implements Regulation {
 
 
     private final MersenneTwisterFast random;
@@ -50,8 +49,10 @@ public class FinedProtectedAreas implements Regulation{
     private Map<MasonGeometry, Enforcement> enforcements = new HashMap<>();
 
 
-    public FinedProtectedAreas(MersenneTwisterFast random,
-                               boolean canContemplateCheating) {
+    public FinedProtectedAreas(
+        MersenneTwisterFast random,
+        boolean canContemplateCheating
+    ) {
         this.random = random;
         this.canContemplateCheating = canContemplateCheating;
     }
@@ -79,7 +80,7 @@ public class FinedProtectedAreas implements Regulation{
      */
     @Override
     public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) {
-        if(tile.isProtected() && !canContemplateCheating)
+        if (tile.isProtected() && !canContemplateCheating)
             return false;
         return true;
     }
@@ -94,7 +95,8 @@ public class FinedProtectedAreas implements Regulation{
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Species species, FishState model, int timeStep) {
+        Fisher agent, Species species, FishState model, int timeStep
+    ) {
         return Double.MAX_VALUE;
     }
 
@@ -113,7 +115,8 @@ public class FinedProtectedAreas implements Regulation{
 
     /**
      * no reaction
-     *  @param where
+     *
+     * @param where
      * @param who
      * @param fishCaught
      * @param fishRetained
@@ -121,20 +124,21 @@ public class FinedProtectedAreas implements Regulation{
      */
     @Override
     public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing, FishState model, int timeStep) {
+        SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
+        int hoursSpentFishing, FishState model, int timeStep
+    ) {
 
-        if(!where.isProtected())
+        if (!where.isProtected())
             return;
 
         assert !who.isExogenousEmergencyOverride(); // you wouldn't have been caught already during this trip!
 
         Enforcement enforcement = enforcements.get(where.grabMPA());
-        Preconditions.checkState(enforcement!= null, "not a registered MPA!");
+        Preconditions.checkState(enforcement != null, "not a registered MPA!");
 
         for (int i = 0; i < hoursSpentFishing; i++)
-            if(random.nextBoolean(enforcement.getHourlyProbabilityOfBeingCaught())) {
-            //you pay a fine
+            if (random.nextBoolean(enforcement.getHourlyProbabilityOfBeingCaught())) {
+                //you pay a fine
                 who.spendForTrip(enforcement.getFine());
                 //you are sent back home
                 who.setExogenousEmergencyOverride(true);
@@ -143,13 +147,12 @@ public class FinedProtectedAreas implements Regulation{
     }
 
 
-    public void registerEnforcement(MasonGeometry mpa, double hourlyProbabilityOfBeingCaught, double fine)
-    {
+    public void registerEnforcement(MasonGeometry mpa, double hourlyProbabilityOfBeingCaught, double fine) {
         Preconditions.checkArgument(!enforcements.containsKey(mpa));
-        enforcements.put(mpa, new Enforcement(hourlyProbabilityOfBeingCaught,fine));
+        enforcements.put(mpa, new Enforcement(hourlyProbabilityOfBeingCaught, fine));
     }
 
-    private static class Enforcement{
+    private static class Enforcement {
 
         final private double hourlyProbabilityOfBeingCaught;
 

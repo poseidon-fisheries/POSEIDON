@@ -37,8 +37,9 @@ public class AbundanceDrivenGearExogenousCatches extends AbstractYearlyTargetExo
 
 
     public AbundanceDrivenGearExogenousCatches(
-            LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg,
-            HashMap<Species, HomogeneousAbundanceGear> gears) {
+        LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg,
+        HashMap<Species, HomogeneousAbundanceGear> gears
+    ) {
         super(exogenousYearlyCatchesInKg, "Exogenous landings of ");
         this.gears = gears;
     }
@@ -55,28 +56,33 @@ public class AbundanceDrivenGearExogenousCatches extends AbstractYearlyTargetExo
      */
     @Override
     protected Catch mortalityEvent(
-            FishState simState, Species target, LocalBiology tile, double step) {
+        FishState simState, Species target, LocalBiology tile, double step
+    ) {
 
         HomogeneousAbundanceGear gear = gears.get(target);
-        Preconditions.checkArgument(gear!=null, "Exogenous catches impossible without providing gear");
+        Preconditions.checkArgument(gear != null, "Exogenous catches impossible without providing gear");
 
 
         StructuredAbundance[] structuredAbundances = new StructuredAbundance[simState.getBiology().getSize()];
-        for(int i=0; i<structuredAbundances.length; i++)
-            structuredAbundances[i] = new StructuredAbundance(simState.getBiology().getSpecie(i).getNumberOfSubdivisions(),
-                                                              simState.getBiology().getSpecie(i).getNumberOfBins());
+        for (int i = 0; i < structuredAbundances.length; i++)
+            structuredAbundances[i] = new StructuredAbundance(
+                simState.getBiology().getSpecie(i).getNumberOfSubdivisions(),
+                simState.getBiology().getSpecie(i).getNumberOfBins()
+            );
         structuredAbundances[target.getIndex()] = gear.catchesAsAbundanceForThisSpecies(tile, 1, target);
-        Catch fish = new Catch(structuredAbundances,
-                                 simState.getBiology());
+        Catch fish = new Catch(
+            structuredAbundances,
+            simState.getBiology()
+        );
         double totalWeight = fish.getTotalWeight();
         //adjust for excess
-        if(totalWeight >step)
+        if (totalWeight > step)
             for (double[] row : fish.getAbundance(target.getIndex()).asMatrix()) {
-                for (int i=0; i<row.length; i++) {
-                    row[i]=row[i]*step/totalWeight;
+                for (int i = 0; i < row.length; i++) {
+                    row[i] = row[i] * step / totalWeight;
                 }
             }
-        tile.reactToThisAmountOfBiomassBeingFished(fish,fish,simState.getBiology());
+        tile.reactToThisAmountOfBiomassBeingFished(fish, fish, simState.getBiology());
         return fish;
 
 

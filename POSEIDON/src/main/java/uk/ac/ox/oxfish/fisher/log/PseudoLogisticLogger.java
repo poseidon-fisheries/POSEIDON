@@ -68,15 +68,18 @@ public class PseudoLogisticLogger implements TripListener {
 
 
     public PseudoLogisticLogger(
-            MapDiscretization discretization,
-            LogisticInputMaker inputter, LogisticLog log,
-            Fisher fisher,
-            FishState state,
-            Set<Integer> allowedGroups) {
+        MapDiscretization discretization,
+        LogisticInputMaker inputter, LogisticLog log,
+        Fisher fisher,
+        FishState state,
+        Set<Integer> allowedGroups
+    ) {
         this.discretization = discretization;
         //only model arms for which we have both at least a tile in the map AND is listed in the input file
-        switcher = new BanditSwitch(discretization.getNumberOfGroups(),
-                                    integer -> discretization.isValid(integer) && allowedGroups.contains(integer));
+        switcher = new BanditSwitch(
+            discretization.getNumberOfGroups(),
+            integer -> discretization.isValid(integer) && allowedGroups.contains(integer)
+        );
 
         this.inputter = inputter;
         this.log = log;
@@ -85,18 +88,21 @@ public class PseudoLogisticLogger implements TripListener {
     }
 
     public PseudoLogisticLogger(
-            MapDiscretization discretization,
-            ObservationExtractor[] commonExtractors,
-            LogisticLog log,
-            Fisher fisher,
-            FishState state,
-            MersenneTwisterFast random) {
+        MapDiscretization discretization,
+        ObservationExtractor[] commonExtractors,
+        LogisticLog log,
+        Fisher fisher,
+        FishState state,
+        MersenneTwisterFast random
+    ) {
         this.discretization = discretization;
         //only model arms for which we have both at least a tile in the map AND is listed in the input file
-        switcher = new BanditSwitch(discretization.getNumberOfGroups(),
-                                    integer -> discretization.isValid(integer) );
+        switcher = new BanditSwitch(
+            discretization.getNumberOfGroups(),
+            integer -> discretization.isValid(integer)
+        );
         ObservationExtractor[][] extractors = new ObservationExtractor[switcher.getNumberOfArms()][];
-        for(int arm = 0; arm<extractors.length; arm++)
+        for (int arm = 0; arm < extractors.length; arm++)
             extractors[arm] = commonExtractors;
 
         this.inputter = new LogisticInputMaker(extractors, new Function<Integer, SeaTile>() {
@@ -112,38 +118,35 @@ public class PseudoLogisticLogger implements TripListener {
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher)
-    {
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
         //if we recorded an input at the end of the last trip, now we reveal the choice
-        if(log.waitingForChoice()) {
-            if(record.getMostFishedTileInTrip()== null || discretization.getGroup(
-                    record.getMostFishedTileInTrip()) == null)
-            {
+        if (log.waitingForChoice()) {
+            if (record.getMostFishedTileInTrip() == null || discretization.getGroup(
+                record.getMostFishedTileInTrip()) == null) {
                 log.reset();
-            }
-            else {
+            } else {
                 Preconditions.checkArgument(log != null);
                 Preconditions.checkArgument(switcher != null);
                 Preconditions.checkArgument(discretization != null);
                 Preconditions.checkArgument(record.getMostFishedTileInTrip() != null);
                 Preconditions.checkArgument(discretization.getGroup(
-                        record.getMostFishedTileInTrip()) != null);
+                    record.getMostFishedTileInTrip()) != null);
                 Preconditions.checkArgument(switcher.getArm(discretization.getGroup(
-                        record.getMostFishedTileInTrip())) != null);
+                    record.getMostFishedTileInTrip())) != null);
                 //you have to turn the tile fished into the map group first and then from that to the bandit arm
                 log.recordChoice(
-                        switcher.getArm(
-                                discretization.getGroup(
-                                        record.getMostFishedTileInTrip())
-                        ),
-                        state.getYear(),
-                        state.getDayOfTheYear());
+                    switcher.getArm(
+                        discretization.getGroup(
+                            record.getMostFishedTileInTrip())
+                    ),
+                    state.getYear(),
+                    state.getDayOfTheYear()
+                );
             }
 
         }
         assert !log.waitingForChoice();
-            log.recordInput(inputter.getRegressionInput(this.fisher, state));
-
+        log.recordInput(inputter.getRegressionInput(this.fisher, state));
 
 
     }

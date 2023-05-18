@@ -21,6 +21,11 @@ class FileAndScreenWriter implements InterfaceTextListener, Closeable {
     }
 
     @Override
+    public void println(String str) {
+        print(str + "\n");
+    }
+
+    @Override
     public void print(String str) {
         System.out.println(str);
         try {
@@ -29,11 +34,6 @@ class FileAndScreenWriter implements InterfaceTextListener, Closeable {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    @Override
-    public void println(String str) {
-        print(str + "\n");
     }
 
 }

@@ -23,8 +23,7 @@ package uk.ac.ox.oxfish.geography;
 /**
  * Simple grid distance. Pythagorean
  */
-public class CartesianDistance extends BaseDistance
-{
+public class CartesianDistance extends BaseDistance {
 
 
     final private double gridCellSizeInKm;
@@ -44,6 +43,6 @@ public class CartesianDistance extends BaseDistance
      */
     @Override
     public double distance(int startXGrid, int startYGrid, int endXGrid, int endYGrid) {
-        return gridCellSizeInKm * Math.sqrt(Math.pow(endXGrid-startXGrid,2) + Math.pow(endYGrid-startYGrid,2));
+        return gridCellSizeInKm * Math.sqrt(Math.pow(endXGrid - startXGrid, 2) + Math.pow(endYGrid - startYGrid, 2));
     }
 }

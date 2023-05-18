@@ -46,26 +46,27 @@ public class LogisticClassifierTest {
         Log.info("The logistic regression tested here is just xb=1*id-2*dayOfTheYear");
 
         LogisticClassifier classifier =
-                new LogisticClassifier(
-                        new Pair<>(
-                                (tile, timeOfObservation, agent, model) -> agent.getID(), 1d
-                        ),
-                        new Pair<>(
-                                (tile, timeOfObservation, agent, model) -> model.getDayOfTheYear(), -2d
-                        ));
+            new LogisticClassifier(
+                new Pair<>(
+                    (tile, timeOfObservation, agent, model) -> agent.getID(), 1d
+                ),
+                new Pair<>(
+                    (tile, timeOfObservation, agent, model) -> model.getDayOfTheYear(), -2d
+                )
+            );
 
         //if xb=0 the probability is 1/2
         when(fisher.getID()).thenReturn(0);
         when(state.getDayOfTheYear()).thenReturn(0);
-        assertEquals(classifier.getProbability(fisher, state.getHoursSinceStart(), state, null),.5,.0001 );
+        assertEquals(classifier.getProbability(fisher, state.getHoursSinceStart(), state, null), .5, .0001);
         //if xb=-1 the probability is lower
         when(fisher.getID()).thenReturn(1);
         when(state.getDayOfTheYear()).thenReturn(1);
-        assertEquals(classifier.getProbability(fisher, state.getHoursSinceStart(), state, null),0.2689414,.0001 );
+        assertEquals(classifier.getProbability(fisher, state.getHoursSinceStart(), state, null), 0.2689414, .0001);
         //if xb=1 the probability is higher
         when(fisher.getID()).thenReturn(3);
         when(state.getDayOfTheYear()).thenReturn(1);
-        assertEquals(classifier.getProbability(fisher, state.getHoursSinceStart(), state, null),0.73105,.0001 );
+        assertEquals(classifier.getProbability(fisher, state.getHoursSinceStart(), state, null), 0.73105, .0001);
 
 
     }

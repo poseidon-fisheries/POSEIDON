@@ -26,7 +26,8 @@ import uk.ac.ox.oxfish.model.market.MarketProxy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class SpeciesMarketMappedFactory implements AlgorithmFactory<MarketProxy> {
 
@@ -49,7 +50,7 @@ public class SpeciesMarketMappedFactory implements AlgorithmFactory<MarketProxy>
      *
      * @return Value for property 'markets'.
      */
-    public LinkedHashMap<String,  AlgorithmFactory<? extends Market>> getMarkets() {
+    public LinkedHashMap<String, AlgorithmFactory<? extends Market>> getMarkets() {
         return markets;
     }
 
@@ -59,33 +60,27 @@ public class SpeciesMarketMappedFactory implements AlgorithmFactory<MarketProxy>
      * @param markets Value to set for property 'markets'.
      */
     public void setMarkets(
-            LinkedHashMap<String, ?> markets) {
+        LinkedHashMap<String, ?> markets
+    ) {
 
         //useless cast, but it deals with YAML quirks
-        LinkedHashMap<String,  AlgorithmFactory<? extends Market>> real = new LinkedHashMap<>();
+        LinkedHashMap<String, AlgorithmFactory<? extends Market>> real = new LinkedHashMap<>();
 
-        FishYAML  yaml = new FishYAML();
+        FishYAML yaml = new FishYAML();
 
         //force it to go through YAML
-        for (Map.Entry<String,  ?> entry : markets.entrySet()) {
+        for (Map.Entry<String, ?> entry : markets.entrySet()) {
             Object factory = entry.getValue();
 
             AlgorithmFactory<? extends Market> recast = (AlgorithmFactory<? extends Market>)
-                    yaml.loadAs(yaml.dump(factory), AlgorithmFactory.class);
-            real.put(entry.getKey(),recast);
+                yaml.loadAs(yaml.dump(factory), AlgorithmFactory.class);
+            real.put(entry.getKey(), recast);
 
         }
 
 
-
         this.markets = real;
     }
-
-
-
-
-
-
 
 
 }

@@ -1,12 +1,9 @@
 package uk.ac.ox.oxfish.model.plugins;
 
-import sim.engine.SimState;
-import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.initializers.TowAndAltitudeOutputInitializer;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 
 import javax.annotation.Nullable;
 
@@ -22,12 +19,14 @@ public class TowAndAltitudePlugin implements AdditionalStartable {
     private final String tag;
 
 
-    public TowAndAltitudePlugin(int histogrammerStartYear, String identifier,
-                                @Nullable
-                                String tag) {
+    public TowAndAltitudePlugin(
+        int histogrammerStartYear, String identifier,
+        @Nullable
+        String tag
+    ) {
 
         this.tag = tag;
-        this.delegate = new TowAndAltitudeOutputInitializer(histogrammerStartYear,identifier);
+        this.delegate = new TowAndAltitudeOutputInitializer(histogrammerStartYear, identifier);
     }
 
 
@@ -35,9 +34,9 @@ public class TowAndAltitudePlugin implements AdditionalStartable {
     public void start(FishState model) {
         delegate.start(model);
         for (Fisher fisher : model.getFishers()) {
-            if(tag == null || fisher.getTags().contains(tag)) {
+            if (tag == null || fisher.getTags().contains(tag)) {
 
-                delegate.add(fisher,model);
+                delegate.add(fisher, model);
 
             }
         }

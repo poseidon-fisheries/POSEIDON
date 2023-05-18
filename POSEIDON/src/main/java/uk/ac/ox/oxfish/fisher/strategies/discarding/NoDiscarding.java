@@ -41,13 +41,14 @@ public class NoDiscarding implements DiscardingStrategy {
      * @param hoursSpentFishing how many hours have we spent fishing
      * @param regulation        the regulation the fisher is subject to
      * @param model
-     *@param random @return a catch object holding how much we are actually going to load in the boat. The difference between
-     * what is returned and the 'fishCaught' variable is the implicit discard
+     * @param random            @return a catch object holding how much we are actually going to load in the boat. The difference between
+     *                          what is returned and the 'fishCaught' variable is the implicit discard
      */
     @Override
     public Catch chooseWhatToKeep(
-            SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing, Regulation regulation,
-            FishState model, MersenneTwisterFast random) {
+        SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing, Regulation regulation,
+        FishState model, MersenneTwisterFast random
+    ) {
         return fishCaught;
     }
 

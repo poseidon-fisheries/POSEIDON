@@ -35,7 +35,7 @@ public class RandomAllocator implements BiomassAllocator {
     public RandomAllocator(double maxAllocation, double minAllocation) {
         this.maxAllocation = maxAllocation;
         this.minAllocation = minAllocation;
-        Preconditions.checkArgument(maxAllocation>=minAllocation);
+        Preconditions.checkArgument(maxAllocation >= minAllocation);
     }
 
     /**
@@ -49,7 +49,8 @@ public class RandomAllocator implements BiomassAllocator {
      */
     @Override
     public double allocate(
-            SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
-        return random.nextDouble() * (maxAllocation-minAllocation) + minAllocation;
+        SeaTile tile, NauticalMap map, MersenneTwisterFast random
+    ) {
+        return random.nextDouble() * (maxAllocation - minAllocation) + minAllocation;
     }
 }

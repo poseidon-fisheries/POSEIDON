@@ -44,7 +44,7 @@ public class DepthMPAFactoryTest {
         factory.setMaxDepth(new FixedDoubleParameter(200));
         factory.setMinDepth(new FixedDoubleParameter(0));
         factory.apply(state);
-        for(SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
+        for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
             assertTrue(tile.isProtected());
 
 
@@ -60,7 +60,7 @@ public class DepthMPAFactoryTest {
         factory.setMaxDepth(new FixedDoubleParameter(200));
         factory.setMinDepth(new FixedDoubleParameter(101));
         factory.apply(state);
-        for(SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
+        for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
             assertTrue(!tile.isProtected());
 
 
@@ -76,7 +76,7 @@ public class DepthMPAFactoryTest {
         factory.setMaxDepth(new FixedDoubleParameter(99));
         factory.setMinDepth(new FixedDoubleParameter(0));
         factory.apply(state);
-        for(SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
+        for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
             assertTrue(!tile.isProtected());
 
 

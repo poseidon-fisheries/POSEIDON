@@ -60,6 +60,26 @@ public class StandardIattcRegulationsFactory implements AlgorithmFactory<Multipl
         this.protectedAreasFromFolderFactory = protectedAreasFromFolderFactory;
     }
 
+    @Override
+    public MultipleRegulations apply(FishState fishState) {
+        return new CompositeMultipleRegulationsFactory(
+            ImmutableList.of(
+                new MultipleRegulationsFactory(
+                    ImmutableMap.of(
+                        getElCorralitoReg(), TAG_FOR_ALL,
+                        getClosureAReg(), "closure A",
+                        getClosureBReg(), "closure B"
+                    )
+                ),
+                getProtectedAreasFromFolderFactory()
+            )
+        ).apply(fishState);
+    }
+
+    public AlgorithmFactory<TemporaryRegulation> getElCorralitoReg() {
+        return elCorralitoReg;
+    }
+
     public AlgorithmFactory<TemporaryRegulation> getClosureAReg() {
         return closureAReg;
     }
@@ -78,15 +98,6 @@ public class StandardIattcRegulationsFactory implements AlgorithmFactory<Multipl
         this.closureBReg = closureBReg;
     }
 
-    public AlgorithmFactory<TemporaryRegulation> getElCorralitoReg() {
-        return elCorralitoReg;
-    }
-
-    @SuppressWarnings("unused")
-    public void setElCorralitoReg(AlgorithmFactory<TemporaryRegulation> elCorralitoReg) {
-        this.elCorralitoReg = elCorralitoReg;
-    }
-
     public ProtectedAreasFromFolderFactory getProtectedAreasFromFolderFactory() {
         return protectedAreasFromFolderFactory;
     }
@@ -96,19 +107,8 @@ public class StandardIattcRegulationsFactory implements AlgorithmFactory<Multipl
         this.protectedAreasFromFolderFactory = protectedAreasFromFolderFactory;
     }
 
-    @Override
-    public MultipleRegulations apply(FishState fishState) {
-        return new CompositeMultipleRegulationsFactory(
-            ImmutableList.of(
-                new MultipleRegulationsFactory(
-                    ImmutableMap.of(
-                        getElCorralitoReg(), TAG_FOR_ALL,
-                        getClosureAReg(), "closure A",
-                        getClosureBReg(), "closure B"
-                    )
-                ),
-                getProtectedAreasFromFolderFactory()
-            )
-        ).apply(fishState);
+    @SuppressWarnings("unused")
+    public void setElCorralitoReg(AlgorithmFactory<TemporaryRegulation> elCorralitoReg) {
+        this.elCorralitoReg = elCorralitoReg;
     }
 }

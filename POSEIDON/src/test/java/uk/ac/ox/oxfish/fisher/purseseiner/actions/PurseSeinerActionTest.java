@@ -51,7 +51,10 @@ public class PurseSeinerActionTest {
             .put(map.getSeaTile(17, map.getHeight() - 1), "South")
             .put(map.getSeaTile(map.getWidth() - 1, map.getHeight() - 1), "Southeast")
             .build()
-            .forEach((seaTile, region) -> assertEquals(region, regionalDivision.getRegion(seaTile.getGridLocation()).getName()));
+            .forEach((seaTile, region) -> assertEquals(
+                region,
+                regionalDivision.getRegion(seaTile.getGridLocation()).getName()
+            ));
     }
 
 }

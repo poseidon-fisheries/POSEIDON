@@ -43,19 +43,19 @@ public class RBFNetworkRegressionTest {
 
 
         RBFNetworkRegression regression = new RBFNetworkRegression(
-                new ObservationExtractor[]{
-                        mock(ObservationExtractor.class),
-                        mock(ObservationExtractor.class),
-                        mock(ObservationExtractor.class)
-                },
-                3,
-                new double[]{1,2,3},
-                new double[]{2,3,4},
-                .1,
-                100
+            new ObservationExtractor[]{
+                mock(ObservationExtractor.class),
+                mock(ObservationExtractor.class),
+                mock(ObservationExtractor.class)
+            },
+            3,
+            new double[]{1, 2, 3},
+            new double[]{2, 3, 4},
+            .1,
+            100
         );
 
-        assertEquals(regression.getNetwork().size(),27);
+        assertEquals(regression.getNetwork().size(), 27);
 
     }
 
@@ -65,15 +65,15 @@ public class RBFNetworkRegressionTest {
 
         //if you keep pushing for it, eventually it should learn to predict correctly
         RBFNetworkRegression regression = new RBFNetworkRegression(
-                new ObservationExtractor[]{
-                        new GridXExtractor(),
-                        new GridYExtractor()
-                },
-                5,
-                new double[]{0,0},
-                new double[]{50,50},
-                100,
-                1000
+            new ObservationExtractor[]{
+                new GridXExtractor(),
+                new GridYExtractor()
+            },
+            5,
+            new double[]{0, 0},
+            new double[]{50, 50},
+            100,
+            1000
         );
 
 
@@ -85,13 +85,14 @@ public class RBFNetworkRegressionTest {
         System.out.println(initialPrediction);
         System.out.println(initialError);
 
-        for(int i=0; i<100; i++) {
+        for (int i = 0; i < 100; i++) {
             regression.addObservation(new GeographicalObservation<>(tile, 0, 54d), mock(Fisher.class),
-                                      mock(FishState.class));
+                mock(FishState.class)
+            );
             System.out.println(regression.predict(tile, 0, mock(Fisher.class), mock(FishState.class)));
         }
 
-        assertEquals(54,regression.predict(tile, 0, mock(Fisher.class), mock(FishState.class)),.01);
+        assertEquals(54, regression.predict(tile, 0, mock(Fisher.class), mock(FishState.class)), .01);
 
     }
 }

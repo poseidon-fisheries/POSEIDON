@@ -55,17 +55,17 @@ public class RegulationTest {
 
         Fisher fisher = mock(Fisher.class);
         Regulation regulation = mock(Regulation.class);
-        when(regulation.allowedAtSea(any(),any() )).thenReturn(false); //you can't go out!
+        when(regulation.allowedAtSea(any(), any())).thenReturn(false); //you can't go out!
 
         AtPort port = new AtPort();
         when(fisher.shouldFisherLeavePort(any())).thenReturn(true); //the fisher wants to go out!
-        ActionResult act = port.act(mock(FishState.class), fisher, regulation,1);
+        ActionResult act = port.act(mock(FishState.class), fisher, regulation, 1);
 
         //must be still at port!
         assertTrue(act.getNextState() instanceof AtPort);
         assertFalse(act.isActAgainThisTurn());
         //in fact it should have never even checked if I wanted to leave port
-        verify(fisher,never()).shouldFisherLeavePort(any());
+        verify(fisher, never()).shouldFisherLeavePort(any());
 
     }
 
@@ -87,23 +87,23 @@ public class RegulationTest {
         Regulation regs = mock(Regulation.class);
 
         final Boat mock = mock(Boat.class);
-        when(mock.isFuelEnoughForTrip(anyDouble(),anyDouble())).thenReturn(true);
+        when(mock.isFuelEnoughForTrip(anyDouble(), anyDouble())).thenReturn(true);
         Fisher fisher = new Fisher(0, port, new MersenneTwisterFast(),
-                                   regs,
-                                   mock(DepartingStrategy.class),
-                                   destination,
-                                   mock(FishingStrategy.class), mock(GearStrategy.class),mock(DiscardingStrategy.class) ,
-                                   new IgnoreWeatherStrategy(), mock, mock(Hold.class), mock(Gear.class), 0);
+            regs,
+            mock(DepartingStrategy.class),
+            destination,
+            mock(FishingStrategy.class), mock(GearStrategy.class), mock(DiscardingStrategy.class),
+            new IgnoreWeatherStrategy(), mock, mock(Hold.class), mock(Gear.class), 0
+        );
 
         when(regs.allowedAtSea(fisher, model)).thenReturn(true);
-        fisher.updateDestination(model,mock(Action.class));
-        assertEquals(fisher.getDestination(),destinationTile);
+        fisher.updateDestination(model, mock(Action.class));
+        assertEquals(fisher.getDestination(), destinationTile);
 
         //if i don't allow it though it will return to home
         when(regs.allowedAtSea(fisher, model)).thenReturn(false);
         fisher.updateDestination(model, mock(Action.class));
-        assertEquals(fisher.getDestination(),portTile);
-
+        assertEquals(fisher.getDestination(), portTile);
 
 
     }

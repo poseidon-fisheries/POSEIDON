@@ -21,14 +21,7 @@ package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.heatmaps.BiomassHeatmapGatherer;
-import uk.ac.ox.oxfish.model.data.heatmaps.CatchFromFadSetsHeatmapGatherer;
-import uk.ac.ox.oxfish.model.data.heatmaps.CatchFromUnassociatedSetsHeatmapGatherer;
-import uk.ac.ox.oxfish.model.data.heatmaps.FadDensityHeatmapGatherer;
-import uk.ac.ox.oxfish.model.data.heatmaps.FadDeploymentHeatmapGatherer;
-import uk.ac.ox.oxfish.model.data.heatmaps.FadSetHeatmapGatherer;
-import uk.ac.ox.oxfish.model.data.heatmaps.HeatmapGatherer;
-import uk.ac.ox.oxfish.model.data.heatmaps.NonAssociatedSetHeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.heatmaps.*;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario;
 

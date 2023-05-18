@@ -48,11 +48,13 @@ public class RecruitmentProcessesFactory
     private Supplier<SpeciesCodes> speciesCodesSupplier;
     private GlobalBiology globalBiology;
     private InputPath recruitmentParametersFile;
+
     /**
      * Empty constructor for YAML construction
      */
     public RecruitmentProcessesFactory() {
     }
+
     public RecruitmentProcessesFactory(
         final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputPath recruitmentParametersFile

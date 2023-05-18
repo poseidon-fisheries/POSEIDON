@@ -23,11 +23,10 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 
 /**
  * Simple departing strategy that forces agents to go out only as long as they haven't gone out more than x hours this year.
- *  It isn't meant to be realistic but used when we want to fix effort at a level (for calibration purposes)
+ * It isn't meant to be realistic but used when we want to fix effort at a level (for calibration purposes)
  * Created by carrknight on 3/29/17.
  */
 public class MaxHoursPerYearDepartingStrategy implements DepartingStrategy {
@@ -67,7 +66,9 @@ public class MaxHoursPerYearDepartingStrategy implements DepartingStrategy {
 
     @Override
     public int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random) {
-        return  Math.min(365-model.getDayOfTheYear(),
-                (int)maxHoursOut/24);
+        return Math.min(
+            365 - model.getDayOfTheYear(),
+            (int) maxHoursOut / 24
+        );
     }
 }

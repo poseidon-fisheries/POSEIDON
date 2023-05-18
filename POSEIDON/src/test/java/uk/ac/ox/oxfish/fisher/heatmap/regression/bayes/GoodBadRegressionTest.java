@@ -49,50 +49,62 @@ public class GoodBadRegressionTest {
         when(random.nextDouble()).thenReturn(.5);
 
         GoodBadRegression regression = new GoodBadRegression(
-                state.getMap(),
-                new ManhattanDistance(),
-                random,
-                5,10,2,
-                1,
-                0.1
+            state.getMap(),
+            new ManhattanDistance(),
+            random,
+            5, 10, 2,
+            1,
+            0.1
         );
 
 
-        assertEquals(regression.predict(state.getMap().getSeaTile(25,25),0,mock(Fisher.class), null), 7.5, .001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(25, 25), 0, mock(Fisher.class), null), 7.5, .001);
         //observe a 9
         regression.addObservation(
-                new GeographicalObservation<>(state.getMap().getSeaTile(25,25),0,9d),
-                mock(Fisher.class),mock(FishState.class)
+            new GeographicalObservation<>(state.getMap().getSeaTile(25, 25), 0, 9d),
+            mock(Fisher.class), mock(FishState.class)
         );
 
         //that suggests that this is a good spot!
         //according to R the new probability ought to be .8670358
-        assertEquals(regression.predict(state.getMap().getSeaTile(25,25),0,mock(Fisher.class),null ),
-                     .8670358*10+(1-.8670358)*5,.001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(25, 25), 0, mock(Fisher.class), null),
+            .8670358 * 10 + (1 - .8670358) * 5, .001
+        );
 
         //now what about the neighboring cell?
         //distance = 1, means rbf is 0.3678794
         //so that the std of the observation is 5.436564
         // when all is said and done the probability of being good increases only to 0.5631002
-        assertEquals(regression.predict(state.getMap().getSeaTile(25,24),0,mock(Fisher.class),null ),
-                     0.5631002*10+(1-0.5631002)*5,.001);
-        assertEquals(regression.predict(state.getMap().getSeaTile(24,25),0,mock(Fisher.class),null ),
-                     0.5631002*10+(1-0.5631002)*5,.001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(25, 24), 0, mock(Fisher.class), null),
+            0.5631002 * 10 + (1 - 0.5631002) * 5, .001
+        );
+        assertEquals(regression.predict(state.getMap().getSeaTile(24, 25), 0, mock(Fisher.class), null),
+            0.5631002 * 10 + (1 - 0.5631002) * 5, .001
+        );
 
         //at distance of 2 the probability moved only to 0.5001572
-        assertEquals(regression.predict(state.getMap().getSeaTile(24,24),0,mock(Fisher.class),null ),
-                     0.5001572*10+(1-0.5001572)*5,.001);
-        assertEquals(regression.predict(state.getMap().getSeaTile(23,25),0,mock(Fisher.class),null ),
-                     0.5001572*10+(1-0.5001572)*5,.001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(24, 24), 0, mock(Fisher.class), null),
+            0.5001572 * 10 + (1 - 0.5001572) * 5, .001
+        );
+        assertEquals(regression.predict(state.getMap().getSeaTile(23, 25), 0, mock(Fisher.class), null),
+            0.5001572 * 10 + (1 - 0.5001572) * 5, .001
+        );
 
 
         //if I step very many times the probabilities go back to being about the same
-        for(int i=0; i<100; i++) {
+        for (int i = 0; i < 100; i++) {
             regression.step(state);
-            System.out.println(regression.predict(state.getMap().getSeaTile(25,25),0,mock(Fisher.class),mock(FishState.class) ));
+            System.out.println(regression.predict(state.getMap().getSeaTile(25, 25),
+                0,
+                mock(Fisher.class),
+                mock(FishState.class)));
         }
-        assertEquals(regression.predict(state.getMap().getSeaTile(25,25),0,mock(Fisher.class),mock(FishState.class)  ),
-                     .5*10+(1-.5)*5,.001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(25, 25),
+                0,
+                mock(Fisher.class),
+                mock(FishState.class)),
+            .5 * 10 + (1 - .5) * 5, .001
+        );
     }
 
     @Test
@@ -107,32 +119,36 @@ public class GoodBadRegressionTest {
         when(random.nextDouble()).thenReturn(.5);
 
         GoodBadRegression regression = new GoodBadRegression(
-                state.getMap(),
-                new ManhattanDistance(),
-                random,
-                5,10,2,
-                1,
-                0.1
+            state.getMap(),
+            new ManhattanDistance(),
+            random,
+            5, 10, 2,
+            1,
+            0.1
         );
 
 
-        assertEquals(regression.predict(state.getMap().getSeaTile(25,25),0,mock(Fisher.class), null), 7.5, .001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(25, 25), 0, mock(Fisher.class), null), 7.5, .001);
         //observe a 9
         regression.addObservation(
-                new GeographicalObservation<>(state.getMap().getSeaTile(25,25),0,9d),
-                mock(Fisher.class),mock(FishState.class)
+            new GeographicalObservation<>(state.getMap().getSeaTile(25, 25), 0, 9d),
+            mock(Fisher.class), mock(FishState.class)
         );
 
         //that suggests that this is a good spot!
         //according to R the new probability ought to be .8670358
-        assertEquals(regression.predict(state.getMap().getSeaTile(25,25),0,mock(Fisher.class),null ),
-                     .8670358*10+(1-.8670358)*5,.001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(25, 25), 0, mock(Fisher.class), null),
+            .8670358 * 10 + (1 - .8670358) * 5, .001
+        );
 
         regression.addObservation(
-                new GeographicalObservation<>(state.getMap().getSeaTile(25,25),0,9d),
-                mock(Fisher.class),mock(FishState.class)
+            new GeographicalObservation<>(state.getMap().getSeaTile(25, 25), 0, 9d),
+            mock(Fisher.class), mock(FishState.class)
         );
-        assertTrue(regression.predict(state.getMap().getSeaTile(25,25),0,mock(Fisher.class),null ) >.8670358*10+(1-.8670358)*5
+        assertTrue(regression.predict(state.getMap().getSeaTile(25, 25),
+            0,
+            mock(Fisher.class),
+            null) > .8670358 * 10 + (1 - .8670358) * 5
         );
     }
 }

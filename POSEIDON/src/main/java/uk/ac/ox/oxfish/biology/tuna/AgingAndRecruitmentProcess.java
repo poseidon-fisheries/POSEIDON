@@ -18,17 +18,18 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static java.util.stream.IntStream.range;
-
 import com.google.common.collect.ImmutableMap;
-import java.util.Collection;
-import java.util.Map;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.complicated.StandardAgingProcess;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.Collection;
+import java.util.Map;
+
+import static java.util.stream.IntStream.range;
 
 /**
  * This is just a wrapper around {@link StandardAgingProcess} that turns it into a {@link

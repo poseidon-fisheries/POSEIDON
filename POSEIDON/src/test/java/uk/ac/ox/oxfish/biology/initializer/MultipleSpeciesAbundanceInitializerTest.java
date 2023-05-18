@@ -41,62 +41,84 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 
-public class MultipleSpeciesAbundanceInitializerTest
-{
+public class MultipleSpeciesAbundanceInitializerTest {
 
 
     @Test
     public void uniformDistribution() throws Exception {
 
-        Path testInput = Paths.get("inputs", "tests", "abundance", "fake");
+        final Path testInput = Paths.get("inputs", "tests", "abundance", "fake");
         Log.info("I pass the directory " + testInput + " to the multiple species initializer. That directory contains a fake simple species of which I know all the characteristic" +
-                         "and I make sure the initializer instantiates correctly when the allocator is uniform.");
+            "and I make sure the initializer instantiates correctly when the allocator is uniform.");
 
         //create an initializer (scales to double the number from file)
-        LinkedHashMap<String,Path> directories= new LinkedHashMap<>();
-        directories.put("fake",testInput);
-        MultipleSpeciesAbundanceInitializer initializer = new MultipleSpeciesAbundanceInitializer(
-                directories, 2.0, true, false, false, true);
+        final LinkedHashMap<String, Path> directories = new LinkedHashMap<>();
+        directories.put("fake", testInput);
+        final MultipleSpeciesAbundanceInitializer initializer = new MultipleSpeciesAbundanceInitializer(
+            directories, 2.0, true, false, false, true);
         //create biology object
-        GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
+        final GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
         //check that name and meristics are correct
-        assertEquals(1,biology.getSpecies().size());
-        Species fakeSpecies = biology.getSpecie(0);
+        assertEquals(1, biology.getSpecies().size());
+        final Species fakeSpecies = biology.getSpecie(0);
         assertEquals("fake", fakeSpecies.getName());
-        assertEquals(3, fakeSpecies.getNumberOfBins()-1);
+        assertEquals(3, fakeSpecies.getNumberOfBins() - 1);
 
 
         //create a 4x4 map of the world.
-        FishState model = MovingTest.generateSimple4x4Map();
+        final FishState model = MovingTest.generateSimple4x4Map();
         //put biology in there
-        NauticalMap map = model.getMap();
-        for(SeaTile element : map.getAllSeaTilesAsList())
-        {
+        final NauticalMap map = model.getMap();
+        for (final SeaTile element : map.getAllSeaTilesAsList()) {
             element.setBiology(initializer.generateLocal(biology,
-                                                         element, new MersenneTwisterFast(),4, 4,                                          mock(NauticalMap.class)
+                element, new MersenneTwisterFast(), 4, 4, mock(NauticalMap.class)
             )); //put new biology in
         }
         //force it to process the map uniformly
-        initializer.putAllocator(fakeSpecies,
-                                 seaTile -> 1d/16d);
+        initializer.putAllocator(
+            fakeSpecies,
+            seaTile -> 1d / 16d
+        );
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
-        assertEquals(200,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
-        assertEquals(200,map.getSeaTile(1,1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
-        assertEquals(200,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
-        assertEquals(250,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],.001);
-        assertEquals(250, map.getSeaTile(1,1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0], .001);
-        assertEquals(250,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],.001);
-        assertEquals(325,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],.001);
-        assertEquals(325,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],.001);
+        assertEquals(
+            200,
+            map.getSeaTile(0, 0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],
+            .001
+        );
+        assertEquals(
+            200,
+            map.getSeaTile(1, 1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],
+            .001
+        );
+        assertEquals(
+            200,
+            map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],
+            .001
+        );
+        assertEquals(250, map.getSeaTile(0, 0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0], .001);
+        assertEquals(250, map.getSeaTile(1, 1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0], .001);
+        assertEquals(250, map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0], .001);
+        assertEquals(
+            325,
+            map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],
+            .001
+        );
+        assertEquals(
+            325,
+            map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],
+            .001
+        );
 
         //force it to put everything in tile 1,1
-        initializer.putAllocator(fakeSpecies,
-                                 seaTile -> {
-                                     if(seaTile.getGridX()==1 && seaTile.getGridY()==1)
-                                         return 1d;
-                                     else
-                                         return 0d;
-                                 });
+        initializer.putAllocator(
+            fakeSpecies,
+            seaTile -> {
+                if (seaTile.getGridX() == 1 && seaTile.getGridY() == 1)
+                    return 1d;
+                else
+                    return 0d;
+            }
+        );
 
     }
 
@@ -104,47 +126,56 @@ public class MultipleSpeciesAbundanceInitializerTest
     @Test
     public void allInOne() throws Exception {
 
-        Path testInput = Paths.get("inputs", "tests", "abundance", "fake");
+        final Path testInput = Paths.get("inputs", "tests", "abundance", "fake");
         Log.info("I pass the directory " + testInput + " to the multiple species initializer. That directory contains a fake simple species of which I know all the characteristic" +
-                         "and I make sure the initializer instantiates correctly when the allocator wants everything to be at 1,1");
+            "and I make sure the initializer instantiates correctly when the allocator wants everything to be at 1,1");
 
         //create an initializer (scales to double the number from file)
-        LinkedHashMap<String,Path> directories= new LinkedHashMap<>();
-        directories.put("fake",testInput);
-        MultipleSpeciesAbundanceInitializer initializer = new MultipleSpeciesAbundanceInitializer(
-                directories, 2.0, true, false, false, true);
+        final LinkedHashMap<String, Path> directories = new LinkedHashMap<>();
+        directories.put("fake", testInput);
+        final MultipleSpeciesAbundanceInitializer initializer = new MultipleSpeciesAbundanceInitializer(
+            directories, 2.0, true, false, false, true);
         //create biology object
-        GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
+        final GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
         //check that name and meristics are correct
-        assertEquals(1,biology.getSpecies().size());
-        Species fakeSpecies = biology.getSpecie(0);
+        assertEquals(1, biology.getSpecies().size());
+        final Species fakeSpecies = biology.getSpecie(0);
         assertEquals("fake", fakeSpecies.getName());
-        assertEquals(3, fakeSpecies.getNumberOfBins()-1);
+        assertEquals(3, fakeSpecies.getNumberOfBins() - 1);
 
 
         //create a 4x4 map of the world.
-        FishState model = MovingTest.generateSimple4x4Map();
+        final FishState model = MovingTest.generateSimple4x4Map();
         //put biology in there
-        NauticalMap map = model.getMap();
-        for(SeaTile element : map.getAllSeaTilesAsList())
-        {
+        final NauticalMap map = model.getMap();
+        for (final SeaTile element : map.getAllSeaTilesAsList()) {
             element.setBiology(initializer.generateLocal(biology,
-                                                         element, new MersenneTwisterFast(),4, 4,                                          mock(NauticalMap.class)
+                element, new MersenneTwisterFast(), 4, 4, mock(NauticalMap.class)
             )); //put new biology in
         }
         //force it to put everything in tile 1,1
-        initializer.putAllocator(fakeSpecies,
-                                 seaTile -> {
-                                     if(seaTile.getGridX()==1 && seaTile.getGridY()==1)
-                                         return 1d;
-                                     else
-                                         return 0d;
-                                 });
+        initializer.putAllocator(
+            fakeSpecies,
+            seaTile -> {
+                if (seaTile.getGridX() == 1 && seaTile.getGridY() == 1)
+                    return 1d;
+                else
+                    return 0d;
+            }
+        );
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
-        assertTrue(map.getSeaTile(0,0).getBiology() instanceof EmptyLocalBiology);
-        assertEquals(1600*2,map.getSeaTile(1,1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
-        assertTrue(map.getSeaTile(2,3).getBiology() instanceof EmptyLocalBiology);
-        assertEquals(2000*2,map.getSeaTile(1,1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],.001);
+        assertTrue(map.getSeaTile(0, 0).getBiology() instanceof EmptyLocalBiology);
+        assertEquals(
+            1600 * 2,
+            map.getSeaTile(1, 1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],
+            .001
+        );
+        assertTrue(map.getSeaTile(2, 3).getBiology() instanceof EmptyLocalBiology);
+        assertEquals(
+            2000 * 2,
+            map.getSeaTile(1, 1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],
+            .001
+        );
 
     }
 

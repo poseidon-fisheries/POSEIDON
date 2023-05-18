@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.model.regs;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.strategies.departing.MaxHoursPerYearDepartingStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -46,8 +45,9 @@ public class MaxHoursOutRegulation implements Regulation {
 
     /**
      * can the agent fish at this location?
+     *
      * @param agent the agent that wants to fish
-     * @param tile the tile the fisher is trying to fish on
+     * @param tile  the tile the fisher is trying to fish on
      * @param model a link to the model
      * @return true if the fisher can fish
      */
@@ -58,9 +58,10 @@ public class MaxHoursOutRegulation implements Regulation {
 
     /**
      * how much of this species biomass is sellable. Zero means it is unsellable
-     * @param agent the fisher selling its catch
+     *
+     * @param agent   the fisher selling its catch
      * @param species the species we are being asked about
-     * @param model a link to the model
+     * @param model   a link to the model
      * @return a positive biomass if it sellable. Zero if you need to throw everything away
      */
     @Override
@@ -70,45 +71,63 @@ public class MaxHoursOutRegulation implements Regulation {
 
     /**
      * Can this fisher be at sea?
+     *
      * @param fisher the  fisher
-     * @param model the model
+     * @param model  the model
      * @return true if it can be out. When it's false the fisher can't leave port and ought to go back to port if he is
      * at sea
      */
     @Override
     public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
         return fisher.getHoursAtSeaThisYear() < maxHoursOut &&
-        delegate.allowedAtSea(fisher, model, timeStep);
+            delegate.allowedAtSea(fisher, model, timeStep);
     }
 
     /**
      * tell the regulation object this much has been caught
-     * @param where where the fishing occurred
-     * @param who who did the fishing
-     * @param fishCaught catch object
+     *
+     * @param where             where the fishing occurred
+     * @param who               who did the fishing
+     * @param fishCaught        catch object
      * @param fishRetained
      * @param hoursSpentFishing how many hours were spent fishing
      */
     @Override
     public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model, int timeStep) {
+        SeaTile where,
+        Fisher who,
+        Catch fishCaught,
+        Catch fishRetained,
+        int hoursSpentFishing,
+        FishState model,
+        int timeStep
+    ) {
         delegate.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
     }
 
     /**
      * tell the regulation object this much of this species has been sold
+     *
      * @param species the species of fish sold
-     * @param seller agent selling the fish
+     * @param seller  agent selling the fish
      * @param biomass how much biomass has been sold
      * @param revenue how much money was made off it
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
+    public void reactToSale(
+        Species species,
+        Fisher seller,
+        double biomass,
+        double revenue,
+        FishState model,
+        int timeStep
+    ) {
         delegate.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 
     /**
      * returns a copy of the regulation, used defensively
+     *
      * @return
      */
     @Override

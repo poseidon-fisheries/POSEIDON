@@ -18,21 +18,22 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.ImmutableDoubleArray;
 import ec.util.MersenneTwisterFast;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingProportionFilter;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 public class AbundanceCatchSampler extends CatchSampler<AbundanceLocalBiology> {
 
@@ -61,14 +62,10 @@ public class AbundanceCatchSampler extends CatchSampler<AbundanceLocalBiology> {
         // ...and then check that this maximum abundance contains enough biomass
         // to satisfy the desired catch for all species.
         boolean isThereEnough = species().allMatch(species ->
-                                               catchArray.get(species.getIndex()) <= catchableAbundance.getBiomass(
-                                                       species)
+            catchArray.get(species.getIndex()) <= catchableAbundance.getBiomass(
+                species)
         );
         return isThereEnough;
-    }
-
-    private Stream<Species> species() {
-        return selectivityFilters.keySet().stream();
     }
 
     private static AbundanceLocalBiology filterAbundance(
@@ -89,6 +86,10 @@ public class AbundanceCatchSampler extends CatchSampler<AbundanceLocalBiology> {
         );
     }
 
+    private Stream<Species> species() {
+        return selectivityFilters.keySet().stream();
+    }
+
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public AbundanceLocalBiology apply(final AbundanceLocalBiology sourceBiology) {
@@ -103,11 +104,11 @@ public class AbundanceCatchSampler extends CatchSampler<AbundanceLocalBiology> {
                 Function.identity(),
                 species -> {
                     double proportion = desiredCatch.get(species.getIndex()) /
-                            catchableAbundance.getBiomass(species);
-                    if(Double.isNaN(proportion))
+                        catchableAbundance.getBiomass(species);
+                    if (Double.isNaN(proportion))
                         proportion = 0;
                     return new NonMutatingProportionFilter(
-                            proportion
+                        proportion
                     ).filter(species, catchableAbundance.getAbundance(species).asMatrix());
                 }
             ))

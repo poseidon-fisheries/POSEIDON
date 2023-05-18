@@ -25,9 +25,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.Gatherer;
-import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.util.LinkedList;
@@ -38,7 +36,6 @@ import java.util.List;
  * pointless in many headless simulations where we don't really look at daily steps change anyway
  */
 public class AdditionalFishStateDailyCollectors implements AdditionalStartable {
-
 
 
     private List<String> gatherersMade = new LinkedList<>();
@@ -59,22 +56,22 @@ public class AdditionalFishStateDailyCollectors implements AdditionalStartable {
 
         this.model = model;
 
-        for(Species species : model.getSpecies())
-        {
+        for (Species species : model.getSpecies()) {
 
             String title = "Biomass " + species.getName();
-            model.getDailyDataSet().registerGatherer(title,
-                                                     new Gatherer<FishState>() {
-                                 @Override
-                                 public Double apply(FishState state) {
-                                     return state.getTotalBiomass(species);
+            model.getDailyDataSet().registerGatherer(
+                title,
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState state) {
+                        return state.getTotalBiomass(species);
 
-                                 }
-                             },
-                                                     0d);
+                    }
+                },
+                0d
+            );
             gatherersMade.add(title);
         }
-
 
 
         model.getDailyDataSet().registerGatherer("Average Cash-Flow", new Gatherer<FishState>() {
@@ -95,13 +92,12 @@ public class AdditionalFishStateDailyCollectors implements AdditionalStartable {
         }, 0d);
 
 
-
         //fishers who are actually out
         model.getDailyDataSet().registerGatherer("Fishers at Sea", new Gatherer<FishState>() {
             @Override
             public Double apply(FishState ignored) {
                 return model.getFishers().stream().mapToDouble(
-                        value -> value.getLocation().equals(value.getHomePort().getLocation()) ? 0 : 1).sum();
+                    value -> value.getLocation().equals(value.getHomePort().getLocation()) ? 0 : 1).sum();
             }
         }, 0d);
 
@@ -151,16 +147,14 @@ public class AdditionalFishStateDailyCollectors implements AdditionalStartable {
     @Override
     public void turnOff() {
 
-        if(this.model == null)
+        if (this.model == null)
             return;
 
 
-        for(String gatherer : gatherersMade)
+        for (String gatherer : gatherersMade)
             model.getDailyDataSet().removeGatherer(gatherer);
 
-        model =null;
-
-
+        model = null;
 
 
     }

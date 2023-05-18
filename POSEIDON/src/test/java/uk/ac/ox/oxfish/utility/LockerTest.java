@@ -34,13 +34,13 @@ public class LockerTest {
     public void locker() throws Exception {
 
 
-        Locker<String,String> locker = new Locker<>();
+        final Locker<String, String> locker = new Locker<>();
         String item = locker.presentKey("key", () -> "old_item");
-        assertEquals(item,"old_item");
+        assertEquals(item, "old_item");
         item = locker.presentKey("key", () -> "other_item");
-        assertEquals(item,"old_item");
+        assertEquals(item, "old_item");
         item = locker.presentKey("new_key", () -> "new_item");
-        assertEquals(item,"new_item");
+        assertEquals(item, "new_item");
 
 
     }

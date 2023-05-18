@@ -46,49 +46,50 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
 
 
     public PlanningHeatmapDestinationStrategy(
-            ProfitFunctionRegression profitRegression,
-            AcquisitionFunction acquisition, boolean ignoreFailedTrips,
-            AdaptationProbability probability,
-            NauticalMap map, MersenneTwisterFast random, int stepSize) {
+        ProfitFunctionRegression profitRegression,
+        AcquisitionFunction acquisition, boolean ignoreFailedTrips,
+        AdaptationProbability probability,
+        NauticalMap map, MersenneTwisterFast random, int stepSize
+    ) {
         super(profitRegression, acquisition, ignoreFailedTrips, probability, map, random, stepSize, null);
         this.regression = profitRegression;
 
     }
 
 
-
     public static PlanningHeatmapDestinationStrategy AlmostPerfectKnowledge(
-            double maxHours, int numberOfSpecies,
-            AcquisitionFunction acquisition, boolean ignoreFailedTrips,
-            AdaptationProbability probability,
-            NauticalMap map, MersenneTwisterFast random, int stepSize,
-            GlobalBiology biology){
+        double maxHours, int numberOfSpecies,
+        AcquisitionFunction acquisition, boolean ignoreFailedTrips,
+        AdaptationProbability probability,
+        NauticalMap map, MersenneTwisterFast random, int stepSize,
+        GlobalBiology biology
+    ) {
 
         GeographicalRegression<Double>[] catches = new GeographicalRegression[numberOfSpecies];
-        for(int i=0; i<catches.length; i++)
-            catches[i]= new AlmostPerfectKnowledgeRegression(i,biology);
+        for (int i = 0; i < catches.length; i++)
+            catches[i] = new AlmostPerfectKnowledgeRegression(i, biology);
         return new PlanningHeatmapDestinationStrategy(
-                new ProfitFunctionRegression(
-                        new ProfitFunction(maxHours),
-                        catches
+            new ProfitFunctionRegression(
+                new ProfitFunction(maxHours),
+                catches
 
-                ),
-                acquisition,ignoreFailedTrips,probability,map,random,stepSize
+            ),
+            acquisition, ignoreFailedTrips, probability, map, random, stepSize
         );
     }
 
 
-
-
     @Override
     protected void learnFromTripRecord(
-            TripRecord record, SeaTile mostFishedTile, Fisher fisherThatMadeTheTrip, FishState model) {
+        TripRecord record, SeaTile mostFishedTile, Fisher fisherThatMadeTheTrip, FishState model
+    ) {
 
-         regression.addObservation(
-                 new GeographicalObservation<>(mostFishedTile,model.getHoursSinceStart(),
-                                              record),
-                 fisherThatMadeTheTrip, model
-         );
+        regression.addObservation(
+            new GeographicalObservation<>(mostFishedTile, model.getHoursSinceStart(),
+                record
+            ),
+            fisherThatMadeTheTrip, model
+        );
 
     }
 
@@ -105,8 +106,7 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
      * for now this class stays here as it really makes sense when used in this context and no other but might
      * make it more generic later
      */
-    private static class AlmostPerfectKnowledgeRegression implements GeographicalRegression<Double>
-    {
+    private static class AlmostPerfectKnowledgeRegression implements GeographicalRegression<Double> {
 
         private final int speciesIndex;
 
@@ -120,14 +120,15 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
 
         @Override
         public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
-            return fisher.getGear().expectedHourlyCatch(fisher,tile,1,biology)[speciesIndex];
+            return fisher.getGear().expectedHourlyCatch(fisher, tile, 1, biology)[speciesIndex];
         }
 
 
         //ignored
         @Override
         public void addObservation(
-                GeographicalObservation<Double> observation, Fisher fisher, FishState model) {
+            GeographicalObservation<Double> observation, Fisher fisher, FishState model
+        ) {
 
         }
 
@@ -135,7 +136,7 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
          * ignored
          */
         @Override
-        public void start(FishState model,Fisher fisher) {
+        public void start(FishState model, Fisher fisher) {
 
         }
 
@@ -152,7 +153,8 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
          */
         @Override
         public double extractNumericalYFromObservation(
-                GeographicalObservation<Double> observation, Fisher fisher) {
+            GeographicalObservation<Double> observation, Fisher fisher
+        ) {
             return observation.getValue();
         }
 

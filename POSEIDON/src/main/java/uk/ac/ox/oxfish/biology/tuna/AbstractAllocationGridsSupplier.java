@@ -95,37 +95,6 @@ abstract class AbstractAllocationGridsSupplier<K>
         return cache.getUnchecked(this);
     }
 
-    private static DoubleGrid2D makeGrid(
-            final MapExtent mapExtent,
-            final Iterable<? extends Record> records, final boolean normalize
-    ) {
-        final DoubleGrid2D grid = new DoubleGrid2D(
-            mapExtent.getGridWidth(),
-            mapExtent.getGridHeight()
-        );
-        records.forEach(record -> {
-            final double lon = record.getDouble("lon");
-            final double lat = record.getDouble("lat");
-            final int x = mapExtent.toGridX(lon);
-            final int y = mapExtent.toGridY(lat);
-            if (x < grid.getWidth() && y < grid.getHeight() &&
-                x >= 0 && y >= 0) {
-                grid.set(
-                    x,
-                    y,
-                    record.getDouble("value")
-                );
-            } else {
-                //System.err.println( "grid cannot include the point at " + lon + "," + lat + " because it is out of bounds");
-            }
-        });
-        if(normalize){
-        return normalize(grid);}
-        return grid;
-    }
-
-    abstract K extractKeyFromRecord(SpeciesCodes speciesCodes, Record record);
-
     private AllocationGrids<K> readGridsFromFile() {
 
         checkNotNull(this.gridsFilePath);
@@ -161,6 +130,38 @@ abstract class AbstractAllocationGridsSupplier<K>
                 )),
             period
         );
+    }
+
+    abstract K extractKeyFromRecord(SpeciesCodes speciesCodes, Record record);
+
+    private static DoubleGrid2D makeGrid(
+        final MapExtent mapExtent,
+        final Iterable<? extends Record> records, final boolean normalize
+    ) {
+        final DoubleGrid2D grid = new DoubleGrid2D(
+            mapExtent.getGridWidth(),
+            mapExtent.getGridHeight()
+        );
+        records.forEach(record -> {
+            final double lon = record.getDouble("lon");
+            final double lat = record.getDouble("lat");
+            final int x = mapExtent.toGridX(lon);
+            final int y = mapExtent.toGridY(lat);
+            if (x < grid.getWidth() && y < grid.getHeight() &&
+                x >= 0 && y >= 0) {
+                grid.set(
+                    x,
+                    y,
+                    record.getDouble("value")
+                );
+            } else {
+                //System.err.println( "grid cannot include the point at " + lon + "," + lat + " because it is out of bounds");
+            }
+        });
+        if (normalize) {
+            return normalize(grid);
+        }
+        return grid;
     }
 
     /**

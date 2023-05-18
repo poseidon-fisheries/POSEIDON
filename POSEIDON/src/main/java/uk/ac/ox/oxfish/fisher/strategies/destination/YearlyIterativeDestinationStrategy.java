@@ -36,8 +36,7 @@ import java.util.function.Predicate;
  * to decide whether the new sea-patch is better than the one before
  * Created by carrknight on 6/17/15.
  */
-public class YearlyIterativeDestinationStrategy implements DestinationStrategy
-{
+public class YearlyIterativeDestinationStrategy implements DestinationStrategy {
 
 
     /**
@@ -45,58 +44,49 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy
      */
     private final FavoriteDestinationStrategy delegate;
     private final DefaultBeamHillClimbing adaptationAlgorithm;
-
+    private final ExploreImitateAdaptation<SeaTile> algorithm;
     /**
      * the previous location tried
      */
     private SeaTile previousLocation = null;
-
     /**
      * the changes in cash when we tried the previous location
      */
-    private double previousYearCashFlow =  Double.NaN;
+    private double previousYearCashFlow = Double.NaN;
 
 
-
-
-
-
-    private final ExploreImitateAdaptation<SeaTile> algorithm;
-
+    public YearlyIterativeDestinationStrategy(
+        FavoriteDestinationStrategy delegate, int stepSize, int attempts
+    ) {
+        this.delegate = delegate;
+        adaptationAlgorithm = new DefaultBeamHillClimbing(stepSize, attempts);
+        this.algorithm = new ExploreImitateAdaptation<SeaTile>(
+            fisher -> fisher.getDailyData().numberOfObservations() > 360,
+            adaptationAlgorithm,
+            (fisher, change, model) -> delegate.setFavoriteSpot(change),
+            fisher -> delegate.getFavoriteSpot(),
+            new CashFlowObjective(360),
+            1d, 0d, new Predicate<SeaTile>() {
+            @Override
+            public boolean test(SeaTile a) {
+                return true;
+            }
+        }
+        );
+    }
 
     /**
      * starts a per-trip adaptation
      */
     @Override
     public void start(FishState model, Fisher fisher) {
-        delegate.start(model,fisher);
+        delegate.start(model, fisher);
         fisher.addYearlyAdaptation(algorithm);
     }
 
-
-    public YearlyIterativeDestinationStrategy(
-            FavoriteDestinationStrategy delegate, int stepSize, int attempts)
-    {
-        this.delegate = delegate;
-        adaptationAlgorithm = new DefaultBeamHillClimbing(stepSize, attempts);
-        this.algorithm = new ExploreImitateAdaptation<SeaTile>(
-                fisher -> fisher.getDailyData().numberOfObservations() > 360,
-                adaptationAlgorithm,
-                (fisher, change, model) -> delegate.setFavoriteSpot(change),
-                fisher -> delegate.getFavoriteSpot(),
-                new CashFlowObjective(360),
-                1d, 0d, new Predicate<SeaTile>() {
-                    @Override
-                    public boolean test(SeaTile a) {
-                        return true;
-                    }
-                });
-    }
-
-
-
     /**
      * tell the startable to turnoff
+     *
      * @param fisher
      */
     @Override
@@ -114,9 +104,10 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy
      */
     @Override
     public SeaTile chooseDestination(
-            Fisher fisher, MersenneTwisterFast random,
-            FishState model,
-            Action currentAction) {
+        Fisher fisher, MersenneTwisterFast random,
+        FishState model,
+        Action currentAction
+    ) {
         return delegate.chooseDestination(fisher, random, model, currentAction);
     }
 

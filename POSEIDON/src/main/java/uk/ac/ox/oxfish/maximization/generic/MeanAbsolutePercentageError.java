@@ -25,11 +25,16 @@ public class MeanAbsolutePercentageError implements DoubleBinaryOperator {
 
     private final double weight;
 
-    public MeanAbsolutePercentageError() { this(1); }
+    public MeanAbsolutePercentageError() {
+        this(1);
+    }
 
-    public MeanAbsolutePercentageError(final double weight) { this.weight = weight; }
+    public MeanAbsolutePercentageError(final double weight) {
+        this.weight = weight;
+    }
 
-    @Override public double applyAsDouble(final double left, final double right) {
+    @Override
+    public double applyAsDouble(final double left, final double right) {
         return 0;
     }
 

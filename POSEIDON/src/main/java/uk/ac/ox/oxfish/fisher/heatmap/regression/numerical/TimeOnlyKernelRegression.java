@@ -30,6 +30,6 @@ public class TimeOnlyKernelRegression extends AbstractKernelRegression {
 
     @Override
     protected double distance(double fromX, double fromY, double fromTime, double toX, double toY, double toTime) {
-        return Math.abs(fromTime-toTime);
+        return Math.abs(fromTime - toTime);
     }
 }

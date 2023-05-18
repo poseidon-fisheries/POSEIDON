@@ -25,8 +25,7 @@ package uk.ac.ox.oxfish.fisher.equipment;
  * utility methods to compute gas consumption
  * Created by carrknight on 7/15/15.
  */
-public class Engine
-{
+public class Engine {
 
     /**
      * the power of the engine in bhp. Unused.
@@ -60,9 +59,8 @@ public class Engine
     }
 
 
-    public double getGasConsumptionPerKm(double KmTravelled)
-    {
-        return efficiencyAsLitersPerKm *KmTravelled;
+    public double getGasConsumptionPerKm(double KmTravelled) {
+        return efficiencyAsLitersPerKm * KmTravelled;
     }
 
     public double getSpeedInKph() {

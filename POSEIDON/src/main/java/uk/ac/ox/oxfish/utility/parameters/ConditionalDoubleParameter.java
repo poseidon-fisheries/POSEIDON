@@ -41,7 +41,7 @@ public class ConditionalDoubleParameter implements DoubleParameter {
 
     @Override
     public DoubleParameter makeCopy() {
-        return new ConditionalDoubleParameter(active,value.makeCopy());
+        return new ConditionalDoubleParameter(active, value.makeCopy());
     }
 
     /**
@@ -52,7 +52,7 @@ public class ConditionalDoubleParameter implements DoubleParameter {
      */
     @Override
     public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast) {
-        if(active)
+        if (active)
             return value.applyAsDouble(mersenneTwisterFast);
         else
             return Double.NaN;

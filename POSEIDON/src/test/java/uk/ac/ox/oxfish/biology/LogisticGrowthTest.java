@@ -29,27 +29,29 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 
-public class LogisticGrowthTest
-{
+public class LogisticGrowthTest {
     @Test
     public void logisticGrowthWorks() throws Exception {
 
-        BiomassLocalBiology bio = new BiomassLocalBiology(
-                new double[]{100d,200d,0d}, new double[]{100d,400d,0d}
+        final BiomassLocalBiology bio = new BiomassLocalBiology(
+            new double[]{100d, 200d, 0d}, new double[]{100d, 400d, 0d}
         );
-        Species species0 = new Species("0"); species0.resetIndexTo(0);
-        Species species1 = new Species("1"); species1.resetIndexTo(1);
-        Species species2 = new Species("2"); species2.resetIndexTo(2);
+        final Species species0 = new Species("0");
+        species0.resetIndexTo(0);
+        final Species species1 = new Species("1");
+        species1.resetIndexTo(1);
+        final Species species2 = new Species("2");
+        species2.resetIndexTo(2);
 
 
-        IndependentLogisticBiomassGrower grower0 =
-                new IndependentLogisticBiomassGrower(.5,species0);
+        final IndependentLogisticBiomassGrower grower0 =
+            new IndependentLogisticBiomassGrower(.5, species0);
         grower0.getBiologies().add(bio);
-        IndependentLogisticBiomassGrower grower1 =
-                new IndependentLogisticBiomassGrower(.5,species1);
+        final IndependentLogisticBiomassGrower grower1 =
+            new IndependentLogisticBiomassGrower(.5, species1);
         grower1.getBiologies().add(bio);
-        IndependentLogisticBiomassGrower grower2 =
-                new IndependentLogisticBiomassGrower(.5,species2);
+        final IndependentLogisticBiomassGrower grower2 =
+            new IndependentLogisticBiomassGrower(.5, species2);
         grower2.getBiologies().add(bio);
 
         assertEquals(100, bio.getBiomass(species0), .1);
@@ -57,8 +59,8 @@ public class LogisticGrowthTest
         assertEquals(0, bio.getBiomass(species2), .1);
 
         //grow it
-        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
-        when(model.getSpecies()).thenReturn(Lists.newArrayList(species0,species1,species2));
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        when(model.getSpecies()).thenReturn(Lists.newArrayList(species0, species1, species2));
         grower0.step(model);
         grower1.step(model);
         grower2.step(model);
@@ -81,16 +83,19 @@ public class LogisticGrowthTest
     @Test
     public void logisticGrowthWorksOneSpecies() throws Exception {
 
-        BiomassLocalBiology bio = new BiomassLocalBiology(
-                new double[]{80d,200d,0d}, new double[]{100d,400d,0d}
+        final BiomassLocalBiology bio = new BiomassLocalBiology(
+            new double[]{80d, 200d, 0d}, new double[]{100d, 400d, 0d}
         );
-        Species species0 = new Species("0"); species0.resetIndexTo(0);
-        Species species1 = new Species("1"); species1.resetIndexTo(1);
-        Species species2 = new Species("2"); species2.resetIndexTo(2);
+        final Species species0 = new Species("0");
+        species0.resetIndexTo(0);
+        final Species species1 = new Species("1");
+        species1.resetIndexTo(1);
+        final Species species2 = new Species("2");
+        species2.resetIndexTo(2);
 
 
-        IndependentLogisticBiomassGrower grower =
-                new IndependentLogisticBiomassGrower(.5,species1);
+        final IndependentLogisticBiomassGrower grower =
+            new IndependentLogisticBiomassGrower(.5, species1);
         grower.getBiologies().add(bio);
 
         assertEquals(80d, bio.getBiomass(species0), .1);
@@ -98,8 +103,8 @@ public class LogisticGrowthTest
         assertEquals(0, bio.getBiomass(species2), .1);
 
         //grow it
-        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
-        when(model.getSpecies()).thenReturn(Lists.newArrayList(species0,species1,species2));
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        when(model.getSpecies()).thenReturn(Lists.newArrayList(species0, species1, species2));
         grower.step(model);
 
         assertEquals(80, bio.getBiomass(species0), .1); //didn't grow because the grower focuses on species1

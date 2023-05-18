@@ -48,40 +48,42 @@ public class DiscardUnderagedTest {
 
 
         //set up copied from the holdsize test
-        Meristics first = new FromListMeristics(new double[]{100,100,100}, 2);
-        Meristics second = new FromListMeristics(new double[]{100,100},2);
+        Meristics first = new FromListMeristics(new double[]{100, 100, 100}, 2);
+        Meristics second = new FromListMeristics(new double[]{100, 100}, 2);
         Species firstSpecies = new Species("first", first);
-        Species secondSpecies = new Species("second",second);
+        Species secondSpecies = new Species("second", second);
 
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
 
 
-
-
         Catch haul = new Catch(
-                new double[]{100,10,1}, new double[]{100,0,0},
-                firstSpecies,
-                bio
+            new double[]{100, 10, 1}, new double[]{100, 0, 0},
+            firstSpecies,
+            bio
         );
-        DiscardUnderaged diskards= new DiscardUnderaged(1);
-        FishState model = mock(FishState.class); when(model.getBiology()).thenReturn(bio);
+        DiscardUnderaged diskards = new DiscardUnderaged(1);
+        FishState model = mock(FishState.class);
+        when(model.getBiology()).thenReturn(bio);
         Catch newCatch = diskards.chooseWhatToKeep(
-                mock(SeaTile.class),
-                mock(Fisher.class),
-                haul,
-                1000,
-                mock(Regulation.class),
-                model,
-                new MersenneTwisterFast()
+            mock(SeaTile.class),
+            mock(Fisher.class),
+            haul,
+            1000,
+            mock(Regulation.class),
+            model,
+            new MersenneTwisterFast()
         );
 
-        assertArrayEquals(new double[]{0,10,1},
-                          newCatch.getAbundance(firstSpecies).asMatrix()[FishStateUtilities.MALE], .001);
-        assertArrayEquals(new double[]{0,0,0},
-                          newCatch.getAbundance(firstSpecies).asMatrix()[FishStateUtilities.FEMALE], .001);
-        assertArrayEquals(new double[]{0,0},
-                          newCatch.getAbundance(secondSpecies).asMatrix()[FishStateUtilities.FEMALE], .001);
+        assertArrayEquals(new double[]{0, 10, 1},
+            newCatch.getAbundance(firstSpecies).asMatrix()[FishStateUtilities.MALE], .001
+        );
+        assertArrayEquals(new double[]{0, 0, 0},
+            newCatch.getAbundance(firstSpecies).asMatrix()[FishStateUtilities.FEMALE], .001
+        );
+        assertArrayEquals(new double[]{0, 0},
+            newCatch.getAbundance(secondSpecies).asMatrix()[FishStateUtilities.FEMALE], .001
+        );
 
     }
 }

@@ -53,14 +53,14 @@ public class MultiITQStringFactoryTest {
         MultiQuotaITQRegulation regulation = (MultiQuotaITQRegulation) state.getFishers().get(0).getRegulation();
         ITQOrderBook itqOrderBook = regulation.testOrderBook(state.getSpecies().get(0));
         assertFalse(itqOrderBook.isAllowMultipleTradesPerFisher());
-        assertEquals(itqOrderBook.getUnitsTradedPerMatch(),99);
-        assertEquals(regulation.getQuotaRemaining(0),100d,.0001);
+        assertEquals(itqOrderBook.getUnitsTradedPerMatch(), 99);
+        assertEquals(regulation.getQuotaRemaining(0), 100d, .0001);
 
 
         itqOrderBook = regulation.testOrderBook(state.getSpecies().get(1));
         assertFalse(itqOrderBook.isAllowMultipleTradesPerFisher());
-        assertEquals(itqOrderBook.getUnitsTradedPerMatch(),99);
-        assertEquals(regulation.getQuotaRemaining(1),200d,.0001);
+        assertEquals(itqOrderBook.getUnitsTradedPerMatch(), 99);
+        assertEquals(regulation.getQuotaRemaining(1), 200d, .0001);
 
     }
 
@@ -81,14 +81,14 @@ public class MultiITQStringFactoryTest {
         MultiQuotaITQRegulation regulation = (MultiQuotaITQRegulation) state.getFishers().get(0).getRegulation();
         ITQOrderBook itqOrderBook = regulation.testOrderBook(state.getSpecies().get(0));
         assertFalse(itqOrderBook.isAllowMultipleTradesPerFisher());
-        assertEquals(itqOrderBook.getUnitsTradedPerMatch(),99);
-        assertEquals(regulation.getQuotaRemaining(0),100d,.0001);
+        assertEquals(itqOrderBook.getUnitsTradedPerMatch(), 99);
+        assertEquals(regulation.getQuotaRemaining(0), 100d, .0001);
 
 
         itqOrderBook = regulation.testOrderBook(state.getSpecies().get(1));
         assertFalse(itqOrderBook.isAllowMultipleTradesPerFisher());
-        assertEquals(itqOrderBook.getUnitsTradedPerMatch(),2);
-        assertEquals(regulation.getQuotaRemaining(1),200d,.0001);
+        assertEquals(itqOrderBook.getUnitsTradedPerMatch(), 2);
+        assertEquals(regulation.getQuotaRemaining(1), 200d, .0001);
 
     }
 }

@@ -34,13 +34,10 @@ import java.util.function.Function;
  */
 public class ThresholdExplorationProbability implements AdaptationProbability, TripListener {
 
-    private boolean exploring = true;
-
     private final double multiplier;
-
-    private FishState model;
-
     final private Function<FishState, Double> threshold;
+    private boolean exploring = true;
+    private FishState model;
 
     public ThresholdExplorationProbability(double multiplier, Function<FishState, Double> threshold) {
         this.multiplier = multiplier;
@@ -50,14 +47,16 @@ public class ThresholdExplorationProbability implements AdaptationProbability, T
     @Override
     public void start(FishState model, Fisher fisher) {
         fisher.addTripListener(this);
-        fisher.getDailyData().registerGatherer("Exploration Probability",
-                                               new Gatherer<Fisher>() {
-                                                   @Override
-                                                   public Double apply(Fisher fisher1) {
-                                                       return exploring ? 1d : 0d;
-                                                   }
-                                               },
-                                               Double.NaN);
+        fisher.getDailyData().registerGatherer(
+            "Exploration Probability",
+            new Gatherer<Fisher>() {
+                @Override
+                public Double apply(Fisher fisher1) {
+                    return exploring ? 1d : 0d;
+                }
+            },
+            Double.NaN
+        );
         this.model = model;
     }
 
@@ -72,7 +71,7 @@ public class ThresholdExplorationProbability implements AdaptationProbability, T
     public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
         Double ourProfits = record.getProfitPerHour(true);
         Double toBeat = threshold.apply(model);
-        double correctMultiplier = toBeat >=0 ? multiplier : 1d/multiplier;
+        double correctMultiplier = toBeat >= 0 ? multiplier : 1d / multiplier;
         exploring = !Double.isFinite(toBeat) || ourProfits <= correctMultiplier * toBeat;
 
     }

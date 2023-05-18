@@ -38,49 +38,46 @@ public class BanditAverage {
 
 
     /**
-     * supplier constructor
-     * @param numberOfArms
-     * @param constructor
-     */
-    public BanditAverage(int numberOfArms, Supplier<Averager<Double>> constructor)
-    {
-        averages = new Averager[numberOfArms];
-        observations = new int[numberOfArms];
-        for(int i=0; i<numberOfArms; i++)
-            averages[i] = constructor.get();
-    }
-
-
-    /**
      * factory constructor
      */
-    public BanditAverage(int numberOfArms,
-                         AlgorithmFactory<? extends Averager> factory,
-                         FishState state)
-    {
+    public BanditAverage(
+        int numberOfArms,
+        AlgorithmFactory<? extends Averager> factory,
+        FishState state
+    ) {
         this(numberOfArms, () -> factory.apply(state));
 
     }
 
 
-    public void observeReward(double reward, int arm)
-    {
+    /**
+     * supplier constructor
+     *
+     * @param numberOfArms
+     * @param constructor
+     */
+    public BanditAverage(int numberOfArms, Supplier<Averager<Double>> constructor) {
+        averages = new Averager[numberOfArms];
+        observations = new int[numberOfArms];
+        for (int i = 0; i < numberOfArms; i++)
+            averages[i] = constructor.get();
+    }
+
+    public void observeReward(double reward, int arm) {
         averages[arm].addObservation(reward);
         observations[arm]++;
     }
 
 
-    public int getNumberOfObservations(int arm)
-    {
+    public int getNumberOfObservations(int arm) {
         return observations[arm];
     }
 
-    public double getAverage(int arm)
-    {
+    public double getAverage(int arm) {
         return averages[arm].getSmoothedObservation();
     }
 
-    public int getNumberOfArms(){
+    public int getNumberOfArms() {
         return averages.length;
     }
 

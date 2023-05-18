@@ -30,25 +30,42 @@ public abstract class MonitorDecorator<O, V, Q extends Quantity<Q>> implements M
 
     private final Monitor<O, V, Q> delegate;
 
-    MonitorDecorator(Monitor<O, V, Q> delegate) { this.delegate = delegate; }
+    MonitorDecorator(Monitor<O, V, Q> delegate) {
+        this.delegate = delegate;
+    }
 
-    @Override public String getBaseName() { return delegate.getBaseName(); }
+    @Override
+    public String getBaseName() {
+        return delegate.getBaseName();
+    }
 
-    @Override public Unit<Q> getUnit() { return delegate.getUnit(); }
+    @Override
+    public Unit<Q> getUnit() {
+        return delegate.getUnit();
+    }
 
-    @Override public Iterable<V> extractValues(O observable) { return delegate.extractValues(observable); }
+    @Override
+    public Iterable<V> extractValues(O observable) {
+        return delegate.extractValues(observable);
+    }
 
-    @Override public Accumulator<V> getAccumulator() { return delegate.getAccumulator(); }
+    @Override
+    public Accumulator<V> getAccumulator() {
+        return delegate.getAccumulator();
+    }
 
-    @Override public void registerWith(TimeSeries<FishState> timeSeries) {
+    @Override
+    public void registerWith(TimeSeries<FishState> timeSeries) {
         delegate.registerWith(timeSeries);
     }
 
-    @Override public void start(FishState model) {
+    @Override
+    public void start(FishState model) {
         delegate.start(model);
     }
 
-    @Override public void observe(O observable) {
+    @Override
+    public void observe(O observable) {
         delegate.observe(observable);
     }
 

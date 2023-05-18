@@ -45,6 +45,10 @@ public class Particle<V> {
         return position;
     }
 
+    public void setPosition(V position) {
+        this.position = position;
+    }
+
     /**
      * Getter for property 'weight'.
      *
@@ -61,9 +65,5 @@ public class Particle<V> {
      */
     public void setWeight(double weight) {
         this.weight = FishStateUtilities.round5(weight);
-    }
-
-    public void setPosition(V position) {
-        this.position = position;
     }
 }

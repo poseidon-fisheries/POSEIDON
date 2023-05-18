@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.model.regs;
 
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -30,7 +29,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * Basically a regulation object that it's told whether the season is open or not
  * Created by carrknight on 12/14/16.
  */
-public class ExternalOpenCloseSeason implements Regulation{
+public class ExternalOpenCloseSeason implements Regulation {
 
 
     private boolean open = true;
@@ -45,7 +44,8 @@ public class ExternalOpenCloseSeason implements Regulation{
      */
     @Override
     public boolean canFishHere(
-            Fisher agent, SeaTile tile, FishState model, int timeStep) {
+        Fisher agent, SeaTile tile, FishState model, int timeStep
+    ) {
         return open;
     }
 
@@ -59,7 +59,8 @@ public class ExternalOpenCloseSeason implements Regulation{
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Species species, FishState model, int timeStep) {
+        Fisher agent, Species species, FishState model, int timeStep
+    ) {
         return Double.MAX_VALUE;
     }
 

@@ -46,62 +46,52 @@ import java.util.function.Predicate;
  * A regression that works by Beam hill-climbing to update regression parameters of its delegate
  * Created by carrknight on 8/26/16.
  */
-public class SocialTuningRegression<V>  implements GeographicalRegression<V>
-{
+public class SocialTuningRegression<V> implements GeographicalRegression<V> {
 
-    /**
-     * the underlying regression doing all the work
-     */
-    private final  GeographicalRegression<V> delegate;
-
-
-    private final AdaptationProbability probability;
-
-
-
-    final private boolean yearly;
-
-
-    final private AdaptationAlgorithm<double[]> optimizer;
-
-    final static private Sensor<Fisher,double[]> parameterSensor = new Sensor<Fisher,double[]>() {
+    final static private Sensor<Fisher, double[]> parameterSensor = new Sensor<Fisher, double[]>() {
         @Override
         public double[] scan(Fisher fisher) {
             return ((HeatmapDestinationStrategy) fisher.getDestinationStrategy()).getHeatmap().getParametersAsArray();
         }
     };
+    /**
+     * the underlying regression doing all the work
+     */
+    private final GeographicalRegression<V> delegate;
+    private final AdaptationProbability probability;
+    final private boolean yearly;
+    final private AdaptationAlgorithm<double[]> optimizer;
+    private ExploreImitateAdaptation<double[]> adaptation;
+
 
     public SocialTuningRegression(
-            GeographicalRegression<V> delegate,
-            AdaptationProbability probability,
-            boolean yearly) {
+        GeographicalRegression<V> delegate,
+        AdaptationProbability probability,
+        boolean yearly
+    ) {
         this.delegate = delegate;
         this.probability = probability;
 
         this.yearly = yearly;
 
 
-
-
-     optimizer = new BeamHillClimbing<double[]>(
-             new RandomStep<double[]>() {
-                 @Override
-                 public double[] randomStep(FishState state, MersenneTwisterFast random, Fisher fisher,
-                                            double[] current)
-                 {
-                     double[] toReturn = Arrays.copyOf(current,current.length);
-                     for(int i=0; i<current.length; i++)
-                         toReturn[i]= toReturn[i] *(.95+random.nextDouble()*.1);
-                     return toReturn;
-                 }
-             }
-     );
+        optimizer = new BeamHillClimbing<double[]>(
+            new RandomStep<double[]>() {
+                @Override
+                public double[] randomStep(
+                    FishState state, MersenneTwisterFast random, Fisher fisher,
+                    double[] current
+                ) {
+                    double[] toReturn = Arrays.copyOf(current, current.length);
+                    for (int i = 0; i < current.length; i++)
+                        toReturn[i] = toReturn[i] * (.95 + random.nextDouble() * .1);
+                    return toReturn;
+                }
+            }
+        );
 
 
     }
-
-
-    private ExploreImitateAdaptation<double[]> adaptation;
 
     @Override
     public void start(FishState model, Fisher fisher) {
@@ -113,57 +103,55 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
                 return fisher.getDestinationStrategy() instanceof HeatmapDestinationStrategy;
             }
         };
-        Actuator<Fisher,double[]> actuator = new Actuator<Fisher,double[]>() {
+        Actuator<Fisher, double[]> actuator = new Actuator<Fisher, double[]>() {
             @Override
             public void apply(Fisher fisher, double[] change, FishState model) {
                 model.scheduleOnce(
-                        new Steppable() {
-                            @Override
-                            public void step(SimState simState) {
-                                ((HeatmapDestinationStrategy) fisher.getDestinationStrategy()).getHeatmap().setParameters(
-                                        Arrays.copyOf(change,change.length));
-                            }
-                        },
-                        StepOrder.DAWN
+                    new Steppable() {
+                        @Override
+                        public void step(SimState simState) {
+                            ((HeatmapDestinationStrategy) fisher.getDestinationStrategy()).getHeatmap().setParameters(
+                                Arrays.copyOf(change, change.length));
+                        }
+                    },
+                    StepOrder.DAWN
                 );
 
             }
         };
 
-        if(yearly) {
+        if (yearly) {
             adaptation = new ExploreImitateAdaptation<>(
-                    predictate,
-                    optimizer,
-                    actuator,
-                    parameterSensor,
-                    new CashFlowObjective(365), probability, new Predicate<double[]>() {
-                        @Override
-                        public boolean test(double[] a) {
-                            return true;
-                        }
-                    });
+                predictate,
+                optimizer,
+                actuator,
+                parameterSensor,
+                new CashFlowObjective(365), probability, new Predicate<double[]>() {
+                @Override
+                public boolean test(double[] a) {
+                    return true;
+                }
+            }
+            );
             fisher.addYearlyAdaptation(
-                    adaptation);
+                adaptation);
         }
         //else bimonthly
-        else
-        {
+        else {
             adaptation = new ExploreImitateAdaptation<>(
-                    predictate,
-                    optimizer,
-                    actuator,
-                    parameterSensor,
-                    new CashFlowObjective(60), 0, 1, new Predicate<double[]>() {
-                        @Override
-                        public boolean test(double[] a) {
-                            return true;
-                        }
-                    });
+                predictate,
+                optimizer,
+                actuator,
+                parameterSensor,
+                new CashFlowObjective(60), 0, 1, new Predicate<double[]>() {
+                @Override
+                public boolean test(double[] a) {
+                    return true;
+                }
+            }
+            );
             fisher.addBiMonthlyAdaptation(adaptation);
         }
-
-
-
 
 
     }
@@ -171,9 +159,8 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
     @Override
     public void turnOff(Fisher fisher) {
         delegate.turnOff(fisher);
-        if(adaptation != null)
-        {
-            if(yearly)
+        if (adaptation != null) {
+            if (yearly)
                 fisher.removeYearlyAdaptation(adaptation);
             else
                 fisher.removeBiMonthlyAdaptation(adaptation);
@@ -182,6 +169,7 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
 
     /**
      * predict numerical value here
+     *
      * @param tile
      * @param time
      * @param fisher
@@ -195,33 +183,38 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
 
     /**
      * learn from this observation
+     *
      * @param observation
      * @param fisher
      * @param model
      */
     @Override
     public void addObservation(
-            GeographicalObservation<V> observation,
-            Fisher fisher, FishState model) {
-        delegate.addObservation(observation, fisher,model );
+        GeographicalObservation<V> observation,
+        Fisher fisher, FishState model
+    ) {
+        delegate.addObservation(observation, fisher, model);
     }
 
     /**
      * turn the "V" value of the geographical observation into a number
+     *
      * @param observation
      * @param fisher
      * @return
      */
     @Override
     public double extractNumericalYFromObservation(
-            GeographicalObservation<V> observation,
-            Fisher fisher) {
+        GeographicalObservation<V> observation,
+        Fisher fisher
+    ) {
         return delegate.extractNumericalYFromObservation(observation, fisher);
     }
 
     /**
      * Transforms the parameters used (and that can be changed) into a double[] array so that it can be inspected
      * from the outside without knowing the inner workings of the regression
+     *
      * @return an array containing all the parameters of the model
      */
     @Override
@@ -232,13 +225,13 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
     /**
      * given an array of parameters (of size equal to what you'd get if you called the getter) the regression is supposed
      * to transition to these parameters
+     *
      * @param parameterArray the new parameters for this regresssion
      */
     @Override
     public void setParameters(double[] parameterArray) {
         delegate.setParameters(parameterArray);
     }
-
 
 
     /**

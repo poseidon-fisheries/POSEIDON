@@ -52,18 +52,6 @@ public class YearlyResultsRowProvider implements RowProvider {
         return HEADERS;
     }
 
-    @SuppressWarnings("UnstableApiUsage")
-    private Stream<List<Object>> getYearlyValues(
-        final int startYear,
-        final String columnName
-    ) {
-        return Streams.zip(
-            IntStream.iterate(startYear, i -> i + 1).boxed(),
-            fishState.getYearlyDataSet().getColumn(columnName).stream(),
-            (year, value) -> ImmutableList.of(columnName, year, value)
-        );
-    }
-
     @Override
     public Iterable<? extends Collection<?>> getRows() {
         final int startYear = fishState.getStartDate().getYear();
@@ -74,6 +62,18 @@ public class YearlyResultsRowProvider implements RowProvider {
             .map(DataColumn::getName)
             .flatMap(columnName -> getYearlyValues(startYear, columnName))
             .collect(toImmutableList());
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private Stream<List<Object>> getYearlyValues(
+        final int startYear,
+        final String columnName
+    ) {
+        return Streams.zip(
+            IntStream.iterate(startYear, i -> i + 1).boxed(),
+            fishState.getYearlyDataSet().getColumn(columnName).stream(),
+            (year, value) -> ImmutableList.of(columnName, year, value)
+        );
     }
 
 }

@@ -23,9 +23,10 @@ package uk.ac.ox.oxfish.utility.parameters;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.math3.distribution.BetaDistribution;
+
 /**
  * Returns a beta distributed double value randomly
- *
+ * <p>
  * Created by Brian Powers 5/1/2016
  */
 public class BetaDoubleParameter implements DoubleParameter {
@@ -34,18 +35,18 @@ public class BetaDoubleParameter implements DoubleParameter {
     private double alpha;
 
     private double beta;
-    
+
     private BetaDistribution betaDist;
 
     public BetaDoubleParameter() {
     }
 
     public BetaDoubleParameter(double alpha, double beta) {
-        Preconditions.checkArgument(alpha >0);
-        Preconditions.checkArgument(beta >0);
+        Preconditions.checkArgument(alpha > 0);
+        Preconditions.checkArgument(beta > 0);
         this.alpha = alpha;
         this.beta = beta;
-        betaDist = new BetaDistribution(alpha,beta);
+        betaDist = new BetaDistribution(alpha, beta);
     }
 
     /**
@@ -77,6 +78,6 @@ public class BetaDoubleParameter implements DoubleParameter {
 
     @Override
     public DoubleParameter makeCopy() {
-        return new BetaDoubleParameter(alpha,beta);
+        return new BetaDoubleParameter(alpha, beta);
     }
 }

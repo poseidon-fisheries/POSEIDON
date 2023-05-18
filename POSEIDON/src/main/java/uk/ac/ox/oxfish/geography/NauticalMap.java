@@ -73,15 +73,6 @@ public class NauticalMap implements Startable {
     private final LinkedHashMap<String, Supplier<DoubleGrid2D>> additionalMaps;
     private final MapExtent mapExtent;
     /**
-     * computing neighborhoods is actually a very expensive computational process so we store here all the
-     * neighborhood we found for each tile and neighborhood size so we compute them but once
-     */
-    public Table<SeaTile, Integer, Bag> alreadyComputedNeighbors = HashBasedTable.create();
-    /**
-     * one size lookups are even more common, so store them here
-     */
-    public Map<SeaTile, Bag> sizeOneNeighborhoods = new WeakHashMap<>();
-    /**
      * this holds the bathymetry raster grid
      */
     private final GeomGridField rasterBathymetry;
@@ -90,14 +81,6 @@ public class NauticalMap implements Startable {
      * casting
      */
     private final ObjectGrid2D rasterBackingGrid;
-    /**
-     * the distance calculator, maybe useful, maybe not
-     */
-    private Distance distance;
-    /**
-     * the object finding a osmoseWFSPath from A to B
-     */
-    private Pathfinder pathfinder;
     /**
      * The list of ports
      */
@@ -118,6 +101,23 @@ public class NauticalMap implements Startable {
      * holds the MPAs
      */
     private final GeomVectorField mpaVectorField;
+    /**
+     * computing neighborhoods is actually a very expensive computational process so we store here all the
+     * neighborhood we found for each tile and neighborhood size so we compute them but once
+     */
+    public Table<SeaTile, Integer, Bag> alreadyComputedNeighbors = HashBasedTable.create();
+    /**
+     * one size lookups are even more common, so store them here
+     */
+    public Map<SeaTile, Bag> sizeOneNeighborhoods = new WeakHashMap<>();
+    /**
+     * the distance calculator, maybe useful, maybe not
+     */
+    private Distance distance;
+    /**
+     * the object finding a osmoseWFSPath from A to B
+     */
+    private Pathfinder pathfinder;
     /**
      * proof that you were started
      */
@@ -410,7 +410,10 @@ public class NauticalMap implements Startable {
         return ports;
     }
 
-    public List<Entry<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(final Deque<SeaTile> route, final double speedInKph) {
+    public List<Entry<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(
+        final Deque<SeaTile> route,
+        final double speedInKph
+    ) {
         return distance.cumulativeTravelTimeAlongRouteInHours(route, this, speedInKph);
     }
 

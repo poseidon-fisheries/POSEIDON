@@ -31,7 +31,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * the intercept associated with that group!
  * Created by carrknight on 8/7/17.
  */
-public class GroupInterceptExtractor implements ObservationExtractor{
+public class GroupInterceptExtractor implements ObservationExtractor {
 
     /**
      * intercepts, must be all provided even the ones that are 0 to avoid interference with the
@@ -43,7 +43,8 @@ public class GroupInterceptExtractor implements ObservationExtractor{
 
 
     public GroupInterceptExtractor(
-            double[] intercepts, MapDiscretization discretization) {
+        double[] intercepts, MapDiscretization discretization
+    ) {
         this.intercepts = intercepts;
         this.discretization = discretization;
     }
@@ -51,7 +52,8 @@ public class GroupInterceptExtractor implements ObservationExtractor{
 
     @Override
     public double extract(
-            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
+        SeaTile tile, double timeOfObservation, Fisher agent, FishState model
+    ) {
 
         int group = discretization.getGroup(tile);
 

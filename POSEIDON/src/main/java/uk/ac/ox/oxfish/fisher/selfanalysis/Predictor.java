@@ -26,16 +26,18 @@ import uk.ac.ox.oxfish.model.FisherStartable;
  * An object that is supposed to track a value in order to predict it
  * Created by carrknight on 8/18/15.
  */
-public interface Predictor extends FisherStartable{
+public interface Predictor extends FisherStartable {
 
     /**
      * ask the predictor the expected value of the variable it is tracking
+     *
      * @return the expected value
      */
     double predict();
 
     /**
      * ask the predictor what is the probability the variable it is tracking is below a given level
+     *
      * @param level the level
      * @return P(x < level)
      */
@@ -45,7 +47,8 @@ public interface Predictor extends FisherStartable{
     /**
      * Asks the predictor what is the probability that a sum of #elementsInSum of identically distributed elements of
      * this predictor is below the given level
-     * @param level the level the sum has to be below of
+     *
+     * @param level         the level the sum has to be below of
      * @param elementsInSum the number of i.i.d independent variables given by the predictor summed together
      * @return a probability value
      */

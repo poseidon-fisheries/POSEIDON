@@ -48,10 +48,11 @@ public class WindThresholdStrategy implements WeatherEmergencyStrategy {
      */
     @Override
     public boolean updateWeatherEmergencyFlag(
-            boolean currentEmergencyFlag, Fisher fisher, SeaTile location) {
+        boolean currentEmergencyFlag, Fisher fisher, SeaTile location
+    ) {
 
         //if you are already having an emergency and you aren't at port, stay in state of emergency
-        if(currentEmergencyFlag && !fisher.isAtPort())
+        if (currentEmergencyFlag && !fisher.isAtPort())
             return true;
         else
             return location.getWindSpeedInKph() > threshold;

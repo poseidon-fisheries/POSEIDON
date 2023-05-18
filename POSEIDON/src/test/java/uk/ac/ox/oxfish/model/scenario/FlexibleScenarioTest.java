@@ -38,18 +38,21 @@ public class FlexibleScenarioTest {
         //scenario with no boats whatsoever, all driven by exogenous landings
         FishYAML yaml = new FishYAML();
         FlexibleScenario flexibleScenario =
-                yaml.loadAs(new FileReader(Paths.get("inputs", "tests",
-                                                     "flexible_exogenous.yaml").toFile()),
-                            FlexibleScenario.class);
+            yaml.loadAs(
+                new FileReader(Paths.get("inputs", "tests",
+                    "flexible_exogenous.yaml"
+                ).toFile()),
+                FlexibleScenario.class
+            );
 
         FishState state = new FishState();
         state.setScenario(flexibleScenario);
         state.start();
-        Assert.assertTrue(state.getTotalBiomass(state.getSpecies().get(0))>100000);
-        while(state.getYear()<=10)
+        Assert.assertTrue(state.getTotalBiomass(state.getSpecies().get(0)) > 100000);
+        while (state.getYear() <= 10)
             state.schedule.step(state);
 
-        Assert.assertTrue(state.getTotalBiomass(state.getSpecies().get(0))<10);
+        Assert.assertTrue(state.getTotalBiomass(state.getSpecies().get(0)) < 10);
 
 
     }

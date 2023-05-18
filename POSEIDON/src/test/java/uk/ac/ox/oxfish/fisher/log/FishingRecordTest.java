@@ -41,25 +41,25 @@ public class FishingRecordTest {
         SeaTile commonTile = mock(SeaTile.class);
 
         FishingRecord record1 = new FishingRecord(
-                1,
-                commonTile,
-                new Catch(new double[]{100, 200})
+            1,
+            commonTile,
+            new Catch(new double[]{100, 200})
         );
         FishingRecord record2 = new FishingRecord(
-                1,
-                commonTile,
-                new Catch(new double[]{100, 200})
+            1,
+            commonTile,
+            new Catch(new double[]{100, 200})
         );
 
         FishingRecord record3 = new FishingRecord(
-                1,
-                commonTile,
-                new Catch(new double[]{10, 20})
+            1,
+            commonTile,
+            new Catch(new double[]{10, 20})
         );
 
 
-        FishingRecord sum = FishingRecord.sumRecords(FishingRecord.sumRecords(record1,record2),record3);
-        assertArrayEquals(sum.getFishCaught().getBiomassArray(),new double[]{210,420},.001);
+        FishingRecord sum = FishingRecord.sumRecords(FishingRecord.sumRecords(record1, record2), record3);
+        assertArrayEquals(sum.getFishCaught().getBiomassArray(), new double[]{210, 420}, .001);
 
     }
 
@@ -67,51 +67,50 @@ public class FishingRecordTest {
     public void abundanceOnlySum() {
 
         //set up copied from the holdsize test
-        Meristics first = new FromListMeristics(new double[]{100,100,100}, 2);
-        Meristics second = new FromListMeristics(new double[]{100,100}, 2);
+        Meristics first = new FromListMeristics(new double[]{100, 100, 100}, 2);
+        Meristics second = new FromListMeristics(new double[]{100, 100}, 2);
         Species firstSpecies = new Species("first", first);
-        Species secondSpecies = new Species("second",second);
-
+        Species secondSpecies = new Species("second", second);
 
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
         SeaTile commonTile = mock(SeaTile.class);
 
         FishingRecord record1 = new FishingRecord(
-                1,
-                commonTile,
-                new Catch(
-                        new double[]{0,10,0},
-                        new double[]{10,0,0},
-                        firstSpecies,
-                        bio
+            1,
+            commonTile,
+            new Catch(
+                new double[]{0, 10, 0},
+                new double[]{10, 0, 0},
+                firstSpecies,
+                bio
 
-                )
+            )
         );
         FishingRecord record2 = new FishingRecord(
-                1,
-                commonTile,
-                new Catch(
-                        new double[]{0,2},
-                        new double[]{0,0},
-                        secondSpecies,
-                        bio
+            1,
+            commonTile,
+            new Catch(
+                new double[]{0, 2},
+                new double[]{0, 0},
+                secondSpecies,
+                bio
 
-                )
+            )
         );
         FishingRecord record3 = new FishingRecord(
-                1,
-                commonTile,
-                new Catch(
-                        new double[]{0,2},
-                        new double[]{0,0},
-                        secondSpecies,
-                        bio
+            1,
+            commonTile,
+            new Catch(
+                new double[]{0, 2},
+                new double[]{0, 0},
+                secondSpecies,
+                bio
 
-                )
+            )
         );
-        FishingRecord sum = FishingRecord.sumRecords(FishingRecord.sumRecords(record1,record2),record3);
-        assertEquals(sum.getFishCaught().getAbundance(0).getAbundance(0,1),10,.001);
-        assertEquals(sum.getFishCaught().getAbundance(1).getAbundance(0,1),4,.001);
+        FishingRecord sum = FishingRecord.sumRecords(FishingRecord.sumRecords(record1, record2), record3);
+        assertEquals(sum.getFishCaught().getAbundance(0).getAbundance(0, 1), 10, .001);
+        assertEquals(sum.getFishCaught().getAbundance(1).getAbundance(0, 1), 4, .001);
     }
 }

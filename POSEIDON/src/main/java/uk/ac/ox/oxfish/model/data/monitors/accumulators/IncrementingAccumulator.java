@@ -23,10 +23,18 @@ public class IncrementingAccumulator<V> implements Accumulator<V> {
 
     private int count = 0;
 
-    @Override public String getNameFormat() { return "Number of %s"; }
+    @Override
+    public String getNameFormat() {
+        return "Number of %s";
+    }
 
-    public void accumulate(V ignored) { this.count++; }
+    public void accumulate(V ignored) {
+        this.count++;
+    }
 
-    @Override public double get() { return count; }
+    @Override
+    public double get() {
+        return count;
+    }
 
 }

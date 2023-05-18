@@ -29,13 +29,16 @@ public interface Maturity {
 
     /**
      * computes the maturity % (any number between 0 and 1) of fish
-     * @param species the species of fish
+     *
+     * @param species     the species of fish
      * @param subdivision its subdivision (usually by sex but often there are no subdivisions)
-     * @param bin the bin (usually age or length)
+     * @param bin         the bin (usually age or length)
      * @return a number between 0 and 1
      */
-    public double getMaturity(Species species,
-                              int subdivision,
-                              int bin);
+    public double getMaturity(
+        Species species,
+        int subdivision,
+        int bin
+    );
 
 }

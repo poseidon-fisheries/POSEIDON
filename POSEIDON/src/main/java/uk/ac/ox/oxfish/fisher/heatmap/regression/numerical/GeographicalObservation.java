@@ -29,8 +29,7 @@ import java.util.Objects;
  * An immutable object useful for regression. It is sorted with respect to time
  * Created by carrknight on 6/27/16.
  */
-public class GeographicalObservation<V> implements Comparable<GeographicalObservation<V>>
-{
+public class GeographicalObservation<V> implements Comparable<GeographicalObservation<V>> {
 
     private final double time;
 
@@ -39,33 +38,24 @@ public class GeographicalObservation<V> implements Comparable<GeographicalObserv
     private final SeaTile tile;
 
     public GeographicalObservation(SeaTile tile, double time, V value) {
-        this.tile=tile;
+        this.tile = tile;
         this.time = time;
         this.value = value;
     }
 
 
     /**
-     *  the tile x coordinate
+     * the tile x coordinate
      */
     public double getXCoordinate() {
         return tile.getGridX();
     }
 
     /**
-     *  the tile y coordinate
+     * the tile y coordinate
      */
     public double getYCoordinate() {
         return tile.getGridY();
-    }
-
-    /**
-     * Getter for property 'time'.
-     *
-     * @return Value for property 'time'.
-     */
-    public double getTime() {
-        return time;
     }
 
     /**
@@ -83,7 +73,16 @@ public class GeographicalObservation<V> implements Comparable<GeographicalObserv
      */
     @Override
     public int compareTo(GeographicalObservation o) {
-        return Double.compare(this.getTime(),o.getTime());
+        return Double.compare(this.getTime(), o.getTime());
+    }
+
+    /**
+     * Getter for property 'time'.
+     *
+     * @return Value for property 'time'.
+     */
+    public double getTime() {
+        return time;
     }
 
     /**
@@ -101,8 +100,8 @@ public class GeographicalObservation<V> implements Comparable<GeographicalObserv
         if (o == null || getClass() != o.getClass()) return false;
         GeographicalObservation<V> that = (GeographicalObservation) o;
         return Double.compare(that.time, time) == 0 &&
-                Objects.equals(that.value, value)  &&
-                Objects.equals(tile, that.tile);
+            Objects.equals(that.value, value) &&
+            Objects.equals(tile, that.tile);
     }
 
     @Override
@@ -113,9 +112,9 @@ public class GeographicalObservation<V> implements Comparable<GeographicalObserv
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("time", time)
-                .add("value", value)
-                .add("tile", tile)
-                .toString();
+            .add("time", time)
+            .add("value", value)
+            .add("tile", tile)
+            .toString();
     }
 }

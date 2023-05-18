@@ -30,8 +30,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Returns a constant weather initializer
  * Created by carrknight on 9/8/15.
  */
-public class ConstantWeatherFactory implements AlgorithmFactory<ConstantWeatherInitializer>
-{
+public class ConstantWeatherFactory implements AlgorithmFactory<ConstantWeatherInitializer> {
 
 
     private DoubleParameter temperature = new FixedDoubleParameter(30);
@@ -48,7 +47,7 @@ public class ConstantWeatherFactory implements AlgorithmFactory<ConstantWeatherI
      */
     @Override
     public ConstantWeatherInitializer apply(FishState state) {
-        return new ConstantWeatherInitializer(temperature,windSpeed,windOrientation);
+        return new ConstantWeatherInitializer(temperature, windSpeed, windOrientation);
     }
 
 

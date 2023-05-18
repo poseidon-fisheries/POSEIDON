@@ -46,9 +46,11 @@ public class LBSPRPolicyUpdater implements Steppable, AdditionalStartable {
      */
     private final int startUpdatingAfterYear;
 
-    public LBSPRPolicyUpdater(SPRAgent internalSPRAgent, LBSPREffortPolicy controller,
-                              double upperDiscrepancyThreshold, double lowerDiscrepancyThreshold,
-                              int cpueHalfPeriod, double minimumMK, double maximumMK, int startUpdatingAfterYear) {
+    public LBSPRPolicyUpdater(
+        SPRAgent internalSPRAgent, LBSPREffortPolicy controller,
+        double upperDiscrepancyThreshold, double lowerDiscrepancyThreshold,
+        int cpueHalfPeriod, double minimumMK, double maximumMK, int startUpdatingAfterYear
+    ) {
         this.internalSPRAgent = internalSPRAgent;
         this.controller = controller;
         this.upperDiscrepancyThreshold = upperDiscrepancyThreshold;
@@ -57,17 +59,19 @@ public class LBSPRPolicyUpdater implements Steppable, AdditionalStartable {
         this.maximumMK = maximumMK;
         this.startUpdatingAfterYear = startUpdatingAfterYear;
 
-        cpueToEffort = new ITarget("not used",
-                "CPUE " + internalSPRAgent.getSpecies() + " " + internalSPRAgent.getSurveyTag(),
-                1.0,
-                1.5,
-                cpueHalfPeriod,
-                -1 //not used!
+        cpueToEffort = new ITarget(
+            "not used",
+            "CPUE " + internalSPRAgent.getSpecies() + " " + internalSPRAgent.getSurveyTag(),
+            1.0,
+            1.5,
+            cpueHalfPeriod,
+            -1 //not used!
         );
     }
 
     /**
      * here we update the SPR M/K
+     *
      * @param simState
      */
     @Override
@@ -80,38 +84,38 @@ public class LBSPRPolicyUpdater implements Steppable, AdditionalStartable {
 
 
         //if there are not enough observations, don't bother updating
-        if(   model.getYear()< startUpdatingAfterYear ||
-                model.getYearlyDataSet().getColumn(cpueToEffort.getIndicatorColumnName()).size() <
-                        cpueToEffort.getTimeInterval()*2
+        if (model.getYear() < startUpdatingAfterYear ||
+            model.getYearlyDataSet().getColumn(cpueToEffort.getIndicatorColumnName()).size() <
+                cpueToEffort.getTimeInterval() * 2
 
         )
             return;
 
         double targetSPR = 0.4;
-        double currentSPR = model.getLatestYearlyObservation("SPR " + internalSPRAgent.getSpecies() +" " + internalSPRAgent.getSurveyTag());
+        double currentSPR = model.getLatestYearlyObservation("SPR " + internalSPRAgent.getSpecies() + " " + internalSPRAgent.getSurveyTag());
         double effortChangeSPR = LBSPREffortPolicy.lbsprPolicyEffortProportion(
-                controller.getLinearParameter(),
-                controller.getCubicParameter(),
-                currentSPR,
-                targetSPR
+            controller.getLinearParameter(),
+            controller.getCubicParameter(),
+            currentSPR,
+            targetSPR
         );
-        double effortChangeCPUE =cpueToEffort.getPercentageChangeToTACDueToIndicator(model);
+        double effortChangeCPUE = cpueToEffort.getPercentageChangeToTACDueToIndicator(model);
         effortChangeCPUE = effortChangeCPUE - 1;
 
         double discrepancy = effortChangeCPUE - effortChangeSPR;
-        if(discrepancy > upperDiscrepancyThreshold) {
+        if (discrepancy > upperDiscrepancyThreshold) {
             //increase M/K
-            double currentMK = internalSPRAgent.getAssumedNaturalMortality()/internalSPRAgent.getAssumedKParameter();
-            double newMortality =internalSPRAgent.getAssumedKParameter() * Math.min(currentMK + .1,maximumMK);
+            double currentMK = internalSPRAgent.getAssumedNaturalMortality() / internalSPRAgent.getAssumedKParameter();
+            double newMortality = internalSPRAgent.getAssumedKParameter() * Math.min(currentMK + .1, maximumMK);
             internalSPRAgent.setAssumedNaturalMortality(newMortality);
         }
-        if(discrepancy < lowerDiscrepancyThreshold){
+        if (discrepancy < lowerDiscrepancyThreshold) {
             //decrease M/K
-            double currentMK = internalSPRAgent.getAssumedNaturalMortality()/internalSPRAgent.getAssumedKParameter();
-            double newMortality =internalSPRAgent.getAssumedKParameter() * Math.max(currentMK - .1,minimumMK);
+            double currentMK = internalSPRAgent.getAssumedNaturalMortality() / internalSPRAgent.getAssumedKParameter();
+            double newMortality = internalSPRAgent.getAssumedKParameter() * Math.max(currentMK - .1, minimumMK);
             internalSPRAgent.setAssumedNaturalMortality(newMortality);
         }
-        System.out.println("M/K is now " + (internalSPRAgent.getAssumedNaturalMortality()/internalSPRAgent.getAssumedKParameter()));
+        System.out.println("M/K is now " + (internalSPRAgent.getAssumedNaturalMortality() / internalSPRAgent.getAssumedKParameter()));
 
 
     }
@@ -128,15 +132,16 @@ public class LBSPRPolicyUpdater implements Steppable, AdditionalStartable {
         model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE, controller.getIntervalInDays());
 
 
-        model.getYearlyDataSet().registerGatherer("M/K ratio " + internalSPRAgent.getSpecies() + " " +
-                        internalSPRAgent.getSurveyTag(),
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        return (internalSPRAgent.getAssumedNaturalMortality()/internalSPRAgent.getAssumedKParameter());
-                    }
-                },
-                Double.NaN
+        model.getYearlyDataSet().registerGatherer(
+            "M/K ratio " + internalSPRAgent.getSpecies() + " " +
+                internalSPRAgent.getSurveyTag(),
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(FishState fishState) {
+                    return (internalSPRAgent.getAssumedNaturalMortality() / internalSPRAgent.getAssumedKParameter());
+                }
+            },
+            Double.NaN
         );
 
     }

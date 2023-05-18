@@ -25,12 +25,12 @@ public class ClearableLogger implements RowProvider {
         this.headers = ImmutableList.copyOf(headers);
     }
 
-    public void addRow(Collection<?> row) {
-        builder.add(ImmutableList.copyOf(row));
-    }
-
     public void addRow(Object... row) {
         addRow(ImmutableList.copyOf(row));
+    }
+
+    public void addRow(Collection<?> row) {
+        builder.add(ImmutableList.copyOf(row));
     }
 
     @Override

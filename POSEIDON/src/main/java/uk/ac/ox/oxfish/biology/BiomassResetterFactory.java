@@ -25,10 +25,7 @@ import uk.ac.ox.oxfish.biology.initializer.allocator.KernelizedRandomFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.util.function.Supplier;
-
 public class BiomassResetterFactory implements AlgorithmFactory<BiomassLocationResetter> {
-
 
 
     private String speciesName = "Species 0";
@@ -45,8 +42,8 @@ public class BiomassResetterFactory implements AlgorithmFactory<BiomassLocationR
     @Override
     public BiomassLocationResetter apply(FishState fishState) {
         return new BiomassLocationResetter(
-                fishState.getBiology().getSpecie(speciesName),
-                () -> algorithmFactory.apply(fishState)
+            fishState.getBiology().getSpecie(speciesName),
+            () -> algorithmFactory.apply(fishState)
 
         );
     }
@@ -84,7 +81,8 @@ public class BiomassResetterFactory implements AlgorithmFactory<BiomassLocationR
      * @param algorithmFactory Value to set for property 'algorithmFactory'.
      */
     public void setAlgorithmFactory(
-            AlgorithmFactory<? extends BiomassAllocator> algorithmFactory) {
+        AlgorithmFactory<? extends BiomassAllocator> algorithmFactory
+    ) {
         this.algorithmFactory = algorithmFactory;
     }
 }

@@ -25,8 +25,8 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -40,29 +40,26 @@ import java.util.stream.Collectors;
  * Grows biomass in each given cell independently
  * Created by carrknight on 1/31/17.
  */
-public class IndependentLogisticBiomassGrower implements Startable, Steppable{
-
-
-    /**
-     * list of biologies to grow. You can use a single grower for all the cells or a separate grower
-     * for each cell. It shouldn't be too much of a big deal.
-     */
-    private List<BiomassLocalBiology> biologies = new LinkedList<>();
-
+public class IndependentLogisticBiomassGrower implements Startable, Steppable {
 
 
     /**
      * the uninpeded growth rate of each species
      */
     private final double malthusianParameter;
-    private Stoppable receipt;
-
     private final Species species;
+    /**
+     * list of biologies to grow. You can use a single grower for all the cells or a separate grower
+     * for each cell. It shouldn't be too much of a big deal.
+     */
+    private List<BiomassLocalBiology> biologies = new LinkedList<>();
+    private Stoppable receipt;
 
 
     public IndependentLogisticBiomassGrower(
-            double malthusianParameter,
-            Species species) {
+        double malthusianParameter,
+        Species species
+    ) {
         this.malthusianParameter = malthusianParameter;
         this.species = species;
     }
@@ -74,68 +71,53 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
 
         //remove all the biologies that stopped
         biologies = biologies.stream().filter(
-                logisticLocalBiology -> !logisticLocalBiology.isStopped()).collect(Collectors.toList());
+            logisticLocalBiology -> !logisticLocalBiology.isStopped()).collect(Collectors.toList());
 
         //for each place
-        for(VariableBiomassBasedBiology biology : biologies)
-        {
+        for (VariableBiomassBasedBiology biology : biologies) {
             //grow fish
 
             double[] currentBiomasses = biology.getCurrentBiomass();
 
 
-
             int speciesIndex = species.getIndex();
-            assert currentBiomasses[speciesIndex] >=0;
+            assert currentBiomasses[speciesIndex] >= 0;
             //grows logistically
 
             double carryingCapacity = biology.getCarryingCapacity(speciesIndex);
-            if(carryingCapacity > FishStateUtilities.EPSILON && carryingCapacity > currentBiomasses[speciesIndex]) {
+            if (carryingCapacity > FishStateUtilities.EPSILON && carryingCapacity > currentBiomasses[speciesIndex]) {
                 double oldBiomass = currentBiomasses[speciesIndex];
-                currentBiomasses[speciesIndex] = logisticStep(currentBiomasses[speciesIndex],
-                                                   carryingCapacity,
-                                                   malthusianParameter);
+                currentBiomasses[speciesIndex] = logisticStep(
+                    currentBiomasses[speciesIndex],
+                    carryingCapacity,
+                    malthusianParameter
+                );
                 //store recruitment number, counter should have been initialized by factory!
-                double recruitment = currentBiomasses[speciesIndex]-oldBiomass;
-                if(recruitment>FishStateUtilities.EPSILON)
-                    model.getYearlyCounter().count(model.getSpecies().get(speciesIndex) +
-                                                           " Recruitment",
-                                                   recruitment);
+                double recruitment = currentBiomasses[speciesIndex] - oldBiomass;
+                if (recruitment > FishStateUtilities.EPSILON)
+                    model.getYearlyCounter().count(
+                        model.getSpecies().get(speciesIndex) +
+                            " Recruitment",
+                        recruitment
+                    );
 
             }
-            assert currentBiomasses[speciesIndex] >=0;
+            assert currentBiomasses[speciesIndex] >= 0;
 
         }
 
 
-        if(biologies.size()==0) //if you removed all the biologies then we are done
+        if (biologies.size() == 0) //if you removed all the biologies then we are done
             turnOff();
     }
 
     public static double logisticStep(
-            double currentBiomasses, double carryingCapacity, double malthusianParameter) {
-        return Math.min(carryingCapacity, currentBiomasses + logisticRecruitment(currentBiomasses, carryingCapacity, malthusianParameter));
-    }
-
-    public static double logisticRecruitment(double currentBiomasses,
-                                             double carryingCapacity,
-                                             double malthusianParameter) {
-        return malthusianParameter *
-                (1d - currentBiomasses / carryingCapacity) * currentBiomasses;
-    }
-
-    /**
-     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
-     * or just to percolate a reference to the model
-     *
-     * @param model the model
-     */
-    @Override
-    public void start(FishState model)
-    {
-        //schedule yourself
-        Preconditions.checkArgument(receipt==null, "Already started!");
-        receipt = model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
+        double currentBiomasses, double carryingCapacity, double malthusianParameter
+    ) {
+        return Math.min(
+            carryingCapacity,
+            currentBiomasses + logisticRecruitment(currentBiomasses, carryingCapacity, malthusianParameter)
+        );
     }
 
     /**
@@ -145,6 +127,28 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
     public void turnOff() {
         receipt.stop();
 
+    }
+
+    public static double logisticRecruitment(
+        double currentBiomasses,
+        double carryingCapacity,
+        double malthusianParameter
+    ) {
+        return malthusianParameter *
+            (1d - currentBiomasses / carryingCapacity) * currentBiomasses;
+    }
+
+    /**
+     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
+     * or just to percolate a reference to the model
+     *
+     * @param model the model
+     */
+    @Override
+    public void start(FishState model) {
+        //schedule yourself
+        Preconditions.checkArgument(receipt == null, "Already started!");
+        receipt = model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
     }
 
     /**

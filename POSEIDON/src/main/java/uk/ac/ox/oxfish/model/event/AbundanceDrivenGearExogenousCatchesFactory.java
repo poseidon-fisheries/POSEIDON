@@ -28,10 +28,12 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 public class AbundanceDrivenGearExogenousCatchesFactory implements
-        AlgorithmFactory<AbundanceDrivenGearExogenousCatches> {
+    AlgorithmFactory<AbundanceDrivenGearExogenousCatches> {
 
 
     private List<String> species = new LinkedList<>();
@@ -50,33 +52,35 @@ public class AbundanceDrivenGearExogenousCatchesFactory implements
     @Override
     public AbundanceDrivenGearExogenousCatches apply(FishState fishState) {
 
-        LinkedHashMap<Species,Double> landings = new LinkedHashMap<>();
-        LinkedHashMap<Species,HomogeneousAbundanceGear> gear = new LinkedHashMap<>();
-        Preconditions.checkArgument(gears.size()==yearlyBiomassToExtract.size(),
-                                    " mismatch between gear map and landing map for exogenous landings");
-        Preconditions.checkArgument(gears.size()==species.size(),
-                                    " mismatch between gear map and landing map for exogenous landings");
+        LinkedHashMap<Species, Double> landings = new LinkedHashMap<>();
+        LinkedHashMap<Species, HomogeneousAbundanceGear> gear = new LinkedHashMap<>();
+        Preconditions.checkArgument(
+            gears.size() == yearlyBiomassToExtract.size(),
+            " mismatch between gear map and landing map for exogenous landings"
+        );
+        Preconditions.checkArgument(
+            gears.size() == species.size(),
+            " mismatch between gear map and landing map for exogenous landings"
+        );
 
-        for(int i=0;i<species.size(); i++)
-        {
+        for (int i = 0; i < species.size(); i++) {
             Species species = fishState.getBiology().getSpecie(this.species.get(i));
             landings.put(
-                    species,
-                    yearlyBiomassToExtract.get(i).doubleValue()
+                species,
+                yearlyBiomassToExtract.get(i).doubleValue()
             );
 
 
             gear.put(
-                    species,
-                    gears.get(i).apply(fishState)
+                species,
+                gears.get(i).apply(fishState)
             );
 
 
         }
 
 
-
-        return new AbundanceDrivenGearExogenousCatches(landings,gear);
+        return new AbundanceDrivenGearExogenousCatches(landings, gear);
     }
 
 
@@ -115,20 +119,19 @@ public class AbundanceDrivenGearExogenousCatchesFactory implements
     public void setGears(List<? extends HomogeneousGearFactory> givenGears) {
         List<HomogeneousGearFactory> real = new LinkedList<>();
 
-        FishYAML  yaml = new FishYAML();
+        FishYAML yaml = new FishYAML();
 
         //force it to go through YAML
-        for(int i=0;i<givenGears.size(); i++)
-        {
+        for (int i = 0; i < givenGears.size(); i++) {
             Object homogeneousGearFactory = givenGears.get(i);
 
-            HomogeneousGearFactory recast = yaml.loadAs(yaml.dump(homogeneousGearFactory),
-                                                        HomogeneousGearFactory.class);
+            HomogeneousGearFactory recast = yaml.loadAs(
+                yaml.dump(homogeneousGearFactory),
+                HomogeneousGearFactory.class
+            );
             real.add(recast);
 
         }
-
-
 
 
         this.gears = real;

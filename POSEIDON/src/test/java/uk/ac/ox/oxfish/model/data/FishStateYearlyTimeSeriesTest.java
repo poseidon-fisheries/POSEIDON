@@ -50,7 +50,7 @@ public class FishStateYearlyTimeSeriesTest {
         when(iterator.hasNext()).thenReturn(true);
         when(iterator.next()).thenReturn(5d);
         final Double sum = summer.apply(mock(FishState.class));
-        Assert.assertEquals(sum,365*5,.001);
+        Assert.assertEquals(sum, 365 * 5, .001);
 
 
     }

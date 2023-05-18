@@ -33,6 +33,13 @@ public class FixedGasFactory implements AlgorithmFactory<FixedGasPrice> {
     private DoubleParameter gasPrice = new FixedDoubleParameter(0.01);
 
 
+    public FixedGasFactory() {
+    }
+
+    public FixedGasFactory(double gasPrice) {
+        this.gasPrice = new FixedDoubleParameter(gasPrice);
+    }
+
     /**
      * Applies this function to the given argument.
      *
@@ -44,14 +51,6 @@ public class FixedGasFactory implements AlgorithmFactory<FixedGasPrice> {
 
         return new FixedGasPrice(gasPrice.applyAsDouble(state.getRandom()));
 
-    }
-
-    public FixedGasFactory() {
-    }
-
-
-    public FixedGasFactory(double gasPrice) {
-        this.gasPrice = new FixedDoubleParameter(gasPrice);
     }
 
     /**

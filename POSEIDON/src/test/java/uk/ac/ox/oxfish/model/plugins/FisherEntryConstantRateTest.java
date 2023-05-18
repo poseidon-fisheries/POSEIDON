@@ -37,7 +37,7 @@ public class FisherEntryConstantRateTest {
         //50% increase given 10 fishers
         FlexibleScenario scenario = new FlexibleScenario();
         scenario.getFisherDefinitions().get(0).getInitialFishersPerPort().clear();
-        scenario.getFisherDefinitions().get(0).getInitialFishersPerPort().put("Port 0",10);
+        scenario.getFisherDefinitions().get(0).getInitialFishersPerPort().put("Port 0", 10);
 
         FisherEntryConstantRateFactory entryRate = new FisherEntryConstantRateFactory();
         entryRate.setGrowthRateInPercentage(new FixedDoubleParameter(.5));
@@ -48,22 +48,22 @@ public class FisherEntryConstantRateTest {
         state.setScenario(scenario);
 
         state.start();
-        while(state.getYear()<2)
+        while (state.getYear() < 2)
             state.schedule.step(state);
 
         //year 0: 10
         //year 1: 15
         //year 2: 22.5 rounded to 23
-        assertEquals(state.getFishers().size(),23);
+        assertEquals(state.getFishers().size(), 23);
 
         //now force all but 10 people to stay home; the active fishers left are 10 which means that the increase is going to be 5 fishers
         for (int i = 10; i < state.getFishers().size(); i++) {
-            state.getFishers().get(i).setRegulation(new FishingSeason(true,0));
+            state.getFishers().get(i).setRegulation(new FishingSeason(true, 0));
 
         }
-        while(state.getYear()<3)
+        while (state.getYear() < 3)
             state.schedule.step(state);
-        assertEquals(state.getFishers().size(),28);
+        assertEquals(state.getFishers().size(), 28);
 
     }
 }

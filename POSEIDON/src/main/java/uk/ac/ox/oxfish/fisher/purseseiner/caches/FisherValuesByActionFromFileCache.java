@@ -19,23 +19,14 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.caches;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.Collections.emptyMap;
-import static java.util.function.Function.identity;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+
+import static java.util.Collections.emptyMap;
 
 /**
  * Caches based on this class store values loaded from a file and uniquely identified by:

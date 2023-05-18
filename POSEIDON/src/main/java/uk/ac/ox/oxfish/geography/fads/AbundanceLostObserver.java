@@ -18,17 +18,18 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-
-import java.util.HashMap;
-import java.util.Map;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.ImmutableAbundance;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceLostEvent;
 import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 
 public class AbundanceLostObserver implements Observer<AbundanceLostEvent> {
 

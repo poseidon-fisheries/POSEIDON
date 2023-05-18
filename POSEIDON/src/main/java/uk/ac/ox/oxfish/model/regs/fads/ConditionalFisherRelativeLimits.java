@@ -32,7 +32,8 @@ public class ConditionalFisherRelativeLimits implements FisherRelativeLimits {
         this.limits = ImmutableList.copyOf(limits);
     }
 
-    @Override public int getLimit(Fisher fisher) {
+    @Override
+    public int getLimit(Fisher fisher) {
         return limits.stream()
             .filter(limit -> limit.test(fisher))
             .findFirst()

@@ -51,42 +51,50 @@ public class LogitReturnStrategyTest {
         LogisticClassifier classifier = mock(LogisticClassifier.class);
 
         LogitReturnStrategy strategy =
-                new LogitReturnStrategy(classifier);
-
+            new LogitReturnStrategy(classifier);
 
 
         //true gets propagated
-        when(classifier.test(any(),any(),any(),any())).thenReturn(true);
+        when(classifier.test(any(), any(), any(), any())).thenReturn(true);
 
         //always true because having put no fishing effort overrides the logit
         TripRecord record = mock(TripRecord.class);
         when(record.getEffort()).thenReturn(0);
         assertTrue(strategy.shouldFish(fisher, new MersenneTwisterFast(), mock(FishState.class),
-                                       record));
+            record
+        ));
         assertTrue(strategy.shouldFish(fisher, new MersenneTwisterFast(), mock(FishState.class),
-                                       record));
+            record
+        ));
         assertTrue(strategy.shouldFish(fisher, new MersenneTwisterFast(), mock(FishState.class),
-                                       record));
+            record
+        ));
         assertTrue(strategy.shouldFish(fisher, new MersenneTwisterFast(), mock(FishState.class),
-                                       record));
+            record
+        ));
 
         //when effort is at least 1, shouldFish returns the opposite of the classifier
         when(record.getEffort()).thenReturn(1);
-        when(classifier.test(any(),any(),any(),any())).thenReturn(true);
+        when(classifier.test(any(), any(), any(), any())).thenReturn(true);
         assertFalse(strategy.shouldFish(fisher, new MersenneTwisterFast(), mock(FishState.class),
-                                        record));
+            record
+        ));
         assertFalse(strategy.shouldFish(fisher, new MersenneTwisterFast(), mock(FishState.class),
-                                        record));
-        when(classifier.test(any(),any(),any(),any())).thenReturn(false);
+            record
+        ));
+        when(classifier.test(any(), any(), any(), any())).thenReturn(false);
         assertTrue(strategy.shouldFish(fisher, new MersenneTwisterFast(), mock(FishState.class),
-                                       record));
+            record
+        ));
         assertTrue(strategy.shouldFish(fisher, new MersenneTwisterFast(), mock(FishState.class),
-                                       record));
+            record
+        ));
 
         //you should return if when the classifier says not to if you are full
-        when(classifier.test(any(),any(),any(),any())).thenReturn(false);
+        when(classifier.test(any(), any(), any(), any())).thenReturn(false);
         when(fisher.getTotalWeightOfCatchInHold()).thenReturn(100d);
         assertFalse(strategy.shouldFish(fisher, new MersenneTwisterFast(), mock(FishState.class),
-                                       record));
+            record
+        ));
     }
 }

@@ -47,7 +47,8 @@ public class ObservingAtIntervalMonitor<O, V, Q extends Quantity<Q>> extends Mon
             fishState -> observablesExtractor.apply(fishState).forEach(this::observe);
     }
 
-    @Override public void start(FishState fishState) {
+    @Override
+    public void start(FishState fishState) {
         StepOrder stepOrder = observationInterval == EVERY_YEAR ? YEARLY_DATA_GATHERING : DAILY_DATA_GATHERING;
         fishState.schedulePerPolicy(observingSteppable, stepOrder, observationInterval);
         super.start(fishState);

@@ -39,24 +39,25 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class HalfBycatchInitializer extends TwoSpeciesBoxInitializer {
 
 
-
-
-
-    public HalfBycatchInitializer(DoubleParameter carryingCapacity,
-                                  double percentageLimitOnDailyMovement,
-                                  double differentialPercentageToMove,
-                                  LogisticGrowerInitializer grower) {
-        super(0,0,Integer.MAX_VALUE,Integer.MAX_VALUE,true,
-              carryingCapacity,
-              new FixedDoubleParameter(1d),
-              percentageLimitOnDailyMovement,
-              differentialPercentageToMove,
-              grower);
+    public HalfBycatchInitializer(
+        DoubleParameter carryingCapacity,
+        double percentageLimitOnDailyMovement,
+        double differentialPercentageToMove,
+        LogisticGrowerInitializer grower
+    ) {
+        super(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, true,
+            carryingCapacity,
+            new FixedDoubleParameter(1d),
+            percentageLimitOnDailyMovement,
+            differentialPercentageToMove,
+            grower
+        );
     }
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -65,8 +66,9 @@ public class HalfBycatchInitializer extends TwoSpeciesBoxInitializer {
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
+        GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
+        int mapWidthInCells, NauticalMap map
+    ) {
 
         setLowestY(mapHeightInCells / 2);
         return super.generateLocal(biology, seaTile, random, mapHeightInCells, mapWidthInCells, map);
@@ -79,14 +81,14 @@ public class HalfBycatchInitializer extends TwoSpeciesBoxInitializer {
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model)
-    {
+        GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model
+    ) {
 
         super.processMap(biology, map, random, model);
 
         int width = map.getHeight();
         int heightLow = map.getHeight() / 2;
-        int heightHigh = heightLow+1;
+        int heightHigh = heightLow + 1;
 
 
         //create daily data
@@ -110,12 +112,16 @@ public class HalfBycatchInitializer extends TwoSpeciesBoxInitializer {
 
 
         //create yearly data
-        model.getYearlyDataSet().registerGatherer("# of North Tows",
-                                                  FishStateUtilities.generateYearlySum(dailyNorthColumn),
-                                                  Double.NaN);
-        model.getYearlyDataSet().registerGatherer("# of South Tows",
-                                                  FishStateUtilities.generateYearlySum(dailySouthColumn),
-                                                  Double.NaN);
+        model.getYearlyDataSet().registerGatherer(
+            "# of North Tows",
+            FishStateUtilities.generateYearlySum(dailyNorthColumn),
+            Double.NaN
+        );
+        model.getYearlyDataSet().registerGatherer(
+            "# of South Tows",
+            FishStateUtilities.generateYearlySum(dailySouthColumn),
+            Double.NaN
+        );
     }
 
 

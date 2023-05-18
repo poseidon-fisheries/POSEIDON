@@ -30,8 +30,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CashFlowObjectiveTest
-{
+public class CashFlowObjectiveTest {
 
     @Test
     public void correctlyFindCashFlow() throws Exception {
@@ -40,12 +39,11 @@ public class CashFlowObjectiveTest
         CashFlowObjective objective = new CashFlowObjective(6);
         Fisher fisher = mock(Fisher.class);
         FisherDailyTimeSeries data = new FisherDailyTimeSeries();
-        data.start(mock(FishState.class),fisher);
+        data.start(mock(FishState.class), fisher);
         when(fisher.getDailyData()).thenReturn(data);
         when(fisher.balanceXDaysAgo(anyInt())).thenCallRealMethod();
 
-        for(int i=0; i<100; i++)
-        {
+        for (int i = 0; i < 100; i++) {
             when(fisher.getBankBalance()).thenReturn(((double) i));
             data.step(mock(FishState.class));
 
@@ -54,8 +52,7 @@ public class CashFlowObjectiveTest
         assertEquals(6, objective.computeCurrentFitness(mock(Fisher.class), fisher), .0001);
 
         //let's add some garbage
-        for(int i=0; i<6; i++)
-        {
+        for (int i = 0; i < 6; i++) {
             when(fisher.getBankBalance()).thenReturn(0d);
             data.step(mock(FishState.class));
         }

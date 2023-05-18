@@ -21,11 +21,14 @@ package uk.ac.ox.oxfish.model.data.monitors.accumulators;
 
 public interface Accumulator<V> {
 
-    String getNameFormat();
     default String makeName(String baseName) {
         return String.format(getNameFormat(), baseName);
     }
+
+    String getNameFormat();
+
     void accumulate(V value);
+
     double get();
 
 }

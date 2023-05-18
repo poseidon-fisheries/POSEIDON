@@ -18,22 +18,19 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
-import java.util.Collection;
-import java.util.List;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.Collection;
+import java.util.List;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * Initializes the biology for multiple independent species and schedules a {@link

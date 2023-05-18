@@ -38,6 +38,7 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
 
     /**
      * create the strategy with given destination
+     *
      * @param favoriteSpot where the fisher wants to go
      */
     public FavoriteDestinationStrategy(SeaTile favoriteSpot) {
@@ -59,6 +60,7 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
 
     /**
      * tell the startable to turnoff,
+     *
      * @param fisher
      */
     @Override
@@ -76,24 +78,23 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
      */
     @Override
     public SeaTile chooseDestination(
-            Fisher fisher, MersenneTwisterFast random,
-            FishState model,
-            Action currentAction) {
+        Fisher fisher, MersenneTwisterFast random,
+        FishState model,
+        Action currentAction
+    ) {
 
         //if we have arrived
-        if(fisher.getLocation().equals(favoriteSpot))
-        {
+        if (fisher.getLocation().equals(favoriteSpot)) {
             //and we are able to fish here, fish here
-            if(fisher.canAndWantToFishHere())
+            if (fisher.canAndWantToFishHere())
                 return fisher.getLocation();
             //otherwise go back home
             return fisher.getHomePort().getLocation();
-        }
-        else
-            //we haven't arrived
+        } else
+        //we haven't arrived
         {
             //if we are going to port, keep going
-            if(!fisher.isAtDestination() && fisher.isGoingToPort() )
+            if (!fisher.isAtDestination() && fisher.isGoingToPort())
                 return fisher.getHomePort().getLocation();
 
             //otherwise go/keep going to favorite spot
@@ -112,11 +113,6 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
 
         Preconditions.checkArgument(this.favoriteSpot.isWater());
     }
-
-
-
-
-
 
 
 }

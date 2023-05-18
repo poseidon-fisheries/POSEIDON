@@ -30,15 +30,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class CashFlowLogisticDepartingStrategyTest
-{
+public class CashFlowLogisticDepartingStrategyTest {
 
 
     @Test
     public void departingCorrectly() throws Exception {
 
 
-        CashFlowLogisticDepartingStrategy  strategy = new CashFlowLogisticDepartingStrategy(1,20,0.9,100,30);
+        CashFlowLogisticDepartingStrategy strategy = new CashFlowLogisticDepartingStrategy(1, 20, 0.9, 100, 30);
 
         //create randomizer
         FishState model = mock(FishState.class);
@@ -55,26 +54,21 @@ public class CashFlowLogisticDepartingStrategyTest
         //your cashflow ought to be 95,compared to a 100$ target it means your daily probability of departing ought to be approx 26%
         //see the xlsx example
         int hoursDeparted = 0;
-        for(int day =0;day <10000; day++ )
-        {
+        for (int day = 0; day < 10000; day++) {
             strategy.step(model);
-            for(int hour=0; hour<24;hour++)
-            {
+            for (int hour = 0; hour < 24; hour++) {
                 boolean departing = strategy.shouldFisherLeavePort(fisher, model, new MersenneTwisterFast());
-                if(departing) {
+                if (departing) {
                     hoursDeparted++;
                 }
             }
         }
 
-        double departingRate = hoursDeparted/(10000*24d);
+        double departingRate = hoursDeparted / (10000 * 24d);
 
         System.out.println(departingRate);
         assertTrue(departingRate > .20);
         assertTrue(departingRate < .30);
-
-
-
 
 
     }

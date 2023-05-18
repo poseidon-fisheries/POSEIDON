@@ -140,6 +140,7 @@ public class Fisher implements Steppable, Startable {
      * collection of adaptation algorithms to fire every trip
      */
     private final AdaptationPerTripScheduler tripAdaptation = new AdaptationPerTripScheduler();
+    private final LinkedList<DockingListener> dockingListeners = new LinkedList<>();
     /**
      * a link to the model. Grabbed when start() is called. It's not used or shared except when a new strategy is plugged in
      * at which point this reference is used to call the strategy's start method
@@ -174,7 +175,6 @@ public class Fisher implements Steppable, Startable {
      * the turnOff switch to call when the fisher is turned off
      */
     private Stoppable receipt;
-    private final LinkedList<DockingListener> dockingListeners = new LinkedList<>();
 
 
     public Fisher(
@@ -489,7 +489,12 @@ public class Fisher implements Steppable, Startable {
      * @param map               the map on which we are moving
      * @param distanceTravelled
      */
-    public void move(final SeaTile newPosition, final NauticalMap map, final FishState state, final double distanceTravelled) {
+    public void move(
+        final SeaTile newPosition,
+        final NauticalMap map,
+        final FishState state,
+        final double distanceTravelled
+    ) {
         Preconditions.checkArgument(newPosition != status.getLocation()); //i am not already here!
         Preconditions.checkArgument(distanceTravelled > 0); //i am not already here!
         equipment.getBoat().recordTravel(distanceTravelled); //tell the boat
@@ -857,7 +862,8 @@ public class Fisher implements Steppable, Startable {
         final int hoursSpentFishing, final GlobalBiology modelBiology, final FishState state
     ) {
         //transfer fish from local to here
-        final Catch catchOfTheDay = equipment.getGear().fish(this,
+        final Catch catchOfTheDay = equipment.getGear().fish(
+            this,
             biology,
             context,
             hoursSpentFishing,
@@ -876,7 +882,10 @@ public class Fisher implements Steppable, Startable {
     }
 
     private void removeFishAfterFishing(
-        final GlobalBiology modelBiology, final Catch catchOfTheDay, final Catch notDiscarded, final LocalBiology biology
+        final GlobalBiology modelBiology,
+        final Catch catchOfTheDay,
+        final Catch notDiscarded,
+        final LocalBiology biology
     ) {
         if (catchOfTheDay.totalCatchWeight() > FishStateUtilities.EPSILON) {
             biology.reactToThisAmountOfBiomassBeingFished(catchOfTheDay, notDiscarded, modelBiology);

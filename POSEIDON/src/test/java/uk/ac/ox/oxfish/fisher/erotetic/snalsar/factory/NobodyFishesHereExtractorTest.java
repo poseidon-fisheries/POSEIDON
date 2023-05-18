@@ -46,8 +46,8 @@ public class NobodyFishesHereExtractorTest {
         SeaTile bad1 = mock(SeaTile.class);
         SeaTile bad2 = mock(SeaTile.class);
 
-        Fisher dude1 = mock(Fisher.class,RETURNS_DEEP_STUBS);
-        Fisher dude2 = mock(Fisher.class,RETURNS_DEEP_STUBS);
+        Fisher dude1 = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        Fisher dude2 = mock(Fisher.class, RETURNS_DEEP_STUBS);
         when(dude1.getLastFinishedTrip().getTilesFished()).thenReturn(Sets.newHashSet(bad1));
         when(dude2.getLastFinishedTrip().getTilesFished()).thenReturn(Sets.newHashSet(bad2));
 
@@ -56,13 +56,14 @@ public class NobodyFishesHereExtractorTest {
 
         NobodyFishesHereExtractor extractor = new NobodyFishesHereExtractor();
         Map<SeaTile, Double> map = extractor.extractFeature(
-                Lists.newArrayList(good, bad1, bad2),
-                model,
-                mock(Fisher.class));
-        assertEquals(map.size(),3);
-        assertEquals(map.get(good),1,.001);
-        assertEquals(map.get(bad1),-1,.001);
-        assertEquals(map.get(bad2),-1,.001);
+            Lists.newArrayList(good, bad1, bad2),
+            model,
+            mock(Fisher.class)
+        );
+        assertEquals(map.size(), 3);
+        assertEquals(map.get(good), 1, .001);
+        assertEquals(map.get(bad1), -1, .001);
+        assertEquals(map.get(bad2), -1, .001);
 
     }
 }

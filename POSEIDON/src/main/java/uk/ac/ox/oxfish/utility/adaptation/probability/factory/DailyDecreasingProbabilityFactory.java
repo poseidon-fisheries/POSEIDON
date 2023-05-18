@@ -49,10 +49,12 @@ public class DailyDecreasingProbabilityFactory implements AlgorithmFactory<Daily
      */
     @Override
     public DailyDecreasingProbability apply(FishState state) {
-        return new DailyDecreasingProbability(explorationProbability.applyAsDouble(state.getRandom()),
-                                              imitationProbability.applyAsDouble(state.getRandom()),
-                                              dailyDecreaseMultiplier.applyAsDouble(state.getRandom()),
-                                              explorationProbabilityMinimum.applyAsDouble(state.getRandom()));
+        return new DailyDecreasingProbability(
+            explorationProbability.applyAsDouble(state.getRandom()),
+            imitationProbability.applyAsDouble(state.getRandom()),
+            dailyDecreaseMultiplier.applyAsDouble(state.getRandom()),
+            explorationProbabilityMinimum.applyAsDouble(state.getRandom())
+        );
     }
 
 
@@ -85,7 +87,8 @@ public class DailyDecreasingProbabilityFactory implements AlgorithmFactory<Daily
     }
 
     public void setExplorationProbabilityMinimum(
-            DoubleParameter explorationProbabilityMinimum) {
+        DoubleParameter explorationProbabilityMinimum
+    ) {
         this.explorationProbabilityMinimum = explorationProbabilityMinimum;
     }
 }

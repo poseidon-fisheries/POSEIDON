@@ -41,8 +41,9 @@ public class FixedProbabilityFactory implements AlgorithmFactory<FixedProbabilit
     }
 
     public FixedProbabilityFactory(
-            double explorationProbability,
-            double imitationProbability) {
+        double explorationProbability,
+        double imitationProbability
+    ) {
         this.explorationProbability = new FixedDoubleParameter(explorationProbability);
         this.imitationProbability = new FixedDoubleParameter(imitationProbability);
     }
@@ -56,8 +57,10 @@ public class FixedProbabilityFactory implements AlgorithmFactory<FixedProbabilit
      */
     @Override
     public FixedProbability apply(FishState state) {
-        return new FixedProbability(explorationProbability.applyAsDouble(state.getRandom()),
-                                    imitationProbability.applyAsDouble(state.getRandom()));
+        return new FixedProbability(
+            explorationProbability.applyAsDouble(state.getRandom()),
+            imitationProbability.applyAsDouble(state.getRandom())
+        );
     }
 
     public DoubleParameter getExplorationProbability() {

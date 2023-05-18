@@ -24,8 +24,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.model.market.FlexibleAbundanceMarket;
-import uk.ac.ox.oxfish.model.market.NThresholdsMarket;
-import uk.ac.ox.oxfish.model.market.PerBinMarket;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,29 +36,27 @@ public class CatchesHistogrammer implements OutputPlugin {
     @Override
     public void reactToEndOfSimulation(FishState state) {
 
-        for(Species species : state.getSpecies()) {
+        for (Species species : state.getSpecies()) {
             String name = species.getName();
-            for (int bin = 0; bin < species.getNumberOfBins(); bin++)
-            {
+            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
                 //get average weight and length first
                 double weight = 0;
                 double length = 0;
-                for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
-                {
-                    weight += species.getWeight(subdivision,bin);
-                    length += species.getLength(subdivision,bin);
+                for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++) {
+                    weight += species.getWeight(subdivision, bin);
+                    length += species.getLength(subdivision, bin);
                 }
-                weight/=(double)species.getNumberOfSubdivisions();
-                length/=(double)species.getNumberOfSubdivisions();
+                weight /= (double) species.getNumberOfSubdivisions();
+                length /= (double) species.getNumberOfSubdivisions();
 
                 //sum up all the catches
 
                 Stream<Double> stream = state.getDailyDataSet().getColumn(
-                        species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME +
-                                FlexibleAbundanceMarket.AGE_BIN_PREFIX + bin).stream();
+                    species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME +
+                        FlexibleAbundanceMarket.AGE_BIN_PREFIX + bin).stream();
                 double catches = stream.collect(Collectors.summarizingDouble(Double::doubleValue)).getSum();
                 //now catches are in KG, but we want frequency, so re-divide
-                catches = catches/weight;
+                catches = catches / weight;
 
                 //append line
                 builder.append(name).append(",");

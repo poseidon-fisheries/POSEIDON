@@ -18,10 +18,9 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import java.util.Map;
-import java.util.Map.Entry;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
+
+import java.util.Map;
 
 /**
  * This is a {@link Restorer} that works with {@link AbundanceLocalBiology}.

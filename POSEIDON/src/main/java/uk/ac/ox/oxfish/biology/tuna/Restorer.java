@@ -18,16 +18,17 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
-import static uk.ac.ox.oxfish.model.StepOrder.POLICY_UPDATE;
-
 import com.google.common.collect.ImmutableMap;
-import java.util.Map;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateSteppable;
+
+import java.util.Map;
+
+import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
+import static uk.ac.ox.oxfish.model.StepOrder.POLICY_UPDATE;
 
 /**
  * The job of this class is to take an aggregated "snapshot" of the biology at some point in time
@@ -52,6 +53,7 @@ abstract class Restorer<B extends LocalBiology>
     private final Aggregator<B> aggregator;
     private final Extractor<B> extractor;
     private final Excluder<B> excluder;
+
     Restorer(
         final Reallocator<B> reallocator,
         final Aggregator<B> aggregator,

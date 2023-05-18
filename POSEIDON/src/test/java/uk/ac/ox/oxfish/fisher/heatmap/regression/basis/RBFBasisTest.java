@@ -32,10 +32,10 @@ public class RBFBasisTest {
     @Test
     public void computesCorrectly() throws Exception {
 
-        RBFBasis basis = new RBFBasis(10,2,2);
+        RBFBasis basis = new RBFBasis(10, 2, 2);
         double similiarity = basis.evaluate(new double[]{1, 1});
 
-        assertEquals(similiarity,.1141512,.0001);
+        assertEquals(similiarity, .1141512, .0001);
 
     }
 }

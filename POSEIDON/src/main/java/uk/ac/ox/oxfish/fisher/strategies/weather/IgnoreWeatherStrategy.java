@@ -40,7 +40,8 @@ public class IgnoreWeatherStrategy implements WeatherEmergencyStrategy {
      */
     @Override
     public boolean updateWeatherEmergencyFlag(
-            boolean currentEmergencyFlag, Fisher fisher, SeaTile location) {
+        boolean currentEmergencyFlag, Fisher fisher, SeaTile location
+    ) {
         return false;
     }
 

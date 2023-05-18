@@ -30,8 +30,7 @@ import java.util.function.Predicate;
  * This little object keeps track of the link from arm to group and from group to arm
  * Created by carrknight on 12/1/16.
  */
-public class BanditSwitch
-{
+public class BanditSwitch {
 
     /**
      * the index represents the "bandit arm" index, the number in the array at
@@ -43,31 +42,29 @@ public class BanditSwitch
     /**
      * map where key is the real group and value is the arm associated with it
      */
-    private final HashMap<Integer,Integer> groupToArm;
+    private final HashMap<Integer, Integer> groupToArm;
 
 
     /**
-     *
      * @param numberOfRealGroups
      * @param groupValidator
      */
-    public BanditSwitch(int numberOfRealGroups,
-                        Predicate<Integer> groupValidator)
-    {
+    public BanditSwitch(
+        int numberOfRealGroups,
+        Predicate<Integer> groupValidator
+    ) {
 
         //go through all the groups and store only the valid ones
         ArrayList<Integer> validGroups = new ArrayList<>();
-        for(int i = 0; i< numberOfRealGroups; i++)
-        {
-            if(groupValidator.test(i))
+        for (int i = 0; i < numberOfRealGroups; i++) {
+            if (groupValidator.test(i))
                 validGroups.add(i);
         }
 
         //associate valid real groups to arms and viceversa
         groupToArm = new HashMap<>();
         armToGroup = new int[validGroups.size()];
-        for(int arm=0; arm<armToGroup.length; arm++)
-        {
+        for (int arm = 0; arm < armToGroup.length; arm++) {
             Integer realGroup = validGroups.get(arm);
             armToGroup[arm] = realGroup;
             groupToArm.put(realGroup, arm);
@@ -75,37 +72,38 @@ public class BanditSwitch
 
     }
 
-
-    /**
-     * given the group index return the bandit arm associated with it
-     * @param group the group index
-     * @return the arm that is associated with the group, or null if no arm is associated with the group
-     */
-    public Integer getArm(Integer group){
-        return groupToArm.get(group);
-    }
-
     /**
      * given the arm index, return the group index associated with it
+     *
      * @param arm the arm index
      * @return the group index
      */
-    public int getGroup(int arm)
-    {
+    public int getGroup(int arm) {
         return armToGroup[arm];
     }
 
-    public int getNumberOfArms(){
+    public int getNumberOfArms() {
         return armToGroup.length;
 
     }
 
     /**
      * checks if this group belongs to any arm
+     *
      * @param group
      * @return
      */
-    public boolean containsGroup(Integer group){
+    public boolean containsGroup(Integer group) {
         return getArm(group) != null;
+    }
+
+    /**
+     * given the group index return the bandit arm associated with it
+     *
+     * @param group the group index
+     * @return the arm that is associated with the group, or null if no arm is associated with the group
+     */
+    public Integer getArm(Integer group) {
+        return groupToArm.get(group);
     }
 }

@@ -34,14 +34,13 @@ import java.util.List;
  * Present the fisher a fixed portfolio of gears that he can choose from
  * Created by carrknight on 6/13/16.
  */
-public class PeriodicUpdateFromListFactory implements AlgorithmFactory<PeriodicUpdateGearStrategy>
-{
+public class PeriodicUpdateFromListFactory implements AlgorithmFactory<PeriodicUpdateGearStrategy> {
 
     private List<AlgorithmFactory<? extends Gear>> availableGears = new LinkedList<>();
 
 
     private AlgorithmFactory<? extends AdaptationProbability>
-            probability = new FixedProbabilityFactory(.2, .6);
+        probability = new FixedProbabilityFactory(.2, .6);
 
 
     private boolean yearly = true;
@@ -56,12 +55,14 @@ public class PeriodicUpdateFromListFactory implements AlgorithmFactory<PeriodicU
     @Override
     public PeriodicUpdateGearStrategy apply(FishState state) {
         List<Gear> options = new LinkedList<>();
-        for(AlgorithmFactory<?extends Gear> gearFactory: availableGears)
+        for (AlgorithmFactory<? extends Gear> gearFactory : availableGears)
             options.add(gearFactory.apply(state));
 
-        return new PeriodicUpdateGearStrategy(yearly,
-                                              options,
-                                              probability.apply(state));
+        return new PeriodicUpdateGearStrategy(
+            yearly,
+            options,
+            probability.apply(state)
+        );
     }
 
 
@@ -80,7 +81,8 @@ public class PeriodicUpdateFromListFactory implements AlgorithmFactory<PeriodicU
      * @param availableGears Value to set for property 'availableGears'.
      */
     public void setAvailableGears(
-            List<AlgorithmFactory<? extends Gear>> availableGears) {
+        List<AlgorithmFactory<? extends Gear>> availableGears
+    ) {
         this.availableGears = availableGears;
     }
 
@@ -99,7 +101,8 @@ public class PeriodicUpdateFromListFactory implements AlgorithmFactory<PeriodicU
      * @param probability Value to set for property 'probability'.
      */
     public void setProbability(
-            AlgorithmFactory<? extends AdaptationProbability> probability) {
+        AlgorithmFactory<? extends AdaptationProbability> probability
+    ) {
         this.probability = probability;
     }
 

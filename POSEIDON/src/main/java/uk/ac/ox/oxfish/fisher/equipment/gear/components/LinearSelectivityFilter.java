@@ -39,8 +39,10 @@ public class LinearSelectivityFilter extends FormulaAbundanceFilter {
     private final double lengthInfinityInCm;
 
 
-    public LinearSelectivityFilter(double minLengthCaughtInCm, double mostFrequentLengthCaughtInCm,
-            double vonBertalanfyKParameter, double meanLengthCaughtAboveThresholdInCm, double lengthInfinityInCm) {
+    public LinearSelectivityFilter(
+        double minLengthCaughtInCm, double mostFrequentLengthCaughtInCm,
+        double vonBertalanfyKParameter, double meanLengthCaughtAboveThresholdInCm, double lengthInfinityInCm
+    ) {
         super(true, false);
         this.minLengthCaughtInCm = minLengthCaughtInCm;
         this.mostFrequentLengthCaughtInCm = mostFrequentLengthCaughtInCm;
@@ -63,24 +65,25 @@ public class LinearSelectivityFilter extends FormulaAbundanceFilter {
 
         //get instantaneousMortality
         double instantaneousMortality = (vonBertalanfyKParameter * (lengthInfinityInCm - meanLengthCaughtAboveThresholdInCm)) /
-                (meanLengthCaughtAboveThresholdInCm - mostFrequentLengthCaughtInCm);
+            (meanLengthCaughtAboveThresholdInCm - mostFrequentLengthCaughtInCm);
 
         //remove from it natural mortality
-        instantaneousMortality -= Math.pow(10,0.566-(0.718*Math.log10(lengthInfinityInCm))+0.02*20);
+        instantaneousMortality -= Math.pow(10, 0.566 - (0.718 * Math.log10(lengthInfinityInCm)) + 0.02 * 20);
 
         for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
             for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++) {
 
                 double length = species.getLength(subdivision, bin);
                 mortality[subdivision][bin] = length <= minLengthCaughtInCm ?
-                        0 :
-                        Math.min(1, (length - minLengthCaughtInCm) /
-                                (mostFrequentLengthCaughtInCm - minLengthCaughtInCm)) * instantaneousMortality;
+                    0 :
+                    Math.min(1, (length - minLengthCaughtInCm) /
+                        (mostFrequentLengthCaughtInCm - minLengthCaughtInCm)) * instantaneousMortality;
             }
 
         }
         return mortality;
     }
+
     /**
      * Getter for property 'minLengthCaughtInCm'.
      *

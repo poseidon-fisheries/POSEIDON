@@ -24,8 +24,6 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.selfanalysis.LameTripSimulator;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.ProfitFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -46,11 +44,13 @@ public class SelfDestructingIterativeDestinationStarter implements DestinationSt
     private final double maxHoursOut;
 
     private final double fractionOfTilesToExamine;
+    boolean turningOff = false;
 
     public SelfDestructingIterativeDestinationStarter(
-            PerTripIterativeDestinationStrategy delegate,
-            double maxHoursOut,
-            double fractionOfTilesToExamine) {
+        PerTripIterativeDestinationStrategy delegate,
+        double maxHoursOut,
+        double fractionOfTilesToExamine
+    ) {
         this.delegate = delegate;
         this.maxHoursOut = maxHoursOut;
         this.fractionOfTilesToExamine = fractionOfTilesToExamine;
@@ -67,67 +67,69 @@ public class SelfDestructingIterativeDestinationStarter implements DestinationSt
      */
     @Override
     public SeaTile chooseDestination(
-            Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
+        Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction
+    ) {
 
-       Preconditions.checkState(false,
-                                "Should have self-destructed by now!");
-       return null;
+        Preconditions.checkState(
+            false,
+            "Should have self-destructed by now!"
+        );
+        return null;
     }
-
-    boolean turningOff = false;
 
     @Override
     public void start(FishState model, Fisher fisher) {
 
         //this gets called when I set it as a delegate
-    //    delegate.start(model,fisher);
+        //    delegate.start(model,fisher);
 
         SeaTile bestTile = null;
         double bestProfits = -Double.MAX_VALUE;
 
         List<SeaTile> candidates = model.getMap().getAllSeaTilesExcludingLandAsList();
-        do{
+        do {
 
 
-            for (SeaTile candidate : candidates)
-            {
+            for (SeaTile candidate : candidates) {
 
                 //simulator
                 ProfitFunction simulator = new ProfitFunction(maxHoursOut);
 
-                if(!model.getRandom().nextBoolean(fractionOfTilesToExamine))
+                if (!model.getRandom().nextBoolean(fractionOfTilesToExamine))
                     continue;
 
                 //simulate trip!
                 Double profits = simulator.simulateHourlyProfits(
-                        fisher,
-                        fisher.getGear().expectedHourlyCatch(fisher, candidate, 1,
-                                                             model.getBiology()),
-                        candidate,
-                        model,
-                        false
+                    fisher,
+                    fisher.getGear().expectedHourlyCatch(fisher, candidate, 1,
+                        model.getBiology()
+                    ),
+                    candidate,
+                    model,
+                    false
 
-                ) ;
-                if(profits==null || !Double.isFinite(profits))
+                );
+                if (profits == null || !Double.isFinite(profits))
                     continue;
-                if(profits>bestProfits)
-                {
-                    bestProfits=profits;
-                    bestTile=candidate;
+                if (profits > bestProfits) {
+                    bestProfits = profits;
+                    bestTile = candidate;
                 }
 
             }
 
 
-        }while(bestTile==null);
+        } while (bestTile == null);
 
-        turningOff=true;
+        turningOff = true;
         delegate.forceFavoriteSpot(bestTile);
-        Preconditions.checkArgument(fisher.getDestinationStrategy()==this,
-                                    "we are not the destination strategy; we can't replace it!");
+        Preconditions.checkArgument(
+            fisher.getDestinationStrategy() == this,
+            "we are not the destination strategy; we can't replace it!"
+        );
         fisher.setDestinationStrategy(delegate);
         assert delegate.getFavoriteSpot() == bestTile;
-        turningOff=false;
+        turningOff = false;
 
 
     }
@@ -135,7 +137,7 @@ public class SelfDestructingIterativeDestinationStarter implements DestinationSt
     @Override
     public void turnOff(Fisher fisher) {
 
-        if(!turningOff)
+        if (!turningOff)
             delegate.turnOff(fisher);
     }
 }

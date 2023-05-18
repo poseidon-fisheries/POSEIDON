@@ -25,7 +25,8 @@ public class TableBasedPathMemory implements PathMemory {
      * <li>null if we don't know anything about this path.</li>
      * </ul>
      */
-    @Override @SuppressWarnings("OptionalAssignedToNull")
+    @Override
+    @SuppressWarnings("OptionalAssignedToNull")
     public Optional<ImmutableList<SeaTile>> getPath(SeaTile start, SeaTile end) {
         final Optional<ImmutableList<SeaTile>> knownPath = memory.get(start, end);
         if (knownPath != null)
@@ -43,11 +44,13 @@ public class TableBasedPathMemory implements PathMemory {
         return null;
     }
 
-    @Override public void putPath(SeaTile start, SeaTile end, ImmutableList<SeaTile> path) {
+    @Override
+    public void putPath(SeaTile start, SeaTile end, ImmutableList<SeaTile> path) {
         memory.put(start, end, Optional.of(path));
     }
 
-    @Override public void putImpossiblePath(SeaTile start, SeaTile end) {
+    @Override
+    public void putImpossiblePath(SeaTile start, SeaTile end) {
         memory.put(start, end, Optional.empty());
     }
 

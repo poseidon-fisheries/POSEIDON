@@ -51,40 +51,48 @@ public class HeatmapDestinationStrategyTest {
         Fisher friend = mock(Fisher.class);
         when(user.getDirectedFriends()).thenReturn(Lists.newArrayList(friend));
 
-        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
+        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         AcquisitionFunction optimizer = mock(AcquisitionFunction.class);
 
         HeatmapDestinationStrategy strategy = new HeatmapDestinationStrategy(
-                regression,
-                optimizer,
-                false,
-                new FixedProbability(0d,1d),
-                model.getMap(),
-                model.getRandom(),
-                10,
-                new HourlyProfitInTripObjective(true));
+            regression,
+            optimizer,
+            false,
+            new FixedProbability(0d, 1d),
+            model.getMap(),
+            model.getRandom(),
+            10,
+            new HourlyProfitInTripObjective(true)
+        );
         SeaTile optimal = mock(SeaTile.class);
 
         when(optimal.isWater()).thenReturn(true);
-        when(optimizer.pick(any(), any(), any(),any(),any() )).thenReturn(optimal);
+        when(optimizer.pick(any(), any(), any(), any(), any())).thenReturn(optimal);
 
-        strategy.start(model,user);
+        strategy.start(model, user);
 
-        when(friend.getLastFinishedTrip()).thenReturn(mock(TripRecord.class,RETURNS_DEEP_STUBS));
+        when(friend.getLastFinishedTrip()).thenReturn(mock(TripRecord.class, RETURNS_DEEP_STUBS));
 
         //should add two observations!
-        strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS), mock(Fisher.class,RETURNS_DEEP_STUBS));
-        verify(regression,times(2)).addObservation(any(),any(),any() );
+        strategy.reactToFinishedTrip(
+            mock(TripRecord.class, RETURNS_DEEP_STUBS),
+            mock(Fisher.class, RETURNS_DEEP_STUBS)
+        );
+        verify(regression, times(2)).addObservation(any(), any(), any());
 
         //one only now because we already added our friend's
-        strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS),mock(Fisher.class,RETURNS_DEEP_STUBS));
-        verify(regression,times(3)).addObservation(any(),any(),any() );
+        strategy.reactToFinishedTrip(mock(TripRecord.class, RETURNS_DEEP_STUBS),
+            mock(Fisher.class, RETURNS_DEEP_STUBS));
+        verify(regression, times(3)).addObservation(any(), any(), any());
 
         //and now two more
-        when(friend.getLastFinishedTrip()).thenReturn(mock(TripRecord.class,RETURNS_DEEP_STUBS));
-        strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS), mock(Fisher.class,RETURNS_DEEP_STUBS));
-        verify(regression,times(5)).addObservation(any(),any(),any() );
+        when(friend.getLastFinishedTrip()).thenReturn(mock(TripRecord.class, RETURNS_DEEP_STUBS));
+        strategy.reactToFinishedTrip(
+            mock(TripRecord.class, RETURNS_DEEP_STUBS),
+            mock(Fisher.class, RETURNS_DEEP_STUBS)
+        );
+        verify(regression, times(5)).addObservation(any(), any(), any());
 
     }
 
@@ -98,39 +106,49 @@ public class HeatmapDestinationStrategyTest {
         when(user.getDirectedFriends()).thenReturn(Lists.newArrayList(friend));
         AcquisitionFunction optimizer = mock(AcquisitionFunction.class);
 
-        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
+        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
 
         HeatmapDestinationStrategy strategy = new HeatmapDestinationStrategy(
-                regression,
-                optimizer,
-                false,
-                new FixedProbability(0d,0d),
-                model.getMap(),
-                model.getRandom(),
-                10,
-                new HourlyProfitInTripObjective(true));
+            regression,
+            optimizer,
+            false,
+            new FixedProbability(0d, 0d),
+            model.getMap(),
+            model.getRandom(),
+            10,
+            new HourlyProfitInTripObjective(true)
+        );
         SeaTile optimal = mock(SeaTile.class);
 
         when(optimal.isWater()).thenReturn(true);
-        when(optimizer.pick(any(), any(), any(),any(),any() )).thenReturn(optimal);
+        when(optimizer.pick(any(), any(), any(), any(), any())).thenReturn(optimal);
 
-        strategy.start(model,user);
+        strategy.start(model, user);
 
-        when(friend.getLastFinishedTrip()).thenReturn(mock(TripRecord.class,RETURNS_DEEP_STUBS));
+        when(friend.getLastFinishedTrip()).thenReturn(mock(TripRecord.class, RETURNS_DEEP_STUBS));
 
         //should add one observations (ignore friend)
-        strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS), mock(Fisher.class,RETURNS_DEEP_STUBS));
-        verify(regression,times(1)).addObservation(any(),any(),any() );
+        strategy.reactToFinishedTrip(
+            mock(TripRecord.class, RETURNS_DEEP_STUBS),
+            mock(Fisher.class, RETURNS_DEEP_STUBS)
+        );
+        verify(regression, times(1)).addObservation(any(), any(), any());
 
         //one only now because we already checked our friend's latest
-        strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS), mock(Fisher.class,RETURNS_DEEP_STUBS));
-        verify(regression,times(2)).addObservation(any(),any(), any());
+        strategy.reactToFinishedTrip(
+            mock(TripRecord.class, RETURNS_DEEP_STUBS),
+            mock(Fisher.class, RETURNS_DEEP_STUBS)
+        );
+        verify(regression, times(2)).addObservation(any(), any(), any());
 
         //and now ignore your friend again
-        when(friend.getLastFinishedTrip()).thenReturn(mock(TripRecord.class,RETURNS_DEEP_STUBS));
-        strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS), mock(Fisher.class,RETURNS_DEEP_STUBS));
-        verify(regression,times(3)).addObservation(any(),any(),any() );
+        when(friend.getLastFinishedTrip()).thenReturn(mock(TripRecord.class, RETURNS_DEEP_STUBS));
+        strategy.reactToFinishedTrip(
+            mock(TripRecord.class, RETURNS_DEEP_STUBS),
+            mock(Fisher.class, RETURNS_DEEP_STUBS)
+        );
+        verify(regression, times(3)).addObservation(any(), any(), any());
 
     }
 
@@ -139,36 +157,41 @@ public class HeatmapDestinationStrategyTest {
 
         Fisher user = mock(Fisher.class);
 
-        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
+        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
 
         AcquisitionFunction optimizer = mock(AcquisitionFunction.class);
 
-        HeatmapDestinationStrategy strategy =  new HeatmapDestinationStrategy(
-                mock(GeographicalRegression.class),
-                optimizer,
-                false,
-                new FixedProbability(0d,1d),
-                model.getMap(),
-                model.getRandom(),
-                10,
-                new HourlyProfitInTripObjective(true));
+        HeatmapDestinationStrategy strategy = new HeatmapDestinationStrategy(
+            mock(GeographicalRegression.class),
+            optimizer,
+            false,
+            new FixedProbability(0d, 1d),
+            model.getMap(),
+            model.getRandom(),
+            10,
+            new HourlyProfitInTripObjective(true)
+        );
 
 
-        strategy.start(model,user);
+        strategy.start(model, user);
 
 
         SeaTile optimal = mock(SeaTile.class);
-        assertNotEquals(strategy.getFavoriteSpot(),
-                        optimal);
+        assertNotEquals(
+            strategy.getFavoriteSpot(),
+            optimal
+        );
         when(optimal.isWater()).thenReturn(true);
-        when(optimizer.pick(any(), any(), any(),any(),any() )).thenReturn(optimal);
-        strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS), mock(Fisher.class,RETURNS_DEEP_STUBS));
-        assertEquals(strategy.getFavoriteSpot(),
-                     optimal);
-
-
-
+        when(optimizer.pick(any(), any(), any(), any(), any())).thenReturn(optimal);
+        strategy.reactToFinishedTrip(
+            mock(TripRecord.class, RETURNS_DEEP_STUBS),
+            mock(Fisher.class, RETURNS_DEEP_STUBS)
+        );
+        assertEquals(
+            strategy.getFavoriteSpot(),
+            optimal
+        );
 
 
     }

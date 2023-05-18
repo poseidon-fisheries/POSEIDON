@@ -30,16 +30,14 @@ import uk.ac.ox.oxfish.model.FishState;
  * The Fisher keep fishing until full or until a limit number of days have passed.
  * Created by carrknight on 6/23/15.
  */
-public class MaximumDaysDecorator implements FishingStrategy
-{
+public class MaximumDaysDecorator implements FishingStrategy {
 
-
-    private FishingStrategy delegate;
 
     private final double daysBeforeGoingHome;
+    private FishingStrategy delegate;
 
     public MaximumDaysDecorator(double daysBeforeGoingHome) {
-        this(new FishUntilFullStrategy(1d),daysBeforeGoingHome);
+        this(new FishUntilFullStrategy(1d), daysBeforeGoingHome);
 
 
     }
@@ -53,25 +51,29 @@ public class MaximumDaysDecorator implements FishingStrategy
      * This is called by the fisher to decide whether or not to fish and then each step after that to decide whether or
      * not to continue fishing
      *
-     *
      * @param random the randomizer
      * @param model  the model itself   @return true if the fisher should fish here, false otherwise
      */
     @Override
     public boolean shouldFish(
-            Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip) {
+        Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip
+    ) {
         return
-                 fisher.getHoursAtSea() /24d  <= daysBeforeGoingHome && delegate.shouldFish(fisher,random,model,currentTrip) ;
+            fisher.getHoursAtSea() / 24d <= daysBeforeGoingHome && delegate.shouldFish(fisher,
+                random,
+                model,
+                currentTrip);
     }
 
 
     @Override
     public void start(FishState model, Fisher fisher) {
-        delegate.start(model,fisher);
+        delegate.start(model, fisher);
     }
 
     /**
      * tell the startable to turnoff,
+     *
      * @param fisher
      */
     @Override
@@ -89,7 +91,7 @@ public class MaximumDaysDecorator implements FishingStrategy
     }
 
     @VisibleForTesting
-    public  FishingStrategy accessDecorated(){
+    public FishingStrategy accessDecorated() {
         return delegate;
     }
 

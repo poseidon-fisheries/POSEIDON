@@ -25,7 +25,6 @@ import com.google.common.collect.Multimap;
 
 import java.util.Collection;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class Observers {
 

@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.function.BinaryOperator;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toMap;
@@ -30,16 +29,6 @@ public class Constructors {
     }
 
     /**
-     * This is a convenience method to get around the fact that Java won't allow lambdas to
-     * throw checked Exceptions. Adapted from https://stackoverflow.com/a/14045585/487946.
-     */
-    private static <T> Supplier<T> wrap(Callable<T> callable) {
-        return () -> {
-            try { return callable.call(); } catch (Exception e) { throw new RuntimeException(e); }
-        };
-    }
-
-    /**
      * Given a class object, returns a Supplier based on either its constructor or a getInstance method.
      */
     public static <T> Supplier<AlgorithmFactory<? extends T>> getSupplier(Class<? extends AlgorithmFactory> classObject) {
@@ -58,5 +47,19 @@ public class Constructors {
                 );
             }
         }
+    }
+
+    /**
+     * This is a convenience method to get around the fact that Java won't allow lambdas to
+     * throw checked Exceptions. Adapted from https://stackoverflow.com/a/14045585/487946.
+     */
+    private static <T> Supplier<T> wrap(Callable<T> callable) {
+        return () -> {
+            try {
+                return callable.call();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 }

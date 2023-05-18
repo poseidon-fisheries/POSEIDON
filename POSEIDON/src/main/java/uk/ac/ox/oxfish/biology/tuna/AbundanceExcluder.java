@@ -18,11 +18,12 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-
-import java.util.Map.Entry;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+
+import java.util.Map.Entry;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 class AbundanceExcluder extends Excluder<AbundanceLocalBiology> {
 

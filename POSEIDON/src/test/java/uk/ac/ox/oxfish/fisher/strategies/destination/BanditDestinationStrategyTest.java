@@ -53,19 +53,24 @@ public class BanditDestinationStrategyTest {
 
         SimpleMapInitializer map = new SimpleMapInitializer(50, 50, 0, 0, 1, 10);
         MersenneTwisterFast randomizer = new MersenneTwisterFast();
-        NauticalMap chart = map.makeMap(randomizer,
-                                        mock(GlobalBiology.class),
-                                        mock(FishState.class));
+        NauticalMap chart = map.makeMap(
+            randomizer,
+            mock(GlobalBiology.class),
+            mock(FishState.class)
+        );
         SquaresMapDiscretizer discretizer = new SquaresMapDiscretizer(2, 2);
         MapDiscretization discretization = new MapDiscretization(discretizer);
         discretization.discretize(chart);
         BanditDestinationStrategy strategy = new BanditDestinationStrategy(
-                (Function<Integer, BanditAverage>) integer -> new BanditAverage(integer,
-                                                                                () -> new ExponentialMovingAverage<>(.5)),
-                banditAverage -> new EpsilonGreedyBanditAlgorithm(banditAverage,.1),
-                discretization,
-                new FavoriteDestinationStrategy(chart.getRandomBelowWaterLineSeaTile(randomizer)),
-                new HourlyProfitInTripObjective(true), false, false);
+            (Function<Integer, BanditAverage>) integer -> new BanditAverage(
+                integer,
+                () -> new ExponentialMovingAverage<>(.5)
+            ),
+            banditAverage -> new EpsilonGreedyBanditAlgorithm(banditAverage, .1),
+            discretization,
+            new FavoriteDestinationStrategy(chart.getRandomBelowWaterLineSeaTile(randomizer)),
+            new HourlyProfitInTripObjective(true), false, false
+        );
 
         //option 2 is the best, you should pick it!
 
@@ -73,12 +78,12 @@ public class BanditDestinationStrategyTest {
         for (int i = 0; i < 1000; i++) {
             SeaTile tile = strategy.getFavoriteSpot();
             int armPlayed = discretization.getGroup(tile);
-            double reward = -Math.pow(armPlayed-2,2)+randomizer.nextGaussian()/2;
-            strategy.choose(tile,reward,randomizer);
+            double reward = -Math.pow(armPlayed - 2, 2) + randomizer.nextGaussian() / 2;
+            strategy.choose(tile, reward, randomizer);
         }
 
         ((EpsilonGreedyBanditAlgorithm) strategy.getAlgorithm()).setExplorationProbability(0);
-        assertEquals(2,strategy.getAlgorithm().chooseArm(randomizer));
+        assertEquals(2, strategy.getAlgorithm().chooseArm(randomizer));
     }
 
 
@@ -88,34 +93,39 @@ public class BanditDestinationStrategyTest {
         SimpleMapInitializer map = new SimpleMapInitializer(9, 9, 0, 0, 1, 1);
 
         MersenneTwisterFast randomizer = new MersenneTwisterFast();
-        NauticalMap chart = map.makeMap(randomizer,
-                                        mock(GlobalBiology.class),
-                                        mock(FishState.class));
+        NauticalMap chart = map.makeMap(
+            randomizer,
+            mock(GlobalBiology.class),
+            mock(FishState.class)
+        );
         SquaresMapDiscretizer discretizer = new SquaresMapDiscretizer(2, 2);
         MapDiscretization discretization = new MapDiscretization(discretizer);
         discretization.discretize(chart);        //forced to pick always area 0
         final BanditAlgorithm banditAlgorithm = mock(BanditAlgorithm.class);
 
         BanditDestinationStrategy strategy = new BanditDestinationStrategy(
-                integer -> new BanditAverage(integer,
-                                             () -> new ExponentialMovingAverage<>(
-                                                     .5)),
-                banditAverage -> banditAlgorithm,
-                discretization,
-                new FavoriteDestinationStrategy(chart.getRandomBelowWaterLineSeaTile(randomizer)),
-                new HourlyProfitInTripObjective(true), false, false);
+            integer -> new BanditAverage(
+                integer,
+                () -> new ExponentialMovingAverage<>(
+                    .5)
+            ),
+            banditAverage -> banditAlgorithm,
+            discretization,
+            new FavoriteDestinationStrategy(chart.getRandomBelowWaterLineSeaTile(randomizer)),
+            new HourlyProfitInTripObjective(true), false, false
+        );
 
 
         int[][] chosen = new int[3][3];
         for (int i = 0; i < 1000; i++) {
-            strategy.choose(strategy.getFavoriteSpot(),0,randomizer);
+            strategy.choose(strategy.getFavoriteSpot(), 0, randomizer);
             SeaTile tile = strategy.getFavoriteSpot();
             chosen[tile.getGridX()][tile.getGridY()]++;
         }
 
-        System.out.println(FishStateUtilities.deepToStringArray(chosen,",","\n"));
-        for(int x=0;x<3;x++)
-            for(int y=0; y<3; y++)
-                assertTrue(chosen[x][y]>50);
+        System.out.println(FishStateUtilities.deepToStringArray(chosen, ",", "\n"));
+        for (int x = 0; x < 3; x++)
+            for (int y = 0; y < 3; y++)
+                assertTrue(chosen[x][y] > 50);
     }
 }

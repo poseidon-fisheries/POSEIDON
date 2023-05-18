@@ -34,17 +34,18 @@ public class InterceptExtractor implements ObservationExtractor {
     private final double intercept;
 
 
-    public InterceptExtractor(double intercept) {
-        this.intercept = intercept;
-    }
-
     public InterceptExtractor() {
         this(1d);
     }
 
+    public InterceptExtractor(double intercept) {
+        this.intercept = intercept;
+    }
+
     @Override
     public double extract(
-            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
+        SeaTile tile, double timeOfObservation, Fisher agent, FishState model
+    ) {
         return intercept;
     }
 }

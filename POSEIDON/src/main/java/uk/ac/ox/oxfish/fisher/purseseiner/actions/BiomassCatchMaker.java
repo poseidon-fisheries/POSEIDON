@@ -18,13 +18,14 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import static java.lang.Math.min;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-
-import java.util.Map.Entry;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+
+import java.util.Map.Entry;
+
+import static java.lang.Math.min;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class BiomassCatchMaker implements CatchMaker<BiomassLocalBiology> {
 

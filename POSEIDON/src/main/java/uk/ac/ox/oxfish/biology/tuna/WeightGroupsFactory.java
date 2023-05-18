@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;

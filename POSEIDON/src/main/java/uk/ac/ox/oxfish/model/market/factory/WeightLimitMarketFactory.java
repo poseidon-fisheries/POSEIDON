@@ -20,9 +20,9 @@ public class WeightLimitMarketFactory implements AlgorithmFactory<WeightLimitMar
     @Override
     public WeightLimitMarket apply(FishState fishState) {
         return new WeightLimitMarket(
-                priceBelowWeight.applyAsDouble(fishState.getRandom()),
-                priceAboveWeight.applyAsDouble(fishState.getRandom()),
-                weightThreshold.applyAsDouble(fishState.getRandom())
+            priceBelowWeight.applyAsDouble(fishState.getRandom()),
+            priceAboveWeight.applyAsDouble(fishState.getRandom()),
+            weightThreshold.applyAsDouble(fishState.getRandom())
         );
     }
 

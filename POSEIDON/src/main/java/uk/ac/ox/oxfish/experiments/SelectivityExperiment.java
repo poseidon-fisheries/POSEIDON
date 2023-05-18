@@ -38,46 +38,28 @@ import java.nio.file.Paths;
  */
 public class SelectivityExperiment {
 
-    private static Path directory = Paths.get("docs","20160313 selectivity");
-
-    private static DataColumn runSimple(int numberOfFishers) throws IOException {
-
-        FishYAML yaml = new FishYAML();
-        String scenarioYaml = String.join("\n", Files.readAllLines(
-                directory.resolve("abundance.yaml")));
-        PrototypeScenario scenario =  yaml.loadAs(scenarioYaml, PrototypeScenario.class);
-        scenario.setFishers(numberOfFishers);
-        FishState state = new FishState(System.currentTimeMillis());
-
-        state.setScenario(scenario);
-        state.start();
-        while(state.getYear()<=10)
-            state.schedule.step(state);
-
-        return state.getDailyDataSet().getColumn("Biomass Dover Sole");
-
-    }
+    private static Path directory = Paths.get("docs", "20160313 selectivity");
 
     public static void main(String[] args) throws IOException {
         FishStateUtilities.printCSVColumnsToFile(
-                directory.resolve("best.csv").toFile(),
-                runComplicated()
+            directory.resolve("best.csv").toFile(),
+            runComplicated()
         );
         FishStateUtilities.printCSVColumnsToFile(
-                directory.resolve("0_fishers.csv").toFile(),
-                runSimple(0)
+            directory.resolve("0_fishers.csv").toFile(),
+            runSimple(0)
         );
         FishStateUtilities.printCSVColumnsToFile(
-                directory.resolve("50_fishers.csv").toFile(),
-                runSimple(50)
+            directory.resolve("50_fishers.csv").toFile(),
+            runSimple(50)
         );
         FishStateUtilities.printCSVColumnsToFile(
-                directory.resolve("100_fishers.csv").toFile(),
-                runSimple(100)
+            directory.resolve("100_fishers.csv").toFile(),
+            runSimple(100)
         );
         FishStateUtilities.printCSVColumnsToFile(
-                directory.resolve("200_fishers.csv").toFile(),
-                runSimple(200)
+            directory.resolve("200_fishers.csv").toFile(),
+            runSimple(200)
         );
     }
 
@@ -85,8 +67,8 @@ public class SelectivityExperiment {
 
         FishYAML yaml = new FishYAML();
         String scenarioYaml = String.join("\n", Files.readAllLines(
-                directory.resolve("abundance.yaml")));
-        PrototypeScenario scenario =  yaml.loadAs(scenarioYaml, PrototypeScenario.class);
+            directory.resolve("abundance.yaml")));
+        PrototypeScenario scenario = yaml.loadAs(scenarioYaml, PrototypeScenario.class);
         ThresholdGearFactory gear = new ThresholdGearFactory();
         gear.setThreshold(new FixedDoubleParameter(25.75));
         scenario.setGear(gear);
@@ -95,9 +77,27 @@ public class SelectivityExperiment {
 
         state.setScenario(scenario);
         state.start();
-        while(state.getYear()<=20)
+        while (state.getYear() <= 20)
             state.schedule.step(state);
 
+
+        return state.getDailyDataSet().getColumn("Biomass Dover Sole");
+
+    }
+
+    private static DataColumn runSimple(int numberOfFishers) throws IOException {
+
+        FishYAML yaml = new FishYAML();
+        String scenarioYaml = String.join("\n", Files.readAllLines(
+            directory.resolve("abundance.yaml")));
+        PrototypeScenario scenario = yaml.loadAs(scenarioYaml, PrototypeScenario.class);
+        scenario.setFishers(numberOfFishers);
+        FishState state = new FishState(System.currentTimeMillis());
+
+        state.setScenario(scenario);
+        state.start();
+        while (state.getYear() <= 10)
+            state.schedule.step(state);
 
         return state.getDailyDataSet().getColumn("Biomass Dover Sole");
 

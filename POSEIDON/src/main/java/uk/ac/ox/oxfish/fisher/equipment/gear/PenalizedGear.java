@@ -21,22 +21,28 @@ public class PenalizedGear implements GearDecorator {
 
 
     public PenalizedGear(double proportionOfCatchLost, Gear delegate) {
-        Preconditions.checkArgument(proportionOfCatchLost>=0);
-        Preconditions.checkArgument(proportionOfCatchLost<=1);
+        Preconditions.checkArgument(proportionOfCatchLost >= 0);
+        Preconditions.checkArgument(proportionOfCatchLost <= 1);
         this.proportionOfCatchLost = proportionOfCatchLost;
         this.delegate = delegate;
     }
 
     @Override
-    public Catch fish(Fisher fisher, LocalBiology localBiology, SeaTile context, int hoursSpentFishing, GlobalBiology modelBiology) {
+    public Catch fish(
+        Fisher fisher,
+        LocalBiology localBiology,
+        SeaTile context,
+        int hoursSpentFishing,
+        GlobalBiology modelBiology
+    ) {
         final Catch original = delegate.fish(fisher, localBiology, context, hoursSpentFishing, modelBiology);
-        if(original.getTotalWeight()<=0)
+        if (original.getTotalWeight() <= 0)
             return original;
         return HoldLimitingDecoratorGear.keepOnlyProportionOfCatch(
-                original,
-                modelBiology,
-                original.getBiomassArray(),
-                1d-proportionOfCatchLost
+            original,
+            modelBiology,
+            original.getBiomassArray(),
+            1d - proportionOfCatchLost
 
         );
     }
@@ -47,23 +53,28 @@ public class PenalizedGear implements GearDecorator {
     }
 
     @Override
-    public double[] expectedHourlyCatch(Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+    public double[] expectedHourlyCatch(
+        Fisher fisher,
+        SeaTile where,
+        int hoursSpentFishing,
+        GlobalBiology modelBiology
+    ) {
         return delegate.expectedHourlyCatch(fisher, where, hoursSpentFishing, modelBiology);
     }
 
     @Override
     public Gear makeCopy() {
         return new PenalizedGear(
-                proportionOfCatchLost,
-                delegate.makeCopy()
+            proportionOfCatchLost,
+            delegate.makeCopy()
         );
     }
 
     @Override
     public boolean isSame(Gear o) {
-        return o instanceof  PenalizedGear &&
-                ((PenalizedGear)o).proportionOfCatchLost == this.proportionOfCatchLost &&
-                ((PenalizedGear)o).delegate.isSame(this.delegate);
+        return o instanceof PenalizedGear &&
+            ((PenalizedGear) o).proportionOfCatchLost == this.proportionOfCatchLost &&
+            ((PenalizedGear) o).delegate.isSame(this.delegate);
     }
 
     @Override

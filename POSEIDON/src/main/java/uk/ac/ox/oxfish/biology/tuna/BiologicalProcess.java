@@ -18,9 +18,10 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import java.util.Collection;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.Collection;
 
 /**
  * A  class that takes some kind of local biology, does something with it, and optionally returns

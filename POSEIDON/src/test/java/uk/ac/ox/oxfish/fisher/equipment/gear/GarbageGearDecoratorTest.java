@@ -45,7 +45,6 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 public class GarbageGearDecoratorTest {
 
 
-
     @Test
     public void fishEmpty() throws Exception {
         Species first = new Species("First");
@@ -55,7 +54,7 @@ public class GarbageGearDecoratorTest {
         SeaTile where = new SeaTile(0, 0, -100, new TileHabitat(0d));
         where.setBiology(local);
 
-        Gear gear = new GarbageGearDecorator(second, 1.5, new OneSpecieGear(first,.5), true);
+        Gear gear = new GarbageGearDecorator(second, 1.5, new OneSpecieGear(first, .5), true);
         Catch fishCaught = gear.fish(mock(Fisher.class), where, where, 1, biology);
 
         assertEquals(fishCaught.getWeightCaught(first), 0, .001);
@@ -64,8 +63,7 @@ public class GarbageGearDecoratorTest {
     }
 
     @Test
-    public void fishOnlyWhatIsAvailable()
-    {
+    public void fishOnlyWhatIsAvailable() {
         Species first = new Species("First");
         Species second = new Species("Second");
         GlobalBiology biology = new GlobalBiology(first, second);
@@ -73,23 +71,22 @@ public class GarbageGearDecoratorTest {
         when(local.getBiomass(first)).thenReturn(100.0);
         when(local.getBiomass(second)).thenReturn(0.0);
 
-        SeaTile where = new SeaTile(0,0,-100, new TileHabitat(0d));
+        SeaTile where = new SeaTile(0, 0, -100, new TileHabitat(0d));
         where.setBiology(local);
 
-        Gear gear = new GarbageGearDecorator(second, 2, new OneSpecieGear(first,.5), true);
-        Catch fishCaught = gear.fish(mock(Fisher.class), where,where , 1, biology);
+        Gear gear = new GarbageGearDecorator(second, 2, new OneSpecieGear(first, .5), true);
+        Catch fishCaught = gear.fish(mock(Fisher.class), where, where, 1, biology);
 
         assertEquals(fishCaught.getWeightCaught(first), 50, .001);
         assertEquals(fishCaught.getWeightCaught(second), 100, .001);
         //gear itself never calls biology reacts
-        verify(local,never()).reactToThisAmountOfBiomassBeingFished(any(),any(),any());
+        verify(local, never()).reactToThisAmountOfBiomassBeingFished(any(), any(), any());
 
     }
 
 
     @Test
-    public void expectationKillsNoFish()
-    {
+    public void expectationKillsNoFish() {
         Species first = new Species("First");
         Species second = new Species("Second");
         GlobalBiology biology = new GlobalBiology(first, second);
@@ -97,16 +94,16 @@ public class GarbageGearDecoratorTest {
         when(local.getBiomass(first)).thenReturn(100.0);
         when(local.getBiomass(second)).thenReturn(0.0);
 
-        SeaTile where = new SeaTile(0,0,-100, new TileHabitat(0d));
+        SeaTile where = new SeaTile(0, 0, -100, new TileHabitat(0d));
         where.setBiology(local);
 
-        Gear gear = new GarbageGearDecorator(second, 2, new OneSpecieGear(first,.5), true);
-        double[] fishCaught = gear.expectedHourlyCatch(mock(Fisher.class), where,1 , biology);
+        Gear gear = new GarbageGearDecorator(second, 2, new OneSpecieGear(first, .5), true);
+        double[] fishCaught = gear.expectedHourlyCatch(mock(Fisher.class), where, 1, biology);
 
         assertEquals(fishCaught[0], 50, .001);
         assertEquals(fishCaught[1], 100.0, .001);
         //gear itself never calls biology reacts
-        verify(local,never()).reactToThisAmountOfBiomassBeingFished(any(),any(),any());
+        verify(local, never()).reactToThisAmountOfBiomassBeingFished(any(), any(), any());
 
     }
 
@@ -114,40 +111,43 @@ public class GarbageGearDecoratorTest {
     @Test
     public void catchesCorrectly() throws Exception {
 
-        Species longspine = new Species("longspine",new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                       0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                       0.111313, 17.826, -1.79, 1,
-                                                                       0, 168434124,
-                                                                       0.6, false));
+        Species longspine = new Species("longspine",
+            new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                0.111313, 17.826, -1.79, 1,
+                0, 168434124,
+                0.6, false
+            ));
         longspine.resetIndexTo(0);
         Species imaginary = new Species("imaginary", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,
-                                        true);
+            true
+        );
         imaginary.resetIndexTo(1);
 
 
-
-        HomogeneousAbundanceGear gear1 = mock(HomogeneousAbundanceGear.class,RETURNS_DEEP_STUBS);
+        HomogeneousAbundanceGear gear1 = mock(HomogeneousAbundanceGear.class, RETURNS_DEEP_STUBS);
         double[][] catches = new double[2][81];
-        catches[0][5]=1000; //total catch weight = 19.880139
-        when(gear1.catchesAsAbundanceForThisSpecies(any(),anyInt(), any())).
-                thenReturn(
-                        new StructuredAbundance(catches[MALE], catches[FEMALE])
-                );
+        catches[0][5] = 1000; //total catch weight = 19.880139
+        when(gear1.catchesAsAbundanceForThisSpecies(any(), anyInt(), any())).
+            thenReturn(
+                new StructuredAbundance(catches[MALE], catches[FEMALE])
+            );
 
 
         Gear gear = new GarbageGearDecorator(imaginary, .5,
-                                             new HeterogeneousAbundanceGear(
-                                                     new Pair<>(longspine, gear1)
-                                             ), true);
+            new HeterogeneousAbundanceGear(
+                new Pair<>(longspine, gear1)
+            ), true
+        );
 
-        GlobalBiology biology = new GlobalBiology(longspine,imaginary);
+        GlobalBiology biology = new GlobalBiology(longspine, imaginary);
 
-        SeaTile mock = mock(SeaTile.class,RETURNS_DEEP_STUBS);
+        SeaTile mock = mock(SeaTile.class, RETURNS_DEEP_STUBS);
         when(mock.getBiology().getBiomass(any())).thenReturn(1d);
-        Catch caught = gear.fish(mock(Fisher.class), mock,mock , 1, biology);
+        Catch caught = gear.fish(mock(Fisher.class), mock, mock, 1, biology);
         assertEquals(caught.getWeightCaught(0), 19.880139, .001);
         assertEquals(caught.getWeightCaught(1), 9, .001); //meristics round!
-        assertEquals(caught.getTotalWeight(), 9+19.880139, .001);
+        assertEquals(caught.getTotalWeight(), 9 + 19.880139, .001);
 
 
     }

@@ -29,8 +29,7 @@ import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -40,49 +39,47 @@ public class SquaresMapDiscretizerTest {
 
 
     @Test
-    public void discretizeMaps() throws Exception
-    {
+    public void discretizeMaps() throws Exception {
 
-        SimpleMapInitializer map = new SimpleMapInitializer(8, 6, 0, 0, 1, 2);
-        NauticalMap chart = map.makeMap(new MersenneTwisterFast(),
-                                              mock(GlobalBiology.class),
-                                              mock(FishState.class));
+        final SimpleMapInitializer map = new SimpleMapInitializer(8, 6, 0, 0, 1, 2);
+        final NauticalMap chart = map.makeMap(
+            new MersenneTwisterFast(),
+            mock(GlobalBiology.class),
+            mock(FishState.class)
+        );
 
-        SquaresMapDiscretizerFactory factory = new SquaresMapDiscretizerFactory();
+        final SquaresMapDiscretizerFactory factory = new SquaresMapDiscretizerFactory();
         factory.setHorizontalSplits(new FixedDoubleParameter(3));
         factory.setVerticalSplits(new FixedDoubleParameter(2));
 
-        MapDiscretization discretization = new MapDiscretization(factory.apply(mock(FishState.class)));
+        final MapDiscretization discretization = new MapDiscretization(factory.apply(mock(FishState.class)));
         discretization.discretize(chart);
-        assertEquals(discretization.getNumberOfGroups(),12);
+        assertEquals(discretization.getNumberOfGroups(), 12);
 
         assertTrue(discretization.isValid(0));
-        assertTrue(!discretization.isValid(11));
+        assertFalse(discretization.isValid(11));
 
-        assertTrue(discretization.getGroup(5).contains(chart.getSeaTile(2,2)));
+        assertTrue(discretization.getGroup(5).contains(chart.getSeaTile(2, 2)));
 
 
     }
 
 
-
-
-
     @Test
-    public void discretizeMaps2() throws Exception
-    {
+    public void discretizeMaps2() throws Exception {
 
-        SimpleMapInitializer map = new SimpleMapInitializer(50, 50, 0, 0, 1, 10);
-        NauticalMap chart = map.makeMap(new MersenneTwisterFast(),
-                                        mock(GlobalBiology.class),
-                                        mock(FishState.class));
-        SquaresMapDiscretizerFactory factory = new SquaresMapDiscretizerFactory();
+        final SimpleMapInitializer map = new SimpleMapInitializer(50, 50, 0, 0, 1, 10);
+        final NauticalMap chart = map.makeMap(
+            new MersenneTwisterFast(),
+            mock(GlobalBiology.class),
+            mock(FishState.class)
+        );
+        final SquaresMapDiscretizerFactory factory = new SquaresMapDiscretizerFactory();
         factory.setHorizontalSplits(new FixedDoubleParameter(2));
         factory.setVerticalSplits(new FixedDoubleParameter(2));
-        MapDiscretization discretization = new MapDiscretization(factory.apply(mock(FishState.class)));
+        final MapDiscretization discretization = new MapDiscretization(factory.apply(mock(FishState.class)));
         discretization.discretize(chart);
-        assertEquals(discretization.getNumberOfGroups(),9);
-
+        assertEquals(discretization.getNumberOfGroups(), 9);
 
 
     }

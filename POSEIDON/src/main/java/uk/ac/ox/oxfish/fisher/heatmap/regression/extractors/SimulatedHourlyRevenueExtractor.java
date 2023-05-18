@@ -43,18 +43,22 @@ public class SimulatedHourlyRevenueExtractor implements ObservationExtractor {
 
     @Override
     public double extract(
-            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
+        SeaTile tile, double timeOfObservation, Fisher agent, FishState model
+    ) {
 
 
-        TripRecord simulation = simulator.simulateRecord(agent,
-                                                         tile,
-                                                         model,
-                                                         maxHoursOut,
-                                                         //using perfect knowledge!
-                                                         agent.getGear().expectedHourlyCatch(agent, tile, 1,
-                                                                                             model.getBiology()));
-        if(simulation== null)
+        TripRecord simulation = simulator.simulateRecord(
+            agent,
+            tile,
+            model,
+            maxHoursOut,
+            //using perfect knowledge!
+            agent.getGear().expectedHourlyCatch(agent, tile, 1,
+                model.getBiology()
+            )
+        );
+        if (simulation == null)
             return -10000;
-        return simulation.getEarnings()/simulation.getDurationInHours();
+        return simulation.getEarnings() / simulation.getDurationInHours();
     }
 }

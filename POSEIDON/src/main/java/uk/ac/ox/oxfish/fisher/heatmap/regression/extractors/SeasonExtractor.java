@@ -29,8 +29,7 @@ import uk.ac.ox.oxfish.utility.Season;
  * Seasonal dummy
  * Created by carrknight on 4/12/17.
  */
-public class SeasonExtractor implements ObservationExtractor
-{
+public class SeasonExtractor implements ObservationExtractor {
 
 
     private final Season correctSeason;
@@ -41,22 +40,39 @@ public class SeasonExtractor implements ObservationExtractor
 
     @Override
     public double extract(
-            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
+        SeaTile tile, double timeOfObservation, Fisher agent, FishState model
+    ) {
         return Season.season(
-                getDayOfTheYearFromHoursSinceStart(timeOfObservation, model)
+            getDayOfTheYearFromHoursSinceStart(timeOfObservation, model)
         ).equals(correctSeason) ? 1d : 0d;
     }
 
+    /**
+     * @param hoursSinceStart
+     * @param model
+     * @return
+     */
+    public static int getDayOfTheYearFromHoursSinceStart(
+        double hoursSinceStart,
+        FishState model
+    ) {
+
+
+        return (getDaySinceStartFromHoursSinceStart(hoursSinceStart, model) % 365) + 1;
+
+    }
 
     /**
      * this is useful for observations that store the observation time as hours since start but sometimes need to get back
      * what day of the year it actually was!
+     *
      * @param hoursSinceStart
      * @return
      */
-    public static int getDaySinceStartFromHoursSinceStart(double hoursSinceStart,
-                                                    FishState model)
-    {
+    public static int getDaySinceStartFromHoursSinceStart(
+        double hoursSinceStart,
+        FishState model
+    ) {
 
         /*
         //get the steps
@@ -66,22 +82,7 @@ public class SeasonExtractor implements ObservationExtractor
 */
 
 //simplifies to this
-        return  (int) (hoursSinceStart / 24d);
-
-    }
-
-    /**
-     *
-     * @param hoursSinceStart
-     * @param model
-     * @return
-     */
-    public static int getDayOfTheYearFromHoursSinceStart(double hoursSinceStart,
-                                                         FishState model)
-    {
-
-
-        return  (getDaySinceStartFromHoursSinceStart(hoursSinceStart,model) % 365) + 1;
+        return (int) (hoursSinceStart / 24d);
 
     }
 }

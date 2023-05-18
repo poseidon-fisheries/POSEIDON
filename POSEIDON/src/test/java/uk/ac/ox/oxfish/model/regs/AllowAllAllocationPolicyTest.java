@@ -55,9 +55,9 @@ public class AllowAllAllocationPolicyTest {
         FishState state = mock(FishState.class);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
-        for(int i=0; i < 100; i++) {
+        for (int i = 0; i < 100; i++) {
             List<Fisher> allowed = policy.computeWhichFishersAreAllowed(fishers, state);
-            assertEquals(allowed.size(),4);
+            assertEquals(allowed.size(), 4);
         }
 
 

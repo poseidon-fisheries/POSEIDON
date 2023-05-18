@@ -29,7 +29,8 @@ public class DummyNaturalMortality implements NaturalMortalityProcess {
      */
     @Override
     public void cull(
-            Meristics species, boolean rounding, StructuredAbundance structuredAbundance, int daysSimulated) {
+        Meristics species, boolean rounding, StructuredAbundance structuredAbundance, int daysSimulated
+    ) {
 
     }
 }

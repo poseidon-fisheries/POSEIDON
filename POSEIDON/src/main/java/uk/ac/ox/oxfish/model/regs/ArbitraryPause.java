@@ -37,9 +37,9 @@ public class ArbitraryPause implements Regulation {
 
     @Override
     public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
-        if(fisher.isAtPortAndDocked() ) {
+        if (fisher.isAtPortAndDocked()) {
             int dayOfTheYear = model.getDayOfTheYear(timeStep);
-            if(dayOfTheYear>=startDay && dayOfTheYear<=endDay)
+            if (dayOfTheYear >= startDay && dayOfTheYear <= endDay)
                 return false;
         }
         return delegate.allowedAtSea(fisher, model, timeStep);
@@ -47,12 +47,27 @@ public class ArbitraryPause implements Regulation {
     }
 
     @Override
-    public void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model, int timeStep) {
+    public void reactToFishing(
+        SeaTile where,
+        Fisher who,
+        Catch fishCaught,
+        Catch fishRetained,
+        int hoursSpentFishing,
+        FishState model,
+        int timeStep
+    ) {
         delegate.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
     }
 
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
+    public void reactToSale(
+        Species species,
+        Fisher seller,
+        double biomass,
+        double revenue,
+        FishState model,
+        int timeStep
+    ) {
         delegate.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 

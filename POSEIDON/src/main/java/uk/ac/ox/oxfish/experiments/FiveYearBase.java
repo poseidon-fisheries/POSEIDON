@@ -42,22 +42,24 @@ public class FiveYearBase {
 
         FishYAML yaml = new FishYAML();
         PrototypeScenario scenario = yaml.loadAs(
-                new FileReader(Paths.get("runs", "optimization", "kalman_tune",  "rbf",
-                                         "kernel.yaml").toFile()),
-                PrototypeScenario.class);
+            new FileReader(Paths.get("runs", "optimization", "kalman_tune", "rbf",
+                "kernel.yaml"
+            ).toFile()),
+            PrototypeScenario.class
+        );
         scenario.setDestinationStrategy(new PerTripImitativeDestinationFactory());
 
         FishState state = new FishState(System.currentTimeMillis());
         state.setScenario(scenario);
 
         state.start();
-        while(state.getYear()<5)
+        while (state.getYear() < 5)
             state.schedule.step(state);
 
 
         double sum = 0;
-        for(Double cash : state.getYearlyDataSet().getColumn("Average Cash-Flow"))
-            sum+=cash;
+        for (Double cash : state.getYearlyDataSet().getColumn("Average Cash-Flow"))
+            sum += cash;
         System.out.println(sum);
     }
 
@@ -66,8 +68,9 @@ public class FiveYearBase {
 
         FishYAML yaml = new FishYAML();
         PrototypeScenario scenario = yaml.loadAs(
-                new FileReader(Paths.get("runs", "optimization", "kalman_tune",  "itq_plan.yaml").toFile()),
-                PrototypeScenario.class);
+            new FileReader(Paths.get("runs", "optimization", "kalman_tune", "itq_plan.yaml").toFile()),
+            PrototypeScenario.class
+        );
         PlanningHeatmapDestinationFactory destinationStrategy = new PlanningHeatmapDestinationFactory();
         ExhaustiveAcquisitionFunctionFactory acquisition = new ExhaustiveAcquisitionFunctionFactory();
         acquisition.setProportionSearched(new FixedDoubleParameter(.1));
@@ -79,13 +82,13 @@ public class FiveYearBase {
         state.setScenario(scenario);
 
         state.start();
-        while(state.getYear()<5)
+        while (state.getYear() < 5)
             state.schedule.step(state);
 
 
         double sum = 0;
-        for(Double cash : state.getYearlyDataSet().getColumn("Average Cash-Flow"))
-            sum+=cash;
+        for (Double cash : state.getYearlyDataSet().getColumn("Average Cash-Flow"))
+            sum += cash;
         System.out.println(sum);
     }
 }

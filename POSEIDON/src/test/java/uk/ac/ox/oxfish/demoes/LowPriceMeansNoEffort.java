@@ -34,11 +34,11 @@ public class LowPriceMeansNoEffort {
 
     /**
      * if the price doesn't pay for trips, just stay home.
+     *
      * @throws Exception
      */
     @Test
-    public void priceIsTooLowAgentsStopFishing() throws Exception
-    {
+    public void priceIsTooLowAgentsStopFishing() throws Exception {
 
 
         //sets very low price
@@ -46,7 +46,7 @@ public class LowPriceMeansNoEffort {
         market.setMarketPrice(new FixedDoubleParameter(2.0));
 
         FishState state = EffortThrottling.effortThrottling(40, market, System.currentTimeMillis(),
-                                                            new UniformDoubleParameter(0.001, 1), null, null
+            new UniformDoubleParameter(0.001, 1), null, null
         );
 
         //probability should be very low!

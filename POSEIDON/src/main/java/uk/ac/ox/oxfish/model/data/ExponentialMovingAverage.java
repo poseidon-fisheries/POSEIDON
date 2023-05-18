@@ -29,23 +29,22 @@ import com.google.common.base.Preconditions;
 public class ExponentialMovingAverage<T extends Number> implements Averager<T> {
 
 
-    private double average = Double.NaN;
-
     private final double alpha;
+    private double average = Double.NaN;
 
     public ExponentialMovingAverage(double alpha) {
         this.alpha = alpha;
-        Preconditions.checkArgument(alpha>=0);
-        Preconditions.checkArgument(alpha<=1);
+        Preconditions.checkArgument(alpha >= 0);
+        Preconditions.checkArgument(alpha <= 1);
     }
 
 
     @Override
     public void addObservation(T observation) {
-        if(Double.isFinite(average))
-            average = (1-alpha)*average + alpha*observation.doubleValue();
+        if (Double.isFinite(average))
+            average = (1 - alpha) * average + alpha * observation.doubleValue();
         else
-            average=observation.doubleValue();
+            average = observation.doubleValue();
     }
 
     /**

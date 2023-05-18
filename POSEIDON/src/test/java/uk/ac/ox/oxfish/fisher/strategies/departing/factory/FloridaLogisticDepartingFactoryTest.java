@@ -47,14 +47,14 @@ public class FloridaLogisticDepartingFactoryTest {
         longlinerDepartingStrategy.setWinter(new FixedDoubleParameter(0.706415));
         longlinerDepartingStrategy.setWeekend(new NullParameter());
         longlinerDepartingStrategy.setWindSpeedInKnots(new FixedDoubleParameter(0.004265));
-        longlinerDepartingStrategy.setRealDieselPrice(new FixedDoubleParameter(-0.125913/ 0.219969157));
+        longlinerDepartingStrategy.setRealDieselPrice(new FixedDoubleParameter(-0.125913 / 0.219969157));
         longlinerDepartingStrategy.setPriceRedGrouper(new NullParameter());
         longlinerDepartingStrategy.setPriceGagGrouper(new NullParameter());
 
-        FishState state = mock(FishState.class,RETURNS_DEEP_STUBS);
+        FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
         DailyLogisticDepartingStrategy strategy = longlinerDepartingStrategy.apply(state);
 
-        assertEquals(strategy.getClassifier().getSize(),6);
+        assertEquals(strategy.getClassifier().getSize(), 6);
 
 
         longlinerDepartingStrategy.setIntercept(new FixedDoubleParameter(-2.075184));
@@ -69,7 +69,7 @@ public class FloridaLogisticDepartingFactoryTest {
 
 
         strategy = longlinerDepartingStrategy.apply(state);
-        assertEquals(strategy.getClassifier().getSize(),9);
+        assertEquals(strategy.getClassifier().getSize(), 9);
     }
 
 
@@ -88,26 +88,30 @@ public class FloridaLogisticDepartingFactoryTest {
         longlinerDepartingStrategy.setPriceGagGrouper(new FixedDoubleParameter(0.649616 / 2.20462262));
 
 
-        FishState state = mock(FishState.class,RETURNS_DEEP_STUBS);
+        FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
         Species gag = mock(Species.class);
         when((state.getBiology().getSpecie("GagGrouper"))).thenReturn(gag);
         DailyLogisticDepartingStrategy strategy = longlinerDepartingStrategy.apply(state);
 
         Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
         when(fisher.getHomePort().getGasPricePerLiter()).thenReturn(2d);
-        double probability = strategy.getClassifier().getProbability(fisher,
-                                                                     24 * 30, //winter!
-                                                                     state,
-                                                                     mock(SeaTile.class));
-        System.out.println("probability: " + probability );
+        double probability = strategy.getClassifier().getProbability(
+            fisher,
+            24 * 30, //winter!
+            state,
+            mock(SeaTile.class)
+        );
+        System.out.println("probability: " + probability);
 
-        assertEquals(0.0015140371942369245d,probability,.001);
-        when(fisher.getHomePort().getMarginalPrice(gag,fisher)).thenReturn(10d);
-        probability = strategy.getClassifier().getProbability(fisher,
-                                                                     24 * 30, //winter!
-                                                                     state,
-                                                                     mock(SeaTile.class));
-        System.out.println("probability: " + probability );
-        assertEquals(0.0280627,probability,.001);
+        assertEquals(0.0015140371942369245d, probability, .001);
+        when(fisher.getHomePort().getMarginalPrice(gag, fisher)).thenReturn(10d);
+        probability = strategy.getClassifier().getProbability(
+            fisher,
+            24 * 30, //winter!
+            state,
+            mock(SeaTile.class)
+        );
+        System.out.println("probability: " + probability);
+        assertEquals(0.0280627, probability, .001);
     }
 }

@@ -40,12 +40,9 @@ import java.util.function.Consumer;
 public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripListener {
 
 
+    final private static String HEADER = "fisherid,effort,x_cell,y_cell," +
+        "date_trip_end_year,date_trip_end_day,tags";
     private String fileName = "tow_log.csv";
-
-
-    final private static String  HEADER = "fisherid,effort,x_cell,y_cell," +
-            "date_trip_end_year,date_trip_end_day,tags";
-
     private StringBuilder log = new StringBuilder().append(HEADER).append("\n");
 
     private FishState model;
@@ -61,17 +58,17 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
 
     @Override
     public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-        int year = (int)(record.getTripDay()/365d);
+        int year = (int) (record.getTripDay() / 365d);
 
 
         for (Map.Entry<SeaTile, FishingRecord> fishingRecord : record.getFishingRecords()) {
             log.append(fisher.getID()).append(",")
-                    .append(fishingRecord.getValue().getHoursSpentFishing()).append(",")
-                    .append(fishingRecord.getKey().getGridX()).append(",")
-                    .append(fishingRecord.getKey().getGridY()).append(",")
-                    .append(year).append(",")
-                    .append(record.getTripDay()).append(",")
-                    .append(String.join(";",fisher.getTags())).append("\n");
+                .append(fishingRecord.getValue().getHoursSpentFishing()).append(",")
+                .append(fishingRecord.getKey().getGridX()).append(",")
+                .append(fishingRecord.getKey().getGridY()).append(",")
+                .append(year).append(",")
+                .append(record.getTripDay()).append(",")
+                .append(String.join(";", fisher.getTags())).append("\n");
         }
 
     }
@@ -90,7 +87,7 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
      */
     @Override
     public void start(FishState model) {
-        Preconditions.checkState(this.model==null, "Already started!");
+        Preconditions.checkState(this.model == null, "Already started!");
 
         this.model = model;
         for (Fisher fisher : model.getFishers()) {
@@ -99,13 +96,13 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
 
         for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
             fisherFactory.getValue().getAdditionalSetups().add(
-                    new Consumer<Fisher>() {
-                        @Override
-                        public void accept(Fisher fisher) {
-                            if(TowLongLogger.this.model !=null) //if i am still active
+                new Consumer<Fisher>() {
+                    @Override
+                    public void accept(Fisher fisher) {
+                        if (TowLongLogger.this.model != null) //if i am still active
                             fisher.addTripListener(TowLongLogger.this);
-                        }
                     }
+                }
             );
         }
 
@@ -113,18 +110,17 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
     }
 
 
-
     /**
      * tell the startable to turnoff,
      */
     @Override
     public void turnOff() {
-        Preconditions.checkState(model!=null, "Not started!");
+        Preconditions.checkState(model != null, "Not started!");
         for (Fisher fisher : model.getFishers()) {
             fisher.removeTripListener(this);
         }
 
-        model=null;
+        model = null;
 
     }
 
@@ -133,14 +129,6 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
     public String getFileName() {
         return fileName;
     }
-
-    @Override
-    public String composeFileContents() {
-        return log.toString();
-    }
-
-
-
 
     /**
      * Setter for property 'fileName'.
@@ -151,7 +139,10 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
         this.fileName = fileName;
     }
 
-
+    @Override
+    public String composeFileContents() {
+        return log.toString();
+    }
 
 
 }

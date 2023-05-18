@@ -18,6 +18,22 @@
 
 package uk.ac.ox.oxfish.environment;
 
+import com.google.common.base.Supplier;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.univocity.parsers.common.record.Record;
+import sim.field.grid.DoubleGrid2D;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
+import uk.ac.ox.oxfish.geography.MapExtent;
+
+import javax.annotation.Nullable;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
@@ -27,26 +43,8 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-import com.google.common.base.Supplier;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.univocity.parsers.common.record.Record;
-import java.nio.file.Path;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import sim.field.grid.DoubleGrid2D;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.environment.GenericGrids;
-import uk.ac.ox.oxfish.geography.MapExtent;
-
-import javax.annotation.Nullable;
-
 abstract class AbstractGridsSupplier<K>
-        implements Supplier<GenericGrids<K>> {
+    implements Supplier<GenericGrids<K>> {
 
     @Nullable
 //    private final SpeciesCodes speciesCodes;
@@ -57,17 +55,18 @@ abstract class AbstractGridsSupplier<K>
     private final boolean toNormalize;
 
     private final LoadingCache<AbstractGridsSupplier<K>, GenericGrids<K>> cache =
-            CacheBuilder.newBuilder().build(CacheLoader.from(__ -> readGridsFromFile()));
+        CacheBuilder.newBuilder().build(CacheLoader.from(__ -> readGridsFromFile()));
 
     AbstractGridsSupplier(
-            @Nullable
+        @Nullable
 
-            final SpeciesCodes speciesCodes,
-            final Path gridsFilePath,
-            final MapExtent mapExtent,
-            final int period,
-            boolean toNormalize) {
- //       this.speciesCodes = speciesCodes;
+        final SpeciesCodes speciesCodes,
+        final Path gridsFilePath,
+        final MapExtent mapExtent,
+        final int period,
+        boolean toNormalize
+    ) {
+        //       this.speciesCodes = speciesCodes;
         this.gridsFilePath = gridsFilePath;
         this.mapExtent = mapExtent;
         this.period = period;
@@ -89,7 +88,7 @@ abstract class AbstractGridsSupplier<K>
         }
         final AbstractGridsSupplier<?> that = (AbstractGridsSupplier<?>) o;
         return period == that.period && Objects.equals(gridsFilePath, that.gridsFilePath)
-                && Objects.equals(mapExtent, that.mapExtent);
+            && Objects.equals(mapExtent, that.mapExtent);
     }
 
     @Override
@@ -103,59 +102,59 @@ abstract class AbstractGridsSupplier<K>
         checkNotNull(this.mapExtent);
 
         final Map<LocalDate, Map<K, List<Record>>> recordsByDateAndKey =
-                recordStream(gridsFilePath)
-                        .collect(groupingBy(
-                                r -> LocalDate.parse(r.getString("date")),
-                                groupingBy(record -> extractKeyFromRecord(record))
-                        ));
+            recordStream(gridsFilePath)
+                .collect(groupingBy(
+                    r -> LocalDate.parse(r.getString("date")),
+                    groupingBy(record -> extractKeyFromRecord(record))
+                ));
 
         final LocalDate startDate = recordsByDateAndKey
-                .keySet()
-                .stream()
-                .min(naturalOrder())
-                .orElseThrow(() ->
-                        new IllegalStateException("No records found in file " + gridsFilePath)
-                );
+            .keySet()
+            .stream()
+            .min(naturalOrder())
+            .orElseThrow(() ->
+                new IllegalStateException("No records found in file " + gridsFilePath)
+            );
 
         return GenericGrids.from(
-                recordsByDateAndKey
-                        .entrySet()
-                        .stream()
-                        .collect(toImmutableSortedMap(
-                                natural(),
-                                entry -> (int) DAYS.between(startDate, entry.getKey()),
-                                entry -> entry.getValue().entrySet().stream().collect(toImmutableMap(
-                                        Map.Entry::getKey,
-                                        subEntry -> makeGrid(mapExtent, subEntry.getValue(), toNormalize)
-                                ))
-                        )),
-                period
+            recordsByDateAndKey
+                .entrySet()
+                .stream()
+                .collect(toImmutableSortedMap(
+                    natural(),
+                    entry -> (int) DAYS.between(startDate, entry.getKey()),
+                    entry -> entry.getValue().entrySet().stream().collect(toImmutableMap(
+                        Map.Entry::getKey,
+                        subEntry -> makeGrid(mapExtent, subEntry.getValue(), toNormalize)
+                    ))
+                )),
+            period
         );
     }
 
     abstract K extractKeyFromRecord(Record record);
 
     private static DoubleGrid2D makeGrid(
-            final MapExtent mapExtent,
-            final Iterable<? extends Record> records, final boolean normalize
+        final MapExtent mapExtent,
+        final Iterable<? extends Record> records, final boolean normalize
     ) {
         final DoubleGrid2D grid = new DoubleGrid2D(
-                mapExtent.getGridWidth(),
-                mapExtent.getGridHeight()
+            mapExtent.getGridWidth(),
+            mapExtent.getGridHeight()
         );
         records.forEach(record -> {
             final double lon = record.getDouble("lon");
             final double lat = record.getDouble("lat");
             int x = mapExtent.toGridX(lon);
             int y = mapExtent.toGridY(lat);
-            if(x<grid.getWidth() && y<grid.getHeight() &&
-                    x>=0 && y>=0) {
+            if (x < grid.getWidth() && y < grid.getHeight() &&
+                x >= 0 && y >= 0) {
                 grid.set(
-                        x,
-                        y,
-                        record.getDouble("value")
-                );}
-            else {
+                    x,
+                    y,
+                    record.getDouble("value")
+                );
+            } else {
                 //System.err.println( "grid cannot include the point at " + lon + "," + lat + " because it is out of bounds");
             }
         });

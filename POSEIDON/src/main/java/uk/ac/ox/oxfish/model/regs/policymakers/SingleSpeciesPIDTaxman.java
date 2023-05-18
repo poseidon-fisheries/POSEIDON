@@ -32,39 +32,39 @@ import uk.ac.ox.oxfish.utility.adaptation.Sensor;
  * PID-driven taxman
  * Created by carrknight on 10/11/16.
  */
-public class SingleSpeciesPIDTaxman implements Startable
-{
+public class SingleSpeciesPIDTaxman implements Startable {
 
 
     final private Species species;
-
+    final private PIDController pid;
     private double taxPreviouslyImposed;
 
-    final private PIDController pid;
 
-
-    public SingleSpeciesPIDTaxman(Species species,
-                                  Sensor<FishState, Double> observed,
-                                  Sensor<FishState, Double> target,
-                                  int interval,
-                                  double p, double i, double d) {
+    public SingleSpeciesPIDTaxman(
+        Species species,
+        Sensor<FishState, Double> observed,
+        Sensor<FishState, Double> target,
+        int interval,
+        double p, double i, double d
+    ) {
         this.species = species;
         this.pid = new PIDController(
-                observed, target,
-                //for each port and each market set the price by adding new tax and taking away the old one
-                //this hopefully will mean that changes to price from other sources aren't lost
-                new Actuator<FishState, Double>() {
-                    @Override
-                    public void apply(FishState subject, Double policy, FishState model) {
-                        for (Port port : model.getPorts()) {
-                            FixedPriceMarket market = (FixedPriceMarket) port.getDefaultMarketMap().getMarket(species);
-                            market.setPrice(market.getPrice() - policy + taxPreviouslyImposed);
-                        }
-                        taxPreviouslyImposed = policy;
+            observed, target,
+            //for each port and each market set the price by adding new tax and taking away the old one
+            //this hopefully will mean that changes to price from other sources aren't lost
+            new Actuator<FishState, Double>() {
+                @Override
+                public void apply(FishState subject, Double policy, FishState model) {
+                    for (Port port : model.getPorts()) {
+                        FixedPriceMarket market = (FixedPriceMarket) port.getDefaultMarketMap().getMarket(species);
+                        market.setPrice(market.getPrice() - policy + taxPreviouslyImposed);
                     }
-                },
-                interval,
-                p,i,d,0);
+                    taxPreviouslyImposed = policy;
+                }
+            },
+            interval,
+            p, i, d, 0
+        );
 
     }
 

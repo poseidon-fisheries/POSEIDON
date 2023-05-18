@@ -29,8 +29,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * Just a biology that has 0 biomass of everything
  * Created by carrknight on 4/11/15.
  */
-public class EmptyLocalBiology implements LocalBiology
-{
+public class EmptyLocalBiology implements LocalBiology {
 
     /**
      * the biomass is 0 for everything
@@ -45,14 +44,17 @@ public class EmptyLocalBiology implements LocalBiology
 
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
-     *  @param caught
+     *
+     * @param caught
      * @param notDiscarded
      * @param biology
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-            Catch caught, Catch notDiscarded, GlobalBiology biology) {
-        Preconditions.checkArgument(caught.getTotalWeight() == 0,"It's impossible to take biomass from the empty biology");
+        Catch caught, Catch notDiscarded, GlobalBiology biology
+    ) {
+        Preconditions.checkArgument(caught.getTotalWeight() == 0,
+            "It's impossible to take biomass from the empty biology");
     }
 
 

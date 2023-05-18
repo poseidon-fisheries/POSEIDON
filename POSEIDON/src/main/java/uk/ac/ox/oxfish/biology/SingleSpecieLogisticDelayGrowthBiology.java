@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.collect.EvictingQueue;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -30,15 +29,16 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * This is not the full Deriso-Schnute model, rather it's just the initial equation given here:
- *  https://catalyst.uw.edu/workspace/file/download/d75d78b22acb18071f8ddc321cda7ed08a74f39da15311374e3c10e448045bc7
- *
+ * https://catalyst.uw.edu/workspace/file/download/d75d78b22acb18071f8ddc321cda7ed08a74f39da15311374e3c10e448045bc7
+ * <p>
  * Created by carrknight on 10/19/15.
  */
 public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBasedBiology
-        implements Steppable, Startable
-{
+    implements Steppable, Startable {
 
     /**
      * how many years before current spawns enter the biomass proper
@@ -59,28 +59,25 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
      * denominator parameter in the recruitment equation
      */
     final private double bParameter;
-
-
-    /**
-     * current biomass
-     */
-    private double currentBiomass;
-
     /**
      * biomass over which you can never go
      */
-    final private double  maxBiomass;
-
+    final private double maxBiomass;
     /**
      * the species modeled
      */
     private final Species species;
+    /**
+     * current biomass
+     */
+    private double currentBiomass;
     private Stoppable stoppable;
 
 
     public SingleSpecieLogisticDelayGrowthBiology(
-            Species species, double currentBiomass, double maxBiomass, int yearDelays, double aParameter,
-            double bParameter) {
+        Species species, double currentBiomass, double maxBiomass, int yearDelays, double aParameter,
+        double bParameter
+    ) {
         checkArgument(yearDelays > 0, "Use undelayed biology rather than feeding 0 to a delayed one");
         checkArgument(maxBiomass > 0);
         checkArgument(currentBiomass <= maxBiomass);
@@ -88,7 +85,7 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
         this.species = species;
         this.yearDelays = yearDelays;
         pastBiomass = EvictingQueue.create(yearDelays);
-        while(pastBiomass.remainingCapacity()>0)
+        while (pastBiomass.remainingCapacity() > 0)
             pastBiomass.add(currentBiomass);
         this.aParameter = aParameter;
         this.bParameter = bParameter;
@@ -103,38 +100,38 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
      * @return the biomass of this species
      */
     @Override
-    public double getBiomass(Species species)
-    {
+    public double getBiomass(Species species) {
         checkArgument(species == this.species, "%s != %s", species, this.species);
         return currentBiomass;
     }
 
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
-     *  @param caught
+     *
+     * @param caught
      * @param notDiscarded
      * @param biology
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-            Catch caught, Catch notDiscarded, GlobalBiology biology) {
+        Catch caught, Catch notDiscarded, GlobalBiology biology
+    ) {
         //focus on only the one you care about!
         double biomassFished = caught.getWeightCaught(this.species);
 
         checkArgument(biomassFished <= currentBiomass);
-        currentBiomass-= biomassFished;
+        currentBiomass -= biomassFished;
 
     }
 
     @Override
-    public void step(SimState simState)
-    {
+    public void step(SimState simState) {
 
         double biologyAtRecruitment = pastBiomass.poll();
         assert pastBiomass.remainingCapacity() == 1;
         double recruitment = aParameter * biologyAtRecruitment / (bParameter + biologyAtRecruitment);
 
-        currentBiomass = Math.min(currentBiomass + recruitment,maxBiomass);
+        currentBiomass = Math.min(currentBiomass + recruitment, maxBiomass);
         pastBiomass.add(currentBiomass);
 
 

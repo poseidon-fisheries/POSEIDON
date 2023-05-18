@@ -25,7 +25,6 @@ import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Arrays;
-import java.util.function.ToDoubleFunction;
 
 /**
  * loops through an array of prices to create fixed price markets
@@ -64,14 +63,14 @@ public class ArrayFixedPriceMarket implements AlgorithmFactory<FixedPriceMarket>
     @Override
     public FixedPriceMarket apply(FishState fishState) {
 
-        if(pricesAsNumbers == null)
+        if (pricesAsNumbers == null)
             pricesAsNumbers = Arrays.stream(prices.split(",")).
-                    mapToDouble(Double::parseDouble).toArray();
+                mapToDouble(Double::parseDouble).toArray();
 
         FixedPriceMarket market = new FixedPriceMarket(pricesAsNumbers[index]);
         index++;
-        if(index==pricesAsNumbers.length)
-            index=0;
+        if (index == pricesAsNumbers.length)
+            index = 0;
         return market;
     }
 

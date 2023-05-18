@@ -51,25 +51,22 @@ public class OnOffSwitchRegulatorTest {
         OffSwitchDecorator decorator4 = mock(OffSwitchDecorator.class);
         when(four.getRegulation()).thenReturn(decorator4);
 
-        FishState state  = mock(FishState.class);
+        FishState state = mock(FishState.class);
         ObservableList<Fisher> fishers = ObservableList.observableList(one, two, three, four);
         when(state.getFishers()).thenReturn(fishers);
 
 
         PermitAllocationPolicy onlyFirstFisher = mock(PermitAllocationPolicy.class);
-        when(onlyFirstFisher.computeWhichFishersAreAllowed(fishers,state)).thenReturn(Lists.newArrayList(one));
+        when(onlyFirstFisher.computeWhichFishersAreAllowed(fishers, state)).thenReturn(Lists.newArrayList(one));
         OnOffSwitchRegulator regulator = new OnOffSwitchRegulator(onlyFirstFisher, new LinkedList<>());
         regulator.start(state);
         //regulator now steps when immediately started
-     //   regulator.step(state);
+        //   regulator.step(state);
 
-        verify(((OffSwitchDecorator) one.getRegulation()),times(1)).setTurnedOff(false);
-        verify(((OffSwitchDecorator) two.getRegulation()),times(1)).setTurnedOff(true);
-        verify(((OffSwitchDecorator) three.getRegulation()),times(1)).setTurnedOff(true);
-        verify(((OffSwitchDecorator) four.getRegulation()),times(1)).setTurnedOff(true);
-
-
-
+        verify(((OffSwitchDecorator) one.getRegulation()), times(1)).setTurnedOff(false);
+        verify(((OffSwitchDecorator) two.getRegulation()), times(1)).setTurnedOff(true);
+        verify(((OffSwitchDecorator) three.getRegulation()), times(1)).setTurnedOff(true);
+        verify(((OffSwitchDecorator) four.getRegulation()), times(1)).setTurnedOff(true);
 
 
     }
@@ -98,25 +95,21 @@ public class OnOffSwitchRegulatorTest {
         when(three.getTags()).thenReturn(Lists.newArrayList("okay"));
         when(one.getTags()).thenReturn(Lists.newArrayList("nope"));
 
-        FishState state  = mock(FishState.class);
+        FishState state = mock(FishState.class);
         ObservableList<Fisher> fishers = ObservableList.observableList(one, two, three, four);
         when(state.getFishers()).thenReturn(fishers);
 
 
         PermitAllocationPolicy onlyFirstFisher = mock(PermitAllocationPolicy.class);
-        when(onlyFirstFisher.computeWhichFishersAreAllowed(anyList(),any())).thenReturn(Lists.newArrayList(one));
+        when(onlyFirstFisher.computeWhichFishersAreAllowed(anyList(), any())).thenReturn(Lists.newArrayList(one));
         OnOffSwitchRegulator regulator = new OnOffSwitchRegulator(onlyFirstFisher, Lists.newArrayList("okay"));
         regulator.start(state);
         regulator.step(state);
 
 
-
         //four is neither turned off nor on; it is completely ignored
-        verify(((OffSwitchDecorator) four.getRegulation()),times(0)).setTurnedOff(true);
-        verify(((OffSwitchDecorator) four.getRegulation()),times(0)).setTurnedOff(false);
-
-
-
+        verify(((OffSwitchDecorator) four.getRegulation()), times(0)).setTurnedOff(true);
+        verify(((OffSwitchDecorator) four.getRegulation()), times(0)).setTurnedOff(false);
 
 
     }

@@ -36,8 +36,13 @@ public class RecruitmentBySpawningBiomassDelayed extends RecruitmentBySpawningBi
 
 
     public RecruitmentBySpawningBiomassDelayed(
-        final int virginRecruits, final double steepness, final double cumulativePhi, final boolean addRelativeFecundityToSpawningBiomass,
-        final double[] maturity, final double[] relativeFecundity, final int femaleSubdivision,
+        final int virginRecruits,
+        final double steepness,
+        final double cumulativePhi,
+        final boolean addRelativeFecundityToSpawningBiomass,
+        final double[] maturity,
+        final double[] relativeFecundity,
+        final int femaleSubdivision,
         final int yearDelay
     ) {
         super(virginRecruits, steepness, cumulativePhi, addRelativeFecundityToSpawningBiomass, maturity,
@@ -58,7 +63,11 @@ public class RecruitmentBySpawningBiomassDelayed extends RecruitmentBySpawningBi
      */
     @Override
     public double recruit(
-        final Species species, final Meristics meristics, final StructuredAbundance abundance, final int dayOfTheYear, final int daysSimulated
+        final Species species,
+        final Meristics meristics,
+        final StructuredAbundance abundance,
+        final int dayOfTheYear,
+        final int daysSimulated
     ) {
 
         final double newRecruit = super.recruit(species, meristics, abundance, dayOfTheYear, daysSimulated);

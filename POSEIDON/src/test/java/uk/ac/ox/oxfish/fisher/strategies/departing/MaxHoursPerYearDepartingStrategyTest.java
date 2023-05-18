@@ -42,10 +42,10 @@ public class MaxHoursPerYearDepartingStrategyTest {
         MaxHoursPerYearDepartingStrategy strategy = new MaxHoursPerYearDepartingStrategy(100);
         when(fisher.getHoursAtSeaThisYear()).thenReturn(50d);
 
-        assertTrue(strategy.shouldFisherLeavePort(fisher,mock(FishState.class),new MersenneTwisterFast()));
+        assertTrue(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
 
         when(fisher.getHoursAtSeaThisYear()).thenReturn(150d);
-        assertFalse(strategy.shouldFisherLeavePort(fisher,mock(FishState.class),new MersenneTwisterFast()));
+        assertFalse(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
 
 
     }

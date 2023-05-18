@@ -38,7 +38,10 @@ public class FixedRestTimeDepartingStrategy implements DepartingStrategy {
         setMinimumHoursToWait(minimumHoursToWait);
     }
 
-    @SuppressWarnings("unused") public double getMinimumHoursToWait() { return minimumHoursToWait; }
+    @SuppressWarnings("unused")
+    public double getMinimumHoursToWait() {
+        return minimumHoursToWait;
+    }
 
     public void setMinimumHoursToWait(double minimumHoursToWait) {
         checkArgument(minimumHoursToWait >= 0);

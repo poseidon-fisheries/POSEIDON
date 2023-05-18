@@ -9,10 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MultipleIndependentSpeciesAbundanceFactory implements
-        AlgorithmFactory<MultipleIndependentSpeciesAbundanceInitializer> {
-
-
-
+    AlgorithmFactory<MultipleIndependentSpeciesAbundanceInitializer> {
 
 
     private List<AlgorithmFactory<? extends SingleSpeciesAbundanceInitializer>> factories = new LinkedList<>();
@@ -34,7 +31,7 @@ public class MultipleIndependentSpeciesAbundanceFactory implements
     public MultipleIndependentSpeciesAbundanceInitializer apply(FishState fishState) {
 
         LinkedList<SingleSpeciesAbundanceInitializer> initializers =
-                new LinkedList<>();
+            new LinkedList<>();
 
         for (AlgorithmFactory<? extends SingleSpeciesAbundanceInitializer> factory : factories) {
             initializers.add(factory.apply(fishState));
@@ -81,7 +78,8 @@ public class MultipleIndependentSpeciesAbundanceFactory implements
      * @param factories Value to set for property 'factories'.
      */
     public void setFactories(
-            List<AlgorithmFactory<? extends SingleSpeciesAbundanceInitializer>> factories) {
+        List<AlgorithmFactory<? extends SingleSpeciesAbundanceInitializer>> factories
+    ) {
         this.factories = factories;
     }
 }

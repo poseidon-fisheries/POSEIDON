@@ -26,15 +26,14 @@ import com.google.common.base.Preconditions;
  * Every action returns the next action to take and a boolean telling whether the action takes place this turn
  * or the next
  */
-public class ActionResult
-{
+public class ActionResult {
 
     private final Action nextState;
 
     private final double hoursLeft;
 
     public ActionResult(Action nextState, double hoursLeft) {
-        Preconditions.checkArgument(hoursLeft>=0);
+        Preconditions.checkArgument(hoursLeft >= 0);
         this.nextState = nextState;
         this.hoursLeft = hoursLeft;
     }
@@ -48,7 +47,7 @@ public class ActionResult
     }
 
     public boolean isActAgainThisTurn() {
-        return hoursLeft > 0 ;
+        return hoursLeft > 0;
     }
 
 

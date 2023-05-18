@@ -14,7 +14,13 @@ public class SimplifiedDoubleNormalFilter extends FormulaAbundanceFilter {
     private final double slopeRight;
 
 
-    public SimplifiedDoubleNormalFilter(boolean memoization, boolean rounding, double lengthFullSelectivity, double slopeLeft, double slopeRight) {
+    public SimplifiedDoubleNormalFilter(
+        boolean memoization,
+        boolean rounding,
+        double lengthFullSelectivity,
+        double slopeLeft,
+        double slopeRight
+    ) {
         super(memoization, rounding);
 
         this.lengthFullSelectivity = lengthFullSelectivity;
@@ -34,18 +40,21 @@ public class SimplifiedDoubleNormalFilter extends FormulaAbundanceFilter {
         //    sel
         //}
         double[][] selex = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
-        for(int subdivision =0; subdivision< species.getNumberOfSubdivisions(); subdivision++)
-            for(int bin=0;bin<species.getNumberOfBins();bin++)
-            {
+        for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++)
+            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
 
                 final double length = species.getLength(subdivision, bin);
                 boolean isLeft = length <= lengthFullSelectivity;
-                if(isLeft)
-                    selex[subdivision][bin] = Math.pow(2,
-                            (-(length-lengthFullSelectivity)/slopeLeft*(length-lengthFullSelectivity)/slopeLeft));
-                else{
-                    selex[subdivision][bin] = Math.pow(2,
-                            (-(length-lengthFullSelectivity)/slopeRight*(length-lengthFullSelectivity)/slopeRight));
+                if (isLeft)
+                    selex[subdivision][bin] = Math.pow(
+                        2,
+                        (-(length - lengthFullSelectivity) / slopeLeft * (length - lengthFullSelectivity) / slopeLeft)
+                    );
+                else {
+                    selex[subdivision][bin] = Math.pow(
+                        2,
+                        (-(length - lengthFullSelectivity) / slopeRight * (length - lengthFullSelectivity) / slopeRight)
+                    );
 
                 }
 

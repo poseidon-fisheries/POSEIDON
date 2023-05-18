@@ -16,23 +16,21 @@ import java.util.List;
 public class SimpleListMeristicFactory implements AlgorithmFactory<FromListMeristics> {
 
 
-    private List<Double> weights = Lists.newArrayList(10d,20d,30d);
+    private List<Double> weights = Lists.newArrayList(10d, 20d, 30d);
 
-    private List<Double> lengths = Lists.newArrayList(10d,20d,30d);
-
+    private List<Double> lengths = Lists.newArrayList(10d, 20d, 30d);
 
 
     @Override
     public FromListMeristics apply(FishState fishState) {
-        Preconditions.checkArgument(weights.size()>0);
-        Preconditions.checkArgument(weights.size()==lengths.size(), "lengths-weights are lists of different size!");
-
+        Preconditions.checkArgument(weights.size() > 0);
+        Preconditions.checkArgument(weights.size() == lengths.size(), "lengths-weights are lists of different size!");
 
 
         return new FromListMeristics(
-                Doubles.toArray(weights),
-                Doubles.toArray(lengths),
-                1
+            Doubles.toArray(weights),
+            Doubles.toArray(lengths),
+            1
         );
 
     }

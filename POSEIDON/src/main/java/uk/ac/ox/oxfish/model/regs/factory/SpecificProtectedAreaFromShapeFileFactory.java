@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.vividsolutions.jts.geom.Point;
-import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.utility.GISReaders;
@@ -34,20 +33,6 @@ public class SpecificProtectedAreaFromShapeFileFactory extends SpecificProtected
         this.setName(name);
     }
 
-    @SuppressWarnings("unused")
-    public Path getShapeFilePath() {
-        return shapeFilePath;
-    }
-
-    @SuppressWarnings("unused")
-    public void setShapeFilePath(Path shapeFilePath) {
-        this.shapeFilePath = shapeFilePath;
-    }
-
-    private GeomVectorField readShapeFile() {
-        return GISReaders.readShapeFile(getShapeFilePath().toString());
-    }
-
     @Override
     BiPredicate<Integer, Integer> inAreaPredicate(MapExtent mapExtent) {
         final GeomVectorField vectorField = readShapeFile();
@@ -56,6 +41,20 @@ public class SpecificProtectedAreaFromShapeFileFactory extends SpecificProtected
             final Point gridPoint = mapExtent.toPoint(x, y);
             return !vectorField.getCoveringObjects(gridPoint).isEmpty();
         };
+    }
+
+    private GeomVectorField readShapeFile() {
+        return GISReaders.readShapeFile(getShapeFilePath().toString());
+    }
+
+    @SuppressWarnings("unused")
+    public Path getShapeFilePath() {
+        return shapeFilePath;
+    }
+
+    @SuppressWarnings("unused")
+    public void setShapeFilePath(Path shapeFilePath) {
+        this.shapeFilePath = shapeFilePath;
     }
 
 }

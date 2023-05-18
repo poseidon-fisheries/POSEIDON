@@ -31,20 +31,6 @@ public class FixedYearlyPricesBiomassMarket
             .orElseThrow(() -> new IllegalStateException("No prices defined."));
     }
 
-    public int getCurrentYear() {
-        return currentYear;
-    }
-
-    public void setCurrentYear(int currentYear) {
-        if (yearlyPrices.containsKey(currentYear)) {
-            this.currentYear = currentYear;
-        } else if (defaultingToLastYear) {
-            this.currentYear = lastYear;
-        } else {
-            throw new IllegalArgumentException("No prices defined for year " + currentYear);
-        }
-    }
-
     @Override
     protected TradeInfo sellFishImplementation(
         double biomass,
@@ -70,6 +56,20 @@ public class FixedYearlyPricesBiomassMarket
             biomassTraded -> biomassTraded * getMarginalPrice(),
             species
         );
+    }
+
+    public int getCurrentYear() {
+        return currentYear;
+    }
+
+    public void setCurrentYear(int currentYear) {
+        if (yearlyPrices.containsKey(currentYear)) {
+            this.currentYear = currentYear;
+        } else if (defaultingToLastYear) {
+            this.currentYear = lastYear;
+        } else {
+            throw new IllegalArgumentException("No prices defined for year " + currentYear);
+        }
     }
 
     @Override

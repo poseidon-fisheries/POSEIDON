@@ -23,8 +23,7 @@ package uk.ac.ox.oxfish.experiments.noisespike;
 import com.google.common.annotations.VisibleForTesting;
 import uk.ac.ox.oxfish.model.FishState;
 
-public class AcceptableRangePredicate  {
-
+public class AcceptableRangePredicate {
 
 
     private double minimum;
@@ -52,11 +51,29 @@ public class AcceptableRangePredicate  {
         this.columnName = columnName;
     }
 
-    public boolean test(FishState state, int yearToTest)
-    {
+    public double distance(FishState state, int yearToTest) {
+
+
+        double between = (maximum + minimum) / 2d;
+        if (test(state, yearToTest))
+            return 0;
 
         double measure = measure(state, yearToTest);
-        System.out.println(measure + " ---" + ((measure >= minimum && measure <= maximum)? "okay" : "fail!"));
+        if (measure > maximum)
+            return (measure - maximum) / between;
+        else {
+            assert measure < minimum;
+            return (minimum - measure) / between;
+
+        }
+
+
+    }
+
+    public boolean test(FishState state, int yearToTest) {
+
+        double measure = measure(state, yearToTest);
+        System.out.println(measure + " ---" + ((measure >= minimum && measure <= maximum) ? "okay" : "fail!"));
 
         return measure >= minimum && measure <= maximum;
 
@@ -66,28 +83,6 @@ public class AcceptableRangePredicate  {
         return state.getYearlyDataSet().getColumn(columnName).get(yearToTest);
     }
 
-
-    public double distance(FishState state, int yearToTest){
-
-
-        double between = (maximum + minimum)/2d;
-        if(test(state,yearToTest))
-            return 0;
-
-        double measure = measure(state, yearToTest);
-        if(measure > maximum)
-            return (measure-maximum)/between;
-        else
-        {
-            assert measure<minimum;
-            return (minimum-measure)/between;
-
-        }
-
-
-    }
-
-
     /**
      * Getter for property 'minimum'.
      *
@@ -95,6 +90,10 @@ public class AcceptableRangePredicate  {
      */
     public double getMinimum() {
         return minimum;
+    }
+
+    public void setMinimum(double minimum) {
+        this.minimum = minimum;
     }
 
     /**
@@ -106,6 +105,10 @@ public class AcceptableRangePredicate  {
         return maximum;
     }
 
+    public void setMaximum(double maximum) {
+        this.maximum = maximum;
+    }
+
     /**
      * Getter for property 'columnName'.
      *
@@ -113,15 +116,6 @@ public class AcceptableRangePredicate  {
      */
     public String getColumnName() {
         return columnName;
-    }
-
-
-    public void setMinimum(double minimum) {
-        this.minimum = minimum;
-    }
-
-    public void setMaximum(double maximum) {
-        this.maximum = maximum;
     }
 
     public void setColumnName(String columnName) {

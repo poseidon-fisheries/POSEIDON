@@ -46,8 +46,8 @@ public class OneBinInitialAbundance implements InitialAbundance {
     private Species species;
 
     public OneBinInitialAbundance(int bin, double initialAbundance, int subdivision) {
-        Preconditions.checkArgument(bin>=0);
-        Preconditions.checkArgument(initialAbundance>=0);
+        Preconditions.checkArgument(bin >= 0);
+        Preconditions.checkArgument(initialAbundance >= 0);
         this.bin = bin;
         this.initialAbundance = initialAbundance;
         this.subdivision = subdivision;
@@ -74,13 +74,12 @@ public class OneBinInitialAbundance implements InitialAbundance {
 
 
         double[][] abundance = new double[species.getNumberOfSubdivisions()]
-                [species.getNumberOfBins()];
-        if(subdivision<0) {
-            for (int i = 0; i<species.getNumberOfSubdivisions(); i++) {
+            [species.getNumberOfBins()];
+        if (subdivision < 0) {
+            for (int i = 0; i < species.getNumberOfSubdivisions(); i++) {
                 abundance[i][bin] = initialAbundance;
             }
-        }
-        else {
+        } else {
             abundance[subdivision][bin] = initialAbundance;
         }
         return abundance;

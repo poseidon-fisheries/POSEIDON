@@ -21,9 +21,7 @@
 package uk.ac.ox.oxfish.fisher.log;
 
 import com.google.common.base.Preconditions;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -31,8 +29,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
  * A record describing the achieved catch for a specific instance of fishing
  * Created by carrknight on 6/30/15.
  */
-public class FishingRecord
-{
+public class FishingRecord {
 
 
     /**
@@ -52,19 +49,40 @@ public class FishingRecord
     final private Catch fishCaught;
 
 
-
-
     public FishingRecord(
-            int hoursSpentFishing, SeaTile tileFished, Catch fishCaught) {
+        int hoursSpentFishing, SeaTile tileFished, Catch fishCaught
+    ) {
         this.hoursSpentFishing = hoursSpentFishing;
         this.tileFished = tileFished;
         this.fishCaught = fishCaught;
     }
 
-    public int getHoursSpentFishing() {
-        return hoursSpentFishing;
-    }
+    /**
+     * adds to fishing records together; fails if they belong to different sea-tiles!
+     *
+     * @param original  the original
+     * @param newRecord
+     * @return
+     */
+    public static FishingRecord sumRecords(
+        FishingRecord original,
+        FishingRecord newRecord
+    ) {
 
+        Preconditions.checkArgument(
+            original.tileFished == newRecord.tileFished,
+            "Fishing records do not belong to same tile!"
+        );
+        return new FishingRecord(
+            original.hoursSpentFishing + newRecord.hoursSpentFishing,
+            original.getTileFished(),
+            newRecord.fishCaught.getTotalWeight() > FishStateUtilities.EPSILON ?
+                Catch.sumCatches(original.getFishCaught(), newRecord.getFishCaught()) :
+                original.getFishCaught()
+        );
+
+
+    }
 
     public SeaTile getTileFished() {
         return tileFished;
@@ -74,30 +92,8 @@ public class FishingRecord
         return fishCaught;
     }
 
-    /**
-     * adds to fishing records together; fails if they belong to different sea-tiles!
-     * @param original the original
-     * @param newRecord
-     * @return
-     */
-    public static  FishingRecord sumRecords(
-            FishingRecord original,
-            FishingRecord newRecord
-    ){
-
-        Preconditions.checkArgument(original.tileFished==newRecord.tileFished,
-                                    "Fishing records do not belong to same tile!");
-        return new FishingRecord(
-                original.hoursSpentFishing + newRecord.hoursSpentFishing,
-                original.getTileFished(),
-                newRecord.fishCaught.getTotalWeight() > FishStateUtilities.EPSILON ?
-                        Catch.sumCatches(original.getFishCaught(),newRecord.getFishCaught()) :
-                        original.getFishCaught());
-
-
-
-
-
+    public int getHoursSpentFishing() {
+        return hoursSpentFishing;
     }
 
 

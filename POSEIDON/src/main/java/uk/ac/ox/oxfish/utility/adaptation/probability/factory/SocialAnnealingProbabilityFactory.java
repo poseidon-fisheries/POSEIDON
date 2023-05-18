@@ -32,7 +32,7 @@ import java.util.function.Function;
 /**
  * Created by carrknight on 10/17/16.
  */
-public class SocialAnnealingProbabilityFactory implements AlgorithmFactory<ThresholdExplorationProbability>{
+public class SocialAnnealingProbabilityFactory implements AlgorithmFactory<ThresholdExplorationProbability> {
 
 
     private DoubleParameter multiplier = new FixedDoubleParameter(1);
@@ -45,6 +45,7 @@ public class SocialAnnealingProbabilityFactory implements AlgorithmFactory<Thres
 
         this.multiplier = new FixedDoubleParameter(multiplier);
     }
+
     /**
      * Applies this function to the given argument.
      *
@@ -53,14 +54,16 @@ public class SocialAnnealingProbabilityFactory implements AlgorithmFactory<Thres
      */
     @Override
     public ThresholdExplorationProbability apply(FishState state) {
-        return new ThresholdExplorationProbability(multiplier.applyAsDouble(state.getRandom()),
-                                                   new Function<FishState, Double>() {
-                                                       @Override
-                                                       public Double apply(FishState model) {
-                                                           return model.getLatestDailyObservation(
-                                                                   FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
-                                                       }
-                                                   });
+        return new ThresholdExplorationProbability(
+            multiplier.applyAsDouble(state.getRandom()),
+            new Function<FishState, Double>() {
+                @Override
+                public Double apply(FishState model) {
+                    return model.getLatestDailyObservation(
+                        FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
+                }
+            }
+        );
     }
 
 

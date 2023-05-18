@@ -29,13 +29,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class WindThresholdStrategyTest
-{
+public class WindThresholdStrategyTest {
 
 
     @Test
-    public void windThreshold() throws Exception
-    {
+    public void windThreshold() throws Exception {
 
 
         WindThresholdStrategy strategy = new WindThresholdStrategy(100);

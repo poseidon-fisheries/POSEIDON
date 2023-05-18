@@ -8,36 +8,37 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PortBasedWaitTimesFactory implements AlgorithmFactory<PortBasedWaitTimesDecorator>
-{
+public class PortBasedWaitTimesFactory implements AlgorithmFactory<PortBasedWaitTimesDecorator> {
 
     private AlgorithmFactory<? extends Regulation> delegate = new AnarchyFactory();
 
 
-    private HashMap<String,Object> portWaitTimes = new HashMap<>();
+    private HashMap<String, Object> portWaitTimes = new HashMap<>();
+
     {
-        portWaitTimes.put("Port 0","0");
- //       portWaitTimes.put("Port 2","10");
+        portWaitTimes.put("Port 0", "0");
+        //       portWaitTimes.put("Port 2","10");
     }
 
     @Override
     public PortBasedWaitTimesDecorator apply(FishState fishState) {
 
 
-        HashMap<String,Integer> portWaitTimesInteger = new HashMap<>();
-        for (Map.Entry<String,Object> waitTime : portWaitTimes.entrySet()) {
+        HashMap<String, Integer> portWaitTimesInteger = new HashMap<>();
+        for (Map.Entry<String, Object> waitTime : portWaitTimes.entrySet()) {
             Object value = waitTime.getValue();
-            portWaitTimesInteger.put(waitTime.getKey(),
-                                     value instanceof String ?
-                                     Integer.parseInt((String) value):
-                                             (Integer)(value)
+            portWaitTimesInteger.put(
+                waitTime.getKey(),
+                value instanceof String ?
+                    Integer.parseInt((String) value) :
+                    (Integer) (value)
 
             );
         }
 
         return new PortBasedWaitTimesDecorator(
-                delegate.apply(fishState),
-                portWaitTimesInteger
+            delegate.apply(fishState),
+            portWaitTimesInteger
         );
     }
 

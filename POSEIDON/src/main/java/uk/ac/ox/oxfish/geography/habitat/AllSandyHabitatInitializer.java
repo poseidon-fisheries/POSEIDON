@@ -33,12 +33,12 @@ public class AllSandyHabitatInitializer implements HabitatInitializer {
     /**
      * Puts sandy tiles everywhere
      *
-     * @param map the input argument
+     * @param map   the input argument
      * @param model
      */
     @Override
     public void applyHabitats(NauticalMap map, MersenneTwisterFast random, FishState model) {
-        for(SeaTile tile : map.getAllSeaTilesAsList())
+        for (SeaTile tile : map.getAllSeaTilesAsList())
             tile.setHabitat(new TileHabitat(0d));
     }
 }

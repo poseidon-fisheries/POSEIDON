@@ -42,7 +42,7 @@ import java.util.List;
  *      <p><strong>These methods must be always enclosed in {@link #beginChange() } and {@link #endChange() } block.</strong>
  *      <p>See the example below.
  * </ul>
- *
+ * <p>
  * The following example shows how the Change build-up works:
  * <pre>
  *  <strong>public void</strong> removeOddIndexes() {
@@ -67,7 +67,7 @@ import java.util.List;
  *  }
  *
  * </pre>
- *
+ * <p>
  * The {@code try}/{@code finally} blocks in the example are needed only if there's a possibility for an exception to occur
  * inside a {@code beginChange()} / {@code endChange()} block
  *
@@ -84,15 +84,16 @@ import java.util.List;
  * @see ModifiableObservableListBase
  * @since JavaFX 8.0
  */
-public abstract class ObservableListBase<E> extends AbstractList<E>  implements ObservableList<E> {
+public abstract class ObservableListBase<E> extends AbstractList<E> implements ObservableList<E> {
 
-    private ListListenerHelper<E> listenerHelper;
     private final ListChangeBuilder<E> changeBuilder = new ListChangeBuilder<E>(this);
+    private ListListenerHelper<E> listenerHelper;
 
     /**
      * Adds a new update operation to the change.
      * <p><strong>Note</strong>: needs to be called inside {@code beginChange()} / {@code endChange()} block.
      * <p><strong>Note</strong>: needs to reflect the <em>current</em> state of the list.
+     *
      * @param pos the position in the list where the updated element resides.
      */
     protected final void nextUpdate(int pos) {
@@ -104,6 +105,7 @@ public abstract class ObservableListBase<E> extends AbstractList<E>  implements 
      * Equivalent to {@code nextRemove(idx); nextAdd(idx, idx + 1); }.
      * <p><strong>Note</strong>: needs to be called inside {@code beginChange()} / {@code endChange()} block.
      * <p><strong>Note</strong>: needs to reflect the <em>current</em> state of the list.
+     *
      * @param idx the index of the item that was set
      * @param old the old value at the {@code idx} position.
      */
@@ -116,8 +118,9 @@ public abstract class ObservableListBase<E> extends AbstractList<E>  implements 
      * Equivalent to {@code nextRemove(from, removed); nextAdd(from, to); }
      * <p><strong>Note</strong>: needs to be called inside {@code beginChange()} / {@code endChange()} block.
      * <p><strong>Note</strong>: needs to reflect the <em>current</em> state of the list.
-     * @param from the index where the items were replaced
-     * @param to the end index (exclusive) of the range where the new items reside
+     *
+     * @param from    the index where the items were replaced
+     * @param to      the end index (exclusive) of the range where the new items reside
      * @param removed the list of items that were removed
      */
     protected final void nextReplace(int from, int to, List<? extends E> removed) {
@@ -128,7 +131,8 @@ public abstract class ObservableListBase<E> extends AbstractList<E>  implements 
      * Adds a new remove operation to the change with multiple items removed.
      * <p><strong>Note</strong>: needs to be called inside {@code beginChange()} / {@code endChange()} block.
      * <p><strong>Note</strong>: needs to reflect the <em>current</em> state of the list.
-     * @param idx the index where the items were removed
+     *
+     * @param idx     the index where the items were removed
      * @param removed the list of items that were removed
      */
     protected final void nextRemove(int idx, List<? extends E> removed) {
@@ -139,7 +143,8 @@ public abstract class ObservableListBase<E> extends AbstractList<E>  implements 
      * Adds a new remove operation to the change with single item removed.
      * <p><strong>Note</strong>: needs to be called inside {@code beginChange()} / {@code endChange()} block.
      * <p><strong>Note</strong>: needs to reflect the <em>current</em> state of the list.
-     * @param idx the index where the item was removed
+     *
+     * @param idx     the index where the item was removed
      * @param removed the item that was removed
      */
     protected final void nextRemove(int idx, E removed) {
@@ -153,10 +158,11 @@ public abstract class ObservableListBase<E> extends AbstractList<E>  implements 
      * with {@code nextPermutation(0, size(), permutation); }
      * <p><strong>Note</strong>: needs to be called inside {@code beginChange()} / {@code endChange()} block.
      * <p><strong>Note</strong>: needs to reflect the <em>current</em> state of the list.
+     *
      * @param from marks the beginning (inclusive) of the range that was permutated
-     * @param to marks the end (exclusive) of the range that was permutated
+     * @param to   marks the end (exclusive) of the range that was permutated
      * @param perm the permutation in that range. Even if {@code from != 0}, the array should
-     * contain the indexes of the list. Therefore, such permutation would not contain indexes of range {@code (0, from)}
+     *             contain the indexes of the list. Therefore, such permutation would not contain indexes of range {@code (0, from)}
      */
     protected final void nextPermutation(int from, int to, int[] perm) {
         changeBuilder.nextPermutation(from, to, perm);
@@ -168,8 +174,9 @@ public abstract class ObservableListBase<E> extends AbstractList<E>  implements 
      * under the specified indexes.
      * <p><strong>Note</strong>: needs to be called inside {@code beginChange()} / {@code endChange()} block.
      * <p><strong>Note</strong>: needs to reflect the <em>current</em> state of the list.
+     *
      * @param from marks the beginning (inclusive) of the range that was added
-     * @param to marks the end (exclusive) of the range that was added
+     * @param to   marks the end (exclusive) of the range that was added
      */
     protected final void nextAdd(int from, int to) {
         changeBuilder.nextAdd(from, to);
@@ -177,7 +184,7 @@ public abstract class ObservableListBase<E> extends AbstractList<E>  implements 
 
     /**
      * Begins a change block.
-     *
+     * <p>
      * Must be called before any of the {@code next*} methods is called.
      * For every {@code beginChange()}, there must be a corresponding {@link #endChange() } call.
      * <p>{@code beginChange()} calls can be nested in a {@code beginChange()}/{@code endChange()} block.
@@ -190,7 +197,7 @@ public abstract class ObservableListBase<E> extends AbstractList<E>  implements 
 
     /**
      * Ends the change block.
-     *
+     * <p>
      * If the block is the outer-most block for the {@code ObservableList}, the
      * {@code Change} is constructed and all listeners are notified.
      * <p> Ending a nested block doesn't fire a notification.
@@ -223,6 +230,7 @@ public abstract class ObservableListBase<E> extends AbstractList<E>  implements 
 
     /**
      * Notifies all listeners of a change
+     *
      * @param change an object representing the change that was done
      */
     protected final void fireChange(ListChangeListener.Change<? extends E> change) {
@@ -231,6 +239,7 @@ public abstract class ObservableListBase<E> extends AbstractList<E>  implements 
 
     /**
      * Returns true if there are some listeners registered for this list.
+     *
      * @return true if there is a listener for this list
      */
     protected final boolean hasListeners() {

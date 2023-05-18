@@ -57,18 +57,12 @@ public class RecruitmentFixedMultiplierByJackKnifeMaturity implements Recruitmen
 
     }
 
-    @Override
-    public void addNoise(final NoiseMaker noiseMaker) {
-
-        this.noiseMaker = noiseMaker;
-
-    }
-
-
     private double getSSB(final Species species, final StructuredAbundance abundance) {
 
-        Preconditions.checkArgument(abundance.getSubdivisions() == 1,
-            "I am assuming this is a simple boxcar or anyway no split between male/female");
+        Preconditions.checkArgument(
+            abundance.getSubdivisions() == 1,
+            "I am assuming this is a simple boxcar or anyway no split between male/female"
+        );
         double ssb = 0;
         for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
             if (species.getLength(0, bin) >= lengthAtMaturity)
@@ -77,6 +71,13 @@ public class RecruitmentFixedMultiplierByJackKnifeMaturity implements Recruitmen
         }
         return ssb;
 
+
+    }
+
+    @Override
+    public void addNoise(final NoiseMaker noiseMaker) {
+
+        this.noiseMaker = noiseMaker;
 
     }
 }

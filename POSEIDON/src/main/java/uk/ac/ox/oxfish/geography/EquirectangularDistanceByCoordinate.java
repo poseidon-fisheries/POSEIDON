@@ -30,7 +30,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class EquirectangularDistanceByCoordinate implements Distance {
 
 
-
     /**
      * the distance between two sea-tiles
      *
@@ -55,13 +54,13 @@ public class EquirectangularDistanceByCoordinate implements Distance {
         double y2 = Math.toRadians(endCoordinates.y);
         double radius = EquirectangularDistance.EARTH_RADIUS;
 
-        double x = (x2-x1) *
-                Math.cos(
-                        (y1+y2)/2d
-                );
-        double y = y2-y1;
+        double x = (x2 - x1) *
+            Math.cos(
+                (y1 + y2) / 2d
+            );
+        double y = y2 - y1;
 
 
-        return Math.sqrt(x*x+y*y) * radius;
+        return Math.sqrt(x * x + y * y) * radius;
     }
 }

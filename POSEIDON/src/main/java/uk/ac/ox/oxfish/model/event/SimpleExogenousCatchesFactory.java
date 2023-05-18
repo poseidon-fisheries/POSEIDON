@@ -29,10 +29,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class SimpleExogenousCatchesFactory  implements AlgorithmFactory<MixedExogenousCatches> {
+public class SimpleExogenousCatchesFactory implements AlgorithmFactory<MixedExogenousCatches> {
 
 
-    private HashMap<String,Number> yearlyBiomassToExtract = new HashMap<>();
+    private HashMap<String, Number> yearlyBiomassToExtract = new HashMap<>();
 
 
     /**
@@ -44,14 +44,13 @@ public class SimpleExogenousCatchesFactory  implements AlgorithmFactory<MixedExo
     @Override
     public MixedExogenousCatches apply(FishState fishState) {
 
-        LinkedHashMap<Species,Double> landings = new LinkedHashMap<>();
+        LinkedHashMap<Species, Double> landings = new LinkedHashMap<>();
         for (Map.Entry<String, Number> input : yearlyBiomassToExtract.entrySet()) {
             landings.put(
-                    fishState.getBiology().getSpecie(input.getKey()),
-                    input.getValue().doubleValue()
+                fishState.getBiology().getSpecie(input.getKey()),
+                input.getValue().doubleValue()
             );
         }
-
 
 
         return new MixedExogenousCatches(landings);

@@ -34,36 +34,29 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
  * A market where price drops if too much biomass accumulates
  * Created by carrknight on 8/11/15.
  */
-public class CongestedMarket extends AbstractBiomassMarket implements Steppable{
+public class CongestedMarket extends AbstractBiomassMarket implements Steppable {
 
-
-    /**
-     * if in the market there is less than this biomass available, there is no penalty to price
-     */
-    private double  acceptableBiomassThreshold;
-
-
-    /**
-     * maximum price of the market
-     */
-    private double maxPrice;
-
-    /**
-     * by how much does price decrease in proportion to how much we are above biomass threshold. It's basically $/weight
-     */
-    private double demandSlope;
-
-    /**
-     * how much biomass for this fish gets consumed each day (and removed from the market)
-     */
-    private double dailyConsumption;
 
     /**
      * if 1 the market consumes stock every day, otherwise the market consumes stock every x days (but multiplies the dailyConsumption accordingly)
      */
     private final int consumptionPeriod;
-
-
+    /**
+     * if in the market there is less than this biomass available, there is no penalty to price
+     */
+    private double acceptableBiomassThreshold;
+    /**
+     * maximum price of the market
+     */
+    private double maxPrice;
+    /**
+     * by how much does price decrease in proportion to how much we are above biomass threshold. It's basically $/weight
+     */
+    private double demandSlope;
+    /**
+     * how much biomass for this fish gets consumed each day (and removed from the market)
+     */
+    private double dailyConsumption;
     /**
      * how much biomass is here, waiting to be consumed
      */
@@ -72,21 +65,23 @@ public class CongestedMarket extends AbstractBiomassMarket implements Steppable{
 
 
     public CongestedMarket(
-            double acceptableBiomassThreshold, double maxPrice, double discountRate,
-            double dailyConsumption) {
-        this(acceptableBiomassThreshold, maxPrice, discountRate, dailyConsumption,1);
+        double acceptableBiomassThreshold, double maxPrice, double discountRate,
+        double dailyConsumption
+    ) {
+        this(acceptableBiomassThreshold, maxPrice, discountRate, dailyConsumption, 1);
     }
 
 
     public CongestedMarket(
-            double acceptableBiomassThreshold, double maxPrice, double discountRate,
-            double dailyConsumption, int consumptionPeriod) {
+        double acceptableBiomassThreshold, double maxPrice, double discountRate,
+        double dailyConsumption, int consumptionPeriod
+    ) {
         super();
         this.acceptableBiomassThreshold = acceptableBiomassThreshold;
         this.maxPrice = maxPrice;
         this.demandSlope = discountRate;
         this.dailyConsumption = dailyConsumption;
-        Preconditions.checkArgument(consumptionPeriod>0);
+        Preconditions.checkArgument(consumptionPeriod > 0);
         this.consumptionPeriod = consumptionPeriod;
     }
 
@@ -99,10 +94,10 @@ public class CongestedMarket extends AbstractBiomassMarket implements Steppable{
     public void start(FishState state) {
         super.start(state);
 
-        if(consumptionPeriod==1)
+        if (consumptionPeriod == 1)
             stoppable = state.scheduleEveryDay(this, StepOrder.DAWN);
         else
-            stoppable = state.scheduleEveryXDay(this,StepOrder.DAWN,consumptionPeriod);
+            stoppable = state.scheduleEveryXDay(this, StepOrder.DAWN, consumptionPeriod);
     }
 
 
@@ -112,13 +107,25 @@ public class CongestedMarket extends AbstractBiomassMarket implements Steppable{
         biomassHere = Math.max(0, biomassHere - dailyConsumption * consumptionPeriod);
     }
 
+    public double getMarginalPrice() {
+        return computePrice(biomassHere);
+    }
+
+    private double computePrice(double totalBiomassHere) {
+        return Math.max(0, maxPrice - getOvershoot(totalBiomassHere) * demandSlope);
+    }
+
+    private double getOvershoot(double totalBiomass) {
+        return Math.max(0, totalBiomass - acceptableBiomassThreshold);
+    }
+
     /**
      * tell the startable to turnoff,
      */
     @Override
     public void turnOff() {
         super.turnOff();
-        if(stoppable!= null)
+        if (stoppable != null)
             stoppable.stop();
     }
 
@@ -133,46 +140,33 @@ public class CongestedMarket extends AbstractBiomassMarket implements Steppable{
      */
     @Override
     protected TradeInfo sellFishImplementation(
-            double biomass, Fisher fisher, Regulation regulation, FishState state,
-            Species species) {
+        double biomass, Fisher fisher, Regulation regulation, FishState state,
+        Species species
+    ) {
 
         //find out legal biomass sold
-        double biomassActuallySellable = Math.min(biomass,
-                                                  regulation.maximumBiomassSellable(fisher, species, state));
-        if(biomassActuallySellable <=0)
+        double biomassActuallySellable = Math.min(
+            biomass,
+            regulation.maximumBiomassSellable(fisher, species, state)
+        );
+        if (biomassActuallySellable <= 0)
             return new TradeInfo(0, species, 0);
 
 
-        biomassHere+=biomassActuallySellable;
+        biomassHere += biomassActuallySellable;
         double revenue = biomassActuallySellable * computePrice(biomassHere);
 
-        assert revenue >=0;
+        assert revenue >= 0;
         //give fisher the money
         fisher.earn(revenue);
 
         //tell regulation
-        regulation.reactToSale(species, fisher , biomassActuallySellable, revenue, state);
+        regulation.reactToSale(species, fisher, biomassActuallySellable, revenue, state);
 
         //return biomass sellable
         return new TradeInfo(biomassActuallySellable, species, revenue);
 
 
-
-    }
-
-
-    private double getOvershoot(double totalBiomass)
-    {
-        return Math.max(0,totalBiomass-acceptableBiomassThreshold);
-    }
-
-    private double computePrice(double totalBiomassHere){
-        return Math.max(0, maxPrice - getOvershoot(totalBiomassHere) * demandSlope);
-    }
-
-    public double getMarginalPrice()
-    {
-        return computePrice(biomassHere);
     }
 
     public double getAcceptableBiomassThreshold() {

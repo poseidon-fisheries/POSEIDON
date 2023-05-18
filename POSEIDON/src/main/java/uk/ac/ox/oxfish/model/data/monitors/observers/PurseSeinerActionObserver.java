@@ -32,9 +32,12 @@ public abstract class PurseSeinerActionObserver<A> implements Startable, Observe
         this.observedClass = observedClass;
     }
 
-    public Class<A> getObservedClass() { return observedClass; }
+    public Class<A> getObservedClass() {
+        return observedClass;
+    }
 
-    @Override public void start(final FishState fishState) {
+    @Override
+    public void start(final FishState fishState) {
         fishState.getFishers().forEach(fisher ->
             getFadManager(fisher).registerObserver(observedClass, this)
         );

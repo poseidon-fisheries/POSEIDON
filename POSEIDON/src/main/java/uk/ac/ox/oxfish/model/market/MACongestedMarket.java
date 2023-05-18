@@ -41,27 +41,22 @@ public class MACongestedMarket extends AbstractBiomassMarket implements Steppabl
      * the moving average holding the previous days sales and whose smoothed value represents the price congestion
      */
     private final MovingAverage<Double> congestion;
-
-    /**
-     * today sales, doesn't affect today's price
-     */
-    private double todayCongestion = 0;
-
-    /**
-     * today's price, computed in the step()
-     */
-    private double todayPrice;
-
     /**
      * price when congestion is 0, basically the intercept of the demand curve
      */
     private final double priceWithNoCongestion;
-
     /**
      * the demand slope, that is how much the price drops in $ for every unit of lagged and smoothed biomass sold
      */
     private final double demandSlope;
-
+    /**
+     * today sales, doesn't affect today's price
+     */
+    private double todayCongestion = 0;
+    /**
+     * today's price, computed in the step()
+     */
+    private double todayPrice;
     /**
      * object to stop this market from stepping
      */
@@ -70,14 +65,18 @@ public class MACongestedMarket extends AbstractBiomassMarket implements Steppabl
 
     /**
      * The congested market with lagged and smoothed congestion
+     *
      * @param priceWithNoCongestion price with no congestion
-     * @param demandSlope the slope ($/biomass) of the demand curve defining how much
-     * @param observationWindow the size of the moving average holding previous days sales as "congestion"
+     * @param demandSlope           the slope ($/biomass) of the demand curve defining how much
+     * @param observationWindow     the size of the moving average holding previous days sales as "congestion"
      */
     public MACongestedMarket(double priceWithNoCongestion, double demandSlope, int observationWindow) {
         this.priceWithNoCongestion = priceWithNoCongestion;
-        todayPrice=priceWithNoCongestion;
-        Preconditions.checkArgument(demandSlope>=0, "Demand slope supplied cannot be negative (I'll flip the sign later)");
+        todayPrice = priceWithNoCongestion;
+        Preconditions.checkArgument(
+            demandSlope >= 0,
+            "Demand slope supplied cannot be negative (I'll flip the sign later)"
+        );
         this.demandSlope = demandSlope;
         congestion = new MovingAverage<>(observationWindow);
     }
@@ -100,7 +99,7 @@ public class MACongestedMarket extends AbstractBiomassMarket implements Steppabl
     @Override
     public void turnOff() {
         super.turnOff();
-        if(stoppable!=null)
+        if (stoppable != null)
             stoppable.stop();
     }
 
@@ -111,32 +110,35 @@ public class MACongestedMarket extends AbstractBiomassMarket implements Steppabl
      * @param fisher     the seller
      * @param regulation the rules the seller abides to
      * @param state      the model
-     * @param species the species being traded
+     * @param species    the species being traded
      * @return TradeInfo  results
      */
     @Override
     protected TradeInfo sellFishImplementation(
-            double biomass, Fisher fisher, Regulation regulation, FishState state, Species species) {
+        double biomass, Fisher fisher, Regulation regulation, FishState state, Species species
+    ) {
         //find out legal biomass sold
-        double biomassActuallySellable = Math.min(biomass,
-                                                  regulation.maximumBiomassSellable(fisher, species, state));
-        if(biomassActuallySellable <=0)
+        double biomassActuallySellable = Math.min(
+            biomass,
+            regulation.maximumBiomassSellable(fisher, species, state)
+        );
+        if (biomassActuallySellable <= 0)
             return new TradeInfo(0, species, 0);
 
-        assert  biomassActuallySellable > 0;
-        todayCongestion+=biomassActuallySellable;
+        assert biomassActuallySellable > 0;
+        todayCongestion += biomassActuallySellable;
         assert todayCongestion > 0;
         double revenue = biomassActuallySellable * todayPrice;
 
 
-        assert revenue >=0;
+        assert revenue >= 0;
         //give fisher the money
         fisher.earn(revenue);
 
         //tell regulation
         regulation.reactToSale(species, fisher, biomassActuallySellable, revenue, state);
 
-        return new TradeInfo(biomassActuallySellable,species,revenue);
+        return new TradeInfo(biomassActuallySellable, species, revenue);
     }
 
     /**
@@ -153,6 +155,6 @@ public class MACongestedMarket extends AbstractBiomassMarket implements Steppabl
     public void step(SimState simState) {
         congestion.addObservation(todayCongestion);
         todayCongestion = 0;
-        todayPrice = Math.max(0,priceWithNoCongestion - demandSlope *congestion.getSmoothedObservation());
+        todayPrice = Math.max(0, priceWithNoCongestion - demandSlope * congestion.getSmoothedObservation());
     }
 }

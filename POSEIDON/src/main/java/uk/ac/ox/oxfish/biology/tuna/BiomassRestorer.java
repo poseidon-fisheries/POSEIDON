@@ -18,8 +18,9 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import java.util.Map;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+
+import java.util.Map;
 
 /**
  * This is a {@link Restorer} that works with {@link BiomassLocalBiology}.

@@ -62,6 +62,36 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
         }
     }
 
+    /**
+     * Applies this function to the given argument.
+     *
+     * @param state the function argument
+     * @return the function result
+     */
+    @Override
+    public HeterogeneousAbundanceGear apply(final FishState state) {
+
+        final HashMap<Species, HomogeneousAbundanceGear> gearsPerSpecies = new HashMap<>();
+
+        for (final Map.Entry<String, HomogeneousGearFactory>
+            entry : getGears().entrySet()) {
+            gearsPerSpecies.put(
+                state.getBiology().getSpecie(entry.getKey()),
+                entry.getValue().apply(state)
+            );
+        }
+
+        Preconditions.checkState(
+            gears.size() == state.getSpecies().size() ||
+                (gears.size() + 1 == state.getSpecies().size() && state.getBiology().getSpecie(
+                    MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME) != null)
+            ,
+            "Not all species have a gear assigned");
+        final HeterogeneousAbundanceGear heterogeneousAbundanceGear = new HeterogeneousAbundanceGear(gearsPerSpecies);
+        heterogeneousAbundanceGear.setHourlyGasPriceOverride(hourlyGasPriceOverride.applyAsDouble(state.getRandom()));
+        return heterogeneousAbundanceGear;
+
+    }
 
     /**
      * Getter for property 'gears'.
@@ -109,37 +139,6 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
         final HashMap<String, HomogeneousGearFactory> gears
     ) {
         this.gears = gears;
-    }
-
-    /**
-     * Applies this function to the given argument.
-     *
-     * @param state the function argument
-     * @return the function result
-     */
-    @Override
-    public HeterogeneousAbundanceGear apply(final FishState state) {
-
-        final HashMap<Species, HomogeneousAbundanceGear> gearsPerSpecies = new HashMap<>();
-
-        for (final Map.Entry<String, HomogeneousGearFactory>
-            entry : getGears().entrySet()) {
-            gearsPerSpecies.put(
-                state.getBiology().getSpecie(entry.getKey()),
-                entry.getValue().apply(state)
-            );
-        }
-
-        Preconditions.checkState(
-            gears.size() == state.getSpecies().size() ||
-                (gears.size() + 1 == state.getSpecies().size() && state.getBiology().getSpecie(
-                    MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME) != null)
-            ,
-            "Not all species have a gear assigned");
-        final HeterogeneousAbundanceGear heterogeneousAbundanceGear = new HeterogeneousAbundanceGear(gearsPerSpecies);
-        heterogeneousAbundanceGear.setHourlyGasPriceOverride(hourlyGasPriceOverride.applyAsDouble(state.getRandom()));
-        return heterogeneousAbundanceGear;
-
     }
 
     /**

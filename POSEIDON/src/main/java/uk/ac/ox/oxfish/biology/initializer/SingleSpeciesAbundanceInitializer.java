@@ -51,8 +51,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
  * according to biomassAllocator
  * Created by carrknight on 3/11/16.
  */
-public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
-{
+public class SingleSpeciesAbundanceInitializer implements BiologyInitializer {
 
 
     /**
@@ -95,7 +94,6 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
      * By default (if this is null) any area where there is no fish initially is marked as wasteland;
      * If this is not null, then even if there is no fish initially an area where this allocator returns > 0
      * will be livable
-     *
      */
     final private BiomassAllocator habitabilityAllocator;
 
@@ -104,24 +102,27 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
      * possibly null allocator to choose where recruits go
      */
     private final BiomassAllocator recruitmentAllocator;
-    private SingleSpeciesNaturalProcesses processes;
-
-
     private final boolean daily;
     private final boolean rounding;
+    private SingleSpeciesNaturalProcesses processes;
+    /**
+     * weights to each location
+     */
+    private Map<SeaTile, Double> initialWeights = new HashMap<>();
 
     public SingleSpeciesAbundanceInitializer(
-            String speciesName,
-            InitialAbundance initialAbundance,
-            BiomassAllocator intialAbundanceAllocator,
-            AgingProcess aging,
-            Meristics meristics,
-            double scaling,
-            RecruitmentProcess recruitmentProcess,
-            AbundanceDiffuser diffuser,
-            BiomassAllocator recruitmentAllocator,
-            BiomassAllocator habitabilityAllocator,
-            NaturalMortalityProcess mortality, boolean daily, boolean rounding) {
+        String speciesName,
+        InitialAbundance initialAbundance,
+        BiomassAllocator intialAbundanceAllocator,
+        AgingProcess aging,
+        Meristics meristics,
+        double scaling,
+        RecruitmentProcess recruitmentProcess,
+        AbundanceDiffuser diffuser,
+        BiomassAllocator recruitmentAllocator,
+        BiomassAllocator habitabilityAllocator,
+        NaturalMortalityProcess mortality, boolean daily, boolean rounding
+    ) {
         this.initialAbundance = initialAbundance;
         this.intialAbundanceAllocator = intialAbundanceAllocator;
         this.aging = aging;
@@ -137,36 +138,34 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         this.rounding = rounding;
     }
 
-    /**
-     * weights to each location
-     */
-    private Map<SeaTile, Double> initialWeights = new HashMap<>();
-
 
     /**
      * this is the default "read from files" california stock assessment constructor
+     *
      * @param biologicalDirectory
      * @param speciesName
      * @param scaling
      * @param state
      */
     public SingleSpeciesAbundanceInitializer(
-            Path biologicalDirectory, String speciesName, double scaling, FishState state) {
+        Path biologicalDirectory, String speciesName, double scaling, FishState state
+    ) {
         initialAbundance = new InitialAbundanceFromFileFactory(
-                biologicalDirectory.resolve("count.csv")).apply(state);
+            biologicalDirectory.resolve("count.csv")).apply(state);
         StockAssessmentCaliforniaMeristics
-                cali = new MeristicsFileFactory(
-                biologicalDirectory.resolve("meristics.yaml")
+            cali = new MeristicsFileFactory(
+            biologicalDirectory.resolve("meristics.yaml")
         ).apply(state);
         meristics = cali;
         recruitmentProcess = new RecruitmentBySpawningBiomass(
-                cali.getVirginRecruits(),
-                cali.getSteepness(),
-                cali.getCumulativePhi(),
-                cali.isAddRelativeFecundityToSpawningBiomass(),
-                cali.getMaturity(),
-                cali.getRelativeFecundity(),
-                FEMALE, false);
+            cali.getVirginRecruits(),
+            cali.getSteepness(),
+            cali.getCumulativePhi(),
+            cali.isAddRelativeFecundityToSpawningBiomass(),
+            cali.getMaturity(),
+            cali.getRelativeFecundity(),
+            FEMALE, false
+        );
         aging = new StandardAgingProcess(false);
 
         this.daily = false;
@@ -174,7 +173,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         this.speciesName = speciesName;
         this.scaling = scaling;
         this.mortality = new ExponentialMortalityProcess(
-                cali
+            cali
         );
         this.diffuser = new NoAbundanceDiffusion();
         this.recruitmentAllocator = null;
@@ -183,13 +182,10 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
     }
 
 
-
-
-
-
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -198,30 +194,32 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
+        GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
+        int mapWidthInCells, NauticalMap map
+    ) {
 
 
         if (seaTile.isLand())
             return new EmptyLocalBiology();
         //weight we want to allocate to this area
-        double weight = intialAbundanceAllocator.allocate(seaTile,
-                                                          map,
-                                                          random);
+        double weight = intialAbundanceAllocator.allocate(
+            seaTile,
+            map,
+            random
+        );
         //weights of 0 or below are wastelands
-        if(!Double.isFinite(weight) || weight <= 0 || (habitabilityAllocator != null && habitabilityAllocator.allocate(
-                seaTile,
-                map,
-                random
-        )  <= 0))
-            return  new EmptyLocalBiology();
+        if (!Double.isFinite(weight) || weight <= 0 || (habitabilityAllocator != null && habitabilityAllocator.allocate(
+            seaTile,
+            map,
+            random
+        ) <= 0))
+            return new EmptyLocalBiology();
         else {
             AbundanceLocalBiology local = new AbundanceLocalBiology(biology);
             initialWeights.put(seaTile, weight);
             return local;
         }
     }
-
 
 
     /**
@@ -235,11 +233,11 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
      */
     @Override
     public void processMap(
-            GlobalBiology biology,
-            NauticalMap map,
-            MersenneTwisterFast random,
-            FishState model)
-    {
+        GlobalBiology biology,
+        NauticalMap map,
+        MersenneTwisterFast random,
+        FishState model
+    ) {
 
 
         Species species = biology.getSpecie(speciesName);
@@ -248,70 +246,73 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         initialAbundance.initialize(species);
         double[][] totalCount = initialAbundance.getInitialAbundance();
         assert totalCount.length == species.getNumberOfSubdivisions();
-        Preconditions.checkArgument(totalCount[0].length == species.getNumberOfBins(),
-                                    "mismatch between size of initial abundance and maxAge of species");
+        Preconditions.checkArgument(
+            totalCount[0].length == species.getNumberOfBins(),
+            "mismatch between size of initial abundance and maxAge of species"
+        );
 
 
         //now the count is complete, let's distribute these fish uniformly throughout the seatiles
 
 
         double sum = initialWeights.values().stream().mapToDouble(
-                new ToDoubleFunction<Double>() {
-                    @Override
-                    public double applyAsDouble(Double value) {
-                        return value;
-                    }
+            new ToDoubleFunction<Double>() {
+                @Override
+                public double applyAsDouble(Double value) {
+                    return value;
                 }
+            }
         ).sum();
 
 
         //create the natural process
         processes = new SingleSpeciesNaturalProcesses(
-                recruitmentProcess,
-                species,
-                rounding, aging,
-                diffuser,
-                mortality, daily);
-        if(recruitmentAllocator !=null)
+            recruitmentProcess,
+            species,
+            rounding, aging,
+            diffuser,
+            mortality, daily
+        );
+        if (recruitmentAllocator != null)
             processes.setRecruitsAllocator(recruitmentAllocator);
 
 
         final DataColumn recruitmentColumn = model.getDailyDataSet().registerGatherer(
-                speciesName + " Recruits",
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        return processes.getLastRecruits();
-                    }
-                },
-                0d
+            speciesName + " Recruits",
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(FishState fishState) {
+                    return processes.getLastRecruits();
+                }
+            },
+            0d
         );
 
-        model.getYearlyDataSet().registerGatherer(speciesName + " Recruits",
-                FishStateUtilities.generateYearlySum(recruitmentColumn),
-                0d);
+        model.getYearlyDataSet().registerGatherer(
+            speciesName + " Recruits",
+            FishStateUtilities.generateYearlySum(recruitmentColumn),
+            0d
+        );
 
 
         /**
          * this used to be collected when generating, but with other initializers it might not
          * be the case that what you generated was used; to be super-safe then we generate this year
          */
-        for(SeaTile tile : map.getAllSeaTilesExcludingLandAsList())
-        {
-            if(!initialWeights.containsKey(tile))
+        for (SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
+            if (!initialWeights.containsKey(tile))
                 continue;
-            double ratio = initialWeights.get(tile)/sum;
+            double ratio = initialWeights.get(tile) / sum;
 
             //cast is justified because we put it in ourselves!
             assert tile.getBiology() instanceof AbundanceLocalBiology;
             processes.add((AbundanceLocalBiology) tile.getBiology(), tile);
             StructuredAbundance abundance = tile.getBiology().getAbundance(species);
-            for(int bin=0; bin<abundance.getBins(); bin++)
+            for (int bin = 0; bin < abundance.getBins(); bin++)
 
-                for(int subdivision =0; subdivision<abundance.getSubdivisions(); subdivision++)
-                {
+                for (int subdivision = 0; subdivision < abundance.getSubdivisions(); subdivision++) {
                     abundance.asMatrix()[subdivision][bin] =
-                            scaling * totalCount[subdivision][bin] *ratio;
+                        scaling * totalCount[subdivision][bin] * ratio;
                 }
 
         }
@@ -323,7 +324,6 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
     }
 
 
-
     /**
      * creates the global biology object for the model
      *
@@ -333,9 +333,10 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
      */
     @Override
     public GlobalBiology generateGlobal(
-            MersenneTwisterFast random, FishState modelBeingInitialized) {
+        MersenneTwisterFast random, FishState modelBeingInitialized
+    ) {
 
-        Species species = new Species(speciesName,meristics);
+        Species species = new Species(speciesName, meristics);
         return new GlobalBiology(species);
 
     }

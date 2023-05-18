@@ -42,53 +42,51 @@ import java.util.function.Supplier;
  * A startable useful to create an ITQ market and to create the ITQ reservation pricer.
  * Created by carrknight on 9/22/15.
  */
-public class ITQMarketBuilder  implements Startable
-{
+public class ITQMarketBuilder implements Startable {
 
 
     private final int speciesIndex;
+    final private Supplier<PriceGenerator> priceGeneratorMaker;
+    private final ITQOrderBook market;
+    private final HashSet<Regulation> traders = new HashSet<>();
     /**
      * the generators of reservation prices for each fisher
      */
-    private HashMap<Fisher,PriceGenerator> reservationPricers = new HashMap<>();
-
-
-    final private Supplier<PriceGenerator> priceGeneratorMaker;
-
-    private final ITQOrderBook market;
-
-    private final HashSet<Regulation> traders = new HashSet<>();
-
-    public void addTrader(Regulation regulation)
-    {
-        traders.add(regulation);
-    }
-
-
-    public ITQMarketBuilder(
-            int speciesIndex,
-            Supplier<PriceGenerator> priceGeneratorMaker) {
-        this.speciesIndex = speciesIndex;
-        this.priceGeneratorMaker = priceGeneratorMaker;
-        market = new ITQOrderBook(speciesIndex, 1,
-                                  new PricingPolicy() {
-                                      @Override
-                                      public double tradePrice(
-                                              double askPrice, double bidPrice, double secondBestAsk,
-                                              double secondBestBid) {
-                                          return askPrice;
-                                      }
-                                  }, 7);
-
-    }
+    private HashMap<Fisher, PriceGenerator> reservationPricers = new HashMap<>();
 
     /**
      * creates an ITQ market using MonoQuotaPriceGenerator
+     *
      * @param speciesIndex
      */
     public ITQMarketBuilder(int speciesIndex) {
 
-        this(speciesIndex,() -> new MonoQuotaPriceGenerator(speciesIndex,false));
+        this(speciesIndex, () -> new MonoQuotaPriceGenerator(speciesIndex, false));
+    }
+
+
+    public ITQMarketBuilder(
+        int speciesIndex,
+        Supplier<PriceGenerator> priceGeneratorMaker
+    ) {
+        this.speciesIndex = speciesIndex;
+        this.priceGeneratorMaker = priceGeneratorMaker;
+        market = new ITQOrderBook(speciesIndex, 1,
+            new PricingPolicy() {
+                @Override
+                public double tradePrice(
+                    double askPrice, double bidPrice, double secondBestAsk,
+                    double secondBestBid
+                ) {
+                    return askPrice;
+                }
+            }, 7
+        );
+
+    }
+
+    public void addTrader(Regulation regulation) {
+        traders.add(regulation);
     }
 
     /**
@@ -101,81 +99,94 @@ public class ITQMarketBuilder  implements Startable
         //create the market
         market.start(model);
         String speciesName = model.getSpecies().get(speciesIndex).getName();
-        if(model.getDailyDataSet().getColumn("ITQ Trades Of " + speciesName)==null) {
+        if (model.getDailyDataSet().getColumn("ITQ Trades Of " + speciesName) == null) {
 
             //gather market data
             model.getDailyDataSet().registerGatherer("ITQ Trades Of " + speciesName, new Gatherer<FishState>() {
-                                                         @Override
-                                                         public Double apply(FishState state1) {
-                                                             return market.getDailyMatches();
-                                                         }
-                                                     },
-                                                     Double.NaN);
+                    @Override
+                    public Double apply(FishState state1) {
+                        return market.getDailyMatches();
+                    }
+                },
+                Double.NaN
+            );
             DataColumn priceGatherer =
-                    model.getDailyDataSet().registerGatherer("ITQ Prices Of " + speciesName,
-                                                             new Gatherer<FishState>() {
-                                                                 @Override
-                                                                 public Double apply(FishState state1) {
-                                                                     return market.getDailyAveragePrice();
-                                                                 }
+                model.getDailyDataSet().registerGatherer(
+                    "ITQ Prices Of " + speciesName,
+                    new Gatherer<FishState>() {
+                        @Override
+                        public Double apply(FishState state1) {
+                            return market.getDailyAveragePrice();
+                        }
 
-                                                             },
-                                                             Double.NaN);
-            model.getYearlyDataSet().registerGatherer("ITQ Prices Of " + speciesName,
-                                                      FishStateUtilities.generateYearlyAverage(priceGatherer),
-                                                      Double.NaN);
+                    },
+                    Double.NaN
+                );
+            model.getYearlyDataSet().registerGatherer(
+                "ITQ Prices Of " + speciesName,
+                FishStateUtilities.generateYearlyAverage(priceGatherer),
+                Double.NaN
+            );
 
 
             model.getDailyDataSet().registerGatherer("ITQ Last Closing Price Of " + speciesName, state1 -> {
-                                                         return market.getLastClosingPrice();
-                                                     },
-                                                     Double.NaN);
-            DataColumn volumeGatherer = model.getDailyDataSet().registerGatherer("ITQ Volume Of " + speciesName,
-                                                                                 state1 -> {
-                                                                                     return market.getDailyQuotasExchanged();
-                                                                                 },
-                                                                                 Double.NaN);
-            model.getYearlyDataSet().registerGatherer("ITQ Volume Of " + speciesName,
-                                                      FishStateUtilities.generateYearlySum(volumeGatherer),
-                                                      0d);
+                    return market.getLastClosingPrice();
+                },
+                Double.NaN
+            );
+            DataColumn volumeGatherer = model.getDailyDataSet().registerGatherer(
+                "ITQ Volume Of " + speciesName,
+                state1 -> {
+                    return market.getDailyQuotasExchanged();
+                },
+                Double.NaN
+            );
+            model.getYearlyDataSet().registerGatherer(
+                "ITQ Volume Of " + speciesName,
+                FishStateUtilities.generateYearlySum(volumeGatherer),
+                0d
+            );
 
 
-            DataColumn tradeValueColumn = model.getDailyDataSet().registerGatherer("ITQ Trade Value Of " + speciesName,
-                                                                          state1 -> {
-                                                                              return market.getDailyQuotasExchanged() * market.getDailyAveragePrice();
-                                                                          },
-                                                                          Double.NaN);
+            DataColumn tradeValueColumn = model.getDailyDataSet().registerGatherer(
+                "ITQ Trade Value Of " + speciesName,
+                state1 -> {
+                    return market.getDailyQuotasExchanged() * market.getDailyAveragePrice();
+                },
+                Double.NaN
+            );
 
             //these is probably more correct as a measure of what the prices of stuff traded were!
-            model.getYearlyDataSet().registerGatherer("ITQ Weighted Prices Of " + speciesName,
-                                                      new Gatherer<FishState>() {
-                                                          @Override
-                                                          public Double apply(FishState fishState) {
+            model.getYearlyDataSet().registerGatherer(
+                "ITQ Weighted Prices Of " + speciesName,
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState fishState) {
 
-                                                              final Iterator<Double> numeratorIterator = tradeValueColumn.descendingIterator();
-                                                              final Iterator<Double> denominatorIterator = volumeGatherer.descendingIterator();
-                                                              if(!numeratorIterator.hasNext()) //not ready/year 1
-                                                                  return Double.NaN;
-                                                              double numerator = 0;
-                                                              double denominator = 0;
-                                                              for(int i=0; i<365; i++) {
-                                                                  //it should be step 365 times at most, but it's possible that this agent was added halfway through
-                                                                  //and only has a partially filled collection
-                                                                  if(numeratorIterator.hasNext()) {
-                                                                      assert denominatorIterator.hasNext();
-                                                                      Double tradeValue = numeratorIterator.next();
-                                                                      if(Double.isFinite(tradeValue))
-                                                                        numerator += tradeValue;
-                                                                      denominator+=denominatorIterator.next();
-                                                                  }
-                                                              }
+                        final Iterator<Double> numeratorIterator = tradeValueColumn.descendingIterator();
+                        final Iterator<Double> denominatorIterator = volumeGatherer.descendingIterator();
+                        if (!numeratorIterator.hasNext()) //not ready/year 1
+                            return Double.NaN;
+                        double numerator = 0;
+                        double denominator = 0;
+                        for (int i = 0; i < 365; i++) {
+                            //it should be step 365 times at most, but it's possible that this agent was added halfway through
+                            //and only has a partially filled collection
+                            if (numeratorIterator.hasNext()) {
+                                assert denominatorIterator.hasNext();
+                                Double tradeValue = numeratorIterator.next();
+                                if (Double.isFinite(tradeValue))
+                                    numerator += tradeValue;
+                                denominator += denominatorIterator.next();
+                            }
+                        }
 
-                                                              return numerator/denominator;
+                        return numerator / denominator;
 
 
-                                                          }
-                                                      },
-                                                      Double.NaN
+                    }
+                },
+                Double.NaN
             );
 
         }
@@ -184,11 +195,11 @@ public class ITQMarketBuilder  implements Startable
 
 
         //and give to each fisher a price-maker
-        for(Fisher fisher : model.getFishers()) {
+        for (Fisher fisher : model.getFishers()) {
             //todo remove this ugly hack~!
-           if (traders.contains(fisher.getRegulation()) ||
-                   (fisher.getRegulation() instanceof MultipleRegulations && isMatch(
-                           ((MultipleRegulations) fisher.getRegulation())))) {
+            if (traders.contains(fisher.getRegulation()) ||
+                (fisher.getRegulation() instanceof MultipleRegulations && isMatch(
+                    ((MultipleRegulations) fisher.getRegulation())))) {
                 PriceGenerator reservationPricer = priceGeneratorMaker.get();
                 reservationPricer.start(model, fisher);
                 market.registerTrader(fisher, reservationPricer);
@@ -203,13 +214,14 @@ public class ITQMarketBuilder  implements Startable
 
     /**
      * checks if the multiple regulation is valid for this market
+     *
      * @param regulations
      * @return
      */
-    private boolean isMatch(MultipleRegulations regulations){
+    private boolean isMatch(MultipleRegulations regulations) {
 
-        for(Regulation trader : traders)
-            if(regulations.containsRegulation(trader))
+        for (Regulation trader : traders)
+            if (regulations.containsRegulation(trader))
                 return true;
         return false;
 
@@ -223,13 +235,12 @@ public class ITQMarketBuilder  implements Startable
     @Override
     public void turnOff() {
         market.turnOff();
-        for(PriceGenerator pricer : reservationPricers.values())
+        for (PriceGenerator pricer : reservationPricers.values())
             pricer.turnOff(pricer.getFisher());
     }
 
 
-    public PriceGenerator getReservationPriceGenerator(Fisher fisher)
-    {
+    public PriceGenerator getReservationPriceGenerator(Fisher fisher) {
         return reservationPricers.get(fisher);
     }
 

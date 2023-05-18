@@ -36,24 +36,23 @@ import java.util.Collection;
  *     <li> Imitation</li>
  *     <li> Exploitation</li>
  * </ul>
- *  <p>
+ * <p>
  *  Probabilities are sequential but only one action is ever taken. So if the probabilities of exploration and imitation
  *  are both at 70% then there is a 70% of exploring and a (.3)(.7) probability of imitating. Failing both the agent will
  *  exploit
- *
+ * <p>
  * Created by carrknight on 8/6/15.
  */
 public interface AdaptationAlgorithm<T> {
-
-
 
 
     void start(FishState model, Fisher agent, T initial);
 
 
     T randomize(
-            MersenneTwisterFast random, Fisher agent, double currentFitness,
-            T current);
+        MersenneTwisterFast random, Fisher agent, double currentFitness,
+        T current
+    );
 
     /**
      * if you have explored in the previous step, this gets called to make you judge exploration (you might want to
@@ -61,45 +60,50 @@ public interface AdaptationAlgorithm<T> {
      */
 
     T judgeRandomization(
-            MersenneTwisterFast random, Fisher agent,
-            double previousFitness, double currentFitness,
-            T previous, T current);
+        MersenneTwisterFast random, Fisher agent,
+        double previousFitness, double currentFitness,
+        T previous, T current
+    );
 
     /**
      * if you have imitated in the previous step, this gets called for you to judge imitation (you might want to backtrack)
      * Return null if you don't want to backtrack and skip directly to another round of exploration-exploitation
      */
     T judgeImitation(
-            MersenneTwisterFast random, Fisher agent,
-            Fisher friendImitated,
-            double fitnessBeforeImitating,
-            double fitnessAfterImitating,
-            T previous, T current);
+        MersenneTwisterFast random, Fisher agent,
+        Fisher friendImitated,
+        double fitnessBeforeImitating,
+        double fitnessAfterImitating,
+        T previous, T current
+    );
 
     /**
      * asks the agent to imitate someone.
-     * @param random the randomizer
-     * @param agent the agent who has to imitate
-     * @param fitness his current fitness
-     * @param current his current decision
-     * @param friends the collection of friends he has
+     *
+     * @param random            the randomizer
+     * @param agent             the agent who has to imitate
+     * @param fitness           his current fitness
+     * @param current           his current decision
+     * @param friends           the collection of friends he has
      * @param objectiveFunction the objective function by which the agent judges himself and others
-     * @param sensor the function that maps Fisher--->current decision
+     * @param sensor            the function that maps Fisher--->current decision
      * @return a pair of the new decision to take AND the friend imitated (which can be null)
      */
-    Pair<T,Fisher> imitate(
-            MersenneTwisterFast random,
-            Fisher agent, double fitness,
-            T current,
-            Collection<Fisher> friends,
-            ObjectiveFunction<Fisher> objectiveFunction,
-            Sensor<Fisher,T> sensor);
+    Pair<T, Fisher> imitate(
+        MersenneTwisterFast random,
+        Fisher agent, double fitness,
+        T current,
+        Collection<Fisher> friends,
+        ObjectiveFunction<Fisher> objectiveFunction,
+        Sensor<Fisher, T> sensor
+    );
 
 
     T exploit(
-            MersenneTwisterFast random,
-            Fisher agent, double currentFitness,
-            T current);
+        MersenneTwisterFast random,
+        Fisher agent, double currentFitness,
+        T current
+    );
 
 
 }

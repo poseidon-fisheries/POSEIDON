@@ -66,13 +66,13 @@ public class TripRecord {
 
     private final int tripDay;
     /**
-     * how long did the trip take
-     */
-    private double durationInHours = 0;
-    /**
      * how many hours have been spent at port waiting/preparing for this trip
      */
     private final double hoursSinceLastTrip;
+    /**
+     * how long did the trip take
+     */
+    private double durationInHours = 0;
     /**
      * set to true if the regulations forced the fisher home earlier.
      */

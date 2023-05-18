@@ -35,37 +35,41 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 
-public class FishOnceStrategyTest
-{
+public class FishOnceStrategyTest {
 
     @Test
     public void fishOnce() throws Exception {
 
-        TripRecord record = new TripRecord(1,100d,0);
+        TripRecord record = new TripRecord(1, 100d, 0);
 
         FishOnceStrategy strategy = new FishOnceFactory().apply(mock(FishState.class));
 
 
         //should be true: you haven't fished before
         assertTrue(
-                strategy.shouldFish(mock(Fisher.class),
-                                    new MersenneTwisterFast(),
-                                    mock(FishState.class),
-                                    record)
+            strategy.shouldFish(
+                mock(Fisher.class),
+                new MersenneTwisterFast(),
+                mock(FishState.class),
+                record
+            )
         );
 
         //record a single fish
-        record.recordFishing(new FishingRecord(1,
-                                               mock(SeaTile.class),
-                                               mock(Catch.class)
+        record.recordFishing(new FishingRecord(
+            1,
+            mock(SeaTile.class),
+            mock(Catch.class)
         ));
 
         //should be false: you have fished at least once~!
         assertFalse(
-                strategy.shouldFish(mock(Fisher.class),
-                                    new MersenneTwisterFast(),
-                                    mock(FishState.class),
-                                    record)
+            strategy.shouldFish(
+                mock(Fisher.class),
+                new MersenneTwisterFast(),
+                mock(FishState.class),
+                record
+            )
         );
     }
 }

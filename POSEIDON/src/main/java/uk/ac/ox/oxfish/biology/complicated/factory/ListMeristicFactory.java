@@ -32,7 +32,7 @@ import java.util.function.ToDoubleFunction;
 /**
  * Created by carrknight on 7/7/17.
  */
-public class ListMeristicFactory implements AlgorithmFactory<FromListMeristics>{
+public class ListMeristicFactory implements AlgorithmFactory<FromListMeristics> {
 
     /**
      * gets turned into a list of doubles
@@ -60,7 +60,7 @@ public class ListMeristicFactory implements AlgorithmFactory<FromListMeristics>{
                 {
                     return Double.parseDouble(s.trim());
                 }
-        }
+            }
         };
 
         double[] weights = Arrays.stream(weightsPerBin.split(",")).mapToDouble(mapper).toArray();
@@ -69,10 +69,7 @@ public class ListMeristicFactory implements AlgorithmFactory<FromListMeristics>{
 
         //create a meristic!
         return new FromListMeristics(
-                weights, 2);
-
-
-
+            weights, 2);
 
 
     }

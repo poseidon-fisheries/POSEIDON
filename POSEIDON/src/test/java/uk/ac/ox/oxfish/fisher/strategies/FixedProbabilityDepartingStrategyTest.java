@@ -41,9 +41,10 @@ public class FixedProbabilityDepartingStrategyTest {
         FixedProbabilityDepartingStrategy always = new FixedProbabilityDepartingStrategy(1.0, false);
 
 
-
-        for(int i=0; i<50;i++) {
-            assertTrue(always.shouldFisherLeavePort(mock(Fisher.class),mock(FishState.class),new MersenneTwisterFast()));
+        for (int i = 0; i < 50; i++) {
+            assertTrue(always.shouldFisherLeavePort(mock(Fisher.class),
+                mock(FishState.class),
+                new MersenneTwisterFast()));
         }
 
     }
@@ -52,21 +53,22 @@ public class FixedProbabilityDepartingStrategyTest {
     public void neverDeparts() throws Exception {
 
         FixedProbabilityDepartingStrategy never = new FixedProbabilityDepartingStrategy(0, false);
-        for(int i=0; i<50;i++)
-            assertFalse(never.shouldFisherLeavePort(mock(Fisher.class),mock(FishState.class),new MersenneTwisterFast()));
+        for (int i = 0; i < 50; i++)
+            assertFalse(never.shouldFisherLeavePort(mock(Fisher.class),
+                mock(FishState.class),
+                new MersenneTwisterFast()));
 
     }
 
 
     @Test
-    public void departsSometimes() throws Exception
-    {
+    public void departsSometimes() throws Exception {
         FixedProbabilityDepartingStrategy sometimes = new FixedProbabilityDepartingStrategy(.5, false);
 
         int departures = 0;
-        for(int i=0; i<50;i++)
-            if(sometimes.shouldFisherLeavePort(mock(Fisher.class),mock(FishState.class),new MersenneTwisterFast()));
-                departures++;
+        for (int i = 0; i < 50; i++)
+            if (sometimes.shouldFisherLeavePort(mock(Fisher.class), mock(FishState.class), new MersenneTwisterFast())) ;
+        departures++;
         assertTrue(departures < 50);
         assertTrue(departures > 0);
 
@@ -82,12 +84,12 @@ public class FixedProbabilityDepartingStrategyTest {
         FishState model = mock(FishState.class);
         when(model.getDay()).thenReturn(1);
         int departures = 0;
-        for(int i=0; i<50;i++) {
-            if(daily.shouldFisherLeavePort(mock(Fisher.class),model,new MersenneTwisterFast()))
+        for (int i = 0; i < 50; i++) {
+            if (daily.shouldFisherLeavePort(mock(Fisher.class), model, new MersenneTwisterFast()))
                 departures++;
         }
         assertTrue(departures == 1);
         when(model.getDay()).thenReturn(2);
-        assertTrue(daily.shouldFisherLeavePort(mock(Fisher.class),model,new MersenneTwisterFast()));
+        assertTrue(daily.shouldFisherLeavePort(mock(Fisher.class), model, new MersenneTwisterFast()));
     }
 }

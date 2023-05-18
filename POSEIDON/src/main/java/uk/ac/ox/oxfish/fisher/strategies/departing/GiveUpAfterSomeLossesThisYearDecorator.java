@@ -19,22 +19,20 @@ import static uk.ac.ox.oxfish.fisher.strategies.departing.FullSeasonalRetiredDec
 public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy, TripListener {
 
     private final int howManyBadTripsBeforeGivingUp;
-
-    private int badTrips = 0;
-
     private final double minimumProfitPerTripRequired;
-
-    private boolean givenUp = false;
-
     private final DepartingStrategy delegate;
-
+    private int badTrips = 0;
+    private boolean givenUp = false;
     private Fisher fisherIAmConnectedTo;
 
     private boolean disabled = false;
+    private Stoppable receipt = null;
 
-    public GiveUpAfterSomeLossesThisYearDecorator(int howManyBadTripsBeforeGivingUp,
-                                                  double minimumProfitPerTripRequired,
-                                                  DepartingStrategy delegate) {
+    public GiveUpAfterSomeLossesThisYearDecorator(
+        int howManyBadTripsBeforeGivingUp,
+        double minimumProfitPerTripRequired,
+        DepartingStrategy delegate
+    ) {
         this.howManyBadTripsBeforeGivingUp = howManyBadTripsBeforeGivingUp;
         this.minimumProfitPerTripRequired = minimumProfitPerTripRequired;
         this.delegate = delegate;
@@ -44,11 +42,8 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
     public boolean shouldFisherLeavePort(Fisher fisher, FishState model, MersenneTwisterFast random) {
 
 
-        return  (disabled || !givenUp) && delegate.shouldFisherLeavePort(fisher, model, random);
+        return (disabled || !givenUp) && delegate.shouldFisherLeavePort(fisher, model, random);
     }
-
-
-    private Stoppable receipt = null;
 
     @Override
     public void start(FishState model, Fisher fisher) {
@@ -57,52 +52,21 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
         this.fisherIAmConnectedTo.addTripListener(this);
 
         receipt = model.scheduleEveryYear(
-                new Steppable() {
-                    @Override
-                    public void step(SimState simState) {
-                        reset();
-                    }
-                },
-                StepOrder.DAWN
+            new Steppable() {
+                @Override
+                public void step(SimState simState) {
+                    reset();
+                }
+            },
+            StepOrder.DAWN
         );
         delegate.start(model, fisher);
-    }
-
-    @Override
-    public void turnOff(Fisher fisher) {
-        this.fisherIAmConnectedTo.removeTripListener(this);
-        this.fisherIAmConnectedTo = null;
-        if(this.receipt!=null)
-            receipt.stop();
-        delegate.turnOff(fisher);
-    }
-
-    @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-        if(disabled)
-            return;
-
-        //if you have given up you should have done no trips, actually.
-        //however it is possible that something forced your hand
-        assert !givenUp;
-        Preconditions.checkArgument(fisher==fisherIAmConnectedTo,
-                "Listening to multiple fishers is not allowed by this decorator");
-
-        if(record.getTotalTripProfit()<minimumProfitPerTripRequired)
-            badTrips++;
-        if(badTrips>=howManyBadTripsBeforeGivingUp) {
-            givenUp = true;
-            this.fisherIAmConnectedTo.getAdditionalVariables().put(SEASONALITY_VARIABLE_NAME,EffortStatus.RETIRED);
-        }
-
-
-
     }
 
     /**
      * stops giving up!
      */
-    public void reset(){
+    public void reset() {
 //        if(givenUp==true)
 //            this.fisherIAmConnectedTo.getAdditionalVariables().put(SEASONALITY_VARIABLE_NAME,null);
 
@@ -110,11 +74,43 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
         badTrips = 0;
     }
 
+    @Override
+    public void turnOff(Fisher fisher) {
+        this.fisherIAmConnectedTo.removeTripListener(this);
+        this.fisherIAmConnectedTo = null;
+        if (this.receipt != null)
+            receipt.stop();
+        delegate.turnOff(fisher);
+    }
+
+    @Override
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+        if (disabled)
+            return;
+
+        //if you have given up you should have done no trips, actually.
+        //however it is possible that something forced your hand
+        assert !givenUp;
+        Preconditions.checkArgument(
+            fisher == fisherIAmConnectedTo,
+            "Listening to multiple fishers is not allowed by this decorator"
+        );
+
+        if (record.getTotalTripProfit() < minimumProfitPerTripRequired)
+            badTrips++;
+        if (badTrips >= howManyBadTripsBeforeGivingUp) {
+            givenUp = true;
+            this.fisherIAmConnectedTo.getAdditionalVariables().put(SEASONALITY_VARIABLE_NAME, EffortStatus.RETIRED);
+        }
+
+
+    }
+
     /**
      * basically stop stopping the fisher
      */
-    public void disable(){
-        disabled=true;
+    public void disable() {
+        disabled = true;
     }
 
 

@@ -48,13 +48,13 @@ public class SamePortEdgesOnlyTest {
 
         when(fisher1.getHomePort()).thenReturn(port1);
         when(fisher2.getHomePort()).thenReturn(port2);
-        assertFalse(predicate.test(fisher1,fisher2));
-        assertFalse(predicate.test(fisher2,fisher1));
+        assertFalse(predicate.test(fisher1, fisher2));
+        assertFalse(predicate.test(fisher2, fisher1));
 
 
         when(fisher1.getHomePort()).thenReturn(port1);
         when(fisher2.getHomePort()).thenReturn(port1);
-        assertTrue(predicate.test(fisher1,fisher2));
-        assertTrue(predicate.test(fisher2,fisher1));
+        assertTrue(predicate.test(fisher1, fisher2));
+        assertTrue(predicate.test(fisher2, fisher1));
     }
 }

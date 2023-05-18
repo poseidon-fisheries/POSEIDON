@@ -168,7 +168,8 @@ public class BuildSampleInputs {
             spatialFiles
         );
 
-        final ObjectOutputStream objectStream = new ObjectOutputStream(new FileOutputStream(directory.resolve("premade.data")
+        final ObjectOutputStream objectStream = new ObjectOutputStream(new FileOutputStream(directory.resolve(
+                "premade.data")
             .toFile()));
         objectStream.writeObject(sampledMap);
         objectStream.close();

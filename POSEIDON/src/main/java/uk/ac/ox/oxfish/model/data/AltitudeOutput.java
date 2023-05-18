@@ -20,32 +20,22 @@
 
 package uk.ac.ox.oxfish.model.data;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.MoreObjects;
 import sim.field.grid.DoubleGrid2D;
-import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.DoubleSummaryStatistics;
-import java.util.Map;
+public class AltitudeOutput implements OutputPlugin {
 
-public class AltitudeOutput implements OutputPlugin{
-
-
-
-
-    private String fileName = "altitude_map.csv";
 
     final private DoubleGrid2D altitude;
+    private String fileName = "altitude_map.csv";
 
 
     public AltitudeOutput(NauticalMap map) {
-        altitude = new DoubleGrid2D(map.getWidth(),map.getHeight());
+        altitude = new DoubleGrid2D(map.getWidth(), map.getHeight());
         for (SeaTile seaTile : map.getAllSeaTilesAsList()) {
-            altitude.set(seaTile.getGridX(),seaTile.getGridY(),seaTile.getAltitude());
+            altitude.set(seaTile.getGridX(), seaTile.getGridY(), seaTile.getAltitude());
         }
 
     }
@@ -61,6 +51,15 @@ public class AltitudeOutput implements OutputPlugin{
         return fileName;
     }
 
+    /**
+     * Setter for property 'fileName'.
+     *
+     * @param fileName Value to set for property 'fileName'.
+     */
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
     @Override
     public String composeFileContents() {
         return toString();
@@ -70,20 +69,11 @@ public class AltitudeOutput implements OutputPlugin{
     public String toString() {
         StringBuilder builder = new StringBuilder(2000);
         builder.append("x,y,z").append("\n");
-        for(int x =0; x< altitude.getWidth(); x++)
-            for(int y=0; y< altitude.getHeight(); y++)
-                builder.append(x).append(",").append(y).append(",").append(altitude.get(x,y)).append("\n");
+        for (int x = 0; x < altitude.getWidth(); x++)
+            for (int y = 0; y < altitude.getHeight(); y++)
+                builder.append(x).append(",").append(y).append(",").append(altitude.get(x, y)).append("\n");
 
         return builder.toString();
 
-    }
-
-    /**
-     * Setter for property 'fileName'.
-     *
-     * @param fileName Value to set for property 'fileName'.
-     */
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
     }
 }

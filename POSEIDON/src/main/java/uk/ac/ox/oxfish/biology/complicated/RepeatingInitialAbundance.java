@@ -30,7 +30,7 @@ import java.util.Arrays;
  * another simple initial abundance, in this case it is supplied an array and will copy it
  * for each subdivision
  */
-public class RepeatingInitialAbundance  implements InitialAbundance{
+public class RepeatingInitialAbundance implements InitialAbundance {
 
 
     private final double[] cohort;
@@ -49,12 +49,14 @@ public class RepeatingInitialAbundance  implements InitialAbundance{
      */
     @Override
     public void initialize(Species species) {
-        abundance= new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
-        Preconditions.checkArgument(species.getNumberOfBins()==cohort.length,
-                                    "The number of boxes provided as inputs don't match the number of boxes the biology initializer expects! " + species.getNumberOfBins() + "," + cohort.length);
+        abundance = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+        Preconditions.checkArgument(
+            species.getNumberOfBins() == cohort.length,
+            "The number of boxes provided as inputs don't match the number of boxes the biology initializer expects! " + species.getNumberOfBins() + "," + cohort.length
+        );
 
-        for(int i=0; i<species.getNumberOfSubdivisions(); i++)
-            abundance[i] = Arrays.copyOf(cohort,cohort.length);
+        for (int i = 0; i < species.getNumberOfSubdivisions(); i++)
+            abundance[i] = Arrays.copyOf(cohort, cohort.length);
     }
 
     /**

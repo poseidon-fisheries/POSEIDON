@@ -49,21 +49,21 @@ public class BiologicalEventTest {
         FishState state = MovingTest.generateSimple4x4Map();
 
         Predicate trigger = mock(Predicate.class);
-        when(trigger.test(any())).thenReturn(true,false,true);
+        when(trigger.test(any())).thenReturn(true, false, true);
 
         Predicate<SeaTile> mock = mock(Predicate.class);
         doAnswer(new Answer() {
             @Override
             public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                return ((SeaTile) invocation.getArguments()[0]).getGridX()==0;
+                return ((SeaTile) invocation.getArguments()[0]).getGridX() == 0;
             }
         }).when(mock).test(any());
 
         BiologicalEvent event = new BiologicalEvent(
 
-                trigger,
-                mock,
-                tile -> counter.incrementAndGet()
+            trigger,
+            mock,
+            tile -> counter.incrementAndGet()
 
         );
 
@@ -72,7 +72,7 @@ public class BiologicalEventTest {
         event.step(state);
 
         //only one row trigger, and it only triggers twice
-        assertEquals(counter.get(),8);
+        assertEquals(counter.get(), 8);
 
 
     }

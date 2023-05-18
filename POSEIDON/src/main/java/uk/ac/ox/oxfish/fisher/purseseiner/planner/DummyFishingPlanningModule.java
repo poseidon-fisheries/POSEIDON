@@ -47,7 +47,10 @@ public class DummyFishingPlanningModule implements PlanningModule {
 
     private FishState model;
 
-    public DummyFishingPlanningModule(final double delayAfterFishingInHours, final int maximumNumberOfFishingActionsInTrip) {
+    public DummyFishingPlanningModule(
+        final double delayAfterFishingInHours,
+        final int maximumNumberOfFishingActionsInTrip
+    ) {
         this.delayAfterFishingInHours = delayAfterFishingInHours;
         this.maximumNumberOfFishingActionsInTrip = maximumNumberOfFishingActionsInTrip;
     }

@@ -43,8 +43,7 @@ import java.util.function.Consumer;
  * A bunch of factories to apply to a model, usually to change its policies or something similar
  * Created by carrknight on 5/3/16.
  */
-public class PolicyScript
-{
+public class PolicyScript {
 
     private AlgorithmFactory<? extends Gear> gear;
     /**
@@ -92,12 +91,11 @@ public class PolicyScript
     }
 
 
-    public void apply(FishState state)
-    {
+    public void apply(FishState state) {
 
         System.out.println("Starting a polcy script!");
         //apply regulations
-        if(regulation != null) {
+        if (regulation != null) {
             for (Fisher fisher : state.getFishers()) {
                 fisher.setRegulation(regulation.apply(state));
             }
@@ -105,7 +103,7 @@ public class PolicyScript
             state.getFisherFactory(nameOfPopulation).setRegulations(regulation);
         }
         //apply gear
-        if(gear != null) {
+        if (gear != null) {
             for (Fisher fisher : state.getFishers()) {
                 fisher.setGear(gear.apply(state));
             }
@@ -113,7 +111,7 @@ public class PolicyScript
             state.getFisherFactory(nameOfPopulation).setGear(gear);
         }
 
-        if(departingStrategy != null) {
+        if (departingStrategy != null) {
             for (Fisher fisher : state.getFishers()) {
                 fisher.setDepartingStrategy(departingStrategy.apply(state));
             }
@@ -121,7 +119,7 @@ public class PolicyScript
             state.getFisherFactory(nameOfPopulation).setDepartingStrategy(departingStrategy);
         }
 
-        if(destinationStrategy != null) {
+        if (destinationStrategy != null) {
             for (Fisher fisher : state.getFishers()) {
                 fisher.setDestinationStrategy(destinationStrategy.apply(state));
             }
@@ -129,8 +127,7 @@ public class PolicyScript
             state.getFisherFactory(nameOfPopulation).setDestinationStrategy(destinationStrategy);
         }
 
-        if(discardingStrategy != null)
-        {
+        if (discardingStrategy != null) {
             for (Fisher fisher : state.getFishers()) {
                 fisher.setDiscardingStrategy(discardingStrategy.apply(state));
             }
@@ -138,41 +135,41 @@ public class PolicyScript
             state.getFisherFactory(nameOfPopulation).setDiscardingStrategy(discardingStrategy);
         }
 
-        if(hourlyTravellingCosts != null)
-        {
+        if (hourlyTravellingCosts != null) {
             for (Fisher fisher : state.getFishers()) {
-                Preconditions.checkArgument(fisher.getAdditionalTripCosts().size() <=1,
-                                            "replacing more than one additional cost, this is probably not what you want");
-                if(fisher.getAdditionalTripCosts().size()==1)
+                Preconditions.checkArgument(
+                    fisher.getAdditionalTripCosts().size() <= 1,
+                    "replacing more than one additional cost, this is probably not what you want"
+                );
+                if (fisher.getAdditionalTripCosts().size() == 1)
                     Log.warn("Replacing the previous additional trip cost object with the new one");
 
                 fisher.getAdditionalTripCosts().clear();
                 fisher.getAdditionalTripCosts().add(new HourlyCost(
-                        hourlyTravellingCosts.applyAsDouble(state.getRandom())
+                    hourlyTravellingCosts.applyAsDouble(state.getRandom())
                 ));
             }
             state.getFisherFactory(nameOfPopulation).getAdditionalSetups().add(
-                    new Consumer<Fisher>() {
-                        @Override
-                        public void accept(Fisher fisher) {
-                            fisher.getAdditionalTripCosts().clear();
-                            fisher.getAdditionalTripCosts().add(new HourlyCost(
-                                    hourlyTravellingCosts.applyAsDouble(state.getRandom())
-                            ));
-                        }
+                new Consumer<Fisher>() {
+                    @Override
+                    public void accept(Fisher fisher) {
+                        fisher.getAdditionalTripCosts().clear();
+                        fisher.getAdditionalTripCosts().add(new HourlyCost(
+                            hourlyTravellingCosts.applyAsDouble(state.getRandom())
+                        ));
                     }
+                }
             );
         }
 
-        if(removeAllMPAs)
-        {
-            for(SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList()) {
+        if (removeAllMPAs) {
+            for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList()) {
                 tile.assignMpa(null);
                 assert !tile.isProtected();
             }
         }
 
-        if(fishingStrategy != null) {
+        if (fishingStrategy != null) {
             for (Fisher fisher : state.getFishers()) {
                 fisher.setFishingStrategy(fishingStrategy.apply(state));
             }
@@ -180,7 +177,7 @@ public class PolicyScript
             state.getFisherFactory(nameOfPopulation).setFishingStrategy(fishingStrategy);
         }
 
-        if(weatherStrategy != null) {
+        if (weatherStrategy != null) {
             for (Fisher fisher : state.getFishers()) {
                 fisher.setWeatherStrategy(weatherStrategy.apply(state));
             }
@@ -189,22 +186,19 @@ public class PolicyScript
         }
 
 
-
         //create new fishers if needed
-        if(changeInNumberOfFishers != null) {
-            if(changeInNumberOfFishers>0)
+        if (changeInNumberOfFishers != null) {
+            if (changeInNumberOfFishers > 0)
                 for (int i = 0; i < changeInNumberOfFishers; i++)
                     state.createFisher(nameOfPopulation);
-            else
-            {
+            else {
                 for (int i = 0; i < -changeInNumberOfFishers; i++)
                     state.killRandomFisher();
             }
         }
 
-        if(gasPricePerLiter!=null)
-        {
-            for(Port port : state.getPorts())
+        if (gasPricePerLiter != null) {
+            for (Port port : state.getPorts())
                 port.setGasPricePerLiter(gasPricePerLiter);
         }
     }
@@ -214,7 +208,8 @@ public class PolicyScript
     }
 
     public void setRegulation(
-            AlgorithmFactory<? extends Regulation> regulation) {
+        AlgorithmFactory<? extends Regulation> regulation
+    ) {
         this.regulation = regulation;
     }
 
@@ -250,7 +245,8 @@ public class PolicyScript
      * @param departingStrategy Value to set for property 'departingStrategy'.
      */
     public void setDepartingStrategy(
-            AlgorithmFactory<? extends DepartingStrategy> departingStrategy) {
+        AlgorithmFactory<? extends DepartingStrategy> departingStrategy
+    ) {
         this.departingStrategy = departingStrategy;
     }
 
@@ -269,7 +265,8 @@ public class PolicyScript
      * @param destinationStrategy Value to set for property 'destinationStrategy'.
      */
     public void setDestinationStrategy(
-            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
+        AlgorithmFactory<? extends DestinationStrategy> destinationStrategy
+    ) {
         this.destinationStrategy = destinationStrategy;
     }
 
@@ -288,7 +285,8 @@ public class PolicyScript
      * @param fishingStrategy Value to set for property 'fishingStrategy'.
      */
     public void setFishingStrategy(
-            AlgorithmFactory<? extends FishingStrategy> fishingStrategy) {
+        AlgorithmFactory<? extends FishingStrategy> fishingStrategy
+    ) {
         this.fishingStrategy = fishingStrategy;
     }
 
@@ -307,7 +305,8 @@ public class PolicyScript
      * @param weatherStrategy Value to set for property 'weatherStrategy'.
      */
     public void setWeatherStrategy(
-            AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy) {
+        AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy
+    ) {
         this.weatherStrategy = weatherStrategy;
     }
 
@@ -334,7 +333,8 @@ public class PolicyScript
     }
 
     public void setDiscardingStrategy(
-            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy) {
+        AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy
+    ) {
         this.discardingStrategy = discardingStrategy;
     }
 

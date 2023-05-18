@@ -20,12 +20,12 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
 import org.junit.Test;
-
-import java.util.function.DoubleUnaryOperator;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunction;
 
+import java.util.function.DoubleUnaryOperator;
+
 import static java.lang.Double.MAX_VALUE;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class LogisticFunctionTest {

@@ -18,19 +18,18 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
  * an abstract class that deals with data gatherrs and other basic utilities of the exogenous catch
  * but doesn't actually do any "catching" except scheduling itself every year
  */
-public abstract class AbstractExogenousCatches implements  ExogenousCatches {
+public abstract class AbstractExogenousCatches implements ExogenousCatches {
 
 
-
-    protected final LinkedHashMap<Species,Double> lastExogenousCatchesMade = new LinkedHashMap<>();
+    protected final LinkedHashMap<Species, Double> lastExogenousCatchesMade = new LinkedHashMap<>();
     private final String columnName;
     private Stoppable stoppable;
 
     public AbstractExogenousCatches(
-            final String dataColumnName) {
+        final String dataColumnName
+    ) {
         columnName = dataColumnName;
     }
-
 
 
     protected List<? extends LocalBiology> getAllCatchableBiologies(FishState model) {
@@ -39,7 +38,7 @@ public abstract class AbstractExogenousCatches implements  ExogenousCatches {
 
     protected Double getFishableBiomass(Species target, LocalBiology seaTile) {
 
-        return seaTile.getBiomass( target);
+        return seaTile.getBiomass(target);
     }
 
     /**
@@ -56,25 +55,26 @@ public abstract class AbstractExogenousCatches implements  ExogenousCatches {
             @Override
             public void step(SimState simState) {
                 AbstractExogenousCatches.this.step(model);
-                stoppable = model.scheduleEveryYear(AbstractExogenousCatches.this,
-                        StepOrder.BIOLOGY_PHASE);
+                stoppable = model.scheduleEveryYear(
+                    AbstractExogenousCatches.this,
+                    StepOrder.BIOLOGY_PHASE
+                );
             }
-        },StepOrder.BIOLOGY_PHASE,364);
+        }, StepOrder.BIOLOGY_PHASE, 364);
 
 
-        for(Species species : model.getSpecies())
-        {
+        for (Species species : model.getSpecies()) {
             model.getYearlyDataSet().registerGatherer(
-                    columnName + species,
-                    new Gatherer<FishState>() {
-                        @Override
-                        public Double apply(FishState state) {
-                            return lastExogenousCatchesMade.get(species);
-                        }
-                    },
-                    0,
-                    KILOGRAM,
-                    "Biomass"
+                columnName + species,
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState state) {
+                        return lastExogenousCatchesMade.get(species);
+                    }
+                },
+                0,
+                KILOGRAM,
+                "Biomass"
             );
         }
     }
@@ -85,7 +85,7 @@ public abstract class AbstractExogenousCatches implements  ExogenousCatches {
     @Override
     public void turnOff() {
 
-        if(stoppable!= null)
+        if (stoppable != null)
             stoppable.stop();
     }
 

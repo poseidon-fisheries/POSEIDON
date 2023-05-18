@@ -47,28 +47,21 @@ public class Port {
      * the location of the port
      */
     private final SeaTile location;
-
-
+    /**
+     * the markets available at this port
+     */
+    private final MarketMap defaultMarketMap;
+    /**
+     * the markets that ara available only to a selected few.
+     */
+    private final HashMap<Fisher, MarketMap> specializedMarketMaps = new HashMap<>();
+    private final String name;
     /**
      * how much does gas cost per liter at this port
      */
     private double gasPricePerLiter;
 
-
-    /**
-     *  the markets available at this port
-     */
-    private final MarketMap defaultMarketMap;
-
-    /**
-     * the markets that ara available only to a selected few.
-     */
-    private final HashMap<Fisher,MarketMap> specializedMarketMaps = new HashMap<>();
-
-    private final String name;
-
-    public Port(String portName, SeaTile location, MarketMap defaultMarketMap, double gasPricePerLiter)
-    {
+    public Port(String portName, SeaTile location, MarketMap defaultMarketMap, double gasPricePerLiter) {
         this.name = portName;
         this.location = location;
         this.defaultMarketMap = defaultMarketMap;
@@ -82,29 +75,31 @@ public class Port {
     /**
      * Tell the port the fisher is docking here. To be correct they must be on the same tile and the fisher must not
      * be already here
+     *
      * @param fisher the fisher docking to port
      */
-    public void dock(Fisher fisher)
-    {
+    public void dock(Fisher fisher) {
 
-        Preconditions.checkArgument(fisher.getLocation().equals(location),
-                "A fisher can't dock a port if they aren't on the same tile");
+        Preconditions.checkArgument(
+            fisher.getLocation().equals(location),
+            "A fisher can't dock a port if they aren't on the same tile"
+        );
 
         boolean wasHere = !fishersHere.add(fisher);
-        if(wasHere)
-            throw new IllegalStateException(fisher +" called dock() but is already here ");
+        if (wasHere)
+            throw new IllegalStateException(fisher + " called dock() but is already here ");
         assert fishersHere.contains(fisher); //should be here now
     }
 
     /**
      * tell the port the fisher is departing
+     *
      * @param fisher the fisher departing
      */
-    public void depart(Fisher fisher)
-    {
-        boolean wasHere =fishersHere.remove(fisher);
-        if(!wasHere)
-            throw new IllegalStateException(fisher +" called undock() but wasn't in the list of docked fishers ");
+    public void depart(Fisher fisher) {
+        boolean wasHere = fishersHere.remove(fisher);
+        if (!wasHere)
+            throw new IllegalStateException(fisher + " called undock() but wasn't in the list of docked fishers ");
         assert !fishersHere.contains(fisher); //shouldn't be here anymore
 
     }
@@ -112,39 +107,43 @@ public class Port {
 
     /**
      * get the marginal price of the market associated with this species
+     *
      * @param species
      * @return
      */
-    public double getMarginalPrice(Species species)
-    {
+    public double getMarginalPrice(Species species) {
         return defaultMarketMap.getMarket(species).getMarginalPrice();
     }
 
 
     /**
      * get the marginal price of the market associated with this species
+     *
      * @param species
      * @return
      */
-    public double getMarginalPrice(Species species, Fisher fisher)
-    {
+    public double getMarginalPrice(Species species, Fisher fisher) {
         return getMarketMap(fisher).getMarket(species).getMarginalPrice();
+    }
+
+    public MarketMap getMarketMap(Fisher fisher) {
+
+        return specializedMarketMaps.getOrDefault(fisher, defaultMarketMap);
+
     }
 
     /**
      * returns an immutable view of the fishers listed here
+     *
      * @return the set of fishers here
      */
     public Set<Fisher> getFishersHere() {
         return Collections.unmodifiableSet(fishersHere);
     }
 
-
-    public boolean isDocked(Fisher fisher)
-    {
+    public boolean isDocked(Fisher fisher) {
         return fishersHere.contains(fisher);
     }
-
 
     public SeaTile getLocation() {
         return location;
@@ -152,13 +151,11 @@ public class Port {
 
     @Override
     public String toString() {
-        return "Port " + getName() + " at " +location;
+        return "Port " + getName() + " at " + location;
     }
 
-    public MarketMap getMarketMap(Fisher fisher) {
-
-        return specializedMarketMaps.getOrDefault(fisher,defaultMarketMap);
-
+    public String getName() {
+        return name;
     }
 
     public MarketMap getDefaultMarketMap() {
@@ -177,16 +174,11 @@ public class Port {
         this.gasPricePerLiter = gasPricePerLiter;
     }
 
-    public String getName() {
-        return name;
+    public void addSpecializedMarketMap(Fisher fisher, MarketMap specializedMarketMap) {
+        specializedMarketMaps.put(fisher, specializedMarketMap);
     }
 
-    public void addSpecializedMarketMap(Fisher fisher, MarketMap specializedMarketMap){
-        specializedMarketMaps.put(fisher,specializedMarketMap);
-    }
-
-    public void removeSpecializedMarketMap(Fisher fisher)
-    {
+    public void removeSpecializedMarketMap(Fisher fisher) {
         specializedMarketMaps.remove(fisher);
     }
 

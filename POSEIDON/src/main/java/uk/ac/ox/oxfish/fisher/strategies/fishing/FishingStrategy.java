@@ -42,14 +42,15 @@ public interface FishingStrategy extends FisherStartable, Action {
      * not to continue fishing
      *
      * @param random the randomizer
-     * @param model the model itself
+     * @param model  the model itself
      * @return true if the fisher should fish here, false otherwise
      */
     boolean shouldFish(
-            Fisher fisher,
-            MersenneTwisterFast random,
-            FishState model,
-            TripRecord currentTrip);
+        Fisher fisher,
+        MersenneTwisterFast random,
+        FishState model,
+        TripRecord currentTrip
+    );
 
     /**
      * This is called by Arriving.act to decide whether or not to fish up arrival. Most fishing

@@ -48,6 +48,8 @@ class PossibleRouteTilesCache {
                     ).collect(toImmutableList()))
             );
 
-    List<SeaTile> get(NauticalMap map) { return cache.getUnchecked(map); }
+    List<SeaTile> get(NauticalMap map) {
+        return cache.getUnchecked(map);
+    }
 
 }

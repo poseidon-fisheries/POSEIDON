@@ -29,8 +29,6 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 /**
  * The default pathfinder: quick and stupid as it runs over land and everything else
  * Created by carrknight on 11/4/15.
@@ -39,9 +37,13 @@ public class StraightLinePathfinder implements Pathfinder {
 
     private final PathMemory memory;
 
-    public StraightLinePathfinder() { this(new TableBasedPathMemory()); }
+    public StraightLinePathfinder() {
+        this(new TableBasedPathMemory());
+    }
 
-    StraightLinePathfinder(PathMemory memory) { this.memory = memory; }
+    StraightLinePathfinder(PathMemory memory) {
+        this.memory = memory;
+    }
 
     /**
      * builds a osmoseWFSPath from start to end. No weird pathfinding here, simply move diagonally then horizontally-vertically when that's not possible anymore

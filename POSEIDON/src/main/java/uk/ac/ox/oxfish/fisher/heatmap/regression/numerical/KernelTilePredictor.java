@@ -36,50 +36,44 @@ import java.util.Arrays;
  * It uses product (gaussian) Kernel
  * Created by carrknight on 7/8/16.
  */
-public class KernelTilePredictor{
+public class KernelTilePredictor {
 
-
-    private double currentPrediction = 0;
-
-    private double currentDenominator = 0;
 
     private final double forgettingFactor;
-
     private final SeaTile whereAmIPredicting;
-
     /**
      * the bandwidth are within the distance objects
      */
     private final ObservationExtractor[] extractors;
-
-
+    private final RBFDistance kerneler = new RBFDistance(0); //this bandwidth gets changed at each step
+    private double currentPrediction = 0;
+    private double currentDenominator = 0;
     private double[] bandwidths;
 
-    private final RBFDistance kerneler = new RBFDistance(0); //this bandwidth gets changed at each step
-
-    public KernelTilePredictor(double forgettingFactor,
-                               SeaTile whereAmIPredicting,
-                               Pair<ObservationExtractor,Double>... extractorsAndBandwidths) {
+    public KernelTilePredictor(
+        double forgettingFactor,
+        SeaTile whereAmIPredicting,
+        Pair<ObservationExtractor, Double>... extractorsAndBandwidths
+    ) {
         this.forgettingFactor = forgettingFactor;
         this.whereAmIPredicting = whereAmIPredicting;
         assert extractorsAndBandwidths.length > 0;
         extractors = new ObservationExtractor[extractorsAndBandwidths.length];
         bandwidths = new double[extractorsAndBandwidths.length];
-        for(int i=0; i< extractorsAndBandwidths.length; i++) {
+        for (int i = 0; i < extractorsAndBandwidths.length; i++) {
             extractors[i] = extractorsAndBandwidths[i].getFirst();
             bandwidths[i] = extractorsAndBandwidths[i].getSecond();
         }
     }
 
-    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher, FishState model)
-    {
+    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher, FishState model) {
         //compute kernel
         double kernel = 1;
-        for(int i=0; i<extractors.length; i++) {
+        for (int i = 0; i < extractors.length; i++) {
             kerneler.setBandwidth(bandwidths[i]);
             kernel *= kerneler.distance(
-                    extractors[i].extract(observation.getTile(),observation.getTime(),fisher,model ),
-                    extractors[i].extract(whereAmIPredicting,observation.getTime(),fisher,model )
+                extractors[i].extract(observation.getTile(), observation.getTime(), fisher, model),
+                extractors[i].extract(whereAmIPredicting, observation.getTime(), fisher, model)
 
             );
         }
@@ -87,14 +81,12 @@ public class KernelTilePredictor{
         //update denominator
         currentDenominator = currentDenominator * forgettingFactor + kernel;
         Preconditions.checkArgument(Double.isFinite(currentDenominator), currentDenominator + " , " +
-        forgettingFactor + " , " + kernel + " , " + Arrays.toString(bandwidths));
+            forgettingFactor + " , " + kernel + " , " + Arrays.toString(bandwidths));
         //update predictor
         if (currentDenominator > 0)
             currentPrediction += (observation.getValue() - currentPrediction) * kernel / currentDenominator;
 
     }
-
-
 
 
     public double getCurrentPrediction() {

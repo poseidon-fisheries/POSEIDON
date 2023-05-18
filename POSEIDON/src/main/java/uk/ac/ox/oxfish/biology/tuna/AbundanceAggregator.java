@@ -18,9 +18,10 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import java.util.Collection;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+
+import java.util.Collection;
 
 /**
  * An {@link Aggregator} that works with {@link AbundanceLocalBiology} biologies.

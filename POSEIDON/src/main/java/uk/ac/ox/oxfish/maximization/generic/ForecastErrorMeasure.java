@@ -23,5 +23,6 @@ import java.util.function.DoubleBinaryOperator;
 
 @FunctionalInterface
 public interface ForecastErrorMeasure extends DoubleBinaryOperator {
-    @Override double applyAsDouble(double actualValue, double predictedValue);
+    @Override
+    double applyAsDouble(double actualValue, double predictedValue);
 }

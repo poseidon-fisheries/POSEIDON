@@ -32,9 +32,10 @@ public class WeekendExtractor implements ObservationExtractor {
 
     @Override
     public double extract(
-            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-        return (SeasonExtractor.getDaySinceStartFromHoursSinceStart(timeOfObservation,model)) % 7
-                >=5 ? 1 : 0;
+        SeaTile tile, double timeOfObservation, Fisher agent, FishState model
+    ) {
+        return (SeasonExtractor.getDaySinceStartFromHoursSinceStart(timeOfObservation, model)) % 7
+            >= 5 ? 1 : 0;
     }
 
 

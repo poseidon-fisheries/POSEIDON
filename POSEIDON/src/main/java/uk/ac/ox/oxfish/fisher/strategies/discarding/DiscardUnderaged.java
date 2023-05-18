@@ -28,9 +28,6 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.util.Arrays;
 
 /**
  * Created by carrknight on 7/12/17.
@@ -65,27 +62,26 @@ public class DiscardUnderaged implements DiscardingStrategy {
      */
     @Override
     public Catch chooseWhatToKeep(
-            SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing, Regulation regulation, FishState model,
-            MersenneTwisterFast random) {
+        SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing, Regulation regulation, FishState model,
+        MersenneTwisterFast random
+    ) {
 
         Preconditions.checkArgument(fishCaught.hasAbundanceInformation(), "this discarding equation" +
-                " requires abundance information");
+            " requires abundance information");
 
         //empty fish doesn't get discarded
-        if(fishCaught.getTotalWeight()<=0)
+        if (fishCaught.getTotalWeight() <= 0)
             return fishCaught;
 
         StructuredAbundance[] abundances = new StructuredAbundance[fishCaught.numberOfSpecies()];
-        for(int species=0 ; species<fishCaught.numberOfSpecies(); species++)
-        {
+        for (int species = 0; species < fishCaught.numberOfSpecies(); species++) {
             StructuredAbundance thisSpeciesAbundance = fishCaught.getAbundance(species);
             int bins = thisSpeciesAbundance.getBins();
             double[][] filtered = new double[thisSpeciesAbundance.getSubdivisions()][];
-            for(int subdivision=0; subdivision<filtered.length; subdivision++ ) {
+            for (int subdivision = 0; subdivision < filtered.length; subdivision++) {
                 filtered[subdivision] = new double[thisSpeciesAbundance.getBins()];
-                for (int bin = 0; bin < thisSpeciesAbundance.getBins(); bin++)
-                {
-                    if(bin<minAge)
+                for (int bin = 0; bin < thisSpeciesAbundance.getBins(); bin++) {
+                    if (bin < minAge)
                         filtered[subdivision][bin] = 0;
                     else
                         filtered[subdivision][bin] = thisSpeciesAbundance.asMatrix()[subdivision][bin];
@@ -93,11 +89,10 @@ public class DiscardUnderaged implements DiscardingStrategy {
                 }
             }
             abundances[species] = new StructuredAbundance(
-                    filtered
+                filtered
             );
         }
-        return new Catch(abundances,model.getBiology());
-
+        return new Catch(abundances, model.getBiology());
 
 
     }

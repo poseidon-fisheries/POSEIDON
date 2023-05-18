@@ -34,14 +34,11 @@ import java.util.Map;
 /**
  * very similar to discretization histogrammer but this one works over map cells rather than map groups!
  */
-public class TowOutput implements OutputPlugin, TripListener
-{
+public class TowOutput implements OutputPlugin, TripListener {
 
-
-    private String fileName = "tow_map.csv";
 
     final private DoubleGrid2D tows;
-
+    private String fileName = "tow_map.csv";
 
 
     public TowOutput(NauticalMap map) {
@@ -51,21 +48,24 @@ public class TowOutput implements OutputPlugin, TripListener
 
     /**
      * turn most fished tile into a group number and add 1 to the list
+     *
      * @param record
      * @param fisher
      */
     @Override
     public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
 
-            for (Map.Entry<SeaTile, FishingRecord> effort : record.getFishingRecords())
-            {
-                SeaTile tile = effort.getKey();
+        for (Map.Entry<SeaTile, FishingRecord> effort : record.getFishingRecords()) {
+            SeaTile tile = effort.getKey();
 
-                tows.set(tile.getGridX(),tile.getGridY(),
-                         1+tows.get(tile.getGridX(),
-                                    tile.getGridY()));
+            tows.set(tile.getGridX(), tile.getGridY(),
+                1 + tows.get(
+                    tile.getGridX(),
+                    tile.getGridY()
+                )
+            );
 
-            }
+        }
 
     }
 
@@ -88,9 +88,9 @@ public class TowOutput implements OutputPlugin, TripListener
     public String composeFileContents() {
         StringBuilder builder = new StringBuilder(2000);
         builder.append("x,y,z").append("\n");
-        for(int x =0; x< tows.getWidth(); x++)
-            for(int y=0; y< tows.getHeight(); y++)
-                builder.append(x).append(",").append(y).append(",").append(tows.get(x,y)).append("\n");
+        for (int x = 0; x < tows.getWidth(); x++)
+            for (int y = 0; y < tows.getHeight(); y++)
+                builder.append(x).append(",").append(y).append(",").append(tows.get(x, y)).append("\n");
 
         return builder.toString();
     }

@@ -20,31 +20,23 @@
 
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.IndependentLogisticInitializer;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.function.Supplier;
 
 /**
  * Factory for IndependentLogisticInitializer
  * Created by carrknight on 6/22/15.
  */
-public class IndependentLogisticFactory implements AlgorithmFactory<BiologyInitializer>
-{
+public class IndependentLogisticFactory implements AlgorithmFactory<BiologyInitializer> {
     private DoubleParameter carryingCapacity = new FixedDoubleParameter(5000);
 
     private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.4);
-
 
 
     /**
@@ -57,9 +49,10 @@ public class IndependentLogisticFactory implements AlgorithmFactory<BiologyIniti
     public BiologyInitializer apply(FishState state) {
 
 
-
-        return new IndependentLogisticInitializer(carryingCapacity,
-                                                  grower.apply(state));
+        return new IndependentLogisticInitializer(
+            carryingCapacity,
+            grower.apply(state)
+        );
     }
 
     public DoubleParameter getCarryingCapacity() {
@@ -85,7 +78,8 @@ public class IndependentLogisticFactory implements AlgorithmFactory<BiologyIniti
      * @param grower Value to set for property 'grower'.
      */
     public void setGrower(
-            AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
+        AlgorithmFactory<? extends LogisticGrowerInitializer> grower
+    ) {
         this.grower = grower;
     }
 }

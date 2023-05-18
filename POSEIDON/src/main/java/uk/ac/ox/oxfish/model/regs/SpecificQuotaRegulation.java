@@ -51,7 +51,6 @@ public class SpecificQuotaRegulation extends MonoQuotaRegulation {
 
     /**
      * Can this fisher be at sea?
-     *
      */
     @Override
     public boolean allowedAtSea(Fisher fisher, FishState model) {
@@ -71,8 +70,15 @@ public class SpecificQuotaRegulation extends MonoQuotaRegulation {
      * ignore if wrong species.
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
-        if(species == protectedSpecies)
+    public void reactToSale(
+        Species species,
+        Fisher seller,
+        double biomass,
+        double revenue,
+        FishState model,
+        int timeStep
+    ) {
+        if (species == protectedSpecies)
             super.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 

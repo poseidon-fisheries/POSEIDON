@@ -18,15 +18,12 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-
 import com.google.common.collect.ImmutableList;
-import java.util.Collection;
-import java.util.Map.Entry;
-import java.util.Optional;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.geography.fads.AbundanceLostObserver;
 import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.Collection;
 
 /**
  * This class puts back the abundance lost by FADs drifting out or losing their fish over

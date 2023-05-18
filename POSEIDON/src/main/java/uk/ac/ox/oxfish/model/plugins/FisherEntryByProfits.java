@@ -22,9 +22,7 @@ package uk.ac.ox.oxfish.model.plugins;
 
 import com.google.common.base.Preconditions;
 import sim.engine.SimState;
-import sim.engine.Steppable;
 import sim.engine.Stoppable;
-import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -46,10 +44,12 @@ public class FisherEntryByProfits implements EntryPlugin {
     private final double minProfitsToCoverFixedCosts;
 
     public boolean paused = false;
+    private Stoppable stoppable;
 
     public FisherEntryByProfits(
-            String profitDataColumnName, String costsFinalColumnName, String populationName,
-            double rateToEntryMultiplier, int maxEntrantsPerYear, double minProfitsToCoverFixedCosts) {
+        String profitDataColumnName, String costsFinalColumnName, String populationName,
+        double rateToEntryMultiplier, int maxEntrantsPerYear, double minProfitsToCoverFixedCosts
+    ) {
         this.profitDataColumnName = profitDataColumnName;
         this.costsFinalColumnName = costsFinalColumnName;
         this.populationName = populationName;
@@ -57,9 +57,6 @@ public class FisherEntryByProfits implements EntryPlugin {
         this.maxEntrantsPerYear = maxEntrantsPerYear;
         this.minProfitsToCoverFixedCosts = minProfitsToCoverFixedCosts;
     }
-
-    private Stoppable stoppable;
-
 
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
@@ -69,10 +66,12 @@ public class FisherEntryByProfits implements EntryPlugin {
      */
     @Override
     public void start(FishState model) {
-        Preconditions.checkArgument(stoppable==null,"already started!");
-        stoppable = model.scheduleEveryYear(this,
-                                            StepOrder.POLICY_UPDATE);
-        if(!model.getEntryPlugins().contains(this))
+        Preconditions.checkArgument(stoppable == null, "already started!");
+        stoppable = model.scheduleEveryYear(
+            this,
+            StepOrder.POLICY_UPDATE
+        );
+        if (!model.getEntryPlugins().contains(this))
             model.getEntryPlugins().add(this);
     }
 
@@ -82,47 +81,42 @@ public class FisherEntryByProfits implements EntryPlugin {
     @Override
     public void turnOff() {
 
-        if(stoppable!=null)
+        if (stoppable != null)
             stoppable.stop();
 
     }
 
-
-
-    public int newEntrants(double averageProfits, double averageCosts)
-    {
-
-        double profitRate = (averageProfits-minProfitsToCoverFixedCosts)/(averageCosts+minProfitsToCoverFixedCosts);
-        System.out.println("profit rate: " + profitRate);
-
-        if(profitRate<=0 || !Double.isFinite(profitRate))
-            return 0;
-        else
-            return FishStateUtilities.quickRounding(
-                    profitRate*rateToEntryMultiplier);
-
-    }
-
-
     @Override
     public void step(SimState simState) {
-        if(isEntryPaused())
+        if (isEntryPaused())
             return;
         FishState model = ((FishState) simState);
         int newEntrants = newEntrants(
-                model.getLatestYearlyObservation(profitDataColumnName),
-                model.getLatestYearlyObservation(costsFinalColumnName)
+            model.getLatestYearlyObservation(profitDataColumnName),
+            model.getLatestYearlyObservation(costsFinalColumnName)
         );
-        if(newEntrants>0) {
-            newEntrants = Math.min(newEntrants,maxEntrantsPerYear);
+        if (newEntrants > 0) {
+            newEntrants = Math.min(newEntrants, maxEntrantsPerYear);
             for (int i = 0; i < newEntrants; i++)
                 model.createFisher(populationName);
         }
     }
 
-
     public boolean isEntryPaused() {
         return paused;
+    }
+
+    public int newEntrants(double averageProfits, double averageCosts) {
+
+        double profitRate = (averageProfits - minProfitsToCoverFixedCosts) / (averageCosts + minProfitsToCoverFixedCosts);
+        System.out.println("profit rate: " + profitRate);
+
+        if (profitRate <= 0 || !Double.isFinite(profitRate))
+            return 0;
+        else
+            return FishStateUtilities.quickRounding(
+                profitRate * rateToEntryMultiplier);
+
     }
 
     public void setEntryPaused(boolean paused) {

@@ -7,10 +7,13 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MapWithFarOffPortsInitializerFactory implements AlgorithmFactory<MapWithFarOffPortsInitializer>{
+public class MapWithFarOffPortsInitializerFactory implements AlgorithmFactory<MapWithFarOffPortsInitializer> {
 
 
     private List<FarOffPortInformation> farOffPorts = new LinkedList<>();
+    private AlgorithmFactory<? extends MapInitializer> delegate =
+        new SimpleMapInitializerFactory();
+
     {
 //        final FarOffPortInformation fakeInfo = new FarOffPortInformation();
 //        fakeInfo.setDistanceFromExitInKm(100);
@@ -28,16 +31,12 @@ public class MapWithFarOffPortsInitializerFactory implements AlgorithmFactory<Ma
     @Override
     public MapWithFarOffPortsInitializer apply(FishState state) {
         return new MapWithFarOffPortsInitializer(
-                delegate.apply(state),
-                farOffPorts
+            delegate.apply(state),
+            farOffPorts
         );
 
 
     }
-
-    private AlgorithmFactory<? extends MapInitializer> delegate =
-        new SimpleMapInitializerFactory();
-
 
     public List<FarOffPortInformation> getFarOffPorts() {
         return farOffPorts;

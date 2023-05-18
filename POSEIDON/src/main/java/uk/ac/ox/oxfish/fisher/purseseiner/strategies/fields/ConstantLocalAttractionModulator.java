@@ -7,5 +7,7 @@ public enum ConstantLocalAttractionModulator implements LocalAttractionModulator
     INSTANCE;
 
     @Override
-    public double modulate(int x, int y, int t, Fisher fisher) { return 1.0; }
+    public double modulate(int x, int y, int t, Fisher fisher) {
+        return 1.0;
+    }
 }

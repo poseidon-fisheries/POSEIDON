@@ -44,7 +44,8 @@ public class BreadthFirstPathfinder implements Pathfinder {
      */
     @Override
     public Deque<SeaTile> getRoute(
-            NauticalMap map, SeaTile start, SeaTile end) {
+        NauticalMap map, SeaTile start, SeaTile end
+    ) {
 
         //preconditions
         Preconditions.checkNotNull(start);
@@ -58,25 +59,23 @@ public class BreadthFirstPathfinder implements Pathfinder {
         Queue<SeaTile> frontier = new LinkedList<>();
         frontier.add(start);
         //edges explored
-        HashMap<SeaTile,SeaTile> cameFrom= new HashMap<>();
-        cameFrom.put(start,null);
+        HashMap<SeaTile, SeaTile> cameFrom = new HashMap<>();
+        cameFrom.put(start, null);
         //as long as there is somewhere to explore
-        while(!frontier.isEmpty())
-        {
+        while (!frontier.isEmpty()) {
             SeaTile current = frontier.poll();
             assert current != null; //otherwise frontier would be empty
 
-            if(current == end)
+            if (current == end)
                 break;
 
             Bag neighbors = map.getMooreNeighbors(current, 1);
-            for(Object next : neighbors)
-            {
+            for (Object next : neighbors) {
                 SeaTile neighbor = ((SeaTile) next);
-                if(neighbor.isWater() && !cameFrom.containsKey(neighbor)) //ignore tiles that aren't in the sea or that we explored already
+                if (neighbor.isWater() && !cameFrom.containsKey(neighbor)) //ignore tiles that aren't in the sea or that we explored already
                 {
                     frontier.add(neighbor);
-                    cameFrom.put(neighbor,current);
+                    cameFrom.put(neighbor, current);
                 }
 
             }
@@ -85,8 +84,7 @@ public class BreadthFirstPathfinder implements Pathfinder {
         //build the osmoseWFSPath
         SeaTile current = end;
         path.add(current);
-        while(current != start)
-        {
+        while (current != start) {
             current = cameFrom.get(current);
             path.add(current);
         }
@@ -96,7 +94,6 @@ public class BreadthFirstPathfinder implements Pathfinder {
         //return it!
         return path;
     }
-
 
 
 }

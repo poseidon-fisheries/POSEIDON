@@ -54,49 +54,51 @@ public class ProfitFunctionTest {
         state.start();
 
 
-        ProfitFunction function = new ProfitFunction(new LameTripSimulator(),24*15);
+        ProfitFunction function = new ProfitFunction(new LameTripSimulator(), 24 * 15);
 
         final Fisher fisher = state.getFishers().get(0);
         final int[] tripsRecorded = {0};
         fisher.addTripListener(
-                new TripListener() {
-                    @Override
-                    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-                        System.out.println("day : " + state.getDay());
+            new TripListener() {
+                @Override
+                public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+                    System.out.println("day : " + state.getDay());
 
-                        TripRecord simulated = function.simulateTrip(fisher,
-                                                                     new double[]{record.getSoldCatch()[0] / record.getEffort()},
-                                                                     record.getMostFishedTileInTrip(),
-                                                                     state
-                                                                     );
-                        //if some areas are blocked off by the map; this may give you a null; in this case just return it
-                        if(simulated==null ) {
-                            return;
-                        }
-                        tripsRecorded[0] = tripsRecorded[0] +1;
-                        assertEquals(simulated.getDistanceTravelled(),record.getDistanceTravelled(),.001d);
-                        assertEquals(record.getEffort()+record.getDistanceTravelled()/fisher.getBoat().getSpeedInKph() - record.getDurationInHours(),0,.1d);
-                        assertEquals(simulated.getEffort(),record.getEffort(),.001d);
-                        assertEquals(simulated.getLitersOfGasConsumed(),record.getLitersOfGasConsumed(),.001d);
-                        assertEquals(simulated.getDurationInHours(),record.getDurationInHours(),.1);
-                        double hourlyProfits = function.hourlyProfitFromHypotheticalTripHere(
-                                fisher, record.getMostFishedTileInTrip(),
-                                state,
-                                new double[]{record.getSoldCatch()[0] / record.getEffort()},
-                                false
-
-
-                        );
-                        assertEquals(hourlyProfits,record.getProfitPerHour(true),.1);
-
+                    TripRecord simulated = function.simulateTrip(
+                        fisher,
+                        new double[]{record.getSoldCatch()[0] / record.getEffort()},
+                        record.getMostFishedTileInTrip(),
+                        state
+                    );
+                    //if some areas are blocked off by the map; this may give you a null; in this case just return it
+                    if (simulated == null) {
+                        return;
                     }
+                    tripsRecorded[0] = tripsRecorded[0] + 1;
+                    assertEquals(simulated.getDistanceTravelled(), record.getDistanceTravelled(), .001d);
+                    assertEquals(record.getEffort() + record.getDistanceTravelled() / fisher.getBoat()
+                        .getSpeedInKph() - record.getDurationInHours(), 0, .1d);
+                    assertEquals(simulated.getEffort(), record.getEffort(), .001d);
+                    assertEquals(simulated.getLitersOfGasConsumed(), record.getLitersOfGasConsumed(), .001d);
+                    assertEquals(simulated.getDurationInHours(), record.getDurationInHours(), .1);
+                    double hourlyProfits = function.hourlyProfitFromHypotheticalTripHere(
+                        fisher, record.getMostFishedTileInTrip(),
+                        state,
+                        new double[]{record.getSoldCatch()[0] / record.getEffort()},
+                        false
+
+
+                    );
+                    assertEquals(hourlyProfits, record.getProfitPerHour(true), .1);
+
                 }
+            }
         );
 
-        for(int i=0; i<10000; i++)
+        for (int i = 0; i < 10000; i++)
             state.schedule.step(state);
 
-        assertTrue(tripsRecorded[0]>0);
+        assertTrue(tripsRecorded[0] > 0);
 
     }
 

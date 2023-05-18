@@ -96,41 +96,81 @@ public class ActiveFadLimitsFactory implements AlgorithmFactory<ActiveFadLimits>
         this.limitClass6b = limitClass6b;
     }
 
-    public ActiveFadLimitsFactory() {}
+    public ActiveFadLimitsFactory() {
+    }
 
-    @SuppressWarnings("unused") public int getLimitClass1() { return limitClass1; }
+    @SuppressWarnings("unused")
+    public int getLimitClass1() {
+        return limitClass1;
+    }
 
-    @SuppressWarnings("unused") public void setLimitClass1(final int limitClass1) { this.limitClass1 = limitClass1; }
+    @SuppressWarnings("unused")
+    public void setLimitClass1(final int limitClass1) {
+        this.limitClass1 = limitClass1;
+    }
 
-    @SuppressWarnings("unused") public int getLimitClass2() { return limitClass2; }
+    @SuppressWarnings("unused")
+    public int getLimitClass2() {
+        return limitClass2;
+    }
 
-    @SuppressWarnings("unused") public void setLimitClass2(final int limitClass2) { this.limitClass2 = limitClass2; }
+    @SuppressWarnings("unused")
+    public void setLimitClass2(final int limitClass2) {
+        this.limitClass2 = limitClass2;
+    }
 
-    @SuppressWarnings("unused") public int getLimitClass3() { return limitClass3; }
+    @SuppressWarnings("unused")
+    public int getLimitClass3() {
+        return limitClass3;
+    }
 
-    @SuppressWarnings("unused") public void setLimitClass3(final int limitClass3) { this.limitClass3 = limitClass3; }
+    @SuppressWarnings("unused")
+    public void setLimitClass3(final int limitClass3) {
+        this.limitClass3 = limitClass3;
+    }
 
-    @SuppressWarnings("unused") public int getLimitClass4() { return limitClass4; }
+    @SuppressWarnings("unused")
+    public int getLimitClass4() {
+        return limitClass4;
+    }
 
-    @SuppressWarnings("unused") public void setLimitClass4(final int limitClass4) { this.limitClass4 = limitClass4; }
+    @SuppressWarnings("unused")
+    public void setLimitClass4(final int limitClass4) {
+        this.limitClass4 = limitClass4;
+    }
 
-    @SuppressWarnings("unused") public int getLimitClass5() { return limitClass5; }
+    @SuppressWarnings("unused")
+    public int getLimitClass5() {
+        return limitClass5;
+    }
 
-    @SuppressWarnings("unused") public void setLimitClass5(final int limitClass5) { this.limitClass5 = limitClass5; }
+    @SuppressWarnings("unused")
+    public void setLimitClass5(final int limitClass5) {
+        this.limitClass5 = limitClass5;
+    }
 
-    @SuppressWarnings("unused") public int getLimitClass6a() { return limitClass6a; }
+    @SuppressWarnings("unused")
+    public int getLimitClass6a() {
+        return limitClass6a;
+    }
 
-    @SuppressWarnings("unused") public void setLimitClass6a(final int limitClass6a) {
+    @SuppressWarnings("unused")
+    public void setLimitClass6a(final int limitClass6a) {
         this.limitClass6a = limitClass6a;
     }
 
-    @SuppressWarnings("unused") public int getLimitClass6b() { return limitClass6b; }
+    @SuppressWarnings("unused")
+    public int getLimitClass6b() {
+        return limitClass6b;
+    }
 
-    @SuppressWarnings("unused") public void setLimitClass6b(final int limitClass6b) {
+    @SuppressWarnings("unused")
+    public void setLimitClass6b(final int limitClass6b) {
         this.limitClass6b = limitClass6b;
     }
 
-    @Override public ActiveFadLimits apply(FishState fishState) {
+    @Override
+    public ActiveFadLimits apply(FishState fishState) {
         final ImmutableIntArray limits = ImmutableIntArray.of(
             limitClass1,
             limitClass2,

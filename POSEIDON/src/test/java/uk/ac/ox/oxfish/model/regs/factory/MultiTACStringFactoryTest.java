@@ -52,12 +52,12 @@ public class MultiTACStringFactoryTest {
         Fisher fisher = state.getFishers().get(0);
         MultiQuotaRegulation regs = (MultiQuotaRegulation) fisher.getRegulation();
         assertTrue(Double.isInfinite(regs.getQuotaRemaining(0)));
-        assertEquals(regs.getQuotaRemaining(1),123d,.0001);
+        assertEquals(regs.getQuotaRemaining(1), 123d, .0001);
 
 
+    }
 
-
-    }    @Test
+    @Test
     public void emptyRule() throws Exception {
 
 
@@ -74,10 +74,8 @@ public class MultiTACStringFactoryTest {
         state.start();
         Fisher fisher = state.getFishers().get(0);
         MultiQuotaRegulation regs = (MultiQuotaRegulation) fisher.getRegulation();
-        assertEquals(regs.getQuotaRemaining(0),1d,.0001);
-        assertEquals(regs.getQuotaRemaining(1),1d,.0001);
-
-
+        assertEquals(regs.getQuotaRemaining(0), 1d, .0001);
+        assertEquals(regs.getQuotaRemaining(1), 1d, .0001);
 
 
     }

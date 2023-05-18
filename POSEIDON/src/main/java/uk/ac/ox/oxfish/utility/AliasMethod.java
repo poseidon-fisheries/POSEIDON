@@ -19,11 +19,12 @@ package uk.ac.ox.oxfish.utility;
  * -- NP 2019-09-18.
  */
 
+import ec.util.MersenneTwisterFast;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-import ec.util.MersenneTwisterFast;
 
 public final class AliasMethod {
     /* The random number generator used to sample from the distribution. */
@@ -102,8 +103,10 @@ public final class AliasMethod {
             /* Decrease the probability of the larger one by the appropriate
              * amount.
              */
-            probabilities.set(more,
-                (probabilities.get(more) + probabilities.get(less)) - average);
+            probabilities.set(
+                more,
+                (probabilities.get(more) + probabilities.get(less)) - average
+            );
 
             /* If the new probability is less than the average, add it into the
              * small list; otherwise add it to the large list.

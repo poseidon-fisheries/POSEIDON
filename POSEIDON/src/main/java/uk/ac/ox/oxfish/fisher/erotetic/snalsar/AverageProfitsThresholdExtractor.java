@@ -33,7 +33,7 @@ import java.util.HashMap;
  * Extracts the fishery average profits from last trip
  * Created by carrknight on 6/7/16.
  */
-public class AverageProfitsThresholdExtractor implements ProfitThresholdExtractor<SeaTile>{
+public class AverageProfitsThresholdExtractor implements ProfitThresholdExtractor<SeaTile> {
 
 
     final private double scale;
@@ -48,10 +48,13 @@ public class AverageProfitsThresholdExtractor implements ProfitThresholdExtracto
 
     @Override
     public HashMap<SeaTile, Double> extractFeature(
-            Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
-        double averageProfits = scale  * model.getLatestDailyObservation(
-                FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
-        return new FixedMap<SeaTile, Double>(averageProfits,
-                                             toRepresent) ;
+        Collection<SeaTile> toRepresent, FishState model, Fisher fisher
+    ) {
+        double averageProfits = scale * model.getLatestDailyObservation(
+            FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
+        return new FixedMap<SeaTile, Double>(
+            averageProfits,
+            toRepresent
+        );
     }
 }

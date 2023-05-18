@@ -34,7 +34,6 @@ import uk.ac.ox.oxfish.model.FishState;
 public class ReplicatorDrivenDestinationStrategy implements DestinationStrategy {
 
 
-
     private final int strategyIndex;
 
 
@@ -42,7 +41,8 @@ public class ReplicatorDrivenDestinationStrategy implements DestinationStrategy 
 
 
     public ReplicatorDrivenDestinationStrategy(
-            int strategyIndex, DestinationStrategy delegate) {
+        int strategyIndex, DestinationStrategy delegate
+    ) {
         this.strategyIndex = strategyIndex;
         this.delegate = delegate;
     }
@@ -50,7 +50,7 @@ public class ReplicatorDrivenDestinationStrategy implements DestinationStrategy 
 
     @Override
     public void start(FishState model, Fisher fisher) {
-        delegate.start(model,fisher);
+        delegate.start(model, fisher);
     }
 
     @Override
@@ -68,8 +68,9 @@ public class ReplicatorDrivenDestinationStrategy implements DestinationStrategy 
      */
     @Override
     public SeaTile chooseDestination(
-            Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
-        return delegate.chooseDestination(fisher,random,model,currentAction);
+        Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction
+    ) {
+        return delegate.chooseDestination(fisher, random, model, currentAction);
     }
 
     /**

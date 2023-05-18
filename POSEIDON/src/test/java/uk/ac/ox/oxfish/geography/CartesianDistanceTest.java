@@ -48,10 +48,6 @@ public class CartesianDistanceTest {
 
     }
 
-    private <T> void checkSecondValueOfEntries(Collection<Entry<T, Double>> pairs, double... values) {
-        assertArrayEquals(values, pairs.stream().mapToDouble(Entry::getValue).toArray(), 0.01);
-    }
-
     @Test
     public void testDistancesAlongRoute() {
 
@@ -66,11 +62,15 @@ public class CartesianDistanceTest {
         final Deque<SeaTile> diagonalRoute = pathfinder.getRoute(map, startTile, map.getSeaTile(2, 2));
         checkSecondValueOfEntries(distance.cumulativeDistanceAlongRouteInKm(diagonalRoute, map), 0.0, 1.41, 2.82);
 
-        for (SeaTile endTile : map.getAllSeaTilesAsList()) {
+        for (final SeaTile endTile : map.getAllSeaTilesAsList()) {
             // First value of cumulative distance should always be zero
             final Deque<SeaTile> route = pathfinder.getRoute(map, startTile, endTile);
             final List<Entry<SeaTile, Double>> cumDist = distance.cumulativeDistanceAlongRouteInKm(route, map);
             assertEquals(0.0, get(cumDist, 0).getValue(), 0.01);
         }
+    }
+
+    private <T> void checkSecondValueOfEntries(final Collection<Entry<T, Double>> pairs, final double... values) {
+        assertArrayEquals(values, pairs.stream().mapToDouble(Entry::getValue).toArray(), 0.01);
     }
 }

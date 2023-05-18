@@ -28,25 +28,25 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
  * species live together
  * Created by carrknight on 10/8/15.
  */
-public class WellMixedBiologyInitializer extends TwoSpeciesBoxInitializer
-{
+public class WellMixedBiologyInitializer extends TwoSpeciesBoxInitializer {
 
     public WellMixedBiologyInitializer(
-            DoubleParameter firstSpeciesCapacity,
-            DoubleParameter ratioFirstToSecondSpecies, double percentageLimitOnDailyMovement,
-            double differentialPercentageToMove,
-            LogisticGrowerInitializer grower) {
-        super(-1,-1,
-              Integer.MAX_VALUE,
-              Integer.MAX_VALUE,
-              true,
-              firstSpeciesCapacity,
-              ratioFirstToSecondSpecies,
-              percentageLimitOnDailyMovement,
-              differentialPercentageToMove,
-              grower);
+        DoubleParameter firstSpeciesCapacity,
+        DoubleParameter ratioFirstToSecondSpecies, double percentageLimitOnDailyMovement,
+        double differentialPercentageToMove,
+        LogisticGrowerInitializer grower
+    ) {
+        super(-1, -1,
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE,
+            true,
+            firstSpeciesCapacity,
+            ratioFirstToSecondSpecies,
+            percentageLimitOnDailyMovement,
+            differentialPercentageToMove,
+            grower
+        );
     }
-
 
 
 }

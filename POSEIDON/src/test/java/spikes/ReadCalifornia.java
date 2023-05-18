@@ -25,8 +25,7 @@ import org.junit.Test;
 /**
  * Created by carrknight on 2/22/16.
  */
-public class ReadCalifornia
-{
+public class ReadCalifornia {
 
     private static final int GRID_WIDTH = 50;
 

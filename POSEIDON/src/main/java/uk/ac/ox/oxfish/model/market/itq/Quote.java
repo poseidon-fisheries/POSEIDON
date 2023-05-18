@@ -27,21 +27,17 @@ import uk.ac.ox.oxfish.fisher.Fisher;
  * The promise to buy or sell at a specified price
  * Created by carrknight on 8/20/15.
  */
-public class Quote implements Comparable<Quote>{
+public class Quote implements Comparable<Quote> {
 
-
-
-    final private double price;
-
-    final private Fisher trader;
 
     private static int counter = 0;
-
+    final private double price;
+    final private Fisher trader;
     final private int splitter;
 
 
     public Quote(double price, Fisher trader) {
-        Preconditions.checkArgument(price >=0);
+        Preconditions.checkArgument(price >= 0);
         this.price = price;
         this.trader = trader;
         splitter = counter++;
@@ -55,7 +51,7 @@ public class Quote implements Comparable<Quote>{
     public int compareTo(Quote o) {
         int compare = Double.compare(this.price, o.price);
         return compare == 0 ?
-                Integer.compare(this.splitter, o.splitter) : compare;
+            Integer.compare(this.splitter, o.splitter) : compare;
     }
 
     public double getPrice() {

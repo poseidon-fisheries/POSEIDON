@@ -105,6 +105,14 @@ public class AbundanceInitializer implements BiologyInitializer {
         );
     }
 
+    private static double[][] binsToAbundanceMatrix(final List<? extends Bin> bins) {
+        final int numSubdivisions = 2; // MALE and FEMALE
+        final double[][] abundance = new double[numSubdivisions][bins.size()];
+        setAll(abundance[MALE], i -> bins.get(i).numberOfMales);
+        setAll(abundance[FEMALE], i -> bins.get(i).numberOfFemales);
+        return abundance;
+    }
+
     @Override
     public GlobalBiology generateGlobal(
         final MersenneTwisterFast rng,
@@ -137,14 +145,6 @@ public class AbundanceInitializer implements BiologyInitializer {
             bins.stream().mapToDouble(getMaleValue).toArray(),
             bins.stream().mapToDouble(getFemaleValue).toArray()
         );
-    }
-
-    private static double[][] binsToAbundanceMatrix(final List<? extends Bin> bins) {
-        final int numSubdivisions = 2; // MALE and FEMALE
-        final double[][] abundance = new double[numSubdivisions][bins.size()];
-        setAll(abundance[MALE], i -> bins.get(i).numberOfMales);
-        setAll(abundance[FEMALE], i -> bins.get(i).numberOfFemales);
-        return abundance;
     }
 
     static class Bin {

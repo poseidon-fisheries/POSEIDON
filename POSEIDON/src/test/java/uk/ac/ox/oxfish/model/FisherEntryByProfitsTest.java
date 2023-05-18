@@ -33,27 +33,27 @@ public class FisherEntryByProfitsTest {
     public void directTest() {
 
         FisherEntryByProfits profits = new FisherEntryByProfits("a", "b", "c",
-                                                                100, 100, 0);
+            100, 100, 0
+        );
 
         //10% returns
         int fishers = profits.newEntrants(100, 1000);
         //should be 10 fishers
-        assertEquals(fishers,10);
-
+        assertEquals(fishers, 10);
 
 
         //0.1% returns: rounded away, no fishers
         fishers = profits.newEntrants(100, 1000000);
-        assertEquals(fishers,0);
+        assertEquals(fishers, 0);
 
         //negative returns, no fishers
         fishers = profits.newEntrants(-100, 1000000);
-        assertEquals(fishers,0);
+        assertEquals(fishers, 0);
 
 
         //NaN returns, no fishers
         fishers = profits.newEntrants(Double.NaN, 1000000);
-        assertEquals(fishers,0);
+        assertEquals(fishers, 0);
 
 
     }
@@ -63,31 +63,31 @@ public class FisherEntryByProfitsTest {
     public void minProfits() {
 
         FisherEntryByProfits profits = new FisherEntryByProfits("a", "b", "c",
-                                                                100, 100,
-                                                                1000);
+            100, 100,
+            1000
+        );
 
         //10% returns
         int fishers = profits.newEntrants(100, 1000);
         //There should be no new entrants because now you aren't even covering the profits you should cover
-        assertEquals(fishers,0);
-
+        assertEquals(fishers, 0);
 
 
     }
 
 
-
     @Test
     public void testReadingComprehension() {
         FisherEntryByProfits profits = new FisherEntryByProfits("a", "b", "c", 100, 100,
-                                                                0);
+            0
+        );
 
-        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
+        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getLatestYearlyObservation("a")).thenReturn(100d);
         when(model.getLatestYearlyObservation("b")).thenReturn(1000d);
 
         profits.step(model);
-        verify(model,times(10)).createFisher("c");
+        verify(model, times(10)).createFisher("c");
 
     }
 
@@ -96,15 +96,16 @@ public class FisherEntryByProfitsTest {
     public void pausedMeansNoNewFishers() {
 
         FisherEntryByProfits profits = new FisherEntryByProfits("a", "b", "c", 100, 100,
-                0);
+            0
+        );
 
-        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
+        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getLatestYearlyObservation("a")).thenReturn(100d);
         when(model.getLatestYearlyObservation("b")).thenReturn(1000d);
 
         profits.setEntryPaused(true);
         profits.step(model);
-        verify(model,times(0)).createFisher("c");
+        verify(model, times(0)).createFisher("c");
 
     }
 

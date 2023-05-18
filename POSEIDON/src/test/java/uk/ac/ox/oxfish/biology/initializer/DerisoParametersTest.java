@@ -34,21 +34,24 @@ import static org.junit.Assert.assertEquals;
 public class DerisoParametersTest {
 
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(final String[] args) throws FileNotFoundException {
 
-        FishYAML yaml = new FishYAML();
-        DerisoParameters derisoParameters = yaml.loadAs(
-                new FileReader(
-                        Paths.get("inputs", "california",
-                                  "biology", "Yelloweye Rockfish", "deriso.yaml")
-                                .toFile()
-                ),
-                DerisoParameters.class
+        final FishYAML yaml = new FishYAML();
+        final DerisoParameters derisoParameters = yaml.loadAs(
+            new FileReader(
+                Paths.get("inputs", "california",
+                        "biology", "Yelloweye Rockfish", "deriso.yaml"
+                    )
+                    .toFile()
+            ),
+            DerisoParameters.class
         );
 
-        assertEquals(derisoParameters.getHistoricalYearlySurvival().get(0),
-                     0.938356073678119,
-                     .0001);
+        assertEquals(
+            derisoParameters.getHistoricalYearlySurvival().get(0),
+            0.938356073678119,
+            .0001
+        );
 
     }
 

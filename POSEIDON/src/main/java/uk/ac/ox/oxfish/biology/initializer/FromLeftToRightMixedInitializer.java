@@ -43,25 +43,24 @@ public class FromLeftToRightMixedInitializer extends AbstractBiologyInitializer 
     final private double maximumBiomass;
 
 
-
-
     private String firstSpeciesName = "Species 0";
 
 
     private String secondSpeciesName = "Species 1";
 
 
-
     public FromLeftToRightMixedInitializer(
-            double maximumBiomass,
-            double proportionSecondSpeciesToFirst) {
+        double maximumBiomass,
+        double proportionSecondSpeciesToFirst
+    ) {
         this.proportionSecondSpeciesToFirst = proportionSecondSpeciesToFirst;
         this.maximumBiomass = maximumBiomass;
     }
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -70,18 +69,21 @@ public class FromLeftToRightMixedInitializer extends AbstractBiologyInitializer 
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
+        GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
+        int mapWidthInCells, NauticalMap map
+    ) {
         if (seaTile.isLand())
             return new EmptyLocalBiology();
         else {
-            double correctBiomass = maximumBiomass*
-                    Math.pow((1-seaTile.getGridX()/(double)mapWidthInCells)
-                            ,2);
+            double correctBiomass = maximumBiomass *
+                Math.pow((1 - seaTile.getGridX() / (double) mapWidthInCells)
+                    , 2);
 
-            return new ConstantHeterogeneousLocalBiology(correctBiomass,
-                                                         correctBiomass*
-                                                                 proportionSecondSpeciesToFirst);
+            return new ConstantHeterogeneousLocalBiology(
+                correctBiomass,
+                correctBiomass *
+                    proportionSecondSpeciesToFirst
+            );
         }
     }
 
@@ -97,10 +99,11 @@ public class FromLeftToRightMixedInitializer extends AbstractBiologyInitializer 
      */
     @Override
     public void processMap(
-            GlobalBiology biology,
-            NauticalMap map,
-            MersenneTwisterFast random,
-            FishState model) {
+        GlobalBiology biology,
+        NauticalMap map,
+        MersenneTwisterFast random,
+        FishState model
+    ) {
 
     }
 
@@ -112,8 +115,8 @@ public class FromLeftToRightMixedInitializer extends AbstractBiologyInitializer 
     @Override
     public String[] getSpeciesNames() {
         return new String[]{
-                firstSpeciesName,
-                secondSpeciesName};
+            firstSpeciesName,
+            secondSpeciesName};
     }
 
 

@@ -33,14 +33,11 @@ public class UCB1BanditAlgorithm implements BanditAlgorithm {
     private final double maxReward;
 
     private final double minReward;
-
-
+    private final BanditAverage averages;
     private int numberOfObservations = 0;
 
-    private final BanditAverage averages;
 
-
-    public UCB1BanditAlgorithm(double minReward, double maxReward , BanditAverage average) {
+    public UCB1BanditAlgorithm(double minReward, double maxReward, BanditAverage average) {
         this.maxReward = maxReward;
         this.minReward = minReward;
         this.averages = average;
@@ -50,25 +47,22 @@ public class UCB1BanditAlgorithm implements BanditAlgorithm {
     public int chooseArm(MersenneTwisterFast random) {
 
         //if there is an option without a single played game, play that first
-        for(int i=0; i<averages.getNumberOfArms(); i++)
-            if(averages.getNumberOfObservations(i) == 0)
+        for (int i = 0; i < averages.getNumberOfArms(); i++)
+            if (averages.getNumberOfObservations(i) == 0)
                 return i;
 
-        assert  numberOfObservations >= averages.getNumberOfArms();
+        assert numberOfObservations >= averages.getNumberOfArms();
         //now pick the one with the highest confidence bound
         double max = upperConfidenceBound(0);
         ArrayList<Integer> maxIndices = new ArrayList<>();
         maxIndices.add(0);
-        for(int i=1; i<averages.getNumberOfArms(); i++)
-        {
+        for (int i = 1; i < averages.getNumberOfArms(); i++) {
             double average = upperConfidenceBound(i);
-            if(average > max)
-            {
+            if (average > max) {
                 max = average;
                 maxIndices = new ArrayList<>();
                 maxIndices.add(i);
-            }
-            else if(average ==max)
+            } else if (average == max)
                 maxIndices.add(i);
         }
         assert maxIndices.size() > 0;
@@ -79,16 +73,16 @@ public class UCB1BanditAlgorithm implements BanditAlgorithm {
 
     private double upperConfidenceBound(final int arm) {
         return averages.getAverage(arm) +
-                Math.sqrt(2*Math.log(numberOfObservations)/averages.getNumberOfObservations(arm));
+            Math.sqrt(2 * Math.log(numberOfObservations) / averages.getNumberOfObservations(arm));
     }
 
     @Override
     public void observeReward(double reward, int armPlayed) {
 
         //rescale
-        reward = Math.min(Math.max(reward,minReward),maxReward);
-        reward = (reward-minReward)/(maxReward-minReward);
-        averages.observeReward(reward,armPlayed);
+        reward = Math.min(Math.max(reward, minReward), maxReward);
+        reward = (reward - minReward) / (maxReward - minReward);
+        averages.observeReward(reward, armPlayed);
         numberOfObservations++;
     }
 

@@ -44,12 +44,12 @@ public class FloridaLogitReturnFactoryTest {
         //scaled $/kg
         FloridaLogitReturnFactory handlinerFishingStrategy = new FloridaLogitReturnFactory();
         handlinerFishingStrategy.setIntercept(new FixedDoubleParameter(-3.47701));
-        handlinerFishingStrategy.setPriceRedGrouper(new FixedDoubleParameter(0.92395 ));
+        handlinerFishingStrategy.setPriceRedGrouper(new FixedDoubleParameter(0.92395));
         handlinerFishingStrategy.setPriceGagGrouper(new FixedDoubleParameter(-0.65122));
         handlinerFishingStrategy.setRatioCatchToFishHold(new FixedDoubleParameter(4.37828));
         handlinerFishingStrategy.setWeekendDummy(new FixedDoubleParameter(-0.24437));
 
-        FishState state = mock(FishState.class,RETURNS_DEEP_STUBS);
+        FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
         Species gag = mock(Species.class);
         when((state.getBiology().getSpecie("GagGrouper"))).thenReturn(gag);
         Species red = mock(Species.class);
@@ -58,25 +58,24 @@ public class FloridaLogitReturnFactoryTest {
         LogitReturnStrategy logit = (LogitReturnStrategy) ((MaximumDaysDecorator) strategy.accessDecorated()).accessDecorated();
 
 
-
         SeaTile tile = mock(SeaTile.class);
         Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
 
-        when(fisher.getHomePort().getMarginalPrice(gag,fisher)).thenReturn(10d);
-        when(fisher.getHomePort().getMarginalPrice(red,fisher)).thenReturn(3d);
+        when(fisher.getHomePort().getMarginalPrice(gag, fisher)).thenReturn(10d);
+        when(fisher.getHomePort().getMarginalPrice(red, fisher)).thenReturn(3d);
         when(fisher.getTotalWeightOfCatchInHold()).thenReturn(100d);
         when(fisher.getMaximumHold()).thenReturn(200d);
 
 
         double probability = logit.getShouldIReturnClassifier().getProbability(
-                fisher,
-                30 * 24, //not a weekend!
-                state,
-                tile
+            fisher,
+            30 * 24, //not a weekend!
+            state,
+            tile
         );
         System.out.println(probability);
         //grabbed from wolfram alpha
-        assertEquals(0.006507830733273149,probability,.001);
+        assertEquals(0.006507830733273149, probability, .001);
 
 
     }

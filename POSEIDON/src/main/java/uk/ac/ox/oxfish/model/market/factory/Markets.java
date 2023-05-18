@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.model.market.factory;
 
 import uk.ac.ox.oxfish.model.market.Market;
-import uk.ac.ox.oxfish.model.market.WeightLimitMarket;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 

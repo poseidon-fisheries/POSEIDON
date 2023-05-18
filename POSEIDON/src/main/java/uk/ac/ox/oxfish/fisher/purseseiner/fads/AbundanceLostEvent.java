@@ -19,9 +19,10 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Map;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.ImmutableAbundance;
+
+import java.util.Map;
 
 public class AbundanceLostEvent {
 

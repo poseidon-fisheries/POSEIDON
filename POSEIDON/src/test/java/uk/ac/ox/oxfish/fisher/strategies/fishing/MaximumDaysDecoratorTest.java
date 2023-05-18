@@ -36,35 +36,37 @@ public class MaximumDaysDecoratorTest {
 
 
     @Test
-    public void maximumSteps() throws Exception
-    {
-        MaximumDaysDecorator steps =  new MaximumDaysDecorator(100);
+    public void maximumSteps() throws Exception {
+        MaximumDaysDecorator steps = new MaximumDaysDecorator(100);
 
         //fish as long as it is BOTH not full and not being out for too long
         Fisher fisher = mock(Fisher.class);
         when(fisher.getMaximumHold()).thenReturn(100d);
         when(fisher.getTotalWeightOfCatchInHold()).thenReturn(50d);
 
-        when(fisher.getHoursAtSea()).thenReturn(50*24d);
+        when(fisher.getHoursAtSea()).thenReturn(50 * 24d);
 
         //both are true
         assertTrue(steps.shouldFish(fisher,
-                                    new MersenneTwisterFast(), mock(FishState.class),
-                                    mock(TripRecord.class)));
+            new MersenneTwisterFast(), mock(FishState.class),
+            mock(TripRecord.class)
+        ));
 
-        when(fisher.getHoursAtSea()).thenReturn(50*24d);
+        when(fisher.getHoursAtSea()).thenReturn(50 * 24d);
         when(fisher.getTotalWeightOfCatchInHold()).thenReturn(100d);
         //full, will be false
         assertFalse(steps.shouldFish(fisher,
-                                     new MersenneTwisterFast(), mock(FishState.class),
-                                     mock(TripRecord.class)));
+            new MersenneTwisterFast(), mock(FishState.class),
+            mock(TripRecord.class)
+        ));
 
-        when(fisher.getHoursAtSea()).thenReturn(101*24d);
+        when(fisher.getHoursAtSea()).thenReturn(101 * 24d);
         when(fisher.getTotalWeightOfCatchInHold()).thenReturn(50d);
         //too late, will be false
         assertFalse(steps.shouldFish(fisher,
-                                     new MersenneTwisterFast(), mock(FishState.class),
-                                     mock(TripRecord.class)));
+            new MersenneTwisterFast(), mock(FishState.class),
+            mock(TripRecord.class)
+        ));
 
 
     }

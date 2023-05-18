@@ -28,8 +28,7 @@ import java.util.Arrays;
 /**
  * Created by carrknight on 6/23/17.
  */
-public class AlwaysDiscardTheseSpeciesFactory implements AlgorithmFactory<AlwaysDiscardTheseSpecies>{
-
+public class AlwaysDiscardTheseSpeciesFactory implements AlgorithmFactory<AlwaysDiscardTheseSpecies> {
 
 
     private String indices = "";
@@ -44,7 +43,7 @@ public class AlwaysDiscardTheseSpeciesFactory implements AlgorithmFactory<Always
     @Override
     public AlwaysDiscardTheseSpecies apply(FishState state) {
         return new AlwaysDiscardTheseSpecies(Arrays.stream(indices.split(",")).
-                mapToInt(Integer::parseInt).toArray());
+            mapToInt(Integer::parseInt).toArray());
     }
 
     /**

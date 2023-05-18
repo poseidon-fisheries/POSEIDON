@@ -30,8 +30,10 @@ public class FixedOptimizationParameter implements OptimizationParameter {
 
     private final String address;
 
-    public FixedOptimizationParameter(double realValue,
-                                      String address) {
+    public FixedOptimizationParameter(
+        double realValue,
+        String address
+    ) {
         this.realValue = realValue;
         this.address = address;
     }
@@ -48,15 +50,18 @@ public class FixedOptimizationParameter implements OptimizationParameter {
 
     /**
      * consume the scenario and add the parameters
-     *  @param scenario the scenario to modify
+     *
+     * @param scenario the scenario to modify
      * @param inputs   the numerical values of the parameters to set
      * @return
      */
     @Override
     public String parametrize(Scenario scenario, double[] inputs) {
-        SimpleOptimizationParameter.quickParametrize(scenario,
-                                                     realValue,
-                                                     address);
+        SimpleOptimizationParameter.quickParametrize(
+            scenario,
+            realValue,
+            address
+        );
         return String.valueOf(realValue);
 
     }

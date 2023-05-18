@@ -34,71 +34,73 @@ import java.util.ArrayList;
 
 /**
  * "An infinite school" of fish. It exists in a radius around a point. Moves towards waypoints.
- *
+ * <p>
  * Created by carrknight on 11/17/16.
  */
 public class InfiniteSchool implements Startable, Steppable {
 
 
-    private int positionX;
-
-    private int positionY;
-
-    /**
-     * the positions this school moves toward
-     */
-    private ArrayList<Pair<Integer,Integer>> waypoints;
-
-    /**
-     * which waypoint we are currently going to
-     */
-    private int currentWaypoint = 0;
-
     /**
      * after how many days we move
      */
     private final int speedInDays;
-
     /**
      * how many cells does it occupy?
      */
     private final double diameterSquared;
-
     /**
      * biomass of the school per cell. This never gets fished out.
      */
     private final double biomassPerCell;
-
-    /**
-     * how many days have we been still at this location?
-     */
-    private int daysWaiting = 0;
-
     /**
      * the species simulated by this school
      */
     private final Species species;
-
+    private int positionX;
+    private int positionY;
+    /**
+     * the positions this school moves toward
+     */
+    private ArrayList<Pair<Integer, Integer>> waypoints;
+    /**
+     * which waypoint we are currently going to
+     */
+    private int currentWaypoint = 0;
+    /**
+     * how many days have we been still at this location?
+     */
+    private int daysWaiting = 0;
+    private Stoppable stoppable;
 
     public InfiniteSchool(
-            int positionX, int positionY, int speedInDays, double diameter, double biomassPerCell,
-            Species species, Pair<Integer, Integer>... waypoints) {
+        int positionX, int positionY, int speedInDays, double diameter, double biomassPerCell,
+        Species species, Pair<Integer, Integer>... waypoints
+    ) {
         this.positionX = positionX;
         this.positionY = positionY;
         this.speedInDays = speedInDays;
-        this.diameterSquared = diameter*diameter;
+        this.diameterSquared = diameter * diameter;
         this.biomassPerCell = biomassPerCell;
         this.species = species;
 
         Preconditions.checkArgument(waypoints.length >= 2);
         this.waypoints = new ArrayList<>(waypoints.length);
-        for(Pair<Integer,Integer> waypoint : waypoints)
+        for (Pair<Integer, Integer> waypoint : waypoints)
             this.waypoints.add(waypoint);
 
         updateWaypoint();
     }
 
-    private Stoppable stoppable;
+    public void updateWaypoint() {
+        Pair<Integer, Integer> waypoint = waypoints.get(currentWaypoint);
+        if (positionX == waypoint.getFirst() && positionY == waypoint.getSecond()) {
+            currentWaypoint++;
+            if (currentWaypoint >= waypoints.size())
+                currentWaypoint = 0;
+        }
+
+
+    }
 
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
@@ -108,7 +110,7 @@ public class InfiniteSchool implements Startable, Steppable {
      */
     @Override
     public void start(FishState model) {
-        Preconditions.checkState(stoppable==null);
+        Preconditions.checkState(stoppable == null);
         this.stoppable = model.scheduleEveryDay(this, StepOrder.BIOLOGY_PHASE);
     }
 
@@ -117,7 +119,7 @@ public class InfiniteSchool implements Startable, Steppable {
      */
     @Override
     public void turnOff() {
-        if(stoppable!=null)
+        if (stoppable != null)
             stoppable.stop();
     }
 
@@ -125,12 +127,11 @@ public class InfiniteSchool implements Startable, Steppable {
     public void step(SimState simState) {
 
         daysWaiting++;
-        if(daysWaiting >= speedInDays)
-        {
-            Pair<Integer,Integer> waypoint = waypoints.get(currentWaypoint);
+        if (daysWaiting >= speedInDays) {
+            Pair<Integer, Integer> waypoint = waypoints.get(currentWaypoint);
 
-            positionX+= Math.signum(waypoint.getFirst()-positionX);
-            positionY+= Math.signum(waypoint.getSecond()-positionY);
+            positionX += Math.signum(waypoint.getFirst() - positionX);
+            positionY += Math.signum(waypoint.getSecond() - positionY);
 
             daysWaiting = 0;
             updateWaypoint();
@@ -138,24 +139,9 @@ public class InfiniteSchool implements Startable, Steppable {
 
     }
 
+    public boolean contains(SeaTile tile) {
 
-    public void updateWaypoint(){
-        Pair<Integer,Integer> waypoint = waypoints.get(currentWaypoint);
-        if(positionX==waypoint.getFirst() && positionY==waypoint.getSecond())
-        {
-            currentWaypoint++;
-            if(currentWaypoint>=waypoints.size())
-                currentWaypoint=0;
-        }
-
-
-    }
-
-
-    public boolean contains(SeaTile tile)
-    {
-
-        return Math.pow(tile.getGridX() - positionX,2) + Math.pow(tile.getGridY() - positionY,2)<= diameterSquared;
+        return Math.pow(tile.getGridX() - positionX, 2) + Math.pow(tile.getGridY() - positionY, 2) <= diameterSquared;
     }
 
     /**

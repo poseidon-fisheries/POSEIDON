@@ -62,13 +62,12 @@ public class YellowBycatchFactoryTest {
         state.start();
         double initialTarget = state.getTotalBiomass(state.getSpecies().get(0));
         double initialBycatch = state.getTotalBiomass(state.getSpecies().get(1));
-        while(state.getYear()<4)
+        while (state.getYear() < 4)
             state.schedule.step(state);
 
-        assertEquals(initialBycatch,state.getTotalBiomass(state.getSpecies().get(1)),1000);
-        assertEquals(initialTarget,state.getTotalBiomass(state.getSpecies().get(0)),1000);
+        assertEquals(initialBycatch, state.getTotalBiomass(state.getSpecies().get(1)), 1000);
+        assertEquals(initialTarget, state.getTotalBiomass(state.getSpecies().get(0)), 1000);
     }
-
 
 
     @Test
@@ -92,29 +91,26 @@ public class YellowBycatchFactoryTest {
         state.start();
         double initialTarget = state.getTotalBiomass(state.getSpecies().get(0));
         double initialBycatch = state.getTotalBiomass(state.getSpecies().get(1));
-        while(state.getYear()<2)
+        while (state.getYear() < 2)
             state.schedule.step(state);
 
         double intermediateTarget = state.getTotalBiomass(state.getSpecies().get(0));
         double intermediateBycatch = state.getTotalBiomass(state.getSpecies().get(1));
-        assertTrue(initialBycatch> intermediateBycatch + FishStateUtilities.EPSILON);
-        assertTrue(initialTarget> intermediateTarget + FishStateUtilities.EPSILON);
+        assertTrue(initialBycatch > intermediateBycatch + FishStateUtilities.EPSILON);
+        assertTrue(initialTarget > intermediateTarget + FishStateUtilities.EPSILON);
 
         //now ban fishing
         FishingSeason regulation = new FishingSeason(true, 0);
-        for(Fisher fisher : state.getFishers()) {
+        for (Fisher fisher : state.getFishers()) {
             fisher.setRegulation(regulation);
         }
-        while(state.getYear()<4)
+        while (state.getYear() < 4)
             state.schedule.step(state);
-        assertTrue(state.getTotalBiomass(state.getSpecies().get(1))> intermediateBycatch + FishStateUtilities.EPSILON);
-        assertTrue(state.getTotalBiomass(state.getSpecies().get(0))> intermediateTarget + FishStateUtilities.EPSILON);
+        assertTrue(state.getTotalBiomass(state.getSpecies().get(1)) > intermediateBycatch + FishStateUtilities.EPSILON);
+        assertTrue(state.getTotalBiomass(state.getSpecies().get(0)) > intermediateTarget + FishStateUtilities.EPSILON);
 
 
     }
-
-
-
 
 
 }

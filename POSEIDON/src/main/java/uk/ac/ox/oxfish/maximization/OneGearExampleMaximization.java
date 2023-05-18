@@ -17,26 +17,24 @@ import java.nio.file.Paths;
 public class OneGearExampleMaximization extends SimpleProblemDouble {
 
 
-
     private String scenarioFile =
-            Paths.get("coe_new.yaml").toString();
+        Paths.get("coe_new.yaml").toString();
 
 
     private String summaryFile =
-            Paths.get(".").toString();
+        Paths.get(".").toString();
 
     private String landingData =
-            Paths.get("landings_10.csv").toString();
+        Paths.get("landings_10.csv").toString();
 
     private long seed = 0;
 
 
     // an input of +10 means this is the catchability
-    private double maxCatchability =  0.002;
+    private double maxCatchability = 0.002;
 
     //an input of -10 means this catchability
-    private double minCatchability =  0.00001;
-
+    private double minCatchability = 0.00001;
 
 
     private int yearsToRun = 9;
@@ -56,14 +54,15 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
             double error = 0;
             for (int i = 0; i < runsPerSetting; i++) {
                 FlexibleScenario scenario = yaml.loadAs(
-                        new FileReader(scenarioPath.toFile()),
-                        FlexibleScenario.class);
+                    new FileReader(scenarioPath.toFile()),
+                    FlexibleScenario.class
+                );
 
-                double catchability = ((x[0]+10)/20)*(maxCatchability-minCatchability);
+                double catchability = ((x[0] + 10) / 20) * (maxCatchability - minCatchability);
 
                 for (FisherDefinition definition : scenario.getFisherDefinitions()) {
                     ((RandomCatchabilityTrawlFactory) definition.getGear()).setMeanCatchabilityFirstSpecies(
-                            new FixedDoubleParameter(catchability)
+                        new FixedDoubleParameter(catchability)
                     );
                 }
 
@@ -77,19 +76,18 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
                 }
                 model.schedule.step(model);
 
-                error+=FishStateUtilities.timeSeriesDistance(
-                        model.getYearlyDataSet().getColumn(
-                                speciesName + " Landings"
-                        ),
-                        Paths.get(landingData), 1
+                error += FishStateUtilities.timeSeriesDistance(
+                    model.getYearlyDataSet().getColumn(
+                        speciesName + " Landings"
+                    ),
+                    Paths.get(landingData), 1
                 );
 
             }
 
             return new double[]{
-                    error/(double)runsPerSetting};
-        }
-        catch (IOException exception){
+                error / (double) runsPerSetting};
+        } catch (IOException exception) {
             throw new RuntimeException("failed to read or deal with files!");
         }
     }

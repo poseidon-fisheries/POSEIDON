@@ -36,34 +36,36 @@ public class ProfitThresholdsExtractors {
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends ProfitThresholdExtractor<SeaTile>>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final Map<String, Supplier<AlgorithmFactory<? extends ProfitThresholdExtractor<SeaTile>>>> CONSTRUCTORS =
+        new LinkedHashMap<>();
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
-            new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES =
+        new LinkedHashMap<>();
 
 
-    static{
+    static {
 
 
-
-        CONSTRUCTORS.put("Fixed Threshold",
-                         FixedProfitThresholdFactory::new);
-        NAMES.put(FixedProfitThresholdFactory.class,
-                  "Fixed Threshold");
-
-
-
-        CONSTRUCTORS.put("Average Profits Threshold",
-                         AverageProfitsThresholdFactory::new);
-        NAMES.put(AverageProfitsThresholdFactory.class,
-                  "Average Profits Threshold");
+        CONSTRUCTORS.put(
+            "Fixed Threshold",
+            FixedProfitThresholdFactory::new
+        );
+        NAMES.put(
+            FixedProfitThresholdFactory.class,
+            "Fixed Threshold"
+        );
 
 
-
-
+        CONSTRUCTORS.put(
+            "Average Profits Threshold",
+            AverageProfitsThresholdFactory::new
+        );
+        NAMES.put(
+            AverageProfitsThresholdFactory.class,
+            "Average Profits Threshold"
+        );
 
 
     }

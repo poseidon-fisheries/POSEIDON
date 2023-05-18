@@ -45,9 +45,9 @@ public class TimeSeriesGasPriceMakerTest {
 
 
         TimeSeriesGasPriceMaker maker = new TimeSeriesGasPriceMaker(
-                Lists.newArrayList(0d,1d,2d,3d,4d),
-                false,
-                IntervalPolicy.EVERY_STEP
+            Lists.newArrayList(0d, 1d, 2d, 3d, 4d),
+            false,
+            IntervalPolicy.EVERY_STEP
         );
 
 
@@ -63,32 +63,31 @@ public class TimeSeriesGasPriceMakerTest {
         state.start();
 
 
-        Port port = state.getPorts().get(0) ;
+        Port port = state.getPorts().get(0);
         //if asked, the initial price is 0
-        assertEquals(maker.supplyInitialPrice(port.getLocation(),port.getName()),0d,.001);
+        assertEquals(maker.supplyInitialPrice(port.getLocation(), port.getName()), 0d, .001);
 
-        maker.start(port,state);
+        maker.start(port, state);
         state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(),1d,.001);
-
-        state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(),2d,.001);
+        assertEquals(port.getGasPricePerLiter(), 1d, .001);
 
         state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(),3d,.001);
+        assertEquals(port.getGasPricePerLiter(), 2d, .001);
 
         state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(),4d,.001);
+        assertEquals(port.getGasPricePerLiter(), 3d, .001);
+
+        state.schedule.step(state);
+        assertEquals(port.getGasPricePerLiter(), 4d, .001);
 
         //and from now on it is stuck at 4
         state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(),4d,.001);
+        assertEquals(port.getGasPricePerLiter(), 4d, .001);
         state.schedule.step(state);
         state.schedule.step(state);
         state.schedule.step(state);
         state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(),4d,.001);
-
+        assertEquals(port.getGasPricePerLiter(), 4d, .001);
 
 
     }
@@ -118,34 +117,32 @@ public class TimeSeriesGasPriceMakerTest {
 
         TimeSeriesGasPriceMaker maker = factory.apply(state);
 
-        Port port = state.getPorts().get(0) ;
+        Port port = state.getPorts().get(0);
         //if asked, the initial price is 0
-        assertEquals(maker.supplyInitialPrice(port.getLocation(),port.getName()),1.677d,.001);
+        assertEquals(maker.supplyInitialPrice(port.getLocation(), port.getName()), 1.677d, .001);
 
-        maker.start(port,state);
+        maker.start(port, state);
 
-        for(int i=0; i<365; i++)
+        for (int i = 0; i < 365; i++)
             state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(),1.561d,.001);
+        assertEquals(port.getGasPricePerLiter(), 1.561d, .001);
 
-        for(int i=0; i<365; i++)
+        for (int i = 0; i < 365; i++)
             state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(),1.878d,.001);
+        assertEquals(port.getGasPricePerLiter(), 1.878d, .001);
 
-        for(int i=0; i<365; i++)
+        for (int i = 0; i < 365; i++)
             state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(),2.166d,.001);
+        assertEquals(port.getGasPricePerLiter(), 2.166d, .001);
 
-        for(int i=0; i<365; i++)
+        for (int i = 0; i < 365; i++)
             state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(),2.517d,.001);
+        assertEquals(port.getGasPricePerLiter(), 2.517d, .001);
 
 
-        for(int i=0; i<365; i++)
+        for (int i = 0; i < 365; i++)
             state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(),2.855d,.001);
-
-
+        assertEquals(port.getGasPricePerLiter(), 2.855d, .001);
 
 
     }

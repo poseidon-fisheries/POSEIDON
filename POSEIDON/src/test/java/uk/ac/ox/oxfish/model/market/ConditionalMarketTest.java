@@ -2,22 +2,17 @@ package uk.ac.ox.oxfish.model.market;
 
 import org.junit.Assert;
 import org.junit.Test;
-import sim.engine.Steppable;
-import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Predicate;
 
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ConditionalMarketTest {
 
@@ -35,16 +30,16 @@ public class ConditionalMarketTest {
         Fisher two = mock(Fisher.class);
 
         ConditionalMarket market =
-                new ConditionalMarket(
-                        defaultMarket,
-                        componentMarket,
-                        new Predicate<Fisher>() {
-                            @Override
-                            public boolean test(Fisher fisher) {
-                                return fisher.equals(two);
-                            }
-                        }
-                );
+            new ConditionalMarket(
+                defaultMarket,
+                componentMarket,
+                new Predicate<Fisher>() {
+                    @Override
+                    public boolean test(Fisher fisher) {
+                        return fisher.equals(two);
+                    }
+                }
+            );
         Species species = mock(Species.class);
 
         market.setSpecies(species);
@@ -53,20 +48,21 @@ public class ConditionalMarketTest {
         Hold hold = mock(Hold.class);
         when(hold.getWeightOfCatchInHold(any())).thenReturn(10d);
         TradeInfo tradeInfo = market.sellFish(hold, mock(Fisher.class), new Anarchy(), mock(FishState.class),
-                species);
+            species
+        );
         Assert.assertEquals(tradeInfo.getMoneyExchanged(), 10, .001);
 
-        tradeInfo = market.sellFish(hold,one, new Anarchy(), mock(FishState.class),
-                species);
+        tradeInfo = market.sellFish(hold, one, new Anarchy(), mock(FishState.class),
+            species
+        );
         Assert.assertEquals(tradeInfo.getMoneyExchanged(), 10, .001);
 
         //but fisher two has access to better market
 
-        tradeInfo = market.sellFish(hold,two, new Anarchy(), mock(FishState.class),
-                species);
+        tradeInfo = market.sellFish(hold, two, new Anarchy(), mock(FishState.class),
+            species
+        );
         Assert.assertEquals(tradeInfo.getMoneyExchanged(), 20, .001);
-
-
 
 
     }

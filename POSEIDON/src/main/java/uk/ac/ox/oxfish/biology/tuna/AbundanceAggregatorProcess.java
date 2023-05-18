@@ -19,9 +19,10 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableList;
-import java.util.Collection;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.Collection;
 
 /**
  * A simple wrapper around {@link AbundanceAggregator} in order to use it in a {@link

@@ -32,14 +32,16 @@ public class GrowthBinByListTest {
 
         //if no length at age provided then the meristic assumes that bins are one year apart
 
-        GrowthBinByList list = new GrowthBinByList(1,new double[]{1,2,3},
-                                                   new double[]{1,2,3});
-        assertEquals(list.getLengthAtAge(1,1),2.0,.0001);
+        GrowthBinByList list = new GrowthBinByList(1, new double[]{1, 2, 3},
+            new double[]{1, 2, 3}
+        );
+        assertEquals(list.getLengthAtAge(1, 1), 2.0, .0001);
 
-        list = new GrowthBinByList(1, new double[]{1,2,3},
-                                   new double[]{1,2,3},
-                                   new double[]{0,10});
-        assertEquals(list.getLengthAtAge(1,1),10.0,.0001);
+        list = new GrowthBinByList(1, new double[]{1, 2, 3},
+            new double[]{1, 2, 3},
+            new double[]{0, 10}
+        );
+        assertEquals(list.getLengthAtAge(1, 1), 10.0, .0001);
 
     }
 }

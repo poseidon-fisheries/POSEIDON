@@ -37,7 +37,7 @@ import java.util.List;
  * Created by carrknight on 4/11/16.
  */
 public class SimpleEroteticDestinationStrategy implements DestinationStrategy,
-        TripListener{
+    TripListener {
 
     private final EroteticChooser<SeaTile> chooser = new EroteticChooser<>();
 
@@ -58,11 +58,12 @@ public class SimpleEroteticDestinationStrategy implements DestinationStrategy,
 
     /**
      * the work is done almost exclusively by the argument passed, which contains all the important parameters
+     *
      * @param thresholder
      */
     public SimpleEroteticDestinationStrategy(
-            EroteticAnswer<SeaTile> thresholder,
-            FavoriteDestinationStrategy delegate
+        EroteticAnswer<SeaTile> thresholder,
+        FavoriteDestinationStrategy delegate
     ) {
         chooser.add(thresholder);
         this.delegate = delegate;
@@ -78,10 +79,10 @@ public class SimpleEroteticDestinationStrategy implements DestinationStrategy,
      */
     @Override
     public SeaTile chooseDestination(
-            Fisher fisher, MersenneTwisterFast random,
-            FishState model, Action currentAction)
-    {
-      return delegate.chooseDestination(fisher, random, model, currentAction);
+        Fisher fisher, MersenneTwisterFast random,
+        FishState model, Action currentAction
+    ) {
+        return delegate.chooseDestination(fisher, random, model, currentAction);
     }
 
     @Override
@@ -89,20 +90,19 @@ public class SimpleEroteticDestinationStrategy implements DestinationStrategy,
         //all choices
         List<SeaTile> options = model.getMap().getAllSeaTilesExcludingLandAsList();
         delegate.setFavoriteSpot(chooser.answer(options,
-                                                this.fisher.getTileRepresentation(),
-                                                model, this.fisher
-                                 )
+                this.fisher.getTileRepresentation(),
+                model, this.fisher
+            )
         );
     }
 
     @Override
-    public void start(FishState model, Fisher fisher)
-    {
+    public void start(FishState model, Fisher fisher) {
 
         this.fisher = fisher;
         this.model = model;
         fisher.addTripListener(this);
-        for(EroteticAnswer<SeaTile> filter : chooser)
+        for (EroteticAnswer<SeaTile> filter : chooser)
             filter.start(model);
     }
 
@@ -110,8 +110,8 @@ public class SimpleEroteticDestinationStrategy implements DestinationStrategy,
     @Override
     public void turnOff(Fisher fisher) {
         this.fisher.removeTripListener(this);
-        for(EroteticAnswer<SeaTile> filter : chooser)
+        for (EroteticAnswer<SeaTile> filter : chooser)
             filter.turnOff();
-        this.fisher =null;
+        this.fisher = null;
     }
 }

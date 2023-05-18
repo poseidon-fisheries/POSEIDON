@@ -55,11 +55,11 @@ public class ProtectedAreaChromosomeFactoryTest {
         state.setScenario(scenario);
         state.start();
 
-        assertFalse(state.getMap().getSeaTile(0,0).isProtected());
-        assertFalse(state.getMap().getSeaTile(1,0).isProtected());
-        assertTrue(state.getMap().getSeaTile(2,0).isProtected());
-        assertFalse(state.getMap().getSeaTile(3,0).isProtected());
-        assertFalse(state.getMap().getSeaTile(0,1).isProtected());
-        assertTrue(state.getMap().getSeaTile(1,1).isProtected());
+        assertFalse(state.getMap().getSeaTile(0, 0).isProtected());
+        assertFalse(state.getMap().getSeaTile(1, 0).isProtected());
+        assertTrue(state.getMap().getSeaTile(2, 0).isProtected());
+        assertFalse(state.getMap().getSeaTile(3, 0).isProtected());
+        assertFalse(state.getMap().getSeaTile(0, 1).isProtected());
+        assertTrue(state.getMap().getSeaTile(1, 1).isProtected());
     }
 }

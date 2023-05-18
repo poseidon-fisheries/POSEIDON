@@ -47,8 +47,27 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public class GravityDestinationStrategyFactory
     implements AlgorithmFactory<GravityDestinationStrategy>, Dummyable {
 
+    private static final FisherValuesFromFileCache<Double> maxTripDurationCache =
+        new FisherValuesFromFileCache<Double>() {
+            protected Map<Integer, Map<String, Double>> readValues(final Path valuesFile) {
+                return recordStream(valuesFile).collect(
+                    groupingBy(
+                        record -> record.getInt("year"),
+                        toMap(
+                            record -> record.getString("ves_no"),
+                            record -> record.getDouble("max_trip_duration_in_hours")
+                        )
+                    ));
+            }
+        };
+    // TODO: This is currently EPO specific, as it excludes tiles from the Atlantic, but should
+    //  be made configurable.
+    private final Predicate<SeaTile> isValidDestination =
+        seaTile -> !(seaTile.getGridX() > 72 && seaTile.getBiology() instanceof EmptyLocalBiology);
     private int targetYear;
     private AttractionFieldsSupplier attractionFieldsSupplier;
+    private InputPath actionWeightsFile;
+    private InputPath maxTripDurationFile;
 
     public GravityDestinationStrategyFactory(
         final int targetYear,
@@ -60,6 +79,9 @@ public class GravityDestinationStrategyFactory
         this.actionWeightsFile = actionWeightsFile;
         this.maxTripDurationFile = maxTripDurationFile;
         this.attractionFieldsSupplier = attractionFieldsSupplier;
+    }
+
+    public GravityDestinationStrategyFactory() {
     }
 
     public ToDoubleFunction<Fisher> loadMaxTripDuration(final Path maxTripDurationFile) {
@@ -83,37 +105,6 @@ public class GravityDestinationStrategyFactory
 
     public int getTargetYear() {
         return targetYear;
-    }
-
-    public AttractionFieldsSupplier getAttractionFieldsSupplier() {
-        return attractionFieldsSupplier;
-    }
-
-    private static final FisherValuesFromFileCache<Double> maxTripDurationCache =
-        new FisherValuesFromFileCache<Double>() {
-            protected Map<Integer, Map<String, Double>> readValues(final Path valuesFile) {
-                return recordStream(valuesFile).collect(
-                    groupingBy(
-                        record -> record.getInt("year"),
-                        toMap(
-                            record -> record.getString("ves_no"),
-                            record -> record.getDouble("max_trip_duration_in_hours")
-                        )
-                    ));
-            }
-        };
-    // TODO: This is currently EPO specific, as it excludes tiles from the Atlantic, but should
-    //  be made configurable.
-    private final Predicate<SeaTile> isValidDestination =
-        seaTile -> !(seaTile.getGridX() > 72 && seaTile.getBiology() instanceof EmptyLocalBiology);
-    private InputPath actionWeightsFile;
-    private InputPath maxTripDurationFile;
-
-    public GravityDestinationStrategyFactory() {
-    }
-
-    public void setAttractionFieldsSupplier(final AttractionFieldsSupplier attractionFieldsSupplier) {
-        this.attractionFieldsSupplier = attractionFieldsSupplier;
     }
 
     public void setTargetYear(final int targetYear) {
@@ -194,6 +185,14 @@ public class GravityDestinationStrategyFactory
         setMaxTripDurationFile(
             dummyDataFolder.path("dummy_boats.csv")
         );
+    }
+
+    public AttractionFieldsSupplier getAttractionFieldsSupplier() {
+        return attractionFieldsSupplier;
+    }
+
+    public void setAttractionFieldsSupplier(final AttractionFieldsSupplier attractionFieldsSupplier) {
+        this.attractionFieldsSupplier = attractionFieldsSupplier;
     }
 
 }

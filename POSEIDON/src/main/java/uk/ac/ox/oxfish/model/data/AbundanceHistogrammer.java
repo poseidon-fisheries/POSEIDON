@@ -15,21 +15,20 @@ public class AbundanceHistogrammer implements OutputPlugin, AdditionalStartable,
     @Override
     public void step(SimState simState) {
         FishState model = (FishState) simState;
-        for (Species species : model.getSpecies())
-        {
+        for (Species species : model.getSpecies()) {
             double[][] totalAbundance = model.getTotalAbundance(species);
             for (int i = 0; i < species.getNumberOfSubdivisions(); i++) {
                 for (int j = 0; j < species.getNumberOfBins(); j++) {
                     builder.append(species.getName()).
-                            append(",").
-                            append(i).
-                            append(",").
-                            append(j).
-                            append(",").
-                            append(totalAbundance[i][j]).
-                            append(",").
-                            append(model.getDay()).
-                            append("\n");
+                        append(",").
+                        append(i).
+                        append(",").
+                        append(j).
+                        append(",").
+                        append(totalAbundance[i][j]).
+                        append(",").
+                        append(model.getDay()).
+                        append("\n");
                 }
 
             }

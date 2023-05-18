@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class MaxHoldSizeRandomAllocationFactory implements AlgorithmFactory<MaxHoldSizeRandomAllocationPolicy> {
 
 
-
     private DoubleParameter maxCumulativeHoldSize = new FixedDoubleParameter(500);
 
 
@@ -61,9 +60,6 @@ public class MaxHoldSizeRandomAllocationFactory implements AlgorithmFactory<MaxH
     public void setMaxCumulativeHoldSize(DoubleParameter maxCumulativeHoldSize) {
         this.maxCumulativeHoldSize = maxCumulativeHoldSize;
     }
-
-
-
 
 
 }

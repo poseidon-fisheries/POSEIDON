@@ -29,21 +29,19 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 
-public class ProtectedAreasOnlyFactoryTest
-{
+public class ProtectedAreasOnlyFactoryTest {
 
 
     @Test
-    public void simpleFactoryTest() throws Exception
-    {
+    public void simpleFactoryTest() throws Exception {
 
         ProtectedAreasOnlyFactory factory = new ProtectedAreasOnlyFactory();
         final ProtectedAreasOnly first = factory.apply(mock(FishState.class));
-        assertTrue(first!=null);
+        assertTrue(first != null);
 
         final ProtectedAreasOnly second = factory.apply(mock(FishState.class));
         //they should be equal on account of being a singleton
-        assertEquals(first,second);
+        assertEquals(first, second);
 
     }
 

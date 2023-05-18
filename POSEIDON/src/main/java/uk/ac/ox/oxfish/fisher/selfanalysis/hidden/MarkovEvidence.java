@@ -34,21 +34,19 @@ public class MarkovEvidence {
     private final double observation;
 
 
-    public MarkovEvidence(SeaTile tile, double observation)
-    {
+    public MarkovEvidence(SeaTile tile, double observation) {
 
-        Preconditions.checkArgument(observation<=1);
-        Preconditions.checkArgument(observation>0);
+        Preconditions.checkArgument(observation <= 1);
+        Preconditions.checkArgument(observation > 0);
         this.tile = tile;
         this.observation = observation;
     }
 
-    public MarkovEvidence(SeaTile tile, double biomassObserved, double totalBiomassAvailable)
-    {
+    public MarkovEvidence(SeaTile tile, double biomassObserved, double totalBiomassAvailable) {
 
 
         this.tile = tile;
-        this.observation = biomassObserved/totalBiomassAvailable;
+        this.observation = biomassObserved / totalBiomassAvailable;
     }
 
     /**

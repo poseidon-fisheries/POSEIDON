@@ -23,7 +23,6 @@ import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer.Bin;
 import uk.ac.ox.oxfish.biology.tuna.BiologyInitializerFactory;
-import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
 import uk.ac.ox.oxfish.biology.tuna.WeightGroups;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -49,7 +48,8 @@ public class AbundanceInitializerFactory
         new CacheByFile<>(AbundanceInitializerFactory::binsPerSpecies);
 
     private InputPath binsFile;
-
+    private Supplier<SpeciesCodes> speciesCodesSupplier;
+    private Map<String, WeightGroups> weightGroupsPerSpecies;
     public AbundanceInitializerFactory(
         final InputPath binsFile,
         final Supplier<SpeciesCodes> speciesCodesSupplier
@@ -58,19 +58,12 @@ public class AbundanceInitializerFactory
         this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
-    private Map<String, WeightGroups> weightGroupsPerSpecies;
-
     /**
      * Empty constructor to allow YAML instantiation.
      */
     @SuppressWarnings("unused")
     public AbundanceInitializerFactory() {
 
-    }
-
-    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
-        return speciesCodesSupplier;
     }
 
     private static Map<String, List<Bin>> binsPerSpecies(final Path binsFilePath) {
@@ -100,16 +93,20 @@ public class AbundanceInitializerFactory
             ));
     }
 
+    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+        return speciesCodesSupplier;
+    }
+
+    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+        this.speciesCodesSupplier = speciesCodesSupplier;
+    }
+
     /**
      * This is named `assign` instead of `set` to avoid confusing the GUI and having it try to build
      * a widget for a map it cannot build one for.
      */
     public void assignWeightGroupsPerSpecies(final Map<String, WeightGroups> weightGroupsPerSpecies) {
         this.weightGroupsPerSpecies = weightGroupsPerSpecies;
-    }
-
-    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")

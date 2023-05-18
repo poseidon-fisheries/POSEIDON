@@ -26,8 +26,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ProportionalMortalityProcessTest
-{
+public class ProportionalMortalityProcessTest {
 
 
     @Test
@@ -36,22 +35,23 @@ public class ProportionalMortalityProcessTest
 
         StructuredAbundance abundance = new StructuredAbundance(
 
-                new double[]{100, 10, 1}
+            new double[]{100, 10, 1}
         );
 
         ProportionalMortalityProcess mortality = new ProportionalMortalityProcess(.1);
 
-        mortality.cull(mock(Meristics.class),
-                       false,
-                       abundance,
-                       365
-                       );
+        mortality.cull(
+            mock(Meristics.class),
+            false,
+            abundance,
+            365
+        );
 
 
         assertArrayEquals(
-                abundance.asMatrix()[0],
-                new double[]{90,9,.9},
-                .001d
+            abundance.asMatrix()[0],
+            new double[]{90, 9, .9},
+            .001d
         );
     }
 
@@ -62,7 +62,7 @@ public class ProportionalMortalityProcessTest
 
         StructuredAbundance abundance = new StructuredAbundance(
 
-                new double[]{100, 10, 1}
+            new double[]{100, 10, 1}
         );
 
         Meristics meristics = mock(Meristics.class);
@@ -72,19 +72,20 @@ public class ProportionalMortalityProcessTest
         NaturalMortalityProcess mortality = new ProportionalMortalityProcess(.5
         );
 
-        for(int i=0; i<365; i++) {
-            mortality.cull(meristics,
-                    false,
-                    abundance,
-                    1
+        for (int i = 0; i < 365; i++) {
+            mortality.cull(
+                meristics,
+                false,
+                abundance,
+                1
             );
         }
 
 
         assertArrayEquals(
-                abundance.asMatrix()[0],
-                new double[]{50,5,.5},
-                .001d
+            abundance.asMatrix()[0],
+            new double[]{50, 5, .5},
+            .001d
         );
     }
 }

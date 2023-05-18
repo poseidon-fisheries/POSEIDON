@@ -33,32 +33,34 @@ public class FromListMeristics implements Meristics {
 
 
     public FromListMeristics(
-            double[] weights, final int subdivisions) {
+        double[] weights, final int subdivisions
+    ) {
         this(weights, new double[weights.length], subdivisions);
     }
 
     public FromListMeristics(
-            double[] weights,
-            double[] lenghts,
-            final int subdivisions) {
+        double[] weights,
+        double[] lenghts,
+        final int subdivisions
+    ) {
         Preconditions.checkArgument(lenghts.length == weights.length, "length mismatch between lenghts and weights");
 
 
-        this.growth = new GrowthBinByList(subdivisions,
-                                          lenghts,
-                                          weights);
+        this.growth = new GrowthBinByList(
+            subdivisions,
+            lenghts,
+            weights
+        );
     }
 
     public int getMaxAge() {
-        return growth.getNumberOfBins()-1;
+        return growth.getNumberOfBins() - 1;
     }
-
-
-
 
 
     /**
      * you can pick as many subdivisions as you want, they will all just spit out the same weight and length
+     *
      * @param subdivision
      * @param bin
      */
@@ -105,6 +107,6 @@ public class FromListMeristics implements Meristics {
      */
     @Override
     public double getLengthAtAge(int ageInYears, int subdivision) {
-        return growth.getLengthAtAge(ageInYears,subdivision);
+        return growth.getLengthAtAge(ageInYears, subdivision);
     }
 }

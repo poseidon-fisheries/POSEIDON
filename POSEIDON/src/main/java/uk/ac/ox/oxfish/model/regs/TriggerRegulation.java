@@ -38,7 +38,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 public class TriggerRegulation implements Regulation, Steppable {
 
 
-
     private final double lowThreshold;
 
     private final double highThreshold;
@@ -53,9 +52,10 @@ public class TriggerRegulation implements Regulation, Steppable {
 
 
     public TriggerRegulation(
-            double lowThreshold, double highThreshold, String indicatorName,
-            Regulation businessAsUsual, Regulation emergency) {
-        Preconditions.checkArgument(lowThreshold<=highThreshold);
+        double lowThreshold, double highThreshold, String indicatorName,
+        Regulation businessAsUsual, Regulation emergency
+    ) {
+        Preconditions.checkArgument(lowThreshold <= highThreshold);
         this.lowThreshold = lowThreshold;
         this.highThreshold = highThreshold;
         this.indicatorName = indicatorName;
@@ -67,6 +67,7 @@ public class TriggerRegulation implements Regulation, Steppable {
 
     /**
      * checks each year whether to trigger the emergency regulation or whether to return to business as usual
+     *
      * @param simState
      */
     @Override
@@ -74,30 +75,27 @@ public class TriggerRegulation implements Regulation, Steppable {
         FishState model = (FishState) simState;
         double indicator = model.getLatestYearlyObservation(indicatorName);
         //if there is no observation, then NaN
-        if(!Double.isFinite(indicator))
+        if (!Double.isFinite(indicator))
             return;
 
-        if(currentRegulation==emergency)
-        {
-            if(indicator>highThreshold)
-                currentRegulation=businessAsUsual;
-        }
-        else
-        {
-            if(indicator<lowThreshold)
-                currentRegulation=emergency;
+        if (currentRegulation == emergency) {
+            if (indicator > highThreshold)
+                currentRegulation = businessAsUsual;
+        } else {
+            if (indicator < lowThreshold)
+                currentRegulation = emergency;
         }
     }
 
     @Override
     public void start(FishState model, Fisher fisher) {
-        businessAsUsual.start(model,fisher);
-        emergency.start(model,fisher);
+        businessAsUsual.start(model, fisher);
+        emergency.start(model, fisher);
 
 
         model.scheduleEveryYear(
-                 this,
-                StepOrder.AFTER_DATA
+            this,
+            StepOrder.AFTER_DATA
         );
     }
 
@@ -109,8 +107,9 @@ public class TriggerRegulation implements Regulation, Steppable {
 
     /**
      * can the agent fish at this location?
+     *
      * @param agent the agent that wants to fish
-     * @param tile the tile the fisher is trying to fish on
+     * @param tile  the tile the fisher is trying to fish on
      * @param model a link to the model
      * @return true if the fisher can fish
      */
@@ -121,9 +120,10 @@ public class TriggerRegulation implements Regulation, Steppable {
 
     /**
      * how much of this species biomass is sellable. Zero means it is unsellable
-     * @param agent the fisher selling its catch
+     *
+     * @param agent   the fisher selling its catch
      * @param species the species we are being asked about
-     * @param model a link to the model
+     * @param model   a link to the model
      * @return a positive biomass if it sellable. Zero if you need to throw everything away
      */
     @Override
@@ -133,8 +133,9 @@ public class TriggerRegulation implements Regulation, Steppable {
 
     /**
      * Can this fisher be at sea?
+     *
      * @param fisher the  fisher
-     * @param model the model
+     * @param model  the model
      * @return true if it can be out. When it's false the fisher can't leave port and ought to go back to port if he is
      * at sea
      */
@@ -145,32 +146,49 @@ public class TriggerRegulation implements Regulation, Steppable {
 
     /**
      * tell the regulation object this much has been caught
-     * @param where where the fishing occurred
-     * @param who who did the fishing
-     * @param fishCaught catch object
+     *
+     * @param where             where the fishing occurred
+     * @param who               who did the fishing
+     * @param fishCaught        catch object
      * @param fishRetained
      * @param hoursSpentFishing how many hours were spent fishing
      */
     @Override
     public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model, int timeStep) {
+        SeaTile where,
+        Fisher who,
+        Catch fishCaught,
+        Catch fishRetained,
+        int hoursSpentFishing,
+        FishState model,
+        int timeStep
+    ) {
         currentRegulation.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
     }
 
     /**
      * tell the regulation object this much of this species has been sold
+     *
      * @param species the species of fish sold
-     * @param seller agent selling the fish
+     * @param seller  agent selling the fish
      * @param biomass how much biomass has been sold
      * @param revenue how much money was made off it
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
+    public void reactToSale(
+        Species species,
+        Fisher seller,
+        double biomass,
+        double revenue,
+        FishState model,
+        int timeStep
+    ) {
         currentRegulation.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 
     /**
      * returns a copy of the regulation, used defensively
+     *
      * @return
      */
     @Override

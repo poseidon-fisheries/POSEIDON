@@ -29,14 +29,13 @@ public class ExplorationPenaltyProbabilityTest {
 
 
     @Test
-    public void explorationPenalty() throws Exception
-    {
+    public void explorationPenalty() throws Exception {
 
 
-        ExplorationPenaltyProbability probability = new ExplorationPenaltyProbability(1d,1d,.5,.1);
+        final ExplorationPenaltyProbability probability = new ExplorationPenaltyProbability(1d, 1d, .5, .1);
 
         assertEquals(probability.getExplorationProbability(), 1d, .001d);
-        assertEquals(probability.getImitationProbability(),1d,.001d);
+        assertEquals(probability.getImitationProbability(), 1d, .001d);
 
         probability.judgeExploration(0, 100);
         assertEquals(probability.getExplorationProbability(), 1d, .001d);

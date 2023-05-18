@@ -20,30 +20,26 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
-import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.util.Objects;
 
 /**
  * The selectivity filter for most species in the assesment reports
  * Created by carrknight on 3/21/16.
  */
-public class DoubleNormalFilter extends FormulaAbundanceFilter{
+public class DoubleNormalFilter extends FormulaAbundanceFilter {
 
 
     final private double peak;
 
     final private double top;
 
-    final private double  ascWidth;
+    final private double ascWidth;
 
-    final private double  dscWidth;
+    final private double dscWidth;
 
-    final private double  initialScaling;
+    final private double initialScaling;
 
-    final private double  finalScaling;
+    final private double finalScaling;
 
     final private double binMin;
 
@@ -53,9 +49,25 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
 
 
     public DoubleNormalFilter(
-            boolean memoization, final boolean rounding, double peak, double top, double ascWidth, double dscWidth,
-            double initialScaling,
-            double finalScaling, double binMin, double binMax, double binWidth) {
+        boolean memoization, final boolean rounding,
+        double peak,
+        double top,
+        double ascWidth,
+        double dscWidth,
+        double binMin,
+        double binMax,
+        double binWidth
+    ) {
+        this(memoization, rounding, peak, top, ascWidth, dscWidth, Double.NaN, Double.NaN, binMin, binMax, binWidth);
+
+    }
+
+
+    public DoubleNormalFilter(
+        boolean memoization, final boolean rounding, double peak, double top, double ascWidth, double dscWidth,
+        double initialScaling,
+        double finalScaling, double binMin, double binMax, double binWidth
+    ) {
         super(memoization, rounding);
         this.peak = peak;
         this.top = top;
@@ -68,20 +80,6 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
         this.binWidth = binWidth;
     }
 
-
-    public DoubleNormalFilter(
-            boolean memoization, final boolean rounding,
-            double peak,
-            double top,
-            double ascWidth,
-            double dscWidth,
-            double binMin,
-            double binMax,
-            double binWidth) {
-        this(memoization, rounding, peak, top, ascWidth, dscWidth, Double.NaN, Double.NaN, binMin, binMax, binWidth);
-
-    }
-
     /**
      * the method that gives the probability matrix for each age class and each sex of not filtering the abundance away
      *
@@ -92,86 +90,73 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
     protected double[][] computeSelectivity(Species species) {
 
 
-
-
         //first build the asc and desc vectors
         //also the join1 and join2
         double expWidth = Math.exp(ascWidth);
         double expDsc = Math.exp(dscWidth);
-        double expTop = peak + binWidth + (0.99*  (binMax+binWidth/2) -peak - binWidth ) / (1+ Math.exp(-top));
+        double expTop = peak + binWidth + (0.99 * (binMax + binWidth / 2) - peak - binWidth) / (1 + Math.exp(-top));
 
 
         double[][] asc = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
         double[][] desc = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
         double[][] join1 = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
         double[][] join2 = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
-        for(int subdivision =0; subdivision< species.getNumberOfSubdivisions(); subdivision++)
-            for(int age=0;age<species.getNumberOfBins();age++)
-            {
-                double bin =  binWidth/2 +  (species.getLength(subdivision,age) - binMin) / binWidth;
+        for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++)
+            for (int age = 0; age < species.getNumberOfBins(); age++) {
+                double bin = binWidth / 2 + (species.getLength(subdivision, age) - binMin) / binWidth;
                 //EXP(-(($B26-$E$7)^2/$E$9))
-                asc[subdivision][age] = Math.exp(-(Math.pow(bin-peak,2)/expWidth));
-                desc[subdivision][age] = Math.exp(-(Math.pow(bin-expTop,2)/expDsc));
+                asc[subdivision][age] = Math.exp(-(Math.pow(bin - peak, 2) / expWidth));
+                desc[subdivision][age] = Math.exp(-(Math.pow(bin - expTop, 2) / expDsc));
                 //1/(1+EXP(-($H$24*($B26-$E$7)/(1+ABS($B26-$E$7)))))
-                join1[subdivision][age] = 1d/(1+Math.exp(-(20*(bin-peak)/(1+Math.abs(bin-peak)))));
+                join1[subdivision][age] = 1d / (1 + Math.exp(-(20 * (bin - peak) / (1 + Math.abs(bin - peak)))));
                 //1/(1+EXP(-($I$24*($B26-$E$8)/(1+ABS($B26-$E$8)))))
-                join2[subdivision][age] = 1d/(1+Math.exp(-(20*(bin-expTop)/(1+Math.abs(bin-expTop)))));
+                join2[subdivision][age] = 1d / (1 + Math.exp(-(20 * (bin - expTop) / (1 + Math.abs(bin - expTop)))));
 
             }
         //if necessary scale the asc vector
-        if(Double.isFinite(initialScaling))
-        {
-            double scaling = 1d/(1+Math.exp(-initialScaling));
+        if (Double.isFinite(initialScaling)) {
+            double scaling = 1d / (1 + Math.exp(-initialScaling));
             //EXP(-(($B20-$E$7)^2/$E$9))
-            double minScaling = Math.exp(-(Math.pow(binMin + binWidth/2d-peak,2)/expWidth));
-            for(int subdivision =0; subdivision< species.getNumberOfSubdivisions(); subdivision++)
-                for(int age=0;age<species.getNumberOfBins()-1;age++)
-                {
+            double minScaling = Math.exp(-(Math.pow(binMin + binWidth / 2d - peak, 2) / expWidth));
+            for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++)
+                for (int age = 0; age < species.getNumberOfBins() - 1; age++) {
                     //($E$11+(1-$E$11)*(C26-$C$20)/($C$21-$C$20))
-                    asc[subdivision][age] = scaling+(1-scaling)*(asc[subdivision][age]-minScaling)/( 1- minScaling);
+                    asc[subdivision][age] = scaling + (1 - scaling) * (asc[subdivision][age] - minScaling) / (1 - minScaling);
                 }
 
         }
 
 
         //if necessary scale the desc vector
-        if(Double.isFinite(finalScaling))
-        {
-            double scaling = 1d/(1+Math.exp(-finalScaling));
+        if (Double.isFinite(finalScaling)) {
+            double scaling = 1d / (1 + Math.exp(-finalScaling));
             //EXP(-(($B20-$E$7)^2/$E$9))
-            double maxScaling = Math.exp(-(Math.pow(binMax + binWidth/2d-expTop,2)/expDsc));
-            for(int subdivision =0; subdivision< species.getNumberOfSubdivisions(); subdivision++)
+            double maxScaling = Math.exp(-(Math.pow(binMax + binWidth / 2d - expTop, 2) / expDsc));
+            for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++)
 
-                for(int age=0;age<species.getNumberOfBins()-1;age++)
-                {
+                for (int age = 0; age < species.getNumberOfBins() - 1; age++) {
                     //((1+($E$12-1)*(E26-$C$22)/($C$23-$C$22)),E26)
-                    desc[subdivision][age] = 1 + (scaling-1)*(desc[subdivision][age]-1)/(maxScaling-1);
+                    desc[subdivision][age] = 1 + (scaling - 1) * (desc[subdivision][age] - 1) / (maxScaling - 1);
                 }
 
         }
 
 
-
         //now turn it into selectivity thank god
         double[][] selex = new double[2][species.getNumberOfBins()];
-        for(int subdivision =0; subdivision< species.getNumberOfSubdivisions(); subdivision++)
-            for(int age=0;age<species.getNumberOfBins();age++)
-            {
+        for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++)
+            for (int age = 0; age < species.getNumberOfBins(); age++) {
 
-                if(Double.isNaN(initialScaling) ||
-                        species.getLength(subdivision,age)>-1000-initialScaling)
-                {
+                if (Double.isNaN(initialScaling) ||
+                    species.getLength(subdivision, age) > -1000 - initialScaling) {
                     //(D26*(1-G26)+G26*(1*(1-H26)+F26*H26))
                     selex[subdivision][age] =
-                            asc[subdivision][age]*(1-join1[subdivision][age])+
-                                    join1[subdivision][age]*((1-join2[subdivision][age])+
-                                            desc[subdivision][age]*join2[subdivision][age]);
-                }
-                else
-                {
+                        asc[subdivision][age] * (1 - join1[subdivision][age]) +
+                            join1[subdivision][age] * ((1 - join2[subdivision][age]) +
+                                desc[subdivision][age] * join2[subdivision][age]);
+                } else {
                     selex[subdivision][age] = 0;
                 }
-
 
 
             }

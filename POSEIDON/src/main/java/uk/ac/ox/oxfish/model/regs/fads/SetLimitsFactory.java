@@ -26,15 +26,24 @@ public class SetLimitsFactory implements AlgorithmFactory<SetLimits> {
 
     private int limit;
 
-    public SetLimitsFactory() { this.limit = Integer.MAX_VALUE; }
+    public SetLimitsFactory() {
+        this.limit = Integer.MAX_VALUE;
+    }
 
-    public SetLimitsFactory(int limit) { this.limit = limit; }
+    public SetLimitsFactory(int limit) {
+        this.limit = limit;
+    }
 
-    @Override public SetLimits apply(FishState fishState) {
+    @Override
+    public SetLimits apply(FishState fishState) {
         return new SetLimits(fishState::registerStartable, __ -> limit);
     }
 
-    public int getLimit() { return limit; }
+    public int getLimit() {
+        return limit;
+    }
 
-    public void setLimit(int limit) { this.limit = limit; }
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
 }

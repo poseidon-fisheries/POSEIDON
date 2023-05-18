@@ -40,9 +40,7 @@ import static org.junit.Assert.assertTrue;
 public class FishTheRockyLineDemo {
 
     @Test
-    public void fishTheRockyLine() throws Exception
-    {
-
+    public void fishTheRockyLine() throws Exception {
 
 
         int rockyAreas = 0;
@@ -85,27 +83,18 @@ public class FishTheRockyLineDemo {
             state.schedule.step(state);
 
 
-
-
         System.out.println("Border fishing intensity: " + state.getDailyDataSet().getColumn(
-                                   RockyRectanglesHabitatInitializer.BORDER_FISHING_INTENSITY).getLatest()
-                                   + "\n -------- \nRocky fishing intensity: " +
-                                   state.getDailyDataSet().getColumn(
-                                           RockyRectanglesHabitatInitializer.ROCKY_FISHING_INTENSITY).getLatest()
+            RockyRectanglesHabitatInitializer.BORDER_FISHING_INTENSITY).getLatest()
+            + "\n -------- \nRocky fishing intensity: " +
+            state.getDailyDataSet().getColumn(
+                RockyRectanglesHabitatInitializer.ROCKY_FISHING_INTENSITY).getLatest()
 
         );
 
         assertTrue(state.getDailyDataSet().getColumn(
-                RockyRectanglesHabitatInitializer.BORDER_FISHING_INTENSITY).getLatest()
-                           > 35); //on average more than 35% of all tows happened in rocky areas
+            RockyRectanglesHabitatInitializer.BORDER_FISHING_INTENSITY).getLatest()
+            > 35); //on average more than 35% of all tows happened in rocky areas
     }
-
-
-
-
-
-
-
 
 
 }

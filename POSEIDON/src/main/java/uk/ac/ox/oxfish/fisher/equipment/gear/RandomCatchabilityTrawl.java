@@ -36,10 +36,9 @@ import java.util.Arrays;
  * Catches = biomass * q * hours
  * Created by carrknight on 7/29/15.
  */
-public class RandomCatchabilityTrawl implements Gear
-{
+public class RandomCatchabilityTrawl implements Gear {
 
-    private final double[]  catchabilityMeanPerSpecie;
+    private final double[] catchabilityMeanPerSpecie;
 
     private final double[] catchabilityDeviationPerSpecie;
 
@@ -47,13 +46,14 @@ public class RandomCatchabilityTrawl implements Gear
     /**
      * speed (used for fuel consumption) of thrawling
      */
-    private  final double gasPerHourFished;
+    private final double gasPerHourFished;
 
 
     public RandomCatchabilityTrawl(
-            double[] catchabilityMeanPerSpecie,
-            double[] catchabilityDeviationPerSpecie,
-            double gasPerHourFished) {
+        double[] catchabilityMeanPerSpecie,
+        double[] catchabilityDeviationPerSpecie,
+        double gasPerHourFished
+    ) {
         this.catchabilityMeanPerSpecie = catchabilityMeanPerSpecie;
         this.catchabilityDeviationPerSpecie = catchabilityDeviationPerSpecie;
         this.gasPerHourFished = gasPerHourFished;
@@ -61,24 +61,24 @@ public class RandomCatchabilityTrawl implements Gear
 
     @Override
     public Catch fish(
-            Fisher fisher, LocalBiology localBiology, SeaTile context,
-            int hoursSpentFishing, GlobalBiology modelBiology)
-    {
+        Fisher fisher, LocalBiology localBiology, SeaTile context,
+        int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
         return new Catch(catchesAsArray(fisher, localBiology, hoursSpentFishing, modelBiology));
     }
 
     private double[] catchesAsArray(
-            Fisher fisher, LocalBiology where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        Fisher fisher, LocalBiology where, int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
         double[] totalCatch = new double[modelBiology.getSize()];
-        for(int i=0; i<modelBiology.getSize(); i++)
-        {
+        for (int i = 0; i < modelBiology.getSize(); i++) {
             double q =
-                    + catchabilityMeanPerSpecie[i];
+                +catchabilityMeanPerSpecie[i];
             //don't call the randomizer unless you absolutely have to!
-            if(catchabilityDeviationPerSpecie[i]!=0)
-                q+=fisher.grabRandomizer().nextGaussian()*catchabilityDeviationPerSpecie[i];
+            if (catchabilityDeviationPerSpecie[i] != 0)
+                q += fisher.grabRandomizer().nextGaussian() * catchabilityDeviationPerSpecie[i];
             totalCatch[i] =
-                    FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, modelBiology.getSpecie(i), q);
+                FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, modelBiology.getSpecie(i), q);
         }
         return totalCatch;
     }
@@ -86,7 +86,8 @@ public class RandomCatchabilityTrawl implements Gear
 
     @Override
     public double[] expectedHourlyCatch(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
         return catchesAsArray(fisher, where, hoursSpentFishing, modelBiology);
     }
 
@@ -99,7 +100,38 @@ public class RandomCatchabilityTrawl implements Gear
      */
     @Override
     public double getFuelConsumptionPerHourOfFishing(
-            Fisher fisher, Boat boat, SeaTile where) {
+        Fisher fisher, Boat boat, SeaTile where
+    ) {
+        return gasPerHourFished;
+    }
+
+    @Override
+    public Gear makeCopy() {
+        return new RandomCatchabilityTrawl(
+            Arrays.copyOf(catchabilityMeanPerSpecie, catchabilityMeanPerSpecie.length),
+            Arrays.copyOf(catchabilityDeviationPerSpecie, catchabilityMeanPerSpecie.length),
+            gasPerHourFished
+        );
+    }
+
+    @Override
+    public String toString() {
+        return "RandomCatchabilityTrawl{" + "catchabilityMeanPerSpecie=" + Arrays.toString(
+            catchabilityMeanPerSpecie) + ", catchabilityDeviationPerSpecie=" + Arrays.toString(
+            catchabilityDeviationPerSpecie) + ", gasPerHourFished=" + gasPerHourFished + '}';
+    }
+
+    @Override
+    public boolean isSame(Gear o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RandomCatchabilityTrawl that = (RandomCatchabilityTrawl) o;
+        return Double.compare(that.getGasPerHourFished(), getGasPerHourFished()) == 0 &&
+            Arrays.equals(getCatchabilityMeanPerSpecie(), that.getCatchabilityMeanPerSpecie()) &&
+            Arrays.equals(getCatchabilityDeviationPerSpecie(), that.getCatchabilityDeviationPerSpecie());
+    }
+
+    public double getGasPerHourFished() {
         return gasPerHourFished;
     }
 
@@ -109,35 +141,6 @@ public class RandomCatchabilityTrawl implements Gear
 
     public double[] getCatchabilityDeviationPerSpecie() {
         return catchabilityDeviationPerSpecie;
-    }
-
-    @Override
-    public Gear makeCopy() {
-        return new RandomCatchabilityTrawl(Arrays.copyOf(catchabilityMeanPerSpecie,catchabilityMeanPerSpecie.length),
-                                            Arrays.copyOf(catchabilityDeviationPerSpecie,catchabilityMeanPerSpecie.length),
-                                           gasPerHourFished);
-    }
-
-    public double getGasPerHourFished() {
-        return gasPerHourFished;
-    }
-
-
-    @Override
-    public String toString() {
-        return "RandomCatchabilityTrawl{" + "catchabilityMeanPerSpecie=" + Arrays.toString(
-                catchabilityMeanPerSpecie) + ", catchabilityDeviationPerSpecie=" + Arrays.toString(
-                catchabilityDeviationPerSpecie) + ", gasPerHourFished=" + gasPerHourFished + '}';
-    }
-
-    @Override
-    public boolean isSame(Gear o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RandomCatchabilityTrawl that = (RandomCatchabilityTrawl) o;
-        return Double.compare(that.getGasPerHourFished(), getGasPerHourFished()) == 0 &&
-                Arrays.equals(getCatchabilityMeanPerSpecie(), that.getCatchabilityMeanPerSpecie()) &&
-                Arrays.equals(getCatchabilityDeviationPerSpecie(), that.getCatchabilityDeviationPerSpecie());
     }
 
 

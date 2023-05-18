@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,56 +23,41 @@ import java.util.List;
 public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
 
-    ///home/carrknight/code/oxfish/docs/groundfish/calibration/step1_catchability/logit
-    private String scenarioFile =
-            Paths.get("docs","groundfish","calibration","northquota_yesgarbage",
-                    "annealing_cheating_start.yaml").toString();
-
-
-    private String summaryDirectory =
-            Paths.get("docs","groundfish","calibration","northquota_yesgarbage"
-                    ).toString();
-
-    private long seed = 0;
-
-
-
-    private int yearsToRun = 7; //in reality since years count to 0 this means we simulate 8 years total
-
-    private int yearsToIgnore = 5; //years to ignore 5 means you are targeting validation days; switch it back to 2 if you are not
-    //doing sensitivity analysis for "cheating" runs
-
-
     //TARGETS
     private static final double YELLOW_QUOTA = 600.0;
     private static final double DOVER_QUOTA = 22234500;
     private static final double LONGSPINE_QUOTA = 1966250.0;
-    private static final double SABLEFISH_QUOTA =  1606257;
-            //2724935 for non-north quota;
+    private static final double SABLEFISH_QUOTA = 1606257;
+    //2724935 for non-north quota;
     private static final double SHORTSPINE_QUOTA = 1481600.056;
+    //doing sensitivity analysis for "cheating" runs
     private static final double[] YELLOW_ATTAINMENT = new double[]{7.03, 2};//{6.6, 2};
-    private static final double[] DOVER_ATTAINMENT = new double[]{30.21 , 3.09};//{33.25 , 3.09};
-    private static final double[] LONGSPINE_ATTAINMENT = new double[]{36.31 , 5.06 };//{51.5 , 5.06 };
-    private static final double[] SHORTSPINE_ATTAINMENT = new double[]{50 , 5.06 };//{52.5 , 5.06 };
+    private static final double[] DOVER_ATTAINMENT = new double[]{30.21, 3.09};//{33.25 , 3.09};
+    private static final double[] LONGSPINE_ATTAINMENT = new double[]{36.31, 5.06};//{51.5 , 5.06 };
+    private static final double[] SHORTSPINE_ATTAINMENT = new double[]{50, 5.06};//{52.5 , 5.06 };
     private static final double[] SABLEFISH_ATTAINMENT = new double[]{86.67356, 6.181};//{83.65, 6.181};
     private static final double[] HOURS_AT_SEA = new double[]{799.44, 120.382023907226};//{999.936, 120.382023907226};
-    private static final double[] PROFITS = new double[]{134405.5,21331}; // new double[]{89308, 21331};
-  //  private static final double[] DISTANCE = new double[]{90.88762, 32};
-  //  private static final double[] DURATION = new double[]{69.097625, 33};
-
-
-
+    private static final double[] PROFITS = new double[]{134405.5, 21331}; // new double[]{89308, 21331};
+    private static final double MINIMUM_CATCHABILITY = 1.0e-05;
+    private static final double MAXIMUM_CATCHABILITY = 1.0e-03;
+    ///home/carrknight/code/oxfish/docs/groundfish/calibration/step1_catchability/logit
+    private String scenarioFile =
+        Paths.get("docs", "groundfish", "calibration", "northquota_yesgarbage",
+            "annealing_cheating_start.yaml"
+        ).toString();
+    private String summaryDirectory =
+        Paths.get("docs", "groundfish", "calibration", "northquota_yesgarbage"
+        ).toString();
+    private long seed = 0;
+    //  private static final double[] DISTANCE = new double[]{90.88762, 32};
+    //  private static final double[] DURATION = new double[]{69.097625, 33};
+    private int yearsToRun = 7; //in reality since years count to 0 this means we simulate 8 years total
+    private int yearsToIgnore = 5; //years to ignore 5 means you are targeting validation days; switch it back to 2 if you are not
     private int runsPerSetting = 1;
-
-
-
     /**
      * list of all parameters that can be changed
      */
     private List<OptimizationParameter> parameters = new LinkedList<>();
-
-    private static final double MINIMUM_CATCHABILITY = 1.0e-05;
-    private static final double MAXIMUM_CATCHABILITY = 1.0e-03;
 
     {
 
@@ -165,18 +149,42 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 //        ));
 
 
-                parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.probability.multiplier",
+        parameters.add(new SimpleOptimizationParameter(
+            "destinationStrategy.probability.multiplier",
 
-                0.1,
-                3
+            0.1,
+            3
         ));
-                parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.stepSize",
+        parameters.add(new SimpleOptimizationParameter(
+            "destinationStrategy.stepSize",
 
-                1,
-                20
+            1,
+            20
         ));
+
+    }
+
+    public static void main(String[] args) throws IOException {
+        double[] best = new double[]{
+            -2.850, -0.822, 8.506, -0.121, -3.353, -3.860, 5.221
+
+
+        };
+
+        CaliforniaDerisoOptimization optimization = new CaliforniaDerisoOptimization();
+        FishYAML yaml = new FishYAML();
+
+
+        Scenario scenario = yaml.loadAs(
+            new FileReader(Paths.get(optimization.scenarioFile).toFile()),
+            Scenario.class
+        );
+        optimization.prepareScenario(best, scenario);
+        yaml.dump(
+            scenario,
+            new FileWriter(Paths.get(optimization.summaryDirectory).resolve("fleetwide_cheating.yaml").toFile())
+        );
+
 
     }
 
@@ -188,13 +196,11 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
             Path scenarioPath = Paths.get(scenarioFile);
 
 
-            for(int i=0; i<runsPerSetting; i++)
-            {
+            for (int i = 0; i < runsPerSetting; i++) {
                 FishYAML yaml = new FishYAML();
 
 
-
-                Scenario scenario = yaml.loadAs(new FileReader(Paths.get(scenarioFile).toFile()),Scenario.class);
+                Scenario scenario = yaml.loadAs(new FileReader(Paths.get(scenarioFile).toFile()), Scenario.class);
                 prepareScenario(x, scenario);
 
 
@@ -210,66 +216,71 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
                 //catches errors
                 double soleError = deviationAttainment(
-                        model.getYearlyDataSet().getColumn("Dover Sole Landings"),
-                        DOVER_QUOTA,
-                        DOVER_ATTAINMENT[0],
-                        DOVER_ATTAINMENT[1],
-                        yearsToIgnore);
+                    model.getYearlyDataSet().getColumn("Dover Sole Landings"),
+                    DOVER_QUOTA,
+                    DOVER_ATTAINMENT[0],
+                    DOVER_ATTAINMENT[1],
+                    yearsToIgnore
+                );
                 error +=
-                        soleError;
+                    soleError;
                 double longspineLandings = deviationAttainment(
-                        model.getYearlyDataSet().getColumn("Longspine Thornyhead Landings"),
-                        LONGSPINE_QUOTA,
-                        LONGSPINE_ATTAINMENT[0],
-                        LONGSPINE_ATTAINMENT[1],
-                        yearsToIgnore);
+                    model.getYearlyDataSet().getColumn("Longspine Thornyhead Landings"),
+                    LONGSPINE_QUOTA,
+                    LONGSPINE_ATTAINMENT[0],
+                    LONGSPINE_ATTAINMENT[1],
+                    yearsToIgnore
+                );
                 error +=
-                        longspineLandings;
+                    longspineLandings;
                 double shortspineLanding = deviationAttainment(
-                        model.getYearlyDataSet().getColumn("Shortspine Thornyhead Landings"),
-                        SHORTSPINE_QUOTA,
-                        SHORTSPINE_ATTAINMENT[0],
-                        SHORTSPINE_ATTAINMENT[1],
-                        yearsToIgnore);
+                    model.getYearlyDataSet().getColumn("Shortspine Thornyhead Landings"),
+                    SHORTSPINE_QUOTA,
+                    SHORTSPINE_ATTAINMENT[0],
+                    SHORTSPINE_ATTAINMENT[1],
+                    yearsToIgnore
+                );
                 error +=
-                        shortspineLanding;
+                    shortspineLanding;
 
                 double rockfishLandings = deviationAttainment(
-                        model.getYearlyDataSet().getColumn("Yelloweye Rockfish Landings"),
-                        YELLOW_QUOTA,
-                        YELLOW_ATTAINMENT[0],
-                        YELLOW_ATTAINMENT[1],
-                        yearsToIgnore);
+                    model.getYearlyDataSet().getColumn("Yelloweye Rockfish Landings"),
+                    YELLOW_QUOTA,
+                    YELLOW_ATTAINMENT[0],
+                    YELLOW_ATTAINMENT[1],
+                    yearsToIgnore
+                );
                 error +=
-                        rockfishLandings;
+                    rockfishLandings;
 
                 double sablefishLandings = deviationAttainment(
-                        model.getYearlyDataSet().getColumn("Sablefish Landings"),
-                        SABLEFISH_QUOTA,
-                        SABLEFISH_ATTAINMENT[0],
-                        SABLEFISH_ATTAINMENT[1],
-                        yearsToIgnore);
+                    model.getYearlyDataSet().getColumn("Sablefish Landings"),
+                    SABLEFISH_QUOTA,
+                    SABLEFISH_ATTAINMENT[0],
+                    SABLEFISH_ATTAINMENT[1],
+                    yearsToIgnore
+                );
                 error +=
-                        sablefishLandings;
+                    sablefishLandings;
 
 
                 double actualAverageHoursOut = deviation(
-                        model.getYearlyDataSet().getColumn("Actual Average Hours Out"),
-                        HOURS_AT_SEA[0],
-                        HOURS_AT_SEA[1],
-                        yearsToIgnore
+                    model.getYearlyDataSet().getColumn("Actual Average Hours Out"),
+                    HOURS_AT_SEA[0],
+                    HOURS_AT_SEA[1],
+                    yearsToIgnore
                 );
                 error +=
-                        actualAverageHoursOut;
+                    actualAverageHoursOut;
 
                 double cashflow = deviation(
-                        model.getYearlyDataSet().getColumn("Average Cash-Flow"),
-                        PROFITS[0],
-                        PROFITS[1],
-                        yearsToIgnore
+                    model.getYearlyDataSet().getColumn("Average Cash-Flow"),
+                    PROFITS[0],
+                    PROFITS[1],
+                    yearsToIgnore
                 );
                 error +=
-                        cashflow;
+                    cashflow;
 
 //                double duration = deviation(
 //                        model.getYearlyDataSet().getColumn("Average Trip Duration"),
@@ -291,24 +302,24 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
 
                 Files.write(
-                        Paths.get(summaryDirectory).resolve(
-                                scenarioPath.getFileName() + "_all_errors_"+seed+".csv"
-                        ),
-                        (
-                                soleError +"," +
-                                        longspineLandings +"," +
-                                        shortspineLanding +"," +
-                                        rockfishLandings +"," +
-                                        sablefishLandings +"," +
-                                        actualAverageHoursOut +"," +
-                                        cashflow +"," +
-                                    //    duration +"," +
-                                    //    distanceFromPort +"," +
+                    Paths.get(summaryDirectory).resolve(
+                        scenarioPath.getFileName() + "_all_errors_" + seed + ".csv"
+                    ),
+                    (
+                        soleError + "," +
+                            longspineLandings + "," +
+                            shortspineLanding + "," +
+                            rockfishLandings + "," +
+                            sablefishLandings + "," +
+                            actualAverageHoursOut + "," +
+                            cashflow + "," +
+                            //    duration +"," +
+                            //    distanceFromPort +"," +
 
-                                        Arrays.toString(x).
-                                                replace("[","").
-                                                replace("]","") +"\n").getBytes(),
-                        StandardOpenOption.WRITE,StandardOpenOption.CREATE,StandardOpenOption.APPEND
+                            Arrays.toString(x).
+                                replace("[", "").
+                                replace("]", "") + "\n").getBytes(),
+                    StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.APPEND
                 );
 
             }
@@ -316,20 +327,20 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
             error /= (double) runsPerSetting;
             //write summary file
             Files.write(
-                    Paths.get(summaryDirectory).resolve(
-                            scenarioPath.getFileName() + "_"+seed+".csv"
-                    ),
-                    (error +"," + Arrays.toString(x).
-                            replace("[","").
-                            replace("]","") +"\n").getBytes(),
-                    StandardOpenOption.WRITE,StandardOpenOption.CREATE,StandardOpenOption.APPEND
+                Paths.get(summaryDirectory).resolve(
+                    scenarioPath.getFileName() + "_" + seed + ".csv"
+                ),
+                (error + "," + Arrays.toString(x).
+                    replace("[", "").
+                    replace("]", "") + "\n").getBytes(),
+                StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.APPEND
             );
 
 
             return new double[]{error};
 
 
-        } catch (IOException  e) {
+        } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("failed to read input file!");
         }
@@ -338,69 +349,47 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
     }
 
     public void prepareScenario(double[] evaParameters, Scenario justReadScenario) {
-        int parameter=0;
-        for (OptimizationParameter optimizationParameter : parameters)
-        {
-            optimizationParameter.parametrize(justReadScenario,
-                    Arrays.copyOfRange(evaParameters,parameter,
-                            parameter+optimizationParameter.size()));
-            parameter+=optimizationParameter.size();
+        int parameter = 0;
+        for (OptimizationParameter optimizationParameter : parameters) {
+            optimizationParameter.parametrize(
+                justReadScenario,
+                Arrays.copyOfRange(evaParameters, parameter,
+                    parameter + optimizationParameter.size()
+                )
+            );
+            parameter += optimizationParameter.size();
         }
     }
 
+    // abs(100*data/quota-attainment)/standardDeviation
+    public static double deviationAttainment(
+        DataColumn data,
+        double quota,
+        double attainment,
+        double standardDeviation,
+        int yearsToSkip
+    ) {
 
-    public static void main(String[] args) throws IOException {
-        double[] best = new double[]{
-                -2.850,-0.822, 8.506,-0.121,-3.353,-3.860, 5.221
-
-
-
-        };
-
-        CaliforniaDerisoOptimization optimization = new CaliforniaDerisoOptimization();
-        FishYAML yaml = new FishYAML();
-
-
-
-        Scenario scenario = yaml.loadAs(
-                new FileReader(Paths.get(optimization.scenarioFile).toFile()),
-                Scenario.class);
-        optimization.prepareScenario(best,scenario);
-        yaml.dump(scenario,
-                new FileWriter(Paths.get(optimization.summaryDirectory).resolve("fleetwide_cheating.yaml").toFile()));
+        attainment = attainment / 100d;
+        standardDeviation = standardDeviation / 100d;
+        return Math.abs(
+            FishStateUtilities.getAverage(data, yearsToSkip) / quota - attainment
+        ) / standardDeviation;
 
 
     }
-
 
     //computes abs(x-mu)/sigma
-    public static double deviation(DataColumn data,
-                                   double target,
-                                   double standardDeviation,
-                                   int yearsToSkip)
-    {
+    public static double deviation(
+        DataColumn data,
+        double target,
+        double standardDeviation,
+        int yearsToSkip
+    ) {
 
         return Math.abs(
-                FishStateUtilities.getAverage(data,yearsToSkip) - target
-        )/standardDeviation;
-
-    }
-
-    // abs(100*data/quota-attainment)/standardDeviation
-    public static double deviationAttainment(DataColumn data,
-                                             double quota,
-                                             double attainment,
-                                             double standardDeviation,
-                                             int yearsToSkip)
-    {
-
-        attainment = attainment/100d;
-        standardDeviation = standardDeviation/100d;
-        return Math.abs(
-                FishStateUtilities.getAverage(data,yearsToSkip)/quota - attainment
-        )/standardDeviation;
-
-
+            FishStateUtilities.getAverage(data, yearsToSkip) - target
+        ) / standardDeviation;
 
     }
 
@@ -450,7 +439,6 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
     public void setYearsToIgnore(int yearsToIgnore) {
         this.yearsToIgnore = yearsToIgnore;
     }
-
 
 
     public int getRunsPerSetting() {

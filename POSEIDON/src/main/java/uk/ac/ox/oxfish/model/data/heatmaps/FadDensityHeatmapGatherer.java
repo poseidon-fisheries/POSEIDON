@@ -45,11 +45,13 @@ public class FadDensityHeatmapGatherer extends HeatmapGatherer {
 
         private FadMap fadMap = null;
 
-        @Override public void start(final FishState fishState) {
+        @Override
+        public void start(final FishState fishState) {
             fadMap = fishState.getFadMap();
         }
 
-        @Override public double applyAsDouble(final SeaTile seaTile) {
+        @Override
+        public double applyAsDouble(final SeaTile seaTile) {
             return fadMap.fadsAt(seaTile).numObjs;
         }
 

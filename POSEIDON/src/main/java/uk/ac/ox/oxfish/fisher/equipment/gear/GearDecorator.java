@@ -11,5 +11,4 @@ public interface GearDecorator extends Gear {
     public void setDelegate(Gear delegate);
 
 
-
 }

@@ -25,10 +25,10 @@ import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * object to convert from  double coordinates to actual variables and viceversa
+ *
  * @param <T>
  */
-public  interface CoordinateTransformer<T>
-{
+public interface CoordinateTransformer<T> {
     /**
      * turn a T into PSO coordinates
      */

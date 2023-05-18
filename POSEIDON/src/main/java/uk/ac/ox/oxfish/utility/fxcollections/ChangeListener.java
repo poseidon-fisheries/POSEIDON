@@ -37,8 +37,6 @@ package uk.ac.ox.oxfish.utility.fxcollections;/*
  * multiple {@code ObservableValues}.
  *
  * @see ObservableValue
- *
- *
  * @since JavaFX 2.0
  */
 @FunctionalInterface
@@ -52,12 +50,9 @@ public interface ChangeListener<T> {
      * In general, it is considered bad practice to modify the observed value in
      * this method.
      *
-     * @param observable
-     *            The {@code ObservableValue} which value changed
-     * @param oldValue
-     *            The old value
-     * @param newValue
-     *            The new value
+     * @param observable The {@code ObservableValue} which value changed
+     * @param oldValue   The old value
+     * @param newValue   The new value
      */
     void changed(ObservableValue<? extends T> observable, T oldValue, T newValue);
 }

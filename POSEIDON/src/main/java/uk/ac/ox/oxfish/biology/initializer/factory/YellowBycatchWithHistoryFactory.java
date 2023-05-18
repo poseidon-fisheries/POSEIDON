@@ -33,20 +33,16 @@ import java.util.List;
  * Like the yellow-bycatch but it allows for user stories
  * Created by carrknight on 3/17/17.
  */
-public class YellowBycatchWithHistoryFactory implements AlgorithmFactory<YellowBycatchInitializer>{
-
+public class YellowBycatchWithHistoryFactory implements AlgorithmFactory<YellowBycatchInitializer> {
 
 
     private YellowBycatchFactory factory = new YellowBycatchFactory();
 
 
-
-    private List<Double> historicalTargetBiomass = Lists.newArrayList(1d,2d,3d);
-
-
-    private List<Double> historicalBycatchBiomass = Lists.newArrayList(1d,2d,3d);
+    private List<Double> historicalTargetBiomass = Lists.newArrayList(1d, 2d, 3d);
 
 
+    private List<Double> historicalBycatchBiomass = Lists.newArrayList(1d, 2d, 3d);
 
 
     private List<Double> historicalTargetSurvival = null;
@@ -64,13 +60,13 @@ public class YellowBycatchWithHistoryFactory implements AlgorithmFactory<YellowB
     @Override
     public YellowBycatchInitializer apply(FishState state) {
         YellowBycatchInitializer product = factory.apply(state);
-        if(historicalTargetBiomass!=null)
+        if (historicalTargetBiomass != null)
             product.setHistoricalTargetBiomass(new ArrayList<>(historicalTargetBiomass));
-        if(historicalBycatchBiomass!=null)
+        if (historicalBycatchBiomass != null)
             product.setHistoricalBycatchBiomass(new ArrayList<>(historicalBycatchBiomass));
-        if(historicalTargetSurvival!=null)
+        if (historicalTargetSurvival != null)
             product.setHistoricalTargetSurvivalRate(new ArrayList<>(historicalTargetSurvival));
-        if(historicalBycatchSurvival!=null)
+        if (historicalBycatchSurvival != null)
             product.setHistoricalBycatchSurvivalRate(new ArrayList<>(historicalBycatchSurvival));
 
 
@@ -122,7 +118,8 @@ public class YellowBycatchWithHistoryFactory implements AlgorithmFactory<YellowB
     }
 
     public void setBycatchRecruitmentSteepness(
-            DoubleParameter bycatchRecruitmentSteepness) {
+        DoubleParameter bycatchRecruitmentSteepness
+    ) {
         factory.setBycatchRecruitmentSteepness(bycatchRecruitmentSteepness);
     }
 
@@ -147,7 +144,8 @@ public class YellowBycatchWithHistoryFactory implements AlgorithmFactory<YellowB
     }
 
     public void setBycatchWeightAtRecruitmentMinus1(
-            DoubleParameter bycatchWeightAtRecruitmentMinus1) {
+        DoubleParameter bycatchWeightAtRecruitmentMinus1
+    ) {
         factory.setBycatchWeightAtRecruitmentMinus1(bycatchWeightAtRecruitmentMinus1);
     }
 
@@ -221,7 +219,8 @@ public class YellowBycatchWithHistoryFactory implements AlgorithmFactory<YellowB
     }
 
     public void setTargetWeightAtRecruitmentMinus1(
-            DoubleParameter targetWeightAtRecruitmentMinus1) {
+        DoubleParameter targetWeightAtRecruitmentMinus1
+    ) {
         factory.setTargetWeightAtRecruitmentMinus1(targetWeightAtRecruitmentMinus1);
     }
 

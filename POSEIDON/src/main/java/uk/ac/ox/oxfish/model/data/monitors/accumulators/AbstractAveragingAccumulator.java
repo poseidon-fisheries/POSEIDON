@@ -33,14 +33,18 @@ public abstract class AbstractAveragingAccumulator<V extends Number> implements 
         this.ignoreNulls = ignoreNulls;
     }
 
-    abstract Averager<V> getAverager();
-
-    @Override public void accumulate(final V value) {
+    @Override
+    public void accumulate(final V value) {
         if (value != null || !ignoreNulls) {
             getAverager().addObservation(value);
         }
     }
 
-    @Override public double get() { return getAverager().getSmoothedObservation(); }
+    abstract Averager<V> getAverager();
+
+    @Override
+    public double get() {
+        return getAverager().getSmoothedObservation();
+    }
 
 }

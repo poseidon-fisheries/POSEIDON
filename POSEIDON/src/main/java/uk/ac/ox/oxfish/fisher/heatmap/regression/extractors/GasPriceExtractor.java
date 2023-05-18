@@ -32,7 +32,8 @@ public class GasPriceExtractor implements ObservationExtractor {
 
     @Override
     public double extract(
-            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
+        SeaTile tile, double timeOfObservation, Fisher agent, FishState model
+    ) {
         return agent.getHomePort().getGasPricePerLiter();
     }
 }

@@ -33,14 +33,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class CongestedMarketTest
-{
+public class CongestedMarketTest {
 
 
     @Test
     public void marketGetCongested() throws Exception {
 
-        CongestedMarket market = new CongestedMarket(100,10,0.01,0);
+        CongestedMarket market = new CongestedMarket(100, 10, 0.01, 0);
         Species species = mock(Species.class);
 
         market.setSpecies(species);
@@ -49,41 +48,41 @@ public class CongestedMarketTest
         Hold hold = mock(Hold.class);
         when(hold.getWeightOfCatchInHold(any())).thenReturn(10d);
         TradeInfo tradeInfo = market.sellFish(hold, mock(Fisher.class), new Anarchy(), mock(FishState.class),
-                                              species);
+            species
+        );
         Assert.assertEquals(tradeInfo.getMoneyExchanged(), 100, .001);
         //sell 90, again the price ought to be steady at 10
         when(hold.getWeightOfCatchInHold(any())).thenReturn(90d);
         tradeInfo = market.sellFish(hold, mock(Fisher.class), new Anarchy(), mock(FishState.class), species);
-        Assert.assertEquals(tradeInfo.getMoneyExchanged(),900,.001);
+        Assert.assertEquals(tradeInfo.getMoneyExchanged(), 900, .001);
 
         //now do it once more, this time it pays less
         when(hold.getWeightOfCatchInHold(any())).thenReturn(100d);
 
         tradeInfo = market.sellFish(hold, mock(Fisher.class), new Anarchy(), mock(FishState.class), species);
-        Assert.assertEquals(tradeInfo.getMoneyExchanged(),900,.001);
-        Assert.assertEquals(market.getMarginalPrice(),9,.0001d);
+        Assert.assertEquals(tradeInfo.getMoneyExchanged(), 900, .001);
+        Assert.assertEquals(market.getMarginalPrice(), 9, .0001d);
 
 
     }
 
 
     @Test
-    public void marketGetDecongested()
-    {
-        CongestedMarket market = new CongestedMarket(100,10,0.01,150);
+    public void marketGetDecongested() {
+        CongestedMarket market = new CongestedMarket(100, 10, 0.01, 150);
         Species species = mock(Species.class);
         market.setSpecies(species);
         market.start(mock(FishState.class));
 
         //decongested
-        Assert.assertEquals(market.getMarginalPrice(),10,.0001d);
+        Assert.assertEquals(market.getMarginalPrice(), 10, .0001d);
 
         Hold hold = mock(Hold.class);
         when(hold.getWeightOfCatchInHold(any())).thenReturn(200d);
         market.sellFish(hold, mock(Fisher.class), new Anarchy(), mock(FishState.class), species);
 
         //congested
-        Assert.assertEquals(market.getMarginalPrice(),9,.0001d);
+        Assert.assertEquals(market.getMarginalPrice(), 9, .0001d);
 
         //drops by 150 each step
         market.step(mock(FishState.class));
@@ -92,8 +91,6 @@ public class CongestedMarketTest
         //recongested
         market.sellFish(hold, mock(Fisher.class), new Anarchy(), mock(FishState.class), species);
         Assert.assertEquals(market.getMarginalPrice(), 8.5, .0001d);
-
-
 
 
     }

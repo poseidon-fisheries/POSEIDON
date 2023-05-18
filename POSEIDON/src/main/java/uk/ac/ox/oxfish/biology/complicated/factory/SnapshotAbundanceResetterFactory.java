@@ -15,8 +15,9 @@ public class SnapshotAbundanceResetterFactory implements AlgorithmFactory<Snapsh
 
     @Override
     public SnapshotBiologyResetter apply(FishState state) {
-        return SnapshotBiologyResetter.abundanceResetter(state.getBiology(), yearsToReset,restoreOriginalLocations,
-                                                         restoreOriginalLengthDistribution );
+        return SnapshotBiologyResetter.abundanceResetter(state.getBiology(), yearsToReset, restoreOriginalLocations,
+            restoreOriginalLengthDistribution
+        );
     }
 
 

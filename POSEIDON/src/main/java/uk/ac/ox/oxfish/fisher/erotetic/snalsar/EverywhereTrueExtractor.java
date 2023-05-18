@@ -33,18 +33,16 @@ import java.util.Map;
  * Created by carrknight on 5/26/16.
  */
 public class EverywhereTrueExtractor implements SafetyFeatureExtractor<SeaTile>, LegalityFeatureExtractor<SeaTile>,
-        SocialAcceptabilityFeatureExtractor<SeaTile>
-{
+    SocialAcceptabilityFeatureExtractor<SeaTile> {
 
     /**
      * Returns a map where everything is assigned value 1 (safe)
      */
     @Override
     public Map<SeaTile, Double> extractFeature(
-            Collection<SeaTile> toRepresent,
-            FishState model, Fisher fisher)
-    {
-
+        Collection<SeaTile> toRepresent,
+        FishState model, Fisher fisher
+    ) {
 
 
         return new FixedMap<>(1.0, toRepresent);

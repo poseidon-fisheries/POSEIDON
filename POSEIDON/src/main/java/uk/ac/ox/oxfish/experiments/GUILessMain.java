@@ -34,26 +34,24 @@ import java.io.FileReader;
  * for more complicated efforts
  * Created by carrknight on 7/13/15.
  */
-public class GUILessMain
-{
+public class GUILessMain {
 
     public static void main(String[] args) throws FileNotFoundException {
 
         String absolutePath = FishStateUtilities.getAbsolutePath(args[0]);
         //read as scenario
         FishYAML yaml = new FishYAML();
-        Scenario scenario  =  yaml.loadAs(new FileReader(new File(absolutePath)), Scenario.class);
+        Scenario scenario = yaml.loadAs(new FileReader(new File(absolutePath)), Scenario.class);
 
         FishState state = new FishState(System.currentTimeMillis());
         state.setScenario(scenario);
         state.start();
         long time = System.currentTimeMillis();
-        while(state.getYear() <20)
-        {
+        while (state.getYear() < 20) {
             state.schedule.step(state);
-          //  System.out.println(state.timeString() + " -- " + scenario.getClass().getSimpleName());
+            //  System.out.println(state.timeString() + " -- " + scenario.getClass().getSimpleName());
         }
-        System.out.println("speed: " + (System.currentTimeMillis()-time)/1000d);
+        System.out.println("speed: " + (System.currentTimeMillis() - time) / 1000d);
 
 
     }

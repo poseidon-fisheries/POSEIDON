@@ -27,24 +27,22 @@ import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
  * Utility to keep track of the tows as a heatmap
  * Created by carrknight on 11/15/16.
  */
-public class TowHeatmapGatherer implements Steppable, Startable{
+public class TowHeatmapGatherer implements Steppable, Startable {
 
-
-    /**
-     * the tow heatmap
-     */
-    private double[][] towHeatmap;
 
     /**
      * which year should we start collecting data?
      */
     private final int startYear;
+    /**
+     * the tow heatmap
+     */
+    private double[][] towHeatmap;
     private Stoppable receipt;
 
 
@@ -68,14 +66,13 @@ public class TowHeatmapGatherer implements Steppable, Startable{
     public void step(SimState simState) {
 
         FishState model = (FishState) simState;
-        if(model.getYear()>=startYear) {
+        if (model.getYear() >= startYear) {
             IntGrid2D trawls = model.getMap().getDailyTrawlsMap();
 
             //remember to flip it
             for (int x = 0; x < model.getMap().getWidth(); x++)
-                for (int y = 0; y < model.getMap().getHeight(); y++)
-                {
-                    if(model.getMap().getSeaTile(x,y).isLand())
+                for (int y = 0; y < model.getMap().getHeight(); y++) {
+                    if (model.getMap().getSeaTile(x, y).isLand())
                         towHeatmap[x][model.getMap().getHeight() - y - 1] = Double.NaN;
                     else
                         towHeatmap[x][model.getMap().getHeight() - y - 1] += trawls.get(x, y);
@@ -108,7 +105,7 @@ public class TowHeatmapGatherer implements Steppable, Startable{
      */
     @Override
     public void turnOff() {
-        if(receipt!=null)
+        if (receipt != null)
             receipt.stop();
     }
 }

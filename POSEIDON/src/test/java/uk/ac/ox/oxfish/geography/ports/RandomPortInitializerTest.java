@@ -41,24 +41,30 @@ import static org.mockito.Mockito.mock;
 public class RandomPortInitializerTest {
 
 
-
     @Test
-    public void portsAreAllInSeparateAreas() throws Exception
-    {
+    public void portsAreAllInSeparateAreas() throws Exception {
 
-        SimpleMapInitializer initializer = new SimpleMapInitializer(4, 4, 0, 0, 1, 1);
-        NauticalMap map = initializer.makeMap(new MersenneTwisterFast(),
-                                              new GlobalBiology(new Species("fake")),
-                                              mock(FishState.class));
+        final SimpleMapInitializer initializer = new SimpleMapInitializer(4, 4, 0, 0, 1, 1);
+        final NauticalMap map = initializer.makeMap(
+            new MersenneTwisterFast(),
+            new GlobalBiology(new Species("fake")),
+            mock(FishState.class)
+        );
 
-        RandomPortInitializer ports = new RandomPortInitializer(4 );
-        ports.buildPorts(map, new MersenneTwisterFast(), mock(Function.class), mock(FishState.class),new FixedGasPrice(5) );
-        assertEquals(map.getPorts().size(),4);
-        assertTrue(map.getSeaTile(3,0).isPortHere());
-        assertTrue(map.getSeaTile(3,1).isPortHere());
-        assertTrue(map.getSeaTile(3,2).isPortHere());
-        assertTrue(map.getSeaTile(3,3).isPortHere());
-        assertEquals(map.getPorts().get(0).getGasPricePerLiter(),5d,.00001d);
+        final RandomPortInitializer ports = new RandomPortInitializer(4);
+        ports.buildPorts(
+            map,
+            new MersenneTwisterFast(),
+            mock(Function.class),
+            mock(FishState.class),
+            new FixedGasPrice(5)
+        );
+        assertEquals(map.getPorts().size(), 4);
+        assertTrue(map.getSeaTile(3, 0).isPortHere());
+        assertTrue(map.getSeaTile(3, 1).isPortHere());
+        assertTrue(map.getSeaTile(3, 2).isPortHere());
+        assertTrue(map.getSeaTile(3, 3).isPortHere());
+        assertEquals(map.getPorts().get(0).getGasPricePerLiter(), 5d, .00001d);
 
     }
 

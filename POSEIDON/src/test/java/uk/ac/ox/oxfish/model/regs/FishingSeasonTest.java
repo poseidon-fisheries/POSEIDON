@@ -39,7 +39,7 @@ public class FishingSeasonTest {
     public void fishHere() throws Exception {
 
         //
-        FishingSeason season = new FishingSeason(true,100);
+        FishingSeason season = new FishingSeason(true, 100);
         Fisher fisher = mock(Fisher.class);
         SeaTile tile = mock(SeaTile.class);
         FishState model = mock(FishState.class);
@@ -53,14 +53,14 @@ public class FishingSeasonTest {
         when(model.getDayOfTheYear(anyInt())).thenReturn(150);
         when(tile.isProtected()).thenReturn(false);
         assertTrue(season.canFishHere(fisher, tile, model));// not an MPA problem
-        assertFalse(season.allowedAtSea(fisher,model));
+        assertFalse(season.allowedAtSea(fisher, model));
 
         //on season, protected ===> can't fish
         when(model.getDayOfTheYear(anyInt())).thenReturn(50);
         when(tile.isProtected()).thenReturn(true);
         assertFalse(season.canFishHere(fisher, tile, model));
         //turnOff caring about mpas
-        season = new FishingSeason(false,100);
+        season = new FishingSeason(false, 100);
         assertTrue(season.canFishHere(fisher, tile, model));
 
     }

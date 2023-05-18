@@ -32,7 +32,10 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 /**
  * Created by carrknight on 8/26/16.
@@ -40,29 +43,23 @@ import java.util.*;
 public class SocialTuningRegressionFactory implements AlgorithmFactory<SocialTuningRegression<Double>> {
 
 
-
-    private AlgorithmFactory<? extends GeographicalRegression> nested = new CompleteNearestNeighborRegressionFactory();
-    {
-        ((CompleteNearestNeighborRegressionFactory) nested).setDistanceFromPortBandwidth(new UniformDoubleParameter(0.1,1000));
-        ((CompleteNearestNeighborRegressionFactory) nested).setHabitatBandwidth(new UniformDoubleParameter(0.1,1000));
-        ((CompleteNearestNeighborRegressionFactory) nested).setTimeBandwidth(new UniformDoubleParameter(0.1,1000));
-        ((CompleteNearestNeighborRegressionFactory) nested).setxBandwidth(new UniformDoubleParameter(0.1,1000));
-        ((CompleteNearestNeighborRegressionFactory) nested).setyBandwidth(new UniformDoubleParameter(0.1,1000));
-    }
-
-
-
-
-    private boolean yearly = false;
-
-    private AlgorithmFactory<? extends AdaptationProbability> probability = new FixedProbabilityFactory(.2,1);
-
     /**
      * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
      */
     private final Set<FishState> weakStateMap = Collections.newSetFromMap(new WeakHashMap<>());
+    private AlgorithmFactory<? extends GeographicalRegression> nested = new CompleteNearestNeighborRegressionFactory();
+    private boolean yearly = false;
 
+    private AlgorithmFactory<? extends AdaptationProbability> probability = new FixedProbabilityFactory(.2, 1);
 
+    {
+        ((CompleteNearestNeighborRegressionFactory) nested).setDistanceFromPortBandwidth(new UniformDoubleParameter(0.1,
+            1000));
+        ((CompleteNearestNeighborRegressionFactory) nested).setHabitatBandwidth(new UniformDoubleParameter(0.1, 1000));
+        ((CompleteNearestNeighborRegressionFactory) nested).setTimeBandwidth(new UniformDoubleParameter(0.1, 1000));
+        ((CompleteNearestNeighborRegressionFactory) nested).setxBandwidth(new UniformDoubleParameter(0.1, 1000));
+        ((CompleteNearestNeighborRegressionFactory) nested).setyBandwidth(new UniformDoubleParameter(0.1, 1000));
+    }
 
     /**
      * Applies this function to the given argument.
@@ -74,54 +71,51 @@ public class SocialTuningRegressionFactory implements AlgorithmFactory<SocialTun
     public SocialTuningRegression apply(FishState state) {
 
 
-
         GeographicalRegression delegate = this.nested.apply(state);
         DoubleParameter[] zeros = new DoubleParameter[delegate.getParametersAsArray().length];
-        Arrays.fill(zeros,new FixedDoubleParameter(0));
+        Arrays.fill(zeros, new FixedDoubleParameter(0));
 
 
         //add data gathering if necessary
-        if(!weakStateMap.contains(state))
-        {
+        if (!weakStateMap.contains(state)) {
             weakStateMap.add(state);
-            addDataGatherers(state,zeros.length);
+            addDataGatherers(state, zeros.length);
             assert weakStateMap.contains(state);
         }
 
         return new SocialTuningRegression(
-                delegate,
-                probability.apply(state),
-                yearly);
+            delegate,
+            probability.apply(state),
+            yearly
+        );
 
     }
 
     private void addDataGatherers(FishState state, int length) {
 
 
-        for(int i=0; i<length; i++)
-        {
+        for (int i = 0; i < length; i++) {
 
             //first add data gatherers
             int finalI = i;
             state.
-                    getYearlyDataSet().
-                    registerGatherer("Average Heatmap Parameter " + i,
-                                     model -> {
-                                         double size =model.getFishers().size();
-                                         if(size == 0)
-                                             return Double.NaN;
-                                         else
-                                         {
-                                             double total = 0;
-                                             for(Fisher fisher1 : state.getFishers())
-                                             {
-                                                 total+=
-                                                         ((HeatmapDestinationStrategy) fisher1.getDestinationStrategy()).
-                                                                 getHeatmap().getParametersAsArray()[finalI];
-                                             }
-                                             return total/size;
-                                         }
-                                     }, Double.NaN);
+                getYearlyDataSet().
+                registerGatherer("Average Heatmap Parameter " + i,
+                    model -> {
+                        double size = model.getFishers().size();
+                        if (size == 0)
+                            return Double.NaN;
+                        else {
+                            double total = 0;
+                            for (Fisher fisher1 : state.getFishers()) {
+                                total +=
+                                    ((HeatmapDestinationStrategy) fisher1.getDestinationStrategy()).
+                                        getHeatmap().getParametersAsArray()[finalI];
+                            }
+                            return total / size;
+                        }
+                    }, Double.NaN
+                );
         }
 
     }
@@ -142,7 +136,8 @@ public class SocialTuningRegressionFactory implements AlgorithmFactory<SocialTun
      * @param nested Value to set for property 'nested'.
      */
     public void setNested(
-            AlgorithmFactory<? extends GeographicalRegression> nested) {
+        AlgorithmFactory<? extends GeographicalRegression> nested
+    ) {
         this.nested = nested;
     }
 
@@ -179,7 +174,8 @@ public class SocialTuningRegressionFactory implements AlgorithmFactory<SocialTun
      * @param probability Value to set for property 'probability'.
      */
     public void setProbability(
-            AlgorithmFactory<? extends AdaptationProbability> probability) {
+        AlgorithmFactory<? extends AdaptationProbability> probability
+    ) {
         this.probability = probability;
     }
 }

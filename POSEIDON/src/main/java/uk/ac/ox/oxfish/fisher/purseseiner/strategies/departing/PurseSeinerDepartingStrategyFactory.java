@@ -41,18 +41,18 @@ public class PurseSeinerDepartingStrategyFactory
 
     @Override
     public CompositeDepartingStrategy apply(final FishState state) {
-        if(destinationBased)
-        return new CompositeDepartingStrategy(
-            new FixedRestTimeDepartingStrategy(0),
-            // rest times assigned in TunaScenario.populateModel
-            new YearlyActionLimitsDepartingStrategy(),
-            new DestinationBasedDepartingStrategy()
-        );
-        else{
+        if (destinationBased)
             return new CompositeDepartingStrategy(
-                    new FixedRestTimeDepartingStrategy(0),
-                    // rest times assigned in TunaScenario.populateModel
-                    new YearlyActionLimitsDepartingStrategy()
+                new FixedRestTimeDepartingStrategy(0),
+                // rest times assigned in TunaScenario.populateModel
+                new YearlyActionLimitsDepartingStrategy(),
+                new DestinationBasedDepartingStrategy()
+            );
+        else {
+            return new CompositeDepartingStrategy(
+                new FixedRestTimeDepartingStrategy(0),
+                // rest times assigned in TunaScenario.populateModel
+                new YearlyActionLimitsDepartingStrategy()
             );
         }
     }

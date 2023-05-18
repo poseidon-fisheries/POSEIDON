@@ -29,23 +29,17 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.TwoPopulationsScenario;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileReader;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
 
 /**
@@ -59,40 +53,36 @@ public class MultipleRegulationsTest {
 
         FishYAML yaml = new FishYAML();
         TwoPopulationsScenario scenario = yaml.loadAs(
-                new FileReader(
-                        Paths.get("inputs","tests","multiregulations.yaml").toFile()
-                ),
-                TwoPopulationsScenario.class
+            new FileReader(
+                Paths.get("inputs", "tests", "multiregulations.yaml").toFile()
+            ),
+            TwoPopulationsScenario.class
         );
         FishState state = new FishState();
         state.setScenario(scenario);
 
         //there is a law that applies to both and one that only applies to large fish
         state.start();
-        assertEquals(state.getFishers().size(),2);
+        assertEquals(state.getFishers().size(), 2);
         int small = 0;
         int large = 0;
-        for(Fisher fisher : state.getFishers())
-        {
-            if(fisher.getTags().contains("small"))
-            {
-                assertEquals(((MultipleRegulations) fisher.getRegulation()).getRegulations().size(),1);
-                assertTrue(((MultipleRegulations) fisher.getRegulation()).getRegulations().get(0) instanceof MonoQuotaRegulation);
+        for (Fisher fisher : state.getFishers()) {
+            if (fisher.getTags().contains("small")) {
+                assertEquals(((MultipleRegulations) fisher.getRegulation()).getRegulations().size(), 1);
+                assertTrue(((MultipleRegulations) fisher.getRegulation()).getRegulations()
+                    .get(0) instanceof MonoQuotaRegulation);
                 small++;
-            }
-            else
-            {
-                assertEquals(((MultipleRegulations) fisher.getRegulation()).getRegulations().size(),2);
-                for(Regulation regulation : ((MultipleRegulations) fisher.getRegulation()).getRegulations() ) {
+            } else {
+                assertEquals(((MultipleRegulations) fisher.getRegulation()).getRegulations().size(), 2);
+                for (Regulation regulation : ((MultipleRegulations) fisher.getRegulation()).getRegulations()) {
                     assertTrue(regulation instanceof MonoQuotaRegulation || regulation instanceof ProtectedAreasOnly);
                     System.out.println(regulation.getClass().getSimpleName());
                 }
                 large++;
             }
         }
-        assertEquals(large,1);
-        assertEquals(small,1);
-
+        assertEquals(large, 1);
+        assertEquals(small, 1);
 
 
     }
@@ -112,7 +102,7 @@ public class MultipleRegulationsTest {
             )
         );
 
-        regs.start(mock(FishState.class),mock(Fisher.class));
+        regs.start(mock(FishState.class), mock(Fisher.class));
 
         //same exact process for "can I be out?"
         when(mpa.allowedAtSea(any(), any(), anyInt())).thenReturn(true);
@@ -136,12 +126,11 @@ public class MultipleRegulationsTest {
         when(quota.canFishHere(any(), any(), any(), anyInt())).thenReturn(true);
         assertFalse(regs.canFishHere(mock(Fisher.class), mock(SeaTile.class), mock(FishState.class)));
 
-        when(season.allowedAtSea(any(),any())).thenReturn(false);
-        assertFalse(regs.allowedAtSea(mock(Fisher.class),mock(FishState.class)));
+        when(season.allowedAtSea(any(), any())).thenReturn(false);
+        assertFalse(regs.allowedAtSea(mock(Fisher.class), mock(FishState.class)));
 
-        when(mpa.allowedAtSea(any(),any())).thenReturn(false);
-        assertFalse(regs.allowedAtSea(mock(Fisher.class),mock(FishState.class)));
-
+        when(mpa.allowedAtSea(any(), any())).thenReturn(false);
+        assertFalse(regs.allowedAtSea(mock(Fisher.class), mock(FishState.class)));
 
 
         //check that calls get propagated
@@ -151,7 +140,7 @@ public class MultipleRegulationsTest {
         FishState state = mock(FishState.class);
         regs.reactToFishing(tile, who, haul, haul, 10, state, 0);
         verify(mpa).reactToFishing(tile, who, haul, haul, 10, state, 0);
-        verify(season).reactToFishing(tile, who, haul,haul , 10, state, 0);
+        verify(season).reactToFishing(tile, who, haul, haul, 10, state, 0);
         verify(quota).reactToFishing(tile, who, haul, haul, 10, state, 0);
         //react to sale
         Species species = mock(Species.class);
@@ -159,7 +148,6 @@ public class MultipleRegulationsTest {
         verify(mpa).reactToSale(species, who, 100d, 100d, state, 0);
         verify(season).reactToSale(species, who, 100d, 100d, state, 0);
         verify(quota).reactToSale(species, who, 100d, 100d, state, 0);
-
 
 
         //take the minimum of the two

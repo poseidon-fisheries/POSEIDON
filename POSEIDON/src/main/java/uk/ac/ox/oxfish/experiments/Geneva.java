@@ -43,7 +43,7 @@ public class Geneva {
     public static void main(String[] args) throws IOException {
         FishYAML yaml = new FishYAML();
         String optimalMpa = String.join("\n", Files.readAllLines(
-                MAIN_DIRECTORY.resolve("mixed_mpa.yaml")));
+            MAIN_DIRECTORY.resolve("mixed_mpa.yaml")));
         PrototypeScenario scenario = yaml.loadAs(optimalMpa, PrototypeScenario.class);
 
         FishState state = new FishState(0);
@@ -52,25 +52,21 @@ public class Geneva {
         state.start();
         double[][] theGrid = new double[state.getMap().getWidth()][state.getMap().getHeight()];
 
-        while(state.getYear()<20)
-        {
+        while (state.getYear() < 20) {
             state.schedule.step(state);
             IntGrid2D trawls = state.getMap().getDailyTrawlsMap();
-            for(int x =0; x<state.getMap().getWidth(); x++)
-            {
-                for (int y = 0; y < state.getMap().getHeight(); y++)
-                {
-                    theGrid[x][state.getMap().getHeight()-y-1] += trawls.get(x, y);
+            for (int x = 0; x < state.getMap().getWidth(); x++) {
+                for (int y = 0; y < state.getMap().getHeight(); y++) {
+                    theGrid[x][state.getMap().getHeight() - y - 1] += trawls.get(x, y);
                 }
             }
         }
 
 
-
         String csvGrid = FishStateUtilities.gridToCSV(theGrid);
         FileWriter writer = new FileWriter(
-                MAIN_DIRECTORY.
-                        resolve("mpa_grid.csv").toFile());
+            MAIN_DIRECTORY.
+                resolve("mpa_grid.csv").toFile());
         writer.write(csvGrid);
         writer.close();
     }

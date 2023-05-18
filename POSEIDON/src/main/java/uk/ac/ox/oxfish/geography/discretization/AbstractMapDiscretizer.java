@@ -41,7 +41,7 @@ public abstract class AbstractMapDiscretizer implements MapDiscretizer {
         public boolean test(SeaTile tile) {
             return true;
         }
-    } ;
+    };
 
 
     /**
@@ -53,13 +53,16 @@ public abstract class AbstractMapDiscretizer implements MapDiscretizer {
     @Override
     public List<SeaTile>[] discretize(NauticalMap map) {
 
-        return discretize(map,
-                          map.getAllSeaTilesExcludingLandAsList().stream().filter(filter).collect(Collectors.toList()));
+        return discretize(
+            map,
+            map.getAllSeaTilesExcludingLandAsList().stream().filter(filter).collect(Collectors.toList())
+        );
     }
 
     /**
      * return groups but only for seatiles in the tiles list (which is all the seatiles we consider valid)
-     * @param map the nautical map
+     *
+     * @param map           the nautical map
      * @param validSeatiles the list of valid seatiles
      * @return groups
      */

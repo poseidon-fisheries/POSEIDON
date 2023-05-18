@@ -48,5 +48,6 @@ public class AcquisitionFunctions {
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private AcquisitionFunctions() { }
+    private AcquisitionFunctions() {
+    }
 }

@@ -40,7 +40,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class SNALSARDestinationFactory implements AlgorithmFactory<SNALSARDestinationStrategy> {
 
 
-
     //1:safe
     //2: not known to have failed
     //3: legal
@@ -53,42 +52,39 @@ public class SNALSARDestinationFactory implements AlgorithmFactory<SNALSARDestin
      * how does the agent choose what's safe and what isn't
      */
     private AlgorithmFactory<? extends SafetyFeatureExtractor<SeaTile>> safety =
-            new EverywhereTrueExtractorFactory();
+        new EverywhereTrueExtractorFactory();
 
     /**
      * how does the agent choose what's socially acceptable and what isn't
      */
     private AlgorithmFactory<? extends SocialAcceptabilityFeatureExtractor<SeaTile>> sociallyAcceptable =
-            new NobodyFishesHereFactory();
+        new NobodyFishesHereFactory();
 
     /**
      * how does the agent choose what's legal and what isn't
      */
     private AlgorithmFactory<? extends LegalityFeatureExtractor<SeaTile>> legal =
-            new FollowRulesExtractorFactory();
+        new FollowRulesExtractorFactory();
 
     /**
      * how does the agent associate a profit level to a specific feature
      */
     private AlgorithmFactory<? extends ProfitFeatureExtractor<SeaTile>> profit =
-            new RememberedProfitsExtractorFactory();
+        new RememberedProfitsExtractorFactory();
 
 
     /**
      * What is the threshold the agent gives to profits below which this tile is considered a failure!
      */
     private AlgorithmFactory<? extends ProfitThresholdExtractor<SeaTile>> failureThreshold =
-            new FixedProfitThresholdFactory();
-
+        new FixedProfitThresholdFactory();
 
 
     /**
      * What is the threshold the agent gives to profits above which this tile is considered a success?
      */
     private AlgorithmFactory<? extends ProfitThresholdExtractor<SeaTile>> acceptableThreshold =
-            new AverageProfitsThresholdFactory();
-
-
+        new AverageProfitsThresholdFactory();
 
 
     /**
@@ -104,18 +100,30 @@ public class SNALSARDestinationFactory implements AlgorithmFactory<SNALSARDestin
         FisherStartable extractorStarter = new FisherStartable() {
             @Override
             public void start(FishState model, Fisher fisher) {
-                fisher.addFeatureExtractor(SNALSARutilities.SAFE_FEATURE,
-                                           safety.apply(model));
-                fisher.addFeatureExtractor(SNALSARutilities.SOCIALLY_APPROPRIATE_FEATURE,
-                                           sociallyAcceptable.apply(model));
-                fisher.addFeatureExtractor(SNALSARutilities.LEGAL_FEATURE,
-                                           legal.apply(model));
-                fisher.addFeatureExtractor(SNALSARutilities.PROFIT_FEATURE,
-                                           profit.apply(model));
-                fisher.addFeatureExtractor(SNALSARutilities.FAILURE_THRESHOLD,
-                                           failureThreshold.apply(model));
-                fisher.addFeatureExtractor(SNALSARutilities.ACCEPTABLE_THRESHOLD,
-                                           acceptableThreshold.apply(model));
+                fisher.addFeatureExtractor(
+                    SNALSARutilities.SAFE_FEATURE,
+                    safety.apply(model)
+                );
+                fisher.addFeatureExtractor(
+                    SNALSARutilities.SOCIALLY_APPROPRIATE_FEATURE,
+                    sociallyAcceptable.apply(model)
+                );
+                fisher.addFeatureExtractor(
+                    SNALSARutilities.LEGAL_FEATURE,
+                    legal.apply(model)
+                );
+                fisher.addFeatureExtractor(
+                    SNALSARutilities.PROFIT_FEATURE,
+                    profit.apply(model)
+                );
+                fisher.addFeatureExtractor(
+                    SNALSARutilities.FAILURE_THRESHOLD,
+                    failureThreshold.apply(model)
+                );
+                fisher.addFeatureExtractor(
+                    SNALSARutilities.ACCEPTABLE_THRESHOLD,
+                    acceptableThreshold.apply(model)
+                );
             }
 
             @Override
@@ -125,28 +133,31 @@ public class SNALSARDestinationFactory implements AlgorithmFactory<SNALSARDestin
         };
 
         SNALSARDestinationStrategy strategy = new SNALSARDestinationStrategy(
-                new ThresholdAnswer<>(0,0,SNALSARutilities.SAFE_FEATURE), //safety above 0 is safe
-                //take the complement of the failures:
-                new InverseEroteticAnswer<>(
-                        new FeatureThresholdAnswer<>(0,
-                                                           SNALSARutilities.PROFIT_FEATURE,
-                                                           SNALSARutilities.FAILURE_THRESHOLD,
-                                                           false)),
-                //everything above 0 is legal
-                new ThresholdAnswer<>(0,0,SNALSARutilities.LEGAL_FEATURE),
-                //everything above 0 is appropriate,
-                new ThresholdAnswer<>(0,0,SNALSARutilities.SOCIALLY_APPROPRIATE_FEATURE),
-                new FeatureThresholdAnswer<>(0,
-                                                    SNALSARutilities.PROFIT_FEATURE,
-                                                    SNALSARutilities.ACCEPTABLE_THRESHOLD,
-                                                    true),
-                new FavoriteDestinationStrategy(state.getMap(),state.getRandom()),
-                extractorStarter
-                );
+            new ThresholdAnswer<>(0, 0, SNALSARutilities.SAFE_FEATURE), //safety above 0 is safe
+            //take the complement of the failures:
+            new InverseEroteticAnswer<>(
+                new FeatureThresholdAnswer<>(
+                    0,
+                    SNALSARutilities.PROFIT_FEATURE,
+                    SNALSARutilities.FAILURE_THRESHOLD,
+                    false
+                )),
+            //everything above 0 is legal
+            new ThresholdAnswer<>(0, 0, SNALSARutilities.LEGAL_FEATURE),
+            //everything above 0 is appropriate,
+            new ThresholdAnswer<>(0, 0, SNALSARutilities.SOCIALLY_APPROPRIATE_FEATURE),
+            new FeatureThresholdAnswer<>(
+                0,
+                SNALSARutilities.PROFIT_FEATURE,
+                SNALSARutilities.ACCEPTABLE_THRESHOLD,
+                true
+            ),
+            new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
+            extractorStarter
+        );
 
 
         return strategy;
-
 
 
     }
@@ -157,7 +168,8 @@ public class SNALSARDestinationFactory implements AlgorithmFactory<SNALSARDestin
     }
 
     public void setSafety(
-            AlgorithmFactory<? extends SafetyFeatureExtractor<SeaTile>> safety) {
+        AlgorithmFactory<? extends SafetyFeatureExtractor<SeaTile>> safety
+    ) {
         this.safety = safety;
     }
 
@@ -166,7 +178,8 @@ public class SNALSARDestinationFactory implements AlgorithmFactory<SNALSARDestin
     }
 
     public void setSociallyAcceptable(
-            AlgorithmFactory<? extends SocialAcceptabilityFeatureExtractor<SeaTile>> sociallyAcceptable) {
+        AlgorithmFactory<? extends SocialAcceptabilityFeatureExtractor<SeaTile>> sociallyAcceptable
+    ) {
         this.sociallyAcceptable = sociallyAcceptable;
     }
 
@@ -175,7 +188,8 @@ public class SNALSARDestinationFactory implements AlgorithmFactory<SNALSARDestin
     }
 
     public void setLegal(
-            AlgorithmFactory<? extends LegalityFeatureExtractor<SeaTile>> legal) {
+        AlgorithmFactory<? extends LegalityFeatureExtractor<SeaTile>> legal
+    ) {
         this.legal = legal;
     }
 
@@ -184,7 +198,8 @@ public class SNALSARDestinationFactory implements AlgorithmFactory<SNALSARDestin
     }
 
     public void setProfit(
-            AlgorithmFactory<? extends ProfitFeatureExtractor<SeaTile>> profit) {
+        AlgorithmFactory<? extends ProfitFeatureExtractor<SeaTile>> profit
+    ) {
         this.profit = profit;
     }
 
@@ -193,7 +208,8 @@ public class SNALSARDestinationFactory implements AlgorithmFactory<SNALSARDestin
     }
 
     public void setFailureThreshold(
-            AlgorithmFactory<? extends ProfitThresholdExtractor<SeaTile>> failureThreshold) {
+        AlgorithmFactory<? extends ProfitThresholdExtractor<SeaTile>> failureThreshold
+    ) {
         this.failureThreshold = failureThreshold;
     }
 
@@ -202,7 +218,8 @@ public class SNALSARDestinationFactory implements AlgorithmFactory<SNALSARDestin
     }
 
     public void setAcceptableThreshold(
-            AlgorithmFactory<? extends ProfitThresholdExtractor<SeaTile>> acceptableThreshold) {
+        AlgorithmFactory<? extends ProfitThresholdExtractor<SeaTile>> acceptableThreshold
+    ) {
         this.acceptableThreshold = acceptableThreshold;
     }
 }

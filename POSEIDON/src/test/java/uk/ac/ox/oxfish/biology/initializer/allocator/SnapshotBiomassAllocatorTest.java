@@ -25,50 +25,60 @@ public class SnapshotBiomassAllocatorTest {
         }
 
         //fill 2x2 at top
-        fishState.getMap().getSeaTile(0,0).setBiology(new ConstantLocalBiology(1));
-        fishState.getMap().getSeaTile(0,1).setBiology(new ConstantLocalBiology(1));
-        fishState.getMap().getSeaTile(1,0).setBiology(new ConstantLocalBiology(1));
-        fishState.getMap().getSeaTile(1,1).setBiology(new ConstantLocalBiology(10));
+        fishState.getMap().getSeaTile(0, 0).setBiology(new ConstantLocalBiology(1));
+        fishState.getMap().getSeaTile(0, 1).setBiology(new ConstantLocalBiology(1));
+        fishState.getMap().getSeaTile(1, 0).setBiology(new ConstantLocalBiology(1));
+        fishState.getMap().getSeaTile(1, 1).setBiology(new ConstantLocalBiology(10));
 
 
         SnapshotBiomassAllocator biomassAllocator = new SnapshotBiomassAllocator();
-        biomassAllocator.takeSnapshort(fishState.getMap(),mock(Species.class));
+        biomassAllocator.takeSnapshort(fishState.getMap(), mock(Species.class));
 
         assertEquals(
-        biomassAllocator.allocate(fishState.getMap().getSeaTile(0,0),
+            biomassAllocator.allocate(
+                fishState.getMap().getSeaTile(0, 0),
                 fishState.getMap(),
-                null),
-                1d/13,
-                .0001
+                null
+            ),
+            1d / 13,
+            .0001
         );
         assertEquals(
-                biomassAllocator.allocate(fishState.getMap().getSeaTile(1,0),
-                        fishState.getMap(),
-                        null),
-                1d/13,
-                .0001
+            biomassAllocator.allocate(
+                fishState.getMap().getSeaTile(1, 0),
+                fishState.getMap(),
+                null
+            ),
+            1d / 13,
+            .0001
         );
         assertEquals(
-                biomassAllocator.allocate(fishState.getMap().getSeaTile(0,1),
-                        fishState.getMap(),
-                        null),
-                1d/13,
-                .0001
+            biomassAllocator.allocate(
+                fishState.getMap().getSeaTile(0, 1),
+                fishState.getMap(),
+                null
+            ),
+            1d / 13,
+            .0001
         );
         assertEquals(
-                biomassAllocator.allocate(fishState.getMap().getSeaTile(1,1),
-                        fishState.getMap(),
-                        null),
-                10d/13,
-                .0001
+            biomassAllocator.allocate(
+                fishState.getMap().getSeaTile(1, 1),
+                fishState.getMap(),
+                null
+            ),
+            10d / 13,
+            .0001
         );
 
         assertEquals(
-                biomassAllocator.allocate(fishState.getMap().getSeaTile(3,3),
-                        fishState.getMap(),
-                        null),
-                0,
-                .0001
+            biomassAllocator.allocate(
+                fishState.getMap().getSeaTile(3, 3),
+                fishState.getMap(),
+                null
+            ),
+            0,
+            .0001
         );
 
 

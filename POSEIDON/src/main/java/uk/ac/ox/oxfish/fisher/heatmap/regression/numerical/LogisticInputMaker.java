@@ -36,7 +36,6 @@ import java.util.function.Function;
 public class LogisticInputMaker {
 
 
-
     /**
      * the observation extractors (the functions that return the "x" associated with each group). One array for each possible Y
      */
@@ -47,43 +46,45 @@ public class LogisticInputMaker {
      * function (that can return null) that extracts from a bandit arm a seatile associated with it.
      * This is then fed to the observtion extractor
      */
-    private final Function<Integer,SeaTile> armToTileExtractor;
+    private final Function<Integer, SeaTile> armToTileExtractor;
 
-    private HashMap<Integer,SeaTile> lastExtraction = null;
+    private HashMap<Integer, SeaTile> lastExtraction = null;
 
 
     public LogisticInputMaker(
-            ObservationExtractor[][] extractors,
-            Function<Integer, SeaTile> armToTileExtractor) {
+        ObservationExtractor[][] extractors
+    ) {
+        this(extractors, integer -> null);
+    }
+
+    public LogisticInputMaker(
+        ObservationExtractor[][] extractors,
+        Function<Integer, SeaTile> armToTileExtractor
+    ) {
         this.extractors = extractors;
         this.armToTileExtractor = armToTileExtractor;
     }
 
-    public LogisticInputMaker(
-            ObservationExtractor[][] extractors) {
-        this(extractors, integer -> null);
-    }
-
     /**
      * extract the design matrix to feed into a regression
+     *
      * @param fisher the fisher
-     * @param state the state
+     * @param state  the state
      * @return a matrix of inputs
      */
-    public double[][] getRegressionInput(Fisher fisher, FishState state)
-    {
+    public double[][] getRegressionInput(Fisher fisher, FishState state) {
         //compute all the x ahead of time
         lastExtraction = new HashMap<>();
         final double[][] x = new double[extractors.length][];
-        for(int i=0; i<extractors.length; i++)
-        {
+        for (int i = 0; i < extractors.length; i++) {
             x[i] = new double[extractors[0].length];
             SeaTile tile = armToTileExtractor.apply(i);
             lastExtraction.put(i, tile);
-            for(int j=0; j<extractors[0].length; j++) {
-                if(tile!=null)
+            for (int j = 0; j < extractors[0].length; j++) {
+                if (tile != null)
                     x[i][j] = extractors[i][j].extract(lastExtraction.get(i),
-                                                       state.getHoursSinceStart(), fisher, state);
+                        state.getHoursSinceStart(), fisher, state
+                    );
                 else
                     x[i][j] = Double.NaN;
             }

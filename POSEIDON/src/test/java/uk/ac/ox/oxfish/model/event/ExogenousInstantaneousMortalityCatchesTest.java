@@ -21,16 +21,17 @@ public class ExogenousInstantaneousMortalityCatchesTest {
         scenario.getFisherDefinitions().clear();
 
         ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).
-                setCarryingCapacity(new FixedDoubleParameter(1000));
+            setCarryingCapacity(new FixedDoubleParameter(1000));
         ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setMinInitialCapacity(new FixedDoubleParameter(1));
         ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setMaxInitialCapacity(new FixedDoubleParameter(1));
-        ((SimpleLogisticGrowerFactory) ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).getGrower()).setSteepness(new FixedDoubleParameter(0d));
+        ((SimpleLogisticGrowerFactory) ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).getGrower()).setSteepness(
+            new FixedDoubleParameter(0d));
         // work!
         FishState state = new FishState();
         state.setScenario(scenario);
 
         ExogenousInstantaneousMortalityCatchesFactory factory = new ExogenousInstantaneousMortalityCatchesFactory();
-        factory.getExogenousMortalities().put("Species 0",.5);
+        factory.getExogenousMortalities().put("Species 0", .5);
         factory.setAbundanceBased(false);
 
         scenario.setExogenousCatches(factory);
@@ -41,8 +42,9 @@ public class ExogenousInstantaneousMortalityCatchesTest {
         for (int i = 0; i < 363; i++) {
             state.schedule.step(state);
             Assert.assertEquals(
-                    state.getMap().getSeaTile(2,2).getBiomass(state.getSpecies("Species 0")),
-                    1000,.0001);
+                state.getMap().getSeaTile(2, 2).getBiomass(state.getSpecies("Species 0")),
+                1000, .0001
+            );
         }
 
         for (int i = 0; i < 30; i++) {
@@ -50,13 +52,12 @@ public class ExogenousInstantaneousMortalityCatchesTest {
 
         }
         Assert.assertEquals(
-                state.getMap().getSeaTile(2,2).getBiomass(state.getSpecies("Species 0")),
-                606.5307,.0001);
-
+            state.getMap().getSeaTile(2, 2).getBiomass(state.getSpecies("Species 0")),
+            606.5307, .0001
+        );
 
 
     }
-
 
 
     @Test
@@ -71,11 +72,16 @@ public class ExogenousInstantaneousMortalityCatchesTest {
 
         // Feed an empty ExogenousCatches factory to the scenario, as we'll build our own later
         scenario.setExogenousCatches(__ -> new ExogenousCatches() {
-            @Override public void start(final FishState model) {}
-            @Override public void step(final SimState simState) {}
+            @Override
+            public void start(final FishState model) {
+            }
+
+            @Override
+            public void step(final SimState simState) {
+            }
         });
 
-           boxy.setInitialBtOverK(new FixedDoubleParameter(1));
+        boxy.setInitialBtOverK(new FixedDoubleParameter(1));
         //   boxy.setYearlyMortality(new FixedDoubleParameter(0d));
         //   boxy.setK(new FixedDoubleParameter(0d));
         //  boxy.setSteepness(new FixedDoubleParameter(0.0001d));
@@ -84,7 +90,7 @@ public class ExogenousInstantaneousMortalityCatchesTest {
         state.setScenario(scenario);
 
         ExogenousInstantaneousMortalityCatchesFactory factory = new ExogenousInstantaneousMortalityCatchesFactory();
-        factory.getExogenousMortalities().put("Red Fish",.5);
+        factory.getExogenousMortalities().put("Red Fish", .5);
         factory.setAbundanceBased(true);
 
 
@@ -97,16 +103,16 @@ public class ExogenousInstantaneousMortalityCatchesTest {
 
         state.schedule.step(state);
         Assert.assertEquals(
-                state.getMap().getSeaTile(2,2).getBiomass(state.getSpecies("Red Fish")),
-                2266886,1);
+            state.getMap().getSeaTile(2, 2).getBiomass(state.getSpecies("Red Fish")),
+            2266886, 1
+        );
 
-    //    catches.start(state);
+        //    catches.start(state);
         catches.step(state);
         Assert.assertEquals(
-                state.getMap().getSeaTile(2,2).getBiomass(state.getSpecies("Red Fish")),
-                1374936,1);
-
-
+            state.getMap().getSeaTile(2, 2).getBiomass(state.getSpecies("Red Fish")),
+            1374936, 1
+        );
 
 
     }

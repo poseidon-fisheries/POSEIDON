@@ -9,13 +9,14 @@ public class LbSPRFormula implements SPRFormula {
 
         final Species species = sprAgent.getSpecies();
 
-        double maxLength =  species.getLengthAtAge(Integer.MAX_VALUE,0);
+        double maxLength = species.getLengthAtAge(Integer.MAX_VALUE, 0);
         final double binWidthInCm = sprAgent.getAssumedLengthBinCm();
-        int bins =  (int)Math.ceil(maxLength / binWidthInCm) + 1;
-        CatchAtLength catchAtLength = new CatchAtLength(abundance,
-                species,
-                binWidthInCm,
-                bins
+        int bins = (int) Math.ceil(maxLength / binWidthInCm) + 1;
+        CatchAtLength catchAtLength = new CatchAtLength(
+            abundance,
+            species,
+            binWidthInCm,
+            bins
         );
 
         final double[] catchAtLengthArray = catchAtLength.getCatchAtLength();
@@ -25,29 +26,28 @@ public class LbSPRFormula implements SPRFormula {
         double maturityLength = sprAgent.getAssumedLenghtAtMaturity();
         for (int bin = 0; bin < catchAtLengthArray.length; bin++) {
             final double edge = bin * binWidthInCm;
-            binMids[bin] = edge + binWidthInCm/2;
-            if(maturityLength>edge) {
+            binMids[bin] = edge + binWidthInCm / 2;
+            if (maturityLength > edge) {
                 if (maturityLength < edge + binWidthInCm)
                     maturityPerBin[bin] = 0.5;
                 else
                     maturityPerBin[bin] = 0;
-            }
-            else {
-                    maturityPerBin[bin] = 1;
+            } else {
+                maturityPerBin[bin] = 1;
 
             }
         }
 
         return LbSprEstimation.computeSPR(
-                catchAtLengthArray,
-                sprAgent.getAssumedLinf(),
-                .1,
-                binMids,
-                sprAgent.getAssumedNaturalMortality()/sprAgent.getAssumedKParameter(),
-                maturityPerBin,
-                sprAgent.getAssumedVarB()
+            catchAtLengthArray,
+            sprAgent.getAssumedLinf(),
+            .1,
+            binMids,
+            sprAgent.getAssumedNaturalMortality() / sprAgent.getAssumedKParameter(),
+            maturityPerBin,
+            sprAgent.getAssumedVarB()
 
-                ).getSpr();
+        ).getSpr();
 
     }
 }

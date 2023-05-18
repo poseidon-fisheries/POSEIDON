@@ -24,9 +24,6 @@ import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -37,8 +34,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
  * true or false according to a logistic probability
  * Created by carrknight on 9/11/15.
  */
-public abstract class LogisticDepartingStrategy  implements DepartingStrategy, Steppable
-{
+public abstract class LogisticDepartingStrategy implements DepartingStrategy, Steppable {
 
 
     private final double l;
@@ -48,7 +44,7 @@ public abstract class LogisticDepartingStrategy  implements DepartingStrategy, S
     private final double x0;
 
 
-    private Boolean  decisionTaken = null;
+    private Boolean decisionTaken = null;
 
     private FishState model;
 
@@ -75,7 +71,6 @@ public abstract class LogisticDepartingStrategy  implements DepartingStrategy, S
     /**
      * logistic
      *
-     *
      * @param fisher
      * @param model
      * @param random
@@ -83,7 +78,8 @@ public abstract class LogisticDepartingStrategy  implements DepartingStrategy, S
      */
     @Override
     public boolean shouldFisherLeavePort(
-            Fisher fisher, FishState model, MersenneTwisterFast random) {
+        Fisher fisher, FishState model, MersenneTwisterFast random
+    ) {
 
         //you have no countdown activated
         if (decisionTaken == null) {
@@ -100,11 +96,9 @@ public abstract class LogisticDepartingStrategy  implements DepartingStrategy, S
             decisionTaken = model.getRandom().nextBoolean(dailyProbability);
 
 
-
             return decisionTaken;
 
-        }
-        else
+        } else
             return decisionTaken;
 
     }
@@ -113,7 +107,6 @@ public abstract class LogisticDepartingStrategy  implements DepartingStrategy, S
      * abstract method, returns whatever we need to plug in the logistic function
      */
     abstract public double computeX(Fisher fisher, FishState model);
-
 
 
     @Override

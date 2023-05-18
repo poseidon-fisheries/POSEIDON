@@ -94,6 +94,23 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSp
         );
     }
 
+    /**
+     * Getter for property 'exponent'.
+     *
+     * @return Value for property 'exponent'.
+     */
+    public DoubleParameter getExponent() {
+        return exponent;
+    }
+
+    /**
+     * Getter for property 'minCapacityRatio'.
+     *
+     * @return Value for property 'minCapacityRatio'.
+     */
+    public DoubleParameter getMinCapacityRatio() {
+        return minCapacityRatio;
+    }
 
     /**
      * Getter for property 'carryingCapacity'.
@@ -134,6 +151,24 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSp
     }
 
     /**
+     * Setter for property 'minCapacityRatio'.
+     *
+     * @param minCapacityRatio Value to set for property 'minCapacityRatio'.
+     */
+    public void setMinCapacityRatio(final DoubleParameter minCapacityRatio) {
+        this.minCapacityRatio = minCapacityRatio;
+    }
+
+    /**
+     * Setter for property 'exponent'.
+     *
+     * @param exponent Value to set for property 'exponent'.
+     */
+    public void setExponent(final DoubleParameter exponent) {
+        this.exponent = exponent;
+    }
+
+    /**
      * Getter for property 'percentageLimitOnDailyMovement'.
      *
      * @return Value for property 'percentageLimitOnDailyMovement'.
@@ -169,42 +204,6 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSp
      */
     public void setDifferentialPercentageToMove(final DoubleParameter differentialPercentageToMove) {
         this.differentialPercentageToMove = differentialPercentageToMove;
-    }
-
-    /**
-     * Getter for property 'minCapacityRatio'.
-     *
-     * @return Value for property 'minCapacityRatio'.
-     */
-    public DoubleParameter getMinCapacityRatio() {
-        return minCapacityRatio;
-    }
-
-    /**
-     * Setter for property 'minCapacityRatio'.
-     *
-     * @param minCapacityRatio Value to set for property 'minCapacityRatio'.
-     */
-    public void setMinCapacityRatio(final DoubleParameter minCapacityRatio) {
-        this.minCapacityRatio = minCapacityRatio;
-    }
-
-    /**
-     * Getter for property 'exponent'.
-     *
-     * @return Value for property 'exponent'.
-     */
-    public DoubleParameter getExponent() {
-        return exponent;
-    }
-
-    /**
-     * Setter for property 'exponent'.
-     *
-     * @param exponent Value to set for property 'exponent'.
-     */
-    public void setExponent(final DoubleParameter exponent) {
-        this.exponent = exponent;
     }
 
     /**

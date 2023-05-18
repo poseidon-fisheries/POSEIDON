@@ -29,22 +29,26 @@ public interface BiologyResetter {
 
     /**
      * records how much biomass there is
+     *
      * @param map
      */
     void recordHowMuchBiomassThereIs(FishState map);
 
     /**
      * returns biology layer to biomass recorded previously
+     *
      * @param map
      * @param random
      */
     void resetAbundance(
-            NauticalMap map,
-            MersenneTwisterFast random);
+        NauticalMap map,
+        MersenneTwisterFast random
+    );
 
 
     /**
      * species we are resetting
+     *
      * @return
      */
     Species getSpecies();

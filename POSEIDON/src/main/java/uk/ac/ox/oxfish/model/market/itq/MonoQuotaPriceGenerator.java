@@ -40,25 +40,18 @@ import java.util.stream.Collectors;
  * quotas
  * Created by carrknight on 8/20/15.
  */
-public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable
-{
-
+public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable {
 
 
     private final int specieIndex;
-
-    private Fisher fisher;
-
-    private FishState state;
-
-    private MonoQuotaRegulation quotas;
-
-
     /**
      * whether to include or not daily profits in the reservation price computation. This was something I attempted
      * on 20151006 but I decided to abandon as I don't think it makes as much economic sense as I thought it did
      */
     private final boolean includeDailyProfits;
+    private Fisher fisher;
+    private FishState state;
+    private MonoQuotaRegulation quotas;
     /**
      * the title we registered our lambda to
      */
@@ -73,25 +66,26 @@ public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable
      */
     private Stoppable receipt;
 
-    public MonoQuotaPriceGenerator(int specieIndex,
-                                   boolean includeDailyProfits) {
+    public MonoQuotaPriceGenerator(
+        int specieIndex,
+        boolean includeDailyProfits
+    ) {
         this.specieIndex = specieIndex;
         this.includeDailyProfits = includeDailyProfits;
     }
 
     @Override
-    public void start(FishState model, Fisher fisher)
-    {
+    public void start(FishState model, Fisher fisher) {
         this.fisher = fisher;
         this.state = model;
         //only works with the right kind of regulation!
-        if(fisher.getRegulation() instanceof MonoQuotaRegulation)
+        if (fisher.getRegulation() instanceof MonoQuotaRegulation)
             quotas = (MonoQuotaRegulation) fisher.getRegulation();
         else
             //todo make this better
-        //ugly hack to deal with multiple regulations: just grab the first one that shows up!
+            //ugly hack to deal with multiple regulations: just grab the first one that shows up!
             quotas = (MonoQuotaRegulation)
-                    ((MultipleRegulations) fisher.getRegulation()).getRegulations().stream().filter(
+                ((MultipleRegulations) fisher.getRegulation()).getRegulations().stream().filter(
                     new Predicate<Regulation>() {
                         @Override
                         public boolean test(Regulation regulation) {
@@ -103,10 +97,11 @@ public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable
         receipt = model.scheduleEveryDay(this, StepOrder.AGGREGATE_DATA_GATHERING);
 
         dataTitle = "Reservation Quota Price of " + model.getSpecies().get(specieIndex);
-        fisher.getDailyData().registerGatherer(dataTitle,
-                                               fisher1 -> lastLambda,
-                                               Double.NaN);
-
+        fisher.getDailyData().registerGatherer(
+            dataTitle,
+            fisher1 -> lastLambda,
+            Double.NaN
+        );
 
 
     }
@@ -114,7 +109,7 @@ public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable
     @Override
     public void turnOff(Fisher fisher) {
         //todo remove gatherer
-        if(receipt!=null) {
+        if (receipt != null) {
             receipt.stop();
             this.fisher.getDailyData().removeGatherer(dataTitle);
         }
@@ -127,29 +122,31 @@ public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable
         lastLambda = computeLambda();
     }
 
-    public double computeLambda()
-    {
+    public double computeLambda() {
 
-        if(fisher == null)
+        if (fisher == null)
             return Double.NaN;
         if (state.getDayOfTheYear() == 365)
             return Double.NaN;
-        int amountOfDaysLeftFishing = fisher.getDepartingStrategy().predictedDaysLeftFishingThisYear(fisher,state,state.getRandom());
+        int amountOfDaysLeftFishing = fisher.getDepartingStrategy()
+            .predictedDaysLeftFishingThisYear(fisher, state, state.getRandom());
 
-        double probability = 1 - fisher.probabilitySumDailyCatchesBelow(specieIndex,quotas.getQuotaRemaining(specieIndex),
-                amountOfDaysLeftFishing);
+        double probability = 1 - fisher.probabilitySumDailyCatchesBelow(specieIndex,
+            quotas.getQuotaRemaining(specieIndex),
+            amountOfDaysLeftFishing
+        );
 
-        if(!includeDailyProfits)
-            return  (probability * fisher.predictUnitProfit(specieIndex));
+        if (!includeDailyProfits)
+            return (probability * fisher.predictUnitProfit(specieIndex));
         else
-            return  (probability * (fisher.predictUnitProfit(specieIndex) +  (365 - state.getDayOfTheYear()) * fisher.predictDailyProfits() ));
-
-
+            return (probability * (fisher.predictUnitProfit(specieIndex) + (365 - state.getDayOfTheYear()) * fisher.predictDailyProfits()));
 
 
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Fisher getFisher() {
         return fisher;

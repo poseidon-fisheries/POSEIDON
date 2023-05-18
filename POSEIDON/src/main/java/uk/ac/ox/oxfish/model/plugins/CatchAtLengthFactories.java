@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.model.plugins;
 
-import uk.ac.ox.oxfish.biology.boxcars.*;
+import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilder;
+import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilderFixedSample;
+import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilderSelectiveSampling;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -11,6 +13,7 @@ public class CatchAtLengthFactories {
 
     public static final LinkedHashMap<String, Supplier<CatchAtLengthFactory>> CONSTRUCTORS = new LinkedHashMap<>();
     public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+
     static {
         //these three probably need a linkedhashmap of their own::
         NAMES.put(SPRAgentBuilder.class, "SPR Agent");

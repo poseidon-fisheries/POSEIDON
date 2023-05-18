@@ -56,6 +56,13 @@ public class IndependentLogisticInitializer extends AbstractBiologyInitializer {
 
 
     public IndependentLogisticInitializer(
+        final DoubleParameter carryingCapacity, final LogisticGrowerInitializer grower
+    ) {
+        this(carryingCapacity, new FixedDoubleParameter(0), new FixedDoubleParameter(1d), grower);
+    }
+
+
+    public IndependentLogisticInitializer(
         final DoubleParameter carryingCapacity,
         final DoubleParameter minInitialCapacity, final DoubleParameter maxInitialCapacity,
         final LogisticGrowerInitializer grower
@@ -64,13 +71,6 @@ public class IndependentLogisticInitializer extends AbstractBiologyInitializer {
         this.minInitialCapacity = minInitialCapacity;
         this.maxInitialCapacity = maxInitialCapacity;
         this.grower = grower;
-    }
-
-
-    public IndependentLogisticInitializer(
-        final DoubleParameter carryingCapacity, final LogisticGrowerInitializer grower
-    ) {
-        this(carryingCapacity, new FixedDoubleParameter(0), new FixedDoubleParameter(1d), grower);
     }
 
     /**

@@ -31,7 +31,7 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
  * biologies where species are just names and nothing else
  * Created by carrknight on 11/5/15.
  */
-public  abstract class AbstractBiologyInitializer implements BiologyInitializer {
+public abstract class AbstractBiologyInitializer implements BiologyInitializer {
 
     /**
      * creates the global biology object for the model
@@ -42,42 +42,34 @@ public  abstract class AbstractBiologyInitializer implements BiologyInitializer 
      */
     @Override
     public GlobalBiology generateGlobal(
-            MersenneTwisterFast random,
-            FishState modelBeingInitialized) {
+        MersenneTwisterFast random,
+        FishState modelBeingInitialized
+    ) {
         //turn list of names into list of species
         String[] names = getSpeciesNames();
         Species[] speciesArray = new Species[names.length];
-        for(int i=0; i< names.length; i++)
-        {
+        for (int i = 0; i < names.length; i++) {
             speciesArray[i] = new Species(names[i]);
         }
-
-
-
-
-
-
-
-
-
-
 
 
         //initialize all the data collection stuff
         for (Species species : speciesArray) {
             final String columnName = species + " Recruitment";
             modelBeingInitialized.getYearlyCounter().addColumn(
-                    columnName);
+                columnName);
             modelBeingInitialized.getYearlyDataSet().registerGatherer(
-                    columnName,
-                    new Gatherer<FishState>() {
-                        @Override
-                        public Double apply(
-                                FishState state) {
-                            return modelBeingInitialized.getYearlyCounter().getColumn(
-                                    columnName);
-                        }
-                    }, 0d);
+                columnName,
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(
+                        FishState state
+                    ) {
+                        return modelBeingInitialized.getYearlyCounter().getColumn(
+                            columnName);
+                    }
+                }, 0d
+            );
         }
 
         return new GlobalBiology(speciesArray);
@@ -88,5 +80,5 @@ public  abstract class AbstractBiologyInitializer implements BiologyInitializer 
      *
      * @return
      */
-     abstract public String[] getSpeciesNames();
+    abstract public String[] getSpeciesNames();
 }

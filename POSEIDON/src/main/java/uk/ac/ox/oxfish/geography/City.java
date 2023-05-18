@@ -28,15 +28,14 @@ import sim.util.geo.MasonGeometry;
  * it not to, but GeoMason gui is pretty choosy about what it wants and so here we are.
  * Created by carrknight on 4/3/15.
  */
-public class City  extends MasonGeometry{
+public class City extends MasonGeometry {
 
 
     private final String name;
 
     private final int population;
 
-    public City(Geometry g, String name, int population)
-    {
+    public City(Geometry g, String name, int population) {
         super(g);
         this.name = name;
         this.population = population;
@@ -55,7 +54,6 @@ public class City  extends MasonGeometry{
     public int getPopulation() {
         return population;
     }
-
 
 
 }

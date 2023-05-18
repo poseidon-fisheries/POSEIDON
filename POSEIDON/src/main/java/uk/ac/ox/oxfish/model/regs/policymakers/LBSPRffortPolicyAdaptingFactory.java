@@ -109,13 +109,8 @@ public class LBSPRffortPolicyAdaptingFactory implements AlgorithmFactory<Additio
         };
     }
 
-
-    public CatchAtLengthFactory getSprAgentDelegate() {
-        return sprAgentDelegate;
-    }
-
-    public void setSprAgentDelegate(CatchAtLengthFactory sprAgentDelegate) {
-        this.sprAgentDelegate = sprAgentDelegate;
+    public String getEffortDefinition() {
+        return controllerDelegate.getEffortDefinition();
     }
 
     public DoubleParameter getLinearParameter() {
@@ -150,8 +145,8 @@ public class LBSPRffortPolicyAdaptingFactory implements AlgorithmFactory<Additio
         controllerDelegate.setMaxChangeEachYear(maxChangeEachYear);
     }
 
-    public String getEffortDefinition() {
-        return controllerDelegate.getEffortDefinition();
+    public boolean isBlockEntryWhenSeasonIsNotFull() {
+        return controllerDelegate.isBlockEntryWhenSeasonIsNotFull();
     }
 
     public int getStartingYear() {
@@ -162,12 +157,16 @@ public class LBSPRffortPolicyAdaptingFactory implements AlgorithmFactory<Additio
         controllerDelegate.setStartingYear(startingYear);
     }
 
-    public boolean isBlockEntryWhenSeasonIsNotFull() {
-        return controllerDelegate.isBlockEntryWhenSeasonIsNotFull();
-    }
-
     public void setBlockEntryWhenSeasonIsNotFull(boolean blockEntryWhenSeasonIsNotFull) {
         controllerDelegate.setBlockEntryWhenSeasonIsNotFull(blockEntryWhenSeasonIsNotFull);
+    }
+
+    public CatchAtLengthFactory getSprAgentDelegate() {
+        return sprAgentDelegate;
+    }
+
+    public void setSprAgentDelegate(CatchAtLengthFactory sprAgentDelegate) {
+        this.sprAgentDelegate = sprAgentDelegate;
     }
 
     public DoubleParameter getUpperDiscrepancyThreshold() {

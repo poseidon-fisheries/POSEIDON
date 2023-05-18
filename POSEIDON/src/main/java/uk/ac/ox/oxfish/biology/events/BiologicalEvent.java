@@ -36,7 +36,7 @@ import java.util.function.Predicate;
  * some sort of operation
  * Created by carrknight on 10/7/16.
  */
-public class BiologicalEvent implements Startable,Steppable{
+public class BiologicalEvent implements Startable, Steppable {
 
 
     /**
@@ -59,8 +59,9 @@ public class BiologicalEvent implements Startable,Steppable{
 
 
     public BiologicalEvent(
-            Predicate<FishState> trigger, Predicate<SeaTile> appliesHere,
-            Consumer<SeaTile> event) {
+        Predicate<FishState> trigger, Predicate<SeaTile> appliesHere,
+        Consumer<SeaTile> event
+    ) {
         this.trigger = trigger;
         this.appliesHere = appliesHere;
         this.event = event;
@@ -69,10 +70,10 @@ public class BiologicalEvent implements Startable,Steppable{
     @Override
     public void step(SimState state) {
         //if the trigger applies
-        if(trigger.test(((FishState) state)))
+        if (trigger.test(((FishState) state)))
             //for all the seatiles that qualify apply the event
             ((FishState) state).getMap().getAllSeaTilesExcludingLandAsList().stream().
-                    filter(appliesHere).forEach(event);
+                filter(appliesHere).forEach(event);
     }
 
     /**
@@ -91,7 +92,7 @@ public class BiologicalEvent implements Startable,Steppable{
      */
     @Override
     public void turnOff() {
-        if(stoppable!=null)
+        if (stoppable != null)
             stoppable.stop();
     }
 }

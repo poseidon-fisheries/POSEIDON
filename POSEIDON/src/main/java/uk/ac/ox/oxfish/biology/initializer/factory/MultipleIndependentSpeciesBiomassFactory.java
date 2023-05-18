@@ -30,21 +30,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MultipleIndependentSpeciesBiomassFactory implements
-        AlgorithmFactory<MultipleIndependentSpeciesBiomassInitializer>{
-
-    public MultipleIndependentSpeciesBiomassFactory() {};
-
-    public MultipleIndependentSpeciesBiomassFactory(
-        List<AlgorithmFactory<SingleSpeciesBiomassInitializer>> factories,
-        boolean addImaginarySpecies,
-        boolean constantBiomass
-    ) {
-        this.factories = factories;
-        this.addImaginarySpecies = addImaginarySpecies;
-        this.constantBiomass = constantBiomass;
-    }
+    AlgorithmFactory<MultipleIndependentSpeciesBiomassInitializer> {
 
     private List<AlgorithmFactory<SingleSpeciesBiomassInitializer>> factories = new LinkedList<>();
+
+    ;
+    private boolean addImaginarySpecies = true;
+    private boolean constantBiomass = false;
+
     {
         SingleSpeciesBiomassFactory first = new SingleSpeciesBiomassFactory();
         first.setSpeciesName("Red Fish");
@@ -56,11 +49,19 @@ public class MultipleIndependentSpeciesBiomassFactory implements
     }
 
 
-    private boolean addImaginarySpecies = true;
+    public MultipleIndependentSpeciesBiomassFactory() {
+    }
 
 
-
-    private boolean constantBiomass = false;
+    public MultipleIndependentSpeciesBiomassFactory(
+        List<AlgorithmFactory<SingleSpeciesBiomassInitializer>> factories,
+        boolean addImaginarySpecies,
+        boolean constantBiomass
+    ) {
+        this.factories = factories;
+        this.addImaginarySpecies = addImaginarySpecies;
+        this.constantBiomass = constantBiomass;
+    }
 
     /**
      * Applies this function to the given argument.
@@ -73,11 +74,13 @@ public class MultipleIndependentSpeciesBiomassFactory implements
 
 
         List<SingleSpeciesBiomassInitializer> initializers = factories.stream().map(
-                factory -> factory.apply(state)).collect(Collectors.toList());
+            factory -> factory.apply(state)).collect(Collectors.toList());
 
-        return new MultipleIndependentSpeciesBiomassInitializer(initializers,
-                addImaginarySpecies,
-                constantBiomass);
+        return new MultipleIndependentSpeciesBiomassInitializer(
+            initializers,
+            addImaginarySpecies,
+            constantBiomass
+        );
 
     }
 
@@ -97,7 +100,8 @@ public class MultipleIndependentSpeciesBiomassFactory implements
      * @param factories Value to set for property 'factories'.
      */
     public void setFactories(
-            List<AlgorithmFactory<SingleSpeciesBiomassInitializer>> factories) {
+        List<AlgorithmFactory<SingleSpeciesBiomassInitializer>> factories
+    ) {
         this.factories = factories;
     }
 

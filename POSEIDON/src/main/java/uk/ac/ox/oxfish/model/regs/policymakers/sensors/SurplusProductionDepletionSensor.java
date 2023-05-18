@@ -10,20 +10,22 @@ import java.util.function.Function;
 /**
  * returns the current depletion level according to a surplus-production model assessment
  */
-public class SurplusProductionDepletionSensor implements Sensor<FishState,Double> {
+public class SurplusProductionDepletionSensor implements Sensor<FishState, Double> {
 
     private final SurplusProductionStockAssessment assessment;
 
-    public SurplusProductionDepletionSensor(double[] carryingCapacityBounds, double[] logisticGrowthBounds,
-                                            double[] catchabilityBounds, String indicatorColumnName,
-                                            String catchColumnName) {
+    public SurplusProductionDepletionSensor(
+        double[] carryingCapacityBounds, double[] logisticGrowthBounds,
+        double[] catchabilityBounds, String indicatorColumnName,
+        String catchColumnName
+    ) {
 
         assessment = new SurplusProductionStockAssessment(
-                carryingCapacityBounds,
-                logisticGrowthBounds,
-                catchabilityBounds,
-                indicatorColumnName,
-                catchColumnName
+            carryingCapacityBounds,
+            logisticGrowthBounds,
+            catchabilityBounds,
+            indicatorColumnName,
+            catchColumnName
         );
     }
 
@@ -32,7 +34,7 @@ public class SurplusProductionDepletionSensor implements Sensor<FishState,Double
     public Double scan(FishState system) {
 
         final SurplusProductionResult assessmentResult = assessment.scan(system);
-        if(assessmentResult == null)
+        if (assessmentResult == null)
             return Double.NaN;
         else
             return assessmentResult.getDepletion()[assessmentResult.getDepletion().length];

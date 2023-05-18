@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class SpendSaveInvestEntryTest {
@@ -16,9 +15,9 @@ public class SpendSaveInvestEntryTest {
     public void spendSaveInvest() {
 
         SpendSaveInvestEntry spendSaveInvestEntry = new SpendSaveInvestEntry(
-                100,
-                10,
-                "population0"
+            100,
+            10,
+            "population0"
         );
         //there are 2 fishers; one has 150$ and the other 100;
         //after expenditure there ought to be 140 and 90
@@ -34,20 +33,22 @@ public class SpendSaveInvestEntryTest {
         when(second.hasBeenActiveThisYear()).thenReturn(true);
 
 
-        FishState state = mock(FishState.class,RETURNS_DEEP_STUBS);
+        FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(state.getFishers()).thenReturn(
-                ObservableList.observableList(
-                first,second));
+            ObservableList.observableList(
+                first, second));
         spendSaveInvestEntry.step(state);
 
-        verify(first,times(1)).spendExogenously(10d);
-        verify(first,times(1)).spendExogenously(100d);
-        verify(second,times(1)).spendExogenously(10d);
-        verify(second,never()).spendExogenously(100d);
+        verify(first, times(1)).spendExogenously(10d);
+        verify(first, times(1)).spendExogenously(100d);
+        verify(second, times(1)).spendExogenously(10d);
+        verify(second, never()).spendExogenously(100d);
 
 
-        verify(state,
-                times(1)).createFisher("population0");
+        verify(
+            state,
+            times(1)
+        ).createFisher("population0");
 
 
     }

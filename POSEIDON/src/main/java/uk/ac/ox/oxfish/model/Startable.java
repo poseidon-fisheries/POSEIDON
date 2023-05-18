@@ -30,6 +30,7 @@ public interface Startable {
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
      * or just to percolate a reference to the model
+     *
      * @param model the model
      */
     void start(FishState model);
@@ -37,5 +38,6 @@ public interface Startable {
     /**
      * tell the startable to turnoff,
      */
-    default void turnOff() {}
+    default void turnOff() {
+    }
 }

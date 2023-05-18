@@ -38,19 +38,17 @@ import java.util.function.Function;
 public class OnePortInitializer implements PortInitializer {
 
 
-
     /**
      * the X position of the port on the grid.
      */
-    private  final int portPositionX;
+    private final int portPositionX;
     /**
      * the X position of the port on the grid.
      */
     private final int portPositionY;
 
 
-    public OnePortInitializer(int portPositionX, int portPositionY)
-    {
+    public OnePortInitializer(int portPositionX, int portPositionY) {
         this.portPositionX = portPositionX;
         this.portPositionY = portPositionY;
     }
@@ -67,13 +65,15 @@ public class OnePortInitializer implements PortInitializer {
      */
     @Override
     public List<Port> buildPorts(
-            NauticalMap map, MersenneTwisterFast mapmakerRandom, Function<SeaTile, MarketMap> marketFactory,
-            FishState model, GasPriceMaker gasPriceMaker) {
+        NauticalMap map, MersenneTwisterFast mapmakerRandom, Function<SeaTile, MarketMap> marketFactory,
+        FishState model, GasPriceMaker gasPriceMaker
+    ) {
         SeaTile here = map.getSeaTile(portPositionX, portPositionY);
         Port port = new Port("Port 0", here,
-                             marketFactory.apply(here),
-                             gasPriceMaker.supplyInitialPrice(here,"Port 0"));
-        gasPriceMaker.start(port,model);
+            marketFactory.apply(here),
+            gasPriceMaker.supplyInitialPrice(here, "Port 0")
+        );
+        gasPriceMaker.start(port, model);
 
         map.addPort(port);
 

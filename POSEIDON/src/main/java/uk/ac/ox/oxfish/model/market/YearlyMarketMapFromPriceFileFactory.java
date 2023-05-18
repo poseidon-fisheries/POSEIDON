@@ -17,6 +17,7 @@ public class YearlyMarketMapFromPriceFileFactory
     implements AlgorithmFactory<MarketMap> {
 
     private InputPath priceFile;
+    private Supplier<SpeciesCodes> speciesCodesSupplier;
 
     public YearlyMarketMapFromPriceFileFactory(
         final InputPath priceFile,
@@ -25,8 +26,6 @@ public class YearlyMarketMapFromPriceFileFactory
         this.priceFile = priceFile;
         this.speciesCodesSupplier = speciesCodesSupplier;
     }
-
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
 
     /**
      * Empty constructor needed to use as factory

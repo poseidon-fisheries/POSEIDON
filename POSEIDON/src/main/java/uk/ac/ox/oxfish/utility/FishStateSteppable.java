@@ -30,7 +30,11 @@ import uk.ac.ox.oxfish.model.FishState;
 public
 interface FishStateSteppable extends Steppable {
 
+    @Override
+    default void step(SimState simState) {
+        step((FishState) simState);
+    }
+
     void step(FishState fishState);
-    @Override default void step(SimState simState) { step((FishState) simState); }
 
 }

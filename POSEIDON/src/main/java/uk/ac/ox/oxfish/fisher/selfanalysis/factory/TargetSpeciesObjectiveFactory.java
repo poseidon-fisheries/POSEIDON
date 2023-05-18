@@ -35,8 +35,7 @@ public class TargetSpeciesObjectiveFactory implements AlgorithmFactory<TargetSpe
 
     private int speciesIndex = 0;
 
-    public TargetSpeciesObjectiveFactory()
-    {
+    public TargetSpeciesObjectiveFactory() {
 
 
     }
@@ -50,8 +49,10 @@ public class TargetSpeciesObjectiveFactory implements AlgorithmFactory<TargetSpe
      */
     @Override
     public TargetSpeciesTripObjective apply(FishState fishState) {
-        return new TargetSpeciesTripObjective(fishState.getSpecies().get(speciesIndex),
-                                              opportunityCosts);
+        return new TargetSpeciesTripObjective(
+            fishState.getSpecies().get(speciesIndex),
+            opportunityCosts
+        );
     }
 
     /**

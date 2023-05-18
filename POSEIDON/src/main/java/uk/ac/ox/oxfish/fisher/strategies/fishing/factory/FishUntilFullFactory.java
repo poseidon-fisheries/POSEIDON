@@ -33,14 +33,17 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  *     |_/_/ \_\___| |_| \___/|_|_\ |_|
  *
  */
-public class FishUntilFullFactory implements AlgorithmFactory<FishUntilFullStrategy>
-{
+public class FishUntilFullFactory implements AlgorithmFactory<FishUntilFullStrategy> {
+
+    private DoubleParameter minimumPercentageFull = new FixedDoubleParameter(1);
 
     public FishUntilFullFactory() {
     }
 
-    private DoubleParameter minimumPercentageFull =  new FixedDoubleParameter(1);
-
+    @Override
+    public FishUntilFullStrategy apply(final FishState state) {
+        return new FishUntilFullStrategy(getMinimumPercentageFull().applyAsDouble(state.random));
+    }
 
     public DoubleParameter getMinimumPercentageFull() {
         return minimumPercentageFull;
@@ -48,10 +51,5 @@ public class FishUntilFullFactory implements AlgorithmFactory<FishUntilFullStrat
 
     public void setMinimumPercentageFull(final DoubleParameter minimumPercentageFull) {
         this.minimumPercentageFull = minimumPercentageFull;
-    }
-
-    @Override
-    public FishUntilFullStrategy apply(final FishState state) {
-        return new FishUntilFullStrategy(getMinimumPercentageFull().applyAsDouble(state.random));
     }
 }

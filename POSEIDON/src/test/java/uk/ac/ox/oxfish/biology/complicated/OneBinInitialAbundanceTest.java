@@ -31,38 +31,38 @@ public class OneBinInitialAbundanceTest {
     @Test
     public void initialAbundanceSpecific() throws Exception {
 
-        OneBinInitialAbundance initialAbundance = new OneBinInitialAbundance(1,100,0);
+        OneBinInitialAbundance initialAbundance = new OneBinInitialAbundance(1, 100, 0);
 
         //let's do longline
         Species longspine = new Species("Longspine", AbundanceLocalBiologyTest.longspineTestInput);
         initialAbundance.initialize(longspine);
 
         double[][] abundance = initialAbundance.getInitialAbundance();
-        assertEquals(abundance.length,2); //male and female
-        assertEquals(abundance[0].length,81); //80 years old fish
-        assertEquals(abundance[0][0],0d,.0001);
-        assertEquals(abundance[1][1],0d,.0001);
-        assertEquals(abundance[0][1],100d,.0001);
-        assertEquals(abundance[0][2],0d,.0001);
+        assertEquals(abundance.length, 2); //male and female
+        assertEquals(abundance[0].length, 81); //80 years old fish
+        assertEquals(abundance[0][0], 0d, .0001);
+        assertEquals(abundance[1][1], 0d, .0001);
+        assertEquals(abundance[0][1], 100d, .0001);
+        assertEquals(abundance[0][2], 0d, .0001);
 
     }
 
     @Test
     public void initialAbundanceAllCohorts() throws Exception {
 
-        OneBinInitialAbundance initialAbundance = new OneBinInitialAbundance(1,100,-1);
+        OneBinInitialAbundance initialAbundance = new OneBinInitialAbundance(1, 100, -1);
 
         //let's do longline
         Species longspine = new Species("Longspine", AbundanceLocalBiologyTest.longspineTestInput);
         initialAbundance.initialize(longspine);
 
         double[][] abundance = initialAbundance.getInitialAbundance();
-        assertEquals(abundance.length,2); //male and female
-        assertEquals(abundance[0].length,81); //80 years old fish
-        assertEquals(abundance[0][0],0d,.0001);
-        assertEquals(abundance[1][1],100d,.0001);
-        assertEquals(abundance[0][1],100d,.0001);
-        assertEquals(abundance[0][2],0d,.0001);
+        assertEquals(abundance.length, 2); //male and female
+        assertEquals(abundance[0].length, 81); //80 years old fish
+        assertEquals(abundance[0][0], 0d, .0001);
+        assertEquals(abundance[1][1], 100d, .0001);
+        assertEquals(abundance[0][1], 100d, .0001);
+        assertEquals(abundance[0][2], 0d, .0001);
 
     }
 }

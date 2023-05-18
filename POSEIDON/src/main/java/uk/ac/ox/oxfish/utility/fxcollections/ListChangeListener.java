@@ -38,9 +38,17 @@ import java.util.List;
 public interface ListChangeListener<E> {
 
     /**
+     * Called after a change has been made to an ObservableList.
+     *
+     * @param c an object representing the change that was done
+     * @see Change
+     */
+    public void onChanged(Change<? extends E> c);
+
+    /**
      * Represents a report of changes done to an {@link ObservableList}. The change may consist of one or more actual
      * changes and must be iterated by calling the {@link #next()} method.
-     *
+     * <p>
      * Each change must be one of the following:
      * <ul>
      * <li><b>Permutation change</b> : {@link #wasPermutated()} returns true in this case.
@@ -64,7 +72,7 @@ public interface ListChangeListener<E> {
      * any other method of {@code Change}. The same applies after calling {@link #reset()}.
      * The only methods that works at any time is {@link #getList()}.
      *
-     *<p>
+     * <p>
      * Typical usage is to observe changes on an ObservableList in order
      * to hook or unhook (or add or remove a listener) or in order to maintain
      * some invariant on every element in that ObservableList. A common code
@@ -106,6 +114,7 @@ public interface ListChangeListener<E> {
      * This is because permutation changes cannot go after add/remove changes as they would change the position of added elements.
      * And on the other hand, update changes must go after add/remove changes because they refer with their indexes to the current
      * state of the list, which means with all add/remove changes applied.
+     *
      * @param <E> the list element type
      * @since JavaFX 2.0
      */
@@ -113,10 +122,20 @@ public interface ListChangeListener<E> {
         private final ObservableList<E> list;
 
         /**
+         * Constructs a new Change instance on the given list.
+         *
+         * @param list The list that was changed
+         */
+        public Change(ObservableList<E> list) {
+            this.list = list;
+        }
+
+        /**
          * Goes to the next change.
          * The Change instance, in its initial state, is invalid and requires a call to {@code next()} before
          * calling other methods. The first {@code next()} call will make this object
          * represent the first change.
+         *
          * @return true if switched to the next change, false if this is the last change.
          */
         public abstract boolean next();
@@ -126,77 +145,6 @@ public interface ListChangeListener<E> {
          * before working with the first change.
          */
         public abstract void reset();
-
-        /**
-         * Constructs a new Change instance on the given list.
-         * @param list The list that was changed
-         */
-        public Change(ObservableList<E> list) {
-            this.list = list;
-        }
-
-        /**
-         * The source list of the change.
-         * @return a list that was changed
-         */
-        public ObservableList<E> getList() {
-            return list;
-        }
-
-        /**
-         * If {@link #wasAdded()} is true, the interval contains all the values that were added.
-         * If {@link #wasPermutated()} is true, the interval marks the values that were permutated.
-         * If {@link #wasRemoved()} is true and {@code wasAdded} is false, {@link #getFrom()} and {@link #getTo()}
-         * should return the same number - the place where the removed elements were positioned in the list.
-         * @return a beginning (inclusive) of an interval related to the change
-         * @throws IllegalStateException if this Change instance is in initial state
-         */
-        public abstract int getFrom();
-
-        /**
-         * The end of the change interval.
-         * @return an end (exclusive) of an interval related to the change.
-         * @throws IllegalStateException if this Change instance is in initial state
-         * @see #getFrom()
-         */
-        public abstract int getTo();
-
-        /**
-         * An immutable list of removed/replaced elements. If no elements
-         * were removed from the list, an empty list is returned.
-         * @return a list with all the removed elements
-         * @throws IllegalStateException if this Change instance is in initial state
-         */
-        public abstract List<E> getRemoved();
-
-        /**
-         * Indicates if the change was only a permutation.
-         * @return true if the change was just a permutation.
-         * @throws IllegalStateException if this Change instance is in initial state
-         */
-        public boolean wasPermutated() {
-            return getPermutation().length != 0;
-        }
-
-        /**
-         * Indicates if elements were added during this change.
-         * @return true if something was added to the list
-         * @throws IllegalStateException if this Change instance is in initial state
-         */
-        public boolean wasAdded() {
-            return !wasPermutated() && !wasUpdated() && getFrom() < getTo();
-        }
-
-        /**
-         * Indicates if elements were removed during this change.
-         * Note that using set will also produce a change with {@code wasRemoved()} returning
-         * true. See {@link #wasReplaced()}.
-         * @return true if something was removed from the list
-         * @throws IllegalStateException if this Change instance is in initial state
-         */
-        public boolean wasRemoved() {
-            return !getRemoved().isEmpty();
-        }
 
         /**
          * Indicates if elements were replaced during this change.
@@ -215,16 +163,92 @@ public interface ListChangeListener<E> {
         }
 
         /**
+         * Indicates if elements were added during this change.
+         *
+         * @return true if something was added to the list
+         * @throws IllegalStateException if this Change instance is in initial state
+         */
+        public boolean wasAdded() {
+            return !wasPermutated() && !wasUpdated() && getFrom() < getTo();
+        }
+
+        /**
+         * Indicates if elements were removed during this change.
+         * Note that using set will also produce a change with {@code wasRemoved()} returning
+         * true. See {@link #wasReplaced()}.
+         *
+         * @return true if something was removed from the list
+         * @throws IllegalStateException if this Change instance is in initial state
+         */
+        public boolean wasRemoved() {
+            return !getRemoved().isEmpty();
+        }
+
+        /**
+         * Indicates if the change was only a permutation.
+         *
+         * @return true if the change was just a permutation.
+         * @throws IllegalStateException if this Change instance is in initial state
+         */
+        public boolean wasPermutated() {
+            return getPermutation().length != 0;
+        }
+
+        /**
          * Indicates that the elements between {@link #getFrom()} (inclusive)
          * to {@link #getTo()} exclusive has changed.
          * This is the only optional event type and may not be
          * fired by all ObservableLists.
+         *
          * @return true if the current change is an update change.
          * @since JavaFX 2.1
          */
         public boolean wasUpdated() {
             return false;
         }
+
+        /**
+         * If {@link #wasAdded()} is true, the interval contains all the values that were added.
+         * If {@link #wasPermutated()} is true, the interval marks the values that were permutated.
+         * If {@link #wasRemoved()} is true and {@code wasAdded} is false, {@link #getFrom()} and {@link #getTo()}
+         * should return the same number - the place where the removed elements were positioned in the list.
+         *
+         * @return a beginning (inclusive) of an interval related to the change
+         * @throws IllegalStateException if this Change instance is in initial state
+         */
+        public abstract int getFrom();
+
+        /**
+         * The end of the change interval.
+         *
+         * @return an end (exclusive) of an interval related to the change.
+         * @throws IllegalStateException if this Change instance is in initial state
+         * @see #getFrom()
+         */
+        public abstract int getTo();
+
+        /**
+         * An immutable list of removed/replaced elements. If no elements
+         * were removed from the list, an empty list is returned.
+         *
+         * @return a list with all the removed elements
+         * @throws IllegalStateException if this Change instance is in initial state
+         */
+        public abstract List<E> getRemoved();
+
+        /**
+         * If this change is a permutation, it returns an integer array
+         * that describes the permutation.
+         * This array maps directly from the previous indexes to the new ones.
+         * This method is not publicly accessible and therefore can return an array safely.
+         * The 0 index of the array corresponds to index {@link #getFrom()} of the list. The same applies
+         * for the last index and {@link #getTo()}.
+         * The method is used by {@link #wasPermutated() } and {@link #getPermutation(int)} methods.
+         *
+         * @return empty array if this is not permutation or an integer array containing the permutation
+         * @throws IllegalStateException if this Change instance is in initial state
+         */
+        protected abstract int[] getPermutation();
 
         /**
          * Returns a subList view of the list that contains only the elements added. This is actually a shortcut to
@@ -235,15 +259,26 @@ public interface ListChangeListener<E> {
          *       // do something
          * }
          * }</pre>
+         *
          * @return the newly created sublist view that contains all the added elements.
          * @throws IllegalStateException if this Change instance is in initial state
          */
         public List<E> getAddedSubList() {
-            return wasAdded()? getList().subList(getFrom(), getTo()) : Collections.<E>emptyList();
+            return wasAdded() ? getList().subList(getFrom(), getTo()) : Collections.<E>emptyList();
+        }
+
+        /**
+         * The source list of the change.
+         *
+         * @return a list that was changed
+         */
+        public ObservableList<E> getList() {
+            return list;
         }
 
         /**
          * Returns the size of {@link #getRemoved()} list.
+         *
          * @return the number of removed items
          * @throws IllegalStateException if this Change instance is in initial state
          */
@@ -253,6 +288,7 @@ public interface ListChangeListener<E> {
 
         /**
          * Returns the size of the interval that was added.
+         *
          * @return the number of added items
          * @throws IllegalStateException if this Change instance is in initial state
          */
@@ -261,31 +297,19 @@ public interface ListChangeListener<E> {
         }
 
         /**
-         * If this change is a permutation, it returns an integer array
-         * that describes the permutation.
-         * This array maps directly from the previous indexes to the new ones.
-         * This method is not publicly accessible and therefore can return an array safely.
-         * The 0 index of the array corresponds to index {@link #getFrom()} of the list. The same applies
-         * for the last index and {@link #getTo()}.
-         * The method is used by {@link #wasPermutated() } and {@link #getPermutation(int)} methods.
-         * @return empty array if this is not permutation or an integer array containing the permutation
-         * @throws IllegalStateException if this Change instance is in initial state
-         */
-        protected abstract int[] getPermutation();
-
-        /**
          * This method allows developers to observe the permutations that occurred in this change. In order to get the
          * new position of an element, you must call:
          * <pre>
          *    change.getPermutation(oldIndex);
          * </pre>
-         *
+         * <p>
          * Note: default implementation of this method takes the information
          * from {@link #getPermutation()} method. You don't have to override this method.
+         *
          * @param i the old index that contained the element prior to this change
-         * @throws IndexOutOfBoundsException if i is out of the bounds of the list
-         * @throws IllegalStateException if this is not a permutation change
          * @return the new index of the same element
+         * @throws IndexOutOfBoundsException if i is out of the bounds of the list
+         * @throws IllegalStateException     if this is not a permutation change
          */
         public int getPermutation(int i) {
             if (!wasPermutated()) {
@@ -295,11 +319,4 @@ public interface ListChangeListener<E> {
         }
 
     }
-    /**
-     * Called after a change has been made to an ObservableList.
-     *
-     * @param c an object representing the change that was done
-     * @see Change
-     */
-    public void onChanged(Change<? extends E> c);
 }

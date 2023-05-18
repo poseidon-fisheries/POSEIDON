@@ -25,7 +25,6 @@ import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import javax.measure.Quantity;
 
 import static tech.units.indriya.AbstractUnit.ONE;
-import static tech.units.indriya.unit.Units.PERCENT;
 
 public class ProportionalGatherer<G, O, V, Q extends Quantity<Q>> extends MonitorDecorator<O, V, Q> {
 
@@ -36,7 +35,8 @@ public class ProportionalGatherer<G, O, V, Q extends Quantity<Q>> extends Monito
         this.delegate = delegate;
     }
 
-    @Override public void registerWith(TimeSeries<FishState> timeSeries) {
+    @Override
+    public void registerWith(TimeSeries<FishState> timeSeries) {
         delegate.getSubMonitors().values().forEach(subMonitor -> {
             if (subMonitor.getBaseName() != null)
                 timeSeries.registerGatherer(

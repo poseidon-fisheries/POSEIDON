@@ -13,33 +13,13 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class SingleSpeciesBoxcarPulseRecruitmentFactory  implements AlgorithmFactory<SingleSpeciesAbundanceInitializer>
-{
+public class SingleSpeciesBoxcarPulseRecruitmentFactory implements AlgorithmFactory<SingleSpeciesAbundanceInitializer> {
 
 
-
-    private final SingleSpeciesRegularBoxcarFactory delegate  = new SingleSpeciesRegularBoxcarFactory();
-
-
-    private LinkedHashMap<Integer,DoubleParameter> spawningDayAndProportionOfYearlyRecruits = new LinkedHashMap<>();
+    private final SingleSpeciesRegularBoxcarFactory delegate = new SingleSpeciesRegularBoxcarFactory();
 
 
-
-    public static <KEY,VALUE>  LinkedHashMap<KEY,VALUE> forceThroughYaml(LinkedHashMap<KEY, ?> original,
-                                                                         Class<VALUE> valueClass){
-
-        FishYAML yaml = new FishYAML();
-        LinkedHashMap<KEY,VALUE> correctedMap = new LinkedHashMap<>();
-        for (Map.Entry<KEY, ?> entry : original.entrySet()) {
-            Object toConvert = entry.getValue();
-            final VALUE converted = yaml.loadAs(yaml.dump(toConvert),valueClass);
-            correctedMap.put(entry.getKey(),converted);
-
-        }
-
-        return correctedMap;
-
-    }
+    private LinkedHashMap<Integer, DoubleParameter> spawningDayAndProportionOfYearlyRecruits = new LinkedHashMap<>();
 
     @Override
     public SingleSpeciesAbundanceInitializer apply(FishState state) {
@@ -47,33 +27,53 @@ public class SingleSpeciesBoxcarPulseRecruitmentFactory  implements AlgorithmFac
         FishYAML yaml = new FishYAML();
 
 
-        spawningDayAndProportionOfYearlyRecruits = forceThroughYaml(spawningDayAndProportionOfYearlyRecruits,
-                DoubleParameter.class);
+        spawningDayAndProportionOfYearlyRecruits = forceThroughYaml(
+            spawningDayAndProportionOfYearlyRecruits,
+            DoubleParameter.class
+        );
 
 
         final SingleSpeciesAbundanceInitializer delegateOutput = delegate.apply(state);
 
         return new SingleSpeciesAbundanceInitializer(
-                delegateOutput.getSpeciesName(),
-                delegateOutput.getInitialAbundance(),
-                delegateOutput.getIntialAbundanceAllocator(),
-                delegateOutput.getAging(),
-                delegateOutput.getMeristics(),
-                delegateOutput.getScaling(),
-                new SpreadYearlyRecruitDecorator(
-                        spawningDayAndProportionOfYearlyRecruits,
-                        (YearlyRecruitmentProcess) delegateOutput.getRecruitmentProcess(),
-                        state.getRandom()
-                ),
-                delegateOutput.getDiffuser(),
-                delegateOutput.getRecruitmentAllocator(),
-                delegateOutput.getHabitabilityAllocator(),
-                delegateOutput.getMortality(),
-                delegateOutput.isDaily(),
-                delegateOutput.isRounding()
+            delegateOutput.getSpeciesName(),
+            delegateOutput.getInitialAbundance(),
+            delegateOutput.getIntialAbundanceAllocator(),
+            delegateOutput.getAging(),
+            delegateOutput.getMeristics(),
+            delegateOutput.getScaling(),
+            new SpreadYearlyRecruitDecorator(
+                spawningDayAndProportionOfYearlyRecruits,
+                (YearlyRecruitmentProcess) delegateOutput.getRecruitmentProcess(),
+                state.getRandom()
+            ),
+            delegateOutput.getDiffuser(),
+            delegateOutput.getRecruitmentAllocator(),
+            delegateOutput.getHabitabilityAllocator(),
+            delegateOutput.getMortality(),
+            delegateOutput.isDaily(),
+            delegateOutput.isRounding()
 
         );
 
+
+    }
+
+    public static <KEY, VALUE> LinkedHashMap<KEY, VALUE> forceThroughYaml(
+        LinkedHashMap<KEY, ?> original,
+        Class<VALUE> valueClass
+    ) {
+
+        FishYAML yaml = new FishYAML();
+        LinkedHashMap<KEY, VALUE> correctedMap = new LinkedHashMap<>();
+        for (Map.Entry<KEY, ?> entry : original.entrySet()) {
+            Object toConvert = entry.getValue();
+            final VALUE converted = yaml.loadAs(yaml.dump(toConvert), valueClass);
+            correctedMap.put(entry.getKey(), converted);
+
+        }
+
+        return correctedMap;
 
     }
 

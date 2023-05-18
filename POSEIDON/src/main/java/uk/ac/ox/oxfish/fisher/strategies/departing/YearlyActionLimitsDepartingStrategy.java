@@ -31,7 +31,8 @@ public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
     /**
      * Only leave port if fisher has remaining yearly-limited actions
      */
-    @Override public boolean shouldFisherLeavePort(Fisher fisher, FishState model, MersenneTwisterFast random) {
+    @Override
+    public boolean shouldFisherLeavePort(Fisher fisher, FishState model, MersenneTwisterFast random) {
         return shouldFisherLeavePort(getFadManager(fisher).getActionSpecificRegulations(), fisher);
     }
 

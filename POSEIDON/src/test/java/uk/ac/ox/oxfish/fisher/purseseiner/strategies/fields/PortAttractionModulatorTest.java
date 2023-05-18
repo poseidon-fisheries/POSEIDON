@@ -19,16 +19,16 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-import static java.lang.Double.MAX_VALUE;
-import static junit.framework.TestCase.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategy;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunction;
+
+import static java.lang.Double.MAX_VALUE;
+import static junit.framework.TestCase.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class PortAttractionModulatorTest {
 

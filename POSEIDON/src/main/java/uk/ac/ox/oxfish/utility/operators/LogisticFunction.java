@@ -45,7 +45,8 @@ public class LogisticFunction implements DoubleUnaryOperator {
         this.maximum = maximum;
     }
 
-    @Override public double applyAsDouble(final double operand) {
+    @Override
+    public double applyAsDouble(final double operand) {
         return maximum / (1 + exp(-steepness * (operand - midpoint)));
     }
 

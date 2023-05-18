@@ -7,22 +7,22 @@ package uk.ac.ox.oxfish.fisher.log.timeScalarFunctions;
  * |
  * |
  * \
- *  \
- *   \_
- *     \_______
- *             \______________ or something like that!
- * @author Brian Powers 5/3/2019
+ * \
+ * \_
+ * \_______
+ * \______________ or something like that!
  *
+ * @author Brian Powers 5/3/2019
  */
 
-public class ExponentialTimeScalar implements TimeScalarFunction{
-	double exponent;
-	
-	public ExponentialTimeScalar(double exponent){
-		this.exponent=exponent;
-	}
-	
-	public double timeScalar(double t){
-		return Math.exp(-exponent * t);
-	}
+public class ExponentialTimeScalar implements TimeScalarFunction {
+    double exponent;
+
+    public ExponentialTimeScalar(double exponent) {
+        this.exponent = exponent;
+    }
+
+    public double timeScalar(double t) {
+        return Math.exp(-exponent * t);
+    }
 }

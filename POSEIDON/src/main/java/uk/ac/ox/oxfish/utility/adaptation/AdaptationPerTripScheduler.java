@@ -33,56 +33,51 @@ import java.util.List;
  * A list of adaptations to fire each time the fisher finishes a trip
  * Created by carrknight on 8/10/15.
  */
-public class AdaptationPerTripScheduler implements TripListener, FisherStartable
-{
-
-    private FishState model;
-
-    private Fisher fisher;
+public class AdaptationPerTripScheduler implements TripListener, FisherStartable {
 
     private final List<Adaptation> adaptations = new LinkedList<>();
+    private FishState model;
+    private Fisher fisher;
 
     @Override
     public void start(FishState model, Fisher fisher) {
         this.model = model;
-        this.fisher=fisher;
+        this.fisher = fisher;
         fisher.addTripListener(this);
 
-        for(Adaptation a : adaptations)
+        for (Adaptation a : adaptations)
             a.start(model, fisher);
 
     }
 
     @Override
     public void turnOff(Fisher fisher) {
-        if(this.fisher !=null)
+        if (this.fisher != null)
             this.fisher.removeTripListener(this);
     }
 
     /**
      * add an adaptation algorithm to the list. Start it if we have already started
+     *
      * @param adaptation
      */
-    public void registerAdaptation(Adaptation adaptation)
-    {
+    public void registerAdaptation(Adaptation adaptation) {
 
         adaptations.add(adaptation);
-       if(model != null)
-           adaptation.start(model, fisher);
+        if (model != null)
+            adaptation.start(model, fisher);
 
 
     }
 
 
-    public void removeAdaptation(Adaptation adaptation)
-    {
+    public void removeAdaptation(Adaptation adaptation) {
         adaptations.remove(adaptation);
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher)
-    {
-        for(Adaptation a : adaptations)
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+        for (Adaptation a : adaptations)
             a.adapt(this.fisher, model, this.fisher.grabRandomizer());
     }
 }

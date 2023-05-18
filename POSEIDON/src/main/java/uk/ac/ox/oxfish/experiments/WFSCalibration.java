@@ -40,11 +40,10 @@ public class WFSCalibration {
     public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170526 gom_catchability", "results");
     public static final int YEARS_PER_RUN = 3;
 
-    public static void  main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         //runMultipleTimesToBuildHistogram("best_scalable");
         //runMultipleTimesToBuildHistogram("best_total");
         runMultipleTimesToBuildHistogram("best_total_800");
-
 
 
     }
@@ -57,27 +56,28 @@ public class WFSCalibration {
         writer.flush();
 
 
-        for(int run = 0; run<RUNS; run++)
-        {
+        for (int run = 0; run < RUNS; run++) {
 
-            FishYAML yaml  = new FishYAML();
-            Scenario scenario = yaml.loadAs(new FileReader(MAIN_DIRECTORY.resolve(input + ".yaml").toFile()),
-                                            Scenario.class);
+            FishYAML yaml = new FishYAML();
+            Scenario scenario = yaml.loadAs(
+                new FileReader(MAIN_DIRECTORY.resolve(input + ".yaml").toFile()),
+                Scenario.class
+            );
 
             FishState state = new FishState(run);
             state.setScenario(scenario);
 
             //run the model
             state.start();
-            while(state.getYear()< YEARS_PER_RUN)
+            while (state.getYear() < YEARS_PER_RUN)
                 state.schedule.step(state);
             state.schedule.step(state);
 
             writer.write(
-                    state.getLatestYearlyObservation("Average Cash-Flow") + ","+
-                            state.getLatestYearlyObservation("Last Season Day of RedSnapper") + ","+
-                            state.getLatestYearlyObservation("RedGrouper Landings") + ","+
-                            state.getLatestYearlyObservation("GagGrouper Landings") +"\n"
+                state.getLatestYearlyObservation("Average Cash-Flow") + "," +
+                    state.getLatestYearlyObservation("Last Season Day of RedSnapper") + "," +
+                    state.getLatestYearlyObservation("RedGrouper Landings") + "," +
+                    state.getLatestYearlyObservation("GagGrouper Landings") + "\n"
             );
 
 

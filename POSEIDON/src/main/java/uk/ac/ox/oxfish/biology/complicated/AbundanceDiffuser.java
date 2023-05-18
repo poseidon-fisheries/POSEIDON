@@ -33,10 +33,11 @@ import java.util.Map;
 public interface AbundanceDiffuser {
 
 
-
-    public void step(Species species,
-                     Map<SeaTile, AbundanceLocalBiology> biologies,
-                     FishState state);
+    public void step(
+        Species species,
+        Map<SeaTile, AbundanceLocalBiology> biologies,
+        FishState state
+    );
 
 
 }

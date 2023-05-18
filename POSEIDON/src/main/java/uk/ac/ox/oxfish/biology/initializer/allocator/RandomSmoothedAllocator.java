@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.biology.initializer.allocator;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 
 
 /**
@@ -37,14 +36,13 @@ public class RandomSmoothedAllocator implements BiomassAllocator {
     private final double absoluteMinimum;
 
     private final int smoothingRuns;
-
-
-    private double[][] biomassMap;
     private final double aggressivness;
+    private double[][] biomassMap;
 
 
     public RandomSmoothedAllocator(
-            double absoluteMaximum, double absoluteMinimum, int smoothingRuns, double aggressivness) {
+        double absoluteMaximum, double absoluteMinimum, int smoothingRuns, double aggressivness
+    ) {
         this.absoluteMaximum = absoluteMaximum;
         this.absoluteMinimum = absoluteMinimum;
         this.smoothingRuns = smoothingRuns;
@@ -62,7 +60,8 @@ public class RandomSmoothedAllocator implements BiomassAllocator {
      */
     @Override
     public double allocate(
-            SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
+        SeaTile tile, NauticalMap map, MersenneTwisterFast random
+    ) {
 
         //lazy initialization
         lazyInitialization(map, random);
@@ -73,15 +72,14 @@ public class RandomSmoothedAllocator implements BiomassAllocator {
     }
 
     public void lazyInitialization(NauticalMap map, MersenneTwisterFast random) {
-        if(biomassMap==null)
-        {
+        if (biomassMap == null) {
             int width = map.getWidth();
             int height = map.getHeight();
             biomassMap = new double[width][height];
-            for(int x=0; x<biomassMap.length; x++)
-                for(int y=0; y<biomassMap[0].length; y++)
-                    biomassMap[x][y] = random.nextDouble(true,true)*
-                            (absoluteMaximum-absoluteMinimum) + absoluteMinimum;
+            for (int x = 0; x < biomassMap.length; x++)
+                for (int y = 0; y < biomassMap[0].length; y++)
+                    biomassMap[x][y] = random.nextDouble(true, true) *
+                        (absoluteMaximum - absoluteMinimum) + absoluteMinimum;
 
             /***
              *      ___                _   _    _
@@ -92,7 +90,7 @@ public class RandomSmoothedAllocator implements BiomassAllocator {
              */
 
 
-            for(int i=0; i<smoothingRuns; i++) {
+            for (int i = 0; i < smoothingRuns; i++) {
                 int x = random.nextInt(width);
                 int y = random.nextInt(height);
                 int xNew = x + random.nextInt(3) - 1;
@@ -102,8 +100,8 @@ public class RandomSmoothedAllocator implements BiomassAllocator {
                 yNew = Math.max(0, yNew);
                 yNew = Math.min(yNew, height - 1);
                 double newValue = biomassMap[x][y] +
-                        (random.nextDouble() * aggressivness) *
-                                (biomassMap[xNew][yNew] - biomassMap[x][y]);
+                    (random.nextDouble() * aggressivness) *
+                        (biomassMap[xNew][yNew] - biomassMap[x][y]);
                 if (newValue > absoluteMaximum)
                     newValue = absoluteMaximum;
                 if (newValue < absoluteMinimum)
@@ -112,7 +110,7 @@ public class RandomSmoothedAllocator implements BiomassAllocator {
 
                 biomassMap[x][y] = newValue;
             }
-            assert biomassMap!=null;
+            assert biomassMap != null;
 
 
         }

@@ -33,6 +33,11 @@ import uk.ac.ox.oxfish.model.FishState;
 public class StandardAgingProcess extends LocalAgingProcess {
 
 
+    /**
+     * if this is false, last year fish dies off. Otherwise it accumulates in the last bin
+     */
+    final boolean preserveLastAge;
+
     public StandardAgingProcess(boolean preserveLastAge) {
         this.preserveLastAge = preserveLastAge;
     }
@@ -48,12 +53,8 @@ public class StandardAgingProcess extends LocalAgingProcess {
     }
 
     /**
-     * if this is false, last year fish dies off. Otherwise it accumulates in the last bin
-     */
-    final boolean preserveLastAge;
-
-    /**
      * as a side-effect ages the local biology according to its rules
+     *
      * @param localBiology
      * @param model
      * @param rounding
@@ -61,22 +62,21 @@ public class StandardAgingProcess extends LocalAgingProcess {
      */
     @Override
     public void ageLocally(
-            AbundanceLocalBiology localBiology, Species species,
-            FishState model, boolean rounding, int daysToSimulate)
-    {
+        AbundanceLocalBiology localBiology, Species species,
+        FishState model, boolean rounding, int daysToSimulate
+    ) {
 
-        Preconditions.checkArgument(daysToSimulate==365, "This should be used yearly!");
+        Preconditions.checkArgument(daysToSimulate == 365, "This should be used yearly!");
         //get the age structure (these are not copies!)
         StructuredAbundance abundance = localBiology.getAbundance(species);
         //escalator move everything
-        for(int subdivision=0; subdivision<abundance.getSubdivisions(); subdivision++)
-        {
+        for (int subdivision = 0; subdivision < abundance.getSubdivisions(); subdivision++) {
             double[] segment = abundance.asMatrix()[subdivision];
-            double oldest = segment[segment.length-1];
-            System.arraycopy(segment,0,segment,1,segment.length-1);
+            double oldest = segment[segment.length - 1];
+            System.arraycopy(segment, 0, segment, 1, segment.length - 1);
             segment[0] = 0;
-            if(preserveLastAge)
-                segment[segment.length-1]+= oldest;
+            if (preserveLastAge)
+                segment[segment.length - 1] += oldest;
 
         }
     }

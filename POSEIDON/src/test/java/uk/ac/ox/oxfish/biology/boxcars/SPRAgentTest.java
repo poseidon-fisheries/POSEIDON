@@ -53,66 +53,66 @@ public class SPRAgentTest {
 
         GrowthBinByList meristics = factory.apply(mock(FishState.class));
 
-        Species fish = new Species("test",meristics);
+        Species fish = new Species("test", meristics);
 
         //there are two fishers, but you should only sample fisher 1
-        int[] lengthsCaught = new int[]{45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,75,81};
-        int[] correctLandings =new int[]{1,1,3,2,8,15,22,20,38,37,52,61,69,69,67,73,82,66,69,58,38,49,36,20,12,16,7,5,2,1,1};
+        int[] lengthsCaught = new int[]{45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 75, 81};
+        int[] correctLandings = new int[]{1, 1, 3, 2, 8, 15, 22, 20, 38, 37, 52, 61, 69, 69, 67, 73, 82, 66, 69, 58, 38, 49, 36, 20, 12, 16, 7, 5, 2, 1, 1};
 
         double reOrderedLandings[] = new double[82];
-        for(int i=0; i<lengthsCaught.length; i++)
+        for (int i = 0; i < lengthsCaught.length; i++)
             reOrderedLandings[lengthsCaught[i]] = correctLandings[i];
 
-        for(int i=0; i<reOrderedLandings.length; i++)
-            reOrderedLandings[i] = reOrderedLandings[i] * fish.getWeight(0,i);
-        Fisher fisher1 = mock(Fisher.class,RETURNS_DEEP_STUBS);
-       // when(fisher1.getDailyCounter()).thenReturn(mock(FisherDailyCounter.class,RETURNS_DEEP_STUBS));
+        for (int i = 0; i < reOrderedLandings.length; i++)
+            reOrderedLandings[i] = reOrderedLandings[i] * fish.getWeight(0, i);
+        Fisher fisher1 = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        // when(fisher1.getDailyCounter()).thenReturn(mock(FisherDailyCounter.class,RETURNS_DEEP_STUBS));
         when(fisher1.getID()).thenReturn(1);
         FisherDailyCounter dailyCounter = fisher1.getDailyCounter();
         doAnswer(invocation -> {
-            int bin = (Integer)invocation.getArguments()[2];
+            int bin = (Integer) invocation.getArguments()[2];
             return reOrderedLandings[bin];
         }).when(dailyCounter).getSpecificLandings(any(Species.class), anyInt(), anyInt());
         //fisher 2 returns garbage
-        Fisher fisher2 = mock(Fisher.class,RETURNS_DEEP_STUBS);
+        Fisher fisher2 = mock(Fisher.class, RETURNS_DEEP_STUBS);
         when(fisher2.getID()).thenReturn(2);
-        when(fisher2.getDailyCounter().getSpecificLandings(any(Species.class),anyInt(),anyInt())).thenReturn(100d);
+        when(fisher2.getDailyCounter().getSpecificLandings(any(Species.class), anyInt(), anyInt())).thenReturn(100d);
 
         SPRAgent agent = new SPRAgent(
-                "testtag",
-                fish,
-                new Predicate<Fisher>() {
-                    @Override
-                    public boolean test(Fisher fisher) {
-                        return fisher.getID()==1;
-                    }
-                },
-                81,
-                0.4946723,
-                0.394192,
-                100,
-                1000,
-                5,
-                0.02d,
-                2.94,
-                48,
-                new SPR(false)
+            "testtag",
+            fish,
+            new Predicate<Fisher>() {
+                @Override
+                public boolean test(Fisher fisher) {
+                    return fisher.getID() == 1;
+                }
+            },
+            81,
+            0.4946723,
+            0.394192,
+            100,
+            1000,
+            5,
+            0.02d,
+            2.94,
+            48,
+            new SPR(false)
         );
-        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
+        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
 
         when(model.getFishers()).thenReturn(
-                ObservableList.observableList(
-                        fisher1,fisher2
-                )
+            ObservableList.observableList(
+                fisher1, fisher2
+            )
         );
 
         agent.start(model);
         agent.step(model);
         double spr = agent.computeSPR();
-        assertEquals(0.08894,spr,.0001);
+        assertEquals(0.08894, spr, .0001);
 
-        assertEquals(agent.computeMaturityRatio(),.995,.001);
-        assertEquals(agent.computeLoptRatio(),.245,.001);
-        assertEquals(agent.computeMeanLength(),59.924,.001);
+        assertEquals(agent.computeMaturityRatio(), .995, .001);
+        assertEquals(agent.computeLoptRatio(), .245, .001);
+        assertEquals(agent.computeMeanLength(), 59.924, .001);
     }
 }

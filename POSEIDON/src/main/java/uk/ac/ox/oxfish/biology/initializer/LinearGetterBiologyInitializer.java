@@ -52,19 +52,20 @@ public class LinearGetterBiologyInitializer implements BiologyInitializer {
 
     private final double yRocky;
 
-    private final  double dayRocky;
+    private final double dayRocky;
 
 
     public LinearGetterBiologyInitializer(
-            double intercept,
-            double x,
-            double y,
-            double xDay,
-            double yDay,
-            double rocky,
-            double xRocky,
-            double yRocky,
-            double dayRocky) {
+        double intercept,
+        double x,
+        double y,
+        double xDay,
+        double yDay,
+        double rocky,
+        double xRocky,
+        double yRocky,
+        double dayRocky
+    ) {
         this.intercept = intercept;
         this.x = x;
         this.y = y;
@@ -78,7 +79,8 @@ public class LinearGetterBiologyInitializer implements BiologyInitializer {
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -87,30 +89,31 @@ public class LinearGetterBiologyInitializer implements BiologyInitializer {
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
+        GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
+        int mapWidthInCells, NauticalMap map
+    ) {
 
         if (seaTile.isLand())
             return new EmptyLocalBiology();
 
         Species species = biology.getSpecie(0);
         return new GetterLocalBiology(
-                species,
-                new Function<FishState, Double>() {
-                    @Override
-                    public Double apply(FishState state) {
-                        return  intercept +
-                                seaTile.getGridX() * x +
-                                seaTile.getGridY() * y +
-                                seaTile.getGridX() * state.getDayOfTheYear() * xDay +
-                                seaTile.getGridY() * state.getDayOfTheYear() * yDay +
-                                seaTile.getRockyPercentage() * rocky +
-                                seaTile.getGridX() * seaTile.getRockyPercentage() * xRocky +
-                                seaTile.getGridY() * seaTile.getRockyPercentage() * yRocky +
-                                state.getDayOfTheYear() * seaTile.getRockyPercentage() * dayRocky;
+            species,
+            new Function<FishState, Double>() {
+                @Override
+                public Double apply(FishState state) {
+                    return intercept +
+                        seaTile.getGridX() * x +
+                        seaTile.getGridY() * y +
+                        seaTile.getGridX() * state.getDayOfTheYear() * xDay +
+                        seaTile.getGridY() * state.getDayOfTheYear() * yDay +
+                        seaTile.getRockyPercentage() * rocky +
+                        seaTile.getGridX() * seaTile.getRockyPercentage() * xRocky +
+                        seaTile.getGridY() * seaTile.getRockyPercentage() * yRocky +
+                        state.getDayOfTheYear() * seaTile.getRockyPercentage() * dayRocky;
 
-                    }
                 }
+            }
         );
 
     }
@@ -121,7 +124,8 @@ public class LinearGetterBiologyInitializer implements BiologyInitializer {
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
+        GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model
+    ) {
 
     }
 
@@ -134,7 +138,7 @@ public class LinearGetterBiologyInitializer implements BiologyInitializer {
      */
     @Override
     public GlobalBiology generateGlobal(MersenneTwisterFast random, FishState modelBeingInitialized) {
-        return  new GlobalBiology(new Species("Species 0"));
+        return new GlobalBiology(new Species("Species 0"));
     }
 
     /**

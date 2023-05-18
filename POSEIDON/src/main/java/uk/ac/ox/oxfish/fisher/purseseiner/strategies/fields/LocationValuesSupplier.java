@@ -27,11 +27,11 @@ public class LocationValuesSupplier
         this.targetYear = targetYear;
     }
 
-    public int getTargetYear() {
-        return targetYear;
+    public LocationValuesSupplier() {
     }
 
-    public LocationValuesSupplier() {
+    public int getTargetYear() {
+        return targetYear;
     }
 
     public void setTargetYear(final int targetYear) {
@@ -46,42 +46,6 @@ public class LocationValuesSupplier
     @SuppressWarnings("unused")
     public void setLocationValuesFile(final InputPath locationValuesFile) {
         this.locationValuesFile = locationValuesFile;
-    }
-
-    public double getDecayRateOfOpportunisticFadSetLocationValues() {
-        return decayRateOfOpportunisticFadSetLocationValues;
-    }
-
-    @SuppressWarnings("unused")
-    public void setDecayRateOfOpportunisticFadSetLocationValues(final double decayRateOfOpportunisticFadSetLocationValues) {
-        this.decayRateOfOpportunisticFadSetLocationValues = decayRateOfOpportunisticFadSetLocationValues;
-    }
-
-    public double getDecayRateOfNonAssociatedSetLocationValues() {
-        return decayRateOfNonAssociatedSetLocationValues;
-    }
-
-    @SuppressWarnings("unused")
-    public void setDecayRateOfNonAssociatedSetLocationValues(final double decayRateOfNonAssociatedSetLocationValues) {
-        this.decayRateOfNonAssociatedSetLocationValues = decayRateOfNonAssociatedSetLocationValues;
-    }
-
-    public double getDecayRateOfDolphinSetLocationValues() {
-        return decayRateOfDolphinSetLocationValues;
-    }
-
-    @SuppressWarnings("unused")
-    public void setDecayRateOfDolphinSetLocationValues(final double decayRateOfDolphinSetLocationValues) {
-        this.decayRateOfDolphinSetLocationValues = decayRateOfDolphinSetLocationValues;
-    }
-
-    public double getDecayRateOfDeploymentLocationValues() {
-        return decayRateOfDeploymentLocationValues;
-    }
-
-    @SuppressWarnings("unused")
-    public void setDecayRateOfDeploymentLocationValues(final double decayRateOfDeploymentLocationValues) {
-        this.decayRateOfDeploymentLocationValues = decayRateOfDeploymentLocationValues;
     }
 
     @Override
@@ -131,5 +95,41 @@ public class LocationValuesSupplier
             fisher,
             actionClass
         );
+    }
+
+    public double getDecayRateOfOpportunisticFadSetLocationValues() {
+        return decayRateOfOpportunisticFadSetLocationValues;
+    }
+
+    @SuppressWarnings("unused")
+    public void setDecayRateOfOpportunisticFadSetLocationValues(final double decayRateOfOpportunisticFadSetLocationValues) {
+        this.decayRateOfOpportunisticFadSetLocationValues = decayRateOfOpportunisticFadSetLocationValues;
+    }
+
+    public double getDecayRateOfNonAssociatedSetLocationValues() {
+        return decayRateOfNonAssociatedSetLocationValues;
+    }
+
+    @SuppressWarnings("unused")
+    public void setDecayRateOfNonAssociatedSetLocationValues(final double decayRateOfNonAssociatedSetLocationValues) {
+        this.decayRateOfNonAssociatedSetLocationValues = decayRateOfNonAssociatedSetLocationValues;
+    }
+
+    public double getDecayRateOfDolphinSetLocationValues() {
+        return decayRateOfDolphinSetLocationValues;
+    }
+
+    @SuppressWarnings("unused")
+    public void setDecayRateOfDolphinSetLocationValues(final double decayRateOfDolphinSetLocationValues) {
+        this.decayRateOfDolphinSetLocationValues = decayRateOfDolphinSetLocationValues;
+    }
+
+    public double getDecayRateOfDeploymentLocationValues() {
+        return decayRateOfDeploymentLocationValues;
+    }
+
+    @SuppressWarnings("unused")
+    public void setDecayRateOfDeploymentLocationValues(final double decayRateOfDeploymentLocationValues) {
+        this.decayRateOfDeploymentLocationValues = decayRateOfDeploymentLocationValues;
     }
 }

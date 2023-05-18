@@ -20,9 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
-import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
  * filters any fish above/below a given cutoff length
@@ -36,14 +34,18 @@ public class CutoffAbundanceFilter extends FormulaAbundanceFilter {
     private final boolean selectHigherThanCutoff;
 
 
-    public CutoffAbundanceFilter(double cutoffLevel, boolean selectHigherThanCutoff,
-                                 final boolean rounding) {
+    public CutoffAbundanceFilter(
+        double cutoffLevel, boolean selectHigherThanCutoff,
+        final boolean rounding
+    ) {
         super(false, rounding);
         this.cutoffLevel = cutoffLevel;
         this.selectHigherThanCutoff = selectHigherThanCutoff;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected double[][] computeSelectivity(Species species) {
         double[][] toReturn = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
@@ -51,10 +53,10 @@ public class CutoffAbundanceFilter extends FormulaAbundanceFilter {
 
         double higherThanCutoff = selectHigherThanCutoff ? 1 : 0;
 
-        for(int cohort =0; cohort < species.getNumberOfSubdivisions(); cohort++)
-            for(int age=0; age<species.getNumberOfBins(); age++)
-            {
-                toReturn[cohort][age] = species.getLength(cohort,age)>=cutoffLevel ? higherThanCutoff : 1-higherThanCutoff;
+        for (int cohort = 0; cohort < species.getNumberOfSubdivisions(); cohort++)
+            for (int age = 0; age < species.getNumberOfBins(); age++) {
+                toReturn[cohort][age] = species.getLength(cohort,
+                    age) >= cutoffLevel ? higherThanCutoff : 1 - higherThanCutoff;
 
             }
         return toReturn;

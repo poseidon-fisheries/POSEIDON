@@ -39,20 +39,20 @@ public class GroupDummyExtractorTest {
 
         MapDiscretization discretization = mock(MapDiscretization.class);
         GroupDummyExtractor extractor = new GroupDummyExtractor(
-                2,
-                discretization
+            2,
+            discretization
         );
 
         SeaTile tile = mock(SeaTile.class);
         when(discretization.getGroup(tile)).thenReturn(2);
         assertEquals(extractor.extract(
-                tile,0,null,null
-        ),1,.001);
+            tile, 0, null, null
+        ), 1, .001);
 
         when(discretization.getGroup(tile)).thenReturn(0);
         assertEquals(extractor.extract(
-                tile,0,null,null
-        ),0,.001);
+            tile, 0, null, null
+        ), 0, .001);
     }
 
 }

@@ -52,12 +52,12 @@ public class AbstractMarketTest {
             steppables.add((Steppable) invocation.getArguments()[0]);
             return mock(Stoppable.class);
         }).when(model).scheduleEveryDay(
-                any(), any());
+            any(), any());
         doAnswer(invocation -> {
             steppables.add((Steppable) invocation.getArguments()[0]);
             return mock(Stoppable.class);
         }).when(model).schedulePerPolicy(
-                any(), any(), any());
+            any(), any(), any());
 
 
         market.start(model);

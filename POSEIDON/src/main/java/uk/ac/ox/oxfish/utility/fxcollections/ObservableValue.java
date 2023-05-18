@@ -60,9 +60,7 @@ package uk.ac.ox.oxfish.utility.fxcollections;/*
  * even if the implementation of the {@code ObservableValue} supports lazy
  * evaluation.
  *
- * @param <T>
- *            The type of the wrapped value.
- *
+ * @param <T> The type of the wrapped value.
  * @see ObservableBooleanValue
  * @see ObservableDoubleValue
  * @see ObservableFloatValue
@@ -71,8 +69,6 @@ package uk.ac.ox.oxfish.utility.fxcollections;/*
  * @see ObservableNumberValue
  * @see ObservableObjectValue
  * @see ObservableStringValue
- *
- *
  * @since JavaFX 2.0
  */
 public interface ObservableValue<T> extends Observable {
@@ -93,12 +89,9 @@ public interface ObservableValue<T> extends Observable {
      * removeListener} after use or to use an instance of
      * {@link WeakChangeListener} avoid this situation.
      *
+     * @param listener The listener to register
+     * @throws NullPointerException if the listener is null
      * @see #removeListener(ChangeListener)
-     *
-     * @param listener
-     *            The listener to register
-     * @throws NullPointerException
-     *             if the listener is null
      */
     void addListener(ChangeListener<? super T> listener);
 
@@ -111,12 +104,9 @@ public interface ObservableValue<T> extends Observable {
      * added then it will be removed. If it had been added more than once, then
      * only the first occurrence will be removed.
      *
+     * @param listener The listener to remove
+     * @throws NullPointerException if the listener is null
      * @see #addListener(ChangeListener)
-     *
-     * @param listener
-     *            The listener to remove
-     * @throws NullPointerException
-     *             if the listener is null
      */
     void removeListener(ChangeListener<? super T> listener);
 

@@ -28,8 +28,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class FollowRulesExtractorFactory implements AlgorithmFactory<FollowRulesExtractor> {
 
     @Override
-    public FollowRulesExtractor apply(FishState state)
-    {
+    public FollowRulesExtractor apply(FishState state) {
         return new FollowRulesExtractor();
     }
 }

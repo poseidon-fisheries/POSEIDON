@@ -6,13 +6,12 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.policymakers.TargetToTACController;
-import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ITarget;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class ITargetTACFactory  implements AlgorithmFactory<AdditionalStartable> {
+public class ITargetTACFactory implements AlgorithmFactory<AdditionalStartable> {
 
 
     private String indicatorColumnName = "Species 0 CPUE";
@@ -38,33 +37,33 @@ public class ITargetTACFactory  implements AlgorithmFactory<AdditionalStartable>
             @Override
             public void start(FishState model) {
                 fishState.scheduleOnceInXDays(
-                        new Steppable() {
-                            @Override
-                            public void step(SimState simState) {
-                                TargetToTACController controller;
-                                final ITarget itarget = new ITarget(
-                                        catchColumnName,
-                                        indicatorColumnName,
-                                        precautionaryScaling.applyAsDouble(model.getRandom()),
-                                        indicatorMultiplier.applyAsDouble(model.getRandom()),
-                                        interval,
-                                        interval * 2
+                    new Steppable() {
+                        @Override
+                        public void step(SimState simState) {
+                            TargetToTACController controller;
+                            final ITarget itarget = new ITarget(
+                                catchColumnName,
+                                indicatorColumnName,
+                                precautionaryScaling.applyAsDouble(model.getRandom()),
+                                indicatorMultiplier.applyAsDouble(model.getRandom()),
+                                interval,
+                                interval * 2
+                            );
+                            if (targetedSpecies.trim().isEmpty()) {
+                                controller = new TargetToTACController(
+                                    itarget
                                 );
-                                if(targetedSpecies.trim().isEmpty()) {
-                                    controller = new TargetToTACController(
-                                            itarget
-                                    );
-                                } else
-                                    controller = new TargetToTACController(
-                                            itarget,
-                                            targetedSpecies
-                                    );
-                                controller.start(model);
-                                controller.step(model);
-                            }
-                        },
-                        StepOrder.DAWN,
-                        365 * startingYear + 1
+                            } else
+                                controller = new TargetToTACController(
+                                    itarget,
+                                    targetedSpecies
+                                );
+                            controller.start(model);
+                            controller.step(model);
+                        }
+                    },
+                    StepOrder.DAWN,
+                    365 * startingYear + 1
                 );
             }
         };
@@ -87,7 +86,6 @@ public class ITargetTACFactory  implements AlgorithmFactory<AdditionalStartable>
     public void setCatchColumnName(String catchColumnName) {
         this.catchColumnName = catchColumnName;
     }
-
 
 
     public DoubleParameter getPrecautionaryScaling() {

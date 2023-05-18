@@ -42,10 +42,9 @@ public class OneSpecieGear implements Gear {
 
     private final double proportionCaught;
 
-    public OneSpecieGear(Species targetedSpecies, double proportionCaught)
-    {
-        Preconditions.checkArgument(proportionCaught <=1);
-        Preconditions.checkArgument(proportionCaught >=0);
+    public OneSpecieGear(Species targetedSpecies, double proportionCaught) {
+        Preconditions.checkArgument(proportionCaught <= 1);
+        Preconditions.checkArgument(proportionCaught >= 0);
         this.targetedSpecies = targetedSpecies;
         this.proportionCaught = proportionCaught;
     }
@@ -53,45 +52,51 @@ public class OneSpecieGear implements Gear {
 
     /**
      * catches a fixed proportion of the targeted specie and nothing of all the others
-     * @param fisher the fisher
-     * @param localBiology where the fisher is fishing
+     *
+     * @param fisher            the fisher
+     * @param localBiology      where the fisher is fishing
      * @param context
      * @param hoursSpentFishing hours spent fishing
-     * @param modelBiology the biology (list of available species)
+     * @param modelBiology      the biology (list of available species)
      * @return the catch
      */
     @Override
     public Catch fish(
-            Fisher fisher, LocalBiology localBiology, SeaTile context,
-            int hoursSpentFishing, GlobalBiology modelBiology) {
+        Fisher fisher, LocalBiology localBiology, SeaTile context,
+        int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
         double[] caught = catchesAsArray(localBiology, hoursSpentFishing, modelBiology);
         return new Catch(caught);
     }
 
     private double[] catchesAsArray(
-            LocalBiology where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        LocalBiology where, int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
         double[] caught = new double[modelBiology.getSize()];
-        if(proportionCaught>0) {
+        if (proportionCaught > 0) {
             FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, targetedSpecies,
-                                                            proportionCaught);
+                proportionCaught
+            );
             caught[targetedSpecies.getIndex()] = FishStateUtilities.round(hoursSpentFishing * proportionCaught * where.getBiomass(
-                    targetedSpecies));
+                targetedSpecies));
         }
         return caught;
     }
 
     /**
-     *  the hypothetical catch coming from catching one
-     * @param fisher the fisher
-     * @param where where the fisher is fishing
+     * the hypothetical catch coming from catching one
+     *
+     * @param fisher            the fisher
+     * @param where             where the fisher is fishing
      * @param hoursSpentFishing hours spent fishing
-     * @param modelBiology the biology (list of available species)
+     * @param modelBiology      the biology (list of available species)
      * @return the catch
      */
     @Override
     public double[] expectedHourlyCatch(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
-        return catchesAsArray(where,1,modelBiology);
+        Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
+        return catchesAsArray(where, 1, modelBiology);
     }
 
     /**
@@ -111,23 +116,22 @@ public class OneSpecieGear implements Gear {
         return new OneSpecieGear(targetedSpecies, proportionCaught);
     }
 
-    public Species getTargetedSpecies() {
-        return targetedSpecies;
-    }
-
-    public double getProportionCaught() {
-        return proportionCaught;
-    }
-
     @Override
     public boolean isSame(Gear o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OneSpecieGear that = (OneSpecieGear) o;
         return Double.compare(that.getProportionCaught(), getProportionCaught()) == 0 &&
-                Objects.equals(getTargetedSpecies(), that.getTargetedSpecies());
+            Objects.equals(getTargetedSpecies(), that.getTargetedSpecies());
     }
 
+    public double getProportionCaught() {
+        return proportionCaught;
+    }
+
+    public Species getTargetedSpecies() {
+        return targetedSpecies;
+    }
 
 
 }

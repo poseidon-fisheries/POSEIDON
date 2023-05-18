@@ -65,8 +65,8 @@ public class SNALSARDestinationStrategyTest {
         SNALSARDestinationStrategy strategy = factory.apply(model);
         Fisher test = mock(Fisher.class);
 
-        strategy.start(model,test);
-        verify(test,times(6)).addFeatureExtractor(anyString(),any());
+        strategy.start(model, test);
+        verify(test, times(6)).addFeatureExtractor(anyString(), any());
     }
 
     @Test
@@ -77,30 +77,84 @@ public class SNALSARDestinationStrategyTest {
         FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         SNALSARDestinationStrategy strategy = factory.apply(model);
-        SeaTile option1 = mock(SeaTile.class); when(option1.isWater()).thenReturn(true);
-        SeaTile option2 = mock(SeaTile.class); when(option2.isWater()).thenReturn(true);
+        SeaTile option1 = mock(SeaTile.class);
+        when(option1.isWater()).thenReturn(true);
+        SeaTile option2 = mock(SeaTile.class);
+        when(option2.isWater()).thenReturn(true);
         ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
 
-        defaultSetup(model, strategy,options);
-
+        defaultSetup(model, strategy, options);
 
 
         when(model.getMap().getAllSeaTilesExcludingLandAsList()).thenReturn(options);
         int timesOption1WasChosen = 0;
         int timesOption2WasChosen = 0;
-        for(int i=0; i<100; i++) {
-            strategy.reactToFinishedTrip(mock(TripRecord.class),mock(Fisher.class,RETURNS_DEEP_STUBS));
-            if(strategy.getFavoriteSpot().equals(option1))
+        for (int i = 0; i < 100; i++) {
+            strategy.reactToFinishedTrip(mock(TripRecord.class), mock(Fisher.class, RETURNS_DEEP_STUBS));
+            if (strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
-                assertEquals(strategy.getFavoriteSpot(),(option2));
+                assertEquals(strategy.getFavoriteSpot(), (option2));
                 timesOption2WasChosen++;
             }
 
         }
-        assertTrue(timesOption1WasChosen>10);
-        assertTrue(timesOption2WasChosen>10);
+        assertTrue(timesOption1WasChosen > 10);
+        assertTrue(timesOption2WasChosen > 10);
 
+    }
+
+    //creates an ALL PASS extractor
+    public FeatureExtractors defaultSetup(
+        FishState model,
+        SNALSARDestinationStrategy strategy,
+        List<SeaTile> options
+    ) {
+        Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
+
+        strategy.start(model, fisher);
+        FeatureExtractors<SeaTile> extractors = mock(FeatureExtractors.class);
+        when(fisher.getTileRepresentation()).thenReturn(extractors);
+        //all safe profitable and legal
+        when(extractors.extractFeature(
+            eq(SNALSARutilities.SAFE_FEATURE),
+            anyCollection(),
+            any(),
+            any()
+        )).thenReturn(new FixedMap<>(1d, options));
+        when(extractors.extractFeature(
+            eq(SNALSARutilities.SOCIALLY_APPROPRIATE_FEATURE),
+            anyCollection(),
+            any(),
+            any()
+        )).thenReturn(new FixedMap<>(1d, options));
+        when(extractors.extractFeature(
+            eq(SNALSARutilities.LEGAL_FEATURE),
+            anyCollection(),
+            any(),
+            any()
+        )).thenReturn(new FixedMap<>(1d, options));
+        //everything good on the profits side
+        when(extractors.extractFeature(
+            eq(SNALSARutilities.PROFIT_FEATURE),
+            anyCollection(),
+            any(),
+            any()
+        )).thenReturn(new FixedMap<>(100d, options));
+        when(extractors.extractFeature(
+            eq(SNALSARutilities.FAILURE_THRESHOLD),
+            anyCollection(),
+            any(),
+            any()
+        )).thenReturn(new FixedMap<>(10d, options));
+        when(extractors.extractFeature(
+            eq(SNALSARutilities.ACCEPTABLE_THRESHOLD),
+            anyCollection(),
+            any(),
+            any()
+        )).thenReturn(new FixedMap<>(50d, options));
+
+        return extractors;
     }
 
     @Test
@@ -111,42 +165,42 @@ public class SNALSARDestinationStrategyTest {
         FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         SNALSARDestinationStrategy strategy = factory.apply(model);
-        SeaTile option1 = mock(SeaTile.class); when(option1.isWater()).thenReturn(true);
-        SeaTile option2 = mock(SeaTile.class); when(option2.isWater()).thenReturn(true);
+        SeaTile option1 = mock(SeaTile.class);
+        when(option1.isWater()).thenReturn(true);
+        SeaTile option2 = mock(SeaTile.class);
+        when(option2.isWater()).thenReturn(true);
         ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
-        FeatureExtractors extractors = defaultSetup(model, strategy,options);
+        FeatureExtractors extractors = defaultSetup(model, strategy, options);
 
-        HashMap<SeaTile,Double> safety = new HashMap<>();
+        HashMap<SeaTile, Double> safety = new HashMap<>();
 
 
-        safety.put(option1,1d);
-        safety.put(option2,-1d);
+        safety.put(option1, 1d);
+        safety.put(option2, -1d);
         when(extractors.extractFeature(
-                eq(SNALSARutilities.SAFE_FEATURE),
-                anyCollection(),
-                any(),
-                any())).thenReturn(safety);
+            eq(SNALSARutilities.SAFE_FEATURE),
+            anyCollection(),
+            any(),
+            any()
+        )).thenReturn(safety);
 
         when(model.getMap().getAllSeaTilesExcludingLandAsList()).thenReturn(options);
         int timesOption1WasChosen = 0;
         int timesOption2WasChosen = 0;
-        for(int i=0; i<100; i++) {
-            strategy.reactToFinishedTrip(mock(TripRecord.class), mock(Fisher.class,RETURNS_DEEP_STUBS));
-            if(strategy.getFavoriteSpot().equals(option1))
+        for (int i = 0; i < 100; i++) {
+            strategy.reactToFinishedTrip(mock(TripRecord.class), mock(Fisher.class, RETURNS_DEEP_STUBS));
+            if (strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
-                assertEquals(strategy.getFavoriteSpot(),(option2));
+                assertEquals(strategy.getFavoriteSpot(), (option2));
                 timesOption2WasChosen++;
             }
 
         }
-        assertTrue(timesOption1WasChosen==100);
-        assertTrue(timesOption2WasChosen==0);
+        assertTrue(timesOption1WasChosen == 100);
+        assertTrue(timesOption2WasChosen == 0);
 
     }
-
-
-
 
     @Test
     public void sociallyAcceptable() throws Exception {
@@ -156,50 +210,55 @@ public class SNALSARDestinationStrategyTest {
         FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         SNALSARDestinationStrategy strategy = factory.apply(model);
-        SeaTile option1 = mock(SeaTile.class); when(option1.isWater()).thenReturn(true);
-        SeaTile option2 = mock(SeaTile.class); when(option2.isWater()).thenReturn(true);
-        SeaTile option3 = mock(SeaTile.class); when(option3.isWater()).thenReturn(true);
-        ArrayList<SeaTile> options = Lists.newArrayList(option1, option2,option3);
-        FeatureExtractors extractors = defaultSetup(model, strategy,options);
+        SeaTile option1 = mock(SeaTile.class);
+        when(option1.isWater()).thenReturn(true);
+        SeaTile option2 = mock(SeaTile.class);
+        when(option2.isWater()).thenReturn(true);
+        SeaTile option3 = mock(SeaTile.class);
+        when(option3.isWater()).thenReturn(true);
+        ArrayList<SeaTile> options = Lists.newArrayList(option1, option2, option3);
+        FeatureExtractors extractors = defaultSetup(model, strategy, options);
 
         //option 3 is unsafe
-        HashMap<SeaTile,Double> safety = new HashMap<>();
-        safety.put(option1,1d);
-        safety.put(option2,1d);
-        safety.put(option3,-1d);
+        HashMap<SeaTile, Double> safety = new HashMap<>();
+        safety.put(option1, 1d);
+        safety.put(option2, 1d);
+        safety.put(option3, -1d);
         when(extractors.extractFeature(
-                eq(SNALSARutilities.SAFE_FEATURE),
-                anyCollection(),
-                any(),
-                any())).thenReturn(safety);
+            eq(SNALSARutilities.SAFE_FEATURE),
+            anyCollection(),
+            any(),
+            any()
+        )).thenReturn(safety);
 
         //option 1 is socially unacceptable
-        HashMap<SeaTile,Double> acceptable = new HashMap<>();
-        acceptable.put(option1,-1d);
-        acceptable.put(option2,1d);
-        acceptable.put(option3,1d);
+        HashMap<SeaTile, Double> acceptable = new HashMap<>();
+        acceptable.put(option1, -1d);
+        acceptable.put(option2, 1d);
+        acceptable.put(option3, 1d);
         when(extractors.extractFeature(
-                eq(SNALSARutilities.SOCIALLY_APPROPRIATE_FEATURE),
-                anyCollection(),
-                any(),
-                any())).thenReturn(acceptable);
+            eq(SNALSARutilities.SOCIALLY_APPROPRIATE_FEATURE),
+            anyCollection(),
+            any(),
+            any()
+        )).thenReturn(acceptable);
 
 
         when(model.getMap().getAllSeaTilesExcludingLandAsList()).thenReturn(options);
         int timesOption1WasChosen = 0;
         int timesOption2WasChosen = 0;
-        for(int i=0; i<100; i++) {
-            strategy.reactToFinishedTrip(mock(TripRecord.class),mock(Fisher.class,RETURNS_DEEP_STUBS));
-            if(strategy.getFavoriteSpot().equals(option1))
+        for (int i = 0; i < 100; i++) {
+            strategy.reactToFinishedTrip(mock(TripRecord.class), mock(Fisher.class, RETURNS_DEEP_STUBS));
+            if (strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
-                assertEquals(strategy.getFavoriteSpot(),(option2));
+                assertEquals(strategy.getFavoriteSpot(), (option2));
                 timesOption2WasChosen++;
             }
 
         }
-        assertTrue(timesOption1WasChosen==0);
-        assertTrue(timesOption2WasChosen==100);
+        assertTrue(timesOption1WasChosen == 0);
+        assertTrue(timesOption2WasChosen == 100);
 
     }
 
@@ -212,88 +271,43 @@ public class SNALSARDestinationStrategyTest {
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         SNALSARDestinationStrategy strategy = factory.apply(model);
 
-        SeaTile option1 = mock(SeaTile.class); when(option1.isWater()).thenReturn(true);
-        SeaTile option2 = mock(SeaTile.class); when(option2.isWater()).thenReturn(true);
+        SeaTile option1 = mock(SeaTile.class);
+        when(option1.isWater()).thenReturn(true);
+        SeaTile option2 = mock(SeaTile.class);
+        when(option2.isWater()).thenReturn(true);
         ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
 
-        FeatureExtractors extractors = defaultSetup(model, strategy,options);
+        FeatureExtractors extractors = defaultSetup(model, strategy, options);
 
         //threshold profits are 10
-        HashMap<SeaTile,Double> profits = new HashMap<>();
+        HashMap<SeaTile, Double> profits = new HashMap<>();
 
 
-        profits.put(option1,5d);
-        profits.put(option2,11d);
+        profits.put(option1, 5d);
+        profits.put(option2, 11d);
         when(extractors.extractFeature(
-                eq(SNALSARutilities.PROFIT_FEATURE),
-                anyCollection(),
-                any(),
-                any())).thenReturn(profits);
+            eq(SNALSARutilities.PROFIT_FEATURE),
+            anyCollection(),
+            any(),
+            any()
+        )).thenReturn(profits);
 
         when(model.getMap().getAllSeaTilesExcludingLandAsList()).thenReturn(options);
         int timesOption1WasChosen = 0;
         int timesOption2WasChosen = 0;
-        for(int i=0; i<100; i++) {
-            strategy.reactToFinishedTrip(mock(TripRecord.class), mock(Fisher.class,RETURNS_DEEP_STUBS));
-            if(strategy.getFavoriteSpot().equals(option1))
+        for (int i = 0; i < 100; i++) {
+            strategy.reactToFinishedTrip(mock(TripRecord.class), mock(Fisher.class, RETURNS_DEEP_STUBS));
+            if (strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
-                assertEquals(strategy.getFavoriteSpot(),(option2));
+                assertEquals(strategy.getFavoriteSpot(), (option2));
                 timesOption2WasChosen++;
             }
 
         }
-        assertTrue(timesOption1WasChosen==0);
-        assertTrue(timesOption2WasChosen==100);
+        assertTrue(timesOption1WasChosen == 0);
+        assertTrue(timesOption2WasChosen == 100);
 
-    }
-
-
-
-
-    //creates an ALL PASS extractor
-    public FeatureExtractors defaultSetup(FishState model,
-                                          SNALSARDestinationStrategy strategy,
-                                          List<SeaTile> options) {
-        Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
-
-        strategy.start(model,fisher);
-        FeatureExtractors<SeaTile> extractors = mock(FeatureExtractors.class);
-        when(fisher.getTileRepresentation()).thenReturn(extractors);
-        //all safe profitable and legal
-        when(extractors.extractFeature(
-                eq(SNALSARutilities.SAFE_FEATURE),
-                anyCollection(),
-                any(),
-                any())).thenReturn(new FixedMap<>(1d, options));
-        when(extractors.extractFeature(
-                eq(SNALSARutilities.SOCIALLY_APPROPRIATE_FEATURE),
-                anyCollection(),
-                any(),
-                any())).thenReturn(new FixedMap<>(1d,options ));
-        when(extractors.extractFeature(
-                eq(SNALSARutilities.LEGAL_FEATURE),
-                anyCollection(),
-                any(),
-                any())).thenReturn(new FixedMap<>(1d, options));
-        //everything good on the profits side
-        when(extractors.extractFeature(
-                eq(SNALSARutilities.PROFIT_FEATURE),
-                anyCollection(),
-                any(),
-                any())).thenReturn(new FixedMap<>(100d,options ));
-        when(extractors.extractFeature(
-                eq(SNALSARutilities.FAILURE_THRESHOLD),
-                anyCollection(),
-                any(),
-                any())).thenReturn(new FixedMap<>(10d,options ));
-        when(extractors.extractFeature(
-                eq(SNALSARutilities.ACCEPTABLE_THRESHOLD),
-                anyCollection(),
-                any(),
-                any())).thenReturn(new FixedMap<>(50d,options ));
-
-        return extractors;
     }
 
     @Test
@@ -362,17 +376,17 @@ public class SNALSARDestinationStrategyTest {
      * 2 species ITQ, both are valuable but the quotas of the ones only available south are very few so that
      * it's better to fish north. The results are muffled by the fact that over time north gets consumed and it becomes better
      * to fish south instead anyway.
+     *
      * @throws Exception
      */
     @Test
     public void itqAffectsGeographySNALSAR() throws Exception {
 
 
-
         FishYAML yaml = new FishYAML();
         String scenarioYaml = String.join("\n", Files.readAllLines(
-                Paths.get("inputs", "first_paper", "location_itq.yaml")));
-        PrototypeScenario scenario =  yaml.loadAs(scenarioYaml,PrototypeScenario.class);
+            Paths.get("inputs", "first_paper", "location_itq.yaml")));
+        PrototypeScenario scenario = yaml.loadAs(scenarioYaml, PrototypeScenario.class);
         //few fishers
         scenario.setFishers(25);
         //small map makes it faster
@@ -387,9 +401,6 @@ public class SNALSARDestinationStrategyTest {
         scenario.setDestinationStrategy(new SNALSARDestinationFactory());
         FishState state = new FishState();
         state.setScenario(scenario);
-
-
-
 
 
         long towsNorth = 0;
@@ -417,7 +428,6 @@ public class SNALSARDestinationStrategyTest {
 
         System.out.println("North vs South : " + towsNorth / ((double) towsNorth + towsSouth));
         Assert.assertTrue(towsNorth / ((double) towsNorth + towsSouth) > .6);
-
 
 
     }

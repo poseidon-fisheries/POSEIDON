@@ -52,10 +52,11 @@ public class FixedProfitThresholdExtractor implements ProfitThresholdExtractor<S
      */
     @Override
     public Map<SeaTile, Double> extractFeature(
-            Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
-        HashMap<SeaTile,Double> features = new HashMap<>();
+        Collection<SeaTile> toRepresent, FishState model, Fisher fisher
+    ) {
+        HashMap<SeaTile, Double> features = new HashMap<>();
 
-        return new FixedMap<>(threshold,toRepresent );
+        return new FixedMap<>(threshold, toRepresent);
     }
 
     /**

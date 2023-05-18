@@ -25,9 +25,6 @@ import com.google.common.collect.Table;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.Arrays;
-import java.util.Objects;
-
 /**
  * A general, if not really elegant, abundance filter that generates a probability matrix for male-female and age class
  * from a formula supplied by the subclass
@@ -37,22 +34,19 @@ public abstract class FormulaAbundanceFilter implements AbundanceFilter {
 
 
     /**
+     * table for memoization: stores the selectivity array for each species so you don't need to recompute it
+     */
+    private final static Table<FormulaAbundanceFilter, Species, double[][]> precomputed =
+        HashBasedTable.create(1, 5);
+    /**
      * a boolean describing whether we should memorize the probability filter rather than computing it
      * each time
      */
     private final boolean memoization;
-
     /**
      * do we round number so that catches are always integers?
      */
     private final boolean rounding;
-
-    public FormulaAbundanceFilter(boolean memoization, boolean rounding) {
-        this.memoization = memoization;
-        this.rounding = rounding;
-    }
-
-
     //most formula filters will probably be single use, so it's probably even faster to just store the last used selectivity
     //without going through the general formula filter
     private double[][] lastUsedSelectivity = null;
@@ -60,16 +54,15 @@ public abstract class FormulaAbundanceFilter implements AbundanceFilter {
     private Species lastCalledSpecies = null;
 
 
-    /**
-     * table for memoization: stores the selectivity array for each species so you don't need to recompute it
-     */
-    private final static Table<FormulaAbundanceFilter,Species,double[][]> precomputed =
-            HashBasedTable.create(1, 5);
+    public FormulaAbundanceFilter(boolean memoization, boolean rounding) {
+        this.memoization = memoization;
+        this.rounding = rounding;
+    }
 
     /**
      * returns a int[2][age+1] array with male and female fish that are not filtered out
      *
-     * @param species the species of fish
+     * @param species   the species of fish
      * @param abundance
      * @return an int[2][age+1] array for all the stuff that is caught/selected and so on
      */
@@ -80,14 +73,14 @@ public abstract class FormulaAbundanceFilter implements AbundanceFilter {
 
         lastUsedSelectivity = selectivity;
         lastCalledSpecies = species;
-        for(int subdivision =0; subdivision<abundance.length; subdivision++) {
+        for (int subdivision = 0; subdivision < abundance.length; subdivision++) {
             for (int age = 0; age < abundance[subdivision].length; age++) {
                 abundance[subdivision][age] =
-                        abundance[subdivision][age] * selectivity[subdivision][age];
+                    abundance[subdivision][age] * selectivity[subdivision][age];
 
                 if (rounding) {
                     abundance[subdivision][age] =
-                            FishStateUtilities.quickRounding(abundance[subdivision][age]);
+                        FishStateUtilities.quickRounding(abundance[subdivision][age]);
 
                 }
             }
@@ -96,33 +89,32 @@ public abstract class FormulaAbundanceFilter implements AbundanceFilter {
     }
 
     /**
-     * the method that gives the probability matrix for each age class and each sex of not filtering the abundance away
-     * @param species
-     * @return
-     */
-    abstract protected double[][] computeSelectivity(Species species);
-
-
-    /**
-     * @return an int[2][age+1] array of all the proportion of fish for each class that get selected
      * @param species the species object, needed for meristics
+     * @return an int[2][age+1] array of all the proportion of fish for each class that get selected
      */
-    public double[][] getProbabilityMatrix(Species species){
+    public double[][] getProbabilityMatrix(Species species) {
         double[][] selectivity = null;
-        if(memoization) {
-            if(species==lastCalledSpecies && lastUsedSelectivity!=null)
+        if (memoization) {
+            if (species == lastCalledSpecies && lastUsedSelectivity != null)
                 return lastUsedSelectivity;
             selectivity = precomputed.get(this, species);
         }
-        if(selectivity == null) {
+        if (selectivity == null) {
             selectivity = computeSelectivity(species);
-            if(memoization)
-                precomputed.put(this,species,selectivity);
+            if (memoization)
+                precomputed.put(this, species, selectivity);
         }
         assert selectivity != null;
         return selectivity;
     }
 
+    /**
+     * the method that gives the probability matrix for each age class and each sex of not filtering the abundance away
+     *
+     * @param species
+     * @return
+     */
+    abstract protected double[][] computeSelectivity(Species species);
 
     @Override
     public boolean equals(Object o) {

@@ -37,34 +37,36 @@ public class CutoffAbundanceFilterTest {
      */
     @Test
     public void computesCorrectly() throws Exception {
-        Species species = new Species("Longspine", new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                      0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                      0.111313, 17.826, -1.79, 1,
-                                                                      0, 168434124,
-                                                                      0.6, false)
+        Species species = new Species(
+            "Longspine",
+            new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                0.111313, 17.826, -1.79, 1,
+                0, 168434124,
+                0.6, false
+            )
         );
         CutoffAbundanceFilter filter = new CutoffAbundanceFilter(10, false, true);
         double[][] selectivity = filter.getProbabilityMatrix(species);
         assertEquals(selectivity[FishStateUtilities.MALE][3], 1, .001);
-        assertEquals(selectivity[FishStateUtilities.FEMALE][20],0,.001);
+        assertEquals(selectivity[FishStateUtilities.FEMALE][20], 0, .001);
         filter = new CutoffAbundanceFilter(10, true, true);
         selectivity = filter.getProbabilityMatrix(species);
         assertEquals(selectivity[FishStateUtilities.MALE][3], 0, .001);
-        assertEquals(selectivity[FishStateUtilities.FEMALE][20],1,.001);
+        assertEquals(selectivity[FishStateUtilities.FEMALE][20], 1, .001);
 
     }
 
 
-
-
-
     @Test
     public void filtersCorrectly() throws Exception {
-        Species species = new Species("Longspine",new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                                         0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                                         0.111313, 17.826, -1.79, 1,
-                                                                                         0, 168434124,
-                                                                                         0.6, false)
+        Species species = new Species("Longspine",
+            new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                0.111313, 17.826, -1.79, 1,
+                0, 168434124,
+                0.6, false
+            )
         );
         CutoffAbundanceFilter filter = new CutoffAbundanceFilter(10, true, true);
 
@@ -74,10 +76,10 @@ public class CutoffAbundanceFilterTest {
         double[][] abundance = new double[2][];
         abundance[FishStateUtilities.MALE] = male;
         abundance[FishStateUtilities.FEMALE] = female;
-        double[][] filtered = filter.filter(species,abundance );
-        assertEquals(filtered[FishStateUtilities.MALE][5],100,.001);
-        assertEquals(filtered[FishStateUtilities.MALE][0],0,.001);
-        assertEquals(filtered[FishStateUtilities.FEMALE][5],0,.0001);
+        double[][] filtered = filter.filter(species, abundance);
+        assertEquals(filtered[FishStateUtilities.MALE][5], 100, .001);
+        assertEquals(filtered[FishStateUtilities.MALE][0], 0, .001);
+        assertEquals(filtered[FishStateUtilities.FEMALE][5], 0, .0001);
 
 
     }

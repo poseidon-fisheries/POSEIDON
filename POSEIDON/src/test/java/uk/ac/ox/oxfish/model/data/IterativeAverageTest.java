@@ -39,7 +39,7 @@ public class IterativeAverageTest {
         averager.addObservation(2);
         averager.addObservation(3);
         averager.addObservation(4);
-        assertEquals(2.5,averager.getSmoothedObservation(),.0001);
+        assertEquals(2.5, averager.getSmoothedObservation(), .0001);
 
     }
 }

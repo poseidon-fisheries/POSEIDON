@@ -30,10 +30,12 @@ import java.util.List;
 public class AsymmetricFixedDataLastStepTargetFromFile implements DataTarget {
 
 
+    private final AsymmetricFixedDataLastStepTarget delegate = new AsymmetricFixedDataLastStepTarget();
     private String pathToCsvFile;
 
-    private final AsymmetricFixedDataLastStepTarget delegate = new AsymmetricFixedDataLastStepTarget();
 
+    public AsymmetricFixedDataLastStepTargetFromFile() {
+    }
 
     @Override
     public double computeError(FishState model) {
@@ -42,18 +44,14 @@ public class AsymmetricFixedDataLastStepTargetFromFile implements DataTarget {
         try {
             List<String> strings = Files.readAllLines(Paths.get(pathToCsvFile));
             delegate.setFixedTarget(Double.parseDouble(
-                    strings.get(strings.size()-1)));
+                strings.get(strings.size() - 1)));
 
         } catch (IOException e) {
 
-            throw new RuntimeException("can't read " + pathToCsvFile +" because of " + e);
+            throw new RuntimeException("can't read " + pathToCsvFile + " because of " + e);
         }
         return delegate.computeError(model);
     }
-
-    public AsymmetricFixedDataLastStepTargetFromFile() {
-    }
-
 
     public String getPathToCsvFile() {
         return pathToCsvFile;

@@ -53,5 +53,6 @@ public class HabitatInitializers {
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private HabitatInitializers() { }
+    private HabitatInitializers() {
+    }
 }

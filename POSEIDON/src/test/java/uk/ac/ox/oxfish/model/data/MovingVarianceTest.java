@@ -34,7 +34,7 @@ public class MovingVarianceTest {
         MovingVariance<Integer> variance = new MovingVariance<>(4);
         variance.addObservation(1);
         assertTrue(Double.isNaN(variance.getSmoothedObservation()));
-        assertEquals(1,variance.getAverage(),.0001);
+        assertEquals(1, variance.getAverage(), .0001);
         variance.addObservation(2);
         assertEquals(1.5f, variance.getAverage(), .001f);
         assertEquals(0.25f, variance.getSmoothedObservation(), .001f);

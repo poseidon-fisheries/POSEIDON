@@ -41,22 +41,20 @@ public class RockyRectanglesHabitatInitializerTest {
     public void notEmpty() throws Exception {
 
 
-
-        for(int attempt = 0; attempt<10; attempt++)
-        {
-            FishState state = generateSimple4x4Map();
+        for (int attempt = 0; attempt < 10; attempt++) {
+            final FishState state = generateSimple4x4Map();
             when(state.getDailyDataSet()).thenReturn(mock(FishStateDailyTimeSeries.class));
-            NauticalMap map = state.getMap();
-            MersenneTwisterFast random = new MersenneTwisterFast();
-            RockyRectanglesHabitatInitializer initializer = new RockyRectanglesHabitatInitializer(3, 3, 3, 3, 1);
+            final NauticalMap map = state.getMap();
+            final MersenneTwisterFast random = new MersenneTwisterFast();
+            final RockyRectanglesHabitatInitializer initializer = new RockyRectanglesHabitatInitializer(3, 3, 3, 3, 1);
 
-            initializer.applyHabitats(map,random,state );
+            initializer.applyHabitats(map, random, state);
             int count = 0;
-            for(SeaTile tile : map.getAllSeaTilesAsList())
-                if(tile.getHabitat().getHardPercentage() > .99d)
+            for (final SeaTile tile : map.getAllSeaTilesAsList())
+                if (tile.getHabitat().getHardPercentage() > .99d)
                     count++;
-            Assert.assertTrue(count>0);
-            Assert.assertTrue(count<=9);
+            Assert.assertTrue(count > 0);
+            Assert.assertTrue(count <= 9);
         }
 
     }

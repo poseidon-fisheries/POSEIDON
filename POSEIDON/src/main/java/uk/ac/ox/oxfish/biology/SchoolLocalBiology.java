@@ -59,21 +59,23 @@ public class SchoolLocalBiology extends AbstractBiomassBasedBiology {
     public double getBiomass(Species species) {
 
         double sum = 0;
-        for(InfiniteSchool school : schools)
-            if(school.getSpecies().equals(species) && school.contains(position))
-                sum+=school.getBiomassPerCell();
+        for (InfiniteSchool school : schools)
+            if (school.getSpecies().equals(species) && school.contains(position))
+                sum += school.getBiomassPerCell();
         return sum;
     }
 
     /**
      * ignored
+     *
      * @param caught
      * @param notDiscarded
      * @param biology
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-            Catch caught, Catch notDiscarded, GlobalBiology biology) {
+        Catch caught, Catch notDiscarded, GlobalBiology biology
+    ) {
 
     }
 

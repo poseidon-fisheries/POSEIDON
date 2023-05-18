@@ -63,16 +63,18 @@ public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
 
 
         registerGatherer(FisherYearlyTimeSeries.CASH_FLOW_COLUMN,
-                         new Gatherer<Fisher>() {
+            new Gatherer<Fisher>() {
 
-                              double oldCash = observed.getBankBalance();
+                double oldCash = observed.getBankBalance();
 
-        @Override
-        public Double apply(Fisher fisher) {
-            double flow = fisher.getBankBalance() - oldCash;
-            oldCash = fisher.getBankBalance();
-            return flow;
-        }}, Double.NaN);
+                @Override
+                public Double apply(Fisher fisher) {
+                    double flow = fisher.getBankBalance() - oldCash;
+                    oldCash = fisher.getBankBalance();
+                    return flow;
+                }
+            }, Double.NaN
+        );
 
         registerGatherer(
             NumberOfActiveFadsGatherer.COLUMN_NAME,
@@ -80,34 +82,35 @@ public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
             0
         );
 
-        for(Species species : state.getSpecies())
-        {
+        for (Species species : state.getSpecies()) {
             final String landings = species + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
 
-            registerGatherer(landings,
-                             (new Gatherer<Fisher>() {
-                                 @Override
-                                 public Double apply(Fisher fisher) {
-                                     return fisher.getDailyCounter().getLandingsPerSpecie(species.getIndex());
-                                 }
-                             }),
-                             Double.NaN,
-                            KILOGRAM,
-                            "Biomass"
+            registerGatherer(
+                landings,
+                (new Gatherer<Fisher>() {
+                    @Override
+                    public Double apply(Fisher fisher) {
+                        return fisher.getDailyCounter().getLandingsPerSpecie(species.getIndex());
+                    }
+                }),
+                Double.NaN,
+                KILOGRAM,
+                "Biomass"
             );
 
             final String catches = species + " " + CATCHES_COLUMN_NAME;
 
-            registerGatherer(catches,
-                             (new Gatherer<Fisher>() {
-                                 @Override
-                                 public Double apply(Fisher fisher) {
-                                     return fisher.getDailyCounter().getCatchesPerSpecie(species.getIndex());
-                                 }
-                             }),
-                            Double.NaN,
-                            KILOGRAM,
-                            "Biomass"
+            registerGatherer(
+                catches,
+                (new Gatherer<Fisher>() {
+                    @Override
+                    public Double apply(Fisher fisher) {
+                        return fisher.getDailyCounter().getCatchesPerSpecie(species.getIndex());
+                    }
+                }),
+                Double.NaN,
+                KILOGRAM,
+                "Biomass"
             );
 
         }

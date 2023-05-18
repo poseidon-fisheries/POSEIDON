@@ -30,17 +30,16 @@ import java.util.HashMap;
  * Given a set of weights to drive movement towards better habitat
  * Created by carrknight on 7/28/17.
  */
-public class WeightedAbundanceDiffuser extends ConstantRateAbundanceDiffuser{
+public class WeightedAbundanceDiffuser extends ConstantRateAbundanceDiffuser {
 
 
-
-
-    private final HashMap<AbundanceLocalBiology,Double> weights;
+    private final HashMap<AbundanceLocalBiology, Double> weights;
 
 
     public WeightedAbundanceDiffuser(
-            int diffusingRange, double diffusingRate,
-            HashMap<AbundanceLocalBiology, Double> weights) {
+        int diffusingRange, double diffusingRate,
+        HashMap<AbundanceLocalBiology, Double> weights
+    ) {
         super(diffusingRange, diffusingRate);
         this.weights = weights;
     }
@@ -49,40 +48,53 @@ public class WeightedAbundanceDiffuser extends ConstantRateAbundanceDiffuser{
     /**
      * ask implementation how to move. This gets called iff there is a positive delta (that is, there are more fish here than there)
      *
-     * @param species      species moving!
-     * @param here         departing point
+     * @param species        species moving!
+     * @param here           departing point
      * @param abundanceHere  departing local biology
-     * @param there        arriving point
+     * @param there          arriving point
      * @param abundanceThere arriving local biology
-     * @param delta        number of fish here - number of fish there (always positive or this isn't called)
+     * @param delta          number of fish here - number of fish there (always positive or this isn't called)
      * @param fishHere
      * @param fishThere
-     * @param bin          bin/age studied
+     * @param bin            bin/age studied
      * @param random
      * @param subdivision
-     * @param biologyHere  departing local biology
-     * @param biologyThere arriving local biology
+     * @param biologyHere    departing local biology
+     * @param biologyThere   arriving local biology
      */
     @Override
     public void move(
-            Species species, SeaTile here, StructuredAbundance abundanceHere, SeaTile there,
-            StructuredAbundance abundanceThere, double delta, double fishHere, double fishThere, int bin,
-            MersenneTwisterFast random,
-            boolean rounding, int subdivision,
-            AbundanceLocalBiology biologyHere,
-            AbundanceLocalBiology biologyThere) {
-
+        Species species, SeaTile here, StructuredAbundance abundanceHere, SeaTile there,
+        StructuredAbundance abundanceThere, double delta, double fishHere, double fishThere, int bin,
+        MersenneTwisterFast random,
+        boolean rounding, int subdivision,
+        AbundanceLocalBiology biologyHere,
+        AbundanceLocalBiology biologyThere
+    ) {
 
 
         //reweights
         double weightHere = weights.get(biologyHere);
         double weightThere = weights.get(biologyThere);
-        delta = ((fishHere * weightThere  - fishThere * weightHere)/(weightHere+weightThere));
-        if(rounding)
-            delta=(int) delta;
+        delta = ((fishHere * weightThere - fishThere * weightHere) / (weightHere + weightThere));
+        if (rounding)
+            delta = (int) delta;
 
-        super.move(species, here, abundanceHere, there, abundanceThere, delta, fishHere, fishThere, bin, random, rounding,
-                   subdivision, biologyHere, biologyThere);
+        super.move(species,
+            here,
+            abundanceHere,
+            there,
+            abundanceThere,
+            delta,
+            fishHere,
+            fishThere,
+            bin,
+            random,
+            rounding,
+            subdivision,
+            biologyHere,
+            biologyThere
+        );
 
 
     }

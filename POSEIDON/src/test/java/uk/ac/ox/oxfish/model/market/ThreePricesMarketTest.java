@@ -46,56 +46,60 @@ public class ThreePricesMarketTest {
     public void sellsAndNotifiesCorrectly() {
 
         //set up copied from the holdsize test
-        Meristics first = new FromListMeristics(new double[]{100,100,100},2);
-        Meristics second = new FromListMeristics(new double[]{100,100},2);
-        Species firstSpecies = new Species("first",first);
-        Species secondSpecies = new Species("second",second);
+        Meristics first = new FromListMeristics(new double[]{100, 100, 100}, 2);
+        Meristics second = new FromListMeristics(new double[]{100, 100}, 2);
+        Species firstSpecies = new Species("first", first);
+        Species secondSpecies = new Species("second", second);
 
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
 
 
-        Hold hold = new Hold(1000d,
-                             bio);
+        Hold hold = new Hold(
+            1000d,
+            bio
+        );
 
         //you catch 1000kg of species 1
         hold.load(
-                new Catch(
-                        new double[]{0,2,3},
-                        new double[]{5,0,0},
-                        firstSpecies,
-                        bio
+            new Catch(
+                new double[]{0, 2, 3},
+                new double[]{5, 0, 0},
+                firstSpecies,
+                bio
 
-                )
+            )
         );
 
 
         NThresholdsMarket market = NThresholdsMarket.ThreePricesMarket(
-                0,1,
-                10,
-                20,
-                30
+            0, 1,
+            10,
+            20,
+            30
         );
         market.setSpecies(firstSpecies);
         market.start(mock(FishState.class));
         Regulation regulation = mock(Regulation.class);
-        when(regulation.maximumBiomassSellable(any(),
-                                               any(),
-                                               any())).thenReturn(1500d);
+        when(regulation.maximumBiomassSellable(
+            any(),
+            any(),
+            any()
+        )).thenReturn(1500d);
 
         //sell the fish
         Fisher fisher = mock(Fisher.class);
-        market.sellFish(hold,
-                        fisher,
-                        regulation,
-                        mock(FishState.class),
-                        firstSpecies);
+        market.sellFish(
+            hold,
+            fisher,
+            regulation,
+            mock(FishState.class),
+            firstSpecies
+        );
         verify(fisher).earn(
-                (10*5*100d+20*2*100d+30*3*100d)
+            (10 * 5 * 100d + 20 * 2 * 100d + 30 * 3 * 100d)
 
         );
-
-
 
 
     }
@@ -105,42 +109,44 @@ public class ThreePricesMarketTest {
     public void sellsAndNotifiesCorrectlyMapped() {
 
         //set up copied from the holdsize test
-        Meristics first = new FromListMeristics(new double[]{100,100,100},2);
-        Meristics second = new FromListMeristics(new double[]{100,100},2);
-        Species firstSpecies = new Species("first",first);
-        Species secondSpecies = new Species("second",second);
+        Meristics first = new FromListMeristics(new double[]{100, 100, 100}, 2);
+        Meristics second = new FromListMeristics(new double[]{100, 100}, 2);
+        Species firstSpecies = new Species("first", first);
+        Species secondSpecies = new Species("second", second);
 
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
 
 
-        Hold hold = new Hold(1000d,
-                             bio);
+        Hold hold = new Hold(
+            1000d,
+            bio
+        );
 
         //you catch 1000kg of species 1
         hold.load(
-                new Catch(
-                        new double[]{0,2,3},
-                        new double[]{5,0,0},
-                        firstSpecies,
-                        bio
+            new Catch(
+                new double[]{0, 2, 3},
+                new double[]{5, 0, 0},
+                firstSpecies,
+                bio
 
-                )
+            )
         );
 
         SpeciesMarketMappedFactory factory = new SpeciesMarketMappedFactory();
         factory.getMarkets().put(
-                "first",
-                new ThreePricesMarketFactory(
-                        0,1,10,20,30
-                )
+            "first",
+            new ThreePricesMarketFactory(
+                0, 1, 10, 20, 30
+            )
 
         );
         factory.getMarkets().put(
-                "second",
-                new ThreePricesMarketFactory(
-                        0,1,-1,-1,-1
-                )
+            "second",
+            new ThreePricesMarketFactory(
+                0, 1, -1, -1, -1
+            )
 
         );
 
@@ -148,23 +154,25 @@ public class ThreePricesMarketTest {
         market.setSpecies(firstSpecies);
         market.start(mock(FishState.class));
         Regulation regulation = mock(Regulation.class);
-        when(regulation.maximumBiomassSellable(any(),
-                                               any(),
-                                               any())).thenReturn(1500d);
+        when(regulation.maximumBiomassSellable(
+            any(),
+            any(),
+            any()
+        )).thenReturn(1500d);
 
         //sell the fish
         Fisher fisher = mock(Fisher.class);
-        market.sellFish(hold,
-                        fisher,
-                        regulation,
-                        mock(FishState.class),
-                        firstSpecies);
+        market.sellFish(
+            hold,
+            fisher,
+            regulation,
+            mock(FishState.class),
+            firstSpecies
+        );
         verify(fisher).earn(
-                (10*5*100d+20*2*100d+30*3*100d)
+            (10 * 5 * 100d + 20 * 2 * 100d + 30 * 3 * 100d)
 
         );
-
-
 
 
     }
@@ -174,60 +182,62 @@ public class ThreePricesMarketTest {
     public void regulationHalves() {
 
         //set up copied from the holdsize test
-        Meristics first = new FromListMeristics(new double[]{100,100,100},2);
-        Meristics second = new FromListMeristics(new double[]{100,100},2);
-        Species firstSpecies = new Species("first",first);
-        Species secondSpecies = new Species("second",second);
+        Meristics first = new FromListMeristics(new double[]{100, 100, 100}, 2);
+        Meristics second = new FromListMeristics(new double[]{100, 100}, 2);
+        Species firstSpecies = new Species("first", first);
+        Species secondSpecies = new Species("second", second);
 
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
 
 
-
-
-        Hold hold = new Hold(1000d,
-                             bio);
+        Hold hold = new Hold(
+            1000d,
+            bio
+        );
 
         //you catch 1000kg of species 1
         //but regulations will only allow to sell 500kg
         hold.load(
-                new Catch(
-                        new double[]{0,2,3},
-                        new double[]{5,0,0},
-                        firstSpecies,
-                        bio
+            new Catch(
+                new double[]{0, 2, 3},
+                new double[]{5, 0, 0},
+                firstSpecies,
+                bio
 
-                )
+            )
         );
 
 
         NThresholdsMarket market = NThresholdsMarket.ThreePricesMarket(
-                0,1,
-                10,
-                20,
-                30
+            0, 1,
+            10,
+            20,
+            30
         );
         market.setSpecies(firstSpecies);
         market.start(mock(FishState.class));
         Regulation regulation = mock(Regulation.class);
-        when(regulation.maximumBiomassSellable(any(),
-                                               any(),
-                                               any())).thenReturn(500d);
+        when(regulation.maximumBiomassSellable(
+            any(),
+            any(),
+            any()
+        )).thenReturn(500d);
 
         //sell the fish
         Fisher fisher = mock(Fisher.class);
-        market.sellFish(hold,
-                        fisher,
-                        regulation,
-                        mock(FishState.class),
-                        firstSpecies);
+        market.sellFish(
+            hold,
+            fisher,
+            regulation,
+            mock(FishState.class),
+            firstSpecies
+        );
         verify(fisher).earn(
-                //you only sold half of the total value
-                (10*5*100d+20*2*100d+30*3*100d)/2d
+            //you only sold half of the total value
+            (10 * 5 * 100d + 20 * 2 * 100d + 30 * 3 * 100d) / 2d
 
         );
-
-
 
 
     }

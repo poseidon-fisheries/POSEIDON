@@ -67,5 +67,6 @@ public class Gears {
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private Gears() { }
+    private Gears() {
+    }
 }

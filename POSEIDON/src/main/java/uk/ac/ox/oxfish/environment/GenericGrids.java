@@ -18,22 +18,19 @@
 
 package uk.ac.ox.oxfish.environment;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
-import static com.google.common.math.DoubleMath.fuzzyEquals;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
-import java.util.Arrays;
+import sim.field.grid.DoubleGrid2D;
+import uk.ac.ox.oxfish.biology.tuna.PeriodicStepMapper;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.IntUnaryOperator;
-import sim.field.grid.DoubleGrid2D;
-import uk.ac.ox.oxfish.biology.tuna.PeriodicStepMapper;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 
 /**
  * My attempt to generalize the Allocation Grids when we aren't using them for
@@ -46,8 +43,8 @@ public class GenericGrids<K> {
     private final IntUnaryOperator stepMapper;
 
     private GenericGrids(
-            final ImmutableSortedMap<Integer, Map<K, DoubleGrid2D>> grids,
-            final int period
+        final ImmutableSortedMap<Integer, Map<K, DoubleGrid2D>> grids,
+        final int period
     ) {
         this.grids = grids;
         this.stepMapper = new PeriodicStepMapper(period);
@@ -63,17 +60,17 @@ public class GenericGrids<K> {
      * @return A new {@link GenericGrids} object.
      */
     public static <K> GenericGrids<K> from(
-            final Map<Integer, ? extends Map<K, DoubleGrid2D>> grids,
-            final int period
+        final Map<Integer, ? extends Map<K, DoubleGrid2D>> grids,
+        final int period
     ) {
         return new GenericGrids<>(
-                grids.entrySet().stream()
-                        .collect(toImmutableSortedMap(
-                                Comparator.naturalOrder(),
-                                Entry::getKey,
-                                entry -> ImmutableMap.copyOf(entry.getValue())
-                        )),
-                period
+            grids.entrySet().stream()
+                .collect(toImmutableSortedMap(
+                    Comparator.naturalOrder(),
+                    Entry::getKey,
+                    entry -> ImmutableMap.copyOf(entry.getValue())
+                )),
+            period
         );
     }
 
@@ -87,7 +84,7 @@ public class GenericGrids<K> {
 
     public Map<K, DoubleGrid2D> atOrBeforeStep(final Integer step) {
         final Entry<? super Integer, Map<K, DoubleGrid2D>> floorEntry =
-                grids.floorEntry(stepMapper.applyAsInt(step));
+            grids.floorEntry(stepMapper.applyAsInt(step));
         checkNotNull(floorEntry, "No grids at or before step " + step);
         return floorEntry.getValue();
     }

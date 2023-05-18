@@ -50,18 +50,6 @@ public class PerTripImitativeDestinationFactoryTest {
 
     }
 
-
-    @Test
-    public void fiveguysAvoid() throws Exception {
-
-        int protectedTargets = protectedTargetsHit(true);
-
-        assertTrue(protectedTargets == 0);
-        System.out.println(protectedTargets);
-
-
-    }
-
     public int protectedTargetsHit(final boolean avoidMPAs) {
         PrototypeScenario scenario = new PrototypeScenario();
         PerTripImitativeDestinationFactory destinationStrategy = new PerTripImitativeDestinationFactory();
@@ -81,16 +69,28 @@ public class PerTripImitativeDestinationFactoryTest {
         state.start();
 
         //burn in
-        for(int i=0; i<20; i++)
+        for (int i = 0; i < 20; i++)
             state.schedule.step(state);
         int protectedTargets = 0;
-        for(int i=0; i<100; i++)
-        {
+        for (int i = 0; i < 100; i++) {
             state.schedule.step(state);
-            for(Fisher fisher : state.getFishers())
-                if(((PerTripIterativeDestinationStrategy) fisher.getDestinationStrategy()).getDelegate().getFavoriteSpot().isProtected())
+            for (Fisher fisher : state.getFishers())
+                if (((PerTripIterativeDestinationStrategy) fisher.getDestinationStrategy()).getDelegate()
+                    .getFavoriteSpot()
+                    .isProtected())
                     protectedTargets++;
         }
         return protectedTargets;
+    }
+
+    @Test
+    public void fiveguysAvoid() throws Exception {
+
+        int protectedTargets = protectedTargetsHit(true);
+
+        assertTrue(protectedTargets == 0);
+        System.out.println(protectedTargets);
+
+
     }
 }

@@ -33,11 +33,6 @@ public class PurseSeineTripLogger
         logTripEvent(record, fisher, "trip_start");
     }
 
-    @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-        logTripEvent(record, fisher, "trip_end");
-    }
-
     private void logTripEvent(TripRecord record, Fisher fisher, String event) {
         final Port port = fisher.getHomePort();
         final Coordinate portCoordinates = fishState.getMap().getCoordinates(port.getLocation());
@@ -50,6 +45,11 @@ public class PurseSeineTripLogger
             portCoordinates.x, // lon
             portCoordinates.y // lat
         );
+    }
+
+    @Override
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+        logTripEvent(record, fisher, "trip_end");
     }
 
     @Override

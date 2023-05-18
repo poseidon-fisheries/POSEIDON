@@ -49,8 +49,7 @@ import java.nio.file.Paths;
 public class EffortThrottling {
 
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
 
         Path root = Paths.get("runs", "effort");
         root.toFile().mkdirs();
@@ -60,10 +59,10 @@ public class EffortThrottling {
         market.setMarketPrice(new FixedDoubleParameter(2.0));
 
         EffortThrottling.effortThrottling(40, market,
-                                          0,
-                                          new UniformDoubleParameter(0.001, 1), root.resolve("low_effort.csv").toFile(),
-                                          root.resolve("low_grid.csv").toFile());
-
+            0,
+            new UniformDoubleParameter(0.001, 1), root.resolve("low_effort.csv").toFile(),
+            root.resolve("low_grid.csv").toFile()
+        );
 
 
         //high effort
@@ -71,9 +70,10 @@ public class EffortThrottling {
         market.setMarketPrice(new FixedDoubleParameter(10.0));
 
         EffortThrottling.effortThrottling(40, market,
-                                          0,
-                                          new UniformDoubleParameter(0.001, 1), root.resolve("high_effort.csv").toFile(),
-                                          root.resolve("high_grid.csv").toFile());
+            0,
+            new UniformDoubleParameter(0.001, 1), root.resolve("high_effort.csv").toFile(),
+            root.resolve("high_grid.csv").toFile()
+        );
 
         //self-regulating effort
         CongestedMarketFactory market2 = new CongestedMarketFactory();
@@ -83,58 +83,78 @@ public class EffortThrottling {
         market2.setMaxPrice(new FixedDoubleParameter(10.0));
 
         FishState state = EffortThrottling.effortThrottling(80, market2,
-                                                            0,
-                                                            new UniformDoubleParameter(0.001, 1),
-                                                            root.resolve("variable_effort.csv").toFile(),
-                                                            root.resolve("variable_grid.csv").toFile()
+            0,
+            new UniformDoubleParameter(0.001, 1),
+            root.resolve("variable_effort.csv").toFile(),
+            root.resolve("variable_grid.csv").toFile()
         );
 
         //print out the price!
         FishStateUtilities.printCSVColumnToFile(
-                root.resolve("variable_price.csv").toFile(),
-                state.getPorts().iterator().next().getDefaultMarketMap().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
-                        AbstractMarket.PRICE_COLUMN_NAME
-                ));
+            root.resolve("variable_price.csv").toFile(),
+            state.getPorts()
+                .iterator()
+                .next()
+                .getDefaultMarketMap()
+                .getMarket(state.getBiology().getSpecie(0))
+                .getData()
+                .getColumn(
+                    AbstractMarket.PRICE_COLUMN_NAME
+                )
+        );
 
 
         //self-regulating from below
         state = EffortThrottling.effortThrottling(80, market2,
-                                                            0,
-                                                            new UniformDoubleParameter(0.001, 0.1),
-                                                            root.resolve("variable_effort2.csv").toFile(),
-                                                            root.resolve("variable_grid2.csv").toFile()
+            0,
+            new UniformDoubleParameter(0.001, 0.1),
+            root.resolve("variable_effort2.csv").toFile(),
+            root.resolve("variable_grid2.csv").toFile()
         );
 
-        Preconditions.checkArgument(state.seed()==0);
+        Preconditions.checkArgument(state.seed() == 0);
 
         FishStateUtilities.printCSVColumnToFile(
-                root.resolve("variable_price2.csv").toFile(),
-                state.getPorts().iterator().next().getDefaultMarketMap().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
-                        AbstractMarket.PRICE_COLUMN_NAME
-                ));
+            root.resolve("variable_price2.csv").toFile(),
+            state.getPorts()
+                .iterator()
+                .next()
+                .getDefaultMarketMap()
+                .getMarket(state.getBiology().getSpecie(0))
+                .getData()
+                .getColumn(
+                    AbstractMarket.PRICE_COLUMN_NAME
+                )
+        );
         //self-regulating from above
         state = EffortThrottling.effortThrottling(80, market2,
-                                                  0,
-                                                  new UniformDoubleParameter(0.8, 1),
-                                                  root.resolve("variable_effort3.csv").toFile(),
-                                                  root.resolve("variable_grid3.csv").toFile()
+            0,
+            new UniformDoubleParameter(0.8, 1),
+            root.resolve("variable_effort3.csv").toFile(),
+            root.resolve("variable_grid3.csv").toFile()
         );
 
         FishStateUtilities.printCSVColumnToFile(
-                root.resolve("variable_price3.csv").toFile(),
-                state.getPorts().iterator().next().getDefaultMarketMap().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
-                        AbstractMarket.PRICE_COLUMN_NAME
-                ));
-
+            root.resolve("variable_price3.csv").toFile(),
+            state.getPorts()
+                .iterator()
+                .next()
+                .getDefaultMarketMap()
+                .getMarket(state.getBiology().getSpecie(0))
+                .getData()
+                .getColumn(
+                    AbstractMarket.PRICE_COLUMN_NAME
+                )
+        );
 
 
     }
 
 
     public static FishState effortThrottling(
-            final int simulationYears, final AlgorithmFactory<? extends Market> market, final long seed,
-            final UniformDoubleParameter initialEffortProbability, File timeSeries, File grid)
-    {
+        final int simulationYears, final AlgorithmFactory<? extends Market> market, final long seed,
+        final UniformDoubleParameter initialEffortProbability, File timeSeries, File grid
+    ) {
 
 
         //create the scenario
@@ -164,41 +184,40 @@ public class EffortThrottling {
         state.start();
         GearImitationAnalysis.attachGoingOutProbabilityToEveryone(state.getFishers(), state, 0.4, .2, .6);
 
-   //     state.getMap().guiStart(state);
+        //     state.getMap().guiStart(state);
         state.schedule.step(state);
         System.out.println("start: " + state.getDailyDataSet().getLatestObservation("Probability to leave port"));
 
 
         //lspiRun it for 40 years
-        while(state.getYear() < simulationYears)
+        while (state.getYear() < simulationYears)
             state.schedule.step(state);
 
         //probability should be very low!
         System.out.println("end: " + state.getDailyDataSet().getLatestObservation("Probability to leave port"));
 
-        if(timeSeries != null)
-            FishStateUtilities.printCSVColumnToFile(timeSeries,
-                                                    state.getDailyDataSet().getColumn("Probability to leave port")
+        if (timeSeries != null)
+            FishStateUtilities.printCSVColumnToFile(
+                timeSeries,
+                state.getDailyDataSet().getColumn("Probability to leave port")
             );
-        if(grid!=null)
-            gridToCSV(state.getDailyTrawlsMap().field,grid);
+        if (grid != null)
+            gridToCSV(state.getDailyTrawlsMap().field, grid);
 
 
         return state;
     }
 
 
-    public static void gridToCSV(int[][] grid, File file)
-    {
+    public static void gridToCSV(int[][] grid, File file) {
 
         try {
             FileWriter writer = new FileWriter(file);
             writer.write("x,y,value");
             writer.write("\n");
-            for(int x = 0 ; x<grid.length; x++)
-                for(int y=0; y<grid[x].length; y++)
-                {
-                    writer.write(x + "," + y +"," + grid[x][y]);
+            for (int x = 0; x < grid.length; x++)
+                for (int y = 0; y < grid[x].length; y++) {
+                    writer.write(x + "," + y + "," + grid[x][y]);
                     writer.write("\n");
 
                 }

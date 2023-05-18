@@ -58,10 +58,10 @@ public class PortDistanceExtractor implements ObservationExtractor {
     public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
         SeaTile portLocation = agent.getHomePort().getLocation();
 
-        if(geographicalDistance != null)
-            return geographicalDistance.distance(portLocation,tile,model.getMap())+offset;
+        if (geographicalDistance != null)
+            return geographicalDistance.distance(portLocation, tile, model.getMap()) + offset;
         else
-            return model.getMap().distance(portLocation,tile) + offset;
+            return model.getMap().distance(portLocation, tile) + offset;
 
 
     }

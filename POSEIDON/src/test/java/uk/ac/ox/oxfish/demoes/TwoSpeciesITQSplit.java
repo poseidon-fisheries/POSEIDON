@@ -36,8 +36,7 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class TwoSpeciesITQSplit
-{
+public class TwoSpeciesITQSplit {
 
 
     /**
@@ -49,16 +48,12 @@ public class TwoSpeciesITQSplit
     public void itqAffectsGeography() throws Exception {
 
 
-
         FishYAML yaml = new FishYAML();
         String scenarioYaml = String.join("\n", Files.readAllLines(
-                Paths.get("inputs", "first_paper", "location_itq.yaml")));
-        PrototypeScenario scenario =  yaml.loadAs(scenarioYaml,PrototypeScenario.class);
+            Paths.get("inputs", "first_paper", "location_itq.yaml")));
+        PrototypeScenario scenario = yaml.loadAs(scenarioYaml, PrototypeScenario.class);
         FishState state = new FishState();
         state.setScenario(scenario);
-
-
-
 
 
         long towsNorth = 0;
@@ -88,7 +83,6 @@ public class TwoSpeciesITQSplit
         Assert.assertTrue(towsNorth / ((double) towsNorth + towsSouth) > .6);
 
 
-
     }
 
 
@@ -97,13 +91,11 @@ public class TwoSpeciesITQSplit
      * being as effective as switching gear
      */
     @Test
-    public void TwoSpeciesITQSplitUnmuffled()
-    {
+    public void TwoSpeciesITQSplitUnmuffled() {
         //this I think has about a 2% failure rate; I am going to make it run twice. If it fails twice, we have a problem
         try {
             unmuffledTestOnce();
-        }
-        catch (AssertionError e){
+        } catch (AssertionError e) {
             unmuffledTestOnce();
 
         }
@@ -152,9 +144,9 @@ public class TwoSpeciesITQSplit
 
         state.schedule.step(state);
         double earlyRedLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(0) + " " +
-                                                                                        AbstractMarket.LANDINGS_COLUMN_NAME);
+            AbstractMarket.LANDINGS_COLUMN_NAME);
         double earlyBlueLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(1) + " " +
-                                                                                         AbstractMarket.LANDINGS_COLUMN_NAME);
+            AbstractMarket.LANDINGS_COLUMN_NAME);
 
         System.out.println("Early Landings: " + earlyRedLandings + " --- " + earlyBlueLandings);
         //blue start as a choke species
@@ -182,12 +174,12 @@ public class TwoSpeciesITQSplit
 
         //by year 10 the quotas are very well used!
         double lateRedLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(0) + " " +
-                                                                                       AbstractMarket.LANDINGS_COLUMN_NAME);
+            AbstractMarket.LANDINGS_COLUMN_NAME);
         double lateBlueLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(1) + " " +
-                                                                                        AbstractMarket.LANDINGS_COLUMN_NAME);
+            AbstractMarket.LANDINGS_COLUMN_NAME);
         System.out.println("Late Landings: " + lateRedLandings + " --- " + lateBlueLandings);
         System.out.println(
-                "Late Quota Efficiency: " + lateRedLandings / totalRedQuotas + " --- " + lateBlueLandings / totalBlueQuotas);
+            "Late Quota Efficiency: " + lateRedLandings / totalRedQuotas + " --- " + lateBlueLandings / totalBlueQuotas);
 
         //geographical choice with "fixed" biology works very strongly
         Assert.assertTrue(lateRedLandings > .6 * totalRedQuotas);

@@ -56,40 +56,40 @@ public class MustShareTagTest {
         when(fisher1.getTags()).thenReturn(new LinkedList<>());
         when(fisher2.getTags()).thenReturn(Lists.newArrayList("A"));
         assertTrue(
-                predicate.test(fisher1,fisher2)
+            predicate.test(fisher1, fisher2)
         );
 
         //nothing ---> nothing is okay
         when(fisher1.getTags()).thenReturn(new LinkedList<>());
         when(fisher2.getTags()).thenReturn(new LinkedList<>());
         assertTrue(
-                predicate.test(fisher1,fisher2)
+            predicate.test(fisher1, fisher2)
         );
 
         //"A" ----> "A" is okay
         when(fisher1.getTags()).thenReturn(Lists.newArrayList("A"));
         when(fisher2.getTags()).thenReturn(Lists.newArrayList("A"));
         assertTrue(
-                predicate.test(fisher1,fisher2)
+            predicate.test(fisher1, fisher2)
         );
 
         //"A","B" ---> "A" is okay
         when(fisher1.getTags()).thenReturn(Lists.newArrayList("A"));
-        when(fisher2.getTags()).thenReturn(Lists.newArrayList("A","B"));
+        when(fisher2.getTags()).thenReturn(Lists.newArrayList("A", "B"));
         assertTrue(
-                predicate.test(fisher1,fisher2)
+            predicate.test(fisher1, fisher2)
         );
         //  "B" ---> "A" is not okay
         when(fisher1.getTags()).thenReturn(Lists.newArrayList("B"));
         when(fisher2.getTags()).thenReturn(Lists.newArrayList("A"));
         assertTrue(
-                !predicate.test(fisher1,fisher2)
+            !predicate.test(fisher1, fisher2)
         );
         //  "B" ---> nothing is not okay
         when(fisher1.getTags()).thenReturn(Lists.newArrayList("B"));
         when(fisher2.getTags()).thenReturn(Lists.newArrayList());
         assertTrue(
-                !predicate.test(fisher1,fisher2)
+            !predicate.test(fisher1, fisher2)
         );
     }
 }

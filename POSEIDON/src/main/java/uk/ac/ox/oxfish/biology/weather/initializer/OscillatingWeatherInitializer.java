@@ -54,52 +54,57 @@ public class OscillatingWeatherInitializer implements WeatherInitializer {
 
 
     public OscillatingWeatherInitializer(
-            double minTemperature, double maxTemperature, int oscillationPeriod, double minWindSpeed,
-            double maxWindSpeed) {
+        double minTemperature, double maxTemperature, int oscillationPeriod, double minWindSpeed,
+        double maxWindSpeed
+    ) {
         this.minTemperature = minTemperature;
         this.maxTemperature = maxTemperature;
-        Preconditions.checkArgument(maxTemperature >= minTemperature, "max temperature must be more or equal min temperature");
+        Preconditions.checkArgument(
+            maxTemperature >= minTemperature,
+            "max temperature must be more or equal min temperature"
+        );
         this.oscillationPeriod = oscillationPeriod;
         Preconditions.checkArgument(oscillationPeriod > 0, "oscillation period must be positive");
         this.minWindSpeed = minWindSpeed;
         this.maxWindSpeed = maxWindSpeed;
-        Preconditions.checkArgument(maxWindSpeed >= minWindSpeed, "max temperature must be more or equal min temperature");
+        Preconditions.checkArgument(
+            maxWindSpeed >= minWindSpeed,
+            "max temperature must be more or equal min temperature"
+        );
 
     }
 
     @Override
     public void processMap(
-            NauticalMap map, MersenneTwisterFast random, FishState model) {
+        NauticalMap map, MersenneTwisterFast random, FishState model
+    ) {
 
 
         List<SeaTile> seaTiles = map.getAllSeaTilesAsList();
         final ConstantWeather singleInstance = new ConstantWeather(minTemperature, minWindSpeed, 0);
 
 
-        for(SeaTile tile : seaTiles)
-        {
+        for (SeaTile tile : seaTiles) {
             tile.assignLocalWeather(singleInstance);
         }
 
 
-        final double temperatureIncrement = (maxTemperature - minTemperature)/oscillationPeriod;
-        final double speedIncrement = (maxWindSpeed - minWindSpeed)/oscillationPeriod;
+        final double temperatureIncrement = (maxTemperature - minTemperature) / oscillationPeriod;
+        final double speedIncrement = (maxWindSpeed - minWindSpeed) / oscillationPeriod;
 
         //create a steppable to modify the weather
         model.scheduleEveryDay(new Steppable() {
             @Override
-            public void step(SimState simState)
-            {
+            public void step(SimState simState) {
                 double day = model.getDay();
-                assert day >=0;
+                assert day >= 0;
 
                 // +1 increasing speed and temperature, -1 decreasing it
-                double multiplier = Math.floor(day/oscillationPeriod)%2==0 ? 1 : -1;
+                double multiplier = Math.floor(day / oscillationPeriod) % 2 == 0 ? 1 : -1;
                 singleInstance.setTemperature(singleInstance.getTemperatureInCelsius() +
-                                                      multiplier * temperatureIncrement);
+                    multiplier * temperatureIncrement);
                 singleInstance.setWindSpeed(singleInstance.getWindSpeedInKph() +
-                                                    multiplier* speedIncrement);
-
+                    multiplier * speedIncrement);
 
 
             }
@@ -112,11 +117,10 @@ public class OscillatingWeatherInitializer implements WeatherInitializer {
             public Double apply(FishState state) {
                 return singleInstance.getWindSpeedInKph();
             }
-        },Double.NaN);
+        }, Double.NaN);
 
 
     }
-
 
 
 }

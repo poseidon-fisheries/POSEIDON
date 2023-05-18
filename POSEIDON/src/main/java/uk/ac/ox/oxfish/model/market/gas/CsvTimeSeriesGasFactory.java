@@ -32,10 +32,10 @@ import java.util.function.Function;
 /**
  * Created by carrknight on 7/18/17.
  */
-public class CsvTimeSeriesGasFactory implements AlgorithmFactory<TimeSeriesGasPriceMaker>{
+public class CsvTimeSeriesGasFactory implements AlgorithmFactory<TimeSeriesGasPriceMaker> {
 
 
-    private Path csvFile = Paths.get("inputs","california","2001_gasprice.csv");
+    private Path csvFile = Paths.get("inputs", "california", "2001_gasprice.csv");
 
     private char separator = ',';
 
@@ -62,22 +62,22 @@ public class CsvTimeSeriesGasFactory implements AlgorithmFactory<TimeSeriesGasPr
     public TimeSeriesGasPriceMaker apply(FishState state) {
 
         CsvColumnToList gasPrices = new CsvColumnToList(
-                csvFile.toString(),
-                true,
-                separator,
-                columnNumber,
-                new Function<Double, Double>() {
-                    @Override
-                    public Double apply(Double dollarsPerGallon) {
-                        return  dollarsPerGallon * scaling; //ratio
-                    }
+            csvFile.toString(),
+            true,
+            separator,
+            columnNumber,
+            new Function<Double, Double>() {
+                @Override
+                public Double apply(Double dollarsPerGallon) {
+                    return dollarsPerGallon * scaling; //ratio
                 }
+            }
         );
 
         return new TimeSeriesGasPriceMaker(
-                gasPrices.readColumn(),
-                loopThroughTheCSV,
-                yearly ? IntervalPolicy.EVERY_YEAR : IntervalPolicy.EVERY_DAY
+            gasPrices.readColumn(),
+            loopThroughTheCSV,
+            yearly ? IntervalPolicy.EVERY_YEAR : IntervalPolicy.EVERY_DAY
         );
 
 

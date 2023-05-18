@@ -5,7 +5,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public class DefaultToDestinationStrategyFishingStrategyFactory implements
-        AlgorithmFactory<DefaultToDestinationStrategyFishingStrategy> {
+    AlgorithmFactory<DefaultToDestinationStrategyFishingStrategy> {
 
     @Override
     public DefaultToDestinationStrategyFishingStrategy apply(FishState state) {

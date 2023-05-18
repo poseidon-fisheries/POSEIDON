@@ -41,10 +41,8 @@ import static org.mockito.Mockito.when;
 public class SocialNetworkTest {
 
 
-
     @Test
-    public void addFriend() throws  Exception{
-
+    public void addFriend() throws Exception {
 
 
         //the world will be made of 2 fishers
@@ -67,7 +65,7 @@ public class SocialNetworkTest {
         assertTrue(!network.getDirectedNeighbors(zero).contains(one));
         assertTrue(!network.getAllNeighbors(one).contains(zero));
         assertTrue(!network.getDirectedNeighbors(zero).contains(zero));
-        network.addRandomFriend(zero,fishers,state.getRandom());
+        network.addRandomFriend(zero, fishers, state.getRandom());
 
         //by necessity it must have connected to one
         assertTrue(network.getAllNeighbors(zero).contains(one));
@@ -75,20 +73,20 @@ public class SocialNetworkTest {
         assertTrue(network.getAllNeighbors(one).contains(zero));
         assertTrue(!network.getDirectedNeighbors(one).contains(zero));
 
-        assertEquals(network.getBackingnetwork().getSuccessorCount(zero),1);
-        assertEquals(network.getBackingnetwork().getSuccessorCount(one),0);
-        assertEquals(network.getBackingnetwork().getPredecessorCount(zero),0);
-        assertEquals(network.getBackingnetwork().getPredecessorCount(one),1);
+        assertEquals(network.getBackingnetwork().getSuccessorCount(zero), 1);
+        assertEquals(network.getBackingnetwork().getSuccessorCount(one), 0);
+        assertEquals(network.getBackingnetwork().getPredecessorCount(zero), 0);
+        assertEquals(network.getBackingnetwork().getPredecessorCount(one), 1);
     }
 
 
     @Test
-    public void addConnection() throws  Exception{
-
+    public void addConnection() throws Exception {
 
 
         //the world will be made of 2 fishers
-        ObservableList<Fisher> fishers = ObservableList.observableList(new ArrayList<>());;
+        ObservableList<Fisher> fishers = ObservableList.observableList(new ArrayList<>());
+        ;
         Fisher zero = mock(Fisher.class);
         Fisher one = mock(Fisher.class);
 
@@ -107,7 +105,7 @@ public class SocialNetworkTest {
         assertTrue(!network.getDirectedNeighbors(zero).contains(one));
         assertTrue(!network.getAllNeighbors(one).contains(zero));
         assertTrue(!network.getDirectedNeighbors(zero).contains(zero));
-        network.addRandomConnection(zero,fishers,state.getRandom());
+        network.addRandomConnection(zero, fishers, state.getRandom());
 
         //by necessity it must have connected to one
         assertTrue(network.getAllNeighbors(zero).contains(one));
@@ -116,12 +114,13 @@ public class SocialNetworkTest {
         assertTrue(network.getDirectedNeighbors(one).contains(zero));
 
 
-        assertEquals(network.getBackingnetwork().getSuccessorCount(zero),0);
-        assertEquals(network.getBackingnetwork().getSuccessorCount(one),1);
-        assertEquals(network.getBackingnetwork().getPredecessorCount(zero),1);
-        assertEquals(network.getBackingnetwork().getPredecessorCount(one),0);
+        assertEquals(network.getBackingnetwork().getSuccessorCount(zero), 0);
+        assertEquals(network.getBackingnetwork().getSuccessorCount(one), 1);
+        assertEquals(network.getBackingnetwork().getPredecessorCount(zero), 1);
+        assertEquals(network.getBackingnetwork().getPredecessorCount(one), 0);
 
     }
+
     @Test
     public void replaceFriends() throws Exception {
 
@@ -130,10 +129,10 @@ public class SocialNetworkTest {
         SocialNetwork network = new SocialNetwork(new NetworkBuilder() {
             @Override
             public DirectedGraph<Fisher, FriendshipEdge> apply(FishState fishState) {
-                DirectedGraph<Fisher,FriendshipEdge> graph = new DirectedSparseGraph<>();
-                for(Fisher fisher : fishState.getFishers())
+                DirectedGraph<Fisher, FriendshipEdge> graph = new DirectedSparseGraph<>();
+                for (Fisher fisher : fishState.getFishers())
                     graph.addVertex(fisher);
-                graph.addEdge(new FriendshipEdge(),fishState.getFishers().get(0),fishState.getFishers().get(1));
+                graph.addEdge(new FriendshipEdge(), fishState.getFishers().get(0), fishState.getFishers().get(1));
                 return graph;
             }
 
@@ -147,7 +146,8 @@ public class SocialNetworkTest {
              */
             @Override
             public void addFisher(
-                    Fisher newAddition, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+                Fisher newAddition, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state
+            ) {
 
             }
 
@@ -160,7 +160,8 @@ public class SocialNetworkTest {
              */
             @Override
             public void removeFisher(
-                    Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+                Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state
+            ) {
 
             }
 
@@ -174,7 +175,8 @@ public class SocialNetworkTest {
         });
 
         //the world will be made of 3 fishers
-        ObservableList<Fisher> fishers = ObservableList.observableList(new ArrayList<>());;
+        ObservableList<Fisher> fishers = ObservableList.observableList(new ArrayList<>());
+        ;
         Fisher zero = mock(Fisher.class);
         Fisher one = mock(Fisher.class);
         Fisher two = mock(Fisher.class);
@@ -190,32 +192,32 @@ public class SocialNetworkTest {
 
         //check to make sure the population is correct
         Collection<Fisher> neighbors = network.getAllNeighbors(zero);
-        assertEquals(neighbors.size(),1);
+        assertEquals(neighbors.size(), 1);
         neighbors.contains(one);
         //it's directed so the other way works as well
         neighbors = network.getDirectedNeighbors(zero);
-        assertEquals(neighbors.size(),1);
+        assertEquals(neighbors.size(), 1);
         neighbors.contains(one);
 
         //1 instead has a friend only if you count it indirectly
         neighbors = network.getAllNeighbors(one);
-        assertEquals(neighbors.size(),1);
+        assertEquals(neighbors.size(), 1);
         neighbors.contains(zero);
-        neighbors =network.getDirectedNeighbors(one);
-        assertEquals(neighbors.size(),0);
+        neighbors = network.getDirectedNeighbors(one);
+        assertEquals(neighbors.size(), 0);
 
 
         //if I force a replacement it must connect 0 with 2
-        Fisher newFriend = network.replaceFriend(zero,one,false,new MersenneTwisterFast(),fishers);
-        assertEquals(newFriend,two);
+        Fisher newFriend = network.replaceFriend(zero, one, false, new MersenneTwisterFast(), fishers);
+        assertEquals(newFriend, two);
         neighbors = network.getDirectedNeighbors(zero);
-        assertEquals(neighbors.size(),1);
+        assertEquals(neighbors.size(), 1);
         neighbors.contains(two);
         //if I do it again, it will revert back to 1
-        newFriend = network.replaceFriend(zero,two,false,new MersenneTwisterFast(),fishers);
-        assertEquals(newFriend,one);
+        newFriend = network.replaceFriend(zero, two, false, new MersenneTwisterFast(), fishers);
+        assertEquals(newFriend, one);
         neighbors = network.getDirectedNeighbors(zero);
-        assertEquals(neighbors.size(),1);
+        assertEquals(neighbors.size(), 1);
         neighbors.contains(one);
 
     }

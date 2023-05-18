@@ -12,15 +12,14 @@ public class WeightedObject<KEY> extends Number {
 
     private final double totalWeight;
 
-    public static <K, N extends Number> WeightedObject<K> from(final Entry<K, N> entry) {
-        return new WeightedObject<>(entry.getKey(), entry.getValue().doubleValue());
-    }
-
     public WeightedObject(final KEY objectBeingWeighted, final double totalWeight) {
         this.objectBeingWeighted = objectBeingWeighted;
         this.totalWeight = totalWeight;
     }
 
+    public static <K, N extends Number> WeightedObject<K> from(final Entry<K, N> entry) {
+        return new WeightedObject<>(entry.getKey(), entry.getValue().doubleValue());
+    }
 
     public KEY getObjectBeingWeighted() {
         return objectBeingWeighted;
@@ -48,6 +47,6 @@ public class WeightedObject<KEY> extends Number {
 
     @Override
     public double doubleValue() {
-        return  totalWeight;
+        return totalWeight;
     }
 }

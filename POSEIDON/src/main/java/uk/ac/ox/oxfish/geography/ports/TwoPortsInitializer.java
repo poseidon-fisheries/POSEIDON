@@ -39,22 +39,20 @@ import java.util.function.Function;
 public class TwoPortsInitializer implements PortInitializer {
 
 
-
     /**
      * the X position of the port on the grid.
      */
-    private  final int port1PositionX;
+    private final int port1PositionX;
     /**
      * the X position of the port on the grid.
      */
     private final int port1PositionY;
 
 
-
     /**
      * the X position of the port on the grid.
      */
-    private  final int port2PositionX;
+    private final int port2PositionX;
     /**
      * the X position of the port on the grid.
      */
@@ -65,9 +63,10 @@ public class TwoPortsInitializer implements PortInitializer {
     private final String namePort2;
 
     public TwoPortsInitializer(
-            int port1PositionX, int port1PositionY, int port2PositionX, int port2PositionY, String namePort1,
-            String namePort2) {
-        Preconditions.checkArgument(port1PositionX!=port2PositionX || port1PositionY != port2PositionY);
+        int port1PositionX, int port1PositionY, int port2PositionX, int port2PositionY, String namePort1,
+        String namePort2
+    ) {
+        Preconditions.checkArgument(port1PositionX != port2PositionX || port1PositionY != port2PositionY);
 
         Preconditions.checkArgument(!Objects.equals(namePort1, namePort2));
 
@@ -93,29 +92,32 @@ public class TwoPortsInitializer implements PortInitializer {
      */
     @Override
     public List<Port> buildPorts(
-            NauticalMap map,
-            MersenneTwisterFast mapmakerRandom,
-            Function<SeaTile, MarketMap> marketFactory, FishState model,
-            GasPriceMaker gasPriceMaker) {
+        NauticalMap map,
+        MersenneTwisterFast mapmakerRandom,
+        Function<SeaTile, MarketMap> marketFactory, FishState model,
+        GasPriceMaker gasPriceMaker
+    ) {
 
         //ports start with price = 0 because I assume the scenario will have its own rules for gas price
 
         SeaTile first = map.getSeaTile(port1PositionX, port1PositionY);
         Port port1 = new Port(namePort1, first,
-                             marketFactory.apply(first),
-                              gasPriceMaker.supplyInitialPrice(first,namePort1));
+            marketFactory.apply(first),
+            gasPriceMaker.supplyInitialPrice(first, namePort1)
+        );
         map.addPort(port1);
 
-        SeaTile second = map.getSeaTile(port2PositionX,port2PositionY);
+        SeaTile second = map.getSeaTile(port2PositionX, port2PositionY);
         Port port2 = new Port(namePort2, second,
-                              marketFactory.apply(second),
-                              gasPriceMaker.supplyInitialPrice(second,namePort2));
+            marketFactory.apply(second),
+            gasPriceMaker.supplyInitialPrice(second, namePort2)
+        );
         map.addPort(port2);
 
-        gasPriceMaker.start(port1,model);
-        gasPriceMaker.start(port2,model);
+        gasPriceMaker.start(port1, model);
+        gasPriceMaker.start(port2, model);
 
-        return Lists.newArrayList(port1,port2);
+        return Lists.newArrayList(port1, port2);
     }
 
 

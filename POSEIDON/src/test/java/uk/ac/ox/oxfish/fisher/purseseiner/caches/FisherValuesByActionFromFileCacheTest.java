@@ -44,7 +44,8 @@ public class FisherValuesByActionFromFileCacheTest {
 
     private final FisherValuesByActionFromFileCache<String> cache =
         new FisherValuesByActionFromFileCache<String>(() -> "") {
-            @Override protected Map<Integer, Map<String, Map<Class<? extends PurseSeinerAction>, String>>> readValues(
+            @Override
+            protected Map<Integer, Map<String, Map<Class<? extends PurseSeinerAction>, String>>> readValues(
                 final Path valuesFile
             ) {
                 return ImmutableMap.of(

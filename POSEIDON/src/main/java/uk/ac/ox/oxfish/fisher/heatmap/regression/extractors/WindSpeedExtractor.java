@@ -31,7 +31,8 @@ import uk.ac.ox.oxfish.model.FishState;
 public class WindSpeedExtractor implements ObservationExtractor {
     @Override
     public double extract(
-            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
+        SeaTile tile, double timeOfObservation, Fisher agent, FishState model
+    ) {
         return tile.getWindSpeedInKph();
     }
 }

@@ -26,7 +26,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
-import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -39,7 +38,7 @@ import java.util.Map;
  * need to create their market for. If we ever bother making a better initialization process for markets, this class
  * should probably die off
  */
-public class MarketProxy implements Market{
+public class MarketProxy implements Market {
 
 
     private Market delegate = null;
@@ -53,7 +52,7 @@ public class MarketProxy implements Market{
     /**
      * if this is set, ignore the price map; call the same algorithm factory every time
      */
-    private AlgorithmFactory<? extends Market>  overrideMarketMaker;
+    private AlgorithmFactory<? extends Market> overrideMarketMaker;
 
 
     private Species species;
@@ -61,7 +60,8 @@ public class MarketProxy implements Market{
     private FishState state;
 
     public MarketProxy(
-            Map<String,  AlgorithmFactory<? extends Market>> pricesMap) {
+        Map<String, AlgorithmFactory<? extends Market>> pricesMap
+    ) {
         this.pricesMap = pricesMap;
     }
 
@@ -77,15 +77,32 @@ public class MarketProxy implements Market{
     @Override
     public void setSpecies(Species species) {
 
-        Preconditions.checkArgument(delegate==null, "There already exist a market for " + species);
-        Preconditions.checkArgument(species!=null, "You have already assigned a species for this market! ");
+        Preconditions.checkArgument(delegate == null, "There already exist a market for " + species);
+        Preconditions.checkArgument(species != null, "You have already assigned a species for this market! ");
         this.species = species;
         initializeDelegateIfPossible();
 
 
+    }
 
+    private void initializeDelegateIfPossible() {
 
+        //you can only start the delegate when you have both been started and given a species to focus on
+        if (species == null || state == null)
+            return;
 
+        String speciesName = species.getName();
+        if (overrideMarketMaker != null) {
+            delegate = overrideMarketMaker.apply(state);
+            delegate.setSpecies(species);
+            delegate.start(state);
+        } else {
+            AlgorithmFactory<? extends Market> factory = pricesMap.get(speciesName);
+            Preconditions.checkArgument(factory != null, "Can't create a market for " + species);
+            delegate = factory.apply(state);
+            delegate.setSpecies(species);
+            delegate.start(state);
+        }
     }
 
     /**
@@ -96,10 +113,9 @@ public class MarketProxy implements Market{
      */
     @Override
     public void start(FishState model) {
-        this.state=model;
+        this.state = model;
         initializeDelegateIfPossible();
     }
-
 
     /**
      * Sells the a specific amount of fish here
@@ -112,7 +128,8 @@ public class MarketProxy implements Market{
      */
     @Override
     public TradeInfo sellFish(
-            Hold hold, Fisher fisher, Regulation regulation, FishState state, Species species) {
+        Hold hold, Fisher fisher, Regulation regulation, FishState state, Species species
+    ) {
 
         return delegate.sellFish(hold, fisher, regulation, state, species);
     }
@@ -134,7 +151,7 @@ public class MarketProxy implements Market{
      */
     @Override
     public double getMarginalPrice() {
-        if(delegate==null)
+        if (delegate == null)
             return Double.NaN;
         return delegate.getMarginalPrice();
     }
@@ -150,32 +167,9 @@ public class MarketProxy implements Market{
     @Override
     public void turnOff() {
         delegate.turnOff();
-        state =null;
+        state = null;
 
     }
-
-    private void initializeDelegateIfPossible(){
-
-        //you can only start the delegate when you have both been started and given a species to focus on
-        if(species== null || state == null)
-            return;
-
-        String speciesName = species.getName();
-        if(overrideMarketMaker != null)
-        {
-            delegate = overrideMarketMaker.apply(state);
-            delegate.setSpecies(species);
-            delegate.start(state);
-        }
-        else {
-            AlgorithmFactory<? extends Market> factory = pricesMap.get(speciesName);
-            Preconditions.checkArgument(factory != null, "Can't create a market for " + species);
-            delegate = factory.apply(state);
-            delegate.setSpecies(species);
-            delegate.start(state);
-        }
-    }
-
 
     public Market getDelegate() {
         return delegate;

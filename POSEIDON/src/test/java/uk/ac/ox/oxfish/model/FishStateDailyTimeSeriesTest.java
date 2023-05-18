@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
@@ -37,7 +36,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class FishStateDailyTimeSeriesTest {
@@ -79,21 +79,23 @@ public class FishStateDailyTimeSeriesTest {
         when(data2.getColumns()).thenReturn(ImmutableList.of(landingsColumn2, earningsColumn2));
         when(market2.getData()).thenReturn(data2);
 
-        List<Market> markets = new LinkedList<>();markets.add(market1); markets.add(market2);
+        List<Market> markets = new LinkedList<>();
+        markets.add(market1);
+        markets.add(market2);
         when(state.getAllMarketsForThisSpecie(species)).thenReturn(markets);
 
         //and after all that set up, see if it aggregates correctly
-        dataSet.start(state,state);
+        dataSet.start(state, state);
         dataSet.step(state);
         assertEquals(
-                -300d,
-                dataSet.getLatestObservation(species + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
-                .0001d
+            -300d,
+            dataSet.getLatestObservation(species + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
+            .0001d
         );
         assertEquals(
-                300d,
-                dataSet.getLatestObservation(species + " " + AbstractMarket.EARNINGS_COLUMN_NAME),
-                .0001d
+            300d,
+            dataSet.getLatestObservation(species + " " + AbstractMarket.EARNINGS_COLUMN_NAME),
+            .0001d
         );
     }
 }

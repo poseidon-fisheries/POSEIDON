@@ -50,7 +50,7 @@ public class TwoPopulationsScenarioTest {
         state.setScenario(scenario);
         state.start();
         //they are all anarchy!
-        for(Fisher fisher : state.getFishers())
+        for (Fisher fisher : state.getFishers())
             assertTrue(fisher.getRegulation() instanceof Anarchy);
 
     }
@@ -72,7 +72,7 @@ public class TwoPopulationsScenarioTest {
         state.start();
         //they are all anarchy!
         int nonAnarchy = 0;
-        for(Fisher fisher : state.getFishers()) {
+        for (Fisher fisher : state.getFishers()) {
             if (fisher.getTags().contains("small"))
                 assertTrue(fisher.getRegulation() instanceof Anarchy);
             else {
@@ -81,7 +81,7 @@ public class TwoPopulationsScenarioTest {
             }
         }
         //make sure you are counting them!
-        assertEquals(nonAnarchy,1);
+        assertEquals(nonAnarchy, 1);
 
     }
 }

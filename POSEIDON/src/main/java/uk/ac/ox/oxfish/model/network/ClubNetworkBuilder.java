@@ -44,6 +44,38 @@ public class ClubNetworkBuilder extends AbstractNetworkBuilder {
     public ClubNetworkBuilder() {
     }
 
+    /**
+     * remove fisher from network. This is to be used while the model is running to clear any ties
+     *
+     * @param toRemove       fisher to remove
+     * @param currentNetwork network to modify
+     * @param state
+     */
+    @Override
+    public void removeFisher(
+        final Fisher toRemove, final DirectedGraph<Fisher, FriendshipEdge> currentNetwork, final FishState state
+    ) {
+
+    }
+
+    /**
+     * Applies this function to the given argument.
+     *
+     * @param fishState the function argument
+     * @return the function result
+     */
+    @Override
+    public DirectedGraph<Fisher, FriendshipEdge> apply(final FishState fishState) {
+
+        final DirectedSparseGraph<Fisher, FriendshipEdge> graph = new DirectedSparseGraph<>();
+        final List<Fisher> fishers = new ArrayList<>(fishState.getFishers());
+
+        for (final Fisher fisher : fishers) {
+            addFisher(fisher, graph, fishState);
+        }
+        return graph;
+
+    }
 
     /**
      * this is supposed to be called not so much when initializing the network but later on if any agent is created
@@ -92,39 +124,6 @@ public class ClubNetworkBuilder extends AbstractNetworkBuilder {
         }
         club.add(newAddition);
 
-
-    }
-
-    /**
-     * remove fisher from network. This is to be used while the model is running to clear any ties
-     *
-     * @param toRemove       fisher to remove
-     * @param currentNetwork network to modify
-     * @param state
-     */
-    @Override
-    public void removeFisher(
-        final Fisher toRemove, final DirectedGraph<Fisher, FriendshipEdge> currentNetwork, final FishState state
-    ) {
-
-    }
-
-    /**
-     * Applies this function to the given argument.
-     *
-     * @param fishState the function argument
-     * @return the function result
-     */
-    @Override
-    public DirectedGraph<Fisher, FriendshipEdge> apply(final FishState fishState) {
-
-        final DirectedSparseGraph<Fisher, FriendshipEdge> graph = new DirectedSparseGraph<>();
-        final List<Fisher> fishers = new ArrayList<>(fishState.getFishers());
-
-        for (final Fisher fisher : fishers) {
-            addFisher(fisher, graph, fishState);
-        }
-        return graph;
 
     }
 

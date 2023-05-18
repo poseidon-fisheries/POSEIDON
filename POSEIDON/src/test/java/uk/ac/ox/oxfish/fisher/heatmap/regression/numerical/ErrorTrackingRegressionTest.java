@@ -43,20 +43,20 @@ public class ErrorTrackingRegressionTest {
         GeographicalRegression<Double> fake = mock(GeographicalRegression.class);
         ErrorTrackingRegression<Double> test = new ErrorTrackingRegression<Double>(fake, 3);
 
-        when(fake.predict(any(),anyDouble(),any(),any() )).thenReturn(1d, 2d, 3d, 4d);
-        when(fake.extractNumericalYFromObservation(any(),any())).thenReturn(0d,0d,0d,0d);
+        when(fake.predict(any(), anyDouble(), any(), any())).thenReturn(1d, 2d, 3d, 4d);
+        when(fake.extractNumericalYFromObservation(any(), any())).thenReturn(0d, 0d, 0d, 0d);
 
-        test.addObservation(mock(GeographicalObservation.class),mock(Fisher.class), mock(FishState.class));
-        test.addObservation(mock(GeographicalObservation.class),mock(Fisher.class), mock(FishState.class));
-        test.addObservation(mock(GeographicalObservation.class),mock(Fisher.class), mock(FishState.class));
-        test.addObservation(mock(GeographicalObservation.class),mock(Fisher.class), mock(FishState.class));
+        test.addObservation(mock(GeographicalObservation.class), mock(Fisher.class), mock(FishState.class));
+        test.addObservation(mock(GeographicalObservation.class), mock(Fisher.class), mock(FishState.class));
+        test.addObservation(mock(GeographicalObservation.class), mock(Fisher.class), mock(FishState.class));
+        test.addObservation(mock(GeographicalObservation.class), mock(Fisher.class), mock(FishState.class));
 
         //it should have forgotten the first error
         double sum = 0;
-        for(double errors : test.getErrors())
-            sum+=errors;
-        assertEquals(4+9+16,sum,.001);
-        assertEquals(test.getLatestError(),16,.001d);
+        for (double errors : test.getErrors())
+            sum += errors;
+        assertEquals(4 + 9 + 16, sum, .001);
+        assertEquals(test.getLatestError(), 16, .001d);
 
     }
 }

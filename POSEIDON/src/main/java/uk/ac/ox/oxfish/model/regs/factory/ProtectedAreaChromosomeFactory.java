@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import org.jfree.util.Log;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
@@ -37,14 +36,14 @@ import java.util.WeakHashMap;
  * a protected cell
  * Created by carrknight on 10/24/16.
  */
-public class ProtectedAreaChromosomeFactory implements AlgorithmFactory<ProtectedAreasOnly>{
+public class ProtectedAreaChromosomeFactory implements AlgorithmFactory<ProtectedAreasOnly> {
 
 
     //assumes 50 by 50 map!
     private String chromosome = Strings.repeat(Strings.repeat("0100000000", 5), 50);
 
 
-    private WeakHashMap<FishState,ProtectedAreasOnlyFactory> delegates = new WeakHashMap<>();
+    private WeakHashMap<FishState, ProtectedAreasOnlyFactory> delegates = new WeakHashMap<>();
 
     /**
      * Applies this function to the given argument.
@@ -56,27 +55,24 @@ public class ProtectedAreaChromosomeFactory implements AlgorithmFactory<Protecte
     public ProtectedAreasOnly apply(FishState state) {
         chromosome = chromosome.trim();
 
-        if(!delegates.containsKey(state))
-        {
+        if (!delegates.containsKey(state)) {
 
             Preconditions.checkArgument(chromosome.length() == state.getMap().getWidth() * state.getMap().getHeight());
 
             char[] geneArray = chromosome.toCharArray();
 
             List<StartingMPA> mpas = new LinkedList<>();
-            for(int i=0; i<state.getMap().getWidth() * state.getMap().getHeight(); i++)
-            {
+            for (int i = 0; i < state.getMap().getWidth() * state.getMap().getHeight(); i++) {
                 int gene = Integer.parseInt(String.valueOf(geneArray[i]));
-                if(gene!=0)
-                {
-                    assert gene==1;
-                    mpas.add(new StartingMPA(i%state.getMap().getWidth(),i /state.getMap().getWidth(),0,0));
+                if (gene != 0) {
+                    assert gene == 1;
+                    mpas.add(new StartingMPA(i % state.getMap().getWidth(), i / state.getMap().getWidth(), 0, 0));
                 }
             }
 
             ProtectedAreasOnlyFactory delegate = new ProtectedAreasOnlyFactory();
             delegate.setStartingMPAs(mpas);
-            delegates.put(state,delegate);
+            delegates.put(state, delegate);
         }
         return delegates.get(state).apply(state);
     }

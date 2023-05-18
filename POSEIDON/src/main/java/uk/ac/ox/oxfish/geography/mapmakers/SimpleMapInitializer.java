@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.geography.mapmakers;
 
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Point;
 import ec.util.MersenneTwisterFast;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
@@ -56,7 +55,7 @@ public class SimpleMapInitializer implements MapInitializer {
 
     private final int depthSmoothing;
 
-    private final  double cellSizeInKilometers;
+    private final double cellSizeInKilometers;
     private final int maxLandWidth;
 
 
@@ -66,8 +65,9 @@ public class SimpleMapInitializer implements MapInitializer {
 
 
     public SimpleMapInitializer(
-            int width, int height, int coastalRoughness, int depthSmoothing, double cellSizeInKilometers,
-            int maxLandWidth) {
+        int width, int height, int coastalRoughness, int depthSmoothing, double cellSizeInKilometers,
+        int maxLandWidth
+    ) {
         this.width = width;
         this.height = height;
         this.coastalRoughness = coastalRoughness;
@@ -80,8 +80,9 @@ public class SimpleMapInitializer implements MapInitializer {
 
 
     public SimpleMapInitializer(
-            int width, int height, int coastalRoughness, int depthSmoothing, double cellSizeInKilometers,
-            int maxLandWidth, double minDepth, double maxDepth) {
+        int width, int height, int coastalRoughness, int depthSmoothing, double cellSizeInKilometers,
+        int maxLandWidth, double minDepth, double maxDepth
+    ) {
         this.width = width;
         this.height = height;
         this.coastalRoughness = coastalRoughness;
@@ -92,29 +93,30 @@ public class SimpleMapInitializer implements MapInitializer {
         this.minInitialDepth = minDepth;
 
     }
+
     /**
      * creates the map. Because there are no real obstacles I am going to assume straight pathfinder and cartesian distance
-     * @param random the randomizer
+     *
+     * @param random  the randomizer
      * @param biology the biology
-     * @param model the model itself
+     * @param model   the model itself
      * @return
      */
-    public NauticalMap makeMap(MersenneTwisterFast random, GlobalBiology biology, FishState model)
-    {
+    public NauticalMap makeMap(MersenneTwisterFast random, GlobalBiology biology, FishState model) {
         //build the grid
-        ObjectGrid2D baseGrid =  new ObjectGrid2D(width, height);
+        ObjectGrid2D baseGrid = new ObjectGrid2D(width, height);
 
         //choose how much of the world is land
         int actualLandWidth = maxLandWidth;
-  //      if(width <= 10)
- //           actualLandWidth = (int) Math.ceil(width *.2);
+        //      if(width <= 10)
+        //           actualLandWidth = (int) Math.ceil(width *.2);
 
-        for(int x=0; x< width; x++)
-            for(int y=0; y< height; y++) {
-                double depth = random.nextDouble()*(maxInitialDepth-minInitialDepth) + minInitialDepth;
-                baseGrid.field[x][y] = x <width- actualLandWidth ?
-                        new SeaTile(x, y, -depth, new TileHabitat(0d)) :
-                        new SeaTile(x,y,2000, new TileHabitat(0d));
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++) {
+                double depth = random.nextDouble() * (maxInitialDepth - minInitialDepth) + minInitialDepth;
+                baseGrid.field[x][y] = x < width - actualLandWidth ?
+                    new SeaTile(x, y, -depth, new TileHabitat(0d)) :
+                    new SeaTile(x, y, 2000, new TileHabitat(0d));
             }
         /***
          *       ___              _        _   ___               _
@@ -123,8 +125,8 @@ public class SimpleMapInitializer implements MapInitializer {
          *      \___\___/\__,_/__/\__\__,_|_| |_|_\___/\_,_\__, |_||_|_||_\___/__/__/
          *                                                 |___/
          */
-        if(actualLandWidth >=10)
-            for(int i=0; i<coastalRoughness; i++) {
+        if (actualLandWidth >= 10)
+            for (int i = 0; i < coastalRoughness; i++) {
                 //now go roughen up the coast
                 List<SeaTile> toFlip = new LinkedList<>();
                 //go through all the tiles
@@ -150,7 +152,8 @@ public class SimpleMapInitializer implements MapInitializer {
                 for (SeaTile toRemove : toFlip) {
                     assert toRemove.isLand(); //should be removing land!
                     SeaTile substitute = new SeaTile(toRemove.getGridX(), toRemove.getGridY(), -random.nextInt(5000),
-                                                     new TileHabitat(0d));
+                        new TileHabitat(0d)
+                    );
                     assert baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] == toRemove;
                     baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] = substitute;
                 }
@@ -165,33 +168,32 @@ public class SimpleMapInitializer implements MapInitializer {
          */
 
 
-        for(int i=0; i<depthSmoothing; i++)
-        {
+        for (int i = 0; i < depthSmoothing; i++) {
             int x = random.nextInt(width);
             int y = random.nextInt(height);
-            SeaTile toChange = (SeaTile) baseGrid.get(x,y);
-            x += random.nextInt(3)-1; x= Math.max(0,x); x = Math.min(x,width-1);
-            y += random.nextInt(3)-1; y= Math.max(0, y); y = Math.min(y,height-1);
-            SeaTile fixed = (SeaTile) baseGrid.get(x,y);
+            SeaTile toChange = (SeaTile) baseGrid.get(x, y);
+            x += random.nextInt(3) - 1;
+            x = Math.max(0, x);
+            x = Math.min(x, width - 1);
+            y += random.nextInt(3) - 1;
+            y = Math.max(0, y);
+            y = Math.min(y, height - 1);
+            SeaTile fixed = (SeaTile) baseGrid.get(x, y);
             double newAltitude = toChange.getAltitude() +
-                    (random.nextDouble()*.04) *
-                            (fixed.getAltitude()-toChange.getAltitude());
-            if(newAltitude <0 && toChange.getAltitude() > 0)
+                (random.nextDouble() * .04) *
+                    (fixed.getAltitude() - toChange.getAltitude());
+            if (newAltitude < 0 && toChange.getAltitude() > 0)
                 newAltitude = 1;
-            if(newAltitude >0 && toChange.getAltitude() < 0)
+            if (newAltitude > 0 && toChange.getAltitude() < 0)
                 newAltitude = -1;
 
             //put the new one in!
-            baseGrid.set(toChange.getGridX(),toChange.getGridY(),
-                         new SeaTile(toChange.getGridX(),toChange.getGridY(),newAltitude, new TileHabitat(0d)));
+            baseGrid.set(toChange.getGridX(), toChange.getGridY(),
+                new SeaTile(toChange.getGridX(), toChange.getGridY(), newAltitude, new TileHabitat(0d))
+            );
 
 
         }
-
-
-
-
-
 
 
         GeomGridField bathymetry = new GeomGridField(baseGrid);
@@ -203,14 +205,15 @@ public class SimpleMapInitializer implements MapInitializer {
         //create the mbr from max-min stuff
         double mapPaddingInDegrees = FromFileMapInitializerFactory.DEFAULT_MAP_PADDING_IN_DEGREES;
         Envelope mbr = new Envelope(
-                //the additional epsilon is there to prevent the very edge observations from falling out
-                0 - mapPaddingInDegrees,
-                baseGrid.getWidth(),// + mapPaddingInDegrees,
-                0 - mapPaddingInDegrees,
-                baseGrid.getHeight());// + mapPaddingInDegrees);
+            //the additional epsilon is there to prevent the very edge observations from falling out
+            0 - mapPaddingInDegrees,
+            baseGrid.getWidth(),// + mapPaddingInDegrees,
+            0 - mapPaddingInDegrees,
+            baseGrid.getHeight()
+        );// + mapPaddingInDegrees);
 
         //expand MBR to cointan all the cells
-     //   bathymetry.getMBR().expandToInclude(width-1,0);
+        //   bathymetry.getMBR().expandToInclude(width-1,0);
 //        Point coordinates = bathymetry.toPoint(width-1, height-1);
 //        bathymetry.getMBR().expandToInclude(coordinates.getX(),coordinates.getY());
 //        coordinates = bathymetry.toPoint(width-1, 0);
@@ -231,7 +234,7 @@ public class SimpleMapInitializer implements MapInitializer {
 
         Distance distance = new CartesianDistance(cellSizeInKilometers);
         Pathfinder pathfinder = new StraightLinePathfinder();
-        return new NauticalMap(bathymetry,mpas,distance,pathfinder);
+        return new NauticalMap(bathymetry, mpas, distance, pathfinder);
     }
 
 

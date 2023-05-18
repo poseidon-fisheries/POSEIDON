@@ -30,7 +30,8 @@ public class IterativeAverageMerger implements DoubleBinaryOperator {
         this.numObservationsSupplier = numObservationsSupplier;
     }
 
-    @Override public double applyAsDouble(final double oldValue, final double newValue) {
+    @Override
+    public double applyAsDouble(final double oldValue, final double newValue) {
         return oldValue + (newValue - oldValue) / numObservationsSupplier.getAsInt();
     }
 

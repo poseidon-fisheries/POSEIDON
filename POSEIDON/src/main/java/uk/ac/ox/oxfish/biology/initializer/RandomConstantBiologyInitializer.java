@@ -57,7 +57,8 @@ public class RandomConstantBiologyInitializer extends AbstractBiologyInitializer
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -66,34 +67,35 @@ public class RandomConstantBiologyInitializer extends AbstractBiologyInitializer
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map)
-    {
+        GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
+        int mapWidthInCells, NauticalMap map
+    ) {
         assert minBiomass > maxBiomass;
 
-            if (seaTile.isLand())
-                return new EmptyLocalBiology();
-            else
-                return new ConstantLocalBiology(random.nextDouble()* (maxBiomass - minBiomass)+ minBiomass);
-        }
+        if (seaTile.isLand())
+            return new EmptyLocalBiology();
+        else
+            return new ConstantLocalBiology(random.nextDouble() * (maxBiomass - minBiomass) + minBiomass);
+    }
 
     /**
      * after all the tiles have been instantiated this method gets called once to put anything together or to smooth
      * biomasses or whatever
-     *  @param biology the global biology instance
+     *
+     * @param biology the global biology instance
      * @param map     the map which by now should have all the tiles in place
-     * @param random the randomizer
+     * @param random  the randomizer
      * @param model
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model)
-    {
+        GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model
+    ) {
         //standard neighboring tiles smoother
         //a bad copy of the NETLOGO prototype
         final Consumer<NauticalMap> smoother =
-                NauticalMapFactory.smoothConstantBiology(
-                        biologySmoothingIndex, map.getWidth(), map.getHeight()).apply(random);
+            NauticalMapFactory.smoothConstantBiology(
+                biologySmoothingIndex, map.getWidth(), map.getHeight()).apply(random);
 
         smoother.accept(map);
     }

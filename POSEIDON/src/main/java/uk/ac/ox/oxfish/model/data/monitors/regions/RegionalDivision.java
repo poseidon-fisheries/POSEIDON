@@ -48,26 +48,26 @@ public abstract class RegionalDivision {
         );
     }
 
+    public abstract Collection<Region> getRegions();
+
     public Region getRegion(final SeaTile seaTile) {
         return cache.get(seaTile.getGridLocation());
-    }
-
-    public Region getRegion(final Int2D gridXY) {
-        return cache.get(gridXY);
-    }
-
-    public Region getRegion(final Double2D gridXY) {
-        return getRegion(new Int2D((int) gridXY.x, (int) gridXY.y));
     }
 
     public Region getRegion(final Coordinate coordinate) {
         return getRegion(getMapExtent().coordinateToXY(coordinate));
     }
 
-    public abstract Collection<Region> getRegions();
+    public Region getRegion(final Double2D gridXY) {
+        return getRegion(new Int2D((int) gridXY.x, (int) gridXY.y));
+    }
 
     public MapExtent getMapExtent() {
         return mapExtent;
+    }
+
+    public Region getRegion(final Int2D gridXY) {
+        return cache.get(gridXY);
     }
 
     public static class Region {
@@ -121,10 +121,6 @@ public abstract class RegionalDivision {
             return name;
         }
 
-        public boolean contains(final Double2D gridXY) {
-            return contains((int) gridXY.x, (int) gridXY.y);
-        }
-
         public boolean contains(final Int2D gridXY) {
             return contains(gridXY.x, gridXY.y);
         }
@@ -135,6 +131,10 @@ public abstract class RegionalDivision {
 
         public boolean contains(final Coordinate coordinate, final MapExtent mapExtent) {
             return contains(mapExtent.coordinateToXY(coordinate));
+        }
+
+        public boolean contains(final Double2D gridXY) {
+            return contains((int) gridXY.x, (int) gridXY.y);
         }
     }
 

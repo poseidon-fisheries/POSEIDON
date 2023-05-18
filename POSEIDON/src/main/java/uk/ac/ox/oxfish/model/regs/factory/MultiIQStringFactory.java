@@ -23,15 +23,11 @@ package uk.ac.ox.oxfish.model.regs.factory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
-
-import java.util.function.Supplier;
 
 /**
  * Created by carrknight on 7/19/17.
  */
-public class MultiIQStringFactory implements AlgorithmFactory<MultiQuotaRegulation>
-{
+public class MultiIQStringFactory implements AlgorithmFactory<MultiQuotaRegulation> {
 
 
     /**
@@ -42,7 +38,6 @@ public class MultiIQStringFactory implements AlgorithmFactory<MultiQuotaRegulati
     private String yearlyQuotaMaps = "0:500000";
 
 
-
     /**
      * Applies this function to the given argument.
      *
@@ -50,12 +45,11 @@ public class MultiIQStringFactory implements AlgorithmFactory<MultiQuotaRegulati
      * @return the function result
      */
     @Override
-    public MultiQuotaRegulation apply(FishState state)
-    {
+    public MultiQuotaRegulation apply(FishState state) {
 
 
-        return  MultiTACStringFactory.createInstance(
-                state, MultiIQStringFactory.this.yearlyQuotaMaps);
+        return MultiTACStringFactory.createInstance(
+            state, MultiIQStringFactory.this.yearlyQuotaMaps);
     }
 
 

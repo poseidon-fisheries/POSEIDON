@@ -40,11 +40,13 @@ public final class ActionCountingExtractor<A extends PurseSeinerAction>
     /**
      * Returns the number of times an action was observed for the tile and resets the count to zero for that tile.
      */
-    @Override public double applyAsDouble(final SeaTile seaTile) {
+    @Override
+    public double applyAsDouble(final SeaTile seaTile) {
         return actionsPerTile.setCount(seaTile, 0);
     }
 
-    @Override public void observe(final A action) {
+    @Override
+    public void observe(final A action) {
         actionsPerTile.add(action.getLocation());
     }
 

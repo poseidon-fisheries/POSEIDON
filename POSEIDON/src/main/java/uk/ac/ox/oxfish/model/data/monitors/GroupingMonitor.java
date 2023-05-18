@@ -47,7 +47,8 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
     private final Map<G, Monitor<O, V, Q>> subMonitors;
     private final Function<? super O, Collection<G>> groupsExtractor;
 
-    @SuppressWarnings("WeakerAccess") public GroupingMonitor(
+    @SuppressWarnings("WeakerAccess")
+    public GroupingMonitor(
         final String baseName,
         final IntervalPolicy intervalPolicy,
         final Supplier<Accumulator<V>> masterAccumulatorSupplier,
@@ -237,9 +238,12 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
         );
     }
 
-    Map<G, Monitor<O, V, Q>> getSubMonitors() { return subMonitors; }
+    Map<G, Monitor<O, V, Q>> getSubMonitors() {
+        return subMonitors;
+    }
 
-    @Override public Iterable<V> extractValues(final O observable) {
+    @Override
+    public Iterable<V> extractValues(final O observable) {
         return groupsExtractor
             .apply(observable)
             .stream()
@@ -248,17 +252,20 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
             ::iterator;
     }
 
-    @Override public void registerWith(final TimeSeries<FishState> timeSeries) {
+    @Override
+    public void registerWith(final TimeSeries<FishState> timeSeries) {
         super.registerWith(timeSeries);
         subMonitors.values().forEach(subMonitor -> subMonitor.registerWith(timeSeries));
     }
 
-    @Override public void start(final FishState fishState) {
+    @Override
+    public void start(final FishState fishState) {
         super.start(fishState);
         subMonitors.values().forEach(subMonitor -> subMonitor.start(fishState));
     }
 
-    @Override public void observe(final O observable) {
+    @Override
+    public void observe(final O observable) {
         super.observe(observable);
         groupsExtractor
             .apply(observable)

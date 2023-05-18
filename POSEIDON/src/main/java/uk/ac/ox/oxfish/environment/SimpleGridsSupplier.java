@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.environment;
 
 import com.univocity.parsers.common.record.Record;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.geography.MapExtent;
 
 import java.nio.file.Path;
@@ -31,21 +30,25 @@ public class SimpleGridsSupplier extends AbstractGridsSupplier<String> {
     private final String keyName;
 
     public SimpleGridsSupplier(
-            Path gridsFilePath,
-            MapExtent mapExtent, String keyName) {
+        Path gridsFilePath,
+        MapExtent mapExtent, String keyName
+    ) {
         this(gridsFilePath, mapExtent,
-                365,
-                false, keyName);
+            365,
+            false, keyName
+        );
     }
 
     public SimpleGridsSupplier(
-            Path gridsFilePath,
-            MapExtent mapExtent,
-            int period,
-            boolean toNormalize, String keyName) {
+        Path gridsFilePath,
+        MapExtent mapExtent,
+        int period,
+        boolean toNormalize, String keyName
+    ) {
         super(null, gridsFilePath, mapExtent,
-                period,
-                toNormalize);
+            period,
+            toNormalize
+        );
         this.keyName = keyName;
     }
 

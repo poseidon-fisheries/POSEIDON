@@ -166,6 +166,24 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
     protected abstract GrowthBinByList generateBins(FishState state);
 
     /**
+     * Getter for property 'yearlyMortality'.
+     *
+     * @return Value for property 'yearlyMortality'.
+     */
+    public DoubleParameter getYearlyMortality() {
+        return yearlyMortality;
+    }
+
+    /**
+     * Setter for property 'yearlyMortality'.
+     *
+     * @param yearlyMortality Value to set for property 'yearlyMortality'.
+     */
+    public void setYearlyMortality(final DoubleParameter yearlyMortality) {
+        this.yearlyMortality = yearlyMortality;
+    }
+
+    /**
      * Getter for property 'speciesName'.
      *
      * @return Value for property 'speciesName'.
@@ -289,24 +307,6 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
      */
     public void setNumberOfBins(final int numberOfBins) {
         this.numberOfBins = numberOfBins;
-    }
-
-    /**
-     * Getter for property 'yearlyMortality'.
-     *
-     * @return Value for property 'yearlyMortality'.
-     */
-    public DoubleParameter getYearlyMortality() {
-        return yearlyMortality;
-    }
-
-    /**
-     * Setter for property 'yearlyMortality'.
-     *
-     * @param yearlyMortality Value to set for property 'yearlyMortality'.
-     */
-    public void setYearlyMortality(final DoubleParameter yearlyMortality) {
-        this.yearlyMortality = yearlyMortality;
     }
 
     /**

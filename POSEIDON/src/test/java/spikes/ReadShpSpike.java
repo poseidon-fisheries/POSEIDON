@@ -38,12 +38,11 @@ import java.net.URL;
  * A simple test to show that I can read shape files
  * Created by carrknight on 3/30/15.
  */
-public class ReadShpSpike
-{
+public class ReadShpSpike {
 
     @Test
     public void readsInCorrectly() throws Exception {
-        GeomVectorField vectorField = readIn();
+        final GeomVectorField vectorField = readIn();
 
 
         //should read all the features!
@@ -53,11 +52,11 @@ public class ReadShpSpike
 
     private GeomVectorField readIn() throws FileNotFoundException {
         //grab the file
-        URL resource = getClass().getClassLoader().getResource("fakempa.shp");
-        if(resource == null)
+        final URL resource = getClass().getClassLoader().getResource("fakempa.shp");
+        if (resource == null)
             throw new NullPointerException("Resource is null");
 
-        GeomVectorField vectorField = new GeomVectorField();
+        final GeomVectorField vectorField = new GeomVectorField();
 
         //read it in!
         ShapeFileImporter.read(resource, vectorField);
@@ -65,44 +64,40 @@ public class ReadShpSpike
     }
 
 
-/*
-    private static final ArrayList<String> landReserves = new ArrayList<>();
-    static {
-        landReserves.add("Elkhorn Slough"); //natural park
-        landReserves.add("Morro Bay"); //wetlands
-        landReserves.add("Moro Cojo Slough"); //slough
-        landReserves.add("Natural Bridges SMR "); //centroid is in land even though this is marine
-    }
-    */
+    /*
+        private static final ArrayList<String> landReserves = new ArrayList<>();
+        static {
+            landReserves.add("Elkhorn Slough"); //natural park
+            landReserves.add("Morro Bay"); //wetlands
+            landReserves.add("Moro Cojo Slough"); //slough
+            landReserves.add("Natural Bridges SMR "); //centroid is in land even though this is marine
+        }
+        */
     @Test
-    public  void correctDepth() throws FileNotFoundException {
+    public void correctDepth() throws FileNotFoundException {
 
         //read in the mpas
-        GeomVectorField vectorField = readIn();
+        final GeomVectorField vectorField = readIn();
         //read in the grid
-        GeomGridField grid = GISReaders.readRaster("test.asc");
+        final GeomGridField grid = GISReaders.readRaster("test.asc");
         //synchronize MBRs
-        Envelope globalMBR = vectorField.getMBR();
+        final Envelope globalMBR = vectorField.getMBR();
         globalMBR.expandToInclude(grid.getMBR());
         grid.setMBR(globalMBR);
         vectorField.setMBR(globalMBR);
 
 
-        for(Object geo : vectorField.getGeometries())
-        {
-            MasonGeometry mpa = (MasonGeometry) geo; //need to cast it
+        for (final Object geo : vectorField.getGeometries()) {
+            final MasonGeometry mpa = (MasonGeometry) geo; //need to cast it
 
 
-            Point centroid = mpa.getGeometry().getCentroid();
-            int x = grid.toXCoord(centroid.getX());
-            int y = grid.toYCoord(centroid.getY());
-            double depth = ((DoubleGrid2D)grid.getGrid()).get(x,y);
+            final Point centroid = mpa.getGeometry().getCentroid();
+            final int x = grid.toXCoord(centroid.getX());
+            final int y = grid.toYCoord(centroid.getY());
+            final double depth = ((DoubleGrid2D) grid.getGrid()).get(x, y);
             System.out.println(depth);
-            Assert.assertEquals(1333,depth,.01);
+            Assert.assertEquals(1333, depth, .01);
         }
-
-
-
 
 
     }

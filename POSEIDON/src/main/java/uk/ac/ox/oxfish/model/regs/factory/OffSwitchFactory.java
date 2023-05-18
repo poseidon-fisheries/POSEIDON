@@ -24,11 +24,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.OffSwitchDecorator;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class OffSwitchFactory implements AlgorithmFactory<OffSwitchDecorator> {
-
 
 
     private AlgorithmFactory<? extends Regulation> delegate = new AnarchyFactory();
@@ -46,8 +43,8 @@ public class OffSwitchFactory implements AlgorithmFactory<OffSwitchDecorator> {
     @Override
     public OffSwitchDecorator apply(FishState fishState) {
         return new OffSwitchDecorator(
-                delegate.apply(fishState),
-                startsOff
+            delegate.apply(fishState),
+            startsOff
         );
     }
 

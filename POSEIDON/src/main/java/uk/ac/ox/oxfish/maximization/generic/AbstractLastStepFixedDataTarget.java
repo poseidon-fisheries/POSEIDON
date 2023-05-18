@@ -85,6 +85,13 @@ public abstract class AbstractLastStepFixedDataTarget implements FixedDataTarget
         return error;
     }
 
+    @Override
+    public double getValue(final FishState fishState) {
+        final DataColumn column = fishState.getYearlyDataSet().getColumn(columnName);
+        checkNotNull(column, "Column " + columnName + " no found");
+        return column.getLatest();
+    }
+
     private void printResult(final double value, final double error) {
         System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         System.out.println("column: " + getColumnName());
@@ -94,24 +101,17 @@ public abstract class AbstractLastStepFixedDataTarget implements FixedDataTarget
     }
 
     @Override
+    public String getColumnName() {
+        return columnName;
+    }
+
+    @Override
     public double getFixedTarget() {
         return fixedTarget;
     }
 
     public void setFixedTarget(final double fixedTarget) {
         this.fixedTarget = fixedTarget;
-    }
-
-    @Override
-    public double getValue(final FishState fishState) {
-        final DataColumn column = fishState.getYearlyDataSet().getColumn(columnName);
-        checkNotNull(column, "Column " + columnName + " no found");
-        return column.getLatest();
-    }
-
-    @Override
-    public String getColumnName() {
-        return columnName;
     }
 
     public void setColumnName(final String columnName) {

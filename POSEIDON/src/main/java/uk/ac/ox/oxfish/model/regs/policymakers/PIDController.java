@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.model.regs.policymakers;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
-import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
@@ -60,7 +59,7 @@ public class PIDController extends Controller {
 
     private double sumOfErrors = 0;
 
-    private Sensor<FishState,Double> offsetSetter;
+    private Sensor<FishState, Double> offsetSetter;
 
 
     private boolean zeroOverflowProtection = false;
@@ -69,12 +68,13 @@ public class PIDController extends Controller {
     private double minimumPolicy = Double.NEGATIVE_INFINITY;
 
     public PIDController(
-            Sensor<FishState, Double> observed,
-            Sensor<FishState, Double> target,
-            Actuator<FishState, Double> actuator,
-            int interval,
-            double p, double i, double d,
-            double offset) {
+        Sensor<FishState, Double> observed,
+        Sensor<FishState, Double> target,
+        Actuator<FishState, Double> actuator,
+        int interval,
+        double p, double i, double d,
+        double offset
+    ) {
         super(observed, target, actuator, interval);
         this.p = p;
         this.i = i;
@@ -89,24 +89,25 @@ public class PIDController extends Controller {
 
         model.getYearlyDataSet().registerGatherer(
 
-                "Policy from PID Controller",
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        return getPolicy();
-                    }
-                },
-                Double.NaN);
+            "Policy from PID Controller",
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(FishState fishState) {
+                    return getPolicy();
+                }
+            },
+            Double.NaN
+        );
     }
 
     @Override
-    public double computePolicy(double currentVariable,
-                                double target,
-                                FishState model,
-                                double oldPolicy)
-    {
-        if(offsetSetter != null)
-        {
+    public double computePolicy(
+        double currentVariable,
+        double target,
+        FishState model,
+        double oldPolicy
+    ) {
+        if (offsetSetter != null) {
             offset = offsetSetter.scan(model);
             offsetSetter = null;
         }
@@ -114,7 +115,7 @@ public class PIDController extends Controller {
         //pid magic here
         double error = target - currentVariable;
         sumOfErrors += error;
-        double derivative =  error - previousError;
+        double derivative = error - previousError;
         previousError = error;
 
         double pidPolicy = p * error + i * sumOfErrors + d * derivative;
@@ -122,10 +123,9 @@ public class PIDController extends Controller {
 
         //do not accumulate error past zero?
         final double policyToOutput = offset + pidPolicy;
-        if(zeroOverflowProtection && i!=0){
-            if(policyToOutput < 0)
-            {
-                sumOfErrors =  (- offset - d * derivative - p * error)/i;
+        if (zeroOverflowProtection && i != 0) {
+            if (policyToOutput < 0) {
+                sumOfErrors = (-offset - d * derivative - p * error) / i;
             }
         }
 

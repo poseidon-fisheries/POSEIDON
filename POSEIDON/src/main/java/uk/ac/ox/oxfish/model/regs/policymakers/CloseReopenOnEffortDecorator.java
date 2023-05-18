@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 public class CloseReopenOnEffortDecorator implements Actuator<FishState, Double> {
 
 
-    private final  Actuator<FishState,Double> delegate;
+    private final Actuator<FishState, Double> delegate;
 
     public CloseReopenOnEffortDecorator(Actuator<FishState, Double> delegate) {
         this.delegate = delegate;
@@ -20,11 +20,11 @@ public class CloseReopenOnEffortDecorator implements Actuator<FishState, Double>
     @Override
     public void apply(FishState subject, Double policy, FishState model) {
 
-        if(policy>=1)
+        if (policy >= 1)
             for (EntryPlugin entryPlugin : model.getEntryPlugins()) {
                 entryPlugin.setEntryPaused(false);
             }
-        if(policy<1)
+        if (policy < 1)
             for (EntryPlugin entryPlugin : model.getEntryPlugins()) {
                 entryPlugin.setEntryPaused(true);
             }

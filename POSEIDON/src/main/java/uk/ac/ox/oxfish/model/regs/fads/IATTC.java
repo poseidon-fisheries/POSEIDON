@@ -25,9 +25,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public final class IATTC {
 
-    private IATTC() {}
+    private IATTC() {
+    }
 
-    public static int capacityClass(Fisher fisher) { return capacityClass(fisher.getMaximumHold()); }
+    public static int capacityClass(Fisher fisher) {
+        return capacityClass(fisher.getMaximumHold());
+    }
 
     /**
      * Not used for now, but it might be what we need in the end

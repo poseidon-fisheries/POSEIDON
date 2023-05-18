@@ -33,35 +33,36 @@ public class FixedPriceMarket extends AbstractBiomassMarket {
 
     private double price;
 
+    public FixedPriceMarket(double price) {
+        this.price = price;
+    }
+
     public double getPrice() {
         return price;
     }
 
     public void setPrice(double price) {
-  //      Preconditions.checkArgument(price>=0); can be negative if it's a fine!
-        this.price = price;
-    }
-
-
-    public FixedPriceMarket(double price) {
+        //      Preconditions.checkArgument(price>=0); can be negative if it's a fine!
         this.price = price;
     }
 
     /**
      * the only method to implement for subclasses. Needs to actually do the trading and return the result
      *
-     * @param biomass     the biomass caught by the seller
-     * @param fisher      the seller
+     * @param biomass    the biomass caught by the seller
+     * @param fisher     the seller
      * @param regulation the rules the seller abides to
-     * @param state       the model
+     * @param state      the model
      * @return TradeInfo  results
      */
     @Override
     protected TradeInfo sellFishImplementation(
-            double biomass, Fisher fisher, Regulation regulation, FishState state,
-            Species species) {
+        double biomass, Fisher fisher, Regulation regulation, FishState state,
+        Species species
+    ) {
         return Market.defaultMarketTransaction(biomass, fisher, regulation, state,
-                                               biomassTraded -> biomassTraded *price, species);
+            biomassTraded -> biomassTraded * price, species
+        );
     }
 
 

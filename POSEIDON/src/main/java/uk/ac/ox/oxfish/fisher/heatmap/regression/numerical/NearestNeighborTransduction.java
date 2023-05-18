@@ -40,12 +40,10 @@ import java.util.List;
 public class NearestNeighborTransduction implements GeographicalRegression<Double> {
 
 
-
-    private final HashMap<SeaTile,GeographicalObservation<Double>> closestNeighborForNow;
-
-    private final static GeographicalObservation<Double> PLACEHOLDER = new GeographicalObservation<Double>(null,-1d,Double.NaN);
-
-
+    private final static GeographicalObservation<Double> PLACEHOLDER = new GeographicalObservation<Double>(null,
+        -1d,
+        Double.NaN);
+    private final HashMap<SeaTile, GeographicalObservation<Double>> closestNeighborForNow;
     /**
      * functions used to turn an observation into a double[]
      */
@@ -63,62 +61,61 @@ public class NearestNeighborTransduction implements GeographicalRegression<Doubl
 
 
     public NearestNeighborTransduction(
-            NauticalMap map,
-            ObservationExtractor[] extractors, double[] bandwidths,
-            RegressionDistance transformer) {
+        NauticalMap map,
+        ObservationExtractor[] extractors, double[] bandwidths,
+        RegressionDistance transformer
+    ) {
 
         Preconditions.checkArgument(bandwidths.length > 0);
-        Preconditions.checkArgument(bandwidths.length  == extractors.length);
+        Preconditions.checkArgument(bandwidths.length == extractors.length);
 
         this.extractors = extractors;
         this.bandwidths = bandwidths;
         this.transformer = transformer;
         List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
         closestNeighborForNow = new HashMap<>(tiles.size());
-        for(SeaTile tile : tiles)
-            closestNeighborForNow.put(tile,PLACEHOLDER);
+        for (SeaTile tile : tiles)
+            closestNeighborForNow.put(tile, PLACEHOLDER);
 
 
     }
 
     /**
      * returns stored closest best
+     *
      * @return
      */
     @Override
     public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
-        return closestNeighborForNow.getOrDefault(tile,PLACEHOLDER).getValue();
+        return closestNeighborForNow.getOrDefault(tile, PLACEHOLDER).getValue();
     }
 
 
     @Override
-    public void addObservation(GeographicalObservation<Double> newObservation, Fisher fisher, FishState model)
-    {
+    public void addObservation(GeographicalObservation<Double> newObservation, Fisher fisher, FishState model) {
 
         //go through all the tiles
-        for(SeaTile tile : closestNeighborForNow.keySet())
-        {
+        for (SeaTile tile : closestNeighborForNow.keySet()) {
             //if the new observation is closer than the old one this is your new closest observation
             GeographicalObservation<Double> oldObservation = closestNeighborForNow.get(tile);
-            if(oldObservation == PLACEHOLDER || (
-                    distance(fisher, tile, newObservation.getTime(),model , newObservation) <
-                            distance(fisher, tile, newObservation.getTime(), model, oldObservation)))
-                closestNeighborForNow.put(tile,newObservation);
+            if (oldObservation == PLACEHOLDER || (
+                distance(fisher, tile, newObservation.getTime(), model, newObservation) <
+                    distance(fisher, tile, newObservation.getTime(), model, oldObservation)))
+                closestNeighborForNow.put(tile, newObservation);
         }
     }
 
 
     private double distance(
-            Fisher fisher, SeaTile tile, double time, FishState model, GeographicalObservation<Double> observation)
-    {
+        Fisher fisher, SeaTile tile, double time, FishState model, GeographicalObservation<Double> observation
+    ) {
         double distance = 0;
-        for(int i=0; i< bandwidths.length; i++)
-        {
+        for (int i = 0; i < bandwidths.length; i++) {
             transformer.setBandwidth(bandwidths[i]);
             distance += transformer.distance(
-                    extractors[i].extract(tile,time,fisher, model),
-                    extractors[i].extract(observation.getTile(),observation.getTime(),fisher, model)
+                extractors[i].extract(tile, time, fisher, model),
+                extractors[i].extract(observation.getTile(), observation.getTime(), fisher, model)
             );
 
 
@@ -128,11 +125,12 @@ public class NearestNeighborTransduction implements GeographicalRegression<Doubl
 
 
     }
+
     /**
      * ignored
      */
     @Override
-    public void start(FishState model,Fisher fisher) {
+    public void start(FishState model, Fisher fisher) {
 
     }
 
@@ -149,7 +147,8 @@ public class NearestNeighborTransduction implements GeographicalRegression<Doubl
      */
     @Override
     public double extractNumericalYFromObservation(
-            GeographicalObservation<Double> observation, Fisher fisher) {
+        GeographicalObservation<Double> observation, Fisher fisher
+    ) {
         return observation.getValue();
     }
 

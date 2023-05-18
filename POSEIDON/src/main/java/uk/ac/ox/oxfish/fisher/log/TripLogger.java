@@ -35,27 +35,21 @@ import java.util.List;
  * Holds a list of all previous trips + can notify listeners that a trip has ended .
  * Created by carrknight on 6/17/15.
  */
-public class TripLogger implements Startable
-{
-
-    /**
-     * this is really null only until the first trip starts.
-     */
-    private TripRecord currentTrip = null;
+public class TripLogger implements Startable {
 
     /**
      * trips trips trips
      */
     private final LinkedList<TripRecord> finishedTrips = new LinkedList<>();
-
-    private TripRecord lastFinishedTrip = null;
-
     /**
      * whatever needs to be notified that a trip is complete
      */
     private final List<TripListener> listeners = new LinkedList<>();
-
-
+    /**
+     * this is really null only until the first trip starts.
+     */
+    private TripRecord currentTrip = null;
+    private TripRecord lastFinishedTrip = null;
     private int numberOfSpecies = -1;
 
     /**
@@ -74,22 +68,21 @@ public class TripLogger implements Startable
         listeners.clear();
     }
 
-    public void addTripListener(TripListener listener)
-    {
+    public void addTripListener(TripListener listener) {
         Preconditions.checkArgument(!listeners.contains(listener));
         listeners.add(listener);
     }
 
-    public void removeTripListener(TripListener listener)
-    {
+    public void removeTripListener(TripListener listener) {
         listeners.remove(listener);
     }
 
     /**
      * log the start of a new trip
+     *
      * @param hoursAtPort
      */
-    public void newTrip(double hoursAtPort, int tripDay, Fisher fisher){
+    public void newTrip(double hoursAtPort, int tripDay, Fisher fisher) {
         assert currentTrip == null || currentTrip.isCompleted(); //the other trip is over
         //just replace the old trip
         currentTrip = new TripRecord(numberOfSpecies, hoursAtPort, tripDay);
@@ -101,8 +94,7 @@ public class TripLogger implements Startable
     /**
      * log the trip is over
      */
-    public TripRecord finishTrip(double hoursAtSea, Port terminal, Fisher fisher)
-    {
+    public TripRecord finishTrip(double hoursAtSea, Port terminal, Fisher fisher) {
 
         //it must have taken more than 0 hours to do a trip
         Preconditions.checkArgument(hoursAtSea > 0);
@@ -113,15 +105,15 @@ public class TripLogger implements Startable
         finishedTrips.add(currentTrip);
         lastFinishedTrip = currentTrip;
         //tell the listeners
-        for(TripListener listener : listeners)
+        for (TripListener listener : listeners)
             listener.reactToFinishedTrip(currentTrip, fisher);
 
         return currentTrip;
     }
 
 
-    public void resetTrip(){
-        currentTrip=null;
+    public void resetTrip() {
+        currentTrip = null;
     }
 
     public TripRecord getCurrentTrip() {
@@ -149,9 +141,7 @@ public class TripLogger implements Startable
     }
 
 
-
     /**
-     *
      * @param specieIndex
      * @param biomass
      * @param earnings

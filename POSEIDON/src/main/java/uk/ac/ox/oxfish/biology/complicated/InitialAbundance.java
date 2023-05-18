@@ -30,12 +30,14 @@ public interface InitialAbundance {
 
     /**
      * called before being asked for initial abundance
+     *
      * @param species
      */
     public void initialize(Species species);
 
     /**
      * returns the abundance matrix; call after initialize()
+     *
      * @return
      */
     public double[][] getInitialAbundance();

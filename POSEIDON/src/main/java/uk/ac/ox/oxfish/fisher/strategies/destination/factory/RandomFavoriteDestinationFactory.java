@@ -26,15 +26,14 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-public class RandomFavoriteDestinationFactory implements AlgorithmFactory<FavoriteDestinationStrategy>
-{
+public class RandomFavoriteDestinationFactory implements AlgorithmFactory<FavoriteDestinationStrategy> {
 
     @Override
     public FavoriteDestinationStrategy apply(FishState state) {
 
         MersenneTwisterFast random = state.random;
         NauticalMap map = state.getMap();
-        return new FavoriteDestinationStrategy(map,random);
+        return new FavoriteDestinationStrategy(map, random);
 
     }
 }

@@ -39,60 +39,62 @@ public class ConstantRateAbundanceDiffuser extends AbstractAbundanceDiffuser {
 
 
     public ConstantRateAbundanceDiffuser(
-            int diffusingRange,
-            double diffusingRate) {
+        int diffusingRange,
+        double diffusingRate
+    ) {
         super(diffusingRange, true);
-        Preconditions.checkArgument(diffusingRate >=0);
-        Preconditions.checkArgument(diffusingRate <=1);
+        Preconditions.checkArgument(diffusingRate >= 0);
+        Preconditions.checkArgument(diffusingRate <= 1);
         this.diffusingRate = diffusingRate;
     }
 
     /**
      * ask implementation how to move. This gets called iff there is a positive delta (that is, there are more fish here than there)
-     *  @param species      species moving!
-     * @param here         departing point
+     *
+     * @param species        species moving!
+     * @param here           departing point
      * @param abundanceHere  departing local biology
-     * @param there        arriving point
+     * @param there          arriving point
      * @param abundanceThere arriving local biology
-     * @param delta        number of fish here - number of fish there (always positive or this isn't called)
+     * @param delta          number of fish here - number of fish there (always positive or this isn't called)
      * @param fishHere
      * @param fishThere
-     * @param bin          bin/age studied
+     * @param bin            bin/age studied
      * @param random
      * @param subdivision
-     * @param biologyHere  departing local biology
-     * @param biologyThere arriving local biology
+     * @param biologyHere    departing local biology
+     * @param biologyThere   arriving local biology
      */
     @Override
     public void move(
-            Species species, SeaTile here, StructuredAbundance abundanceHere,
-            SeaTile there, StructuredAbundance abundanceThere, double delta, double fishHere, double fishThere,
-            int bin,
-            MersenneTwisterFast random,
-            boolean rounding, int subdivision,
-            AbundanceLocalBiology biologyHere,
-            AbundanceLocalBiology biologyThere)
-    {
-        if(delta<=0)
+        Species species, SeaTile here, StructuredAbundance abundanceHere,
+        SeaTile there, StructuredAbundance abundanceThere, double delta, double fishHere, double fishThere,
+        int bin,
+        MersenneTwisterFast random,
+        boolean rounding, int subdivision,
+        AbundanceLocalBiology biologyHere,
+        AbundanceLocalBiology biologyThere
+    ) {
+        if (delta <= 0)
             return;
 
         double movement = delta * diffusingRate;
-        if(rounding)
-            movement = FishStateUtilities.randomRounding(delta * diffusingRate,
-                                                         random);
+        if (rounding)
+            movement = FishStateUtilities.randomRounding(
+                delta * diffusingRate,
+                random
+            );
 
         //might be too small differential for movement
-        if(movement > 0)
-        {
+        if (movement > 0) {
 
             //move!
             abundanceHere.asMatrix()[subdivision][bin] -= movement;
-            assert abundanceHere.asMatrix()[subdivision][bin] >=0;
+            assert abundanceHere.asMatrix()[subdivision][bin] >= 0;
             abundanceThere.asMatrix()[subdivision][bin] += movement;
-            assert abundanceThere.asMatrix()[subdivision][bin] >=0;
+            assert abundanceThere.asMatrix()[subdivision][bin] >= 0;
 
         }
-
 
 
     }

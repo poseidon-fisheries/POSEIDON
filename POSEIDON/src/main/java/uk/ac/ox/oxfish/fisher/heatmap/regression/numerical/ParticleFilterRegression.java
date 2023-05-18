@@ -39,37 +39,29 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- *A geographical regression which at its core is just a long hash map of separate
- *
+ * A geographical regression which at its core is just a long hash map of separate
+ * <p>
  * Created by carrknight on 8/1/16.
  */
 public class ParticleFilterRegression implements GeographicalRegression<Double> {
 
 
-    private final HashMap<SeaTile,ParticleFilter<Double>> filters = new HashMap<>();
-
-
+    private final HashMap<SeaTile, ParticleFilter<Double>> filters = new HashMap<>();
+    private final int filterSizes;
+    private final NauticalMap map;
+    private final MersenneTwisterFast random;
     /**
      * the % increase per unit of distance in evidence variance
      */
     private double distanceNoise;
-
     /**
      * the standard deviation  of p(e|X)~N(observation,.)
      */
     private double evidenceDeviation;
-
     /**
      * standard deviation of the daily shock to each particle applied
      */
     private double temporalDrift;
-
-    private final int filterSizes;
-
-    private final NauticalMap map;
-
-    private final MersenneTwisterFast random;
-
     private double minValue;
 
     private double maxValue;
@@ -77,8 +69,9 @@ public class ParticleFilterRegression implements GeographicalRegression<Double> 
 
 
     public ParticleFilterRegression(
-            double distanceNoise, double evidenceDeviation, double temporalDrift, int filterSizes,
-            NauticalMap map, MersenneTwisterFast random, double minValue, double maxValue) {
+        double distanceNoise, double evidenceDeviation, double temporalDrift, int filterSizes,
+        NauticalMap map, MersenneTwisterFast random, double minValue, double maxValue
+    ) {
         this.distanceNoise = distanceNoise;
         this.evidenceDeviation = evidenceDeviation;
         this.temporalDrift = temporalDrift;
@@ -89,12 +82,14 @@ public class ParticleFilterRegression implements GeographicalRegression<Double> 
         this.maxValue = maxValue;
 
         List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
-        for(SeaTile tile : tiles)
-            filters.put(tile,ParticleFilter.defaultParticleFilter(minValue,
-                                                           maxValue,
-                                                           temporalDrift,
-                                                           filterSizes,
-                                                           random));
+        for (SeaTile tile : tiles)
+            filters.put(tile, ParticleFilter.defaultParticleFilter(
+                minValue,
+                maxValue,
+                temporalDrift,
+                filterSizes,
+                random
+            ));
     }
 
     /**
@@ -122,47 +117,27 @@ public class ParticleFilterRegression implements GeographicalRegression<Double> 
      */
     @Override
     public void turnOff(Fisher fisher) {
-        if(receipt!=null)
+        if (receipt != null)
             receipt.stop();
     }
 
     @Override
     public double predict(
-            SeaTile tile, double time, Fisher fisher, FishState model) {
+        SeaTile tile, double time, Fisher fisher, FishState model
+    ) {
         return getMean(tile);
     }
 
-    @Override
-    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher, FishState model) {
-
-        for(Map.Entry<SeaTile,ParticleFilter<Double>> filter : filters.entrySet())
-        {
-            double distance = map.distance(observation.getTile(),filter.getKey());
-            double totalDeviation = evidenceDeviation * (1 + distanceNoise * distance);
-            Function<Double, Double> evidenceProbability = FishStateUtilities.normalPDF(
-                    observation.getValue(), totalDeviation
-            );
-            //if there is a meaningful difference between probability max and min then there is some value in this
-            if(totalDeviation < (maxValue-minValue)/2)
-                filter.getValue().updateGivenEvidence(
-                        evidenceProbability, random);
-
-        }
-
-    }
-
-    public double getMean(SeaTile tile){
+    public double getMean(SeaTile tile) {
         ParticleFilter<Double> filter = filters.get(tile);
-        if(filter == null)
+        if (filter == null)
             return Double.NaN;
-        else
-        {
+        else {
             Belief<Double> belief = filter.getBelief();
-            if(belief.getTotalWeight()<=0)
+            if (belief.getTotalWeight() <= 0)
                 return Double.NaN;
             double mean = 0;
-            for (Map.Entry<Double, Double> temp : belief.getCdf().entrySet())
-            {
+            for (Map.Entry<Double, Double> temp : belief.getCdf().entrySet()) {
                 mean += temp.getKey() * temp.getValue();
             }
             return mean;
@@ -171,7 +146,25 @@ public class ParticleFilterRegression implements GeographicalRegression<Double> 
 
     }
 
-    public double getStandardDeviation(SeaTile tile){
+    @Override
+    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher, FishState model) {
+
+        for (Map.Entry<SeaTile, ParticleFilter<Double>> filter : filters.entrySet()) {
+            double distance = map.distance(observation.getTile(), filter.getKey());
+            double totalDeviation = evidenceDeviation * (1 + distanceNoise * distance);
+            Function<Double, Double> evidenceProbability = FishStateUtilities.normalPDF(
+                observation.getValue(), totalDeviation
+            );
+            //if there is a meaningful difference between probability max and min then there is some value in this
+            if (totalDeviation < (maxValue - minValue) / 2)
+                filter.getValue().updateGivenEvidence(
+                    evidenceProbability, random);
+
+        }
+
+    }
+
+    public double getStandardDeviation(SeaTile tile) {
         ParticleFilter<Double> filter = filters.get(tile);
         return Belief.getSummaryStatistics(filter.getBelief())[1];
 
@@ -215,7 +208,8 @@ public class ParticleFilterRegression implements GeographicalRegression<Double> 
      */
     @Override
     public double extractNumericalYFromObservation(
-            GeographicalObservation<Double> observation, Fisher fisher) {
+        GeographicalObservation<Double> observation, Fisher fisher
+    ) {
         return observation.getValue();
     }
 
@@ -228,7 +222,7 @@ public class ParticleFilterRegression implements GeographicalRegression<Double> 
     @Override
     public double[] getParametersAsArray() {
 
-        return  new double[]{distanceNoise,evidenceDeviation};
+        return new double[]{distanceNoise, evidenceDeviation};
 
     }
 
@@ -240,7 +234,7 @@ public class ParticleFilterRegression implements GeographicalRegression<Double> 
      */
     @Override
     public void setParameters(double[] parameterArray) {
-        assert  parameterArray.length == 2;
+        assert parameterArray.length == 2;
         distanceNoise = parameterArray[0];
         evidenceDeviation = parameterArray[1];
 

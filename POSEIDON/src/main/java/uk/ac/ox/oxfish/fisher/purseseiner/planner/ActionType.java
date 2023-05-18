@@ -30,8 +30,7 @@ public enum ActionType {
     FishingOnTile("FSH"),
     DolphinSets("DEL"),
     NonAssociatedSets("NOA"),
-    OpportunisticFadSets("OFS")
-    ;
+    OpportunisticFadSets("OFS");
 
     private final String text;
 

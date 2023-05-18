@@ -41,22 +41,22 @@ public class NaturalMortalityProcessTest {
     public void mortalityTest() throws Exception {
 
 
-        double male[] = new double[]{10000,10000,10000};
-        double female[] = new double[]{5000,4000,3000};
+        double male[] = new double[]{10000, 10000, 10000};
+        double female[] = new double[]{5000, 4000, 3000};
         Meristics meristics = mock(StockAssessmentCaliforniaMeristics.class);
         when(meristics.getNumberOfSubdivisions()).thenReturn(2);
 
 
-        NaturalMortalityProcess mortality = new ExponentialMortalityProcess(.1,.2);
-        mortality.cull(meristics, true,new StructuredAbundance(male,female),365 );
+        NaturalMortalityProcess mortality = new ExponentialMortalityProcess(.1, .2);
+        mortality.cull(meristics, true, new StructuredAbundance(male, female), 365);
         //this numbers I obtained in R
-        assertEquals(male[0],9048,.001);
-        assertEquals(male[1],9048,.001);
-        assertEquals(male[2],9048,.001);
+        assertEquals(male[0], 9048, .001);
+        assertEquals(male[1], 9048, .001);
+        assertEquals(male[2], 9048, .001);
 
-        assertEquals(female[0], 4093,1);
-        assertEquals(female[1],3275,1);
-        assertEquals(female[2],2456,1);
+        assertEquals(female[0], 4093, 1);
+        assertEquals(female[1], 3275, 1);
+        assertEquals(female[2], 2456, 1);
 
 
     }
@@ -66,23 +66,25 @@ public class NaturalMortalityProcessTest {
     public void sablefishMortality() throws Exception {
 
         Species species = MultipleSpeciesAbundanceInitializer.
-                generateSpeciesFromFolder(Paths.get("inputs",
-                                                    "california",
-                                                    "biology",
-                                                    "Sablefish"),"Sablefish");
+            generateSpeciesFromFolder(Paths.get(
+                "inputs",
+                "california",
+                "biology",
+                "Sablefish"
+            ), "Sablefish");
 
         double[] male = new double[60];
         double[] female = new double[60];
-        Arrays.fill(male,10000);
+        Arrays.fill(male, 10000);
 
 
         NaturalMortalityProcess process = new ExponentialMortalityProcess(
-                (StockAssessmentCaliforniaMeristics) species.getMeristics());
+            (StockAssessmentCaliforniaMeristics) species.getMeristics());
 
-        process.cull(species.getMeristics(), true,new StructuredAbundance(male,female),365);
+        process.cull(species.getMeristics(), true, new StructuredAbundance(male, female), 365);
 
-        for(int i=0; i<male.length; i++)
-            assertEquals(male[i],9370, .001); //always round down now
+        for (int i = 0; i < male.length; i++)
+            assertEquals(male[i], 9370, .001); //always round down now
         System.out.println(Arrays.toString(male));
 
     }

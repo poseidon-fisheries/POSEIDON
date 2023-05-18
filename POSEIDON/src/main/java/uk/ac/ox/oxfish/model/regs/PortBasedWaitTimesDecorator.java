@@ -37,11 +37,12 @@ public class PortBasedWaitTimesDecorator implements Regulation {
     private final Regulation decorated;
 
 
-    private final Map<String,Integer> hoursToWaitPerPort;
+    private final Map<String, Integer> hoursToWaitPerPort;
 
 
     public PortBasedWaitTimesDecorator(
-            Regulation decorated, Map<String, Integer> hoursToWaitPerPort) {
+        Regulation decorated, Map<String, Integer> hoursToWaitPerPort
+    ) {
         this.decorated = decorated;
         this.hoursToWaitPerPort = hoursToWaitPerPort;
     }
@@ -56,7 +57,8 @@ public class PortBasedWaitTimesDecorator implements Regulation {
      */
     @Override
     public boolean canFishHere(
-            Fisher agent, SeaTile tile, FishState model, int timeStep) {
+        Fisher agent, SeaTile tile, FishState model, int timeStep
+    ) {
         return decorated.canFishHere(agent, tile, model, timeStep);
     }
 
@@ -70,7 +72,8 @@ public class PortBasedWaitTimesDecorator implements Regulation {
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Species species, FishState model, int timeStep) {
+        Fisher agent, Species species, FishState model, int timeStep
+    ) {
         return decorated.maximumBiomassSellable(agent, species, model, timeStep);
     }
 
@@ -85,7 +88,8 @@ public class PortBasedWaitTimesDecorator implements Regulation {
     @Override
     public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
 
-        if(fisher.isAtPortAndDocked() && fisher.getHoursAtPort() < hoursToWaitPerPort.get(fisher.getHomePort().getName()) )
+        if (fisher.isAtPortAndDocked() && fisher.getHoursAtPort() < hoursToWaitPerPort.get(fisher.getHomePort()
+            .getName()))
             return false;
 
         return decorated.allowedAtSea(fisher, model, timeStep);
@@ -102,8 +106,8 @@ public class PortBasedWaitTimesDecorator implements Regulation {
      */
     @Override
     public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing,
-            FishState model, int timeStep
+        SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing,
+        FishState model, int timeStep
     ) {
         decorated.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
     }
@@ -117,7 +121,14 @@ public class PortBasedWaitTimesDecorator implements Regulation {
      * @param revenue how much money was made off it
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
+    public void reactToSale(
+        Species species,
+        Fisher seller,
+        double biomass,
+        double revenue,
+        FishState model,
+        int timeStep
+    ) {
         decorated.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 
@@ -129,15 +140,15 @@ public class PortBasedWaitTimesDecorator implements Regulation {
     @Override
     public Regulation makeCopy() {
         return new PortBasedWaitTimesDecorator(
-                decorated.makeCopy(),
-                hoursToWaitPerPort
+            decorated.makeCopy(),
+            hoursToWaitPerPort
         );
     }
 
     @Override
     public void start(FishState model, Fisher fisher) {
 
-        decorated.start(model,fisher);
+        decorated.start(model, fisher);
     }
 
     @Override

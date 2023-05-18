@@ -81,32 +81,33 @@ public class FisherTest {
 
         Gear gear = mock(Gear.class);
         //catch 1 pound of fish a day
-        when(gear.fish(any(), any(),any() , anyInt(), any())).thenReturn(new Catch(species, 1, biology));
+        when(gear.fish(any(), any(), any(), anyInt(), any())).thenReturn(new Catch(species, 1, biology));
         //9 liters each time you fish
-        when(gear.getFuelConsumptionPerHourOfFishing(any(),any(),any())).thenReturn(9d);
+        when(gear.getFuelConsumptionPerHourOfFishing(any(), any(), any())).thenReturn(9d);
         Fisher fisher = new Fisher(0, port,
-                                   new MersenneTwisterFast(),
-                                   new AnarchyFactory().apply(fishState),
-                                   new FixedProbabilityDepartingStrategy(1.0, false),
-                                   new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
-                                   new FishUntilFullStrategy(1.0),
-                                   new FixedGearStrategy(),
-                                   new NoDiscarding(),
-                                   new IgnoreWeatherStrategy(),
-                                   new Boat(1, 1, new Engine(1, litersPerKm, kph), new FuelTank(1000000)),
-                                   new Hold(2,biology), gear, 1);
+            new MersenneTwisterFast(),
+            new AnarchyFactory().apply(fishState),
+            new FixedProbabilityDepartingStrategy(1.0, false),
+            new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
+            new FishUntilFullStrategy(1.0),
+            new FixedGearStrategy(),
+            new NoDiscarding(),
+            new IgnoreWeatherStrategy(),
+            new Boat(1, 1, new Engine(1, litersPerKm, kph), new FuelTank(1000000)),
+            new Hold(2, biology), gear, 1
+        );
         fisher.start(fishState);
         fishmarket.start(fishState);
         //step it, it should reach the sea tile and do nothing
         fisher.step(fishState);
-        assertEquals(fisher.getHoursAtSea(),1,.001);
+        assertEquals(fisher.getHoursAtSea(), 1, .001);
         TripRecord record = fisher.getCurrentTrip();
         assertEquals(0, fisher.getTotalWeightOfCatchInHold(), .001);
 
         fisher.step(fishState);
         assertEquals(fisher.getHoursAtSea(), 2, .001);
         fisher.step(fishState);
-        assertEquals(fisher.getHoursAtSea(), 3,.001);
+        assertEquals(fisher.getHoursAtSea(), 3, .001);
         //ready to go home
         assertEquals(2.0, fisher.getTotalWeightOfCatchInHold(), .001);
 
@@ -116,7 +117,7 @@ public class FisherTest {
         fisher.setDepartingStrategy(new FixedProbabilityDepartingStrategy(0, false));
         assertEquals(fisher.getHoursAtSea(), 4, .001);
         fisher.step(fishState);
-        assertEquals(fisher.getHoursAtSea(), 0,.001);
+        assertEquals(fisher.getHoursAtSea(), 0, .001);
         assertEquals(0.0, fisher.getTotalWeightOfCatchInHold(), .001);
 
         assertEquals(record.isCutShort(), false);
@@ -124,15 +125,14 @@ public class FisherTest {
         //2 steps fishing, 9  liters each, 10$ per liter
         //--->
         //380$ of costs per step
-        assertEquals(record.getProfitPerHour(false), (23*2 - 10.0 * 10 * 2 - 2 * 10 * 9)/4,.001);
+        assertEquals(record.getProfitPerHour(false), (23 * 2 - 10.0 * 10 * 2 - 2 * 10 * 9) / 4, .001);
 
 
     }
 
 
     @Test
-    public void fuelEmergencyOverride()
-    {
+    public void fuelEmergencyOverride() {
         //exactly like above, except that now the tank is only 30 liters
         final int kmPerCell = 1;
         FishState fishState = RandomThenBackToPortDestinationStrategyTest.generateSimple2x2Map(kmPerCell);
@@ -160,29 +160,29 @@ public class FisherTest {
 
         Gear gear = mock(Gear.class);
         //catch 1 pound of fish a day
-        when(gear.fish(any(), any(),any() , anyInt(), any())).thenReturn(new Catch(species, 1, biology));
+        when(gear.fish(any(), any(), any(), anyInt(), any())).thenReturn(new Catch(species, 1, biology));
         //10 liters each time you fish
-        when(gear.getFuelConsumptionPerHourOfFishing(any(),any(),any())).thenReturn(10d);
+        when(gear.getFuelConsumptionPerHourOfFishing(any(), any(), any())).thenReturn(10d);
         Fisher fisher = new Fisher(0, port,
-                                   new MersenneTwisterFast(),
-                                   new AnarchyFactory().apply(fishState),
-                                   new FixedProbabilityDepartingStrategy(1.0, false),
-                                   new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
-                                   new FishUntilFullStrategy(1.0),
-                                   new FixedGearStrategy(),
-                                   new NoDiscarding(),
-                                   new IgnoreWeatherStrategy(),
-                                   new Boat(1, 1, new Engine(1, litersPerKm, kph), new FuelTank(30)),
-                                   new Hold(2,biology),
-                                   gear, 1);
-
+            new MersenneTwisterFast(),
+            new AnarchyFactory().apply(fishState),
+            new FixedProbabilityDepartingStrategy(1.0, false),
+            new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
+            new FishUntilFullStrategy(1.0),
+            new FixedGearStrategy(),
+            new NoDiscarding(),
+            new IgnoreWeatherStrategy(),
+            new Boat(1, 1, new Engine(1, litersPerKm, kph), new FuelTank(30)),
+            new Hold(2, biology),
+            gear, 1
+        );
 
 
         fisher.start(fishState);
         fishmarket.start(fishState);
         //step it, it should reach the sea tile and do nothing
         fisher.step(fishState);
-        assertEquals(fisher.getHoursAtSea(), 1,.001);
+        assertEquals(fisher.getHoursAtSea(), 1, .001);
         assertEquals(fisher.getFuelLeft(), 20.0, 0.0);
         //step it again, it should fish a bit
         fisher.step(fishState);
@@ -194,7 +194,7 @@ public class FisherTest {
         assertEquals(fisher.getFuelLeft(), 0.0, 0.0);
         assertTrue(fisher.isFuelEmergencyOverride());
         fisher.step(fishState);
-        assertEquals(fisher.getHoursAtSea(), 0,.001);
+        assertEquals(fisher.getHoursAtSea(), 0, .001);
         assertEquals(fisher.getFuelLeft(), 30.0, 0.0);
 
 

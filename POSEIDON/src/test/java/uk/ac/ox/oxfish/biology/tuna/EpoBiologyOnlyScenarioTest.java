@@ -11,7 +11,7 @@ import java.util.List;
 
 public class EpoBiologyOnlyScenarioTest extends TestCase {
 
-    public void testRunBiologyOnlyScenario(){
+    public void testRunBiologyOnlyScenario() {
         final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
 
 
@@ -24,7 +24,7 @@ public class EpoBiologyOnlyScenarioTest extends TestCase {
         fishState.setScenario(scenario);
         scenario.getFadMapFactory().setCurrentPatternMapSupplier(CurrentPatternMapSupplier.EMPTY);
 
-        double[] partialF = {0.132763,0.00484204,3.12056E-05,0.0296353,0.00197554,0.00632267,0.00559769,0.0555887,0.00258933};
+        double[] partialF = {0.132763, 0.00484204, 3.12056E-05, 0.0296353, 0.00197554, 0.00632267, 0.00559769, 0.0555887, 0.00258933};
 
         fishState.start();
 
@@ -40,31 +40,32 @@ public class EpoBiologyOnlyScenarioTest extends TestCase {
 //        assertEquals(fishState.getTotalBiomass(BET), 1472570250,1000);
         //this is coming out to be 1470816000
 
-        int[] checkDays = {0,90,181,273};
+        int[] checkDays = {0, 90, 181, 273};
         double[] expectedBiomass = {1472570250,
-                                    1263384168,
-                                    1151702333,
-                                    1047984966};
+            1263384168,
+            1151702333,
+            1047984966};
 
-        int check=0;
-        double[][]prevAbund = fishState.getTotalAbundance(BET);
-        double[][]deaths = fishState.getTotalAbundance(BET);
+        int check = 0;
+        double[][] prevAbund = fishState.getTotalAbundance(BET);
+        double[][] deaths = fishState.getTotalAbundance(BET);
         do {
 
-            if(ArrayUtils.contains(checkDays,fishState.getStep())){
-                System.out.println(fishState.getStep() + " " + fishState.getTotalBiomass(fishState.getSpecies("Bigeye tuna"))/1000);
+            if (ArrayUtils.contains(checkDays, fishState.getStep())) {
+                System.out.println(fishState.getStep() + " " + fishState.getTotalBiomass(fishState.getSpecies(
+                    "Bigeye tuna")) / 1000);
                 double[][] totalAbundance = fishState.getTotalAbundance(BET);
-                for(int i=0; i<totalAbundance.length; i++){
-                    for(int j=0; j<totalAbundance[0].length-1; j++){
-                        deaths[i][j]=prevAbund[i][j]-totalAbundance[i][j+1];
+                for (int i = 0; i < totalAbundance.length; i++) {
+                    for (int j = 0; j < totalAbundance[0].length - 1; j++) {
+                        deaths[i][j] = prevAbund[i][j] - totalAbundance[i][j + 1];
                     }
                 }
                 System.out.println("breakpoint");
 
-                prevAbund=fishState.getTotalAbundance(BET);
+                prevAbund = fishState.getTotalAbundance(BET);
 
                 //System.out.println("new recruits: "+(totalAbundance[0][0]+totalAbundance[1][0]));
-                assertEquals(expectedBiomass[check],fishState.getTotalBiomass(BET), 1000000);
+                assertEquals(expectedBiomass[check], fishState.getTotalBiomass(BET), 1000000);
                 check++;
             }
             fishState.schedule.step(fishState);

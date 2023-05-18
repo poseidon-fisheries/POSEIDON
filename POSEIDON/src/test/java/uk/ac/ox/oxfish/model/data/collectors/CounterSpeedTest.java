@@ -23,20 +23,17 @@ package uk.ac.ox.oxfish.model.data.collectors;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class CounterSpeedTest {
 
 
     @Test
-    public void counterSpeed()
-    {
+    public void counterSpeed() {
 
 
         Counter counter = new Counter(IntervalPolicy.EVERY_DAY);
 
 
-        String[] columns = new String[]{"one","two","three","four"};
+        String[] columns = new String[]{"one", "two", "three", "four"};
         for (String column : columns) {
             counter.addColumn(column);
         }
@@ -44,22 +41,19 @@ public class CounterSpeedTest {
         MersenneTwisterFast randomizer = new MersenneTwisterFast();
         double valuesToAdd[] = new double[100000];
         int colsToPick[] = new int[100000];
-        for(int i=0; i<100000; i++)
-        {
-            valuesToAdd[i] = randomizer.nextDouble()*1000;
+        for (int i = 0; i < 100000; i++) {
+            valuesToAdd[i] = randomizer.nextDouble() * 1000;
             colsToPick[i] = randomizer.nextInt(4);
         }
 
 
         long start = System.currentTimeMillis();
-        for(int i=0; i<100000; i++)
-        {
-            counter.count(columns[colsToPick[i]],valuesToAdd[i]);
+        for (int i = 0; i < 100000; i++) {
+            counter.count(columns[colsToPick[i]], valuesToAdd[i]);
         }
         long end = System.currentTimeMillis();
 
-        System.out.println((end-start)/1000d);
-
+        System.out.println((end - start) / 1000d);
 
 
     }

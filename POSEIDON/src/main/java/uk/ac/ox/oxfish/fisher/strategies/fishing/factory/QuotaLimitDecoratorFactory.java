@@ -28,10 +28,10 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 /**
  * Created by carrknight on 7/27/17.
  */
-public class QuotaLimitDecoratorFactory implements AlgorithmFactory<QuotaLimitDecorator>{
+public class QuotaLimitDecoratorFactory implements AlgorithmFactory<QuotaLimitDecorator> {
 
     private AlgorithmFactory<? extends FishingStrategy> decorated =
-            new TowLimitFactory();
+        new TowLimitFactory();
 
 
     public QuotaLimitDecoratorFactory() {
@@ -67,7 +67,8 @@ public class QuotaLimitDecoratorFactory implements AlgorithmFactory<QuotaLimitDe
      * @param decorated Value to set for property 'decorated'.
      */
     public void setDecorated(
-            AlgorithmFactory<? extends FishingStrategy> decorated) {
+        AlgorithmFactory<? extends FishingStrategy> decorated
+    ) {
         this.decorated = decorated;
     }
 }

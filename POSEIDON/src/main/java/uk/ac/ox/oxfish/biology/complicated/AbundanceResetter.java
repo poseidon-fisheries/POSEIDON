@@ -14,10 +14,8 @@ import uk.ac.ox.oxfish.model.FishState;
  */
 public class AbundanceResetter implements BiologyResetter {
 
-    private BiomassAllocator allocator;
-
     private final Species species;
-
+    private BiomassAllocator allocator;
     private double[][] recordedAbundance;
 
 
@@ -27,22 +25,17 @@ public class AbundanceResetter implements BiologyResetter {
     }
 
 
-
     @Override
-    public void recordHowMuchBiomassThereIs(FishState state)
-    {
+    public void recordHowMuchBiomassThereIs(FishState state) {
         recordedAbundance = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
 
-        for (SeaTile seaTile : state.getMap().getAllSeaTilesExcludingLandAsList())
-        {
+        for (SeaTile seaTile : state.getMap().getAllSeaTilesExcludingLandAsList()) {
 
-            if(!seaTile.isFishingEvenPossibleHere())
+            if (!seaTile.isFishingEvenPossibleHere())
                 continue;
             StructuredAbundance abundance = seaTile.getAbundance(species);
-            for(int i=0; i<species.getNumberOfSubdivisions(); i++)
-            {
-                for (int j = 0; j < species.getNumberOfBins(); j++)
-                {
+            for (int i = 0; i < species.getNumberOfSubdivisions(); i++) {
+                for (int j = 0; j < species.getNumberOfBins(); j++) {
                     recordedAbundance[i][j] += abundance.asMatrix()[i][j];
                 }
             }
@@ -51,19 +44,30 @@ public class AbundanceResetter implements BiologyResetter {
 
     }
 
+    @Override
+    public void resetAbundance(
+        NauticalMap map,
+        MersenneTwisterFast random
+    ) {
+        for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
+            resetAbundanceHere(seaTile, map, random);
+        }
+    }
 
+    public void resetAbundanceHere(
+        SeaTile tile,
+        NauticalMap map,
+        MersenneTwisterFast random
+    ) {
 
-    public void resetAbundanceHere(SeaTile tile,
-                                   NauticalMap map,
-                                   MersenneTwisterFast random){
-
-        if(!tile.isFishingEvenPossibleHere())
-        {
-            Preconditions.checkArgument(allocator.allocate(tile,map,random)==0 |
-                            Double.isNaN(allocator.allocate(tile,map,random)),
-                    "Allocating biomass on previously unfishable areas is not allowed; " +
-                            "keep them empty but don't use always empty local biologies " + "\n" +
-                            allocator.allocate(tile,map,random));
+        if (!tile.isFishingEvenPossibleHere()) {
+            Preconditions.checkArgument(
+                allocator.allocate(tile, map, random) == 0 |
+                    Double.isNaN(allocator.allocate(tile, map, random)),
+                "Allocating biomass on previously unfishable areas is not allowed; " +
+                    "keep them empty but don't use always empty local biologies " + "\n" +
+                    allocator.allocate(tile, map, random)
+            );
             return;
         }
 
@@ -72,25 +76,13 @@ public class AbundanceResetter implements BiologyResetter {
         assert abundanceHere[0].length == species.getNumberOfBins();
         double weightHere = allocator.allocate(tile, map, random);
 
-        for(int i=0; i<species.getNumberOfSubdivisions(); i++) {
+        for (int i = 0; i < species.getNumberOfSubdivisions(); i++) {
             for (int j = 0; j < species.getNumberOfBins(); j++) {
                 abundanceHere[i][j] = weightHere * recordedAbundance[i][j];
             }
         }
 
 
-    }
-
-
-
-    @Override
-    public void resetAbundance(
-            NauticalMap map,
-            MersenneTwisterFast random)
-    {
-        for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
-            resetAbundanceHere(seaTile,map,random);
-        }
     }
 
     public BiomassAllocator getAllocator() {

@@ -37,6 +37,10 @@ public abstract class BiologicalProcessesFactory<B extends LocalBiology> {
         this.scheduledProcessesFactory = scheduledProcessesFactory;
     }
 
+    public BiologicalProcessesFactory() {
+
+    }
+
     public ScheduledBiologicalProcessesFactory<B> getScheduledProcessesFactory() {
         return scheduledProcessesFactory;
     }
@@ -51,26 +55,6 @@ public abstract class BiologicalProcessesFactory<B extends LocalBiology> {
 
     public void setRestorerFactory(final RestorerFactory<B> restorerFactory) {
         this.restorerFactory = restorerFactory;
-    }
-
-    public ReallocatorFactory<B, Reallocator<B>> getReallocatorFactory() {
-        return reallocatorFactory;
-    }
-
-    public void setReallocatorFactory(final ReallocatorFactory<B, Reallocator<B>> reallocatorFactory) {
-        this.reallocatorFactory = reallocatorFactory;
-    }
-
-    public BiologyInitializerFactory<B> getBiologyInitializerFactory() {
-        return biologyInitializerFactory;
-    }
-
-    public void setBiologyInitializerFactory(final BiologyInitializerFactory<B> biologyInitializerFactory) {
-        this.biologyInitializerFactory = biologyInitializerFactory;
-    }
-
-    public BiologicalProcessesFactory() {
-
     }
 
     public InputPath getInputFolder() {
@@ -106,6 +90,22 @@ public abstract class BiologicalProcessesFactory<B extends LocalBiology> {
                 restorerFactory
             )
         );
+    }
+
+    public ReallocatorFactory<B, Reallocator<B>> getReallocatorFactory() {
+        return reallocatorFactory;
+    }
+
+    public void setReallocatorFactory(final ReallocatorFactory<B, Reallocator<B>> reallocatorFactory) {
+        this.reallocatorFactory = reallocatorFactory;
+    }
+
+    public BiologyInitializerFactory<B> getBiologyInitializerFactory() {
+        return biologyInitializerFactory;
+    }
+
+    public void setBiologyInitializerFactory(final BiologyInitializerFactory<B> biologyInitializerFactory) {
+        this.biologyInitializerFactory = biologyInitializerFactory;
     }
 
     public static class Processes {

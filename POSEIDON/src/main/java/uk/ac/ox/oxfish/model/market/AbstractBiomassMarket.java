@@ -36,27 +36,31 @@ public abstract class AbstractBiomassMarket extends AbstractMarket {
 
     @Override
     protected TradeInfo sellFishImplementation(
-            Hold hold, Fisher fisher, Regulation regulation, FishState state, Species species) {
-        return  sellFishImplementation(
-                hold.getWeightOfCatchInHold(species),
-                fisher,
-                regulation,
-                state,
-                species
+        Hold hold, Fisher fisher, Regulation regulation, FishState state, Species species
+    ) {
+        return sellFishImplementation(
+            hold.getWeightOfCatchInHold(species),
+            fisher,
+            regulation,
+            state,
+            species
         );
     }
 
     /**
      * the only method to implement for subclasses. Needs to actually do the trading and return the result
-     * @param biomass the biomass caught by the seller
-     * @param fisher the seller
+     *
+     * @param biomass    the biomass caught by the seller
+     * @param fisher     the seller
      * @param regulation the rules the seller abides to
-     * @param state the model
+     * @param state      the model
      * @return TradeInfo  results
      */
-    protected abstract TradeInfo sellFishImplementation(double biomass, Fisher fisher,
-                                                        Regulation regulation, FishState state,
-                                                        Species species);
+    protected abstract TradeInfo sellFishImplementation(
+        double biomass, Fisher fisher,
+        Regulation regulation, FishState state,
+        Species species
+    );
 
 
 }

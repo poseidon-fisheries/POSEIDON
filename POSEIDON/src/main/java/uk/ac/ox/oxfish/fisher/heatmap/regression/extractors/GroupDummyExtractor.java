@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * Returns 1 if the tile is in the same group and 0 otherwise
  * Created by carrknight on 8/7/17.
  */
-public class GroupDummyExtractor implements ObservationExtractor{
+public class GroupDummyExtractor implements ObservationExtractor {
 
 
     /**
@@ -47,7 +47,7 @@ public class GroupDummyExtractor implements ObservationExtractor{
 
     @Override
     public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-        if(discretization.getGroup(tile)==group)
+        if (discretization.getGroup(tile) == group)
             return 1;
         else
             return 0;

@@ -27,11 +27,10 @@ import java.util.function.Function;
 /**
  * It will be useful to have strategies created by a factory so that I can have the YAML and GUI instantiation separated
  * from the strategy itself. This is the main interface holding everything together
- *
+ * <p>
  * Created by carrknight on 5/27/15.
  */
-public interface AlgorithmFactory<T> extends Function<FishState,T>
-{
+public interface AlgorithmFactory<T> extends Function<FishState, T> {
 
 
 }

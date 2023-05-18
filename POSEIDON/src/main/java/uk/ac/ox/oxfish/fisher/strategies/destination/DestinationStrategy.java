@@ -20,12 +20,9 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
-import java.util.ArrayList;
-
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.fisher.log.Territory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
@@ -39,16 +36,17 @@ public interface DestinationStrategy extends FisherStartable {
 
     /**
      * decides where to go.
+     *
      * @param fisher
-     * @param random the randomizer. It probably comes from the fisher but I make explicit it might be needed
-     * @param model the model link
-     * @param currentAction what action is the fisher currently taking that prompted to check for destination   @return the destination   */
+     * @param random        the randomizer. It probably comes from the fisher but I make explicit it might be needed
+     * @param model         the model link
+     * @param currentAction what action is the fisher currently taking that prompted to check for destination   @return the destination
+     */
     SeaTile chooseDestination(
-            Fisher fisher, MersenneTwisterFast random,
-            FishState model,
-            Action currentAction);
-
-	
+        Fisher fisher, MersenneTwisterFast random,
+        FishState model,
+        Action currentAction
+    );
 
 
 }

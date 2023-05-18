@@ -39,10 +39,10 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
  * This is the "cell", the tile of the sea grid. The plan is for this to have information about whether it is protected or not
  * a link to larger fishing-tiles if needed and more in general as a place where to store geographical information we don't
  * want to re-compute over and over again.
- *
+ * <p>
  * Created by carrknight on 4/2/15.
  */
-public class SeaTile implements Startable, LocalBiology{
+public class SeaTile implements Startable, LocalBiology {
 
 
     private final int gridX;
@@ -79,6 +79,7 @@ public class SeaTile implements Startable, LocalBiology{
      * weather object, contains temperatures and such at this tile
      */
     private LocalWeather weather;
+    private String coords;
 
 
     public SeaTile(int gridX, int gridY, double altitude, TileHabitat habitat) {
@@ -88,7 +89,6 @@ public class SeaTile implements Startable, LocalBiology{
         this.habitat = habitat;
     }
 
-
     public int getGridX() {
         return gridX;
     }
@@ -97,17 +97,18 @@ public class SeaTile implements Startable, LocalBiology{
         return gridY;
     }
 
-    public Int2D getGridLocation() { return new Int2D(gridX, gridY); }
+    public Int2D getGridLocation() {
+        return new Int2D(gridX, gridY);
+    }
 
     public double getAltitude() {
         return altitude;
     }
 
     /**
-     *
      * @return true if it belongs to a MPA
      */
-    public boolean isProtected(){
+    public boolean isProtected() {
         return mpa != null;
     }
 
@@ -119,56 +120,32 @@ public class SeaTile implements Startable, LocalBiology{
         this.mpa = mpa;
     }
 
-
-    public LocalBiology getBiology() {
-        return biology;
-    }
-
-    /**
-     * set the biology object. Without there is no biomass!
-     * @param biology the local biology
-     */
-    public void setBiology(LocalBiology biology) {
-
-       this.setBiology(biology,true);
-    }
-
-
-    public void setBiology(LocalBiology biology,boolean turnOffPreviousOne) {
-
-        if(turnOffPreviousOne && this.biology != null)
-            this.biology.turnOff();
-        this.biology = biology;
-    }
     /**
      * the biomass at this location for a single species.
-     * @param species  the species you care about
+     *
+     * @param species the species you care about
      * @return the biomass of this species
      */
     public double getBiomass(Species species) {
         return biology.getBiomass(species);
     }
 
-
-    private String coords;
-
     @Override
     public String toString() {
-        if(coords==null)
-        return "SeaTile "
+        if (coords == null)
+            return "SeaTile "
                 + gridX +
                 "," + gridY +
                 " altitude=" + altitude +
                 " bio = " + biology;
         else
             return "SeaTile "
-                    + gridX +
-                    "," + gridY +
-                    " altitude=" + altitude +
-                    " bio = " + biology +
-                    " coords = " + coords;
+                + gridX +
+                "," + gridY +
+                " altitude=" + altitude +
+                " bio = " + biology +
+                " coords = " + coords;
     }
-
 
     public double getRockyPercentage() {
         return habitat.getHardPercentage();
@@ -192,7 +169,6 @@ public class SeaTile implements Startable, LocalBiology{
         biology.turnOff();
     }
 
-
     public LocalWeather grabLocalWeather() {
         return weather;
     }
@@ -206,11 +182,11 @@ public class SeaTile implements Startable, LocalBiology{
     }
 
     public double getWindSpeedInKph() {
-        return weather == null ? 0 :weather.getWindSpeedInKph();
+        return weather == null ? 0 : weather.getWindSpeedInKph();
     }
 
     public double getWindDirection() {
-        return weather == null ? 0 :weather.getWindDirection();
+        return weather == null ? 0 : weather.getWindDirection();
     }
 
     public boolean isPortHere() {
@@ -231,40 +207,65 @@ public class SeaTile implements Startable, LocalBiology{
 
     /**
      * Tells the local biology that a fisher (or something anyway) fished from this location
-     * @param caught fish taken from the sea
-     * @param notDiscarded fish put in hold
+     *
+     * @param caught        fish taken from the sea
+     * @param notDiscarded  fish put in hold
      * @param globalBiology biology object
      */
     public void reactToThisAmountOfBiomassBeingFished(
-            Catch caught, Catch notDiscarded, GlobalBiology globalBiology){
+        Catch caught, Catch notDiscarded, GlobalBiology globalBiology
+    ) {
         //don't bother cascading if it's nothing
-        if(caught.totalCatchWeight() >= FishStateUtilities.EPSILON)
+        if (caught.totalCatchWeight() >= FishStateUtilities.EPSILON)
             biology.reactToThisAmountOfBiomassBeingFished(caught, notDiscarded, globalBiology);
     }
-
 
     /**
      * checks if the tile is valid for fishing, which means that it's on sea and not land AND that there is a biology in it
      * that is not always empty; <b>THIS IS NOT A REGULATION CHECK</b>
+     *
      * @return true if this tile can in theory contain fish
      */
-    public boolean isFishingEvenPossibleHere()
-    {
-        if(isLand() || getBiology() instanceof EmptyLocalBiology)
+    public boolean isFishingEvenPossibleHere() {
+        if (isLand() || getBiology() instanceof EmptyLocalBiology)
             return false;
         else
             return true;
 
     }
 
+    public boolean isLand() {
+        return altitude >= 0;
+    }
+
+    public LocalBiology getBiology() {
+        return biology;
+    }
+
+    /**
+     * set the biology object. Without there is no biomass!
+     *
+     * @param biology the local biology
+     */
+    public void setBiology(LocalBiology biology) {
+
+        this.setBiology(biology, true);
+    }
+
+    public void setBiology(LocalBiology biology, boolean turnOffPreviousOne) {
+
+        if (turnOffPreviousOne && this.biology != null)
+            this.biology.turnOff();
+        this.biology = biology;
+    }
 
     public StructuredAbundance getAbundance(Species species) {
         return biology.getAbundance(species);
     }
 
-    public boolean isLand() { return altitude >= 0; }
-
-    public boolean isWater() { return !isLand(); }
+    public boolean isWater() {
+        return !isLand();
+    }
 
     public Port grabPortHere() {
         return portHere;

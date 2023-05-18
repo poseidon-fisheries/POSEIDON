@@ -15,24 +15,32 @@ public class MainOptimizer {
 
         Yaml yaml = new Yaml();
         try {
-            yaml.dump(new SamplePoseidonOptimization(),
-                    new FileWriter(Paths.get("eva","sample.yaml").toFile()));
-            yaml.dump(new CaliforniaDerisoOptimization(),
-                    new FileWriter(Paths.get("eva","deriso.yaml").toFile()));
-            yaml.dump(new OneGearExampleMaximization(),
-                    new FileWriter(Paths.get("eva","example.yaml").toFile()));
-            yaml.dump(new MultipleGearsExampleMaximization(),
-                      new FileWriter(Paths.get("eva","flexible.yaml").toFile()));
-            yaml.dump(new GenericOptimization(),
-                    new FileWriter(Paths.get("eva","generic.yaml").toFile()));
+            yaml.dump(
+                new SamplePoseidonOptimization(),
+                new FileWriter(Paths.get("eva", "sample.yaml").toFile())
+            );
+            yaml.dump(
+                new CaliforniaDerisoOptimization(),
+                new FileWriter(Paths.get("eva", "deriso.yaml").toFile())
+            );
+            yaml.dump(
+                new OneGearExampleMaximization(),
+                new FileWriter(Paths.get("eva", "example.yaml").toFile())
+            );
+            yaml.dump(
+                new MultipleGearsExampleMaximization(),
+                new FileWriter(Paths.get("eva", "flexible.yaml").toFile())
+            );
+            yaml.dump(
+                new GenericOptimization(),
+                new FileWriter(Paths.get("eva", "generic.yaml").toFile())
+            );
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args)
-    {
-
+    public static void main(String[] args) {
 
 
         eva2.gui.Main.main(args);

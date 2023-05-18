@@ -27,8 +27,7 @@ public class IntervalTarget {
         this.lag = lag;
     }
 
-    public boolean[] test(FishState state)
-    {
+    public boolean[] test(FishState state) {
 
         final DataColumn column = state.getYearlyDataSet().getColumn(nameOfYearlyColumn);
         boolean[] toReturn = new boolean[column.size()];
@@ -45,10 +44,9 @@ public class IntervalTarget {
         //at time 3 ...
 
 
-
         for (int i = lag; i < column.size(); i++)
-            toReturn[i] = (Double.isFinite(column.get(i-lag)) &&
-                    column.get(i-lag)>=minimum && column.get(i-lag)<=maximum);
+            toReturn[i] = (Double.isFinite(column.get(i - lag)) &&
+                column.get(i - lag) >= minimum && column.get(i - lag) <= maximum);
 
 
         return toReturn;

@@ -31,7 +31,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Created by carrknight on 8/28/15.
  */
 public class ExplorationPenaltyProbabilityFactory
-        implements AlgorithmFactory<ExplorationPenaltyProbability> {
+    implements AlgorithmFactory<ExplorationPenaltyProbability> {
 
     private DoubleParameter explorationProbability = new FixedDoubleParameter(.8);
 
@@ -42,6 +42,21 @@ public class ExplorationPenaltyProbabilityFactory
     private DoubleParameter explorationProbabilityMinimum = new FixedDoubleParameter(.01);
 
 
+    public ExplorationPenaltyProbabilityFactory() {
+    }
+
+
+    public ExplorationPenaltyProbabilityFactory(
+        double explorationProbability, double imitationProbability,
+        double incrementMultiplier,
+        double explorationProbabilityMinimum
+    ) {
+        this.explorationProbability = new FixedDoubleParameter(explorationProbability);
+        this.imitationProbability = new FixedDoubleParameter(imitationProbability);
+        this.incrementMultiplier = new FixedDoubleParameter(incrementMultiplier);
+        this.explorationProbabilityMinimum = new FixedDoubleParameter(explorationProbabilityMinimum);
+    }
+
     /**
      * Applies this function to the given argument.
      *
@@ -50,24 +65,12 @@ public class ExplorationPenaltyProbabilityFactory
      */
     @Override
     public ExplorationPenaltyProbability apply(FishState state) {
-        return new ExplorationPenaltyProbability(explorationProbability.applyAsDouble(state.getRandom()),
-                                                 imitationProbability.applyAsDouble(state.getRandom()),
-                                                 incrementMultiplier.applyAsDouble(state.getRandom()),
-                                                 explorationProbabilityMinimum.applyAsDouble(state.getRandom()));
-    }
-
-
-    public ExplorationPenaltyProbabilityFactory() {
-    }
-
-    public ExplorationPenaltyProbabilityFactory(
-            double explorationProbability, double imitationProbability,
-            double incrementMultiplier,
-            double explorationProbabilityMinimum) {
-        this.explorationProbability = new FixedDoubleParameter(explorationProbability);
-        this.imitationProbability = new FixedDoubleParameter(imitationProbability);
-        this.incrementMultiplier = new FixedDoubleParameter(incrementMultiplier);
-        this.explorationProbabilityMinimum = new FixedDoubleParameter(explorationProbabilityMinimum);
+        return new ExplorationPenaltyProbability(
+            explorationProbability.applyAsDouble(state.getRandom()),
+            imitationProbability.applyAsDouble(state.getRandom()),
+            incrementMultiplier.applyAsDouble(state.getRandom()),
+            explorationProbabilityMinimum.applyAsDouble(state.getRandom())
+        );
     }
 
     public DoubleParameter getExplorationProbability() {
@@ -99,7 +102,8 @@ public class ExplorationPenaltyProbabilityFactory
     }
 
     public void setExplorationProbabilityMinimum(
-            DoubleParameter explorationProbabilityMinimum) {
+        DoubleParameter explorationProbabilityMinimum
+    ) {
         this.explorationProbabilityMinimum = explorationProbabilityMinimum;
     }
 }

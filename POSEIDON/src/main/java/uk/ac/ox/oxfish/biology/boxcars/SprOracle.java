@@ -38,13 +38,11 @@ public class SprOracle implements AdditionalStartable {
     private final double maturityLength;
 
     private final int dayOfMeasurement;
-
-    private double spr = Double.NaN;
-
     /**
      * the Spawning biomass (in kg) for virgin fish
      */
     private final double virginSpawningBiomass;
+    private double spr = Double.NaN;
     private int spawningSubdivision;
 
     public SprOracle(Species species, double maturityLength, int dayOfMeasurement, double virginSpawningBiomass) {
@@ -80,7 +78,7 @@ public class SprOracle implements AdditionalStartable {
     }
 
     private void updateSPR(FishState model) {
-      //  System.out.println("Observed SPR");
+        //  System.out.println("Observed SPR");
         double spawningBiomass = 0;
         for (int i = 0; i < species.getNumberOfBins(); i++) {
             spawningSubdivision = 0;

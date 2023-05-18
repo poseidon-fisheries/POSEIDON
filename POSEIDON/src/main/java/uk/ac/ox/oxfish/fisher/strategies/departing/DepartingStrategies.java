@@ -60,6 +60,7 @@ public class DepartingStrategies {
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private DepartingStrategies() {}
+    private DepartingStrategies() {
+    }
 
 }

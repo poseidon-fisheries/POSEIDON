@@ -33,22 +33,29 @@ public class FixedRecruitmentProcessTest {
     public void fixedRecruits() throws Exception {
 
         FixedRecruitmentProcess fixedRecruitmentProcess = new FixedRecruitmentProcess(365);
-        assertEquals(fixedRecruitmentProcess.recruit(mock(Species.class),
-                                                     mock(Meristics.class),
-                                                     mock(StructuredAbundance.class),
-                                                     12,
-                                                     365),
-                     365d,
-                     0.001);
+        assertEquals(
+            fixedRecruitmentProcess.recruit(
+                mock(Species.class),
+                mock(Meristics.class),
+                mock(StructuredAbundance.class),
+                12,
+                365
+            ),
+            365d,
+            0.001
+        );
 
-        assertEquals(fixedRecruitmentProcess.recruit(mock(Species.class),
-                                                     mock(Meristics.class),
-                                                     mock(StructuredAbundance.class),
-                                                     12,
-                                                     1),
-                     1d,
-                     0.001);
-
+        assertEquals(
+            fixedRecruitmentProcess.recruit(
+                mock(Species.class),
+                mock(Meristics.class),
+                mock(StructuredAbundance.class),
+                12,
+                1
+            ),
+            1d,
+            0.001
+        );
 
 
     }

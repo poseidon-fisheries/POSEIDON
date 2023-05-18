@@ -29,9 +29,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
  * Allocates only within a bound and within depth
  * Created by carrknight on 7/11/17.
  */
-public class DepthAllocatorDecorator implements BiomassAllocator{
-
-
+public class DepthAllocatorDecorator implements BiomassAllocator {
 
 
     private final double minDepth;
@@ -42,13 +40,14 @@ public class DepthAllocatorDecorator implements BiomassAllocator{
 
 
     public DepthAllocatorDecorator(
-            double minDepth,
-            double maxDepth,
-            BiomassAllocator delegate) {
+        double minDepth,
+        double maxDepth,
+        BiomassAllocator delegate
+    ) {
         this.minDepth = minDepth;
         this.maxDepth = maxDepth;
         this.delegate = delegate;
-        Preconditions.checkArgument(minDepth<=maxDepth, "allocator depth bound badly defined");
+        Preconditions.checkArgument(minDepth <= maxDepth, "allocator depth bound badly defined");
     }
 
 
@@ -63,11 +62,12 @@ public class DepthAllocatorDecorator implements BiomassAllocator{
      */
     @Override
     public double allocate(
-            SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
-        if(
-                tile.getAltitude()<=0 &&
-                -tile.getAltitude()>=minDepth && -tile.getAltitude()<=maxDepth
-                )
+        SeaTile tile, NauticalMap map, MersenneTwisterFast random
+    ) {
+        if (
+            tile.getAltitude() <= 0 &&
+                -tile.getAltitude() >= minDepth && -tile.getAltitude() <= maxDepth
+        )
             return delegate.allocate(tile, map, random);
         else
             return 0d;

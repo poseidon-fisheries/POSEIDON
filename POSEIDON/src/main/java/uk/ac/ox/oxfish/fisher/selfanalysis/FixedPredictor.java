@@ -55,7 +55,7 @@ public class FixedPredictor implements Predictor {
      */
     @Override
     public double probabilityBelowThis(double level) {
-        if(level >= fixedValue)
+        if (level >= fixedValue)
             return 1;
         else
             return 0;
@@ -72,15 +72,14 @@ public class FixedPredictor implements Predictor {
      */
     @Override
     public double probabilitySumBelowThis(double level, int elementsInSum) {
-        if(level >= fixedValue * elementsInSum)
+        if (level >= fixedValue * elementsInSum)
             return 1;
         else
             return 0;
     }
 
     @Override
-    public void start(FishState model, Fisher fisher)
-    {
+    public void start(FishState model, Fisher fisher) {
         //ignored
 
     }

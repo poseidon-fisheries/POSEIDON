@@ -35,14 +35,13 @@ import java.util.*;
  * It steps itself aging the memories contained and has a fixed chance each day of forgetting them
  * Created by carrknight on 7/27/15.
  */
-public class LocationMemories<T> implements Startable, Steppable
-{
+public class LocationMemories<T> implements Startable, Steppable {
 
 
     /**
      * a map of each sea-tile with its most recent memory
      */
-    private final Map<SeaTile,LocationMemory<T>> memories;
+    private final Map<SeaTile, LocationMemory<T>> memories;
 
     private final double dailyForgettingProbability;
 
@@ -50,19 +49,18 @@ public class LocationMemories<T> implements Startable, Steppable
 
 
     private final int minimumNumberOfMemoriesBeforeForgetting;
-
+    private Stoppable receipt;
 
     public LocationMemories(
-            double dailyForgettingProbability,
-            int minimumMemoryAgeInDaysBeforeForgetting,
-            int minimumNumberOfMemoriesBeforeForgetting) {
+        double dailyForgettingProbability,
+        int minimumMemoryAgeInDaysBeforeForgetting,
+        int minimumNumberOfMemoriesBeforeForgetting
+    ) {
         this.memories = new HashMap<>();
         this.dailyForgettingProbability = dailyForgettingProbability;
         this.minimumMemoryAgeInDaysBeforeForgetting = minimumMemoryAgeInDaysBeforeForgetting;
         this.minimumNumberOfMemoriesBeforeForgetting = minimumNumberOfMemoriesBeforeForgetting;
     }
-
-    private Stoppable receipt;
 
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
@@ -84,18 +82,16 @@ public class LocationMemories<T> implements Startable, Steppable
     }
 
     @Override
-    public void step(SimState simState)
-    {
+    public void step(SimState simState) {
 
         LinkedList<SeaTile> toRemove = new LinkedList<>();
 
-        if(memories.size() > minimumNumberOfMemoriesBeforeForgetting)
-        {
+        if (memories.size() > minimumNumberOfMemoriesBeforeForgetting) {
             for (Map.Entry<SeaTile, LocationMemory<T>> memory : memories.entrySet()) {
                 int age = memory.getValue().age();
-                if (age >= minimumMemoryAgeInDaysBeforeForgetting )
-                    if(dailyForgettingProbability>=1 ||
-                            ((FishState) simState).getRandom().nextBoolean(dailyForgettingProbability))
+                if (age >= minimumMemoryAgeInDaysBeforeForgetting)
+                    if (dailyForgettingProbability >= 1 ||
+                        ((FishState) simState).getRandom().nextBoolean(dailyForgettingProbability))
                         toRemove.add(memory.getKey());
 
             }
@@ -108,12 +104,11 @@ public class LocationMemories<T> implements Startable, Steppable
     /**
      * grab the location whose memory is "best" according to the given comparator
      */
-    public SeaTile getBestFishingSpotInMemory(Comparator<LocationMemory<T>> comparator)
-    {
+    public SeaTile getBestFishingSpotInMemory(Comparator<LocationMemory<T>> comparator) {
 
         Optional<LocationMemory<T>> best = memories.values().stream().max(comparator);
 
-        if(best.isPresent())
+        if (best.isPresent())
             return best.get().getSpot();
         else
             return null;
@@ -121,19 +116,19 @@ public class LocationMemories<T> implements Startable, Steppable
 
     /**
      * memorize a new event!
+     *
      * @param memory what to remember
      */
-    public void memorize(T memory, SeaTile tile)
-    {
+    public void memorize(T memory, SeaTile tile) {
         memories.put(tile, new LocationMemory<>(tile, memory));
     }
 
     /**
-
+     *
      */
     public T getMemory(SeaTile key) {
         LocationMemory<T> memory = memories.get(key);
-        if(memory != null)
+        if (memory != null)
             return memory.getInformation();
         else
             return null;
@@ -146,7 +141,7 @@ public class LocationMemories<T> implements Startable, Steppable
      * @return Value for property 'memories'.
      */
     public Map<SeaTile,
-            LocationMemory<T>> getMemories() {
+        LocationMemory<T>> getMemories() {
         return memories;
     }
 }

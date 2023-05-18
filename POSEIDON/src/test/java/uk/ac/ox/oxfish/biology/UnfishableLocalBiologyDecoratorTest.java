@@ -32,22 +32,22 @@ public class UnfishableLocalBiologyDecoratorTest {
     public void protects() throws Exception {
 
 
-        LocalBiology decorated = mock(LocalBiology.class);
-        UnfishableLocalBiologyDecorator decorator = new UnfishableLocalBiologyDecorator(
-                1,
-                decorated
+        final LocalBiology decorated = mock(LocalBiology.class);
+        final UnfishableLocalBiologyDecorator decorator = new UnfishableLocalBiologyDecorator(
+            1,
+            decorated
         );
 
-        FishState state = mock(FishState.class);
+        final FishState state = mock(FishState.class);
         when(state.getYear()).thenReturn(0);
         decorator.start(state);
 
-        decorator.reactToThisAmountOfBiomassBeingFished(null,null,null);
-        verify(decorated,never()).reactToThisAmountOfBiomassBeingFished(any(),any(),any());
+        decorator.reactToThisAmountOfBiomassBeingFished(null, null, null);
+        verify(decorated, never()).reactToThisAmountOfBiomassBeingFished(any(), any(), any());
 
 
         when(state.getYear()).thenReturn(1);
-        decorator.reactToThisAmountOfBiomassBeingFished(null,null,null);
-        verify(decorated,times(1)).reactToThisAmountOfBiomassBeingFished(any(),any(),any());
+        decorator.reactToThisAmountOfBiomassBeingFished(null, null, null);
+        verify(decorated, times(1)).reactToThisAmountOfBiomassBeingFished(any(), any(), any());
     }
 }

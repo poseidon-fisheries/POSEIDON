@@ -18,11 +18,12 @@ public class FarOffPort {
     private final Coordinate coordinate;
 
 
-
-    public FarOffPort(Port port,
-                      SeaTile landTilePortSitsOn,
-                      SeaTile exitOnMap,
-                      double distanceToExit, Coordinate coordinate) {
+    public FarOffPort(
+        Port port,
+        SeaTile landTilePortSitsOn,
+        SeaTile exitOnMap,
+        double distanceToExit, Coordinate coordinate
+    ) {
         this.port = port;
         this.landTilePortSitsOn = landTilePortSitsOn;
         this.exitOnMap = exitOnMap;
@@ -30,7 +31,6 @@ public class FarOffPort {
 
         this.coordinate = coordinate;
     }
-
 
 
     public Port getPort() {

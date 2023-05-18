@@ -50,13 +50,11 @@ public class ArrayFixedPriceMarketTest {
         state.schedule.step(state);
 
         double firstPrice = state.getPorts().iterator().next().getDefaultMarketMap().getMarket(
-                state.getSpecies().get(0)).getMarginalPrice();
+            state.getSpecies().get(0)).getMarginalPrice();
         double secondPrice = state.getPorts().iterator().next().getDefaultMarketMap().getMarket(
-                state.getSpecies().get(1)).getMarginalPrice();
-        assertEquals(firstPrice,20,.0001);
-        assertEquals(secondPrice,-10,.0001);
-
-
+            state.getSpecies().get(1)).getMarginalPrice();
+        assertEquals(firstPrice, 20, .0001);
+        assertEquals(secondPrice, -10, .0001);
 
 
     }

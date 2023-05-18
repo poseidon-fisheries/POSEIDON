@@ -16,28 +16,22 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 public class DelayGearDecorator implements GearDecorator {
 
 
+    private final int hoursItTakeToFish;
     /**
      * something we return when we aren't fishing. Made as a singleton so that we don't built tons of arrays we don't care about
      */
     private Catch emptyCatchSingleton;
-
-
     private Gear delegate;
-
-
-    private final int hoursItTakeToFish;
-
-
     private int hoursWaiting = 0;
 
     public DelayGearDecorator(Gear delegate, int hoursItTakeToFish) {
         this.delegate = delegate;
         this.hoursItTakeToFish = hoursItTakeToFish;
-        Preconditions.checkArgument(hoursItTakeToFish>=0);
-        if(hoursItTakeToFish==1)
+        Preconditions.checkArgument(hoursItTakeToFish >= 0);
+        if (hoursItTakeToFish == 1)
             Log.warn("It's weird to set gear delay to 1!");
 
-        hoursWaiting=0;
+        hoursWaiting = 0;
     }
 
 
@@ -53,38 +47,39 @@ public class DelayGearDecorator implements GearDecorator {
 
     @Override
     public boolean isSame(Gear o) {
-        if(o instanceof DelayGearDecorator)
-        {
+        if (o instanceof DelayGearDecorator) {
             return ((DelayGearDecorator) o).delegate.isSame(this.delegate) &&
-                    this.hoursItTakeToFish == ((DelayGearDecorator) o).hoursItTakeToFish;
-        }
-        else
+                this.hoursItTakeToFish == ((DelayGearDecorator) o).hoursItTakeToFish;
+        } else
             return false;
 
 
     }
 
     @Override
-    public Catch fish(Fisher fisher, LocalBiology localBiology, SeaTile context, int hoursSpentFishing, GlobalBiology modelBiology) {
+    public Catch fish(
+        Fisher fisher,
+        LocalBiology localBiology,
+        SeaTile context,
+        int hoursSpentFishing,
+        GlobalBiology modelBiology
+    ) {
 
-        hoursWaiting+=hoursSpentFishing;
-        if(hoursWaiting>=hoursItTakeToFish)
-        {
+        hoursWaiting += hoursSpentFishing;
+        if (hoursWaiting >= hoursItTakeToFish) {
             Catch toReturn = delegate.fish(fisher, localBiology, context, hoursSpentFishing, modelBiology);
-            hoursWaiting-=hoursItTakeToFish;
-            assert (hoursWaiting>=0) & hoursWaiting<hoursItTakeToFish;
+            hoursWaiting -= hoursItTakeToFish;
+            assert (hoursWaiting >= 0) & hoursWaiting < hoursItTakeToFish;
 
             return toReturn;
-        }
-        else
+        } else
             return getEmptyCatchSingleton(modelBiology.getSize());
 
     }
 
-    private Catch getEmptyCatchSingleton(int numberOfSpecies){
+    private Catch getEmptyCatchSingleton(int numberOfSpecies) {
 
-        if(emptyCatchSingleton==null)
-        {
+        if (emptyCatchSingleton == null) {
             emptyCatchSingleton = new Catch(new double[numberOfSpecies]);
         }
 
@@ -103,12 +98,17 @@ public class DelayGearDecorator implements GearDecorator {
      * this returns the delegate expected catch / hours it takes to catch it
      */
     @Override
-    public double[] expectedHourlyCatch(Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+    public double[] expectedHourlyCatch(
+        Fisher fisher,
+        SeaTile where,
+        int hoursSpentFishing,
+        GlobalBiology modelBiology
+    ) {
 
         double[] delegate = this.delegate.expectedHourlyCatch(fisher, where, hoursSpentFishing, modelBiology);
         for (int i = 0; i < delegate.length; i++) {
 
-            delegate[i] = delegate[i]/(double)hoursItTakeToFish;
+            delegate[i] = delegate[i] / (double) hoursItTakeToFish;
         }
         return delegate;
     }
@@ -116,12 +116,11 @@ public class DelayGearDecorator implements GearDecorator {
     @Override
     public Gear makeCopy() {
         return
-                new DelayGearDecorator(
-                        delegate.makeCopy(),
-                        this.hoursItTakeToFish
-                );
+            new DelayGearDecorator(
+                delegate.makeCopy(),
+                this.hoursItTakeToFish
+            );
     }
-
 
 
 }

@@ -60,5 +60,6 @@ public class NumericalGeographicalRegressions {
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private NumericalGeographicalRegressions() { }
+    private NumericalGeographicalRegressions() {
+    }
 }

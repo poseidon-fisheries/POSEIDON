@@ -15,12 +15,15 @@ public class HockeyStickRecruitment extends YearlyRecruitmentProcess {
     final private double lengthAtMaturity;
 
     final private double virginSpawningBiomass;
+    private NoiseMaker noiseMaker = new NoNoiseMaker();
 
-    public HockeyStickRecruitment(boolean recruitEveryday,
-                                  double hinge,
-                                  double virginRecruits,
-                                  double lengthAtMaturity,
-                                  double virginSpawningBiomass) {
+    public HockeyStickRecruitment(
+        boolean recruitEveryday,
+        double hinge,
+        double virginRecruits,
+        double lengthAtMaturity,
+        double virginSpawningBiomass
+    ) {
         super(recruitEveryday);
         this.hinge = hinge;
         this.virginRecruits = virginRecruits;
@@ -28,16 +31,12 @@ public class HockeyStickRecruitment extends YearlyRecruitmentProcess {
         this.virginSpawningBiomass = virginSpawningBiomass;
     }
 
-    private NoiseMaker noiseMaker = new NoNoiseMaker();
-
-
-
     @Override
     protected double computeYearlyRecruitment(Species species, Meristics meristics, StructuredAbundance abundance) {
         double depletion = LinearSSBRatioSpawning.
-                computeDepletion(species, meristics, abundance, lengthAtMaturity, virginSpawningBiomass);
+            computeDepletion(species, meristics, abundance, lengthAtMaturity, virginSpawningBiomass);
 
-        return Math.min(1d,depletion/hinge) * virginRecruits * (1+noiseMaker.get());
+        return Math.min(1d, depletion / hinge) * virginRecruits * (1 + noiseMaker.get());
     }
 
     @Override

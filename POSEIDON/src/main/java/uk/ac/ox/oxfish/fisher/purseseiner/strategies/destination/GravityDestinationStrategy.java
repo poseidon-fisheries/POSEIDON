@@ -31,8 +31,6 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.utility.Dummyable;
 
 import java.util.Map;
 import java.util.Optional;
@@ -55,10 +53,10 @@ public class GravityDestinationStrategy implements DestinationStrategy {
     private final AttractionWeightLoader attractionWeightLoader;
     private final ToDoubleFunction<Fisher> maxTravelTimeLoader;
     private final Predicate<SeaTile> isValidDestination;
+    private final Set<AttractionField> attractionFields;
     private Map<AttractionField, Double> attractionWeights;
     private SeaTile destination = null;
-
-    private final Set<AttractionField> attractionFields;
+    private double maxTravelTime;
 
     GravityDestinationStrategy(
         final AttractionWeightLoader attractionWeightLoader,
@@ -71,7 +69,6 @@ public class GravityDestinationStrategy implements DestinationStrategy {
         this.isValidDestination = isValidDestination;
         this.attractionFields = attractionFields;
     }
-    private double maxTravelTime;
 
     public Set<AttractionField> getAttractionFields() {
         return attractionFields;

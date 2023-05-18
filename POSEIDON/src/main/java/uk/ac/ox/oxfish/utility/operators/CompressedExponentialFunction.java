@@ -18,11 +18,11 @@
 
 package uk.ac.ox.oxfish.utility.operators;
 
+import java.util.function.DoubleUnaryOperator;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.exp;
 import static java.lang.Math.pow;
-
-import java.util.function.DoubleUnaryOperator;
 
 public class CompressedExponentialFunction implements DoubleUnaryOperator {
 

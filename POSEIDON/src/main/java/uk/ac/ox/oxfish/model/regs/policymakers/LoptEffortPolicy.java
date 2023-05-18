@@ -20,50 +20,56 @@ public class LoptEffortPolicy extends Controller {
     private double maxChangePerYear = .1;
 
 
-    public LoptEffortPolicy(String meanLengthColumnName,
-                            double buffer,
-                            double lengthTarget,
-                            int averageMeanLengthOverTheseManyYears,
-                            Actuator<FishState, Double> effortActuator,
-                            boolean closeEntryWhenNeeded) {
+    public LoptEffortPolicy(
+        String meanLengthColumnName,
+        double buffer,
+        double lengthTarget,
+        int averageMeanLengthOverTheseManyYears,
+        Actuator<FishState, Double> effortActuator,
+        boolean closeEntryWhenNeeded
+    ) {
 
         super(
-                (Sensor<FishState, Double>) system -> {
-                    DoubleSummaryStatistics lengthSummaryStatistic = new DoubleSummaryStatistics();
-                    for (int yearBack = 0; yearBack < averageMeanLengthOverTheseManyYears; yearBack++) {
-                        lengthSummaryStatistic.accept(
-                                system.getYearlyDataSet().getColumn(meanLengthColumnName).
-                                        getDatumXStepsAgo(yearBack)
-                        );
+            (Sensor<FishState, Double>) system -> {
+                DoubleSummaryStatistics lengthSummaryStatistic = new DoubleSummaryStatistics();
+                for (int yearBack = 0; yearBack < averageMeanLengthOverTheseManyYears; yearBack++) {
+                    lengthSummaryStatistic.accept(
+                        system.getYearlyDataSet().getColumn(meanLengthColumnName).
+                            getDatumXStepsAgo(yearBack)
+                    );
 
-                    }
+                }
 
-                    return lengthSummaryStatistic.getAverage();
-                },
-                (Sensor<FishState, Double>) system ->
-                        lengthTarget,
-                closeEntryWhenNeeded ? new CloseReopenOnEffortDecorator(effortActuator):
-                        effortActuator,
-                365
+                return lengthSummaryStatistic.getAverage();
+            },
+            (Sensor<FishState, Double>) system ->
+                lengthTarget,
+            closeEntryWhenNeeded ? new CloseReopenOnEffortDecorator(effortActuator) :
+                effortActuator,
+            365
         );
         this.buffer = buffer;
     }
 
 
     @Override
-    public double computePolicy(double meanLengthColumn,
-                                double lengthTarget,
-                                FishState model, double oldPolicy) {
+    public double computePolicy(
+        double meanLengthColumn,
+        double lengthTarget,
+        FishState model, double oldPolicy
+    ) {
 
 
-        double ratio =  meanLengthColumn / lengthTarget;
+        double ratio = meanLengthColumn / lengthTarget;
         //TAE((1−buffer)(w+(1−w)r))
-        double effort = theoreticalSuggestedEffort *((1-buffer) * (0.5 + 0.5 * ratio));
+        double effort = theoreticalSuggestedEffort * ((1 - buffer) * (0.5 + 0.5 * ratio));
 
-        theoreticalSuggestedEffort = Math.max(Math.min(effort,theoreticalSuggestedEffort*(1d+maxChangePerYear)),
-                                              theoreticalSuggestedEffort*(1d-maxChangePerYear));
+        theoreticalSuggestedEffort = Math.max(
+            Math.min(effort, theoreticalSuggestedEffort * (1d + maxChangePerYear)),
+            theoreticalSuggestedEffort * (1d - maxChangePerYear)
+        );
 
-        return Math.min(1d,theoreticalSuggestedEffort);
+        return Math.min(1d, theoreticalSuggestedEffort);
 
     }
 

@@ -144,7 +144,12 @@ public class Catch {
      * @param correctSpecies
      * @param biology
      */
-    public Catch(final double[] maleAbundance, final double[] femaleAbundance, final Species correctSpecies, final GlobalBiology biology) {
+    public Catch(
+        final double[] maleAbundance,
+        final double[] femaleAbundance,
+        final Species correctSpecies,
+        final GlobalBiology biology
+    ) {
         this.abundance = new StructuredAbundance[biology.getSize()];
         for (final Species index : biology.getSpecies()) {
             if (correctSpecies == index)
@@ -264,6 +269,10 @@ public class Catch {
 
     }
 
+    public boolean hasAbundanceInformation() {
+        return abundance != null;
+    }
+
     /**
      * Getter for property 'totalWeight'.
      *
@@ -288,10 +297,6 @@ public class Catch {
     public double getWeightCaught(final Species species, final int bin) {
         Preconditions.checkArgument(hasAbundanceInformation());
         return FishStateUtilities.weigh(abundance[species.getIndex()], species.getMeristics(), bin);
-    }
-
-    public boolean hasAbundanceInformation() {
-        return abundance != null;
     }
 
     public double getWeightCaught(final Species species, final int subdivision, final int bin) {

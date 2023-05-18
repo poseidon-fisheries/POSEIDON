@@ -27,5 +27,5 @@ import java.util.function.Function;
  * A serializable function
  * Created by carrknight on 4/20/16.
  */
-public interface Gatherer<T> extends Function<T,Double>, Serializable {
+public interface Gatherer<T> extends Function<T, Double>, Serializable {
 }

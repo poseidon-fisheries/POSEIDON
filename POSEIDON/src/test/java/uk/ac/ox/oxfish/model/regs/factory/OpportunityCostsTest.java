@@ -56,22 +56,32 @@ public class OpportunityCostsTest {
         scenario.setMapMakerDedicatedRandomSeed(100l); //places port around the middle
 
         state.start();
-        for(Fisher fisher : state.getFishers())
+        for (Fisher fisher : state.getFishers())
             fisher.getOpportunityCosts().add(new Cost() {
                                                  @Override
-                                                 public double cost(Fisher fisher, FishState model, TripRecord record, double revenue, double durationInHours) {
+                                                 public double cost(
+                                                     Fisher fisher,
+                                                     FishState model,
+                                                     TripRecord record,
+                                                     double revenue,
+                                                     double durationInHours
+                                                 ) {
                                                      //account for opportunity costs
                                                      SpecificQuotaRegulation regs = ((SpecificQuotaRegulation) fisher.getRegulation());
                                                      double biomass = record.getSoldCatch()[regs.getProtectedSpecies().getIndex()];
-                                                     if(biomass > 0)
-                                                     {
-                                                         return 1000*biomass;
+                                                     if (biomass > 0) {
+                                                         return 1000 * biomass;
                                                      }
                                                      return 0d;
                                                  }
 
                                                  @Override
-                                                 public double expectedAdditionalCosts(Fisher fisher, double additionalTripHours, double additionalEffortHours, double additionalKmTravelled) {
+                                                 public double expectedAdditionalCosts(
+                                                     Fisher fisher,
+                                                     double additionalTripHours,
+                                                     double additionalEffortHours,
+                                                     double additionalKmTravelled
+                                                 ) {
                                                      return 0;
                                                  }
                                              }
@@ -85,13 +95,13 @@ public class OpportunityCostsTest {
         state.schedule.step(state);
         //grab yearly fishing data
         final double protectedSpecie = state.getYearlyDataSet().getColumn(
-                state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME).getLatest();
+            state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME).getLatest();
         final double unprotected = state.getYearlyDataSet().getColumn(
-                state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME).getLatest();
+            state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME).getLatest();
 
 
-        System.out.println(unprotected/(protectedSpecie + unprotected));
-        assertTrue(unprotected/(protectedSpecie+unprotected)>.9); //90% of all the fishing ought to be from
+        System.out.println(unprotected / (protectedSpecie + unprotected));
+        assertTrue(unprotected / (protectedSpecie + unprotected) > .9); //90% of all the fishing ought to be from
         //the non-ITQ specie
 
     }
@@ -114,22 +124,32 @@ public class OpportunityCostsTest {
         scenario.setMapMakerDedicatedRandomSeed(100l); //places port around the middle
 
         state.start();
-        for(Fisher fisher : state.getFishers())
+        for (Fisher fisher : state.getFishers())
             fisher.getOpportunityCosts().add(new Cost() {
                 @Override
-                public double cost(Fisher fisher, FishState model, TripRecord record, double revenue, double durationInHours) {
+                public double cost(
+                    Fisher fisher,
+                    FishState model,
+                    TripRecord record,
+                    double revenue,
+                    double durationInHours
+                ) {
                     //account for opportunity costs
                     SpecificQuotaRegulation regs = ((SpecificQuotaRegulation) fisher.getRegulation());
                     double biomass = record.getSoldCatch()[regs.getProtectedSpecies().getIndex()];
-                    if(biomass > 0)
-                    {
-                        return 1000*biomass;
+                    if (biomass > 0) {
+                        return 1000 * biomass;
                     }
                     return 0d;
                 }
 
                 @Override
-                public double expectedAdditionalCosts(Fisher fisher, double additionalTripHours, double additionalEffortHours, double additionalKmTravelled) {
+                public double expectedAdditionalCosts(
+                    Fisher fisher,
+                    double additionalTripHours,
+                    double additionalEffortHours,
+                    double additionalKmTravelled
+                ) {
                     return 0;
                 }
             });
@@ -141,13 +161,13 @@ public class OpportunityCostsTest {
         state.schedule.step(state);
         //grab yearly fishing data
         final double protectedSpecie = state.getYearlyDataSet().getColumn(
-                state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME).getLatest();
+            state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME).getLatest();
         final double unprotected = state.getYearlyDataSet().getColumn(
-                state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME).getLatest();
+            state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME).getLatest();
 
 
-        System.out.println(unprotected/(protectedSpecie + unprotected));
-        assertTrue(unprotected/(protectedSpecie+unprotected)>.9); //90% of all the fishing ought to be from
+        System.out.println(unprotected / (protectedSpecie + unprotected));
+        assertTrue(unprotected / (protectedSpecie + unprotected) > .9); //90% of all the fishing ought to be from
         //the non-ITQ specie
 
     }

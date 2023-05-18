@@ -26,8 +26,14 @@ public class IterativeAveragingAccumulator<V extends Number> extends AbstractAve
 
     private final Averager<V> averager = new IterativeAverage<>();
 
-    @Override Averager<V> getAverager() { return averager; }
+    @Override
+    Averager<V> getAverager() {
+        return averager;
+    }
 
-    @Override public String getNameFormat() { return "Average %s"; }
+    @Override
+    public String getNameFormat() {
+        return "Average %s";
+    }
 
 }

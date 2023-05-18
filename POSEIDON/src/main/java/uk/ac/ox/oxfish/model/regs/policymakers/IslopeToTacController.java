@@ -10,29 +10,30 @@ import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 public class IslopeToTacController extends Controller {
     public IslopeToTacController(
-            ISlope islope) {
+        ISlope islope
+    ) {
         super(
-                //this is a simplified controller where target to policy requires no adjustment
-                (Sensor<FishState, Double>) system -> -1d,
-                islope,
-                //actuator just take the quota and sets it as a single TAC
-                //for everybody!
-                new Actuator<FishState, Double>() {
-                    @Override
-                    public void apply(FishState subject, Double tac, FishState model) {
-                        if(!Double.isFinite(tac))
-                            return;
+            //this is a simplified controller where target to policy requires no adjustment
+            (Sensor<FishState, Double>) system -> -1d,
+            islope,
+            //actuator just take the quota and sets it as a single TAC
+            //for everybody!
+            new Actuator<FishState, Double>() {
+                @Override
+                public void apply(FishState subject, Double tac, FishState model) {
+                    if (!Double.isFinite(tac))
+                        return;
 
-                        final MonoQuotaRegulation quotaRegulation =
-                                new MonoQuotaRegulation(
-                                tac
+                    final MonoQuotaRegulation quotaRegulation =
+                        new MonoQuotaRegulation(
+                            tac
                         );
-                        for (Fisher fisher : model.getFishers()) {
-                            fisher.setRegulation(quotaRegulation);
-                        }
+                    for (Fisher fisher : model.getFishers()) {
+                        fisher.setRegulation(quotaRegulation);
                     }
-                },
-                islope.getMaxTimeLag()*365
+                }
+            },
+            islope.getMaxTimeLag() * 365
         );
     }
 
@@ -41,19 +42,21 @@ public class IslopeToTacController extends Controller {
     public void start(FishState model) {
         super.start(model);
 
-        model.getYearlyDataSet().registerGatherer("TAC from ISLOPE-TAC Controller",
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        return getPolicy();
-                    }
-                },
-                Double.NaN);
+        model.getYearlyDataSet().registerGatherer(
+            "TAC from ISLOPE-TAC Controller",
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(FishState fishState) {
+                    return getPolicy();
+                }
+            },
+            Double.NaN
+        );
     }
 
     @Override
     public double computePolicy(double currentVariable, double target, FishState model, double oldPolicy) {
-        assert currentVariable==-1;
+        assert currentVariable == -1;
 
         System.out.println("target TAC is: " + target);
         return target;

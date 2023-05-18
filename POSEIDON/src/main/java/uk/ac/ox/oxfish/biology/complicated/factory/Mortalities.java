@@ -46,6 +46,7 @@ public class Mortalities {
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private Mortalities() {}
+    private Mortalities() {
+    }
 
 }

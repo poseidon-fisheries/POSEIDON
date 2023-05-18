@@ -24,12 +24,10 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 
 /**
- * 
  * An objective function that judges people by their latest finished trip profits per hour
  * Created by carrknight on 8/7/15.
  */
-public class HourlyProfitInTripObjective extends TripBasedObjectiveFunction
-{
+public class HourlyProfitInTripObjective extends TripBasedObjectiveFunction {
 
 
     /**
@@ -37,18 +35,18 @@ public class HourlyProfitInTripObjective extends TripBasedObjectiveFunction
      */
     private final boolean includingOpportunityCosts;
 
-    public HourlyProfitInTripObjective(boolean includingOpportunityCosts) {
-        this.includingOpportunityCosts = includingOpportunityCosts;
-    }
-
     public HourlyProfitInTripObjective() {
         this(true);
     }
 
+    public HourlyProfitInTripObjective(boolean includingOpportunityCosts) {
+        this.includingOpportunityCosts = includingOpportunityCosts;
+    }
 
     @Override
     protected double extractUtilityFromTrip(
-            Fisher observer, TripRecord tripRecord, Fisher Observed) {
+        Fisher observer, TripRecord tripRecord, Fisher Observed
+    ) {
         return tripRecord.getProfitPerHour(includingOpportunityCosts);
     }
 }

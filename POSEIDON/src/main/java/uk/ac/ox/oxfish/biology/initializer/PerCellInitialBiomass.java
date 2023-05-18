@@ -34,7 +34,8 @@ public class PerCellInitialBiomass implements InitialBiomass {
 
     @Override
     public double getInitialBiomass(
-            NauticalMap map, Species species, int numberOfHabitableCells) {
+        NauticalMap map, Species species, int numberOfHabitableCells
+    ) {
         return valuePerCell * numberOfHabitableCells;
     }
 }

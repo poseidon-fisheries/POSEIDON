@@ -23,30 +23,31 @@ package uk.ac.ox.oxfish.maximization.generic;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
 /**
  * like last step target, but with different exponent above and below
  */
 public class AsymmetricFixedDataLastStepTarget implements DataTarget {
 
 
-
-
+    public static boolean VERBOSE = true;
     private double fixedTarget = 100;
-
     private double exponentAbove = 1;
-
     private double exponentBelow = 1;
-
-
     private String columnName = "Average Cash-Flow";
 
-    public static boolean VERBOSE = true;
 
+    public AsymmetricFixedDataLastStepTarget(
+        double fixedTarget, double exponentAbove, double exponentBelow, String columnName
+    ) {
+        this.fixedTarget = fixedTarget;
+        this.exponentAbove = exponentAbove;
+        this.exponentBelow = exponentBelow;
+        this.columnName = columnName;
+    }
+
+
+    public AsymmetricFixedDataLastStepTarget() {
+    }
 
     /**
      * computes distance from target (0 best, the higher the number the further away from optimum we are)
@@ -60,13 +61,13 @@ public class AsymmetricFixedDataLastStepTarget implements DataTarget {
         DataColumn simulationOutput = model.getYearlyDataSet().getColumn(columnName);
 
         double error;
-        if(simulationOutput.getLatest() > fixedTarget)
-            error = Math.pow(Math.abs(simulationOutput.getLatest() - fixedTarget),exponentAbove);
+        if (simulationOutput.getLatest() > fixedTarget)
+            error = Math.pow(Math.abs(simulationOutput.getLatest() - fixedTarget), exponentAbove);
         else
-            error = Math.pow(Math.abs(simulationOutput.getLatest() - fixedTarget),exponentBelow);
+            error = Math.pow(Math.abs(simulationOutput.getLatest() - fixedTarget), exponentBelow);
 
 
-        if(VERBOSE) {
+        if (VERBOSE) {
             System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
             System.out.println("column: " + columnName);
             System.out.println("output: " + simulationOutput.getLatest());
@@ -77,19 +78,6 @@ public class AsymmetricFixedDataLastStepTarget implements DataTarget {
         return error;
 
     }
-
-
-    public AsymmetricFixedDataLastStepTarget(
-            double fixedTarget, double exponentAbove, double exponentBelow, String columnName) {
-        this.fixedTarget = fixedTarget;
-        this.exponentAbove = exponentAbove;
-        this.exponentBelow = exponentBelow;
-        this.columnName = columnName;
-    }
-
-    public AsymmetricFixedDataLastStepTarget() {
-    }
-
 
     /**
      * Getter for property 'fixedTarget'.

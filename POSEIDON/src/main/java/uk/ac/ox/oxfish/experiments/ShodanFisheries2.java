@@ -46,12 +46,9 @@ import java.util.LinkedList;
 public class ShodanFisheries2 {
 
 
-    private static final int SIMULATION_PER_STEP = 2;
-
     public static final int VALUE_FUNCTION_DIMENSION = 6;
-
     public static final String directory = "shodan4";
-
+    private static final int SIMULATION_PER_STEP = 2;
 
     public static void main(String[] args) throws IOException {
 
@@ -60,11 +57,11 @@ public class ShodanFisheries2 {
         //do one lspiRun everything open
         FishState initialRun = oneRun(shodan, 0);
         double initialScore = 0;
-        for(Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
-            initialScore+=landing;
+        for (Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
+            initialScore += landing;
 
         BufferedWriter writer = new BufferedWriter(
-                new FileWriter(Paths.get("runs", directory, "shodan.csv").toFile(), true));
+            new FileWriter(Paths.get("runs", directory, "shodan.csv").toFile(), true));
         writer.newLine();
         writer.write("open," + initialScore);
         writer.close();
@@ -73,37 +70,35 @@ public class ShodanFisheries2 {
         shodan.setErrorRate(1);
         initialRun = oneRun(shodan, 0);
         initialScore = 0;
-        for(Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
-            initialScore+=landing;
+        for (Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
+            initialScore += landing;
 
         writer = new BufferedWriter(
-                new FileWriter(Paths.get("runs", directory, "shodan.csv").toFile(), true));
+            new FileWriter(Paths.get("runs", directory, "shodan.csv").toFile(), true));
         writer.newLine();
         writer.write("random," + initialScore);
         writer.close();
 
         //now start for real
         shodan.setErrorRate(.9);
-        for(int generation=0; generation<500; generation++)
-        {
+        for (int generation = 0; generation < 500; generation++) {
             shodan.generation = generation;
             writer = new BufferedWriter(
-                    new FileWriter(Paths.get("runs", directory, "shodan_input_"+
-                            generation + ".csv").toFile()));
+                new FileWriter(Paths.get("runs", directory, "shodan_input_" +
+                    generation + ".csv").toFile()));
 
-            for(int i=0; i<VALUE_FUNCTION_DIMENSION; i++)
-                writer.write("old_feature_"+i+",");
-            for(int i=0; i<VALUE_FUNCTION_DIMENSION; i++)
-                writer.write("new_feature_"+i+",");
+            for (int i = 0; i < VALUE_FUNCTION_DIMENSION; i++)
+                writer.write("old_feature_" + i + ",");
+            for (int i = 0; i < VALUE_FUNCTION_DIMENSION; i++)
+                writer.write("new_feature_" + i + ",");
             writer.write("reward,old_action,new_action");
             writer.close();
-
 
 
             for (int run = 0; run < SIMULATION_PER_STEP; run++) {
                 oneRun(shodan, System.currentTimeMillis());
                 //less error rate
-                shodan.setErrorRate(Math.max(shodan.getErrorRate()*.99,.05));
+                shodan.setErrorRate(Math.max(shodan.getErrorRate() * .99, .05));
             }
             shodan.regress();
             //make one lspiRun with error rate 0
@@ -111,18 +106,17 @@ public class ShodanFisheries2 {
             shodan.setErrorRate(0d);
             FishState referenceRun = oneRun(shodan, 0);
             double score = 0;
-            for(Double landing : referenceRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
-                score+=landing;
+            for (Double landing : referenceRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
+                score += landing;
 
             shodan.setErrorRate(errorRate);
             writer = new BufferedWriter(
-                    new FileWriter(Paths.get("runs", directory, "shodan.csv").toFile(), true));
+                new FileWriter(Paths.get("runs", directory, "shodan.csv").toFile(), true));
             writer.newLine();
-            System.out.println((generation+1) + "," + score);
+            System.out.println((generation + 1) + "," + score);
             writer.write(generation + "," + score);
             writer.close();
         }
-
 
 
     }
@@ -153,8 +147,8 @@ public class ShodanFisheries2 {
                     return;
 
                 //change oil price
-                for(Port port : state.getPorts())
-                    port.setGasPricePerLiter(state.getDayOfTheYear()/1000d);
+                for (Port port : state.getPorts())
+                    port.setGasPricePerLiter(state.getDayOfTheYear() / 1000d);
 
                 shodan.step(simState);
                 controller.setOpen(shodan.action == 0);
@@ -169,13 +163,12 @@ public class ShodanFisheries2 {
     }
 
 
-    private static class Shodan implements Steppable
-    {
+    private static class Shodan implements Steppable {
 
 
         public static final int INTERCEPT = 5;
         public static final int MONTHS_LEFT_INDEX = 4;
-        private  double[] oldFeatures;
+        private double[] oldFeatures;
 
         private Integer action;
 
@@ -184,19 +177,6 @@ public class ShodanFisheries2 {
 
 
         private int generation = 0;
-
-
-
-
-        public Shodan(int action,double errorRate) {
-            this.errorRate = errorRate;
-            this.action = action;
-            Arrays.fill(qParameterOpen, 0d);
-            Arrays.fill(qParameterClosed,0d);
-
-        }
-
-
         /*
          * store the features of S and S' separately. S will be used as x, S' will be used to compute Q.
          */
@@ -207,47 +187,29 @@ public class ShodanFisheries2 {
          */
         private LinkedList<Double> openRewards = new LinkedList<>();
         private LinkedList<Double> closedRewards = new LinkedList<>();
-
         private LinkedList<double[]> closedPreDecisionState = new LinkedList<>();
         private LinkedList<double[]> closedPostDecisionState = new LinkedList<>();
-
-
         /**
          * the betas of the linear regression when action is close
          */
         private double[] qParameterClosed = new double[VALUE_FUNCTION_DIMENSION];
-
         /**
          * the betas of the linear regression when action is open
          */
         private double[] qParameterOpen = new double[VALUE_FUNCTION_DIMENSION];
 
-        public double qValue(double[] features, boolean open)
-        {
-
-            if(features[MONTHS_LEFT_INDEX] <= FishStateUtilities.EPSILON)
-                return 0;
-
-            double sum =0;
-            double[] beta;
-            if(open)
-                beta=qParameterOpen;
-            else
-                beta=qParameterClosed;
-
-            assert beta.length == features.length;
-            for(int i=0; i<features.length; i++)
-                sum += beta[i] * features[i];
-            return sum;
+        public Shodan(int action, double errorRate) {
+            this.errorRate = errorRate;
+            this.action = action;
+            Arrays.fill(qParameterOpen, 0d);
+            Arrays.fill(qParameterClosed, 0d);
 
         }
-
 
         /**
          * called when enough data is accumulated
          */
-        public void regress()
-        {
+        public void regress() {
             qParameterOpen = computeBeta(openPreDecisionState, openPostDecisionState, openRewards);
             qParameterClosed = computeBeta(closedPreDecisionState, closedPostDecisionState, closedRewards);
 
@@ -260,44 +222,62 @@ public class ShodanFisheries2 {
         }
 
         private double[] computeBeta(
-                final LinkedList<double[]> preDecision, final LinkedList<double[]> postDecision,
-                final LinkedList<Double> rewards) {
+            final LinkedList<double[]> preDecision, final LinkedList<double[]> postDecision,
+            final LinkedList<Double> rewards
+        ) {
             assert postDecision.size() == preDecision.size();
-            assert preDecision.size() ==  rewards.size();
+            assert preDecision.size() == rewards.size();
             double[][] x = new double[preDecision.size()][VALUE_FUNCTION_DIMENSION];
             double[] y = new double[preDecision.size()];
             Iterator<double[]> pre = preDecision.iterator();
             Iterator<double[]> post = postDecision.iterator();
             Iterator<Double> rewardIterator = rewards.iterator();
-            int i=0;
-            while(pre.hasNext())
-            {
+            int i = 0;
+            while (pre.hasNext()) {
                 double[] features = pre.next();
                 x[i] = Arrays.copyOf(features, features.length);
                 //y is just reward plus max Q
                 double reward = rewardIterator.next();
                 double[] postFeatures = post.next();
-                double maxQ = Math.max(qValue(postFeatures,true),qValue(postFeatures,false));
-                y[i] = reward+ maxQ;
+                double maxQ = Math.max(qValue(postFeatures, true), qValue(postFeatures, false));
+                y[i] = reward + maxQ;
                 i++;
             }
             OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
             regression.setNoIntercept(true); //we bring our own
-            regression.newSampleData(y,x);
+            regression.newSampleData(y, x);
             return regression.estimateRegressionParameters();
         }
 
-        @Override
-        public void step(SimState simState)
-        {
+        public double qValue(double[] features, boolean open) {
 
-            FishState state = (FishState)simState;
-            double[] currentFeatures = factorize(state,oldFeatures == null?
-                    new double[VALUE_FUNCTION_DIMENSION] : oldFeatures);
+            if (features[MONTHS_LEFT_INDEX] <= FishStateUtilities.EPSILON)
+                return 0;
+
+            double sum = 0;
+            double[] beta;
+            if (open)
+                beta = qParameterOpen;
+            else
+                beta = qParameterClosed;
+
+            assert beta.length == features.length;
+            for (int i = 0; i < features.length; i++)
+                sum += beta[i] * features[i];
+            return sum;
+
+        }
+
+        @Override
+        public void step(SimState simState) {
+
+            FishState state = (FishState) simState;
+            double[] currentFeatures = factorize(state, oldFeatures == null ?
+                new double[VALUE_FUNCTION_DIMENSION] : oldFeatures);
             Iterator<Double> landings = state.getDailyDataSet().getColumn(
-                    "Average Cash-Flow").descendingIterator();
+                "Average Cash-Flow").descendingIterator();
             double reward = 0;
-            for(int i=0; i<30; i++)
+            for (int i = 0; i < 30; i++)
                 reward += landings.next();
 
             System.out.println("reward: " + reward);
@@ -305,22 +285,18 @@ public class ShodanFisheries2 {
 
             int previousAction = action;
             //update your actions
-            action = qValue(currentFeatures,true) >=  qValue(currentFeatures,false) ? 0 : 1;
+            action = qValue(currentFeatures, true) >= qValue(currentFeatures, false) ? 0 : 1;
             //random chance
-            if(state.getRandom().nextDouble()<errorRate)
+            if (state.getRandom().nextDouble() < errorRate)
                 action = state.getRandom().nextInt(2);
 
 
-            if(oldFeatures != null)
-            {
-                if(previousAction == 0)
-                {
+            if (oldFeatures != null) {
+                if (previousAction == 0) {
                     openPreDecisionState.add(oldFeatures);
                     openPostDecisionState.add(currentFeatures);
                     openRewards.add(reward);
-                }
-                else
-                {
+                } else {
                     closedPreDecisionState.add(oldFeatures);
                     closedPostDecisionState.add(currentFeatures);
                     closedRewards.add(reward);
@@ -330,16 +306,16 @@ public class ShodanFisheries2 {
                 BufferedWriter writer = null;
                 try {
                     writer = new BufferedWriter(
-                            new FileWriter(Paths.get("runs", directory, "shodan_input_"+
-                                    generation + ".csv").toFile(), true));
+                        new FileWriter(Paths.get("runs", directory, "shodan_input_" +
+                            generation + ".csv").toFile(), true));
                     writer.newLine();
                     //old features
-                    for(double feature : oldFeatures) {
+                    for (double feature : oldFeatures) {
                         writer.write(Double.toString(feature));
                         writer.write(",");
                     }
                     //new features
-                    for(double feature : currentFeatures) {
+                    for (double feature : currentFeatures) {
                         writer.write(Double.toString(feature));
                         writer.write(",");
                     }
@@ -363,12 +339,9 @@ public class ShodanFisheries2 {
             System.out.println(Arrays.toString(currentFeatures));
 
 
-
-
         }
 
-        private double[] factorize(FishState state,  double[] previousFactors)
-        {
+        private double[] factorize(FishState state, double[] previousFactors) {
 
             //landings, distance from port, cpue, % of tows south, months left till the end
             //averages daily landings, total distance, total cpue, total tows south
@@ -379,37 +352,37 @@ public class ShodanFisheries2 {
             double[] factors = new double[VALUE_FUNCTION_DIMENSION];
             //landings
             Iterator<Double> landings = state.getDailyDataSet().getColumn(
-                    "Species 0 Landings").descendingIterator();
-            for(int i=0; i<30; i++)
+                "Species 0 Landings").descendingIterator();
+            for (int i = 0; i < 30; i++)
                 factors[0] += landings.next();
             //distance from port
             Iterator<Double> distance = state.getDailyDataSet().getColumn(
-                    "Average Distance From Port").descendingIterator();
-            for(int i=0; i<30; i++)
+                "Average Distance From Port").descendingIterator();
+            for (int i = 0; i < 30; i++)
                 factors[1] += distance.next();
-            factors[1]/=30;
+            factors[1] /= 30;
             //cpue
             Iterator<Double> effort = state.getDailyDataSet().getColumn(
-                    "Total Effort").descendingIterator();
-            for(int i=0; i<30; i++)
+                "Total Effort").descendingIterator();
+            for (int i = 0; i < 30; i++)
                 factors[2] += effort.next();
-            factors[2]= factors[2] > 0 ? factors[0]/factors[2] : 0;
+            factors[2] = factors[2] > 0 ? factors[0] / factors[2] : 0;
 
-            factors[0]/=30;
+            factors[0] /= 30;
 
             //day of the year
-        //    factors[3]= state.getDayOfTheYear();
-          //  factors[3]= state.getDayOfTheYear();
+            //    factors[3]= state.getDayOfTheYear();
+            //  factors[3]= state.getDayOfTheYear();
             //months gone out
             ExternalOpenCloseSeason controller = (ExternalOpenCloseSeason) state.getFishers().get(0).getRegulation();
-            if(controller.isOpen())
-                factors[3]=0;
+            if (controller.isOpen())
+                factors[3] = 0;
             else
-                factors[3] = previousFactors[3]+1;
+                factors[3] = previousFactors[3] + 1;
 
 
             //month-left
-            factors[MONTHS_LEFT_INDEX] = (int)(240-state.getDay()/30);
+            factors[MONTHS_LEFT_INDEX] = (int) (240 - state.getDay() / 30);
 
             //intercept!
             factors[INTERCEPT] = 1;
@@ -444,13 +417,9 @@ public class ShodanFisheries2 {
          */
         public void setErrorRate(double errorRate) {
             this.errorRate = errorRate;
-            System.out.println("error rate:"+errorRate);
+            System.out.println("error rate:" + errorRate);
         }
     }
-
-
-
-
 
 
 }

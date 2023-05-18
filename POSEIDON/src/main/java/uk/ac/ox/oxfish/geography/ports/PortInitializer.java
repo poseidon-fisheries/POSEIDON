@@ -41,16 +41,18 @@ public interface PortInitializer {
      * Create and add ports to map, return them as a list.
      * Supposedly this is called during the early scenario setup. The map is built, the biology is built
      * and the marketmap can be built.
-     * @param map the map to place ports in
+     *
+     * @param map            the map to place ports in
      * @param mapmakerRandom the randomizer
-     * @param marketFactory a function that returns the market associated with a location. We might refactor this at some point*
+     * @param marketFactory  a function that returns the market associated with a location. We might refactor this at some point*
      * @param model
      * @param gasPriceMaker
      * @return the list of ports that have been built and added to the map. It can be ignored.
      */
     public List<Port> buildPorts(
-            NauticalMap map,
-            MersenneTwisterFast mapmakerRandom,
-            Function<SeaTile, MarketMap> marketFactory, FishState model,
-            GasPriceMaker gasPriceMaker);
+        NauticalMap map,
+        MersenneTwisterFast mapmakerRandom,
+        Function<SeaTile, MarketMap> marketFactory, FishState model,
+        GasPriceMaker gasPriceMaker
+    );
 }

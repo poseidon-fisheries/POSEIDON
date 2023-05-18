@@ -68,20 +68,21 @@ public class FromFilePortInitializer implements PortInitializer {
      */
     @Override
     public List<Port> buildPorts(
-            NauticalMap map, MersenneTwisterFast mapmakerRandom, Function<SeaTile, MarketMap> marketFactory,
-            FishState model, GasPriceMaker gasPriceMaker) {
+        NauticalMap map, MersenneTwisterFast mapmakerRandom, Function<SeaTile, MarketMap> marketFactory,
+        FishState model, GasPriceMaker gasPriceMaker
+    ) {
         try {
             portMap = reader.readFile(
-                    filePath,map,marketFactory,
-                    gasPriceMaker,
-                    model
+                filePath, map, marketFactory,
+                gasPriceMaker,
+                model
 
             );
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("failed to read port file!");
         }
-        for(Port port : portMap.keySet())
+        for (Port port : portMap.keySet())
             map.addPort(port);
         return Lists.newArrayList(portMap.keySet());
     }
@@ -89,10 +90,11 @@ public class FromFilePortInitializer implements PortInitializer {
 
     /**
      * returns a list of fishers per port in form of a map tags--->port
+     *
      * @param port port
      * @return # of fishers to instantiate per tags
      */
-    public Integer getFishersPerPort(Port port){
+    public Integer getFishersPerPort(Port port) {
 
         return portMap.get(port);
 

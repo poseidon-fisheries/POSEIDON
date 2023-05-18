@@ -5,7 +5,6 @@ import uk.ac.ox.oxfish.biology.boxcars.BoxCarSimulator;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceDiffuser;
 import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
 import uk.ac.ox.oxfish.biology.complicated.factory.InitialAbundanceFromListFactory;
-import uk.ac.ox.oxfish.biology.complicated.factory.InitialAbundanceFromStringFactory;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.model.FishState;
@@ -18,15 +17,15 @@ import java.util.List;
 /**
  * like the Single Species Boxcar factories but this one forces initial abundance to be whatever is given
  * from the list (needs to be of the same size) <br>
- *     The way it works however is by intercepting the SingleSpeciesBoxcarAbstractFactory output
- *     and replacing the abundance
+ * The way it works however is by intercepting the SingleSpeciesBoxcarAbstractFactory output
+ * and replacing the abundance
  */
 public class SingleSpeciesBoxcarFromListFactory implements AlgorithmFactory<SingleSpeciesAbundanceInitializer> {
 
     private final SingleSpeciesRegularBoxcarFactory delegate = new SingleSpeciesRegularBoxcarFactory();
 
 
-    private List<Double> initialNumbersInEachBin = Lists.newArrayList(10d,30d,100d);
+    private List<Double> initialNumbersInEachBin = Lists.newArrayList(10d, 30d, 100d);
 
     @Override
     public SingleSpeciesAbundanceInitializer apply(FishState fishState) {
@@ -38,19 +37,19 @@ public class SingleSpeciesBoxcarFromListFactory implements AlgorithmFactory<Sing
         forcedAbundance.setFishPerBinPerSex(new LinkedList<>(initialNumbersInEachBin));
 
         return new SingleSpeciesAbundanceInitializer(
-                intercepted.getSpeciesName(),
-                forcedAbundance.apply(fishState),
-                intercepted.getIntialAbundanceAllocator(),
-                intercepted.getAging(),
-                intercepted.getMeristics(),
-                intercepted.getScaling(),
-                intercepted.getRecruitmentProcess(),
-                intercepted.getDiffuser(),
-                intercepted.getRecruitmentAllocator(),
-                intercepted.getHabitabilityAllocator(),
-                intercepted.getMortality(),
-                intercepted.isDaily(),
-                intercepted.isRounding()
+            intercepted.getSpeciesName(),
+            forcedAbundance.apply(fishState),
+            intercepted.getIntialAbundanceAllocator(),
+            intercepted.getAging(),
+            intercepted.getMeristics(),
+            intercepted.getScaling(),
+            intercepted.getRecruitmentProcess(),
+            intercepted.getDiffuser(),
+            intercepted.getRecruitmentAllocator(),
+            intercepted.getHabitabilityAllocator(),
+            intercepted.getMortality(),
+            intercepted.isDaily(),
+            intercepted.isRounding()
         );
 
     }

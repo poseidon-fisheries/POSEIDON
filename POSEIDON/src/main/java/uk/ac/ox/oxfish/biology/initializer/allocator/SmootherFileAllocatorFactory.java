@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.biology.initializer.allocator;
 
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborRegressionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NearestNeighborRegression;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -30,26 +29,25 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class SmootherFileAllocatorFactory implements FileBiomassAllocatorFactory
-{
+public class SmootherFileAllocatorFactory implements FileBiomassAllocatorFactory {
 
 
     private Path biomassPath = Paths.get("inputs", "tests", "fake_indo_abundance.csv");
 
     private boolean inputFileHasHeader = true;
 
-    private  AlgorithmFactory<
+    private AlgorithmFactory<
         ? extends GeographicalRegression<Double>> smoother = new NearestNeighborRegressionFactory();
+
     {
         ((NearestNeighborRegressionFactory) smoother).setNeighbors(new FixedDoubleParameter(1));
     }
 
 
-
     @Override
     public SmoothFileBiomassAllocator apply(FishState fishState) {
-        return new SmoothFileBiomassAllocator(biomassPath,inputFileHasHeader,
-                                              smoother.apply(fishState)
+        return new SmoothFileBiomassAllocator(biomassPath, inputFileHasHeader,
+            smoother.apply(fishState)
         );
     }
 
@@ -104,7 +102,8 @@ public class SmootherFileAllocatorFactory implements FileBiomassAllocatorFactory
      * @param smoother Value to set for property 'smoother'.
      */
     public void setSmoother(
-            AlgorithmFactory<? extends GeographicalRegression<Double>> smoother) {
+        AlgorithmFactory<? extends GeographicalRegression<Double>> smoother
+    ) {
         this.smoother = smoother;
     }
 }

@@ -51,13 +51,14 @@ public class HabitatAwareRandomCatchability implements Gear {
     /**
      * speed (used for fuel consumption) of thrawling
      */
-    private  final double trawlSpeed;
+    private final double trawlSpeed;
 
 
     public HabitatAwareRandomCatchability(
-            double[] sandyCatchabilityMeanPerSpecie, double[] sandyCatchabilityDeviationPerSpecie,
-            double[] rockCatchabilityMeanPerSpecie, double[] rockCatchabilityDeviationPerSpecie,
-            double trawlSpeed) {
+        double[] sandyCatchabilityMeanPerSpecie, double[] sandyCatchabilityDeviationPerSpecie,
+        double[] rockCatchabilityMeanPerSpecie, double[] rockCatchabilityDeviationPerSpecie,
+        double trawlSpeed
+    ) {
         this.sandyCatchabilityMeanPerSpecie = sandyCatchabilityMeanPerSpecie;
         this.sandyCatchabilityDeviationPerSpecie = sandyCatchabilityDeviationPerSpecie;
         this.rockCatchabilityMeanPerSpecie = rockCatchabilityMeanPerSpecie;
@@ -67,8 +68,9 @@ public class HabitatAwareRandomCatchability implements Gear {
 
     @Override
     public Catch fish(
-            Fisher fisher, LocalBiology localBiology, SeaTile context,
-            int hoursSpentFishing, GlobalBiology modelBiology) {
+        Fisher fisher, LocalBiology localBiology, SeaTile context,
+        int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
         List<Species> species = modelBiology.getSpecies();
         double[] totalCatch = catchesAsArray(fisher, context, hoursSpentFishing, modelBiology, species);
         return new Catch(totalCatch);
@@ -77,28 +79,31 @@ public class HabitatAwareRandomCatchability implements Gear {
     }
 
     private double[] catchesAsArray(
-            Fisher fisher, SeaTile where, int hoursSpentFishing,
-            GlobalBiology modelBiology,
-            List<Species> species) {
+        Fisher fisher, SeaTile where, int hoursSpentFishing,
+        GlobalBiology modelBiology,
+        List<Species> species
+    ) {
         double[] totalCatch = new double[modelBiology.getSize()];
-        for(Species specie : species)
-        {
-            double sandyQ = fisher.grabRandomizer().nextGaussian()* sandyCatchabilityDeviationPerSpecie[specie.getIndex()]
-                    + sandyCatchabilityMeanPerSpecie[specie.getIndex()];
-            double rockyQ = fisher.grabRandomizer().nextGaussian()* rockCatchabilityDeviationPerSpecie[specie.getIndex()]
-                    + rockCatchabilityMeanPerSpecie[specie.getIndex()];
+        for (Species specie : species) {
+            double sandyQ = fisher.grabRandomizer()
+                .nextGaussian() * sandyCatchabilityDeviationPerSpecie[specie.getIndex()]
+                + sandyCatchabilityMeanPerSpecie[specie.getIndex()];
+            double rockyQ = fisher.grabRandomizer()
+                .nextGaussian() * rockCatchabilityDeviationPerSpecie[specie.getIndex()]
+                + rockCatchabilityMeanPerSpecie[specie.getIndex()];
 
-            double q = sandyQ * (1d-where.getRockyPercentage()) + rockyQ * where.getRockyPercentage();
+            double q = sandyQ * (1d - where.getRockyPercentage()) + rockyQ * where.getRockyPercentage();
 
             totalCatch[specie.getIndex()] =
-                    FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, specie, q);
+                FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, specie, q);
         }
         return totalCatch;
     }
 
     @Override
     public double[] expectedHourlyCatch(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
         return catchesAsArray(fisher, where, hoursSpentFishing, modelBiology, modelBiology.getSpecies());
     }
 
@@ -111,21 +116,22 @@ public class HabitatAwareRandomCatchability implements Gear {
      */
     @Override
     public double getFuelConsumptionPerHourOfFishing(
-            Fisher fisher, Boat boat, SeaTile where) {
+        Fisher fisher, Boat boat, SeaTile where
+    ) {
         return boat.expectedFuelConsumption(trawlSpeed);
     }
-
 
 
     @Override
     public Gear makeCopy() {
 
         return new HabitatAwareRandomCatchability(
-                Arrays.copyOf(sandyCatchabilityMeanPerSpecie,sandyCatchabilityMeanPerSpecie.length),
-                Arrays.copyOf(sandyCatchabilityDeviationPerSpecie,sandyCatchabilityDeviationPerSpecie.length),
-                Arrays.copyOf(rockCatchabilityMeanPerSpecie,rockCatchabilityMeanPerSpecie.length),
-                Arrays.copyOf(rockCatchabilityDeviationPerSpecie,rockCatchabilityDeviationPerSpecie.length),
-                trawlSpeed);
+            Arrays.copyOf(sandyCatchabilityMeanPerSpecie, sandyCatchabilityMeanPerSpecie.length),
+            Arrays.copyOf(sandyCatchabilityDeviationPerSpecie, sandyCatchabilityDeviationPerSpecie.length),
+            Arrays.copyOf(rockCatchabilityMeanPerSpecie, rockCatchabilityMeanPerSpecie.length),
+            Arrays.copyOf(rockCatchabilityDeviationPerSpecie, rockCatchabilityDeviationPerSpecie.length),
+            trawlSpeed
+        );
 
 
     }
@@ -136,12 +142,11 @@ public class HabitatAwareRandomCatchability implements Gear {
         if (o == null || getClass() != o.getClass()) return false;
         HabitatAwareRandomCatchability that = (HabitatAwareRandomCatchability) o;
         return Double.compare(that.trawlSpeed, trawlSpeed) == 0 &&
-                Arrays.equals(sandyCatchabilityMeanPerSpecie, that.sandyCatchabilityMeanPerSpecie) &&
-                Arrays.equals(sandyCatchabilityDeviationPerSpecie, that.sandyCatchabilityDeviationPerSpecie) &&
-                Arrays.equals(rockCatchabilityMeanPerSpecie, that.rockCatchabilityMeanPerSpecie) &&
-                Arrays.equals(rockCatchabilityDeviationPerSpecie, that.rockCatchabilityDeviationPerSpecie);
+            Arrays.equals(sandyCatchabilityMeanPerSpecie, that.sandyCatchabilityMeanPerSpecie) &&
+            Arrays.equals(sandyCatchabilityDeviationPerSpecie, that.sandyCatchabilityDeviationPerSpecie) &&
+            Arrays.equals(rockCatchabilityMeanPerSpecie, that.rockCatchabilityMeanPerSpecie) &&
+            Arrays.equals(rockCatchabilityDeviationPerSpecie, that.rockCatchabilityDeviationPerSpecie);
     }
-
 
 
 }

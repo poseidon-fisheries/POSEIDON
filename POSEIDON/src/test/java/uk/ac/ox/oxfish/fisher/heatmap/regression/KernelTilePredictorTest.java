@@ -46,51 +46,52 @@ public class KernelTilePredictorTest {
         NauticalMap map = state.getMap();
 
         KernelTilePredictor predictor = new KernelTilePredictor(
-                1d,
-                map.getSeaTile(25,25),
-                new Pair<>(
-                        new GridXExtractor(),
-                        1d
-                ),
-                new Pair<>(
-                        new GridYExtractor(),
-                        1d
-                ));
+            1d,
+            map.getSeaTile(25, 25),
+            new Pair<>(
+                new GridXExtractor(),
+                1d
+            ),
+            new Pair<>(
+                new GridYExtractor(),
+                1d
+            )
+        );
 
 
         predictor.addObservation(
-                new GeographicalObservation<>(
-                        map.getSeaTile(20,20),
-                        0d,
-                        80d
-                ),
-                null,mock(FishState.class)
+            new GeographicalObservation<>(
+                map.getSeaTile(20, 20),
+                0d,
+                80d
+            ),
+            null, mock(FishState.class)
         );
         predictor.addObservation(
-                new GeographicalObservation<>(
-                        map.getSeaTile(22,22),
-                        0d,
-                        90d
-                ),
-                null,mock(FishState.class)
+            new GeographicalObservation<>(
+                map.getSeaTile(22, 22),
+                0d,
+                90d
+            ),
+            null, mock(FishState.class)
         );
         predictor.addObservation(
-                new GeographicalObservation<>(
-                        map.getSeaTile(28,28),
-                        0d,
-                        110d
-                ),
-                null,mock(FishState.class)
+            new GeographicalObservation<>(
+                map.getSeaTile(28, 28),
+                0d,
+                110d
+            ),
+            null, mock(FishState.class)
         );
         predictor.addObservation(
-                new GeographicalObservation<>(
-                        map.getSeaTile(30,30),
-                        0d,
-                        130d
-                ),
-                null,mock(FishState.class)
+            new GeographicalObservation<>(
+                map.getSeaTile(30, 30),
+                0d,
+                130d
+            ),
+            null, mock(FishState.class)
         );
-        Assert.assertEquals(predictor.getCurrentPrediction(),100,5);
+        Assert.assertEquals(predictor.getCurrentPrediction(), 100, 5);
     }
 
     @Test
@@ -100,64 +101,66 @@ public class KernelTilePredictorTest {
         NauticalMap map = state.getMap();
 
         KernelTilePredictor forgetting = new KernelTilePredictor(
-                .8d,
-                map.getSeaTile(25,25),
-                new Pair<>(
-                        new GridXExtractor(),
-                        1d
-                ),
-                new Pair<>(
-                        new GridYExtractor(),
-                        1d
-                ));
-        KernelTilePredictor notForgetting =new KernelTilePredictor(
-                1d,
-                map.getSeaTile(25,25),
-                new Pair<>(
-                        new GridXExtractor(),
-                        1d
-                ),
-                new Pair<>(
-                        new GridYExtractor(),
-                        1d
-                ));
-
-        forgetting.addObservation(
-                 new GeographicalObservation<>(
-                        map.getSeaTile(25,25),
-                        0d,
-                        80d
-                ),
-                null,mock(FishState.class)
+            .8d,
+            map.getSeaTile(25, 25),
+            new Pair<>(
+                new GridXExtractor(),
+                1d
+            ),
+            new Pair<>(
+                new GridYExtractor(),
+                1d
+            )
         );
-        notForgetting.addObservation(
-                 new GeographicalObservation<>(
-                        map.getSeaTile(25,25),
-                        0d,
-                        80d
-                ),
-                null,mock(FishState.class)
+        KernelTilePredictor notForgetting = new KernelTilePredictor(
+            1d,
+            map.getSeaTile(25, 25),
+            new Pair<>(
+                new GridXExtractor(),
+                1d
+            ),
+            new Pair<>(
+                new GridYExtractor(),
+                1d
+            )
         );
 
         forgetting.addObservation(
-                new GeographicalObservation<>(
-                        map.getSeaTile(25,25),
-                        0d,
-                        100d
-                ),
-                null,mock(FishState.class)
+            new GeographicalObservation<>(
+                map.getSeaTile(25, 25),
+                0d,
+                80d
+            ),
+            null, mock(FishState.class)
         );
         notForgetting.addObservation(
-                new GeographicalObservation<>(
-                        map.getSeaTile(25,25),
-                        0d,
-                        100d
-                ),
-                null,mock(FishState.class)
+            new GeographicalObservation<>(
+                map.getSeaTile(25, 25),
+                0d,
+                80d
+            ),
+            null, mock(FishState.class)
+        );
+
+        forgetting.addObservation(
+            new GeographicalObservation<>(
+                map.getSeaTile(25, 25),
+                0d,
+                100d
+            ),
+            null, mock(FishState.class)
+        );
+        notForgetting.addObservation(
+            new GeographicalObservation<>(
+                map.getSeaTile(25, 25),
+                0d,
+                100d
+            ),
+            null, mock(FishState.class)
         );
 
         System.out.println(forgetting.getCurrentPrediction());
         System.out.println(notForgetting.getCurrentPrediction());
-        Assert.assertTrue(forgetting.getCurrentPrediction()>notForgetting.getCurrentPrediction());
+        Assert.assertTrue(forgetting.getCurrentPrediction() > notForgetting.getCurrentPrediction());
     }
 }

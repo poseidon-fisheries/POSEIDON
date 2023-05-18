@@ -35,9 +35,10 @@ public class NoAbundanceDiffusion implements AbundanceDiffuser {
 
     @Override
     public void step(
-            Species species,
-            Map<SeaTile, AbundanceLocalBiology> biologies,
-            FishState state) {
+        Species species,
+        Map<SeaTile, AbundanceLocalBiology> biologies,
+        FishState state
+    ) {
 
     }
 }

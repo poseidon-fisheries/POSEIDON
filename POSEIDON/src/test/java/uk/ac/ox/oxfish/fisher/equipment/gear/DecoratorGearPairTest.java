@@ -14,8 +14,8 @@ public class DecoratorGearPairTest {
 
         FixedProportionGear single = new FixedProportionGear(.1);
         DecoratorGearPair returned = DecoratorGearPair.getActualGear(single);
-        assertEquals(returned.getDeepestDecorator(),null);
-        assertEquals(returned.getDecorated(),single);
+        assertEquals(returned.getDeepestDecorator(), null);
+        assertEquals(returned.getDecorated(), single);
 
     }
 
@@ -23,13 +23,15 @@ public class DecoratorGearPairTest {
     public void oneDown() {
 
         FixedProportionGear delegate = new FixedProportionGear(.1);
-        GarbageGearDecorator decorator = new GarbageGearDecorator(mock(Species.class),
-                .1,
-                delegate,
-                true);
+        GarbageGearDecorator decorator = new GarbageGearDecorator(
+            mock(Species.class),
+            .1,
+            delegate,
+            true
+        );
         DecoratorGearPair returned = DecoratorGearPair.getActualGear(decorator);
-        assertEquals(returned.getDeepestDecorator(),decorator);
-        assertEquals(returned.getDecorated(),delegate);
+        assertEquals(returned.getDeepestDecorator(), decorator);
+        assertEquals(returned.getDecorated(), delegate);
 
     }
 
@@ -37,24 +39,28 @@ public class DecoratorGearPairTest {
     public void twoDown() {
 
         FixedProportionGear delegate = new FixedProportionGear(.1);
-        GarbageGearDecorator decorator = new GarbageGearDecorator(mock(Species.class),
-                .1,
-                delegate,
-                true);
-        GarbageGearDecorator decorator2 = new GarbageGearDecorator(mock(Species.class),
-                .1,
-                decorator,
-                true);
+        GarbageGearDecorator decorator = new GarbageGearDecorator(
+            mock(Species.class),
+            .1,
+            delegate,
+            true
+        );
+        GarbageGearDecorator decorator2 = new GarbageGearDecorator(
+            mock(Species.class),
+            .1,
+            decorator,
+            true
+        );
         DecoratorGearPair returned = DecoratorGearPair.getActualGear(decorator2);
-        assertEquals(returned.getDeepestDecorator(),decorator);
-        assertEquals(returned.getDecorated(),delegate);
+        assertEquals(returned.getDeepestDecorator(), decorator);
+        assertEquals(returned.getDecorated(), delegate);
 
         //and I can change the tree leaf without affecting the tree structure
         Gear mock = mock(Gear.class);
         returned.getDeepestDecorator().setDelegate(mock);
         returned = DecoratorGearPair.getActualGear(decorator2);
-        assertEquals(returned.getDeepestDecorator(),decorator);
-        assertEquals(returned.getDecorated(),mock);
+        assertEquals(returned.getDeepestDecorator(), decorator);
+        assertEquals(returned.getDecorated(), mock);
 
     }
 }

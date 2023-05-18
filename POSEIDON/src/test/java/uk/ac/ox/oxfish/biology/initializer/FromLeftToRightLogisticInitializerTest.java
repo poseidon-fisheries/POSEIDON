@@ -48,68 +48,74 @@ public class FromLeftToRightLogisticInitializerTest {
     public void leftToRightInitializer() throws Exception {
 
 
-
-        FromLeftToRightLogisticFactory factory = new FromLeftToRightLogisticFactory();
+        final FromLeftToRightLogisticFactory factory = new FromLeftToRightLogisticFactory();
         factory.setCarryingCapacity(new FixedDoubleParameter(100d));
         factory.setExponent(new FixedDoubleParameter(1d));
         factory.setMinCapacityRatio(new FixedDoubleParameter(.1d));
         factory.setGrower(new AlgorithmFactory<LogisticGrowerInitializer>() {
             @Override
-            public LogisticGrowerInitializer apply(FishState state) {
-                return mock(LogisticGrowerInitializer.class,RETURNS_DEEP_STUBS);
+            public LogisticGrowerInitializer apply(final FishState state) {
+                return mock(LogisticGrowerInitializer.class, RETURNS_DEEP_STUBS);
             }
         });
 
 
-        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
-        SingleSpeciesBiomassInitializer initializer = factory.apply(model);
+        final SingleSpeciesBiomassInitializer initializer = factory.apply(model);
 
-        NauticalMap map = mock(NauticalMap.class);
+        final NauticalMap map = mock(NauticalMap.class);
         when(map.getWidth()).thenReturn(100);
-        SeaTile leftmost = mock(SeaTile.class); when(leftmost.getGridX()).thenReturn(0);
-        SeaTile middle = mock(SeaTile.class); when(middle.getGridX()).thenReturn(50);
-        SeaTile rightmost = mock(SeaTile.class); when(rightmost.getGridX()).thenReturn(99);
+        final SeaTile leftmost = mock(SeaTile.class);
+        when(leftmost.getGridX()).thenReturn(0);
+        final SeaTile middle = mock(SeaTile.class);
+        when(middle.getGridX()).thenReturn(50);
+        final SeaTile rightmost = mock(SeaTile.class);
+        when(rightmost.getGridX()).thenReturn(99);
         when(leftmost.getAltitude()).thenReturn(-100d);
         when(middle.getAltitude()).thenReturn(-100d);
         when(rightmost.getAltitude()).thenReturn(-100d);
-        List<SeaTile> cells = Lists.newArrayList(
-                leftmost,
-                middle,
-                rightmost
+        final List<SeaTile> cells = Lists.newArrayList(
+            leftmost,
+            middle,
+            rightmost
         );
         when(map.getAllSeaTilesExcludingLandAsList()).thenReturn(
-                cells
+            cells
         );
         when(map.getAllSeaTilesAsList()).thenReturn(cells);
 
-        GlobalBiology globalBiology = initializer.generateGlobal(model.getRandom(),
-                                                                 model);
-        for(SeaTile cell : cells)
-            initializer.generateLocal(globalBiology,
-                                      cell,
-                                      model.getRandom(),
-                                      0,
-                                      3,
-                                      map);
+        final GlobalBiology globalBiology = initializer.generateGlobal(
+            model.getRandom(),
+            model
+        );
+        for (final SeaTile cell : cells)
+            initializer.generateLocal(
+                globalBiology,
+                cell,
+                model.getRandom(),
+                0,
+                3,
+                map
+            );
 
 
         //the leftmost cell shouldn't be bothered
-        VariableBiomassBasedBiology local = mock(BiomassLocalBiology.class);
+        final VariableBiomassBasedBiology local = mock(BiomassLocalBiology.class);
         when(leftmost.getBiology()).thenReturn(local);
         when(middle.getBiology()).thenReturn(local);
         when(rightmost.getBiology()).thenReturn(local);
         initializer.processMap(
-                globalBiology,
-                map,
-                model.getRandom(),
-                model
+            globalBiology,
+            map,
+            model.getRandom(),
+            model
 
         );
 
-        verify(local).setCarryingCapacity(globalBiology.getSpecie(0),100d);
-        verify(local).setCarryingCapacity(globalBiology.getSpecie(0),50d);
-        verify(local).setCarryingCapacity(globalBiology.getSpecie(0),10d);
+        verify(local).setCarryingCapacity(globalBiology.getSpecie(0), 100d);
+        verify(local).setCarryingCapacity(globalBiology.getSpecie(0), 50d);
+        verify(local).setCarryingCapacity(globalBiology.getSpecie(0), 10d);
 
 
     }

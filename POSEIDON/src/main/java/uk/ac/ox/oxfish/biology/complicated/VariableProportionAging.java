@@ -44,6 +44,10 @@ public class VariableProportionAging extends LocalAgingProcess {
 
     private Species speciesConnected = null;
 
+    public VariableProportionAging(double[][] yearlyProportionGraduating) {
+        this.yearlyProportionGraduating = yearlyProportionGraduating;
+    }
+
     /**
      * called after the aging process has been initialized but before it is run.
      *
@@ -51,18 +55,14 @@ public class VariableProportionAging extends LocalAgingProcess {
      */
     @Override
     public void start(Species species) {
-        Preconditions.checkState(speciesConnected==null);
+        Preconditions.checkState(speciesConnected == null);
         speciesConnected = species; //you don't want to re-use this for multiple species!!
 
     }
 
-    public VariableProportionAging(double[][] yearlyProportionGraduating) {
-        this.yearlyProportionGraduating = yearlyProportionGraduating;
-    }
-
-
     /**
      * as a side-effect ages the local biology according to its rules
+     *
      * @param localBiology
      * @param species
      * @param model
@@ -71,27 +71,30 @@ public class VariableProportionAging extends LocalAgingProcess {
      */
     @Override
     public void ageLocally(
-            AbundanceLocalBiology localBiology, Species species, FishState model, boolean rounding,
-            int daysToSimulate)
-    {
+        AbundanceLocalBiology localBiology, Species species, FishState model, boolean rounding,
+        int daysToSimulate
+    ) {
 
-        Preconditions.checkArgument(rounding==false,
-                                    "VariableProportionAging works very poorly with rounding!");
-        Preconditions.checkArgument(species==speciesConnected,
-                                    "Wrong species!");
+        Preconditions.checkArgument(
+            rounding == false,
+            "VariableProportionAging works very poorly with rounding!"
+        );
+        Preconditions.checkArgument(
+            species == speciesConnected,
+            "Wrong species!"
+        );
         double[][] abundance = localBiology.getAbundance(species).asMatrix();
 
         //scale graduating proportion lazily
         lazyEvaluation(daysToSimulate);
         assert daysToSimulateLastLazyEvaluation == daysToSimulate;
 
-        for(int subdivision=0; subdivision<abundance.length; subdivision++)
-        {
+        for (int subdivision = 0; subdivision < abundance.length; subdivision++) {
             Preconditions.checkArgument(yearlyProportionGraduating[subdivision].length ==
-                                                abundance[subdivision].length, "length mismatch between aging speed and # of bins");
+                abundance[subdivision].length, "length mismatch between aging speed and # of bins");
             variableAging(
-                    abundance[subdivision],
-                    lazyGraduation[subdivision]
+                abundance[subdivision],
+                lazyGraduation[subdivision]
             );
         }
 
@@ -102,23 +105,18 @@ public class VariableProportionAging extends LocalAgingProcess {
     /**
      * quick helper to avoid rescaling the same vector by the same factor every time
      */
-    private void lazyEvaluation(int daysToSimulate){
-        if(daysToSimulate==daysToSimulateLastLazyEvaluation)
-        {
-            assert lazyGraduation !=null;
-        }
-        else
-        {
+    private void lazyEvaluation(int daysToSimulate) {
+        if (daysToSimulate == daysToSimulateLastLazyEvaluation) {
+            assert lazyGraduation != null;
+        } else {
             lazyGraduation = new double[yearlyProportionGraduating.length][yearlyProportionGraduating[0].length];
-            for(int i = 0; i< lazyGraduation.length; i++)
-            {
-                for(int j=0; j<lazyGraduation[i].length; j++)
-                lazyGraduation[i][j] = yearlyProportionGraduating[i][j] * ((double)daysToSimulate)/365d;
+            for (int i = 0; i < lazyGraduation.length; i++) {
+                for (int j = 0; j < lazyGraduation[i].length; j++)
+                    lazyGraduation[i][j] = yearlyProportionGraduating[i][j] * ((double) daysToSimulate) / 365d;
             }
             this.daysToSimulateLastLazyEvaluation = daysToSimulate;
         }
     }
-
 
 
     /**
@@ -131,25 +129,23 @@ public class VariableProportionAging extends LocalAgingProcess {
      * @return number of graduates (at position i is the number that left bin i and went into bin i+1)
      */
     public static double[] variableAging(
-            double[] currentDistribution,
-            double[] proportionGraduating
-    )
-    {
+        double[] currentDistribution,
+        double[] proportionGraduating
+    ) {
         int bins = currentDistribution.length;
         double[] graduate = new double[bins];
         Preconditions.checkArgument(bins ==
-                                            proportionGraduating.length);
-        Preconditions.checkArgument(bins >=2);
-        assert proportionGraduating[bins-1]==0 || Double.isNaN(proportionGraduating[bins-1]);
+            proportionGraduating.length);
+        Preconditions.checkArgument(bins >= 2);
+        assert proportionGraduating[bins - 1] == 0 || Double.isNaN(proportionGraduating[bins - 1]);
         //going backward
-        for(int i=bins-2; i>=0; i--)
-        {
-            assert currentDistribution[i] >=0;
+        for (int i = bins - 2; i >= 0; i--) {
+            assert currentDistribution[i] >= 0;
             // find graduates
-            graduate[i] = currentDistribution[i]*proportionGraduating[i];
-            currentDistribution[i+1] += graduate[i];
+            graduate[i] = currentDistribution[i] * proportionGraduating[i];
+            currentDistribution[i + 1] += graduate[i];
             currentDistribution[i] -= graduate[i];
-            assert currentDistribution[i] >=0;
+            assert currentDistribution[i] >= 0;
 
         }
         return graduate;

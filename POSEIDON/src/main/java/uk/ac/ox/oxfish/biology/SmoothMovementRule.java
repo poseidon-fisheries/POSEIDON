@@ -47,28 +47,29 @@ public class SmoothMovementRule implements BiomassMovementRule {
 
     @Override
     public void move(
-            Species species, SeaTile here, double biomassHere, SeaTile there, double biomassThere, double delta,
-            double carryingCapacityHere, double carryingCapacityThere,
-            VariableBiomassBasedBiology biologyHere, VariableBiomassBasedBiology biologyThere)
-    {
+        Species species, SeaTile here, double biomassHere, SeaTile there, double biomassThere, double delta,
+        double carryingCapacityHere, double carryingCapacityThere,
+        VariableBiomassBasedBiology biologyHere, VariableBiomassBasedBiology biologyThere
+    ) {
         //shouldn't call this uselessly
-        assert carryingCapacityHere >FishStateUtilities.EPSILON;
-        assert  carryingCapacityThere >FishStateUtilities.EPSILON;
-        if(delta<=0)
+        assert carryingCapacityHere > FishStateUtilities.EPSILON;
+        assert carryingCapacityThere > FishStateUtilities.EPSILON;
+        if (delta <= 0)
             return;
 
-        double differential = Math.min(delta, (carryingCapacityThere-biomassThere));
+        double differential = Math.min(delta, (carryingCapacityThere - biomassThere));
         differential = FishStateUtilities.round(differential);
-        if(differential>0)
-        {
-            double movement = Math.min(differentialPercentageToMove * differential,
-                                       percentageLimitOnDailyMovement * biomassHere);
+        if (differential > 0) {
+            double movement = Math.min(
+                differentialPercentageToMove * differential,
+                percentageLimitOnDailyMovement * biomassHere
+            );
             assert movement >= 0 : movement + " --- " + differential + " ------ " + here.getBiomass(
-                    species) + " ------ " + FishStateUtilities.round(movement);
+                species) + " ------ " + FishStateUtilities.round(movement);
             assert here.getBiomass(species) >= movement;
 
-            biologyHere.getCurrentBiomass()[species.getIndex()] -=movement;
-            biologyThere.getCurrentBiomass()[species.getIndex()] +=movement;
+            biologyHere.getCurrentBiomass()[species.getIndex()] -= movement;
+            biologyThere.getCurrentBiomass()[species.getIndex()] += movement;
 
         }
 

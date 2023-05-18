@@ -31,8 +31,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 
-public class TripLoggerTest
-{
+public class TripLoggerTest {
 
 
     @Test
@@ -44,25 +43,27 @@ public class TripLoggerTest
         logger.setNumberOfSpecies(1);
 
         assertNull(logger.getCurrentTrip());
-        assertEquals(logger.getFinishedTrips().size(),0);
+        assertEquals(logger.getFinishedTrips().size(), 0);
         //create a new trip, now there is a current trip, but it's not in the history
         final Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
-        logger.newTrip(0,0, fisher);
+        logger.newTrip(0, 0, fisher);
         assertNotNull(logger.getCurrentTrip());
-        assertEquals(logger.getFinishedTrips().size(),0);
+        assertEquals(logger.getFinishedTrips().size(), 0);
 
-        logger.recordFishing(new FishingRecord(1,
-                                               mock(SeaTile.class),
-                                               new Catch(new double[]{100,100})));
-        logger.recordEarnings(0,100,100);
+        logger.recordFishing(new FishingRecord(
+            1,
+            mock(SeaTile.class),
+            new Catch(new double[]{100, 100})
+        ));
+        logger.recordEarnings(0, 100, 100);
         logger.recordCosts(200);
         logger.finishTrip(10, mock(Port.class), fisher);
         //even though it's over, it is still there as current trip
         assertTrue(logger.getCurrentTrip().isCompleted());
-        assertEquals(logger.getCurrentTrip().getProfitPerHour(false),-10,.001);
-        assertEquals(logger.getCurrentTrip().getProfitPerSpecie(0, false),-100,.001);
-        assertEquals(logger.getCurrentTrip().getUnitProfitPerSpecie(0),-1,.001);
-        assertEquals(logger.getFinishedTrips().size(),1);
+        assertEquals(logger.getCurrentTrip().getProfitPerHour(false), -10, .001);
+        assertEquals(logger.getCurrentTrip().getProfitPerSpecie(0, false), -100, .001);
+        assertEquals(logger.getCurrentTrip().getUnitProfitPerSpecie(0), -1, .001);
+        assertEquals(logger.getFinishedTrips().size(), 1);
 
 
     }
@@ -76,12 +77,11 @@ public class TripLoggerTest
 
         logger.addTripListener(receiver);
         Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
-        logger.newTrip(0,0, fisher);
+        logger.newTrip(0, 0, fisher);
         TripRecord record = logger.getCurrentTrip();
 
         logger.finishTrip(1, mock(Port.class), fisher);
         verify(receiver).reactToFinishedTrip(record, fisher);
-
 
 
     }

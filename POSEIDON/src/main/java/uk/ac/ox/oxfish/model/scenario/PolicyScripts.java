@@ -35,18 +35,14 @@ import java.util.Map;
  * Steps once a year and checks if anything is applicable
  * Created by carrknight on 5/3/16.
  */
-public class PolicyScripts implements Steppable,Startable{
+public class PolicyScripts implements Steppable, Startable {
 
-    private HashMap<Integer,PolicyScript> scripts;
+    private HashMap<Integer, PolicyScript> scripts;
+    private Stoppable receipt;
 
 
     public PolicyScripts(HashMap<Integer, PolicyScript> scripts) {
         this.scripts = scripts;
-    }
-
-
-    public PolicyScripts() {
-        this.scripts = new HashMap<>();
     }
 
 
@@ -79,17 +75,18 @@ public class PolicyScripts implements Steppable,Startable{
     }
     */
 
-    @Override
-    public void step(SimState simState)
-    {
-        Preconditions.checkNotNull(receipt);
-        FishState model = ((FishState) simState);
-        for(Map.Entry<Integer,PolicyScript> policy : scripts.entrySet())
-            if (model.getYear()+1 == policy.getKey())
-                policy.getValue().apply(model);
+    public PolicyScripts() {
+        this.scripts = new HashMap<>();
     }
 
-    private Stoppable receipt ;
+    @Override
+    public void step(SimState simState) {
+        Preconditions.checkNotNull(receipt);
+        FishState model = ((FishState) simState);
+        for (Map.Entry<Integer, PolicyScript> policy : scripts.entrySet())
+            if (model.getYear() + 1 == policy.getKey())
+                policy.getValue().apply(model);
+    }
 
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
@@ -98,8 +95,7 @@ public class PolicyScripts implements Steppable,Startable{
      * @param model the model
      */
     @Override
-    public void start(FishState model)
-    {
+    public void start(FishState model) {
         receipt = model.scheduleEveryYear(this, StepOrder.DAWN);
     }
 

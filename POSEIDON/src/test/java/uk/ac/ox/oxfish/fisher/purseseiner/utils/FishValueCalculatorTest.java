@@ -27,8 +27,6 @@ import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
@@ -46,7 +44,10 @@ public class FishValueCalculatorTest {
 
         assertEquals(
             5.0,
-            fishValueCalculator.valueOf(new BiomassLocalBiology(new double[]{1, 2}, new double[]{2, 2}), marketMap.getPrices()),
+            fishValueCalculator.valueOf(
+                new BiomassLocalBiology(new double[]{1, 2}, new double[]{2, 2}),
+                marketMap.getPrices()
+            ),
             EPSILON
         );
         assertEquals(

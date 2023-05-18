@@ -21,7 +21,7 @@ public class MaximumOfFilters implements AbundanceFilter {
         double[][][] allFilters = new double[componentFilters.length][][];
         //run all filters
         for (int filter = 0; filter < allFilters.length; filter++) {
-            allFilters[filter]= componentFilters[filter].filter(species,arrayCopy(abundance));
+            allFilters[filter] = componentFilters[filter].filter(species, arrayCopy(abundance));
         }
 
 
@@ -31,8 +31,10 @@ public class MaximumOfFilters implements AbundanceFilter {
                 maximumFiltered[subdivision][bin] = allFilters[0][subdivision][bin];
                 for (int filter = 1; filter < allFilters.length; filter++) {
                     maximumFiltered[subdivision][bin] =
-                            Math.max(allFilters[filter][subdivision][bin],
-                            maximumFiltered[subdivision][bin]);
+                        Math.max(
+                            allFilters[filter][subdivision][bin],
+                            maximumFiltered[subdivision][bin]
+                        );
                 }
 
 

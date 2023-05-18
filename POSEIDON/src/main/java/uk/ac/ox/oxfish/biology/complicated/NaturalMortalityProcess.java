@@ -24,11 +24,13 @@ public interface NaturalMortalityProcess {
 
     /**
      * call the mortality process to kill (by side-effect) fish
-     * @param species the fish species to kill
-     * @param rounding whether we want the process to round all abundances to closest int
+     *
+     * @param species             the fish species to kill
+     * @param rounding            whether we want the process to round all abundances to closest int
      * @param structuredAbundance the current abundance of the fish (and what actually gets modified)
-     * @param daysSimulated how many days are we simulating the mortality for
+     * @param daysSimulated       how many days are we simulating the mortality for
      */
     void cull(
-            Meristics species, boolean rounding, StructuredAbundance structuredAbundance, int daysSimulated);
+        Meristics species, boolean rounding, StructuredAbundance structuredAbundance, int daysSimulated
+    );
 }

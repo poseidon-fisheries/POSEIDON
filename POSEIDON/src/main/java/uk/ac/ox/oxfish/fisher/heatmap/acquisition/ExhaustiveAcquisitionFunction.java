@@ -26,7 +26,6 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegressio
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Collections;
@@ -37,19 +36,16 @@ import java.util.Random;
  * Goes through all the possible seatiles and picks the highest one
  * Created by carrknight on 6/28/16.
  */
-public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
-{
-
-    private double proportionSearched;
+public class ExhaustiveAcquisitionFunction implements AcquisitionFunction {
 
     private final boolean ignoreProtectedAreas;
-
     private final boolean ignoreWastelands;
-
+    private double proportionSearched;
 
 
     public ExhaustiveAcquisitionFunction(
-            double proportionSearched, boolean ignoreProtectedAreas, boolean ignoreWastelands) {
+        double proportionSearched, boolean ignoreProtectedAreas, boolean ignoreWastelands
+    ) {
         this.proportionSearched = proportionSearched;
         this.ignoreProtectedAreas = ignoreProtectedAreas;
         this.ignoreWastelands = ignoreWastelands;
@@ -57,43 +53,41 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
 
     /**
      * Goes through all the possible seatiles and picks the highest one
+     *
      * @param map        the map to pick from
      * @param regression the geographical regression
-     * @param state  @return a choice
+     * @param state      @return a choice
      * @param fisher
      * @param current
      */
     @Override
     public SeaTile pick(
-            NauticalMap map, GeographicalRegression regression,
-            FishState state, Fisher fisher, SeaTile current) {
+        NauticalMap map, GeographicalRegression regression,
+        FishState state, Fisher fisher, SeaTile current
+    ) {
 
         List<SeaTile> seaTiles = map.getAllSeaTilesExcludingLandAsList();
 
         MersenneTwisterFast random = state.getRandom();
-        Collections.shuffle(seaTiles,new Random(random.nextLong()));
+        Collections.shuffle(seaTiles, new Random(random.nextLong()));
 
 
-
-        Pair<SeaTile,Double> best;
-        if(current!=null)
-            best = new Pair<>(current, regression.predict(current, state.getHoursSinceStart(), fisher,state ));
+        Pair<SeaTile, Double> best;
+        if (current != null)
+            best = new Pair<>(current, regression.predict(current, state.getHoursSinceStart(), fisher, state));
         else
-            best = new Pair<>(null,-Double.MAX_VALUE);
+            best = new Pair<>(null, -Double.MAX_VALUE);
         assert Double.isFinite(best.getSecond());
-        for(SeaTile tile : seaTiles)
-        {
-            if(
-                    (!ignoreWastelands || tile.isFishingEvenPossibleHere()) &&
-                            (!ignoreProtectedAreas || fisher.isAllowedToFishHere(tile,state)) &&
-                            random.nextBoolean(proportionSearched))
-            {
-                double predicted = regression.predict(tile, state.getHoursSinceStart(), fisher,state );
-                if(Double.isFinite(predicted) && predicted > best.getSecond())
-                    best=new Pair<>(tile,predicted);
+        for (SeaTile tile : seaTiles) {
+            if (
+                (!ignoreWastelands || tile.isFishingEvenPossibleHere()) &&
+                    (!ignoreProtectedAreas || fisher.isAllowedToFishHere(tile, state)) &&
+                    random.nextBoolean(proportionSearched)) {
+                double predicted = regression.predict(tile, state.getHoursSinceStart(), fisher, state);
+                if (Double.isFinite(predicted) && predicted > best.getSecond())
+                    best = new Pair<>(tile, predicted);
             }
         }
-
 
 
         return best.getFirst();

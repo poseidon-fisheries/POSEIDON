@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 /**
  * Basically put the fish where the pyramid isn't. Useful to put some form of anti-correlation when multiple species are around
  */
-public class MirroredPyramidsAllocator implements BiomassAllocator{
+public class MirroredPyramidsAllocator implements BiomassAllocator {
 
     private final PyramidsAllocator originalPyramid;
 
@@ -22,12 +22,12 @@ public class MirroredPyramidsAllocator implements BiomassAllocator{
 
     @Override
     public double allocate(SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
-        if(tile.isLand())
+        if (tile.isLand())
             return 0d;
 
 
-        return 1d-originalPyramid.allocate(tile, map, random)/originalPyramid.getPeakBiomass() +
-                random.nextDouble()*noiseLevel;
+        return 1d - originalPyramid.allocate(tile, map, random) / originalPyramid.getPeakBiomass() +
+            random.nextDouble() * noiseLevel;
 
     }
 

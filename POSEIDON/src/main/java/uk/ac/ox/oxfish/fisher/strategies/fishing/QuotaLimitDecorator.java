@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.QuotaPerSpecieRegulation;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.List;
 
@@ -48,7 +47,7 @@ public class QuotaLimitDecorator implements FishingStrategy {
 
     @Override
     public void start(FishState model, Fisher fisher) {
-        decorated.start(model,fisher);
+        decorated.start(model, fisher);
     }
 
     @Override
@@ -68,25 +67,23 @@ public class QuotaLimitDecorator implements FishingStrategy {
      */
     @Override
     public boolean shouldFish(
-            Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip) {
-        return decorated.shouldFish(fisher,random,model,currentTrip)
-                &&
-                check(fisher.getRegulation(),fisher.getHold(),model.getSpecies());
+        Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip
+    ) {
+        return decorated.shouldFish(fisher, random, model, currentTrip)
+            &&
+            check(fisher.getRegulation(), fisher.getHold(), model.getSpecies());
     }
 
 
+    private boolean check(Regulation regulation, Hold hold, List<Species> speciesList) {
 
-    private boolean check(Regulation regulation, Hold hold, List<Species> speciesList){
-
-        if(regulation instanceof QuotaPerSpecieRegulation)
-        {
-            for(Species species : speciesList)
-            {
+        if (regulation instanceof QuotaPerSpecieRegulation) {
+            for (Species species : speciesList) {
                 //if it's a protected species for which you have quotas
                 double quotaHeld = ((QuotaPerSpecieRegulation) regulation).getQuotaRemaining(species.getIndex());
-                if(quotaHeld > 0
+                if (quotaHeld > 0
                     && //and you already hold more than you can sell
-                  quotaHeld *1.1 < hold.getWeightOfCatchInHold(species))
+                    quotaHeld * 1.1 < hold.getWeightOfCatchInHold(species))
                     //then stop fishing!
                     return false;
 

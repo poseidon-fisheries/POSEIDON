@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
  * returns the same instance of ignore weather
  * Created by carrknight on 9/8/15.
  */
-public class IgnoreWeatherFactory implements AlgorithmFactory<IgnoreWeatherStrategy>{
+public class IgnoreWeatherFactory implements AlgorithmFactory<IgnoreWeatherStrategy> {
 
 
     private static IgnoreWeatherStrategy instance;
@@ -42,8 +42,8 @@ public class IgnoreWeatherFactory implements AlgorithmFactory<IgnoreWeatherStrat
      */
     @Override
     public IgnoreWeatherStrategy apply(FishState state) {
-        if(instance == null)
-            instance= new IgnoreWeatherStrategy();
+        if (instance == null)
+            instance = new IgnoreWeatherStrategy();
 
         return instance;
     }

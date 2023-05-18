@@ -54,7 +54,8 @@ public class FromLeftToRightSplitInitializer extends AbstractBiologyInitializer 
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -63,33 +64,34 @@ public class FromLeftToRightSplitInitializer extends AbstractBiologyInitializer 
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map)
-    {
+        GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
+        int mapWidthInCells, NauticalMap map
+    ) {
         if (seaTile.isLand())
             return new EmptyLocalBiology();
+        else if (seaTile.getGridY() < mapHeightInCells / 2d)
+            return new ConstantHeterogeneousLocalBiology(maximumBiomass *
+                Math.pow((1 - seaTile.getGridX() / (double) mapWidthInCells)
+                    , 2), 0);
         else
-        if(seaTile.getGridY() < mapHeightInCells/2d)
-            return new ConstantHeterogeneousLocalBiology(maximumBiomass*
-                                                    Math.pow((1-seaTile.getGridX()/(double)mapWidthInCells)
-                                                            ,2),0);
-        else
-            return new ConstantHeterogeneousLocalBiology(0,maximumBiomass*
-                                                                 Math.pow((1-seaTile.getGridX()/(double)mapWidthInCells)
-                                                                         ,2));
+            return new ConstantHeterogeneousLocalBiology(0, maximumBiomass *
+                Math.pow((1 - seaTile.getGridX() / (double) mapWidthInCells)
+                    , 2));
     }
 
     /**
      * after all the tiles have been instantiated this method gets called once to put anything together or to smooth
      * biomasses or whatever
-     *  @param biology the global biology instance
+     *
+     * @param biology the global biology instance
      * @param map     the map which by now should have all the tiles in place
-     * @param random the randomizer
+     * @param random  the randomizer
      * @param model
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
+        GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model
+    ) {
         List<Species> species = biology.getSpecies();
 
         //call the smoother
@@ -116,10 +118,10 @@ public class FromLeftToRightSplitInitializer extends AbstractBiologyInitializer 
             if (toChange.getBiomass(species.get(specie)) > 0 && fixed.getBiomass(species.get(specie)) > 0) {
 
                 double newBiology = Math.round(toChange.getBiomass(species.get(specie)) +
-                                                       (random.nextFloat() * .025f) *
-                                                               (fixed.getBiomass(
-                                                                       species.get(specie)) - toChange.getBiomass(
-                                                                       species.get(specie))));
+                    (random.nextFloat() * .025f) *
+                        (fixed.getBiomass(
+                            species.get(specie)) - toChange.getBiomass(
+                            species.get(specie))));
                 if (newBiology <= 0)
                     newBiology = 1;
 
@@ -147,6 +149,7 @@ public class FromLeftToRightSplitInitializer extends AbstractBiologyInitializer 
     public void setBiologySmoothingIndex(int biologySmoothingIndex) {
         this.biologySmoothingIndex = biologySmoothingIndex;
     }
+
     /**
      * "Species 0" and "Species 1"
      *

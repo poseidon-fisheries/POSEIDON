@@ -11,7 +11,7 @@ public class SamplePoseidonOptimization extends SimpleProblemDouble {
     @Override
     public double[] evaluate(double[] x) {
 
-        return new double[]{ Math.pow(x[0]-multiplier,2)};
+        return new double[]{Math.pow(x[0] - multiplier, 2)};
 
 
     }

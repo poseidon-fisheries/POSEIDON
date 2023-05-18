@@ -21,9 +21,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.LogisticDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -52,8 +49,9 @@ public class WeatherLogisticDepartingStrategy extends LogisticDepartingStrategy 
 
 
     public WeatherLogisticDepartingStrategy(
-            double l, double k, double x0, double windspeedSensitivity, double boatLengthSensitivity,
-            double harshnessIntercept) {
+        double l, double k, double x0, double windspeedSensitivity, double boatLengthSensitivity,
+        double harshnessIntercept
+    ) {
         super(l, k, x0);
         this.windspeedSensitivity = windspeedSensitivity;
         this.boatLengthSensitivity = boatLengthSensitivity;
@@ -65,15 +63,14 @@ public class WeatherLogisticDepartingStrategy extends LogisticDepartingStrategy 
      * abstract method, returns whatever we need to plug in the logistic function
      *
      * @param fisher the fisher making the decision
-     * @param model the state
+     * @param model  the state
      */
-    public double computeX(Fisher fisher, FishState model){
-
+    public double computeX(Fisher fisher, FishState model) {
 
 
         return fisher.getLocation().getWindSpeedInKph() * windspeedSensitivity +
-                fisher.getBoat().getLength() * boatLengthSensitivity +
-                harshnessIntercept;
+            fisher.getBoat().getLength() * boatLengthSensitivity +
+            harshnessIntercept;
 
     }
 }

@@ -40,8 +40,10 @@ public class PortTest {
         SeaTile location = mock(SeaTile.class);
         Port port = new Port("Port 0", location, mock(MarketMap.class), 0);
 
-        Fisher one = mock(Fisher.class); when(one.getLocation()).thenReturn(location);
-        Fisher two = mock(Fisher.class);when(two.getLocation()).thenReturn(location);
+        Fisher one = mock(Fisher.class);
+        when(one.getLocation()).thenReturn(location);
+        Fisher two = mock(Fisher.class);
+        when(two.getLocation()).thenReturn(location);
 
         //initially neither fisher is at port
         assertFalse(port.isDocked(one));
@@ -60,37 +62,37 @@ public class PortTest {
         assertFalse(port.isDocked(two));
     }
 
-    @Test(expected=RuntimeException.class)
-    public void wrongLocationThrowsException()
-    {
+    @Test(expected = RuntimeException.class)
+    public void wrongLocationThrowsException() {
         SeaTile location1 = mock(SeaTile.class);
         SeaTile location2 = mock(SeaTile.class);
         Port port = new Port("Port 0", location1, mock(MarketMap.class), 0);
 
-        Fisher one = mock(Fisher.class);when(one.getLocation()).thenReturn(location2);
+        Fisher one = mock(Fisher.class);
+        when(one.getLocation()).thenReturn(location2);
         //one is not sharing the sea-tile with port
         port.dock(one);
 
     }
 
-    @Test(expected=IllegalStateException.class)
-    public void dockingTwiceIsNotAllowd()
-    {
+    @Test(expected = IllegalStateException.class)
+    public void dockingTwiceIsNotAllowd() {
         SeaTile location = mock(SeaTile.class);
         Port port = new Port("Port 0", location, mock(MarketMap.class), 0);
 
-        Fisher one = mock(Fisher.class); when(one.getLocation()).thenReturn(location);
+        Fisher one = mock(Fisher.class);
+        when(one.getLocation()).thenReturn(location);
         port.dock(one);
         port.dock(one);
     }
 
-    @Test(expected=IllegalStateException.class)
-    public void undockingWithoutBeingDockedIsNotAllowed()
-    {
+    @Test(expected = IllegalStateException.class)
+    public void undockingWithoutBeingDockedIsNotAllowed() {
         SeaTile location = mock(SeaTile.class);
         Port port = new Port("Port 0", location, mock(MarketMap.class), 0);
 
-        Fisher one = mock(Fisher.class); when(one.getLocation()).thenReturn(location);
+        Fisher one = mock(Fisher.class);
+        when(one.getLocation()).thenReturn(location);
         port.depart(one);
     }
 

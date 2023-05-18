@@ -41,7 +41,8 @@ public class FixedGearStrategy implements GearStrategy {
      */
     @Override
     public void updateGear(
-            Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
+        Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction
+    ) {
     }
 
     @Override

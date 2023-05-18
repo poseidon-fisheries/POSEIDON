@@ -55,6 +55,9 @@ public class ConstantWeather implements LocalWeather {
         return windDirection;
     }
 
+    public void setWindDirection(double windDirection) {
+        this.windDirection = windDirection;
+    }
 
     public void setTemperature(double temperature) {
         this.temperature = temperature;
@@ -62,9 +65,5 @@ public class ConstantWeather implements LocalWeather {
 
     public void setWindSpeed(double windSpeed) {
         this.windSpeed = windSpeed;
-    }
-
-    public void setWindDirection(double windDirection) {
-        this.windDirection = windDirection;
     }
 }

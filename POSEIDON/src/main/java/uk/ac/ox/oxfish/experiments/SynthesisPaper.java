@@ -138,7 +138,11 @@ public class SynthesisPaper {
 
     }
 
-    public static void socialAnnealing(final int runsPerScenario, final Path inputFolder, final Path outputFolder) throws IOException {
+    public static void socialAnnealing(
+        final int runsPerScenario,
+        final Path inputFolder,
+        final Path outputFolder
+    ) throws IOException {
 
         final String readScenario = String.join("\n", Files.readAllLines(inputFolder.resolve("basic.yaml")));
 

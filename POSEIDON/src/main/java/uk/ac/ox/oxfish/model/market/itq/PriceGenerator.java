@@ -30,7 +30,7 @@ import java.io.Serializable;
  * between buying and not buying quotas
  * Created by carrknight on 10/7/15.
  */
-public interface PriceGenerator extends FisherStartable, Serializable{
+public interface PriceGenerator extends FisherStartable, Serializable {
 
 
     double computeLambda();

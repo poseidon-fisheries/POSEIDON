@@ -18,9 +18,10 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import java.util.List;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.List;
 
 abstract class Excluder<B extends LocalBiology> {
 
@@ -48,9 +49,9 @@ abstract class Excluder<B extends LocalBiology> {
         return biologiesToExclude.isEmpty()
             ? originalBiology
             : exclude(
-                originalBiology,
-                aggregator.apply(fishState.getBiology(), biologiesToExclude)
-            );
+            originalBiology,
+            aggregator.apply(fishState.getBiology(), biologiesToExclude)
+        );
     }
 
     abstract B exclude(B aggregatedBiology, B biologyToExclude);

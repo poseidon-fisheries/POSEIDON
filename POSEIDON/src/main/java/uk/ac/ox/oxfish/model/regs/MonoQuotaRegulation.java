@@ -25,7 +25,6 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -40,6 +39,10 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
 
 
     /**
+     * if this is set to anything above 0, then quota season is in this many days rather than yearly
+     */
+    private final int quotaPeriodInDays;
+    /**
      * how much biomass in total can be caught each year
      */
     private double yearlyQuota;
@@ -48,21 +51,16 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      */
     private double quotaRemaining;
 
-    /**
-     * if this is set to anything above 0, then quota season is in this many days rather than yearly
-     */
-    private final int quotaPeriodInDays;
-
 
     /**
      * when created it sets itself to step every year to reset the quota
-     * @param yearlyQuota the yearly quota
      *
+     * @param yearlyQuota the yearly quota
      */
 
     public MonoQuotaRegulation(double yearlyQuota) {
 
-        this(yearlyQuota,-1);
+        this(yearlyQuota, -1);
     }
 
     public MonoQuotaRegulation(double yearlyQuota, int quotaPeriodInDays) {
@@ -71,19 +69,16 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
         this.quotaPeriodInDays = quotaPeriodInDays;
     }
 
-    private boolean isFishingStillAllowed(){
-        return quotaRemaining > FishStateUtilities.EPSILON;
-    }
-
-
     /**
      * this regulation step resets the quota remaining
+     *
      * @param simState the quota
      */
     @Override
     public void step(SimState simState) {
         quotaRemaining = yearlyQuota;
     }
+
     /**
      * can the agent fish at this location?
      *
@@ -94,21 +89,27 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      */
     @Override
     public boolean canFishHere(
-            Fisher agent, SeaTile tile, FishState model, int timeStep) {
+        Fisher agent, SeaTile tile, FishState model, int timeStep
+    ) {
         return isFishingStillAllowed();
+    }
+
+    private boolean isFishingStillAllowed() {
+        return quotaRemaining > FishStateUtilities.EPSILON;
     }
 
     /**
      * how much of this species biomass is sellable. Zero means it is unsellable
      *
-     * @param agent  the fisher selling its catch
+     * @param agent   the fisher selling its catch
      * @param species the species we are being asked about
-     * @param model  a link to the model
+     * @param model   a link to the model
      * @return a positive biomass if it sellable. Zero if you need to throw everything away
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Species species, FishState model, int timeStep) {
+        Fisher agent, Species species, FishState model, int timeStep
+    ) {
         return quotaRemaining;
     }
 
@@ -127,13 +128,21 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
 
     /**
      * tell the regulation object this much of this species has been sold
-     *  @param species  the species of fish sold
+     *
+     * @param species the species of fish sold
      * @param seller
      * @param biomass how much biomass has been sold
      * @param revenue how much money was made off it
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
+    public void reactToSale(
+        Species species,
+        Fisher seller,
+        double biomass,
+        double revenue,
+        FishState model,
+        int timeStep
+    ) {
 
         quotaRemaining -= biomass;
         Preconditions.checkState(quotaRemaining >= -FishStateUtilities.EPSILON, quotaRemaining);
@@ -143,8 +152,13 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
         return yearlyQuota;
     }
 
+    public void setYearlyQuota(double yearlyQuota) {
+        this.yearlyQuota = yearlyQuota;
+    }
+
     /**
      * get quota remaining
+     *
      * @param specieIndex ignored
      * @return
      */
@@ -152,13 +166,10 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
         return quotaRemaining;
     }
 
-    public void setYearlyQuota(double yearlyQuota) {
-        this.yearlyQuota = yearlyQuota;
-    }
-
     /**
      * set total quota remaining. specie index is completely ignored
-     * @param specieIndex ignored since the quota is for any specie
+     *
+     * @param specieIndex    ignored since the quota is for any specie
      * @param quotaRemaining the quota remaining
      */
     public void setQuotaRemaining(int specieIndex, double quotaRemaining) {
@@ -178,10 +189,10 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
 
     @Override
     public void start(FishState model, Fisher fisher) {
-        if(quotaPeriodInDays<=0)
+        if (quotaPeriodInDays <= 0)
             model.scheduleEveryYear(this, StepOrder.POLICY_UPDATE);
         else
-            model.scheduleEveryXDay(this,StepOrder.POLICY_UPDATE,quotaPeriodInDays);
+            model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE, quotaPeriodInDays);
 
     }
 

@@ -42,7 +42,7 @@ public class AlwaysDiscardTheseSpecies implements DiscardingStrategy {
     public AlwaysDiscardTheseSpecies(int... speciesToDiscard) {
 
         indicesOfSpeciesToThrowOverboard = new LinkedList<>();
-        for(int index : speciesToDiscard)
+        for (int index : speciesToDiscard)
             indicesOfSpeciesToThrowOverboard.add(index);
 
     }
@@ -73,30 +73,28 @@ public class AlwaysDiscardTheseSpecies implements DiscardingStrategy {
      */
     @Override
     public Catch chooseWhatToKeep(
-            SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing, Regulation regulation, FishState model,
-            MersenneTwisterFast random) {
+        SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing, Regulation regulation, FishState model,
+        MersenneTwisterFast random
+    ) {
 
 
-
-        if(!fishCaught.hasAbundanceInformation())
-        {
+        if (!fishCaught.hasAbundanceInformation()) {
             double[] biomassArray = fishCaught.getBiomassArray();
             for (Integer index : indicesOfSpeciesToThrowOverboard)
                 biomassArray[index] = 0;
             return new Catch(biomassArray);
-        }
-        else
-        {
+        } else {
             StructuredAbundance[] abundance = new StructuredAbundance[fishCaught.numberOfSpecies()];
-            for (int species=0; species< fishCaught.numberOfSpecies(); species++)
-            {
-                if(indicesOfSpeciesToThrowOverboard.contains(species))
-                    abundance[species] = new StructuredAbundance(fishCaught.getAbundance(species).getSubdivisions(),
-                                                                 fishCaught.getAbundance(species).getBins());
+            for (int species = 0; species < fishCaught.numberOfSpecies(); species++) {
+                if (indicesOfSpeciesToThrowOverboard.contains(species))
+                    abundance[species] = new StructuredAbundance(
+                        fishCaught.getAbundance(species).getSubdivisions(),
+                        fishCaught.getAbundance(species).getBins()
+                    );
                 else
                     abundance[species] = new StructuredAbundance(fishCaught.getAbundance(species));
             }
-            return new Catch(abundance,model.getBiology());
+            return new Catch(abundance, model.getBiology());
         }
 
     }

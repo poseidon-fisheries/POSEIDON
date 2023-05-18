@@ -28,8 +28,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
  * builds classic averager
  * Created by carrknight on 11/11/16.
  */
-public class IterativeAverageFactory implements AlgorithmFactory<IterativeAverage<Double>>
-{
+public class IterativeAverageFactory implements AlgorithmFactory<IterativeAverage<Double>> {
 
 
     /**

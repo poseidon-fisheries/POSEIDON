@@ -53,16 +53,40 @@ public class MapDiscretization {
     /**
      * the "inverse" mapping that gets for each seatile which group it belongs to
      */
-    private Map<SeaTile,Integer> grouped;
+    private Map<SeaTile, Integer> grouped;
 
     /**
-     *  boolean is true if at least one cell within that group
+     * boolean is true if at least one cell within that group
      */
     private boolean[] validGroup;
 
 
     public MapDiscretization(MapDiscretizer discretizer) {
         this.discretizer = discretizer;
+    }
+
+    public static MapDiscretization createDiscretization(FishState state, String centroidFile) {
+        CsvColumnsToLists reader = new CsvColumnsToLists(
+            centroidFile,
+            ',',
+            new String[]{"eastings", "northings"}
+        );
+
+        LinkedList<Double>[] lists = reader.readColumns();
+        ArrayList<Coordinate> coordinates = new ArrayList<>();
+        for (int i = 0; i < lists[0].size(); i++)
+            coordinates.add(new Coordinate(
+                lists[0].get(i),
+                lists[1].get(i),
+                0
+            ));
+
+        CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(
+            coordinates);
+        MapDiscretization discretization = new MapDiscretization(
+            discretizer);
+        discretization.discretize(state.getMap());
+        return discretization;
     }
 
     public void discretize(NauticalMap map) {
@@ -79,9 +103,9 @@ public class MapDiscretization {
         assert groupsShareNoTile();
 
         //now check for each group if there is at least one seatile in them
-        validGroup =  new boolean[groups.length];
-        for(int i=0;  i<groups.length; i++)
-            validGroup[i] = groups[i].size()>0;
+        validGroup = new boolean[groups.length];
+        for (int i = 0; i < groups.length; i++)
+            validGroup[i] = groups[i].size() > 0;
 
         //now again go through each group
         grouped = new HashMap<>(map.getAllSeaTilesExcludingLandAsList().size());
@@ -90,38 +114,35 @@ public class MapDiscretization {
                 assert !grouped.containsKey(tile);
                 grouped.put(tile, i);
             }
-      //  assert allTilesAreInAGroup(map); not true anymore because you could decide to ignore certain seatiles (usually wastelands)
+        //  assert allTilesAreInAGroup(map); not true anymore because you could decide to ignore certain seatiles (usually wastelands)
 
     }
 
-    private boolean groupsShareNoTile()
-    {
+    private boolean groupsShareNoTile() {
         boolean disjoint = true;
-        for(int i=0; i<groups.length; i++)
-            for(int j=i+1; j<groups.length; j++)
-                disjoint = disjoint && Collections.disjoint(groups[i],groups[j]);
-        return  disjoint;
+        for (int i = 0; i < groups.length; i++)
+            for (int j = i + 1; j < groups.length; j++)
+                disjoint = disjoint && Collections.disjoint(groups[i], groups[j]);
+        return disjoint;
     }
 
-    private boolean allTilesAreInAGroup(NauticalMap map)
-    {
+    private boolean allTilesAreInAGroup(NauticalMap map) {
         boolean fine = true;
         List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
-        for(SeaTile tile : tiles)
+        for (SeaTile tile : tiles)
             fine = fine && (getGroup(tile) != null);
 
         return fine;
     }
 
-
     /**
      * find out which group does this sea tile belong to
+     *
      * @param tile
      * @return
      */
-    public Integer getGroup(SeaTile tile)
-    {
-        if(!grouped.containsKey(tile)) {
+    public Integer getGroup(SeaTile tile) {
+        if (!grouped.containsKey(tile)) {
             return null;
         }
         assert grouped.containsKey(tile);
@@ -129,45 +150,20 @@ public class MapDiscretization {
         return grouped.get(tile);
     }
 
-    public int getNumberOfGroups()
-    {
+    public int getNumberOfGroups() {
         return groups.length;
     }
 
-    public boolean isActive(){
+    public boolean isActive() {
         return groups != null;
     }
 
-    public boolean isValid(int groupIndex)
-    {
+    public boolean isValid(int groupIndex) {
         return validGroup[groupIndex];
     }
 
-    public List<SeaTile> getGroup(int groupIndex)
-    {
+    public List<SeaTile> getGroup(int groupIndex) {
         return groups[groupIndex];
-    }
-
-    public static MapDiscretization createDiscretization(FishState state, String centroidFile) {
-        CsvColumnsToLists reader = new CsvColumnsToLists(
-            centroidFile,
-            ',',
-            new String[]{"eastings", "northings"}
-        );
-
-        LinkedList<Double>[] lists = reader.readColumns();
-        ArrayList<Coordinate> coordinates = new ArrayList<>();
-        for (int i = 0; i < lists[0].size(); i++)
-            coordinates.add(new Coordinate(lists[0].get(i),
-                lists[1].get(i),
-                0));
-
-        CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(
-            coordinates);
-        MapDiscretization discretization = new MapDiscretization(
-            discretizer);
-        discretization.discretize(state.getMap());
-        return discretization;
     }
 
 }

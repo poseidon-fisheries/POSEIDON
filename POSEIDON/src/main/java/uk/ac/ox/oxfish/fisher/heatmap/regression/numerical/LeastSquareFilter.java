@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 import java.util.Arrays;
@@ -43,8 +42,9 @@ public class LeastSquareFilter {
 
 
     public LeastSquareFilter(
-            int dimension, double[][] uncertainty, double[] beta, double exponentialForgetting) {
-        Preconditions.checkArgument(dimension>0);
+        int dimension, double[][] uncertainty, double[] beta, double exponentialForgetting
+    ) {
+        Preconditions.checkArgument(dimension > 0);
         this.dimension = dimension;
         this.uncertainty = uncertainty;
         this.beta = beta;
@@ -52,16 +52,17 @@ public class LeastSquareFilter {
     }
 
     public LeastSquareFilter(
-            int dimension, double uncertainty, double[] beta, double exponentialForgetting) {
+        int dimension, double uncertainty, double[] beta, double exponentialForgetting
+    ) {
         this.dimension = dimension;
         this.uncertainty = new double[dimension][dimension];
-        for(int i=0; i<dimension; i++)
+        for (int i = 0; i < dimension; i++)
             this.uncertainty[i][i] = uncertainty;
         this.beta = beta;
         this.exponentialForgetting = exponentialForgetting;
     }
 
-    public void addObservation(double[] x, double y, double sigmaSquared){
+    public void addObservation(double[] x, double y, double sigmaSquared) {
 
         assert x.length == dimension;
 
@@ -69,24 +70,22 @@ public class LeastSquareFilter {
         //going through the least squares filter as described here:
         //http://www.cs.tut.fi/~tabus/course/ASP/LectureNew10.pdf
         double pi[] = new double[dimension];
-        for(int column=0; column<dimension; column++)
-            for(int row=0; row<dimension; row++)
-            {
+        for (int column = 0; column < dimension; column++)
+            for (int row = 0; row < dimension; row++) {
                 pi[column] += x[row] * uncertainty[row][column];
-                assert(Double.isFinite(pi[column]));
+                assert (Double.isFinite(pi[column]));
 
             }
         //gamma is basically dispersion
         double gamma = exponentialForgetting * sigmaSquared;
-        assert(gamma != 0);
+        assert (gamma != 0);
 
-        for(int row=0; row<dimension; row++)
-            gamma+= x[row] *  pi[row];
+        for (int row = 0; row < dimension; row++)
+            gamma += x[row] * pi[row];
 
         //if the dispersion is not invertible, do not add the observation
-        if(gamma == 0)
-        {
-          //  System.out.println("ignored");
+        if (gamma == 0) {
+            //  System.out.println("ignored");
             increaseUncertainty();
             return;
         }
@@ -94,46 +93,45 @@ public class LeastSquareFilter {
 
         //kalman gain
         double[] kalman = new double[dimension];
-        for(int row=0; row<dimension; row++) {
-            assert(Double.isFinite( pi[row]));
-            assert(Double.isFinite( gamma));
+        for (int row = 0; row < dimension; row++) {
+            assert (Double.isFinite(pi[row]));
+            assert (Double.isFinite(gamma));
 
             kalman[row] = pi[row] / gamma;
 
-            assert(Double.isFinite( kalman[row]));
+            assert (Double.isFinite(kalman[row]));
 
 
         }
 
         //prediction error
         double prediction = 0;
-        for(int i=0; i<x.length; i++)
+        for (int i = 0; i < x.length; i++)
             prediction += x[i] * beta[i];
         double predictionError = y - prediction;
         assert (Double.isFinite(predictionError));
 
         //update beta
-        for(int i=0; i<dimension; i++) {
+        for (int i = 0; i < dimension; i++) {
             beta[i] += predictionError * kalman[i];
-            assert  Double.isFinite(beta[i]);
+            assert Double.isFinite(beta[i]);
         }
         //get P'
         final double[][] prime = new double[dimension][dimension];
-        for(int row=0; row<dimension; row++)
-            for(int column=0; column<dimension; column++) {
+        for (int row = 0; row < dimension; row++)
+            for (int column = 0; column < dimension; column++) {
                 prime[row][column] = kalman[row] * pi[column];
-                assert(Double.isFinite(prime[row][column])) : "pi " + pi[column] + " , kalman: " + kalman[column] ;
+                assert (Double.isFinite(prime[row][column])) : "pi " + pi[column] + " , kalman: " + kalman[column];
 
             }
         //update uncertainty
-        for(int row=0; row<dimension; row++)
-            for(int column=0; column<dimension; column++)
-            {
-                assert(Double.isFinite(prime[row][column]));
+        for (int row = 0; row < dimension; row++)
+            for (int column = 0; column < dimension; column++) {
+                assert (Double.isFinite(prime[row][column]));
 
-                uncertainty[row][column]-=prime[row][column];
-                uncertainty[row][column]/=exponentialForgetting;
-                assert(Double.isFinite(uncertainty[row][column]));
+                uncertainty[row][column] -= prime[row][column];
+                uncertainty[row][column] /= exponentialForgetting;
+                assert (Double.isFinite(uncertainty[row][column]));
 
             }
 
@@ -144,12 +142,10 @@ public class LeastSquareFilter {
      * if sigma^2 is infinite the kalman will be 0 which means that the only thing actually changing is P increasing.
      * This method just applies that part
      */
-    public void increaseUncertainty()
-    {
-        for(int row=0; row<dimension; row++)
-            for(int column=0; column<dimension; column++)
-            {
-                uncertainty[row][column]/=exponentialForgetting;
+    public void increaseUncertainty() {
+        for (int row = 0; row < dimension; row++)
+            for (int column = 0; column < dimension; column++) {
+                uncertainty[row][column] /= exponentialForgetting;
             }
 
 

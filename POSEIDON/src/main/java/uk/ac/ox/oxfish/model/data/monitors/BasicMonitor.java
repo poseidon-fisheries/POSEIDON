@@ -19,8 +19,6 @@
 
 package uk.ac.ox.oxfish.model.data.monitors;
 
-import static java.util.Collections.singletonList;
-
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
 
@@ -28,6 +26,8 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static java.util.Collections.singletonList;
 
 public class BasicMonitor<O, V, Q extends Quantity<Q>> extends AbstractMonitor<O, V, Q> {
 
@@ -45,7 +45,8 @@ public class BasicMonitor<O, V, Q extends Quantity<Q>> extends AbstractMonitor<O
         this.valueExtractor = valueExtractor;
     }
 
-    @Override public Iterable<V> extractValues(final O observable) {
+    @Override
+    public Iterable<V> extractValues(final O observable) {
         return singletonList(valueExtractor.apply(observable));
     }
 

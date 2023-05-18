@@ -14,5 +14,4 @@ public interface CatchAtLengthFactory extends AlgorithmFactory<SPRAgent> {
     public String getSurveyTag();
 
 
-
 }

@@ -380,7 +380,8 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         stillAllowedActionsInPlan.clear();
         thisTripTargetHours = maxHoursPerTripGenerator.applyAsDouble(model.getRandom());
         currentPlan = planRecursively(currentPlan, thisTripTargetHours,
-            model, fisher);
+            model, fisher
+        );
 
         return currentPlan;
     }

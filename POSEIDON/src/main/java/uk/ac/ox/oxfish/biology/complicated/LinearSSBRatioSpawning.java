@@ -33,6 +33,16 @@ public class LinearSSBRatioSpawning extends YearlyRecruitmentProcess {
     final private double virginSpawningBiomass;
 
 
+    public LinearSSBRatioSpawning(
+        double virginRecruits, double lenghtAtMaturity,
+        double virginSpawningBiomass, boolean recruitEveryDay
+    ) {
+        super(recruitEveryDay);
+        this.virginRecruits = virginRecruits;
+        this.lenghtAtMaturity = lenghtAtMaturity;
+        this.virginSpawningBiomass = virginSpawningBiomass;
+    }
+
     /**
      * Getter for property 'virginRecruits'.
      *
@@ -60,34 +70,29 @@ public class LinearSSBRatioSpawning extends YearlyRecruitmentProcess {
         return virginSpawningBiomass;
     }
 
-    public LinearSSBRatioSpawning(double virginRecruits, double lenghtAtMaturity,
-                                  double virginSpawningBiomass, boolean recruitEveryDay) {
-        super(recruitEveryDay);
-        this.virginRecruits = virginRecruits;
-        this.lenghtAtMaturity = lenghtAtMaturity;
-        this.virginSpawningBiomass = virginSpawningBiomass;
-    }
-
     @Override
     protected double computeYearlyRecruitment(
-            Species species, Meristics meristics, StructuredAbundance abundance) {
+        Species species, Meristics meristics, StructuredAbundance abundance
+    ) {
 
         double ratio = computeDepletion(species, meristics, abundance, lenghtAtMaturity, virginSpawningBiomass);
-        return virginRecruits* ratio;
+        return virginRecruits * ratio;
     }
 
-    public static double computeDepletion(Species species,
-                                           Meristics meristics,
-                                           StructuredAbundance abundance,
-                                           double lenghtAtMaturity, double virginSpawningBiomass) {
+    public static double computeDepletion(
+        Species species,
+        Meristics meristics,
+        StructuredAbundance abundance,
+        double lenghtAtMaturity, double virginSpawningBiomass
+    ) {
         double currentSpawningBiomass = 0;
 
-        for(int i=0; i<abundance.getSubdivisions(); i++)
-            for(int j=0; j<abundance.getBins(); j++)
-                if(species.getLength(i,j)>=lenghtAtMaturity)
-                    currentSpawningBiomass+= FishStateUtilities.weigh(abundance,meristics,i,j);
+        for (int i = 0; i < abundance.getSubdivisions(); i++)
+            for (int j = 0; j < abundance.getBins(); j++)
+                if (species.getLength(i, j) >= lenghtAtMaturity)
+                    currentSpawningBiomass += FishStateUtilities.weigh(abundance, meristics, i, j);
 
-        return Math.min(currentSpawningBiomass / virginSpawningBiomass,1);
+        return Math.min(currentSpawningBiomass / virginSpawningBiomass, 1);
     }
 
     /**

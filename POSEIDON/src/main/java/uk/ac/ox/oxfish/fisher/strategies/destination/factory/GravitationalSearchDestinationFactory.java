@@ -43,8 +43,7 @@ import java.util.function.Predicate;
 /**
  * Created by carrknight on 10/6/16.
  */
-public class GravitationalSearchDestinationFactory implements AlgorithmFactory<PerTripIterativeDestinationStrategy>
-{
+public class GravitationalSearchDestinationFactory implements AlgorithmFactory<PerTripIterativeDestinationStrategy> {
 
 
     private DoubleParameter explorationSize = new FixedDoubleParameter(20);
@@ -68,61 +67,65 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
 
         FavoriteDestinationStrategy delegate = new FavoriteDestinationStrategy(map, random);
         GravitationalSearchAdaptation<SeaTile> search = new GravitationalSearchAdaptation<>(
-                new Sensor<Fisher,SeaTile>() {
-                    @Override
-                    public SeaTile scan(Fisher fisher) {
+            new Sensor<Fisher, SeaTile>() {
+                @Override
+                public SeaTile scan(Fisher fisher) {
 
-                        if(
-                                fisher.getDestinationStrategy() instanceof PerTripIterativeDestinationStrategy &&
-                                ((PerTripIterativeDestinationStrategy) fisher.getDestinationStrategy()).getDelegate().equals(
-                                delegate))
-                            return delegate.getFavoriteSpot();
-                        else {
-                            TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
-                            return lastFinishedTrip == null ? null : lastFinishedTrip.getMostFishedTileInTrip();
+                    if (
+                        fisher.getDestinationStrategy() instanceof PerTripIterativeDestinationStrategy &&
+                            ((PerTripIterativeDestinationStrategy) fisher.getDestinationStrategy()).getDelegate()
+                                .equals(
+                                    delegate))
+                        return delegate.getFavoriteSpot();
+                    else {
+                        TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
+                        return lastFinishedTrip == null ? null : lastFinishedTrip.getMostFishedTileInTrip();
 
-                        }
                     }
-                },
-                new Actuator<Fisher,SeaTile>() {
-                    @Override
-                    public void apply(Fisher fisher, SeaTile change, FishState model) {
-                            delegate.setFavoriteSpot(change);
-                    }
-                },
-                new Predicate<Fisher>() {
-                    @Override
-                    public boolean test(Fisher fisher) {
-                        return true;
-                    }
-                },
-                new CoordinateTransformer<SeaTile>() {
-                    @Override
-                    public double[] toCoordinates(
-                            SeaTile variable,
-                            Fisher fisher,
-                            FishState model) {
-                        return variable == null ? null :
-                                new double[]{
-                                        variable.getGridX(),
-                                        variable.getGridY()};
-                    }
+                }
+            },
+            new Actuator<Fisher, SeaTile>() {
+                @Override
+                public void apply(Fisher fisher, SeaTile change, FishState model) {
+                    delegate.setFavoriteSpot(change);
+                }
+            },
+            new Predicate<Fisher>() {
+                @Override
+                public boolean test(Fisher fisher) {
+                    return true;
+                }
+            },
+            new CoordinateTransformer<SeaTile>() {
+                @Override
+                public double[] toCoordinates(
+                    SeaTile variable,
+                    Fisher fisher,
+                    FishState model
+                ) {
+                    return variable == null ? null :
+                        new double[]{
+                            variable.getGridX(),
+                            variable.getGridY()};
+                }
 
-                    @Override
-                    public SeaTile fromCoordinates(
-                            double[] variable,
-                            Fisher fisher,
-                            FishState model) {
-                        return model.getMap().getSeaTile(
-                                (int)variable[0],
-                                (int)variable[1]);
-                    }
-                },
-                new HourlyProfitInTripObjective(true),
-                100,
-                10,
-                new FixedDoubleParameter(0),
-                state.getRandom()
+                @Override
+                public SeaTile fromCoordinates(
+                    double[] variable,
+                    Fisher fisher,
+                    FishState model
+                ) {
+                    return model.getMap().getSeaTile(
+                        (int) variable[0],
+                        (int) variable[1]
+                    );
+                }
+            },
+            new HourlyProfitInTripObjective(true),
+            100,
+            10,
+            new FixedDoubleParameter(0),
+            state.getRandom()
 
         );
         //bound and randomize if you end up on land!
@@ -133,8 +136,7 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
                 variable[1] = Math.max(Math.min(variable[1], state.getMap().getHeight() - 1), 0);
 
                 SeaTile presumedLocation = map.getSeaTile((int) variable[0], (int) variable[1]);
-                if(presumedLocation.isLand())
-                {
+                if (presumedLocation.isLand()) {
                     Object[] options = map.getMooreNeighbors(presumedLocation, 3).stream().filter(new Predicate() {
                         @Override
                         public boolean test(Object o) {
@@ -142,7 +144,7 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
                         }
                     }).toArray();
                     SeaTile tile;
-                    if(options.length>0)
+                    if (options.length > 0)
                         tile = (SeaTile) options[random.nextInt(options.length)];
                     else
                         tile = map.getRandomBelowWaterLineSeaTile(random);
@@ -151,9 +153,9 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
                 }
             }
         });
-        return  new PerTripIterativeDestinationStrategy(
-                delegate,
-                search
+        return new PerTripIterativeDestinationStrategy(
+            delegate,
+            search
 
         );
     }

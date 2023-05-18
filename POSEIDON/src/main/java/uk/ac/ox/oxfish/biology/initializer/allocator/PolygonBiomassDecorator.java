@@ -28,7 +28,7 @@ public class PolygonBiomassDecorator implements BiomassAllocator {
     /**
      * pre-compute all the tiles so that you call "isInsideUnion" only once
      */
-    private final HashMap<SeaTile,Boolean> insideUnion;
+    private final HashMap<SeaTile, Boolean> insideUnion;
 
 
     public PolygonBiomassDecorator(GeomVectorField boundingPolygons, boolean inside, BiomassAllocator delegate) {
@@ -43,33 +43,30 @@ public class PolygonBiomassDecorator implements BiomassAllocator {
     public double allocate(SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
 
 
-        if(!checkIfInside(tile,map))
-        {
-            if(inside)
+        if (!checkIfInside(tile, map)) {
+            if (inside)
                 return 0;
             else
-                return delegate.allocate(tile,map,random);
-        }
-        else
-        {
-            if(inside)
-                return delegate.allocate(tile,map,random);
+                return delegate.allocate(tile, map, random);
+        } else {
+            if (inside)
+                return delegate.allocate(tile, map, random);
             else
                 return 0;
         }
 
     }
 
-    private boolean checkIfInside(SeaTile tile, NauticalMap map){
+    private boolean checkIfInside(SeaTile tile, NauticalMap map) {
         return
-                insideUnion.computeIfAbsent(
-                        tile, new Function<SeaTile, Boolean>() {
-                            @Override
-                            public Boolean apply(SeaTile seaTile) {
-                                return boundingPolygons.isInsideUnion(map.getCoordinates(tile));
-                            }
-                        }
-                );
+            insideUnion.computeIfAbsent(
+                tile, new Function<SeaTile, Boolean>() {
+                    @Override
+                    public Boolean apply(SeaTile seaTile) {
+                        return boundingPolygons.isInsideUnion(map.getCoordinates(tile));
+                    }
+                }
+            );
 
     }
 }

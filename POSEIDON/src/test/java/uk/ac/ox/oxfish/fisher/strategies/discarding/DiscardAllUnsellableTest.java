@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
 public class DiscardAllUnsellableTest {
 
     private final FishState model = mock(FishState.class);
-    private Fisher fisher= mock(Fisher.class);
+    private Fisher fisher = mock(Fisher.class);
 
     @Test
     public void noDiscarding() throws Exception {
@@ -59,19 +59,21 @@ public class DiscardAllUnsellableTest {
 
         Regulation mock = mock(Regulation.class);
         //no discarding should occur
-        when(mock.maximumBiomassSellable(fisher,species1,model)).thenReturn(200d);
-        Catch retained = noDiscarding.chooseWhatToKeep(mock(SeaTile.class),
-                                                       fisher,
-                                                       caught,
-                                                       1,
-                                                       mock,
-                                                       model,
-                                                       new MersenneTwisterFast());
+        when(mock.maximumBiomassSellable(fisher, species1, model)).thenReturn(200d);
+        Catch retained = noDiscarding.chooseWhatToKeep(
+            mock(SeaTile.class),
+            fisher,
+            caught,
+            1,
+            mock,
+            model,
+            new MersenneTwisterFast()
+        );
 
         //assertEquals(retained,caught); not true because the objects are different!
-        assertEquals(retained.getTotalWeight(),caught.getTotalWeight(),.001);
-        assertEquals(retained.getWeightCaught(0),caught.getWeightCaught(0),.001);
-        assertEquals(retained.getWeightCaught(1),caught.getWeightCaught(1),.001);
+        assertEquals(retained.getTotalWeight(), caught.getTotalWeight(), .001);
+        assertEquals(retained.getWeightCaught(0), caught.getWeightCaught(0), .001);
+        assertEquals(retained.getWeightCaught(1), caught.getWeightCaught(1), .001);
 
     }
 
@@ -89,19 +91,21 @@ public class DiscardAllUnsellableTest {
 
         Regulation mock = mock(Regulation.class);
         //no discarding should occur
-        when(mock.maximumBiomassSellable(fisher,species1,model)).thenReturn(50d);
-        Catch retained = noDiscarding.chooseWhatToKeep(mock(SeaTile.class),
-                                                       fisher,
-                                                       caught,
-                                                       1,
-                                                       mock,
-                                                       model,
-                                                       new MersenneTwisterFast());
+        when(mock.maximumBiomassSellable(fisher, species1, model)).thenReturn(50d);
+        Catch retained = noDiscarding.chooseWhatToKeep(
+            mock(SeaTile.class),
+            fisher,
+            caught,
+            1,
+            mock,
+            model,
+            new MersenneTwisterFast()
+        );
 
-        assertNotEquals(retained,caught);
-        assertEquals(retained.getWeightCaught(0),50d,.001);
-        assertEquals(retained.getWeightCaught(1),0d,.001);
-        assertEquals(caught.getWeightCaught(0),100d,.001);
+        assertNotEquals(retained, caught);
+        assertEquals(retained.getWeightCaught(0), 50d, .001);
+        assertEquals(retained.getWeightCaught(1), 0d, .001);
+        assertEquals(caught.getWeightCaught(0), 100d, .001);
 
     }
 

@@ -35,10 +35,8 @@ public class FishingMortalityAgentTest {
     public void fishingMortality() {
 
 
-
-
         //vulnerability filter is just 0.6 in bin 1 and 0 in bin 0
-        AbundanceFilter vulnerabilityFilter = new FormulaAbundanceFilter(false,false){
+        AbundanceFilter vulnerabilityFilter = new FormulaAbundanceFilter(false, false) {
             /**
              * the method that gives the probability matrix for each age class and each sex of not filtering the
              * abundance away
@@ -57,13 +55,17 @@ public class FishingMortalityAgentTest {
         };
 
 
-        Species species = new Species("test",
-                                   new FromListMeristics(new double[]{1, 2}, 2));
+        Species species = new Species(
+            "test",
+            new FromListMeristics(new double[]{1, 2}, 2)
+        );
 
 
-        FishingMortalityAgent agent = new FishingMortalityAgent(vulnerabilityFilter,
-                                                                                species,
-                false);
+        FishingMortalityAgent agent = new FishingMortalityAgent(
+            vulnerabilityFilter,
+            species,
+            false
+        );
 
 
         double[][] catches = new double[2][2];
@@ -77,10 +79,10 @@ public class FishingMortalityAgentTest {
 
 
         double mortality = agent.computeMortality(
-                catches,
-                abundance
+            catches,
+            abundance
         );
-        assertEquals(0.8754687,mortality,.001);
+        assertEquals(0.8754687, mortality, .001);
 
 
     }

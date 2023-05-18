@@ -22,21 +22,22 @@ package uk.ac.ox.oxfish.model.data.monitors.loggers;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
-import javax.measure.Unit;
 import java.util.Collection;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.IntStream.range;
-import static tech.units.indriya.AbstractUnit.ONE;
 
 public abstract class TidyTimeSeries<T extends TimeSeries<?>> implements RowProvider {
 
     private final T timeSeries;
 
-    TidyTimeSeries(final T timeSeries) { this.timeSeries = timeSeries; }
+    TidyTimeSeries(final T timeSeries) {
+        this.timeSeries = timeSeries;
+    }
 
-    @Override public Iterable<? extends Collection<?>> getRows() {
+    @Override
+    public Iterable<? extends Collection<?>> getRows() {
         return timeSeries.getColumns().stream().flatMap(column ->
             range(0, column.size()).mapToObj(index -> makeRow(column, index))
         ).collect(toImmutableList());

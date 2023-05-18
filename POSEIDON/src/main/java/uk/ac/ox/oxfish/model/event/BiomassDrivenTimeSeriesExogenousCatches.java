@@ -29,13 +29,14 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * updates exogenous catches every year
  */
-public class BiomassDrivenTimeSeriesExogenousCatches implements ExogenousCatches{
-
+public class BiomassDrivenTimeSeriesExogenousCatches implements ExogenousCatches {
 
 
     private final LinkedHashMap<Species, Queue<Double>> landingsTimeSeries;
@@ -46,19 +47,17 @@ public class BiomassDrivenTimeSeriesExogenousCatches implements ExogenousCatches
 
 
     public BiomassDrivenTimeSeriesExogenousCatches(
-            LinkedHashMap<Species, Queue<Double>> landingsTimeSeries, final boolean allowMortalityOnFads) {
+        LinkedHashMap<Species, Queue<Double>> landingsTimeSeries, final boolean allowMortalityOnFads
+    ) {
 
         this.landingsTimeSeries = landingsTimeSeries;
 
-        LinkedHashMap<Species,Double> exogenousCatches = new LinkedHashMap<>();
-        for(Species species : landingsTimeSeries.keySet())
-            exogenousCatches.put(species,Double.NaN); //start them at NaN
+        LinkedHashMap<Species, Double> exogenousCatches = new LinkedHashMap<>();
+        for (Species species : landingsTimeSeries.keySet())
+            exogenousCatches.put(species, Double.NaN); //start them at NaN
         delegate = new BiomassDrivenFixedExogenousCatches(exogenousCatches, allowMortalityOnFads);
 
     }
-
-
-
 
 
     @Override
@@ -78,13 +77,37 @@ public class BiomassDrivenTimeSeriesExogenousCatches implements ExogenousCatches
      */
     @Override
     public void start(FishState model) {
-        Preconditions.checkArgument(stoppable==null, "Already started!");
+        Preconditions.checkArgument(stoppable == null, "Already started!");
         delegate.start(model);
 
 
         updateYearlyCatches();
-        stoppable = model.scheduleEveryYear((Steppable) simState1 -> updateYearlyCatches(),
-                                            StepOrder.DAWN);
+        stoppable = model.scheduleEveryYear(
+            (Steppable) simState1 -> updateYearlyCatches(),
+            StepOrder.DAWN
+        );
+
+    }
+
+    /**
+     * called every year, updates the amount of exogenous catches. Stops when it runs out of time series (which by default
+     * implies the landings are fixed after that point)
+     */
+    public void updateYearlyCatches() {
+
+        for (Map.Entry<Species, Queue<Double>> speciesTimeSeries : landingsTimeSeries.entrySet()) {
+
+            Species species = speciesTimeSeries.getKey();
+            Queue<Double> timeSeries = speciesTimeSeries.getValue();
+            if (timeSeries.size() > 0) {
+                Double newLandings = timeSeries.poll(); //grab top and remove!
+                assert newLandings != null; //otherwise the size call is off!
+                delegate.updateExogenousCatches(species, newLandings);
+            }
+
+
+        }
+
 
     }
 
@@ -94,32 +117,8 @@ public class BiomassDrivenTimeSeriesExogenousCatches implements ExogenousCatches
     @Override
     public void turnOff() {
         delegate.turnOff();
-        if(stoppable!=null)
+        if (stoppable != null)
             stoppable.stop();
-
-    }
-
-
-    /**
-     * called every year, updates the amount of exogenous catches. Stops when it runs out of time series (which by default
-     * implies the landings are fixed after that point)
-     */
-    public void updateYearlyCatches(){
-
-        for (Map.Entry<Species, Queue<Double>> speciesTimeSeries : landingsTimeSeries.entrySet()) {
-
-            Species species = speciesTimeSeries.getKey();
-            Queue<Double> timeSeries = speciesTimeSeries.getValue();
-            if(timeSeries.size()>0)
-            {
-                Double newLandings = timeSeries.poll(); //grab top and remove!
-                assert newLandings !=null; //otherwise the size call is off!
-                delegate.updateExogenousCatches(species,newLandings);
-            }
-
-
-        }
-
 
     }
 }

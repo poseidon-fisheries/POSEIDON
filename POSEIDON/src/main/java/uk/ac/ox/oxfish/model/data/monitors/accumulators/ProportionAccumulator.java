@@ -29,12 +29,19 @@ public class ProportionAccumulator implements Accumulator<Boolean> {
 
     private final Averager<Double> averager = new IterativeAverage<>();
 
-    @Override public String getNameFormat() { return "Proportion of %s"; }
+    @Override
+    public String getNameFormat() {
+        return "Proportion of %s";
+    }
 
-    @Override public void accumulate(final Boolean value) {
+    @Override
+    public void accumulate(final Boolean value) {
         averager.addObservation(value ? 1.0 : 0.0);
     }
 
-    @Override public double get() { return averager.getSmoothedObservation(); }
+    @Override
+    public double get() {
+        return averager.getSmoothedObservation();
+    }
 
 }

@@ -25,7 +25,7 @@ import ec.util.MersenneTwisterFast;
 
 /**
  * Returns a gaussian double value randomly
- *
+ * <p>
  * Created by carrknight on 6/7/15.
  */
 public class NormalDoubleParameter implements DoubleParameter {
@@ -39,7 +39,7 @@ public class NormalDoubleParameter implements DoubleParameter {
     }
 
     public NormalDoubleParameter(double mean, double standardDeviation) {
-        Preconditions.checkArgument(standardDeviation >=0);
+        Preconditions.checkArgument(standardDeviation >= 0);
         this.mean = mean;
         this.standardDeviation = standardDeviation;
     }
@@ -52,7 +52,7 @@ public class NormalDoubleParameter implements DoubleParameter {
      */
     @Override
     public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast) {
-        return mersenneTwisterFast.nextGaussian()*standardDeviation + mean;
+        return mersenneTwisterFast.nextGaussian() * standardDeviation + mean;
     }
 
     public double getMean() {
@@ -73,6 +73,6 @@ public class NormalDoubleParameter implements DoubleParameter {
 
     @Override
     public DoubleParameter makeCopy() {
-        return new NormalDoubleParameter(mean,standardDeviation);
+        return new NormalDoubleParameter(mean, standardDeviation);
     }
 }

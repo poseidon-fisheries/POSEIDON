@@ -18,16 +18,17 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.ImmutableIntArray;
 import com.vividsolutions.jts.geom.Coordinate;
-import java.util.Collection;
-import java.util.List;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.Collection;
+import java.util.List;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 public class FadBiomassLogger implements RowProvider {
 

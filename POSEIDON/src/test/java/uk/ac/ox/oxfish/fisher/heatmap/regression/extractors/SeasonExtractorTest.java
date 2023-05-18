@@ -37,7 +37,6 @@ import static org.mockito.Mockito.when;
 public class SeasonExtractorTest {
 
 
-
     @Test
     public void seasonDummyIsCorrect() throws Exception {
         Log.info("Tests that seasons are assigned correctly given the day number");
@@ -55,55 +54,70 @@ public class SeasonExtractorTest {
 
 
         //day 40 is winter, not spring
-        assertEquals(winter.extract(mock(SeaTile.class),
-                       40*24d,
-                       mock(Fisher.class),
-                       mock(FishState.class)),
-                     1d,
-                     .001
-                     );
-        assertEquals(spring.extract(mock(SeaTile.class),
-                                    40*24d,
-                                    mock(Fisher.class),
-                                    model),
-                     0d,
-                     .001
+        assertEquals(
+            winter.extract(
+                mock(SeaTile.class),
+                40 * 24d,
+                mock(Fisher.class),
+                mock(FishState.class)
+            ),
+            1d,
+            .001
+        );
+        assertEquals(
+            spring.extract(
+                mock(SeaTile.class),
+                40 * 24d,
+                mock(Fisher.class),
+                model
+            ),
+            0d,
+            .001
         );
         //same is true 365 days later!
-        assertEquals(winter.extract(mock(SeaTile.class),
-                                    (40+365)*24d,
-                                    mock(Fisher.class),
-                                    model),
-                     1d,
-                     .001
+        assertEquals(
+            winter.extract(
+                mock(SeaTile.class),
+                (40 + 365) * 24d,
+                mock(Fisher.class),
+                model
+            ),
+            1d,
+            .001
         );
-        assertEquals(spring.extract(mock(SeaTile.class),
-                                    (40+365)*24d,
-                                    mock(Fisher.class),
-                                    model),
-                     0d,
-                     .001
+        assertEquals(
+            spring.extract(
+                mock(SeaTile.class),
+                (40 + 365) * 24d,
+                mock(Fisher.class),
+                model
+            ),
+            0d,
+            .001
         );
 
 
         //day 90 is spring though
-        assertEquals(winter.extract(mock(SeaTile.class),
-                                    90*24d,
-                                    mock(Fisher.class),
-                                    model),
-                     0d,
-                     .001
+        assertEquals(
+            winter.extract(
+                mock(SeaTile.class),
+                90 * 24d,
+                mock(Fisher.class),
+                model
+            ),
+            0d,
+            .001
         );
-        assertEquals(spring.extract(mock(SeaTile.class),
-                                    90*24d,
-                                    mock(Fisher.class),
-                                    model),
-                     1d,
-                     .001
+        assertEquals(
+            spring.extract(
+                mock(SeaTile.class),
+                90 * 24d,
+                mock(Fisher.class),
+                model
+            ),
+            1d,
+            .001
         );
-
-
-
 
 
     }

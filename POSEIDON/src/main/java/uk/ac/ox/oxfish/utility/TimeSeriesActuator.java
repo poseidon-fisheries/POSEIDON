@@ -37,8 +37,7 @@ import java.util.function.Consumer;
  * When the time series is done, start over
  * Created by carrknight on 11/29/16.
  */
-public class TimeSeriesActuator implements Steppable
-{
+public class TimeSeriesActuator implements Steppable {
 
 
     /**
@@ -50,83 +49,82 @@ public class TimeSeriesActuator implements Steppable
      * the function we are going to call
      */
     private final Consumer<Double> actuator;
-
-    private Iterator<Double> iterator;
-
     /**
      * if we run out of things to read, do we start from the top?
      */
     private final boolean startOver;
-
-    /**
-     * helper static constructor for gas time series
-     * @param gasSchedule time series of prices
-     * @param ports ports to apply the gas price to
-     * @return the actuator to schedule
-     */
-    public static TimeSeriesActuator gasPriceDailySchedule(
-            LinkedList<Double> gasSchedule, List<Port> ports)
-    {
-        return new TimeSeriesActuator(
-                gasSchedule,
-                new Consumer<Double>() {
-                    @Override
-                    public void accept(Double nextPrice) {
-                        for(Port port : ports)
-                            port.setGasPricePerLiter(nextPrice);
-                    }
-                },
-                true);
-
-    }
-
-
-
-    /**
-     * helper static constructor for weather time series
-     * @param gasSchedule time series of prices
-     * @param weathers list of all the weather objects to update at once
-     * @return the actuator to schedule
-     */
-    public static TimeSeriesActuator weatherDailySchedule(
-            LinkedList<Double> gasSchedule, List<ConstantWeather> weathers)
-    {
-        return new TimeSeriesActuator(
-                gasSchedule,
-                new Consumer<Double>() {
-                    @Override
-                    public void accept(Double windSpeed) {
-                        for(ConstantWeather weather : weathers)
-                            weather.setWindSpeed(windSpeed);
-                    }
-                },
-                true);
-
-    }
+    private Iterator<Double> iterator;
 
     public TimeSeriesActuator(
-            List<Double> timeSeries,
-            Consumer<Double> actuator, boolean startOver) {
+        List<Double> timeSeries,
+        Consumer<Double> actuator, boolean startOver
+    ) {
         this.startOver = startOver;
-        Preconditions.checkArgument(timeSeries.size()>0);
+        Preconditions.checkArgument(timeSeries.size() > 0);
 
         this.timeSeries = timeSeries;
         this.actuator = actuator;
     }
 
+    /**
+     * helper static constructor for gas time series
+     *
+     * @param gasSchedule time series of prices
+     * @param ports       ports to apply the gas price to
+     * @return the actuator to schedule
+     */
+    public static TimeSeriesActuator gasPriceDailySchedule(
+        LinkedList<Double> gasSchedule, List<Port> ports
+    ) {
+        return new TimeSeriesActuator(
+            gasSchedule,
+            new Consumer<Double>() {
+                @Override
+                public void accept(Double nextPrice) {
+                    for (Port port : ports)
+                        port.setGasPricePerLiter(nextPrice);
+                }
+            },
+            true
+        );
+
+    }
+
+    /**
+     * helper static constructor for weather time series
+     *
+     * @param gasSchedule time series of prices
+     * @param weathers    list of all the weather objects to update at once
+     * @return the actuator to schedule
+     */
+    public static TimeSeriesActuator weatherDailySchedule(
+        LinkedList<Double> gasSchedule, List<ConstantWeather> weathers
+    ) {
+        return new TimeSeriesActuator(
+            gasSchedule,
+            new Consumer<Double>() {
+                @Override
+                public void accept(Double windSpeed) {
+                    for (ConstantWeather weather : weathers)
+                        weather.setWindSpeed(windSpeed);
+                }
+            },
+            true
+        );
+
+    }
 
     /**
      * next element of the time series is sent to actuator
      */
     @Override
-    public void step(SimState simState)
-    {
+    public void step(SimState simState) {
 
         //starting or finished the list? start again!
-        if(iterator == null)
-            iterator= timeSeries.iterator();
+        if (iterator == null)
+            iterator = timeSeries.iterator();
 
-        if(!iterator.hasNext()) {
+        if (!iterator.hasNext()) {
             if (startOver)
                 iterator = timeSeries.iterator();
             else

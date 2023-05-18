@@ -9,13 +9,12 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**
  * this class assumes the fisher's destination strategy is actually also a fishing strategy and will just use it
- *
  */
 public class DefaultToDestinationStrategyFishingStrategy implements FishingStrategy {
 
     @Override
     public boolean shouldFish(Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip) {
-        return ((FishingStrategy) fisher.getDestinationStrategy()).shouldFish(fisher,random,model,currentTrip);
+        return ((FishingStrategy) fisher.getDestinationStrategy()).shouldFish(fisher, random, model, currentTrip);
     }
 
     @Override

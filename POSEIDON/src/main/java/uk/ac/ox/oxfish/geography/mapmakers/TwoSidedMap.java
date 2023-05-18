@@ -25,7 +25,7 @@ public class TwoSidedMap implements MapInitializer {
 
     private final int height;
 
-    private final  double cellSizeInKilometers;
+    private final double cellSizeInKilometers;
 
 
     public TwoSidedMap(int width, int height, double cellSizeInKilometers) {
@@ -33,10 +33,6 @@ public class TwoSidedMap implements MapInitializer {
         this.height = height;
         this.cellSizeInKilometers = cellSizeInKilometers;
     }
-
-
-
-
 
 
     public int getWidth() {
@@ -53,23 +49,22 @@ public class TwoSidedMap implements MapInitializer {
 
 
     @Override
-    public NauticalMap makeMap(MersenneTwisterFast random, GlobalBiology biology, FishState model)
-    {
+    public NauticalMap makeMap(MersenneTwisterFast random, GlobalBiology biology, FishState model) {
 
         //build the grid
-        ObjectGrid2D baseGrid =  new ObjectGrid2D(width, height);
+        ObjectGrid2D baseGrid = new ObjectGrid2D(width, height);
 
-        for(int x=1; x< width-1; x++)
-            for(int y=0; y< height; y++) {
+        for (int x = 1; x < width - 1; x++)
+            for (int y = 0; y < height; y++) {
                 baseGrid.field[x][y] =
-                        new SeaTile(x,y,-2000, new TileHabitat(0d));
+                    new SeaTile(x, y, -2000, new TileHabitat(0d));
             }
 
-        for(int y=0; y< height; y++) {
+        for (int y = 0; y < height; y++) {
             baseGrid.field[0][y] =
-                    new SeaTile(0,y,2000, new TileHabitat(0d));
-            baseGrid.field[width-1][y] =
-                    new SeaTile(width-1,y,2000, new TileHabitat(0d));
+                new SeaTile(0, y, 2000, new TileHabitat(0d));
+            baseGrid.field[width - 1][y] =
+                new SeaTile(width - 1, y, 2000, new TileHabitat(0d));
         }
 
 
@@ -77,25 +72,29 @@ public class TwoSidedMap implements MapInitializer {
         GeomVectorField mpas = new GeomVectorField(baseGrid.getWidth(), baseGrid.getHeight()); //empty MPAs
 
         //expand MBR to cointan all the cells
-        Point coordinates = bathymetry.toPoint(width-1, height-1);
-        bathymetry.getMBR().expandToInclude(coordinates.getX(),coordinates.getY());
-        coordinates = bathymetry.toPoint(width-1, 0);
-        bathymetry.getMBR().expandToInclude(coordinates.getX(),coordinates.getY());
+        Point coordinates = bathymetry.toPoint(width - 1, height - 1);
+        bathymetry.getMBR().expandToInclude(coordinates.getX(), coordinates.getY());
+        coordinates = bathymetry.toPoint(width - 1, 0);
+        bathymetry.getMBR().expandToInclude(coordinates.getX(), coordinates.getY());
         coordinates = bathymetry.toPoint(0, 0);
-        bathymetry.getMBR().expandToInclude(coordinates.getX(),coordinates.getY());
-        coordinates = bathymetry.toPoint(0, height-1);
+        bathymetry.getMBR().expandToInclude(coordinates.getX(), coordinates.getY());
+        coordinates = bathymetry.toPoint(0, height - 1);
         bathymetry.getMBR().expandToInclude(coordinates.getX(), coordinates.getY());
 
         //expand it a little further
-        bathymetry.getMBR().expandToInclude(bathymetry.getMBR().getMaxX()-bathymetry.getPixelWidth()/2,
-                bathymetry.getMBR().getMaxY()-bathymetry.getPixelHeight()/2);
-        bathymetry.getMBR().expandToInclude(bathymetry.getMBR().getMinX()-bathymetry.getPixelWidth()/2,
-                bathymetry.getMBR().getMinY()-bathymetry.getPixelHeight()/2);
+        bathymetry.getMBR().expandToInclude(
+            bathymetry.getMBR().getMaxX() - bathymetry.getPixelWidth() / 2,
+            bathymetry.getMBR().getMaxY() - bathymetry.getPixelHeight() / 2
+        );
+        bathymetry.getMBR().expandToInclude(
+            bathymetry.getMBR().getMinX() - bathymetry.getPixelWidth() / 2,
+            bathymetry.getMBR().getMinY() - bathymetry.getPixelHeight() / 2
+        );
 
         mpas.setMBR(bathymetry.getMBR());
 
         Distance distance = new CartesianDistance(cellSizeInKilometers);
         Pathfinder pathfinder = new StraightLinePathfinder();
-        return new NauticalMap(bathymetry,mpas,distance,pathfinder);
+        return new NauticalMap(bathymetry, mpas, distance, pathfinder);
     }
 }

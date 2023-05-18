@@ -40,7 +40,7 @@ public class SullivanTransitionAging extends LocalAgingProcess {
     private final int agingPeriodInDays;
 
     private LocalSullivanTransitionAging delegate;
-
+    private Species speciesConnected = null;
 
     public SullivanTransitionAging(double k, double LInfinity, double gammaScaleParameter, int agingPeriodInDays) {
         this.k = k;
@@ -51,15 +51,14 @@ public class SullivanTransitionAging extends LocalAgingProcess {
 
     @Override
     public void ageLocally(
-            AbundanceLocalBiology localBiology, Species species, FishState model, boolean rounding,
-            int daysToSimulate) {
+        AbundanceLocalBiology localBiology, Species species, FishState model, boolean rounding,
+        int daysToSimulate
+    ) {
 
-        Preconditions.checkState(delegate!=null, "not started!");
+        Preconditions.checkState(delegate != null, "not started!");
         delegate.ageLocally(localBiology, species, model, rounding, daysToSimulate);
 
     }
-
-    private Species speciesConnected = null;
 
     /**
      * called after the aging process has been initialized but before it is run.
@@ -68,30 +67,30 @@ public class SullivanTransitionAging extends LocalAgingProcess {
      */
     @Override
     public void start(Species species) {
-        Preconditions.checkState(speciesConnected==null);
+        Preconditions.checkState(speciesConnected == null);
         speciesConnected = species; //you don't want to re-use this for multiple species!!
         initializeTransitionMatrix();
     }
 
-    private void initializeTransitionMatrix(){
+    private void initializeTransitionMatrix() {
 
-        assert delegate==null;
-        assert speciesConnected!=null;
+        assert delegate == null;
+        assert speciesConnected != null;
         SullivanTransitionProbability[] probabilities = new SullivanTransitionProbability[speciesConnected.getNumberOfSubdivisions()];
         for (int subdivision = 0; subdivision < speciesConnected.getNumberOfSubdivisions(); subdivision++) {
             probabilities[subdivision] = new SullivanTransitionProbability(
-                    gammaScaleParameter,
-                    LInfinity,
-                    k,
-                    agingPeriodInDays/365d,
-                    subdivision,
-                    speciesConnected
+                gammaScaleParameter,
+                LInfinity,
+                k,
+                agingPeriodInDays / 365d,
+                subdivision,
+                speciesConnected
 
             );
 
 
         }
-        delegate = new LocalSullivanTransitionAging(probabilities,agingPeriodInDays);
+        delegate = new LocalSullivanTransitionAging(probabilities, agingPeriodInDays);
         delegate.start(speciesConnected);
 
     }

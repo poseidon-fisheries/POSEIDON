@@ -27,8 +27,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 /**
  * Created by carrknight on 5/31/16.
  */
-public class NoFriendsHereExtractorFactory implements AlgorithmFactory<NoFriendsHereExtractor>
-{
+public class NoFriendsHereExtractorFactory implements AlgorithmFactory<NoFriendsHereExtractor> {
 
 
     /**

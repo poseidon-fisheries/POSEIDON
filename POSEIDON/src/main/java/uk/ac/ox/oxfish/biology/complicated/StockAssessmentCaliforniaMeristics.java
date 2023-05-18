@@ -33,7 +33,7 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
 
 
     public static final Meristics FAKE_MERISTICS =
-            new FromListMeristics(new double[]{1}, new double[]{1}, 1);
+        new FromListMeristics(new double[]{1}, new double[]{1}, 1);
 
 
     private final CaliforniaStockAssessmentGrowthBinParameters growth;
@@ -135,7 +135,7 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
      */
     private final double fecunditySlope;
 
-      /**
+    /**
      * For each age contains the maturity percentage
      */
     private final double[] maturity;
@@ -158,95 +158,65 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
      * the phi at each age
      */
     private final ImmutableList<Double> phi;
-
+    /**
+     * the expected number of recruits in the "virgin" state.
+     */
+    private final int virginRecruits;
+    /**
+     * the biomass steepness used for recruitment
+     */
+    private final double steepness;
+    /**
+     * a parameter defining the kind of recruitment process the species performs
+     */
+    private final boolean addRelativeFecundityToSpawningBiomass;
+    /**
+     * age the fish is considered "old"
+     */
+    private final int ageOld;
     /**
      * the total phi
      */
     private double cumulativePhi = 0d;
 
 
-    /**
-     * the expected number of recruits in the "virgin" state.
-     */
-    private final int virginRecruits;
-
-    /**
-     * the biomass steepness used for recruitment
-     */
-    private final double steepness;
-
-    /**
-     * a parameter defining the kind of recruitment process the species performs
-     */
-    private final boolean addRelativeFecundityToSpawningBiomass;
-
-    /**
-     * age the fish is considered "old"
-     */
-    private final int ageOld;
-
-
     public StockAssessmentCaliforniaMeristics(MeristicsInput input) {
-        this(input.getMaxAge(),
-             input.getAgeOld(),
-             input.getYoungAgeMale(),
-             input.getYoungLengthMale(),
-             input.getMaxLengthMale(),
-             input.getKParameterMale(),
-             input.getWeightParameterAMale(),
-             input.getWeightParameterBMale(),
-             input.getMortalityParameterMMale(),
-             input.getYoungAgeFemale(),
-             input.getYoungLengthFemale(),
-             input.getMaxLengthFemale(),
-             input.getKParameterFemale(),
-             input.getWeightParameterAFemale(),
-             input.getWeightParameterBFemale(),
-             input.getMortalityParameterMFemale(),
-             input.getMaturityInflection(),
-             input.getMaturitySlope(),
-             input.getFecundityIntercept(),
-             input.getFecunditySlope(),
-             input.getVirginRecruits(),
-             input.getSteepness(),
-             input.isAddRelativeFecundityToSpawningBiomass());
-    }
-
-    public StockAssessmentCaliforniaMeristics(StockAssessmentCaliforniaMeristics input) {
-
-        this(input.getMaxAge(),
-             input.getAgeOld(),
-             input.getYoungAgeMale(),
-             input.getYoungLengthMale(),
-             input.getMaxLengthMale(),
-             input.getKParameterMale(),
-             input.getWeightParameterAMale(),
-             input.getWeightParameterBMale(),
-             input.mortalityParameterMMale,
-             input.getYoungAgeFemale(),
-             input.getYoungLengthFemale(),
-             input.getMaxLengthFemale(),
-             input.getKParameterFemale(),
-             input.getWeightParameterAFemale(),
-             input.getWeightParameterBFemale(),
-             input.mortalityParameterMFemale,
-             input.getMaturityInflection(),
-             input.getMaturitySlope(),
-             input.getFecundityIntercept(),
-             input.getFecunditySlope(),
-             input.getVirginRecruits(),
-             input.getSteepness(),
-             input.isAddRelativeFecundityToSpawningBiomass());
+        this(
+            input.getMaxAge(),
+            input.getAgeOld(),
+            input.getYoungAgeMale(),
+            input.getYoungLengthMale(),
+            input.getMaxLengthMale(),
+            input.getKParameterMale(),
+            input.getWeightParameterAMale(),
+            input.getWeightParameterBMale(),
+            input.getMortalityParameterMMale(),
+            input.getYoungAgeFemale(),
+            input.getYoungLengthFemale(),
+            input.getMaxLengthFemale(),
+            input.getKParameterFemale(),
+            input.getWeightParameterAFemale(),
+            input.getWeightParameterBFemale(),
+            input.getMortalityParameterMFemale(),
+            input.getMaturityInflection(),
+            input.getMaturitySlope(),
+            input.getFecundityIntercept(),
+            input.getFecunditySlope(),
+            input.getVirginRecruits(),
+            input.getSteepness(),
+            input.isAddRelativeFecundityToSpawningBiomass()
+        );
     }
 
     public StockAssessmentCaliforniaMeristics(
-            int maxAge, int ageOld, double youngAgeMale, double youngLengthMale, double maxLengthMale,
-            double KParameterMale,
-            double weightParameterAMale, double weightParameterBMale, double mortalityParameterMMale,
-            double youngAgeFemale, double youngLengthFemale, double maxLengthFemale, double KParameterFemale,
-            double weightParameterAFemale, double weightParameterBFemale, double mortalityParameterMFemale,
-            double maturityInflection, double maturitySlope, double fecundityIntercept, double fecunditySlope,
-            int virginRecruits, double steepness, boolean addRelativeFecundityToSpawningBiomass) {
+        int maxAge, int ageOld, double youngAgeMale, double youngLengthMale, double maxLengthMale,
+        double KParameterMale,
+        double weightParameterAMale, double weightParameterBMale, double mortalityParameterMMale,
+        double youngAgeFemale, double youngLengthFemale, double maxLengthFemale, double KParameterFemale,
+        double weightParameterAFemale, double weightParameterBFemale, double mortalityParameterMFemale,
+        double maturityInflection, double maturitySlope, double fecundityIntercept, double fecunditySlope,
+        int virginRecruits, double steepness, boolean addRelativeFecundityToSpawningBiomass
+    ) {
         this.maxAge = maxAge;
         this.youngAgeMale = youngAgeMale;
         this.youngLengthMale = youngLengthMale;
@@ -269,45 +239,46 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
         this.virginRecruits = virginRecruits;
         this.steepness = steepness;
         this.addRelativeFecundityToSpawningBiomass = addRelativeFecundityToSpawningBiomass;
-        this.ageOld =ageOld;
+        this.ageOld = ageOld;
 
-        Preconditions.checkArgument(maxAge>=ageOld);
-        Preconditions.checkArgument(maxAge>=youngAgeFemale);
-        Preconditions.checkArgument(maxAge>=youngAgeMale);
+        Preconditions.checkArgument(maxAge >= ageOld);
+        Preconditions.checkArgument(maxAge >= youngAgeFemale);
+        Preconditions.checkArgument(maxAge >= youngAgeMale);
 
         growth = new CaliforniaStockAssessmentGrowthBinParameters(
-                maxAge,
-                youngLengthMale,
-                maxLengthMale,
-                weightParameterAMale,
-                weightParameterBMale,
-                KParameterMale,
-                youngLengthFemale,
-                maxLengthFemale,
-                weightParameterAFemale,
-                weightParameterBFemale,
-                KParameterFemale,
-                ageOld,
-                youngAgeMale,
-                youngAgeFemale
+            maxAge,
+            youngLengthMale,
+            maxLengthMale,
+            weightParameterAMale,
+            weightParameterBMale,
+            KParameterMale,
+            youngLengthFemale,
+            maxLengthFemale,
+            weightParameterAFemale,
+            weightParameterBFemale,
+            KParameterFemale,
+            ageOld,
+            youngAgeMale,
+            youngAgeFemale
         );
 
-        double[] maturityArray = new double[this.maxAge +1];
-        double[] relativeFecundityArray = new double[this.maxAge +1];
-        Double[] cumulativeSurvivalMaleArray = new Double[this.maxAge +1];
+        double[] maturityArray = new double[this.maxAge + 1];
+        double[] relativeFecundityArray = new double[this.maxAge + 1];
+        Double[] cumulativeSurvivalMaleArray = new Double[this.maxAge + 1];
         Double[] cumulativeSurvivalFemaleArray = new Double[this.maxAge + 1];
-        Double[] phiArray = new Double[this.maxAge +1];
-        for(int age = 0; age< this.maxAge +1; age++)
-        {
+        Double[] phiArray = new Double[this.maxAge + 1];
+        for (int age = 0; age < this.maxAge + 1; age++) {
 
-            maturityArray[age] = 1d/(1+Math.exp(maturitySlope*(growth.getLength(FEMALE,age)-maturityInflection)));
-            relativeFecundityArray[age] = growth.getWeight(FEMALE,age)*(fecundityIntercept + fecunditySlope*growth.getWeight(FEMALE,age));
-            cumulativeSurvivalMaleArray[age] = age == 0 ? 1 : Math.exp(-mortalityParameterMMale)*cumulativeSurvivalMaleArray[age-1];
-            cumulativeSurvivalFemaleArray[age] = age == 0 ? 1 : Math.exp(-mortalityParameterMFemale)*cumulativeSurvivalFemaleArray[age-1];
+            maturityArray[age] = 1d / (1 + Math.exp(maturitySlope * (growth.getLength(FEMALE,
+                age) - maturityInflection)));
+            relativeFecundityArray[age] = growth.getWeight(FEMALE,
+                age) * (fecundityIntercept + fecunditySlope * growth.getWeight(FEMALE, age));
+            cumulativeSurvivalMaleArray[age] = age == 0 ? 1 : Math.exp(-mortalityParameterMMale) * cumulativeSurvivalMaleArray[age - 1];
+            cumulativeSurvivalFemaleArray[age] = age == 0 ? 1 : Math.exp(-mortalityParameterMFemale) * cumulativeSurvivalFemaleArray[age - 1];
             double thisPhi = maturityArray[age] * relativeFecundityArray[age] * cumulativeSurvivalFemaleArray[age];
             phiArray[age] = thisPhi;
             cumulativePhi += thisPhi;
-            assert  cumulativePhi >= 0;
+            assert cumulativePhi >= 0;
 
         }
 
@@ -321,9 +292,46 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
 
     }
 
+    public StockAssessmentCaliforniaMeristics(StockAssessmentCaliforniaMeristics input) {
+
+        this(
+            input.getMaxAge(),
+            input.getAgeOld(),
+            input.getYoungAgeMale(),
+            input.getYoungLengthMale(),
+            input.getMaxLengthMale(),
+            input.getKParameterMale(),
+            input.getWeightParameterAMale(),
+            input.getWeightParameterBMale(),
+            input.mortalityParameterMMale,
+            input.getYoungAgeFemale(),
+            input.getYoungLengthFemale(),
+            input.getMaxLengthFemale(),
+            input.getKParameterFemale(),
+            input.getWeightParameterAFemale(),
+            input.getWeightParameterBFemale(),
+            input.mortalityParameterMFemale,
+            input.getMaturityInflection(),
+            input.getMaturitySlope(),
+            input.getFecundityIntercept(),
+            input.getFecunditySlope(),
+            input.getVirginRecruits(),
+            input.getSteepness(),
+            input.isAddRelativeFecundityToSpawningBiomass()
+        );
+    }
 
     public int getMaxAge() {
         return maxAge;
+    }
+
+    /**
+     * Getter for property 'ageOld'.
+     *
+     * @return Value for property 'ageOld'.
+     */
+    public int getAgeOld() {
+        return ageOld;
     }
 
     public double getYoungAgeMale() {
@@ -342,7 +350,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
         return KParameterMale;
     }
 
-
     public double getWeightParameterAMale() {
         return weightParameterAMale;
     }
@@ -350,7 +357,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
     public double getWeightParameterBMale() {
         return weightParameterBMale;
     }
-
 
     public double getYoungAgeFemale() {
         return youngAgeFemale;
@@ -368,7 +374,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
         return KParameterFemale;
     }
 
-
     public double getWeightParameterAFemale() {
         return weightParameterAFemale;
     }
@@ -376,8 +381,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
     public double getWeightParameterBFemale() {
         return weightParameterBFemale;
     }
-
-
 
     public double getMaturityInflection() {
         return maturityInflection;
@@ -393,27 +396,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
 
     public double getFecunditySlope() {
         return fecunditySlope;
-    }
-
-
-    public ImmutableList<Double> getCumulativeSurvivalMale() {
-        return cumulativeSurvivalMale;
-    }
-
-    public ImmutableList<Double> getCumulativeSurvivalFemale() {
-        return cumulativeSurvivalFemale;
-    }
-
-    public ImmutableList<Double> getPhi() {
-        return phi;
-    }
-
-    public double getCumulativePhi() {
-        return cumulativePhi;
-    }
-
-    public void setCumulativePhi(double cumulativePhi) {
-        this.cumulativePhi = cumulativePhi;
     }
 
     /**
@@ -443,13 +425,24 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
         return addRelativeFecundityToSpawningBiomass;
     }
 
-    /**
-     * Getter for property 'ageOld'.
-     *
-     * @return Value for property 'ageOld'.
-     */
-    public int getAgeOld() {
-        return ageOld;
+    public ImmutableList<Double> getCumulativeSurvivalMale() {
+        return cumulativeSurvivalMale;
+    }
+
+    public ImmutableList<Double> getCumulativeSurvivalFemale() {
+        return cumulativeSurvivalFemale;
+    }
+
+    public ImmutableList<Double> getPhi() {
+        return phi;
+    }
+
+    public double getCumulativePhi() {
+        return cumulativePhi;
+    }
+
+    public void setCumulativePhi(double cumulativePhi) {
+        this.cumulativePhi = cumulativePhi;
     }
 
     @Override

@@ -33,11 +33,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.function.Consumer;
 
 /**
- *
  * Creates fixed local biologies that are much richer on the left side of the map than on the right
  * Created by carrknight on 6/22/15.
  */
-public class FromLeftToRightInitializer extends AbstractBiologyInitializer{
+public class FromLeftToRightInitializer extends AbstractBiologyInitializer {
 
 
     private final double exponent;
@@ -60,7 +59,8 @@ public class FromLeftToRightInitializer extends AbstractBiologyInitializer{
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -69,34 +69,35 @@ public class FromLeftToRightInitializer extends AbstractBiologyInitializer{
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map)
-    {
+        GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
+        int mapWidthInCells, NauticalMap map
+    ) {
         if (seaTile.isLand())
             return new EmptyLocalBiology();
         else
-            return new ConstantLocalBiology(maximumBiomass*
-                                                    Math.pow((1-seaTile.getGridX()/(double)mapWidthInCells)
-                                                            , exponent));
+            return new ConstantLocalBiology(maximumBiomass *
+                Math.pow((1 - seaTile.getGridX() / (double) mapWidthInCells)
+                    , exponent));
     }
 
     /**
      * after all the tiles have been instantiated this method gets called once to put anything together or to smooth
      * biomasses or whatever
-     *  @param biology the global biology instance
+     *
+     * @param biology the global biology instance
      * @param map     the map which by now should have all the tiles in place
-     * @param random the randomizer
+     * @param random  the randomizer
      * @param model
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model)
-    {
+        GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model
+    ) {
 
         //standard neighboring tiles smoother
         //a bad copy of the NETLOGO prototype
         final Consumer<NauticalMap> smoother =
-                NauticalMapFactory.smoothConstantBiology(
+            NauticalMapFactory.smoothConstantBiology(
                 biologySmoothingIndex, map.getWidth(), map.getHeight()).apply(random);
 
         smoother.accept(map);

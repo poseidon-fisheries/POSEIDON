@@ -29,8 +29,6 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.model.market.FlexibleAbundanceMarket;
-import uk.ac.ox.oxfish.model.market.NThresholdsMarket;
-import uk.ac.ox.oxfish.model.market.PerBinMarket;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
@@ -48,32 +46,32 @@ public class CatchAtBinGatherer implements AdditionalStartable {
     @Override
     public void start(FishState model) {
         //add counters for catches if there is any need (aggregate catches are counted by fishers, here we want abundance based)
-        for(Species species : model.getSpecies())
-            if(species.getNumberOfBins()>0)
-                for(int age=0; age<species.getNumberOfBins(); age++)
-                {
+        for (Species species : model.getSpecies())
+            if (species.getNumberOfBins() > 0)
+                for (int age = 0; age < species.getNumberOfBins(); age++) {
                     String columnName = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + FlexibleAbundanceMarket.AGE_BIN_PREFIX + age;
                     int finalAge = age;
                     DataColumn dailyCatches = model.getDailyDataSet().registerGatherer(
-                            columnName,
-                            new Gatherer<FishState>() {
-                                @Override
-                                public Double apply(FishState state) {
+                        columnName,
+                        new Gatherer<FishState>() {
+                            @Override
+                            public Double apply(FishState state) {
 
-                                    double sum = 0;
-                                    for(Fisher fisher : state.getFishers())
-                                    {
-                                        sum+= fisher.getCountedLandingsPerBin(species, finalAge);
-                                    }
-
-                                    return sum;
-
+                                double sum = 0;
+                                for (Fisher fisher : state.getFishers()) {
+                                    sum += fisher.getCountedLandingsPerBin(species, finalAge);
                                 }
-                            },0
+
+                                return sum;
+
+                            }
+                        }, 0
                     );
-                    model.getYearlyDataSet().registerGatherer(columnName,
-                                                   FishStateUtilities.generateYearlySum(dailyCatches),
-                                                   0d);
+                    model.getYearlyDataSet().registerGatherer(
+                        columnName,
+                        FishStateUtilities.generateYearlySum(dailyCatches),
+                        0d
+                    );
 
                 }
     }

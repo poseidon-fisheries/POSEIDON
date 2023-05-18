@@ -29,22 +29,21 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 public interface BiomassMovementRule {
 
     /**
-     decide how much fish moves and use the setters to make it so
+     * decide how much fish moves and use the setters to make it so
      */
-    public void move(Species species,
-                     SeaTile here,
-                     double biomassHere,
-                     SeaTile there,
-                     double biomassThere,
-                     double delta,
-                     double carryingCapacityHere,
-                     double carryingCapacityThere,
+    public void move(
+        Species species,
+        SeaTile here,
+        double biomassHere,
+        SeaTile there,
+        double biomassThere,
+        double delta,
+        double carryingCapacityHere,
+        double carryingCapacityThere,
 
-                     VariableBiomassBasedBiology biologyHere,
-                     VariableBiomassBasedBiology biologyThere
+        VariableBiomassBasedBiology biologyHere,
+        VariableBiomassBasedBiology biologyThere
     );
-
-
 
 
 }

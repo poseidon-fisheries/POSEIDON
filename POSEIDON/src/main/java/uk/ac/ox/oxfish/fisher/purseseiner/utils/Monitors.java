@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
 import com.google.common.collect.ImmutableList;
-import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
@@ -30,7 +29,6 @@ import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.data.monitors.*;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.*;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
-import uk.ac.ox.oxfish.model.data.monitors.regions.TwoByTwoRegionalDivision;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 
 import javax.measure.quantity.Dimensionless;
@@ -47,7 +45,6 @@ import static tech.units.indriya.unit.Units.DAY;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy.EVERY_YEAR;
 import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.*;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.DEFAULT_MAP_EXTENT;
 
 @SuppressWarnings("rawtypes")
 public class Monitors {

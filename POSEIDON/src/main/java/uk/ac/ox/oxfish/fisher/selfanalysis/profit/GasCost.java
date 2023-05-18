@@ -28,14 +28,15 @@ import uk.ac.ox.oxfish.model.FishState;
  * Cost function representing petrol consumed
  * Created by carrknight on 7/13/16.
  */
-public class GasCost implements Cost{
+public class GasCost implements Cost {
 
     /**
      * computes and return the cost
-     *  @param fisher  agent that did the trip
+     *
+     * @param fisher          agent that did the trip
      * @param model
-     * @param record  the trip record
-     * @param revenue revenue from catches
+     * @param record          the trip record
+     * @param revenue         revenue from catches
      * @param durationInHours
      * @return $ spent
      */
@@ -45,13 +46,19 @@ public class GasCost implements Cost{
     }
 
     @Override
-    public double expectedAdditionalCosts(Fisher fisher, double additionalTripHours, double additionalEffortHours, double additionalKmTravelled) {
-        return expectedAdditionalGasCosts(fisher,additionalKmTravelled);
+    public double expectedAdditionalCosts(
+        Fisher fisher,
+        double additionalTripHours,
+        double additionalEffortHours,
+        double additionalKmTravelled
+    ) {
+        return expectedAdditionalGasCosts(fisher, additionalKmTravelled);
     }
 
 
-    public static double expectedAdditionalGasCosts(Fisher fisher, double additionalKmTravelled){
-        return fisher.getBoat().expectedFuelConsumption(additionalKmTravelled) * fisher.getHomePort().getGasPricePerLiter();
+    public static double expectedAdditionalGasCosts(Fisher fisher, double additionalKmTravelled) {
+        return fisher.getBoat().expectedFuelConsumption(additionalKmTravelled) * fisher.getHomePort()
+            .getGasPricePerLiter();
 
     }
 

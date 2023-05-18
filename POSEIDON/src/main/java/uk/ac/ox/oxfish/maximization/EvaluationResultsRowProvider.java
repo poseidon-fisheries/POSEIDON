@@ -49,7 +49,9 @@ class EvaluationResultsRowProvider implements RowProvider {
     }
 
     @Override
-    public List<String> getHeaders() { return HEADERS; }
+    public List<String> getHeaders() {
+        return HEADERS;
+    }
 
     @Override
     public Iterable<? extends Collection<?>> getRows() {

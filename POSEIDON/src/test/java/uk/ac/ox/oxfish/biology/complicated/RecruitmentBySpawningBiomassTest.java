@@ -47,26 +47,28 @@ public class RecruitmentBySpawningBiomassTest {
     public void recruitment() throws Exception {
 
         MeristicsFileFactory factory = new MeristicsFileFactory(Paths.get("inputs",
-                                                                          "california",
-                                                                          "biology",
-                                                                          "Sablefish","meristics.yaml"));
+            "california",
+            "biology",
+            "Sablefish", "meristics.yaml"
+        ));
 
         StockAssessmentCaliforniaMeristics meristics = factory.apply(mock(FishState.class));
         SingleSpeciesNaturalProcesses process = MultipleSpeciesAbundanceInitializer.initializeNaturalProcesses(
-                mock(FishState.class),
-                MultipleSpeciesAbundanceInitializer.
-                        generateSpeciesFromFolder(Paths.get("inputs",
-                                                            "california",
-                                                            "biology",
-                                                            "Sablefish"), "Sablefish"),
-                new HashMap<>(),
-                meristics,
-                true,
-                0,
-                false
+            mock(FishState.class),
+            MultipleSpeciesAbundanceInitializer.
+                generateSpeciesFromFolder(Paths.get(
+                    "inputs",
+                    "california",
+                    "biology",
+                    "Sablefish"
+                ), "Sablefish"),
+            new HashMap<>(),
+            meristics,
+            true,
+            0,
+            false
 
         );
-
 
 
         double[] male = new double[60];
@@ -80,9 +82,9 @@ public class RecruitmentBySpawningBiomassTest {
         System.out.println(recruitment.isAddRelativeFecundityToSpawningBiomass());
 
 
-
-        double recruits = recruitment.recruit(process.getSpecies(),meristics,
-                                              new StructuredAbundance(male,female),0 ,365 );
+        double recruits = recruitment.recruit(process.getSpecies(), meristics,
+            new StructuredAbundance(male, female), 0, 365
+        );
         System.out.println(recruits);
         Assert.assertEquals(416140d, recruits, 1d);
 
@@ -95,7 +97,6 @@ public class RecruitmentBySpawningBiomassTest {
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
 
-
         EquallySpacedBertalanffyFactory factory = new EquallySpacedBertalanffyFactory();
         factory.setAllometricAlpha(new FixedDoubleParameter(0.02));
         factory.setAllometricBeta(new FixedDoubleParameter(2.944));
@@ -105,8 +106,8 @@ public class RecruitmentBySpawningBiomassTest {
         factory.setNumberOfBins(25);
         factory.setCmPerBin(5.0);
         GrowthBinByList meristics = factory.apply(state);
-        for(int i=0; i<25; i++)
-            Assert.assertEquals(2.5+i*5d,meristics.getLength(0,i),.001);
+        for (int i = 0; i < 25; i++)
+            Assert.assertEquals(2.5 + i * 5d, meristics.getLength(0, i), .001);
         //create 25 bins, each of 5 cm
 
 
@@ -115,12 +116,11 @@ public class RecruitmentBySpawningBiomassTest {
         RecruitmentBySpawningBiomass recruit = recruitment.apply(state);
         double[] maturities = recruit.getMaturity().apply(new Species("test", meristics));
 
-        for(int i=0; i<=9; i++)
-            Assert.assertEquals(maturities[i],0,.001);
+        for (int i = 0; i <= 9; i++)
+            Assert.assertEquals(maturities[i], 0, .001);
 
-        for(int i=10; i<25; i++)
-            Assert.assertEquals(maturities[i],1,.001);
-
+        for (int i = 10; i < 25; i++)
+            Assert.assertEquals(maturities[i], 1, .001);
 
 
     }

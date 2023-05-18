@@ -29,7 +29,6 @@ import java.io.Serializable;
 public interface PricingPolicy extends Serializable {
 
 
-
     double tradePrice(double askPrice, double bidPrice, double secondBestAsk, double secondBestBid);
 
 

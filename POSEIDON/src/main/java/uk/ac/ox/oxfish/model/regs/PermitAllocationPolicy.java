@@ -35,17 +35,16 @@ public interface PermitAllocationPolicy {
     /**
      * given all the fishers who participates, return a list of those that will be
      * allowed to participate in the fishery (those that are not returned are assumed to be banned)
+     *
      * @param participants ALL the fishers subject to the regulation (both allowed and not)
-     * @param state model
+     * @param state        model
      * @return a list of those fishers that are allowed to go out next year
      */
     public List<Fisher> computeWhichFishersAreAllowed(
-            List<Fisher> participants,
-            FishState state
+        List<Fisher> participants,
+        FishState state
 
     );
-
-
 
 
 }

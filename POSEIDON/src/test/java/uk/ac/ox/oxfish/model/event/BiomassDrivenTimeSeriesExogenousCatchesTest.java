@@ -66,7 +66,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesTest {
 
         //no fishing except for exogenous
         for (FisherDefinition fisherDefinition : scenario.getFisherDefinitions()) {
-            fisherDefinition.setRegulation(new FishingSeasonFactory(0,true));
+            fisherDefinition.setRegulation(new FishingSeasonFactory(0, true));
         }
 
 
@@ -87,8 +87,8 @@ public class BiomassDrivenTimeSeriesExogenousCatchesTest {
             @Override
             public ExogenousCatches apply(FishState state) {
                 LinkedHashMap<Species, Queue<Double>> exogenous = new LinkedHashMap<>();
-                exogenous.put(state.getSpecies().get(0),exogenousLandings);
-                exogenous.put(state.getSpecies().get(1),exogenousLandingsSecondSpecies);
+                exogenous.put(state.getSpecies().get(0), exogenousLandings);
+                exogenous.put(state.getSpecies().get(1), exogenousLandingsSecondSpecies);
                 return new BiomassDrivenTimeSeriesExogenousCatches(exogenous, false);
             }
         });
@@ -102,37 +102,46 @@ public class BiomassDrivenTimeSeriesExogenousCatchesTest {
         double initialBiomassFirst = state.getTotalBiomass(state.getSpecies().get(0));
         double initialBiomassSecond = state.getTotalBiomass(state.getSpecies().get(1));
 
-        while(state.getYear()<4)
+        while (state.getYear() < 4)
             state.schedule.step(state);
 
         System.out.println(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0"));
         Assert.assertEquals(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0").get(0),
-                            10d,.001);
+            10d, .001
+        );
         Assert.assertEquals(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0").get(1),
-                            20d,.001);
+            20d, .001
+        );
         Assert.assertEquals(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0").get(2),
-                            30d,.001);
+            30d, .001
+        );
         Assert.assertEquals(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0").get(3),
-                            30d,.001);
+            30d, .001
+        );
 
         //no other landings must have occurred!
-        for(int i=0; i<4; i++)
+        for (int i = 0; i < 4; i++)
             Assert.assertEquals(state.getYearlyDataSet().getColumn("Species 0 Landings").get(i),
-                                0,.001);
+                0, .001
+            );
 
 
         System.out.println(state.getYearlyDataSet().getColumn("Biomass Species 0"));
         System.out.println(state.getYearlyDataSet().getColumn("Species 0 Landings"));
 
-        assertEquals(state.getTotalBiomass(state.getSpecies().get(0)),
-                     initialBiomassFirst-10-20-30-30,
-                     .0001);
+        assertEquals(
+            state.getTotalBiomass(state.getSpecies().get(0)),
+            initialBiomassFirst - 10 - 20 - 30 - 30,
+            .0001
+        );
         System.out.println(state.getTotalBiomass(state.getSpecies().get(0)));
         System.out.println(initialBiomassFirst);
 
-        assertEquals(state.getTotalBiomass(state.getSpecies().get(1)),
-                     initialBiomassSecond-1-2,
-                     .0001);
+        assertEquals(
+            state.getTotalBiomass(state.getSpecies().get(1)),
+            initialBiomassSecond - 1 - 2,
+            .0001
+        );
 
 
     }

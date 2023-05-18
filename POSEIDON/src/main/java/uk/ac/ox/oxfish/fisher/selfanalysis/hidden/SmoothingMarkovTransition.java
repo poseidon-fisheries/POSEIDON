@@ -29,8 +29,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
  * This way we don't compute neighborhoods.
  * Created by carrknight on 6/27/16.
  */
-public class SmoothingMarkovTransition implements  MarkovTransition
-{
+public class SmoothingMarkovTransition implements MarkovTransition {
 
     /**
      * the higher the quicker it all normalizes to 1
@@ -53,14 +52,15 @@ public class SmoothingMarkovTransition implements  MarkovTransition
 
         double sum = 0;
         //first pass
-        for(SeaTile tile : map.getAllSeaTilesAsList())
-            sum+= current.getBelief(tile) + noiseValue;
+        for (SeaTile tile : map.getAllSeaTilesAsList())
+            sum += current.getBelief(tile) + noiseValue;
 
         //now again
         DoubleGrid2D newGrid = current.representBeliefs();
-        for(SeaTile tile : map.getAllSeaTilesAsList())
-            newGrid.set(tile.getGridX(),tile.getGridY(),
-                        (newGrid.get(tile.getGridX(),tile.getGridY())+noiseValue)/sum);
+        for (SeaTile tile : map.getAllSeaTilesAsList())
+            newGrid.set(tile.getGridX(), tile.getGridY(),
+                (newGrid.get(tile.getGridX(), tile.getGridY()) + noiseValue) / sum
+            );
 
         return new ExactMarkovBelief(newGrid);
 

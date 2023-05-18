@@ -20,13 +20,13 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 public class AgingAndRecruitmentProcessTest {
 
     @Test
-    public void AgingAndRecruitmentProcessTester(){
+    public void AgingAndRecruitmentProcessTester() {
         List<double[]> weights = new ArrayList<>();
-        weights.add(new double[] {10,15,20,25,30}); //male
-        weights.add(new double[] {15,20,25,30,35}); //female
+        weights.add(new double[]{10, 15, 20, 25, 30}); //male
+        weights.add(new double[]{15, 20, 25, 30, 35}); //female
         List<double[]> lengths = new ArrayList<>();
-        lengths.add(new double[] {5,6,7,8,9});  //male
-        lengths.add(new double[] {10,11,12,13,14}); //female
+        lengths.add(new double[]{5, 6, 7, 8, 9});  //male
+        lengths.add(new double[]{10, 11, 12, 13, 14}); //female
 
         TunaMeristics meristics = new TunaMeristics(
             weights,
@@ -41,9 +41,9 @@ public class AgingAndRecruitmentProcessTest {
         sCodes.put("SP1", species1.getName());
         SpeciesCodes speciesCodes = new SpeciesCodes(sCodes);
 
-        final GlobalBiology globalBiology= new GlobalBiology(species1);
+        final GlobalBiology globalBiology = new GlobalBiology(species1);
         HashMap<Species, double[][]> abundance = new HashMap<>();
-        abundance.put(species1, new double[][]{{10000, 500,400,300,100}, {10000,500, 400,300,100}});
+        abundance.put(species1, new double[][]{{10000, 500, 400, 300, 100}, {10000, 500, 400, 300, 100}});
 
 //        final NauticalMap nauticalMap = makeMap(1, 1);
 //        nauticalMap.getAllSeaTilesAsList().forEach(seaTile ->
@@ -51,7 +51,7 @@ public class AgingAndRecruitmentProcessTest {
 //                )
 //        );
 
- //       List<SeaTile> allSeaTiles = nauticalMap.getAllSeaTilesAsList();
+        //       List<SeaTile> allSeaTiles = nauticalMap.getAllSeaTilesAsList();
 
         Collection<AbundanceLocalBiology> localBiologies = new ArrayList<>();
         AbundanceLocalBiology localBio = new AbundanceLocalBiology(abundance);
@@ -64,14 +64,15 @@ public class AgingAndRecruitmentProcessTest {
 
         HashMap<Species, RecruitmentProcess> recruitmentProcesses = new HashMap<>();
         recruitmentProcesses.put(species1, new RecruitmentBySpawningBiomass(
-                2000000,
-                        .95,
-                .1,
-                false,
-                ((TunaMeristics) species1.getMeristics()).getMaturity().toArray() ,
-                null,
-                FEMALE,
-                false));
+            2000000,
+            .95,
+            .1,
+            false,
+            ((TunaMeristics) species1.getMeristics()).getMaturity().toArray(),
+            null,
+            FEMALE,
+            false
+        ));
         AgingAndRecruitmentProcess agingProcess = new AgingAndRecruitmentProcess(recruitmentProcesses);
 
         FishState fishState = mock(FishState.class);
@@ -83,10 +84,10 @@ public class AgingAndRecruitmentProcessTest {
 //        dumbiomass = localBio.getBiomass(species1);
         //        }
 
-        assertEquals(localBio.getAbundance(species1).getAbundance(0,0), 786573.430
-                , 0.01);
-        assertEquals(localBio.getAbundance(species1).getAbundance(0,1), 10000
-                , 0.01);
+        assertEquals(localBio.getAbundance(species1).getAbundance(0, 0), 786573.430
+            , 0.01);
+        assertEquals(localBio.getAbundance(species1).getAbundance(0, 1), 10000
+            , 0.01);
 
     }
 }

@@ -19,9 +19,10 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-import java.util.function.DoubleUnaryOperator;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategy;
+
+import java.util.function.DoubleUnaryOperator;
 
 public class PortAttractionModulator implements GlobalAttractionModulator {
 

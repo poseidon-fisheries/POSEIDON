@@ -49,28 +49,20 @@ public class GrowthBinByList implements Meristics {
 
 
     /**
-     *  @param subdivisions
+     * @param subdivisions
      * @param lenghts
      * @param weights
-     * @param lengthAtAge an array with [age]---> length at all subdivisions <br> NULL if each bin described in lengths is also one year apart
+     * @param lengthAtAge  an array with [age]---> length at all subdivisions <br> NULL if each bin described in lengths is also one year apart
      */
     public GrowthBinByList(
-            int subdivisions, double[] lenghts, double[] weights,
-            @Nullable
-                    double[] lengthAtAge) {
+        int subdivisions, double[] lenghts, double[] weights,
+        @Nullable
+        double[] lengthAtAge
+    ) {
         this.lenghts = lenghts;
         this.weights = weights;
         this.subdivisions = subdivisions;
         this.lengthAtAge = lengthAtAge;
-    }
-
-    /**
-     * you can pick as many subdivisions as you want, they will all just spit out the same weight and length
-     */
-
-    @Override
-    public double getLength(int subdivision, int bin) {
-        return lenghts[bin];
     }
 
     @Override
@@ -104,8 +96,9 @@ public class GrowthBinByList implements Meristics {
 
     /**
      * if no lengthAtBin was provided then bins represent age here and this is just a lookup; we always round down the age
-     *
+     * <p>
      * Otherwise just lookup the table provided! (if asked for an age that doesn't exit, return max age instead)
+     *
      * @param ageInYears  age in terms of years
      * @param subdivision the subdivision we are study (male/female is different for example)
      * @return the length of the fish
@@ -113,9 +106,18 @@ public class GrowthBinByList implements Meristics {
     @Override
     public double getLengthAtAge(int ageInYears, int subdivision) {
 
-        if(lengthAtAge == null)
-            return getLength(subdivision,ageInYears <= (lenghts.length-1) ? (int)ageInYears : lenghts.length-1 );
+        if (lengthAtAge == null)
+            return getLength(subdivision, ageInYears <= (lenghts.length - 1) ? (int) ageInYears : lenghts.length - 1);
         else
-            return lengthAtAge[ageInYears <= (lengthAtAge.length-1) ? (int)ageInYears : lengthAtAge.length-1 ];
+            return lengthAtAge[ageInYears <= (lengthAtAge.length - 1) ? (int) ageInYears : lengthAtAge.length - 1];
+    }
+
+    /**
+     * you can pick as many subdivisions as you want, they will all just spit out the same weight and length
+     */
+
+    @Override
+    public double getLength(int subdivision, int bin) {
+        return lenghts[bin];
     }
 }

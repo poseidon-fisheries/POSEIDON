@@ -35,13 +35,15 @@ public interface MapDiscretizer {
 
     /**
      * assign all tiles to an array of groups (all groups must be disjoint)
+     *
      * @param map the map to discretize
      * @return an array of lists, each list representing a group.
      */
-    public  List<SeaTile>[] discretize(NauticalMap map);
+    public List<SeaTile>[] discretize(NauticalMap map);
 
     /**
      * If any filter returns false, the seatile is not meant to be grouped
+     *
      * @param filter
      */
     public void addFilter(Predicate<SeaTile> filter);

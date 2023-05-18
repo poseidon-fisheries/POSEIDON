@@ -49,5 +49,6 @@ public class WeatherInitializers {
     /**
      * can't be instantiated
      */
-    private WeatherInitializers() { }
+    private WeatherInitializers() {
+    }
 }

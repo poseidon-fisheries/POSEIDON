@@ -26,27 +26,36 @@ public class MultipleIndependentSpeciesAbundanceInitializer implements BiologyIn
 
 
     public MultipleIndependentSpeciesAbundanceInitializer(
-            List<SingleSpeciesAbundanceInitializer> individualInitializers, boolean addOtherSpecies)
-    {
+        List<SingleSpeciesAbundanceInitializer> individualInitializers, boolean addOtherSpecies
+    ) {
         this.individualInitializers = individualInitializers;
         this.addOtherSpecies = addOtherSpecies;
     }
 
     @Override
-    public LocalBiology generateLocal(GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells, int mapWidthInCells, NauticalMap map) {
+    public LocalBiology generateLocal(
+        GlobalBiology biology,
+        SeaTile seaTile,
+        MersenneTwisterFast random,
+        int mapHeightInCells,
+        int mapWidthInCells,
+        NauticalMap map
+    ) {
         //generate them locally
         //you call each because each abundance initializer has to weigh each seatile
         //depending on its abundance algorithm
         LocalBiology toReturn = null;
-        for(SingleSpeciesAbundanceInitializer initializer : individualInitializers) {
-            LocalBiology lastgen = initializer.generateLocal(biology,
-                                                             seaTile,
-                                                             random,
-                                                             mapHeightInCells,
-                                                             mapWidthInCells,
-                                                             map);
-            if(toReturn == null ||
-                    (toReturn instanceof EmptyLocalBiology && lastgen instanceof AbundanceLocalBiology))
+        for (SingleSpeciesAbundanceInitializer initializer : individualInitializers) {
+            LocalBiology lastgen = initializer.generateLocal(
+                biology,
+                seaTile,
+                random,
+                mapHeightInCells,
+                mapWidthInCells,
+                map
+            );
+            if (toReturn == null ||
+                (toReturn instanceof EmptyLocalBiology && lastgen instanceof AbundanceLocalBiology))
                 toReturn = lastgen;
         }
         //return one, it doesn't matter which
@@ -55,17 +64,20 @@ public class MultipleIndependentSpeciesAbundanceInitializer implements BiologyIn
     }
 
     @Override
-    public void processMap(GlobalBiology biology,
-                           NauticalMap map,
-                           MersenneTwisterFast random,
-                           FishState model) {
-        for(SingleSpeciesAbundanceInitializer initializer : individualInitializers)
-            initializer.processMap(biology,map,random,model);
+    public void processMap(
+        GlobalBiology biology,
+        NauticalMap map,
+        MersenneTwisterFast random,
+        FishState model
+    ) {
+        for (SingleSpeciesAbundanceInitializer initializer : individualInitializers)
+            initializer.processMap(biology, map, random, model);
     }
 
     /**
      * call global generation for each, grab the species built and move on
-     * @param random the random number generator
+     *
+     * @param random                the random number generator
      * @param modelBeingInitialized the model we are in the process of initializing
      * @return
      */
@@ -74,14 +86,16 @@ public class MultipleIndependentSpeciesAbundanceInitializer implements BiologyIn
 
 
         List<Species> species = new ArrayList<>();
-        for(SingleSpeciesAbundanceInitializer initializer : individualInitializers)
+        for (SingleSpeciesAbundanceInitializer initializer : individualInitializers)
             species.add(initializer.generateGlobal(random, modelBeingInitialized).getSpecie(0));
 
         //need to add an additional species to catch "all"
-        if(addOtherSpecies)
-            species.add(new Species(FAKE_SPECIES_NAME,
-                                    StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,
-                                    true));
+        if (addOtherSpecies)
+            species.add(new Species(
+                FAKE_SPECIES_NAME,
+                StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,
+                true
+            ));
 
         return new GlobalBiology(species.toArray(new Species[species.size()]));
 

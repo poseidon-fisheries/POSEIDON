@@ -51,19 +51,22 @@ public class TowLimitFishingStrategyTest {
         Fisher fisher = mock(Fisher.class);
         when(fisher.getMaximumHold()).thenReturn(100d);
         assertTrue(
-                strategy.shouldFish(fisher, new MersenneTwisterFast(),
-                                    mock(FishState.class), record)
+            strategy.shouldFish(fisher, new MersenneTwisterFast(),
+                mock(FishState.class), record
+            )
         );
         when(record.getEffort()).thenReturn(100);
         assertTrue(
-                strategy.shouldFish(fisher, new MersenneTwisterFast(),
-                                    mock(FishState.class), record)
+            strategy.shouldFish(fisher, new MersenneTwisterFast(),
+                mock(FishState.class), record
+            )
         );
 
         when(record.getEffort()).thenReturn(101);
         assertFalse(
-                strategy.shouldFish(fisher, new MersenneTwisterFast(),
-                                    mock(FishState.class), record)
+            strategy.shouldFish(fisher, new MersenneTwisterFast(),
+                mock(FishState.class), record
+            )
         );
     }
 }

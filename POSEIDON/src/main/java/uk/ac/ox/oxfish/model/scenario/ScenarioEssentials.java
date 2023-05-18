@@ -34,9 +34,9 @@ public class ScenarioEssentials {
     private final NauticalMap map;
 
 
-
     public ScenarioEssentials(
-            GlobalBiology biology, NauticalMap map) {
+        GlobalBiology biology, NauticalMap map
+    ) {
         this.biology = biology;
         this.map = map;
     }

@@ -40,10 +40,11 @@ public class DepthAllocatorDecoratorTest {
 
 
         DepthAllocatorDecorator allocator = new DepthAllocatorDecorator(
-             
-                105,300,
-                new BoundedAllocatorDecorator(0,0,5,10,true,
-                    new ConstantBiomassAllocator())
+
+            105, 300,
+            new BoundedAllocatorDecorator(0, 0, 5, 10, true,
+                new ConstantBiomassAllocator()
+            )
         );
 
 
@@ -53,54 +54,54 @@ public class DepthAllocatorDecoratorTest {
 
         when(tile.getAltitude()).thenReturn(-100d);
         double allocate = allocator.allocate(
-                tile,
-                mock(NauticalMap.class),
-                new MersenneTwisterFast()
+            tile,
+            mock(NauticalMap.class),
+            new MersenneTwisterFast()
         );
-        assertEquals(0d,allocate,.001);
+        assertEquals(0d, allocate, .001);
 
 
         when(tile.getAltitude()).thenReturn(-105d);
         allocate = allocator.allocate(
-                tile,
-                mock(NauticalMap.class),
-                new MersenneTwisterFast()
+            tile,
+            mock(NauticalMap.class),
+            new MersenneTwisterFast()
         );
-        assertEquals(1d,allocate,.001);
+        assertEquals(1d, allocate, .001);
 
 
         when(tile.getAltitude()).thenReturn(-500d);
         allocate = allocator.allocate(
-                tile,
-                mock(NauticalMap.class),
-                new MersenneTwisterFast()
+            tile,
+            mock(NauticalMap.class),
+            new MersenneTwisterFast()
         );
-        assertEquals(0d,allocate,.001);
+        assertEquals(0d, allocate, .001);
 
         when(tile.getAltitude()).thenReturn(-300d);
         allocate = allocator.allocate(
-                tile,
-                mock(NauticalMap.class),
-                new MersenneTwisterFast()
+            tile,
+            mock(NauticalMap.class),
+            new MersenneTwisterFast()
         );
-        assertEquals(1d,allocate,.001);
+        assertEquals(1d, allocate, .001);
 
         when(tile.getGridY()).thenReturn(10);
         allocate = allocator.allocate(
-                tile,
-                mock(NauticalMap.class),
-                new MersenneTwisterFast()
+            tile,
+            mock(NauticalMap.class),
+            new MersenneTwisterFast()
         );
-        assertEquals(1d,allocate,.001);
+        assertEquals(1d, allocate, .001);
 
 
         when(tile.getGridY()).thenReturn(11);
         allocate = allocator.allocate(
-                tile,
-                mock(NauticalMap.class),
-                new MersenneTwisterFast()
+            tile,
+            mock(NauticalMap.class),
+            new MersenneTwisterFast()
         );
-        assertEquals(0d,allocate,.001);
+        assertEquals(0d, allocate, .001);
 
     }
 }

@@ -54,29 +54,27 @@ public class WeatherLogisticDepartingStrategyTest {
         //create long boat
         Boat boat = mock(Boat.class);
         when(boat.getLength()).thenReturn(5d);
-        Fisher fisher= mock(Fisher.class);
+        Fisher fisher = mock(Fisher.class);
         when(fisher.getBoat()).thenReturn(boat);
         when(fisher.getLocation()).thenReturn(location);
 
         int hoursDeparted = 0;
 
         //given the setup the harshness value ought to be 0.8 and the probability ought to be .88
-        assertEquals(.8,strategy.computeX(fisher,model),.001);
+        assertEquals(.8, strategy.computeX(fisher, model), .001);
 
-        for(int day =0;day <10000; day++ )
-        {
+        for (int day = 0; day < 10000; day++) {
             strategy.step(model);
 
-            for(int hour=0; hour<24;hour++)
-            {
+            for (int hour = 0; hour < 24; hour++) {
                 boolean departing = strategy.shouldFisherLeavePort(fisher, model, new MersenneTwisterFast());
-                if(departing) {
+                if (departing) {
                     hoursDeparted++;
                 }
             }
         }
 
-        double departingRate = hoursDeparted/(10000*24d);
+        double departingRate = hoursDeparted / (10000 * 24d);
 
         System.out.println(departingRate);
         assertTrue(departingRate > .85);

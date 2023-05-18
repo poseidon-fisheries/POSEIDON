@@ -41,8 +41,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.getValidSeatileFromGrou
  * by softmax (up to a distance limit!)
  * Created by carrknight on 8/8/17.
  */
-public class ClampedDestinationStrategy implements DestinationStrategy, TripListener
-{
+public class ClampedDestinationStrategy implements DestinationStrategy, TripListener {
 
     private final MapDiscretization discretization;
 
@@ -51,30 +50,26 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
     private final double[] propensities;
 
     private final FavoriteDestinationStrategy delegate;
-
-    private Fisher fisher;
-
-    private FishState state;
-
     private final boolean respectMPA;
-
     private final boolean avoidWastelands;
+    private Fisher fisher;
+    private FishState state;
 
 
     public ClampedDestinationStrategy(
-            FavoriteDestinationStrategy delegate,
-            MapDiscretization discretization, double distanceMaximum, double[] propensities
+        FavoriteDestinationStrategy delegate,
+        MapDiscretization discretization, double distanceMaximum, double[] propensities
     ) {
-        this(delegate,discretization,distanceMaximum,propensities,true,true);
+        this(delegate, discretization, distanceMaximum, propensities, true, true);
     }
 
     public ClampedDestinationStrategy(
-            FavoriteDestinationStrategy delegate,
-            MapDiscretization discretization, double distanceMaximum, double[] propensities,
-            boolean respectMPA,
-            boolean avoidWastelands
-    ){
-        Preconditions.checkArgument(propensities.length==discretization.getNumberOfGroups());
+        FavoriteDestinationStrategy delegate,
+        MapDiscretization discretization, double distanceMaximum, double[] propensities,
+        boolean respectMPA,
+        boolean avoidWastelands
+    ) {
+        Preconditions.checkArgument(propensities.length == discretization.getNumberOfGroups());
         this.discretization = discretization;
         this.distanceMaximum = distanceMaximum;
         this.propensities = propensities;
@@ -86,6 +81,7 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
 
     /**
      * ignored
+     *
      * @param model
      * @param fisher
      */
@@ -99,11 +95,12 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
 
     /**
      * tell the startable to turnoff,
+     *
      * @param fisher
      */
     @Override
     public void turnOff(Fisher fisher) {
-        if(state != null) {
+        if (state != null) {
             delegate.turnOff(fisher);
             fisher.removeTripListener(this);
 
@@ -112,15 +109,17 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
 
     /**
      * decides where to go.
-     *  @param fisher
+     *
+     * @param fisher
      * @param random        the randomizer. It probably comes from the fisher but I make explicit it might be needed
      * @param model         the model link
      * @param currentAction what action is the fisher currently taking that prompted to check for destination   @return the destination
      */
     @Override
     public SeaTile chooseDestination(
-            Fisher fisher, MersenneTwisterFast random, FishState model,
-            Action currentAction) {
+        Fisher fisher, MersenneTwisterFast random, FishState model,
+        Action currentAction
+    ) {
         return delegate.chooseDestination(fisher, random, model, currentAction);
     }
 
@@ -131,21 +130,21 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
         NauticalMap map = state.getMap();
         //grab a random seatile for each group
         SeaTile[] candidates = new SeaTile[discretization.getNumberOfGroups()];
-        for(int group = 0; group<discretization.getNumberOfGroups(); group++) {
+        for (int group = 0; group < discretization.getNumberOfGroups(); group++) {
             List<SeaTile> tileGroup = discretization.getGroup(group);
-            if(tileGroup.size() > 0)
+            if (tileGroup.size() > 0)
                 candidates[group] = getValidSeatileFromGroup(
-                        random,
-                        tileGroup,
-                        respectMPA,
-                        this.fisher,
-                        state,
-                        avoidWastelands,
-                        100
+                    random,
+                    tileGroup,
+                    respectMPA,
+                    this.fisher,
+                    state,
+                    avoidWastelands,
+                    100
                 );
         }
-        assert candidates.length ==  propensities.length;
-        double[] currentPropensities = Arrays.copyOf(propensities,candidates.length);
+        assert candidates.length == propensities.length;
+        double[] currentPropensities = Arrays.copyOf(propensities, candidates.length);
 
 
         //set propensity to 0 for all tiles further than the max distance
@@ -153,7 +152,7 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
         sum = 0;
         for (int group = 0; group < discretization.getNumberOfGroups(); group++) {
             if (candidates[group] == null ||
-                    map.distance(candidates[group], this.fisher.getHomePort().getLocation()) > distanceMaximum)
+                map.distance(candidates[group], this.fisher.getHomePort().getLocation()) > distanceMaximum)
                 currentPropensities[group] = 0;
             else
                 sum += currentPropensities[group];
@@ -166,7 +165,7 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
             cdf[i] = cdf[i - 1] + currentPropensities[i] / sum;
 
 
-        if(sum>0) {
+        if (sum > 0) {
             int index = Arrays.binarySearch(cdf, random.nextDouble());
             index = (index >= 0) ? index : (-index - 1);
             SeaTile candidate = candidates[index];

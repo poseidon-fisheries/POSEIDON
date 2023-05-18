@@ -4,17 +4,18 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 public class FixedDataLastStepTargetFromFile implements DataTarget {
 
 
+    private final FixedDataLastStepTarget delegate = new FixedDataLastStepTarget();
     private String pathToCsvFile;
 
-    private final FixedDataLastStepTarget delegate = new FixedDataLastStepTarget();
 
+    public FixedDataLastStepTargetFromFile() {
+    }
 
     @Override
     public double computeError(FishState model) {
@@ -23,18 +24,14 @@ public class FixedDataLastStepTargetFromFile implements DataTarget {
         try {
             List<String> strings = Files.readAllLines(Paths.get(pathToCsvFile));
             delegate.setFixedTarget(Double.parseDouble(
-                    strings.get(strings.size()-1)));
+                strings.get(strings.size() - 1)));
 
         } catch (IOException e) {
 
-            throw new RuntimeException("can't read " + pathToCsvFile +" because of " + e);
+            throw new RuntimeException("can't read " + pathToCsvFile + " because of " + e);
         }
         return delegate.computeError(model);
     }
-
-    public FixedDataLastStepTargetFromFile() {
-    }
-
 
     public String getPathToCsvFile() {
         return pathToCsvFile;

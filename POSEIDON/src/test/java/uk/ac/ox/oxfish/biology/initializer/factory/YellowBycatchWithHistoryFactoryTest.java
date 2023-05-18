@@ -69,10 +69,10 @@ public class YellowBycatchWithHistoryFactoryTest {
         FishState state = new FishState();
         state.setScenario(scenario);
         state.start();
-        while(state.getYear()<=3){
+        while (state.getYear() <= 3) {
             state.schedule.step(state);
         }
-        assertEquals(state.getTotalBiomass(state.getSpecies().get(0)),527154d, .001);
+        assertEquals(state.getTotalBiomass(state.getSpecies().get(0)), 527154d, .001);
 
     }
 
@@ -107,10 +107,10 @@ public class YellowBycatchWithHistoryFactoryTest {
         FishState state = new FishState();
         state.setScenario(scenario);
         state.start();
-        while(state.getYear()<=3){
+        while (state.getYear() <= 3) {
             state.schedule.step(state);
         }
-        assertEquals(state.getTotalBiomass(state.getSpecies().get(0)),527154d, .001);
+        assertEquals(state.getTotalBiomass(state.getSpecies().get(0)), 527154d, .001);
 
     }
 
@@ -148,15 +148,16 @@ public class YellowBycatchWithHistoryFactoryTest {
         state.start();
         Species target = state.getSpecies().get(0);
 
-        while(state.getYear()<=3){
+        while (state.getYear() <= 3) {
             state.schedule.step(state);
 
-            if(state.getDayOfTheYear()==100) { // at day 100 kill off one % of all the target
+            if (state.getDayOfTheYear() == 100) { // at day 100 kill off one % of all the target
                 System.out.println(state.getTotalBiomass(target));
                 for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
                     tile.reactToThisAmountOfBiomassBeingFished(
-                            new Catch(target,tile.getBiomass(target)*.01,state.getBiology()),
-                            null,state.getBiology());
+                        new Catch(target, tile.getBiomass(target) * .01, state.getBiology()),
+                        null, state.getBiology()
+                    );
             }
         }
         assertEquals(state.getTotalBiomass(target), 509166.4d, .1);
@@ -169,8 +170,15 @@ public class YellowBycatchWithHistoryFactoryTest {
 
         //numbers numbers numbers
         YellowBycatchWithHistoryFactory factory = new YellowBycatchWithHistoryFactory();
-        factory.setHistoricalTargetBiomass(Lists.newArrayList(505317.4, 501682.3, 498248.3, 495003.3, 491936.2, 489036.4));
-        factory.setHistoricalTargetSurvival(Lists.newArrayList(0.9138789,0.9138789));
+        factory.setHistoricalTargetBiomass(Lists.newArrayList(
+            505317.4,
+            501682.3,
+            498248.3,
+            495003.3,
+            491936.2,
+            489036.4
+        ));
+        factory.setHistoricalTargetSurvival(Lists.newArrayList(0.9138789, 0.9138789));
         factory.setTargetRho(new FixedDoubleParameter(1.03));
         factory.setTargetNaturalSurvivalRate(new FixedDoubleParameter(0.92311));
         factory.setTargetRecruitmentSteepness(new FixedDoubleParameter(0.6));
@@ -198,15 +206,16 @@ public class YellowBycatchWithHistoryFactoryTest {
         state.start();
         Species target = state.getSpecies().get(0);
 
-        while(state.getYear()<=3){
+        while (state.getYear() <= 3) {
             state.schedule.step(state);
 
-            if(state.getDayOfTheYear()==100) { // at day 100 kill off one % of all the target
+            if (state.getDayOfTheYear() == 100) { // at day 100 kill off one % of all the target
                 System.out.println(state.getTotalBiomass(target));
                 for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
                     tile.reactToThisAmountOfBiomassBeingFished(
-                            new Catch(target,tile.getBiomass(target)*.01,state.getBiology()),
-                            null,state.getBiology());
+                        new Catch(target, tile.getBiomass(target) * .01, state.getBiology()),
+                        null, state.getBiology()
+                    );
             }
         }
         assertEquals(state.getTotalBiomass(target), 478923.5d, .1);

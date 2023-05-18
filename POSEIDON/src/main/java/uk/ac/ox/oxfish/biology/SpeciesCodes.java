@@ -2,10 +2,10 @@ package uk.ac.ox.oxfish.biology;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import uk.ac.ox.oxfish.model.FishState;
 
 public class SpeciesCodes {
 

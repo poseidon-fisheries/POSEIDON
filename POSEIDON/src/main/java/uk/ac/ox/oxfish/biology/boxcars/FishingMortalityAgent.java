@@ -45,22 +45,16 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
     private final AbundanceFilter vulnerabilityFilter;
 
     private final Species species;
-
-    private StochasticCatchSampler dailyCatchSampler;
-
-    private double lastDailyMortality;
-
     /**
      * do we bother computing landings every day?
      */
     private final boolean computeDailyFishingMortality;
-
     /**
      * here we track of all the landings (IN WEIGHT) for the year. For yearly mortality rate
      */
     double[][] yearlyCatchesInWeight;
-
-
+    private StochasticCatchSampler dailyCatchSampler;
+    private double lastDailyMortality;
     private Stoppable dailyStoppable;
 
     private Stoppable yearlyStoppable;
@@ -68,25 +62,27 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
 
     private double[][] lastMeasuredYearlyAbundance = null;
 
-    /**
-     * tell the startable to turnoff,
-     */
-    @Override
-    public void turnOff() {
-        if(dailyStoppable!=null)
-        {
-            dailyStoppable.stop();
-            yearlyStoppable.stop();
-            dailyCatchSampler.turnOff();
-        }
-    }
-
-    public FishingMortalityAgent(AbundanceFilter vulnerabilityFilter, Species species, boolean computeDailyFishingMortality) {
+    public FishingMortalityAgent(
+        AbundanceFilter vulnerabilityFilter,
+        Species species,
+        boolean computeDailyFishingMortality
+    ) {
         this.vulnerabilityFilter = vulnerabilityFilter;
         this.species = species;
         this.computeDailyFishingMortality = computeDailyFishingMortality;
     }
 
+    /**
+     * tell the startable to turnoff,
+     */
+    @Override
+    public void turnOff() {
+        if (dailyStoppable != null) {
+            dailyStoppable.stop();
+            yearlyStoppable.stop();
+            dailyCatchSampler.turnOff();
+        }
+    }
 
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
@@ -100,60 +96,114 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
         //let's look at abundance now
         lastMeasuredYearlyAbundance = model.getTotalAbundance(species);
 
-        dailyCatchSampler = new StochasticCatchSampler((Predicate<Fisher>) input -> true,
-                                             species,
-                                             null);
+        dailyCatchSampler = new StochasticCatchSampler(
+            (Predicate<Fisher>) input -> true,
+            species,
+            null
+        );
         dailyCatchSampler.start(model);
         yearlyCatchesInWeight = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
         dailyStoppable =
-                model.scheduleEveryDay(this, StepOrder.DAILY_DATA_GATHERING);
+            model.scheduleEveryDay(this, StepOrder.DAILY_DATA_GATHERING);
         yearlyStoppable =
-                model.scheduleEveryYear(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                //observe abundance
-                lastMeasuredYearlyAbundance = model.getTotalAbundance(species);
+            model.scheduleEveryYear(new Steppable() {
+                @Override
+                public void step(SimState simState) {
+                    //observe abundance
+                    lastMeasuredYearlyAbundance = model.getTotalAbundance(species);
 
 
-                //clear landings observed
-                for(int subdivision=0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
-                    Arrays.fill(yearlyCatchesInWeight[subdivision], 0);
-            }
-        }, StepOrder.DATA_RESET);
+                    //clear landings observed
+                    for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++)
+                        Arrays.fill(yearlyCatchesInWeight[subdivision], 0);
+                }
+            }, StepOrder.DATA_RESET);
 
 
-        if(computeDailyFishingMortality) {
-                DataColumn dailyColumn = model.getDailyDataSet().registerGatherer("Daily Fishing Mortality " + species,
-                    new Gatherer<FishState>() {
-                        @Override
-                        public Double apply(FishState fishState) {
-                            return lastDailyMortality;
+        if (computeDailyFishingMortality) {
+            DataColumn dailyColumn = model.getDailyDataSet().registerGatherer("Daily Fishing Mortality " + species,
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState fishState) {
+                        return lastDailyMortality;
 
-                        }
-                    }, Double.NaN);
+                    }
+                }, Double.NaN
+            );
 
 
             //yearly you account for the average
-            model.getYearlyDataSet().registerGatherer("Average Daily Fishing Mortality " + species,
-                    FishStateUtilities.generateYearlyAverage(dailyColumn),
-                    Double.NaN)
+            model.getYearlyDataSet().registerGatherer(
+                "Average Daily Fishing Mortality " + species,
+                FishStateUtilities.generateYearlyAverage(dailyColumn),
+                Double.NaN
+            )
             ;
 
         }
 
         model.getYearlyDataSet().registerGatherer("Yearly Fishing Mortality " + species,
-                                                  new Gatherer<FishState>() {
-                                                      @Override
-                                                      public Double apply(FishState fishState) {
-                                                          return computeYearlyMortality();
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(FishState fishState) {
+                    return computeYearlyMortality();
 
-                                                      }
-                                                  },Double.NaN);
-
+                }
+            }, Double.NaN
+        );
 
 
     }
 
+    /**
+     * compute daily mortality rate
+     *
+     * @return
+     */
+    public double computeYearlyMortality() {
+
+
+        return computeMortality(
+            CatchSample.convertLandingsToAbundance(
+                species,
+                yearlyCatchesInWeight
+            ),
+            lastMeasuredYearlyAbundance
+        );
+
+
+    }
+
+    /**
+     * compute mortality rate - log(1- catches/vulnerables)
+     *
+     * @return
+     */
+    public double computeMortality(
+        double[][] catches,
+        double[][] totalAbundance
+    ) {
+
+        double[][] vulnerable = vulnerabilityFilter.filter(species, totalAbundance);
+
+        double numerator = 0;
+        double denominator = 0;
+        assert (vulnerable.length == catches.length);
+        assert (vulnerable[0].length == catches[0].length);
+        for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++) {
+            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
+
+                numerator += catches[subdivision][bin];
+                denominator += vulnerable[subdivision][bin];
+
+            }
+
+        }
+
+        return -Math.log(1d - numerator / denominator);
+
+
+    }
 
     @Override
     public void step(SimState simState) {
@@ -161,85 +211,33 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
 
         dailyCatchSampler.resetCatchObservations();
         dailyCatchSampler.observeDaily();
-        if(computeDailyFishingMortality)
-            lastDailyMortality =  computeDailyMortality((FishState)simState);
+        if (computeDailyFishingMortality)
+            lastDailyMortality = computeDailyMortality((FishState) simState);
         final double[][] abundance = dailyCatchSampler.getLandings();
 
-        for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
+        for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++)
             for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
                 yearlyCatchesInWeight[subdivision][bin] += abundance[subdivision][bin];
             }
 
-        }
+    }
 
     /**
      * compute daily mortality rate
+     *
      * @param model
      * @return
      */
-    public double computeDailyMortality(FishState model){
+    public double computeDailyMortality(FishState model) {
 
 
         return computeMortality(
-                dailyCatchSampler.getAbundance(),
-                model.getTotalAbundance(species)
+            dailyCatchSampler.getAbundance(),
+            model.getTotalAbundance(species)
         );
 
 
-
-
     }
-
-    /**
-     * compute daily mortality rate
-     * @return
-     */
-    public double computeYearlyMortality(){
-
-
-        return computeMortality(
-                CatchSample.convertLandingsToAbundance(species,
-                        yearlyCatchesInWeight),
-                lastMeasuredYearlyAbundance
-        );
-
-
-
-
-    }
-
-
-
-
-    /**
-     * compute mortality rate - log(1- catches/vulnerables)
-     * @return
-     */
-    public double computeMortality(double[][] catches,
-                                   double[][] totalAbundance){
-
-        double[][] vulnerable = vulnerabilityFilter.filter(species, totalAbundance);
-
-        double numerator = 0;
-        double denominator = 0;
-        assert (vulnerable.length==catches.length);
-        assert (vulnerable[0].length==catches[0].length);
-        for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++) {
-            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
-
-                numerator+= catches[subdivision][bin];
-                denominator+= vulnerable[subdivision][bin];
-
-            }
-
-        }
-
-        return  - Math.log(1d-numerator / denominator);
-
-
-    }
-
-
 
 
 }

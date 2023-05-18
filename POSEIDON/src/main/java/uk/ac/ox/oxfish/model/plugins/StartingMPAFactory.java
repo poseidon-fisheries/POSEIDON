@@ -29,7 +29,7 @@ import java.util.List;
 
 public class StartingMPAFactory implements AlgorithmFactory<StartingMPAPlugin> {
 
-    final  private List<StartingMPA> startingMPAs = new LinkedList<>();
+    final private List<StartingMPA> startingMPAs = new LinkedList<>();
 
 
     /**

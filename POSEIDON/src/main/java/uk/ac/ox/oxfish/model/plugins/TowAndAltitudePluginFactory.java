@@ -34,19 +34,18 @@ public class TowAndAltitudePluginFactory implements AlgorithmFactory<TowAndAltit
     public TowAndAltitudePlugin apply(FishState fishState) {
 
 
-        if(tagSusbset == null || tagSusbset.trim().length()<=0)
+        if (tagSusbset == null || tagSusbset.trim().length() <= 0)
             return new TowAndAltitudePlugin(
-                    histogrammerStartYear,
-                    identifier,
-                    null
+                histogrammerStartYear,
+                identifier,
+                null
             );
         else
             return new TowAndAltitudePlugin(
-                    histogrammerStartYear,
-                    identifier,
-                    tagSusbset
+                histogrammerStartYear,
+                identifier,
+                tagSusbset
             );
-
 
 
     }

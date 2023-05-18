@@ -45,21 +45,25 @@ public class TemporaryProtectedAreaTest {
 
         when(state.getDayOfTheYear()).thenReturn(100);
 
-        TemporaryProtectedArea reg1 = new TemporaryProtectedArea(10,300);
-        TemporaryProtectedArea reg2 = new TemporaryProtectedArea(10,30);
-        TemporaryProtectedArea reg3 = new TemporaryProtectedArea(150,300);
+        TemporaryProtectedArea reg1 = new TemporaryProtectedArea(10, 300);
+        TemporaryProtectedArea reg2 = new TemporaryProtectedArea(10, 30);
+        TemporaryProtectedArea reg3 = new TemporaryProtectedArea(150, 300);
 
-        assertFalse(reg1.canFishHere(mock(Fisher.class),
-                                    tile,
-                                    state));
-        assertTrue(reg2.canFishHere(mock(Fisher.class),
-                                    tile,
-                                    state));
-        assertTrue(reg3.canFishHere(mock(Fisher.class),
-                                    tile,
-                                    state));
-
-
+        assertFalse(reg1.canFishHere(
+            mock(Fisher.class),
+            tile,
+            state
+        ));
+        assertTrue(reg2.canFishHere(
+            mock(Fisher.class),
+            tile,
+            state
+        ));
+        assertTrue(reg3.canFishHere(
+            mock(Fisher.class),
+            tile,
+            state
+        ));
 
 
     }

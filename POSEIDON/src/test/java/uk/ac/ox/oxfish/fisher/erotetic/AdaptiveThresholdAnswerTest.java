@@ -55,10 +55,11 @@ public class AdaptiveThresholdAnswerTest {
         extractor.addFeatureExtractor("feature", new FeatureExtractor<Double>() {
             @Override
             public HashMap<Double, Double> extractFeature(
-                    Collection<Double> toRepresent, FishState model, Fisher fisher) {
-                HashMap<Double,Double> toReturn = new HashMap<>();
-                for(Double number : toRepresent)
-                    toReturn.put(number,number);
+                Collection<Double> toRepresent, FishState model, Fisher fisher
+            ) {
+                HashMap<Double, Double> toReturn = new HashMap<>();
+                for (Double number : toRepresent)
+                    toReturn.put(number, number);
                 return toReturn;
             }
         });
@@ -71,56 +72,59 @@ public class AdaptiveThresholdAnswerTest {
 
         Log.info("needs at least 4 observations, has only 3");
         FeatureExtractor<Double> adaptor = mock(FeatureExtractor.class);
-        extractor.addFeatureExtractor("threshold",
-                                      adaptor);
+        extractor.addFeatureExtractor(
+            "threshold",
+            adaptor
+        );
 
-        HashMap<Double,Double> adaptorAnswer = mock(HashMap.class);
+        HashMap<Double, Double> adaptorAnswer = mock(HashMap.class);
         when(adaptor.extractFeature(anyCollection(),
-                                      any(), any())).thenReturn(adaptorAnswer);
+            any(), any()
+        )).thenReturn(adaptorAnswer);
 
         FeatureThresholdAnswer<Double> filter = new FeatureThresholdAnswer<>(
-                3,
-                "feature",
-                "threshold"
+            3,
+            "feature",
+            "threshold"
         );
 
 
         when(adaptorAnswer.get(any())).thenReturn(0d);
 
         List<Double> selected = filter.answer(
-                options,
-                extractor,
-                mock(FishState.class),
-                mock(Fisher.class)
+            options,
+            extractor,
+            mock(FishState.class),
+            mock(Fisher.class)
 
         );
-        assertEquals(selected.size(),3);
+        assertEquals(selected.size(), 3);
 
         when(adaptorAnswer.get(any())).thenReturn(1d);
         selected = filter.answer(
-                options,
-                extractor,
-                mock(FishState.class),
-                mock(Fisher.class)
+            options,
+            extractor,
+            mock(FishState.class),
+            mock(Fisher.class)
         );
-        assertEquals(selected.size(),3);
+        assertEquals(selected.size(), 3);
 
         when(adaptorAnswer.get(any())).thenReturn(2d);
         selected = filter.answer(
-                options,
-                extractor,
-                mock(FishState.class),
-                mock(Fisher.class)
+            options,
+            extractor,
+            mock(FishState.class),
+            mock(Fisher.class)
         );
-        assertEquals(selected.size(),2);
+        assertEquals(selected.size(), 2);
 
         when(adaptorAnswer.get(any())).thenReturn(3d);
         selected = filter.answer(
-                options,
-                extractor,
-                mock(FishState.class),
-                mock(Fisher.class)
+            options,
+            extractor,
+            mock(FishState.class),
+            mock(Fisher.class)
         );
-        assertEquals(selected.size(),1);
+        assertEquals(selected.size(), 1);
     }
 }

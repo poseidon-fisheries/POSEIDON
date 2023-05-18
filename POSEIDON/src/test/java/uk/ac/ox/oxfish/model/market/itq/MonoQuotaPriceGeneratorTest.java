@@ -43,7 +43,7 @@ public class MonoQuotaPriceGeneratorTest {
     public void testQuotaPrice() throws Exception {
 
 
-        Fisher fisher = mock(Fisher.class,RETURNS_DEEP_STUBS);
+        Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
 
         when(fisher.getDailyData()).thenReturn(mock(FisherDailyTimeSeries.class));
         FishState model = mock(FishState.class);
@@ -56,14 +56,15 @@ public class MonoQuotaPriceGeneratorTest {
 
             @Override
             public int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random) {
-                return 365-model.getDayOfTheYear();
+                return 365 - model.getDayOfTheYear();
             }
         };
         when(fisher.getDepartingStrategy()).thenReturn(departing);
 //        when(departing.
 //                predictedDaysLeftFishingThisYear(any(),any(),any())).thenReturn(365-model.getDayOfTheYear());
         when(model.getSpecies()).thenReturn(Arrays.asList(new Species("a"), new Species("b"),
-                                                          new Species("c"), new Species("d")));
+            new Species("c"), new Species("d")
+        ));
         MonoQuotaRegulation regulation = new MonoQuotaRegulation(100);
         when(fisher.getRegulation()).thenReturn(regulation);
 
@@ -95,7 +96,7 @@ public class MonoQuotaPriceGeneratorTest {
     @Test
     public void countingDailyProfits() throws Exception {
 
-        Fisher fisher = mock(Fisher.class,RETURNS_DEEP_STUBS);
+        Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
         when(fisher.getDailyData()).thenReturn(mock(FisherDailyTimeSeries.class));
         FishState model = mock(FishState.class);
         when(model.getSpecies()).thenReturn(Collections.singletonList(new Species("a")));
@@ -108,13 +109,13 @@ public class MonoQuotaPriceGeneratorTest {
         when(fisher.predictDailyProfits()).thenReturn(10d);
         when(model.getDayOfTheYear()).thenReturn(363);
 
-        MonoQuotaPriceGenerator gen = new MonoQuotaPriceGenerator(0,true);
-        gen.start(model,fisher);
+        MonoQuotaPriceGenerator gen = new MonoQuotaPriceGenerator(0, true);
+        gen.start(model, fisher);
 
         // .5 * (10+10*2) = 15
         when(fisher.getDepartingStrategy().
-                predictedDaysLeftFishingThisYear(any(),any(),any())).thenReturn(365-363);
-        assertEquals(15d,gen.computeLambda(),.001d );
+            predictedDaysLeftFishingThisYear(any(), any(), any())).thenReturn(365 - 363);
+        assertEquals(15d, gen.computeLambda(), .001d);
 
     }
 }

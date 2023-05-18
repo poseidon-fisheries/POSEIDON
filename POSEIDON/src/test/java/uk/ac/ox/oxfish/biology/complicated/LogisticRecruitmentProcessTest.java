@@ -32,25 +32,23 @@ import static org.mockito.Mockito.mock;
 public class LogisticRecruitmentProcessTest {
 
 
-
-
     private final static Meristics meristics = new FromListMeristics(
-            new double[]{1d, 2d, 3d}, 2);
+        new double[]{1d, 2d, 3d}, 2);
 
 
     @Test
     public void logisticGrowth() throws Exception {
 
         LogisticRecruitmentProcess process = new LogisticRecruitmentProcess(
-                400d,.5,
-                false);
+            400d, .5,
+            false
+        );
         double recruit = process.recruit(mock(Species.class), meristics,
-                                         new StructuredAbundance(new double[]{0, 0, 0}, new double[]{12, 4, 60}),0 ,365 );
+            new StructuredAbundance(new double[]{0, 0, 0}, new double[]{12, 4, 60}), 0, 365
+        );
 
         //recruits ought to be weighin a total of 50kg, so that there ought to be 50 of them
-        Assert.assertEquals((int)recruit,50);
-
-
+        Assert.assertEquals((int) recruit, 50);
 
 
     }
@@ -59,16 +57,16 @@ public class LogisticRecruitmentProcessTest {
     public void noRecruitsAboveCarryingCapacity() throws Exception {
 
         LogisticRecruitmentProcess process = new LogisticRecruitmentProcess(
-                201,100,
-                false);
+            201, 100,
+            false
+        );
         double recruit = process.recruit(mock(Species.class), meristics,
-                                         new StructuredAbundance(
-                                      new double[]{0, 0, 0}, new double[]{12, 4, 60}),0 ,365);
+            new StructuredAbundance(
+                new double[]{0, 0, 0}, new double[]{12, 4, 60}), 0, 365
+        );
 
         //recruits ought to be weighin a total of 1kg, so that there ought to be 1 of them
-        Assert.assertEquals((int)recruit,1);
-
-
+        Assert.assertEquals((int) recruit, 1);
 
 
     }
@@ -78,13 +76,15 @@ public class LogisticRecruitmentProcessTest {
     public void noGrowthFromDepletion() throws Exception {
 
         LogisticRecruitmentProcess process = new LogisticRecruitmentProcess(
-                400d,.5,
-                false);
+            400d, .5,
+            false
+        );
         double recruit = process.recruit(mock(Species.class), meristics,
-                                         new StructuredAbundance(
-                                      new double[]{0, 0, 0}, new double[]{0,0, 0}),0 ,365);
+            new StructuredAbundance(
+                new double[]{0, 0, 0}, new double[]{0, 0, 0}), 0, 365
+        );
 
-        Assert.assertEquals((int)recruit,0);
+        Assert.assertEquals((int) recruit, 0);
 
 
     }

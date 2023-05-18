@@ -22,8 +22,7 @@ package uk.ac.ox.oxfish.fisher.log;
 
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-public class LocationMemory<T>
-{
+public class LocationMemory<T> {
     private final SeaTile spot;
 
     private final T information;
@@ -48,7 +47,7 @@ public class LocationMemory<T>
         return memoryAge;
     }
 
-    public int age(){
+    public int age() {
         return ++memoryAge;
     }
 }

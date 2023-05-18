@@ -38,6 +38,21 @@ public class FixedProportionHomogeneousGearFactory implements HomogeneousGearFac
     private DoubleParameter litersOfGasConsumed = new FixedDoubleParameter(0d);
 
     /**
+     * Applies this function to the given argument.
+     *
+     * @param state the function argument
+     * @return the function result
+     */
+    @Override
+    public HomogeneousAbundanceGear apply(final FishState state) {
+
+        return new HomogeneousAbundanceGear(
+            litersOfGasConsumed.applyAsDouble(state.getRandom()),
+            new FixedProportionFilter(getAverageCatchability().applyAsDouble(state.getRandom()), rounding)
+        );
+    }
+
+    /**
      * Getter for property 'averageCatchability'.
      *
      * @return Value for property 'averageCatchability'.
@@ -56,22 +71,6 @@ public class FixedProportionHomogeneousGearFactory implements HomogeneousGearFac
     public void setAverageCatchability(final DoubleParameter averageCatchability) {
         this.catchability = averageCatchability;
     }
-
-    /**
-     * Applies this function to the given argument.
-     *
-     * @param state the function argument
-     * @return the function result
-     */
-    @Override
-    public HomogeneousAbundanceGear apply(final FishState state) {
-
-        return new HomogeneousAbundanceGear(
-            litersOfGasConsumed.applyAsDouble(state.getRandom()),
-            new FixedProportionFilter(getAverageCatchability().applyAsDouble(state.getRandom()), rounding)
-        );
-    }
-
 
     /**
      * Getter for property 'litersOfGasConsumed'.

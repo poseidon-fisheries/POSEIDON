@@ -45,6 +45,10 @@ public class DailyLogisticDepartingStrategy implements DepartingStrategy {
     private int daysToWait = 0;
 
 
+    public DailyLogisticDepartingStrategy(LogisticClassifier classifier) {
+        this.classifier = classifier;
+    }
+
     /**
      * Getter for property 'daysToWait'.
      *
@@ -52,10 +56,6 @@ public class DailyLogisticDepartingStrategy implements DepartingStrategy {
      */
     public int getDaysToWait() {
         return daysToWait;
-    }
-
-    public DailyLogisticDepartingStrategy(LogisticClassifier classifier) {
-        this.classifier = classifier;
     }
 
     @Override
@@ -78,15 +78,16 @@ public class DailyLogisticDepartingStrategy implements DepartingStrategy {
      */
     @Override
     public boolean shouldFisherLeavePort(
-            Fisher fisher, FishState model, MersenneTwisterFast random) {
+        Fisher fisher, FishState model, MersenneTwisterFast random
+    ) {
 
         //if you are waiting because you failed a check before, keep waiting
-        if(fisher.getHoursAtPort() < daysToWait * 24)
+        if (fisher.getHoursAtPort() < daysToWait * 24)
             return false;
         //time for a check!
-        boolean check = classifier.test(fisher,model,fisher.getHomePort().getLocation(),random);
-        if(check)
-            daysToWait=0;
+        boolean check = classifier.test(fisher, model, fisher.getHomePort().getLocation(), random);
+        if (check)
+            daysToWait = 0;
         else
             daysToWait++;
         return check;

@@ -22,10 +22,12 @@ public class FixedPricingStrategy implements PricingStrategy {
     }
 
     @Override
-    public double getPricePerKg(Species speciesBeingSold,
-                                Fisher seller,
-                                int biologicalBin,
-                                double quantitySold) {
+    public double getPricePerKg(
+        Species speciesBeingSold,
+        Fisher seller,
+        int biologicalBin,
+        double quantitySold
+    ) {
         return fixedPrice;
     }
 

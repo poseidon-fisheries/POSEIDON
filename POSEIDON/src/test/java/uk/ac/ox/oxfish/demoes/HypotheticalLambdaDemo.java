@@ -48,26 +48,31 @@ public class HypotheticalLambdaDemo {
 
 
                     //reset predictors to moving averages
-                    fisher.setDailyCatchesPredictor(0,MovingAveragePredictor.dailyMAPredictor("Predicted Daily Catches",
-                                                                                              fisher1 -> fisher1.getDailyCounter().getLandingsPerSpecie(
-                                                                                                      0),
-                                                                                              90));
-                    fisher.setProfitPerUnitPredictor(0,MovingAveragePredictor.perTripMAPredictor("Predicted Unit Profit",
-                                                                                                 fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(0),
-                                                                                                 30));
-
+                    fisher.setDailyCatchesPredictor(0, MovingAveragePredictor.dailyMAPredictor(
+                        "Predicted Daily Catches",
+                        fisher1 -> fisher1.getDailyCounter().getLandingsPerSpecie(
+                            0),
+                        90
+                    ));
+                    fisher.setProfitPerUnitPredictor(0, MovingAveragePredictor.perTripMAPredictor(
+                        "Predicted Unit Profit",
+                        fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(0),
+                        30
+                    ));
 
 
                     //create a lambda gatherer
                     fisher.getDailyData().registerGatherer("Reservation Lambda Owning 1000 quotas",
-                                                           fisher1 -> {
-                                                               if (state.getDayOfTheYear() == 365)
-                                                                   return Double.NaN;
-                                                               double probability = 1 - fisher1.probabilityDailyCatchesBelowLevel(
-                                                                       0,
-                                                                       1000 / (365 - state.getDayOfTheYear()));
-                                                               return (probability * fisher1.predictUnitProfit(0));
-                                                           }, Double.NaN);
+                        fisher1 -> {
+                            if (state.getDayOfTheYear() == 365)
+                                return Double.NaN;
+                            double probability = 1 - fisher1.probabilityDailyCatchesBelowLevel(
+                                0,
+                                1000 / (365 - state.getDayOfTheYear())
+                            );
+                            return (probability * fisher1.predictUnitProfit(0));
+                        }, Double.NaN
+                    );
 
 
                 }
@@ -82,37 +87,36 @@ public class HypotheticalLambdaDemo {
 
         state.start();
 
-        while(state.getYear()<4)
+        while (state.getYear() < 4)
             state.schedule.step(state);
-
 
 
         //write first histogram
-        while(state.getDayOfTheYear() != 100)
+        while (state.getDayOfTheYear() != 100)
             state.schedule.step(state);
 
 
-        double averageLambda = state.getFishers().stream().mapToDouble(
-                value -> Math.max(0,value.getDailyData().getLatestObservation("Reservation Lambda Owning 1000 quotas"))).sum() / 100;
+        double averageLambda = state.getFishers()
+            .stream()
+            .mapToDouble(
+                value -> Math.max(0,
+                    value.getDailyData().getLatestObservation("Reservation Lambda Owning 1000 quotas")))
+            .sum() / 100;
 
 
         //lambda estimated is higher than 3
         System.out.println("mid year lambda: " + averageLambda);
         assertTrue(averageLambda > 3);
 
-        while(state.getDayOfTheYear() != 360)
+        while (state.getDayOfTheYear() != 360)
             state.schedule.step(state);
 
 
         //at the end of the year, lambda is lower than 1
         averageLambda = state.getFishers().stream().mapToDouble(
-                value -> value.getDailyData().getLatestObservation("Reservation Lambda Owning 1000 quotas")).sum() / 100;
+            value -> value.getDailyData().getLatestObservation("Reservation Lambda Owning 1000 quotas")).sum() / 100;
         System.out.println("end year lambda: " + averageLambda);
         assertTrue(averageLambda < 1);
-
-
-
-
 
 
     }

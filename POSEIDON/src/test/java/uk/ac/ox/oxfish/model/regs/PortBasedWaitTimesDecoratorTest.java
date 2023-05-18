@@ -41,44 +41,46 @@ public class PortBasedWaitTimesDecoratorTest {
     @Test
     public void stayAtPort() {
 
-        Port port = new Port("correct",
-                             mock(SeaTile.class),
-                             mock(MarketMap.class),
-                             100);
+        Port port = new Port(
+            "correct",
+            mock(SeaTile.class),
+            mock(MarketMap.class),
+            100
+        );
 
         Fisher fisher = mock(Fisher.class);
 
         HashMap<String, Integer> hoursToWaitPerPort = new HashMap<>();
-        hoursToWaitPerPort.put("correct",100);
-        hoursToWaitPerPort.put("false",50);
+        hoursToWaitPerPort.put("correct", 100);
+        hoursToWaitPerPort.put("false", 50);
         PortBasedWaitTimesDecorator decorator = new PortBasedWaitTimesDecorator(
-                new Anarchy(),
-                hoursToWaitPerPort
+            new Anarchy(),
+            hoursToWaitPerPort
         );
 
 
         when(fisher.isAtPortAndDocked()).thenReturn(false); //never stop somebody who is already out!
-        assertTrue(decorator.allowedAtSea(fisher,mock(FishState.class)));
+        assertTrue(decorator.allowedAtSea(fisher, mock(FishState.class)));
 
         when(fisher.isAtPortAndDocked()).thenReturn(true); //allow somebody who has waited for a long time
         when(fisher.getHomePort()).thenReturn(port);
         when(fisher.getHoursAtPort()).thenReturn(200d);
-        assertTrue(decorator.allowedAtSea(fisher,mock(FishState.class)));
+        assertTrue(decorator.allowedAtSea(fisher, mock(FishState.class)));
 
 
         //but do not allow if they haven't waited enough!
         when(fisher.getHoursAtPort()).thenReturn(20d);
-        assertFalse(decorator.allowedAtSea(fisher,mock(FishState.class)));
+        assertFalse(decorator.allowedAtSea(fisher, mock(FishState.class)));
 
         //if the decorator says no, then it's no
         Regulation decorated = mock(Regulation.class);
-        when(decorated.allowedAtSea(any(),any())).thenReturn(false);
+        when(decorated.allowedAtSea(any(), any())).thenReturn(false);
         decorator = new PortBasedWaitTimesDecorator(
-                decorated,
-                hoursToWaitPerPort
+            decorated,
+            hoursToWaitPerPort
         );
         when(fisher.getHoursAtPort()).thenReturn(200d);
-        assertFalse(decorator.allowedAtSea(fisher,mock(FishState.class)));
+        assertFalse(decorator.allowedAtSea(fisher, mock(FishState.class)));
 
 
     }

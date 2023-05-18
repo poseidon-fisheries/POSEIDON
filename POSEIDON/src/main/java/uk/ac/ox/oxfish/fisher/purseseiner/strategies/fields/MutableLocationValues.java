@@ -97,7 +97,7 @@ public abstract class MutableLocationValues<A>
     }
 
 
-    public boolean hasStarted(){
+    public boolean hasStarted() {
         return values != null;
     }
 

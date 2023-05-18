@@ -40,9 +40,9 @@ public class CacheByFishStateTest {
         final FishState fishStateA = mock(FishState.class);
         final FishState fishStateB = mock(FishState.class);
 
-        assertEquals((Integer)1, cache.get(fishStateA));
-        assertEquals((Integer)2, cache.get(fishStateB));
-        assertEquals((Integer)1, cache.get(fishStateA));
+        assertEquals((Integer) 1, cache.get(fishStateA));
+        assertEquals((Integer) 2, cache.get(fishStateB));
+        assertEquals((Integer) 1, cache.get(fishStateA));
     }
 
 }

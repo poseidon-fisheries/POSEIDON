@@ -1,12 +1,10 @@
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
-import com.opencsv.CSVWriter;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
 
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -42,20 +40,18 @@ public class RowProviderToOutputPluginAdaptor implements OutputPlugin, Additiona
         StringBuilder builder = new StringBuilder();
         // if there are headers...
         Iterator<String> headers = delegate.getHeaders().iterator();
-        while(headers.hasNext())
-        {
+        while (headers.hasNext()) {
             builder.append(headers.next());
-            if(headers.hasNext())
+            if (headers.hasNext())
                 builder.append(",");
         }
         builder.append("\n");
 
         for (Collection<?> row : delegate.getRows()) {
             Iterator<?> rowElements = row.iterator();
-            while(rowElements.hasNext())
-            {
+            while (rowElements.hasNext()) {
                 builder.append(rowElements.next());
-                if(rowElements.hasNext())
+                if (rowElements.hasNext())
                     builder.append(",");
             }
 
@@ -69,14 +65,14 @@ public class RowProviderToOutputPluginAdaptor implements OutputPlugin, Additiona
     @Override
     public void start(FishState model) {
         //this is how the runner does it, so let's do it here too
-        if(delegate instanceof Startable)
+        if (delegate instanceof Startable)
             ((Startable) delegate).start(model);
         model.getOutputPlugins().add(this);
     }
 
     @Override
     public void turnOff() {
-        if(delegate instanceof Startable)
+        if (delegate instanceof Startable)
             ((Startable) delegate).turnOff();
     }
 }

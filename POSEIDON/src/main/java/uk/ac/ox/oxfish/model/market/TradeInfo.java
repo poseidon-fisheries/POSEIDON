@@ -40,8 +40,8 @@ public class TradeInfo {
         this.biomassTraded = biomassTraded;
         this.species = species;
         this.moneyExchanged = moneyExchanged;
-        Preconditions.checkArgument(biomassTraded>=0);
-  //      Preconditions.checkArgument(moneyExchanged>=0); not true if it's a fine
+        Preconditions.checkArgument(biomassTraded >= 0);
+        //      Preconditions.checkArgument(moneyExchanged>=0); not true if it's a fine
     }
 
     public double getBiomassTraded() {
@@ -60,9 +60,9 @@ public class TradeInfo {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("biomassTraded", biomassTraded)
-                .add("species", species)
-                .add("moneyExchanged", moneyExchanged)
-                .toString();
+            .add("biomassTraded", biomassTraded)
+            .add("species", species)
+            .add("moneyExchanged", moneyExchanged)
+            .toString();
     }
 }

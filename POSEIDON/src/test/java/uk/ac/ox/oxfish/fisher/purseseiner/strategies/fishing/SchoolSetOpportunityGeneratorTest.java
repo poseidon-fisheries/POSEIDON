@@ -55,6 +55,23 @@ public class SchoolSetOpportunityGeneratorTest {
     private static final double coefficient = 1;
     private static final MersenneTwisterFast rng = new MersenneTwisterFast();
 
+    @Test
+    public void test() {
+        final double expected = 0.6321205588285577;
+        assertEquals(expected, getP(1, 1, 0, 0).getKey(), EPSILON);
+        assertEquals(expected, getP(0, 0, 1, 1).getKey(), EPSILON);
+        assertEquals(expected, getP(1, 0, 1, 1).getKey(), EPSILON);
+        assertEquals(expected, getP(1, 1, 1, 0).getKey(), EPSILON);
+        assertEquals(expected, getP(2, 1, 0, 1).getKey(), EPSILON);
+        assertEquals(expected, getP(0, 1, 2, 1).getKey(), EPSILON);
+        assertTrue(expected > getP(0, 1, 0, 1).getKey());
+        assertTrue(expected < getP(2, 1, 2, 1).getKey());
+
+        assertTrue(getP(MAX_VALUE, 1, MAX_VALUE, 1).getValue().isPresent());
+        assertFalse(getP(0, 1, 0, 1).getValue().isPresent());
+
+    }
+
     @SuppressWarnings("unchecked")
     private static Entry<Double, Optional<NonAssociatedSetAction<BiomassLocalBiology>>> getP(
         final double biomass0,
@@ -100,23 +117,6 @@ public class SchoolSetOpportunityGeneratorTest {
             setOpportunityGenerator.probabilityOfOpportunity(biology),
             setOpportunityGenerator.apply(fisher).stream().findAny()
         );
-    }
-
-    @Test
-    public void test() {
-        final double expected = 0.6321205588285577;
-        assertEquals(expected, getP(1, 1, 0, 0).getKey(), EPSILON);
-        assertEquals(expected, getP(0, 0, 1, 1).getKey(), EPSILON);
-        assertEquals(expected, getP(1, 0, 1, 1).getKey(), EPSILON);
-        assertEquals(expected, getP(1, 1, 1, 0).getKey(), EPSILON);
-        assertEquals(expected, getP(2, 1, 0, 1).getKey(), EPSILON);
-        assertEquals(expected, getP(0, 1, 2, 1).getKey(), EPSILON);
-        assertTrue(expected > getP(0, 1, 0, 1).getKey());
-        assertTrue(expected < getP(2, 1, 2, 1).getKey());
-
-        assertTrue(getP(MAX_VALUE, 1, MAX_VALUE, 1).getValue().isPresent());
-        assertFalse(getP(0, 1, 0, 1).getValue().isPresent());
-
     }
 
 }

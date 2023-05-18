@@ -41,17 +41,17 @@ public class ProportionalMortalityProcess implements NaturalMortalityProcess {
      */
     @Override
     public void cull(
-            Meristics species, boolean rounding, StructuredAbundance structuredAbundance, int daysSimulated)
-    {
-        double scaling = daysSimulated/365d;
-        double effectiveMortality = 1d-Math.pow(1d-yearlyMortality,scaling);
+        Meristics species, boolean rounding, StructuredAbundance structuredAbundance, int daysSimulated
+    ) {
+        double scaling = daysSimulated / 365d;
+        double effectiveMortality = 1d - Math.pow(1d - yearlyMortality, scaling);
         double[][] abundanceMatrix = structuredAbundance.asMatrix();
 
 
-        for(int cohort=0; cohort<abundanceMatrix.length; cohort++)
-            for(int bin=0; bin<abundanceMatrix[cohort].length; bin++) {
+        for (int cohort = 0; cohort < abundanceMatrix.length; cohort++)
+            for (int bin = 0; bin < abundanceMatrix[cohort].length; bin++) {
                 abundanceMatrix[cohort][bin] -= abundanceMatrix[cohort][bin] * (effectiveMortality);
-                if(rounding)
+                if (rounding)
                     abundanceMatrix[cohort][bin] = FishStateUtilities.quickRounding(abundanceMatrix[cohort][bin]);
             }
     }

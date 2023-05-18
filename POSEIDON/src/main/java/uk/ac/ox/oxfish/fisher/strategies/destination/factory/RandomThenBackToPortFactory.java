@@ -24,8 +24,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.RandomThenBackToPortDestina
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-public class RandomThenBackToPortFactory implements AlgorithmFactory<RandomThenBackToPortDestinationStrategy>
-{
+public class RandomThenBackToPortFactory implements AlgorithmFactory<RandomThenBackToPortDestinationStrategy> {
 
     @Override
     public RandomThenBackToPortDestinationStrategy apply(FishState state) {

@@ -22,10 +22,8 @@ package uk.ac.ox.oxfish.model.plugins;
 
 import com.google.common.base.Preconditions;
 import sim.engine.SimState;
-import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
@@ -33,25 +31,21 @@ public class FisherEntryConstantRate implements EntryPlugin {
 
 
     /**
-     * we expect activeBoats * (growthRateInPercentage) to be the new entrants next year
-     */
-    private double growthRateInPercentage;
-
-    /**
      * which population of boats are we growing; this has to be both the name of the fishery factory and a tag so that we know
      * which boats belong to it
      */
     private final String populationName;
-
-    private Stoppable stoppable;
-
     private final int doNotGrowBeforeThisYear;
-
+    /**
+     * we expect activeBoats * (growthRateInPercentage) to be the new entrants next year
+     */
+    private double growthRateInPercentage;
+    private Stoppable stoppable;
     private boolean isEntryPaused = false;
 
 
     public FisherEntryConstantRate(double growthRateInPercentage, String populationName) {
-        this(growthRateInPercentage,populationName,-1);
+        this(growthRateInPercentage, populationName, -1);
     }
 
 
@@ -69,12 +63,14 @@ public class FisherEntryConstantRate implements EntryPlugin {
      */
     @Override
     public void start(FishState model) {
-        Preconditions.checkArgument(stoppable==null, "already started!");
-        stoppable = model.scheduleEveryYear(this,
-                                            StepOrder.AFTER_DATA);
+        Preconditions.checkArgument(stoppable == null, "already started!");
+        stoppable = model.scheduleEveryYear(
+            this,
+            StepOrder.AFTER_DATA
+        );
 
 
-        if(!model.getEntryPlugins().contains(this))
+        if (!model.getEntryPlugins().contains(this))
             model.getEntryPlugins().add(this);
     }
 
@@ -85,7 +81,7 @@ public class FisherEntryConstantRate implements EntryPlugin {
     @Override
     public void turnOff() {
 
-        if(stoppable!=null)
+        if (stoppable != null)
             stoppable.stop();
 
     }
@@ -94,14 +90,14 @@ public class FisherEntryConstantRate implements EntryPlugin {
     public void step(SimState simState) {
 
         FishState model = ((FishState) simState);
-        if(isEntryPaused || model.getYear()<doNotGrowBeforeThisYear)
+        if (isEntryPaused || model.getYear() < doNotGrowBeforeThisYear)
             return;
 
 
         double currentActiveFishers = 0;
         // count the fisher as active if it has been on at least a trip in the past 365 days!
         for (Fisher fisher : model.getFishers()) {
-            if(fisher.getTags().contains(populationName) && fisher.hasBeenActiveThisYear())
+            if (fisher.getTags().contains(populationName) && fisher.hasBeenActiveThisYear())
                 currentActiveFishers++;
 
 

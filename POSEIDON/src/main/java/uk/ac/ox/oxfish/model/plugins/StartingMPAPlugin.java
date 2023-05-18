@@ -24,17 +24,15 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
  *
  */
 public class StartingMPAPlugin implements AdditionalStartable {
 
 
-    final  private List<StartingMPA> startingMPAs;
+    final private List<StartingMPA> startingMPAs;
 
 
     public StartingMPAPlugin(List<StartingMPA> startingMPAs) {
@@ -51,8 +49,7 @@ public class StartingMPAPlugin implements AdditionalStartable {
     public void start(FishState model) {
 
 
-        for(StartingMPA mpa : startingMPAs)
-        {
+        for (StartingMPA mpa : startingMPAs) {
             mpa.buildMPA(model.getMap());
         }
 

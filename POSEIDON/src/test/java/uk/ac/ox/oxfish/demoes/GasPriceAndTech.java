@@ -32,13 +32,12 @@ public class GasPriceAndTech {
     public void expensiveOilPushesEfficientGear() throws Exception {
 
         double averageTech = 0;
-        for(int i=0; i<3; i++) {
+        for (int i = 0; i < 3; i++) {
             averageTech += efficiencyImitation(.5, 20, "Independent Logistic", System.currentTimeMillis()).getLatest();
             System.out.println(averageTech);
         }
 
-        Assert.assertTrue(averageTech/3d < 5);
-
+        Assert.assertTrue(averageTech / 3d < 5);
 
 
     }
@@ -46,12 +45,11 @@ public class GasPriceAndTech {
     @Test
     public void freeGasNoPointImprovingGear() throws Exception {
         double averageTech = 0;
-        for(int i=0; i<3; i++)
-            averageTech+=efficiencyImitation(0, 20, "Independent Logistic", System.currentTimeMillis()).getLatest();
+        for (int i = 0; i < 3; i++)
+            averageTech += efficiencyImitation(0, 20, "Independent Logistic", System.currentTimeMillis()).getLatest();
 
 
-        Assert.assertTrue(averageTech/3d > 5);
-
+        Assert.assertTrue(averageTech / 3d > 5);
 
 
     }

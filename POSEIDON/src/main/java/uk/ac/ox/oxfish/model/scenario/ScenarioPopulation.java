@@ -30,8 +30,7 @@ import java.util.Map;
  * The result of calling populateModel from the scenario
  * Created by carrknight on 7/1/15.
  */
-public class ScenarioPopulation
-{
+public class ScenarioPopulation {
 
 
     /**
@@ -47,16 +46,19 @@ public class ScenarioPopulation
     /**
      * method to create and kill fishers while the model is running; mapping name of the population to fishery factory
      */
-    private final Map<String,FisherFactory> factory;
+    private final Map<String, FisherFactory> factory;
 
     /**
      * The list of agents and a network ready to be populated!
+     *
      * @param population list of agents
-     * @param network   network NOT populated
+     * @param network    network NOT populated
      * @param factory
      */
-    public ScenarioPopulation(List<Fisher> population, SocialNetwork network,
-                              Map<String,FisherFactory> factory) {
+    public ScenarioPopulation(
+        List<Fisher> population, SocialNetwork network,
+        Map<String, FisherFactory> factory
+    ) {
         this.population = population;
         this.network = network;
         this.factory = factory;
@@ -71,7 +73,7 @@ public class ScenarioPopulation
         return network;
     }
 
-    public Map<String,FisherFactory> getFactory() {
+    public Map<String, FisherFactory> getFactory() {
         return factory;
     }
 }

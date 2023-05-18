@@ -20,10 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedList;
-
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
@@ -38,6 +34,10 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.restrictions.RegionalRestrictions;
 import uk.ac.ox.oxfish.model.restrictions.ReputationalRestrictions;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedList;
+
 /**
  * contains all the transitory variables of  a fisher including:
  * <ul>
@@ -50,166 +50,10 @@ import uk.ac.ox.oxfish.model.restrictions.ReputationalRestrictions;
 public class FisherStatus implements Serializable {
 
 
-
-
-
-    /**
-     * the location of the port!
-     */
-    private SeaTile location;
-
-    /**
-     * set by events (right now by enforcement).
-     * It forces agents back to port!
-     */
-    private boolean exogenousEmergencyOverride = false;
-
-    public SeaTile getLocation() {
-        return location;
-    }
-
-    public void setLocation(SeaTile location) {
-        this.location = location;
-    }
-
-    /**
-     * Home is where the port is
-     */
-    private Port homePort;
-
-    public Port getHomePort() {
-        return homePort;
-    }
-
-
-    /**
-     * if it is moving somewhere, the destination is stored here.
-     */
-    private SeaTile destination;
-
-    public SeaTile getDestination() {
-        return destination;
-    }
-
-    public void setDestination(SeaTile destination) {
-        this.destination = destination;
-    }
-
     /**
      * randomizer
      */
     private final MersenneTwisterFast random;
-
-    public MersenneTwisterFast getRandom() {
-        return random;
-    }
-
-
-    /**
-     * the regulation object to obey
-     */
-    private Regulation regulation;
-
-    public Regulation getRegulation() {
-        return regulation;
-    }
-
-    public void setRegulation(Regulation regulation) {
-        this.regulation = regulation;
-    }
-
-    
-    /** 
-     * The community Standards to obey
-     */
-    
-    private RegionalRestrictions communalStandards;
-    
-    public RegionalRestrictions getCommunalStandards(){
-    	return communalStandards;
-    }
-    
-    public void setCommunalStandards(RegionalRestrictions communalStandards){
-    	this.communalStandards = communalStandards;
-    }
-    
-    /**
-     * The reputational risks to observe
-     */
-    
-    private ReputationalRestrictions reputationalRisk;
-    
-    public ReputationalRestrictions getReputationalRisk(){
-    	return reputationalRisk;
-    }
-    
-    public void setReputationalRisk(ReputationalRestrictions reputationalRisk){
-    	this.reputationalRisk = reputationalRisk;
-    }
-    
-    
-    
-    /**
-     * the state of the fisher: the next action they are taking
-     */
-    private Action action;
-
-    public Action getAction() {
-        return action;
-    }
-
-    public void setAction(Action action) {
-        this.action = action;
-    }
-
-    /**
-     * hours spent away from port current trip
-     */
-    private double hoursAtSea;
-
-    public double getHoursAtSea() {
-        return hoursAtSea;
-    }
-
-
-    public void setHoursAtSea(double hoursAtSea) {
-        this.hoursAtSea = hoursAtSea;
-    }
-
-    private double hoursAtPort;
-
-    public double getHoursAtPort() {
-        return hoursAtPort;
-    }
-
-    public void setHoursAtPort(double hoursAtPort) {
-        this.hoursAtPort = hoursAtPort;
-    }
-
-    /**
-     * the cash owned by the firm
-     */
-    private double bankBalance;
-
-    public double getBankBalance() {
-        return bankBalance;
-    }
-
-    public void setBankBalance(double bankBalance) {
-        this.bankBalance = bankBalance;
-    }
-
-    private SocialNetwork network;
-
-    public SocialNetwork getNetwork() {
-        return network;
-    }
-
-    public void setNetwork(SocialNetwork network) {
-        this.network = network;
-    }
-
-
     /**
      * anything that doesn't fit a counter or a time series can be stored in this map which is nothing else than a
      * white board to scribble fisher parameters in.
@@ -217,92 +61,79 @@ public class FisherStatus implements Serializable {
      * objects
      */
     private final HashMap<String, Object> additionalVariables = new HashMap<>();
-
-
-
-
     /**
      * list of costs to pay at the end of the trip. Any amount computed is spent. Wages would be a good example.
      */
     private final LinkedList<Cost> additionalTripCosts = new LinkedList<>();
-
     /**
      * list of additional costs to account for on trip record but not to actually burn money on.
      */
     private final LinkedList<Cost> opportunityCosts = new LinkedList<>();
+    /**
+     * the location of the port!
+     */
+    private SeaTile location;
+    /**
+     * set by events (right now by enforcement).
+     * It forces agents back to port!
+     */
+    private boolean exogenousEmergencyOverride = false;
+    /**
+     * Home is where the port is
+     */
+    private Port homePort;
+    /**
+     * if it is moving somewhere, the destination is stored here.
+     */
+    private SeaTile destination;
+    /**
+     * the regulation object to obey
+     */
+    private Regulation regulation;
+    /**
+     * The community Standards to obey
+     */
 
+    private RegionalRestrictions communalStandards;
+    /**
+     * The reputational risks to observe
+     */
 
-
+    private ReputationalRestrictions reputationalRisk;
+    /**
+     * the state of the fisher: the next action they are taking
+     */
+    private Action action;
+    /**
+     * hours spent away from port current trip
+     */
+    private double hoursAtSea;
+    private double hoursAtPort;
+    /**
+     * the cash owned by the firm
+     */
+    private double bankBalance;
+    private SocialNetwork network;
     private Predictor[] dailyCatchesPredictor;
-            /*MovingAveragePredictor.dailyMAPredictor("Predicted Daily Catches",
-                                                                                            fisher -> fisher.getDailyCounter().getLandingsPerSpecie(0),
-                                                                                            90);
-                                                                                            */
-
     private Predictor[] profitPerUnitPredictor;
-            /*
-            MovingAveragePredictor.perTripMAPredictor("Predicted Unit Profit",
-                                                                                               fisher -> fisher.getLastFinishedTrip().getUnitProfitPerSpecie(
-                                                                                                       0),
-                                                                                               30);
-                                                                                               */
-
-
     private Predictor dailyProfitsPredictor = new FixedPredictor(Double.NaN);
-            /*
-            MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
-                                                                                      fisher ->
-                                                                                              fisher.getDailyData().
-                                                                                                      getColumn(
-                                                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN).getLatest(),
-                                                                                      365);
-*/
-
-
     /**
      * when this flag is on, the agent believes that it MUST return home or it will lspiRun out of fuel. All other usual
      * decisions about destination are ignored.
      */
     private boolean fuelEmergencyOverride = false;
-
-    public boolean isFuelEmergencyOverride() {
-        return fuelEmergencyOverride;
-    }
-
-    public void setFuelEmergencyOverride(boolean fuelEmergencyOverride) {
-        this.fuelEmergencyOverride = fuelEmergencyOverride;
-    }
-
-
     /**
      * when this flag is on, the agent believes it MUST return home to avoid the worst part of a storm. All other decisions
      * are otherwise ignored
      */
     private boolean weatherEmergencyOverride = false;
 
-
-    public boolean isWeatherEmergencyOverride() {
-        return weatherEmergencyOverride;
-    }
-
-    public void setWeatherEmergencyOverride(boolean weatherEmergencyOverride) {
-        this.weatherEmergencyOverride = weatherEmergencyOverride;
-    }
-
-    /**
-     * whenever any of these flag is set to true, the agent just goes back home
-     * @return
-     */
-    public boolean isAnyEmergencyFlagOn()
-    {
-        return fuelEmergencyOverride || weatherEmergencyOverride || exogenousEmergencyOverride;
-    }
-
     public FisherStatus(
-            MersenneTwisterFast random, Regulation regulation, Action action, Port homePort, SeaTile location,
-            SeaTile destination,
-            double hoursAtSea, double hoursAtPort,
-            double bankBalance, boolean fuelEmergencyOverride, SocialNetwork network) {
+        MersenneTwisterFast random, Regulation regulation, Action action, Port homePort, SeaTile location,
+        SeaTile destination,
+        double hoursAtSea, double hoursAtPort,
+        double bankBalance, boolean fuelEmergencyOverride, SocialNetwork network
+    ) {
         this.location = location;
         this.homePort = homePort;
         this.destination = destination;
@@ -316,17 +147,18 @@ public class FisherStatus implements Serializable {
         this.fuelEmergencyOverride = fuelEmergencyOverride;
     }
 
-
     /**
      * default initializer used by the fisher constructor. Initializes most stuff automagically except
      * for the social network which is set to null (this is because we need to build fishers before we can
      * create a netowkr for them)
-     * @param random randomizer
+     *
+     * @param random     randomizer
      * @param regulation regulation object
-     * @param homePort home port
+     * @param homePort   home port
      */
     public FisherStatus(
-            MersenneTwisterFast random, Regulation regulation, Port homePort) {
+        MersenneTwisterFast random, Regulation regulation, Port homePort
+    ) {
         this.homePort = homePort;
         this.location = homePort.getLocation();
         this.destination = homePort.getLocation();
@@ -338,22 +170,150 @@ public class FisherStatus implements Serializable {
         this.network = network;
         this.bankBalance = 0;
         this.fuelEmergencyOverride = false;
-        this.exogenousEmergencyOverride=false;
+        this.exogenousEmergencyOverride = false;
         network = null;
     }
 
+    public SeaTile getLocation() {
+        return location;
+    }
+
+    public void setLocation(SeaTile location) {
+        this.location = location;
+    }
+
+    public Port getHomePort() {
+        return homePort;
+    }
 
     /**
+     * Setter for property 'homePort'.
      *
+     * @param homePort Value to set for property 'homePort'.
+     */
+    public void setHomePort(Port homePort) {
+        this.homePort = homePort;
+    }
+
+    public SeaTile getDestination() {
+        return destination;
+    }
+
+    public void setDestination(SeaTile destination) {
+        this.destination = destination;
+    }
+
+    public MersenneTwisterFast getRandom() {
+        return random;
+    }
+
+    public Regulation getRegulation() {
+        return regulation;
+    }
+
+    public void setRegulation(Regulation regulation) {
+        this.regulation = regulation;
+    }
+
+    public RegionalRestrictions getCommunalStandards() {
+        return communalStandards;
+    }
+
+    public void setCommunalStandards(RegionalRestrictions communalStandards) {
+        this.communalStandards = communalStandards;
+    }
+
+    public Action getAction() {
+        return action;
+    }
+
+    public void setAction(Action action) {
+        this.action = action;
+    }
+
+    public double getHoursAtSea() {
+        return hoursAtSea;
+    }
+
+    public void setHoursAtSea(double hoursAtSea) {
+        this.hoursAtSea = hoursAtSea;
+    }
+
+    public double getHoursAtPort() {
+        return hoursAtPort;
+    }
+            /*MovingAveragePredictor.dailyMAPredictor("Predicted Daily Catches",
+                                                                                            fisher -> fisher.getDailyCounter().getLandingsPerSpecie(0),
+                                                                                            90);
+                                                                                            */
+
+    public void setHoursAtPort(double hoursAtPort) {
+        this.hoursAtPort = hoursAtPort;
+    }
+            /*
+            MovingAveragePredictor.perTripMAPredictor("Predicted Unit Profit",
+                                                                                               fisher -> fisher.getLastFinishedTrip().getUnitProfitPerSpecie(
+                                                                                                       0),
+                                                                                               30);
+                                                                                               */
+
+    public double getBankBalance() {
+        return bankBalance;
+    }
+            /*
+            MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
+                                                                                      fisher ->
+                                                                                              fisher.getDailyData().
+                                                                                                      getColumn(
+                                                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN).getLatest(),
+                                                                                      365);
+*/
+
+    public void setBankBalance(double bankBalance) {
+        this.bankBalance = bankBalance;
+    }
+
+    public SocialNetwork getNetwork() {
+        return network;
+    }
+
+    public void setNetwork(SocialNetwork network) {
+        this.network = network;
+    }
+
+    public boolean isFuelEmergencyOverride() {
+        return fuelEmergencyOverride;
+    }
+
+    public void setFuelEmergencyOverride(boolean fuelEmergencyOverride) {
+        this.fuelEmergencyOverride = fuelEmergencyOverride;
+    }
+
+    public boolean isWeatherEmergencyOverride() {
+        return weatherEmergencyOverride;
+    }
+
+    public void setWeatherEmergencyOverride(boolean weatherEmergencyOverride) {
+        this.weatherEmergencyOverride = weatherEmergencyOverride;
+    }
+
+    /**
+     * whenever any of these flag is set to true, the agent just goes back home
+     *
+     * @return
+     */
+    public boolean isAnyEmergencyFlagOn() {
+        return fuelEmergencyOverride || weatherEmergencyOverride || exogenousEmergencyOverride;
+    }
+
+    /**
      * @return true if destination == location
      */
-    public boolean isAtDestination()
-    {
+    public boolean isAtDestination() {
         return destination.equals(location);
     }
 
-    public boolean isGoingToPort()
-    {
+    public boolean isGoingToPort() {
         return destination.equals(homePort.getLocation());
     }
 
@@ -361,26 +321,27 @@ public class FisherStatus implements Serializable {
         return homePort.getLocation().equals(location);
     }
 
-
-    public FisherStatus makeCopy()
-    {
-        return new FisherStatus(random,
-                                                 regulation.makeCopy(),
-                                                 action,
-                                                 homePort,
-                                                 location,
-                                                 destination,
-                                                 hoursAtSea,
-                                                 hoursAtPort,
-                                                 bankBalance,
-                                                 fuelEmergencyOverride,
-                                                 network);
+    public FisherStatus makeCopy() {
+        return new FisherStatus(
+            random,
+            regulation.makeCopy(),
+            action,
+            homePort,
+            location,
+            destination,
+            hoursAtSea,
+            hoursAtPort,
+            bankBalance,
+            fuelEmergencyOverride,
+            network
+        );
     }
 
     /**
      * Can this fisher be at sea?
+     *
      * @param fisher the  fisher
-     * @param model the model
+     * @param model  the model
      * @return true if it can be out. When it's false the fisher can't leave port and ought to go back to port if he is
      * at sea
      */
@@ -390,22 +351,23 @@ public class FisherStatus implements Serializable {
 
     /**
      * can the agent fish at this location?
+     *
      * @param agent the agent that wants to fish
-     * @param tile the tile the fisher is trying to fish on
+     * @param tile  the tile the fisher is trying to fish on
      * @param model a link to the model
      * @return true if the fisher can fish
      */
     public boolean isAllowedToFishHere(Fisher agent, SeaTile tile, FishState model) {
         return regulation.canFishHere(agent, tile, model);
     }
-    
+
     public boolean isAllowedByCommunityStandardsToFishHere(Fisher agent, SeaTile tile, FishState model) {
-    	if(communalStandards==null) System.out.println("My communal standards are not set!");
-    	return communalStandards.canFishHere(agent, tile, model);
+        if (communalStandards == null) System.out.println("My communal standards are not set!");
+        return communalStandards.canFishHere(agent, tile, model);
     }
 
     public boolean isAllowedReputationToFishHere(Fisher agent, SeaTile tile, FishState model) {
-    	return reputationalRisk.canFishHere(agent, tile, model);
+        return reputationalRisk.canFishHere(agent, tile, model);
     }
 
     /**
@@ -425,16 +387,6 @@ public class FisherStatus implements Serializable {
     public void setExogenousEmergencyOverride(boolean exogenousEmergencyOverride) {
         this.exogenousEmergencyOverride = exogenousEmergencyOverride;
     }
-
-    /**
-     * Setter for property 'homePort'.
-     *
-     * @param homePort Value to set for property 'homePort'.
-     */
-    public void setHomePort(Port homePort) {
-        this.homePort = homePort;
-    }
-
 
     /**
      * Getter for property 'additionalTripCosts'.
@@ -517,7 +469,15 @@ public class FisherStatus implements Serializable {
         return additionalVariables;
     }
 
-	public int countTerritories() {
-		return getReputationalRisk().countTerritory();
-	}
+    public int countTerritories() {
+        return getReputationalRisk().countTerritory();
+    }
+
+    public ReputationalRestrictions getReputationalRisk() {
+        return reputationalRisk;
+    }
+
+    public void setReputationalRisk(ReputationalRestrictions reputationalRisk) {
+        this.reputationalRisk = reputationalRisk;
+    }
 }

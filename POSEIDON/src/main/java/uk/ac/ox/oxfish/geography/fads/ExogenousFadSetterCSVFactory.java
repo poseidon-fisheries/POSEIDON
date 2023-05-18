@@ -74,6 +74,13 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
         return setter;
     }
 
+    public DoubleParameter getMissingFadError() {
+        return missingFadError;
+    }
+
+    public void setMissingFadError(final DoubleParameter missingFadError) {
+        this.missingFadError = missingFadError;
+    }
 
     public InputPath getSetsFile() {
         return setsFile;
@@ -97,14 +104,6 @@ public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousF
 
     public void setNeighborhoodSearchSize(final DoubleParameter neighborhoodSearchSize) {
         this.neighborhoodSearchSize = neighborhoodSearchSize;
-    }
-
-    public DoubleParameter getMissingFadError() {
-        return missingFadError;
-    }
-
-    public void setMissingFadError(final DoubleParameter missingFadError) {
-        this.missingFadError = missingFadError;
     }
 
     public boolean isKeepLog() {

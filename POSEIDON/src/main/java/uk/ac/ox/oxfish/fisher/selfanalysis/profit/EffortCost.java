@@ -12,7 +12,7 @@ public class EffortCost implements Cost {
 
     public EffortCost(double costPerHourSpentFishing) {
         this.costPerHourSpentFishing = costPerHourSpentFishing;
-        Preconditions.checkArgument(costPerHourSpentFishing>0);
+        Preconditions.checkArgument(costPerHourSpentFishing > 0);
         Preconditions.checkArgument(Double.isFinite(costPerHourSpentFishing));
     }
 
@@ -30,7 +30,12 @@ public class EffortCost implements Cost {
     }
 
     @Override
-    public double expectedAdditionalCosts(Fisher fisher, double additionalTripHours, double additionalEffortHours, double additionalKmTravelled) {
+    public double expectedAdditionalCosts(
+        Fisher fisher,
+        double additionalTripHours,
+        double additionalEffortHours,
+        double additionalKmTravelled
+    ) {
         return additionalEffortHours * costPerHourSpentFishing;
     }
 }

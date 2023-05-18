@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.extractors;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -31,17 +30,14 @@ import uk.ac.ox.oxfish.model.FishState;
  * Nasty and used only to add noise and make prediction worse
  * Created by carrknight on 7/7/16.
  */
-public class RandomObservationExtractor implements ObservationExtractor
-{
+public class RandomObservationExtractor implements ObservationExtractor {
 
-
-    private double maxNoise;
 
     final private MersenneTwisterFast randomizer;
+    private double maxNoise;
 
 
-    public RandomObservationExtractor(double maxNoise, MersenneTwisterFast randomizer)
-    {
+    public RandomObservationExtractor(double maxNoise, MersenneTwisterFast randomizer) {
         this.maxNoise = maxNoise;
         this.randomizer = randomizer;
     }
@@ -49,7 +45,7 @@ public class RandomObservationExtractor implements ObservationExtractor
 
     @Override
     public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-        return randomizer.nextDouble()*maxNoise;
+        return randomizer.nextDouble() * maxNoise;
     }
 
     /**

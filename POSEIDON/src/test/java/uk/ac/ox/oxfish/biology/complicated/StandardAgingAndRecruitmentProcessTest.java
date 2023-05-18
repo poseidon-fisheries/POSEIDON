@@ -42,7 +42,7 @@ public class StandardAgingAndRecruitmentProcessTest {
         when(species.getNumberOfBins()).thenReturn(3);
         double[] male = {10, 20, 30};
         double[] female = {100, 200, 300};
-        StructuredAbundance abundance = new StructuredAbundance(male,female);
+        StructuredAbundance abundance = new StructuredAbundance(male, female);
         StandardAgingProcess process = new StandardAgingProcess(false);
 
         AbundanceLocalBiology bio = mock(AbundanceLocalBiology.class);
@@ -51,8 +51,8 @@ public class StandardAgingAndRecruitmentProcessTest {
 
         process.ageLocally(bio, species, null, true, 365);
 
-        assertArrayEquals(male,new double[]{0,10,20},.0001);
-        assertArrayEquals(female,new double[]{0,100,200},.0001);
+        assertArrayEquals(male, new double[]{0, 10, 20}, .0001);
+        assertArrayEquals(female, new double[]{0, 100, 200}, .0001);
 
     }
 
@@ -64,7 +64,7 @@ public class StandardAgingAndRecruitmentProcessTest {
         when(species.getNumberOfBins()).thenReturn(3);
         double[] male = {10, 20, 30};
         double[] female = {100, 200, 300};
-        StructuredAbundance abundance = new StructuredAbundance(male,female);
+        StructuredAbundance abundance = new StructuredAbundance(male, female);
 
         StandardAgingProcess process = new StandardAgingProcess(true);
 
@@ -72,12 +72,11 @@ public class StandardAgingAndRecruitmentProcessTest {
         when(bio.getAbundance(species)).thenReturn(abundance);
 
 
-
-        process.ageLocally(bio, species, null, true,365 );
+        process.ageLocally(bio, species, null, true, 365);
 
         System.out.println(Arrays.toString(male));
-        assertArrayEquals(male,new double[]{0,10,50},.0001);
-        assertArrayEquals(female,new double[]{0,100,500},.0001);
+        assertArrayEquals(male, new double[]{0, 10, 50}, .0001);
+        assertArrayEquals(female, new double[]{0, 100, 500}, .0001);
 
     }
 }

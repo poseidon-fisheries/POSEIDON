@@ -38,8 +38,6 @@ package uk.ac.ox.oxfish.utility.fxcollections;/*
  *
  * @see Observable
  * @see ObservableValue
- *
- *
  * @since JavaFX 2.0
  */
 @FunctionalInterface
@@ -53,8 +51,7 @@ public interface InvalidationListener {
      * In general, it is considered bad practice to modify the observed value in
      * this method.
      *
-     * @param observable
-     *            The {@code Observable} that became invalid
+     * @param observable The {@code Observable} that became invalid
      */
     public void invalidated(Observable observable);
 }

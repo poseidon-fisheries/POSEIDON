@@ -24,10 +24,9 @@ public class LogisticSimpleFilter extends FormulaAbundanceFilter {
     protected double[][] computeSelectivity(Species species) {
         double[][] toReturn = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
 
-        for(int subdivision = 0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
-            for(int bin=0; bin<species.getNumberOfBins(); bin++)
-            {
-                toReturn[subdivision][bin] = 1/(1+Math.exp(selex1-selex2*species.getLength(subdivision,bin)));
+        for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++)
+            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
+                toReturn[subdivision][bin] = 1 / (1 + Math.exp(selex1 - selex2 * species.getLength(subdivision, bin)));
 
 
             }

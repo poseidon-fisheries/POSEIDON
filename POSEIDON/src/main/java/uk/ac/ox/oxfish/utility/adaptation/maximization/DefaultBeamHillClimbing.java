@@ -36,21 +36,33 @@ import java.util.function.Predicate;
 public class DefaultBeamHillClimbing extends BeamHillClimbing<SeaTile> {
 
 
+    public DefaultBeamHillClimbing(int maxStep, int attempts) {
+        this(DEFAULT_ALWAYS_COPY_BEST, DEFAULT_DYNAMIC_NETWORK, maxStep, attempts, true);
+    }
 
+    public DefaultBeamHillClimbing(
+        boolean copyAlwaysBest, Predicate<Pair<Double, Double>> unfriendPredicate,
+        int maxStep, int attempts, final boolean backtracksOnBadExploration
+    ) {
+        super(copyAlwaysBest, backtracksOnBadExploration, unfriendPredicate,
+            DEFAULT_RANDOM_STEP(maxStep, attempts)
+        );
+    }
 
-    final public static RandomStep<SeaTile> DEFAULT_RANDOM_STEP(int maxStep,int attempts){
+    final public static RandomStep<SeaTile> DEFAULT_RANDOM_STEP(int maxStep, int attempts) {
         return new RandomStep<SeaTile>() {
             @Override
             public SeaTile randomStep(
-                    FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current)
-            {
-                for(int i=0; i<attempts; i++)
-                {
-                    int x = current.getGridX() + (random.nextBoolean() ? random.nextInt(maxStep+1) : -random.nextInt(maxStep+1));
-                    int y = current.getGridY() + (random.nextBoolean() ? random.nextInt(maxStep+1) : -random.nextInt(maxStep+1));
-                    SeaTile candidate = state.getMap().getSeaTile(x,y);
-                    if(candidate!=null && current!= candidate && candidate.isWater()
-                            &&!fisher.getHomePort().getLocation().equals(candidate) )
+                FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current
+            ) {
+                for (int i = 0; i < attempts; i++) {
+                    int x = current.getGridX() + (random.nextBoolean() ? random.nextInt(maxStep + 1) : -random.nextInt(
+                        maxStep + 1));
+                    int y = current.getGridY() + (random.nextBoolean() ? random.nextInt(maxStep + 1) : -random.nextInt(
+                        maxStep + 1));
+                    SeaTile candidate = state.getMap().getSeaTile(x, y);
+                    if (candidate != null && current != candidate && candidate.isWater()
+                        && !fisher.getHomePort().getLocation().equals(candidate))
                         return candidate;
                 }
 
@@ -60,33 +72,20 @@ public class DefaultBeamHillClimbing extends BeamHillClimbing<SeaTile> {
         };
     }
 
-    public DefaultBeamHillClimbing(
-            boolean copyAlwaysBest, Predicate<Pair<Double, Double>> unfriendPredicate,
-            int maxStep, int attempts, final boolean backtracksOnBadExploration) {
-        super(copyAlwaysBest, backtracksOnBadExploration, unfriendPredicate,
-              DEFAULT_RANDOM_STEP(maxStep,attempts)
-              );
-    }
-
-    public DefaultBeamHillClimbing(int maxStep, int attempts)
-    {
-        this(DEFAULT_ALWAYS_COPY_BEST, DEFAULT_DYNAMIC_NETWORK, maxStep, attempts, true);
-    }
-
-
-    static public DefaultBeamHillClimbing  BeamHillClimbingWithUnfriending(boolean alwaysCopyBest,
-                                                                           final double unfriendingThreshold,
-                                                                           int maxSteps,int attempts)
-    {
-        Preconditions.checkArgument(unfriendingThreshold>=0, "Unfriending threshold should be above 0!");
+    static public DefaultBeamHillClimbing BeamHillClimbingWithUnfriending(
+        boolean alwaysCopyBest,
+        final double unfriendingThreshold,
+        int maxSteps, int attempts
+    ) {
+        Preconditions.checkArgument(unfriendingThreshold >= 0, "Unfriending threshold should be above 0!");
         return new DefaultBeamHillClimbing(alwaysCopyBest,
-                                           oldFitnessAndNew ->
-                                                   unfriendingThreshold * oldFitnessAndNew.getFirst() >
-                                                           oldFitnessAndNew.getSecond(),
-                                           maxSteps,
-                                           attempts, true);
+            oldFitnessAndNew ->
+                unfriendingThreshold * oldFitnessAndNew.getFirst() >
+                    oldFitnessAndNew.getSecond(),
+            maxSteps,
+            attempts, true
+        );
     }
-
 
 
 }

@@ -49,8 +49,10 @@ public class AbundanceScalingResetter implements BiologyResetter {
     private double recordedTotalBiomass;
 
 
-    public AbundanceScalingResetter(BiomassAllocator allocator,
-                                    Species species) {
+    public AbundanceScalingResetter(
+        BiomassAllocator allocator,
+        Species species
+    ) {
         this.allocator = allocator;
         this.species = species;
     }
@@ -79,17 +81,14 @@ public class AbundanceScalingResetter implements BiologyResetter {
 
         double[][] currentCatchAtLength = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
 
-        for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList())
-        {
+        for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
 
-            if(!seaTile.isFishingEvenPossibleHere())
+            if (!seaTile.isFishingEvenPossibleHere())
                 continue;
             StructuredAbundance abundance = seaTile.getAbundance(species);
-            for(int i=0; i<species.getNumberOfSubdivisions(); i++)
-            {
-                for (int j = 0; j < species.getNumberOfBins(); j++)
-                {
-                    currentCatchAtLength[i][j] += abundance.asMatrix()[i][j] ;
+            for (int i = 0; i < species.getNumberOfSubdivisions(); i++) {
+                for (int j = 0; j < species.getNumberOfBins(); j++) {
+                    currentCatchAtLength[i][j] += abundance.asMatrix()[i][j];
                 }
             }
 
@@ -101,51 +100,63 @@ public class AbundanceScalingResetter implements BiologyResetter {
         problem.setDefaultRange(3);
         problem.setParallelThreads(1);
         OptimizationParameters params = OptimizerFactory.makeParams(
-                NelderMeadSimplex.createNelderMeadSimplex(
+            NelderMeadSimplex.createNelderMeadSimplex(
 
-                        problem
-                        , null),
-                15,problem
+                problem
+                , null),
+            15, problem
 
         );
         params.setTerminator(new EvaluationTerminator(500));
         double[] bestMultiplier = OptimizerFactory.optimizeToDouble(
-                params
+            params
         );
 
 
+        double[][] correctAbundance = reweightAbundance(
+            bestMultiplier[0] + 3,
+            currentCatchAtLength
+        );
 
-        double[][] correctAbundance = reweightAbundance(bestMultiplier[0]+3,
-                                                        currentCatchAtLength);
-
-        System.out.println("weight found: " + bestMultiplier[0]+3);
+        System.out.println("weight found: " + bestMultiplier[0] + 3);
         System.out.println("error: " + (
-                                   recordedTotalBiomass- FishStateUtilities.weigh(new StructuredAbundance(correctAbundance),
-                                                                                  species.getMeristics()) )
+            recordedTotalBiomass - FishStateUtilities.weigh(
+                new StructuredAbundance(correctAbundance),
+                species.getMeristics()
+            ))
 
-                );
-
+        );
 
 
         for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
-            resetAbundanceHere(seaTile,map,random,correctAbundance);
+            resetAbundanceHere(seaTile, map, random, correctAbundance);
         }
 
     }
 
+    private double[][] reweightAbundance(double multiplier, double[][] currentCatchAtLength) {
+        double[][] testCatchAtLength = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+        for (int i = 0; i < testCatchAtLength.length; i++)
+            for (int j = 0; j < testCatchAtLength[0].length; j++)
+                testCatchAtLength[i][j] = currentCatchAtLength[i][j] * multiplier;
+        return testCatchAtLength;
+    }
 
-    public void resetAbundanceHere(SeaTile tile,
-                                   NauticalMap map,
-                                   MersenneTwisterFast random,
-                                   double[][] recordedAbundance){
+    public void resetAbundanceHere(
+        SeaTile tile,
+        NauticalMap map,
+        MersenneTwisterFast random,
+        double[][] recordedAbundance
+    ) {
 
-        if(!tile.isFishingEvenPossibleHere())
-        {
-            Preconditions.checkArgument(allocator.allocate(tile, map, random)==0 |
-                                                Double.isNaN(allocator.allocate(tile,map,random)),
-                                        "Allocating biomass on previously unfishable areas is not allowed; " +
-                                                "keep them empty but don't use always empty local biologies " + "\n" +
-                                                allocator.allocate(tile,map,random));
+        if (!tile.isFishingEvenPossibleHere()) {
+            Preconditions.checkArgument(
+                allocator.allocate(tile, map, random) == 0 |
+                    Double.isNaN(allocator.allocate(tile, map, random)),
+                "Allocating biomass on previously unfishable areas is not allowed; " +
+                    "keep them empty but don't use always empty local biologies " + "\n" +
+                    allocator.allocate(tile, map, random)
+            );
             return;
         }
 
@@ -154,21 +165,13 @@ public class AbundanceScalingResetter implements BiologyResetter {
         assert abundanceHere[0].length == species.getNumberOfBins();
         double weightHere = allocator.allocate(tile, map, random);
 
-        for(int i=0; i<species.getNumberOfSubdivisions(); i++) {
+        for (int i = 0; i < species.getNumberOfSubdivisions(); i++) {
             for (int j = 0; j < species.getNumberOfBins(); j++) {
                 abundanceHere[i][j] = weightHere * recordedAbundance[i][j];
             }
         }
 
 
-    }
-
-    private double[][] reweightAbundance(double multiplier, double[][] currentCatchAtLength) {
-        double[][] testCatchAtLength = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
-        for(int i = 0; i<testCatchAtLength.length; i++)
-            for(int j = 0; j<testCatchAtLength[0].length; j++)
-                testCatchAtLength[i][j] = currentCatchAtLength[i][j] * multiplier;
-        return testCatchAtLength;
     }
 
     /**
@@ -190,12 +193,14 @@ public class AbundanceScalingResetter implements BiologyResetter {
 
         @Override
         public double[] evaluate(double[] x) {
-            double multiplier = x[0] +3;
+            double multiplier = x[0] + 3;
             double[][] testCatchAtLength = reweightAbundance(multiplier, currentCatchAtLength);
 
             return new double[]{Math.abs(
-                    recordedTotalBiomass- FishStateUtilities.weigh(new StructuredAbundance(testCatchAtLength),
-                                                                   species.getMeristics())
+                recordedTotalBiomass - FishStateUtilities.weigh(
+                    new StructuredAbundance(testCatchAtLength),
+                    species.getMeristics()
+                )
             )};
 
         }

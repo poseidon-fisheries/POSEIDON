@@ -35,9 +35,11 @@ public class ConditionalMarket implements Market {
     private boolean started;
 
 
-    public ConditionalMarket(MarketWithCounter defaultMarket,
-                             MarketWithCounter passThePredicateMarket,
-                             Predicate<Fisher> marketChecker) {
+    public ConditionalMarket(
+        MarketWithCounter defaultMarket,
+        MarketWithCounter passThePredicateMarket,
+        Predicate<Fisher> marketChecker
+    ) {
         this.defaultMarket = defaultMarket;
         this.passThePredicateMarket = passThePredicateMarket;
         this.marketChecker = marketChecker;
@@ -46,39 +48,44 @@ public class ConditionalMarket implements Market {
     @Override
     public void start(FishState model) {
 
-        Preconditions.checkArgument(defaultMarket.getSpecies()!=null,
-                " market doesn't know the species to trade in");
-        if(started) //don't start twice
+        Preconditions.checkArgument(
+            defaultMarket.getSpecies() != null,
+            " market doesn't know the species to trade in"
+        );
+        if (started) //don't start twice
             return;
 
         defaultMarket.start(model);
         passThePredicateMarket.start(model);
 
         //start the data-set where we are going to store the history of the counter
-        dailyObservations.start(model,this);
+        dailyObservations.start(model, this);
         //the gatherers reset the counters as a side effect
         dailyObservations.registerGatherer(EARNINGS_COLUMN_NAME, new Gatherer<Market>() {
-                    @Override
-                    public Double apply(Market market) {
-                        return defaultMarket.getDailyCounter().getColumn(EARNINGS_COLUMN_NAME) +
-                                passThePredicateMarket.getDailyCounter().getColumn(EARNINGS_COLUMN_NAME)
-                                ;
-                    }
-                },
-                Double.NaN);
+                @Override
+                public Double apply(Market market) {
+                    return defaultMarket.getDailyCounter().getColumn(EARNINGS_COLUMN_NAME) +
+                        passThePredicateMarket.getDailyCounter().getColumn(EARNINGS_COLUMN_NAME)
+                        ;
+                }
+            },
+            Double.NaN
+        );
 
         dailyObservations.registerGatherer(LANDINGS_COLUMN_NAME, new Gatherer<Market>() {
-                    @Override
-                    public Double apply(Market market) {
-                        return defaultMarket.getDailyCounter().getColumn(LANDINGS_COLUMN_NAME) +
-                                passThePredicateMarket.getDailyCounter().getColumn(LANDINGS_COLUMN_NAME)
-                                ;
-                    }
-                },
-                Double.NaN);
+                @Override
+                public Double apply(Market market) {
+                    return defaultMarket.getDailyCounter().getColumn(LANDINGS_COLUMN_NAME) +
+                        passThePredicateMarket.getDailyCounter().getColumn(LANDINGS_COLUMN_NAME)
+                        ;
+                }
+            },
+            Double.NaN
+        );
 
         dailyObservations.registerGatherer(PRICE_COLUMN_NAME, Market::getMarginalPrice,
-                Double.NaN, dailyObservations.getCurrency(), "Price");
+            Double.NaN, dailyObservations.getCurrency(), "Price"
+        );
 
         started = true;
 
@@ -105,8 +112,8 @@ public class ConditionalMarket implements Market {
 
     @Override
     public TradeInfo sellFish(Hold hold, Fisher fisher, Regulation regulation, FishState state, Species species) {
-        if(marketChecker.test(fisher))
-           return passThePredicateMarket.sellFish(hold, fisher, regulation, state, species);
+        if (marketChecker.test(fisher))
+            return passThePredicateMarket.sellFish(hold, fisher, regulation, state, species);
         else
             return defaultMarket.sellFish(hold, fisher, regulation, state, species);
 

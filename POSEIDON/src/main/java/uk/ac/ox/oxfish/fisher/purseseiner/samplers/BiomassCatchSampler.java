@@ -20,8 +20,9 @@ package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
 import com.google.common.primitives.ImmutableDoubleArray;
 import ec.util.MersenneTwisterFast;
-import java.util.Collection;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+
+import java.util.Collection;
 
 public class BiomassCatchSampler extends CatchSampler<BiomassLocalBiology> {
 

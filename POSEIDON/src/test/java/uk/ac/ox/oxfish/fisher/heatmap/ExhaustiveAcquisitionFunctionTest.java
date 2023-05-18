@@ -41,7 +41,6 @@ import static org.mockito.Mockito.when;
 public class ExhaustiveAcquisitionFunctionTest {
 
 
-
     @Test
     public void finds2525() throws Exception {
 
@@ -51,21 +50,19 @@ public class ExhaustiveAcquisitionFunctionTest {
         when(state.getRandom()).thenReturn(random);
         when(state.getHoursSinceStart()).thenReturn(120d);
 
-        ExhaustiveAcquisitionFunction acquisitionFunction = new ExhaustiveAcquisitionFunction(1d,false,false);
+        ExhaustiveAcquisitionFunction acquisitionFunction = new ExhaustiveAcquisitionFunction(1d, false, false);
 
         GeographicalRegression regression = mock(GeographicalRegression.class);
-        when(regression.predict(any(SeaTile.class), eq(120d), any(),any() )).thenAnswer((Answer<Double>) invocation -> {
+        when(regression.predict(any(SeaTile.class), eq(120d), any(), any())).thenAnswer((Answer<Double>) invocation -> {
             SeaTile seaTile = (SeaTile) invocation.getArguments()[0];
-            double toReturn = -Math.abs(seaTile.getGridX()-25) -Math.abs(seaTile.getGridY()-25);
+            double toReturn = -Math.abs(seaTile.getGridX() - 25) - Math.abs(seaTile.getGridY() - 25);
             return toReturn;
         });
 
 
-        SeaTile pick = acquisitionFunction.pick(state.getMap(), regression, state,null,null );
-        assertEquals(pick.getGridX(),25);
-        assertEquals(pick.getGridY(),25);
-
-
+        SeaTile pick = acquisitionFunction.pick(state.getMap(), regression, state, null, null);
+        assertEquals(pick.getGridX(), 25);
+        assertEquals(pick.getGridY(), 25);
 
 
     }

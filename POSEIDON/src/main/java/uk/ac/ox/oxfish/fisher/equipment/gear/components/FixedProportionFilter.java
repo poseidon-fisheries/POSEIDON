@@ -28,10 +28,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
  * Filters the same proportion for each age and sex
  * Created by carrknight on 3/10/16.
  */
-public class FixedProportionFilter implements AbundanceFilter
-{
-
-
+public class FixedProportionFilter implements AbundanceFilter {
 
 
     final private double proportion;
@@ -43,32 +40,31 @@ public class FixedProportionFilter implements AbundanceFilter
 
     public FixedProportionFilter(double proportion, boolean rounding) {
         this.rounding = rounding;
-        Preconditions.checkArgument(proportion>=0, "Proportion filter cannot be negative");
-        Preconditions.checkArgument(proportion<=1, "Proportion filter cannot be above 1");
+        Preconditions.checkArgument(proportion >= 0, "Proportion filter cannot be negative");
+        Preconditions.checkArgument(proportion <= 1, "Proportion filter cannot be above 1");
         this.proportion = proportion;
     }
 
     /**
      * returns a int[2][age+1] array with male and female fish that are not filtered out
-     *
+     * <p>
      * WARNING: this mutates the original array.
      *
-     * @param species the species of fish
+     * @param species   the species of fish
      * @param abundance
      * @return an int[2][age+1] array for all the stuff that is caught/selected and so on
      */
     @Override
-    public double[][] filter(Species species, double[][] abundance)
-    {
-        for(int subdivision=0; subdivision<abundance.length; subdivision++ ) {
+    public double[][] filter(Species species, double[][] abundance) {
+        for (int subdivision = 0; subdivision < abundance.length; subdivision++) {
             for (int age = 0; age < abundance[subdivision].length; age++) {
-                abundance[subdivision][age] *=   proportion;
+                abundance[subdivision][age] *= proportion;
 
 
             }
         }
         if (rounding) {
-            for(int subdivision=0; subdivision<abundance.length; subdivision++ )
+            for (int subdivision = 0; subdivision < abundance.length; subdivision++)
                 for (int age = 0; age < abundance[subdivision].length; age++)
                     abundance[subdivision][age] = FishStateUtilities.quickRounding(abundance[subdivision][age]);
 

@@ -33,7 +33,7 @@ public class AbundancePurseSeineGearFactory extends PurseSeineGearFactory {
     ) {
         super(fadInitializerFactory, fishValueCalculatorFactory);
     }
-    
+
     public AbundancePurseSeineGearFactory() {
     }
 

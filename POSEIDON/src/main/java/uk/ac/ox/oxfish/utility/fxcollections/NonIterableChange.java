@@ -30,6 +30,7 @@ import java.util.List;
 
 public abstract class NonIterableChange<E> extends ListChangeListener.Change<E> {
 
+    private static final int[] EMPTY_PERM = new int[0];
     private final int from;
     private final int to;
     private boolean invalid = true;
@@ -46,18 +47,16 @@ public abstract class NonIterableChange<E> extends ListChangeListener.Change<E> 
         return from;
     }
 
+    public void checkState() {
+        if (invalid) {
+            throw new IllegalStateException("Invalid Change state: next() must be called before inspecting the Change.");
+        }
+    }
+
     @Override
     public int getTo() {
         checkState();
         return to;
-    }
-
-    private static final int[] EMPTY_PERM = new int[0];
-
-    @Override
-    protected int[] getPermutation() {
-        checkState();
-        return EMPTY_PERM;
     }
 
     @Override
@@ -74,12 +73,6 @@ public abstract class NonIterableChange<E> extends ListChangeListener.Change<E> 
         invalid = true;
     }
 
-    public void checkState() {
-        if (invalid) {
-            throw new IllegalStateException("Invalid Change state: next() must be called before inspecting the Change.");
-        }
-    }
-
     @Override
     public String toString() {
         boolean oldInvalid = invalid;
@@ -94,6 +87,12 @@ public abstract class NonIterableChange<E> extends ListChangeListener.Change<E> 
         }
         invalid = oldInvalid;
         return "{ " + ret + " }";
+    }
+
+    @Override
+    protected int[] getPermutation() {
+        checkState();
+        return EMPTY_PERM;
     }
 
     public static class GenericAddRemoveChange<E> extends NonIterableChange<E> {
@@ -116,6 +115,7 @@ public abstract class NonIterableChange<E> extends ListChangeListener.Change<E> 
     public static class SimpleRemovedChange<E> extends NonIterableChange<E> {
 
         private final List<E> removed;
+
         public SimpleRemovedChange(int from, int to, E removed, ObservableList<E> list) {
             super(from, to, list);
             this.removed = Collections.singletonList(removed);
@@ -155,7 +155,7 @@ public abstract class NonIterableChange<E> extends ListChangeListener.Change<E> 
 
     }
 
-    public static class SimplePermutationChange<E> extends NonIterableChange<E>{
+    public static class SimplePermutationChange<E> extends NonIterableChange<E> {
 
         private final int[] permutation;
 
@@ -178,7 +178,7 @@ public abstract class NonIterableChange<E> extends ListChangeListener.Change<E> 
         }
     }
 
-    public static class SimpleUpdateChange<E> extends NonIterableChange<E>{
+    public static class SimpleUpdateChange<E> extends NonIterableChange<E> {
 
         public SimpleUpdateChange(int position, ObservableList<E> list) {
             this(position, position + 1, list);

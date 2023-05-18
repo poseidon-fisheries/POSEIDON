@@ -34,8 +34,10 @@ public class SimplexAllocator implements BiomassAllocator {
 
     private final OpenSimplexNoise noise;
 
-    public SimplexAllocator(double maxAllocation, double minAllocation, double bandwidth,
-                            long randomSeed) {
+    public SimplexAllocator(
+        double maxAllocation, double minAllocation, double bandwidth,
+        long randomSeed
+    ) {
         this.maxAllocation = maxAllocation;
         this.minAllocation = minAllocation;
         this.bandwidth = bandwidth;
@@ -53,11 +55,14 @@ public class SimplexAllocator implements BiomassAllocator {
      */
     @Override
     public double allocate(
-            SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
+        SeaTile tile, NauticalMap map, MersenneTwisterFast random
+    ) {
 
 
-        return Math.max(noise.eval(tile.getGridX()/bandwidth,
-                          tile.getGridY()/bandwidth)*(maxAllocation-minAllocation)+minAllocation,0);
+        return Math.max(noise.eval(
+            tile.getGridX() / bandwidth,
+            tile.getGridY() / bandwidth
+        ) * (maxAllocation - minAllocation) + minAllocation, 0);
 
     }
 }

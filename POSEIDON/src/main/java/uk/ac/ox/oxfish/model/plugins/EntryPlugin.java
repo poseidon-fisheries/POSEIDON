@@ -11,9 +11,9 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 public interface EntryPlugin extends Steppable, AdditionalStartable {
 
 
-    public void setEntryPaused(boolean entryPaused);
-
     public boolean isEntryPaused();
+
+    public void setEntryPaused(boolean entryPaused);
 
 
 }

@@ -27,8 +27,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class AllowAllAllocationPolicyFactory implements AlgorithmFactory<AllowAllAllocationPolicy> {
 
 
-
-
     /**
      * Applies this function to the given argument.
      *

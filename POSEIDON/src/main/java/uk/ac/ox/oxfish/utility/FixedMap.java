@@ -28,7 +28,7 @@ import java.util.HashMap;
  * http://stackoverflow.com/questions/28554878/is-it-possible-to-create-a-map-where-every-key-points-to-the-same-value
  * Created by carrknight on 5/31/16.
  */
-public class FixedMap<K,V> extends HashMap<K,V> {
+public class FixedMap<K, V> extends HashMap<K, V> {
 
 
     protected V defaultValue;
@@ -38,8 +38,8 @@ public class FixedMap<K,V> extends HashMap<K,V> {
 
         this.defaultValue = defaultValue;
 
-        for(K key : keys)
-            put(key,defaultValue);
+        for (K key : keys)
+            put(key, defaultValue);
     }
 
 }

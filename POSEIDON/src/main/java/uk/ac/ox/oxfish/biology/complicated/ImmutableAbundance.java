@@ -18,21 +18,22 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.google.common.collect.Streams.stream;
-import static java.util.stream.IntStream.range;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.ImmutableDoubleArray;
+import uk.ac.ox.oxfish.biology.Species;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
-import uk.ac.ox.oxfish.biology.Species;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.Streams.stream;
+import static java.util.stream.IntStream.range;
 
 @SuppressWarnings("UnstableApiUsage")
 public class ImmutableAbundance {

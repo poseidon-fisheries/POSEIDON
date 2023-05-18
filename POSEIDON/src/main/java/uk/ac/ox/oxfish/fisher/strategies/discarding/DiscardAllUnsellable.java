@@ -48,31 +48,34 @@ public class DiscardAllUnsellable implements DiscardingStrategy {
      * @param hoursSpentFishing how many hours have we spent fishing
      * @param regulation        the regulation the fisher is subject to
      * @param model
-     *@param random
+     * @param random
      * @return a catch object holding how much we are actually going to load in the boat. The difference between
      * what is returned and the 'fishCaught' variable is the implicit discard
      */
     @Override
     public Catch chooseWhatToKeep(
-            SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing, Regulation regulation,
-            FishState model, MersenneTwisterFast random) {
+        SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing, Regulation regulation,
+        FishState model, MersenneTwisterFast random
+    ) {
 
-        Preconditions.checkArgument(!fishCaught.hasAbundanceInformation(),
-                                    "This discard strategy erases abundance information!");
+        Preconditions.checkArgument(
+            !fishCaught.hasAbundanceInformation(),
+            "This discard strategy erases abundance information!"
+        );
 
         //go through the regulation object and return everything that isn't kept
-        double[] saved  = new double[fishCaught.numberOfSpecies()];
-        for(Species species : model.getSpecies())
-        {
+        double[] saved = new double[fishCaught.numberOfSpecies()];
+        for (Species species : model.getSpecies()) {
             //never hold on to more than it is sellable
-            saved[species.getIndex()] = Math.max(0,
-                                                 Math.min(
-                                                         fishCaught.getWeightCaught(species),
-                                                         regulation.maximumBiomassSellable(who,species,model)
-                                                                 - safetyBuffer
-                                                                 - who.getTotalWeightOfCatchInHold(species)
+            saved[species.getIndex()] = Math.max(
+                0,
+                Math.min(
+                    fishCaught.getWeightCaught(species),
+                    regulation.maximumBiomassSellable(who, species, model)
+                        - safetyBuffer
+                        - who.getTotalWeightOfCatchInHold(species)
 
-                                                 )
+                )
             );
         }
 

@@ -10,14 +10,47 @@ public class TwoPunchCalibrationMini {
 
     public static void main(final String[] args) throws IOException {
         runAll(
-                Paths.get(args[0]),
-                Integer.parseInt(args[1])
+            Paths.get(args[0]),
+            Integer.parseInt(args[1])
         );
     }
 
+    public static void runAll(
+        final Path calibrationFile,
+        final int nProcs
+    ) throws IOException {
+        //run GA
+        final double[] gaSolution = stepOne(calibrationFile, nProcs);
+        writeSolutionOut(calibrationFile, gaSolution, "ga_solution.txt");
+        final double[] zeros = new double[gaSolution.length];
+        Arrays.fill(zeros, 0d);
+        writeSolutionOut(calibrationFile, zeros, "zeros.txt");
+        //run PSO
+        GenericOptimization.buildLocalCalibrationProblem(
+            calibrationFile,
+            gaSolution,
+            "local_calibration.yaml",
+            .2
+        );
+        final Path localCalibrationFile = calibrationFile.getParent().resolve("local_calibration.yaml");
+        final double[] localSolution = stepTwo(
+            localCalibrationFile,
+            nProcs
+        );
+        writeSolutionOut(localCalibrationFile, localSolution, "local_solution.txt");
+
+        //run once again locally
+        final TunaEvaluator evaluator = new TunaEvaluator(localCalibrationFile, localSolution);
+        evaluator.setNumRuns(10);
+        evaluator.setParallel(false);
+        evaluator.run();
+
+
+    }
+
     public static double[] stepOne(
-            final Path calibrationFile,
-            final int nProcs
+        final Path calibrationFile,
+        final int nProcs
     ) throws IOException {
 
         final TunaCalibrationConsole firstStep = new TunaCalibrationConsole();
@@ -34,16 +67,30 @@ public class TwoPunchCalibrationMini {
         return firstStep.generateCalibratorProblem().run();
     }
 
+    private static void writeSolutionOut(
+        final Path calibrationFile,
+        final double[] gaSolution,
+        final String solutionName
+    ) throws IOException {
+        final FileWriter writer = new FileWriter(calibrationFile.getParent().resolve(solutionName).toFile());
+        writer.write(Double.toString(gaSolution[0]));
+        for (int i = 1; i < gaSolution.length; i++) {
+            writer.write(",");
+            writer.write(Double.toString(gaSolution[i]));
+        }
+        writer.close();
+    }
+
     public static double[] stepTwo(
-            final Path calibrationFile,
-            final int nProcs
+        final Path calibrationFile,
+        final int nProcs
     ) throws IOException {
 
         final TunaCalibrationConsole secondStep = new TunaCalibrationConsole();
         secondStep.setLocalSearch(false);
         secondStep.setPSO(true);
         secondStep.setBestGuessesTextFile(
-                calibrationFile.getParent().resolve("zeros.txt").toFile().getAbsolutePath()
+            calibrationFile.getParent().resolve("zeros.txt").toFile().getAbsolutePath()
         );
         secondStep.setPopulationSize(50); //Lowered from 50
         secondStep.setMaxProcessorsToUse(nProcs);
@@ -53,53 +100,6 @@ public class TwoPunchCalibrationMini {
         secondStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
         secondStep.setRunNickName("local");
         return secondStep.generateCalibratorProblem().run();
-    }
-
-    public static void runAll(
-            final Path calibrationFile,
-            final int nProcs
-    ) throws IOException {
-        //run GA
-        final double[] gaSolution = stepOne(calibrationFile, nProcs);
-        writeSolutionOut(calibrationFile, gaSolution, "ga_solution.txt");
-        final double[] zeros = new double[gaSolution.length];
-        Arrays.fill(zeros, 0d);
-        writeSolutionOut(calibrationFile, zeros, "zeros.txt");
-        //run PSO
-        GenericOptimization.buildLocalCalibrationProblem(
-                calibrationFile,
-                gaSolution,
-                "local_calibration.yaml",
-                .2
-        );
-        final Path localCalibrationFile = calibrationFile.getParent().resolve("local_calibration.yaml");
-        final double[] localSolution = stepTwo(
-                localCalibrationFile,
-                nProcs
-        );
-        writeSolutionOut(localCalibrationFile, localSolution, "local_solution.txt");
-
-        //run once again locally
-        final TunaEvaluator evaluator = new TunaEvaluator(localCalibrationFile, localSolution);
-        evaluator.setNumRuns(10);
-        evaluator.setParallel(false);
-        evaluator.run();
-
-
-    }
-
-    private static void writeSolutionOut(
-            final Path calibrationFile,
-            final double[] gaSolution,
-            final String solutionName
-    ) throws IOException {
-        final FileWriter writer = new FileWriter(calibrationFile.getParent().resolve(solutionName).toFile());
-        writer.write(Double.toString(gaSolution[0]));
-        for (int i = 1; i < gaSolution.length; i++) {
-            writer.write(",");
-            writer.write(Double.toString(gaSolution[i]));
-        }
-        writer.close();
     }
 
 }

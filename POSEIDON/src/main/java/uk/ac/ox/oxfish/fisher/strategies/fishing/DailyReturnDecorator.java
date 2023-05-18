@@ -35,27 +35,22 @@ public class DailyReturnDecorator implements FishingStrategy {
 
 
     private final FishingStrategy decorated;
+    private double lastCheck = -1000;
 
 
     public DailyReturnDecorator(FishingStrategy decorated) {
         this.decorated = decorated;
     }
 
-
     @Override
     public void start(FishState model, Fisher fisher) {
-        this.decorated.start(model,fisher);
+        this.decorated.start(model, fisher);
     }
 
     @Override
     public void turnOff(Fisher fisher) {
         this.decorated.turnOff(fisher);
     }
-
-
-
-
-    private double lastCheck = -1000;
 
     /**
      * This is called by the fisher to decide whether or not to fish and then each step after that to decide whether or
@@ -69,27 +64,26 @@ public class DailyReturnDecorator implements FishingStrategy {
      */
     @Override
     public boolean shouldFish(
-            Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip) {
+        Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip
+    ) {
 
         //always stop if you are full
-        if(fisher.getTotalWeightOfCatchInHold() >= fisher.getMaximumHold()- FishStateUtilities.EPSILON) {
+        if (fisher.getTotalWeightOfCatchInHold() >= fisher.getMaximumHold() - FishStateUtilities.EPSILON) {
             lastCheck = -1000;
             return false;
         }
         //fish at least once and at least for a day!
-        if(fisher.getHoursAtSea()<24 || currentTrip.getEffort() == 0)
+        if (fisher.getHoursAtSea() < 24 || currentTrip.getEffort() == 0)
             return true;
         //if you checked recently, don't check again
-        if(fisher.getHoursAtSea() < lastCheck + 24)
+        if (fisher.getHoursAtSea() < lastCheck + 24)
             return true;
 
         //check!
-        if(decorated.shouldFish(fisher, random, model, currentTrip))
-        {
+        if (decorated.shouldFish(fisher, random, model, currentTrip)) {
             lastCheck = fisher.getHoursAtSea();
             return true;
-        }
-        else{
+        } else {
             lastCheck = -1000;
             return false;
         }
@@ -106,7 +100,7 @@ public class DailyReturnDecorator implements FishingStrategy {
     }
 
     @VisibleForTesting
-    public  FishingStrategy accessDecorated(){
+    public FishingStrategy accessDecorated() {
         return decorated;
     }
 }

@@ -28,8 +28,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
  * An interface that makes sure all the implementers can have their catchability modified
  * Created by carrknight on 5/18/16.
  */
-public interface HomogeneousGearFactory extends AlgorithmFactory<HomogeneousAbundanceGear>
-{
+public interface HomogeneousGearFactory extends AlgorithmFactory<HomogeneousAbundanceGear> {
 
 
     /**

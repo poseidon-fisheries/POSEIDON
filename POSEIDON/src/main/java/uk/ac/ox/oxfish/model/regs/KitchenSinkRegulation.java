@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * A regulation object that is at the same time a MPA regulation + Season Limits + Quota Regulation
  * Created by carrknight on 12/9/15.
  */
-public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulation{
+public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulation {
 
 
     private final TemporaryProtectedArea mpaRules;
@@ -40,8 +40,9 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
     private final QuotaPerSpecieRegulation quotas;
 
     public KitchenSinkRegulation(
-            TemporaryProtectedArea mpaRules, FishingSeason fishingSeason,
-            QuotaPerSpecieRegulation quotas) {
+        TemporaryProtectedArea mpaRules, FishingSeason fishingSeason,
+        QuotaPerSpecieRegulation quotas
+    ) {
         this.mpaRules = mpaRules;
         fishingSeason.setRespectMPAs(false);
         this.fishingSeason = fishingSeason;
@@ -54,8 +55,10 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
      */
     @Override
     public double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep) {
-        return Math.min(quotas.maximumBiomassSellable(agent,species,model, timeStep),
-                        this.fishingSeason.maximumBiomassSellable(agent,species,model, timeStep));
+        return Math.min(
+            quotas.maximumBiomassSellable(agent, species, model, timeStep),
+            this.fishingSeason.maximumBiomassSellable(agent, species, model, timeStep)
+        );
     }
 
     /**
@@ -63,11 +66,12 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
      */
     @Override
     public boolean canFishHere(
-            Fisher agent, SeaTile tile, FishState model, int timeStep) {
+        Fisher agent, SeaTile tile, FishState model, int timeStep
+    ) {
         return
-                mpaRules.canFishHere(agent,tile,model) &&
-                    fishingSeason.allowedAtSea(agent, model, timeStep) &&
-                    quotas.allowedAtSea(agent, model, timeStep);
+            mpaRules.canFishHere(agent, tile, model) &&
+                fishingSeason.allowedAtSea(agent, model, timeStep) &&
+                quotas.allowedAtSea(agent, model, timeStep);
 
     }
 
@@ -89,16 +93,18 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
 
     /**
      * tell the regulation object this much inPenaltyBox been caught
+     *
      * @param where
      * @param who
-     * @param fishCaught catch object
+     * @param fishCaught        catch object
      * @param fishRetained
      * @param hoursSpentFishing
      */
     @Override
     public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing, FishState model, int timeStep) {
+        SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
+        int hoursSpentFishing, FishState model, int timeStep
+    ) {
         mpaRules.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
         fishingSeason.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
         quotas.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
@@ -114,7 +120,8 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
      */
     @Override
     public void reactToSale(
-            Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
+        Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep
+    ) {
         mpaRules.reactToSale(species, seller, biomass, revenue, model, timeStep);
         fishingSeason.reactToSale(species, seller, biomass, revenue, model, timeStep);
         quotas.reactToSale(species, seller, biomass, revenue, model, timeStep);
@@ -127,9 +134,10 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
      */
     @Override
     public Regulation makeCopy() {
-        return new KitchenSinkRegulation(((TemporaryProtectedArea) mpaRules.makeCopy()),
-                                         ((FishingSeason) fishingSeason.makeCopy()),
-                                         ((QuotaPerSpecieRegulation) quotas.makeCopy())
+        return new KitchenSinkRegulation(
+            ((TemporaryProtectedArea) mpaRules.makeCopy()),
+            ((FishingSeason) fishingSeason.makeCopy()),
+            ((QuotaPerSpecieRegulation) quotas.makeCopy())
         );
     }
 
@@ -145,9 +153,9 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
 
     @Override
     public void start(FishState model, Fisher fisher) {
-        mpaRules.start(model,fisher);
-        fishingSeason.start(model,fisher);
-        quotas.start(model,fisher);
+        mpaRules.start(model, fisher);
+        fishingSeason.start(model, fisher);
+        quotas.start(model, fisher);
     }
 
     @Override

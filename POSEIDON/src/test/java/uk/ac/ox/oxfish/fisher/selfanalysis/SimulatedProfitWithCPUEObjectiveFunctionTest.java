@@ -21,8 +21,8 @@ public class SimulatedProfitWithCPUEObjectiveFunctionTest {
     @Test
     public void simulatedProfit() {
 
-        Fisher observer = mock(Fisher.class,RETURNS_DEEP_STUBS);
-        Fisher observed = mock(Fisher.class,RETURNS_DEEP_STUBS);
+        Fisher observer = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        Fisher observed = mock(Fisher.class, RETURNS_DEEP_STUBS);
         Gear gear = new FixedProportionGear(.1);
         when(observer.getGear()).thenReturn(gear);
         when(observed.getGear()).thenReturn(gear);
@@ -32,9 +32,8 @@ public class SimulatedProfitWithCPUEObjectiveFunctionTest {
 
         ObjectiveFunction<Fisher> function = new SimulatedProfitWithCPUEObjectiveFunction(10);
         //no trip, it should be NaN
-        assertTrue(Double.isNaN(function.computeCurrentFitness(observer,observed)));
-        assertTrue(Double.isNaN(function.computeCurrentFitness(observer,observer)));
-
+        assertTrue(Double.isNaN(function.computeCurrentFitness(observer, observed)));
+        assertTrue(Double.isNaN(function.computeCurrentFitness(observer, observer)));
 
 
     }
@@ -42,8 +41,8 @@ public class SimulatedProfitWithCPUEObjectiveFunctionTest {
     @Test
     public void sameGear() {
 
-        Fisher observer = mock(Fisher.class,RETURNS_DEEP_STUBS);
-        Fisher observed = mock(Fisher.class,RETURNS_DEEP_STUBS);
+        Fisher observer = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        Fisher observed = mock(Fisher.class, RETURNS_DEEP_STUBS);
         Gear gear = new FixedProportionGear(.1);
         when(observer.getGear()).thenReturn(gear);
         when(observed.getGear()).thenReturn(gear);
@@ -51,7 +50,7 @@ public class SimulatedProfitWithCPUEObjectiveFunctionTest {
         when(observed.getLastFinishedTrip()).thenReturn(fakeRecord);
 
 
-        when(fakeRecord.getTotalCPUE()).thenReturn(new double[]{.1,.1});
+        when(fakeRecord.getTotalCPUE()).thenReturn(new double[]{.1, .1});
         when(fakeRecord.getMostFishedTileInTrip()).thenReturn(mock(SeaTile.class));
 
         ProfitFunction simulation = mock(ProfitFunction.class);
@@ -60,34 +59,36 @@ public class SimulatedProfitWithCPUEObjectiveFunctionTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 return Arrays.stream((double[])
-                        invocation.getArguments()[3]).sum();
+                    invocation.getArguments()[3]).sum();
             }
         })
-                .when(simulation).hourlyProfitFromHypotheticalTripHere(any(),any(),any(),any(),anyBoolean());
+            .when(simulation).hourlyProfitFromHypotheticalTripHere(any(), any(), any(), any(), anyBoolean());
 
         SimulatedProfitWithCPUEObjectiveFunction function = new SimulatedProfitWithCPUEObjectiveFunction(
-                10,
-                simulation
-                );
+            10,
+            simulation
+        );
         //the trip "profits" will be just .1 + .1
-        assertEquals(.2,(function).computeCurrentFitness(observer,observed),.001);
+        assertEquals(.2, (function).computeCurrentFitness(observer, observed), .001);
 
     }
 
     @Test
     public void differentGear() {
 
-        Fisher observer = mock(Fisher.class,RETURNS_DEEP_STUBS);
-        Fisher observed = mock(Fisher.class,RETURNS_DEEP_STUBS);
-        Gear gear1 = mock(Gear.class); when(gear1.expectedHourlyCatch(any(),any(),anyInt(),any())).thenReturn(new double[]{.2,.2});
-        Gear gear2 = mock(Gear.class);when(gear2.expectedHourlyCatch(any(),any(),anyInt(),any())).thenReturn(new double[]{.1,.1});
+        Fisher observer = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        Fisher observed = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        Gear gear1 = mock(Gear.class);
+        when(gear1.expectedHourlyCatch(any(), any(), anyInt(), any())).thenReturn(new double[]{.2, .2});
+        Gear gear2 = mock(Gear.class);
+        when(gear2.expectedHourlyCatch(any(), any(), anyInt(), any())).thenReturn(new double[]{.1, .1});
         when(observer.getGear()).thenReturn(gear1);
         when(observed.getGear()).thenReturn(gear2);
         TripRecord fakeRecord = mock(TripRecord.class);
         when(observed.getLastFinishedTrip()).thenReturn(fakeRecord);
 
 
-        when(fakeRecord.getTotalCPUE()).thenReturn(new double[]{.1,.1});
+        when(fakeRecord.getTotalCPUE()).thenReturn(new double[]{.1, .1});
         when(fakeRecord.getMostFishedTileInTrip()).thenReturn(mock(SeaTile.class));
 
         ProfitFunction simulation = mock(ProfitFunction.class);
@@ -96,17 +97,17 @@ public class SimulatedProfitWithCPUEObjectiveFunctionTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 return Arrays.stream((double[])
-                        invocation.getArguments()[3]).sum();
+                    invocation.getArguments()[3]).sum();
             }
         })
-                .when(simulation).hourlyProfitFromHypotheticalTripHere(any(),any(),any(),any(),anyBoolean());
+            .when(simulation).hourlyProfitFromHypotheticalTripHere(any(), any(), any(), any(), anyBoolean());
 
         SimulatedProfitWithCPUEObjectiveFunction function = new SimulatedProfitWithCPUEObjectiveFunction(
-                10,
-                simulation
+            10,
+            simulation
         );
         //the trip "profits" will be just .2 + .2 (basically it's doubled by the fact that the fisher1 is more efficient)
-        assertEquals(.4,(function).computeCurrentFitness(observer,observed),.001);
+        assertEquals(.4, (function).computeCurrentFitness(observer, observed), .001);
 
     }
 

@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
 
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class SimpleAllocationGridsSupplierTest {
 
@@ -42,16 +42,16 @@ public class SimpleAllocationGridsSupplierTest {
         model.setScenario(scenarioPathfinding);
         model.start();
         final SimpleAllocationGridsSupplier supplier = new SimpleAllocationGridsSupplier(
-                Paths.get("inputs/epo_inputs/environmental_maps/chlorophyll.csv"),
-                model.getMap().getMapExtent(),
-                "Chlorophyll"
+            Paths.get("inputs/epo_inputs/environmental_maps/chlorophyll.csv"),
+            model.getMap().getMapExtent(),
+            "Chlorophyll"
         );
 
         final AllocationGrids<String> lame = supplier.get();
         final SeaTile seaTile = model.getMap().getSeaTile(new Coordinate(-142, 40));
         double chlorophyll = lame.atOrBeforeStep(1).get("Chlorophyll").get(seaTile.getGridX(), seaTile.getGridY());
-        assertEquals(chlorophyll,0.258503,.0001);
+        assertEquals(chlorophyll, 0.258503, .0001);
         chlorophyll = lame.atOrBeforeStep(360).get("Chlorophyll").get(seaTile.getGridX(), seaTile.getGridY());
-        assertEquals(chlorophyll,0.136956,.0001);
+        assertEquals(chlorophyll, 0.136956, .0001);
     }
 }

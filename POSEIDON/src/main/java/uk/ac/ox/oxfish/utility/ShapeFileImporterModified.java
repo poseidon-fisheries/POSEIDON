@@ -39,107 +39,25 @@ public class ShapeFileImporterModified {
     final static int MULTIPOINTM = 28;
     final static int MULTIPATCH = 31;
 
-    public static boolean isSupported(int shapeType)
-    {
-        switch (shapeType)
-        {
-            case POINT:
-                return true;
-            case POLYLINE:
-                return true;
-            case POLYGON:
-                return true;
-            default:
-                return false;	// no other types are currently supported
-        }
-    }
-
-    /** Create a polygon from an array of LinearRings.
-     *
-     * If there is only one ring the function will create and return a simple
-     * polygon. If there are multiple rings, the function checks to see if any
-     * of them are holes (which are in counter-clockwise order) and if so, it
-     * creates a polygon with holes.  If there are no holes, it creates and
-     * returns a multi-part polygon.
-     *
-     */
-    private static Geometry createPolygon(LinearRing[] parts)
-    {
-        GeometryFactory geomFactory = new GeometryFactory();
-
-        if (parts.length == 1)
-        {
-            return geomFactory.createPolygon(parts[0], null);
-        }
-
-        ArrayList<LinearRing> shells = new ArrayList<LinearRing>();
-        ArrayList<LinearRing> holes = new ArrayList<LinearRing>();
-
-        for (int i = 0; i < parts.length; i++)
-        {
-            if (CGAlgorithms.isCCW(parts[i].getCoordinates()))
-            {
-                holes.add(parts[i]);
-            } else
-            {
-                shells.add(parts[i]);
-            }
-        }
-
-        if (holes.size() > 0)
-        {
-            // Create a polygon with holes
-            LinearRing[] holesArray = new LinearRing[holes.size()];
-            holes.toArray(holesArray);
-            return geomFactory.createPolygon(shells.get(0), holesArray);
-        }
-
-        // Create multi-polygon
-        Polygon[] poly = new Polygon[shells.size()];
-        for (int i = 0; i < shells.size(); i++)
-        {
-            poly[i] = geomFactory.createPolygon(parts[i], null);
-        }
-        return geomFactory.createMultiPolygon(poly);
-    }
-
-
-
-    /**
-     * Wrapper function which creates a new array of LinearRings and calls
-     * the other function.
-     */
-    private static Geometry createPolygon(Geometry[] parts)
-    {
-        LinearRing[] rings = new LinearRing[parts.length];
-        for (int i = 0; i < parts.length; i++)
-        {
-            rings[i] = (LinearRing) parts[i];
-        }
-
-        return createPolygon(rings);
-    }
-
-
-    public static void read(final URL shpFile, GeomVectorField field, final Bag masked, Class<?> masonGeometryClass) throws FileNotFoundException
-    {
-        if (shpFile == null)
-        {
+    public static void read(
+        final URL shpFile,
+        GeomVectorField field,
+        final Bag masked,
+        Class<?> masonGeometryClass
+    ) throws FileNotFoundException {
+        if (shpFile == null) {
             throw new IllegalArgumentException("shpFile is null; likely file not found");
         }
 
-        if (! MasonGeometry.class.isAssignableFrom(masonGeometryClass))
-        {
+        if (!MasonGeometry.class.isAssignableFrom(masonGeometryClass)) {
             throw new IllegalArgumentException("masonGeometryClass not a MasonGeometry class or subclass");
         }
 
 
-        try
-        {
+        try {
             FileInputStream shpFileInputStream = new FileInputStream(shpFile.getFile());
 
-            if (shpFileInputStream == null)
-            {
+            if (shpFileInputStream == null) {
                 throw new FileNotFoundException(shpFile.getFile());
             }
 
@@ -165,8 +83,7 @@ public class ShapeFileImporterModified {
             int fieldCnt = (short) ((headerSize - 1) / 32 - 1);
 
             // Corresponds to a dBase field directory entry
-            class FieldDirEntry
-            {
+            class FieldDirEntry {
                 public String name;
                 public int fieldSize;
             }
@@ -175,8 +92,7 @@ public class ShapeFileImporterModified {
 
             RandomAccessFile inFile = new RandomAccessFile(dbfFilename, "r");
 
-            if (inFile == null)
-            {
+            if (inFile == null) {
                 throw new FileNotFoundException(dbfFilename);
             }
 
@@ -186,13 +102,12 @@ public class ShapeFileImporterModified {
             char type[] = new char[fieldCnt];
             int length;
 
-            for (int i = 0; i < fieldCnt; i++)
-            {
+            for (int i = 0; i < fieldCnt; i++) {
                 inFile.readFully(c, 0, 11);
 
                 int j = 0;
 
-                for (j = 0; j < 12 && c[j] != 0; j++);
+                for (j = 0; j < 12 && c[j] != 0; j++) ;
 
                 String name = new String(c, 0, j);
 
@@ -206,11 +121,9 @@ public class ShapeFileImporterModified {
 
                 byte b = inFile.readByte();
 
-                if (b > 0)
-                {
+                if (b > 0) {
                     length = (int) b;
-                } else
-                {
+                } else {
                     length = 256 + (int) b;
                 }
 
@@ -229,8 +142,7 @@ public class ShapeFileImporterModified {
             // advance to the first record
             byteBuf.position(100);
 
-            while (byteBuf.hasRemaining())
-            {
+            while (byteBuf.hasRemaining()) {
                 // advance past two int: recordNumber and recordLength
                 byteBuf.position(byteBuf.position() + 8);
 
@@ -238,9 +150,8 @@ public class ShapeFileImporterModified {
 
                 int recordType = byteBuf.getInt();
 
-                if (!isSupported(recordType))
-                {
-                    return;		// all shapes are the same type so don't bother reading any more
+                if (!isSupported(recordType)) {
+                    return;        // all shapes are the same type so don't bother reading any more
                 }
 
                 // Read the attributes
@@ -256,8 +167,7 @@ public class ShapeFileImporterModified {
 
                 //attributeInfo = new ArrayList<AttributeValue>();
 
-                for (int k = 0; k < fieldCnt; k++)
-                {
+                for (int k = 0; k < fieldCnt; k++) {
                     // It used to be that we'd just flag attributes not in
                     // the mask Bag as hidden; however, now we just don't
                     // bother adding it to the MasonGeometry.  If the user
@@ -274,8 +184,7 @@ public class ShapeFileImporterModified {
                     // If the user bothered specifying a mask and the current
                     // attribute, as indexed by 'k', is NOT in the mask, then
                     // merrily skip on to the next attribute
-                    if (masked != null && ! masked.contains(fields[k].name))
-                    {
+                    if (masked != null && !masked.contains(fields[k].name)) {
                         // But before we skip, ensure that we wind the pointer
                         // to the start of the next attribute value.
                         start1 += fields[k].fieldSize;
@@ -288,23 +197,18 @@ public class ShapeFileImporterModified {
 
                     AttributeValue attributeValue = new AttributeValue();
 
-                    if ( rawAttributeValue.isEmpty() )
-                    {
+                    if (rawAttributeValue.isEmpty()) {
                         // If we've gotten no data for this, then just add the
                         // empty string.
                         attributeValue.setString(rawAttributeValue);
-                    }
-                    else if (type[k] == 'N') // Numeric
+                    } else if (type[k] == 'N') // Numeric
                     {
-                        if (rawAttributeValue.length() == 0)
-                        {
+                        if (rawAttributeValue.length() == 0) {
                             attributeValue.setString("0");
                         }
-                        if (rawAttributeValue.indexOf('.') != -1)
-                        {
+                        if (rawAttributeValue.indexOf('.') != -1) {
                             attributeValue.setDouble(Double.valueOf(rawAttributeValue));
-                        } else
-                        {
+                        } else {
                             attributeValue.setInteger(Integer.valueOf(rawAttributeValue));
                         }
                     } else if (type[k] == 'L') // Logical
@@ -313,9 +217,7 @@ public class ShapeFileImporterModified {
                     } else if (type[k] == 'F') // Floating point
                     {
                         attributeValue.setValue(Double.valueOf(rawAttributeValue));
-                    }
-                    else
-                    {
+                    } else {
                         attributeValue.setString(rawAttributeValue);
                     }
 
@@ -329,12 +231,10 @@ public class ShapeFileImporterModified {
 
                 Geometry geom = null;
 
-                if (recordType == POINT)
-                {
+                if (recordType == POINT) {
                     Coordinate pt = new Coordinate(byteBuf.getDouble(), byteBuf.getDouble());
                     geom = geomFactory.createPoint(pt);
-                } else if (recordType == POLYLINE || recordType == POLYGON)
-                {
+                } else if (recordType == POLYLINE || recordType == POLYGON) {
                     // advance past four doubles: minX, minY, maxX, maxY
                     byteBuf.position(byteBuf.position() + 32);
 
@@ -343,95 +243,145 @@ public class ShapeFileImporterModified {
 
                     // get the array of part indices
                     int partIndicies[] = new int[numParts];
-                    for (int i = 0; i < numParts; i++)
-                    {
+                    for (int i = 0; i < numParts; i++) {
                         partIndicies[i] = byteBuf.getInt();
                     }
 
                     // get the array of points
                     Coordinate pointsArray[] = new Coordinate[numPoints];
-                    for (int i = 0; i < numPoints; i++)
-                    {
+                    for (int i = 0; i < numPoints; i++) {
                         pointsArray[i] = new Coordinate(byteBuf.getDouble(), byteBuf.getDouble());
                     }
 
                     Geometry[] parts = new Geometry[numParts];
 
-                    for (int i = 0; i < numParts; i++)
-                    {
+                    for (int i = 0; i < numParts; i++) {
                         int start = partIndicies[i];
                         int end = numPoints;
-                        if (i < numParts - 1)
-                        {
+                        if (i < numParts - 1) {
                             end = partIndicies[i + 1];
                         }
                         int size = end - start;
                         Coordinate coords[] = new Coordinate[size];
 
-                        for (int j = 0; j < size; j++)
-                        {
+                        for (int j = 0; j < size; j++) {
                             coords[j] = new Coordinate(pointsArray[start + j]);
                         }
 
-                        if (recordType == POLYLINE)
-                        {
+                        if (recordType == POLYLINE) {
                             parts[i] = geomFactory.createLineString(coords);
-                        } else
-                        {
+                        } else {
                             parts[i] = geomFactory.createLinearRing(coords);
                         }
                     }
-                    if (recordType == POLYLINE)
-                    {
+                    if (recordType == POLYLINE) {
                         LineString[] ls = new LineString[numParts];
-                        for (int i = 0; i < numParts; i++)
-                        {
+                        for (int i = 0; i < numParts; i++) {
                             ls[i] = (LineString) parts[i];
                         }
-                        if (numParts == 1)
-                        {
+                        if (numParts == 1) {
                             geom = parts[0];
-                        } else
-                        {
+                        } else {
                             geom = geomFactory.createMultiLineString(ls);
                         }
-                    } else	// polygon
+                    } else    // polygon
                     {
                         geom = createPolygon(parts);
                     }
-                } else
-                {
+                } else {
                     System.err.println("Unknown shape type in " + recordType);
                 }
 
-                if (geom != null)
-                {
-                    try
-                    {
+                if (geom != null) {
+                    try {
                         // The user *may* have created their own MasonGeometry
                         // class, so use the given masonGeometry class; by
                         // default it's MasonGeometry.
-                        MasonGeometry masonGeometry =  (MasonGeometry) masonGeometryClass.newInstance();
+                        MasonGeometry masonGeometry = (MasonGeometry) masonGeometryClass.newInstance();
                         masonGeometry.geometry = geom;
 
-                        if (!attributes.isEmpty())
-                        {
+                        if (!attributes.isEmpty()) {
                             masonGeometry.addAttributes(attributes);
                         }
 
                         field.addGeometry(masonGeometry);
-                    } catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             System.out.println("Error in ShapeFileImporter!!");
             System.out.println("SHP filename: " + shpFile);
             e.printStackTrace();
         }
+    }
+
+    public static boolean isSupported(int shapeType) {
+        switch (shapeType) {
+            case POINT:
+                return true;
+            case POLYLINE:
+                return true;
+            case POLYGON:
+                return true;
+            default:
+                return false;    // no other types are currently supported
+        }
+    }
+
+    /**
+     * Wrapper function which creates a new array of LinearRings and calls
+     * the other function.
+     */
+    private static Geometry createPolygon(Geometry[] parts) {
+        LinearRing[] rings = new LinearRing[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            rings[i] = (LinearRing) parts[i];
+        }
+
+        return createPolygon(rings);
+    }
+
+    /**
+     * Create a polygon from an array of LinearRings.
+     * <p>
+     * If there is only one ring the function will create and return a simple
+     * polygon. If there are multiple rings, the function checks to see if any
+     * of them are holes (which are in counter-clockwise order) and if so, it
+     * creates a polygon with holes.  If there are no holes, it creates and
+     * returns a multi-part polygon.
+     */
+    private static Geometry createPolygon(LinearRing[] parts) {
+        GeometryFactory geomFactory = new GeometryFactory();
+
+        if (parts.length == 1) {
+            return geomFactory.createPolygon(parts[0], null);
+        }
+
+        ArrayList<LinearRing> shells = new ArrayList<LinearRing>();
+        ArrayList<LinearRing> holes = new ArrayList<LinearRing>();
+
+        for (int i = 0; i < parts.length; i++) {
+            if (CGAlgorithms.isCCW(parts[i].getCoordinates())) {
+                holes.add(parts[i]);
+            } else {
+                shells.add(parts[i]);
+            }
+        }
+
+        if (holes.size() > 0) {
+            // Create a polygon with holes
+            LinearRing[] holesArray = new LinearRing[holes.size()];
+            holes.toArray(holesArray);
+            return geomFactory.createPolygon(shells.get(0), holesArray);
+        }
+
+        // Create multi-polygon
+        Polygon[] poly = new Polygon[shells.size()];
+        for (int i = 0; i < shells.size(); i++) {
+            poly[i] = geomFactory.createPolygon(parts[i], null);
+        }
+        return geomFactory.createMultiPolygon(poly);
     }
 }

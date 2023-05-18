@@ -41,7 +41,7 @@ public class GetterLocalBiology extends AbstractBiomassBasedBiology {
     /**
      * the function that actually returns the amount of biomass available
      */
-    private final Function<FishState,Double> biomass;
+    private final Function<FishState, Double> biomass;
 
     /**
      * the model
@@ -49,9 +49,9 @@ public class GetterLocalBiology extends AbstractBiomassBasedBiology {
     private FishState state;
 
 
-
     public GetterLocalBiology(
-            Species species, Function<FishState, Double> biomass) {
+        Species species, Function<FishState, Double> biomass
+    ) {
         this.species = species;
         this.biomass = biomass;
     }
@@ -84,21 +84,23 @@ public class GetterLocalBiology extends AbstractBiomassBasedBiology {
     @Override
     public double getBiomass(Species species) {
 
-        if(species==this.species)
-            return Math.max(0,biomass.apply(state));
+        if (species == this.species)
+            return Math.max(0, biomass.apply(state));
         return
-                0d;
+            0d;
     }
 
     /**
      * ignored
+     *
      * @param caught
      * @param notDiscarded
      * @param biology
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-            Catch caught, Catch notDiscarded, GlobalBiology biology) {
+        Catch caught, Catch notDiscarded, GlobalBiology biology
+    ) {
 
         //ignored
     }

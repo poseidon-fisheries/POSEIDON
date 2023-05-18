@@ -28,17 +28,17 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
-import java.util.*;
-import java.util.function.BiFunction;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A simple map String--->Double that auto-resets once started
  * Created by carrknight on 6/8/15.
  */
-public class Counter implements Startable, Steppable
-{
+public class Counter implements Startable, Steppable {
 
-    final private Map<String,Double> data;
+    final private Map<String, Double> data;
 
     final private IntervalPolicy policy;
 
@@ -57,10 +57,9 @@ public class Counter implements Startable, Steppable
         this.policy = policy;
     }
 
-    public void start(FishState state)
-    {
-        Preconditions.checkState(receipt==null, "Already Started!");
-        receipt = state.schedulePerPolicy(this, StepOrder.DATA_RESET,policy);
+    public void start(FishState state) {
+        Preconditions.checkState(receipt == null, "Already Started!");
+        receipt = state.schedulePerPolicy(this, StepOrder.DATA_RESET, policy);
     }
 
     @Override
@@ -71,55 +70,38 @@ public class Counter implements Startable, Steppable
         data.entrySet().forEach(datum -> datum.setValue(0d));
     }
 
-
-    private void flushLazyValueInCounter(){
-        assert lazyColumnToInsert != null;
-        assert Double.isFinite(lazyValueToAdd);
-        data.compute(lazyColumnToInsert,
-                (s, oldValue) -> {
-                    if(oldValue==null)
-                        throw new NullPointerException("No column exists");
-                    else
-                        return oldValue + lazyValueToAdd;
-
-                });
-        lazyColumnToInsert = null;
-        lazyValueToAdd = 0;
-
-    }
-
     /**
      * adds a new data column, ready to be counted. It can't be already there
+     *
      * @param columnName the name of the column
      */
-    public void addColumn(String columnName)
-    {
+    public void addColumn(String columnName) {
         Preconditions.checkArgument(!hasColumn(columnName), columnName + " column already exists!");
-        data.put(columnName,0d);
+        data.put(columnName, 0d);
     }
-
 
     /**
      * Does this column already exist?
+     *
      * @param columnName
      * @return
      */
-    public boolean hasColumn(String columnName){
+    public boolean hasColumn(String columnName) {
         return data.containsKey(columnName);
     }
 
     /**
      * increment column by this
+     *
      * @param columnName the column to increment
-     * @param add by how much to increment
+     * @param add        by how much to increment
      */
-    public void count(String columnName, double add)
-    {
+    public void count(String columnName, double add) {
 
-        if(add==0)
+        if (add == 0)
             return;
 
-        if(lazyColumnToInsert != null && lazyColumnToInsert != columnName)
+        if (lazyColumnToInsert != null && lazyColumnToInsert != columnName)
             flushLazyValueInCounter();
 
         lazyColumnToInsert = columnName;
@@ -128,24 +110,42 @@ public class Counter implements Startable, Steppable
 
     }
 
+    private void flushLazyValueInCounter() {
+        assert lazyColumnToInsert != null;
+        assert Double.isFinite(lazyValueToAdd);
+        data.compute(
+            lazyColumnToInsert,
+            (s, oldValue) -> {
+                if (oldValue == null)
+                    throw new NullPointerException("No column exists");
+                else
+                    return oldValue + lazyValueToAdd;
+
+            }
+        );
+        lazyColumnToInsert = null;
+        lazyValueToAdd = 0;
+
+    }
+
     /**
      * turnOff resetting
      */
     @Override
     public void turnOff() {
-        if(receipt!=null)
+        if (receipt != null)
             receipt.stop();
     }
 
 
-    public Double getColumn(String columnName){
-        if(lazyColumnToInsert!=null)
+    public Double getColumn(String columnName) {
+        if (lazyColumnToInsert != null)
             flushLazyValueInCounter();
         return data.get(columnName);
     }
 
 
-    public Set<String> getValidCounters(){
+    public Set<String> getValidCounters() {
         return data.keySet();
     }
 

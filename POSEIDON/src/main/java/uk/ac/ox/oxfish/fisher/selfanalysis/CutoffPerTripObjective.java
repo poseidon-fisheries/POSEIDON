@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
  * Takes hourly profit objective function but adds potentially two thresholds above and below
  * Created by carrknight on 1/28/17.
  */
-public class CutoffPerTripObjective implements ObjectiveFunction<Fisher>{
+public class CutoffPerTripObjective implements ObjectiveFunction<Fisher> {
 
 
     private final HourlyProfitInTripObjective delegate;
@@ -37,12 +37,13 @@ public class CutoffPerTripObjective implements ObjectiveFunction<Fisher>{
 
     private final double highThreshold;
 
-    public CutoffPerTripObjective(HourlyProfitInTripObjective delegate,
-                                  double lowThreshold,
-                                  double highThreshold)
-    {
-        if(Double.isFinite(lowThreshold) && Double.isFinite(highThreshold))
-            Preconditions.checkArgument(lowThreshold<=highThreshold);
+    public CutoffPerTripObjective(
+        HourlyProfitInTripObjective delegate,
+        double lowThreshold,
+        double highThreshold
+    ) {
+        if (Double.isFinite(lowThreshold) && Double.isFinite(highThreshold))
+            Preconditions.checkArgument(lowThreshold <= highThreshold);
         this.delegate = delegate;
         this.lowThreshold = lowThreshold;
         this.highThreshold = highThreshold;
@@ -50,7 +51,6 @@ public class CutoffPerTripObjective implements ObjectiveFunction<Fisher>{
 
     /**
      * compute current fitness of the agent
-     *
      *
      * @param observer
      * @param observed agent whose fitness we are trying to compute
@@ -62,9 +62,9 @@ public class CutoffPerTripObjective implements ObjectiveFunction<Fisher>{
     }
 
     private double censor(double profit) {
-        if(Double.isFinite(lowThreshold) && profit<=lowThreshold)
+        if (Double.isFinite(lowThreshold) && profit <= lowThreshold)
             return lowThreshold;
-        if(Double.isFinite(highThreshold) && profit>=highThreshold)
+        if (Double.isFinite(highThreshold) && profit >= highThreshold)
             return highThreshold;
         return profit;
     }

@@ -32,17 +32,15 @@ import java.util.PriorityQueue;
 public abstract class AbstractKernelRegression implements GeographicalRegression<Double> {
 
 
-
-    private  final int maximumNumberOfObservations;
-
+    private final int maximumNumberOfObservations;
+    private final PriorityQueue<GeographicalObservation<Double>> observations;
     private double bandwidth;
 
 
-    private final PriorityQueue<GeographicalObservation<Double>> observations;
-
-
-    public AbstractKernelRegression(int maximumNumberOfObservations,
-                                    double bandwidth) {
+    public AbstractKernelRegression(
+        int maximumNumberOfObservations,
+        double bandwidth
+    ) {
         this.maximumNumberOfObservations = maximumNumberOfObservations;
         this.bandwidth = bandwidth;
         observations = new PriorityQueue<>(maximumNumberOfObservations);
@@ -50,6 +48,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
 
     /**
      * adds an observation and if there are too many removes the oldest one
+     *
      * @param observation
      * @param fisher
      * @param model
@@ -57,75 +56,33 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
     @Override
     public void addObservation(GeographicalObservation observation, Fisher fisher, FishState model) {
         observations.add(observation);
-        if(observations.size()>maximumNumberOfObservations)
-        {
-            assert observations.size()==maximumNumberOfObservations+1;
+        if (observations.size() > maximumNumberOfObservations) {
+            assert observations.size() == maximumNumberOfObservations + 1;
             observations.poll();
         }
     }
 
+    @Override
+    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
-    public Double predict(int x, int y, double time)
-    {
+        if (tile.isLand())
+            return Double.NaN;
+        else
+            return predict(tile.getGridX(), tile.getGridY(), time);
+    }
 
-        if(getObservations().size()==0)
+    public Double predict(int x, int y, double time) {
+
+        if (getObservations().size() == 0)
             return 0d;
-        if(getObservations().size()==1)
+        if (getObservations().size() == 1)
             return getObservations().peek().getValue();
 
 
         double[] prediction = generatePrediction(x, y, time);
-        return prediction[0]/prediction[1];
+        return prediction[0] / prediction[1];
 
 
-
-    }
-
-    /**
-     * like predict but this one returns an array with [0] being the numerator and [1] being the kernel sum.
-     * Useful if you need intermediate steps
-     * @param x the gridX you are predicting at
-     * @param y the gridY you are predicting at
-     * @param time the time (in hours) you want to predict to
-     * @return an array with numerator and denominator
-     */
-    public double[] generatePrediction(int x, int y, double time)
-    {
-        double kernelSum = 0;
-        double numerator = 0;
-        for(GeographicalObservation<Double> observation : getObservations())
-        {
-            double distance = distance(observation.getXCoordinate(),
-                                       observation.getYCoordinate(),
-                                       observation.getTime(),
-                                       x,
-                                       y,
-                                       time);
-            double kernel = kernel(distance/ getBandwidth());
-            kernelSum+= kernel;
-            numerator+= kernel*observation.getValue();
-        }
-
-        return new double[]{numerator,kernelSum};
-
-    }
-
-    abstract protected double distance(double fromX, double fromY, double fromTime,
-                                       double toX, double toY, double toTime);
-
-
-    @Override
-    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
-
-        if(tile.isLand())
-            return Double.NaN;
-        else
-            return predict(tile.getGridX(),tile.getGridY(),time);
-    }
-
-    public double kernel(double u)
-    {
-        return Math.max(1d/(Math.exp(u)+2+Math.exp(-u)),0);
     }
 
     /**
@@ -138,12 +95,42 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
     }
 
     /**
-     * Getter for property 'maximumNumberOfObservations'.
+     * like predict but this one returns an array with [0] being the numerator and [1] being the kernel sum.
+     * Useful if you need intermediate steps
      *
-     * @return Value for property 'maximumNumberOfObservations'.
+     * @param x    the gridX you are predicting at
+     * @param y    the gridY you are predicting at
+     * @param time the time (in hours) you want to predict to
+     * @return an array with numerator and denominator
      */
-    public int getMaximumNumberOfObservations() {
-        return maximumNumberOfObservations;
+    public double[] generatePrediction(int x, int y, double time) {
+        double kernelSum = 0;
+        double numerator = 0;
+        for (GeographicalObservation<Double> observation : getObservations()) {
+            double distance = distance(
+                observation.getXCoordinate(),
+                observation.getYCoordinate(),
+                observation.getTime(),
+                x,
+                y,
+                time
+            );
+            double kernel = kernel(distance / getBandwidth());
+            kernelSum += kernel;
+            numerator += kernel * observation.getValue();
+        }
+
+        return new double[]{numerator, kernelSum};
+
+    }
+
+    abstract protected double distance(
+        double fromX, double fromY, double fromTime,
+        double toX, double toY, double toTime
+    );
+
+    public double kernel(double u) {
+        return Math.max(1d / (Math.exp(u) + 2 + Math.exp(-u)), 0);
     }
 
     /**
@@ -165,14 +152,23 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
     }
 
     /**
+     * Getter for property 'maximumNumberOfObservations'.
+     *
+     * @return Value for property 'maximumNumberOfObservations'.
+     */
+    public int getMaximumNumberOfObservations() {
+        return maximumNumberOfObservations;
+    }
+
+    /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
      * or just to percolate a reference to the model
      *
      * @param model the model
      */
     @Override
-    public void start(FishState model,Fisher fisher) {
-        
+    public void start(FishState model, Fisher fisher) {
+
     }
 
     /**
@@ -188,10 +184,10 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
      */
     @Override
     public double extractNumericalYFromObservation(
-            GeographicalObservation<Double> observation, Fisher fisher) {
+        GeographicalObservation<Double> observation, Fisher fisher
+    ) {
         return observation.getValue();
     }
-
 
 
     /**
@@ -214,7 +210,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
      */
     @Override
     public void setParameters(double[] parameterArray) {
-        assert  parameterArray.length == 1;
+        assert parameterArray.length == 1;
 
         setBandwidth(parameterArray[0]);
 

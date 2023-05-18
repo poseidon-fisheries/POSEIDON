@@ -24,10 +24,7 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.Arrays;
-import java.util.IntSummaryStatistics;
 import java.util.List;
-import java.util.function.ToIntFunction;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
@@ -44,7 +41,9 @@ public class CompositeDepartingStrategy implements DepartingStrategy {
         this.strategies = strategies;
     }
 
-    public List<DepartingStrategy> getStrategies() { return unmodifiableList(asList(strategies)); }
+    public List<DepartingStrategy> getStrategies() {
+        return unmodifiableList(asList(strategies));
+    }
 
     @Override
     public void turnOff(Fisher fisher) {
@@ -75,9 +74,9 @@ public class CompositeDepartingStrategy implements DepartingStrategy {
 
     @Override
     public int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random) {
-        int minimum =  365-model.getDayOfTheYear();
+        int minimum = 365 - model.getDayOfTheYear();
         for (DepartingStrategy strategy : strategies) {
-            minimum = Integer.min(minimum,strategy.predictedDaysLeftFishingThisYear(fisher, model, random));
+            minimum = Integer.min(minimum, strategy.predictedDaysLeftFishingThisYear(fisher, model, random));
         }
         return minimum;
 

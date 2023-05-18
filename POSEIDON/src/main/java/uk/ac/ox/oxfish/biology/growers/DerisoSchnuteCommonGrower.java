@@ -35,9 +35,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- *  Grower using Deriso Schnute formula.
- *  It aggregates all given biologies into one, reproduce biomass that way and
- *  redistribute it uniformly.
+ * Grower using Deriso Schnute formula.
+ * It aggregates all given biologies into one, reproduce biomass that way and
+ * redistribute it uniformly.
  * Created by carrknight on 2/2/17.
  */
 public class DerisoSchnuteCommonGrower implements Startable, Steppable {
@@ -58,22 +58,22 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
     private final double weightAtRecruitment;
 
     private final double weightAtRecruitmentMinus1;
-
+    /**
+     * this is the OPTIONAL time series of survival rates used to initialize the model
+     * Assume the "last" element of the list is the newest.
+     * if not given, it will be filled with natural survival rates (assuming virgin state)
+     */
+    private final List<Double> empiricalSurvivalRates;
     private double lastStepRecruits;
-
-
-
     /**
      * queue containing previous end of the year biomasses, last is the latest/newest
      */
     private LinkedList<Double> previousBiomasses =
-            new LinkedList<>();
-
+        new LinkedList<>();
     /**
      * queue containing survival rates after fishing has occurred, last is the latest/newest
      */
-    private LinkedList<Double> actualSurvivalRates =  new LinkedList<>();
-
+    private LinkedList<Double> actualSurvivalRates = new LinkedList<>();
     /**
      * list of local biologies we manage. We will at all times
      */
@@ -84,32 +84,26 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
     private Stoppable stoppable;
 
 
-    /**
-     * this is the OPTIONAL time series of survival rates used to initialize the model
-     * Assume the "last" element of the list is the newest.
-     * if not given, it will be filled with natural survival rates (assuming virgin state)
-     */
-    private final List<Double> empiricalSurvivalRates;
-
-
-
     public DerisoSchnuteCommonGrower(
-            List<Double> empiricalYearlyBiomasses, double rho, double naturalSurvivalRate, double recruitmentSteepness,
-            int recruitmentLag, int speciesIndex, double weightAtRecruitment, double weightAtRecruitmentMinus1,
-            double initialRecruits) {
-        this(empiricalYearlyBiomasses,null,rho,naturalSurvivalRate,recruitmentSteepness,
-             recruitmentLag,speciesIndex,weightAtRecruitment,weightAtRecruitmentMinus1,initialRecruits);
+        List<Double> empiricalYearlyBiomasses, double rho, double naturalSurvivalRate, double recruitmentSteepness,
+        int recruitmentLag, int speciesIndex, double weightAtRecruitment, double weightAtRecruitmentMinus1,
+        double initialRecruits
+    ) {
+        this(empiricalYearlyBiomasses, null, rho, naturalSurvivalRate, recruitmentSteepness,
+            recruitmentLag, speciesIndex, weightAtRecruitment, weightAtRecruitmentMinus1, initialRecruits
+        );
     }
 
 
     public DerisoSchnuteCommonGrower(
-            //doesn't ask for the virgin biomass because it discovers it on its own
-            //by looking at carrying capacity
-            List<Double> empiricalYearlyBiomasses,
-            List<Double> empiricalSurvivalRates,
-            double rho, double naturalSurvivalRate, double recruitmentSteepness,
-            int recruitmentLag, int speciesIndex, double weightAtRecruitment, double weightAtRecruitmentMinus1,
-            double initialRecruits) {
+        //doesn't ask for the virgin biomass because it discovers it on its own
+        //by looking at carrying capacity
+        List<Double> empiricalYearlyBiomasses,
+        List<Double> empiricalSurvivalRates,
+        double rho, double naturalSurvivalRate, double recruitmentSteepness,
+        int recruitmentLag, int speciesIndex, double weightAtRecruitment, double weightAtRecruitmentMinus1,
+        double initialRecruits
+    ) {
         this.empiricalSurvivalRates = empiricalSurvivalRates;
         this.empiricalYearlyBiomasses = empiricalYearlyBiomasses;
         this.rho = rho;
@@ -125,7 +119,6 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
     /**
      * very much like the independent grower, except we do not divide the biomasses by number of cells
      *
-     *
      * @param model the model
      */
     @Override
@@ -133,25 +126,21 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
 
 
         //populates biomasses from data
-        for(int i=0; i<recruitmentLag; i++)
+        for (int i = 0; i < recruitmentLag; i++)
             previousBiomasses.addFirst(empiricalYearlyBiomasses.
-                    get(empiricalYearlyBiomasses.size()-i-1));
+                get(empiricalYearlyBiomasses.size() - i - 1));
         assert previousBiomasses.size() == recruitmentLag;
 
 
         //read from data or bootstrap it as just natural survival rate
-        if(empiricalSurvivalRates != null)
-        {
-            for(int i=0; i<2; i++)
+        if (empiricalSurvivalRates != null) {
+            for (int i = 0; i < 2; i++)
                 actualSurvivalRates.addFirst(empiricalSurvivalRates.
-                        get(empiricalSurvivalRates.size()-i-1));
-        }
-        else
-        {
+                    get(empiricalSurvivalRates.size() - i - 1));
+        } else {
             actualSurvivalRates.add(naturalSurvivalRate);
             actualSurvivalRates.add(naturalSurvivalRate);
         }
-
 
 
         stoppable = model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
@@ -164,51 +153,51 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
     @Override
     public void turnOff() {
 
-        if(stoppable!=null)
+        if (stoppable != null)
             stoppable.stop();
     }
+
     @Override
     public void step(SimState simState) {
 
         //basic current info
         double currentBiomass = 0;
         double virginBiomass = 0;
-        for(VariableBiomassBasedBiology biology : biologies)
-        {
-            currentBiomass+= biology.getCurrentBiomass()[speciesIndex];
-            virginBiomass+= biology.getCarryingCapacity(speciesIndex);
+        for (VariableBiomassBasedBiology biology : biologies) {
+            currentBiomass += biology.getCurrentBiomass()[speciesIndex];
+            virginBiomass += biology.getCarryingCapacity(speciesIndex);
 
         }
         DerisoSchnuteIndependentGrower.DerisoSchnuteStep bioStep = DerisoSchnuteIndependentGrower.computeNewBiomassDerisoSchnute(
-                currentBiomass,
-                virginBiomass,
-                previousBiomasses,
-                actualSurvivalRates,
-                naturalSurvivalRate,
-                recruitmentLag,
-                recruitmentSteepness,
-                weightAtRecruitment,
-                rho,
-                weightAtRecruitmentMinus1,
-                lastStepRecruits
+            currentBiomass,
+            virginBiomass,
+            previousBiomasses,
+            actualSurvivalRates,
+            naturalSurvivalRate,
+            recruitmentLag,
+            recruitmentSteepness,
+            weightAtRecruitment,
+            rho,
+            weightAtRecruitmentMinus1,
+            lastStepRecruits
         );
-        double newBiomass =  bioStep.getBiomass();
+        double newBiomass = bioStep.getBiomass();
         lastStepRecruits = bioStep.getRecruits();
 
         //reallocate uniformly. Do not allocate above carrying capacity
 
         List<VariableBiomassBasedBiology> biologyList = new ArrayList<>(this.biologies);
 
-        double toReallocate = newBiomass  - currentBiomass; // I suppose this could be negative
+        double toReallocate = newBiomass - currentBiomass; // I suppose this could be negative
 
-        if( Math.abs(toReallocate) < FishStateUtilities.EPSILON ) //if there is nothing to allocate, ignore
+        if (Math.abs(toReallocate) < FishStateUtilities.EPSILON) //if there is nothing to allocate, ignore
             return;
 
-        if(toReallocate > 0) //if we are adding biomass, keep only not-full biologies
+        if (toReallocate > 0) //if we are adding biomass, keep only not-full biologies
             biologyList = biologyList.stream().filter(new Predicate<VariableBiomassBasedBiology>() {
                 @Override
                 public boolean test(VariableBiomassBasedBiology loco) {
-                    return loco.getCurrentBiomass()[speciesIndex]< loco.getCarryingCapacity(speciesIndex);
+                    return loco.getCurrentBiomass()[speciesIndex] < loco.getCarryingCapacity(speciesIndex);
                 }
             }).collect(Collectors.toList());
         else {
@@ -232,43 +221,46 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
     }
 
     /**
-     *  given a bunch of biomass (spawning/recruiting) put them in the given boxes
-     * @param biologyList all the biology items that can receive biomass
+     * given a bunch of biomass (spawning/recruiting) put them in the given boxes
+     *
+     * @param biologyList  all the biology items that can receive biomass
      * @param toReallocate the amount of biomass to allocate
-     * @param random the randomizer to use
+     * @param random       the randomizer to use
      * @param speciesIndex the species index
      */
-    public static void allocateBiomassAtRandom(List<? extends VariableBiomassBasedBiology> biologyList, double toReallocate, MersenneTwisterFast random, int speciesIndex) {
-        while(toReallocate > 0 && !biologyList.isEmpty())
-        {
+    public static void allocateBiomassAtRandom(
+        List<? extends VariableBiomassBasedBiology> biologyList,
+        double toReallocate,
+        MersenneTwisterFast random,
+        int speciesIndex
+    ) {
+        while (toReallocate > 0 && !biologyList.isEmpty()) {
             biologyList = new ArrayList<>(biologyList);
             //pick a biology at random
             VariableBiomassBasedBiology local = biologyList.get(random.nextInt(biologyList.size()));
             //give or take some biomass out
-            double delta = toReallocate<FishStateUtilities.EPSILON ?
-                    toReallocate :
-                    toReallocate / (double) biologyList.size();
+            double delta = toReallocate < FishStateUtilities.EPSILON ?
+                toReallocate :
+                toReallocate / (double) biologyList.size();
             local.getCurrentBiomass()[speciesIndex] += delta;
             //if you gave some biomass
-            if(delta > 0)
-            {
+            if (delta > 0) {
                 //account for it
                 toReallocate -= delta;
                 //but if it's above carrying capacity, take it back
-                double excess =  local.getCurrentBiomass()[speciesIndex] - local.getCarryingCapacity(speciesIndex);
-                if(excess > FishStateUtilities.EPSILON) {
+                double excess = local.getCurrentBiomass()[speciesIndex] - local.getCarryingCapacity(speciesIndex);
+                if (excess > FishStateUtilities.EPSILON) {
                     toReallocate += excess;
                     local.getCurrentBiomass()[speciesIndex] = local.getCarryingCapacity(speciesIndex);
                     biologyList.remove(local); //this biology is not going to accept any more
                 }
             }
             //if you took biomass back
-            else
-            {
+            else {
                 //account for it
                 toReallocate -= delta;
                 //but if there is negative fish, put it back!
-                if(local.getCurrentBiomass()[speciesIndex] < 0 ) {
+                if (local.getCurrentBiomass()[speciesIndex] < 0) {
                     toReallocate -= local.getCurrentBiomass()[speciesIndex];
                     local.getCurrentBiomass()[speciesIndex] = 0d;
                     biologyList.remove(local); //this biology is not going to accept any more

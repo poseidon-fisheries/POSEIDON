@@ -33,15 +33,15 @@ public class FixedDataLastStepTargetTest {
 
     @Test
     public void errorComputesCorrectly() {
-        DataTarget target = FixedDataLastStepTarget.lastStepTarget(
-                Paths.get("inputs", "tests", "landings.csv"), "fakeData"
+        final DataTarget target = FixedDataLastStepTarget.lastStepTarget(
+            Paths.get("inputs", "tests", "landings.csv"), "fakeData"
         );
 
         //the last number there is 10702457.01
         //that should be the only number that matters!
 
-        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
-        DataColumn fakeData = new DataColumn("fakeData");
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final DataColumn fakeData = new DataColumn("fakeData");
         fakeData.add(100d);
         fakeData.add(100d);
         fakeData.add(100d);
@@ -49,21 +49,21 @@ public class FixedDataLastStepTargetTest {
 
         when(model.getYearlyDataSet().getColumn("fakeData")).thenReturn(fakeData);
 
-        assertEquals(target.computeError(model),10702357.01,.0001);
+        assertEquals(target.computeError(model), 10702357.01, .0001);
 
     }
 
     @Test
     public void onlyLastElementMatters() {
-        DataTarget target = FixedDataLastStepTarget.lastStepTarget(
-                Paths.get("inputs", "tests", "landings.csv"), "fakeData"
+        final DataTarget target = FixedDataLastStepTarget.lastStepTarget(
+            Paths.get("inputs", "tests", "landings.csv"), "fakeData"
         );
 
         //the last number there is 10702457.01
         //that should be the only number that matters!
 
-        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
-        DataColumn fakeData = new DataColumn("fakeData");
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final DataColumn fakeData = new DataColumn("fakeData");
         fakeData.add(100d);
         fakeData.add(100d);
         fakeData.add(100d);
@@ -71,7 +71,7 @@ public class FixedDataLastStepTargetTest {
 
         when(model.getYearlyDataSet().getColumn("fakeData")).thenReturn(fakeData);
 
-        assertEquals(target.computeError(model),100,.0001);
+        assertEquals(target.computeError(model), 100, .0001);
 
     }
 }

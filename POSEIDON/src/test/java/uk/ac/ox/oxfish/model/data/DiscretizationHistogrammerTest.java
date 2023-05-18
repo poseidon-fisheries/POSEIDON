@@ -49,20 +49,20 @@ public class DiscretizationHistogrammerTest {
         when(discretization.getNumberOfGroups()).thenReturn(4);
 
         DiscretizationHistogrammer histogrammer = new DiscretizationHistogrammer(
-                discretization,false
+            discretization, false
         );
 
         TripRecord record = mock(TripRecord.class);
         when(record.getMostFishedTileInTrip()).thenReturn(tile1);
-        histogrammer.reactToFinishedTrip(record, null );
-        histogrammer.reactToFinishedTrip(record, null );
-        histogrammer.reactToFinishedTrip(record,null );
+        histogrammer.reactToFinishedTrip(record, null);
+        histogrammer.reactToFinishedTrip(record, null);
+        histogrammer.reactToFinishedTrip(record, null);
         when(record.getMostFishedTileInTrip()).thenReturn(tile2);
-        histogrammer.reactToFinishedTrip(record,null );
+        histogrammer.reactToFinishedTrip(record, null);
         when(record.getMostFishedTileInTrip()).thenReturn(tile3);
-        histogrammer.reactToFinishedTrip(record, null );
+        histogrammer.reactToFinishedTrip(record, null);
 
-        assertEquals("3,2,0,0",histogrammer.composeFileContents());
+        assertEquals("3,2,0,0", histogrammer.composeFileContents());
 
     }
 }

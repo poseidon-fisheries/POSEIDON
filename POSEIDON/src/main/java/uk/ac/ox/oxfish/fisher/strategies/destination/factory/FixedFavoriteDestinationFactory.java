@@ -28,18 +28,17 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 /**
  * this factory gets its own class because it has setters and getters which can be found through reflection
  */
-public class FixedFavoriteDestinationFactory implements AlgorithmFactory<FavoriteDestinationStrategy>
-{
+public class FixedFavoriteDestinationFactory implements AlgorithmFactory<FavoriteDestinationStrategy> {
 
     /**
      * x grid of the sea tile
      */
-    private int x=0;
+    private int x = 0;
 
     /**
      * y grid of the sea tile
      */
-    private int y=0;
+    private int y = 0;
 
     public int getX() {
         return x;
@@ -61,7 +60,7 @@ public class FixedFavoriteDestinationFactory implements AlgorithmFactory<Favorit
     public FavoriteDestinationStrategy apply(FishState state) {
 
         NauticalMap map = state.getMap();
-        return new FavoriteDestinationStrategy(map.getSeaTile(x,y));
+        return new FavoriteDestinationStrategy(map.getSeaTile(x, y));
 
     }
 

@@ -9,7 +9,7 @@ import java.util.DoubleSummaryStatistics;
 import java.util.Iterator;
 import java.util.function.Function;
 
-public class ITarget implements Sensor<FishState,Double> {
+public class ITarget implements Sensor<FishState, Double> {
 
 //    The TAC is calculated as: If Irecent≥I0:
 //    TAC=0.5TAC∗[1+(Irecent−I0)/(Itarget−I0)]
@@ -28,81 +28,50 @@ public class ITarget implements Sensor<FishState,Double> {
     private final String catchColumnName;
 
     private final UnchangingPastSensor historicalAverageIndex;
-
-    /**
-     * pipe observations through these, useful for rescaling
-     */
-    private Function<Double,Double> catchTransformer = catches -> catches;
-
-
     private final String indicatorColumnName;
-
-
     /**
-     * pipe observations through these, useful for rescaling: THIS HAPPENS BEFORE LOGGINg IT
-     */
-    private Function<Double,Double> indicatorTransformer = indicator -> indicator;
-
-
-    /**
-     *  TAC* is (1-precautionaryScaling)C
+     * TAC* is (1-precautionaryScaling)C
      */
     private final double precautionaryScaling;
-
     /**
      * Itarget is IAverage*IndicatorMultiplier
      */
     private final double indicatorMultiplier;
-
     /**
      * how many years back to go
      */
     private final int timeInterval;
-
-
+    /**
+     * pipe observations through these, useful for rescaling
+     */
+    private Function<Double, Double> catchTransformer = catches -> catches;
+    /**
+     * pipe observations through these, useful for rescaling: THIS HAPPENS BEFORE LOGGINg IT
+     */
+    private Function<Double, Double> indicatorTransformer = indicator -> indicator;
     /**
      * this is TAC* and is unchanged through the years
      */
     private double lastPolicy = Double.NaN;
 
 
-
-    public ITarget(String catchColumnName, String indicatorColumnName,
-                   double precautionaryScaling, double indicatorMultiplier,
-                   int timeInterval, int yearsToLookBackToTarget) {
+    public ITarget(
+        String catchColumnName, String indicatorColumnName,
+        double precautionaryScaling, double indicatorMultiplier,
+        int timeInterval, int yearsToLookBackToTarget
+    ) {
         //the historical average does not get updated with time, so we need
         //a fixed sensor
         historicalAverageIndex =
-                new UnchangingPastSensor(
-                        indicatorColumnName,1.0,
-                        yearsToLookBackToTarget
-                );
+            new UnchangingPastSensor(
+                indicatorColumnName, 1.0,
+                yearsToLookBackToTarget
+            );
         this.catchColumnName = catchColumnName;
         this.indicatorColumnName = indicatorColumnName;
         this.precautionaryScaling = precautionaryScaling;
         this.indicatorMultiplier = indicatorMultiplier;
         this.timeInterval = timeInterval;
-    }
-
-
-    public Double getPercentageChangeToTACDueToIndicator(FishState system){
-        final DataColumn indicatorColumn = system.getYearlyDataSet().getColumn(indicatorColumnName);
-        final int stepsBackToLook = Math.min(timeInterval, indicatorColumn.size());
-        DoubleSummaryStatistics indicatorThisInterval = new DoubleSummaryStatistics();
-        final Iterator<Double> indicatorIterator = indicatorColumn.descendingIterator();
-        for (int lag = 0; lag < stepsBackToLook;
-             lag++) {
-            final Double observedIndicator = indicatorTransformer.apply(
-                    indicatorIterator.next());
-            indicatorThisInterval.accept(observedIndicator);
-        }
-
-        return LTargetEffortPolicy.computePolicyMultiplier(
-                indicatorThisInterval.getAverage(),
-                historicalAverageIndex.scan(system),
-                indicatorMultiplier,
-                0.8
-        );
     }
 
     @Override
@@ -111,7 +80,7 @@ public class ITarget implements Sensor<FishState,Double> {
 
         final DataColumn catchColumn = system.getYearlyDataSet().getColumn(catchColumnName);
         //you need to have at least timeInterval*2 observations
-        if(catchColumn.size()< historicalAverageIndex.getYearsToLookBack()) //need a long enough time series!
+        if (catchColumn.size() < historicalAverageIndex.getYearsToLookBack()) //need a long enough time series!
             return Double.NaN;
 
         double percentageChangeDueToIndicator = getPercentageChangeToTACDueToIndicator(system);
@@ -119,7 +88,7 @@ public class ITarget implements Sensor<FishState,Double> {
         final int stepsBackToLook = Math.min(timeInterval, catchColumn.size());
 
         //if this is the first time we do policy, look at average catches to form a TAC baseline
-        if(!Double.isFinite(lastPolicy)) {
+        if (!Double.isFinite(lastPolicy)) {
             DoubleSummaryStatistics catchesThisInterval = new DoubleSummaryStatistics();
             final Iterator<Double> catchesIterator = catchColumn.descendingIterator();
 
@@ -129,9 +98,9 @@ public class ITarget implements Sensor<FishState,Double> {
 
 
                 catchesThisInterval.accept(
-                        catchTransformer.apply(
-                                catchesIterator.next()
-                        ));
+                    catchTransformer.apply(
+                        catchesIterator.next()
+                    ));
 
             }
 
@@ -140,12 +109,31 @@ public class ITarget implements Sensor<FishState,Double> {
 
 
             lastPolicy = catches * (1 - precautionaryScaling);
-  //          return lastPolicy;
+            //          return lastPolicy;
         }
 
         return lastPolicy * percentageChangeDueToIndicator;
     }
 
+    public Double getPercentageChangeToTACDueToIndicator(FishState system) {
+        final DataColumn indicatorColumn = system.getYearlyDataSet().getColumn(indicatorColumnName);
+        final int stepsBackToLook = Math.min(timeInterval, indicatorColumn.size());
+        DoubleSummaryStatistics indicatorThisInterval = new DoubleSummaryStatistics();
+        final Iterator<Double> indicatorIterator = indicatorColumn.descendingIterator();
+        for (int lag = 0; lag < stepsBackToLook;
+             lag++) {
+            final Double observedIndicator = indicatorTransformer.apply(
+                indicatorIterator.next());
+            indicatorThisInterval.accept(observedIndicator);
+        }
+
+        return LTargetEffortPolicy.computePolicyMultiplier(
+            indicatorThisInterval.getAverage(),
+            historicalAverageIndex.scan(system),
+            indicatorMultiplier,
+            0.8
+        );
+    }
 
     public String getCatchColumnName() {
         return catchColumnName;

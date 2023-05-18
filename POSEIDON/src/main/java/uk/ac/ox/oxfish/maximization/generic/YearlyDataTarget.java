@@ -42,8 +42,8 @@ public class YearlyDataTarget implements DataTarget {
     private boolean cumulative;
 
     private String pathToCsvFile = Paths.
-            get("/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice1/calibration/targets/Small_LL021 Lutjanus malabaricus.csv").
-            resolve("Small_other.csv").toString();
+        get("/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice1/calibration/targets/Small_LL021 Lutjanus malabaricus.csv").
+        resolve("Small_other.csv").toString();
 
     private String yearlyDataColumnName = "Other Landings of population0";
     /**
@@ -55,20 +55,21 @@ public class YearlyDataTarget implements DataTarget {
      * useful as a way to compute STD of error (negative or 0 means do not use)
      */
 
-    private  double coefficientOfVariation = .1;
+    private double coefficientOfVariation = .1;
 
 
     /**
-     *  @param pathToCsvFile
+     * @param pathToCsvFile
      * @param yearlyDataColumnName
      * @param hasHeader
      * @param coefficientOfVariation can be 0, negative or not a number; will then ignore
      * @param cumulative
      */
     public YearlyDataTarget(
-            String pathToCsvFile, String yearlyDataColumnName, boolean hasHeader,
-            double coefficientOfVariation,
-            double exponent, boolean cumulative) {
+        String pathToCsvFile, String yearlyDataColumnName, boolean hasHeader,
+        double coefficientOfVariation,
+        double exponent, boolean cumulative
+    ) {
         this.pathToCsvFile = pathToCsvFile;
         this.yearlyDataColumnName = yearlyDataColumnName;
         this.hasHeader = hasHeader;
@@ -79,8 +80,10 @@ public class YearlyDataTarget implements DataTarget {
     }
 
 
-    public double computeError(FishState model)
-    {
+    public YearlyDataTarget() {
+    }
+
+    public double computeError(FishState model) {
 
         DataColumn simulationOutput = model.getYearlyDataSet().getColumn(yearlyDataColumnName);
 
@@ -96,12 +99,13 @@ public class YearlyDataTarget implements DataTarget {
 
             }
             double plainDistance = FishStateUtilities.timeSeriesDistance(
-                    simulationOutput,
-                    realData, exponent,
-                    cumulative) / stats.getCount();
+                simulationOutput,
+                realData, exponent,
+                cumulative
+            ) / stats.getCount();
 
             double std = stats.getAverage() * coefficientOfVariation;
-            if(std <=0 || !Double.isFinite(std))
+            if (std <= 0 || !Double.isFinite(std))
                 return plainDistance;
             else
             // average distance / std
@@ -110,14 +114,10 @@ public class YearlyDataTarget implements DataTarget {
                 return plainDistance / std;
             }
 
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-    }
-
-    public YearlyDataTarget() {
     }
 
     /**

@@ -107,7 +107,12 @@ public class PortReader {
 
     }
 
-    private SeaTile computePortLocation(final NauticalMap map, final String portName, final double lon, final double lat) {
+    private SeaTile computePortLocation(
+        final NauticalMap map,
+        final String portName,
+        final double lon,
+        final double lat
+    ) {
         final SeaTile location = map.getSeaTile(new Coordinate(lon, lat));
         Preconditions.checkArgument(
             location != null,

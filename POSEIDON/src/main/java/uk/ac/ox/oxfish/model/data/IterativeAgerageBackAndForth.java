@@ -25,6 +25,7 @@ import com.google.common.base.Preconditions;
 /**
  * a simple variant of the iterative average that can move back and forth (as in, you can "remove" observations),
  * maybe not as efficient
+ *
  * @param <T>
  */
 public class IterativeAgerageBackAndForth<T extends Number> implements Averager<T> {
@@ -44,8 +45,8 @@ public class IterativeAgerageBackAndForth<T extends Number> implements Averager<
 
     public void addObservationfromDouble(double observation) {
         observations++;
-        totalSum+=observation;
-        average = totalSum/observations;
+        totalSum += observation;
+        average = totalSum / observations;
     }
 
     /**
@@ -57,10 +58,10 @@ public class IterativeAgerageBackAndForth<T extends Number> implements Averager<
     }
 
     public void removeObservation(double observation) {
-        Preconditions.checkArgument(observations>1);
+        Preconditions.checkArgument(observations > 1);
         observations--;
-        totalSum-=observation;
-        average = totalSum/observations;
+        totalSum -= observation;
+        average = totalSum / observations;
     }
 
 

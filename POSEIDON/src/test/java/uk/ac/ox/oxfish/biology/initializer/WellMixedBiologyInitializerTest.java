@@ -40,30 +40,31 @@ public class WellMixedBiologyInitializerTest {
     @Test
     public void initializerMixesWell() throws Exception {
 
-        WellMixedBiologyInitializer initializer =
-                new WellMixedBiologyInitializer(new FixedDoubleParameter(60),
-                                                new FixedDoubleParameter(.25),
-                                                .01,.01,
-                                                new SimpleLogisticGrowerInitializer(new FixedDoubleParameter(.8d))
-                );
+        final WellMixedBiologyInitializer initializer =
+            new WellMixedBiologyInitializer(new FixedDoubleParameter(60),
+                new FixedDoubleParameter(.25),
+                .01, .01,
+                new SimpleLogisticGrowerInitializer(new FixedDoubleParameter(.8d))
+            );
 
 
-
-        SeaTile tile = mock(SeaTile.class);
-        VariableBiomassBasedBiology biology = (VariableBiomassBasedBiology) initializer.generateLocal(mock(GlobalBiology.class),
-                                                                                                      tile,
-                                                                                                      new MersenneTwisterFast(), 50,
-                                                                                                      50,
-                                                                                                      mock(NauticalMap.class)
+        final SeaTile tile = mock(SeaTile.class);
+        final VariableBiomassBasedBiology biology = (VariableBiomassBasedBiology) initializer.generateLocal(mock(GlobalBiology.class),
+            tile,
+            new MersenneTwisterFast(), 50,
+            50,
+            mock(NauticalMap.class)
         );
 
 
-        Species zero = new Species("zero"); zero.resetIndexTo(0);
-        Species one = new Species("one"); one.resetIndexTo(1);
+        final Species zero = new Species("zero");
+        zero.resetIndexTo(0);
+        final Species one = new Species("one");
+        one.resetIndexTo(1);
 
 
-        assertEquals(biology.getCarryingCapacity(zero),60,.001);
-        assertEquals(biology.getCarryingCapacity(one),20,.001);
+        assertEquals(biology.getCarryingCapacity(zero), 60, .001);
+        assertEquals(biology.getCarryingCapacity(one), 20, .001);
 
     }
 }

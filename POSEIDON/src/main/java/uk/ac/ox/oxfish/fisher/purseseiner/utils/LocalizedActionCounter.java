@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 /**
  * counts for certain actions (and their total catch) when they pass a predicate. Useful for studying only actions that happen
  * in a specific area.
- *
+ * <p>
  * Following convention here assuming that we start ourselves to register gatherers but somebody else has already registered
  * us as observers in the fad manager!
  */
@@ -27,8 +27,10 @@ public class LocalizedActionCounter implements Observer<AbstractFadSetAction>, A
 
     private final String counterName;
 
-    public LocalizedActionCounter(Predicate<AbstractFadSetAction> passThisIfYouWantToBeCounted,
-                                  String counterName) {
+    public LocalizedActionCounter(
+        Predicate<AbstractFadSetAction> passThisIfYouWantToBeCounted,
+        String counterName
+    ) {
         this.passThisIfYouWantToBeCounted = passThisIfYouWantToBeCounted;
         this.counterName = counterName;
         validActions = new Counter(IntervalPolicy.EVERY_YEAR);
@@ -39,12 +41,13 @@ public class LocalizedActionCounter implements Observer<AbstractFadSetAction>, A
 
     @Override
     public void observe(AbstractFadSetAction observable) {
-        if(passThisIfYouWantToBeCounted.test(observable))
-        {
-            validActions.count("Number of Actions",1.0);
-            if(observable.getCatchesKept().isPresent())
-                validActions.count("Total Catch",
-                        ((Catch) observable.getCatchesKept().get()).getTotalWeight());
+        if (passThisIfYouWantToBeCounted.test(observable)) {
+            validActions.count("Number of Actions", 1.0);
+            if (observable.getCatchesKept().isPresent())
+                validActions.count(
+                    "Total Catch",
+                    ((Catch) observable.getCatchesKept().get()).getTotalWeight()
+                );
 
         }
     }
@@ -54,31 +57,34 @@ public class LocalizedActionCounter implements Observer<AbstractFadSetAction>, A
 
         validActions.start(model);
         model.getYearlyDataSet().registerGatherer(counterName + ": Number of Actions",
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        return getNumberOfActionsThisYearSoFar();
-                    }
-                }, Double.NaN);
-                model.getYearlyDataSet().registerGatherer(counterName + ": Total Catch",
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        return getTotalCatchThisYearSoFar();
-                    }
-                }, Double.NaN);
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(FishState fishState) {
+                    return getNumberOfActionsThisYearSoFar();
+                }
+            }, Double.NaN
+        );
+        model.getYearlyDataSet().registerGatherer(counterName + ": Total Catch",
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(FishState fishState) {
+                    return getTotalCatchThisYearSoFar();
+                }
+            }, Double.NaN
+        );
 
+    }
+
+    public double getNumberOfActionsThisYearSoFar() {
+        return validActions.getColumn("Number of Actions");
+    }
+
+    public double getTotalCatchThisYearSoFar() {
+        return validActions.getColumn("Total Catch");
     }
 
     @Override
     public void turnOff() {
         validActions.turnOff();
-    }
-
-    public double getNumberOfActionsThisYearSoFar(){
-        return validActions.getColumn("Number of Actions");
-    }
-    public double getTotalCatchThisYearSoFar(){
-        return validActions.getColumn("Total Catch");
     }
 }

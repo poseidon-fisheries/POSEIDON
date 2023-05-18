@@ -32,8 +32,7 @@ import java.util.HashMap;
  * Created by carrknight on 5/26/16.
  */
 public class LessThanXFishersHereExtractor implements
-        SafetyFeatureExtractor<SeaTile>, SocialAcceptabilityFeatureExtractor<SeaTile>
-{
+    SafetyFeatureExtractor<SeaTile>, SocialAcceptabilityFeatureExtractor<SeaTile> {
 
 
     private int minimumNumberOfFishersBeforeFalse = 1;
@@ -65,18 +64,19 @@ public class LessThanXFishersHereExtractor implements
 
     /**
      * Method called to extract the feature from the object toRepresent, given the observer and the overall model
-     *  @param toRepresent the list of object from which to extract a feature
+     *
+     * @param toRepresent the list of object from which to extract a feature
      * @param model       the model to represent
      * @param fisher
      */
     @Override
     public HashMap<SeaTile, Double> extractFeature(
-            Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
+        Collection<SeaTile> toRepresent, FishState model, Fisher fisher
+    ) {
 
-        HashMap<SeaTile,Double> toReturn = new HashMap<>(toRepresent.size());
-        for(SeaTile tile : toRepresent)
-        {
-            if(model.getFishersAtLocation(tile).size()>= minimumNumberOfFishersBeforeFalse)
+        HashMap<SeaTile, Double> toReturn = new HashMap<>(toRepresent.size());
+        for (SeaTile tile : toRepresent) {
+            if (model.getFishersAtLocation(tile).size() >= minimumNumberOfFishersBeforeFalse)
                 toReturn.put(tile, -1d); //unsafe
             else
                 toReturn.put(tile, 1d); //safe

@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 /**
  * Created by carrknight on 7/8/17.
  */
-public class NoDiffuserFactory  implements AlgorithmFactory<NoAbundanceDiffusion>{
+public class NoDiffuserFactory implements AlgorithmFactory<NoAbundanceDiffusion> {
 
 
     /**

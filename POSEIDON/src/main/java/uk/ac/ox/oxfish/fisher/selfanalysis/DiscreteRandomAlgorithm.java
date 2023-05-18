@@ -36,17 +36,17 @@ import java.util.function.Function;
  * A simple exploration-imitaiton-exploitation decision where the random part occurs by choosing from a list
  * Created by carrknight on 8/6/15.
  */
-public class DiscreteRandomAlgorithm<T> implements AdaptationAlgorithm<T>
-{
+public class DiscreteRandomAlgorithm<T> implements AdaptationAlgorithm<T> {
 
 
-    private final Function<Pair<T,MersenneTwisterFast>, T> randomChooser;
+    private final Function<Pair<T, MersenneTwisterFast>, T> randomChooser;
 
 
     public DiscreteRandomAlgorithm(
-            List<T> randomChoices) {
+        List<T> randomChoices
+    ) {
         this.randomChooser = pair -> {
-            if(randomChoices.isEmpty()) //if there is nothing randomizable, don't bother
+            if (randomChoices.isEmpty()) //if there is nothing randomizable, don't bother
                 return pair.getFirst();
             //otherwise randomize!
             return randomChoices.get(pair.getSecond().nextInt(randomChoices.size()));
@@ -55,18 +55,21 @@ public class DiscreteRandomAlgorithm<T> implements AdaptationAlgorithm<T>
 
     @Override
     public T randomize(
-            MersenneTwisterFast random, Fisher agent, double currentFitness, T current) {
-        return randomChooser.apply(new Pair<T, MersenneTwisterFast>(current,random));
+        MersenneTwisterFast random, Fisher agent, double currentFitness, T current
+    ) {
+        return randomChooser.apply(new Pair<T, MersenneTwisterFast>(current, random));
     }
 
 
     @Override
-    public Pair<T,Fisher> imitate(
-            MersenneTwisterFast random, Fisher agent, double fitness, T current, Collection<Fisher> friends,
-            ObjectiveFunction<Fisher> objectiveFunction, Sensor<Fisher,T> sensor) {
+    public Pair<T, Fisher> imitate(
+        MersenneTwisterFast random, Fisher agent, double fitness, T current, Collection<Fisher> friends,
+        ObjectiveFunction<Fisher> objectiveFunction, Sensor<Fisher, T> sensor
+    ) {
         return FishStateUtilities.imitateFriendAtRandom(random, fitness,
-                                                        current, friends,
-                                                        objectiveFunction, sensor,agent );
+            current, friends,
+            objectiveFunction, sensor, agent
+        );
 
 
     }
@@ -83,8 +86,9 @@ public class DiscreteRandomAlgorithm<T> implements AdaptationAlgorithm<T>
      */
     @Override
     public T judgeRandomization(
-            MersenneTwisterFast random, Fisher agent, double previousFitness, double currentFitness, T previous,
-            T current) {
+        MersenneTwisterFast random, Fisher agent, double previousFitness, double currentFitness, T previous,
+        T current
+    ) {
         return null;
     }
 
@@ -93,9 +97,10 @@ public class DiscreteRandomAlgorithm<T> implements AdaptationAlgorithm<T>
      */
     @Override
     public T judgeImitation(
-            MersenneTwisterFast random, Fisher agent, Fisher friendImitated, double fitnessBeforeImitating,
-            double fitnessAfterImitating, T previous,
-            T current) {
+        MersenneTwisterFast random, Fisher agent, Fisher friendImitated, double fitnessBeforeImitating,
+        double fitnessAfterImitating, T previous,
+        T current
+    ) {
         return null;
     }
 

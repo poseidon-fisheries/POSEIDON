@@ -26,8 +26,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
  * The more money is gained in a fixed number of days, the better!
  * Created by carrknight on 8/4/15.
  */
-public class CashFlowObjective implements  ObjectiveFunction<Fisher>
-{
+public class CashFlowObjective implements ObjectiveFunction<Fisher> {
 
 
     /**
@@ -44,7 +43,6 @@ public class CashFlowObjective implements  ObjectiveFunction<Fisher>
     /**
      * compute current fitness of the agent
      *
-     *
      * @param observer
      * @param observed agent whose fitness we are trying to compute
      * @return a fitness value: the higher the better
@@ -52,18 +50,18 @@ public class CashFlowObjective implements  ObjectiveFunction<Fisher>
     @Override
     public double computeCurrentFitness(Fisher observer, Fisher observed) {
         //get cash available today
-        double currentCash= observed.getBankBalance();
+        double currentCash = observed.getBankBalance();
         //get cash in the past (if not present, assumes it started at 0)
-        double laggedCash = getCashInPast(observed,period);
+        double laggedCash = getCashInPast(observed, period);
 
-        return currentCash-laggedCash;
+        return currentCash - laggedCash;
     }
 
     private double getCashInPast(Fisher observed, int daysAgo) {
 
 
         return observed.getDailyData().numberOfObservations() > daysAgo ?
-                observed.balanceXDaysAgo(daysAgo) : 0;
+            observed.balanceXDaysAgo(daysAgo) : 0;
     }
 
 

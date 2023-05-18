@@ -32,29 +32,31 @@ import java.util.function.Function;
 /**
  * Created by carrknight on 8/11/16.
  */
-public class ITQCostManager implements Cost{
+public class ITQCostManager implements Cost {
 
 
-    private final Function<Species,ITQOrderBook> orderBooks;
+    private final Function<Species, ITQOrderBook> orderBooks;
 
 
     public ITQCostManager(
-            Function<Species,ITQOrderBook> orderBooks) {
+        Function<Species, ITQOrderBook> orderBooks
+    ) {
         this.orderBooks = orderBooks;
     }
 
     /**
      * computes and return the cost
-     *  @param fisher  agent that did the trip
+     *
+     * @param fisher          agent that did the trip
      * @param model
-     * @param record  the trip record
-     * @param revenue revenue from catches   @return $ spent
+     * @param record          the trip record
+     * @param revenue         revenue from catches   @return $ spent
      * @param durationInHours
      */
     @Override
     public double cost(Fisher fisher, FishState model, TripRecord record, double revenue, double durationInHours) {
-        double total=0;
-        for(Species species : model.getSpecies()) {
+        double total = 0;
+        for (Species species : model.getSpecies()) {
             ITQOrderBook market = orderBooks.apply(species);
             double biomass = record.getSoldCatch()[species.getIndex()];
             if (biomass > 0 && market != null) {
@@ -62,7 +64,7 @@ public class ITQCostManager implements Cost{
 
                 if (Double.isFinite(lastClosingPrice)) {
                     //you could have sold those quotas!
-                    total+= (lastClosingPrice * biomass);
+                    total += (lastClosingPrice * biomass);
                 }
 
             }
@@ -71,7 +73,12 @@ public class ITQCostManager implements Cost{
     }
 
     @Override
-    public double expectedAdditionalCosts(Fisher fisher, double additionalTripHours, double additionalEffortHours, double additionalKmTravelled) {
+    public double expectedAdditionalCosts(
+        Fisher fisher,
+        double additionalTripHours,
+        double additionalEffortHours,
+        double additionalKmTravelled
+    ) {
         return 0;
     }
 }

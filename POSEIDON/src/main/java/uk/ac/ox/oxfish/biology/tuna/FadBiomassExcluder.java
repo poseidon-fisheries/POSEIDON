@@ -18,10 +18,10 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+
 import static java.lang.Math.max;
 import static java.util.stream.IntStream.range;
-
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 
 class FadBiomassExcluder extends Excluder<BiomassLocalBiology> {
 

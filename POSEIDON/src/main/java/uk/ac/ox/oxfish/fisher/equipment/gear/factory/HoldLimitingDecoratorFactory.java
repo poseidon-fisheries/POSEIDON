@@ -60,7 +60,8 @@ public class HoldLimitingDecoratorFactory implements AlgorithmFactory<HoldLimiti
      * @param delegate Value to set for property 'delegate'.
      */
     public void setDelegate(
-            AlgorithmFactory<? extends Gear> delegate) {
+        AlgorithmFactory<? extends Gear> delegate
+    ) {
         this.delegate = delegate;
     }
 }

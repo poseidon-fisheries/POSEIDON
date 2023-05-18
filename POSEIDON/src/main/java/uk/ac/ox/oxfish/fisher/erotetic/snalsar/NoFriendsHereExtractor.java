@@ -32,7 +32,7 @@ import java.util.*;
  * Created by carrknight on 5/31/16.
  */
 public class NoFriendsHereExtractor
-        implements SocialAcceptabilityFeatureExtractor<SeaTile> {
+    implements SocialAcceptabilityFeatureExtractor<SeaTile> {
 
 
     /**
@@ -46,8 +46,7 @@ public class NoFriendsHereExtractor
         this.directedFriendsOnly = directedFriendsOnly;
     }
 
-    public NoFriendsHereExtractor()
-    {
+    public NoFriendsHereExtractor() {
 
 
     }
@@ -55,34 +54,34 @@ public class NoFriendsHereExtractor
 
     /**
      * Method called to extract the feature from the object toRepresent, given the observer and the overall model
-     *  @param toRepresent the list of object from which to extract a feature
+     *
+     * @param toRepresent the list of object from which to extract a feature
      * @param model       the model to represent
      * @param fisher
      */
     @Override
     public Map<SeaTile, Double> extractFeature(
-            Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
+        Collection<SeaTile> toRepresent, FishState model, Fisher fisher
+    ) {
 
         Collection<Fisher> friends =
-                directedFriendsOnly ?
+            directedFriendsOnly ?
                 fisher.getDirectedFriends() :
                 fisher.getAllFriends();
 
         //go through all your friends and collect the tiles they've fished into
-        Set<SeaTile> friendsTiles =new HashSet<>();
-        for(Fisher friend : friends)
-        {
+        Set<SeaTile> friendsTiles = new HashSet<>();
+        for (Fisher friend : friends) {
             TripRecord lastTrip = friend.getLastFinishedTrip();
-            if(lastTrip != null)
-            friendsTiles.addAll(lastTrip.getTilesFished());
+            if (lastTrip != null)
+                friendsTiles.addAll(lastTrip.getTilesFished());
         }
 
-        HashMap<SeaTile,Double> toReturn =
-                new HashMap<>(toRepresent.size());
-        for(SeaTile tile : toRepresent)
-        {
+        HashMap<SeaTile, Double> toReturn =
+            new HashMap<>(toRepresent.size());
+        for (SeaTile tile : toRepresent) {
 
-            if(friendsTiles.contains(tile))
+            if (friendsTiles.contains(tile))
                 toReturn.put(tile, -1d); //unsafe
             else
                 toReturn.put(tile, 1d); //safe

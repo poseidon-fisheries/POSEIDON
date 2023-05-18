@@ -33,7 +33,8 @@ public class ConstantInitialBiomass implements InitialBiomass {
 
     @Override
     public double getInitialBiomass(
-            NauticalMap map, Species species, int numberOfHabitableCells) {
+        NauticalMap map, Species species, int numberOfHabitableCells
+    ) {
         return initialBiomass;
     }
 }

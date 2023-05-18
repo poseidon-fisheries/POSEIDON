@@ -67,13 +67,18 @@ public class SPRAgent implements AdditionalStartable, Steppable {
 
 
     public SPRAgent(
-        final String surveyTag, final Species species,
+        final String surveyTag,
+        final Species species,
         final Predicate<Fisher> samplingSelector,
         final double assumedLinf,
-        final double assumedKParameter, final double assumedNaturalMortality,
+        final double assumedKParameter,
+        final double assumedNaturalMortality,
         final int assumedMaxAge,
         final double assumedVirginRecruits,
-        final double assumedLengthBinCm, final double assumedVarA, final double assumedVarB, final double assumedLenghtAtMaturity,
+        final double assumedLengthBinCm,
+        final double assumedVarA,
+        final double assumedVarB,
+        final double assumedLenghtAtMaturity,
         final SPRFormula formula
     ) {
 
@@ -93,13 +98,18 @@ public class SPRAgent implements AdditionalStartable, Steppable {
     }
 
     public SPRAgent(
-        final String surveyTag, final Species species,
+        final String surveyTag,
+        final Species species,
         final CatchAtLengthSampler sampler,
         final double assumedLinf,
-        final double assumedKParameter, final double assumedNaturalMortality,
+        final double assumedKParameter,
+        final double assumedNaturalMortality,
         final int assumedMaxAge,
         final double assumedVirginRecruits,
-        final double assumedLengthBinCm, final double assumedVarA, final double assumedVarB, final double assumedLenghtAtMaturity,
+        final double assumedLengthBinCm,
+        final double assumedVarA,
+        final double assumedVarB,
+        final double assumedLenghtAtMaturity,
         final SPRFormula formula
     ) {
         /**

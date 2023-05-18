@@ -48,7 +48,6 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
     private final KdTree<Double> nearestNeighborTree;
 
 
-
     /**
      * functions used to turn an observation into a double[]
      */
@@ -75,11 +74,30 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
     private int neighbors;
 
 
-    public NearestNeighborRegression(int neighbors, double[] bandwidths, RegressionDistance distance,
-                                     ObservationExtractor... extractors)
-    {
+    /**
+     * creates a nearest neighbor regression caring only about space and time
+     */
+    public NearestNeighborRegression(int neighbors, double timeBandwidth, double spaceBandwidth) {
+        this(neighbors, new double[]{spaceBandwidth, spaceBandwidth, timeBandwidth},
+            new GridXExtractor(),
+            new GridYExtractor(),
+            new ObservationTimeExtractor()
+        );
+    }
+
+
+    public NearestNeighborRegression(int neighbors, double[] bandwidths, ObservationExtractor... extractors) {
+        this(neighbors, bandwidths, new AbsoluteRegressionDistance(0), extractors);
+
+
+    }
+
+    public NearestNeighborRegression(
+        int neighbors, double[] bandwidths, RegressionDistance distance,
+        ObservationExtractor... extractors
+    ) {
         Preconditions.checkArgument(bandwidths.length > 0);
-        Preconditions.checkArgument(bandwidths.length  == extractors.length);
+        Preconditions.checkArgument(bandwidths.length == extractors.length);
         this.transformer = distance;
         this.extractors = extractors;
         this.bandwidths = bandwidths;
@@ -91,62 +109,40 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
 
     }
 
-
-    public NearestNeighborRegression(int neighbors, double[] bandwidths, ObservationExtractor... extractors)
-    {
-       this(neighbors,bandwidths,new AbsoluteRegressionDistance(0),extractors);
-
-
-    }
-
     public void rebuildDistanceFunction(final double[] bandwidths) {
-        this.treeDistance =  new DistanceFunction() {
+        this.treeDistance = new DistanceFunction() {
             @Override
             public double distance(double[] obs1, double[] obs2) {
 
                 double distance = 0;
-                for(int i = 0; i < obs1.length; i++)
-                {
+                for (int i = 0; i < obs1.length; i++) {
                     transformer.setBandwidth(bandwidths[i]);
-                    distance += transformer.distance(obs1[i],obs2[i]);
+                    distance += transformer.distance(obs1[i], obs2[i]);
                 }
                 return distance;
 
             }
 
             @Override
-            public double distanceToRect(double[] observation,
-                                         double[] min,
-                                         double[] max) {
+            public double distanceToRect(
+                double[] observation,
+                double[] min,
+                double[] max
+            ) {
                 double distance = 0;
-                for(int i = 0; i < observation.length; i++)
-                {
+                for (int i = 0; i < observation.length; i++) {
                     transformer.setBandwidth(bandwidths[i]);
                     double diff = 0;
                     if (observation[i] > max[i]) {
-                        diff = transformer.distance(observation[i],max[i]);
-                    }
-                    else if (observation[i] < min[i]) {
-                        diff = transformer.distance(observation[i],min[i]);
+                        diff = transformer.distance(observation[i], max[i]);
+                    } else if (observation[i] < min[i]) {
+                        diff = transformer.distance(observation[i], min[i]);
                     }
                     distance += diff;
                 }
                 return distance;
             }
         };
-    }
-
-
-    /**
-     * creates a nearest neighbor regression caring only about space and time
-     */
-    public NearestNeighborRegression(int neighbors, double timeBandwidth, double spaceBandwidth)
-    {
-        this(neighbors, new double[]{spaceBandwidth, spaceBandwidth, timeBandwidth},
-             new GridXExtractor(),
-             new GridYExtractor(),
-             new ObservationTimeExtractor()
-             );
     }
 
     @Override
@@ -161,22 +157,22 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
 
     public double predict(double... observation) {
 
-        if(nearestNeighborTree.size()<1)
+        if (nearestNeighborTree.size() < 1)
             return 0;
 
         MaxHeap<Double> neighbors = nearestNeighborTree.findNearestNeighbors(observation, this.neighbors,
-                                                                             treeDistance);
+            treeDistance
+        );
 
         double prediction = 0;
         double size = neighbors.size();
-        while(neighbors.size()>0) {
+        while (neighbors.size() > 0) {
             prediction += neighbors.getMax();
             neighbors.removeMax();
         }
-        if(size>0)
-            prediction= prediction/size;
-        return  prediction;
-
+        if (size > 0)
+            prediction = prediction / size;
+        return prediction;
 
 
     }
@@ -184,11 +180,14 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
     @Override
     public void addObservation(GeographicalObservation<Double> observation, Fisher fisher, FishState model) {
 
-        nearestNeighborTree.addPoint(ObservationExtractor.convertToFeatures(observation.getTile(),
-                                                                            observation.getTime(),
-                                                                            fisher, extractors,
-                                                                            model),
-                                     observation.getValue());
+        nearestNeighborTree.addPoint(
+            ObservationExtractor.convertToFeatures(observation.getTile(),
+                observation.getTime(),
+                fisher, extractors,
+                model
+            ),
+            observation.getValue()
+        );
 
 
     }
@@ -197,7 +196,7 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
      * ignored
      */
     @Override
-    public void start(FishState model,Fisher fisher) {
+    public void start(FishState model, Fisher fisher) {
 
     }
 
@@ -214,7 +213,8 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
      */
     @Override
     public double extractNumericalYFromObservation(
-            GeographicalObservation<Double> observation, Fisher fisher) {
+        GeographicalObservation<Double> observation, Fisher fisher
+    ) {
         return observation.getValue();
     }
 
@@ -227,9 +227,9 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
      */
     @Override
     public double[] getParametersAsArray() {
-        double[] parameters = new double[bandwidths.length+1];
-        System.arraycopy(bandwidths,0,parameters,0,bandwidths.length);
-        parameters[parameters.length-1] = neighbors;
+        double[] parameters = new double[bandwidths.length + 1];
+        System.arraycopy(bandwidths, 0, parameters, 0, bandwidths.length);
+        parameters[parameters.length - 1] = neighbors;
         return
             parameters;
     }
@@ -242,10 +242,10 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
      */
     @Override
     public void setParameters(double[] parameterArray) {
-        assert parameterArray.length == this.bandwidths.length+1;
-        for(int i=0; i<bandwidths.length; i++)
+        assert parameterArray.length == this.bandwidths.length + 1;
+        for (int i = 0; i < bandwidths.length; i++)
             this.bandwidths[i] = parameterArray[i];
-        neighbors = Math.max(1,(int) parameterArray[parameterArray.length-1]);
+        neighbors = Math.max(1, (int) parameterArray[parameterArray.length - 1]);
         rebuildDistanceFunction(bandwidths);
     }
 }

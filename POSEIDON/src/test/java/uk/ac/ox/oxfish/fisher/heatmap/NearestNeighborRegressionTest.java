@@ -37,8 +37,7 @@ public class NearestNeighborRegressionTest {
 
 
     @Test
-    public void correctNeighbor() throws Exception
-    {
+    public void correctNeighbor() throws Exception {
 
         NearestNeighborRegression regression = new NearestNeighborRegression(1, 10000, 1);
 
@@ -48,18 +47,14 @@ public class NearestNeighborRegressionTest {
         SeaTile zero = mock(SeaTile.class);
         when(zero.getGridX()).thenReturn(0);
         when(zero.getGridY()).thenReturn(0);
-        regression.addObservation(new GeographicalObservation<>(tenten, 0, 100d),null,mock(FishState.class) );
-        regression.addObservation(new GeographicalObservation<>(zero,0,1d), null,mock(FishState.class) );
-        assertEquals(regression.predict(0,0,0),1,.001);
-        assertEquals(regression.predict(1,0,0),1,.001);
-        assertEquals(regression.predict(0,1,0),1,.001);
-        assertEquals(regression.predict(3,3,0),1,.001);
-        assertEquals(regression.predict(6,6,0),100,.001);
-        assertEquals(regression.predict(30,30,0),100,.001);
-
-
-
-
+        regression.addObservation(new GeographicalObservation<>(tenten, 0, 100d), null, mock(FishState.class));
+        regression.addObservation(new GeographicalObservation<>(zero, 0, 1d), null, mock(FishState.class));
+        assertEquals(regression.predict(0, 0, 0), 1, .001);
+        assertEquals(regression.predict(1, 0, 0), 1, .001);
+        assertEquals(regression.predict(0, 1, 0), 1, .001);
+        assertEquals(regression.predict(3, 3, 0), 1, .001);
+        assertEquals(regression.predict(6, 6, 0), 100, .001);
+        assertEquals(regression.predict(30, 30, 0), 100, .001);
 
 
     }

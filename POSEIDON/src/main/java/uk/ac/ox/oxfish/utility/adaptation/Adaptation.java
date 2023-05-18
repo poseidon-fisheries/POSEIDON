@@ -33,12 +33,12 @@ import uk.ac.ox.oxfish.model.FisherStartable;
 public interface Adaptation<T> extends FisherStartable {
 
 
-
     /**
      * Ask yourself to adapt
+     *
      * @param toAdapt who is doing the adaptation
      * @param state
-     * @param random the randomizer
+     * @param random  the randomizer
      */
     public void adapt(Fisher toAdapt, FishState state, MersenneTwisterFast random);
 }

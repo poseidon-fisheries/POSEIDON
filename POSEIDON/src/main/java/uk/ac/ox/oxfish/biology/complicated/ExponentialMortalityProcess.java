@@ -48,34 +48,35 @@ public class ExponentialMortalityProcess implements NaturalMortalityProcess {
 
     /**
      * as a side-effect modifies male and female cohorts by killing a % of its population equal to the mortality rate.
-     * @param species the characteristics of the species
+     *
+     * @param species             the characteristics of the species
      * @param rounding
      * @param structuredAbundance
      * @param daysSimulated
      */
     @Override
     public void cull(
-            Meristics species,
-            boolean rounding,
-            StructuredAbundance structuredAbundance,
-            int daysSimulated)
-    {
+        Meristics species,
+        boolean rounding,
+        StructuredAbundance structuredAbundance,
+        int daysSimulated
+    ) {
         assert species.getNumberOfSubdivisions() == structuredAbundance.getSubdivisions();
-        Preconditions.checkArgument(species.getNumberOfSubdivisions() ==mortalityParameters.length,
-                                    "There ought to be a mortality parameter for each subdivision/cohort");
+        Preconditions.checkArgument(
+            species.getNumberOfSubdivisions() == mortalityParameters.length,
+            "There ought to be a mortality parameter for each subdivision/cohort"
+        );
 
 
-        double scaling = daysSimulated/365d;
+        double scaling = daysSimulated / 365d;
         double[][] abundance = structuredAbundance.asMatrix();
-        for(int subdivision=0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
-        {
+        for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++) {
             double survivingProportion = Math.exp((-mortalityParameters[subdivision] * scaling));
 
-            for (int i = 0; i < structuredAbundance.getBins(); i++)
-            {
+            for (int i = 0; i < structuredAbundance.getBins(); i++) {
 
-                abundance[subdivision][i] =  abundance[subdivision][i] *
-                        survivingProportion;
+                abundance[subdivision][i] = abundance[subdivision][i] *
+                    survivingProportion;
                 if (rounding) {
                     abundance[subdivision][i] = (int) FishStateUtilities.round(abundance[subdivision][i]);
                 }

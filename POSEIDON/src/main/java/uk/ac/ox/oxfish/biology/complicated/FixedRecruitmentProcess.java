@@ -45,8 +45,9 @@ public class FixedRecruitmentProcess implements RecruitmentProcess {
      */
     @Override
     public double recruit(
-            Species species, Meristics meristics, StructuredAbundance abundance, int dayOfTheYear, int daysSimulated) {
-        return (yearlyRecruits * (1+noiseMaker.get())) * ((double)daysSimulated)/365d;
+        Species species, Meristics meristics, StructuredAbundance abundance, int dayOfTheYear, int daysSimulated
+    ) {
+        return (yearlyRecruits * (1 + noiseMaker.get())) * ((double) daysSimulated) / 365d;
     }
 
     /**

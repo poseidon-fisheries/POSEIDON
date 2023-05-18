@@ -46,9 +46,11 @@ public class KernelizedRandomAllocator implements BiomassAllocator {
 
     private KernelNumericalRegression smoother;
 
-    public KernelizedRandomAllocator(double maxAllocation, double minAllocation,
-                                     double bandwidth,
-                                     int fixedPoints) {
+    public KernelizedRandomAllocator(
+        double maxAllocation, double minAllocation,
+        double bandwidth,
+        int fixedPoints
+    ) {
         this.maxAllocation = maxAllocation;
         this.minAllocation = minAllocation;
         this.bandwidth = bandwidth;
@@ -66,36 +68,37 @@ public class KernelizedRandomAllocator implements BiomassAllocator {
      */
     @Override
     public double allocate(
-            SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
+        SeaTile tile, NauticalMap map, MersenneTwisterFast random
+    ) {
         //lazily initialize it
-        if(smoother == null) {
+        if (smoother == null) {
             smoother = new KernelNumericalRegression(
-                    new FeatureKernel[]{
-                            new RBFKernel(bandwidth),
-                            new RBFKernel(bandwidth)
-                    },
-                    fixedPoints
+                new FeatureKernel[]{
+                    new RBFKernel(bandwidth),
+                    new RBFKernel(bandwidth)
+                },
+                fixedPoints
             );
 
-            for(int i=0; i<fixedPoints; i++)
+            for (int i = 0; i < fixedPoints; i++)
                 smoother.observe(
-                        new double[]{
-                                random.nextDouble()*map.getWidth(),
-                                random.nextDouble()*map.getHeight()
+                    new double[]{
+                        random.nextDouble() * map.getWidth(),
+                        random.nextDouble() * map.getHeight()
 
-                        },
-                        random.nextDouble() * (maxAllocation-minAllocation) - minAllocation
+                    },
+                    random.nextDouble() * (maxAllocation - minAllocation) - minAllocation
                 );
 
         }
 
 
         return smoother.predict(
-                new double[]{
-                        tile.getGridX(),
-                        tile.getGridY()
+            new double[]{
+                tile.getGridX(),
+                tile.getGridY()
 
-                }
+            }
         );
     }
 }

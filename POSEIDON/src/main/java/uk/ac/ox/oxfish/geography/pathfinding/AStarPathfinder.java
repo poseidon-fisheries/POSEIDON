@@ -28,12 +28,7 @@ import uk.ac.ox.oxfish.geography.Distance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.PriorityQueue;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -53,6 +48,7 @@ public class AStarPathfinder implements Pathfinder {
     /**
      * creates the A* pathfinder it uses distanceFunction both for computing the cost of moving from A to its neighbors
      * and as a straight osmoseWFSPath heuristic
+     *
      * @param distanceFunction
      */
     public AStarPathfinder(Distance distanceFunction, PathMemory memory) {
@@ -76,8 +72,8 @@ public class AStarPathfinder implements Pathfinder {
     @Override
     @SuppressWarnings("OptionalAssignedToNull")
     public Deque<SeaTile> getRoute(
-            NauticalMap map, SeaTile start, SeaTile end)
-    {
+        NauticalMap map, SeaTile start, SeaTile end
+    ) {
         //preconditions
         Preconditions.checkNotNull(start);
         Preconditions.checkNotNull(end);
@@ -95,41 +91,39 @@ public class AStarPathfinder implements Pathfinder {
 
         //set of tiles to observe
         PriorityQueue<FrontierElement> frontier = new PriorityQueue<>();
-        frontier.add(new FrontierElement(start,0d));
+        frontier.add(new FrontierElement(start, 0d));
         //edges explored
-        HashMap<SeaTile,SeaTile> cameFrom= new HashMap<>();
+        HashMap<SeaTile, SeaTile> cameFrom = new HashMap<>();
         //best osmoseWFSPath cost to here so far
-        HashMap<SeaTile,Double> costSoFar = new HashMap<>();
-        costSoFar.put(start,0d);
+        HashMap<SeaTile, Double> costSoFar = new HashMap<>();
+        costSoFar.put(start, 0d);
 
 
         //go!
-        while(!frontier.isEmpty())
-        {
+        while (!frontier.isEmpty()) {
             //get the next element
             SeaTile current = frontier.poll().getTile();
-            assert  current!=null;
+            assert current != null;
             //stop if we have arrived
-            if(current == end)
+            if (current == end)
                 break;
 
             //get all your neighbors
             Bag neighbors = map.getMooreNeighbors(current, 1);
-            for(Object next : neighbors)
-            {
+            for (Object next : neighbors) {
                 SeaTile neighbor = ((SeaTile) next);
 
                 if (neighbor.isLand() && neighbor != end) //don't bother if it's land
                     continue;
 
                 //check how much it would cost to move there
-                double newCost = costSoFar.get(current) + distanceFunction.distance(current,neighbor,map );
-                if(!cameFrom.containsKey(neighbor) || newCost < costSoFar.get(neighbor)) //ignore tiles that aren't in the sea or that we explored already
+                double newCost = costSoFar.get(current) + distanceFunction.distance(current, neighbor, map);
+                if (!cameFrom.containsKey(neighbor) || newCost < costSoFar.get(neighbor)) //ignore tiles that aren't in the sea or that we explored already
                 {
-                    costSoFar.put(neighbor,newCost);
+                    costSoFar.put(neighbor, newCost);
                     double priority = newCost + distanceHeuristic.distance(end, neighbor, map);
-                    frontier.add(new FrontierElement(neighbor,priority));
-                    cameFrom.put(neighbor,current);
+                    frontier.add(new FrontierElement(neighbor, priority));
+                    cameFrom.put(neighbor, current);
                 }
 
             }
@@ -138,18 +132,16 @@ public class AStarPathfinder implements Pathfinder {
         }
 
         //if you haven't found the osmoseWFSPath, then return null
-        if(cameFrom.get(end) == null)
-        {
+        if (cameFrom.get(end) == null) {
             memory.putImpossiblePath(start, end);
             return null;
         }
         //build the osmoseWFSPath
         SeaTile current = end;
         path.add(current);
-        while(current != start)
-        {
+        while (current != start) {
             current = cameFrom.get(current);
-            assert current!=null;
+            assert current != null;
             path.add(current);
         }
 
@@ -165,8 +157,7 @@ public class AStarPathfinder implements Pathfinder {
     }
 
 
-    private class FrontierElement implements Comparable<FrontierElement>
-    {
+    private class FrontierElement implements Comparable<FrontierElement> {
 
 
         private final SeaTile tile;
@@ -189,7 +180,7 @@ public class AStarPathfinder implements Pathfinder {
 
         @Override
         public int compareTo(FrontierElement o) {
-            return Double.compare(this.priority,o.priority);
+            return Double.compare(this.priority, o.priority);
         }
     }
 }

@@ -34,13 +34,13 @@ public class MovingSumTest {
         MovingSum<Integer> movingSum = new MovingSum<>(3);
         Assert.assertTrue(Double.isNaN(movingSum.getSmoothedObservation()));
         movingSum.addObservation(10);
-        Assert.assertEquals(10f,movingSum.getSmoothedObservation(),.0001d);
+        Assert.assertEquals(10f, movingSum.getSmoothedObservation(), .0001d);
         movingSum.addObservation(20);
-        Assert.assertEquals(30f,movingSum.getSmoothedObservation(),.0001d);
+        Assert.assertEquals(30f, movingSum.getSmoothedObservation(), .0001d);
         movingSum.addObservation(30);
-        Assert.assertEquals(60f,movingSum.getSmoothedObservation(),.0001d);
+        Assert.assertEquals(60f, movingSum.getSmoothedObservation(), .0001d);
         movingSum.addObservation(40);
-        Assert.assertEquals(90f,movingSum.getSmoothedObservation(),.0001d);
+        Assert.assertEquals(90f, movingSum.getSmoothedObservation(), .0001d);
 
     }
 

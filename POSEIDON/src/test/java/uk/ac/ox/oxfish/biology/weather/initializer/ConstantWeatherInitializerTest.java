@@ -39,30 +39,30 @@ public class ConstantWeatherInitializerTest {
     public void initializesCorrectly() throws Exception {
 
         ConstantWeatherInitializer initializer = new ConstantWeatherInitializer(
-                new FixedDoubleParameter(100),
-                new FixedDoubleParameter(100),
-                new FixedDoubleParameter(999) //this will be automatically bounded to 360
+            new FixedDoubleParameter(100),
+            new FixedDoubleParameter(100),
+            new FixedDoubleParameter(999) //this will be automatically bounded to 360
         );
 
         FishState state = generateSimple4x4Map();
         NauticalMap map = state.getMap();
 
         //shouldn't have any local weather
-        for(int x=0; x<4; x++)
-            for(int y=0; y<4; y++)
+        for (int x = 0; x < 4; x++)
+            for (int y = 0; y < 4; y++)
                 assertNull(map.getSeaTile(x, y).grabLocalWeather());
 
 
-        initializer.processMap(state.getMap(),new MersenneTwisterFast(),state);
+        initializer.processMap(state.getMap(), new MersenneTwisterFast(), state);
 
 
-        for(int x=0; x<4; x++)
-            for(int y=0; y<4; y++) {
+        for (int x = 0; x < 4; x++)
+            for (int y = 0; y < 4; y++) {
                 SeaTile tile = map.getSeaTile(x, y);
                 assertTrue(tile.grabLocalWeather() instanceof ConstantWeather);
-                assertEquals(tile.getTemperatureInCelsius(),100,.001);
-                assertEquals(tile.getWindSpeedInKph(),100,.001);
-                assertEquals(tile.getWindDirection(),360,.001); //bounded!
+                assertEquals(tile.getTemperatureInCelsius(), 100, .001);
+                assertEquals(tile.getWindSpeedInKph(), 100, .001);
+                assertEquals(tile.getWindDirection(), 360, .001); //bounded!
             }
     }
 }

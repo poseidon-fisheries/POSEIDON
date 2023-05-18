@@ -35,24 +35,24 @@ import uk.ac.ox.oxfish.utility.adaptation.Sensor;
  * anything really
  * Created by carrknight on 10/11/16.
  */
-public abstract class Controller implements Steppable,Startable {
+public abstract class Controller implements Steppable, Startable {
 
 
     /**
      * returns the current value of the variable we are trying to manipulate
      */
-    private final Sensor<FishState,Double> observed;
+    private final Sensor<FishState, Double> observed;
 
     /**
      * returns the current value we would like the variable to be at
      */
-    private final Sensor<FishState,Double> target;
+    private final Sensor<FishState, Double> target;
 
 
     /**
      * act on policy value
      */
-    private final Actuator<FishState,Double>  actuator;
+    private final Actuator<FishState, Double> actuator;
 
     /**
      * how often do we act? (in days)
@@ -68,10 +68,11 @@ public abstract class Controller implements Steppable,Startable {
 
 
     public Controller(
-            Sensor<FishState, Double> observed,
-            Sensor<FishState, Double> target,
-            Actuator<FishState, Double> actuator,
-            int intervalInDays) {
+        Sensor<FishState, Double> observed,
+        Sensor<FishState, Double> target,
+        Actuator<FishState, Double> actuator,
+        int intervalInDays
+    ) {
         this.observed = observed;
         this.target = target;
         this.actuator = actuator;
@@ -85,15 +86,17 @@ public abstract class Controller implements Steppable,Startable {
         double currentVariable = observed.scan(model);
         double currentTarget = target.scan(model);
 
-        policy = computePolicy(currentVariable,currentTarget,model,policy);
+        policy = computePolicy(currentVariable, currentTarget, model, policy);
 
-        actuator.apply(model,policy,model);
+        actuator.apply(model, policy, model);
 
 
     }
 
-    public abstract double computePolicy(double currentVariable, double target,
-                                         FishState model, double oldPolicy);
+    public abstract double computePolicy(
+        double currentVariable, double target,
+        FishState model, double oldPolicy
+    );
 
 
     /**
@@ -104,7 +107,7 @@ public abstract class Controller implements Steppable,Startable {
      */
     @Override
     public void start(FishState model) {
-        Preconditions.checkArgument(receipt==null);
+        Preconditions.checkArgument(receipt == null);
         receipt = model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE, intervalInDays);
     }
 
@@ -113,7 +116,7 @@ public abstract class Controller implements Steppable,Startable {
      */
     @Override
     public void turnOff() {
-        if(receipt!=null)
+        if (receipt != null)
             receipt.stop();
     }
 

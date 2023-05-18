@@ -37,13 +37,12 @@ import java.nio.file.Paths;
 public class MaximumSustainableYield {
 
 
-
     ///home/carrknight/code/oxfish/inputs/first_paper/sensitivity/quotas/separated.yaml
     private final static Path MAIN_FILE =
-            Paths.get("inputs", "first_paper", "sensitivity","quotas","separated.yaml");
+        Paths.get("inputs", "first_paper", "sensitivity", "quotas", "separated.yaml");
 
     private final static Path OUTPUT_FILE =
-            Paths.get("docs", "20180201 msy");
+        Paths.get("docs", "20180201 msy");
 
     private final static int MAX_YEARS = 100;
 
@@ -56,25 +55,25 @@ public class MaximumSustainableYield {
 
     private static void random() throws IOException {
 
-        FileWriter writer = new FileWriter(OUTPUT_FILE.resolve("random.csv").toFile(),true);
+        FileWriter writer = new FileWriter(OUTPUT_FILE.resolve("random.csv").toFile(), true);
 
-        if(!OUTPUT_FILE.resolve("random.csv").toFile().exists() ||
-                OUTPUT_FILE.resolve("random.csv").toFile().length()/1024 < 1) {
+        if (!OUTPUT_FILE.resolve("random.csv").toFile().exists() ||
+            OUTPUT_FILE.resolve("random.csv").toFile().length() / 1024 < 1) {
             writer.write("fishers,run,landings_blue,landings_red,year");
             writer.write("\n");
             writer.flush();
         }
 
-        for(int fishers=200; fishers<300; fishers+=1)
-        {
+        for (int fishers = 200; fishers < 300; fishers += 1) {
 
-            for(int run=0; run<5; run++)
-            {
+            for (int run = 0; run < 5; run++) {
 
 
                 FishYAML yaml = new FishYAML();
-                PrototypeScenario scenario = yaml.loadAs(new FileReader(MAIN_FILE.toFile()),
-                                                         PrototypeScenario.class);
+                PrototypeScenario scenario = yaml.loadAs(
+                    new FileReader(MAIN_FILE.toFile()),
+                    PrototypeScenario.class
+                );
                 scenario.setFishers(fishers);
                 scenario.setRegulation(new AnarchyFactory());
                 scenario.setDestinationStrategy(new RandomThenBackToPortFactory());
@@ -83,11 +82,9 @@ public class MaximumSustainableYield {
 
 
                 model.start();
-                while(model.getYear()<MAX_YEARS)
-                {
+                while (model.getYear() < MAX_YEARS) {
                     model.schedule.step(model);
-                    if(model.getDayOfTheYear()==1 && model.getYear()>0)
-                    {
+                    if (model.getDayOfTheYear() == 1 && model.getYear() > 0) {
                         writer.write(Integer.toString(fishers));
                         writer.write(",");
                         writer.write(Integer.toString(run));
@@ -101,7 +98,6 @@ public class MaximumSustainableYield {
                         writer.flush();
                     }
                 }
-
 
 
             }
@@ -121,32 +117,30 @@ public class MaximumSustainableYield {
         writer.flush();
 
 
-        for(int fishers=10; fishers<200; fishers+=1)
-        {
+        for (int fishers = 10; fishers < 200; fishers += 1) {
 
-            for(int run=0; run<5; run++)
-            {
+            for (int run = 0; run < 5; run++) {
 
 
                 FishYAML yaml = new FishYAML();
-                PrototypeScenario scenario = yaml.loadAs(new FileReader(MAIN_FILE.toFile()),
-                                                         PrototypeScenario.class);
+                PrototypeScenario scenario = yaml.loadAs(
+                    new FileReader(MAIN_FILE.toFile()),
+                    PrototypeScenario.class
+                );
                 scenario.setFishers(fishers);
                 scenario.setRegulation(new ProtectedAreasOnlyFactory());
                 scenario.getStartingMPAs().add(
-                        new StartingMPA(
-                                0,25,50,50
-                        )
+                    new StartingMPA(
+                        0, 25, 50, 50
+                    )
                 );
                 FishState model = new FishState(run);
                 model.setScenario(scenario);
 
                 model.start();
-                while(model.getYear()<MAX_YEARS)
-                {
+                while (model.getYear() < MAX_YEARS) {
                     model.schedule.step(model);
-                    if(model.getDayOfTheYear()==1 && model.getYear()>0)
-                    {
+                    if (model.getDayOfTheYear() == 1 && model.getYear() > 0) {
                         writer.write(Integer.toString(fishers));
                         writer.write(",");
                         writer.write(Integer.toString(run));
@@ -160,7 +154,6 @@ public class MaximumSustainableYield {
                         writer.flush();
                     }
                 }
-
 
 
             }
@@ -180,27 +173,25 @@ public class MaximumSustainableYield {
         writer.flush();
 
 
-        for(int fishers=10; fishers<200; fishers+=1)
-        {
+        for (int fishers = 10; fishers < 200; fishers += 1) {
 
-            for(int run=0; run<5; run++)
-            {
+            for (int run = 0; run < 5; run++) {
 
 
                 FishYAML yaml = new FishYAML();
-                PrototypeScenario scenario = yaml.loadAs(new FileReader(MAIN_FILE.toFile()),
-                                                                  PrototypeScenario.class);
+                PrototypeScenario scenario = yaml.loadAs(
+                    new FileReader(MAIN_FILE.toFile()),
+                    PrototypeScenario.class
+                );
                 scenario.setFishers(fishers);
                 scenario.setRegulation(new AnarchyFactory());
                 FishState model = new FishState(run);
                 model.setScenario(scenario);
 
                 model.start();
-                while(model.getYear()<MAX_YEARS)
-                {
+                while (model.getYear() < MAX_YEARS) {
                     model.schedule.step(model);
-                    if(model.getDayOfTheYear()==1 && model.getYear()>0)
-                    {
+                    if (model.getDayOfTheYear() == 1 && model.getYear() > 0) {
                         writer.write(Integer.toString(fishers));
                         writer.write(",");
                         writer.write(Integer.toString(run));
@@ -214,7 +205,6 @@ public class MaximumSustainableYield {
                         writer.flush();
                     }
                 }
-
 
 
             }

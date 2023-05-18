@@ -58,10 +58,10 @@ public class ImitationWorksWhenPeopleAreFromDifferentPorts {
         scenario.setLargeFishers(100);
 
         ((PerTripImitativeDestinationFactory) scenario.getDestinationStrategySmall()).setObjectiveFunction(
-                new SimulatedProfitCPUEObjectiveFactory()
+            new SimulatedProfitCPUEObjectiveFactory()
         );
         ((PerTripImitativeDestinationFactory) scenario.getDestinationStrategyLarge()).setObjectiveFunction(
-                new SimulatedProfitCPUEObjectiveFactory()
+            new SimulatedProfitCPUEObjectiveFactory()
         );
 
         EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
@@ -89,51 +89,49 @@ public class ImitationWorksWhenPeopleAreFromDifferentPorts {
         state.schedule.step(state);
 
         // make sure there are people in both ports!
-        int port1= 0;
+        int port1 = 0;
         int port2 = 0;
-        for(Fisher fisher : state.getFishers()) {
+        for (Fisher fisher : state.getFishers()) {
             if (fisher.getHomePort().getName().equals("port1"))
                 port1++;
             else
                 port2++;
         }
-        assertTrue(port1>0);
-        assertTrue(port2>0);
+        assertTrue(port1 > 0);
+        assertTrue(port2 > 0);
 
         //make sure people have friends in opposite ports
         int crossFriendships = 0;
-        for(Fisher fisher : state.getFishers())
-            for(Fisher friend : fisher.getDirectedFriends())
-                if(fisher.getHomePort() != friend.getHomePort())
+        for (Fisher fisher : state.getFishers())
+            for (Fisher friend : fisher.getDirectedFriends())
+                if (fisher.getHomePort() != friend.getHomePort())
                     crossFriendships++;
 
 
-        assertTrue(crossFriendships>0);
+        assertTrue(crossFriendships > 0);
 
 
         //step for 100 days
-        for(int i=0; i<300; i++)
+        for (int i = 0; i < 300; i++)
             state.schedule.step(state);
 
 
         DoubleSummaryStatistics averageXFishedPort1 = new DoubleSummaryStatistics();
-        DoubleSummaryStatistics averageXFishedPort2= new DoubleSummaryStatistics();
-        DoubleSummaryStatistics averageYFishedPort1= new DoubleSummaryStatistics();
-        DoubleSummaryStatistics averageYFishedPort2= new DoubleSummaryStatistics();
+        DoubleSummaryStatistics averageXFishedPort2 = new DoubleSummaryStatistics();
+        DoubleSummaryStatistics averageYFishedPort1 = new DoubleSummaryStatistics();
+        DoubleSummaryStatistics averageYFishedPort2 = new DoubleSummaryStatistics();
 
         //gather data:
-        for(Fisher fisher : state.getFishers()) {
+        for (Fisher fisher : state.getFishers()) {
             TripRecord lastTrip = fisher.getLastFinishedTrip();
             SeaTile tile = lastTrip.getMostFishedTileInTrip();
             int gridX = tile.getGridX();
             int gridY = tile.getGridY();
-            if (fisher.getHomePort().getName().equals("port1"))
-            {
+            if (fisher.getHomePort().getName().equals("port1")) {
 
                 averageXFishedPort1.accept(gridX);
                 averageYFishedPort1.accept(gridY);
-            }
-            else {
+            } else {
                 averageXFishedPort2.accept(gridX);
                 averageYFishedPort2.accept(gridY);
             }
@@ -149,9 +147,9 @@ public class ImitationWorksWhenPeopleAreFromDifferentPorts {
         System.out.println(y1);
         System.out.println(y2);
 
-        assertEquals(x1,39,2);
-        assertEquals(x2,39,2);
-        assertEquals(y1,0,2);
-        assertEquals(y2,49,2);
+        assertEquals(x1, 39, 2);
+        assertEquals(x2, 39, 2);
+        assertEquals(y1, 0, 2);
+        assertEquals(y2, 49, 2);
     }
 }

@@ -31,12 +31,9 @@ import uk.ac.ox.oxfish.model.FishState;
 public interface GasPriceMaker {
 
 
-
-    public  double supplyInitialPrice(SeaTile location,String portName);
+    public double supplyInitialPrice(SeaTile location, String portName);
 
     public void start(Port port, FishState model);
-
-
 
 
 }

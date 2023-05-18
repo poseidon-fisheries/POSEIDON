@@ -22,17 +22,18 @@ package uk.ac.ox.oxfish.biology;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import java.util.Arrays;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+
+import java.util.Arrays;
 
 /**
  * A simple local biology that has carrying capacity and actual biomass.
  * Created by carrknight on 5/8/15.
  */
 public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements Startable,
-        VariableBiomassBasedBiology {
+    VariableBiomassBasedBiology {
 
     /**
      * the current amount of biomass in this spot
@@ -43,10 +44,17 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
      * the maximum amount of biomass
      */
     private double[] carryingCapacity;
+    /**
+     * proof that you have started
+     */
+    private boolean started;
+    private boolean stopped;
+
 
     /**
      * Initialize the local biology with biomass information only.
      * Carrying capacity is set to an array of NaN.
+     *
      * @param currentBiomass the biomass available.
      */
     public BiomassLocalBiology(final double[] currentBiomass) {
@@ -55,23 +63,33 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
         Arrays.fill(carryingCapacity, Double.NaN);
     }
 
+
     /**
      * initialize the local biology
-     * @param currentBiomass the biomass available
+     *
+     * @param currentBiomass   the biomass available
      * @param carryingCapacity the maximum amount of fish
      */
     public BiomassLocalBiology(
-            double[] currentBiomass, double[] carryingCapacity) {
-        Preconditions.checkArgument(currentBiomass.length==carryingCapacity.length);
+        double[] currentBiomass, double[] carryingCapacity
+    ) {
+        Preconditions.checkArgument(currentBiomass.length == carryingCapacity.length);
 
-        this.currentBiomass = Arrays.copyOf(currentBiomass,currentBiomass.length);
-        this.carryingCapacity =Arrays.copyOf(carryingCapacity,carryingCapacity.length);
+        this.currentBiomass = Arrays.copyOf(currentBiomass, currentBiomass.length);
+        this.carryingCapacity = Arrays.copyOf(carryingCapacity, carryingCapacity.length);
 
     }
 
+    public BiomassLocalBiology(
+        double carryingCapacity, int species,
+        MersenneTwisterFast random
+    ) {
+        this(carryingCapacity, species, random, 1, 0);
+    }
 
     /**
      * create a logistic local biology where we specify how much of the biomass is currently available
+     *
      * @param carryingCapacity
      * @param species
      * @param random
@@ -79,29 +97,23 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
      * @param initialMinCapacity min proportion 0 to 1 of carrying capacity that might be available at this cell
      */
     public BiomassLocalBiology(
-            double carryingCapacity, int species,
-            MersenneTwisterFast random, double initialMaxCapacity, double initialMinCapacity)
-    {
-        assert initialMaxCapacity>= initialMinCapacity;
-        assert  initialMaxCapacity >=0;
-        assert  initialMinCapacity <=1;
+        double carryingCapacity, int species,
+        MersenneTwisterFast random, double initialMaxCapacity, double initialMinCapacity
+    ) {
+        assert initialMaxCapacity >= initialMinCapacity;
+        assert initialMaxCapacity >= 0;
+        assert initialMinCapacity <= 1;
         this.carryingCapacity = new double[species];
         Arrays.fill(this.carryingCapacity, carryingCapacity);
         this.currentBiomass = new double[species];
 
-        for(int i=0; i<currentBiomass.length; i++)
-        {
-            currentBiomass[i] = ((initialMaxCapacity - initialMinCapacity)*random.nextDouble(true, true) + initialMinCapacity)
-                    * carryingCapacity;
+        for (int i = 0; i < currentBiomass.length; i++) {
+            currentBiomass[i] = ((initialMaxCapacity - initialMinCapacity) * random.nextDouble(
+                true,
+                true
+            ) + initialMinCapacity)
+                * carryingCapacity;
         }
-    }
-
-
-    public BiomassLocalBiology(
-            double carryingCapacity, int species,
-            MersenneTwisterFast random)
-    {
-        this(carryingCapacity, species, random, 1, 0);
     }
 
     /**
@@ -113,7 +125,7 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
     @Override
     public double getBiomass(Species species) {
         final int index = species.getIndex();
-        if(index>=this.currentBiomass.length)
+        if (index >= this.currentBiomass.length)
             return 0d; //don't have it
         else
             return this.currentBiomass[index];
@@ -121,14 +133,14 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
 
     /**
      * the carrying capacity of this location for this species
+     *
      * @param species the species
      * @return the carrying capacity for this species at this location
      */
     @Override
-    public double getCarryingCapacity(Species species)
-    {
+    public double getCarryingCapacity(Species species) {
         final int index = species.getIndex();
-        if(index>=this.carryingCapacity.length)
+        if (index >= this.carryingCapacity.length)
             return 0d; //don't have it
         else
             return this.carryingCapacity[index];
@@ -136,83 +148,92 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
 
     /**
      * the carrying capacity of this location for this species
+     *
      * @param index the species
      * @return the carrying capacity for this species at this location
      */
     @Override
-    public double getCarryingCapacity(int index)
-    {
-        if(index>=this.carryingCapacity.length)
+    public double getCarryingCapacity(int index) {
+        if (index >= this.carryingCapacity.length)
             return 0d; //don't have it
         else
             return this.carryingCapacity[index];
     }
 
-
-
-
-
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
-     *  @param caught
+     *
+     * @param caught
      * @param notDiscarded
      * @param biology
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-            Catch caught, Catch notDiscarded, GlobalBiology biology) {
+        Catch caught, Catch notDiscarded, GlobalBiology biology
+    ) {
 
-        Preconditions.checkArgument(!caught.hasAbundanceInformation(),
-                                    "using abundance driven catches with biomass driven biology!");
+        Preconditions.checkArgument(
+            !caught.hasAbundanceInformation(),
+            "using abundance driven catches with biomass driven biology!"
+        );
 
-        for(int speciesIndex =0; speciesIndex< caught.numberOfSpecies(); speciesIndex++)
-        {
+        for (int speciesIndex = 0; speciesIndex < caught.numberOfSpecies(); speciesIndex++) {
             //if you caught anything
             double biomassFishedOut = caught.getWeightCaught(speciesIndex);
-            if(biomassFishedOut > 0 && !biology.getSpecie(speciesIndex).isImaginary())
-            {
-                assert currentBiomass[speciesIndex]>=biomassFishedOut :
-                                            "going to fish more biomass than available for species " + speciesIndex + " , fishedOut: " + biomassFishedOut +
-                                                    ", currentBiomass " + currentBiomass[speciesIndex];
-                currentBiomass[speciesIndex]-= biomassFishedOut;
-                assert currentBiomass[speciesIndex] >=0 :
-                                         "fished more biomass than available for species " + speciesIndex + " , fishedOut: " + biomassFishedOut +
-                                                 ", currentBiomass " + currentBiomass[speciesIndex];
+            if (biomassFishedOut > 0 && !biology.getSpecie(speciesIndex).isImaginary()) {
+                assert currentBiomass[speciesIndex] >= biomassFishedOut :
+                    "going to fish more biomass than available for species " + speciesIndex + " , fishedOut: " + biomassFishedOut +
+                        ", currentBiomass " + currentBiomass[speciesIndex];
+                currentBiomass[speciesIndex] -= biomassFishedOut;
+                assert currentBiomass[speciesIndex] >= 0 :
+                    "fished more biomass than available for species " + speciesIndex + " , fishedOut: " + biomassFishedOut +
+                        ", currentBiomass " + currentBiomass[speciesIndex];
             }
         }
 
 
-
-
     }
 
-
-
-
-
     /**
-     *  set a new carrying capacity, might modify the current biomass
-     * @param s the specie
+     * set a new carrying capacity, might modify the current biomass
+     *
+     * @param s                   the specie
      * @param newCarryingCapacity the new carrying capacity
      */
     @Override
-    public void setCarryingCapacity(Species s, double newCarryingCapacity)
-    {
+    public void setCarryingCapacity(Species s, double newCarryingCapacity) {
         Preconditions.checkArgument(newCarryingCapacity >= 0, "new carrying capacity must be positive");
 
         final int index = s.getIndex();
-        if(index >=currentBiomass.length)
-            growArrays(index +1);
+        if (index >= currentBiomass.length)
+            growArrays(index + 1);
         carryingCapacity[index] = newCarryingCapacity;
         //don't let currentbiomass be above carryingCapacity
-        currentBiomass[index] = Math.min(currentBiomass[index],newCarryingCapacity);
-        assert currentBiomass[index]>=0;
+        currentBiomass[index] = Math.min(currentBiomass[index], newCarryingCapacity);
+        assert currentBiomass[index] >= 0;
     }
 
+    /**
+     * pad with zeros
+     *
+     * @param newSize new array size
+     */
+    private void growArrays(int newSize) {
+        final int oldSize = currentBiomass.length;
+        assert oldSize < newSize;
+        currentBiomass = Arrays.copyOf(currentBiomass, newSize);
+        carryingCapacity = Arrays.copyOf(carryingCapacity, newSize);
+        //fill them
+        for (int i = oldSize; i < newSize; i++) {
+            currentBiomass[i] = 0d;
+            carryingCapacity[i] = 0d;
+        }
+    }
 
     /**
      * sets the new current biomass. Must be lower than carrying capacity
-     * @param s the specie
+     *
+     * @param s                 the specie
      * @param newCurrentBiomass the new biomass in lbs
      */
     @Override
@@ -226,23 +247,16 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
     }
 
     /**
-     * proof that you have started
-     */
-    private boolean started;
-
-    private boolean stopped;
-
-
-    /**
      * schedule to act each year
+     *
      * @param model the model to schedule on
      */
     @Override
     public void start(FishState model) {
 
-        Preconditions.checkArgument(!started,"Already started");
+        Preconditions.checkArgument(!started, "Already started");
 
-        started=true;
+        started = true;
     }
 
     /**
@@ -250,7 +264,6 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
      */
     @Override
     public void turnOff() {
-
 
 
         stopped = true;
@@ -265,25 +278,6 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
     public boolean isStopped() {
         return stopped;
     }
-
-    /**
-     * pad with zeros
-     * @param newSize new array size
-     */
-    private void growArrays(int newSize)
-    {
-        final int oldSize = currentBiomass.length;
-        assert oldSize < newSize;
-        currentBiomass = Arrays.copyOf(currentBiomass,newSize);
-        carryingCapacity = Arrays.copyOf(carryingCapacity,newSize);
-        //fill them
-        for(int i=oldSize; i<newSize; i++)
-        {
-            currentBiomass[i]=0d;
-            carryingCapacity[i]=0d;
-        }
-    }
-
 
     @Override
     public double[] getCurrentBiomass() {

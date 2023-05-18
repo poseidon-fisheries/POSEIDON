@@ -40,28 +40,29 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
-public class TwoSpeciesBoxInitializerTest
-{
+public class TwoSpeciesBoxInitializerTest {
 
 
     @Test
     public void killsOffCorrectly() throws Exception {
 
 
-        GenericBiomassInitializer initializer = new
-                GenericBiomassInitializer(
-                Lists.newArrayList(
-                        new FixedDoubleParameter(100d),new FixedDoubleParameter(100d)),
-                new FixedDoubleParameter(0),
-                new FixedDoubleParameter(1),
-                0d,0d,
-                new SimpleLogisticGrowerInitializer(new FixedDoubleParameter(1d)),
-                Lists.newArrayList(
-                        new BoundedAllocatorDecorator(0, 0, 9, 9, false, 
-new ConstantBiomassAllocator() ),
-                        new BoundedAllocatorDecorator(0, 0, 9, 9, true, 
-new ConstantBiomassAllocator() )
+        final GenericBiomassInitializer initializer = new
+            GenericBiomassInitializer(
+            Lists.newArrayList(
+                new FixedDoubleParameter(100d), new FixedDoubleParameter(100d)),
+            new FixedDoubleParameter(0),
+            new FixedDoubleParameter(1),
+            0d, 0d,
+            new SimpleLogisticGrowerInitializer(new FixedDoubleParameter(1d)),
+            Lists.newArrayList(
+                new BoundedAllocatorDecorator(0, 0, 9, 9, false,
+                    new ConstantBiomassAllocator()
+                ),
+                new BoundedAllocatorDecorator(0, 0, 9, 9, true,
+                    new ConstantBiomassAllocator()
                 )
+            )
         );
 
         /*
@@ -79,46 +80,49 @@ new ConstantBiomassAllocator() )
         );
 */
 
-        GlobalBiology biology = new GlobalBiology(new Species("A"), new Species("B"));
+        final GlobalBiology biology = new GlobalBiology(new Species("A"), new Species("B"));
         //at 0,0 there is no species 0
-        VariableBiomassBasedBiology zerozero = (VariableBiomassBasedBiology)
-                initializer.generateLocal(biology,
-                                          new SeaTile(0, 0, -100, mock(TileHabitat.class)),
-                                          new MersenneTwisterFast(),
-                                          100,
-                                          100,
-                                          mock(NauticalMap.class)
-                );
+        final VariableBiomassBasedBiology zerozero = (VariableBiomassBasedBiology)
+            initializer.generateLocal(
+                biology,
+                new SeaTile(0, 0, -100, mock(TileHabitat.class)),
+                new MersenneTwisterFast(),
+                100,
+                100,
+                mock(NauticalMap.class)
+            );
 
-        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(0)),0,.0001 );
-        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(1)),100,.0001 );
+        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(0)), 0, .0001);
+        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(1)), 100, .0001);
 
         //at 5,5 also no species 0
-        VariableBiomassBasedBiology fivefive = (VariableBiomassBasedBiology)
-                initializer.generateLocal(biology,
-                                          new SeaTile(5,5, -100, mock(TileHabitat.class)),
-                                          new MersenneTwisterFast(),
-                                          100,
-                                          100,
-                                          mock(NauticalMap.class)
+        final VariableBiomassBasedBiology fivefive = (VariableBiomassBasedBiology)
+            initializer.generateLocal(
+                biology,
+                new SeaTile(5, 5, -100, mock(TileHabitat.class)),
+                new MersenneTwisterFast(),
+                100,
+                100,
+                mock(NauticalMap.class)
 
-                );
-        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(0)),0,.0001 );
-        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(1)),100,.0001 );
+            );
+        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(0)), 0, .0001);
+        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(1)), 100, .0001);
 
 
         //at 10,10 there is no species 1
-        VariableBiomassBasedBiology tenten = (VariableBiomassBasedBiology)
-                initializer.generateLocal(biology,
-                                          new SeaTile(10,10, -100, mock(TileHabitat.class)),
-                                          new MersenneTwisterFast(),
-                                          100,
-                                          100,
-                                          mock(NauticalMap.class)
+        final VariableBiomassBasedBiology tenten = (VariableBiomassBasedBiology)
+            initializer.generateLocal(
+                biology,
+                new SeaTile(10, 10, -100, mock(TileHabitat.class)),
+                new MersenneTwisterFast(),
+                100,
+                100,
+                mock(NauticalMap.class)
 
-                );
-        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(0)),100,.0001 );
-        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(1)),0,.0001 );
+            );
+        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(0)), 100, .0001);
+        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(1)), 0, .0001);
     }
 
     @Test
@@ -140,7 +144,7 @@ new ConstantBiomassAllocator() )
 */
 
 
-        TwoSpeciesBoxFactory factory = new TwoSpeciesBoxFactory();
+        final TwoSpeciesBoxFactory factory = new TwoSpeciesBoxFactory();
         factory.setBoxHeight(new FixedDoubleParameter(10d));
         factory.setBoxWidth(new FixedDoubleParameter(10d));
         factory.setDifferentialPercentageToMove(new FixedDoubleParameter(0));
@@ -149,48 +153,51 @@ new ConstantBiomassAllocator() )
         factory.setFirstSpeciesCapacity(new FixedDoubleParameter(100d));
         factory.setRatioFirstToSecondSpecies(new FixedDoubleParameter(1d));
 
-        GenericBiomassInitializer initializer = factory.apply(mock(FishState.class));
+        final GenericBiomassInitializer initializer = factory.apply(mock(FishState.class));
 
-        GlobalBiology biology = new GlobalBiology(new Species("A"), new Species("B"));
+        final GlobalBiology biology = new GlobalBiology(new Species("A"), new Species("B"));
         //at 0,0 there is no species 0
-        VariableBiomassBasedBiology zerozero = (VariableBiomassBasedBiology)
-                initializer.generateLocal(biology,
-                                          new SeaTile(0, 0, -100, mock(TileHabitat.class)),
-                                          new MersenneTwisterFast(),
-                                          100,
-                                          100,
-                                          mock(NauticalMap.class)
-                );
+        final VariableBiomassBasedBiology zerozero = (VariableBiomassBasedBiology)
+            initializer.generateLocal(
+                biology,
+                new SeaTile(0, 0, -100, mock(TileHabitat.class)),
+                new MersenneTwisterFast(),
+                100,
+                100,
+                mock(NauticalMap.class)
+            );
 
-        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(0)),0,.0001 );
-        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(1)),100,.0001 );
+        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(0)), 0, .0001);
+        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(1)), 100, .0001);
 
         //at 5,5 also no species 0
-        VariableBiomassBasedBiology fivefive = (VariableBiomassBasedBiology)
-                initializer.generateLocal(biology,
-                                          new SeaTile(5,5, -100, mock(TileHabitat.class)),
-                                          new MersenneTwisterFast(),
-                                          100,
-                                          100,
-                                          mock(NauticalMap.class)
+        final VariableBiomassBasedBiology fivefive = (VariableBiomassBasedBiology)
+            initializer.generateLocal(
+                biology,
+                new SeaTile(5, 5, -100, mock(TileHabitat.class)),
+                new MersenneTwisterFast(),
+                100,
+                100,
+                mock(NauticalMap.class)
 
-                );
-        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(0)),0,.0001 );
-        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(1)),100,.0001 );
+            );
+        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(0)), 0, .0001);
+        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(1)), 100, .0001);
 
 
         //at 10,10 there is no species 1
-        VariableBiomassBasedBiology tenten = (VariableBiomassBasedBiology)
-                initializer.generateLocal(biology,
-                                          new SeaTile(10,10, -100, mock(TileHabitat.class)),
-                                          new MersenneTwisterFast(),
-                                          100,
-                                          100,
-                                          mock(NauticalMap.class)
+        final VariableBiomassBasedBiology tenten = (VariableBiomassBasedBiology)
+            initializer.generateLocal(
+                biology,
+                new SeaTile(10, 10, -100, mock(TileHabitat.class)),
+                new MersenneTwisterFast(),
+                100,
+                100,
+                mock(NauticalMap.class)
 
-                );
-        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(0)),100,.0001 );
-        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(1)),0,.0001 );
+            );
+        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(0)), 100, .0001);
+        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(1)), 0, .0001);
 
     }
 }

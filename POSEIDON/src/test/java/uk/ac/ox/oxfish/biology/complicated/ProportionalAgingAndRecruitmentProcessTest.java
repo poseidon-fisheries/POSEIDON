@@ -36,7 +36,6 @@ import static org.mockito.Mockito.when;
 public class ProportionalAgingAndRecruitmentProcessTest {
 
 
-
     @Test
     public void halfAge() throws Exception {
 
@@ -56,11 +55,10 @@ public class ProportionalAgingAndRecruitmentProcessTest {
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         process.ageLocally(bio, species, model, true, 365);
 
-        assertArrayEquals(male,new double[]{5,15,25},.001);
-        assertArrayEquals(female,new double[]{50,150,250},.001);
+        assertArrayEquals(male, new double[]{5, 15, 25}, .001);
+        assertArrayEquals(female, new double[]{50, 150, 250}, .001);
 
     }
-
 
 
 }

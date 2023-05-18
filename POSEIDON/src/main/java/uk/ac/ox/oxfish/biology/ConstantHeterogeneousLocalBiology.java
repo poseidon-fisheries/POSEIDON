@@ -48,14 +48,16 @@ public class ConstantHeterogeneousLocalBiology extends AbstractBiomassBasedBiolo
     }
 
     /**
-     *  nothing
+     * nothing
+     *
      * @param caught
      * @param notDiscarded
      * @param biology
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-            Catch caught, Catch notDiscarded, GlobalBiology biology) {
+        Catch caught, Catch notDiscarded, GlobalBiology biology
+    ) {
 
     }
 

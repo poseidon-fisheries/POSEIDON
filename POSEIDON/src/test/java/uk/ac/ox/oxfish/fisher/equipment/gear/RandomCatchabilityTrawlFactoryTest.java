@@ -42,29 +42,33 @@ public class RandomCatchabilityTrawlFactoryTest {
         MersenneTwisterFast random = mock(MersenneTwisterFast.class);
         when(mock.grabRandomizer()).thenReturn(random);
 
-        RandomCatchabilityTrawl thrawl = new RandomCatchabilityTrawl(new double[]{.5},
-                                                                       new double[]{.1},
-                                                                       100);
+        RandomCatchabilityTrawl thrawl = new RandomCatchabilityTrawl(
+            new double[]{.5},
+            new double[]{.1},
+            100
+        );
 
         Boat boat = mock(Boat.class);
         SeaTile tile = mock(SeaTile.class);
-        double fuelConsumed = thrawl.getFuelConsumptionPerHourOfFishing(mock,
-                                                                        boat,
-                                                                        tile);
+        double fuelConsumed = thrawl.getFuelConsumptionPerHourOfFishing(
+            mock,
+            boat,
+            tile
+        );
 
         assertEquals(fuelConsumed, 100d, .0001d);
-
-
 
 
         when(tile.getBiomass(any())).thenReturn(1000d);
         when(random.nextGaussian()).thenReturn(0d); //no deviation
 
         GlobalBiology biology = new GlobalBiology(new Species("test"));
-        assertEquals(500, thrawl.fish(mock, tile,tile , 1, biology).getWeightCaught(0), .0001d);
-        verify(tile,never()).reactToThisAmountOfBiomassBeingFished(any(),any(),any()); //gear alone doesn't kill off fish
+        assertEquals(500, thrawl.fish(mock, tile, tile, 1, biology).getWeightCaught(0), .0001d);
+        verify(tile, never()).reactToThisAmountOfBiomassBeingFished(any(),
+            any(),
+            any()); //gear alone doesn't kill off fish
         when(random.nextGaussian()).thenReturn(2d); //no deviation
-        assertEquals(700, thrawl.fish(mock, tile,tile , 1, biology).getWeightCaught(0), .0001d);
+        assertEquals(700, thrawl.fish(mock, tile, tile, 1, biology).getWeightCaught(0), .0001d);
 
     }
 
@@ -75,19 +79,21 @@ public class RandomCatchabilityTrawlFactoryTest {
         MersenneTwisterFast random = mock(MersenneTwisterFast.class);
         when(mock.grabRandomizer()).thenReturn(random);
 
-        RandomCatchabilityTrawl thrawl = new RandomCatchabilityTrawl(new double[]{.5},
-                                                                     new double[]{.1},
-                                                                     100);
+        RandomCatchabilityTrawl thrawl = new RandomCatchabilityTrawl(
+            new double[]{.5},
+            new double[]{.1},
+            100
+        );
 
         Boat boat = mock(Boat.class);
         SeaTile tile = mock(SeaTile.class);
-        double fuelConsumed = thrawl.getFuelConsumptionPerHourOfFishing(mock,
-                                                                        boat,
-                                                                        tile);
+        double fuelConsumed = thrawl.getFuelConsumptionPerHourOfFishing(
+            mock,
+            boat,
+            tile
+        );
 
         assertEquals(fuelConsumed, 100d, .0001d);
-
-
 
 
         when(tile.getBiomass(any())).thenReturn(1000d);
@@ -97,7 +103,9 @@ public class RandomCatchabilityTrawlFactoryTest {
         assertEquals(500, thrawl.expectedHourlyCatch(mock, tile, 1, biology)[0], .0001d);
         when(random.nextGaussian()).thenReturn(2d); //no deviation
         assertEquals(700, thrawl.expectedHourlyCatch(mock, tile, 1, biology)[0], .0001d);
-        verify(tile,never()).reactToThisAmountOfBiomassBeingFished(any(),any(),any()); //gear alone doesn't kill off fish
+        verify(tile, never()).reactToThisAmountOfBiomassBeingFished(any(),
+            any(),
+            any()); //gear alone doesn't kill off fish
 
     }
 }

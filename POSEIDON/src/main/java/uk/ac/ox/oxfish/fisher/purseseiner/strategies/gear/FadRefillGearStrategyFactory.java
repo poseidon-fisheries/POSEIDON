@@ -35,10 +35,8 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrategy>, Dummyable {
 
-    private InputPath maxFadDeploymentsFile;
     private final CacheByFile<Map<Integer, ImmutableMap<String, Integer>>> cache = new CacheByFile<>(this::readValues);
-
-
+    private InputPath maxFadDeploymentsFile;
     private int targetYear;
 
     private double fadCost = 1000;

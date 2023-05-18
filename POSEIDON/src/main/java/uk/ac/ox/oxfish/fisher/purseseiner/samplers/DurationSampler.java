@@ -20,9 +20,10 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
 import ec.util.MersenneTwisterFast;
-import java.util.function.DoubleSupplier;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import uk.ac.ox.oxfish.utility.MTFApache;
+
+import java.util.function.DoubleSupplier;
 
 public class DurationSampler implements DoubleSupplier {
 

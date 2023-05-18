@@ -45,13 +45,23 @@ public class LogisticLogs extends LinkedList<LogisticLog> implements OutputPlugi
     }
 
     /**
+     * Setter for property 'filename'.
+     *
+     * @param filename Value to set for property 'filename'.
+     */
+    public void setFileName(String filename) {
+        this.filename = filename;
+    }
+
+    /**
      * create a "long-format" csv file by row-binding all the separate loggers
+     *
      * @return
      */
     @Override
     public String composeFileContents() {
-        if(isEmpty())
-            return  "";
+        if (isEmpty())
+            return "";
 
         StringBuilder builder = new StringBuilder();
         builder.append(get(0).getColumnNames()).append("\n");
@@ -59,17 +69,5 @@ public class LogisticLogs extends LinkedList<LogisticLog> implements OutputPlugi
             builder.append(log.getData().toString());
         return builder.toString();
 
-    }
-
-
-
-
-    /**
-     * Setter for property 'filename'.
-     *
-     * @param filename Value to set for property 'filename'.
-     */
-    public void setFileName(String filename) {
-        this.filename = filename;
     }
 }

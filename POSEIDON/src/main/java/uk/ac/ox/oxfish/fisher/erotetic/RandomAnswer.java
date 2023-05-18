@@ -60,7 +60,10 @@ public class RandomAnswer<T> implements EroteticAnswer<T> {
      */
     @Override
     public List<T> answer(
-        final List<T> currentOptions, final FeatureExtractors<T> representation, final FishState state, final Fisher fisher
+        final List<T> currentOptions,
+        final FeatureExtractors<T> representation,
+        final FishState state,
+        final Fisher fisher
     ) {
         Preconditions.checkArgument(!currentOptions.isEmpty());
 

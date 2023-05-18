@@ -9,7 +9,6 @@ import sim.util.Int2D;
 public class ConstantCurrentVector implements CurrentVectors {
 
 
-
     private final Double2D currentVector;
 
     /**
@@ -24,7 +23,7 @@ public class ConstantCurrentVector implements CurrentVectors {
 
 
     public ConstantCurrentVector(double xCurrent, double yCurrent, int gridHeight, int gridWidth) {
-        this.currentVector = new Double2D(xCurrent,yCurrent);
+        this.currentVector = new Double2D(xCurrent, yCurrent);
         this.gridHeight = gridHeight;
         this.gridWidth = gridWidth;
     }

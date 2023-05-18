@@ -37,13 +37,14 @@ import java.util.List;
  * Reads up a csv file containing male and female columns (+ a header) and use them as initial abundance
  * Created by carrknight on 7/8/17.
  */
-public class InitialAbundanceFromFileFactory implements AlgorithmFactory<PremadeInitialAbundance>
-{
-    private Path pathToCsvFile = Paths.get("inputs",
-                                           "california",
-                                           "biology",
-                                           "Sablefish",
-                                           "count.csv");
+public class InitialAbundanceFromFileFactory implements AlgorithmFactory<PremadeInitialAbundance> {
+    private Path pathToCsvFile = Paths.get(
+        "inputs",
+        "california",
+        "biology",
+        "Sablefish",
+        "count.csv"
+    );
 
 
     public InitialAbundanceFromFileFactory() {
@@ -70,7 +71,7 @@ public class InitialAbundanceFromFileFactory implements AlgorithmFactory<Premade
             //remove empty lines
             countfile.removeAll(Collections.singleton(null));
             countfile.removeAll(Collections.singleton(""));
-            int maxAge = countfile.size()-2; //-1 because of the header and -1 because you start counting from 0
+            int maxAge = countfile.size() - 2; //-1 because of the header and -1 because you start counting from 0
             //allow for one line of empty space
             String[] titleLine = countfile.get(0).split(",");
             //expect to be female and then male
@@ -79,20 +80,20 @@ public class InitialAbundanceFromFileFactory implements AlgorithmFactory<Premade
             Preconditions.checkArgument(titleLine[1].trim().toLowerCase().equals("male"));
 
             double[][] totalCount = new double[2][];
-            totalCount[0] = new double[maxAge+1];
-            totalCount[1] = new double[maxAge+1];
-            for(int i=1;i<maxAge +2; i++)
-            {
-                String[] line = countfile.get(i).split(","); //this is not very efficient but it's a 100 lines at most so no big deal
-                assert  line.length == 2;
-                totalCount[FishStateUtilities.FEMALE][i-1] = Double.parseDouble(line[0]);
-                totalCount[FishStateUtilities.MALE][i-1] = Double.parseDouble(line[1]);
+            totalCount[0] = new double[maxAge + 1];
+            totalCount[1] = new double[maxAge + 1];
+            for (int i = 1; i < maxAge + 2; i++) {
+                String[] line = countfile.get(i)
+                    .split(","); //this is not very efficient but it's a 100 lines at most so no big deal
+                assert line.length == 2;
+                totalCount[FishStateUtilities.FEMALE][i - 1] = Double.parseDouble(line[0]);
+                totalCount[FishStateUtilities.MALE][i - 1] = Double.parseDouble(line[1]);
             }
 
             return new PremadeInitialAbundance(totalCount);
         } catch (IOException e) {
             e.printStackTrace();
-            throw  new RuntimeException(" failed to read a count file at " + pathToCsvFile.toString());
+            throw new RuntimeException(" failed to read a count file at " + pathToCsvFile.toString());
         }
     }
 

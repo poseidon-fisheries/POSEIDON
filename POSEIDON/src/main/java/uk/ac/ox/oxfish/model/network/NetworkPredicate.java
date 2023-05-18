@@ -33,8 +33,9 @@ public interface NetworkPredicate extends Serializable {
 
     /**
      * Used by the network builder to see if this friendship is allowed.
+     *
      * @param from origin
-     * @param to destination
+     * @param to   destination
      * @return true if the connection can be built
      */
     boolean test(Fisher from, Fisher to);

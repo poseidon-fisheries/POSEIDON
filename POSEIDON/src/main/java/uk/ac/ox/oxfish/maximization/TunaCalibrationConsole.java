@@ -2,85 +2,81 @@ package uk.ac.ox.oxfish.maximization;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.google.common.primitives.ImmutableIntArray;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import static java.util.Arrays.stream;
 
-public class TunaCalibrationConsole  {
+public class TunaCalibrationConsole {
 
     @Parameter(
-            names = "--nickname",
-            description = "A nickname for the folder containing the outputs",
-            required = false,
-            arity = 1
+        names = "--nickname",
+        description = "A nickname for the folder containing the outputs",
+        required = false,
+        arity = 1
     )
     private String runNickName = null;
 
     @Parameter(
-            names = "--path",
-            description = "Path to calibration.yaml",
-            required = false,
-            arity = 1
+        names = "--path",
+        description = "Path to calibration.yaml",
+        required = false,
+        arity = 1
     )
     private String pathToCalibrationYaml = null;
 
     @Parameter(
-            names = "--pop",
-            description = "Size of optimizer population size"
+        names = "--pop",
+        description = "Size of optimizer population size"
     )
     private int populationSize = TunaCalibrator.DEFAULT_POPULATION_SIZE;
 
     @Parameter(
-            names = "--maxProcs",
-            description = "maximum number of processors"
+        names = "--maxProcs",
+        description = "maximum number of processors"
     )
     private int maxProcessorsToUse = TunaCalibrator.MAX_PROCESSORS_TO_USE;
 
     @Parameter(
-            names = "--runs",
-            description = "maximum number of fitness calls"
+        names = "--runs",
+        description = "maximum number of fitness calls"
     )
     private int maxFitnessCalls = TunaCalibrator.MAX_FITNESS_CALLS;
 
     @Parameter(
-            names = "--range",
-            description = "EVA range of parameters, by default this is 10"
+        names = "--range",
+        description = "EVA range of parameters, by default this is 10"
     )
-    private int parameterRange=  TunaCalibrator.DEFAULT_RANGE;
+    private int parameterRange = TunaCalibrator.DEFAULT_RANGE;
 
     @Parameter(
-            names ="--local",
-            description = "when true this is a Nelder-Mead search"
+        names = "--local",
+        description = "when true this is a Nelder-Mead search"
 
     )
     private boolean isLocalSearch = false;
 
     @Parameter(
-            names ="--pso",
-            description = "when true this is a Particle Swarm search"
+        names = "--pso",
+        description = "when true this is a Particle Swarm search"
 
     )
     private boolean isPSO = false;
 
     @Parameter(
-            names ="--initialGuessesTextFile",
-            description = "path to text file where each line is an individual (comma separated double array) we need to add in the first population"
+        names = "--initialGuessesTextFile",
+        description = "path to text file where each line is an individual (comma separated double array) we need to add in the first population"
 
     )
     private String bestGuessesTextFile = null;
 
     @Parameter(
-            names ="--runsPerSetting",
-            description = "overrides the number of simulations per parameter specified by the yaml file with argument"
+        names = "--runsPerSetting",
+        description = "overrides the number of simulations per parameter specified by the yaml file with argument"
 
     )
     private int numberOfRunsPerSettingOverride = -1;
@@ -106,30 +102,30 @@ public class TunaCalibrationConsole  {
         final TunaCalibrator tunaCalibrator = new TunaCalibrator();
         tunaCalibrator.setMaxFitnessCalls(this.getMaxFitnessCalls());
         tunaCalibrator.setPopulationSize(this.getPopulationSize());
-        if(this.pathToCalibrationYaml != null && !this.pathToCalibrationYaml.trim().isEmpty())
+        if (this.pathToCalibrationYaml != null && !this.pathToCalibrationYaml.trim().isEmpty())
             tunaCalibrator.setOriginalCalibrationFilePath(Paths.get(this.getPathToCalibrationYaml()));
 
         tunaCalibrator.setRunNickName(this.getRunNickName());
         tunaCalibrator.setParameterRange(this.getParameterRange());
-        if(this.isLocalSearch())
+        if (this.isLocalSearch())
             tunaCalibrator.setOptimizationRoutine(TunaCalibrator.OptimizationRoutine.NELDER_MEAD);
-        if(this.isPSO)
+        if (this.isPSO)
             tunaCalibrator.setOptimizationRoutine(TunaCalibrator.OptimizationRoutine.PARTICLE_SWARM);
         tunaCalibrator.setMaxProcessorsToUse(this.getMaxProcessorsToUse());
         tunaCalibrator.setNumberOfRunsPerSettingOverride(this.getNumberOfRunsPerSettingOverride());
 
 
         //add initial guesses if provided
-        if(this.getBestGuessesTextFile() != null && !this.getBestGuessesTextFile().trim().isEmpty()){
+        if (this.getBestGuessesTextFile() != null && !this.getBestGuessesTextFile().trim().isEmpty()) {
             tunaCalibrator.getBestGuess().clear();
             List<String> allLines = Files.readAllLines(Paths.get(this.getBestGuessesTextFile()));
             List<double[]> individuals = new LinkedList<>();
             for (String readLine : allLines) {
-                if(readLine.trim().isEmpty())
+                if (readLine.trim().isEmpty())
                     continue;
                 double[] individual = stream(readLine.trim().split(","))
-                        .mapToDouble(Double::parseDouble)
-                        .toArray();
+                    .mapToDouble(Double::parseDouble)
+                    .toArray();
                 individuals.add(individual);
 
             }
@@ -140,20 +136,20 @@ public class TunaCalibrationConsole  {
         return tunaCalibrator;
     }
 
-    public String getRunNickName() {
-        return runNickName;
-    }
-
-    public String getPathToCalibrationYaml() {
-        return pathToCalibrationYaml;
+    public int getMaxFitnessCalls() {
+        return maxFitnessCalls;
     }
 
     public int getPopulationSize() {
         return populationSize;
     }
 
-    public int getMaxFitnessCalls() {
-        return maxFitnessCalls;
+    public String getPathToCalibrationYaml() {
+        return pathToCalibrationYaml;
+    }
+
+    public String getRunNickName() {
+        return runNickName;
     }
 
     public int getParameterRange() {
@@ -162,6 +158,38 @@ public class TunaCalibrationConsole  {
 
     public boolean isLocalSearch() {
         return isLocalSearch;
+    }
+
+    public void setLocalSearch(boolean localSearch) {
+        isLocalSearch = localSearch;
+    }
+
+    public int getMaxProcessorsToUse() {
+        return maxProcessorsToUse;
+    }
+
+    public void setMaxProcessorsToUse(int maxProcessorsToUse) {
+        this.maxProcessorsToUse = maxProcessorsToUse;
+    }
+
+    public int getNumberOfRunsPerSettingOverride() {
+        return numberOfRunsPerSettingOverride;
+    }
+
+    public String getBestGuessesTextFile() {
+        return bestGuessesTextFile;
+    }
+
+    public void setBestGuessesTextFile(String bestGuessesTextFile) {
+        this.bestGuessesTextFile = bestGuessesTextFile;
+    }
+
+    public void setNumberOfRunsPerSettingOverride(int numberOfRunsPerSettingOverride) {
+        this.numberOfRunsPerSettingOverride = numberOfRunsPerSettingOverride;
+    }
+
+    public void setParameterRange(int parameterRange) {
+        this.parameterRange = parameterRange;
     }
 
     public void setRunNickName(String runNickName) {
@@ -178,38 +206,6 @@ public class TunaCalibrationConsole  {
 
     public void setMaxFitnessCalls(int maxFitnessCalls) {
         this.maxFitnessCalls = maxFitnessCalls;
-    }
-
-    public void setParameterRange(int parameterRange) {
-        this.parameterRange = parameterRange;
-    }
-
-    public void setLocalSearch(boolean localSearch) {
-        isLocalSearch = localSearch;
-    }
-
-    public String getBestGuessesTextFile() {
-        return bestGuessesTextFile;
-    }
-
-    public void setBestGuessesTextFile(String bestGuessesTextFile) {
-        this.bestGuessesTextFile = bestGuessesTextFile;
-    }
-
-    public int getMaxProcessorsToUse() {
-        return maxProcessorsToUse;
-    }
-
-    public void setMaxProcessorsToUse(int maxProcessorsToUse) {
-        this.maxProcessorsToUse = maxProcessorsToUse;
-    }
-
-    public int getNumberOfRunsPerSettingOverride() {
-        return numberOfRunsPerSettingOverride;
-    }
-
-    public void setNumberOfRunsPerSettingOverride(int numberOfRunsPerSettingOverride) {
-        this.numberOfRunsPerSettingOverride = numberOfRunsPerSettingOverride;
     }
 
     public boolean isPSO() {

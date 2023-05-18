@@ -28,8 +28,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
  * Creates a hourly profit objective function
  * Created by carrknight on 3/24/16.
  */
-public class HourlyProfitObjectiveFactory implements AlgorithmFactory<HourlyProfitInTripObjective>
-{
+public class HourlyProfitObjectiveFactory implements AlgorithmFactory<HourlyProfitInTripObjective> {
 
 
     private boolean opportunityCosts = true;

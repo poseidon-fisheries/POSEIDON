@@ -35,12 +35,14 @@ public interface AllocatedBiologyInitializer extends BiologyInitializer {
      * puts the function describing the % of biomass that will initially be allocated to this sea-tile
      */
     public Function<SeaTile, Double> putAllocator(
-            Species key,
-            Function< SeaTile, Double> value);
+        Species key,
+        Function<SeaTile, Double> value
+    );
 
 
     /**
      * you must at all time be ready to reset local biology to its pristine state
+     *
      * @param species species you want the biomass resetted
      */
     public void resetLocalBiology(Species species);

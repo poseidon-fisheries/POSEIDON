@@ -2,10 +2,8 @@ package uk.ac.ox.oxfish.model.plugins;
 
 import com.google.common.base.Preconditions;
 import sim.engine.SimState;
-import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
@@ -27,29 +25,19 @@ public class SpendSaveInvestEntry implements EntryPlugin {
     private final String populationName;
 
     public boolean paused = false;
-
-    public boolean isPaused() {
-        return paused;
-    }
-
-    public void setPaused(boolean paused) {
-        this.paused = paused;
-    }
+    private Stoppable stoppable;
+    private boolean newEntryAllowed = true;
 
 
-    public SpendSaveInvestEntry(double moneyNeededForANewEntry,
-                                double yearlyExpenses,
-                                String populationName) {
+    public SpendSaveInvestEntry(
+        double moneyNeededForANewEntry,
+        double yearlyExpenses,
+        String populationName
+    ) {
         this.moneyNeededForANewEntry = moneyNeededForANewEntry;
         this.yearlyExpenses = yearlyExpenses;
         this.populationName = populationName;
     }
-
-    private Stoppable stoppable;
-
-    private boolean newEntryAllowed = true;
-
-
 
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
@@ -59,13 +47,14 @@ public class SpendSaveInvestEntry implements EntryPlugin {
      */
     @Override
     public void start(FishState model) {
-        Preconditions.checkArgument(stoppable==null, "already started!");
-        stoppable = model.scheduleEveryYear(this,
-                StepOrder.AFTER_DATA);
-        if(!model.getEntryPlugins().contains(this))
+        Preconditions.checkArgument(stoppable == null, "already started!");
+        stoppable = model.scheduleEveryYear(
+            this,
+            StepOrder.AFTER_DATA
+        );
+        if (!model.getEntryPlugins().contains(this))
             model.getEntryPlugins().add(this);
     }
-
 
     /**
      * tell the startable to turnoff,
@@ -73,14 +62,14 @@ public class SpendSaveInvestEntry implements EntryPlugin {
     @Override
     public void turnOff() {
 
-        if(stoppable!=null)
+        if (stoppable != null)
             stoppable.stop();
 
     }
 
     @Override
     public void step(SimState simState) {
-        if(isPaused())
+        if (isPaused())
             return;
         FishState model = ((FishState) simState);
 
@@ -88,14 +77,13 @@ public class SpendSaveInvestEntry implements EntryPlugin {
         int boatsToAdd = 0;
         // count the fisher as active if it has been on at least a trip in the past 365 days!
         for (Fisher fisher : model.getFishers()) {
-            if(fisher.getTags().contains(populationName) && fisher.hasBeenActiveThisYear())
-            {
+            if (fisher.getTags().contains(populationName) && fisher.hasBeenActiveThisYear()) {
                 //spend your daily trip
                 fisher.spendExogenously(yearlyExpenses);
                 //if you have collected enough money, invest it in a new boat
-                if(newEntryAllowed && fisher.getBankBalance()>moneyNeededForANewEntry){
+                if (newEntryAllowed && fisher.getBankBalance() > moneyNeededForANewEntry) {
                     fisher.spendExogenously(moneyNeededForANewEntry);
-                    assert fisher.getBankBalance()>0;
+                    assert fisher.getBankBalance() > 0;
                     boatsToAdd++;
                 }
             }
@@ -106,6 +94,14 @@ public class SpendSaveInvestEntry implements EntryPlugin {
         for (int i = 0; i < boatsToAdd; i++)
             model.createFisher(populationName);
 
+    }
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
 
     public double getMoneyNeededForANewEntry() {
@@ -125,14 +121,13 @@ public class SpendSaveInvestEntry implements EntryPlugin {
         this.newEntryAllowed = newEntryAllowed;
     }
 
-
-    @Override
-    public void setEntryPaused(boolean entryPaused) {
-            paused = entryPaused;
-    }
-
     @Override
     public boolean isEntryPaused() {
         return paused;
+    }
+
+    @Override
+    public void setEntryPaused(boolean entryPaused) {
+        paused = entryPaused;
     }
 }

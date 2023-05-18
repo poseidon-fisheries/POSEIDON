@@ -39,47 +39,46 @@ public class FromLeftToRightMixedInitializerTest {
 
 
     @Test
-    public void moreOnTheLeft() throws Exception
-    {
+    public void moreOnTheLeft() throws Exception {
 
-        SeaTile left = new SeaTile(0, 0, -1, new TileHabitat(0d));
-        SeaTile middle = new SeaTile(50,0,-1, new TileHabitat(0d));
-        SeaTile right = new SeaTile(100,0,-1, new TileHabitat(0d));
-        FromLeftToRightMixedInitializer initializer = new FromLeftToRightMixedInitializer(5000, 2);
+        final SeaTile left = new SeaTile(0, 0, -1, new TileHabitat(0d));
+        final SeaTile middle = new SeaTile(50, 0, -1, new TileHabitat(0d));
+        final SeaTile right = new SeaTile(100, 0, -1, new TileHabitat(0d));
+        final FromLeftToRightMixedInitializer initializer = new FromLeftToRightMixedInitializer(5000, 2);
         final Species species1 = new Species("Specie0");
         final Species species2 = new Species("Specie1");
-        GlobalBiology biology = new GlobalBiology(species1,species2);
+        final GlobalBiology biology = new GlobalBiology(species1, species2);
 
         left.setBiology(
-                initializer.generateLocal(biology, left,
-                                          new MersenneTwisterFast(System.currentTimeMillis()), 100, 100,
-                                          mock(NauticalMap.class)
-                )
+            initializer.generateLocal(biology, left,
+                new MersenneTwisterFast(System.currentTimeMillis()), 100, 100,
+                mock(NauticalMap.class)
+            )
         );
 
         middle.setBiology(
-                initializer.generateLocal(biology, middle,
-                                          new MersenneTwisterFast(
-                                                  System.currentTimeMillis()),
-                                          100, 100,
-                                          mock(NauticalMap.class)
-                )
+            initializer.generateLocal(biology, middle,
+                new MersenneTwisterFast(
+                    System.currentTimeMillis()),
+                100, 100,
+                mock(NauticalMap.class)
+            )
         );
 
         right.setBiology(
-                initializer.generateLocal(biology, right, new MersenneTwisterFast(System.currentTimeMillis()),
-                                          100, 100,
-                                          mock(NauticalMap.class)
-                )
+            initializer.generateLocal(biology, right, new MersenneTwisterFast(System.currentTimeMillis()),
+                100, 100,
+                mock(NauticalMap.class)
+            )
         );
 
 
-        assertTrue(left.getBiomass(species1)> middle.getBiomass(species1));
-        assertTrue(middle.getBiomass(species1)> right.getBiomass(species1));
-        assertTrue(left.getBiomass(species2)> middle.getBiomass(species2));
-        assertTrue(middle.getBiomass(species2)> right.getBiomass(species2));
-        assertEquals(left.getBiomass(species1)/left.getBiomass(species2),.5,.001);
-        assertEquals(middle.getBiomass(species1)/middle.getBiomass(species2),.5,.001);
+        assertTrue(left.getBiomass(species1) > middle.getBiomass(species1));
+        assertTrue(middle.getBiomass(species1) > right.getBiomass(species1));
+        assertTrue(left.getBiomass(species2) > middle.getBiomass(species2));
+        assertTrue(middle.getBiomass(species2) > right.getBiomass(species2));
+        assertEquals(left.getBiomass(species1) / left.getBiomass(species2), .5, .001);
+        assertEquals(middle.getBiomass(species1) / middle.getBiomass(species2), .5, .001);
     }
 }
 

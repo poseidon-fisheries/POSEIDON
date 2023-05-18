@@ -36,7 +36,7 @@ import java.util.Objects;
 /**
  * Basically this decorator is added so that for every catch, regardless of the gear used, a fixed proportion of garbage
  * species is caught
- *
+ * <p>
  * Created by carrknight on 3/22/17.
  */
 public class GarbageGearDecorator implements GearDecorator {
@@ -50,17 +50,15 @@ public class GarbageGearDecorator implements GearDecorator {
      * basically if this is .3 then it means that garbageCollected = .3 * restOfSpeciesCollected
      */
     private final double ratioToRestOfCatch;
-
+    private final boolean rounding;
     /**
      * a delegate gear that catches non garbage stuff
      */
     private Gear delegate;
 
-
-    private final boolean rounding;
-
     public GarbageGearDecorator(
-            Species garbageSpecies, double ratioToRestOfCatch, Gear delegate, boolean rounding) {
+        Species garbageSpecies, double ratioToRestOfCatch, Gear delegate, boolean rounding
+    ) {
         this.garbageSpecies = garbageSpecies;
         this.ratioToRestOfCatch = ratioToRestOfCatch;
         this.delegate = delegate;
@@ -69,10 +67,11 @@ public class GarbageGearDecorator implements GearDecorator {
 
     @Override
     public Catch fish(
-            Fisher fisher, LocalBiology localBiology, SeaTile context,
-            int hoursSpentFishing, GlobalBiology modelBiology) {
+        Fisher fisher, LocalBiology localBiology, SeaTile context,
+        int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
         //delegate
-        Catch nonGarbage = delegate.fish(fisher, localBiology,context , hoursSpentFishing, modelBiology);
+        Catch nonGarbage = delegate.fish(fisher, localBiology, context, hoursSpentFishing, modelBiology);
         //shouldn't be any garbage collected so far
         assert nonGarbage.getWeightCaught(garbageSpecies) == 0;
         double totalNonGarbageWeight = nonGarbage.totalCatchWeight();
@@ -92,8 +91,8 @@ public class GarbageGearDecorator implements GearDecorator {
                 else {
                     //todo make this sex structured too if needed
                     double[] garbageStructured = new double[garbageSpecies.getNumberOfBins()];
-                    garbageStructured[0]= (garbageWeight/garbageSpecies.getWeight(0,0));
-                    if(rounding)
+                    garbageStructured[0] = (garbageWeight / garbageSpecies.getWeight(0, 0));
+                    if (rounding)
                         garbageStructured[0] = (int) garbageStructured[0];
                     newAbundances[i] = new StructuredAbundance(garbageStructured);
                 }
@@ -101,7 +100,7 @@ public class GarbageGearDecorator implements GearDecorator {
 
             }
 
-            return  new Catch(newAbundances,modelBiology);
+            return new Catch(newAbundances, modelBiology);
         }
         //replicate all weights!
         else {
@@ -117,8 +116,6 @@ public class GarbageGearDecorator implements GearDecorator {
         }
 
 
-
-
     }
 
     /**
@@ -130,13 +127,15 @@ public class GarbageGearDecorator implements GearDecorator {
      */
     @Override
     public double getFuelConsumptionPerHourOfFishing(
-            Fisher fisher, Boat boat, SeaTile where) {
+        Fisher fisher, Boat boat, SeaTile where
+    ) {
         return delegate.getFuelConsumptionPerHourOfFishing(fisher, boat, where);
     }
 
     @Override
     public double[] expectedHourlyCatch(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
         double[] expectation = delegate.expectedHourlyCatch(fisher, where, hoursSpentFishing, modelBiology);
         double nonGarbageWeight = Arrays.stream(expectation).sum();
         expectation[garbageSpecies.getIndex()] = nonGarbageWeight * ratioToRestOfCatch;
@@ -148,18 +147,19 @@ public class GarbageGearDecorator implements GearDecorator {
     public Gear makeCopy() {
 
         return new GarbageGearDecorator(garbageSpecies,
-                                        ratioToRestOfCatch,
-                                        delegate.makeCopy(), rounding);
+            ratioToRestOfCatch,
+            delegate.makeCopy(), rounding
+        );
     }
 
-
-    /**
-     * Getter for property 'garbageSpecies'.
-     *
-     * @return Value for property 'garbageSpecies'.
-     */
-    public Species getGarbageSpecies() {
-        return garbageSpecies;
+    @Override
+    public boolean isSame(Gear o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GarbageGearDecorator that = (GarbageGearDecorator) o;
+        return Double.compare(that.getRatioToRestOfCatch(), getRatioToRestOfCatch()) == 0 &&
+            Objects.equals(getGarbageSpecies(), that.getGarbageSpecies()) &&
+            delegate.isSame(that.delegate);
     }
 
     /**
@@ -171,15 +171,13 @@ public class GarbageGearDecorator implements GearDecorator {
         return ratioToRestOfCatch;
     }
 
-
-    @Override
-    public boolean isSame(Gear o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        GarbageGearDecorator that = (GarbageGearDecorator) o;
-        return Double.compare(that.getRatioToRestOfCatch(), getRatioToRestOfCatch()) == 0 &&
-                Objects.equals(getGarbageSpecies(), that.getGarbageSpecies()) &&
-                delegate.isSame(that.delegate);
+    /**
+     * Getter for property 'garbageSpecies'.
+     *
+     * @return Value for property 'garbageSpecies'.
+     */
+    public Species getGarbageSpecies() {
+        return garbageSpecies;
     }
 
     @Override

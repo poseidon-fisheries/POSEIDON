@@ -11,8 +11,7 @@ public class LogisticSelectivityGearFactoryTest {
 
 
     @Test
-    public void create()
-    {
+    public void create() {
 
         LogisticSelectivityGearFactory factory = new LogisticSelectivityGearFactory();
         factory.setAverageCatchability(new FixedDoubleParameter(.123));
@@ -21,8 +20,8 @@ public class LogisticSelectivityGearFactoryTest {
 
 
         SelectivityAbundanceGear gear = (SelectivityAbundanceGear) factory.apply(new FishState());
-        assertEquals(gear.getaParameter(),.234,.0001);
-        assertEquals(gear.getbParameter(),.345,.0001);
+        assertEquals(gear.getaParameter(), .234, .0001);
+        assertEquals(gear.getbParameter(), .345, .0001);
 
     }
 }

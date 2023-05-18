@@ -38,32 +38,35 @@ public class HillClimbingMovementTest {
     public void hillclimber() throws Exception {
 
 
-        SeaTile old = mock(SeaTile.class);
-        SeaTile current = mock(SeaTile.class);
-        SeaTile newTile = mock(SeaTile.class);
-        MersenneTwisterFast random = new MersenneTwisterFast(System.currentTimeMillis());
+        final SeaTile old = mock(SeaTile.class);
+        final SeaTile current = mock(SeaTile.class);
+        final SeaTile newTile = mock(SeaTile.class);
+        final MersenneTwisterFast random = new MersenneTwisterFast(System.currentTimeMillis());
 
 
         //if new is better than old, go random
-        BeamHillClimbing<SeaTile> algo = new BeamHillClimbing<SeaTile>(
-                new RandomStep<SeaTile>() {
-                    @Override
-                    public SeaTile randomStep(
-                            FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current) {
-                        return newTile;
-                    }
+        final BeamHillClimbing<SeaTile> algo = new BeamHillClimbing<SeaTile>(
+            new RandomStep<SeaTile>() {
+                @Override
+                public SeaTile randomStep(
+                    final FishState state, final MersenneTwisterFast random, final Fisher fisher, final SeaTile current
+                ) {
+                    return newTile;
                 }
+            }
         );
 
-        assertEquals(newTile,algo.randomize(random,mock(Fisher.class),0,current));
+        assertEquals(newTile, algo.randomize(random, mock(Fisher.class), 0, current));
 
         //current better than old? stay!
-        assertEquals(current,algo.judgeRandomization(random,
-                                                     mock(Fisher.class),0,100,old,current));
+        assertEquals(current, algo.judgeRandomization(random,
+            mock(Fisher.class), 0, 100, old, current
+        ));
 
         //if old is better than new, go back to new
-        assertEquals(old,algo.judgeRandomization(random,
-                                                     mock(Fisher.class), 100,0, old, current));
+        assertEquals(old, algo.judgeRandomization(random,
+            mock(Fisher.class), 100, 0, old, current
+        ));
 
     }
 }

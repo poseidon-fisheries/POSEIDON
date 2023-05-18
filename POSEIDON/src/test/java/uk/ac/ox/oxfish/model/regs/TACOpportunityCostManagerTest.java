@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -48,7 +47,7 @@ public class TACOpportunityCostManagerTest {
         when(model.getFishers()).thenReturn(ObservableList.observableList(new ArrayList<>()));
         MultiQuotaRegulation quotas = new MultiQuotaRegulation(new double[]{100}, model);
         TACOpportunityCostManager manager = new TACOpportunityCostManager(
-                quotas);
+            quotas);
 
         manager.start(model);
 
@@ -58,19 +57,19 @@ public class TACOpportunityCostManagerTest {
         when(model.getLatestDailyObservation("dummy " + AbstractMarket.LANDINGS_COLUMN_NAME)).thenReturn(10d);
         when(record.getDurationInHours()).thenReturn(10d);
         when(record.getSoldCatch()).thenReturn(new double[1]);
-        manager.reactToFinishedTrip(record,null );
+        manager.reactToFinishedTrip(record, null);
         manager.step(model);
 
         when(model.getLatestDailyObservation("dummy " + AbstractMarket.LANDINGS_COLUMN_NAME)).thenReturn(20d);
         when(record.getDurationInHours()).thenReturn(20d);
         when(record.getSoldCatch()).thenReturn(new double[1]);
-        manager.reactToFinishedTrip(record, null );
+        manager.reactToFinishedTrip(record, null);
         manager.step(model);
 
         when(model.getLatestDailyObservation("dummy " + AbstractMarket.LANDINGS_COLUMN_NAME)).thenReturn(30d);
         when(record.getDurationInHours()).thenReturn(30d);
         when(record.getSoldCatch()).thenReturn(new double[1]);
-        manager.reactToFinishedTrip(record, null );
+        manager.reactToFinishedTrip(record, null);
         manager.step(model);
 
 
@@ -82,9 +81,9 @@ public class TACOpportunityCostManagerTest {
         when(newRecord.getDurationInHours()).thenReturn(20d);
         when(newRecord.getSoldCatch()).thenReturn(new double[]{10d});
         when(newRecord.getImplicitPriceReceived(species)).thenReturn(20d);
-        manager.reactToFinishedTrip(newRecord,null );
+        manager.reactToFinishedTrip(newRecord, null);
         //opportunity costs predicted 0.5 fish per hour; you've been out 20 hours and each unit of fish is worth 20$
-        verify(newRecord,times(1)).recordOpportunityCosts(0.5*20*20);
+        verify(newRecord, times(1)).recordOpportunityCosts(0.5 * 20 * 20);
 
 
     }

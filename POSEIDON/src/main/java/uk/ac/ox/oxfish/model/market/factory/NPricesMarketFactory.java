@@ -19,7 +19,7 @@ public class NPricesMarketFactory implements AlgorithmFactory<NThresholdsMarket>
 
     @Override
     public NThresholdsMarket apply(FishState state) {
-        Preconditions.checkArgument(prices.size()==binThresholds.size()+1);
+        Preconditions.checkArgument(prices.size() == binThresholds.size() + 1);
         int[] bins = new int[binThresholds.size()];
         for (int i = 0; i < binThresholds.size(); i++) {
             bins[i] = binThresholds.get(i);
@@ -32,10 +32,8 @@ public class NPricesMarketFactory implements AlgorithmFactory<NThresholdsMarket>
         }
 
         return new NThresholdsMarket(
-               bins,
-                price
-
-
+            bins,
+            price
 
 
         );

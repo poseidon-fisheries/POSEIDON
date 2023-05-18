@@ -52,9 +52,9 @@ public class FisherYearlyTimeSeriesTest {
         assertEquals(1d, yearlyGatherer.getColumn("CASH").get(0), .0001);
         assertEquals(2d, yearlyGatherer.getColumn("CASH").get(1), .0001);
         assertEquals(3d, yearlyGatherer.getColumn("CASH").get(2), .0001);
-        assertEquals(1d,yearlyGatherer.getColumn("NET_CASH_FLOW").get(0),.0001);
-        assertEquals(1d,yearlyGatherer.getColumn("NET_CASH_FLOW").get(1),.0001);
-        assertEquals(1d,yearlyGatherer.getColumn("NET_CASH_FLOW").get(2),.0001);
+        assertEquals(1d, yearlyGatherer.getColumn("NET_CASH_FLOW").get(0), .0001);
+        assertEquals(1d, yearlyGatherer.getColumn("NET_CASH_FLOW").get(1), .0001);
+        assertEquals(1d, yearlyGatherer.getColumn("NET_CASH_FLOW").get(2), .0001);
 
 
     }

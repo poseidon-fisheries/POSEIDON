@@ -27,8 +27,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.nio.file.Paths;
-
 public class AdditionalMapFactory implements AlgorithmFactory<AdditionalStartable> {
     public String mapVariableName;
     private InputPath gridFile;
@@ -70,6 +68,7 @@ public class AdditionalMapFactory implements AlgorithmFactory<AdditionalStartabl
                     () -> grids.atOrBeforeStep(model.getStep()).get(mapVariableName)
                 );
             }
+
             @Override
             public void turnOff() {
                 model.getMap().getAdditionalMaps().remove(mapVariableName);

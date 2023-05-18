@@ -46,7 +46,7 @@ public class CartesianUTMDistance implements Distance {
         double xEnd = coordinate.x;
         double yEnd = coordinate.y;
         //this should return the distance in kilometers!
-        return Math.sqrt( Math.pow(yEnd-yStart,2) +  Math.pow(xEnd-xStart,2) )/1000;
+        return Math.sqrt(Math.pow(yEnd - yStart, 2) + Math.pow(xEnd - xStart, 2)) / 1000;
 
     }
 }

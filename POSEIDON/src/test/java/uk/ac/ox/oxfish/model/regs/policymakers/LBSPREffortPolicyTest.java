@@ -5,7 +5,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class LBSPREffortPolicyTest {
@@ -18,15 +18,16 @@ public class LBSPREffortPolicyTest {
 
 
         LBSPREffortPolicy policy =
-                new LBSPREffortPolicy(
-                        "lala",
-                        0.05,
-                        0.3,
-                        .4,
-                        .1,
-                        (subject, policy1, model) -> lastReturn[0] = policy1,
+            new LBSPREffortPolicy(
+                "lala",
+                0.05,
+                0.3,
+                .4,
+                .1,
+                (subject, policy1, model) -> lastReturn[0] = policy1,
 
-                        false);
+                false
+            );
 
 
         final FishState red = mock(FishState.class);
@@ -36,14 +37,13 @@ public class LBSPREffortPolicyTest {
         policy.step(red);
         policy.step(red);
         policy.step(red);
-        assertTrue(lastReturn[0]<1d);
+        assertTrue(lastReturn[0] < 1d);
         double minimum = lastReturn[0];
         //spr is too high!
         when(red.getLatestYearlyObservation("lala")).thenReturn(.9);
         policy.step(red);
 
-        assertTrue(lastReturn[0]>minimum);
-
+        assertTrue(lastReturn[0] > minimum);
 
 
     }
@@ -56,15 +56,16 @@ public class LBSPREffortPolicyTest {
 
         //close
         LBSPREffortPolicy policy =
-                new LBSPREffortPolicy(
-                        "lala",
-                        0.05,
-                        0.3,
-                        .4,
-                        .1,
-                        (subject, policy1, model) -> lastReturn[0] = policy1,
+            new LBSPREffortPolicy(
+                "lala",
+                0.05,
+                0.3,
+                .4,
+                .1,
+                (subject, policy1, model) -> lastReturn[0] = policy1,
 
-                        true);
+                true
+            );
 
 
         final FishState red = mock(FishState.class);
@@ -76,11 +77,11 @@ public class LBSPREffortPolicyTest {
         policy.step(red);
         policy.step(red);
         policy.step(red);
-        verify(entryPlugin,times(3)).setEntryPaused(true);
-        assertTrue(lastReturn[0]<1d);
+        verify(entryPlugin, times(3)).setEntryPaused(true);
+        assertTrue(lastReturn[0] < 1d);
         double minimum = lastReturn[0];
         //push it above 1
-        for(int i =0; i<100; i++) {
+        for (int i = 0; i < 100; i++) {
             when(red.getLatestYearlyObservation("lala")).thenReturn(.9);
             policy.step(red);
         }
@@ -88,11 +89,10 @@ public class LBSPREffortPolicyTest {
         entryPlugin = mock(EntryPlugin.class);
         when(red.getEntryPlugins()).thenReturn(Lists.newArrayList(entryPlugin));
         policy.step(red);
-        verify(entryPlugin,times(1)).setEntryPaused(false);
+        verify(entryPlugin, times(1)).setEntryPaused(false);
 
 
-        assertTrue(lastReturn[0]>minimum);
-
+        assertTrue(lastReturn[0] > minimum);
 
 
     }

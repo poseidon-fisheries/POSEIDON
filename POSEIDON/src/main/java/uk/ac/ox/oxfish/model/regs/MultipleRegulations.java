@@ -63,6 +63,7 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
         MultimapBuilder.hashKeys().linkedListValues().build();
     private boolean started = false;
     private QuotaPerSpecieRegulation delegateHack = null;
+
     public MultipleRegulations(
         Multimap<String, AlgorithmFactory<? extends Regulation>> factoriesByTag
     ) {
@@ -246,6 +247,15 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
         regulations.clear();
     }
 
+    @Override
+    public double getQuotaRemaining(int specieIndex) {
+        QuotaPerSpecieRegulation quotaDelegate = getQuotaDelegate();
+        if (quotaDelegate != null)
+            return quotaDelegate.getQuotaRemaining(specieIndex);
+        else
+            return Double.POSITIVE_INFINITY;
+    }
+
     private QuotaPerSpecieRegulation getQuotaDelegate() {
         if (delegateHack == null) {
             delegateHack = getRegulations().stream()
@@ -256,20 +266,6 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
         return delegateHack;
     }
 
-    @Override
-    public double getQuotaRemaining(int specieIndex) {
-        QuotaPerSpecieRegulation quotaDelegate = getQuotaDelegate();
-        if (quotaDelegate != null)
-            return quotaDelegate.getQuotaRemaining(specieIndex);
-        else
-            return Double.POSITIVE_INFINITY;
-    }
-
-    @Override
-    public void setQuotaRemaining(int specieIndex, double newQuotaValue) {
-        getQuotaDelegate().setQuotaRemaining(specieIndex, newQuotaValue);
-    }
-
     /**
      * Getter for property 'regulations'.
      *
@@ -278,6 +274,11 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
     @VisibleForTesting
     public List<Regulation> getRegulations() {
         return regulations;
+    }
+
+    @Override
+    public void setQuotaRemaining(int specieIndex, double newQuotaValue) {
+        getQuotaDelegate().setQuotaRemaining(specieIndex, newQuotaValue);
     }
 
     public boolean containsRegulation(Regulation regulation) {

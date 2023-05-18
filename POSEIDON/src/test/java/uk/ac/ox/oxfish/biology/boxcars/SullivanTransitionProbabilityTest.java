@@ -29,29 +29,34 @@ public class SullivanTransitionProbabilityTest {
     @Test
     public void sullivanTransitionMatrix() {
 
-        SullivanTransitionProbability probability = new SullivanTransitionProbability(Math.sqrt(.1),
-                                                                                      95,
-                                                                                      0.1627,
-                                                                                      25,
-                                                                                      5,
-                                                                                      1);
+        SullivanTransitionProbability probability = new SullivanTransitionProbability(
+            Math.sqrt(.1),
+            95,
+            0.1627,
+            25,
+            5,
+            1
+        );
         //todo scaling ought to apply to beta too?
 
 
         Assert.assertEquals(
-                probability.getTransitionMatrix()[0][4],
-                0.06278263,
-                .0001);
+            probability.getTransitionMatrix()[0][4],
+            0.06278263,
+            .0001
+        );
 
         Assert.assertEquals(
-                probability.getTransitionMatrix()[6][9],
-                0.1770288,
-                .0001);
+            probability.getTransitionMatrix()[6][9],
+            0.1770288,
+            .0001
+        );
 
         Assert.assertEquals(
-                probability.getTransitionMatrix()[9][9],
-                0.1309123,
-                .0001);
+            probability.getTransitionMatrix()[9][9],
+            0.1309123,
+            .0001
+        );
 
 
     }

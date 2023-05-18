@@ -26,18 +26,19 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 /**
  * Created by carrknight on 6/27/16.
  */
-public interface MarkovBelief
-{
+public interface MarkovBelief {
 
 
     /**
      * returns the belief at this location
+     *
      * @return the belief (a number)
      */
     public double getBelief(int x, int y);
 
     /**
      * returns the belief on this tile
+     *
      * @param tile tile
      * @return the belief (a number)
      */

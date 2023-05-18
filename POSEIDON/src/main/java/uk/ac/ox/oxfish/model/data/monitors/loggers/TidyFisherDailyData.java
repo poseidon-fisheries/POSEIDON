@@ -38,9 +38,13 @@ public class TidyFisherDailyData extends TidyTimeSeries<TimeSeries<Fisher>> {
         this.boatId = boatId;
     }
 
-    @Override public List<String> getHeaders() { return HEADERS; }
+    @Override
+    public List<String> getHeaders() {
+        return HEADERS;
+    }
 
-    @Override List<Object> makeRow(final DataColumn column, final int index) {
+    @Override
+    List<Object> makeRow(final DataColumn column, final int index) {
         return ImmutableList.of(
             boatId, // boat_id
             index, // step

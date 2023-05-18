@@ -33,9 +33,9 @@ public class DailyDecreasingProbabilityTest {
     @Test
     public void decreasesCorrectly() throws Exception {
 
-        DailyDecreasingProbability probability = new DailyDecreasingProbability(1,1,.5,.1);
+        final DailyDecreasingProbability probability = new DailyDecreasingProbability(1, 1, .5, .1);
         assertEquals(probability.getExplorationProbability(), 1, .0001);
-        assertEquals(probability.getImitationProbability(),1,.0001);
+        assertEquals(probability.getImitationProbability(), 1, .0001);
 
         probability.step(mock(FishState.class));
         assertEquals(probability.getExplorationProbability(), .5, .0001);

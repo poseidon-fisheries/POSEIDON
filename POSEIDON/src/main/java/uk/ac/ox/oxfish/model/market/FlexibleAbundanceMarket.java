@@ -8,21 +8,18 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.Arrays;
 /**
  * The most "generic" market for "abundance" species.
  * The pricing behaviour is commanded by a pricing strategy which should be fully swappable
- *
  */
 public class FlexibleAbundanceMarket extends AbstractMarket {
 
 
+    public static final String AGE_BIN_PREFIX = " - age bin ";
     /**
      * the object deciding the prices
      */
     private PricingStrategy pricingStrategy;
-
-    public static final String AGE_BIN_PREFIX = " - age bin ";
 
 
     public FlexibleAbundanceMarket(PricingStrategy pricingStrategy) {
@@ -32,18 +29,24 @@ public class FlexibleAbundanceMarket extends AbstractMarket {
     }
 
     @Override
-    protected TradeInfo sellFishImplementation(Hold hold, Fisher fisher,
-                                               Regulation regulation,
-                                               FishState state, Species species) {
+    protected TradeInfo sellFishImplementation(
+        Hold hold, Fisher fisher,
+        Regulation regulation,
+        FishState state, Species species
+    ) {
 
 
         //find out legal biomass sold
         double proportionActuallySellable =
-                Math.min(1d,
-                        regulation.maximumBiomassSellable(fisher,
-                                species,
-                                state) /
-                                hold.getWeightOfCatchInHold(species));
+            Math.min(
+                1d,
+                regulation.maximumBiomassSellable(
+                    fisher,
+                    species,
+                    state
+                ) /
+                    hold.getWeightOfCatchInHold(species)
+            );
         assert proportionActuallySellable >= 0;
         assert proportionActuallySellable <= 1;
 
@@ -59,19 +62,18 @@ public class FlexibleAbundanceMarket extends AbstractMarket {
             //reweight because you might be not allowed to sell more than x
             soldThisBin *= proportionActuallySellable;
             //if there is nothing to sell here...
-            if(soldThisBin<=0)
-            {
+            if (soldThisBin <= 0) {
                 //sometimes this becomes -1e-35
-                assert soldThisBin>=-FishStateUtilities.EPSILON;
+                assert soldThisBin >= -FishStateUtilities.EPSILON;
                 continue;
             }
 
             //look for the correct price bin
             double priceForThisBin = pricingStrategy.getPricePerKg(
-                    species,
-                    fisher,
-                    age,
-                    soldThisBin
+                species,
+                fisher,
+                age,
+                soldThisBin
             );
 
             getDailyCounter().count(LANDINGS_COLUMN_NAME + " - age bin " + age, soldThisBin);
@@ -105,24 +107,26 @@ public class FlexibleAbundanceMarket extends AbstractMarket {
             getDailyCounter().addColumn(columnName);
             String finalColumnName1 = columnName;
             getData().registerGatherer(columnName, new Gatherer<Market>() {
-                        @Override
-                        public Double apply(Market market) {
-                            return getDailyCounter().getColumn(finalColumnName1);
-                        }
-                    },
-                    0);
+                    @Override
+                    public Double apply(Market market) {
+                        return getDailyCounter().getColumn(finalColumnName1);
+                    }
+                },
+                0
+            );
 
 
             columnName = EARNINGS_COLUMN_NAME + " - age bin " + age;
             getDailyCounter().addColumn(columnName);
             String finalColumnName = columnName;
             getData().registerGatherer(columnName, new Gatherer<Market>() {
-                        @Override
-                        public Double apply(Market market) {
-                            return getDailyCounter().getColumn(finalColumnName);
-                        }
-                    },
-                    0);
+                    @Override
+                    public Double apply(Market market) {
+                        return getDailyCounter().getColumn(finalColumnName);
+                    }
+                },
+                0
+            );
         }
     }
 

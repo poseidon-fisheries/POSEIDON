@@ -36,6 +36,4 @@ public interface Averager<T> {
     public double getSmoothedObservation();
 
 
-
-
 }

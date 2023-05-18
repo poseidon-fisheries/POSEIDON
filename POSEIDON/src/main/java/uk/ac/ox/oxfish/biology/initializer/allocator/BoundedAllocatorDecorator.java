@@ -45,13 +45,14 @@ public class BoundedAllocatorDecorator implements BiomassAllocator {
     private final BiomassAllocator delegate;
 
     public BoundedAllocatorDecorator(
-            double lowestX, double lowestY,
-            double highestX, double highestY, boolean insideTheBox,
-            BiomassAllocator delegate) {
+        double lowestX, double lowestY,
+        double highestX, double highestY, boolean insideTheBox,
+        BiomassAllocator delegate
+    ) {
         this.insideTheBox = insideTheBox;
         this.delegate = delegate;
-        Preconditions.checkArgument(lowestX<=highestX, "allocator bound badly defined");
-        Preconditions.checkArgument(lowestY<=highestY,"allocator bound badly defined");
+        Preconditions.checkArgument(lowestX <= highestX, "allocator bound badly defined");
+        Preconditions.checkArgument(lowestY <= highestY, "allocator bound badly defined");
         this.lowestX = lowestX;
         this.lowestY = lowestY;
         this.highestX = highestX;
@@ -69,15 +70,14 @@ public class BoundedAllocatorDecorator implements BiomassAllocator {
      */
     @Override
     public double allocate(
-            SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
+        SeaTile tile, NauticalMap map, MersenneTwisterFast random
+    ) {
 
-        if(tile.getGridY()>=lowestY && tile.getGridY()<=highestY &&
-                tile.getGridX()>=lowestX && tile.getGridX()<=highestX)
+        if (tile.getGridY() >= lowestY && tile.getGridY() <= highestY &&
+            tile.getGridX() >= lowestX && tile.getGridX() <= highestX)
             return insideTheBox ? delegate.allocate(tile, map, random) : 0d;
         else
             return insideTheBox ? 0d : delegate.allocate(tile, map, random);
-
-
 
 
     }

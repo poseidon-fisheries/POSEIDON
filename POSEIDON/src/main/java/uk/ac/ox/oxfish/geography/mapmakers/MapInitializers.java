@@ -52,7 +52,8 @@ public class MapInitializers {
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private MapInitializers() { }
+    private MapInitializers() {
+    }
 
     public static void add(
         final String name,

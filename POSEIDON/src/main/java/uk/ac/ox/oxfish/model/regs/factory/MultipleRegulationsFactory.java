@@ -48,12 +48,14 @@ public class MultipleRegulationsFactory implements AlgorithmFactory<MultipleRegu
     private LinkedList<String> tags;
     private LinkedList<AlgorithmFactory<? extends Regulation>> factories;
 
-    public MultipleRegulationsFactory(
-        LinkedList<AlgorithmFactory<? extends Regulation>> factories,
-        LinkedList<String> tags
-    ) {
-        this.factories = factories;
-        this.tags = tags;
+    /**
+     * default factories provided
+     */
+    public MultipleRegulationsFactory() {
+        this(ImmutableMap.of(
+            new ITQMonoFactory(2500), TAG_FOR_ALL,
+            new ProtectedAreasOnlyFactory(), TAG_FOR_ALL
+        ));
     }
 
     /**
@@ -66,14 +68,12 @@ public class MultipleRegulationsFactory implements AlgorithmFactory<MultipleRegu
         this(new LinkedList<>(regulations.keySet()), new LinkedList<>(regulations.values()));
     }
 
-    /**
-     * default factories provided
-     */
-    public MultipleRegulationsFactory() {
-        this(ImmutableMap.of(
-            new ITQMonoFactory(2500), TAG_FOR_ALL,
-            new ProtectedAreasOnlyFactory(), TAG_FOR_ALL
-        ));
+    public MultipleRegulationsFactory(
+        LinkedList<AlgorithmFactory<? extends Regulation>> factories,
+        LinkedList<String> tags
+    ) {
+        this.factories = factories;
+        this.tags = tags;
     }
 
     /**
@@ -128,7 +128,8 @@ public class MultipleRegulationsFactory implements AlgorithmFactory<MultipleRegu
      * @param factories Value to set for property 'factories'.
      */
     public void setFactories(
-            LinkedList<AlgorithmFactory<? extends Regulation>> factories) {
+        LinkedList<AlgorithmFactory<? extends Regulation>> factories
+    ) {
         this.factories = factories;
     }
 }

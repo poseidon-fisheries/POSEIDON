@@ -31,15 +31,15 @@ import java.util.List;
 
 /**
  * if "from" has one of these tags, then "to" has to have it in at least one case.
- *
+ * <p>
  * So for example if the tags are "A" and "B" then:
- *
- *  nothing ---> "A" is okay
- *  nothing ---> nothing is okay
- *  "A" ----> "A" is okay
- *  "A","B" ---> "A" is okay
- *  "B" ---> "A" is not okay
- *  "B" ---> nothing is not okay
+ * <p>
+ * nothing ---> "A" is okay
+ * nothing ---> nothing is okay
+ * "A" ----> "A" is okay
+ * "A","B" ---> "A" is okay
+ * "B" ---> "A" is not okay
+ * "B" ---> nothing is not okay
  */
 public class MustShareTag implements AlgorithmFactory<NetworkPredicate> {
 
@@ -58,39 +58,36 @@ public class MustShareTag implements AlgorithmFactory<NetworkPredicate> {
 
         final List<String> tags = Splitter.on(",").splitToList(mustShareOneOfThese);
 
-        Preconditions.checkArgument(tags.size()>0,"No valid tags for network predicate");
+        Preconditions.checkArgument(tags.size() > 0, "No valid tags for network predicate");
 
         return new NetworkPredicate() {
             @Override
             public boolean test(Fisher from, Fisher to) {
 
                 //empty is easy
-                if(from.getTags().isEmpty())
+                if (from.getTags().isEmpty())
                     return true;
 
 
                 boolean atLeastOneMismatch = false;
 
 
-              // go through all the tags
-                for(String tag : tags)
-                {
+                // go through all the tags
+                for (String tag : tags) {
                     //if there is a match you are done
-                    if(from.getTags().contains(tag))
-                        if(to.getTags().contains(tag))
-                        {
+                    if (from.getTags().contains(tag))
+                        if (to.getTags().contains(tag)) {
                             return true;
-                        }
-                    else{
-                        //otherwise remember there was a mismatch
-                        atLeastOneMismatch = true;
+                        } else {
+                            //otherwise remember there was a mismatch
+                            atLeastOneMismatch = true;
                         }
 
 
                 }
                 //if there was a mismatch and no matches, you are done!
-                if(atLeastOneMismatch)
-                 return false;
+                if (atLeastOneMismatch)
+                    return false;
                 else
                     return true;
 

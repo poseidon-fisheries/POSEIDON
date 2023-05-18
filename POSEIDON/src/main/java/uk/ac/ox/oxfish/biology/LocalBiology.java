@@ -20,8 +20,6 @@
 
 package uk.ac.ox.oxfish.biology;
 
-import static com.google.common.collect.Streams.stream;
-
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.Startable;
@@ -32,22 +30,12 @@ import uk.ac.ox.oxfish.model.Startable;
  * information
  * Created by carrknight on 4/11/15.
  */
-public interface LocalBiology extends Startable
-{
+public interface LocalBiology extends Startable {
 
-
-
-
-
-    /**
-     * the biomass at this location for a single species.
-     * @param species  the species you care about
-     * @return the biomass of this species
-     */
-    double getBiomass(Species species);
 
     /**
      * The biomass at this location for the specified species.
+     *
      * @param species an iterable of the species we are interested in.
      * @return the sum of biomass for the specified species.
      */
@@ -62,19 +50,26 @@ public interface LocalBiology extends Startable
     }
 
     /**
+     * the biomass at this location for a single species.
+     *
+     * @param species the species you care about
+     * @return the biomass of this species
+     */
+    double getBiomass(Species species);
+
+    /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
-     * @param caught the amount fished out of the sea
+     *
+     * @param caught       the amount fished out of the sea
      * @param notDiscarded the amount retained in the boat (not thrown out)
      * @param biology
      */
     void reactToThisAmountOfBiomassBeingFished(
-            Catch caught, Catch notDiscarded, GlobalBiology biology);
-
+        Catch caught, Catch notDiscarded, GlobalBiology biology
+    );
 
 
     StructuredAbundance getAbundance(Species species);
-
-
 
 
 }

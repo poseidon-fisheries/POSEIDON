@@ -33,9 +33,13 @@ public class TidyYearlyData extends TidyTimeSeries<TimeSeries<?>> {
         super(timeSeries);
     }
 
-    @Override public List<String> getHeaders() { return HEADERS; }
+    @Override
+    public List<String> getHeaders() {
+        return HEADERS;
+    }
 
-    @Override List<Object> makeRow(final DataColumn column, final int index) {
+    @Override
+    List<Object> makeRow(final DataColumn column, final int index) {
         return ImmutableList.of(
             index + 1, // year
             column.getName(), // variable

@@ -21,8 +21,7 @@ import java.util.stream.Collectors;
 public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable {
 
 
-
-    private final LinkedHashMap<String,Integer> numberOfSamplesPerTag = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Integer> numberOfSamplesPerTag = new LinkedHashMap<>();
 
     private final HashSet<Fisher> observedFishers = new HashSet<>();
 
@@ -30,16 +29,17 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
     private Stoppable receipt;
 
     public CatchSamplerFixedSample(
-            LinkedHashMap<String, Integer> numberOfSamplesPerTag,
-            Species species) {
-        this.delegate = new CatchSample(species,
-                new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()]);
+        LinkedHashMap<String, Integer> numberOfSamplesPerTag,
+        Species species
+    ) {
+        this.delegate = new CatchSample(
+            species,
+            new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()]
+        );
 
         numberOfSamplesPerTag.forEach(
-                    CatchSamplerFixedSample.this.numberOfSamplesPerTag::put);
+            CatchSamplerFixedSample.this.numberOfSamplesPerTag::put);
     }
-
-
 
 
     @Override
@@ -49,12 +49,12 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
 
     @Override
     public void resetCatchObservations() {
-            delegate.resetCatchObservations();
+        delegate.resetCatchObservations();
     }
 
     @Override
     public double[][] getAbundance() {
-        return  delegate.getAbundance();
+        return delegate.getAbundance();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
 
     @Override
     public Species getSpecies() {
-        return  delegate.getSpecies();
+        return delegate.getSpecies();
     }
 
     @Override
@@ -87,16 +87,21 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
 
     }
 
+    @Override
+    public void step(SimState simState) {
+        checkWhichFisherToObserve(((FishState) simState));
+    }
 
     /**
      * builds the list of fishers to observe
+     *
      * @param model the model
      */
-    private void checkWhichFisherToObserve(FishState model){
+    private void checkWhichFisherToObserve(FishState model) {
 
         //remove fishers who do not go out anymore from the list of observations
         final List<Fisher> stillValidFishersToObserve = observedFishers.stream().filter(
-                fisher -> model.getYear() == 0 || fisher.hasBeenActiveThisYear()
+            fisher -> model.getYear() == 0 || fisher.hasBeenActiveThisYear()
         ).collect(Collectors.toList());
 
         observedFishers.clear();
@@ -107,52 +112,42 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
 
             //how many are you already monitoring?
             long currentlyContained = observedFishers.stream().filter(
-                    fisher -> fisher.getTags().contains(tagToSample.getKey())
+                fisher -> fisher.getTags().contains(tagToSample.getKey())
             ).count();
             //how many do you need to add to the sample?
-            long shortfall = Math.max(tagToSample.getValue() - currentlyContained,0); //could go negative if the tag is shared among many populations
-            if(shortfall>0)
-            model.getFishers().stream().
+            long shortfall = Math.max(tagToSample.getValue() - currentlyContained,
+                0); //could go negative if the tag is shared among many populations
+            if (shortfall > 0)
+                model.getFishers().stream().
                     //ignore fishers that quit
 
-                            filter(
+                        filter(
 
-                            fisher -> model.getYear()== 0 || fisher.hasBeenActiveThisYear()
+                        fisher -> model.getYear() == 0 || fisher.hasBeenActiveThisYear()
 
                     ).
                     //pick only the right tag
-                    filter(
-                            fisher -> fisher.getTags().contains(tagToSample.getKey())
+                        filter(
+                        fisher -> fisher.getTags().contains(tagToSample.getKey())
                     ).
                     //shuffle them
-                    sorted(new RandomComparator<>(model.getRandom())).
+                        sorted(new RandomComparator<>(model.getRandom())).
                     //pick only first x
-                    limit(shortfall).
+                        limit(shortfall).
                     //add them list of fishers
-                    forEach(
-                    fisher -> observedFishers.add(fisher)
-            );
-
-
+                        forEach(
+                        fisher -> observedFishers.add(fisher)
+                    );
 
 
         }
 
 
-
-
-    }
-
-
-
-    @Override
-    public void step(SimState simState) {
-        checkWhichFisherToObserve(((FishState) simState));
     }
 
     @Override
     public void turnOff() {
-        if(receipt!=null)
+        if (receipt != null)
             receipt.stop();
     }
 

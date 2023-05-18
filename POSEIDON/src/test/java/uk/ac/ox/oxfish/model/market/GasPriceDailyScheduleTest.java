@@ -47,7 +47,7 @@ public class GasPriceDailyScheduleTest {
         Port port1 = mock(Port.class);
         Port port2 = mock(Port.class);
         TimeSeriesActuator gasPrice = TimeSeriesActuator.gasPriceDailySchedule(
-                gasSchedule,Lists.newArrayList(port1,port2)
+            gasSchedule, Lists.newArrayList(port1, port2)
         );
 
         gasPrice.step(mock(FishState.class));
@@ -63,7 +63,7 @@ public class GasPriceDailyScheduleTest {
         verify(port2).setGasPricePerLiter(3);
 
         gasPrice.step(mock(FishState.class));
-        verify(port1,times(2)).setGasPricePerLiter(1);
-        verify(port2,times(2)).setGasPricePerLiter(1);
+        verify(port1, times(2)).setGasPricePerLiter(1);
+        verify(port2, times(2)).setGasPricePerLiter(1);
     }
 }

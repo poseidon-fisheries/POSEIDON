@@ -36,8 +36,7 @@ import java.util.Map;
  * Depending on flag this can either be counting trips or hours spent fishing
  * Created by carrknight on 1/10/17.
  */
-public class DiscretizationHistogrammer implements TripListener, OutputPlugin
-{
+public class DiscretizationHistogrammer implements TripListener, OutputPlugin {
 
     private final MapDiscretization discretization;
 
@@ -53,36 +52,34 @@ public class DiscretizationHistogrammer implements TripListener, OutputPlugin
 
     private String fileName = "location_histogram.csv";
 
+    public DiscretizationHistogrammer(MapDiscretization discretization, boolean effortCounter) {
+        this.discretization = discretization;
+        this.effortCounter = effortCounter;
+        counts = new Integer[discretization.getNumberOfGroups()];
+        for (int i = 0; i < counts.length; i++)
+            counts[i] = 0;
+    }
+
     @Override
     public void reactToEndOfSimulation(FishState state) {
 
     }
 
-    public DiscretizationHistogrammer(MapDiscretization discretization, boolean effortCounter) {
-        this.discretization = discretization;
-        this.effortCounter = effortCounter;
-        counts = new Integer[discretization.getNumberOfGroups()];
-        for(int i=0; i<counts.length; i++)
-            counts[i] = 0;
-    }
-
     /**
      * turn most fished tile into a group number and add 1 to the list
+     *
      * @param record
      * @param fisher
      */
     @Override
     public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-        if(!effortCounter) {
+        if (!effortCounter) {
             SeaTile mostFishedTileInTrip = record.getMostFishedTileInTrip();
-            if(mostFishedTileInTrip != null && discretization.getGroup(mostFishedTileInTrip) != null)
+            if (mostFishedTileInTrip != null && discretization.getGroup(mostFishedTileInTrip) != null)
                 counts[discretization.getGroup(mostFishedTileInTrip)]++;
-        }
-        else
-        {
-            for (Map.Entry<SeaTile, FishingRecord> effort : record.getFishingRecords())
-            {
-                counts[discretization.getGroup(effort.getKey())]+=effort.getValue().getHoursSpentFishing();
+        } else {
+            for (Map.Entry<SeaTile, FishingRecord> effort : record.getFishingRecords()) {
+                counts[discretization.getGroup(effort.getKey())] += effort.getValue().getHoursSpentFishing();
             }
         }
     }
@@ -116,12 +113,6 @@ public class DiscretizationHistogrammer implements TripListener, OutputPlugin
     }
 
     @Override
-    public String toString() {
-        Joiner joiner = Joiner.on(",").skipNulls();
-        return joiner.join(counts);
-    }
-
-    @Override
     public String getFileName() {
         return fileName;
     }
@@ -138,5 +129,11 @@ public class DiscretizationHistogrammer implements TripListener, OutputPlugin
     @Override
     public String composeFileContents() {
         return toString();
+    }
+
+    @Override
+    public String toString() {
+        Joiner joiner = Joiner.on(",").skipNulls();
+        return joiner.join(counts);
     }
 }

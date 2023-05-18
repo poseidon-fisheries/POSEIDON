@@ -54,5 +54,6 @@ public class ObjectiveFunctions {
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private ObjectiveFunctions() {}
+    private ObjectiveFunctions() {
+    }
 }

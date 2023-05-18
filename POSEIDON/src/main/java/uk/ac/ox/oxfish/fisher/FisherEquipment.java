@@ -44,7 +44,6 @@ public class FisherEquipment implements Serializable {
     private Hold hold;
 
 
-
     /**
      * what is used for fishing
      */
@@ -98,12 +97,14 @@ public class FisherEquipment implements Serializable {
     }
 
 
-    public FisherEquipment makeCopy()
-    {
+    public FisherEquipment makeCopy() {
         FuelTank tank = new FuelTank(boat.getFuelCapacityInLiters());
         tank.refill();
-        tank.consume(tank.getFuelCapacityInLiters()-boat.getLitersOfFuelInTank());
-        return new FisherEquipment(new Boat(boat.getLength(),boat.getWidth(),new Engine(boat.getPowerInBhp(),boat.getEfficiencyAsLitersPerKm(),boat.getSpeedInKph()),
-                                            tank),hold.makeCopy(),gear.makeCopy());
+        tank.consume(tank.getFuelCapacityInLiters() - boat.getLitersOfFuelInTank());
+        return new FisherEquipment(new Boat(boat.getLength(),
+            boat.getWidth(),
+            new Engine(boat.getPowerInBhp(), boat.getEfficiencyAsLitersPerKm(), boat.getSpeedInKph()),
+            tank
+        ), hold.makeCopy(), gear.makeCopy());
     }
 }

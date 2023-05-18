@@ -23,10 +23,19 @@ public class SummingAccumulator<V extends Number> implements Accumulator<V> {
 
     private double sum;
 
-    @Override public double get() { return sum; }
+    @Override
+    public double get() {
+        return sum;
+    }
 
-    @Override public String getNameFormat() { return "Sum of %s"; }
+    @Override
+    public String getNameFormat() {
+        return "Sum of %s";
+    }
 
-    @Override public void accumulate(V value) { this.sum = this.sum + value.doubleValue(); }
+    @Override
+    public void accumulate(V value) {
+        this.sum = this.sum + value.doubleValue();
+    }
 
 }

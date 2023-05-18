@@ -52,12 +52,14 @@ public class ITQCostManagerTest {
     public void factoriesCreateIt() throws Exception {
 
 
-        List<String> regulations = Lists.newArrayList("Mono-ITQ",
-                                                      "Multi-ITQ",
-                                                      "Multi-ITQ by List",
-                                                      "Partial-ITQ") ;
+        List<String> regulations = Lists.newArrayList(
+            "Mono-ITQ",
+            "Multi-ITQ",
+            "Multi-ITQ by List",
+            "Partial-ITQ"
+        );
 
-        for(String regulation : regulations)
+        for (String regulation : regulations)
             testThatCostManagerHasBeenInitialized(regulation);
 
     }
@@ -66,11 +68,11 @@ public class ITQCostManagerTest {
         Log.info("Testing that " + regulationName + " creates 1 cost manager");
         FishState state = initialize(regulationName);
         int count = 0;
-        for(Cost cost : state.getFishers().get(0).getOpportunityCosts())
-            if(cost instanceof ITQCostManager)
+        for (Cost cost : state.getFishers().get(0).getOpportunityCosts())
+            if (cost instanceof ITQCostManager)
                 count++;
 
-        assertEquals(count,1);
+        assertEquals(count, 1);
     }
 
     private FishState initialize(final String regulationName) {
@@ -99,15 +101,17 @@ public class ITQCostManagerTest {
         when(second.getLastClosingPrice()).thenReturn(10d);
 
 
-        Species firstSpecies = mock(Species.class); when(firstSpecies.getIndex()).thenReturn(0);
-        Species secondSpecies = mock(Species.class); when(secondSpecies.getIndex()).thenReturn(1);
+        Species firstSpecies = mock(Species.class);
+        when(firstSpecies.getIndex()).thenReturn(0);
+        Species secondSpecies = mock(Species.class);
+        when(secondSpecies.getIndex()).thenReturn(1);
         FishState model = mock(FishState.class);
-        when(model.getSpecies()).thenReturn(Lists.newArrayList(firstSpecies,secondSpecies));
+        when(model.getSpecies()).thenReturn(Lists.newArrayList(firstSpecies, secondSpecies));
 
         ITQCostManager costManager = new ITQCostManager(new Function<Species, ITQOrderBook>() {
             @Override
             public ITQOrderBook apply(Species species) {
-                if(species == firstSpecies)
+                if (species == firstSpecies)
                     return first;
                 else {
                     assert species == secondSpecies;
@@ -117,8 +121,8 @@ public class ITQCostManagerTest {
         });
 
         TripRecord record = mock(TripRecord.class);
-        when(record.getSoldCatch()).thenReturn(new double[]{5,3});
-        assertEquals(35, costManager.cost(mock(Fisher.class), model, record, -1,1 ), .001);
+        when(record.getSoldCatch()).thenReturn(new double[]{5, 3});
+        assertEquals(35, costManager.cost(mock(Fisher.class), model, record, -1, 1), .001);
 
     }
 }

@@ -20,7 +20,7 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
     private boolean premiumThirdBin = false;
 
     private DoubleParameter premiumInPercentage =
-            new FixedDoubleParameter(2);
+        new FixedDoubleParameter(2);
 
     private ThreePricesMarketFactory nonPremiumMarket;
 
@@ -34,33 +34,33 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
         final double v = premiumInPercentage.applyAsDouble(fishState.getRandom());
 
         //save prices to restore later
-        if(premiumFirstBin) {
+        if (premiumFirstBin) {
             premium.getPricePerSegment()[0] =
-                    premium.getPricePerSegment()[0] * v;
+                premium.getPricePerSegment()[0] * v;
         }
-        if(premiumSecondBin) {
+        if (premiumSecondBin) {
 
             premium.getPricePerSegment()[1] =
-                    premium.getPricePerSegment()[1] * v;
+                premium.getPricePerSegment()[1] * v;
 
         }
-        if(premiumThirdBin) {
+        if (premiumThirdBin) {
 
             premium.getPricePerSegment()[2] =
-                    premium.getPricePerSegment()[2] * v;
+                premium.getPricePerSegment()[2] * v;
 
         }
 
 
         return new ConditionalMarket(
-                nonPremium,
-                premium,
-                new Predicate<Fisher>() {
-                    @Override
-                    public boolean test(Fisher fisher) {
-                        return fisher.getTags().contains(tagNeededToAccessToPremium);
-                    }
+            nonPremium,
+            premium,
+            new Predicate<Fisher>() {
+                @Override
+                public boolean test(Fisher fisher) {
+                    return fisher.getTags().contains(tagNeededToAccessToPremium);
                 }
+            }
         );
     }
 
@@ -111,7 +111,6 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
     public void setTagNeededToAccessToPremium(String tagNeededToAccessToPremium) {
         this.tagNeededToAccessToPremium = tagNeededToAccessToPremium;
     }
-
 
 
 }

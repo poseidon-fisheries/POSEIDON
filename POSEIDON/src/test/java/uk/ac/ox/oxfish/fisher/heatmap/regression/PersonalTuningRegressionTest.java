@@ -43,22 +43,24 @@ public class PersonalTuningRegressionTest {
 
         GeographicalRegression<Double> fake = new GeographicalRegression<Double>() {
 
-            double[] parameters =  new double[2];
+            double[] parameters = new double[2];
 
             @Override
             public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
-                return Math.pow(parameters[0]+2,2) + Math.pow(parameters[1]-10,2);
+                return Math.pow(parameters[0] + 2, 2) + Math.pow(parameters[1] - 10, 2);
             }
 
             @Override
             public void addObservation(
-                    GeographicalObservation<Double> observation, Fisher fisher, FishState model) {
+                GeographicalObservation<Double> observation, Fisher fisher, FishState model
+            ) {
                 //ignored
             }
 
             @Override
             public double extractNumericalYFromObservation(
-                    GeographicalObservation<Double> observation, Fisher fisher) {
+                GeographicalObservation<Double> observation, Fisher fisher
+            ) {
                 return 0;
             }
 
@@ -85,21 +87,20 @@ public class PersonalTuningRegressionTest {
 
 
         PersonalTuningRegression regression = new PersonalTuningRegression(
-                    fake,
-                    .005,.001,
-                    2
+            fake,
+            .005, .001,
+            2
 
         );
 
 
-        for(int i=0; i<1000; i++)
-        {
-            regression.addObservation(mock(GeographicalObservation.class),mock(Fisher.class),mock(FishState.class) );
+        for (int i = 0; i < 1000; i++) {
+            regression.addObservation(mock(GeographicalObservation.class), mock(Fisher.class), mock(FishState.class));
             System.out.println(Arrays.toString(regression.getParametersAsArray()));
         }
         //the approach gets really slow so you might not have reached it
-        assertEquals(regression.getParametersAsArray()[0],-2,.1);
-        assertEquals(regression.getParametersAsArray()[1],10,.5);
+        assertEquals(regression.getParametersAsArray()[0], -2, .1);
+        assertEquals(regression.getParametersAsArray()[1], 10, .5);
 
     }
 }

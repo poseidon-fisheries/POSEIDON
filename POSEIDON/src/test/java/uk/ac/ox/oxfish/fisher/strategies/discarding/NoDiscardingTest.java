@@ -46,26 +46,27 @@ public class NoDiscardingTest {
         Species species1 = new Species("first", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
         Species species2 = new Species("second", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
 
-        GlobalBiology biology = new GlobalBiology(species1,species2);
+        GlobalBiology biology = new GlobalBiology(species1, species2);
 
-        Catch caught = new Catch(species1,100,biology);
+        Catch caught = new Catch(species1, 100, biology);
         NoDiscarding noDiscarding = new NoDiscarding();
 
-        Catch retained = noDiscarding.chooseWhatToKeep(mock(SeaTile.class),
-                                                       mock(Fisher.class),
-                                                       caught,
-                                                       1,
-                                                       mock(Regulation.class),
-                                                       mock(FishState.class),
-                                                       new MersenneTwisterFast());
+        Catch retained = noDiscarding.chooseWhatToKeep(
+            mock(SeaTile.class),
+            mock(Fisher.class),
+            caught,
+            1,
+            mock(Regulation.class),
+            mock(FishState.class),
+            new MersenneTwisterFast()
+        );
 
-        assertEquals(retained,caught);
-        assertEquals(retained.getTotalWeight(),caught.getTotalWeight(),.001);
-        assertEquals(retained.getWeightCaught(0),caught.getWeightCaught(0),.001);
-        assertEquals(retained.getWeightCaught(1),caught.getWeightCaught(1),.001);
+        assertEquals(retained, caught);
+        assertEquals(retained.getTotalWeight(), caught.getTotalWeight(), .001);
+        assertEquals(retained.getWeightCaught(0), caught.getWeightCaught(0), .001);
+        assertEquals(retained.getWeightCaught(1), caught.getWeightCaught(1), .001);
 
     }
-
 
 
 }

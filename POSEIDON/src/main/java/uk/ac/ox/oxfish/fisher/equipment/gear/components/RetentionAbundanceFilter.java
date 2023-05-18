@@ -20,11 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
-import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.util.Objects;
 
 /**
  * The retention filter formula that appears the most in the spreadhseets
@@ -40,9 +36,9 @@ public class RetentionAbundanceFilter extends FormulaAbundanceFilter {
     private final double asymptote;
 
 
-
     public RetentionAbundanceFilter(
-            boolean memoization, double inflection, double slope, double asymptote, final boolean rounding) {
+        boolean memoization, double inflection, double slope, double asymptote, final boolean rounding
+    ) {
         super(memoization, rounding);
         this.inflection = inflection;
         this.slope = slope;
@@ -50,15 +46,13 @@ public class RetentionAbundanceFilter extends FormulaAbundanceFilter {
     }
 
     @Override
-    protected double[][] computeSelectivity(Species species)
-    {
+    protected double[][] computeSelectivity(Species species) {
         double[][] toReturn = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
 
-        for(int subdivision = 0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
-            for(int age=0; age<species.getNumberOfBins(); age++)
-            {
+        for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++)
+            for (int age = 0; age < species.getNumberOfBins(); age++) {
                 toReturn[subdivision][age] =
-                        asymptote/(1+Math.exp(-( species.getLength(subdivision,age)-inflection)/slope));
+                    asymptote / (1 + Math.exp(-(species.getLength(subdivision, age) - inflection) / slope));
 
 
             }

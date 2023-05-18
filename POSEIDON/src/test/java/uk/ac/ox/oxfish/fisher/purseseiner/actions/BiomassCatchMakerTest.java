@@ -18,14 +18,15 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-
-import java.util.Map.Entry;
 import junit.framework.TestCase;
 import org.junit.Assert;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+
+import java.util.Map.Entry;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class BiomassCatchMakerTest extends TestCase {
 
@@ -36,16 +37,16 @@ public class BiomassCatchMakerTest extends TestCase {
     public void testApply() {
         final Entry<Catch, BiomassLocalBiology> caughtAndUncaught =
             catchMaker.apply(
-                new BiomassLocalBiology(new double[] {10.0, 10.0}),
-                new BiomassLocalBiology(new double[] {5.0, 15.0})
+                new BiomassLocalBiology(new double[]{10.0, 10.0}),
+                new BiomassLocalBiology(new double[]{5.0, 15.0})
             );
         Assert.assertArrayEquals(
-            new double[] {5.0, 10.0},
+            new double[]{5.0, 10.0},
             caughtAndUncaught.getKey().getBiomassArray(),
             EPSILON
         );
         Assert.assertArrayEquals(
-            new double[] {0.0, 5.0},
+            new double[]{0.0, 5.0},
             caughtAndUncaught.getValue().getCurrentBiomass(),
             EPSILON
         );

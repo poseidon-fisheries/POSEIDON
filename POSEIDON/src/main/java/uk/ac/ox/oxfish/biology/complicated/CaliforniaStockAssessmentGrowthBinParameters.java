@@ -25,13 +25,11 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 
 /**
  * follows the california stock assessment formulas where bins are age classes, and the subdivision is MALE-FEMALE
- * 
  */
-public class CaliforniaStockAssessmentGrowthBinParameters implements Meristics{
-    
-    
-    private final int maxAge;
+public class CaliforniaStockAssessmentGrowthBinParameters implements Meristics {
 
+
+    private final int maxAge;
 
 
     private final double[][] weights;
@@ -41,88 +39,84 @@ public class CaliforniaStockAssessmentGrowthBinParameters implements Meristics{
 
     /**
      * creates what is basically Von Bertalanffy but with very particular parametrization
-     * @param maxAge max age (which is the last bin)
-     * @param youngLengthMale  length at "ageYoung"
-     * @param oldLengthMale length at "ageOld"
-     * @param weightParameterAMale alpha transforming length to weight
-     * @param weightParameterBMale beta transforming length to weight
-     * @param KParameterMale growth parameter
-     * @param youngLengthFemale length at "ageYoung"
-     * @param oldLengthFemale length at "ageOld"
+     *
+     * @param maxAge                 max age (which is the last bin)
+     * @param youngLengthMale        length at "ageYoung"
+     * @param oldLengthMale          length at "ageOld"
+     * @param weightParameterAMale   alpha transforming length to weight
+     * @param weightParameterBMale   beta transforming length to weight
+     * @param KParameterMale         growth parameter
+     * @param youngLengthFemale      length at "ageYoung"
+     * @param oldLengthFemale        length at "ageOld"
      * @param weightParameterAFemale alpha transforming length to weight
      * @param weightParameterBFemale beta transforming length to weight
-     * @param KParameterFemale the growth parameter (annual)
-     * @param ageOld what year the fish is considered old
-     * @param ageYoungMale what year the male fish is considered young
+     * @param KParameterFemale       the growth parameter (annual)
+     * @param ageOld                 what year the fish is considered old
+     * @param ageYoungMale           what year the male fish is considered young
      */
     public CaliforniaStockAssessmentGrowthBinParameters(
-            int maxAge, double youngLengthMale,
-            double oldLengthMale,
-            double weightParameterAMale,
-            double weightParameterBMale,
-            double KParameterMale,
-            double youngLengthFemale,
-            double oldLengthFemale,
-            double weightParameterAFemale,
-            double weightParameterBFemale,
-            double KParameterFemale,
-            double ageOld,
-            double ageYoungMale,
-            double ageYoungFemale) {
+        int maxAge, double youngLengthMale,
+        double oldLengthMale,
+        double weightParameterAMale,
+        double weightParameterBMale,
+        double KParameterMale,
+        double youngLengthFemale,
+        double oldLengthFemale,
+        double weightParameterAFemale,
+        double weightParameterBFemale,
+        double KParameterFemale,
+        double ageOld,
+        double ageYoungMale,
+        double ageYoungFemale
+    ) {
 
 
         this.maxAge = maxAge;
         //compute L-Inf for Von Bertalanffy
         double LInfFemale =
-                 youngLengthFemale < ageOld
-                        ?
-                        youngLengthFemale +((oldLengthFemale- youngLengthFemale)/
-                                (1-Math.exp(-KParameterFemale *(ageOld - ageYoungFemale))))
-                        :
-                        oldLengthFemale
-        ;
+            youngLengthFemale < ageOld
+                ?
+                youngLengthFemale + ((oldLengthFemale - youngLengthFemale) /
+                    (1 - Math.exp(-KParameterFemale * (ageOld - ageYoungFemale))))
+                :
+                oldLengthFemale;
         double LInfMale =
-                youngLengthMale < ageOld
-                        ?
-                        youngLengthMale +((oldLengthMale- youngLengthMale)/
-                                (1-Math.exp(-KParameterMale *(ageOld- ageYoungMale))))
-                        :
-                       oldLengthMale
-        ;
+            youngLengthMale < ageOld
+                ?
+                youngLengthMale + ((oldLengthMale - youngLengthMale) /
+                    (1 - Math.exp(-KParameterMale * (ageOld - ageYoungMale))))
+                :
+                oldLengthMale;
 
         //set up the the weights and lengths containers
         weights = new double[2][];
-        weights[0] = new double[maxAge+1];
-        weights[1] = new double[maxAge+1];
+        weights[0] = new double[maxAge + 1];
+        weights[1] = new double[maxAge + 1];
         lengths = new double[2][];
-        lengths[0] = new double[maxAge+1];
-        lengths[1] = new double[maxAge+1];
+        lengths[0] = new double[maxAge + 1];
+        lengths[1] = new double[maxAge + 1];
 
         //compute each year Bertalanffy length
-        for(int age = 0; age< maxAge +1; age++)
-        {
-            lengths[FEMALE][age] = LInfFemale + ((youngLengthFemale -LInfFemale))*
-                    Math.exp(-KParameterFemale*(age- ageYoungFemale));
+        for (int age = 0; age < maxAge + 1; age++) {
+            lengths[FEMALE][age] = LInfFemale + ((youngLengthFemale - LInfFemale)) *
+                Math.exp(-KParameterFemale * (age - ageYoungFemale));
             //the formulas lead to negative lenghts for very small fish, here we just round it to 0
-            if(lengths[FEMALE][age]<0)
-                lengths[FEMALE][age]=0d;
-            weights[FEMALE][age] = weightParameterAFemale * Math.pow(lengths[FEMALE][age],
-                                                                     weightParameterBFemale);
+            if (lengths[FEMALE][age] < 0)
+                lengths[FEMALE][age] = 0d;
+            weights[FEMALE][age] = weightParameterAFemale * Math.pow(
+                lengths[FEMALE][age],
+                weightParameterBFemale
+            );
 
 
-            lengths[MALE][age] = LInfMale + ((youngLengthMale- LInfMale))*
-                    Math.exp(-KParameterMale*(age- ageYoungMale));
-            if(lengths[MALE][age]<0)
-                lengths[MALE][age]=0d;
-            weights[MALE][age] = weightParameterAMale * Math.pow(lengths[MALE][age],weightParameterBMale);
+            lengths[MALE][age] = LInfMale + ((youngLengthMale - LInfMale)) *
+                Math.exp(-KParameterMale * (age - ageYoungMale));
+            if (lengths[MALE][age] < 0)
+                lengths[MALE][age] = 0d;
+            weights[MALE][age] = weightParameterAMale * Math.pow(lengths[MALE][age], weightParameterBMale);
         }
 
 
-    }
-
-    @Override
-    public double getLength(int subdivision, int bin) {
-        return lengths[subdivision][bin];
     }
 
     @Override
@@ -148,7 +142,7 @@ public class CaliforniaStockAssessmentGrowthBinParameters implements Meristics{
      */
     @Override
     public int getNumberOfBins() {
-        return maxAge+1;
+        return maxAge + 1;
     }
 
     /**
@@ -161,6 +155,11 @@ public class CaliforniaStockAssessmentGrowthBinParameters implements Meristics{
     @Override
     public double getLengthAtAge(int ageInYears, int subdivision) {
 
-        return getLength(subdivision,ageInYears > maxAge ? (int)ageInYears : maxAge );
+        return getLength(subdivision, ageInYears > maxAge ? (int) ageInYears : maxAge);
+    }
+
+    @Override
+    public double getLength(int subdivision, int bin) {
+        return lengths[subdivision][bin];
     }
 }

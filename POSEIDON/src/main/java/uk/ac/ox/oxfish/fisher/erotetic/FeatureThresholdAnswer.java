@@ -30,8 +30,7 @@ import java.util.Map;
  * Like threshold filter but the threshold is just another feature
  * Created by carrknight on 4/11/16.
  */
-public class FeatureThresholdAnswer<T>  implements EroteticAnswer<T>
-{
+public class FeatureThresholdAnswer<T> implements EroteticAnswer<T> {
 
 
     private final int minimumNumberOfObservations;
@@ -45,25 +44,24 @@ public class FeatureThresholdAnswer<T>  implements EroteticAnswer<T>
     private final boolean goodAboveTrue;
 
     public FeatureThresholdAnswer(
-            int minimumNumberOfObservations,
-            String featureName,
-            String thresholdFeatureName)
-    {
-        this(minimumNumberOfObservations, featureName, thresholdFeatureName,true);
+        int minimumNumberOfObservations,
+        String featureName,
+        String thresholdFeatureName
+    ) {
+        this(minimumNumberOfObservations, featureName, thresholdFeatureName, true);
     }
 
     public FeatureThresholdAnswer(
-            int minimumNumberOfObservations,
-            String featureName,
-            String thresholdFeatureName,
-            boolean goodAboveTrue)
-    {
+        int minimumNumberOfObservations,
+        String featureName,
+        String thresholdFeatureName,
+        boolean goodAboveTrue
+    ) {
         this.minimumNumberOfObservations = minimumNumberOfObservations;
         this.featureName = featureName;
         this.thresholdFeatureName = thresholdFeatureName;
         this.goodAboveTrue = goodAboveTrue;
     }
-
 
 
     /**
@@ -76,22 +74,24 @@ public class FeatureThresholdAnswer<T>  implements EroteticAnswer<T>
      */
     @Override
     public List<T> answer(
-            List<T> currentOptions, FeatureExtractors<T> representation, FishState state, Fisher fisher) {
+        List<T> currentOptions, FeatureExtractors<T> representation, FishState state, Fisher fisher
+    ) {
         Map<T, Double> features = representation.extractFeature(featureName,
-                                                                currentOptions,
-                                                                state, fisher);
+            currentOptions,
+            state, fisher
+        );
         Map<T, Double> thresholds = representation.extractFeature(thresholdFeatureName,
-                                                                    currentOptions,
-                                                                    state, fisher);
-
+            currentOptions,
+            state, fisher
+        );
 
 
         return ThresholdAnswer.thresholdAnswer(
-                currentOptions,
-                features,
-                thresholds::get,
-                minimumNumberOfObservations,
-                goodAboveTrue
+            currentOptions,
+            features,
+            thresholds::get,
+            minimumNumberOfObservations,
+            goodAboveTrue
         );
     }
 

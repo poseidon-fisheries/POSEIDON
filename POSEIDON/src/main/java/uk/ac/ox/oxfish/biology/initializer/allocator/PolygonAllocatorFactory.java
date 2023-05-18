@@ -12,7 +12,6 @@ import java.nio.file.Paths;
 public class PolygonAllocatorFactory implements AlgorithmFactory<PolygonBiomassDecorator> {
 
 
-
     private Path shapeFile = Paths.get("./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp");
 
 
@@ -26,11 +25,13 @@ public class PolygonAllocatorFactory implements AlgorithmFactory<PolygonBiomassD
 
             GeomVectorField polygon = new GeomVectorField();
             ShapeFileImporterModified.read(shapeFile.toUri().toURL(), polygon,
-                    null, MasonGeometry.class);
-            return new PolygonBiomassDecorator(polygon,
+                null, MasonGeometry.class
+            );
+            return new PolygonBiomassDecorator(
+                polygon,
                 insidePolygon,
-                    delegate.apply(fishState)
-                    );
+                delegate.apply(fishState)
+            );
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to read shapefile!");

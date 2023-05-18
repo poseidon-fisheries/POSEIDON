@@ -2,10 +2,7 @@ package uk.ac.ox.oxfish.maximization.generic;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
-
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * returns a uniform double parameter centered on average and with random spread.
@@ -29,21 +26,21 @@ public class UniformWithSpreadOptimizationParameter implements OptimizationParam
 
     @Override
     public String parametrize(Scenario scenario, double[] inputs) {
-        Preconditions.checkArgument(maxSpread>=minSpread, "invalid bounds " + addressToModify);
-        Preconditions.checkArgument(inputs.length==1);
+        Preconditions.checkArgument(maxSpread >= minSpread, "invalid bounds " + addressToModify);
+        Preconditions.checkArgument(inputs.length == 1);
 
         double actualSpread = SimpleOptimizationParameter.computeNumericValueFromEVABounds(
-                inputs[0],minSpread,maxSpread,true
+            inputs[0], minSpread, maxSpread, true
         );
-        double actualMinimum = average-actualSpread;
-        double actualMaximum = average+actualSpread;
+        double actualMinimum = average - actualSpread;
+        double actualMaximum = average + actualSpread;
 
         try {
             OptimizationParameter.navigateAndSet(
-                    scenario,addressToModify,new UniformDoubleParameter(
-                            actualMinimum,
-                            actualMaximum
-                    )
+                scenario, addressToModify, new UniformDoubleParameter(
+                    actualMinimum,
+                    actualMaximum
+                )
 
             );
         } catch (Exception e) {

@@ -23,9 +23,9 @@ import java.util.function.Function;
 public class HerfindalIndexCollector implements AdditionalStartable, TripListener {
 
 
-    private Table<Integer,Integer,Double> effort;
+    private Table<Integer, Integer, Double> effort;
 
-    private Table<Integer,Integer,Double> catches;
+    private Table<Integer, Integer, Double> catches;
 
 
     @Override
@@ -36,66 +36,68 @@ public class HerfindalIndexCollector implements AdditionalStartable, TripListene
 
         for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
             fisherFactory.getValue().getAdditionalSetups().add(
-                    new Consumer<Fisher>() {
-                        @Override
-                        public void accept(Fisher fisher) {
-                                fisher.addTripListener(HerfindalIndexCollector.this);
-                        }
+                new Consumer<Fisher>() {
+                    @Override
+                    public void accept(Fisher fisher) {
+                        fisher.addTripListener(HerfindalIndexCollector.this);
                     }
+                }
             );
         }
 
         effort = HashBasedTable.create(
-                model.getMap().getWidth(),
-                model.getMap().getHeight()
+            model.getMap().getWidth(),
+            model.getMap().getHeight()
         );
         catches = HashBasedTable.create(
-                model.getMap().getWidth(),
-                model.getMap().getHeight()
+            model.getMap().getWidth(),
+            model.getMap().getHeight()
         );
 
         //register the gatherer (which in our case will also reset the table)
         model.getYearlyDataSet().registerGatherer("Effort Herfindal",
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        double hhi = computeHerfindalIndex(HerfindalIndexCollector.this.effort);
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(FishState fishState) {
+                    double hhi = computeHerfindalIndex(HerfindalIndexCollector.this.effort);
 
-                        effort = HashBasedTable.create(
-                                model.getMap().getWidth(),
-                                model.getMap().getHeight()
-                        );
+                    effort = HashBasedTable.create(
+                        model.getMap().getWidth(),
+                        model.getMap().getHeight()
+                    );
 
-                        return hhi;
+                    return hhi;
 
-                    }
-                },1d);
+                }
+            }, 1d
+        );
 
         model.getYearlyDataSet().registerGatherer("Catch Herfindal",
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        double hhi = computeHerfindalIndex(HerfindalIndexCollector.this.catches);
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(FishState fishState) {
+                    double hhi = computeHerfindalIndex(HerfindalIndexCollector.this.catches);
 
-                        catches = HashBasedTable.create(
-                                model.getMap().getWidth(),
-                                model.getMap().getHeight()
-                        );
+                    catches = HashBasedTable.create(
+                        model.getMap().getWidth(),
+                        model.getMap().getHeight()
+                    );
 
-                        return hhi;
+                    return hhi;
 
-                    }
-                },1d);
+                }
+            }, 1d
+        );
     }
 
     private double computeHerfindalIndex(Table<Integer, Integer, Double> table) {
         double sumOfEffort = 0;
         for (Double effort : table.values()) {
-            sumOfEffort+=effort;
+            sumOfEffort += effort;
         }
         double hhi = 0d;
         for (Double effort : table.values()) {
-            hhi+= Math.pow(effort/sumOfEffort,2);
+            hhi += Math.pow(effort / sumOfEffort, 2);
         }
         return hhi;
     }
@@ -104,11 +106,18 @@ public class HerfindalIndexCollector implements AdditionalStartable, TripListene
     public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
 
 
-        Map<Table<Integer,Integer,Double>,
-                Function<FishingRecord,Double>> tablesToUpdate =
-                new HashMap<>();
-        tablesToUpdate.put(effort, (Function<FishingRecord, Double>) fishingRecord -> Double.valueOf(fishingRecord.getHoursSpentFishing()));
-        tablesToUpdate.put(catches, (Function<FishingRecord, Double>) fishingRecord -> Double.valueOf(fishingRecord.getFishCaught().getTotalWeight()));
+        Map<Table<Integer, Integer, Double>,
+            Function<FishingRecord, Double>> tablesToUpdate =
+            new HashMap<>();
+        tablesToUpdate.put(
+            effort,
+            (Function<FishingRecord, Double>) fishingRecord -> Double.valueOf(fishingRecord.getHoursSpentFishing())
+        );
+        tablesToUpdate.put(
+            catches,
+            (Function<FishingRecord, Double>) fishingRecord -> Double.valueOf(fishingRecord.getFishCaught()
+                .getTotalWeight())
+        );
 
         for (Map.Entry<Table<Integer, Integer, Double>, Function<FishingRecord, Double>> table : tablesToUpdate.entrySet()) {
 
@@ -116,15 +125,17 @@ public class HerfindalIndexCollector implements AdditionalStartable, TripListene
             for (Map.Entry<SeaTile, FishingRecord> fishingEntry : record.getFishingRecords()) {
 
                 Double previousEffort =
-                        table.getKey().get(fishingEntry.getKey().getGridX(),
-                                fishingEntry.getKey().getGridY());
+                    table.getKey().get(
+                        fishingEntry.getKey().getGridX(),
+                        fishingEntry.getKey().getGridY()
+                    );
                 if (previousEffort == null)
                     previousEffort = 0d;
 
                 table.getKey().put(
-                        fishingEntry.getKey().getGridX(),
-                        fishingEntry.getKey().getGridY(),
-                        previousEffort + table.getValue().apply(fishingEntry.getValue())
+                    fishingEntry.getKey().getGridX(),
+                    fishingEntry.getKey().getGridY(),
+                    previousEffort + table.getValue().apply(fishingEntry.getValue())
                 );
 
             }

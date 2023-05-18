@@ -31,7 +31,6 @@ import uk.ac.ox.oxfish.model.FishState;
 public class FixedProbability implements AdaptationProbability {
 
 
-
     private double explorationProbability;
 
     private double imitationProbability;
@@ -41,7 +40,7 @@ public class FixedProbability implements AdaptationProbability {
         Preconditions.checkArgument(explorationProbability <= 1);
         Preconditions.checkArgument(imitationProbability <= 1);
         Preconditions.checkArgument(explorationProbability >= 0);
-        Preconditions.checkArgument(imitationProbability >= 0 );
+        Preconditions.checkArgument(imitationProbability >= 0);
         this.explorationProbability = explorationProbability;
         this.imitationProbability = imitationProbability;
     }
@@ -52,10 +51,18 @@ public class FixedProbability implements AdaptationProbability {
         return explorationProbability;
     }
 
+    public void setExplorationProbability(double explorationProbability) {
+        this.explorationProbability = explorationProbability;
+    }
+
     @Override
     public double getImitationProbability() {
 
         return imitationProbability;
+    }
+
+    public void setImitationProbability(double imitationProbability) {
+        this.imitationProbability = imitationProbability;
     }
 
     @Override
@@ -73,18 +80,11 @@ public class FixedProbability implements AdaptationProbability {
 
     /**
      * ignored
+     *
      * @param fisher
      */
     @Override
     public void turnOff(Fisher fisher) {
 
-    }
-
-    public void setExplorationProbability(double explorationProbability) {
-        this.explorationProbability = explorationProbability;
-    }
-
-    public void setImitationProbability(double imitationProbability) {
-        this.imitationProbability = imitationProbability;
     }
 }

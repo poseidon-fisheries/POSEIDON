@@ -8,7 +8,6 @@ import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import static org.junit.Assert.*;
@@ -28,15 +27,15 @@ public class MaxThroughputDecoratorTest {
         //catches 100 units
         Gear delegate = mock(Gear.class);
         when(delegate.fish(any(), any(), any(), anyInt(), any())).thenReturn(
-                new Catch(new double[]{70,30})
+            new Catch(new double[]{70, 30})
         );
 
-        MaxThroughputDecorator gear = new MaxThroughputDecorator(delegate,50);
+        MaxThroughputDecorator gear = new MaxThroughputDecorator(delegate, 50);
         SeaTile tile = mock(SeaTile.class);
-        Catch haul = gear.fish(fisher, tile,tile , 100, mock(GlobalBiology.class));
-        assertEquals(haul.getTotalWeight(),50d,.001);
-        assertEquals(haul.getWeightCaught(0),35d,.001);
-        assertEquals(haul.getWeightCaught(1),15d,.001);
+        Catch haul = gear.fish(fisher, tile, tile, 100, mock(GlobalBiology.class));
+        assertEquals(haul.getTotalWeight(), 50d, .001);
+        assertEquals(haul.getWeightCaught(0), 35d, .001);
+        assertEquals(haul.getWeightCaught(1), 15d, .001);
 
         assertFalse(haul.hasAbundanceInformation());
 
@@ -46,10 +45,10 @@ public class MaxThroughputDecoratorTest {
     public void limitsWithAbundance() throws Exception {
 
         //set up copied from the holdsize test
-        Meristics first = new FromListMeristics(new double[]{100,100,100}, 1);
-        Meristics second = new FromListMeristics(new double[]{100,100},1);
+        Meristics first = new FromListMeristics(new double[]{100, 100, 100}, 1);
+        Meristics second = new FromListMeristics(new double[]{100, 100}, 1);
         Species firstSpecies = new Species("first", first);
-        Species secondSpecies = new Species("second",second);
+        Species secondSpecies = new Species("second", second);
 
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
@@ -61,20 +60,22 @@ public class MaxThroughputDecoratorTest {
         StructuredAbundance secondCatch = new StructuredAbundance(new double[]{1, 1});
         Gear delegate = mock(Gear.class);
         when(delegate.fish(any(), any(), any(), anyInt(), any())).thenReturn(
-                new Catch(
-                        new StructuredAbundance[]{firstCatch,secondCatch},
-                        bio
-                )
+            new Catch(
+                new StructuredAbundance[]{firstCatch, secondCatch},
+                bio
+            )
         );
 
-        MaxThroughputDecorator gear = new MaxThroughputDecorator(delegate,
-                200);
+        MaxThroughputDecorator gear = new MaxThroughputDecorator(
+            delegate,
+            200
+        );
         SeaTile tile = mock(SeaTile.class);
         Catch haul = gear.fish(fisher, tile, tile, 100, bio);
         assertTrue(haul.hasAbundanceInformation());
-        assertEquals(haul.getTotalWeight(),200d,.001);
-        assertEquals(haul.getWeightCaught(0),120d,.001);
-        assertEquals(haul.getWeightCaught(1),80d,.001);
+        assertEquals(haul.getTotalWeight(), 200d, .001);
+        assertEquals(haul.getWeightCaught(0), 120d, .001);
+        assertEquals(haul.getWeightCaught(1), 80d, .001);
 
     }
 

@@ -26,11 +26,9 @@ import uk.ac.ox.oxfish.model.regs.PermitAllocationPolicy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class OnOffSwitchAllocatorFactory implements AlgorithmFactory<OnOffSwitchRegulator>{
+public class OnOffSwitchAllocatorFactory implements AlgorithmFactory<OnOffSwitchRegulator> {
 
 
     /**
@@ -51,13 +49,11 @@ public class OnOffSwitchAllocatorFactory implements AlgorithmFactory<OnOffSwitch
     public OnOffSwitchRegulator apply(FishState state) {
 
 
-
-
         return new OnOffSwitchRegulator(
-                permitPolicy.apply(state),
-                Arrays.asList(this.tagsOfParticipants.split(",")).
-                        stream().map(
-                        String::trim
+            permitPolicy.apply(state),
+            Arrays.asList(this.tagsOfParticipants.split(",")).
+                stream().map(
+                    String::trim
                 ).collect(Collectors.toList())
         );
 
@@ -96,7 +92,8 @@ public class OnOffSwitchAllocatorFactory implements AlgorithmFactory<OnOffSwitch
      * @param permitPolicy Value to set for property 'permitPolicy'.
      */
     public void setPermitPolicy(
-            AlgorithmFactory<? extends PermitAllocationPolicy> permitPolicy) {
+        AlgorithmFactory<? extends PermitAllocationPolicy> permitPolicy
+    ) {
         this.permitPolicy = permitPolicy;
     }
 }

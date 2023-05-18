@@ -46,8 +46,7 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadMana
  *     <li> NET_CASH_FLOW</li>
  * </ul>
  */
-public class FisherYearlyTimeSeries extends TimeSeries<Fisher>
-{
+public class FisherYearlyTimeSeries extends TimeSeries<Fisher> {
 
 
     public static final String CASH_COLUMN = "CASH";
@@ -81,95 +80,106 @@ public class FisherYearlyTimeSeries extends TimeSeries<Fisher>
         registerGatherer(CASH_COLUMN, Fisher::getBankBalance, Double.NaN);
 
         registerGatherer(CASH_FLOW_COLUMN,
-                         new Gatherer<Fisher>() {
-            double oldCash = observed.getBankBalance();
+            new Gatherer<Fisher>() {
+                double oldCash = observed.getBankBalance();
 
-            @Override
-            public Double apply(Fisher fisher) {
-                double flow = fisher.getBankBalance() - oldCash;
-                oldCash = fisher.getBankBalance();
-                return flow;
-            }
-        }, Double.NaN);
+                @Override
+                public Double apply(Fisher fisher) {
+                    double flow = fisher.getBankBalance() - oldCash;
+                    oldCash = fisher.getBankBalance();
+                    return flow;
+                }
+            }, Double.NaN
+        );
 
 
         registerGatherer(FUEL_CONSUMPTION,
-                         fisher -> observed.getYearlyCounterColumn(FUEL_CONSUMPTION),Double.NaN);
+            fisher -> observed.getYearlyCounterColumn(FUEL_CONSUMPTION), Double.NaN
+        );
 
         registerGatherer(FUEL_EXPENDITURE,
-                         fisher -> observed.getYearlyCounterColumn(FUEL_EXPENDITURE),Double.NaN);
+            fisher -> observed.getYearlyCounterColumn(FUEL_EXPENDITURE), Double.NaN
+        );
 
         registerGatherer(VARIABLE_COSTS,
-                         fisher -> observed.getYearlyCounterColumn(VARIABLE_COSTS),Double.NaN);
+            fisher -> observed.getYearlyCounterColumn(VARIABLE_COSTS), Double.NaN
+        );
 
         registerGatherer(EARNINGS,
-                         fisher -> observed.getYearlyCounterColumn(EARNINGS),Double.NaN);
+            fisher -> observed.getYearlyCounterColumn(EARNINGS), Double.NaN
+        );
 
         registerGatherer(TRIPS,
-                         fisher -> observed.getYearlyCounterColumn(TRIPS),Double.NaN);
+            fisher -> observed.getYearlyCounterColumn(TRIPS), Double.NaN
+        );
 
         registerGatherer(EFFORT,
-                         fisher -> observed.getYearlyCounterColumn(EFFORT),Double.NaN);
+            fisher -> observed.getYearlyCounterColumn(EFFORT), Double.NaN
+        );
 
         registerGatherer(HOURS_OUT,
-                         fisher -> observed.getYearlyCounterColumn(HOURS_OUT),Double.NaN);
+            fisher -> observed.getYearlyCounterColumn(HOURS_OUT), Double.NaN
+        );
         registerGatherer(PROFITS_PER_HOUR,
-                         fisher ->
-                                 (observed.getYearlyCounterColumn(EARNINGS)-observed.getYearlyCounterColumn(VARIABLE_COSTS))/
-                                 observed.getYearlyCounterColumn(HOURS_OUT), Double.NaN);
+            fisher ->
+                (observed.getYearlyCounterColumn(EARNINGS) - observed.getYearlyCounterColumn(VARIABLE_COSTS)) /
+                    observed.getYearlyCounterColumn(HOURS_OUT), Double.NaN
+        );
         registerGatherer(PROFITS_PER_TRIP,
-                         fisher ->
-                                 (observed.getYearlyCounterColumn(EARNINGS)-observed.getYearlyCounterColumn(VARIABLE_COSTS))/
-                                 observed.getYearlyCounterColumn(TRIPS), Double.NaN);
+            fisher ->
+                (observed.getYearlyCounterColumn(EARNINGS) - observed.getYearlyCounterColumn(VARIABLE_COSTS)) /
+                    observed.getYearlyCounterColumn(TRIPS), Double.NaN
+        );
 
         //this is a set because it gets accessed by two different gatherers and can be filled by either
         registerGatherer(FISHING_DISTANCE,
-                         new Gatherer<Fisher>() {
-                             final HashSet<TripRecord> alreadyExaminedTrips = new HashSet<>();
-                             @Override
-                             public Double apply(Fisher fisher) {
+            new Gatherer<Fisher>() {
+                final HashSet<TripRecord> alreadyExaminedTrips = new HashSet<>();
 
-                                 NauticalMap map = state.getMap();
-                                 SeaTile portLocation = fisher.getHomePort().getLocation();
-                                 LinkedList<TripRecord> trips = new LinkedList<>(fisher.getFinishedTrips());
-                                 boolean removedSome = trips.removeAll(alreadyExaminedTrips);
-                                 assert removedSome ^ alreadyExaminedTrips.isEmpty();
-                                 DoubleSummaryStatistics totalDistance = new DoubleSummaryStatistics();
-                                 for(TripRecord record : trips)
-                                 {
-                                     for(SeaTile tile : record.getTilesFished())
-                                     {
-                                         totalDistance.accept(map.distance(tile,portLocation));
-                                     }
-                                 }
-                                 assert totalDistance.getAverage() > 0 || totalDistance.getCount()==0;
-                                 alreadyExaminedTrips.addAll(trips);
+                @Override
+                public Double apply(Fisher fisher) {
 
-                                 if(totalDistance.getCount()==0)
-                                     return Double.NaN;
-                                 else
-                                     return totalDistance.getAverage();
+                    NauticalMap map = state.getMap();
+                    SeaTile portLocation = fisher.getHomePort().getLocation();
+                    LinkedList<TripRecord> trips = new LinkedList<>(fisher.getFinishedTrips());
+                    boolean removedSome = trips.removeAll(alreadyExaminedTrips);
+                    assert removedSome ^ alreadyExaminedTrips.isEmpty();
+                    DoubleSummaryStatistics totalDistance = new DoubleSummaryStatistics();
+                    for (TripRecord record : trips) {
+                        for (SeaTile tile : record.getTilesFished()) {
+                            totalDistance.accept(map.distance(tile, portLocation));
+                        }
+                    }
+                    assert totalDistance.getAverage() > 0 || totalDistance.getCount() == 0;
+                    alreadyExaminedTrips.addAll(trips);
 
-                             }
-                         }, Double.NaN);
+                    if (totalDistance.getCount() == 0)
+                        return Double.NaN;
+                    else
+                        return totalDistance.getAverage();
+
+                }
+            }, Double.NaN
+        );
         registerGatherer(TRIP_DURATION,
-                         new Gatherer<Fisher>() {
+            new Gatherer<Fisher>() {
 
-                             @Override
-                             public Double apply(Fisher fisher) {
+                @Override
+                public Double apply(Fisher fisher) {
 
 
-                                 return observed.getYearlyCounterColumn(HOURS_OUT)/
-                                         observed.getYearlyCounterColumn(TRIPS);
+                    return observed.getYearlyCounterColumn(HOURS_OUT) /
+                        observed.getYearlyCounterColumn(TRIPS);
 
-                             }
-                         }, Double.NaN);
+                }
+            }, Double.NaN
+        );
 
         //also aggregate
-        for(Species species : state.getSpecies())
-        {
+        for (Species species : state.getSpecies()) {
             final String landings = species + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
-            registerGatherer(landings,
+            registerGatherer(
+                landings,
                 FishStateUtilities.generateYearlySum(observed.getDailyData().getColumn(landings)),
                 Double.NaN,
                 KILOGRAM,
@@ -180,9 +190,10 @@ public class FisherYearlyTimeSeries extends TimeSeries<Fisher>
 
 
             registerGatherer(catches,
-                    FishStateUtilities.generateYearlySum(observed.getDailyData().getColumn(
-                            catches))
-                    , Double.NaN);
+                FishStateUtilities.generateYearlySum(observed.getDailyData().getColumn(
+                    catches))
+                , Double.NaN
+            );
 
         }
 

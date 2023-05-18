@@ -15,15 +15,15 @@ public class TemporaryRegulationFactory implements AlgorithmFactory<TemporaryReg
     private AlgorithmFactory<? extends Regulation> delegate;
     private AlgorithmFactory<? extends Regulation> inactiveDelegate = new AnarchyFactory();
 
+    @SuppressWarnings("unused")
+    public TemporaryRegulationFactory() {
+        this(1, 1, new ProtectedAreasOnlyFactory());
+    }
+
     public TemporaryRegulationFactory(int startDay, int endDay, AlgorithmFactory<? extends Regulation> delegate) {
         this.startDay = new FixedDoubleParameter(startDay);
         this.endDay = new FixedDoubleParameter(endDay);
         this.delegate = delegate;
-    }
-
-    @SuppressWarnings("unused")
-    public TemporaryRegulationFactory() {
-        this(1, 1, new ProtectedAreasOnlyFactory());
     }
 
     @SuppressWarnings("unused")

@@ -35,53 +35,53 @@ public class TriggerRegulationTest {
         Regulation businessAsUsual = mock(Regulation.class);
         Regulation emergency = mock(Regulation.class);
         TriggerRegulation trigger = new TriggerRegulation(
-                10,
-                100,
-                "Test Indicator",
-                businessAsUsual,
-                emergency
+            10,
+            100,
+            "Test Indicator",
+            businessAsUsual,
+            emergency
         );
         FishState model = mock(FishState.class);
         when(model.getLatestYearlyObservation("Test Indicator")).thenReturn(100d);
         //at the start, it should be set to business as usual
 
-        trigger.allowedAtSea(mock(Fisher.class),model);
-        verify(businessAsUsual,times(1)).allowedAtSea(any(),any(),anyInt());
-        verify(emergency,times(0)).allowedAtSea(any(),any(),anyInt());
+        trigger.allowedAtSea(mock(Fisher.class), model);
+        verify(businessAsUsual, times(1)).allowedAtSea(any(), any(), anyInt());
+        verify(emergency, times(0)).allowedAtSea(any(), any(), anyInt());
 
         //stepping it, should stay with business as usual
         trigger.step(model);
-        trigger.allowedAtSea(mock(Fisher.class),model);
-        verify(businessAsUsual,times(2)).allowedAtSea(any(),any(),anyInt());
-        verify(emergency,times(0)).allowedAtSea(any(),any(),anyInt());
+        trigger.allowedAtSea(mock(Fisher.class), model);
+        verify(businessAsUsual, times(2)).allowedAtSea(any(), any(), anyInt());
+        verify(emergency, times(0)).allowedAtSea(any(), any(), anyInt());
 
         //indicator drops, but not enough for an emergency
         when(model.getLatestYearlyObservation("Test Indicator")).thenReturn(50d);
         trigger.step(model);
-        trigger.allowedAtSea(mock(Fisher.class),model);
-        verify(businessAsUsual,times(3)).allowedAtSea(any(),any(),anyInt());
-        verify(emergency,times(0)).allowedAtSea(any(),any(),anyInt());
+        trigger.allowedAtSea(mock(Fisher.class), model);
+        verify(businessAsUsual, times(3)).allowedAtSea(any(), any(), anyInt());
+        verify(emergency, times(0)).allowedAtSea(any(), any(), anyInt());
 
         //emergency ought to kick in now
         when(model.getLatestYearlyObservation("Test Indicator")).thenReturn(5d);
         trigger.step(model);
-        trigger.allowedAtSea(mock(Fisher.class),model);
-        verify(businessAsUsual,times(3)).allowedAtSea(any(),any(),anyInt());
-        verify(emergency,times(1)).allowedAtSea(any(),any(),anyInt());
+        trigger.allowedAtSea(mock(Fisher.class), model);
+        verify(businessAsUsual, times(3)).allowedAtSea(any(), any(), anyInt());
+        verify(emergency, times(1)).allowedAtSea(any(), any(), anyInt());
 
         //increasing above the low threshold is not enough to remove emergency
         when(model.getLatestYearlyObservation("Test Indicator")).thenReturn(50d);
         trigger.step(model);
-        trigger.allowedAtSea(mock(Fisher.class),model);
-        verify(businessAsUsual,times(3)).allowedAtSea(any(),any(),anyInt());
-        verify(emergency,times(2)).allowedAtSea(any(),any(),anyInt());
+        trigger.allowedAtSea(mock(Fisher.class), model);
+        verify(businessAsUsual, times(3)).allowedAtSea(any(), any(), anyInt());
+        verify(emergency, times(2)).allowedAtSea(any(), any(), anyInt());
 
         //will return to business as usual when the indicator is back to above the high threshold
         when(model.getLatestYearlyObservation("Test Indicator")).thenReturn(200d);
         trigger.step(model);
-        trigger.allowedAtSea(mock(Fisher.class),model);
-        verify(businessAsUsual,times(4)).allowedAtSea(any(),any(),anyInt());
-        verify(emergency,times(2)).allowedAtSea(any(),any(),anyInt());
+        trigger.allowedAtSea(mock(Fisher.class), model);
+        verify(businessAsUsual, times(4)).allowedAtSea(any(), any(), anyInt());
+        verify(emergency, times(2)).allowedAtSea(any(), any(), anyInt());
     }
 
 }

@@ -34,8 +34,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
  * Fish the fixed proportion
  * Created by carrknight on 4/20/15.
  */
-public class FixedProportionGear implements Gear
-{
+public class FixedProportionGear implements Gear {
 
     final private double proportionFished;
 
@@ -50,17 +49,18 @@ public class FixedProportionGear implements Gear
 
     @Override
     public Catch fish(
-            Fisher fisher, LocalBiology localBiology, SeaTile context,
-            int hoursSpentFishing, GlobalBiology modelBiology) {
+        Fisher fisher, LocalBiology localBiology, SeaTile context,
+        int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
 
         return new Catch(catchesToArray(localBiology, hoursSpentFishing, modelBiology, proportionFished));
     }
 
 
     private double[] catchesToArray(
-            LocalBiology where, int hoursSpentFishing, GlobalBiology modelBiology, double proportionFished)
-    {
-        Preconditions.checkArgument(hoursSpentFishing==1);
+        LocalBiology where, int hoursSpentFishing, GlobalBiology modelBiology, double proportionFished
+    ) {
+        Preconditions.checkArgument(hoursSpentFishing == 1);
         //catch fish
         double[] caught = new double[modelBiology.getSize()];
         //for each species, same operation
@@ -76,14 +76,15 @@ public class FixedProportionGear implements Gear
 
     @Override
     public double[] expectedHourlyCatch(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology
+    ) {
         return catchesToArray(where, hoursSpentFishing, modelBiology, proportionFished);
 
     }
 
     @Override
     public String toString() {
-        return "fixed efficiency: " + proportionFished ;
+        return "fixed efficiency: " + proportionFished;
     }
 
     /**
@@ -98,10 +99,6 @@ public class FixedProportionGear implements Gear
         return 0;
     }
 
-    public double getProportionFished() {
-        return proportionFished;
-    }
-
     @Override
     public boolean isSame(Gear o) {
         if (this == o) return true;
@@ -110,4 +107,8 @@ public class FixedProportionGear implements Gear
         return Double.compare(that.getProportionFished(), getProportionFished()) == 0;
     }
 
-   }
+    public double getProportionFished() {
+        return proportionFished;
+    }
+
+}

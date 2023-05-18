@@ -20,16 +20,16 @@
 
 package uk.ac.ox.oxfish.biology;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
+import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
-import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
-import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * A collection of all information regarding a species (for now just a name) Created by carrknight

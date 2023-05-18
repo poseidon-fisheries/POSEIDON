@@ -39,8 +39,7 @@ public class RandomCatchabilityTrawlFactoryFromStringTest {
 
 
     @Test
-    public void simpleMap() throws Exception
-    {
+    public void simpleMap() throws Exception {
 
         RandomTrawlStringFactory factory = new RandomTrawlStringFactory();
         factory.setCatchabilityMap(" 0:1, 3:1 ");
@@ -48,25 +47,24 @@ public class RandomCatchabilityTrawlFactoryFromStringTest {
 
         FishState state = mock(FishState.class);
         when(state.getSpecies()).thenReturn(Arrays.asList(
-                new Species("0"),
-                new Species("1"),
-                new Species("2"),
-                new Species("3")));
+            new Species("0"),
+            new Species("1"),
+            new Species("2"),
+            new Species("3")
+        ));
 
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
         RandomCatchabilityTrawl gear = factory.apply(state);
-        assertEquals(gear.getCatchabilityMeanPerSpecie()[0],1,.001);
-        assertEquals(gear.getCatchabilityMeanPerSpecie()[1],0,.001);
-        assertEquals(gear.getCatchabilityMeanPerSpecie()[2],0,.001);
-        assertEquals(gear.getCatchabilityMeanPerSpecie()[3],1,.001);
+        assertEquals(gear.getCatchabilityMeanPerSpecie()[0], 1, .001);
+        assertEquals(gear.getCatchabilityMeanPerSpecie()[1], 0, .001);
+        assertEquals(gear.getCatchabilityMeanPerSpecie()[2], 0, .001);
+        assertEquals(gear.getCatchabilityMeanPerSpecie()[3], 1, .001);
 
-        assertEquals(gear.getCatchabilityDeviationPerSpecie()[0],1,.001);
-        assertEquals(gear.getCatchabilityDeviationPerSpecie()[1],0,.001);
-        assertEquals(gear.getCatchabilityDeviationPerSpecie()[2],1,.001);
-        assertEquals(gear.getCatchabilityDeviationPerSpecie()[3],0,.001);
-
-
+        assertEquals(gear.getCatchabilityDeviationPerSpecie()[0], 1, .001);
+        assertEquals(gear.getCatchabilityDeviationPerSpecie()[1], 0, .001);
+        assertEquals(gear.getCatchabilityDeviationPerSpecie()[2], 1, .001);
+        assertEquals(gear.getCatchabilityDeviationPerSpecie()[3], 0, .001);
 
 
     }
@@ -83,7 +81,7 @@ public class RandomCatchabilityTrawlFactoryFromStringTest {
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
         RandomCatchabilityTrawl gear = factory.apply(state);
-        assertTrue(gear.getCatchabilityMeanPerSpecie()[0]>=1);
-        assertTrue(gear.getCatchabilityMeanPerSpecie()[0]<=2);
+        assertTrue(gear.getCatchabilityMeanPerSpecie()[0] >= 1);
+        assertTrue(gear.getCatchabilityMeanPerSpecie()[0] <= 2);
     }
 }

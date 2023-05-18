@@ -40,7 +40,7 @@ public class GeographicalSample {
 
     private final LinkedList<Double> observations = new LinkedList<>();
 
-    private  double minSecondCoordinate = Double.NaN;
+    private double minSecondCoordinate = Double.NaN;
 
     private double maxSecondCoordinate = Double.NaN;
 
@@ -53,23 +53,25 @@ public class GeographicalSample {
 
     /**
      * reads a csv file in the format "easting,northing,observation" and processes it into the sampled map
-     * @param csvFileToParse csvFile to Parse
+     *
+     * @param csvFileToParse    csvFile to Parse
      * @param csvFileHasHeading if we need to ignore the first line
      * @throws IOException didn't find the file
      */
-    public GeographicalSample(Path csvFileToParse,
-                              boolean csvFileHasHeading) throws IOException {
+    public GeographicalSample(
+        Path csvFileToParse,
+        boolean csvFileHasHeading
+    ) throws IOException {
 
         List<String> lines = Files.readAllLines(csvFileToParse);
 
-        if(csvFileHasHeading)
+        if (csvFileHasHeading)
             lines.remove(0);
 
-        for(String line : lines)
-        {
+        for (String line : lines) {
             //split and record
             String[] newLine = line.split(",");
-            assert  newLine.length == 3;
+            assert newLine.length == 3;
             double easting = Double.parseDouble(newLine[0]);
             firstCoordinate.add(easting);
             double northing = Double.parseDouble(newLine[1]);
@@ -78,19 +80,20 @@ public class GeographicalSample {
 
 
             //if it's a min or a max, remember it
-            if(Double.isNaN(minFirstCoordinate) || easting < minFirstCoordinate)
+            if (Double.isNaN(minFirstCoordinate) || easting < minFirstCoordinate)
                 minFirstCoordinate = easting;
-            if(Double.isNaN(maxFirstCoordinate) || easting > maxFirstCoordinate)
+            if (Double.isNaN(maxFirstCoordinate) || easting > maxFirstCoordinate)
                 maxFirstCoordinate = easting;
-            if(Double.isNaN(minSecondCoordinate) || northing < minSecondCoordinate)
+            if (Double.isNaN(minSecondCoordinate) || northing < minSecondCoordinate)
                 minSecondCoordinate = northing;
-            if(Double.isNaN(maxSecondCoordinate) || northing > maxSecondCoordinate)
+            if (Double.isNaN(maxSecondCoordinate) || northing > maxSecondCoordinate)
                 maxSecondCoordinate = northing;
         }
 
         numberOfObservations = firstCoordinate.size();
-        Preconditions.checkState(secondCoordinate.size()==numberOfObservations);;
-        Preconditions.checkState(observations.size()==numberOfObservations);
+        Preconditions.checkState(secondCoordinate.size() == numberOfObservations);
+        ;
+        Preconditions.checkState(observations.size() == numberOfObservations);
 
     }
 

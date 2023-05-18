@@ -46,50 +46,49 @@ public class ITQCaresAboutMileage {
 
 
         long seed = System.currentTimeMillis();
-        FishState state=
-                MarketFirstDemo.generateAndRunMarketDemo(MarketFirstDemo.MarketDemoPolicy.ITQ,
-                                                         new FixedDoubleParameter(.1),
-                                                         new UniformDoubleParameter(0, 20),
-                                                         null,
-                                                         5, seed, true);
+        FishState state =
+            MarketFirstDemo.generateAndRunMarketDemo(MarketFirstDemo.MarketDemoPolicy.ITQ,
+                new FixedDoubleParameter(.1),
+                new UniformDoubleParameter(0, 20),
+                null,
+                5, seed, true
+            );
 
         //the correlation ought to be very small
         Species species = state.getSpecies().get(0);
 
         double[] mileage = new double[state.getFishers().size()];
-        double[] catches =  new double[state.getFishers().size()];
+        double[] catches = new double[state.getFishers().size()];
 
-        int i=0;
-        for(Fisher fisher : state.getFishers())
-        {
+        int i = 0;
+        for (Fisher fisher : state.getFishers()) {
             mileage[i] = (((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished());
             catches[i] = fisher.getLatestYearlyObservation(
-                    species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
+                species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
 
             i++;
         }
 
         System.out.println("seed " + seed);
         System.out.println("Correlation: " +
-                         Double.toString(FishStateUtilities.computeCorrelation(mileage, catches)));
+            Double.toString(FishStateUtilities.computeCorrelation(mileage, catches)));
         //efficiency is 100%
         assertEquals(400000.0, DoubleStream.of(catches).sum(), .1);
 
 
         //make sure the same number of landings is recorded in the market
         DataColumn marketData = state.getAllMarketsForThisSpecie(species).get(0).getData().getColumn(
-                AbstractMarket.LANDINGS_COLUMN_NAME);
+            AbstractMarket.LANDINGS_COLUMN_NAME);
         Iterator<Double> doubleIterator = marketData.descendingIterator();
         double landedCatches = 0;
-        for(i=0;i<365;i++) {
+        for (i = 0; i < 365; i++) {
 
-            landedCatches+=doubleIterator.next();
+            landedCatches += doubleIterator.next();
         }
         //sum up the last 365 days of observations
-        assertEquals(400000,landedCatches,.1);
+        assertEquals(400000, landedCatches, .1);
 
         assertTrue(FishStateUtilities.computeCorrelation(mileage, catches) < -.45);
-
 
 
     }

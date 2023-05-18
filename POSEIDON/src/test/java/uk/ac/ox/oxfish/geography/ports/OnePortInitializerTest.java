@@ -41,21 +41,23 @@ public class OnePortInitializerTest {
 
 
     @Test
-    public void createsPortWhereYouWant() throws Exception
-    {
+    public void createsPortWhereYouWant() throws Exception {
 
-        SimpleMapInitializer initializer = new SimpleMapInitializer(4, 4, 0, 0, 1, 1);
-        NauticalMap map = initializer.makeMap(new MersenneTwisterFast(),
-                                               new GlobalBiology(new Species("fake")),
-                                               mock(FishState.class));
+        final SimpleMapInitializer initializer = new SimpleMapInitializer(4, 4, 0, 0, 1, 1);
+        final NauticalMap map = initializer.makeMap(
+            new MersenneTwisterFast(),
+            new GlobalBiology(new Species("fake")),
+            mock(FishState.class)
+        );
 
-        OnePortInitializer ports = new OnePortInitializer(3,1);
+        final OnePortInitializer ports = new OnePortInitializer(3, 1);
         ports.buildPorts(map, new MersenneTwisterFast(), mock(Function.class), mock(FishState.class),
-                         new FixedGasPrice(2d ));
-        assertEquals(map.getPorts().size(),1);
-        assertEquals(map.getPorts().get(0).getGasPricePerLiter(),2d,.0001d);
-        assertEquals(map.getPorts().iterator().next().getLocation().getGridX(),3);
-        assertEquals(map.getPorts().iterator().next().getLocation().getGridY(),1);
+            new FixedGasPrice(2d)
+        );
+        assertEquals(map.getPorts().size(), 1);
+        assertEquals(map.getPorts().get(0).getGasPricePerLiter(), 2d, .0001d);
+        assertEquals(map.getPorts().iterator().next().getLocation().getGridX(), 3);
+        assertEquals(map.getPorts().iterator().next().getLocation().getGridY(), 1);
 
     }
 }

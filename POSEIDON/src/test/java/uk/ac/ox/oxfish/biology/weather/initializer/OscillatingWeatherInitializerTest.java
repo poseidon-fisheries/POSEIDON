@@ -39,8 +39,7 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.fisher.actions.MovingTest.generateSimple4x4Map;
 
 
-public class OscillatingWeatherInitializerTest
-{
+public class OscillatingWeatherInitializerTest {
 
 
     @Test
@@ -49,7 +48,7 @@ public class OscillatingWeatherInitializerTest
 
         OscillatingWeatherInitializer initializer = new OscillatingWeatherInitializer(
 
-                0,100,5,100,200
+            0, 100, 5, 100, 200
         );
 
         FishState state = generateSimple4x4Map();
@@ -57,8 +56,8 @@ public class OscillatingWeatherInitializerTest
         NauticalMap map = state.getMap();
 
         //shouldn't have any local weather
-        for(int x=0; x<4; x++)
-            for(int y=0; y<4; y++)
+        for (int x = 0; x < 4; x++)
+            for (int y = 0; y < 4; y++)
                 assertNull(map.getSeaTile(x, y).grabLocalWeather());
 
 
@@ -66,15 +65,13 @@ public class OscillatingWeatherInitializerTest
         ArgumentCaptor<Steppable> argument = ArgumentCaptor.forClass(Steppable.class);
 
         //process the map
-        initializer.processMap(state.getMap(),new MersenneTwisterFast(),state);
+        initializer.processMap(state.getMap(), new MersenneTwisterFast(), state);
         Mockito.verify(state).scheduleEveryDay(argument.capture(), eq(StepOrder.BIOLOGY_PHASE));
 
 
-
-
         //should start with min
-        for(int x=0; x<4; x++)
-            for(int y=0; y<4; y++) {
+        for (int x = 0; x < 4; x++)
+            for (int y = 0; y < 4; y++) {
                 SeaTile tile = map.getSeaTile(x, y);
                 assertTrue(tile.grabLocalWeather() instanceof ConstantWeather);
                 assertEquals(tile.getTemperatureInCelsius(), 0, .001);
@@ -89,9 +86,12 @@ public class OscillatingWeatherInitializerTest
         weatherStep.step(state);
         assertEquals(map.getSeaTile(0, 0).getTemperatureInCelsius(), 20, .001);
         assertEquals(map.getSeaTile(0, 0).getWindSpeedInKph(), 120, .001);
-        when(state.getDay()).thenReturn(1);weatherStep.step(state);
-        when(state.getDay()).thenReturn(2);weatherStep.step(state);
-        when(state.getDay()).thenReturn(3);weatherStep.step(state);
+        when(state.getDay()).thenReturn(1);
+        weatherStep.step(state);
+        when(state.getDay()).thenReturn(2);
+        weatherStep.step(state);
+        when(state.getDay()).thenReturn(3);
+        weatherStep.step(state);
         assertEquals(map.getSeaTile(0, 0).getTemperatureInCelsius(), 80, .001);
         assertEquals(map.getSeaTile(0, 0).getWindSpeedInKph(), 180, .001);
         when(state.getDay()).thenReturn(4);
@@ -104,16 +104,21 @@ public class OscillatingWeatherInitializerTest
         weatherStep.step(state);
         assertEquals(map.getSeaTile(0, 0).getTemperatureInCelsius(), 80, .001);
         assertEquals(map.getSeaTile(0, 0).getWindSpeedInKph(), 180, .001);
-        when(state.getDay()).thenReturn(6);weatherStep.step(state);
-        when(state.getDay()).thenReturn(7);weatherStep.step(state);
-        when(state.getDay()).thenReturn(8);weatherStep.step(state);
-        when(state.getDay()).thenReturn(9);weatherStep.step(state);
+        when(state.getDay()).thenReturn(6);
+        weatherStep.step(state);
+        when(state.getDay()).thenReturn(7);
+        weatherStep.step(state);
+        when(state.getDay()).thenReturn(8);
+        weatherStep.step(state);
+        when(state.getDay()).thenReturn(9);
+        weatherStep.step(state);
         assertEquals(map.getSeaTile(0, 0).getTemperatureInCelsius(), 0, .001);
         assertEquals(map.getSeaTile(0, 0).getWindSpeedInKph(), 100, .001);
 
 
         //should go back up!
-        when(state.getDay()).thenReturn(10);weatherStep.step(state);
+        when(state.getDay()).thenReturn(10);
+        weatherStep.step(state);
         assertEquals(map.getSeaTile(0, 0).getTemperatureInCelsius(), 20, .001);
         assertEquals(map.getSeaTile(0, 0).getWindSpeedInKph(), 120, .001);
 

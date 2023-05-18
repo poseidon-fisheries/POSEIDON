@@ -7,5 +7,5 @@ import uk.ac.ox.oxfish.model.FisherStartable;
 
 public interface Restriction extends FisherStartable {
 
-	boolean canFishHere(Fisher agent, SeaTile tile, FishState model);
+    boolean canFishHere(Fisher agent, SeaTile tile, FishState model);
 }

@@ -60,28 +60,27 @@ public class ChangingNetworksTest {
         scenario.setNetworkBuilder(networkBuilder);
 
 
-        state.getYearlyDataSet().registerGatherer("Same Gear Friends",
-                                                  fishState -> {
-                                                      double sameGearConnections = 0;
-                                                      double connections = 0;
-                                                      for(Fisher fisher : fishState.getFishers())
-                                                      {
-                                                          Collection<Fisher> friends = fisher.getDirectedFriends();
-                                                          connections += friends.size();
-                                                          for(Fisher friend : friends)
-                                                          {
-                                                              if(friend.getID() < 50 && fisher.getID() < 50) {
-                                                                  sameGearConnections++;
-                                                              }
-                                                              else  if (friend.getID() >= 50 && fisher.getID() >= 50) {
-                                                                  sameGearConnections++;
-                                                              }
-                                                          }
+        state.getYearlyDataSet().registerGatherer(
+            "Same Gear Friends",
+            fishState -> {
+                double sameGearConnections = 0;
+                double connections = 0;
+                for (Fisher fisher : fishState.getFishers()) {
+                    Collection<Fisher> friends = fisher.getDirectedFriends();
+                    connections += friends.size();
+                    for (Fisher friend : friends) {
+                        if (friend.getID() < 50 && fisher.getID() < 50) {
+                            sameGearConnections++;
+                        } else if (friend.getID() >= 50 && fisher.getID() >= 50) {
+                            sameGearConnections++;
+                        }
+                    }
 
-                                                      }
-                                                      return sameGearConnections/connections;
-                                                  },
-                                                  Double.NaN);
+                }
+                return sameGearConnections / connections;
+            },
+            Double.NaN
+        );
 
 
         OneSpecieGearFactory option1 = new OneSpecieGearFactory();
@@ -91,10 +90,11 @@ public class ChangingNetworksTest {
 
         scenario.setGear(new AlgorithmFactory<Gear>() {
             int counter;
+
             @Override
             public Gear apply(FishState fishState) {
                 counter++;
-                if(counter<=50)
+                if (counter <= 50)
                     return option1.apply(fishState);
                 else
                     return option2.apply(fishState);
@@ -110,9 +110,9 @@ public class ChangingNetworksTest {
 
 
         //lspiRun for 5 years
-        while(state.getYear()<5)
+        while (state.getYear() < 5)
             state.schedule.step(state);
-        assertTrue(state.getLatestYearlyObservation("Same Gear Friends")>.9);
+        assertTrue(state.getLatestYearlyObservation("Same Gear Friends") > .9);
 
     }
 }

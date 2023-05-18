@@ -33,7 +33,8 @@ public enum SymmetricMeanAbsolutePercentageErrorMeasure implements ForecastError
 
     INSTANCE;
 
-    @Override public double applyAsDouble(final double actualValue, final double predictedValue) {
+    @Override
+    public double applyAsDouble(final double actualValue, final double predictedValue) {
         return (actualValue == predictedValue)
             ? 0 // avoids NaN when both actual and predicted are 0
             : 100 * abs(actualValue - predictedValue) / (abs(predictedValue) + abs(actualValue));

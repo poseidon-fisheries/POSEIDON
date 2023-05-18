@@ -18,21 +18,18 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
-import static com.google.common.math.DoubleMath.fuzzyEquals;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
-import java.util.Arrays;
+import sim.field.grid.DoubleGrid2D;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.IntUnaryOperator;
-import sim.field.grid.DoubleGrid2D;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 
 /**
  * An allocation grid is basically just a DoubleGrid2D, normalized to sum up to one. This class does

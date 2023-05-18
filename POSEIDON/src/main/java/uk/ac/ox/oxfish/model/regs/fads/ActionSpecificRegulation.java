@@ -31,9 +31,18 @@ import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 public interface ActionSpecificRegulation extends Startable, Steppable, Observer<PurseSeinerAction> {
 
     ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions();
+
     boolean isForbidden(Class<? extends PurseSeinerAction> action, Fisher fisher);
-    default void observe(PurseSeinerAction action) {}
-    @Override default void step(SimState simState) {}
-    @Override default void start(FishState model) {}
+
+    default void observe(PurseSeinerAction action) {
+    }
+
+    @Override
+    default void step(SimState simState) {
+    }
+
+    @Override
+    default void start(FishState model) {
+    }
 
 }

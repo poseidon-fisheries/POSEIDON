@@ -42,50 +42,48 @@ import static org.junit.Assert.assertTrue;
 public class NarrativeBestTest {
 
 
-    Path inputs = Paths.get("inputs","tests","narrative");
+    Path inputs = Paths.get("inputs", "tests", "narrative");
 
 
     @Test
-    public void anarchyKillsOffAllFish() throws Exception
-    {
+    public void anarchyKillsOffAllFish() throws Exception {
 
 
-        FishYAML yaml = new FishYAML();
-        Scenario scenario = yaml.loadAs(new FileReader(inputs.resolve("anarchy.yaml").toFile()), Scenario.class);
-        FishState state = new FishState(System.currentTimeMillis());
+        final FishYAML yaml = new FishYAML();
+        final Scenario scenario = yaml.loadAs(new FileReader(inputs.resolve("anarchy.yaml").toFile()), Scenario.class);
+        final FishState state = new FishState(System.currentTimeMillis());
         state.setScenario(scenario);
         state.start();
 
-        double initialBiomass = state.getTotalBiomass(state.getSpecies().get(0));
+        final double initialBiomass = state.getTotalBiomass(state.getSpecies().get(0));
         //we expect no regulation to achieve biomass levels of 5% or less
 
-        while(state.getYear()<20)
+        while (state.getYear() < 20)
             state.schedule.step(state);
 
-        double finalBiomass = state.getTotalBiomass(state.getSpecies().get(0));
+        final double finalBiomass = state.getTotalBiomass(state.getSpecies().get(0));
 
-        Log.info("final biomass : " + finalBiomass + " which is  " + (finalBiomass/initialBiomass) + "% of the initial value; we are targeting 5% or lower");
-        System.out.println("final biomass : " + finalBiomass + " which is  " + (finalBiomass/initialBiomass) + "% of the initial value; we are targeting 5% or lower");
-        assertTrue(finalBiomass< initialBiomass *.05);
+        Log.info("final biomass : " + finalBiomass + " which is  " + (finalBiomass / initialBiomass) + "% of the initial value; we are targeting 5% or lower");
+        System.out.println("final biomass : " + finalBiomass + " which is  " + (finalBiomass / initialBiomass) + "% of the initial value; we are targeting 5% or lower");
+        assertTrue(finalBiomass < initialBiomass * .05);
 
     }
 
 
     @Test
-    public void improveSmallFishermen() throws Exception
-    {
+    public void improveSmallFishermen() throws Exception {
 
-        long start = System.currentTimeMillis();
+        final long start = System.currentTimeMillis();
 
-        HashMap<String, Double> profits = new HashMap<>();
-        String[] files = new String[]{"itq_best.yaml","itqplus_best.yaml","tac_best.yaml"};
+        final HashMap<String, Double> profits = new HashMap<>();
+        final String[] files = new String[]{"itq_best.yaml", "itqplus_best.yaml", "tac_best.yaml"};
 
 
         //gather for each run the profits made by small boats
-        for(String file : files) {
-            FishYAML yaml = new FishYAML();
-            Scenario scenario = yaml.loadAs(new FileReader(inputs.resolve(file).toFile()), Scenario.class);
-            FishState state = new FishState(System.currentTimeMillis());
+        for (final String file : files) {
+            final FishYAML yaml = new FishYAML();
+            final Scenario scenario = yaml.loadAs(new FileReader(inputs.resolve(file).toFile()), Scenario.class);
+            final FishState state = new FishState(System.currentTimeMillis());
             state.setScenario(scenario);
             state.start();
 
@@ -93,12 +91,14 @@ public class NarrativeBestTest {
             while (state.getYear() < 20)
                 state.schedule.step(state);
 
-            DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
-            for(Double profit : state.getYearlyDataSet().getColumn("Small Fishers Total Income"))
+            final DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
+            for (final Double profit : state.getYearlyDataSet().getColumn("Small Fishers Total Income"))
                 statistics.accept(profit);
 
-            profits.put(file,
-                        statistics.getSum());
+            profits.put(
+                file,
+                statistics.getSum()
+            );
 
             Log.info("small fishermen profits of " + file + " are " + statistics.getSum());
             System.out.println("small fishermen profits of " + file + " are " + statistics.getSum());
@@ -108,10 +108,10 @@ public class NarrativeBestTest {
         //itq beats tac
         assertTrue(profits.get("itq_best.yaml") > profits.get("tac_best.yaml"));
         //itq+ beats itq
-        assertTrue(profits.get("itqplus_best.yaml") > profits.get("itq_best.yaml")*1.5);
+        assertTrue(profits.get("itqplus_best.yaml") > profits.get("itq_best.yaml") * 1.5);
 
-        long end = System.currentTimeMillis();
-        System.out.println((end-start)/1000);
+        final long end = System.currentTimeMillis();
+        System.out.println((end - start) / 1000);
 
 
     }

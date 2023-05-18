@@ -33,17 +33,14 @@ import uk.ac.ox.oxfish.model.FishState;
 public class TowLimitFishingStrategy implements FishingStrategy {
 
     private final int maxNumberOfTows;
+    private final FishUntilFullStrategy delegate = new FishUntilFullStrategy(1.0);
 
     public TowLimitFishingStrategy(int maxNumberOfTows) {
         this.maxNumberOfTows = maxNumberOfTows;
     }
 
-    private final FishUntilFullStrategy delegate = new FishUntilFullStrategy(1.0);
-
-
     @Override
-    public void start(FishState model, Fisher fisher)
-    {
+    public void start(FishState model, Fisher fisher) {
 
     }
 
@@ -64,9 +61,10 @@ public class TowLimitFishingStrategy implements FishingStrategy {
      */
     @Override
     public boolean shouldFish(
-            Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip) {
+        Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip
+    ) {
         return delegate.shouldFish(fisher, random, model, currentTrip) &&
-                currentTrip.getEffort()<=maxNumberOfTows;
+            currentTrip.getEffort() <= maxNumberOfTows;
     }
 
     /**

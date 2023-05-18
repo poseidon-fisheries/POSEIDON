@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis.profit;
 
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
@@ -32,7 +31,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -60,29 +58,33 @@ public class GasCostTest {
 
         final Fisher fisher = state.getFishers().get(0);
         fisher.addTripListener(
-                new TripListener() {
-                    @Override
-                    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-                        System.out.println("day : " + state.getDay());
-                        assertEquals(cost.cost(fisher, state, record, 0d, fisher.getHoursAtSea()),
-                                     record.getTotalCosts(), .001d);
-                        if(record.getEffort() > 0) {
-                            TripRecord simulated = simulator.simulateRecord(fisher,
-                                                                            record.getMostFishedTileInTrip(),
-                                                                            state, 24 * 5,
-                                                                            new double[]{record.getSoldCatch()[0] / record.getEffort()}
-                            );
-                            assertEquals(simulated.getDistanceTravelled(), record.getDistanceTravelled(), .001d);
-                            assertEquals(
-                                    record.getEffort() + record.getDistanceTravelled() / fisher.getBoat().getSpeedInKph() - record.getDurationInHours(),
-                                    0, .1d);
-                            assertEquals(simulated.getEffort(), record.getEffort(), .001d);
-                            assertEquals(simulated.getLitersOfGasConsumed(), record.getLitersOfGasConsumed(),
-                                         .001d);
-                            assertEquals(simulated.getDurationInHours(), record.getDurationInHours(), .1);
-                        }
+            new TripListener() {
+                @Override
+                public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+                    System.out.println("day : " + state.getDay());
+                    assertEquals(cost.cost(fisher, state, record, 0d, fisher.getHoursAtSea()),
+                        record.getTotalCosts(), .001d
+                    );
+                    if (record.getEffort() > 0) {
+                        TripRecord simulated = simulator.simulateRecord(fisher,
+                            record.getMostFishedTileInTrip(),
+                            state, 24 * 5,
+                            new double[]{record.getSoldCatch()[0] / record.getEffort()}
+                        );
+                        assertEquals(simulated.getDistanceTravelled(), record.getDistanceTravelled(), .001d);
+                        assertEquals(
+                            record.getEffort() + record.getDistanceTravelled() / fisher.getBoat()
+                                .getSpeedInKph() - record.getDurationInHours(),
+                            0, .1d
+                        );
+                        assertEquals(simulated.getEffort(), record.getEffort(), .001d);
+                        assertEquals(simulated.getLitersOfGasConsumed(), record.getLitersOfGasConsumed(),
+                            .001d
+                        );
+                        assertEquals(simulated.getDurationInHours(), record.getDurationInHours(), .1);
                     }
                 }
+            }
         );
 
         for (int i = 0; i < 10000; i++)
@@ -93,17 +95,18 @@ public class GasCostTest {
 
     @Test
     public void additionalGasCost() {
-        Fisher fisher = mock(Fisher.class,RETURNS_DEEP_STUBS);
+        Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
         //100$ per liter
         //2 liter per km
         when(fisher.getHomePort().getGasPricePerLiter()).thenReturn(100d);
         when(fisher.getBoat().expectedFuelConsumption(anyDouble())).thenAnswer(
-                (Answer<Double>) invocation -> ((Double) invocation.getArgument(0)) * 2
+            (Answer<Double>) invocation -> ((Double) invocation.getArgument(0)) * 2
         );
         //5 km travelled
         //===> 5 * 2 * 100
         GasCost cost = new GasCost();
-        assertEquals(1000d,cost.expectedAdditionalCosts(fisher,999,888,5),
-                .0001);
+        assertEquals(1000d, cost.expectedAdditionalCosts(fisher, 999, 888, 5),
+            .0001
+        );
     }
 }

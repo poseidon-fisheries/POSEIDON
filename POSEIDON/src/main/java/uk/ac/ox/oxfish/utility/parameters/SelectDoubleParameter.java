@@ -36,12 +36,6 @@ public class SelectDoubleParameter implements DoubleParameter {
 
     private String valueString;
 
-    public SelectDoubleParameter(double[] possibleValues) {
-        Preconditions.checkArgument(possibleValues.length > 0, "The select list is empty!");
-        this.possibleValues = possibleValues;
-        arrayToString();
-    }
-
     public SelectDoubleParameter(String valueList) {
 
         //splits by whitespace
@@ -50,16 +44,29 @@ public class SelectDoubleParameter implements DoubleParameter {
 
     }
 
-    public static double[] stringToArray(String valueList) {
-        return Splitter.onPattern("\\s+").splitToList(valueList.trim()).stream().
-                mapToDouble((s) -> {
-                    if(s.matches(".*\\d+.*"))
-                        return Double.parseDouble(s);
-                    else
-                        return Double.NaN;
-                }).toArray();
+    public SelectDoubleParameter(double[] possibleValues) {
+        Preconditions.checkArgument(possibleValues.length > 0, "The select list is empty!");
+        this.possibleValues = possibleValues;
+        arrayToString();
     }
 
+    public static double[] stringToArray(String valueList) {
+        return Splitter.onPattern("\\s+").splitToList(valueList.trim()).stream().
+            mapToDouble((s) -> {
+                if (s.matches(".*\\d+.*"))
+                    return Double.parseDouble(s);
+                else
+                    return Double.NaN;
+            }).toArray();
+    }
+
+    private void arrayToString() {
+        StringBuilder builder = new StringBuilder();
+        for (double value : possibleValues)
+            builder.append(value).append(" ");
+        valueString = builder.toString();
+
+    }
 
     /**
      * Applies this function to the given argument.
@@ -68,11 +75,11 @@ public class SelectDoubleParameter implements DoubleParameter {
      * @return the function result
      */
     @Override
-    public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast){
+    public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast) {
         Preconditions.checkArgument(possibleValues.length > 0);
 
         double possibleValue = possibleValues[mersenneTwisterFast.nextInt(possibleValues.length)];
-        if(Double.isNaN(possibleValue))
+        if (Double.isNaN(possibleValue))
             throw new IllegalStateException("Select variable contains a NaN!");
         return possibleValue;
     }
@@ -81,27 +88,18 @@ public class SelectDoubleParameter implements DoubleParameter {
         return possibleValues;
     }
 
-
-    private void arrayToString(){
-        StringBuilder builder = new StringBuilder();
-        for(double value : possibleValues)
-            builder.append(value).append(" ");
-        valueString = builder.toString();
-
-    }
-
     public String getValueString() {
         return valueString;
     }
 
     public void setValueString(String valueString) {
         this.valueString = valueString;
-        if(valueString.matches(".*\\d+.*")) //don't transform until there is at least a number (ugly hack to keep gui happy)
-            this.possibleValues =   stringToArray(valueString);
+        if (valueString.matches(".*\\d+.*")) //don't transform until there is at least a number (ugly hack to keep gui happy)
+            this.possibleValues = stringToArray(valueString);
     }
 
     @Override
     public DoubleParameter makeCopy() {
-        return new SelectDoubleParameter(Arrays.copyOf(possibleValues,possibleValues.length));
+        return new SelectDoubleParameter(Arrays.copyOf(possibleValues, possibleValues.length));
     }
 }

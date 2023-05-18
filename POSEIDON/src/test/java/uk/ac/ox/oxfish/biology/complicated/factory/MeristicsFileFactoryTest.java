@@ -36,15 +36,15 @@ public class MeristicsFileFactoryTest {
 
 
     @Test
-    public void meristics() throws Exception
-    {
+    public void meristics() throws Exception {
         MeristicsFileFactory factory = new MeristicsFileFactory();
-        factory.setPathToMeristicFile(Paths.get("inputs","california",
-                                                "biology","Sablefish", "meristics.yaml"));
+        factory.setPathToMeristicFile(Paths.get("inputs", "california",
+            "biology", "Sablefish", "meristics.yaml"
+        ));
         StockAssessmentCaliforniaMeristics meristics = factory.apply(mock(FishState.class));
 
 
-        assertEquals(meristics.getMaturitySlope(),-0.13,.001d);
+        assertEquals(meristics.getMaturitySlope(), -0.13, .001d);
 
     }
 }

@@ -31,9 +31,13 @@ import javax.measure.Unit;
 public interface Monitor<O, V, Q extends Quantity<Q>> extends Observer<O>, Startable {
 
     String getBaseName();
+
     Unit<Q> getUnit();
+
     Iterable<V> extractValues(O observable);
+
     Accumulator<V> getAccumulator();
+
     void registerWith(TimeSeries<FishState> timeSeries);
 
 }

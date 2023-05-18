@@ -22,8 +22,6 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
 import uk.ac.ox.oxfish.biology.Species;
 
-import java.util.Objects;
-
 /**
  * A logistic abundance filter as for example the one used for trawl selectivity
  * for thornyheads; works on the length of the fish
@@ -38,7 +36,13 @@ public class LogisticAbundanceFilter extends FormulaAbundanceFilter {
     private final boolean logBaseTen;
 
 
-    public LogisticAbundanceFilter(double aParameter, double bParameter, boolean memoization, final boolean rounding, boolean logBaseTen) {
+    public LogisticAbundanceFilter(
+        double aParameter,
+        double bParameter,
+        boolean memoization,
+        final boolean rounding,
+        boolean logBaseTen
+    ) {
         super(memoization, rounding);
         this.aParameter = aParameter;
         this.bParameter = bParameter;
@@ -46,19 +50,17 @@ public class LogisticAbundanceFilter extends FormulaAbundanceFilter {
     }
 
 
-
-
-    protected double[][] computeSelectivity(Species species)
-    {
+    protected double[][] computeSelectivity(Species species) {
         double[][] toReturn = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
 
-        for(int subdivision = 0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
-            for(int age=0; age<species.getNumberOfBins(); age++)
-            {
+        for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++)
+            for (int age = 0; age < species.getNumberOfBins(); age++) {
                 toReturn[subdivision][age] =
-                        logBaseTen ?
-                        1d/(1+Math.exp(-Math.log10(19)*( species.getLength(subdivision,age)-aParameter)/bParameter)) :
-                        1d/(1+Math.exp(-Math.log(19)*( species.getLength(subdivision,age)-aParameter)/bParameter))
+                    logBaseTen ?
+                        1d / (1 + Math.exp(-Math.log10(19) * (species.getLength(subdivision,
+                            age) - aParameter) / bParameter)) :
+                        1d / (1 + Math.exp(-Math.log(19) * (species.getLength(subdivision,
+                            age) - aParameter) / bParameter))
 
                 ;
 

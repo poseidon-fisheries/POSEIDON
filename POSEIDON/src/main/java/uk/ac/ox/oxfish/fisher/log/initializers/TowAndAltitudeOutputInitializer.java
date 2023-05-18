@@ -23,19 +23,16 @@ package uk.ac.ox.oxfish.fisher.log.initializers;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.AltitudeOutput;
-import uk.ac.ox.oxfish.model.data.DiscretizationHistogrammer;
 import uk.ac.ox.oxfish.model.data.TowOutput;
 
 /**
  * generates exclusively the histogram initializer
  */
 public class TowAndAltitudeOutputInitializer implements AdditionalStartable, LogbookInitializer {
-
 
 
     private final int histogrammerStartYear;
@@ -49,13 +46,10 @@ public class TowAndAltitudeOutputInitializer implements AdditionalStartable, Log
     private TowOutput tows;
 
 
-
-
     public TowAndAltitudeOutputInitializer(int histogrammerStartYear, String identifier) {
         this.histogrammerStartYear = histogrammerStartYear;
         this.identifier = identifier;
     }
-
 
 
     @Override
@@ -63,7 +57,7 @@ public class TowAndAltitudeOutputInitializer implements AdditionalStartable, Log
 
 
         //add histogrammer now or when it is time!
-        if(histogrammerStartYear>=0) { //don't do anything if the start year is negative!
+        if (histogrammerStartYear >= 0) { //don't do anything if the start year is negative!
             if (state.getYear() >= histogrammerStartYear)
                 fisher.addTripListener(tows);
             else
@@ -74,7 +68,6 @@ public class TowAndAltitudeOutputInitializer implements AdditionalStartable, Log
                     }
                 }, StepOrder.DAWN, histogrammerStartYear);
         }
-
 
 
     }
@@ -90,12 +83,12 @@ public class TowAndAltitudeOutputInitializer implements AdditionalStartable, Log
 
         //let it build, we won't start it until it's time though
         tows = new TowOutput(model.getMap());
-        tows.setFileName(identifier +"_" + tows.getFileName());
+        tows.setFileName(identifier + "_" + tows.getFileName());
         model.getOutputPlugins().add(tows);
 
 
         AltitudeOutput altitude = new AltitudeOutput(model.getMap());
-        altitude.setFileName( identifier + altitude.getFileName());
+        altitude.setFileName(identifier + altitude.getFileName());
         model.getOutputPlugins().add(altitude);
 
 

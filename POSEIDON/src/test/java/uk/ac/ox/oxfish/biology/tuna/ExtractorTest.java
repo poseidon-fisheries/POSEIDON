@@ -6,15 +6,16 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.IntFunction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
@@ -32,18 +33,17 @@ public class ExtractorTest {
         SpeciesCodes speciesCodes = new SpeciesCodes(sCodes);
 
         Map<String, IntFunction<SmallLargeAllocationGridsSupplier.SizeGroup>> binToSizeGroupMappings = new HashMap<>();
-        binToSizeGroupMappings.put("Piano Tuna", entry -> entry==0?SMALL:LARGE );
+        binToSizeGroupMappings.put("Piano Tuna", entry -> entry == 0 ? SMALL : LARGE);
 
-        final GlobalBiology globalBiology= new GlobalBiology(species1);
+        final GlobalBiology globalBiology = new GlobalBiology(species1);
         HashMap<Species, double[][]> abundance = new HashMap<>();
         abundance.put(species1, new double[][]{{10, 10}, {10, 10}});
 
         final NauticalMap nauticalMap = makeMap(3, 3);
         nauticalMap.getAllSeaTilesAsList().forEach(seaTile ->
-                seaTile.setBiology(new AbundanceLocalBiology(abundance)
-                )
+            seaTile.setBiology(new AbundanceLocalBiology(abundance)
+            )
         );
-
 
 
         List<SeaTile> allSeaTiles = nauticalMap.getAllSeaTilesAsList();
@@ -56,7 +56,7 @@ public class ExtractorTest {
 
         List<LocalBiology> localBiologyList = extractor.apply(fishState);
 
-        assertEquals(localBiologyList.size(),9);
-        assertEquals(localBiologyList.get(0).getAbundance(species1).asMatrix()[0][0],10,.01);
+        assertEquals(localBiologyList.size(), 9);
+        assertEquals(localBiologyList.get(0).getAbundance(species1).asMatrix()[0][0], 10, .01);
     }
 }

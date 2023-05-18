@@ -52,7 +52,7 @@ public class PerTripIterativeDestinationStrategyTest {
         when(fishState.getRandom()).thenReturn(random);
         when(fishState.getMap()).thenReturn(map);
         final FavoriteDestinationStrategy delegate = new FavoriteDestinationStrategy(
-                map.getSeaTile(50, 50));
+            map.getSeaTile(50, 50));
         final PerTripIterativeDestinationStrategy hill = new PerTripIterativeDestinationFactory().apply(fishState);
 
         //mock fisher enough to fool delegate
@@ -69,20 +69,19 @@ public class PerTripIterativeDestinationStrategyTest {
         when(fisher.getHomePort()).thenReturn(port);
 
 
-
-        hill.start(fishState,fisher);
-        hill.getAlgorithm().start(fishState,fisher);
-        SeaTile favoriteSpot=null;
-        for(int i=0; i<1000; i++)
-        {
+        hill.start(fishState, fisher);
+        hill.getAlgorithm().start(fishState, fisher);
+        SeaTile favoriteSpot = null;
+        for (int i = 0; i < 1000; i++) {
             TripRecord record = mock(TripRecord.class);
             when(record.isCompleted()).thenReturn(true);
             when(record.isCutShort()).thenReturn(true);
             favoriteSpot = hill.chooseDestination(fisher,
-                                                    random, fishState, new Moving());
+                random, fishState, new Moving()
+            );
             when(record.getProfitPerHour(anyBoolean())).thenReturn((double) (favoriteSpot.getGridX() + favoriteSpot.getGridY()));
             when(fisher.getLastFinishedTrip()).thenReturn(record);
-            hill.getAlgorithm().adapt(fisher,fishState,random);
+            hill.getAlgorithm().adapt(fisher, fishState, random);
 
         }
 

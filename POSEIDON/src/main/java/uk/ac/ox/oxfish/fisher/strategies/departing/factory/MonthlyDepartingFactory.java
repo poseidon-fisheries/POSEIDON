@@ -20,36 +20,24 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
-import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.MonthlyDepartingDecorator;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.adaptation.Actuator;
-import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
-import uk.ac.ox.oxfish.utility.adaptation.Sensor;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * Creates the monthly departing Strategy
  * Created by carrknight on 1/6/16.
  */
-public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartingDecorator>{
+public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartingDecorator> {
 
 
     private List<Integer> monthsNotGoingOut = new LinkedList<>();
+    private AlgorithmFactory<? extends DepartingStrategy> delegate = new FixedRestTimeDepartingFactory();
+
     {
         monthsNotGoingOut.add(1);//jan
         monthsNotGoingOut.add(12);//dec
@@ -58,8 +46,6 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
 
 
     }
-
-    private AlgorithmFactory<? extends DepartingStrategy> delegate = new FixedRestTimeDepartingFactory();
 
     /**
      * Applies this function to the given argument.
@@ -70,11 +56,13 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
     @Override
     public MonthlyDepartingDecorator apply(FishState fishState) {
         boolean[] months = new boolean[12];
-        for(int i=0;i<12;i++)
+        for (int i = 0; i < 12; i++)
             months[i] = !monthsNotGoingOut.contains(i + 1);
 
-            return new MonthlyDepartingDecorator(delegate.apply(fishState),
-                                                 months);
+        return new MonthlyDepartingDecorator(
+            delegate.apply(fishState),
+            months
+        );
 
     }
 
@@ -111,7 +99,8 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
      * @param delegate Value to set for property 'delegate'.
      */
     public void setDelegate(
-            AlgorithmFactory<? extends DepartingStrategy> delegate) {
+        AlgorithmFactory<? extends DepartingStrategy> delegate
+    ) {
         this.delegate = delegate;
     }
 }

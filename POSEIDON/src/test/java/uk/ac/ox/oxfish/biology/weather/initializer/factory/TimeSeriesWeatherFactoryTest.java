@@ -41,30 +41,30 @@ public class TimeSeriesWeatherFactoryTest {
 
 
         TimeSeriesWeatherFactory factory = new TimeSeriesWeatherFactory(
-                Paths.get("inputs","tests","weather.csv").toString(),
-                true,
-                ',',
-                1
+            Paths.get("inputs", "tests", "weather.csv").toString(),
+            true,
+            ',',
+            1
         );
 
         FishState mock = MovingTest.generateSimple4x4Map();
         CSVWeatherInitializer weather = factory.apply(mock);
-        weather.processMap(mock.getMap(),new MersenneTwisterFast(),mock);
+        weather.processMap(mock.getMap(), new MersenneTwisterFast(), mock);
 
-        assertEquals(mock.getMap().getSeaTile(0,0).getWindSpeedInKph(),1,.0001);
+        assertEquals(mock.getMap().getSeaTile(0, 0).getWindSpeedInKph(), 1, .0001);
         weather.getActuator().step(mock);
-        assertEquals(mock.getMap().getSeaTile(1,1).getWindSpeedInKph(),2,.0001);
+        assertEquals(mock.getMap().getSeaTile(1, 1).getWindSpeedInKph(), 2, .0001);
 
 
         //notice that all tiles share the same weather object
-        assertEquals(mock.getMap().getSeaTile(0,0).getWindSpeedInKph()
-                           ,mock.getMap().getSeaTile(1,1).getWindSpeedInKph(),.001d);
+        assertEquals(mock.getMap().getSeaTile(0, 0).getWindSpeedInKph()
+            , mock.getMap().getSeaTile(1, 1).getWindSpeedInKph(), .001d);
 
         weather.getActuator().step(mock);
-        assertEquals(mock.getMap().getSeaTile(2,2).getWindSpeedInKph(),3,.0001);
+        assertEquals(mock.getMap().getSeaTile(2, 2).getWindSpeedInKph(), 3, .0001);
 
         weather.getActuator().step(mock);
-        assertEquals(mock.getMap().getSeaTile(3,3).getWindSpeedInKph(),1,.0001);
+        assertEquals(mock.getMap().getSeaTile(3, 3).getWindSpeedInKph(), 1, .0001);
 
 
     }

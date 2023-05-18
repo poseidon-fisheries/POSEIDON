@@ -37,6 +37,8 @@ public class ActionAttractionField extends AttractionField {
         this.actionClass = actionClass;
     }
 
-    public Class<? extends PurseSeinerAction> getActionClass() { return actionClass; }
+    public Class<? extends PurseSeinerAction> getActionClass() {
+        return actionClass;
+    }
 
 }

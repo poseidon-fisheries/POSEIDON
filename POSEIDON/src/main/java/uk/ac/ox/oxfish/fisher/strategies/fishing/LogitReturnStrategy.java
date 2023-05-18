@@ -33,7 +33,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
  * boolean value compared to the question we are asking)
  * Created by carrknight on 4/19/17.
  */
-public class LogitReturnStrategy  implements FishingStrategy{
+public class LogitReturnStrategy implements FishingStrategy {
 
 
     /**
@@ -43,7 +43,8 @@ public class LogitReturnStrategy  implements FishingStrategy{
 
 
     public LogitReturnStrategy(
-            LogisticClassifier shouldIReturnClassifier) {
+        LogisticClassifier shouldIReturnClassifier
+    ) {
         this.shouldIReturnClassifier = shouldIReturnClassifier;
     }
 
@@ -70,17 +71,18 @@ public class LogitReturnStrategy  implements FishingStrategy{
      */
     @Override
     public boolean shouldFish(
-            Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip) {
+        Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip
+    ) {
 
         //do not return if you haven't done any fishing yet
-        if(currentTrip.getEffort() ==0)
+        if (currentTrip.getEffort() == 0)
             return true;
         //always return if full
-        if(fisher.getTotalWeightOfCatchInHold()/fisher.getMaximumHold()>=1d- FishStateUtilities.EPSILON)
+        if (fisher.getTotalWeightOfCatchInHold() / fisher.getMaximumHold() >= 1d - FishStateUtilities.EPSILON)
             return false;
         //otherwise check if you want to continue by calling the logit
         //should I fish is the inverse of should I return
-        return ! shouldIReturnClassifier.test(fisher, model, fisher.getLocation(), random);
+        return !shouldIReturnClassifier.test(fisher, model, fisher.getLocation(), random);
 
 
     }

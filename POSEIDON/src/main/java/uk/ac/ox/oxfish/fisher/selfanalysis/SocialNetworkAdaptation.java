@@ -44,62 +44,68 @@ public class SocialNetworkAdaptation implements Adaptation<Integer> {
 
 
     public SocialNetworkAdaptation(
-            final int stepSize,
-            final ObjectiveFunction<Fisher> objective,
-            final double explorationProbability) {
-
+        final int stepSize,
+        final ObjectiveFunction<Fisher> objective,
+        final double explorationProbability
+    ) {
 
 
         delegate =
-                new ExploreImitateAdaptation<Integer>(
-                        //don't change friends if you've been stuck a lot of time at home
+            new ExploreImitateAdaptation<Integer>(
+                //don't change friends if you've been stuck a lot of time at home
 
-                        (Predicate<Fisher>) fisher1 -> fisher1.getHoursAtPort() < 10*24,
-                        new BeamHillClimbing<Integer>(new RandomStep<Integer>() {
-                            @Override
-                            public Integer randomStep(FishState state, MersenneTwisterFast random, Fisher fisher,
-                                                      Integer current) {
-                                return Math.min(
-                                        Math.max( random.nextBoolean() ?
-                                                          current + random.nextInt(stepSize) + 1 :
-                                                          current - random.nextInt(stepSize) - 1,
-                                                  0),
-                                        state.getFishers().size() - 1);
-                            }
-                        })
-                        ,
-                        (Actuator<Fisher, Integer>) (subject, policy, model) -> {
-                            int originalDirectedNeighbors = model.getSocialNetwork().getDirectedNeighbors(subject).size();
-                            int target = Math.min(Math.max(policy, 0), model.getFishers().size() - 1);
-                            int difference = target - model.getSocialNetwork().getBackingnetwork().getPredecessorCount(subject);
-                            if (difference > 0) {
-                                for (int i = 0; i < difference; i++)
-                                    model.getSocialNetwork().addRandomConnection(subject,model.getFishers(),new MersenneTwisterFast());
-                                ;
-                            }
-                            else if (difference < 0) {
-                                for (int i = 0; i < -difference; i++)
-                                {
-                                    model.getSocialNetwork().removeRandomConnection(subject, model.getRandom());
-                                }
-                            }
-                            Preconditions.checkArgument(
-                                    model.getSocialNetwork().getBackingnetwork().getPredecessorCount(subject) == target);
-                            assert  originalDirectedNeighbors == model.getSocialNetwork().getDirectedNeighbors(subject).size();
-                        },
-                        (Sensor<Fisher, Integer>) system -> system.getSocialNetwork().getBackingnetwork().getPredecessorCount(system),
-                        objective,
-                        new FixedProbability(explorationProbability, 0),
-                        (Predicate<Integer>) integer -> true
+                (Predicate<Fisher>) fisher1 -> fisher1.getHoursAtPort() < 10 * 24,
+                new BeamHillClimbing<Integer>(new RandomStep<Integer>() {
+                    @Override
+                    public Integer randomStep(
+                        FishState state, MersenneTwisterFast random, Fisher fisher,
+                        Integer current
+                    ) {
+                        return Math.min(
+                            Math.max(
+                                random.nextBoolean() ?
+                                    current + random.nextInt(stepSize) + 1 :
+                                    current - random.nextInt(stepSize) - 1,
+                                0
+                            ),
+                            state.getFishers().size() - 1
+                        );
+                    }
+                })
+                ,
+                (Actuator<Fisher, Integer>) (subject, policy, model) -> {
+                    int originalDirectedNeighbors = model.getSocialNetwork().getDirectedNeighbors(subject).size();
+                    int target = Math.min(Math.max(policy, 0), model.getFishers().size() - 1);
+                    int difference = target - model.getSocialNetwork().getBackingnetwork().getPredecessorCount(subject);
+                    if (difference > 0) {
+                        for (int i = 0; i < difference; i++)
+                            model.getSocialNetwork()
+                                .addRandomConnection(subject, model.getFishers(), new MersenneTwisterFast());
+                        ;
+                    } else if (difference < 0) {
+                        for (int i = 0; i < -difference; i++) {
+                            model.getSocialNetwork().removeRandomConnection(subject, model.getRandom());
+                        }
+                    }
+                    Preconditions.checkArgument(
+                        model.getSocialNetwork().getBackingnetwork().getPredecessorCount(subject) == target);
+                    assert originalDirectedNeighbors == model.getSocialNetwork().getDirectedNeighbors(subject).size();
+                },
+                (Sensor<Fisher, Integer>) system -> system.getSocialNetwork()
+                    .getBackingnetwork()
+                    .getPredecessorCount(system),
+                objective,
+                new FixedProbability(explorationProbability, 0),
+                (Predicate<Integer>) integer -> true
 
 
-                );
+            );
     }
 
 
     @Override
     public void start(FishState model, Fisher fisher) {
-        delegate.start(model,fisher);
+        delegate.start(model, fisher);
     }
 
     @Override

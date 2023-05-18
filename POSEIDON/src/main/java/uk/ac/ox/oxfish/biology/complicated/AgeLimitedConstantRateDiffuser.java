@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 /**
  * like constant rate abundance diffuser, but only works for a certain age range (outside this range fish is immobile!)
- *
+ * <p>
  * Created by carrknight on 7/7/17.
  */
 public class AgeLimitedConstantRateDiffuser extends ConstantRateAbundanceDiffuser {
@@ -40,12 +40,13 @@ public class AgeLimitedConstantRateDiffuser extends ConstantRateAbundanceDiffuse
     /**
      * fish of this age or below can move
      */
-    private  final  int maxMovementAge;
+    private final int maxMovementAge;
 
 
     public AgeLimitedConstantRateDiffuser(
-            int diffusingRange, double diffusingRate,
-            int minMovementAge, int maxMovementAge) {
+        int diffusingRange, double diffusingRate,
+        int minMovementAge, int maxMovementAge
+    ) {
         super(diffusingRange, diffusingRate);
         this.minMovementAge = minMovementAge;
         this.maxMovementAge = maxMovementAge;
@@ -53,36 +54,51 @@ public class AgeLimitedConstantRateDiffuser extends ConstantRateAbundanceDiffuse
 
     /**
      * ask implementation how to move. This gets called iff there is a positive delta (that is, there are more fish here than there)
-     *  @param species
-     * @param here         departing point
+     *
+     * @param species
+     * @param here           departing point
      * @param abundanceHere  departing local biology
-     * @param there        arriving point
+     * @param there          arriving point
      * @param abundanceThere arriving local biology
-     * @param delta        number of fish here - number of fish there (always positive or this isn't called)
+     * @param delta          number of fish here - number of fish there (always positive or this isn't called)
      * @param fishHere
      * @param fishThere
-     * @param bin          bin/age studied
+     * @param bin            bin/age studied
      * @param random
      * @param subdivision
-     * @param biologyHere  departing local biology
-     * @param biologyThere arriving local biology
+     * @param biologyHere    departing local biology
+     * @param biologyThere   arriving local biology
      */
     @Override
     public void move(
-            Species species,
-            SeaTile here, StructuredAbundance abundanceHere,
-            SeaTile there,
-            StructuredAbundance abundanceThere,
-            double delta, double fishHere, double fishThere, int bin,
-            MersenneTwisterFast random,
-            boolean rounding, int subdivision,
-            AbundanceLocalBiology biologyHere,
-            AbundanceLocalBiology biologyThere) {
+        Species species,
+        SeaTile here, StructuredAbundance abundanceHere,
+        SeaTile there,
+        StructuredAbundance abundanceThere,
+        double delta, double fishHere, double fishThere, int bin,
+        MersenneTwisterFast random,
+        boolean rounding, int subdivision,
+        AbundanceLocalBiology biologyHere,
+        AbundanceLocalBiology biologyThere
+    ) {
 
-        if(delta<=0)
+        if (delta <= 0)
             return;
-        if(bin >= minMovementAge && bin<=maxMovementAge)
-            super.move(species, here, abundanceHere, there, abundanceThere, delta, fishHere, fishThere, bin, random, rounding,
-                       subdivision, biologyHere, biologyThere);
+        if (bin >= minMovementAge && bin <= maxMovementAge)
+            super.move(species,
+                here,
+                abundanceHere,
+                there,
+                abundanceThere,
+                delta,
+                fishHere,
+                fishThere,
+                bin,
+                random,
+                rounding,
+                subdivision,
+                biologyHere,
+                biologyThere
+            );
     }
 }

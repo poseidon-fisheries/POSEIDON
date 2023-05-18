@@ -52,10 +52,11 @@ public class ThresholdAnswerTest {
         extractor.addFeatureExtractor("feature", new FeatureExtractor<Double>() {
             @Override
             public HashMap<Double, Double> extractFeature(
-                    Collection<Double> toRepresent, FishState model, Fisher fisher) {
-                HashMap<Double,Double> toReturn = new HashMap<>();
-                for(Double number : toRepresent)
-                    toReturn.put(number,number);
+                Collection<Double> toRepresent, FishState model, Fisher fisher
+            ) {
+                HashMap<Double, Double> toReturn = new HashMap<>();
+                for (Double number : toRepresent)
+                    toReturn.put(number, number);
                 return toReturn;
             }
         });
@@ -67,17 +68,17 @@ public class ThresholdAnswerTest {
 
         Log.info("needs numbers to be above 10, will not select any");
         ThresholdAnswer<Double> filter = new ThresholdAnswer<>(
-                2,
-                10,
-                "feature"
+            2,
+            10,
+            "feature"
         );
 
 
         List<Double> selected = filter.answer(
-                options,
-                extractor,
-                mock(FishState.class),
-                mock(Fisher.class)
+            options,
+            extractor,
+            mock(FishState.class),
+            mock(Fisher.class)
         );
 
         assertTrue(selected == null || selected.isEmpty());
@@ -91,17 +92,17 @@ public class ThresholdAnswerTest {
 
         Log.info("needs at least 4 observations, has only 3");
         ThresholdAnswer<Double> filter = new ThresholdAnswer<>(
-                4,
-                0,
-                "feature"
+            4,
+            0,
+            "feature"
         );
 
 
         List<Double> selected = filter.answer(
-                options,
-                extractor,
-                mock(FishState.class),
-                mock(Fisher.class)
+            options,
+            extractor,
+            mock(FishState.class),
+            mock(Fisher.class)
         );
 
         assertTrue(selected == null || selected.isEmpty());
@@ -115,21 +116,21 @@ public class ThresholdAnswerTest {
 
         Log.info("needs at least 4 observations, has only 3");
         ThresholdAnswer<Double> filter = new ThresholdAnswer<>(
-                3,
-                0,
-                "feature"
+            3,
+            0,
+            "feature"
         );
 
 
         List<Double> selected = filter.answer(
-                options,
-                extractor,
-                mock(FishState.class),
-                mock(Fisher.class)
+            options,
+            extractor,
+            mock(FishState.class),
+            mock(Fisher.class)
 
         );
 
-        assertEquals(selected.size(),3);
+        assertEquals(selected.size(), 3);
 
     }
 
@@ -139,20 +140,20 @@ public class ThresholdAnswerTest {
 
         Log.info("needs at least 4 observations, has only 3");
         ThresholdAnswer<Double> filter = new ThresholdAnswer<>(
-                3,
-                3,
-                "feature"
+            3,
+            3,
+            "feature"
         );
 
 
         List<Double> selected = filter.answer(
-                options,
-                extractor,
-                mock(FishState.class),
-                mock(Fisher.class)
+            options,
+            extractor,
+            mock(FishState.class),
+            mock(Fisher.class)
         );
 
-        assertEquals(selected.size(),1);
+        assertEquals(selected.size(), 1);
 
     }
 }

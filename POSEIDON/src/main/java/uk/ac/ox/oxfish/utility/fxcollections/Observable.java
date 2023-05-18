@@ -24,7 +24,6 @@ package uk.ac.ox.oxfish.utility.fxcollections;/*
  */
 
 
-
 /**
  * An {@code Observable} is an entity that wraps content and allows to
  * observe the content for invalidations.
@@ -43,8 +42,6 @@ package uk.ac.ox.oxfish.utility.fxcollections;/*
  * @see javafx.beans.value.ObservableValue
  * @see javafx.collections.ObservableList
  * @see javafx.collections.ObservableMap
- *
- *
  * @since JavaFX 2.0
  */
 public interface Observable {
@@ -65,12 +62,9 @@ public interface Observable {
      * removeListener} after use or to use an instance of
      * {@link WeakInvalidationListener} avoid this situation.
      *
+     * @param listener The listener to register
+     * @throws NullPointerException if the listener is null
      * @see #removeListener(InvalidationListener)
-     *
-     * @param listener
-     *            The listener to register
-     * @throws NullPointerException
-     *             if the listener is null
      */
     void addListener(InvalidationListener listener);
 
@@ -83,12 +77,9 @@ public interface Observable {
      * added then it will be removed. If it had been added more than once, then
      * only the first occurrence will be removed.
      *
+     * @param listener The listener to remove
+     * @throws NullPointerException if the listener is null
      * @see #addListener(InvalidationListener)
-     *
-     * @param listener
-     *            The listener to remove
-     * @throws NullPointerException
-     *             if the listener is null
      */
     void removeListener(InvalidationListener listener);
 

@@ -21,10 +21,8 @@
 package uk.ac.ox.oxfish.model.market;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.factory.AbundanceAwareFixedPriceMarketFactory;
@@ -46,7 +44,7 @@ public class FixedPriceMarketTest {
 
         Fisher seller = mock(Fisher.class);
 
-        market.sellFishImplementation(100.0,seller,new Anarchy(),mock(FishState.class),mock(Species.class));
+        market.sellFishImplementation(100.0, seller, new Anarchy(), mock(FishState.class), mock(Species.class));
         verify(seller).earn(200.0);
 
     }
@@ -62,13 +60,13 @@ public class FixedPriceMarketTest {
         Species species = mock(Species.class);
         when(species.getNumberOfBins()).thenReturn(1);
 
-        final Hold hold =  mock(Hold.class);
-        when(hold.getWeightOfBin(species,0)).thenReturn(100d);
+        final Hold hold = mock(Hold.class);
+        when(hold.getWeightOfBin(species, 0)).thenReturn(100d);
         when(hold.hasAbundanceInformation()).thenReturn(true);
         market.setSpecies(species);
         market.start(mock(FishState.class));
 
-        market.sellFish(hold,seller,new Anarchy(),mock(FishState.class),species);
+        market.sellFish(hold, seller, new Anarchy(), mock(FishState.class), species);
         verify(seller).earn(200.0);
 
     }
@@ -80,10 +78,10 @@ public class FixedPriceMarketTest {
 
         Fisher seller = mock(Fisher.class);
         Regulation regulation = mock(Regulation.class);
-        when(regulation.maximumBiomassSellable(any(),any(),any())).thenReturn(50.0); //can only sell 50!
+        when(regulation.maximumBiomassSellable(any(), any(), any())).thenReturn(50.0); //can only sell 50!
 
 
-        market.sellFishImplementation(100.0,seller, regulation,mock(FishState.class),mock(Species.class));
+        market.sellFishImplementation(100.0, seller, regulation, mock(FishState.class), mock(Species.class));
         verify(seller).earn(100.0);
 
     }

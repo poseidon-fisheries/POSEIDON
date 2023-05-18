@@ -20,14 +20,11 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentBySpawningBiomass;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.function.Function;
 
 public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<RecruitmentBySpawningBiomass> {
 
@@ -85,8 +82,10 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
                 final double[] actualMaturity = new double[species.getNumberOfBins()];
                 final double maxMaturity = halfFemalePopulation ? 0.5 : 1;
                 for (int bin = 0; bin < species.getNumberOfBins(); bin++)
-                    actualMaturity[bin] = species.getLength(subdivisionThatSpawns,
-                        bin) >= lengthAtMaturity ? maxMaturity : 0;
+                    actualMaturity[bin] = species.getLength(
+                        subdivisionThatSpawns,
+                        bin
+                    ) >= lengthAtMaturity ? maxMaturity : 0;
                 return actualMaturity;
 
             },

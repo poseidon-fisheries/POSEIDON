@@ -19,15 +19,14 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-import static java.lang.Math.pow;
-
-import java.util.Map.Entry;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import sim.util.MutableDouble2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
+
+import static java.lang.Math.pow;
 
 public class AttractionField implements FisherStartable {
 
@@ -110,7 +109,7 @@ public class AttractionField implements FisherStartable {
     @Override
     public void start(final FishState model, final Fisher fisher) {
         //don't start twice
-        if(this.fisher==null) {
+        if (this.fisher == null) {
             this.fisher = fisher;
             locationValues.start(model, fisher);
         }

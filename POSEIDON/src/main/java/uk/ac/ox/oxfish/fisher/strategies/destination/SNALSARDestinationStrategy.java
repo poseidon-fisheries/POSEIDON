@@ -46,10 +46,7 @@ import java.util.List;
  * Created by carrknight on 5/26/16.
  */
 public class SNALSARDestinationStrategy implements DestinationStrategy,
-        TripListener
-{
-
-
+    TripListener {
 
 
     /**
@@ -63,16 +60,19 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
     private final FavoriteDestinationStrategy delegate;
 
     private final FisherStartable startable;
+    private FishState model;
+    private Fisher fisher;
 
 
     public SNALSARDestinationStrategy(
-            EroteticAnswer<SeaTile> safetyFilter,
-            EroteticAnswer<SeaTile> notKnownToFailProfitFilter,
-            EroteticAnswer<SeaTile> legalFilter,
-            EroteticAnswer<SeaTile> sociallyAppropriateFilter,
-            EroteticAnswer<SeaTile> knownToHaveAcceptableProfits,
-            FavoriteDestinationStrategy delegate,
-            FisherStartable startable) {
+        EroteticAnswer<SeaTile> safetyFilter,
+        EroteticAnswer<SeaTile> notKnownToFailProfitFilter,
+        EroteticAnswer<SeaTile> legalFilter,
+        EroteticAnswer<SeaTile> sociallyAppropriateFilter,
+        EroteticAnswer<SeaTile> knownToHaveAcceptableProfits,
+        FavoriteDestinationStrategy delegate,
+        FisherStartable startable
+    ) {
         this.chooser = new EroteticChooser<>();
         this.chooser.add(safetyFilter);
         this.chooser.add(notKnownToFailProfitFilter);
@@ -80,7 +80,7 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
         this.chooser.add(sociallyAppropriateFilter);
         this.chooser.add(knownToHaveAcceptableProfits);
         this.delegate = delegate;
-        this.startable =startable;
+        this.startable = startable;
     }
 
     /**
@@ -93,22 +93,18 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
      */
     @Override
     public SeaTile chooseDestination(
-            Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
-        return delegate.chooseDestination(fisher,random,model,currentAction);
+        Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction
+    ) {
+        return delegate.chooseDestination(fisher, random, model, currentAction);
     }
-
-
-    private FishState model ;
-
-    private Fisher fisher;
 
     @Override
     public void start(FishState model, Fisher fisher) {
-        startable.start(model,fisher);
-        this.model=model;
-        this.fisher=fisher;
+        startable.start(model, fisher);
+        this.model = model;
+        this.fisher = fisher;
         fisher.addTripListener(this);
-        delegate.start(model,fisher);
+        delegate.start(model, fisher);
     }
 
     @Override
@@ -121,9 +117,9 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
         //all choices
         List<SeaTile> options = model.getMap().getAllSeaTilesExcludingLandAsList();
         delegate.setFavoriteSpot(chooser.answer(options,
-                                                this.fisher.getTileRepresentation(),
-                                                model, this.fisher
-                                 )
+                this.fisher.getTileRepresentation(),
+                model, this.fisher
+            )
         );
     }
 

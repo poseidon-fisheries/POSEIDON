@@ -53,7 +53,8 @@ public class LogisticAbundanceFilterTest {
      */
     @Test
     public void computesCorrectly() throws Exception {
-        final Species species = new Species("Longspine",
+        final Species species = new Species(
+            "Longspine",
             new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
                 0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
                 0.111313, 17.826, -1.79, 1,
@@ -99,7 +100,8 @@ public class LogisticAbundanceFilterTest {
     @Test
     public void memoizationIsFaster() throws Exception {
         final MersenneTwisterFast random = new MersenneTwisterFast();
-        final Species species = new Species("Longspine",
+        final Species species = new Species(
+            "Longspine",
             new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
                 0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
                 0.111313, 17.826, -1.79, 1,

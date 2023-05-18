@@ -32,23 +32,23 @@ import java.util.List;
  * make it more general in the future.
  * Created by carrknight on 6/27/16.
  */
-public class ExactMarkovBelief implements MarkovBelief
-{
+public class ExactMarkovBelief implements MarkovBelief {
 
 
     public final DoubleGrid2D belief;
 
     /**
      * creates a new random uniform markof belief!
+     *
      * @param map
      */
     public ExactMarkovBelief(NauticalMap map) {
 
-        belief = new DoubleGrid2D(map.getWidth(),map.getHeight(),0d);
+        belief = new DoubleGrid2D(map.getWidth(), map.getHeight(), 0d);
         List<SeaTile> seaTiles = map.getAllSeaTilesExcludingLandAsList();
-        double initialAssumption = seaTiles.size()/((double)map.getWidth()*map.getHeight());
-        for(SeaTile seaTile : seaTiles)
-            belief.set(seaTile.getGridX(),seaTile.getGridY(),initialAssumption);
+        double initialAssumption = seaTiles.size() / ((double) map.getWidth() * map.getHeight());
+        for (SeaTile seaTile : seaTiles)
+            belief.set(seaTile.getGridX(), seaTile.getGridY(), initialAssumption);
     }
 
 
@@ -57,35 +57,33 @@ public class ExactMarkovBelief implements MarkovBelief
      */
     public ExactMarkovBelief(DoubleGrid2D belief) {
 
-        this.belief=belief;
+        this.belief = belief;
     }
-
 
 
     /**
      * returns the belief at this location
+     *
      * @return the belief (a number)
      */
-    public double getBelief(int x, int y)
-    {
-        return belief.get(x,y);
+    public double getBelief(int x, int y) {
+        return belief.get(x, y);
     }
 
     /**
      * returns the belief on this tile
+     *
      * @param tile tile
      * @return the belief (a number)
      */
-    public double getBelief(SeaTile tile)
-    {
-        return belief.get(tile.getGridX(),tile.getGridY());
+    public double getBelief(SeaTile tile) {
+        return belief.get(tile.getGridX(), tile.getGridY());
     }
 
     /**
      * returns the whole grid. Do not modify directly!
      */
-    public DoubleGrid2D representBeliefs()
-    {
+    public DoubleGrid2D representBeliefs() {
         return belief;
     }
 }

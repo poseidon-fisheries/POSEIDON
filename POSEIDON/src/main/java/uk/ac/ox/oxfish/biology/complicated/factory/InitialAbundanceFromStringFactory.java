@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
-import uk.ac.ox.oxfish.biology.complicated.PremadeInitialAbundance;
 import uk.ac.ox.oxfish.biology.complicated.RepeatingInitialAbundance;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -34,7 +33,7 @@ import java.util.function.Function;
 public class InitialAbundanceFromStringFactory implements AlgorithmFactory<RepeatingInitialAbundance> {
 
 
-    private String fishPerBinPerSex ="10000000,1000000,10000";
+    private String fishPerBinPerSex = "10000000,1000000,10000";
 
 
     /**
@@ -44,8 +43,7 @@ public class InitialAbundanceFromStringFactory implements AlgorithmFactory<Repea
      * @return the function result
      */
     @Override
-    public RepeatingInitialAbundance apply(FishState state)
-    {
+    public RepeatingInitialAbundance apply(FishState state) {
 
         //turn into weights array
         Function<String, Integer> mapper = new Function<String, Integer>() {
@@ -58,12 +56,10 @@ public class InitialAbundanceFromStringFactory implements AlgorithmFactory<Repea
         Integer[] fish = Arrays.stream(fishPerBinPerSex.split(",")).map(mapper).toArray(Integer[]::new);
 
 
-
         //set up initial abundance array
-        double[] abundance =new double[fish.length];
+        double[] abundance = new double[fish.length];
         //fill it up
-        for(int bin=0; bin<fish.length; bin++)
-        {
+        for (int bin = 0; bin < fish.length; bin++) {
             abundance[bin] = fish[bin];
         }
         //return it

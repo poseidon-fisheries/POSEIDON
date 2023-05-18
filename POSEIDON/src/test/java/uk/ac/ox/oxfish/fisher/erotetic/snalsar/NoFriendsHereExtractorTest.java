@@ -49,27 +49,27 @@ public class NoFriendsHereExtractorTest {
         Fisher friend = mock(Fisher.class);
         TripRecord record = mock(TripRecord.class);
         when(record.getTilesFished()).thenReturn(
-                Sets.newHashSet(full)
+            Sets.newHashSet(full)
         );
         when(friend.getLastFinishedTrip()).thenReturn(record);
 
         NoFriendsHereExtractor extractor =
-                new NoFriendsHereExtractor(true);
+            new NoFriendsHereExtractor(true);
 
         Fisher chooser = mock(Fisher.class);
         when(chooser.getDirectedFriends()).thenReturn(
-                Lists.newArrayList(friend));
+            Lists.newArrayList(friend));
 
-        List<SeaTile> options =Lists.newArrayList(empty,full);
+        List<SeaTile> options = Lists.newArrayList(empty, full);
         Map<SeaTile, Double> featureMap = extractor.extractFeature(
-                options,
-                mock(FishState.class),
-                chooser
+            options,
+            mock(FishState.class),
+            chooser
         );
 
-        Assert.assertEquals(featureMap.size(),2);
-        Assert.assertEquals(featureMap.get(empty),1,.0001);
-        Assert.assertEquals(featureMap.get(full),-1,.0001);
+        Assert.assertEquals(featureMap.size(), 2);
+        Assert.assertEquals(featureMap.get(empty), 1, .0001);
+        Assert.assertEquals(featureMap.get(full), -1, .0001);
 
 
     }

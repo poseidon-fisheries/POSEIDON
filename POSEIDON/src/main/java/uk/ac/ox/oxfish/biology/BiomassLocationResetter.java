@@ -15,8 +15,7 @@ import java.util.function.Supplier;
  * calls biomass allocator at the end of each year to reset the location of biomass left.
  * If the habitat doesn't support it, the biomass will die in the transportation
  */
-public class BiomassLocationResetter implements AdditionalStartable, Steppable
-{
+public class BiomassLocationResetter implements AdditionalStartable, Steppable {
 
     private final Species species;
 
@@ -33,9 +32,7 @@ public class BiomassLocationResetter implements AdditionalStartable, Steppable
     public void start(FishState model) {
 
 
-
-
-        model.scheduleEveryYear(this,StepOrder.AFTER_DATA);
+        model.scheduleEveryYear(this, StepOrder.AFTER_DATA);
     }
 
 
@@ -51,50 +48,50 @@ public class BiomassLocationResetter implements AdditionalStartable, Steppable
         BiomassAllocator thisYearAllocator = this.biomassAllocator.get();
         Double totalAllocation = 0d;
         double totalBiomass = computeBiomassNextYear((FishState) simState);
-        HashMap<SeaTile,Double> hashMap = new HashMap<>();
+        HashMap<SeaTile, Double> hashMap = new HashMap<>();
         //for all the areas of the seas that are livable
-        for(SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList()) {
+        for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList()) {
             //skip if it's unlivable
 
-            if(((VariableBiomassBasedBiology) tile.getBiology()).getCarryingCapacity(species)<=0)
+            if (((VariableBiomassBasedBiology) tile.getBiology()).getCarryingCapacity(species) <= 0)
                 continue;
 
 
             //allocate new biomass weight
             double allocated = thisYearAllocator.allocate(
-                    tile,
-                    state.getMap(),
-                    state.getRandom()
+                tile,
+                state.getMap(),
+                state.getRandom()
             );
 
-            if(!Double.isFinite(allocated))
-                allocated=0;
-            hashMap.put(tile,
-                        allocated);
+            if (!Double.isFinite(allocated))
+                allocated = 0;
+            hashMap.put(
+                tile,
+                allocated
+            );
             totalAllocation += allocated;
 
 
         }
         assert Double.isFinite(totalAllocation);
-        assert  totalAllocation>=0;
+        assert totalAllocation >= 0;
 
         //now loop again and place it!
-        for(SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
-        {
-            if(tile.getBiology() instanceof VariableBiomassBasedBiology)
-            {
+        for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList()) {
+            if (tile.getBiology() instanceof VariableBiomassBasedBiology) {
                 VariableBiomassBasedBiology biology = (VariableBiomassBasedBiology) tile.getBiology();
-                if (biology.getCarryingCapacity(species) > 0)
-                {
-                    biology.setCurrentBiomass(species,
-                                              Math.min(
-                                                      totalBiomass*hashMap.get(tile)/totalAllocation,
-                                                      biology.getCarryingCapacity(species))
+                if (biology.getCarryingCapacity(species) > 0) {
+                    biology.setCurrentBiomass(
+                        species,
+                        Math.min(
+                            totalBiomass * hashMap.get(tile) / totalAllocation,
+                            biology.getCarryingCapacity(species)
+                        )
                     );
                 }
 
             }
-
 
 
         }

@@ -28,23 +28,22 @@ public interface CatchAtLengthSampler extends Startable {
     /**
      * get approximate NUMBER of fish recorded as caught
      */
-    public double[][] getAbundance() ;
+    public double[][] getAbundance();
 
     /**
      * get approximate NUMBER of fish recorded as caught using a custom function matching bin weight to numbers
      * (this is useful if we don't want to use the REAL species parameters)
      */
-    public double[][] getAbundance(Function<Pair<Integer, Integer>, Double> subdivisionBinToWeightFunction) ;
-
-
+    public double[][] getAbundance(Function<Pair<Integer, Integer>, Double> subdivisionBinToWeightFunction);
 
 
     public Species getSpecies();
 
-    public double[][] getLandings() ;
+    public double[][] getLandings();
 
     /**
      * returns unmodifiable list showing fishers
+     *
      * @return
      */
     public List<Fisher> viewObservedFishers();

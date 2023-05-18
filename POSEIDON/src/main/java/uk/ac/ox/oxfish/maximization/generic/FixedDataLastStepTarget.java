@@ -35,15 +35,44 @@ import static java.lang.Math.abs;
 public class FixedDataLastStepTarget implements FixedDataTarget {
 
 
+    public static boolean VERBOSE = false;
     private double fixedTarget = 100;
-
     private double exponent = 1;
-
-
     private String columnName = "Average Cash-Flow";
 
-    public static boolean VERBOSE = false;
 
+    public FixedDataLastStepTarget() {
+    }
+
+    public FixedDataLastStepTarget(double fixedTarget, String columnName) {
+        this.fixedTarget = fixedTarget;
+        this.columnName = columnName;
+    }
+
+    /**
+     * extracts fixed target as last element of a csv you provided
+     *
+     * @param file       single column CSV. The fixed target will the last line
+     * @param columnName name of the column IN THE MODEL that you are trying to match
+     * @return
+     */
+    public static FixedDataLastStepTarget lastStepTarget(
+        Path file, String columnName
+    ) {
+        try {
+            List<String> strings = Files.readAllLines(file);
+            return new FixedDataLastStepTarget(
+                Double.parseDouble(
+                    strings.get(strings.size() - 1)),
+                columnName
+            );
+        } catch (IOException e) {
+
+            throw new RuntimeException("can't read " + file + " because of " + e);
+        }
+
+
+    }
 
     /**
      * computes distance from target (0 best, the higher the number the further away from optimum we are)
@@ -68,37 +97,9 @@ public class FixedDataLastStepTarget implements FixedDataTarget {
         return error;
     }
 
-    @Override public double getValue(final FishState fishState) {
+    @Override
+    public double getValue(final FishState fishState) {
         return fishState.getYearlyDataSet().getColumn(columnName).getLatest();
-    }
-
-    public FixedDataLastStepTarget() {
-    }
-
-    public FixedDataLastStepTarget(double fixedTarget, String columnName) {
-        this.fixedTarget = fixedTarget;
-        this.columnName = columnName;
-    }
-
-    /**
-     * extracts fixed target as last element of a csv you provided
-     * @param file single column CSV. The fixed target will the last line
-     * @param columnName name of the column IN THE MODEL that you are trying to match
-     * @return
-     */
-    public static FixedDataLastStepTarget lastStepTarget(
-            Path file, String columnName){
-        try {
-            List<String> strings = Files.readAllLines(file);
-            return new FixedDataLastStepTarget(Double.parseDouble(
-                    strings.get(strings.size()-1)),
-                                               columnName);
-        } catch (IOException e) {
-
-            throw new RuntimeException("can't read " + file +" because of " + e);
-        }
-
-
     }
 
     /**
@@ -106,7 +107,8 @@ public class FixedDataLastStepTarget implements FixedDataTarget {
      *
      * @return Value for property 'fixedTarget'.
      */
-    @Override public double getFixedTarget() {
+    @Override
+    public double getFixedTarget() {
         return fixedTarget;
     }
 
@@ -124,7 +126,8 @@ public class FixedDataLastStepTarget implements FixedDataTarget {
      *
      * @return Value for property 'columnName'.
      */
-    @Override public String getColumnName() {
+    @Override
+    public String getColumnName() {
         return columnName;
     }
 

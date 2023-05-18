@@ -5,13 +5,13 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.boxcars.BoxCarSimulator;
 import uk.ac.ox.oxfish.biology.boxcars.FixedBoxcarAging;
-import uk.ac.ox.oxfish.biology.complicated.*;
+import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
+import uk.ac.ox.oxfish.biology.complicated.RecruitmentBySpawningBiomass;
+import uk.ac.ox.oxfish.biology.complicated.RepeatingInitialAbundance;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.Arrays;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -26,7 +26,6 @@ public class SingleSpeciesIrregularBoxcarFactoryTest {
         when(mock.getRandom()).thenReturn(new MersenneTwisterFast());
 
 
-
         //check that the length and weights match the regular ones
         SingleSpeciesRegularBoxcarFactory control = new SingleSpeciesRegularBoxcarFactory();
         control.setCmPerBin(5);
@@ -34,38 +33,44 @@ public class SingleSpeciesIrregularBoxcarFactoryTest {
 
         SingleSpeciesIrregularBoxcarFactory factory = new SingleSpeciesIrregularBoxcarFactory();
 
-        factory.setBinnedLengthsInCm(Lists.newArrayList(12.5d,57.5d,102.5d));
+        factory.setBinnedLengthsInCm(Lists.newArrayList(12.5d, 57.5d, 102.5d));
         final SingleSpeciesAbundanceInitializer unequalSpaced = factory.apply(mock);
 
         //same lengths/same weights
         //12.5 cm
         assertEquals(
-                equalSpaced.getMeristics().getLength(0,2),
-                unequalSpaced.getMeristics().getLength(0,0),
-                .0001);
+            equalSpaced.getMeristics().getLength(0, 2),
+            unequalSpaced.getMeristics().getLength(0, 0),
+            .0001
+        );
         assertEquals(
-                equalSpaced.getMeristics().getWeight(0,2),
-                unequalSpaced.getMeristics().getWeight(0,0),
-                .0001);
+            equalSpaced.getMeristics().getWeight(0, 2),
+            unequalSpaced.getMeristics().getWeight(0, 0),
+            .0001
+        );
         //57.5
         assertEquals(
-                equalSpaced.getMeristics().getLength(0,11),
-                unequalSpaced.getMeristics().getLength(0,1),
-                .0001);
+            equalSpaced.getMeristics().getLength(0, 11),
+            unequalSpaced.getMeristics().getLength(0, 1),
+            .0001
+        );
         assertEquals(
-                equalSpaced.getMeristics().getWeight(0,11),
-                unequalSpaced.getMeristics().getWeight(0,1),
-                .0001);
+            equalSpaced.getMeristics().getWeight(0, 11),
+            unequalSpaced.getMeristics().getWeight(0, 1),
+            .0001
+        );
 
         //102.5
         assertEquals(
-                equalSpaced.getMeristics().getLength(0,20),
-                unequalSpaced.getMeristics().getLength(0,2),
-                .0001);
+            equalSpaced.getMeristics().getLength(0, 20),
+            unequalSpaced.getMeristics().getLength(0, 2),
+            .0001
+        );
         assertEquals(
-                equalSpaced.getMeristics().getWeight(0,20),
-                unequalSpaced.getMeristics().getWeight(0,2),
-                .0001);
+            equalSpaced.getMeristics().getWeight(0, 20),
+            unequalSpaced.getMeristics().getWeight(0, 2),
+            .0001
+        );
     }
 
 
@@ -87,9 +92,9 @@ public class SingleSpeciesIrregularBoxcarFactoryTest {
 
         //the initial abundance ought to be the same (since that's carrying capacity!)
         assertArrayEquals(
-                ((RepeatingInitialAbundance) noNoise.getInitialAbundance()).peekCohort(),
-                ((RepeatingInitialAbundance) noise.getInitialAbundance()).peekCohort(),
-                1
+            ((RepeatingInitialAbundance) noNoise.getInitialAbundance()).peekCohort(),
+            ((RepeatingInitialAbundance) noise.getInitialAbundance()).peekCohort(),
+            1
         );
 
     }
@@ -108,29 +113,33 @@ public class SingleSpeciesIrregularBoxcarFactoryTest {
 
         final GrowthBinByList meristicsInstance = (GrowthBinByList) noNoise.getMeristics();
         BoxCarSimulator simulator = new BoxCarSimulator(
-                ((RecruitmentBySpawningBiomass) noNoise.getRecruitmentProcess()).getVirginRecruits(),
-                ((FixedBoxcarAging) noNoise.getAging()),
-                ((RecruitmentBySpawningBiomass) noNoise.getRecruitmentProcess()),
-                meristicsInstance,
-                noNoise.getMortality()
+            ((RecruitmentBySpawningBiomass) noNoise.getRecruitmentProcess()).getVirginRecruits(),
+            ((FixedBoxcarAging) noNoise.getAging()),
+            ((RecruitmentBySpawningBiomass) noNoise.getRecruitmentProcess()),
+            meristicsInstance,
+            noNoise.getMortality()
         );
-        final double totalWeightNoNoise = FishStateUtilities.weigh(simulator.virginCondition(state, 20),
-                meristicsInstance);
+        final double totalWeightNoNoise = FishStateUtilities.weigh(
+            simulator.virginCondition(state, 20),
+            meristicsInstance
+        );
         System.out.println(totalWeightNoNoise);
 
         //all no noise runs will generate exactly the same simulated numbers
         for (int attempts = 0; attempts < 10; attempts++) {
             final SingleSpeciesAbundanceInitializer initializer = factory.apply(state);
             simulator = new BoxCarSimulator(
-                    ((RecruitmentBySpawningBiomass) initializer.getRecruitmentProcess()).getVirginRecruits(),
-                    ((FixedBoxcarAging) initializer.getAging()),
-                    ((RecruitmentBySpawningBiomass) initializer.getRecruitmentProcess()),
-                    meristicsInstance,
-                    initializer.getMortality()
+                ((RecruitmentBySpawningBiomass) initializer.getRecruitmentProcess()).getVirginRecruits(),
+                ((FixedBoxcarAging) initializer.getAging()),
+                ((RecruitmentBySpawningBiomass) initializer.getRecruitmentProcess()),
+                meristicsInstance,
+                initializer.getMortality()
             );
-            double newWeight = FishStateUtilities.weigh(simulator.virginCondition(state, 20),
-                    meristicsInstance);
-            assertEquals(totalWeightNoNoise,newWeight,.0001);
+            double newWeight = FishStateUtilities.weigh(
+                simulator.virginCondition(state, 20),
+                meristicsInstance
+            );
+            assertEquals(totalWeightNoNoise, newWeight, .0001);
         }
 
         //but if it is with noise, completely different numbers will get simulated... that's noise for you.
@@ -140,15 +149,17 @@ public class SingleSpeciesIrregularBoxcarFactoryTest {
         for (int attempts = 0; attempts < 10; attempts++) {
             final SingleSpeciesAbundanceInitializer initializer = factory.apply(state);
             simulator = new BoxCarSimulator(
-                    ((RecruitmentBySpawningBiomass) initializer.getRecruitmentProcess()).getVirginRecruits(),
-                    ((FixedBoxcarAging) initializer.getAging()),
-                    ((RecruitmentBySpawningBiomass) initializer.getRecruitmentProcess()),
-                    meristicsInstance,
-                    initializer.getMortality()
+                ((RecruitmentBySpawningBiomass) initializer.getRecruitmentProcess()).getVirginRecruits(),
+                ((FixedBoxcarAging) initializer.getAging()),
+                ((RecruitmentBySpawningBiomass) initializer.getRecruitmentProcess()),
+                meristicsInstance,
+                initializer.getMortality()
             );
-            double newWeight = FishStateUtilities.weigh(simulator.virginCondition(state, 20),
-                    meristicsInstance);
-            assertNotEquals(totalWeightNoNoise,newWeight,1000);
+            double newWeight = FishStateUtilities.weigh(
+                simulator.virginCondition(state, 20),
+                meristicsInstance
+            );
+            assertNotEquals(totalWeightNoNoise, newWeight, 1000);
         }
 
     }

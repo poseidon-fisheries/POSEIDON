@@ -29,19 +29,19 @@ import java.util.function.Predicate;
 /**
  * Created by carrknight on 10/4/16.
  */
-public abstract class AbstractAdaptation<T> implements  Adaptation<T>{
+public abstract class AbstractAdaptation<T> implements Adaptation<T> {
 
 
     /**
      * used by the agent to tell what is its current T object and what is the T of
      * others
      */
-    private Sensor<Fisher,T> sensor;
+    private Sensor<Fisher, T> sensor;
 
     /**
      * a class that assigns a new T to the fisher
      */
-    private Actuator<Fisher,T> actuator;
+    private Actuator<Fisher, T> actuator;
 
     /**
      * each "step" the validator makes sure the fisher is ready to adapt; if it returns false the adaptation is aborted
@@ -52,37 +52,38 @@ public abstract class AbstractAdaptation<T> implements  Adaptation<T>{
     private FishState model;
 
 
-    @Override
-    public void start(FishState model, Fisher fisher) {
-        this.model=model;
-        onStart(model,fisher);
-    }
-
-    protected abstract void onStart(FishState model, Fisher fisher);
-
     public AbstractAdaptation(
-            Sensor<Fisher,T> sensor, Actuator<Fisher,T> actuator, Predicate<Fisher> validator) {
+        Sensor<Fisher, T> sensor, Actuator<Fisher, T> actuator, Predicate<Fisher> validator
+    ) {
         this.sensor = sensor;
         this.actuator = actuator;
         this.validator = validator;
     }
 
+    @Override
+    public void start(FishState model, Fisher fisher) {
+        this.model = model;
+        onStart(model, fisher);
+    }
+
+    protected abstract void onStart(FishState model, Fisher fisher);
 
     /**
      * Ask yourself to adapt
-     *  @param toAdapt who is doing the adaptation
+     *
+     * @param toAdapt who is doing the adaptation
      * @param state
      * @param random  the randomizer
      */
     @Override
     public void adapt(Fisher toAdapt, FishState state, MersenneTwisterFast random) {
         //are you ready?
-        if(!validator.test(toAdapt))
+        if (!validator.test(toAdapt))
             return;
 
-        T newVariable = concreteAdaptation(toAdapt,state,random);
-        if(newVariable!= null && newVariable != sensor.scan(toAdapt))
-            actuator.apply(toAdapt,newVariable,state );
+        T newVariable = concreteAdaptation(toAdapt, state, random);
+        if (newVariable != null && newVariable != sensor.scan(toAdapt))
+            actuator.apply(toAdapt, newVariable, state);
 
 
     }
@@ -96,7 +97,7 @@ public abstract class AbstractAdaptation<T> implements  Adaptation<T>{
      *
      * @return Value for property 'sensor'.
      */
-    public Sensor<Fisher,T> getSensor() {
+    public Sensor<Fisher, T> getSensor() {
         return sensor;
     }
 
@@ -105,7 +106,7 @@ public abstract class AbstractAdaptation<T> implements  Adaptation<T>{
      *
      * @param sensor Value to set for property 'sensor'.
      */
-    public void setSensor(Sensor<Fisher,T> sensor) {
+    public void setSensor(Sensor<Fisher, T> sensor) {
         this.sensor = sensor;
     }
 
@@ -114,7 +115,7 @@ public abstract class AbstractAdaptation<T> implements  Adaptation<T>{
      *
      * @return Value for property 'actuator'.
      */
-    public Actuator<Fisher,T> getActuator() {
+    public Actuator<Fisher, T> getActuator() {
         return actuator;
     }
 
@@ -123,7 +124,7 @@ public abstract class AbstractAdaptation<T> implements  Adaptation<T>{
      *
      * @param actuator Value to set for property 'actuator'.
      */
-    public void setActuator(Actuator<Fisher,T> actuator) {
+    public void setActuator(Actuator<Fisher, T> actuator) {
         this.actuator = actuator;
     }
 

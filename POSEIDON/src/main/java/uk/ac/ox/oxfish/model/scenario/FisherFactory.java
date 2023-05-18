@@ -20,10 +20,6 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import java.util.LinkedList;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
@@ -39,70 +35,78 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.restrictions.RegionalRestrictions;
 import uk.ac.ox.oxfish.model.restrictions.ReputationalRestrictions;
-import uk.ac.ox.oxfish.model.restrictions.Restriction;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import java.util.LinkedList;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * An object produced by the scenario that allows the model to produce more fishers
  * Created by carrknight on 12/11/15.
  */
-public class FisherFactory
-{
-
-    private int nextID;
-
-    private Supplier<Port> portSupplier;
-
-    private AlgorithmFactory<? extends Regulation> regulations;
-    
-    private AlgorithmFactory<? extends ReputationalRestrictions> reputationalRestrictions;
-    
-    private AlgorithmFactory<? extends RegionalRestrictions> communityRestrictions;
-    
-    private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
-
-    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy;
-
-    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy;
-
-
-    private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy;
-
-
-    private AlgorithmFactory<? extends GearStrategy> gearStrategy;
-
-    private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy;
-
-    private Supplier<Boat> boatSupplier;
-
-    private Supplier<Hold> holdSupplier;
-
-    private AlgorithmFactory<? extends Gear> gear;
+public class FisherFactory {
 
     /**
      * this consumers will be called after the fisher is created but before it is returned.
      * It can be used to add additional characteristics (tags/predictors/etc.) to the boat.
      */
     private final LinkedList<Consumer<Fisher>> additionalSetups = new LinkedList<>();
+    private int nextID;
+    private Supplier<Port> portSupplier;
+    private AlgorithmFactory<? extends Regulation> regulations;
+    private AlgorithmFactory<? extends ReputationalRestrictions> reputationalRestrictions;
+    private AlgorithmFactory<? extends RegionalRestrictions> communityRestrictions;
+    private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
+    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy;
+    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy;
+    private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy;
+    private AlgorithmFactory<? extends GearStrategy> gearStrategy;
+    private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy;
+    private Supplier<Boat> boatSupplier;
+    private Supplier<Hold> holdSupplier;
+    private AlgorithmFactory<? extends Gear> gear;
 
 
     private FisherFactory() {
     }
 
     public FisherFactory(
-            Supplier<Port> portSupplier,
-            AlgorithmFactory<? extends Regulation> regulations,
-            AlgorithmFactory<? extends DepartingStrategy> departingStrategy,
-            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy,
-            AlgorithmFactory<? extends FishingStrategy> fishingStrategy,
-            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy,
-            AlgorithmFactory<? extends GearStrategy> gearStrategy,
-            AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy,
-            Supplier<Boat> boatSupplier, Supplier<Hold> holdSupplier,
-            AlgorithmFactory<? extends Gear> gear, int nextID) {
+        Supplier<Port> portSupplier,
+        AlgorithmFactory<? extends Regulation> regulations,
+        AlgorithmFactory<? extends ReputationalRestrictions> reputationalRestrictions,
+        AlgorithmFactory<? extends RegionalRestrictions> communityRestrictions,
+        AlgorithmFactory<? extends DepartingStrategy> departingStrategy,
+        AlgorithmFactory<? extends DestinationStrategy> destinationStrategy,
+        AlgorithmFactory<? extends FishingStrategy> fishingStrategy,
+        AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy,
+        AlgorithmFactory<? extends GearStrategy> gearStrategy,
+        AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy,
+        Supplier<Boat> boatSupplier, Supplier<Hold> holdSupplier,
+        AlgorithmFactory<? extends Gear> gear, int nextID
+    ) {
+        this(portSupplier, regulations, departingStrategy, destinationStrategy, fishingStrategy, discardingStrategy,
+            gearStrategy, weatherStrategy, boatSupplier, holdSupplier, gear, nextID
+        );
+        this.reputationalRestrictions = reputationalRestrictions;
+        this.communityRestrictions = communityRestrictions;
+    }
+
+    public FisherFactory(
+        Supplier<Port> portSupplier,
+        AlgorithmFactory<? extends Regulation> regulations,
+        AlgorithmFactory<? extends DepartingStrategy> departingStrategy,
+        AlgorithmFactory<? extends DestinationStrategy> destinationStrategy,
+        AlgorithmFactory<? extends FishingStrategy> fishingStrategy,
+        AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy,
+        AlgorithmFactory<? extends GearStrategy> gearStrategy,
+        AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy,
+        Supplier<Boat> boatSupplier, Supplier<Hold> holdSupplier,
+        AlgorithmFactory<? extends Gear> gear, int nextID
+    ) {
         this.portSupplier = portSupplier;
         this.regulations = regulations;
-        
+
         this.departingStrategy = departingStrategy;
         this.destinationStrategy = destinationStrategy;
         this.fishingStrategy = fishingStrategy;
@@ -115,69 +119,53 @@ public class FisherFactory
         this.nextID = nextID;
     }
 
-    public FisherFactory(
-            Supplier<Port> portSupplier,
-            AlgorithmFactory<? extends Regulation> regulations,
-            AlgorithmFactory<? extends ReputationalRestrictions> reputationalRestrictions,
-            AlgorithmFactory<? extends RegionalRestrictions> communityRestrictions,
-            AlgorithmFactory<? extends DepartingStrategy> departingStrategy,
-            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy,
-            AlgorithmFactory<? extends FishingStrategy> fishingStrategy,
-            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy,
-            AlgorithmFactory<? extends GearStrategy> gearStrategy,
-            AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy,
-            Supplier<Boat> boatSupplier, Supplier<Hold> holdSupplier,
-            AlgorithmFactory<? extends Gear> gear, int nextID) {
-    	this(portSupplier, regulations,departingStrategy,destinationStrategy,fishingStrategy,discardingStrategy,
-    			gearStrategy,weatherStrategy,boatSupplier,holdSupplier,gear, nextID);
-        this.reputationalRestrictions = reputationalRestrictions;
-        this.communityRestrictions = communityRestrictions;
-    }
-
     /**
      * creates a fisher and returns it. Doesn't schedule it or add it to the rest of the model so use this
      * method while the model is still or if the model is running remember to add the fisher to the fisher list
      * and register it as a startable (also add it to the social network if needed)
+     *
      * @param fishState model
      * @return
      */
     public Fisher buildFisher(FishState fishState) {
-    	
-    	Fisher fisher;
-    	if(this.communityRestrictions==null){
-    		fisher = new Fisher(nextID++, portSupplier.get(),
-                                   fishState.getRandom(),
-                                   regulations.apply(fishState),
-                                   departingStrategy.apply(fishState),
-                                   destinationStrategy.apply(fishState),
-                                   fishingStrategy.apply(fishState),
-                                   gearStrategy.apply(fishState),
-                                   discardingStrategy.apply(fishState),
-                                   weatherStrategy.apply(fishState),
-                                   boatSupplier.get(),
-                                   holdSupplier.get(),
-                                   gear.apply(fishState), fishState.getSpecies().size());
-        for(Consumer<Fisher> setup : additionalSetups)
-            setup.accept(fisher);
-    	} else {
-    		fisher = new Fisher(nextID++, portSupplier.get(),
-                    fishState.getRandom(),
-                    regulations.apply(fishState),
-                    reputationalRestrictions.apply(fishState),
-                    communityRestrictions.apply(fishState),
-                    departingStrategy.apply(fishState),
-                    destinationStrategy.apply(fishState),
-                    fishingStrategy.apply(fishState),
-                    gearStrategy.apply(fishState),
-                    discardingStrategy.apply(fishState),
-                    weatherStrategy.apply(fishState),
-                    boatSupplier.get(),
-                    holdSupplier.get(),
-                    gear.apply(fishState), fishState.getSpecies().size());
-			for(Consumer<Fisher> setup : additionalSetups)
-			setup.accept(fisher);
-    		
-    	}
+
+        Fisher fisher;
+        if (this.communityRestrictions == null) {
+            fisher = new Fisher(nextID++, portSupplier.get(),
+                fishState.getRandom(),
+                regulations.apply(fishState),
+                departingStrategy.apply(fishState),
+                destinationStrategy.apply(fishState),
+                fishingStrategy.apply(fishState),
+                gearStrategy.apply(fishState),
+                discardingStrategy.apply(fishState),
+                weatherStrategy.apply(fishState),
+                boatSupplier.get(),
+                holdSupplier.get(),
+                gear.apply(fishState), fishState.getSpecies().size()
+            );
+            for (Consumer<Fisher> setup : additionalSetups)
+                setup.accept(fisher);
+        } else {
+            fisher = new Fisher(nextID++, portSupplier.get(),
+                fishState.getRandom(),
+                regulations.apply(fishState),
+                reputationalRestrictions.apply(fishState),
+                communityRestrictions.apply(fishState),
+                departingStrategy.apply(fishState),
+                destinationStrategy.apply(fishState),
+                fishingStrategy.apply(fishState),
+                gearStrategy.apply(fishState),
+                discardingStrategy.apply(fishState),
+                weatherStrategy.apply(fishState),
+                boatSupplier.get(),
+                holdSupplier.get(),
+                gear.apply(fishState), fishState.getSpecies().size()
+            );
+            for (Consumer<Fisher> setup : additionalSetups)
+                setup.accept(fisher);
+
+        }
         return fisher;
 
     }
@@ -197,7 +185,8 @@ public class FisherFactory
      * @param regulations Value to set for property 'regulations'.
      */
     public void setRegulations(
-            AlgorithmFactory<? extends Regulation> regulations) {
+        AlgorithmFactory<? extends Regulation> regulations
+    ) {
         this.regulations = regulations;
     }
 
@@ -216,7 +205,8 @@ public class FisherFactory
      * @param departingStrategy Value to set for property 'departingStrategy'.
      */
     public void setDepartingStrategy(
-            AlgorithmFactory<? extends DepartingStrategy> departingStrategy) {
+        AlgorithmFactory<? extends DepartingStrategy> departingStrategy
+    ) {
         this.departingStrategy = departingStrategy;
     }
 
@@ -235,7 +225,8 @@ public class FisherFactory
      * @param destinationStrategy Value to set for property 'destinationStrategy'.
      */
     public void setDestinationStrategy(
-            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
+        AlgorithmFactory<? extends DestinationStrategy> destinationStrategy
+    ) {
         this.destinationStrategy = destinationStrategy;
     }
 
@@ -254,7 +245,8 @@ public class FisherFactory
      * @param fishingStrategy Value to set for property 'fishingStrategy'.
      */
     public void setFishingStrategy(
-            AlgorithmFactory<? extends FishingStrategy> fishingStrategy) {
+        AlgorithmFactory<? extends FishingStrategy> fishingStrategy
+    ) {
         this.fishingStrategy = fishingStrategy;
     }
 
@@ -273,7 +265,8 @@ public class FisherFactory
      * @param weatherStrategy Value to set for property 'weatherStrategy'.
      */
     public void setWeatherStrategy(
-            AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy) {
+        AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy
+    ) {
         this.weatherStrategy = weatherStrategy;
     }
 
@@ -346,7 +339,8 @@ public class FisherFactory
      * @param gearStrategy Value to set for property 'gearStrategy'.
      */
     public void setGearStrategy(
-            AlgorithmFactory<? extends GearStrategy> gearStrategy) {
+        AlgorithmFactory<? extends GearStrategy> gearStrategy
+    ) {
         this.gearStrategy = gearStrategy;
     }
 
@@ -412,7 +406,8 @@ public class FisherFactory
      * @param discardingStrategy Value to set for property 'discardingStrategy'.
      */
     public void setDiscardingStrategy(
-            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy) {
+        AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy
+    ) {
         this.discardingStrategy = discardingStrategy;
     }
 }

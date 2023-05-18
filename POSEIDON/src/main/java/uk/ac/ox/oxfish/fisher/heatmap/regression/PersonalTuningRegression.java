@@ -33,8 +33,7 @@ import java.util.Arrays;
  * Just a gradient descent over latest prediction error
  * Created by carrknight on 9/13/16.
  */
-public class PersonalTuningRegression implements GeographicalRegression<Double>
-{
+public class PersonalTuningRegression implements GeographicalRegression<Double> {
 
     /**
      * the gradient is guessed numerically by checking prediction error at x +- percentageChangeToGuessGradient * x
@@ -59,8 +58,9 @@ public class PersonalTuningRegression implements GeographicalRegression<Double>
 
 
     public PersonalTuningRegression(
-            GeographicalRegression<Double> delegate, double percentageChangeToGuessGradient, double stepSize,
-            int observationsBeforeTuning) {
+        GeographicalRegression<Double> delegate, double percentageChangeToGuessGradient, double stepSize,
+        int observationsBeforeTuning
+    ) {
         this.percentageChangeToGuessGradient = percentageChangeToGuessGradient;
         this.stepSize = stepSize;
         this.delegate = delegate;
@@ -90,25 +90,25 @@ public class PersonalTuningRegression implements GeographicalRegression<Double>
     public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
 
-
-        return delegate.predict(tile,time,fisher,model );
+        return delegate.predict(tile, time, fisher, model);
     }
 
     /**
      * learn from this observation
-     *  @param observation
+     *
+     * @param observation
      * @param fisher
      * @param model
      */
     @Override
     public void addObservation(
-            GeographicalObservation<Double> observation, Fisher fisher, FishState model)
-    {
+        GeographicalObservation<Double> observation, Fisher fisher, FishState model
+    ) {
 
         numberOfObservations++;
-        if(numberOfObservations> observationsBeforeTuning)
-            tune(observation,fisher,model);
-        delegate.addObservation(observation,fisher, model);
+        if (numberOfObservations > observationsBeforeTuning)
+            tune(observation, fisher, model);
+        delegate.addObservation(observation, fisher, model);
 
 
     }
@@ -116,46 +116,45 @@ public class PersonalTuningRegression implements GeographicalRegression<Double>
     /**
      * performs a one step gradient descent
      */
-    private void tune(GeographicalObservation<Double> observation,
-                      Fisher fisher, FishState model)
-    {
+    private void tune(
+        GeographicalObservation<Double> observation,
+        Fisher fisher, FishState model
+    ) {
 
         //find (squared) prediction error
-        double predictionError =  delegate.predict(observation.getTile(),observation.getTime(),fisher,model ) -
-                extractNumericalYFromObservation(observation,fisher);
-        predictionError*=predictionError;
-        if(!Double.isFinite(predictionError))
+        double predictionError = delegate.predict(observation.getTile(), observation.getTime(), fisher, model) -
+            extractNumericalYFromObservation(observation, fisher);
+        predictionError *= predictionError;
+        if (!Double.isFinite(predictionError))
             return;
 
 
         //loop through the parameters
-        double[] parameters = Arrays.copyOf(delegate.getParametersAsArray(),delegate.getParametersAsArray().length);
+        double[] parameters = Arrays.copyOf(delegate.getParametersAsArray(), delegate.getParametersAsArray().length);
         double[] gradient = new double[parameters.length];
-        for(int i=0; i<gradient.length; i++)
-        {
-            double[] highParameters = Arrays.copyOf(parameters,parameters.length);
-            highParameters[i]*=1+percentageChangeToGuessGradient;
-            double h =  highParameters[i]-parameters[i];
+        for (int i = 0; i < gradient.length; i++) {
+            double[] highParameters = Arrays.copyOf(parameters, parameters.length);
+            highParameters[i] *= 1 + percentageChangeToGuessGradient;
+            double h = highParameters[i] - parameters[i];
             //too small of a change? don't bother
-            if(h==0)
-                {
-                    assert  highParameters[i] == parameters[i];
-                    h= FishStateUtilities.EPSILON;
-                    highParameters[i] +=h;
+            if (h == 0) {
+                assert highParameters[i] == parameters[i];
+                h = FishStateUtilities.EPSILON;
+                highParameters[i] += h;
 
-                }
+            }
 
             delegate.setParameters(highParameters);
-            double errorHigh = delegate.predict(observation.getTile(),observation.getTime(),fisher,model ) -
-                    extractNumericalYFromObservation(observation,fisher);
+            double errorHigh = delegate.predict(observation.getTile(), observation.getTime(), fisher, model) -
+                extractNumericalYFromObservation(observation, fisher);
 
-            gradient[i] = (errorHigh*errorHigh-predictionError)/h;
+            gradient[i] = (errorHigh * errorHigh - predictionError) / h;
 
         }
 
         //modify parameters
-        for(int i=0; i<parameters.length; i++)
-            if(Double.isFinite(gradient[i]))
+        for (int i = 0; i < parameters.length; i++)
+            if (Double.isFinite(gradient[i]))
                 parameters[i] = parameters[i] - stepSize * gradient[i];
 
         delegate.setParameters(parameters);
@@ -171,8 +170,9 @@ public class PersonalTuningRegression implements GeographicalRegression<Double>
      */
     @Override
     public double extractNumericalYFromObservation(
-            GeographicalObservation<Double> observation, Fisher fisher) {
-        return delegate.extractNumericalYFromObservation(observation,fisher);
+        GeographicalObservation<Double> observation, Fisher fisher
+    ) {
+        return delegate.extractNumericalYFromObservation(observation, fisher);
     }
 
     /**
@@ -183,7 +183,7 @@ public class PersonalTuningRegression implements GeographicalRegression<Double>
      */
     @Override
     public double[] getParametersAsArray() {
-        return  delegate.getParametersAsArray();
+        return delegate.getParametersAsArray();
     }
 
     /**

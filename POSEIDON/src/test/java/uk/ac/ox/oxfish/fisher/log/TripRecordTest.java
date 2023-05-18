@@ -31,11 +31,11 @@ public class TripRecordTest {
 
     @Test
     public void records() {
-        TripRecord record = new TripRecord(1, 0d,0);
+        TripRecord record = new TripRecord(1, 0d, 0);
         record.recordCosts(100);
-        record.recordEarnings(0,1,200);
+        record.recordEarnings(0, 1, 200);
         record.completeTrip(10, mock(Port.class));
-        assertEquals(record.getProfitPerHour(false),10,.001d);
+        assertEquals(record.getProfitPerHour(false), 10, .001d);
     }
 
 
@@ -43,23 +43,23 @@ public class TripRecordTest {
     public void opportunityCosts() {
 
 
-        TripRecord record = new TripRecord(1, 123d,0);
+        TripRecord record = new TripRecord(1, 123d, 0);
         record.recordCosts(100);
         record.recordOpportunityCosts(50);
-        record.recordEarnings(0,1,200);
-        record.completeTrip(10,mock(Port.class) );
-        assertEquals(record.getProfitPerHour(false),10,.001d);
-        assertEquals(record.getProfitPerHour(true),5,.001d);
+        record.recordEarnings(0, 1, 200);
+        record.completeTrip(10, mock(Port.class));
+        assertEquals(record.getProfitPerHour(false), 10, .001d);
+        assertEquals(record.getProfitPerHour(true), 5, .001d);
     }
 
     @Test
     public void profitsAreCorrect() {
-        TripRecord record = new TripRecord(2,123d,0 );
+        TripRecord record = new TripRecord(2, 123d, 0);
         record.recordCosts(100);
-        record.recordEarnings(0,1,200);
-        record.recordEarnings(1,1,100);
+        record.recordEarnings(0, 1, 200);
+        record.recordEarnings(1, 1, 100);
         record.completeTrip(10, mock(Port.class));
-        assertEquals(record.getTotalTripProfit(),200,.001);
+        assertEquals(record.getTotalTripProfit(), 200, .001);
 
     }
 }

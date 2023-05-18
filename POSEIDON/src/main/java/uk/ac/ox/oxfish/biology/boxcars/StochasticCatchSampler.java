@@ -63,22 +63,23 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
      */
     @Nullable
     private final String surveyTag;
+    private FishState model;
 
 
     public StochasticCatchSampler(
-            Predicate<Fisher> samplingSelector,
-            Species species,
-            @Nullable String surveyTag) {
-        Preconditions.checkArgument(species!=null);
+        Predicate<Fisher> samplingSelector,
+        Species species,
+        @Nullable String surveyTag
+    ) {
+        Preconditions.checkArgument(species != null);
         this.samplingSelector = samplingSelector;
-        this.delegate = new CatchSample(species,
-                new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()]);
+        this.delegate = new CatchSample(
+            species,
+            new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()]
+        );
         this.surveyTag = surveyTag;
-        this.species =species;
+        this.species = species;
     }
-
-
-    private FishState model;
 
     @Override
     public void start(FishState model) {
@@ -86,6 +87,43 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
         this.model = model;
         checkWhichFisherToObserve(model);
         model.getFishers().addListener(this);
+    }
+
+    /**
+     * builds the list of fishers to observe
+     *
+     * @param model the model
+     */
+    private void checkWhichFisherToObserve(FishState model) {
+
+        resetObservedFishers();
+
+        for (Fisher fisher : model.getFishers()) {
+            checkIfAddFisherToSurvey(fisher);
+        }
+
+
+    }
+
+    /**
+     * clear the previous list of fishers
+     */
+    private void resetObservedFishers() {
+        if (surveyTag != null) {
+            String totalTag = surveyTag + " " + species;
+            for (Fisher fisher : observedFishers) {
+                fisher.getTags().remove(totalTag);
+            }
+        }
+        observedFishers.clear();
+    }
+
+    private void checkIfAddFisherToSurvey(Fisher fisher) {
+        if (samplingSelector.test(fisher)) {
+            if (surveyTag != null)
+                fisher.getTags().add(surveyTag + " " + species);
+            observedFishers.add(fisher);
+        }
     }
 
     @Override
@@ -98,52 +136,11 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
     }
 
     /**
-     * clear the previous list of fishers
-     */
-    private void resetObservedFishers(){
-        if(surveyTag!=null) {
-            String totalTag = surveyTag+" "+species;
-            for (Fisher fisher : observedFishers) {
-                fisher.getTags().remove(totalTag);
-            }
-        }
-        observedFishers.clear();
-    }
-
-
-    /**
-     * builds the list of fishers to observe
-     * @param model the model
-     */
-    private void checkWhichFisherToObserve(FishState model){
-
-        resetObservedFishers();
-
-        for(Fisher fisher : model.getFishers())
-        {
-            checkIfAddFisherToSurvey(fisher);
-        }
-
-
-    }
-
-    private void checkIfAddFisherToSurvey(Fisher fisher) {
-        if(samplingSelector.test(fisher))
-        {
-            if(surveyTag!=null)
-                fisher.getTags().add(surveyTag+" "+species);
-            observedFishers.add(fisher);
-        }
-    }
-
-
-    /**
      * supposedly what you'd step on: looks at all the fishers we are sampling and sum up all their landings and ADD it to the abundance vector.
      * Because fishers store their landings in weight, we need a function to turn them back into abundance. Here
      * we use the REAL weight function to do so
      */
-    public void observeDaily()
-    {
+    public void observeDaily() {
 
         delegate.observeDaily(observedFishers);
 
@@ -160,8 +157,6 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
     public double[][] getAbundance(Function<Pair<Integer, Integer>, Double> subdivisionBinToWeightFunction) {
         return delegate.getAbundance(subdivisionBinToWeightFunction);
     }
-
-
 
 
     public Species getSpecies() {
@@ -183,10 +178,9 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
     }
 
 
-
     @Override
     public void onChanged(Change<? extends Fisher> c) {
-        while(c.next()) {
+        while (c.next()) {
             for (Fisher newFisher : c.getAddedSubList()) {
                 checkIfAddFisherToSurvey(newFisher);
             }
@@ -197,6 +191,7 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
 
     /**
      * returns unmodifiable list showing fishers
+     *
      * @return
      */
     public List<Fisher> viewObservedFishers() {

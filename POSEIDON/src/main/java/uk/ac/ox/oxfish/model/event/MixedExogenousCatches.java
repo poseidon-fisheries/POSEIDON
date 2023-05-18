@@ -29,7 +29,8 @@ import java.util.LinkedHashMap;
 
 public class MixedExogenousCatches extends AbstractYearlyTargetExogenousCatches {
     public MixedExogenousCatches(
-            LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg) {
+        LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg
+    ) {
         super(exogenousYearlyCatchesInKg, "Exogenous catches of ");
     }
 
@@ -44,18 +45,22 @@ public class MixedExogenousCatches extends AbstractYearlyTargetExogenousCatches 
      */
     @Override
     protected Catch mortalityEvent(
-            FishState simState, Species target, LocalBiology tile, double step) {
+        FishState simState, Species target, LocalBiology tile, double step
+    ) {
 
-        if(target.getNumberOfBins()>1)
+        if (target.getNumberOfBins() > 1)
             return AbundanceDrivenFixedExogenousCatches.abundanceSimpleMortalityEvent(simState,
-                                                                                      target,
-                                                                                      tile,
-                                                                                      step, false);
+                target,
+                tile,
+                step, false
+            );
         else
-            return BiomassDrivenFixedExogenousCatches.biomassSimpleMortalityEvent(simState,
-                                                                                  target,
-                                                                                  tile,
-                                                                                  step);
+            return BiomassDrivenFixedExogenousCatches.biomassSimpleMortalityEvent(
+                simState,
+                target,
+                tile,
+                step
+            );
 
     }
 }

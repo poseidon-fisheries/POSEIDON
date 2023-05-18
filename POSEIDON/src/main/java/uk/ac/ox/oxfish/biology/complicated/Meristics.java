@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.biology.complicated;
 /**
  * this interface keeps track of basically how much a fish in a bin weigh and is long as well as how many bins and
  * subdivisions there actually are
- *
  */
 public interface Meristics {
 
@@ -31,14 +30,16 @@ public interface Meristics {
 
     /**
      * get the weight of one fish
+     *
      * @param subdivision at this division
-     * @param bin at this bin
+     * @param bin         at this bin
      * @return the unit weight
      */
     double getWeight(int subdivision, int bin);
 
     /**
      * subdivision are groups like male-female or age cohorts
+     *
      * @return
      */
     int getNumberOfSubdivisions();
@@ -46,7 +47,8 @@ public interface Meristics {
     /**
      * number of bins for each subdivision. All subdivisions are assumed to have these number of bins
      * and all bins with the same index refer to the same weight and length; <br>
-     *     Bins can be length-bins or age-bins, it depends on the use case
+     * Bins can be length-bins or age-bins, it depends on the use case
+     *
      * @return
      */
     int getNumberOfBins();
@@ -55,7 +57,8 @@ public interface Meristics {
     /**
      * function mapping time to length; the growth function.
      * It doesn't have to be consistent with the subdivisions but it should
-     * @param ageInYears age in terms of years
+     *
+     * @param ageInYears  age in terms of years
      * @param subdivision the subdivision we are study (male/female is different for example)
      * @return the length of the fish
      */

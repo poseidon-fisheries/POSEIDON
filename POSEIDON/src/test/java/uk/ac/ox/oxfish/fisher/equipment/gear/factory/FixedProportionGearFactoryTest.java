@@ -31,17 +31,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class FixedProportionGearFactoryTest
-{
+public class FixedProportionGearFactoryTest {
 
 
     @Test
-    public void fixedProportion() throws Exception
-    {
+    public void fixedProportion() throws Exception {
 
 
         FixedProportionGearFactory fixedProportionGearFactory =
-                (FixedProportionGearFactory) Gears.CONSTRUCTORS.get(
+            (FixedProportionGearFactory) Gears.CONSTRUCTORS.get(
                 "Fixed Proportion").get();
 
 
@@ -50,7 +48,7 @@ public class FixedProportionGearFactoryTest
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
         FixedProportionGear gear = fixedProportionGearFactory.apply(state);
-        assertEquals(gear.getProportionFished(),.5,.001);
+        assertEquals(gear.getProportionFished(), .5, .001);
 
 
     }

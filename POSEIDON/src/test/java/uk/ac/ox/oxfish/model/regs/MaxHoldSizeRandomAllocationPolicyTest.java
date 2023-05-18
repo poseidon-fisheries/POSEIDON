@@ -49,7 +49,7 @@ public class MaxHoldSizeRandomAllocationPolicyTest {
         when(four.getMaximumHold()).thenReturn(100d);
 
 
-        List<Fisher> fishers = Lists.newArrayList(one,two,three,four);
+        List<Fisher> fishers = Lists.newArrayList(one, two, three, four);
 
 
         MaxHoldSizeRandomAllocationPolicy policy = new MaxHoldSizeRandomAllocationPolicy(200);
@@ -57,9 +57,9 @@ public class MaxHoldSizeRandomAllocationPolicyTest {
         FishState state = mock(FishState.class);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
-        for(int i=0; i < 100; i++) {
+        for (int i = 0; i < 100; i++) {
             List<Fisher> allowed = policy.computeWhichFishersAreAllowed(fishers, state);
-            assertEquals(allowed.size(),2);
+            assertEquals(allowed.size(), 2);
         }
 
 
@@ -80,7 +80,7 @@ public class MaxHoldSizeRandomAllocationPolicyTest {
         when(four.getMaximumHold()).thenReturn(100d);
 
 
-        List<Fisher> fishers = Lists.newArrayList(one,two,three,four);
+        List<Fisher> fishers = Lists.newArrayList(one, two, three, four);
 
 
         MaxHoldSizeRandomAllocationPolicy policy = new MaxHoldSizeRandomAllocationPolicy(300);
@@ -88,9 +88,9 @@ public class MaxHoldSizeRandomAllocationPolicyTest {
         FishState state = mock(FishState.class);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
-        for(int i=0; i < 100; i++) {
+        for (int i = 0; i < 100; i++) {
             List<Fisher> allowed = policy.computeWhichFishersAreAllowed(fishers, state);
-            assertEquals(allowed.size(),3);
+            assertEquals(allowed.size(), 3);
             assertTrue(!allowed.contains(one));
         }
 

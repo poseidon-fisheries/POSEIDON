@@ -24,7 +24,12 @@ public class CoordinateFileBiomassAllocator extends FileBiomassAllocator impleme
     }
 
     @Override
-    protected void observePoint(final NauticalMap map, final Double currentX, final Double currentY, final Double nextValue) {
+    protected void observePoint(
+        final NauticalMap map,
+        final Double currentX,
+        final Double currentY,
+        final Double nextValue
+    ) {
         final SeaTile tile = map.getSeaTile(new Coordinate(currentX, currentY));
         if (tile == null) //if you are off the depth map, ignore!
             return;

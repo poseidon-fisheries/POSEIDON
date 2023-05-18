@@ -46,19 +46,19 @@ public class MaximumDaysAYearDecorator implements FishingStrategy {
      * This is called by the fisher to decide whether or not to fish and then each step after that to decide whether or
      * not to continue fishing
      *
-     *
      * @param fisher
-     * @param random the randomizer
-     * @param model the model itself
+     * @param random      the randomizer
+     * @param model       the model itself
      * @param currentTrip
      * @return true if the fisher should fish here, false otherwise
      */
     @Override
     public boolean shouldFish(
-            Fisher fisher, MersenneTwisterFast random, FishState model,
-            TripRecord currentTrip) {
+        Fisher fisher, MersenneTwisterFast random, FishState model,
+        TripRecord currentTrip
+    ) {
 
-        if(fisher.getHoursAtSeaThisYear()/24 > maxNumberOfDaysOutPerYear )
+        if (fisher.getHoursAtSeaThisYear() / 24 > maxNumberOfDaysOutPerYear)
             return false;
 
         return delegate.shouldFish(fisher, random, model, currentTrip);
@@ -68,6 +68,7 @@ public class MaximumDaysAYearDecorator implements FishingStrategy {
      * This is called by Arriving.act to decide whether or not to fish up arrival. Most fishing
      * strategies should use this default implementation, but FAD fishing strategies are expected to
      * override this method and result in action types other than `Fishing`.
+     *
      * @param model
      * @param agent
      * @param regulation
@@ -75,8 +76,9 @@ public class MaximumDaysAYearDecorator implements FishingStrategy {
      */
     @Override
     public ActionResult act(
-            FishState model, Fisher agent,
-            Regulation regulation, double hoursLeft) {
+        FishState model, Fisher agent,
+        Regulation regulation, double hoursLeft
+    ) {
         return delegate.act(model, agent, regulation, hoursLeft);
     }
 

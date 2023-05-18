@@ -19,13 +19,14 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
+import ec.util.MersenneTwisterFast;
+import org.junit.Test;
+
+import java.util.function.DoubleSupplier;
+
 import static java.lang.Math.E;
 import static junit.framework.TestCase.assertEquals;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-
-import ec.util.MersenneTwisterFast;
-import java.util.function.DoubleSupplier;
-import org.junit.Test;
 
 public class DurationSamplerTest {
 

@@ -18,17 +18,18 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import static java.util.Objects.requireNonNull;
-import static org.junit.Assert.assertArrayEquals;
-
 import com.google.common.collect.ImmutableMap;
-import java.util.Map.Entry;
 import junit.framework.TestCase;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+
+import java.util.Map.Entry;
+
+import static java.util.Objects.requireNonNull;
+import static org.junit.Assert.assertArrayEquals;
 
 public class AbundanceCatchMakerTest extends TestCase {
 
@@ -47,13 +48,13 @@ public class AbundanceCatchMakerTest extends TestCase {
 
         final AbundanceLocalBiology desiredBiology =
             new AbundanceLocalBiology(ImmutableMap.of(
-                twoBinner, new double[][] {
-                    new double[] {100, 101},
-                    new double[] {110, 111}
+                twoBinner, new double[][]{
+                    new double[]{100, 101},
+                    new double[]{110, 111}
                 },
-                threeBinner, new double[][] {
-                    new double[] {200, 201, 202},
-                    new double[] {210, 211, 212}
+                threeBinner, new double[][]{
+                    new double[]{200, 201, 202},
+                    new double[]{210, 211, 212}
                 }
             ));
 
@@ -76,13 +77,13 @@ public class AbundanceCatchMakerTest extends TestCase {
 
         final AbundanceLocalBiology availableBiology =
             new AbundanceLocalBiology(ImmutableMap.of(
-                twoBinner, new double[][] {
-                    new double[] {100, 100},
-                    new double[] {100, 100}
+                twoBinner, new double[][]{
+                    new double[]{100, 100},
+                    new double[]{100, 100}
                 },
-                threeBinner, new double[][] {
-                    new double[] {100, 100, 100},
-                    new double[] {100, 100, 100}
+                threeBinner, new double[][]{
+                    new double[]{100, 100, 100},
+                    new double[]{100, 100, 100}
                 }
             ));
 
@@ -96,13 +97,13 @@ public class AbundanceCatchMakerTest extends TestCase {
             );
             assertArrayEquals(
                 new AbundanceLocalBiology(ImmutableMap.of(
-                    twoBinner, new double[][] {
-                        new double[] {0, 1},
-                        new double[] {10, 11}
+                    twoBinner, new double[][]{
+                        new double[]{0, 1},
+                        new double[]{10, 11}
                     },
-                    threeBinner, new double[][] {
-                        new double[] {100, 101, 102},
-                        new double[] {110, 111, 112}
+                    threeBinner, new double[][]{
+                        new double[]{100, 101, 102},
+                        new double[]{110, 111, 112}
                     }
                 )).getAbundance(species).asMatrix(),
                 betterCatch.getValue().getAbundance(species).asMatrix()

@@ -15,27 +15,22 @@ import java.util.function.Function;
  * the same number over and over again!
  */
 public class UnchangingPastSensor implements
-        Sensor<FishState,Double> {
+    Sensor<FishState, Double> {
 
 
     private final String indicatorColumnName;
-
-
-    /**
-     * pipe observations through these, useful for rescaling:
-     */
-    private Function<Double,Double> indicatorTransformer = indicator -> indicator;
-
     /**
      * do we need to multiply the average by something?
      */
     private final double indicatorMultiplier;
-
     /**
      * how many years back to go
      */
     private final int yearsToLookBack;
-
+    /**
+     * pipe observations through these, useful for rescaling:
+     */
+    private Function<Double, Double> indicatorTransformer = indicator -> indicator;
     private double targetSet = Double.NaN;
 
     public UnchangingPastSensor(String indicatorColumnName, double indicatorMultiplier, int yearsToLookBack) {
@@ -55,12 +50,12 @@ public class UnchangingPastSensor implements
     public Double scan(FishState system) {
 
         //if you have already set the target, go no further
-        if(Double.isFinite(targetSet))
+        if (Double.isFinite(targetSet))
             return targetSet;
 
         final DataColumn indicatorColumn = system.getYearlyDataSet().getColumn(indicatorColumnName);
         //you need to have at least tyearsToLookBack observations
-        if(indicatorColumn.size()<yearsToLookBack) //need a long enough time series!
+        if (indicatorColumn.size() < yearsToLookBack) //need a long enough time series!
             return Double.NaN;
 
         final Iterator<Double> indicatorIterator = indicatorColumn.descendingIterator();
@@ -72,14 +67,14 @@ public class UnchangingPastSensor implements
 
             //transforming them if necessary
             final Double observedIndicator = indicatorTransformer.apply(
-                    indicatorIterator.next());
+                indicatorIterator.next());
             indicators.accept(observedIndicator);
         }
 
         // get the target
 
         double indicatorAve = indicators.getAverage();
-        targetSet = indicatorAve* indicatorMultiplier;
+        targetSet = indicatorAve * indicatorMultiplier;
         return targetSet;
 
 

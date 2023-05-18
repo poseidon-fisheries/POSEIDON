@@ -33,32 +33,30 @@ public class AtPort implements Action {
     /**
      * Asks the fisher if they want to move, otherwise stay at port.
      *
-     * @param model a link to the model, in case you need to grab global objects
-     * @param agent a link to the fisher in case you need to get or set agent's variables
+     * @param model      a link to the model, in case you need to grab global objects
+     * @param agent      a link to the fisher in case you need to get or set agent's variables
      * @param regulation the regulation that tells us whether we can leave
      * @return the next action to take and whether or not to take it now
      */
     @Override
-    public ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft)
-    {
+    public ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft) {
 
-        if( (regulation.allowedAtSea(agent, model) || agent.isCheater() )
-                &&
-                agent.shouldFisherLeavePort(model))
-        {
+        if ((regulation.allowedAtSea(agent, model) || agent.isCheater())
+            &&
+            agent.shouldFisherLeavePort(model)) {
 
             //departing!
-            agent.updateGear(model.getRandom(),model,this);
-            agent.updateDestination(model,this);
+            agent.updateGear(model.getRandom(), model, this);
+            agent.updateDestination(model, this);
             //you can be redirected by the destination strategy to stay at port, check now
-            if(agent.getDestination().equals(agent.getHomePort().getLocation()))
-                return new ActionResult(this,Math.max(0,hoursLeft-1));
-            assert !agent.getDestination().equals(agent.getHomePort().getLocation()); //shouldn't have chosen to go to port because that's weird
+            if (agent.getDestination().equals(agent.getHomePort().getLocation()))
+                return new ActionResult(this, Math.max(0, hoursLeft - 1));
+            assert !agent.getDestination()
+                .equals(agent.getHomePort().getLocation()); //shouldn't have chosen to go to port because that's weird
             agent.undock();
-            return new ActionResult(new Moving(),hoursLeft);
-        }
-        else //you don't want to leave this hour, try again next hour
-            return new ActionResult(this,Math.max(0,hoursLeft-1));
+            return new ActionResult(new Moving(), hoursLeft);
+        } else //you don't want to leave this hour, try again next hour
+            return new ActionResult(this, Math.max(0, hoursLeft - 1));
 
 
     }

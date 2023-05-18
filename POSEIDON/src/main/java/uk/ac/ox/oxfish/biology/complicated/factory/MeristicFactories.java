@@ -52,6 +52,7 @@ public class MeristicFactories {
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private MeristicFactories() {}
+    private MeristicFactories() {
+    }
 
 }

@@ -42,32 +42,29 @@ public class PeriodicUpdateFromListFactoryTest {
     public void readFromYamlCorrectly() throws Exception {
 
         String toRead = "Periodic Gear Update from List:\n" +
-                "  availableGears:\n" +
-                "    - Fixed Proportion:\n" +
-                "        catchabilityPerHour: '0.01'\n" +
-                "    - Fixed Proportion:\n" +
-                "        catchabilityPerHour: '0.02'\n" +
-                "  probability:\n" +
-                "    Fixed Probability:\n" +
-                "      explorationProbability: '0.2'\n" +
-                "      imitationProbability: '0.6'\n" +
-                "  yearly: true";
+            "  availableGears:\n" +
+            "    - Fixed Proportion:\n" +
+            "        catchabilityPerHour: '0.01'\n" +
+            "    - Fixed Proportion:\n" +
+            "        catchabilityPerHour: '0.02'\n" +
+            "  probability:\n" +
+            "    Fixed Probability:\n" +
+            "      explorationProbability: '0.2'\n" +
+            "      imitationProbability: '0.6'\n" +
+            "  yearly: true";
 
         FishYAML yamler = new FishYAML();
         AlgorithmFactory<? extends GearStrategy> gearStrategy = yamler.loadAs(toRead, AlgorithmFactory.class);
 
         assertTrue(gearStrategy.getClass().equals(PeriodicUpdateFromListFactory.class));
         PeriodicUpdateFromListFactory casted = (PeriodicUpdateFromListFactory) gearStrategy;
-        assertEquals(2,casted.getAvailableGears().size());
-        for(AlgorithmFactory<? extends Gear> gearFactory : casted.getAvailableGears())
-        {
+        assertEquals(2, casted.getAvailableGears().size());
+        for (AlgorithmFactory<? extends Gear> gearFactory : casted.getAvailableGears()) {
             assertTrue(gearFactory.getClass().equals(FixedProportionGearFactory.class));
             DoubleParameter catchabilityPerHour = ((FixedProportionGearFactory) gearFactory).getCatchabilityPerHour();
-            assertTrue(((FixedDoubleParameter) catchabilityPerHour).getFixedValue()==0.01 ||
-                               ((FixedDoubleParameter) catchabilityPerHour).getFixedValue()==0.02);
+            assertTrue(((FixedDoubleParameter) catchabilityPerHour).getFixedValue() == 0.01 ||
+                ((FixedDoubleParameter) catchabilityPerHour).getFixedValue() == 0.02);
         }
-
-
 
 
     }

@@ -28,12 +28,10 @@ import java.util.HashMap;
 public class BiomassDepletionGathererFactory implements AlgorithmFactory<BiomassDepletionGatherer> {
 
 
-
-
     /**
      * optionally you can get also msy collected
      */
-    private HashMap<String,Double> msy = new HashMap<>();
+    private HashMap<String, Double> msy = new HashMap<>();
 
 
     /**

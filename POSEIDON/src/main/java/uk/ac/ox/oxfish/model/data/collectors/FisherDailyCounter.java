@@ -25,7 +25,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 
 /**
- *
  * like a normal counter but has arrays ready to make catch data faster to read and write
  * Created by carrknight on 8/14/15.
  */
@@ -53,16 +52,14 @@ public class FisherDailyCounter extends Counter {
     public void step(SimState simState) {
         super.step(simState);
 
-        for(int i=0; i<landings.length; i++)
-        {
-            landings[i]=0;
-            earnings[i]=0;
-            catches[i]=0;
-            if(landingsPerBin[i]!=null)
-            {
-                for(int subdivision = 0; subdivision< landingsPerBin[i].length; subdivision++)
-                    for(int bin = 0; bin< landingsPerBin[i][0].length; bin++)
-                        landingsPerBin[i][subdivision][bin]=0;
+        for (int i = 0; i < landings.length; i++) {
+            landings[i] = 0;
+            earnings[i] = 0;
+            catches[i] = 0;
+            if (landingsPerBin[i] != null) {
+                for (int subdivision = 0; subdivision < landingsPerBin[i].length; subdivision++)
+                    for (int bin = 0; bin < landingsPerBin[i][0].length; bin++)
+                        landingsPerBin[i][subdivision][bin] = 0;
             }
         }
     }
@@ -70,59 +67,60 @@ public class FisherDailyCounter extends Counter {
     /**
      * increment catch earnings column by this
      *
-     * @param add        by how much to increment
+     * @param add by how much to increment
      */
     public void countLanding(Species species, double add) {
-        landings[species.getIndex()]+=add;
+        landings[species.getIndex()] += add;
     }
 
 
     public void countLandinngPerBin(Species species, Catch catchOfTheDay) {
 
-        if(landingsPerBin[species.getIndex()]==null)
-            landingsPerBin[species.getIndex()]=new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+        if (landingsPerBin[species.getIndex()] == null)
+            landingsPerBin[species.getIndex()] = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
 
-        for(int subdivision = 0; subdivision< landingsPerBin[species.getIndex()].length; subdivision++)
-            for(int bin = 0; bin< landingsPerBin[species.getIndex()][0].length; bin++)
-                landingsPerBin[species.getIndex()][subdivision][bin] += catchOfTheDay.getWeightCaught(species,subdivision,bin);
+        for (int subdivision = 0; subdivision < landingsPerBin[species.getIndex()].length; subdivision++)
+            for (int bin = 0; bin < landingsPerBin[species.getIndex()][0].length; bin++)
+                landingsPerBin[species.getIndex()][subdivision][bin] += catchOfTheDay.getWeightCaught(species,
+                    subdivision,
+                    bin);
 
     }
 
     public void countEarnings(Species species, double add) {
-        earnings[species.getIndex()]+=add;
+        earnings[species.getIndex()] += add;
     }
 
     public void countCatches(Species species, double add) {
-        catches[species.getIndex()]+=add;
+        catches[species.getIndex()] += add;
     }
 
-    public double getLandingsPerSpecie(int index)
-    {
+    public double getLandingsPerSpecie(int index) {
         return landings[index];
     }
 
-    public double getEarningsPerSpecie(int index)
-    {
+    public double getEarningsPerSpecie(int index) {
         return earnings[index];
     }
 
-    public double getCatchesPerSpecie(int index){
+    public double getCatchesPerSpecie(int index) {
         return catches[index];
     }
 
 
-    public double getSpecificLandings(Species species, int bin){
-        if(landingsPerBin[species.getIndex()]==null)
+    public double getSpecificLandings(Species species, int bin) {
+        if (landingsPerBin[species.getIndex()] == null)
             return 0d;
         else {
             double sum = 0;
-            for(int subdivision = 0; subdivision< landingsPerBin[species.getIndex()].length; subdivision++)
-                sum+=landingsPerBin[species.getIndex()][subdivision][bin];
+            for (int subdivision = 0; subdivision < landingsPerBin[species.getIndex()].length; subdivision++)
+                sum += landingsPerBin[species.getIndex()][subdivision][bin];
             return sum;
         }
     }
-    public double getSpecificLandings(Species species, int subdivision, int bin){
-        if(landingsPerBin[species.getIndex()]==null)
+
+    public double getSpecificLandings(Species species, int subdivision, int bin) {
+        if (landingsPerBin[species.getIndex()] == null)
             return 0d;
         else {
             return landingsPerBin[species.getIndex()][subdivision][bin];

@@ -34,8 +34,4 @@ public interface WeatherInitializer {
     void processMap(NauticalMap map, MersenneTwisterFast random, FishState model);
 
 
-
-
-
-
 }

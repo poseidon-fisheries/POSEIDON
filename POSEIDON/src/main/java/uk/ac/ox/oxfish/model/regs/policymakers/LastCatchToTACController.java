@@ -35,35 +35,36 @@ public class LastCatchToTACController implements AlgorithmFactory<AdditionalStar
             @Override
             public void start(FishState model) {
                 fishState.scheduleOnceInXDays(
-                        new Steppable() {
-                            @Override
-                            public void step(SimState simState) {
-                                TargetToTACController controller;
-                                if(targetedSpecies.trim().isEmpty())
-                                    controller = new TargetToTACController(
-                                            new UnchangingPastSensor(
-                                                    catchColumnName,
-                                                    catchesToTargetMultiplier.applyAsDouble(fishState.getRandom()),
-                                                    1
-                                            ),
-                                            365
-                                    );
-                                else
-                                    controller = new TargetToTACController(
-                                            new UnchangingPastSensor(
-                                                    catchColumnName,
-                                                    catchesToTargetMultiplier.applyAsDouble(fishState.getRandom()),
-                                                    1
-                                            ),
-                                            365,
-                                            targetedSpecies);
-                                controller.start(model);
-                                controller.step(model);
-                            }
-                        },
-                        StepOrder.DAWN,
-                        365*startingYear+1);
-
+                    new Steppable() {
+                        @Override
+                        public void step(SimState simState) {
+                            TargetToTACController controller;
+                            if (targetedSpecies.trim().isEmpty())
+                                controller = new TargetToTACController(
+                                    new UnchangingPastSensor(
+                                        catchColumnName,
+                                        catchesToTargetMultiplier.applyAsDouble(fishState.getRandom()),
+                                        1
+                                    ),
+                                    365
+                                );
+                            else
+                                controller = new TargetToTACController(
+                                    new UnchangingPastSensor(
+                                        catchColumnName,
+                                        catchesToTargetMultiplier.applyAsDouble(fishState.getRandom()),
+                                        1
+                                    ),
+                                    365,
+                                    targetedSpecies
+                                );
+                            controller.start(model);
+                            controller.step(model);
+                        }
+                    },
+                    StepOrder.DAWN,
+                    365 * startingYear + 1
+                );
 
 
             }

@@ -26,6 +26,8 @@ import uk.ac.ox.oxfish.model.FishState;
  */
 public interface FixedDataTarget extends DataTarget {
     double getFixedTarget();
+
     double getValue(FishState fishState);
+
     String getColumnName();
 }

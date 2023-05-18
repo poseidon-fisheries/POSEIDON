@@ -45,52 +45,45 @@ import java.util.Map;
  * We assume actual draws are ~N(theta,sigma) where theta is different for good and bad spots
  * Created by carrknight on 8/22/16.
  */
-public class GoodBadRegression implements GeographicalRegression<Double>, Steppable
-{
+public class GoodBadRegression implements GeographicalRegression<Double>, Steppable {
 
 
     /**
      * what subjective probability do we give to this spot being good
      */
-    private final HashMap<SeaTile,Double> spots;
-
-
+    private final HashMap<SeaTile, Double> spots;
+    /**
+     * daily drift of probabilities towards the middle
+     */
+    private final double drift;
+    private final Distance distance;
+    private final NauticalMap map;
     /**
      * gives us the theta for the bad prior
      */
     private double badAverage;
-
     /**
      * gives us the theta for the good prior
      */
     private double goodAverage;
-
-
     private double standardDeviation;
     /**
      * its inverse penalizes observations that are far so that the priors are stronger
      * the penalty comes by dividing sigma by the the RBF Kernel
      */
     private RBFDistance distancePenalty;
+    private Stoppable receipt;
 
-    /**
-     * daily drift of probabilities towards the middle
-     */
-    private final double drift;
-
-    private final Distance distance;
-
-    private final NauticalMap map;
 
     public GoodBadRegression(
-            NauticalMap map,
-            Distance distance,
-            MersenneTwisterFast random,
-            double badAverage,
-            double goodAverage,
-            double deviation,
-            double distanceBandwidth,
-            double drift
+        NauticalMap map,
+        Distance distance,
+        MersenneTwisterFast random,
+        double badAverage,
+        double goodAverage,
+        double deviation,
+        double distanceBandwidth,
+        double drift
     ) {
         this.map = map;
         this.drift = drift;
@@ -103,17 +96,11 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
         //each tile its own random probability
         spots = new HashMap<>();
         List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
-        for(SeaTile tile : tiles) {
-            spots.put(tile,random.nextDouble());
+        for (SeaTile tile : tiles) {
+            spots.put(tile, random.nextDouble());
         }
 
     }
-
-
-
-
-    private Stoppable receipt;
-
 
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
@@ -124,7 +111,7 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
     @Override
     public void start(FishState model, Fisher fisher) {
         receipt = model.scheduleEveryDay(
-                this, StepOrder.DAWN);
+            this, StepOrder.DAWN);
     }
 
 
@@ -138,49 +125,50 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
             probability.setValue((good + drift) / (good + drift + bad + drift));
         }
     }
+
     /**
      * learn from this observation
-     *  @param observation
+     *
+     * @param observation
      * @param fisher
      * @param model
      */
     @Override
     public void addObservation(
-            GeographicalObservation<Double> observation, Fisher fisher, FishState model)
-    {
+        GeographicalObservation<Double> observation, Fisher fisher, FishState model
+    ) {
 
-        for(Map.Entry<SeaTile,Double> probability : spots.entrySet())
-        {
-            double distance = this.distance.distance(probability.getKey(),
-                                            observation.getTile(),
-                                            map);
+        for (Map.Entry<SeaTile, Double> probability : spots.entrySet()) {
+            double distance = this.distance.distance(
+                probability.getKey(),
+                observation.getTile(),
+                map
+            );
             double rbf = distancePenalty.transform(distance);
             //if the evidence has even a shred of strenght, update
-            if(rbf >= FishStateUtilities.EPSILON)
-            {
-                double evidenceStrength = 1d/ rbf;
+            if (rbf >= FishStateUtilities.EPSILON) {
+                double evidenceStrength = 1d / rbf;
 
 
                 //all that follows is standard bayes
 
 
-
                 double goodPrior = probability.getValue();
                 double goodLikelihood = FishStateUtilities.normalPDF(
-                        goodAverage,standardDeviation*evidenceStrength).apply(observation.getValue());
-                double goodPosterior =  goodPrior *goodLikelihood;
-                assert  Double.isFinite(goodPosterior);
-                assert  goodPosterior >=0;
+                    goodAverage, standardDeviation * evidenceStrength).apply(observation.getValue());
+                double goodPosterior = goodPrior * goodLikelihood;
+                assert Double.isFinite(goodPosterior);
+                assert goodPosterior >= 0;
 
 
-                double badPrior = 1d-probability.getValue();
+                double badPrior = 1d - probability.getValue();
                 double badLikelihood = FishStateUtilities.normalPDF(
-                        badAverage,standardDeviation*evidenceStrength).apply(observation.getValue());
-                double badPosterior = badPrior*badLikelihood;
-                assert  badPosterior >=0;
-                assert  Double.isFinite(badPosterior);
+                    badAverage, standardDeviation * evidenceStrength).apply(observation.getValue());
+                double badPosterior = badPrior * badLikelihood;
+                assert badPosterior >= 0;
+                assert Double.isFinite(badPosterior);
 
-                if(badPosterior + goodPosterior == 0) {
+                if (badPosterior + goodPosterior == 0) {
                     //if it's many standard deviations away then just default to one or the other
                     if (observation.getValue() > goodAverage)
                         probability.setValue(1d);
@@ -188,9 +176,8 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
                         probability.setValue(0d);
                     else
                         probability.setValue(.5d); //if you are here that's some very poor averages/std you got
-                }
-                else
-                    probability.setValue(goodPosterior/(badPosterior+goodPosterior));
+                } else
+                    probability.setValue(goodPosterior / (badPosterior + goodPosterior));
             }
         }
 
@@ -201,7 +188,7 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      */
     @Override
     public void turnOff(Fisher fisher) {
-        if(receipt!= null)
+        if (receipt != null)
             receipt.stop();
     }
 
@@ -218,11 +205,10 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
     public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
         Double probabilityGood = spots.get(tile);
-        if(probabilityGood==null)
+        if (probabilityGood == null)
             return Double.NaN;
-        else
-        {
-            return probabilityGood * goodAverage + (1-probabilityGood) * badAverage;
+        else {
+            return probabilityGood * goodAverage + (1 - probabilityGood) * badAverage;
         }
 
 
@@ -237,7 +223,8 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      */
     @Override
     public double extractNumericalYFromObservation(
-            GeographicalObservation<Double> observation, Fisher fisher) {
+        GeographicalObservation<Double> observation, Fisher fisher
+    ) {
         return observation.getValue();
     }
 

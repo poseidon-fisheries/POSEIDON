@@ -1,10 +1,10 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
+import uk.ac.ox.oxfish.fisher.Fisher;
 
 import java.util.function.DoubleUnaryOperator;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunction;
+
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class GlobalSetAttractionModulator implements GlobalAttractionModulator {
 

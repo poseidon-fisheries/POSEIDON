@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -17,31 +16,12 @@ import static org.mockito.Mockito.when;
 
 public class TemporaryRegulationTest {
 
-    @Test public void isActiveWhenStartLessThanEnd() {
+    @Test
+    public void isActiveWhenStartLessThanEnd() {
         isActiveTest(10, 20, ImmutableMap.of(
             1, false,
             10, true,
             15, true,
-            20, true,
-            365, false
-        ));
-    }
-
-    @Test public void isActiveWhenEndLessThanStart() {
-        isActiveTest(20, 10, ImmutableMap.of(
-            1, true,
-            10, true,
-            15, false,
-            20, true,
-            365, true
-        ));
-    }
-
-    @Test public void isActiveWhenStartEqualsEnd() {
-        isActiveTest(20, 20, ImmutableMap.of(
-            1, false,
-            10, false,
-            15, false,
             20, true,
             365, false
         ));
@@ -53,6 +33,28 @@ public class TemporaryRegulationTest {
         cases.forEach((day, expected) ->
             assertEquals("on day " + day, expected, temporaryRegulation.isActive(day))
         );
+    }
+
+    @Test
+    public void isActiveWhenEndLessThanStart() {
+        isActiveTest(20, 10, ImmutableMap.of(
+            1, true,
+            10, true,
+            15, false,
+            20, true,
+            365, true
+        ));
+    }
+
+    @Test
+    public void isActiveWhenStartEqualsEnd() {
+        isActiveTest(20, 20, ImmutableMap.of(
+            1, false,
+            10, false,
+            15, false,
+            20, true,
+            365, false
+        ));
     }
 
     @Test
@@ -77,7 +79,6 @@ public class TemporaryRegulationTest {
     }
 
 
-
     @Test
     public void doubleDelegate() {
         //check that the right policy is active at the right time
@@ -87,16 +88,16 @@ public class TemporaryRegulationTest {
         when(state.getDayOfTheYear(anyInt())).thenReturn(0);
         //active regulation mean you can't go out
         final Regulation active = mock(Regulation.class);
-        when(active.allowedAtSea(any(),any())).thenReturn(false);
+        when(active.allowedAtSea(any(), any())).thenReturn(false);
         //inactive regulation means you can go out
         final Regulation inactive = mock(Regulation.class);
-        when(active.allowedAtSea(any(),any())).thenReturn(true);
+        when(active.allowedAtSea(any(), any())).thenReturn(true);
 
         TemporaryRegulationFactory factory =
-                new TemporaryRegulationFactory(
-                        100, 200,
-                        fishState -> active
-                );
+            new TemporaryRegulationFactory(
+                100, 200,
+                fishState -> active
+            );
         factory.setInactiveDelegate(fishState -> inactive);
 
         final TemporaryRegulation regulation = factory.apply(state);
@@ -104,16 +105,16 @@ public class TemporaryRegulationTest {
         //day 10 :  allowed at sea
         final Fisher fisher = mock(Fisher.class);
         when(state.getDayOfTheYear(anyInt())).thenReturn(10);
-        assertTrue(regulation.allowedAtSea(fisher,state));
+        assertTrue(regulation.allowedAtSea(fisher, state));
 
         //day 150: not allowed at sea
         when(state.getDayOfTheYear(anyInt())).thenReturn(150);
-        assertTrue(!regulation.allowedAtSea(fisher,state));
+        assertTrue(!regulation.allowedAtSea(fisher, state));
 
 
         //day 250: allowed at sea
         when(state.getDayOfTheYear(anyInt())).thenReturn(250);
-        assertTrue(regulation.allowedAtSea(fisher,state));
+        assertTrue(regulation.allowedAtSea(fisher, state));
 
     }
 }

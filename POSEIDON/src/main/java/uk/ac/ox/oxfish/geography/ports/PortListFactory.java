@@ -35,16 +35,14 @@ import java.util.Map;
  */
 public class PortListFactory implements AlgorithmFactory<PortListInitializer> {
 
-    private LinkedHashMap<String,String> ports = new LinkedHashMap<>();
+    private LinkedHashMap<String, String> ports = new LinkedHashMap<>();
+    private boolean usingGridCoordinates = true;
+
     {
         ports.put("Top Port", "x:40,y:0");
         ports.put("Middle Port", "x:40,y:24");
         ports.put("Bottom Port", "x:40,y:49");
     }
-
-
-    private boolean usingGridCoordinates = true;
-
 
     /**
      * Applies this function to the given argument.
@@ -55,16 +53,16 @@ public class PortListFactory implements AlgorithmFactory<PortListInitializer> {
     @Override
     public PortListInitializer apply(FishState state) {
 
-        ports = SingleSpeciesBoxcarPulseRecruitmentFactory.forceThroughYaml(ports,String.class);
-        LinkedHashMap<String,Coordinate> coordinatedPorts = new LinkedHashMap<>();
+        ports = SingleSpeciesBoxcarPulseRecruitmentFactory.forceThroughYaml(ports, String.class);
+        LinkedHashMap<String, Coordinate> coordinatedPorts = new LinkedHashMap<>();
 
         for (Map.Entry<String, String> stringPort : ports.entrySet()) {
 
             coordinatedPorts.put(
-                    stringPort.getKey(),
-                    YamlConstructor.convertToCoordinate(
-                            stringPort.getValue()
-                    )
+                stringPort.getKey(),
+                YamlConstructor.convertToCoordinate(
+                    stringPort.getValue()
+                )
             );
 
         }

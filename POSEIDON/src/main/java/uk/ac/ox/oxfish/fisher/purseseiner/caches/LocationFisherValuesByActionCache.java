@@ -40,7 +40,9 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class LocationFisherValuesByActionCache extends FisherValuesByActionFromFileCache<Map<Coordinate, Double>> {
 
-    public LocationFisherValuesByActionCache() { super(Collections::emptyMap); }
+    public LocationFisherValuesByActionCache() {
+        super(Collections::emptyMap);
+    }
 
     protected Map<Integer, Map<String, Map<Class<? extends PurseSeinerAction>, Map<Coordinate, Double>>>> readValues(
         final Path locationValuesFile

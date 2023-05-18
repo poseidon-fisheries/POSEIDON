@@ -32,8 +32,7 @@ import java.util.HashMap;
  * A simple hash-map that gets created at the end of the model to collect FishState information
  * Created by carrknight on 11/20/15.
  */
-public class ModelResults extends HashMap<String,Object>
-{
+public class ModelResults extends HashMap<String, Object> {
 
 
     /**

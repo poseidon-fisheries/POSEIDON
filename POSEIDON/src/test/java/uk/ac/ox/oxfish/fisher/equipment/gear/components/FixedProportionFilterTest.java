@@ -28,20 +28,22 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import static org.junit.Assert.assertEquals;
 
 
-
-public class FixedProportionFilterTest
-{
+public class FixedProportionFilterTest {
 
 
     @Test
     public void filtersCorrectly() throws Exception {
 
 
-        Species species = new Species("Longspine", new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                      0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                      0.111313, 17.826, -1.79, 1,
-                                                                      0, 168434124,
-                                                                      0.6, false));
+        Species species = new Species(
+            "Longspine",
+            new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                0.111313, 17.826, -1.79, 1,
+                0, 168434124,
+                0.6, false
+            )
+        );
         FixedProportionFilter filter = new FixedProportionFilter(.2, true);
 
         double[] male = new double[81];
@@ -51,17 +53,17 @@ public class FixedProportionFilterTest
         double[][] abundance = new double[2][];
         abundance[FishStateUtilities.MALE] = male;
         abundance[FishStateUtilities.FEMALE] = female;
-        double[][] filtered = filter.filter(species,abundance);
-        assertEquals(filtered[FishStateUtilities.MALE][20],20,.0001);
-        assertEquals(filtered[FishStateUtilities.MALE][21],0,.001);
+        double[][] filtered = filter.filter(species, abundance);
+        assertEquals(filtered[FishStateUtilities.MALE][20], 20, .0001);
+        assertEquals(filtered[FishStateUtilities.MALE][21], 0, .001);
 
         abundance = new double[2][];
         abundance[FishStateUtilities.MALE] = male;
         male[20] = 100;
         abundance[FishStateUtilities.FEMALE] = female;
         filter = new FixedProportionFilter(1, true);
-        filtered = filter.filter(species,abundance);
-        assertEquals(filtered[FishStateUtilities.MALE][20],100,.001);
-        assertEquals(filtered[FishStateUtilities.MALE][21],0,.001);
+        filtered = filter.filter(species, abundance);
+        assertEquals(filtered[FishStateUtilities.MALE][20], 100, .001);
+        assertEquals(filtered[FishStateUtilities.MALE][21], 0, .001);
     }
 }

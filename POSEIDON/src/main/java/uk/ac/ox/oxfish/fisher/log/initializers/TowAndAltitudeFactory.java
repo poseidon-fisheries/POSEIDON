@@ -20,14 +20,8 @@
 
 package uk.ac.ox.oxfish.fisher.log.initializers;
 
-import uk.ac.ox.oxfish.geography.discretization.IdentityDiscretizerFactory;
-import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
-import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
-
-import java.util.function.Supplier;
 
 public class TowAndAltitudeFactory implements AlgorithmFactory<TowAndAltitudeOutputInitializer> {
 
@@ -35,7 +29,6 @@ public class TowAndAltitudeFactory implements AlgorithmFactory<TowAndAltitudeOut
      * useful (in fact, needed) if you have multiple logbooks running at once!
      */
     private String identifier = "";
-
 
 
     /**
@@ -55,11 +48,9 @@ public class TowAndAltitudeFactory implements AlgorithmFactory<TowAndAltitudeOut
 
 
         return new TowAndAltitudeOutputInitializer(
-                histogrammerStartYear,
-                identifier
+            histogrammerStartYear,
+            identifier
         );
-
-
 
 
     }

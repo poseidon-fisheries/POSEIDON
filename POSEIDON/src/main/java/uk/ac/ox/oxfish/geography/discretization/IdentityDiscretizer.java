@@ -21,14 +21,13 @@
 package uk.ac.ox.oxfish.geography.discretization;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
 
 /**
- *
  * 1 to 1 discretizer, that is each tile is in its own group
  * Created by carrknight on 2/6/17.
  */
@@ -38,7 +37,7 @@ public class IdentityDiscretizer extends AbstractMapDiscretizer {
     /**
      * return groups but only for seatiles in the tiles list (which is all the seatiles we consider valid)
      *
-     * @param map           the nautical map
+     * @param map   the nautical map
      * @param tiles the list of valid seatiles
      * @return groups
      */
@@ -60,12 +59,13 @@ public class IdentityDiscretizer extends AbstractMapDiscretizer {
 
         List<SeaTile>[] groups = new List[tiles.size()];
 
-        for(int i=0; i<tiles.size(); i++) {
-            groups[i]  = ImmutableList.of(tiles.get(i));
+        for (int i = 0; i < tiles.size(); i++) {
+            groups[i] = ImmutableList.of(tiles.get(i));
         }
 
 
-        return groups;    }
+        return groups;
+    }
 
 
 }

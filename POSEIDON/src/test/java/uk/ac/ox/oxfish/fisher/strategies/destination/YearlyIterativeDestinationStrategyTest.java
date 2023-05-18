@@ -45,9 +45,9 @@ public class YearlyIterativeDestinationStrategyTest {
         final FishState fishState = RandomThenBackToPortDestinationStrategyTest.generateSimpleSquareMap(100);
         NauticalMap map = fishState.getMap();
         final FavoriteDestinationStrategy delegate = new FavoriteDestinationStrategy(
-                map.getSeaTile(50, 50));
+            map.getSeaTile(50, 50));
         final YearlyIterativeDestinationStrategy hill = new YearlyIterativeDestinationStrategy(
-                delegate, 1,10);
+            delegate, 1, 10);
 
         //mock fisher enough to fool delegate
         Fisher fisher = mock(Fisher.class);
@@ -57,17 +57,15 @@ public class YearlyIterativeDestinationStrategyTest {
         when(fisher.getHomePort()).thenReturn(port);
 
 
-
         FisherDailyTimeSeries data = mock(FisherDailyTimeSeries.class);
         when(data.numberOfObservations()).thenReturn(8000);
         when(fisher.getDailyData()).thenReturn(data);
 
 
-
-
         //cashflow is x+y
-        doAnswer(invocation -> (double)(delegate.getFavoriteSpot().getGridX() + delegate.getFavoriteSpot().getGridY())).when(
-                fisher).getBankBalance();
+        doAnswer(invocation -> (double) (delegate.getFavoriteSpot().getGridX() + delegate.getFavoriteSpot()
+            .getGridY())).when(
+            fisher).getBankBalance();
         when(fisher.balanceXDaysAgo(360)).thenReturn(0d);
 
 
@@ -76,10 +74,9 @@ public class YearlyIterativeDestinationStrategyTest {
         hill.getAlgorithm().start(fishState, mock(Fisher.class));
 
         //give it 1000 years!
-        for(int i=0; i<2000; i++)
-        {
+        for (int i = 0; i < 2000; i++) {
             double bankBalance = fisher.getBankBalance();
-            hill.getAlgorithm().adapt(fisher, fishState,new MersenneTwisterFast());
+            hill.getAlgorithm().adapt(fisher, fishState, new MersenneTwisterFast());
 
 
         }

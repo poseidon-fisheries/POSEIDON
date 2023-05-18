@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
-public enum EffortStatus{
+public enum EffortStatus {
 
     FULLTIME,
 

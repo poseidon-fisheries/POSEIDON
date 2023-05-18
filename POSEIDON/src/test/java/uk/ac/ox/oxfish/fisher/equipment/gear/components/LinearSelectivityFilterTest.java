@@ -44,28 +44,28 @@ public class LinearSelectivityFilterTest {
         factory.setRecruitLengthInCm(new FixedDoubleParameter(6));
         factory.setNumberOfBins(20);
 
-        Species species = new Species("malabaricus",
-                                      factory.apply(mock(FishState.class))
-                                      );
+        Species species = new Species(
+            "malabaricus",
+            factory.apply(mock(FishState.class))
+        );
 
 
         LinearSelectivityFilter selectivity =
-                new LinearSelectivityFilter(28,
-                                            55,
-                                            0.4438437,
-                                            63.23406,
-                                                                                      86
-        );
+            new LinearSelectivityFilter(
+                28,
+                55,
+                0.4438437,
+                63.23406,
+                86
+            );
 
 
         double[][] mortality = selectivity.computeSelectivity(species);
 
         System.out.println(Arrays.toString(mortality[0]));
 
-        assertEquals(0,mortality[0][0],.0001);
-        assertEquals(0.84956384,mortality[0][mortality[0].length-1],.0001);
-
-
+        assertEquals(0, mortality[0][0], .0001);
+        assertEquals(0.84956384, mortality[0][mortality[0].length - 1], .0001);
 
 
     }

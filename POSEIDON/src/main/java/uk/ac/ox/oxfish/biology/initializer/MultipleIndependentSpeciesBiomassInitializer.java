@@ -32,11 +32,10 @@ import uk.ac.ox.oxfish.utility.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInitializer
-{
+public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInitializer {
 
 
-    private final List<SingleSpeciesBiomassInitializer> initializers ;
+    private final List<SingleSpeciesBiomassInitializer> initializers;
 
 
     private final boolean addImaginarySpecies;
@@ -45,7 +44,8 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
     private final boolean unfishable;
 
     public MultipleIndependentSpeciesBiomassInitializer(
-            List<SingleSpeciesBiomassInitializer> initializers, boolean addImaginarySpecies, boolean unfishable) {
+        List<SingleSpeciesBiomassInitializer> initializers, boolean addImaginarySpecies, boolean unfishable
+    ) {
         this.initializers = initializers;
         this.addImaginarySpecies = addImaginarySpecies;
         this.unfishable = unfishable;
@@ -56,20 +56,23 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
+        GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
+        int mapWidthInCells, NauticalMap map
+    ) {
         assert !initializers.isEmpty();
 
         LocalBiology toReturn = null;
-        for(SingleSpeciesBiomassInitializer initializer : initializers) {
-            LocalBiology lastgen = initializer.generateLocal(biology,
-                    seaTile,
-                    random,
-                    mapHeightInCells,
-                    mapWidthInCells,
-                    map);
-            if(toReturn == null ||
-                    (toReturn instanceof EmptyLocalBiology && lastgen instanceof BiomassLocalBiology))
+        for (SingleSpeciesBiomassInitializer initializer : initializers) {
+            LocalBiology lastgen = initializer.generateLocal(
+                biology,
+                seaTile,
+                random,
+                mapHeightInCells,
+                mapWidthInCells,
+                map
+            );
+            if (toReturn == null ||
+                (toReturn instanceof EmptyLocalBiology && lastgen instanceof BiomassLocalBiology))
                 toReturn = lastgen;
         }
         //return one, it doesn't matter which
@@ -89,38 +92,36 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
+        GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model
+    ) {
 
 
-
-
-        ArrayList<Pair<Species,BiomassMovementRule>> movements = new ArrayList<>(initializers.size());
-        for (SingleSpeciesBiomassInitializer initializer : initializers)
-        {
+        ArrayList<Pair<Species, BiomassMovementRule>> movements = new ArrayList<>(initializers.size());
+        for (SingleSpeciesBiomassInitializer initializer : initializers) {
             //do not let them create their own movement!
             initializer.setForceMovementOff(true);
 
             initializer.processMap(biology, map, random, model);
             movements.add(
-                    new Pair<>(
-                            biology.getSpecie(initializer.getSpeciesName()),
-                            initializer.getMovementRule())
+                new Pair<>(
+                    biology.getSpecie(initializer.getSpeciesName()),
+                    initializer.getMovementRule()
+                )
             );
         }
 
 
-        if(unfishable)
-        {
+        if (unfishable) {
             for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
-                if(!(seaTile.getBiology() instanceof EmptyLocalBiology))
-                    seaTile.setBiology(new ConstantBiomassDecorator((BiomassLocalBiology)seaTile.getBiology()));
+                if (!(seaTile.getBiology() instanceof EmptyLocalBiology))
+                    seaTile.setBiology(new ConstantBiomassDecorator((BiomassLocalBiology) seaTile.getBiology()));
             }
         }
 
 
         //create a single movement now
         BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(
-                map,random,biology,movements.toArray(new Pair[movements.size()])
+            map, random, biology, movements.toArray(new Pair[movements.size()])
         );
         model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
 
@@ -129,7 +130,8 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
 
     /**
      * call global generation for each, grab the species built and move on
-     * @param random the random number generator
+     *
+     * @param random                the random number generator
      * @param modelBeingInitialized the model we are in the process of initializing
      * @return
      */
@@ -138,16 +140,18 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
 
 
         List<Species> species = new ArrayList<>();
-        for(SingleSpeciesBiomassInitializer initializer : initializers) {
+        for (SingleSpeciesBiomassInitializer initializer : initializers) {
 
             GlobalBiology individualBiology = initializer.generateGlobal(random, modelBeingInitialized);
-            assert individualBiology.getSize()==1;
+            assert individualBiology.getSize() == 1;
             species.add(individualBiology.getSpecie(0));
         }
-        if(addImaginarySpecies)
-            species.add(new Species("Others",
-                    StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,
-                    true));
+        if (addImaginarySpecies)
+            species.add(new Species(
+                "Others",
+                StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,
+                true
+            ));
 
         return new GlobalBiology(species.toArray(new Species[species.size()]));
 

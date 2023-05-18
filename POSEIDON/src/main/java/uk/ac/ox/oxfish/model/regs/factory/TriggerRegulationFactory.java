@@ -32,15 +32,16 @@ public class TriggerRegulationFactory implements AlgorithmFactory<TriggerRegulat
 
     private DoubleParameter lowThreshold = new FixedDoubleParameter(1000000);
 
-    private DoubleParameter highThreshold = new FixedDoubleParameter(3000000);;
+    private DoubleParameter highThreshold = new FixedDoubleParameter(3000000);
+    ;
 
     private String indicatorName = "Biomass Species 0";
 
     private AlgorithmFactory<? extends Regulation>
-            businessAsUsual = new AnarchyFactory();
+        businessAsUsual = new AnarchyFactory();
 
     private AlgorithmFactory<? extends Regulation> emergency =
-            new FishingSeasonFactory(50,true);
+        new FishingSeasonFactory(50, true);
 
 
     /**
@@ -52,11 +53,11 @@ public class TriggerRegulationFactory implements AlgorithmFactory<TriggerRegulat
     @Override
     public TriggerRegulation apply(FishState fishState) {
         return new TriggerRegulation(
-                lowThreshold.applyAsDouble(fishState.getRandom()),
-                highThreshold.applyAsDouble(fishState.getRandom()),
-                indicatorName,
-                businessAsUsual.apply(fishState),
-                emergency.apply(fishState)
+            lowThreshold.applyAsDouble(fishState.getRandom()),
+            highThreshold.applyAsDouble(fishState.getRandom()),
+            indicatorName,
+            businessAsUsual.apply(fishState),
+            emergency.apply(fishState)
         );
     }
 
@@ -129,7 +130,8 @@ public class TriggerRegulationFactory implements AlgorithmFactory<TriggerRegulat
      * @param businessAsUsual Value to set for property 'businessAsUsual'.
      */
     public void setBusinessAsUsual(
-            AlgorithmFactory<? extends Regulation> businessAsUsual) {
+        AlgorithmFactory<? extends Regulation> businessAsUsual
+    ) {
         this.businessAsUsual = businessAsUsual;
     }
 

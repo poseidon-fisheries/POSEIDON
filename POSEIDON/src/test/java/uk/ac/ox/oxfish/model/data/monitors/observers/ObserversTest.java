@@ -59,13 +59,17 @@ public class ObserversTest {
 
     private static class A extends O {
 
-        private A(final Observers observers) { super(observers); }
+        private A(final Observers observers) {
+            super(observers);
+        }
 
     }
 
     private static class B extends O {
 
-        private B(final Observers observers) { super(observers); }
+        private B(final Observers observers) {
+            super(observers);
+        }
 
     }
 

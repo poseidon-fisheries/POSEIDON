@@ -33,7 +33,8 @@ public class DayOfTheYearExtractor implements ObservationExtractor {
 
     @Override
     public double extract(
-            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
+        SeaTile tile, double timeOfObservation, Fisher agent, FishState model
+    ) {
         return model.getDayOfTheYear();
     }
 }

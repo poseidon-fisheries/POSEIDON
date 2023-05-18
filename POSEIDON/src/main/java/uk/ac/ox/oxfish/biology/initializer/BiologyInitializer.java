@@ -32,41 +32,41 @@ import uk.ac.ox.oxfish.model.FishState;
  * various biologies
  * Created by carrknight on 6/22/15.
  */
-public interface BiologyInitializer
-{
-
-
-
+public interface BiologyInitializer {
 
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     * @param biology the global biology (species' list) object
-     * @param seaTile the sea-tile to populate
-     * @param random the randomizer
+     *
+     * @param biology          the global biology (species' list) object
+     * @param seaTile          the sea-tile to populate
+     * @param random           the randomizer
      * @param mapHeightInCells height of the map
-     * @param mapWidthInCells width of the map
+     * @param mapWidthInCells  width of the map
      * @param map
      */
     LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map);
+        GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
+        int mapWidthInCells, NauticalMap map
+    );
 
 
     /**
      * after all the tiles have been instantiated this method gets called once to put anything together or to smooth
      * biomasses or whatever
+     *
      * @param biology the global biology instance
-     * @param map the map which by now should have all the tiles in place
-     * @param model the model: it is in the process of being initialized so it should be only used to schedule stuff rather
-     *              than using getters
+     * @param map     the map which by now should have all the tiles in place
+     * @param model   the model: it is in the process of being initialized so it should be only used to schedule stuff rather
+     *                than using getters
      */
     void processMap(GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model);
 
 
     /**
      * creates the global biology object for the model
-     * @param random the random number generator
+     *
+     * @param random                the random number generator
      * @param modelBeingInitialized the model we are in the process of initializing
      * @return a global biology object
      */

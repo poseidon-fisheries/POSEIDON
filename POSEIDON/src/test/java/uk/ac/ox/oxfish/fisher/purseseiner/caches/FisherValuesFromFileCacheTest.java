@@ -24,11 +24,8 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FisherMocker;
 
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,7 +41,8 @@ public class FisherValuesFromFileCacheTest {
 
     private final FisherValuesFromFileCache<Integer> cache =
         new FisherValuesFromFileCache<Integer>() {
-            @Override protected Map<Integer, Map<String, Integer>> readValues(
+            @Override
+            protected Map<Integer, Map<String, Integer>> readValues(
                 final Path valuesFile
             ) {
                 return recordStream(valuesFile).collect(

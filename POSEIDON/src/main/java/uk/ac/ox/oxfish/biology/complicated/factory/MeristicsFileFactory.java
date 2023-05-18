@@ -26,7 +26,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -37,15 +36,16 @@ import java.nio.file.Paths;
  * Created by carrknight on 7/7/17.
  */
 public class MeristicsFileFactory
-        implements AlgorithmFactory<StockAssessmentCaliforniaMeristics> {
+    implements AlgorithmFactory<StockAssessmentCaliforniaMeristics> {
 
 
-
-    private Path pathToMeristicFile = Paths.get("inputs",
-                                                "california",
-                                                "biology",
-                                                "Sablefish",
-                                                "meristics.yaml");
+    private Path pathToMeristicFile = Paths.get(
+        "inputs",
+        "california",
+        "biology",
+        "Sablefish",
+        "meristics.yaml"
+    );
 
 
     public MeristicsFileFactory(Path pathToMeristicFile) {
@@ -68,7 +68,7 @@ public class MeristicsFileFactory
         FishYAML yaml = new FishYAML();
         try {
             FileReader io = new FileReader(
-                    pathToMeristicFile.toFile()
+                pathToMeristicFile.toFile()
             );
             MeristicsInput input = yaml.loadAs(io, MeristicsInput.class);
             io.close();

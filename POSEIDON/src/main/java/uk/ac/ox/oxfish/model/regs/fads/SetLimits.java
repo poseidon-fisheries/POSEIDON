@@ -20,13 +20,10 @@
 package uk.ac.ox.oxfish.model.regs.fads;
 
 import com.google.common.collect.ImmutableSet;
-import java.util.function.Consumer;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.model.Startable;
+
+import java.util.function.Consumer;
 
 public class SetLimits extends YearlyActionLimitRegulation {
 

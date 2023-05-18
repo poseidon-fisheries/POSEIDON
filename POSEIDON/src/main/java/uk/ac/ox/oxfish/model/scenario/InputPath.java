@@ -17,12 +17,12 @@ public class InputPath implements Supplier<Path> {
         this.path = path;
     }
 
-    public static InputPath of(final Path path) {
-        return new InputPath(null, path);
-    }
-
     public static InputPath of(final String first, final String... more) {
         return of(Paths.get(first, more));
+    }
+
+    public static InputPath of(final Path path) {
+        return new InputPath(null, path);
     }
 
     public InputPath getParent() {

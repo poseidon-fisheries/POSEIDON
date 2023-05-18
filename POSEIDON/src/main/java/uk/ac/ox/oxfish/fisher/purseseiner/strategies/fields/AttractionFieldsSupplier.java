@@ -142,14 +142,6 @@ public class AttractionFieldsSupplier implements Supplier<Set<AttractionField>> 
         this.destinationDistanceExponent = destinationDistanceExponent;
     }
 
-    public InputPath getMaxCurrentSpeedsFile() {
-        return maxCurrentSpeedsFile;
-    }
-
-    public void setMaxCurrentSpeedsFile(final InputPath maxCurrentSpeedsFile) {
-        this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
-    }
-
     @Override
     public Set<AttractionField> get() {
         final Map<Class<? extends PurseSeinerAction>, LocationValues> locationValues =
@@ -239,5 +231,13 @@ public class AttractionFieldsSupplier implements Supplier<Set<AttractionField>> 
                 )
             )
             .build();
+    }
+
+    public InputPath getMaxCurrentSpeedsFile() {
+        return maxCurrentSpeedsFile;
+    }
+
+    public void setMaxCurrentSpeedsFile(final InputPath maxCurrentSpeedsFile) {
+        this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
     }
 }

@@ -38,9 +38,11 @@ public class LogisticRecruitmentProcess extends YearlyRecruitmentProcess {
     private NoiseMaker noise = new NoNoiseMaker();
 
 
-    public LogisticRecruitmentProcess(double carryingCapacity,
-                                      double malthusianParameter,
-                                      boolean recruitEveryDay) {
+    public LogisticRecruitmentProcess(
+        double carryingCapacity,
+        double malthusianParameter,
+        boolean recruitEveryDay
+    ) {
         super(recruitEveryDay);
         this.carryingCapacity = carryingCapacity;
         this.malthusianParameter = malthusianParameter;
@@ -49,32 +51,33 @@ public class LogisticRecruitmentProcess extends YearlyRecruitmentProcess {
     /**
      * Computes the number of new recruits per sex
      *
-     * @param species      the species of fish examined
-     * @param meristics    the biological characteristics of the fish
+     * @param species   the species of fish examined
+     * @param meristics the biological characteristics of the fish
      * @param abundance
      * @return the number of male + female recruits
      */
     @Override
     public double computeYearlyRecruitment(
-            Species species, Meristics meristics, StructuredAbundance abundance) {
+        Species species, Meristics meristics, StructuredAbundance abundance
+    ) {
 
         //weigh
-        double biomass = FishStateUtilities.weigh(abundance,meristics);
+        double biomass = FishStateUtilities.weigh(abundance, meristics);
 
         double nextBiomass = IndependentLogisticBiomassGrower.logisticStep(
-                biomass + noise.get(),carryingCapacity,malthusianParameter
+            biomass + noise.get(), carryingCapacity, malthusianParameter
         );
 
-        double recruitmentBiomass = nextBiomass-biomass;
+        double recruitmentBiomass = nextBiomass - biomass;
         double recruitAverageWeight = 0;
-        for(int i=0; i<abundance.getSubdivisions(); i++)
-            recruitAverageWeight += meristics.getWeight(i,0);
-        recruitAverageWeight/= (double) meristics.getNumberOfSubdivisions();
+        for (int i = 0; i < abundance.getSubdivisions(); i++)
+            recruitAverageWeight += meristics.getWeight(i, 0);
+        recruitAverageWeight /= (double) meristics.getNumberOfSubdivisions();
 
-        assert  recruitmentBiomass >=0;
+        assert recruitmentBiomass >= 0;
 
         //turn weight into # of recruits and return it!
-        return recruitmentBiomass > 0 ? (recruitmentBiomass/recruitAverageWeight) :0;
+        return recruitmentBiomass > 0 ? (recruitmentBiomass / recruitAverageWeight) : 0;
     }
 
     /**
@@ -84,6 +87,6 @@ public class LogisticRecruitmentProcess extends YearlyRecruitmentProcess {
      */
     @Override
     public void addNoise(NoiseMaker noiseMaker) {
-            this.noise = noiseMaker;
+        this.noise = noiseMaker;
     }
 }

@@ -29,19 +29,20 @@ import java.util.*;
 
 /**
  * A List wrapper class that implements observability.
- *
  */
 public class ObservableListWrapper<E> extends ModifiableObservableListBase<E> implements
-        ObservableList<E>, RandomAccess {
+    ObservableList<E>, RandomAccess {
 
     private final List<E> backingList;
 
     private final ElementObserver elementObserver;
+    private SortHelper helper;
 
     public ObservableListWrapper(List<E> list) {
         backingList = list;
         elementObserver = null;
     }
+
 
     public ObservableListWrapper(List<E> list, Callback<E, Observable[]> extractor) {
         backingList = list;
@@ -72,15 +73,14 @@ public class ObservableListWrapper<E> extends ModifiableObservableListBase<E> im
         }
     }
 
+    @Override
+    public int size() {
+        return backingList.size();
+    }
 
     @Override
     public E get(int index) {
         return backingList.get(index);
-    }
-
-    @Override
-    public int size() {
-        return backingList.size();
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ObservableListWrapper<E> extends ModifiableObservableListBase<E> im
 
     @Override
     protected E doSet(int index, E element) {
-        E removed =  backingList.set(index, element);
+        E removed = backingList.set(index, element);
         if (elementObserver != null) {
             elementObserver.detachListener(removed);
             elementObserver.attachListener(element);
@@ -102,7 +102,7 @@ public class ObservableListWrapper<E> extends ModifiableObservableListBase<E> im
 
     @Override
     protected E doRemove(int index) {
-        E removed =  backingList.remove(index);
+        E removed = backingList.remove(index);
         if (elementObserver != null)
             elementObserver.detachListener(removed);
         return removed;
@@ -193,9 +193,6 @@ public class ObservableListWrapper<E> extends ModifiableObservableListBase<E> im
         endChange();
         return !bs.isEmpty();
     }
-
-    private SortHelper helper;
-
 
     @Override
     public void sort(Comparator<? super E> comparator) {

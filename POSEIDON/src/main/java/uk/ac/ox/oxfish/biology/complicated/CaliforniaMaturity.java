@@ -28,8 +28,7 @@ import uk.ac.ox.oxfish.biology.Species;
  * M(l) = 1/(e+exp(-slope*(l-inflectionPoint))
  * Where l is length
  */
-public class CaliforniaMaturity  implements Maturity{
-
+public class CaliforniaMaturity implements Maturity {
 
 
     private final double slope;
@@ -53,8 +52,8 @@ public class CaliforniaMaturity  implements Maturity{
     @Override
     public double getMaturity(Species species, int subdivision, int bin) {
 
-        return  1d/(1d + Math.exp(-slope*(
-                species.getLength(subdivision,bin) - inflectionPoint
-                )));
+        return 1d / (1d + Math.exp(-slope * (
+            species.getLength(subdivision, bin) - inflectionPoint
+        )));
     }
 }

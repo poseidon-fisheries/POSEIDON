@@ -47,63 +47,63 @@ public class MultipleIndependentSpeciesBiomassInitializerTest {
     public void twoSpeciesFewCells() {
 
 
-        FishState model = MovingTest.generateSimple4x4Map();
-        DiffusingLogisticFactory species0 = new DiffusingLogisticFactory();
+        final FishState model = MovingTest.generateSimple4x4Map();
+        final DiffusingLogisticFactory species0 = new DiffusingLogisticFactory();
         species0.setCarryingCapacity(new FixedDoubleParameter(100));
         species0.setMinInitialCapacity(new FixedDoubleParameter(1d));
         species0.setMaxInitialCapacity(new FixedDoubleParameter(1d));
         species0.setSpeciesName("red");
-        DiffusingLogisticFactory species1 = new DiffusingLogisticFactory();
+        final DiffusingLogisticFactory species1 = new DiffusingLogisticFactory();
         species1.setSpeciesName("blue");
         species1.setCarryingCapacity(new FixedDoubleParameter(200));
         species1.setMinInitialCapacity(new FixedDoubleParameter(.8d));
         species1.setMaxInitialCapacity(new FixedDoubleParameter(.8d));
 
-        MultipleIndependentSpeciesBiomassInitializer toTest = new
-                MultipleIndependentSpeciesBiomassInitializer(
-                Lists.newArrayList(
-                        species0.apply(model),
-                        species1.apply(model)
-                )
-                ,
-                false,
-                false);
+        final MultipleIndependentSpeciesBiomassInitializer toTest = new
+            MultipleIndependentSpeciesBiomassInitializer(
+            Lists.newArrayList(
+                species0.apply(model),
+                species1.apply(model)
+            )
+            ,
+            false,
+            false
+        );
 
 
-        GlobalBiology globalBiology = toTest.generateGlobal(model.getRandom(), model);
-        assertEquals(globalBiology.getSize(),2);
-        assertEquals(globalBiology.getSpecie(0).getName(),"red");
-        assertEquals(globalBiology.getSpecie(1).getName(),"blue");
-        Mockito.verify(model.getYearlyCounter(),times(1)).addColumn("red Recruitment");
-        Mockito.verify(model.getYearlyCounter(),times(1)).addColumn("blue Recruitment");
+        final GlobalBiology globalBiology = toTest.generateGlobal(model.getRandom(), model);
+        assertEquals(globalBiology.getSize(), 2);
+        assertEquals(globalBiology.getSpecie(0).getName(), "red");
+        assertEquals(globalBiology.getSpecie(1).getName(), "blue");
+        Mockito.verify(model.getYearlyCounter(), times(1)).addColumn("red Recruitment");
+        Mockito.verify(model.getYearlyCounter(), times(1)).addColumn("blue Recruitment");
 
 
-        NauticalMap map = model.getMap();
+        final NauticalMap map = model.getMap();
         //this calls all the generateLocal!
-        map.initializeBiology(toTest,model.getRandom(),globalBiology);
+        map.initializeBiology(toTest, model.getRandom(), globalBiology);
 
 
-        toTest.processMap(globalBiology,map,model.getRandom(),model);
+        toTest.processMap(globalBiology, map, model.getRandom(), model);
 
-        for(SeaTile tile : map.getAllSeaTilesAsList())
-        {
-            assertEquals(tile.getBiomass(globalBiology.getSpecie(0)),100d,.0001);
-            assertEquals(tile.getBiomass(globalBiology.getSpecie(1)),160d,.0001);
+        for (final SeaTile tile : map.getAllSeaTilesAsList()) {
+            assertEquals(tile.getBiomass(globalBiology.getSpecie(0)), 100d, .0001);
+            assertEquals(tile.getBiomass(globalBiology.getSpecie(1)), 160d, .0001);
 
             assertEquals(((VariableBiomassBasedBiology) tile.getBiology()).getCarryingCapacity(0), 100d, .0001);
             assertEquals(((VariableBiomassBasedBiology) tile.getBiology()).getCarryingCapacity(1), 200d, .0001);
         }
         //only one movement should have started!
-        verify(model,times(1)).scheduleEveryDay(
-                ArgumentMatchers.isA(BiomassDiffuserContainer.class)
-                ,any());
+        verify(model, times(1)).scheduleEveryDay(
+            ArgumentMatchers.isA(BiomassDiffuserContainer.class)
+            , any());
         //two separate growers!
-        verify(model,times(2)).registerStartable(
-                any(IndependentLogisticBiomassGrower.class)
+        verify(model, times(2)).registerStartable(
+            any(IndependentLogisticBiomassGrower.class)
         );
-        verify(model,times(0)).scheduleEveryDay(
-                ArgumentMatchers.isA(IndependentLogisticBiomassGrower.class)
-                ,any());
+        verify(model, times(0)).scheduleEveryDay(
+            ArgumentMatchers.isA(IndependentLogisticBiomassGrower.class)
+            , any());
 
 
     }

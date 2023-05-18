@@ -34,68 +34,63 @@ import static org.junit.Assert.assertTrue;
 public class UCB1BanditAlgorithmTest {
 
 
-
     @Test
-    public void tenOptions() throws Exception
-    {
+    public void tenOptions() throws Exception {
 
         //option 10 is the best, you should pick it!
-        MersenneTwisterFast random = new MersenneTwisterFast();
-        UCB1BanditAlgorithm bandit = new UCB1BanditAlgorithm(
-                -10,10,new BanditAverage(10, IterativeAverage::new)) ;
+        final MersenneTwisterFast random = new MersenneTwisterFast();
+        final UCB1BanditAlgorithm bandit = new UCB1BanditAlgorithm(
+            -10, 10, new BanditAverage(10, IterativeAverage::new));
         for (int i = 0; i < 10000; i++) { //notice how much slower this method is. It is being extremely cautious
-            int arm = bandit.chooseArm(random);
-            double reward = random.nextGaussian() / 2 + arm;
+            final int arm = bandit.chooseArm(random);
+            final double reward = random.nextGaussian() / 2 + arm;
             bandit.observeReward(reward, arm);
         }
 
         //now you should be playing most
         System.out.println(bandit.getNumberOfObservations(9));
-        assertTrue(bandit.getNumberOfObservations(9)>5000);
-
-    }
-
-
-
-    @Test
-    public void tenOptionsEMA() throws Exception
-    {
-
-        //option 10 is the best, you should pick it!
-        MersenneTwisterFast random = new MersenneTwisterFast();
-        UCB1BanditAlgorithm bandit = new UCB1BanditAlgorithm(
-                -10,10,new BanditAverage(10, () -> new ExponentialMovingAverage<>(.8))) ;
-
-        for (int i = 0; i < 10000; i++) {
-            int arm = bandit.chooseArm(random);
-            double reward = random.nextGaussian() / 2 + arm;
-            bandit.observeReward(reward, arm);
-        }
-
-        //now you should be playing most
-        System.out.println(bandit.getNumberOfObservations(9));
-        assertTrue(bandit.getNumberOfObservations(9)>4000);
+        assertTrue(bandit.getNumberOfObservations(9) > 5000);
 
     }
 
 
     @Test
-    public void tenOptionsMA() throws Exception
-    {
+    public void tenOptionsEMA() throws Exception {
 
         //option 10 is the best, you should pick it!
-        MersenneTwisterFast random = new MersenneTwisterFast();
-        UCB1BanditAlgorithm bandit = new UCB1BanditAlgorithm(
-                -10,10,new BanditAverage(10, () -> new MovingAverage<>(20))) ;
+        final MersenneTwisterFast random = new MersenneTwisterFast();
+        final UCB1BanditAlgorithm bandit = new UCB1BanditAlgorithm(
+            -10, 10, new BanditAverage(10, () -> new ExponentialMovingAverage<>(.8)));
+
         for (int i = 0; i < 10000; i++) {
-            int arm = bandit.chooseArm(random);
-            double reward = random.nextGaussian() / 2 + arm;
+            final int arm = bandit.chooseArm(random);
+            final double reward = random.nextGaussian() / 2 + arm;
             bandit.observeReward(reward, arm);
         }
 
         //now you should be playing most
         System.out.println(bandit.getNumberOfObservations(9));
-        assertTrue(bandit.getNumberOfObservations(9)>5000);
+        assertTrue(bandit.getNumberOfObservations(9) > 4000);
+
+    }
+
+
+    @Test
+    public void tenOptionsMA() throws Exception {
+
+        //option 10 is the best, you should pick it!
+        final MersenneTwisterFast random = new MersenneTwisterFast();
+        final UCB1BanditAlgorithm bandit = new UCB1BanditAlgorithm(
+            -10, 10, new BanditAverage(10, () -> new MovingAverage<>(20)));
+        for (int i = 0; i < 10000; i++) {
+            final int arm = bandit.chooseArm(random);
+            final double reward = random.nextGaussian() / 2 + arm;
+            bandit.observeReward(reward, arm);
+        }
+
+        //now you should be playing most
+        System.out.println(bandit.getNumberOfObservations(9));
+        assertTrue(bandit.getNumberOfObservations(9) > 5000);
 
     }
 

@@ -41,35 +41,37 @@ public class TwoPortsInitializerTest {
 
 
     @Test
-    public void createsPortWhereYouWant() throws Exception
-    {
+    public void createsPortWhereYouWant() throws Exception {
 
-        SimpleMapInitializer initializer = new SimpleMapInitializer(4, 4, 0, 0, 1, 1);
-        NauticalMap map = initializer.makeMap(new MersenneTwisterFast(),
-                                              new GlobalBiology(new Species("fake")),
-                                              mock(FishState.class));
+        final SimpleMapInitializer initializer = new SimpleMapInitializer(4, 4, 0, 0, 1, 1);
+        final NauticalMap map = initializer.makeMap(
+            new MersenneTwisterFast(),
+            new GlobalBiology(new Species("fake")),
+            mock(FishState.class)
+        );
 
-        TwoPortsInitializer ports = new TwoPortsInitializer(3,
-                                                            1,
-                                                            3,
-                                                            2,
-                                                            "North",
-                                                            "South");
+        final TwoPortsInitializer ports = new TwoPortsInitializer(
+            3,
+            1,
+            3,
+            2,
+            "North",
+            "South"
+        );
         ports.buildPorts(map, new MersenneTwisterFast(), mock(Function.class), mock(FishState.class),
-                         new FixedGasPrice(3));
-        assertEquals(map.getPorts().size(),2);
-        for(Port port : map.getPorts())
-        {
-            assertEquals(port.getGasPricePerLiter(),3,.0001d);
-            assertEquals(port.getLocation().getGridX(),3);
-            if(port.getName().equals("North"))
-                assertEquals(port.getLocation().getGridY(),1);
-            else
-                {
-                    assertEquals(port.getLocation().getGridY(),2);
-                    assertEquals("South",port.getName());
+            new FixedGasPrice(3)
+        );
+        assertEquals(map.getPorts().size(), 2);
+        for (final Port port : map.getPorts()) {
+            assertEquals(port.getGasPricePerLiter(), 3, .0001d);
+            assertEquals(port.getLocation().getGridX(), 3);
+            if (port.getName().equals("North"))
+                assertEquals(port.getLocation().getGridY(), 1);
+            else {
+                assertEquals(port.getLocation().getGridY(), 2);
+                assertEquals("South", port.getName());
 
-                }
+            }
         }
 
 

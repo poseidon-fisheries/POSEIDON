@@ -30,7 +30,6 @@ import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -44,99 +43,13 @@ import java.nio.file.Paths;
  */
 public class BestGearWins {
 
-    public static DataColumn efficiencyImitation(
-            final double gasPrice, final int simulationYears,
-            final String biologyInitializer, final long seed)
-    {
-
-        //without fuel cost:
-        PrototypeScenario scenario = new PrototypeScenario();
-        scenario.setBiologyInitializer(BiologyInitializers.CONSTRUCTORS.get(biologyInitializer).get());
-        scenario.setFishers(100);
-        scenario.setGasPricePerLiter(new FixedDoubleParameter(gasPrice));
-        RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
-        gear.setGasPerHourFished(new FixedDoubleParameter(10));
-        scenario.setGear(gear);
-        PeriodicUpdateFromListFactory gearStrategy = new PeriodicUpdateFromListFactory();
-        gearStrategy.setProbability(new FixedProbabilityFactory(.05,.25));
-        gearStrategy.setYearly(false);
-        for(int i=0; i<20; i++)
-        {
-            gear = new RandomCatchabilityTrawlFactory();
-            gear.setGasPerHourFished(new FixedDoubleParameter(i));
-            gearStrategy.getAvailableGears().add(gear);
-        }
-        scenario.setGearStrategy(gearStrategy);
-        //start everything
-        FishState state = new FishState(seed);
-        state.setScenario(scenario);
-        state.start();
-
-        state.getDailyDataSet().registerGatherer("Thrawling Fuel Consumption", model -> {
-            double size =state.getFishers().size();
-            if(size == 0)
-                return Double.NaN;
-            else
-            {
-                double total = 0;
-                for(Fisher fisher1 : state.getFishers())
-                    total+= ((RandomCatchabilityTrawl) fisher1.getGear()).getGasPerHourFished();
-                return total/size;
-            }
-        }, Double.NaN);
-
-
-        for(int i=0; i<state.getSpecies().size(); i++)
-        {
-            final int finalI = i;
-            state.getDailyDataSet().registerGatherer("Trawling Efficiency for Species " + i,
-                                                     model -> {
-                                                         double size = state.getFishers().size();
-                                                         if (size == 0)
-                                                             return Double.NaN;
-                                                         else {
-                                                             double total = 0;
-                                                             for (Fisher fisher1 : state.getFishers())
-                                                                 total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[finalI];
-                                                             return total / size;
-                                                         }
-                                                     }, Double.NaN);
-        }
-
-        //pre-lspiRun average efficiency
-        double average = 0;
-        for(Fisher fisher : state.getFishers())
-        {
-            average += ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished();
-        }
-        average/=100;
-   //     System.out.println(average);
-
-        while(state.getYear() < simulationYears)
-            state.schedule.step(state);
-
-        state.schedule.step(state);
-        //average now? Ought to be more or less the same
-        average = 0;
-        for(Fisher fisher : state.getFishers())
-        {
-            average += ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished();
-        }
-        average/=100;
-        System.out.println(average);
-        System.out.println(state.getDailyDataSet().getColumn("Thrawling Fuel Consumption").getLatest());
-        return state.getDailyDataSet().getColumn("Thrawling Fuel Consumption");
-
-    }
-
     public static void main(String[] args) throws IOException {
 
 
         Path root = Paths.get("runs", "ltr");
 
         root.toFile().mkdirs();
-        for(int i=0; i<100;i++)
-        {
+        for (int i = 0; i < 100; i++) {
             DataColumn column = efficiencyImitation(.05, 20, "From Left To Right Fixed", System.currentTimeMillis());
             File file = root.resolve("pricey" + i + ".csv").toFile();
             FileWriter writer = new FileWriter(file);
@@ -147,8 +60,7 @@ public class BestGearWins {
             writer.flush();
             writer.close();
         }
-        for(int i=0; i<100;i++)
-        {
+        for (int i = 0; i < 100; i++) {
             DataColumn column = efficiencyImitation(0, 20, "From Left To Right Fixed", System.currentTimeMillis());
             File file = root.resolve("free" + i + ".csv").toFile();
             FileWriter writer = new FileWriter(file);
@@ -163,8 +75,7 @@ public class BestGearWins {
 
         root = Paths.get("runs", "logistic");
         root.toFile().mkdirs();
-        for(int i=0; i<100;i++)
-        {
+        for (int i = 0; i < 100; i++) {
             DataColumn column = efficiencyImitation(.05, 20, "Independent Logistic", System.currentTimeMillis());
             File file = root.resolve("pricey" + i + ".csv").toFile();
             FileWriter writer = new FileWriter(file);
@@ -175,8 +86,7 @@ public class BestGearWins {
             writer.flush();
             writer.close();
         }
-        for(int i=0; i<100;i++)
-        {
+        for (int i = 0; i < 100; i++) {
             DataColumn column = efficiencyImitation(0, 20, "Independent Logistic", System.currentTimeMillis());
             File file = root.resolve("free" + i + ".csv").toFile();
             FileWriter writer = new FileWriter(file);
@@ -190,8 +100,7 @@ public class BestGearWins {
 
         root = Paths.get("runs", "marginal");
         root.toFile().mkdirs();
-        for(int i=0; i<100;i++)
-        {
+        for (int i = 0; i < 100; i++) {
             DataColumn column = efficiencyImitation(.2, 20, "Independent Logistic", System.currentTimeMillis());
             File file = root.resolve("pricey" + i + ".csv").toFile();
             FileWriter writer = new FileWriter(file);
@@ -202,8 +111,7 @@ public class BestGearWins {
             writer.flush();
             writer.close();
         }
-        for(int i=0; i<100;i++)
-        {
+        for (int i = 0; i < 100; i++) {
             DataColumn column = efficiencyImitation(.01, 20, "Independent Logistic", System.currentTimeMillis());
             File file = root.resolve("free" + i + ".csv").toFile();
             FileWriter writer = new FileWriter(file);
@@ -215,6 +123,87 @@ public class BestGearWins {
             writer.close();
         }
 
+
+    }
+
+    public static DataColumn efficiencyImitation(
+        final double gasPrice, final int simulationYears,
+        final String biologyInitializer, final long seed
+    ) {
+
+        //without fuel cost:
+        PrototypeScenario scenario = new PrototypeScenario();
+        scenario.setBiologyInitializer(BiologyInitializers.CONSTRUCTORS.get(biologyInitializer).get());
+        scenario.setFishers(100);
+        scenario.setGasPricePerLiter(new FixedDoubleParameter(gasPrice));
+        RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
+        gear.setGasPerHourFished(new FixedDoubleParameter(10));
+        scenario.setGear(gear);
+        PeriodicUpdateFromListFactory gearStrategy = new PeriodicUpdateFromListFactory();
+        gearStrategy.setProbability(new FixedProbabilityFactory(.05, .25));
+        gearStrategy.setYearly(false);
+        for (int i = 0; i < 20; i++) {
+            gear = new RandomCatchabilityTrawlFactory();
+            gear.setGasPerHourFished(new FixedDoubleParameter(i));
+            gearStrategy.getAvailableGears().add(gear);
+        }
+        scenario.setGearStrategy(gearStrategy);
+        //start everything
+        FishState state = new FishState(seed);
+        state.setScenario(scenario);
+        state.start();
+
+        state.getDailyDataSet().registerGatherer("Thrawling Fuel Consumption", model -> {
+            double size = state.getFishers().size();
+            if (size == 0)
+                return Double.NaN;
+            else {
+                double total = 0;
+                for (Fisher fisher1 : state.getFishers())
+                    total += ((RandomCatchabilityTrawl) fisher1.getGear()).getGasPerHourFished();
+                return total / size;
+            }
+        }, Double.NaN);
+
+
+        for (int i = 0; i < state.getSpecies().size(); i++) {
+            final int finalI = i;
+            state.getDailyDataSet().registerGatherer("Trawling Efficiency for Species " + i,
+                model -> {
+                    double size = state.getFishers().size();
+                    if (size == 0)
+                        return Double.NaN;
+                    else {
+                        double total = 0;
+                        for (Fisher fisher1 : state.getFishers())
+                            total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[finalI];
+                        return total / size;
+                    }
+                }, Double.NaN
+            );
+        }
+
+        //pre-lspiRun average efficiency
+        double average = 0;
+        for (Fisher fisher : state.getFishers()) {
+            average += ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished();
+        }
+        average /= 100;
+        //     System.out.println(average);
+
+        while (state.getYear() < simulationYears)
+            state.schedule.step(state);
+
+        state.schedule.step(state);
+        //average now? Ought to be more or less the same
+        average = 0;
+        for (Fisher fisher : state.getFishers()) {
+            average += ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished();
+        }
+        average /= 100;
+        System.out.println(average);
+        System.out.println(state.getDailyDataSet().getColumn("Thrawling Fuel Consumption").getLatest());
+        return state.getDailyDataSet().getColumn("Thrawling Fuel Consumption");
 
     }
 }

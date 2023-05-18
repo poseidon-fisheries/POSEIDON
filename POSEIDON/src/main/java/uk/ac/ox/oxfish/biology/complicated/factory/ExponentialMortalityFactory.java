@@ -30,7 +30,7 @@ public class ExponentialMortalityFactory implements AlgorithmFactory<Exponential
     /**
      * mortality rate for each group (say, male and female)
      */
-    double[] mortalityPerSubdivision = new double[]{0.1,0.1};
+    double[] mortalityPerSubdivision = new double[]{0.1, 0.1};
 
     /**
      * Applies this function to the given argument.

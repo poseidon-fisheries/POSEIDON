@@ -24,8 +24,7 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
  * 1/rbfKernel
  * Created by carrknight on 8/24/16.
  */
-public class RBFRegressionDistance implements RegressionDistance
-{
+public class RBFRegressionDistance implements RegressionDistance {
 
 
     private final RBFDistance delegate;

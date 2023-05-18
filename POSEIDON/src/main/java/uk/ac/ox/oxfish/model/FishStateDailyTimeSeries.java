@@ -24,18 +24,13 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.data.Gatherer;
-import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
-import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
-import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
-import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.*;
 import uk.ac.ox.oxfish.model.market.Market;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Streams.stream;
@@ -54,7 +49,15 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
     public static final String AVERAGE_LAST_TRIP_HOURLY_PROFITS = "Average Last Trip Hourly Profits";
 
     public FishStateDailyTimeSeries() {
-        super(IntervalPolicy.EVERY_DAY,StepOrder.YEARLY_DATA_GATHERING);
+        super(IntervalPolicy.EVERY_DAY, StepOrder.YEARLY_DATA_GATHERING);
+    }
+
+    public static List<String> getAllMarketColumns(Collection<Market> markets) {
+        //get all important columns
+        return markets.stream()
+            .flatMap(market -> market.getData().getColumns().stream().map(DataColumn::getName))
+            .distinct()
+            .collect(Collectors.toList());
     }
 
     /**
@@ -79,81 +82,66 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         );
 
         //add a counter for all catches (including discards) by asking each fisher individually
-        for(Species species : observed.getSpecies())
-        {
+        for (Species species : observed.getSpecies()) {
 
             String catchesColumn = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
             registerGatherer(catchesColumn,
-                             new Gatherer<FishState>() {
-                                 @Override
-                                 public Double apply(FishState ignored) {
-                                     return observed.getFishers().stream().mapToDouble(
-                                             new ToDoubleFunction<Fisher>() {
-                                                 @Override
-                                                 public double applyAsDouble(Fisher value) {
-                                                     return value.getDailyCounter().getCatchesPerSpecie(species.getIndex());
-                                                 }
-                                             }).sum();
-                                 }
-                             }, 0d, KILOGRAM, "Biomass");
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState ignored) {
+                        return observed.getFishers().stream().mapToDouble(
+                            new ToDoubleFunction<Fisher>() {
+                                @Override
+                                public double applyAsDouble(Fisher value) {
+                                    return value.getDailyCounter().getCatchesPerSpecie(species.getIndex());
+                                }
+                            }).sum();
+                    }
+                }, 0d, KILOGRAM, "Biomass"
+            );
         }
 
         final List<Fisher> fishers = state.getFishers();
-
 
 
         registerGatherer("Total Effort", new Gatherer<FishState>() {
             @Override
             public Double apply(FishState ignored) {
                 return observed.getFishers().stream().mapToDouble(
-                        new ToDoubleFunction<Fisher>() {
-                            @Override
-                            public double applyAsDouble(Fisher value) {
-                                return value.getDailyCounter().getColumn(FisherYearlyTimeSeries.EFFORT);
-                            }
-                        }).sum();
+                    new ToDoubleFunction<Fisher>() {
+                        @Override
+                        public double applyAsDouble(Fisher value) {
+                            return value.getDailyCounter().getColumn(FisherYearlyTimeSeries.EFFORT);
+                        }
+                    }).sum();
             }
         }, 0d, HOUR, "Effort");
-
-
 
 
         registerGatherer(AVERAGE_LAST_TRIP_HOURLY_PROFITS, new Gatherer<FishState>() {
             @Override
             public Double apply(FishState ignored) {
 
-                if(fishers.size()==0)
+                if (fishers.size() == 0)
                     return 0d;
 
                 double sum = 0;
                 for (Fisher fisher : observed.getFishers()) {
                     TripRecord lastTrip = fisher.getLastFinishedTrip();
-                    if (lastTrip != null ) {
+                    if (lastTrip != null) {
                         double lastProfits = lastTrip.getProfitPerHour(true);
-                        if(Double.isFinite(lastProfits)) //NaN or Infinite are assumed to be 0 here
-                            sum+= lastProfits;
+                        if (Double.isFinite(lastProfits)) //NaN or Infinite are assumed to be 0 here
+                            sum += lastProfits;
                     }
 
                 }
 
-                return sum/(double)fishers.size();
+                return sum / (double) fishers.size();
             }
         }, 0d);
 
 
-
-
-
-
         super.start(state, observed);
-    }
-
-    public static List<String> getAllMarketColumns(Collection<Market> markets) {
-        //get all important columns
-        return markets.stream()
-            .flatMap(market -> market.getData().getColumns().stream().map(DataColumn::getName))
-            .distinct()
-            .collect(Collectors.toList());
     }
 
     private void registerSummaryGatherers(Iterable<DataColumn> allColumns, String nameTemplate) {

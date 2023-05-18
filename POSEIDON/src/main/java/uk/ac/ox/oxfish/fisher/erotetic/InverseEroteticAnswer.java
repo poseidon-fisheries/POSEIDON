@@ -30,7 +30,7 @@ import java.util.List;
  * Takes a delegate answer and returns its complement
  * Created by carrknight on 6/7/16.
  */
-public class InverseEroteticAnswer<T> implements EroteticAnswer<T>{
+public class InverseEroteticAnswer<T> implements EroteticAnswer<T> {
 
 
     private final EroteticAnswer<T> delegate;
@@ -49,26 +49,26 @@ public class InverseEroteticAnswer<T> implements EroteticAnswer<T>{
      */
     @Override
     public List<T> answer(
-            List<T> currentOptions, FeatureExtractors<T> representation, FishState state, Fisher fisher) {
+        List<T> currentOptions, FeatureExtractors<T> representation, FishState state, Fisher fisher
+    ) {
 
         //take the original answer
         List<T> toInvert = delegate.answer(currentOptions, representation, state, fisher);
         //if empty or full, easy
-        if(toInvert==null || currentOptions.isEmpty())
+        if (toInvert == null || currentOptions.isEmpty())
             return currentOptions;
-        if(toInvert.size()==currentOptions.size())
+        if (toInvert.size() == currentOptions.size())
             return null;
 
         //it's neither empty nor full. Return all the options that were not included in the original answer
         assert currentOptions.size() > toInvert.size();
-        List<T> toReturn = new ArrayList<>(currentOptions.size()-toInvert.size());
-        for(T option : currentOptions)
-        {
-            if(!toInvert.contains(option))
+        List<T> toReturn = new ArrayList<>(currentOptions.size() - toInvert.size());
+        for (T option : currentOptions) {
+            if (!toInvert.contains(option))
                 toReturn.add(option);
         }
 
-        assert toReturn.size() == currentOptions.size()-toInvert.size();
+        assert toReturn.size() == currentOptions.size() - toInvert.size();
         return toReturn;
     }
 

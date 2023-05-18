@@ -18,11 +18,12 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-
-import java.util.function.DoubleUnaryOperator;
 import junit.framework.TestCase;
 import uk.ac.ox.oxfish.utility.operators.CompressedExponentialFunction;
+
+import java.util.function.DoubleUnaryOperator;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class CompressedExponentialFunctionTest extends TestCase {
 

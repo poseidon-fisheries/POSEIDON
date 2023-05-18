@@ -43,7 +43,8 @@ public class BiasedCurrentVectors implements CurrentVectors {
 
 
     public BiasedCurrentVectors(
-            CurrentVectors delegate, double biasY, double biasX, int gridYMinimum, int gridYMaximum) {
+        CurrentVectors delegate, double biasY, double biasX, int gridYMinimum, int gridYMaximum
+    ) {
         this.delegate = delegate;
         this.biasY = biasY;
         this.biasX = biasX;
@@ -64,8 +65,8 @@ public class BiasedCurrentVectors implements CurrentVectors {
     @Override
     public Double2D getVector(int step, Int2D location) {
         Double2D vector = delegate.getVector(step, location);
-        if(location.y>=gridYMinimum && location.y<=gridYMaximum)
-            return new Double2D(vector.x + biasX, vector.y + biasY) ;
+        if (location.y >= gridYMinimum && location.y <= gridYMaximum)
+            return new Double2D(vector.x + biasX, vector.y + biasY);
         return vector;
     }
 

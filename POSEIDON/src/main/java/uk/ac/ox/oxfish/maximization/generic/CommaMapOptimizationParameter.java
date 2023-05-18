@@ -50,10 +50,12 @@ public class CommaMapOptimizationParameter implements OptimizationParameter {
     public CommaMapOptimizationParameter() {
     }
 
-    public CommaMapOptimizationParameter(int size,
-                                         String addressToModify,
-                                         double minimum,
-                                         double maximum) {
+    public CommaMapOptimizationParameter(
+        int size,
+        String addressToModify,
+        double minimum,
+        double maximum
+    ) {
         this.size = size;
         this.addressToModify = addressToModify;
         this.minimum = minimum;
@@ -72,36 +74,35 @@ public class CommaMapOptimizationParameter implements OptimizationParameter {
 
     /**
      * consume the scenario and add the parameters
-     *  @param scenario the scenario to modify
+     *
+     * @param scenario the scenario to modify
      * @param inputs   the numerical values of the parameters to set
      * @return
      */
     @Override
     public String parametrize(Scenario scenario, double[] inputs) {
 
-        Preconditions.checkArgument(inputs.length==size);
-        Preconditions.checkArgument(size>0);
-        Preconditions.checkArgument(maximum>=minimum);
+        Preconditions.checkArgument(inputs.length == size);
+        Preconditions.checkArgument(size > 0);
+        Preconditions.checkArgument(maximum >= minimum);
 
-        double realValue = ((inputs[0]+10)/20)*(maximum-minimum);
+        double realValue = ((inputs[0] + 10) / 20) * (maximum - minimum);
         StringBuffer buffer = new StringBuffer().append("0:").append(realValue);
 
 
-        for(int i=1; i<size; i++)
-        {
+        for (int i = 1; i < size; i++) {
             buffer.append(",").
-                    append(i).append(":").
-                    append(((inputs[i]+10)/20)*(maximum-minimum));
+                append(i).append(":").
+                append(((inputs[i] + 10) / 20) * (maximum - minimum));
         }
 
         //try as double parameter
-        try{
-        OptimizationParameter.navigateAndSet(
-                scenario,addressToModify,buffer.toString()
+        try {
+            OptimizationParameter.navigateAndSet(
+                scenario, addressToModify, buffer.toString()
 
-        );}
-        catch (Exception e)
-        {
+            );
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 

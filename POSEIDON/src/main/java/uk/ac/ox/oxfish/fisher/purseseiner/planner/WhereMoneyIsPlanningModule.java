@@ -17,7 +17,10 @@ public class WhereMoneyIsPlanningModule extends PickBestPilePlanningModule {
     }
 
     @Override
-    protected double weighFad(final int currentModelStep, final OwnFadSetDiscretizedActionGenerator.ValuedFad valuedFad) {
+    protected double weighFad(
+        final int currentModelStep,
+        final OwnFadSetDiscretizedActionGenerator.ValuedFad valuedFad
+    ) {
         return Math.pow(valuedFad.getValue(), valueWeight);
     }
 

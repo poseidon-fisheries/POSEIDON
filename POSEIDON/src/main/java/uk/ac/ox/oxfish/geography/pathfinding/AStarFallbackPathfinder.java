@@ -23,7 +23,9 @@ public class AStarFallbackPathfinder implements Pathfinder {
     private final Pathfinder straightLinePathfinder = new StraightLinePathfinder(new DiscardingPathMemory());
     private final AStarPathfinder aStarPathfinder;
 
-    public AStarFallbackPathfinder(Distance distanceFunction) { this(distanceFunction, new TableBasedPathMemory()); }
+    public AStarFallbackPathfinder(Distance distanceFunction) {
+        this(distanceFunction, new TableBasedPathMemory());
+    }
 
     @SuppressWarnings("WeakerAccess")
     public AStarFallbackPathfinder(Distance distanceFunction, PathMemory memory) {
@@ -32,7 +34,8 @@ public class AStarFallbackPathfinder implements Pathfinder {
     }
 
     @SuppressWarnings("OptionalAssignedToNull")
-    @Override public Deque<SeaTile> getRoute(NauticalMap map, SeaTile start, SeaTile end) {
+    @Override
+    public Deque<SeaTile> getRoute(NauticalMap map, SeaTile start, SeaTile end) {
 
         checkArgument(start.isWater() || start.isPortHere());
         checkArgument(end.isWater() || end.isPortHere());

@@ -47,27 +47,27 @@ public abstract class YearlyRecruitmentProcess implements RecruitmentProcess {
      */
     @Override
     public double recruit(
-            Species species, Meristics meristics, StructuredAbundance abundance, int dayOfTheYear, int daysSimulated) {
+        Species species, Meristics meristics, StructuredAbundance abundance, int dayOfTheYear, int daysSimulated
+    ) {
 
 
         //recruits yearly only?
-        if(!recruitEveryday) {
-            if (daysSimulated == 1 && dayOfTheYear != YEARLY_RECRUITMENT_SPAWNING_DAY)
-            {
+        if (!recruitEveryday) {
+            if (daysSimulated == 1 && dayOfTheYear != YEARLY_RECRUITMENT_SPAWNING_DAY) {
                 return 0d;
-            }
-            else
-            {
+            } else {
                 return computeYearlyRecruitment(species, meristics, abundance);
             }
-        }
-        else
-        {
-            return computeYearlyRecruitment(species, meristics, abundance) * daysSimulated/365;
+        } else {
+            return computeYearlyRecruitment(species, meristics, abundance) * daysSimulated / 365;
         }
     }
 
-    protected abstract double computeYearlyRecruitment(Species species, Meristics meristics, StructuredAbundance abundance);
+    protected abstract double computeYearlyRecruitment(
+        Species species,
+        Meristics meristics,
+        StructuredAbundance abundance
+    );
 
 
     public boolean isRecruitEveryday() {

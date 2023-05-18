@@ -42,6 +42,7 @@ public class DestinationStrategies {
     public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
     public static final Map<String, Supplier<AlgorithmFactory<? extends DestinationStrategy>>> CONSTRUCTORS;
+
     static {
         NAMES.put(RandomFavoriteDestinationFactory.class, "Random Favorite");
         NAMES.put(FixedFavoriteDestinationFactory.class, "Fixed Favorite");
@@ -66,6 +67,7 @@ public class DestinationStrategies {
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private DestinationStrategies() {}
+    private DestinationStrategies() {
+    }
 
 }

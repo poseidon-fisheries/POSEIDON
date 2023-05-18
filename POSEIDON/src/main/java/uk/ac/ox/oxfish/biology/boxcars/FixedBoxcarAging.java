@@ -27,22 +27,18 @@ import uk.ac.ox.oxfish.biology.complicated.LocalAgingProcess;
 import uk.ac.ox.oxfish.biology.complicated.VariableProportionAging;
 import uk.ac.ox.oxfish.model.FishState;
 
-public class FixedBoxcarAging  extends LocalAgingProcess {
-
+public class FixedBoxcarAging extends LocalAgingProcess {
 
 
     private final double k;
 
     private final double LInfinity;
-
+    private VariableProportionAging delegate;
 
     public FixedBoxcarAging(double k, double LInfinity) {
         this.k = k;
         this.LInfinity = LInfinity;
     }
-
-    private VariableProportionAging delegate;
-
 
     /**
      * called after the aging process has been initialized but before it is run.
@@ -56,19 +52,19 @@ public class FixedBoxcarAging  extends LocalAgingProcess {
         double[][] graduatingRates = new double[species.getNumberOfSubdivisions()][numberOfBins];
 
 
-        for(int subdivision = 0; subdivision<graduatingRates.length; subdivision++) {
+        for (int subdivision = 0; subdivision < graduatingRates.length; subdivision++) {
             double[] proportionGraduating = graduatingRates[subdivision];
             //this is just the derivative of VB per time
             double[] growthPerBin = new double[numberOfBins];
             for (int i = 0; i < numberOfBins; i++)
-                growthPerBin[i] = Math.max(k * (LInfinity - species.getLength(subdivision,i)),0);
+                growthPerBin[i] = Math.max(k * (LInfinity - species.getLength(subdivision, i)), 0);
             //turn this into graduating proportion
             //which is basically what % of length distance has been covered within deltaT (by growthPerBin)
             for (int i = 0; i < numberOfBins - 1; i++)
                 proportionGraduating[i] =
-                        Math.max(growthPerBin[i] /
-                                         (species.getLength(subdivision,i + 1)
-                                                 - species.getLength(subdivision,i)), 0);
+                    Math.max(growthPerBin[i] /
+                        (species.getLength(subdivision, i + 1)
+                            - species.getLength(subdivision, i)), 0);
             proportionGraduating[numberOfBins - 1] = 0;
         }
 
@@ -91,16 +87,17 @@ public class FixedBoxcarAging  extends LocalAgingProcess {
      */
     @Override
     public void ageLocally(
-            AbundanceLocalBiology localBiology, Species species, FishState model, boolean rounding,
-            int daysToSimulate) {
+        AbundanceLocalBiology localBiology, Species species, FishState model, boolean rounding,
+        int daysToSimulate
+    ) {
         delegate.ageLocally(localBiology, species, model, rounding, daysToSimulate);
     }
 
     /**
      * Getter for property 'yearlyProportionGraduating'.
      *
-     * @return Value for property 'yearlyProportionGraduating'.
      * @param subdivision
+     * @return Value for property 'yearlyProportionGraduating'.
      */
     @VisibleForTesting
     public double[] getYearlyProportionGraduating(int subdivision) {

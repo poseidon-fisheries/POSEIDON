@@ -38,8 +38,7 @@ public class EpsilonGreedyBanditAlgorithm implements BanditAlgorithm {
 
     private double explorationProbability;
 
-    public EpsilonGreedyBanditAlgorithm(BanditAverage averages, double explorationProbability)
-    {
+    public EpsilonGreedyBanditAlgorithm(BanditAverage averages, double explorationProbability) {
         this.averages = averages;
         this.explorationProbability = explorationProbability;
     }
@@ -47,7 +46,7 @@ public class EpsilonGreedyBanditAlgorithm implements BanditAlgorithm {
     @Override
     public int chooseArm(MersenneTwisterFast random) {
 
-        if(random.nextDouble()<explorationProbability)
+        if (random.nextDouble() < explorationProbability)
             return random.nextInt(averages.getNumberOfArms());
 
 
@@ -55,17 +54,14 @@ public class EpsilonGreedyBanditAlgorithm implements BanditAlgorithm {
         max = Double.isFinite(max) ? max : 0; //if it's NaN turn it into a 0
         ArrayList<Integer> maxIndices = new ArrayList<>();
         maxIndices.add(0);
-        for(int i=1; i<averages.getNumberOfArms(); i++)
-        {
+        for (int i = 1; i < averages.getNumberOfArms(); i++) {
             double average = averages.getAverage(i);
             average = Double.isFinite(average) ? average : 0; //if it's NaN turn it into a 0
-            if(average > max)
-            {
+            if (average > max) {
                 max = average;
-                 maxIndices = new ArrayList<>();
+                maxIndices = new ArrayList<>();
                 maxIndices.add(i);
-            }
-            else if(average ==max)
+            } else if (average == max)
                 maxIndices.add(i);
         }
 
@@ -73,14 +69,12 @@ public class EpsilonGreedyBanditAlgorithm implements BanditAlgorithm {
         return maxIndices.get(random.nextInt(maxIndices.size()));
 
 
-
-
     }
 
     @Override
     public void observeReward(double reward, int armPlayed) {
 
-       averages.observeReward(reward, armPlayed);
+        averages.observeReward(reward, armPlayed);
     }
 
     /**

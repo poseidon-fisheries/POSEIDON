@@ -26,30 +26,21 @@ import org.apache.commons.math3.distribution.GammaDistribution;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.Arrays;
-
 /**
  * gamma distributed VB growth matrix
  */
 public class SullivanTransitionProbability {
 
 
+    //cannot go bigger than this times lInfinity
+    private final static double L_MAX_TO_LINFINITY = 1.2;
     /**
      * what they call "beta" in the paper (incorrectly, since beta is the name not of the scale but the rate!)
      */
     private final double gammaScaleParameter;
-
     private final double lInfinity;
-
     private final double vbkGrowthParameter;
-
     private final int numberOfBins;
-
-
-    //cannot go bigger than this times lInfinity
-    private final static double L_MAX_TO_LINFINITY = 1.2;
-
-
     /**
      * transition matrix; [departingBin][arrivingBin]
      */
@@ -62,22 +53,24 @@ public class SullivanTransitionProbability {
 
 
     public SullivanTransitionProbability(
-            double gammaScaleParameter,
-            double lInfinity,
-            double vbkGrowthParameter,
-            int numberOfBins,
-            int binLengthInCm) {
+        double gammaScaleParameter,
+        double lInfinity,
+        double vbkGrowthParameter,
+        int numberOfBins,
+        int binLengthInCm
+    ) {
 
-        this(gammaScaleParameter,lInfinity,vbkGrowthParameter,numberOfBins,binLengthInCm,1.0);
+        this(gammaScaleParameter, lInfinity, vbkGrowthParameter, numberOfBins, binLengthInCm, 1.0);
     }
 
     public SullivanTransitionProbability(
-            double gammaScaleParameter,
-            double lInfinity,
-            double vbkGrowthParameter,
-            int numberOfBins,
-            int binLengthInCm,
-            double scaling) {
+        double gammaScaleParameter,
+        double lInfinity,
+        double vbkGrowthParameter,
+        int numberOfBins,
+        int binLengthInCm,
+        double scaling
+    ) {
         this.gammaScaleParameter = gammaScaleParameter;
         this.lInfinity = lInfinity;
         this.vbkGrowthParameter = vbkGrowthParameter;
@@ -88,78 +81,50 @@ public class SullivanTransitionProbability {
         gammaTransitionMatrix(binLengthInCm);
     }
 
+    private void gammaTransitionMatrix(double binLengthInCm) {
 
-    public SullivanTransitionProbability(
-            double gammaScaleParameter,
-            double lInfinity,
-            double vbkGrowthParameter,
-            double scaling,
-            int subdivision, //transition matrix for one sex of the species
-            Species species) {
-        this.gammaScaleParameter = gammaScaleParameter;
-        this.lInfinity = lInfinity;
-        this.vbkGrowthParameter = vbkGrowthParameter;
+        //compute upper, lower and mid bins
+        double[] midLengths = new double[numberOfBins];
 
-        this.scaling = scaling;
-        this.numberOfBins = species.getNumberOfBins();
 
-        transitionMatrix = new double[species.getNumberOfBins()][species.getNumberOfBins()];
+        for (int i = 0; i < midLengths.length; i++) {
 
-        double[] midLengths = new double[species.getNumberOfBins()];
-        for(int i=0; i<midLengths.length; i++)
-            midLengths[i]= species.getLength(subdivision,i);
+            midLengths[i] = i * binLengthInCm + (binLengthInCm) / 2.0;
+
+
+        }
+
 
         gammaTransitionMatrix(midLengths);
+
     }
 
-
     //build it given midlengths (will assume lower and upper lengths are in between the midlengths)
-    private void gammaTransitionMatrix(double[] midLengths){
+    private void gammaTransitionMatrix(double[] midLengths) {
 
         //compute upper, lower and mid bins
         double[] lowerLengths = new double[numberOfBins];
         double[] upperLengths = new double[numberOfBins];
         //also compute the average growth and the corresponding alpha
-        double[] deltaL = new  double[numberOfBins]; //this is the vbk growth from midlength
+        double[] deltaL = new double[numberOfBins]; //this is the vbk growth from midlength
         double[] alphaL = new double[numberOfBins]; //this is shape of growth when made stochastic
 
-        for(int i=0;i<midLengths.length; i++) {
-            lowerLengths[i] = i == 0 ? 0 : (midLengths[i-1] + midLengths[i])/2.0;
-            upperLengths[i] =  i == midLengths.length-1 ?
-                    midLengths[i] + (midLengths[i] - midLengths[i])/2.0 :
-                    (midLengths[i+1] + midLengths[i])/2.0;
+        for (int i = 0; i < midLengths.length; i++) {
+            lowerLengths[i] = i == 0 ? 0 : (midLengths[i - 1] + midLengths[i]) / 2.0;
+            upperLengths[i] = i == midLengths.length - 1 ?
+                midLengths[i] + (midLengths[i] - midLengths[i]) / 2.0 :
+                (midLengths[i + 1] + midLengths[i]) / 2.0;
 
 
-            deltaL[i] = (lInfinity-midLengths[i])*(1-Math.exp(-vbkGrowthParameter));
-            deltaL[i] = deltaL[i]* scaling;
-            alphaL[i] =  (midLengths[i]+deltaL[i])/gammaScaleParameter;
+            deltaL[i] = (lInfinity - midLengths[i]) * (1 - Math.exp(-vbkGrowthParameter));
+            deltaL[i] = deltaL[i] * scaling;
+            alphaL[i] = (midLengths[i] + deltaL[i]) / gammaScaleParameter;
 
 
         }
 
 
         gammaTransitionMatrix(lowerLengths, upperLengths, alphaL);
-
-    }
-
-
-    private void gammaTransitionMatrix(double binLengthInCm){
-
-        //compute upper, lower and mid bins
-        double[] midLengths = new double[numberOfBins];
-
-
-        for(int i=0;i<midLengths.length; i++) {
-
-            midLengths[i] = i * binLengthInCm + (binLengthInCm)/2.0;
-
-
-
-
-        }
-
-
-        gammaTransitionMatrix(midLengths);
 
     }
 
@@ -172,19 +137,19 @@ public class SullivanTransitionProbability {
                     transitionMatrix[departure][arrival] = 0.0; //can't grow down
                 else if (departure == arrival)
                     transitionMatrix[departure][arrival] =
-                            arrival == numberOfBins - 1 ? 1.0 :
-                                    fromBin.cumulativeProbability(
-                                            upperLengths[arrival]); //gamma up to lowest bin should be counted
+                        arrival == numberOfBins - 1 ? 1.0 :
+                            fromBin.cumulativeProbability(
+                                upperLengths[arrival]); //gamma up to lowest bin should be counted
                     //don't let the fish grow a lot more than L_INF
-                else if( upperLengths[arrival] >= L_MAX_TO_LINFINITY * lInfinity)
-                    transitionMatrix[departure][arrival]=0;
+                else if (upperLengths[arrival] >= L_MAX_TO_LINFINITY * lInfinity)
+                    transitionMatrix[departure][arrival] = 0;
                 else if (departure < arrival & arrival == numberOfBins - 1) //if you are at the edge, upper
                     // probability is always 1
                     transitionMatrix[departure][arrival] = 1 - fromBin.cumulativeProbability(lowerLengths[arrival]);
                 else if (departure < arrival)
                     transitionMatrix[departure][arrival] =
-                            fromBin.cumulativeProbability(upperLengths[arrival]) - fromBin.cumulativeProbability(
-                                    lowerLengths[arrival]);
+                        fromBin.cumulativeProbability(upperLengths[arrival]) - fromBin.cumulativeProbability(
+                            lowerLengths[arrival]);
 
 
                 //don't bother with probabilities below 0.00001
@@ -201,24 +166,44 @@ public class SullivanTransitionProbability {
         }
     }
 
-
-
+    private void normalizeToOne(double[] array) {
+        double sum = sumArray(array);
+        for (int i = 0; i < array.length; i++) {
+            array[i] /= sum;
+        }
+    }
 
     private double sumArray(double[] array) {
         double sum = 0;
         for (double element : array) {
-            sum+=element;
+            sum += element;
         }
         return sum;
     }
 
-    private void normalizeToOne(double[] array){
-        double sum = sumArray(array);
-        for (int i = 0; i < array.length; i++) {
-            array[i]/=sum;
-        }
-    }
+    public SullivanTransitionProbability(
+        double gammaScaleParameter,
+        double lInfinity,
+        double vbkGrowthParameter,
+        double scaling,
+        int subdivision, //transition matrix for one sex of the species
+        Species species
+    ) {
+        this.gammaScaleParameter = gammaScaleParameter;
+        this.lInfinity = lInfinity;
+        this.vbkGrowthParameter = vbkGrowthParameter;
 
+        this.scaling = scaling;
+        this.numberOfBins = species.getNumberOfBins();
+
+        transitionMatrix = new double[species.getNumberOfBins()][species.getNumberOfBins()];
+
+        double[] midLengths = new double[species.getNumberOfBins()];
+        for (int i = 0; i < midLengths.length; i++)
+            midLengths[i] = species.getLength(subdivision, i);
+
+        gammaTransitionMatrix(midLengths);
+    }
 
     /**
      * Getter for property 'gammaScaleParameter'.

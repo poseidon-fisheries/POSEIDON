@@ -34,15 +34,16 @@ public interface BiomassAllocator {
     /**
      * Returns a positive number representing the weight in terms of either
      * biomass or carrying capacity (or whatever else the allocator is used for)
-     * @param tile tile to allocate a weight to
-     * @param map general map information
+     *
+     * @param tile   tile to allocate a weight to
+     * @param map    general map information
      * @param random
      * @return
      */
     public double allocate(
-            SeaTile tile, NauticalMap map,
-            MersenneTwisterFast random);
-
+        SeaTile tile, NauticalMap map,
+        MersenneTwisterFast random
+    );
 
 
 }

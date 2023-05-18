@@ -37,58 +37,66 @@ public class SimpleOptimizationParameterTest {
 
     @Test
     public void twoStepsWork() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        PrototypeScenario scenario  = new PrototypeScenario();
-        FromLeftToRightFactory biologyInitializer = new FromLeftToRightFactory();
+        final PrototypeScenario scenario = new PrototypeScenario();
+        final FromLeftToRightFactory biologyInitializer = new FromLeftToRightFactory();
 
         biologyInitializer.setExponent(new FixedDoubleParameter(100));
         scenario.setBiologyInitializer(biologyInitializer);
 
 
         assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getFixedValue(),
-                     100,.0001);
-
-        SimpleOptimizationParameter parameter = new SimpleOptimizationParameter(
-                "biologyInitializer.exponent",
-                0,200
+            100, .0001
         );
 
-        parameter.parametrize(scenario,
-                              new double[]{10});
+        final SimpleOptimizationParameter parameter = new SimpleOptimizationParameter(
+            "biologyInitializer.exponent",
+            0, 200
+        );
+
+        parameter.parametrize(
+            scenario,
+            new double[]{10}
+        );
 
 
         assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getFixedValue(),
-                     200,.0001);
+            200, .0001
+        );
     }
 
     @Test
     public void oneStepWork() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        PrototypeScenario scenario  = new PrototypeScenario();
+        final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setSpeedInKmh(new FixedDoubleParameter(150));
 
 
         assertEquals(((FixedDoubleParameter) scenario.getSpeedInKmh()).getFixedValue(),
-                     150,.0001);
-
-        SimpleOptimizationParameter parameter = new SimpleOptimizationParameter(
-                "speedInKmh",
-                0,20
+            150, .0001
         );
 
-        parameter.parametrize(scenario,
-                              new double[]{0});
+        final SimpleOptimizationParameter parameter = new SimpleOptimizationParameter(
+            "speedInKmh",
+            0, 20
+        );
+
+        parameter.parametrize(
+            scenario,
+            new double[]{0}
+        );
 
         assertEquals(((FixedDoubleParameter) scenario.getSpeedInKmh()).getFixedValue(),
-                     10,.0001);
+            10, .0001
+        );
     }
 
     @Test
     public void indexedWorks() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        PrototypeScenario scenario  = new PrototypeScenario();
-        MultipleIndependentSpeciesBiomassFactory biology = new MultipleIndependentSpeciesBiomassFactory();
+        final PrototypeScenario scenario = new PrototypeScenario();
+        final MultipleIndependentSpeciesBiomassFactory biology = new MultipleIndependentSpeciesBiomassFactory();
         scenario.setBiologyInitializer(biology);
         biology.getFactories().clear();
-        SingleSpeciesBiomassFactory first = new SingleSpeciesBiomassFactory();
-        SingleSpeciesBiomassFactory second = new SingleSpeciesBiomassFactory();
+        final SingleSpeciesBiomassFactory first = new SingleSpeciesBiomassFactory();
+        final SingleSpeciesBiomassFactory second = new SingleSpeciesBiomassFactory();
         biology.getFactories().add(first);
         biology.getFactories().add(second);
 
@@ -97,28 +105,36 @@ public class SimpleOptimizationParameterTest {
 
 
         assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getFixedValue(),
-                     .567,.0001);
+            .567, .0001
+        );
         assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getFixedValue(),
-                     .567,.0001);
-
-
-        SimpleOptimizationParameter parameter = new SimpleOptimizationParameter(
-                "biologyInitializer.factories$1.grower.steepness",
-                10,20
+            .567, .0001
         );
 
-        parameter.parametrize(scenario,
-                              new double[]{-10});
 
-        OptimizationParameter.navigateAndSet(scenario,
-                                             "biologyInitializer.factories$1.grower.steepness",
-                                             new FixedDoubleParameter(10));
+        final SimpleOptimizationParameter parameter = new SimpleOptimizationParameter(
+            "biologyInitializer.factories$1.grower.steepness",
+            10, 20
+        );
+
+        parameter.parametrize(
+            scenario,
+            new double[]{-10}
+        );
+
+        OptimizationParameter.navigateAndSet(
+            scenario,
+            "biologyInitializer.factories$1.grower.steepness",
+            new FixedDoubleParameter(10)
+        );
 
 
         assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getFixedValue(),
-                     .567,.0001);
+            .567, .0001
+        );
         assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getFixedValue(),
-                     10,.0001);
+            10, .0001
+        );
     }
 
 

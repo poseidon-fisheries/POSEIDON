@@ -34,18 +34,14 @@ import java.util.function.Function;
  */
 public class CsvColumnToList {
 
+    private final Function<Double, Double> transformer;
     private String pathToCSV;
-
     private boolean headerInFile;
-
     private char separator;
-
     private int columnNumber;
 
-    private final Function<Double,Double> transformer;
 
-
-    public CsvColumnToList(String pathToCSV, boolean headerInFile, char separator,  int columnNumber) {
+    public CsvColumnToList(String pathToCSV, boolean headerInFile, char separator, int columnNumber) {
         this.pathToCSV = pathToCSV;
         this.headerInFile = headerInFile;
         this.separator = separator;
@@ -55,8 +51,9 @@ public class CsvColumnToList {
     }
 
     public CsvColumnToList(
-            String pathToCSV, boolean headerInFile, char separator, int columnNumber,
-            Function<Double, Double> transformer) {
+        String pathToCSV, boolean headerInFile, char separator, int columnNumber,
+        Function<Double, Double> transformer
+    ) {
         this.pathToCSV = pathToCSV;
         this.headerInFile = headerInFile;
         this.separator = separator;
@@ -64,28 +61,27 @@ public class CsvColumnToList {
         this.transformer = transformer;
     }
 
-    public LinkedList<Double> readColumn()
-    {
+    public LinkedList<Double> readColumn() {
 
 
         //turn the csv column into a list of doubles
         try {
-            CSVReader  reader = new CSVReader(new FileReader(pathToCSV), separator);
+            CSVReader reader = new CSVReader(new FileReader(pathToCSV), separator);
 
 
             Iterator<String[]> iterator = reader.iterator();
 
-            if(headerInFile)
+            if (headerInFile)
                 iterator.next();
 
             LinkedList<Double> column = new LinkedList<Double>();
-            while(iterator.hasNext())
+            while (iterator.hasNext())
                 column.add(transformer.apply(Double.parseDouble(iterator.next()[columnNumber])));
 
             reader.close();
             return column;
         } catch (IOException e) {
-            throw new RuntimeException("failed to read or parse " + pathToCSV  + " with exception " + e);
+            throw new RuntimeException("failed to read or parse " + pathToCSV + " with exception " + e);
         }
     }
 
@@ -99,40 +95,21 @@ public class CsvColumnToList {
     }
 
     /**
-     * Getter for property 'headerInFile'.
-     *
-     * @return Value for property 'headerInFile'.
-     */
-    public boolean isHeaderInFile() {
-        return headerInFile;
-    }
-
-    /**
-     * Getter for property 'separator'.
-     *
-     * @return Value for property 'separator'.
-     */
-    public char getSeparator() {
-        return separator;
-    }
-
-    /**
-     * Getter for property 'columnNumber'.
-     *
-     * @return Value for property 'columnNumber'.
-     */
-    public int getColumnNumber() {
-        return columnNumber;
-    }
-
-
-    /**
      * Setter for property 'pathToCSV'.
      *
      * @param pathToCSV Value to set for property 'pathToCSV'.
      */
     public void setPathToCSV(String pathToCSV) {
         this.pathToCSV = pathToCSV;
+    }
+
+    /**
+     * Getter for property 'headerInFile'.
+     *
+     * @return Value for property 'headerInFile'.
+     */
+    public boolean isHeaderInFile() {
+        return headerInFile;
     }
 
     /**
@@ -145,12 +122,30 @@ public class CsvColumnToList {
     }
 
     /**
+     * Getter for property 'separator'.
+     *
+     * @return Value for property 'separator'.
+     */
+    public char getSeparator() {
+        return separator;
+    }
+
+    /**
      * Setter for property 'separator'.
      *
      * @param separator Value to set for property 'separator'.
      */
     public void setSeparator(char separator) {
         this.separator = separator;
+    }
+
+    /**
+     * Getter for property 'columnNumber'.
+     *
+     * @return Value for property 'columnNumber'.
+     */
+    public int getColumnNumber() {
+        return columnNumber;
     }
 
     /**

@@ -25,7 +25,7 @@ import ec.util.MersenneTwisterFast;
 
 /**
  * A uniformly distributed double will be returned each time
- *
+ * <p>
  * Created by carrknight on 6/7/15.
  */
 public class UniformDoubleParameter implements DoubleParameter {
@@ -52,7 +52,7 @@ public class UniformDoubleParameter implements DoubleParameter {
     @Override
     public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast) {
         Preconditions.checkArgument(maximum >= minimum, "maximum is not bigger than minimum");
-        return (maximum-minimum)*mersenneTwisterFast.nextDouble(true,true)+minimum;
+        return (maximum - minimum) * mersenneTwisterFast.nextDouble(true, true) + minimum;
     }
 
     public double getMinimum() {
@@ -73,6 +73,6 @@ public class UniformDoubleParameter implements DoubleParameter {
 
     @Override
     public UniformDoubleParameter makeCopy() {
-        return new UniformDoubleParameter(minimum,maximum);
+        return new UniformDoubleParameter(minimum, maximum);
     }
 }

@@ -36,16 +36,17 @@ public class BatchTest {
 
 
         BatchRunner runner = new BatchRunner(
-                Paths.get("inputs", "first_paper", "fronts.yaml"),
-                2,
-                Lists.newArrayList(
-                        "Average Cash-Flow",
-                        "Average Distance From Port"
-                ),
-                Paths.get("output", "batch"),
-                null,
-                0l,
-                null);
+            Paths.get("inputs", "first_paper", "fronts.yaml"),
+            2,
+            Lists.newArrayList(
+                "Average Cash-Flow",
+                "Average Distance From Port"
+            ),
+            Paths.get("output", "batch"),
+            null,
+            0l,
+            null
+        );
 
         runner.run(null);
         runner.run(null);

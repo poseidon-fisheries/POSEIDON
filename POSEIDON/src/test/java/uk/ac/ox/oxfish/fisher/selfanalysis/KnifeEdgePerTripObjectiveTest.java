@@ -43,15 +43,15 @@ public class KnifeEdgePerTripObjectiveTest {
         Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
         TripLogger logger = new TripLogger();
         logger.setNumberOfSpecies(1);
-        logger.newTrip(0,0, fisher);
+        logger.newTrip(0, 0, fisher);
         logger.recordCosts(100);
-        logger.recordEarnings(0,1,100);
+        logger.recordEarnings(0, 1, 100);
         logger.finishTrip(10, mock(Port.class), fisher);
 
-        logger.newTrip(0,0, fisher);
+        logger.newTrip(0, 0, fisher);
         logger.recordCosts(100);
-        logger.recordEarnings(0,1,200);
-        logger.finishTrip(10,mock(Port.class), fisher);
+        logger.recordEarnings(0, 1, 200);
+        logger.finishTrip(10, mock(Port.class), fisher);
         when(fisher.getFinishedTrips()).thenReturn(logger.getFinishedTrips());
         when(fisher.getLastFinishedTrip()).thenReturn(logger.getLastFinishedTrip());
 

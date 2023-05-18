@@ -1,14 +1,11 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.FixedRestTimeDepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.MaxHoursPerYearDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
-public class MaxHoursOutWithRestingTimeDepartingStrategy implements AlgorithmFactory<CompositeDepartingStrategy>
-{
+public class MaxHoursOutWithRestingTimeDepartingStrategy implements AlgorithmFactory<CompositeDepartingStrategy> {
 
     private MaxHoursPerYearDepartingFactory firstDelegate = new MaxHoursPerYearDepartingFactory();
 
@@ -18,8 +15,8 @@ public class MaxHoursOutWithRestingTimeDepartingStrategy implements AlgorithmFac
     @Override
     public CompositeDepartingStrategy apply(FishState fishState) {
         return new CompositeDepartingStrategy(
-                firstDelegate.apply(fishState),
-                fixedRest.apply(fishState)
+            firstDelegate.apply(fishState),
+            fixedRest.apply(fishState)
         );
     }
 

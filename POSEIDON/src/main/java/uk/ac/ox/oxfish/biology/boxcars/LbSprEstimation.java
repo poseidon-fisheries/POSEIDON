@@ -11,8 +11,6 @@ import eva2.problems.SimpleProblemWrapper;
 import eva2.problems.simple.SimpleProblemDouble;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -21,7 +19,7 @@ import java.util.Arrays;
 /**
  * class to compute Length-based SPR the way Hordyk does it (maximize log-likelihood, changing mortality and selectivity)
  */
-public class LbSprEstimation extends SimpleProblemDouble{
+public class LbSprEstimation extends SimpleProblemDouble {
 
     private final double[] catchAtLengthObserved;
     private final double Linf;
@@ -32,12 +30,12 @@ public class LbSprEstimation extends SimpleProblemDouble{
     private final double bVariableLengthToWeightConversion;
 
 
-
-
-    public LbSprEstimation(double[] catchAtLengthObserved, double linf,
-                           double coefficientVariationLinf, double[] binMids,
-                           double mkRatio, double[] maturityPerBin,
-                           double bVariableLengthToWeightConversion) {
+    public LbSprEstimation(
+        double[] catchAtLengthObserved, double linf,
+        double coefficientVariationLinf, double[] binMids,
+        double mkRatio, double[] maturityPerBin,
+        double bVariableLengthToWeightConversion
+    ) {
         this.catchAtLengthObserved = catchAtLengthObserved;
         Linf = linf;
         this.coefficientVariationLinf = coefficientVariationLinf;
@@ -48,30 +46,39 @@ public class LbSprEstimation extends SimpleProblemDouble{
     }
 
 
-    public static LBSPREstimate  computeSPR(double[] catchAtLengthObserved, double linf,
-                                    double coefficientVariationLinf, double[] binMids,
-                                    double mkRatio, double[] maturityPerBin,
-                                    double bVariableLengthToWeightConversion)
-    {
-        LbSprEstimation problem = new LbSprEstimation(catchAtLengthObserved, linf, coefficientVariationLinf, binMids, mkRatio, maturityPerBin, bVariableLengthToWeightConversion);
+    public static LBSPREstimate computeSPR(
+        double[] catchAtLengthObserved, double linf,
+        double coefficientVariationLinf, double[] binMids,
+        double mkRatio, double[] maturityPerBin,
+        double bVariableLengthToWeightConversion
+    ) {
+        LbSprEstimation problem = new LbSprEstimation(
+            catchAtLengthObserved,
+            linf,
+            coefficientVariationLinf,
+            binMids,
+            mkRatio,
+            maturityPerBin,
+            bVariableLengthToWeightConversion
+        );
 
         SimpleProblemWrapper wrapper = new SimpleProblemWrapper();
         wrapper.setSimpleProblem(problem);
         wrapper.setParallelThreads(1);
         wrapper.setDefaultRange(1);
         final NelderMeadSimplex nelderMeadSimplex = NelderMeadSimplex.createNelderMeadSimplex(
-                wrapper
-                , null);
+            wrapper
+            , null);
         nelderMeadSimplex.setCheckRange(false);
         OptimizationParameters params = OptimizerFactory.makeParams(
-                nelderMeadSimplex,
-                15,wrapper
+            nelderMeadSimplex,
+            15, wrapper
 
         );
         params.setTerminator(new CombinedTerminator(
-                new EvaluationTerminator(500),
-                new FitnessConvergenceTerminator(),
-                false
+            new EvaluationTerminator(500),
+            new FitnessConvergenceTerminator(),
+            false
         ));
         //kill the error printer which EVA abuses
         PrintStream _err = System.err;
@@ -81,7 +88,7 @@ public class LbSprEstimation extends SimpleProblemDouble{
         }));
 
         double[] bestMultiplier = OptimizerFactory.optimizeToDouble(
-                params
+            params
         );
         System.setErr(_err);
 //        System.out.println("best is: " +
@@ -98,16 +105,18 @@ public class LbSprEstimation extends SimpleProblemDouble{
         double lengthForSelectivityAt95cm = lengthForSelectivityAt50cm + lengthForSelectivityAt50cm * selectivitySlope;
         double fishingMortalityToNaturalMortalityRatio = Math.exp(bestMultiplier[2]);
 
-        final TheoreticalSPR bestSPR = sprFormula(lengthForSelectivityAt50cm,
-                lengthForSelectivityAt95cm,
-                fishingMortalityToNaturalMortalityRatio,
-                100,
-                linf,
-                coefficientVariationLinf,
-                binMids,
-                mkRatio,
-                maturityPerBin,
-                bVariableLengthToWeightConversion);
+        final TheoreticalSPR bestSPR = sprFormula(
+            lengthForSelectivityAt50cm,
+            lengthForSelectivityAt95cm,
+            fishingMortalityToNaturalMortalityRatio,
+            100,
+            linf,
+            coefficientVariationLinf,
+            binMids,
+            mkRatio,
+            maturityPerBin,
+            bVariableLengthToWeightConversion
+        );
 
 //        SL50 <- exp(runOpt$par[1]) * Linf
 //        dSL50 <- exp(runOpt$par[2])
@@ -115,75 +124,101 @@ public class LbSprEstimation extends SimpleProblemDouble{
 //        FM <- exp(runOpt$par[3])
 
         return new LBSPREstimate(
-                bestSPR.getSpr(),
-                fishingMortalityToNaturalMortalityRatio,
-                lengthForSelectivityAt50cm,
-                lengthForSelectivityAt95cm,
-                problem.evaluate(bestMultiplier)[0]);
+            bestSPR.getSpr(),
+            fishingMortalityToNaturalMortalityRatio,
+            lengthForSelectivityAt50cm,
+            lengthForSelectivityAt95cm,
+            problem.evaluate(bestMultiplier)[0]
+        );
     }
 
+    //LBSPRgen in the Rcpp file
+    static public final TheoreticalSPR sprFormula(
+        double selectivityCmAt50Percent,
+        double selectivityCmAt95Percent,
+        double ratioFishingToNaturalMortality,
+        int maximumAge,
+        double Linf,
+        double coefficientVariationLinf,
+        double[] binMids,
+        double mkRatio,
+        double[] maturityPerBin, //todo check that L50-L95 make sense when it's jacknife
+        double bVariableLengthToWeightConversion
+    ) {
+
+        //build age-to-length key
+        final AgeToLength ageToLength =
+            buildAgeToLengthKey(binMids, mkRatio, Linf, coefficientVariationLinf, maximumAge);
+
+        return sprFormula(selectivityCmAt50Percent,
+            selectivityCmAt95Percent,
+            ratioFishingToNaturalMortality,
+            maximumAge,
+            binMids,
+            mkRatio,
+            maturityPerBin,
+            bVariableLengthToWeightConversion,
+            ageToLength
+        );
+
+
+    }
 
     @Override
     public double[] evaluate(double[] x) {
 
 
-
         return
-                new double[]{lbsprDistance(
-                        catchAtLengthObserved,
-                        x[0],
-                        x[1],
-                        x[2],
-                        100,
-                        Linf,
-                        coefficientVariationLinf,
-                        binMids,
-                        mkRatio,
-                        maturityPerBin,
-                        bVariableLengthToWeightConversion
-                )};
+            new double[]{lbsprDistance(
+                catchAtLengthObserved,
+                x[0],
+                x[1],
+                x[2],
+                100,
+                Linf,
+                coefficientVariationLinf,
+                binMids,
+                mkRatio,
+                maturityPerBin,
+                bVariableLengthToWeightConversion
+            )};
 
 
-    }
-
-    @Override
-    public int getProblemDimension() {
-        return 3;
     }
 
     /**
-     * @param binMids vector including the mid poitns of all bins
-     * @param mkRatio the ratio between natural mortality and growth coefficnet
-     * @param Linf length at infinity
+     * @param binMids                  vector including the mid poitns of all bins
+     * @param mkRatio                  the ratio between natural mortality and growth coefficnet
+     * @param Linf                     length at infinity
      * @param coefficientVariationLinf coefficient of variation assumed for Linf
-     * @param maximumAge the maximum age we want to build the key for
+     * @param maximumAge               the maximum age we want to build the key for
      * @return two object: the age-->key matrix and the relative length at age vector
      */
     static public final AgeToLength buildAgeToLengthKey(
-            double[] binMids,
-            double mkRatio,
-            double Linf,
-            double coefficientVariationLinf,
-            int maximumAge
-    ){
+        double[] binMids,
+        double mkRatio,
+        double Linf,
+        double coefficientVariationLinf,
+        int maximumAge
+    ) {
         //this is the mystical "Prob" matrix in LBSPR_ in the DLM toolkit
-        double ageToLengthKey[][] = new double[maximumAge+1][binMids.length];
+        double ageToLengthKey[][] = new double[maximumAge + 1][binMids.length];
 
 
-        double[] relativeLengthAtAge = new double[maximumAge+1];
-        for (int age = 0; age < maximumAge+1; age++) {
-            double xs =  age/((double)maximumAge);
-            relativeLengthAtAge[age] = 1 - Math.pow(0.01,xs/mkRatio);
+        double[] relativeLengthAtAge = new double[maximumAge + 1];
+        for (int age = 0; age < maximumAge + 1; age++) {
+            double xs = age / ((double) maximumAge);
+            relativeLengthAtAge[age] = 1 - Math.pow(0.01, xs / mkRatio);
             final double mean = relativeLengthAtAge[age] * Linf;
             final double sd = mean * coefficientVariationLinf;
 
-            if(sd > 0) {
-                NormalDistribution density =  new NormalDistribution(
-                        mean,
-                        sd
-                ) ;
+            if (sd > 0) {
+                NormalDistribution density = new NormalDistribution(
+                    mean,
+                    sd
+                );
                 double limit = density.density(
-                        mean + sd * 2.5
+                    mean + sd * 2.5
                 );
                 double sum = 0;
                 for (int lengthIndex = 0; lengthIndex < ageToLengthKey[age].length; lengthIndex++) {
@@ -193,45 +228,45 @@ public class LbSprEstimation extends SimpleProblemDouble{
 
                 }
                 //now normalize to 1!
-                if(sum>0)
+                if (sum > 0)
                     for (int lengthIndex = 0; lengthIndex < ageToLengthKey[age].length; lengthIndex++) {
                         ageToLengthKey[age][lengthIndex] = ageToLengthKey[age][lengthIndex] / sum;
 
                     }
-            }
-            else
-                Arrays.fill(ageToLengthKey[age],0d);
+            } else
+                Arrays.fill(ageToLengthKey[age], 0d);
 
         }
 
-        return new AgeToLength(ageToLengthKey,relativeLengthAtAge);
+        return new AgeToLength(ageToLengthKey, relativeLengthAtAge);
 
     }
 
 
     //LBSPRgen in the Rcpp file
     static public final TheoreticalSPR sprFormula(
-            double selectivityCmAt50Percent,
-            double selectivityCmAt95Percent,
-            double ratioFishingToNaturalMortality,
-            int maximumAge,
-            double[] binMids,
-            double mkRatio,
-            double[] maturityPerBin, //todo check that L50-L95 make sense when it's jacknife
-            double bVariableLengthToWeightConversion,
-            final AgeToLength ageToLength) {
+        double selectivityCmAt50Percent,
+        double selectivityCmAt95Percent,
+        double ratioFishingToNaturalMortality,
+        int maximumAge,
+        double[] binMids,
+        double mkRatio,
+        double[] maturityPerBin, //todo check that L50-L95 make sense when it's jacknife
+        double bVariableLengthToWeightConversion,
+        final AgeToLength ageToLength
+    ) {
         //logistic selectivity here
         double[] selectivityAtLength = new double[binMids.length];
         for (int bin = 0; bin < selectivityAtLength.length; bin++) {
             selectivityAtLength[bin] = 1d / (
-                    1 + Math.exp(-Math.log(19.0) * (binMids[bin] - selectivityCmAt50Percent) / (selectivityCmAt95Percent - selectivityCmAt50Percent))
+                1 + Math.exp(-Math.log(19.0) * (binMids[bin] - selectivityCmAt50Percent) / (selectivityCmAt95Percent - selectivityCmAt50Percent))
             );
         }
 
         double[][] catchesMatrix = new double[maximumAge + 1][binMids.length];
         double[] survivorsAtAge = new double[maximumAge + 1]; // this is Ns
-        double[] unfishedNumberAtAge = new double[maximumAge+1]; //this is N0
-        double[] maturityAtAge = new double[maximumAge+1]; //this is Ma
+        double[] unfishedNumberAtAge = new double[maximumAge + 1]; //this is N0
+        double[] maturityAtAge = new double[maximumAge + 1]; //this is Ma
 
         double cumulativeSelexAtAge = 0; //sum(Sx) in the original code
         for (int age = 0; age < catchesMatrix.length; age++) {
@@ -245,26 +280,25 @@ public class LbSprEstimation extends SimpleProblemDouble{
             }
 
             double ratioedSelex = cumulativeSelexAtAge / (age + 1); //MSX
-            survivorsAtAge[age] = Math.pow((1 - ageToLength.getRelativeLengthAtAge()[age]),
-                    mkRatio + (mkRatio * ratioFishingToNaturalMortality) * ratioedSelex
+            survivorsAtAge[age] = Math.pow(
+                (1 - ageToLength.getRelativeLengthAtAge()[age]),
+                mkRatio + (mkRatio * ratioFishingToNaturalMortality) * ratioedSelex
             );
-            unfishedNumberAtAge[age] = Math.pow(1-ageToLength.relativeLengthAtAge[age],mkRatio);
+            unfishedNumberAtAge[age] = Math.pow(1 - ageToLength.relativeLengthAtAge[age], mkRatio);
         }
 
         //compute and normalize catch at length
         double[] catchAtLength = new double[binMids.length];
         double sum = 0;
-        for (int lengthBin = 0; lengthBin < binMids.length; lengthBin++)
-        {
+        for (int lengthBin = 0; lengthBin < binMids.length; lengthBin++) {
             for (int age = 0; age < catchesMatrix.length; age++) {
                 catchAtLength[lengthBin] += survivorsAtAge[age] * catchesMatrix[age][lengthBin];
             }
-            sum+=catchAtLength[lengthBin];
+            sum += catchAtLength[lengthBin];
         }
         for (int i = 0; i < catchAtLength.length; i++) {
-            catchAtLength[i]=catchAtLength[i]/sum;
+            catchAtLength[i] = catchAtLength[i] / sum;
         }
-
 
 
         //SPR
@@ -272,96 +306,84 @@ public class LbSprEstimation extends SimpleProblemDouble{
         double unfishedEggs = 0;
         for (int age = 0; age < ageToLength.getRelativeLengthAtAge().length; age++) {
 
-            assert unfishedNumberAtAge[age]>= survivorsAtAge[age] : age;
+            assert unfishedNumberAtAge[age] >= survivorsAtAge[age] : age;
 
-            fishedEggs+= maturityAtAge[age] * survivorsAtAge[age] * Math.pow(ageToLength.relativeLengthAtAge[age],
-                    bVariableLengthToWeightConversion);
+            fishedEggs += maturityAtAge[age] * survivorsAtAge[age] * Math.pow(
+                ageToLength.relativeLengthAtAge[age],
+                bVariableLengthToWeightConversion
+            );
 
-            unfishedEggs+= maturityAtAge[age] * unfishedNumberAtAge[age] * Math.pow(ageToLength.relativeLengthAtAge[age],
-                    bVariableLengthToWeightConversion);
+            unfishedEggs += maturityAtAge[age] * unfishedNumberAtAge[age] * Math.pow(
+                ageToLength.relativeLengthAtAge[age],
+                bVariableLengthToWeightConversion
+            );
 
         }
 
-        assert fishedEggs<=unfishedEggs;
+        assert fishedEggs <= unfishedEggs;
 
-        return new TheoreticalSPR(fishedEggs/unfishedEggs,
-                catchAtLength);
-
-
-
-    }
-
-    //LBSPRgen in the Rcpp file
-    static public final TheoreticalSPR sprFormula(
-            double selectivityCmAt50Percent,
-            double selectivityCmAt95Percent,
-            double ratioFishingToNaturalMortality,
-            int maximumAge,
-            double Linf,
-            double coefficientVariationLinf,
-            double[] binMids,
-            double mkRatio,
-            double[] maturityPerBin, //todo check that L50-L95 make sense when it's jacknife
-            double bVariableLengthToWeightConversion) {
-
-        //build age-to-length key
-        final AgeToLength ageToLength =
-                buildAgeToLengthKey(binMids, mkRatio, Linf, coefficientVariationLinf, maximumAge);
-
-        return sprFormula(selectivityCmAt50Percent,selectivityCmAt95Percent,ratioFishingToNaturalMortality,maximumAge,
-                binMids,mkRatio,maturityPerBin,bVariableLengthToWeightConversion,ageToLength);
+        return new TheoreticalSPR(
+            fishedEggs / unfishedEggs,
+            catchAtLength
+        );
 
 
     }
-
 
     //LBSPRopt in the original cpp code
     static public double lbsprDistance(
-            double[] catchAtLengthObserved,
-            //these three are the variables of the model, they are logged because I think it helps with optim in R
-            double logSelectivityCmAt50PercentAsPercentageOfLinf,
-            double logSelectivitySlope,
-            double logRatioFishingToNaturalMortality,
-            int maximumAge,
-            double Linf,
-            double coefficientVariationLinf,
-            double[] binMids,
-            double mkRatio,
-            double[] maturityPerBin, //todo check that L50-L95 make sense when it's jacknife
-            double bVariableLengthToWeightConversion
+        double[] catchAtLengthObserved,
+        //these three are the variables of the model, they are logged because I think it helps with optim in R
+        double logSelectivityCmAt50PercentAsPercentageOfLinf,
+        double logSelectivitySlope,
+        double logRatioFishingToNaturalMortality,
+        int maximumAge,
+        double Linf,
+        double coefficientVariationLinf,
+        double[] binMids,
+        double mkRatio,
+        double[] maturityPerBin, //todo check that L50-L95 make sense when it's jacknife
+        double bVariableLengthToWeightConversion
 
-    ){
+    ) {
         final AgeToLength ageToLength =
-                buildAgeToLengthKey(binMids, mkRatio, Linf, coefficientVariationLinf, maximumAge);
+            buildAgeToLengthKey(binMids, mkRatio, Linf, coefficientVariationLinf, maximumAge);
 
         //rescale to useful
         double selectivityCmAt50Percent =
-                Math.exp(logSelectivityCmAt50PercentAsPercentageOfLinf) * Linf;
+            Math.exp(logSelectivityCmAt50PercentAsPercentageOfLinf) * Linf;
         double selectivityCmAt95Percent = selectivityCmAt50Percent +
-                Math.exp(logSelectivitySlope) * selectivityCmAt50Percent;
+            Math.exp(logSelectivitySlope) * selectivityCmAt50Percent;
         double ratioFishingToNaturalMortality =
-                Math.exp(logRatioFishingToNaturalMortality);
+            Math.exp(logRatioFishingToNaturalMortality);
 
         //normalize observed catch at length
         double[] catchAtLengthObservedNormalized = new double[catchAtLengthObserved.length];
         double totalCatches = 0;
         for (double caught : catchAtLengthObserved) {
-            totalCatches+=caught;
+            totalCatches += caught;
         }
         for (int bin = 0; bin < catchAtLengthObservedNormalized.length; bin++) {
-            catchAtLengthObservedNormalized[bin] = catchAtLengthObserved[bin]/totalCatches;
+            catchAtLengthObservedNormalized[bin] = catchAtLengthObserved[bin] / totalCatches;
         }
 
         //compute SPR in theory
-        final TheoreticalSPR theoreticalSPR = sprFormula(selectivityCmAt50Percent, selectivityCmAt95Percent, ratioFishingToNaturalMortality, maximumAge,
-                binMids, mkRatio, maturityPerBin, bVariableLengthToWeightConversion, ageToLength);
+        final TheoreticalSPR theoreticalSPR = sprFormula(selectivityCmAt50Percent,
+            selectivityCmAt95Percent,
+            ratioFishingToNaturalMortality,
+            maximumAge,
+            binMids,
+            mkRatio,
+            maturityPerBin,
+            bVariableLengthToWeightConversion,
+            ageToLength
+        );
 
         //compare and compute NLL
         double error = 0;
         for (int bin = 0; bin < catchAtLengthObservedNormalized.length; bin++) {
-            if(catchAtLengthObservedNormalized[bin]>0 & theoreticalSPR.getCatchesAtLength()[bin]>0)
-            {
-                error+= catchAtLengthObserved[bin] * Math.log(theoreticalSPR.getCatchesAtLength()[bin]/ catchAtLengthObservedNormalized[bin] );
+            if (catchAtLengthObservedNormalized[bin] > 0 & theoreticalSPR.getCatchesAtLength()[bin] > 0) {
+                error += catchAtLengthObserved[bin] * Math.log(theoreticalSPR.getCatchesAtLength()[bin] / catchAtLengthObservedNormalized[bin]);
             }
         }
 
@@ -375,9 +397,9 @@ public class LbSprEstimation extends SimpleProblemDouble{
   if (exp(pars(0)) >= 1) Pen=PenVal*exp(pars(0));
   NLL = NLL + Pen;
          */
-        BetaDistribution distribution = new BetaDistribution(5,0.1);
+        BetaDistribution distribution = new BetaDistribution(5, 0.1);
         final double expPar0 = Math.exp(logSelectivityCmAt50PercentAsPercentageOfLinf);
-        if(expPar0>=1)
+        if (expPar0 >= 1)
             penalization = penalizationValue * expPar0;
         else
             penalization = distribution.density(expPar0) * penalizationValue;
@@ -387,13 +409,14 @@ public class LbSprEstimation extends SimpleProblemDouble{
         return -error;
 
 
-
     }
 
+    @Override
+    public int getProblemDimension() {
+        return 3;
+    }
 
-
-
-    public static class TheoreticalSPR{
+    public static class TheoreticalSPR {
 
         private final double spr;
 
@@ -414,7 +437,7 @@ public class LbSprEstimation extends SimpleProblemDouble{
         }
     }
 
-    public static class AgeToLength{
+    public static class AgeToLength {
 
         private final double[][] ageToLengthKey;
 
@@ -448,7 +471,13 @@ public class LbSprEstimation extends SimpleProblemDouble{
         private final double likelihood;
 
 
-        public LBSPREstimate(double spr, double fishingToNaturalMortalityRatio, double lengthAt50PercentSelectivity, double lengthAt95PercentSelectivity, double likelihood) {
+        public LBSPREstimate(
+            double spr,
+            double fishingToNaturalMortalityRatio,
+            double lengthAt50PercentSelectivity,
+            double lengthAt95PercentSelectivity,
+            double likelihood
+        ) {
             this.spr = spr;
             this.fishingToNaturalMortalityRatio = fishingToNaturalMortalityRatio;
             this.lengthAt50PercentSelectivity = lengthAt50PercentSelectivity;
@@ -481,12 +510,12 @@ public class LbSprEstimation extends SimpleProblemDouble{
         @Override
         public String toString() {
             return MoreObjects.toStringHelper(this)
-                    .add("spr", spr)
-                    .add("fishingToNaturalMortalityRatio", fishingToNaturalMortalityRatio)
-                    .add("lengthAt50PercentSelectivity", lengthAt50PercentSelectivity)
-                    .add("lengthAt95PercentSelectivity", lengthAt95PercentSelectivity)
-                    .add("likelihood", likelihood)
-                    .toString();
+                .add("spr", spr)
+                .add("fishingToNaturalMortalityRatio", fishingToNaturalMortalityRatio)
+                .add("lengthAt50PercentSelectivity", lengthAt50PercentSelectivity)
+                .add("lengthAt95PercentSelectivity", lengthAt95PercentSelectivity)
+                .add("likelihood", likelihood)
+                .toString();
         }
     }
 

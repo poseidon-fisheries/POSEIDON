@@ -20,10 +20,12 @@ public class SurplusProductionResult {
     private final double[] biomass;
 
 
-    public SurplusProductionResult(double carryingCapacity,
-                                   double logisticGrowth,
-                                   double catchability, double[] depletion,
-                                   double[] cpue, double[] landings, double[] biomass) {
+    public SurplusProductionResult(
+        double carryingCapacity,
+        double logisticGrowth,
+        double catchability, double[] depletion,
+        double[] cpue, double[] landings, double[] biomass
+    ) {
         this.carryingCapacity = carryingCapacity;
         this.logisticGrowth = logisticGrowth;
         this.catchability = catchability;
@@ -65,13 +67,13 @@ public class SurplusProductionResult {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("carryingCapacity", carryingCapacity)
-                .add("logisticGrowth", logisticGrowth)
-                .add("catchability", catchability)
-                .add("depletion", depletion)
-                .add("cpue", cpue)
-                .add("landings", landings)
-                .add("biomass", biomass)
-                .toString();
+            .add("carryingCapacity", carryingCapacity)
+            .add("logisticGrowth", logisticGrowth)
+            .add("catchability", catchability)
+            .add("depletion", depletion)
+            .add("cpue", cpue)
+            .add("landings", landings)
+            .add("biomass", biomass)
+            .toString();
     }
 }

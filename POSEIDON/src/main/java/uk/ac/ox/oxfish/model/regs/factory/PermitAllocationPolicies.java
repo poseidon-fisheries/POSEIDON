@@ -20,10 +20,7 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import uk.ac.ox.oxfish.model.AdditionalStartable;
-import uk.ac.ox.oxfish.model.regs.AllowAllAllocationPolicy;
 import uk.ac.ox.oxfish.model.regs.ExogenousPercentagePermitFactory;
-import uk.ac.ox.oxfish.model.regs.MaxHoldSizeRandomAllocationPolicy;
 import uk.ac.ox.oxfish.model.regs.PermitAllocationPolicy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;

@@ -50,7 +50,6 @@ public class ProfitFunctionRegressionTest {
         Log.info("Makes sure that the catches/hr regressed are correct!");
 
 
-
         //build a full model with one fisher
         FishState state = new FishState(System.currentTimeMillis());
 
@@ -68,17 +67,19 @@ public class ProfitFunctionRegressionTest {
 
         //profit regression uses nearest neighbor
         ProfitFunctionRegression regression = new ProfitFunctionRegression(
-                new ProfitFunction(24*5),
-                new NearestNeighborTransductionFactory(),
-                state
+            new ProfitFunction(24 * 5),
+            new NearestNeighborTransductionFactory(),
+            state
         );
         Fisher fisher = state.getFishers().get(0);
         fisher.addTripListener(new TripListener() {
             @Override
             public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-                regression.addObservation(new GeographicalObservation<>(record.getMostFishedTileInTrip(),
-                                                                        state.getHoursSinceStart(),
-                                                                        record),fisher,state
+                regression.addObservation(new GeographicalObservation<>(
+                        record.getMostFishedTileInTrip(),
+                        state.getHoursSinceStart(),
+                        record
+                    ), fisher, state
                 );
             }
         });
@@ -87,12 +88,13 @@ public class ProfitFunctionRegressionTest {
         //make him go to 20,20
         SeaTile target = state.getMap().getSeaTile(20, 20);
         fisher.setDestinationStrategy(new FavoriteDestinationStrategy(target));
-        for(int day=0; day<10; day++)
+        for (int day = 0; day < 10; day++)
             state.schedule.step(state);
         //if I predict the catches it ought to be exactly the same as what I get at 20,20
         double predictedCatchesPerHour = regression.apply(state.getMap().getSeaTile(20, 20))[0];
         assertEquals(predictedCatchesPerHour,
-                     target.getBiomass(state.getSpecies().get(0)) * .01,.001);
+            target.getBiomass(state.getSpecies().get(0)) * .01, .001
+        );
 
     }
 }

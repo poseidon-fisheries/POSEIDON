@@ -36,7 +36,7 @@ public class Delaying implements Action {
     private double hoursToWaste;
 
     public Delaying(double hoursToWaste) {
-        Preconditions.checkArgument(hoursToWaste>0);
+        Preconditions.checkArgument(hoursToWaste > 0);
         this.hoursToWaste = hoursToWaste;
     }
 
@@ -51,10 +51,11 @@ public class Delaying implements Action {
      */
     @Override
     public ActionResult act(
-            FishState model, Fisher agent, Regulation regulation, double hoursLeft) {
-        if(hoursLeft >= hoursToWaste)
-            return new ActionResult(new Arriving(),hoursLeft-hoursToWaste);
+        FishState model, Fisher agent, Regulation regulation, double hoursLeft
+    ) {
+        if (hoursLeft >= hoursToWaste)
+            return new ActionResult(new Arriving(), hoursLeft - hoursToWaste);
         else
-            return new ActionResult(new Delaying(hoursToWaste - hoursLeft),0);
+            return new ActionResult(new Delaying(hoursToWaste - hoursLeft), 0);
     }
 }

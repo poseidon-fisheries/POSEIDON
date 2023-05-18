@@ -51,22 +51,22 @@ public class MaxHoldSizeRandomAllocationPolicy implements PermitAllocationPolicy
      */
     @Override
     public List<Fisher> computeWhichFishersAreAllowed(
-            List<Fisher> participants, FishState state) {
+        List<Fisher> participants, FishState state
+    ) {
 
 
         System.out.println(state.getYear() + " --- " + state.getDay());
 
         ArrayList<Fisher> participantsCopy = new ArrayList<>(participants);
-        Collections.shuffle(participantsCopy,new Random(state.getRandom().nextLong()));
+        Collections.shuffle(participantsCopy, new Random(state.getRandom().nextLong()));
 
 
         List<Fisher> allowedFishers = new LinkedList<>();
         double sumOfHoldSize = 0;
         for (Fisher fisher : participantsCopy) {
-            if(fisher.getMaximumHold() + sumOfHoldSize <= maxCumulativeHoldSize)
-            {
+            if (fisher.getMaximumHold() + sumOfHoldSize <= maxCumulativeHoldSize) {
                 allowedFishers.add(fisher);
-                sumOfHoldSize+=fisher.getMaximumHold();
+                sumOfHoldSize += fisher.getMaximumHold();
             }
         }
 

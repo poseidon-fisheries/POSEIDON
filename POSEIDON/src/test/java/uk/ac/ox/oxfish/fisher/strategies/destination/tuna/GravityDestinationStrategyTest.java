@@ -21,16 +21,23 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.tuna;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
 public class GravityDestinationStrategyTest {
-
-    class A { void pr() { System.out.println(this.getClass());}}
-
-    class B extends A { void pr() { super.pr(); }}
 
     @Test
     public void name() {
         new B().pr();
+    }
+
+    class A {
+        void pr() {
+            System.out.println(this.getClass());
+        }
+    }
+
+    class B extends A {
+        void pr() {
+            super.pr();
+        }
     }
 
 }

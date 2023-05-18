@@ -55,11 +55,13 @@ public class FishingTest {
         Action fishing = new Fishing();
 
         Fisher agent = mock(Fisher.class);
-        when(agent.isAtDestination()).thenReturn(true); when(agent.getLocation()).thenReturn(new SeaTile(0,0,-1,
-                                                                                                         new TileHabitat(
-                                                                                                                 0d)));
-        fishing.act(mock(FishState.class), agent, new Anarchy(),1d );
-        verify(agent).fishHere(any(),anyInt(),any() );
+        when(agent.isAtDestination()).thenReturn(true);
+        when(agent.getLocation()).thenReturn(new SeaTile(0, 0, -1,
+            new TileHabitat(
+                0d)
+        ));
+        fishing.act(mock(FishState.class), agent, new Anarchy(), 1d);
+        verify(agent).fishHere(any(), anyInt(), any());
     }
 
 
@@ -79,35 +81,37 @@ public class FishingTest {
         Port port = new Port("Port 0", fishState.getMap().getSeaTile(1, 1), mock(MarketMap.class), 0);
 
         Gear gear = mock(Gear.class);
-        when(gear.fish(any(), any(),any() , anyInt(), any())).thenReturn(new Catch(species, 50.0, biology));
+        when(gear.fish(any(), any(), any(), anyInt(), any())).thenReturn(new Catch(species, 50.0, biology));
         Fisher fisher = new Fisher(0, port,
-                                   new MersenneTwisterFast(),
-                                   new AnarchyFactory().apply(fishState),
-                                   new FixedProbabilityDepartingStrategy(1.0, false),
-                                   new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
-                                   new FishingStrategy() {
-                                       @Override
-                                       public boolean shouldFish(
-                                               Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip) {
-                                           return true;
-                                       }
+            new MersenneTwisterFast(),
+            new AnarchyFactory().apply(fishState),
+            new FixedProbabilityDepartingStrategy(1.0, false),
+            new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
+            new FishingStrategy() {
+                @Override
+                public boolean shouldFish(
+                    Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip
+                ) {
+                    return true;
+                }
 
-                                       @Override
-                                       public void start(FishState model,Fisher fisher) {
+                @Override
+                public void start(FishState model, Fisher fisher) {
 
-                                       }
+                }
 
-                                       @Override
-                                       public void turnOff(Fisher fisher) {
+                @Override
+                public void turnOff(Fisher fisher) {
 
-                                       }
-                                   },
-                                   new FixedGearStrategy(),
-                                   new NoDiscarding(),
-                                   new IgnoreWeatherStrategy(),
-                                   new Boat(1, 1, new Engine(1, 1, 1), new FuelTank(1000000)),
-                                   new Hold(100.0, biology), gear,
-                                   1);
+                }
+            },
+            new FixedGearStrategy(),
+            new NoDiscarding(),
+            new IgnoreWeatherStrategy(),
+            new Boat(1, 1, new Engine(1, 1, 1), new FuelTank(1000000)),
+            new Hold(100.0, biology), gear,
+            1
+        );
         fisher.start(fishState);
         fisher.step(fishState);
         assertEquals(0, fisher.getTotalWeightOfCatchInHold(), .001);
@@ -124,7 +128,7 @@ public class FishingTest {
         //fish again does nothing because it's full
         fisher.step(fishState);
         assertEquals(100.0, fisher.getTotalWeightOfCatchInHold(), .001);
-        verify(gear,times(3)).fish(any(), any(),any() , anyInt(), any());
+        verify(gear, times(3)).fish(any(), any(), any(), anyInt(), any());
 
 
     }

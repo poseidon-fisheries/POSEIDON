@@ -33,7 +33,9 @@ public class ActionWeightsCache extends FisherValuesByActionFromFileCache<Double
 
     public static final ActionWeightsCache INSTANCE = new ActionWeightsCache();
 
-    ActionWeightsCache() { super(() -> 0.0); }
+    ActionWeightsCache() {
+        super(() -> 0.0);
+    }
 
     @Override
     protected Map<Integer, Map<String, Map<Class<? extends PurseSeinerAction>, Double>>> readValues(final Path valuesFile) {

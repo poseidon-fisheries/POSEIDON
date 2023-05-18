@@ -42,20 +42,22 @@ public class DerisoSchnuteIndependentGrowerTest {
         //numbers are from sablefish
 
         BiomassLocalBiology biology =
-                new BiomassLocalBiology(new double[]{527154d},
-                                        new double[]{527154d});
+            new BiomassLocalBiology(
+                new double[]{527154d},
+                new double[]{527154d}
+            );
 
         ArrayList<Double> biomasses = Lists.newArrayList(527154d, 527154d, 527154d, 527154d, 527154d, 527154d);
         DerisoSchnuteIndependentGrower grower =
-                new DerisoSchnuteIndependentGrower(
-                        biomasses, 1.03, 0.92311,
-                        0.6, 3, 0,
-                        1.03313,
-                        1.01604,
-                        527154d,
-                        29728.8
+            new DerisoSchnuteIndependentGrower(
+                biomasses, 1.03, 0.92311,
+                0.6, 3, 0,
+                1.03313,
+                1.01604,
+                527154d,
+                29728.8
 
-                );
+            );
 
         grower.getBiologies().add(biology);
 
@@ -65,7 +67,7 @@ public class DerisoSchnuteIndependentGrowerTest {
             grower.step(mock(FishState.class));
             System.out.println(biology.getCurrentBiomass()[0]);
         }
-        Assert.assertEquals(biology.getCurrentBiomass()[0],527154d,.001);
+        Assert.assertEquals(biology.getCurrentBiomass()[0], 527154d, .001);
 
     }
 
@@ -75,32 +77,34 @@ public class DerisoSchnuteIndependentGrowerTest {
         //numbers are from sablefish
 
         BiomassLocalBiology biology =
-                new BiomassLocalBiology(new double[]{527154d},
-                                        new double[]{527154d});
+            new BiomassLocalBiology(
+                new double[]{527154d},
+                new double[]{527154d}
+            );
 
         ArrayList<Double> biomasses = Lists.newArrayList(527154d, 527154d, 527154d, 527154d, 527154d, 527154d);
         DerisoSchnuteIndependentGrower grower =
-                new DerisoSchnuteIndependentGrower(
-                        biomasses, 1.03, 0.92311,
-                        0.6, 3, 0,
-                        1.03313,
-                        1.01604,
-                        527154d,
-                        29728.8
+            new DerisoSchnuteIndependentGrower(
+                biomasses, 1.03, 0.92311,
+                0.6, 3, 0,
+                1.03313,
+                1.01604,
+                527154d,
+                29728.8
 
-                );
+            );
 
         grower.getBiologies().add(biology);
 
         grower.start(mock(FishState.class));
 
         for (int i = 0; i < 20; i++) {
-            biology.getCurrentBiomass()[0] =  biology.getCurrentBiomass()[0]*.95; //5% mortality!
+            biology.getCurrentBiomass()[0] = biology.getCurrentBiomass()[0] * .95; //5% mortality!
             grower.step(mock(FishState.class));
             System.out.println(biology.getCurrentBiomass()[0]);
         }
 
-        Assert.assertEquals(297073.2,biology.getCurrentBiomass()[0],.0001);
+        Assert.assertEquals(297073.2, biology.getCurrentBiomass()[0], .0001);
     }
 
     @Test
@@ -111,41 +115,44 @@ public class DerisoSchnuteIndependentGrowerTest {
         double virginB = 8883d;
         double virginV = 85.13962;
         BiomassLocalBiology biology =
-                new BiomassLocalBiology(new double[]{virginB},
-                                        new double[]{virginB});
+            new BiomassLocalBiology(
+                new double[]{virginB},
+                new double[]{virginB}
+            );
 
         ArrayList<Double> biomasses = Lists.newArrayList(virginB, virginB, virginB, virginB, virginB,
-                                                         virginB, virginB, virginB, virginB, virginB,
-                                                         virginB, virginB, virginB, virginB, virginB,
-                                                         virginB, virginB, virginB, virginB, virginB,
-                                                         virginB, virginB);
+            virginB, virginB, virginB, virginB, virginB,
+            virginB, virginB, virginB, virginB, virginB,
+            virginB, virginB, virginB, virginB, virginB,
+            virginB, virginB
+        );
 
         //notice that these aren't the correct yelloweye numbers (rho is from sablefish)
         //but these were the numbers in the R script and the factual accuracy of the
         //biology is not important here, the numbers have to be the same though
 
         DerisoSchnuteIndependentGrower grower =
-                new DerisoSchnuteIndependentGrower(
-                        biomasses, 0.922, 0.95504,
-                        0.44056, 14, 0,
-                        1.11910,
-                        .63456,
-                        virginB,
-                        virginV
+            new DerisoSchnuteIndependentGrower(
+                biomasses, 0.922, 0.95504,
+                0.44056, 14, 0,
+                1.11910,
+                .63456,
+                virginB,
+                virginV
 
-                );
+            );
 
         grower.getBiologies().add(biology);
 
         grower.start(mock(FishState.class));
 
         for (int i = 0; i < 20; i++) {
-            biology.getCurrentBiomass()[0] =  biology.getCurrentBiomass()[0]*.95; //5% mortality!
+            biology.getCurrentBiomass()[0] = biology.getCurrentBiomass()[0] * .95; //5% mortality!
             grower.step(mock(FishState.class));
             System.out.println(biology.getCurrentBiomass()[0]);
         }
 
-        Assert.assertEquals(4184.71,biology.getCurrentBiomass()[0],.0001);
+        Assert.assertEquals(4184.71, biology.getCurrentBiomass()[0], .0001);
     }
 
     /*

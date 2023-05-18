@@ -18,14 +18,14 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A departing strategy that relies on a destination strategy: it will say we should leave port only

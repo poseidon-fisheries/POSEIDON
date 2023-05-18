@@ -31,6 +31,7 @@ public interface DataTarget extends Serializable {
 
     /**
      * computes distance from target (0 best, the higher the number the further away from optimum we are)
+     *
      * @param model model after it has been run
      * @return distance from target (0 best, the higher the number the further away from optimum we are)
      */

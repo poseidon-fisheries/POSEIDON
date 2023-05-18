@@ -18,10 +18,11 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import java.util.Map.Entry;
-import java.util.function.BiFunction;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+
+import java.util.Map.Entry;
+import java.util.function.BiFunction;
 
 /**
  * The idea of a "catch maker" is that you pass it a biology representing the available fish and a

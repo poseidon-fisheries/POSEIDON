@@ -64,7 +64,7 @@ public class AverageDataTarget implements DataTarget {
         Preconditions.checkArgument(iterator.hasNext(), "no observations to compute error!");
         iterator.forEachRemaining(statistics::accept);
 
-        return Math.abs(statistics.getAverage()-fixedTarget)/ weightInverse;
+        return Math.abs(statistics.getAverage() - fixedTarget) / weightInverse;
 
 
     }

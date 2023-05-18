@@ -34,20 +34,20 @@ public class GetterLocalBiologyTest {
     @Test
     public void getter() throws Exception {
 
-        Species species = mock(Species.class);
-        GetterLocalBiology localBiology =
-                new GetterLocalBiology(species,
-                                       state -> 10d + state.getDay());
+        final Species species = mock(Species.class);
+        final GetterLocalBiology localBiology =
+            new GetterLocalBiology(
+                species,
+                state -> 10d + state.getDay()
+            );
 
-        FishState state = mock(FishState.class);
+        final FishState state = mock(FishState.class);
         localBiology.start(state);
 
         when(state.getDay()).thenReturn(0);
-        assertEquals(localBiology.getBiomass(species),10d,.001);
+        assertEquals(localBiology.getBiomass(species), 10d, .001);
         when(state.getDay()).thenReturn(10);
-        assertEquals(localBiology.getBiomass(species),20d,.001);
-
-
+        assertEquals(localBiology.getBiomass(species), 20d, .001);
 
 
     }

@@ -46,26 +46,26 @@ public class AlwaysDiscardTheseSpeciesTest {
     @Test
     public void discard() throws Exception {
 
-        AlwaysDiscardTheseSpecies strategy = new AlwaysDiscardTheseSpecies(1,2);
-        Catch original = new Catch(new double[]{100,100,100});
+        AlwaysDiscardTheseSpecies strategy = new AlwaysDiscardTheseSpecies(1, 2);
+        Catch original = new Catch(new double[]{100, 100, 100});
         Catch postDiscard = strategy.chooseWhatToKeep(
-                null,
-                null,
-                original,
-                0,
-                null,
-                null,
-                null
+            null,
+            null,
+            original,
+            0,
+            null,
+            null,
+            null
         );
 
-        assertEquals(original.getTotalWeight(),300.0,.0001);
-        assertEquals(postDiscard.getTotalWeight(),100.0,.0001);
+        assertEquals(original.getTotalWeight(), 300.0, .0001);
+        assertEquals(postDiscard.getTotalWeight(), 100.0, .0001);
 
-        assertEquals(original.getWeightCaught(0),100.0,.0001);
-        assertEquals(postDiscard.getWeightCaught(0),100.0,.0001);
+        assertEquals(original.getWeightCaught(0), 100.0, .0001);
+        assertEquals(postDiscard.getWeightCaught(0), 100.0, .0001);
 
-        assertEquals(original.getWeightCaught(1),100.0,.0001);
-        assertEquals(postDiscard.getWeightCaught(1),0,.0001);
+        assertEquals(original.getWeightCaught(1), 100.0, .0001);
+        assertEquals(postDiscard.getWeightCaught(1), 0, .0001);
 
 
     }
@@ -75,39 +75,38 @@ public class AlwaysDiscardTheseSpeciesTest {
     public void discardAbundance() throws Exception {
 
         //set up copied from the holdsize test
-        Meristics first = new FromListMeristics(new double[]{100,100,100}, 2);
-        Meristics second = new FromListMeristics(new double[]{100,100},2);
+        Meristics first = new FromListMeristics(new double[]{100, 100, 100}, 2);
+        Meristics second = new FromListMeristics(new double[]{100, 100}, 2);
         Species firstSpecies = new Species("first", first);
-        Species secondSpecies = new Species("second",second);
+        Species secondSpecies = new Species("second", second);
 
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
 
 
-
-
         AlwaysDiscardTheseSpecies strategy = new AlwaysDiscardTheseSpecies(1);
-        double maleFirst[] = new double[]{100,100,100};
-        double femaleFirst[] = new double[]{20,20,20};
-        double maleSecond[] = new double[]{20,20};
-        double femaleSecond[] = new double[]{20,20};
+        double maleFirst[] = new double[]{100, 100, 100};
+        double femaleFirst[] = new double[]{20, 20, 20};
+        double maleSecond[] = new double[]{20, 20};
+        double femaleSecond[] = new double[]{20, 20};
         Catch original = new Catch(
-                new double[][]{maleFirst,maleSecond},
-                new double[][]{femaleFirst,femaleSecond},
-                bio
+            new double[][]{maleFirst, maleSecond},
+            new double[][]{femaleFirst, femaleSecond},
+            bio
         );
         FishState model = mock(FishState.class);
         when(model.getBiology()).thenReturn(bio);
         Catch end = strategy.chooseWhatToKeep(null, null, original, 1,
-                                                 mock(Regulation.class),
-                                                 model,
-                                                 new MersenneTwisterFast());
-        Assert.assertEquals(end.getWeightCaught(secondSpecies),0,.0001);
-        assertTrue(end.getWeightCaught(firstSpecies)>0);
+            mock(Regulation.class),
+            model,
+            new MersenneTwisterFast()
+        );
+        Assert.assertEquals(end.getWeightCaught(secondSpecies), 0, .0001);
+        assertTrue(end.getWeightCaught(firstSpecies) > 0);
         assertEquals(end.getAbundance(firstSpecies).asMatrix()
-                             [FishStateUtilities.MALE][1],100,.001);
+            [FishStateUtilities.MALE][1], 100, .001);
         assertEquals(end.getAbundance(firstSpecies).asMatrix()
-                             [FishStateUtilities.FEMALE][1],20,.001);
+            [FishStateUtilities.FEMALE][1], 20, .001);
 
 
     }

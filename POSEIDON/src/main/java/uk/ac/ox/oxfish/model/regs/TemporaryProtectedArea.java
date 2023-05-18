@@ -23,15 +23,13 @@ package uk.ac.ox.oxfish.model.regs;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * Created by carrknight on 7/26/16.
  */
-public class TemporaryProtectedArea implements Regulation
-{
+public class TemporaryProtectedArea implements Regulation {
 
 
     private final int firstDay;
@@ -47,24 +45,9 @@ public class TemporaryProtectedArea implements Regulation
     public TemporaryProtectedArea(int firstDay, int finalDay) {
         this.firstDay = firstDay;
         this.finalDay = finalDay;
-        Preconditions.checkArgument(firstDay<=finalDay);
+        Preconditions.checkArgument(firstDay <= finalDay);
 
     }
-
-    /**
-     * if it's the protected area season then return that delegate, otherwise return the anarchy delegate
-     * @param state link to the model (to get current date)
-     * @return appropriate delegate
-     */
-    private Regulation getCorrectDelegate(FishState state)
-    {
-        if(state.getDayOfTheYear() >= firstDay && state.getDayOfTheYear()<=finalDay)
-            return activeDelegate;
-        else
-            return inactiveDelegate;
-
-    }
-
 
     /**
      * can the agent fish at this location?
@@ -76,8 +59,23 @@ public class TemporaryProtectedArea implements Regulation
      */
     @Override
     public boolean canFishHere(
-            Fisher agent, SeaTile tile, FishState model, int timeStep) {
+        Fisher agent, SeaTile tile, FishState model, int timeStep
+    ) {
         return getCorrectDelegate(model).canFishHere(agent, tile, model, timeStep);
+    }
+
+    /**
+     * if it's the protected area season then return that delegate, otherwise return the anarchy delegate
+     *
+     * @param state link to the model (to get current date)
+     * @return appropriate delegate
+     */
+    private Regulation getCorrectDelegate(FishState state) {
+        if (state.getDayOfTheYear() >= firstDay && state.getDayOfTheYear() <= finalDay)
+            return activeDelegate;
+        else
+            return inactiveDelegate;
+
     }
 
     /**
@@ -90,7 +88,8 @@ public class TemporaryProtectedArea implements Regulation
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Species species, FishState model, int timeStep) {
+        Fisher agent, Species species, FishState model, int timeStep
+    ) {
         return getCorrectDelegate(model).maximumBiomassSellable(agent, species, model, timeStep);
     }
 
@@ -114,7 +113,7 @@ public class TemporaryProtectedArea implements Regulation
      */
     @Override
     public Regulation makeCopy() {
-        return new TemporaryProtectedArea(firstDay,finalDay);
+        return new TemporaryProtectedArea(firstDay, finalDay);
     }
 
     /**
@@ -122,8 +121,8 @@ public class TemporaryProtectedArea implements Regulation
      */
     @Override
     public void start(FishState model, Fisher fisher) {
-        activeDelegate.start(model,fisher);
-        inactiveDelegate.start(model,fisher);
+        activeDelegate.start(model, fisher);
+        inactiveDelegate.start(model, fisher);
     }
 
     /**

@@ -19,18 +19,19 @@
 
 package uk.ac.ox.oxfish.model.regs.fads;
 
+import com.google.common.collect.ImmutableSetMultimap;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
+import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutableSetMultimap;
 import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
-
-import com.google.common.collect.ImmutableSetMultimap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
-import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 
 public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
 
@@ -45,7 +46,9 @@ public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final Optional<SetLimits> setLimits;
 
-    public ActiveActionRegulations() { this(ImmutableSetMultimap.of()); }
+    public ActiveActionRegulations() {
+        this(ImmutableSetMultimap.of());
+    }
 
     private ActiveActionRegulations(
         final ImmutableSetMultimap<Class<? extends PurseSeinerAction>, ActionSpecificRegulation> actionSpecificRegulations

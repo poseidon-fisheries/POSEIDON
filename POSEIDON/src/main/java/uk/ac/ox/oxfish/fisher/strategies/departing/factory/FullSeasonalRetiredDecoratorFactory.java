@@ -92,6 +92,13 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
         );
     }
 
+    public DoubleParameter getInertia() {
+        return inertia;
+    }
+
+    public void setInertia(final DoubleParameter inertia) {
+        this.inertia = inertia;
+    }
 
     /**
      * Getter for property 'probabilityStartingFullTime'.
@@ -203,7 +210,6 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
         this.variableName = variableName;
     }
 
-
     /**
      * Getter for property 'firstYearYouCanSwitch'.
      *
@@ -220,14 +226,6 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
      */
     public void setFirstYearYouCanSwitch(final DoubleParameter firstYearYouCanSwitch) {
         this.firstYearYouCanSwitch = firstYearYouCanSwitch;
-    }
-
-    public DoubleParameter getInertia() {
-        return inertia;
-    }
-
-    public void setInertia(final DoubleParameter inertia) {
-        this.inertia = inertia;
     }
 
     public boolean isCanReturnFromRetirement() {

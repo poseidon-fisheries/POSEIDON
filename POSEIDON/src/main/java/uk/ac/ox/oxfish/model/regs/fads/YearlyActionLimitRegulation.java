@@ -47,12 +47,14 @@ public abstract class YearlyActionLimitRegulation implements ActionSpecificRegul
         return counter >= getLimit(fisher);
     }
 
+    public int getLimit(Fisher fisher) {
+        return limits.getLimit(fisher);
+    }
+
     public double getPctLimitRemaining(Fisher fisher) {
         int limit = getLimit(fisher);
         return (double) (limit - counter) / limit;
     }
-
-    public int getLimit(Fisher fisher) { return limits.getLimit(fisher); }
 
     @Override
     public void step(SimState simState) {
@@ -64,7 +66,9 @@ public abstract class YearlyActionLimitRegulation implements ActionSpecificRegul
         model.scheduleEveryYear(this, StepOrder.DAWN);
     }
 
-    public int getNumRemainingActions(Fisher fisher) { return getLimit(fisher) - counter; }
+    public int getNumRemainingActions(Fisher fisher) {
+        return getLimit(fisher) - counter;
+    }
 
     @Override
     public void observe(PurseSeinerAction action) {

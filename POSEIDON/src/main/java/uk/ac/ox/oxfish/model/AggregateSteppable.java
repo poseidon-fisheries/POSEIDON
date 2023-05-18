@@ -36,14 +36,14 @@ import java.util.List;
  * Those steppables then are aggregated in one of these objects so that the MASON steppable only has to deal with it.
  * Created by carrknight on 8/14/15.
  */
-public class AggregateSteppable implements Steppable{
+public class AggregateSteppable implements Steppable {
 
     List<Steppable> steppableList = new LinkedList<>();
 
 
     @Override
     public void step(SimState simState) {
-        for(Steppable steppable : steppableList)
+        for (Steppable steppable : steppableList)
             steppable.step(simState);
     }
 
@@ -60,6 +60,7 @@ public class AggregateSteppable implements Steppable{
     }
 
     /**
+     *
      */
     public boolean remove(Steppable o) {
         return steppableList.remove(o);

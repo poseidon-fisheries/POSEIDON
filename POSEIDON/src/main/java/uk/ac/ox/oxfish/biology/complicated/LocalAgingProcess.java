@@ -24,7 +24,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Collection;
-import java.util.function.Consumer;
 
 /**
  * abstract class that turns aging process from happening to the entire collection of biologies to happen independently
@@ -36,7 +35,7 @@ public abstract class LocalAgingProcess implements AgingProcess {
     /**
      * as a side-effect ages the local biology according to its rules
      *
-     * @param biologies   list of local biologies to age
+     * @param biologies      list of local biologies to age
      * @param species
      * @param model          link to the model
      * @param rounding       whether we expect numbers to be rounded to integers
@@ -44,8 +43,9 @@ public abstract class LocalAgingProcess implements AgingProcess {
      */
     @Override
     public void age(
-            Collection<AbundanceLocalBiology> biologies, Species species, FishState model, boolean rounding,
-            int daysToSimulate) {
+        Collection<AbundanceLocalBiology> biologies, Species species, FishState model, boolean rounding,
+        int daysToSimulate
+    ) {
         for (AbundanceLocalBiology abundanceLocalBiology : biologies) {
             ageLocally(abundanceLocalBiology, species, model, rounding, daysToSimulate);
         }
@@ -53,8 +53,9 @@ public abstract class LocalAgingProcess implements AgingProcess {
 
 
     abstract public void ageLocally(
-            AbundanceLocalBiology localBiology, Species species, FishState model, boolean rounding,
-            int daysToSimulate);
+        AbundanceLocalBiology localBiology, Species species, FishState model, boolean rounding,
+        int daysToSimulate
+    );
 
 
 }

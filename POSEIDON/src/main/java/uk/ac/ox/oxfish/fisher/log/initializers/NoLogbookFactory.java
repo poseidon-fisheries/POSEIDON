@@ -24,8 +24,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 
-public class NoLogbookFactory implements AlgorithmFactory<NoLogbookInitializer>
-{
+public class NoLogbookFactory implements AlgorithmFactory<NoLogbookInitializer> {
 
 
     /**

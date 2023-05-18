@@ -34,16 +34,14 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class NotGoingTooFar {
 
     @Test
-    public void neverReallyGoBeyondWhereItIsNecessary() throws Exception
-    {
-
+    public void neverReallyGoBeyondWhereItIsNecessary() throws Exception {
 
 
         final FishState state = new FishState(System.currentTimeMillis());
 
         //world split in half
         PrototypeScenario scenario = new PrototypeScenario();
-        scenario.setMapInitializer(new SimpleMapInitializerFactory(50,1,0,100000,2));
+        scenario.setMapInitializer(new SimpleMapInitializerFactory(50, 1, 0, 100000, 2));
         state.setScenario(scenario);
         //world split in half
         //scenario.setBiologyInitializer(OpportunityCostsDemo.FIXED_AND_SPLIT_BIOLOGY);
@@ -79,8 +77,7 @@ public class NotGoingTooFar {
                 worstTows += hotspots.get(x, 0);
             }
             //the tows must happen on the area before 100000 is hit
-            for(int x=limitX; x<50; x++)
-            {
+            for (int x = limitX; x < 50; x++) {
                 bestTows += hotspots.get(x, 0);
             }
         }

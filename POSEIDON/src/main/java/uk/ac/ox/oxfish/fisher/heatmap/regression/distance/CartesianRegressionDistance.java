@@ -27,8 +27,6 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
 public class CartesianRegressionDistance implements RegressionDistance {
 
 
-
-
     private double bandwidth;
 
 
@@ -40,7 +38,7 @@ public class CartesianRegressionDistance implements RegressionDistance {
     public double distance(double firstObservation, double secondObservation) {
 
         double distance = firstObservation - secondObservation;
-        return distance*distance/bandwidth;
+        return distance * distance / bandwidth;
     }
 
 

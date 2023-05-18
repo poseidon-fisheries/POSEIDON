@@ -44,9 +44,9 @@ public class EquallySpacedBertalanffyFactoryTest {
         GrowthBinByList species = factory.apply(mock(FishState.class));
 
         //numbers come from fixedBoxcar.R
-        Assert.assertEquals(species.getLength(0,0),10.0,.0001);
-        Assert.assertEquals(species.getLength(0,5),15.2020202020202,.0001);
-        Assert.assertEquals(species.getLength(0,99),113,.0001);
+        Assert.assertEquals(species.getLength(0, 0), 10.0, .0001);
+        Assert.assertEquals(species.getLength(0, 5), 15.2020202020202, .0001);
+        Assert.assertEquals(species.getLength(0, 99), 113, .0001);
 
 
     }

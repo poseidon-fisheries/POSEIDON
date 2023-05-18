@@ -19,15 +19,15 @@ import java.util.List;
 public class MapWithFarOffPortsInitializer implements MapInitializer {
 
 
-
-
     private final MapInitializer delegate;
 
     private final List<FarOffPortInformation> farOffPorts;
 
 
-    public MapWithFarOffPortsInitializer(MapInitializer delegate,
-                                         List<FarOffPortInformation> farOffPorts) {
+    public MapWithFarOffPortsInitializer(
+        MapInitializer delegate,
+        List<FarOffPortInformation> farOffPorts
+    ) {
         this.delegate = delegate;
         this.farOffPorts = farOffPorts;
     }
@@ -36,13 +36,14 @@ public class MapWithFarOffPortsInitializer implements MapInitializer {
     public NauticalMap makeMap(MersenneTwisterFast random, GlobalBiology biology, FishState model) {
 
         final NauticalMap originalMap = delegate.makeMap(random, biology, model);
-        final HashMap<SeaTile,FarOffPort> instantiatedPorts = new LinkedHashMap<>();
+        final HashMap<SeaTile, FarOffPort> instantiatedPorts = new LinkedHashMap<>();
         //we'll make a copy of this adding ports info
         for (int i = 0; i < farOffPorts.size(); i++) {
             //fake land, immediately
             SeaTile tile = new SeaTile(
-                    NauticalMapWithFarOffPorts.GRID_X_ALLOCATED_TO_FAR_OFF_PORTS,i,
-                    1000,new TileHabitat(0));
+                NauticalMapWithFarOffPorts.GRID_X_ALLOCATED_TO_FAR_OFF_PORTS, i,
+                1000, new TileHabitat(0)
+            );
 
             //create  market map
             MarketMap marketMap = new MarketMap(biology);
@@ -51,43 +52,51 @@ public class MapWithFarOffPortsInitializer implements MapInitializer {
             //this might be a problem for constructors that expect an ordered call
             final FarOffPortInformation information = farOffPorts.get(i);
             for (Species species : biology.getSpecies())
-                marketMap.addMarket(species,
-                        new MarketProxy(information.getMarketMaker()));
+                marketMap.addMarket(
+                    species,
+                    new MarketProxy(information.getMarketMaker())
+                );
 
 
             tile.setBiology(new EmptyLocalBiology());
-            Port newPort = new Port(information.getPortName(),
-                    tile,
-                    marketMap,
-                    information.getGasPriceAtPort());
-
-            final SeaTile exitTile = originalMap.
-                    getSeaTile(information.getExitGridX(),
-                            information.getExitGridY());
-
-            Preconditions.checkNotNull(exitTile, "Exit tile does not exist for port " + information.getPortName());
-            Preconditions.checkArgument(exitTile.isWater(), "Exit tile is not sea tile for " + information.getPortName());
-            FarOffPort farOffPort = new FarOffPort(
-                    newPort,
-                    tile,
-                    exitTile,
-                    information.getDistanceFromExitInKm(),
-                    null
+            Port newPort = new Port(
+                information.getPortName(),
+                tile,
+                marketMap,
+                information.getGasPriceAtPort()
             );
 
-            instantiatedPorts.put(tile,farOffPort);
+            final SeaTile exitTile = originalMap.
+                getSeaTile(
+                    information.getExitGridX(),
+                    information.getExitGridY()
+                );
 
+            Preconditions.checkNotNull(exitTile, "Exit tile does not exist for port " + information.getPortName());
+            Preconditions.checkArgument(
+                exitTile.isWater(),
+                "Exit tile is not sea tile for " + information.getPortName()
+            );
+            FarOffPort farOffPort = new FarOffPort(
+                newPort,
+                tile,
+                exitTile,
+                information.getDistanceFromExitInKm(),
+                null
+            );
+
+            instantiatedPorts.put(tile, farOffPort);
 
 
         }
 
 
         return new NauticalMapWithFarOffPorts(
-                originalMap.getRasterBathymetry(),
-                originalMap.getMpaVectorField(),
-                originalMap.getDistance(),
-                originalMap.getPathfinder(),
-                instantiatedPorts
+            originalMap.getRasterBathymetry(),
+            originalMap.getMpaVectorField(),
+            originalMap.getDistance(),
+            originalMap.getPathfinder(),
+            instantiatedPorts
 
 
         );

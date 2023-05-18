@@ -43,6 +43,6 @@ public class JackknifeMaturity implements Maturity {
      */
     @Override
     public double getMaturity(Species species, int subdivision, int bin) {
-        return species.getLength(subdivision,bin) >= lengthAtMaturity ? 1d : 0d;
+        return species.getLength(subdivision, bin) >= lengthAtMaturity ? 1d : 0d;
     }
 }

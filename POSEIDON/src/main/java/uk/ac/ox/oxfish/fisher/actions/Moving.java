@@ -32,8 +32,7 @@ import java.util.Deque;
 /**
  * The action of moving
  */
-public class Moving implements Action
-{
+public class Moving implements Action {
 
 
     /**
@@ -43,25 +42,24 @@ public class Moving implements Action
 
     private Deque<SeaTile> path;
 
+    public Moving() {
+        this(-1, null);
+    }
+
     public Moving(double timeAlreadyTravelling, Deque<SeaTile> currentPath) {
         this.accruedHours = timeAlreadyTravelling;
         this.path = currentPath;
     }
 
-    public Moving() {
-        this(-1,null);
-    }
-
-    public Moving(Deque<SeaTile> currentPath)
-    {
-        this(-1,currentPath);
+    public Moving(Deque<SeaTile> currentPath) {
+        this(-1, currentPath);
     }
 
     /**
      * Move on a previous osmoseWFSPath or ask the map for a new osmoseWFSPath and follow it from agent location to agent destination
      *
-     * @param model a link to the model, in case you need to grab global objects
-     * @param agent a link to the fisher in case you need to get or set agent's variables
+     * @param model      a link to the model, in case you need to grab global objects
+     * @param agent      a link to the fisher in case you need to get or set agent's variables
      * @param regulation the regulation object that tells us whether we can be out at all
      * @return the next action to take and whether or not to take it now
      */
@@ -74,9 +72,9 @@ public class Moving implements Action
 
         //adapt if needed
         SeaTile oldDestination = agent.getDestination();
-        agent.updateDestination(model,this);
+        agent.updateDestination(model, this);
         //if you changed your direction, you lose your accrued hours
-        if(oldDestination != agent.getDestination()) {
+        if (oldDestination != agent.getDestination()) {
             accruedHours = -1;
             path = null;
         }
@@ -84,20 +82,19 @@ public class Moving implements Action
         /**
          * If we have arrived, don't bother moving.
          */
-        if(agent.getDestination().equals(agent.getLocation()))
-            return new ActionResult(new Arriving(),hoursLeft);
+        if (agent.getDestination().equals(agent.getLocation()))
+            return new ActionResult(new Arriving(), hoursLeft);
 
 
         NauticalMap map = model.getMap();
         //if you don't have a path, you have to find it
-        if(path==null) {
+        if (path == null) {
             //get the pathfinder to help
             path = map.getRoute(agent.getLocation(), agent.getDestination());
-            if(path == null)
-            {
+            if (path == null) {
                 //there is no osmoseWFSPath available
                 agent.setDestinationForPort();
-                return new ActionResult(new Arriving(),0);
+                return new ActionResult(new Arriving(), 0);
             }
 
             assert path.peek().equals(agent.getLocation()); //starts at the right location
@@ -111,63 +108,56 @@ public class Moving implements Action
 
 
         //if you have been moving from the previous step, count those hours
-        if(accruedHours > 0)
-            hoursLeft+= accruedHours;
+        if (accruedHours > 0)
+            hoursLeft += accruedHours;
 
         //while there are still places to go
 
 
-
-
         //moving actually happens in more than one "step" at a time; this is because agent.move(*) is slow (since we have to update the MASON map)
         //so what we do is that we check what's the farthest we can go in one period and go there
-        double timeSpentTravelling=0;
+        double timeSpentTravelling = 0;
         double totalDistance = 0;
         SeaTile next = agent.getLocation();
         //go through the osmoseWFSPath until it's empty
-        while(!path.isEmpty())
-        {
+        while (!path.isEmpty()) {
             //check distance and time to travel one more node during this period
             SeaTile step = path.peekFirst();
             double distance = map.distance(next, step);
             final double hoursForThisNode = agent.hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(distance);
 
             //if you can make this step within the time given, do it
-            if(timeSpentTravelling + hoursForThisNode<=hoursLeft)
-            {
+            if (timeSpentTravelling + hoursForThisNode <= hoursLeft) {
                 next = path.poll();
                 assert next == step;
-                timeSpentTravelling+=hoursForThisNode;
-                totalDistance+=distance;
-            }
-            else
-             break;
+                timeSpentTravelling += hoursForThisNode;
+                totalDistance += distance;
+            } else
+                break;
 
         }
 
-        if(!next.equals(agent.getLocation())) //if you have time to make at least one step
+        if (!next.equals(agent.getLocation())) //if you have time to make at least one step
         {
 
-            assert  Math.abs(totalDistance/agent.getBoat().getSpeedInKph()- timeSpentTravelling)<
-                    FishStateUtilities.EPSILON;
+            assert Math.abs(totalDistance / agent.getBoat().getSpeedInKph() - timeSpentTravelling) <
+                FishStateUtilities.EPSILON;
             assert hoursLeft >= timeSpentTravelling;
             hoursLeft = hoursLeft - timeSpentTravelling;
             hoursLeft = (Math.abs(hoursLeft) < FishStateUtilities.EPSILON) ? 0 : hoursLeft;
 
-            agent.move(next, map,model, totalDistance);
+            agent.move(next, map, model, totalDistance);
 
             assert agent.getLocation().equals(next); //check that I moved to the right spot
-            if(next.equals(agent.getDestination()))
-                return new ActionResult(new Arriving(),hoursLeft);
-            else
-            {
+            if (next.equals(agent.getDestination()))
+                return new ActionResult(new Arriving(), hoursLeft);
+            else {
                 assert !path.isEmpty();
                 return new ActionResult(new Moving(path), hoursLeft);
             }
         }
         //didn't make it to there
-        return new ActionResult(new Moving(hoursLeft,path),0);
-
+        return new ActionResult(new Moving(hoursLeft, path), 0);
 
 
     }

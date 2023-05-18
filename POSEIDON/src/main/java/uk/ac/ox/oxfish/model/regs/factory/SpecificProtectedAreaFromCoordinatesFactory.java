@@ -27,6 +27,11 @@ public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtect
         this.eastLongitude = eastLongitude;
     }
 
+    @SuppressWarnings("unused")
+    public SpecificProtectedAreaFromCoordinatesFactory() {
+        this(1, 1, 1, 1);
+    }
+
     public SpecificProtectedAreaFromCoordinatesFactory(
         final double northLatitude,
         final double westLongitude,
@@ -39,9 +44,17 @@ public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtect
         this.eastLongitude = eastLongitude;
     }
 
-    @SuppressWarnings("unused")
-    public SpecificProtectedAreaFromCoordinatesFactory() {
-        this(1, 1, 1, 1);
+    @Override
+    BiPredicate<Integer, Integer> inAreaPredicate(final MapExtent mapExtent) {
+        final Envelope envelope = new Envelope(
+            new Coordinate(getWestLongitude(), getNorthLatitude()),
+            new Coordinate(getEastLongitude(), getSouthLatitude())
+        );
+        return (x, y) -> envelope.covers(mapExtent.getCoordinates(x, y));
+    }
+
+    public double getWestLongitude() {
+        return westLongitude;
     }
 
     public double getNorthLatitude() {
@@ -53,13 +66,8 @@ public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtect
         this.northLatitude = northLatitude;
     }
 
-    public double getWestLongitude() {
-        return westLongitude;
-    }
-
-    @SuppressWarnings("unused")
-    public void setWestLongitude(final double westLongitude) {
-        this.westLongitude = westLongitude;
+    public double getEastLongitude() {
+        return eastLongitude;
     }
 
     public double getSouthLatitude() {
@@ -71,21 +79,13 @@ public class SpecificProtectedAreaFromCoordinatesFactory extends SpecificProtect
         this.southLatitude = southLatitude;
     }
 
-    public double getEastLongitude() {
-        return eastLongitude;
-    }
-
     @SuppressWarnings("unused")
     public void setEastLongitude(final double eastLongitude) {
         this.eastLongitude = eastLongitude;
     }
 
-    @Override
-    BiPredicate<Integer, Integer> inAreaPredicate(final MapExtent mapExtent) {
-        final Envelope envelope = new Envelope(
-            new Coordinate(getWestLongitude(), getNorthLatitude()),
-            new Coordinate(getEastLongitude(), getSouthLatitude())
-        );
-        return (x, y) -> envelope.covers(mapExtent.getCoordinates(x, y));
+    @SuppressWarnings("unused")
+    public void setWestLongitude(final double westLongitude) {
+        this.westLongitude = westLongitude;
     }
 }

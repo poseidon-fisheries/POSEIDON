@@ -23,11 +23,24 @@ public class ParameterAddressBuilder implements Supplier<String> {
         this.address = ImmutableList.copyOf(address);
     }
 
+    @Override
+    public String get() {
+        return join(".", address);
+    }
+
+    public ParameterAddressBuilder add(final String element) {
+        return new ParameterAddressBuilder(add(address, element));
+    }
+
     private static <T> List<T> add(final List<T> list, final T element) {
         return new ImmutableList.Builder<T>()
             .addAll(list)
             .add(element)
             .build();
+    }
+
+    public ParameterAddressBuilder addKey(final String key) {
+        return new ParameterAddressBuilder(addSuffixToAddress(address, "~", key));
     }
 
     private static List<String> addSuffixToAddress(
@@ -43,19 +56,6 @@ public class ParameterAddressBuilder implements Supplier<String> {
                 Stream.of(Iterables.getLast(address)).map(s -> s + separator + suffix)
             )
             .collect(toImmutableList());
-    }
-
-    @Override
-    public String get() {
-        return join(".", address);
-    }
-
-    public ParameterAddressBuilder add(final String element) {
-        return new ParameterAddressBuilder(add(address, element));
-    }
-
-    public ParameterAddressBuilder addKey(final String key) {
-        return new ParameterAddressBuilder(addSuffixToAddress(address, "~", key));
     }
 
     public ParameterAddressBuilder addIndex(final long index) {

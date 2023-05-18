@@ -49,7 +49,7 @@ public class WeightedAbundanceDiffuserTest {
 
         //there is only one species of fish, with 3 age structures
         Meristics meristics = new FromListMeristics(
-                new double[]{10d, 20d, 30d}, 2);
+            new double[]{10d, 20d, 30d}, 2);
         Species species = new Species("only", meristics);
         GlobalBiology biology = new GlobalBiology(species);
 
@@ -70,7 +70,8 @@ public class WeightedAbundanceDiffuserTest {
         AbundanceLocalBiology bioThere = new AbundanceLocalBiology(biology);
         there.setBiology(bioThere);
         bioThere.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][2] = 100;
-        bioThere.getAbundance(species).asMatrix()[FishStateUtilities.MALE][1] = 500; //bio there has the same amount of age 1 male
+        bioThere.getAbundance(species)
+            .asMatrix()[FishStateUtilities.MALE][1] = 500; //bio there has the same amount of age 1 male
 
         //however we will make "there" more habitable than here
 
@@ -85,9 +86,9 @@ public class WeightedAbundanceDiffuserTest {
 
 
         WeightedAbundanceDiffuser diffuser = new WeightedAbundanceDiffuser(
-                1,
-                .5,
-                habitability
+            1,
+            .5,
+            habitability
 
         );
 
@@ -128,11 +129,27 @@ public class WeightedAbundanceDiffuserTest {
 
 
         //ought to rearrange so that 2/3 of biomass is in "there"
-        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE], new double[]{334, 334, 0},.001);
-        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE], new double[]{0, 0, 33}, .001);
+        assertArrayEquals(
+            fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
+            new double[]{334, 334, 0},
+            .001
+        );
+        assertArrayEquals(
+            fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
+            new double[]{0, 0, 33},
+            .001
+        );
 
-        assertArrayEquals(bioThere.getAbundance(species).asMatrix()[FishStateUtilities.MALE], new double[]{666, 666, 0},.001);
-        assertArrayEquals(bioThere.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE], new double[]{0, 0, 67},.001);
+        assertArrayEquals(
+            bioThere.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
+            new double[]{666, 666, 0},
+            .001
+        );
+        assertArrayEquals(
+            bioThere.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
+            new double[]{0, 0, 67},
+            .001
+        );
 
     }
 

@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.model.market.factory;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.FixedPricingStrategy;
 import uk.ac.ox.oxfish.model.market.FlexibleAbundanceMarket;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -28,9 +27,9 @@ public class AbundanceAwareFixedPriceMarketFactory implements AlgorithmFactory<F
     @Override
     public FlexibleAbundanceMarket apply(FishState state) {
         return new FlexibleAbundanceMarket(
-                new FixedPricingStrategy(
-                        marketPrice.applyAsDouble(state.getRandom())
-                )
+            new FixedPricingStrategy(
+                marketPrice.applyAsDouble(state.getRandom())
+            )
         );
     }
 

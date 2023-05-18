@@ -36,68 +36,59 @@ import java.util.stream.IntStream;
  * Here I store what I did in order to produce documents and such
  * Created by carrknight on 7/2/15.
  */
-public class FriendsHillClimbing
-{
+public class FriendsHillClimbing {
 
-    public static void testThatFriendsAreGood()
-    {
+    public static void main(String[] args) {
+        testThatFriendsAreGood();
+    }
+
+    public static void testThatFriendsAreGood() {
 
         //lspiRun the prototype (2nd July 2015 edition)
         //make the agents act by hillclimber
         //and compare it with and without friends. Depending on the exploration parameter, with friends is better.
 
 
-        for(int friends=0;friends<=20;friends++)
-        {
+        for (int friends = 0; friends <= 20; friends++) {
             int[] stepsItTook = new int[100];
-            for(int run=0; run<5; run++)
-            {
+            for (int run = 0; run < 5; run++) {
 
                 PrototypeScenario scenario = new PrototypeScenario();
-                if(friends ==0) {
+                if (friends == 0) {
                     scenario.setNetworkBuilder(new EmptyNetworkBuilder());
                     scenario.setDestinationStrategy(new PerTripIterativeDestinationFactory());
-                }
-                else
-                {
+                } else {
                     final EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
                     networkBuilder.setDegree(new FixedDoubleParameter(friends));
                     scenario.setNetworkBuilder(networkBuilder);
                     final PerTripImitativeDestinationFactory destinationStrategy = new PerTripImitativeDestinationFactory();
-                    destinationStrategy.setProbability(new FixedProbabilityFactory(.20,1d));
+                    destinationStrategy.setProbability(new FixedProbabilityFactory(.20, 1d));
                     destinationStrategy.setIgnoreEdgeDirection(false);
                     scenario.setDestinationStrategy(destinationStrategy);
                 }
-                FishState state = new FishState(run,1);
+                FishState state = new FishState(run, 1);
                 state.setScenario(scenario);
                 state.start();
                 Species onlySpecies = state.getBiology().getSpecie(0);
-                final double minimumBiomass= state.getTotalBiomass(onlySpecies)*.05; //how much does it take to eat 95% of all the fish?
+                final double minimumBiomass = state.getTotalBiomass(onlySpecies) * .05; //how much does it take to eat 95% of all the fish?
 
 
                 int steps = 0;
-                for(steps = 0; steps<3500; steps++)
-                {
+                for (steps = 0; steps < 3500; steps++) {
                     state.schedule.step(state);
-                    if(state.getTotalBiomass(onlySpecies)<=minimumBiomass)
+                    if (state.getTotalBiomass(onlySpecies) <= minimumBiomass)
                         break;
                 }
-             //   System.out.println(steps + " -- " + state.getTotalBiomass(onlySpecies));
-                stepsItTook[run] =steps;
+                //   System.out.println(steps + " -- " + state.getTotalBiomass(onlySpecies));
+                stepsItTook[run] = steps;
 
 
             }
-            System.out.println(friends + "," + IntStream.of(stepsItTook).sum()/5);
+            System.out.println(friends + "," + IntStream.of(stepsItTook).sum() / 5);
 
         }
 
 
-    }
-
-
-    public static void main(String[] args)
-    {
-        testThatFriendsAreGood();
     }
 
 }

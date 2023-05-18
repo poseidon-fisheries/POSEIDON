@@ -38,54 +38,57 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class CopyFriendSeaTileTest
-{
+public class CopyFriendSeaTileTest {
 
 
     @Test
     public void ignoreFriend() throws Exception {
 
 
-        SeaTile newT = mock(SeaTile.class);
-        SeaTile friendT = mock(SeaTile.class);
+        final SeaTile newT = mock(SeaTile.class);
+        final SeaTile friendT = mock(SeaTile.class);
 
 
-        ObjectiveFunction<Fisher> friendFunction = mock(ObjectiveFunction.class);
+        final ObjectiveFunction<Fisher> friendFunction = mock(ObjectiveFunction.class);
 
         //going to choose your own T because you have no friend
-        SeaTile chosen  = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(), mock(Fisher.class),
-                                                               0d, newT,
-                                                               new ArrayList<>(), friendFunction, fisher -> friendT).getFirst();
+        SeaTile chosen = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(), mock(Fisher.class),
+            0d, newT,
+            new ArrayList<>(), friendFunction, fisher -> friendT
+        ).getFirst();
 
 
         assertEquals(chosen, newT);
 
         //you have a friend but he has no fitness
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(Double.NaN);
-        chosen  = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(), mock(Fisher.class),
-                                                       10d, newT,
-                                                       Collections.singletonList(mock(Fisher.class)), friendFunction,
-                                                       fisher -> friendT).getFirst();
+        chosen = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(), mock(Fisher.class),
+            10d, newT,
+            Collections.singletonList(mock(Fisher.class)), friendFunction,
+            fisher -> friendT
+        ).getFirst();
 
-        assertEquals(chosen,newT);
+        assertEquals(chosen, newT);
 
         //you have a friend with fitness but no seatile
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(0d);
-        chosen  = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),mock(Fisher.class) ,
-                                                       10d, newT,
-                                                       Collections.singletonList(mock(Fisher.class)), friendFunction,
-                                                       fisher -> null).getFirst();
+        chosen = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(), mock(Fisher.class),
+            10d, newT,
+            Collections.singletonList(mock(Fisher.class)), friendFunction,
+            fisher -> null
+        ).getFirst();
 
-        assertEquals(chosen,newT);
+        assertEquals(chosen, newT);
 
         //you have a normal friend but he has low fitness
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(0d);
-        chosen  = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),mock(Fisher.class) ,
-                                                       10d, newT,
-                                                       Collections.singletonList(mock(Fisher.class)), friendFunction,
-                                                       fisher -> friendT).getFirst();
+        chosen = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(), mock(Fisher.class),
+            10d, newT,
+            Collections.singletonList(mock(Fisher.class)), friendFunction,
+            fisher -> friendT
+        ).getFirst();
 
-        assertEquals(chosen,newT);
+        assertEquals(chosen, newT);
 
     }
 
@@ -93,48 +96,52 @@ public class CopyFriendSeaTileTest
     public void fitnessMatters() throws Exception {
 
 
-        SeaTile newT = mock(SeaTile.class);
-        SeaTile friendT = mock(SeaTile.class);
+        final SeaTile newT = mock(SeaTile.class);
+        final SeaTile friendT = mock(SeaTile.class);
 
 
-        ObjectiveFunction<Fisher> friendFunction = mock(ObjectiveFunction.class);
-
-
+        final ObjectiveFunction<Fisher> friendFunction = mock(ObjectiveFunction.class);
 
 
         //best fitness is the new
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(0d);
-        Pair<SeaTile, Fisher> imitation = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),mock(Fisher.class) ,
-                                                                               10d,
-                                                                               newT,
-                                                                               Collections.singletonList(
-                                                                                       mock(Fisher.class)),
-                                                                               friendFunction, fisher -> friendT);
-        SeaTile chosen  = imitation.getFirst();
+        Pair<SeaTile, Fisher> imitation = FishStateUtilities.imitateBestFriend(
+            new MersenneTwisterFast(),
+            mock(Fisher.class),
+            10d,
+            newT,
+            Collections.singletonList(
+                mock(Fisher.class)),
+            friendFunction,
+            fisher -> friendT
+        );
+        final SeaTile chosen = imitation.getFirst();
         assertNull(imitation.getSecond()); // we didn't imitate anyone
-        assertEquals(chosen,newT);
+        assertEquals(chosen, newT);
 
         //best fitness is friend
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(100d);
-        Fisher friend = mock(Fisher.class);
-        imitation = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),mock(Fisher.class) ,
-                                                         10d,
-                                                         newT,
-                                                         Collections.singletonList(
-                                                                 friend),
-                                                         friendFunction, fisher -> friendT);
-        assertEquals(imitation.getFirst(),friendT);
-        assertEquals(imitation.getSecond(),friend); // we imitated our friend
+        final Fisher friend = mock(Fisher.class);
+        imitation = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(), mock(Fisher.class),
+            10d,
+            newT,
+            Collections.singletonList(
+                friend),
+            friendFunction, fisher -> friendT
+        );
+        assertEquals(imitation.getFirst(), friendT);
+        assertEquals(imitation.getSecond(), friend); // we imitated our friend
 
         //friends lose ties
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(10d);
-        imitation = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),mock(Fisher.class) ,
-                                                         10d,
-                                                         newT,
-                                                         Collections.singletonList(
-                                                                 mock(Fisher.class)),
-                                                         friendFunction, fisher -> friendT);
-        assertEquals(imitation.getFirst(),newT);
+        imitation = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(), mock(Fisher.class),
+            10d,
+            newT,
+            Collections.singletonList(
+                mock(Fisher.class)),
+            friendFunction, fisher -> friendT
+        );
+        assertEquals(imitation.getFirst(), newT);
         assertNull(imitation.getSecond()); // we didn't imitate anyone
 
     }

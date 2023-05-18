@@ -144,6 +144,22 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInit
         );
     }
 
+    public DoubleParameter getBoxWidth() {
+        return boxWidth;
+    }
+
+    public DoubleParameter getBoxHeight() {
+        return boxHeight;
+    }
+
+    public void setBoxHeight(final DoubleParameter boxHeight) {
+        this.boxHeight = boxHeight;
+    }
+
+    public void setBoxWidth(final DoubleParameter boxWidth) {
+        this.boxWidth = boxWidth;
+    }
+
     public DoubleParameter getLowestX() {
         return lowestX;
     }
@@ -158,22 +174,6 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInit
 
     public void setLowestY(final DoubleParameter lowestY) {
         this.lowestY = lowestY;
-    }
-
-    public DoubleParameter getBoxHeight() {
-        return boxHeight;
-    }
-
-    public void setBoxHeight(final DoubleParameter boxHeight) {
-        this.boxHeight = boxHeight;
-    }
-
-    public DoubleParameter getBoxWidth() {
-        return boxWidth;
-    }
-
-    public void setBoxWidth(final DoubleParameter boxWidth) {
-        this.boxWidth = boxWidth;
     }
 
     public boolean isSpecies0InsideTheBox() {

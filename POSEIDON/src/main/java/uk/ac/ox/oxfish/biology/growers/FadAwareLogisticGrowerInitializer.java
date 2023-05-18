@@ -54,7 +54,9 @@ public class FadAwareLogisticGrowerInitializer implements LogisticGrowerInitiali
     }
 
     @SuppressWarnings("unused")
-    public double getMalthusianParameter() { return malthusianParameter; }
+    public double getMalthusianParameter() {
+        return malthusianParameter;
+    }
 
     @SuppressWarnings("unused")
     public void setMalthusianParameter(final double malthusianParameter) {
@@ -62,7 +64,9 @@ public class FadAwareLogisticGrowerInitializer implements LogisticGrowerInitiali
     }
 
     @SuppressWarnings("unused")
-    public boolean isUseLastYearBiomass() { return useLastYearBiomass; }
+    public boolean isUseLastYearBiomass() {
+        return useLastYearBiomass;
+    }
 
     @SuppressWarnings("unused")
     public void setUseLastYearBiomass(final boolean useLastYearBiomass) {

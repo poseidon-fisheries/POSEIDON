@@ -29,8 +29,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Creates rocky initializers
  * Created by carrknight on 10/1/15.
  */
-public class RockyPyramidsFactory implements AlgorithmFactory<RockyPyramidsHabitatInitializer>
-{
+public class RockyPyramidsFactory implements AlgorithmFactory<RockyPyramidsHabitatInitializer> {
 
 
     private int numberOfPeaks = 10;
@@ -49,8 +48,9 @@ public class RockyPyramidsFactory implements AlgorithmFactory<RockyPyramidsHabit
      */
     @Override
     public RockyPyramidsHabitatInitializer apply(FishState state) {
-        return new RockyPyramidsHabitatInitializer(numberOfPeaks,smoothingValue,
-                                             maxSpread);
+        return new RockyPyramidsHabitatInitializer(numberOfPeaks, smoothingValue,
+            maxSpread
+        );
     }
 
     public int getNumberOfPeaks() {

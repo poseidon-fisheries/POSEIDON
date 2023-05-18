@@ -38,7 +38,8 @@ public class AllowAllAllocationPolicy implements PermitAllocationPolicy {
      */
     @Override
     public List<Fisher> computeWhichFishersAreAllowed(
-            List<Fisher> participants, FishState state) {
+        List<Fisher> participants, FishState state
+    ) {
         return participants;
     }
 }

@@ -30,12 +30,10 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 /**
- *
  * The logistic local biologies now daily share their biomass with their poorer neighbors
  * Created by carrknight on 6/22/15.
  */
-public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
-{
+public class DiffusingLogisticInitializer extends IndependentLogisticInitializer {
 
     /**
      * fixes a limit on how much biomass can leave the sea-tile
@@ -49,32 +47,36 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
 
 
     public DiffusingLogisticInitializer(
-            DoubleParameter carryingCapacity,
-            DoubleParameter minInitialCapacity, DoubleParameter maxInitialCapacity,
-            double percentageLimitOnDailyMovement,
-            double differentialPercentageToMove,
-            LogisticGrowerInitializer grower) {
-        super(carryingCapacity, minInitialCapacity, maxInitialCapacity,grower);
+        DoubleParameter carryingCapacity,
+        DoubleParameter minInitialCapacity, DoubleParameter maxInitialCapacity,
+        double percentageLimitOnDailyMovement,
+        double differentialPercentageToMove,
+        LogisticGrowerInitializer grower
+    ) {
+        super(carryingCapacity, minInitialCapacity, maxInitialCapacity, grower);
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
         this.differentialPercentageToMove = differentialPercentageToMove;
     }
 
     /**
      * Call the independent logistic initializer but add a steppable to call to smooth fish around
-     *  @param biology the global biology instance
+     *
+     * @param biology the global biology instance
      * @param map     the map which by now should have all the tiles in place
      * @param random  mersenne randomizer
      * @param model
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
+        GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model
+    ) {
         super.processMap(biology, map, random, model);
 
         BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
-                                                                         differentialPercentageToMove,
-                                                                         percentageLimitOnDailyMovement);
-        model.scheduleEveryDay(diffuser,StepOrder.BIOLOGY_PHASE);
+            differentialPercentageToMove,
+            percentageLimitOnDailyMovement
+        );
+        model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
 
 
     }

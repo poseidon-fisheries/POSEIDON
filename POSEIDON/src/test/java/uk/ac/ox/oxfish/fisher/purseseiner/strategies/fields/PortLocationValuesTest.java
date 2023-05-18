@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import sim.util.Int2D;
@@ -27,7 +26,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.mock;

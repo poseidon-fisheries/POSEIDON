@@ -41,27 +41,11 @@ public class OffSwitchDecorator implements Regulation {
     private boolean turnedOff;
 
 
-    public OffSwitchDecorator(Regulation delegate,
-                              boolean turnedOff) {
+    public OffSwitchDecorator(
+        Regulation delegate,
+        boolean turnedOff
+    ) {
         this.delegate = delegate;
-        this.turnedOff = turnedOff;
-    }
-
-    /**
-     * Getter for property 'turnedOff'.
-     *
-     * @return Value for property 'turnedOff'.
-     */
-    public boolean isTurnedOff() {
-        return turnedOff;
-    }
-
-    /**
-     * Setter for property 'turnedOff'.
-     *
-     * @param turnedOff Value to set for property 'turnedOff'.
-     */
-    public void setTurnedOff(boolean turnedOff) {
         this.turnedOff = turnedOff;
     }
 
@@ -75,7 +59,8 @@ public class OffSwitchDecorator implements Regulation {
      */
     @Override
     public boolean canFishHere(
-            Fisher agent, SeaTile tile, FishState model, int timeStep) {
+        Fisher agent, SeaTile tile, FishState model, int timeStep
+    ) {
         return turnedOff ? false : delegate.canFishHere(agent, tile, model, timeStep);
     }
 
@@ -89,7 +74,8 @@ public class OffSwitchDecorator implements Regulation {
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Species species, FishState model, int timeStep) {
+        Fisher agent, Species species, FishState model, int timeStep
+    ) {
         return turnedOff ? 0d : delegate.maximumBiomassSellable(agent, species, model, timeStep);
     }
 
@@ -117,7 +103,14 @@ public class OffSwitchDecorator implements Regulation {
      */
     @Override
     public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model, int timeStep) {
+        SeaTile where,
+        Fisher who,
+        Catch fishCaught,
+        Catch fishRetained,
+        int hoursSpentFishing,
+        FishState model,
+        int timeStep
+    ) {
         assert !turnedOff;
         delegate.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
 
@@ -132,7 +125,14 @@ public class OffSwitchDecorator implements Regulation {
      * @param revenue how much money was made off it
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
+    public void reactToSale(
+        Species species,
+        Fisher seller,
+        double biomass,
+        double revenue,
+        FishState model,
+        int timeStep
+    ) {
         assert !turnedOff;
         delegate.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
@@ -144,8 +144,28 @@ public class OffSwitchDecorator implements Regulation {
      */
     @Override
     public Regulation makeCopy() {
-        return new OffSwitchDecorator(delegate.makeCopy(),
-                                      this.isTurnedOff());
+        return new OffSwitchDecorator(
+            delegate.makeCopy(),
+            this.isTurnedOff()
+        );
+    }
+
+    /**
+     * Getter for property 'turnedOff'.
+     *
+     * @return Value for property 'turnedOff'.
+     */
+    public boolean isTurnedOff() {
+        return turnedOff;
+    }
+
+    /**
+     * Setter for property 'turnedOff'.
+     *
+     * @param turnedOff Value to set for property 'turnedOff'.
+     */
+    public void setTurnedOff(boolean turnedOff) {
+        this.turnedOff = turnedOff;
     }
 
     public Regulation getDelegate() {

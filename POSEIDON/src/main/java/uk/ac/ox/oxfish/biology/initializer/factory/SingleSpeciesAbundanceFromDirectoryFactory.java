@@ -30,8 +30,7 @@ import java.nio.file.Paths;
  * The factory that generates the single species abundance biology.
  * Created by carrknight on 3/11/16.
  */
-public class SingleSpeciesAbundanceFromDirectoryFactory implements AlgorithmFactory<SingleSpeciesAbundanceInitializer>
-{
+public class SingleSpeciesAbundanceFromDirectoryFactory implements AlgorithmFactory<SingleSpeciesAbundanceInitializer> {
 
 
     private String folderPath = "inputs/california/biology/Dover Sole/";
@@ -50,10 +49,10 @@ public class SingleSpeciesAbundanceFromDirectoryFactory implements AlgorithmFact
     @Override
     public SingleSpeciesAbundanceInitializer apply(FishState fishState) {
         return new SingleSpeciesAbundanceInitializer(
-                Paths.get(folderPath),
-                speciesName,
-                scaling,
-                fishState
+            Paths.get(folderPath),
+            speciesName,
+            scaling,
+            fishState
         );
     }
 

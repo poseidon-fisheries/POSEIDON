@@ -47,46 +47,46 @@ public class RBFBasis {
 
     /**
      * builds a basis
+     *
      * @param bandwidth
      * @param center
      */
     public RBFBasis(double bandwidth, double... center) {
         this.center = center;
         this.bandwidth = bandwidth;
-        this.multiplier = 1d/Math.sqrt(2*Math.PI*bandwidth);
+        this.multiplier = 1d / Math.sqrt(2 * Math.PI * bandwidth);
     }
 
     /**
      * checks kernel between basis and observation
+     *
      * @param observation the observation
      * @return a value of similiarity between the center and the observation.
      * The higher the more important this basis is
      */
-    public double evaluate(double[] observation)
-    {
-        double norm = normSquared(center,observation);
-        if(Double.isNaN(norm))
+    public double evaluate(double[] observation) {
+        double norm = normSquared(center, observation);
+        if (Double.isNaN(norm))
             throw new RuntimeException("NaN in RBF basis; unexpected!");
-        if(!Double.isFinite(norm)) //if distance is "infinite" then return  0
+        if (!Double.isFinite(norm)) //if distance is "infinite" then return  0
             return 0d;
         else
-            return multiplier * Math.exp(-norm/(2*bandwidth));
+            return multiplier * Math.exp(-norm / (2 * bandwidth));
 
     }
 
 
     /**
      * square distance per element (euclidean norm without square-rooting the end)
+     *
      * @return
      */
-    public static double normSquared(double[] vector1, double[] vector2)
-    {
-        Preconditions.checkArgument(vector1.length==vector2.length);
+    public static double normSquared(double[] vector1, double[] vector2) {
+        Preconditions.checkArgument(vector1.length == vector2.length);
         double sum = 0;
-        for(int i= 0; i<vector1.length; i++)
-        {
-            sum += Math.pow(vector1[i]-vector2[i],2);
-            if(!Double.isFinite(sum)) //if you got to infinity, don't bother
+        for (int i = 0; i < vector1.length; i++) {
+            sum += Math.pow(vector1[i] - vector2[i], 2);
+            if (!Double.isFinite(sum)) //if you got to infinity, don't bother
                 return sum;
         }
         return sum;
@@ -112,7 +112,7 @@ public class RBFBasis {
 
     public void setBandwidth(double bandwidth) {
         this.bandwidth = bandwidth;
-        this.multiplier = 1d/Math.sqrt(2*Math.PI*bandwidth);
+        this.multiplier = 1d / Math.sqrt(2 * Math.PI * bandwidth);
 
     }
 

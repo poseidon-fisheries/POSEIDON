@@ -36,13 +36,19 @@ public enum Season {
 
     WINTER;
 
+    public static Season season(FishState model) {
+
+        return season(model.getDayOfTheYear());
+
+    }
+
     /**
      * turns day of the year into season, approximately
+     *
      * @param dayOfTheYear the day of the year
      * @return
      */
-    public static Season season(int dayOfTheYear)
-    {
+    public static Season season(int dayOfTheYear) {
 
         int month = getMonth(dayOfTheYear);
         int day = (int) (dayOfTheYear % 30.42);
@@ -63,14 +69,7 @@ public enum Season {
     }
 
     public static int getMonth(int dayOfTheYear) {
-        return (int)(dayOfTheYear / 30.42) + 1;
-    }
-
-    public static Season season(FishState model)
-    {
-
-        return season(model.getDayOfTheYear());
-
+        return (int) (dayOfTheYear / 30.42) + 1;
     }
 
 }

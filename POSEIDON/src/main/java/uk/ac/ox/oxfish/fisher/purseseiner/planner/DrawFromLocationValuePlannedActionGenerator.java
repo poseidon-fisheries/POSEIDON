@@ -47,6 +47,14 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
         localRng = new MTFApache(random);
     }
 
+    public void start() {
+        Preconditions.checkState(
+            originalLocationValues.hasStarted(),
+            "need to start the location values first!"
+        );
+        preparePicker();
+    }
+
     private void preparePicker() {
 
         if (originalLocationValues.getValues().size() > 0) {
@@ -80,14 +88,6 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
 
 
         }
-    }
-
-    public void start() {
-        Preconditions.checkState(
-            originalLocationValues.hasStarted(),
-            "need to start the location values first!"
-        );
-        preparePicker();
     }
 
     abstract public PA drawNewPlannedAction();

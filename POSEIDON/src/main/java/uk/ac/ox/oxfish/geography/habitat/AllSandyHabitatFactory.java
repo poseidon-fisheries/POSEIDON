@@ -27,8 +27,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
  * Creates the initializer
  * Created by carrknight on 9/29/15.
  */
-public class AllSandyHabitatFactory implements AlgorithmFactory<AllSandyHabitatInitializer>
-{
+public class AllSandyHabitatFactory implements AlgorithmFactory<AllSandyHabitatInitializer> {
 
 
     /**

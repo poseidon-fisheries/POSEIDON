@@ -26,9 +26,6 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeWit
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
-import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
-import uk.ac.ox.oxfish.model.market.FlexibleAbundanceMarket;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.util.function.ToDoubleFunction;
@@ -47,25 +44,25 @@ public class PrototypeScenarioTest {
 
         //make sure we can add MPAs from list
         String override = "Abstract:\n" +
-                "  startingMPAs:\n" +
-                "  - height: 6\n" +
-                "    topLeftX: 0\n" +
-                "    topLeftY: 0\n" +
-                "    width: 5\n" +
-                "  - height: 5\n" +
-                "    topLeftX: 10\n" +
-                "    topLeftY: 10\n" +
-                "    width: 5\n";
+            "  startingMPAs:\n" +
+            "  - height: 6\n" +
+            "    topLeftX: 0\n" +
+            "    topLeftY: 0\n" +
+            "    width: 5\n" +
+            "  - height: 5\n" +
+            "    topLeftX: 10\n" +
+            "    topLeftY: 10\n" +
+            "    width: 5\n";
 
         //read in the base scenario
 
         FishYAML yaml = new FishYAML();
         PrototypeScenario scenario = yaml.loadAs(override, PrototypeScenario.class);
 
-        assertEquals(scenario.getStartingMPAs().size(),2);
+        assertEquals(scenario.getStartingMPAs().size(), 2);
         //the order can be flipped
-        assertEquals(scenario.getStartingMPAs().get(0).getHeight(),5,1);
-        assertEquals(scenario.getStartingMPAs().get(1).getHeight(),5,1);
+        assertEquals(scenario.getStartingMPAs().get(0).getHeight(), 5, 1);
+        assertEquals(scenario.getStartingMPAs().get(1).getHeight(), 5, 1);
 
 
     }
@@ -85,8 +82,8 @@ public class PrototypeScenarioTest {
         state.start();
         Port port = state.getMap().getPorts().iterator().next();
 
-        assertEquals(port.getLocation().getGridX(),40);
-        assertEquals(port.getLocation().getGridY(),25);
+        assertEquals(port.getLocation().getGridX(), 40);
+        assertEquals(port.getLocation().getGridY(), 25);
 
 
     }
@@ -107,8 +104,8 @@ public class PrototypeScenarioTest {
         state.start();
         Port port = state.getMap().getPorts().iterator().next();
 
-        assertEquals(port.getLocation().getGridX(),40);
-        assertEquals(port.getLocation().getGridY(),20);
+        assertEquals(port.getLocation().getGridX(), 40);
+        assertEquals(port.getLocation().getGridY(), 20);
 
 
     }
@@ -116,28 +113,30 @@ public class PrototypeScenarioTest {
     /**
      * if I give agents a head start, they'll use it to fish closer to port than they would have had if they had started
      * at random
+     *
      * @throws Exception
      */
 
     @Test
-    public void headStartMakesDistanceSmall() throws Exception
-    {
+    public void headStartMakesDistanceSmall() throws Exception {
 
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setDestinationStrategy(new PerTripImitativeWithHeadStartFactory());
         final FishState state = new FishState();
         state.setScenario(scenario);
         state.start();
-        for(int i=0; i<10;i++)
+        for (int i = 0; i < 10; i++)
             state.schedule.step(state);
 
         double distanceWithHeadStart = state.getFishers().stream().mapToDouble(
-                new ToDoubleFunction<Fisher>() {
-                    @Override
-                    public double applyAsDouble(Fisher value) {
-                        return state.getMap().distance(value.getHomePort().getLocation(),value.getLastFinishedTrip().getMostFishedTileInTrip());
-                    }
+            new ToDoubleFunction<Fisher>() {
+                @Override
+                public double applyAsDouble(Fisher value) {
+                    return state.getMap()
+                        .distance(value.getHomePort().getLocation(),
+                            value.getLastFinishedTrip().getMostFishedTileInTrip());
                 }
+            }
         ).average().getAsDouble();
 
         scenario = new PrototypeScenario();
@@ -145,26 +144,27 @@ public class PrototypeScenarioTest {
         final FishState state2 = new FishState();
         state2.setScenario(scenario);
         state2.start();
-        for(int i=0; i<10;i++)
+        for (int i = 0; i < 10; i++)
             state.schedule.step(state);
         double distanceWithoutHeadStart = state.getFishers().stream().mapToDouble(
-                new ToDoubleFunction<Fisher>() {
-                    @Override
-                    public double applyAsDouble(Fisher value) {
-                        return state2.getMap().distance(value.getHomePort().getLocation(),value.getLastFinishedTrip().getMostFishedTileInTrip());
-                    }
+            new ToDoubleFunction<Fisher>() {
+                @Override
+                public double applyAsDouble(Fisher value) {
+                    return state2.getMap()
+                        .distance(value.getHomePort().getLocation(),
+                            value.getLastFinishedTrip().getMostFishedTileInTrip());
                 }
+            }
         ).average().getAsDouble();
 
         System.out.println(distanceWithHeadStart);
         System.out.println(distanceWithoutHeadStart);
-        assertTrue(distanceWithHeadStart<distanceWithoutHeadStart);
+        assertTrue(distanceWithHeadStart < distanceWithoutHeadStart);
     }
 
 
     @Test
-    public void fixingTheSeedWorks() throws Exception
-    {
+    public void fixingTheSeedWorks() throws Exception {
 
         PrototypeScenario scenario = new PrototypeScenario();
 
@@ -173,11 +173,11 @@ public class PrototypeScenarioTest {
         state.setScenario(scenario);
         state.start();
 
-        for(int i=0; i<400;i++)
+        for (int i = 0; i < 400; i++)
             state.schedule.step(state);
 
         double landings = state.getDailyDataSet().getColumn("Species 0 Landings").stream().reduce(
-                (aDouble, aDouble2) -> aDouble + aDouble2).get();
+            (aDouble, aDouble2) -> aDouble + aDouble2).get();
 
 
         long random = state.getRandom().nextLong();
@@ -190,15 +190,15 @@ public class PrototypeScenarioTest {
         state.setScenario(scenario);
         state.start();
 
-        for(int i=0; i<400;i++)
+        for (int i = 0; i < 400; i++)
             state.schedule.step(state);
 
         double landings2 = state.getDailyDataSet().getColumn("Species 0 Landings").stream().reduce(
-                (aDouble, aDouble2) -> aDouble + aDouble2).get();
+            (aDouble, aDouble2) -> aDouble + aDouble2).get();
 
-        assertEquals(landings,landings2,.0001);
+        assertEquals(landings, landings2, .0001);
         System.out.println(random);
-        assertEquals(random,state.getRandom().nextLong());
+        assertEquals(random, state.getRandom().nextLong());
 
     }
 }

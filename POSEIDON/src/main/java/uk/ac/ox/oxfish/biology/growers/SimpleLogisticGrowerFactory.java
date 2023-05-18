@@ -43,8 +43,8 @@ public class SimpleLogisticGrowerFactory implements AlgorithmFactory<SimpleLogis
     }
 
 
-    public SimpleLogisticGrowerFactory(double low,double high) {
-        this.steepness =  new UniformDoubleParameter(low, high);
+    public SimpleLogisticGrowerFactory(double low, double high) {
+        this.steepness = new UniformDoubleParameter(low, high);
     }
 
     /**

@@ -25,8 +25,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.nio.file.Paths;
-
 public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStartable> {
 
     public String mapVariableName;

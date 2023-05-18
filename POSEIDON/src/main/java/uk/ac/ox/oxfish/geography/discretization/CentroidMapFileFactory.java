@@ -25,7 +25,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.CsvColumnsToLists;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ public class CentroidMapFileFactory implements AlgorithmFactory<CentroidMapDiscr
      * file should be a csv and should contain the two columns we care about
      */
     private String filePath =
-            Paths.get("temp_wfs", "areas.txt").toString();
+        Paths.get("temp_wfs", "areas.txt").toString();
 
     private String xColumnName = "eastings";
 
@@ -62,21 +61,23 @@ public class CentroidMapFileFactory implements AlgorithmFactory<CentroidMapDiscr
     @Override
     public CentroidMapDiscretizer apply(FishState fishState) {
         CsvColumnsToLists reader = new CsvColumnsToLists(
-                filePath,
-                ',',
-                new String[]{xColumnName, yColumnName}
+            filePath,
+            ',',
+            new String[]{xColumnName, yColumnName}
         );
 
         LinkedList<Double>[] lists = reader.readColumns();
         ArrayList<Coordinate> coordinates = new ArrayList<>();
         for (int i = 0; i < lists[0].size(); i++)
-            coordinates.add(new Coordinate(lists[0].get(i),
-                                           lists[1].get(i),
-                                           0));
+            coordinates.add(new Coordinate(
+                lists[0].get(i),
+                lists[1].get(i),
+                0
+            ));
 
 
         CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(coordinates);
-        if(automaticallyIgnoreWastelands)
+        if (automaticallyIgnoreWastelands)
             discretizer.addFilter(new Predicate<SeaTile>() {
                 @Override
                 public boolean test(SeaTile tile) {

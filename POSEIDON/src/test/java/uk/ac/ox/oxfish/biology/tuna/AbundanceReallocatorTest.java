@@ -28,7 +28,7 @@ import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 public class AbundanceReallocatorTest {
 
     @Test
-    public void AbundanceReallocatorTester(){
+    public void AbundanceReallocatorTester() {
 
         final Meristics meristics = mock(Meristics.class);
         when(meristics.getNumberOfSubdivisions()).thenReturn(2);
@@ -48,9 +48,9 @@ public class AbundanceReallocatorTest {
         abundance.put(species1, new double[][]{{10, 10}, {10, 10}});
 
         final NauticalMap nauticalMap = makeMap(3, 3);
-         nauticalMap.getAllSeaTilesAsList().forEach(seaTile ->
-                seaTile.setBiology(new AbundanceLocalBiology(abundance)
-                )
+        nauticalMap.getAllSeaTilesAsList().forEach(seaTile ->
+            seaTile.setBiology(new AbundanceLocalBiology(abundance)
+            )
         );
 
         final AllocationGrids<Key> allocationGrids = new SmallLargeAllocationGridsSupplier(
@@ -77,9 +77,9 @@ public class AbundanceReallocatorTest {
         );
 
         assertEquals(
-                1.13292204,
-                nauticalMap.getAllSeaTilesAsList().get(4).getAbundance(species1).asMatrix()[0][1],
-                .0000001
+            1.13292204,
+            nauticalMap.getAllSeaTilesAsList().get(4).getAbundance(species1).asMatrix()[0][1],
+            .0000001
         );
 
     }

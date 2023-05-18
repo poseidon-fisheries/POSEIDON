@@ -19,13 +19,14 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
 import com.google.common.primitives.ImmutableDoubleArray;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+
 import java.util.Collection;
 import java.util.function.UnaryOperator;
-import uk.ac.ox.oxfish.biology.LocalBiology;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * TODO.
@@ -48,7 +49,7 @@ public abstract class CatchSampler<B extends LocalBiology> implements UnaryOpera
     }
 
     public ImmutableDoubleArray next(final B sourceBiology) {
-       return sampler.next(catchArray -> test(sourceBiology, catchArray));
+        return sampler.next(catchArray -> test(sourceBiology, catchArray));
     }
 
     abstract boolean test(B sourceBiology, ImmutableDoubleArray catchArray);
@@ -56,7 +57,7 @@ public abstract class CatchSampler<B extends LocalBiology> implements UnaryOpera
     /**
      * forces the sampler to look at the whole original data-set again
      */
-    public void reset(){
+    public void reset() {
         this.sampler.resetQueue();
     }
 

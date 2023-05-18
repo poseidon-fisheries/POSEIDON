@@ -30,8 +30,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * A fixed price market maker
  * Created by carrknight on 8/11/15.
  */
-public class FixedPriceMarketFactory implements AlgorithmFactory<FixedPriceMarket>
-{
+public class FixedPriceMarketFactory implements AlgorithmFactory<FixedPriceMarket> {
 
     private DoubleParameter marketPrice = new FixedDoubleParameter(10.0);
 

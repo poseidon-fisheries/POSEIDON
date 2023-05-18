@@ -28,8 +28,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
  * The factory that creates the fixed gear strategy
  * Created by carrknight on 6/13/16.
  */
-public class FixedGearStrategyFactory implements AlgorithmFactory<FixedGearStrategy>
-{
+public class FixedGearStrategyFactory implements AlgorithmFactory<FixedGearStrategy> {
 
 
     /**

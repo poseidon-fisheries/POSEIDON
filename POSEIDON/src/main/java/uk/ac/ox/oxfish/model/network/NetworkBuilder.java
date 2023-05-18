@@ -29,11 +29,11 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
  * Creates a network and manages adding more vertices to the graph
  * Created by carrknight on 12/11/15.
  */
-public interface NetworkBuilder extends AlgorithmFactory<DirectedGraph<Fisher,FriendshipEdge>>
-{
+public interface NetworkBuilder extends AlgorithmFactory<DirectedGraph<Fisher, FriendshipEdge>> {
 
     /**
      * adds a condition that needs to be true for two fishers to be friends.
+     *
      * @param predicate the condition to add
      */
     void addPredicate(NetworkPredicate predicate);
@@ -46,7 +46,8 @@ public interface NetworkBuilder extends AlgorithmFactory<DirectedGraph<Fisher,Fr
 
     /**
      * remove fisher from network. This is to be used while the model is running to clear any ties
-     * @param toRemove fisher to remove
+     *
+     * @param toRemove       fisher to remove
      * @param currentNetwork network to modify
      * @param state
      */

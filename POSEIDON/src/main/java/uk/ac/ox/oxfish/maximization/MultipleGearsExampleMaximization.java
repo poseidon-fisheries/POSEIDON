@@ -44,27 +44,28 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
 
 
     private static final Path DEFAULT_PATH = Paths.get("docs",
-                                                       "indonesia_hub",
-                                                       "runs","712","slice0","calibration");
+        "indonesia_hub",
+        "runs", "712", "slice0", "calibration"
+    );
 
     private String scenarioFile =
-            DEFAULT_PATH.resolve("712_optimistic_2014_perfect.yaml").toString();
+        DEFAULT_PATH.resolve("712_optimistic_2014_perfect.yaml").toString();
 
 
     private String summaryFile =
-            DEFAULT_PATH.resolve("summary_2014.csv").toString();
+        DEFAULT_PATH.resolve("summary_2014.csv").toString();
 
     private String landingData =
-            DEFAULT_PATH.resolve("landings4.csv").toString();
+        DEFAULT_PATH.resolve("landings4.csv").toString();
 
     private long seed = 0;
 
 
     // an input of +10 means this is the catchability
-    private double maxCatchability =  0.005;
+    private double maxCatchability = 0.005;
 
     //an input of -10 means this catchability
-    private double minCatchability =  0.00001;
+    private double minCatchability = 0.00001;
 
     private int populations = 3;
 
@@ -85,10 +86,9 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
             //read landings
             List<String> lines = Files.readAllLines(Paths.get(landingData));
             Double[][] landings = new Double[populations][lines.size()];
-            for(int i=0; i<lines.size(); i++)
-            {
+            for (int i = 0; i < lines.size(); i++) {
                 String[] split = lines.get(i).split(",");
-                for(int population=0; population<populations; population++)
+                for (int population = 0; population < populations; population++)
                     landings[population][i] = Double.parseDouble(split[population]);
             }
 
@@ -106,34 +106,33 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
                 }
                 model.schedule.step(model);
 
-                if(populations>1)
-                for(int population = 0; population<populations; population++)
-                {
-                    List<Double> simulatedLandings = model.getYearlyDataSet().getColumn(
-                            speciesName + " Landings of population"+population
-                    ).stream().collect(Collectors.toList());
-                    for(int j=0; j<yearsToIgnore; j++) //remove years to ignore!
-                        simulatedLandings.remove(0);
+                if (populations > 1)
+                    for (int population = 0; population < populations; population++) {
+                        List<Double> simulatedLandings = model.getYearlyDataSet().getColumn(
+                            speciesName + " Landings of population" + population
+                        ).stream().collect(Collectors.toList());
+                        for (int j = 0; j < yearsToIgnore; j++) //remove years to ignore!
+                            simulatedLandings.remove(0);
 
-                    error+= FishStateUtilities.timeSeriesDistance(
+                        error += FishStateUtilities.timeSeriesDistance(
                             simulatedLandings,
                             Arrays.asList(landings[population]), 1,
-                            false);
-                }
-                else{
+                            false
+                        );
+                    }
+                else {
                     List<Double> simulatedLandings = model.getYearlyDataSet().getColumn(
-                            speciesName + " Landings").stream().collect(Collectors.toList());
+                        speciesName + " Landings").stream().collect(Collectors.toList());
 
-                    for(int j=0; j<yearsToIgnore; j++) //remove years to ignore!
+                    for (int j = 0; j < yearsToIgnore; j++) //remove years to ignore!
                         simulatedLandings.remove(0);
 
-                    error+= FishStateUtilities.timeSeriesDistance(
-                            simulatedLandings,
-                            Arrays.asList(landings[0]), 1,
-                            false);
+                    error += FishStateUtilities.timeSeriesDistance(
+                        simulatedLandings,
+                        Arrays.asList(landings[0]), 1,
+                        false
+                    );
                 }
-
-
 
 
             }
@@ -143,17 +142,16 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
 
             //write summary file
             Files.write(
-                    Paths.get(summaryFile),
-                    (averageError +"," + Arrays.toString(x).
-                            replace("[","").
-                            replace("]","") +"\n").getBytes(),
-                    StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.APPEND
+                Paths.get(summaryFile),
+                (averageError + "," + Arrays.toString(x).
+                    replace("[", "").
+                    replace("]", "") + "\n").getBytes(),
+                StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.APPEND
             );
 
             return new double[]{
-                    averageError};
-        }
-        catch (IOException exception){
+                averageError};
+        } catch (IOException exception) {
             throw new RuntimeException("failed to read or deal with files!");
         }
     }
@@ -164,17 +162,17 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
 
 
         FlexibleScenario scenario = yaml.loadAs(
-                new FileReader(scenarioPath.toFile()),
-                FlexibleScenario.class);
+            new FileReader(scenarioPath.toFile()),
+            FlexibleScenario.class
+        );
 
 
-        assert x.length==populations;
-        for(int k=0; k<x.length; k++)
-        {
-            double catchability = ((x[k]+10)/20)*(maxCatchability-minCatchability);
+        assert x.length == populations;
+        for (int k = 0; k < x.length; k++) {
+            double catchability = ((x[k] + 10) / 20) * (maxCatchability - minCatchability);
             FisherDefinition definition = scenario.getFisherDefinitions().get(k);
             ((RandomCatchabilityTrawlFactory) definition.getGear()).setMeanCatchabilityFirstSpecies(
-                    new FixedDoubleParameter(catchability)
+                new FixedDoubleParameter(catchability)
             );
 
         }
@@ -245,7 +243,6 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
     public void setMinCatchability(double minCatchability) {
         this.minCatchability = minCatchability;
     }
-
 
 
     public int getYearsToIgnore() {

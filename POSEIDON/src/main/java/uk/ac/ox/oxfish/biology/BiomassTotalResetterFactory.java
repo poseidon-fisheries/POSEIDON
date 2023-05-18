@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class BiomassTotalResetterFactory  implements AlgorithmFactory<BiomassTotalResetter>{
+public class BiomassTotalResetterFactory implements AlgorithmFactory<BiomassTotalResetter> {
 
 
     private String speciesName = "Species 0";
@@ -45,9 +45,9 @@ public class BiomassTotalResetterFactory  implements AlgorithmFactory<BiomassTot
     @Override
     public BiomassTotalResetter apply(FishState fishState) {
         return new BiomassTotalResetter(
-                fishState.getBiology().getSpecie(speciesName),
-                () -> allocator.apply(fishState),
-                yearlyBiomass
+            fishState.getBiology().getSpecie(speciesName),
+            () -> allocator.apply(fishState),
+            yearlyBiomass
 
         );
     }
@@ -85,7 +85,8 @@ public class BiomassTotalResetterFactory  implements AlgorithmFactory<BiomassTot
      * @param allocator Value to set for property 'allocator'.
      */
     public void setAllocator(
-            AlgorithmFactory<? extends BiomassAllocator> allocator) {
+        AlgorithmFactory<? extends BiomassAllocator> allocator
+    ) {
         this.allocator = allocator;
     }
 

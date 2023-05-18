@@ -44,18 +44,20 @@ public class CommonLogisticGrowerTest {
         model.start();
 
         assertEquals(
-                7500,
-                model.getTotalBiomass(model.getBiology().getSpecie(0)),
-                .001);
+            7500,
+            model.getTotalBiomass(model.getBiology().getSpecie(0)),
+            .001
+        );
 
-        for(int i=0; i<370; i++)
+        for (int i = 0; i < 370; i++)
             model.schedule.step(model);
 
 
         assertEquals(
-                8118.75,
-                model.getTotalBiomass(model.getBiology().getSpecie(0)),
-                .001);
+            8118.75,
+            model.getTotalBiomass(model.getBiology().getSpecie(0)),
+            .001
+        );
     }
 
     @Test
@@ -66,13 +68,14 @@ public class CommonLogisticGrowerTest {
         ArrayList<BiomassLocalBiology> biologies = Lists.newArrayList(first, second);
 
         CommonLogisticGrower.allocateBiomassProportionally(
-                biologies,
-                100,
-                0,
-                1);
+            biologies,
+            100,
+            0,
+            1
+        );
 
-        assertEquals(150,first.getCurrentBiomass()[0],.0001);
-        assertEquals(150,second.getCurrentBiomass()[0],.0001);
+        assertEquals(150, first.getCurrentBiomass()[0], .0001);
+        assertEquals(150, second.getCurrentBiomass()[0], .0001);
 
 
     }
@@ -85,13 +88,14 @@ public class CommonLogisticGrowerTest {
         ArrayList<BiomassLocalBiology> biologies = Lists.newArrayList(first, second);
 
         CommonLogisticGrower.allocateBiomassProportionally(
-                biologies,
-                1000,
-                0,
-                1);
+            biologies,
+            1000,
+            0,
+            1
+        );
 
-        assertEquals(200,first.getCurrentBiomass()[0],.0001);
-        assertEquals(200,second.getCurrentBiomass()[0],.0001);
+        assertEquals(200, first.getCurrentBiomass()[0], .0001);
+        assertEquals(200, second.getCurrentBiomass()[0], .0001);
 
 
     }
@@ -105,13 +109,14 @@ public class CommonLogisticGrowerTest {
         ArrayList<BiomassLocalBiology> biologies = Lists.newArrayList(first, second);
 
         CommonLogisticGrower.allocateBiomassProportionally(
-                biologies,
-                1000,
-                0,
-                1);
+            biologies,
+            1000,
+            0,
+            1
+        );
 
-        assertEquals(200,first.getCurrentBiomass()[0],.0001);
-        assertEquals(200,second.getCurrentBiomass()[0],.0001);
+        assertEquals(200, first.getCurrentBiomass()[0], .0001);
+        assertEquals(200, second.getCurrentBiomass()[0], .0001);
 
 
     }
@@ -124,13 +129,14 @@ public class CommonLogisticGrowerTest {
         ArrayList<BiomassLocalBiology> biologies = Lists.newArrayList(first, second);
 
         CommonLogisticGrower.allocateBiomassProportionally(
-                biologies,
-                100,
-                0,
-                1);
+            biologies,
+            100,
+            0,
+            1
+        );
 
-        assertEquals(100*(200d/300),first.getCurrentBiomass()[0],.0001);
-        assertEquals(100+100d*(100d/300),second.getCurrentBiomass()[0],.0001);
+        assertEquals(100 * (200d / 300), first.getCurrentBiomass()[0], .0001);
+        assertEquals(100 + 100d * (100d / 300), second.getCurrentBiomass()[0], .0001);
 
 
     }
@@ -143,13 +149,14 @@ public class CommonLogisticGrowerTest {
         ArrayList<BiomassLocalBiology> biologies = Lists.newArrayList(first, second);
 
         CommonLogisticGrower.allocateBiomassProportionally(
-                biologies,
-                250,
-                0,
-                1);
+            biologies,
+            250,
+            0,
+            1
+        );
 
-        assertEquals(250d*(200d/300),first.getCurrentBiomass()[0],.0001);
-        assertEquals(100+250d*(100d/300),second.getCurrentBiomass()[0],.0001);
+        assertEquals(250d * (200d / 300), first.getCurrentBiomass()[0], .0001);
+        assertEquals(100 + 250d * (100d / 300), second.getCurrentBiomass()[0], .0001);
 
 
     }
@@ -162,14 +169,15 @@ public class CommonLogisticGrowerTest {
         ArrayList<BiomassLocalBiology> biologies = Lists.newArrayList(first, second);
 
         CommonLogisticGrower.allocateBiomassProportionally(
-                biologies,
-                250,
-                0,
-                3);
+            biologies,
+            250,
+            0,
+            3
+        );
 
         //fill this up first!
-        assertEquals(200,first.getCurrentBiomass()[0],.0001);
-        assertEquals(150,second.getCurrentBiomass()[0],.0001);
+        assertEquals(200, first.getCurrentBiomass()[0], .0001);
+        assertEquals(150, second.getCurrentBiomass()[0], .0001);
 
 
     }

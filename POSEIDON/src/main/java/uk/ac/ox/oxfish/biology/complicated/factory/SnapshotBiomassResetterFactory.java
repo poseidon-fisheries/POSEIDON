@@ -33,7 +33,7 @@ public class SnapshotBiomassResetterFactory implements AlgorithmFactory<Snapshot
 
     @Override
     public SnapshotBiologyResetter apply(FishState state) {
-        return SnapshotBiologyResetter.biomassResetter(state.getBiology(), yearsToReset,restoreOriginalLocations);
+        return SnapshotBiologyResetter.biomassResetter(state.getBiology(), yearsToReset, restoreOriginalLocations);
     }
 
 

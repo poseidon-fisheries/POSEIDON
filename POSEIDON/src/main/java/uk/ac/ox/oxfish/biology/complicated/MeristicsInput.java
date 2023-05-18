@@ -32,65 +32,65 @@ public class MeristicsInput {
     private int maxAge;
 
 
-
     /**
      * LENGTH-WEIGHT parameters
      */
-    private  double maxLengthMale; //linfinity male
-    private  double maxLengthFemale; //linfinity female
-    private  double KParameterFemale; //growth slope female
+    private double maxLengthMale; //linfinity male
+    private double maxLengthFemale; //linfinity female
+    private double KParameterFemale; //growth slope female
     private double KParameterMale; //growth slope male
     private double weightParameterAFemale; //allometric parameter A female
-    private  double weightParameterBFemale; //allometric parameter B female
+    private double weightParameterBFemale; //allometric parameter B female
     private double weightParameterAMale; //allometric parameter A male
-    private  double weightParameterBMale; //allometric parameter B female
+    private double weightParameterBMale; //allometric parameter B female
 
     //age you are considered "old" (after this bin, you reach L infinity)
-    private  int ageOld;
+    private int ageOld;
     //age when young
-    private  double youngAgeMale;
+    private double youngAgeMale;
     private double youngAgeFemale;
 
     // length when "young"
-    private  double youngLengthMale;
-    private  double youngLengthFemale;
+    private double youngLengthMale;
+    private double youngLengthFemale;
 
     /***
      * MORTALITY
      */
     //instantaneous mortality male
-    private  double mortalityParameterMMale;
+    private double mortalityParameterMMale;
     //instantaneous mortality female
-    private  double mortalityParameterMFemale;
+    private double mortalityParameterMFemale;
     /**
      * RECRUITMENT PARAMETERS
      */
     //maturity parameter 1
     private double maturityInflection;
     //maturity parameter 2
-    private  double maturitySlope;
+    private double maturitySlope;
     //fecundity parameter 1
-    private  double fecundityIntercept;
+    private double fecundityIntercept;
     //fecundity parameter 2
-    private  double fecunditySlope;
+    private double fecunditySlope;
     //recruits when at full capacity
     private int virginRecruits;
     //resilience of the stock in terms of recruitment
-    private  double steepness;
+    private double steepness;
     //yelloweye was a special case where relative fecundity was part of the equation, if you need to use the same formula, this is set to true
-    private  boolean addRelativeFecundityToSpawningBiomass;
+    private boolean addRelativeFecundityToSpawningBiomass;
 
     public MeristicsInput() {
     }
 
     public MeristicsInput(
-            int maxAge, int ageOld, double youngAgeMale, double youngLengthMale, double maxLengthMale,
-            double KParameterMale, double weightParameterAMale, double weightParameterBMale,
-            double mortalityParameterMMale,
-            double youngAgeFemale, double youngLengthFemale, double maxLengthFemale, double KParameterFemale,
-            double weightParameterAFemale, double weightParameterBFemale, double mortalityParameterMFemale,
-            double maturityInflection, double maturitySlope, double fecundityIntercept, double fecunditySlope,
-            int virginRecruits, double steepness, boolean addRelativeFecundityToSpawningBiomass) {
+        int maxAge, int ageOld, double youngAgeMale, double youngLengthMale, double maxLengthMale,
+        double KParameterMale, double weightParameterAMale, double weightParameterBMale,
+        double mortalityParameterMMale,
+        double youngAgeFemale, double youngLengthFemale, double maxLengthFemale, double KParameterFemale,
+        double weightParameterAFemale, double weightParameterBFemale, double mortalityParameterMFemale,
+        double maturityInflection, double maturitySlope, double fecundityIntercept, double fecunditySlope,
+        int virginRecruits, double steepness, boolean addRelativeFecundityToSpawningBiomass
+    ) {
         this.maxAge = maxAge;
         this.ageOld = ageOld;
         this.youngAgeMale = youngAgeMale;

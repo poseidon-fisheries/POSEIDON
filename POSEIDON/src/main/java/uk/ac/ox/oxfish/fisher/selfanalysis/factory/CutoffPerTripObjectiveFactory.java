@@ -33,11 +33,15 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  */
 public class CutoffPerTripObjectiveFactory implements AlgorithmFactory<CutoffPerTripObjective> {
 
-    private final ConditionalDoubleParameter lowThreshold = new ConditionalDoubleParameter(false,
-        new FixedDoubleParameter(0));
+    private final ConditionalDoubleParameter lowThreshold = new ConditionalDoubleParameter(
+        false,
+        new FixedDoubleParameter(0)
+    );
 
-    private final ConditionalDoubleParameter highThreshold = new ConditionalDoubleParameter(false,
-        new FixedDoubleParameter(0));
+    private final ConditionalDoubleParameter highThreshold = new ConditionalDoubleParameter(
+        false,
+        new FixedDoubleParameter(0)
+    );
 
     private boolean opportunityCosts = true;
 

@@ -25,7 +25,8 @@ public enum SummingMerger implements DoubleBinaryOperator {
 
     INSTANCE;
 
-    @Override public double applyAsDouble(final double oldValue, final double newValue) {
+    @Override
+    public double applyAsDouble(final double oldValue, final double newValue) {
         return oldValue + newValue;
     }
 

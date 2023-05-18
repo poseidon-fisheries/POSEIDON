@@ -37,7 +37,7 @@ public class AbsoluteRegressionDistance implements RegressionDistance {
     @Override
     public double distance(double firstObservation, double secondObservation) {
 
-        return Math.abs(firstObservation-secondObservation)/bandwidth;
+        return Math.abs(firstObservation - secondObservation) / bandwidth;
     }
 
 

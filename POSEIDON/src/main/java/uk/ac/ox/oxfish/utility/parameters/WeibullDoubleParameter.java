@@ -22,37 +22,35 @@ package uk.ac.ox.oxfish.utility.parameters;
 
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.math3.distribution.WeibullDistribution;
-import org.apache.commons.math3.random.Well19937c;
 import uk.ac.ox.oxfish.utility.MTFApache;
 
 public class WeibullDoubleParameter implements DoubleParameter {
 
+    private final double epsilon = 0.0001;
     private double shape;
     private double scale;
-    private final double epsilon = 0.0001;
-
     private WeibullDistribution distribution;
 
-    public WeibullDoubleParameter(double shape, double scale)
-    {
-        this.shape = Math.max(shape,epsilon); //Cannot be zero
-        this.scale = Math.max(scale,epsilon);
+    public WeibullDoubleParameter(double shape, double scale) {
+        this.shape = Math.max(shape, epsilon); //Cannot be zero
+        this.scale = Math.max(scale, epsilon);
     }
 
     @Override
     public DoubleParameter makeCopy() {
-        return new WeibullDoubleParameter(shape,scale);
+        return new WeibullDoubleParameter(shape, scale);
     }
 
     @Override
     public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast) {
 
-        if(distribution==null)
+        if (distribution == null)
             distribution = new WeibullDistribution(
-                    new MTFApache(
-                            mersenneTwisterFast
-                    ),
-                    shape,scale);
+                new MTFApache(
+                    mersenneTwisterFast
+                ),
+                shape, scale
+            );
 
         return distribution.sample();
     }
@@ -64,7 +62,7 @@ public class WeibullDoubleParameter implements DoubleParameter {
 
     public void setShape(double shape) {
         this.shape = Math.max(shape, epsilon);
-        distribution=null;
+        distribution = null;
     }
 
     public double getScale() {
@@ -72,11 +70,11 @@ public class WeibullDoubleParameter implements DoubleParameter {
     }
 
     public void setScale(double scale) {
-        distribution=null;
-        this.scale = Math.max(scale,epsilon);
+        distribution = null;
+        this.scale = Math.max(scale, epsilon);
     }
 
-    public double inverseCDF(double probability){
-        return(scale*Math.pow(-Math.log(1-probability),1/shape));
+    public double inverseCDF(double probability) {
+        return (scale * Math.pow(-Math.log(1 - probability), 1 / shape));
     }
 }

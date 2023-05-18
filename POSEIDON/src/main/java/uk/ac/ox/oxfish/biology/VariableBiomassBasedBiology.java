@@ -39,7 +39,9 @@ public interface VariableBiomassBasedBiology extends LocalBiology {
 
     double[] getCurrentBiomass();
 
-    default boolean isEmpty() { return stream(getCurrentBiomass()).allMatch(b -> b == 0); }
+    default boolean isEmpty() {
+        return stream(getCurrentBiomass()).allMatch(b -> b == 0);
+    }
 
     default boolean isFull() {
         return range(0, getCurrentBiomass().length)

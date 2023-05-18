@@ -45,8 +45,7 @@ public class LessThanXFishersHereExtractorTest {
         SeaTile full = mock(SeaTile.class);
         SeaTile empty = mock(SeaTile.class);
         SeaTile halfFull = mock(SeaTile.class);
-        List<SeaTile> toRepresent = Arrays.asList(full, empty,halfFull);
-
+        List<SeaTile> toRepresent = Arrays.asList(full, empty, halfFull);
 
 
         FishState model = mock(FishState.class);
@@ -67,12 +66,12 @@ public class LessThanXFishersHereExtractorTest {
 
         LessThanXFishersHereExtractor safe = new LessThanXFishersHereExtractor(5);
         HashMap<SeaTile, Double> safetyReport = safe.extractFeature(toRepresent, model,
-                                                                    mock(Fisher.class)
+            mock(Fisher.class)
         );
 
-        assertTrue(safetyReport.get(empty)>0);
-        assertTrue(safetyReport.get(halfFull)>0);
-        assertTrue(safetyReport.get(full)<=0);
+        assertTrue(safetyReport.get(empty) > 0);
+        assertTrue(safetyReport.get(halfFull) > 0);
+        assertTrue(safetyReport.get(full) <= 0);
 
 
     }

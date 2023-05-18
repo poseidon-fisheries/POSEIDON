@@ -41,18 +41,19 @@ public class SimulatedHourlyCostExtractor implements ObservationExtractor {
     }
 
     public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-        TripRecord simulation = simulator.simulateTrip(agent,
-                                                       agent.getGear().expectedHourlyCatch(agent, tile, 1,
-                                                                                           model.getBiology()),
-                                                       tile,
-                                                       model
+        TripRecord simulation = simulator.simulateTrip(
+            agent,
+            agent.getGear().expectedHourlyCatch(agent, tile, 1,
+                model.getBiology()
+            ),
+            tile,
+            model
         );
 
 
-
-        if(simulation== null)
+        if (simulation == null)
             return 10000;
-        return (simulation.getTotalCosts()  + simulation.getOpportunityCosts())/simulation.getDurationInHours();
+        return (simulation.getTotalCosts() + simulation.getOpportunityCosts()) / simulation.getDurationInHours();
     }
 }
 

@@ -43,11 +43,13 @@ public class TrawlsHeatmapGatherer extends HeatmapGatherer {
 
         private IntGrid2D trawlsMap;
 
-        @Override public void start(final FishState fishState) {
+        @Override
+        public void start(final FishState fishState) {
             trawlsMap = fishState.getDailyTrawlsMap();
         }
 
-        @Override public double applyAsDouble(final SeaTile seaTile) {
+        @Override
+        public double applyAsDouble(final SeaTile seaTile) {
             return trawlsMap.get(seaTile.getGridX(), seaTile.getGridY());
         }
 

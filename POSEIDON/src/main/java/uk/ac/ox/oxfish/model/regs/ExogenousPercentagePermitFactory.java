@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ExogenousPercentagePermitFactory implements AlgorithmFactory<ExogenousPercentagePermitAllocation> {
 
-    private List<Double> yearlyEffortAllowed = Lists.newArrayList(.1,.2,.3,.4,.5);
+    private List<Double> yearlyEffortAllowed = Lists.newArrayList(.1, .2, .3, .4, .5);
 
 
     @Override

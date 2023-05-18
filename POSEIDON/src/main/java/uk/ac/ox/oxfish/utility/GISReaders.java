@@ -41,13 +41,12 @@ import java.nio.file.Paths;
 public class GISReaders {
 
 
-
-    public  static GeomGridField readRaster(String resourceName) {
+    public static GeomGridField readRaster(String resourceName) {
         URL resource = GISReaders.class.getClassLoader().getResource(resourceName);
         File input = null;
-        if(resource!= null)
+        if (resource != null)
             input = new File(resource.getFile());
-        if(resource == null || !input.exists())
+        if (resource == null || !input.exists())
             //it's not a resource, maybe it's an external file
             input = Paths.get(resourceName).toFile();
 
@@ -62,34 +61,33 @@ public class GISReaders {
         GeomGridField field = new GeomGridField();
         ArcInfoASCGridImporter.read(inputStream, GeomGridField.GridDataType.DOUBLE, field);
 
-        return  field;
+        return field;
 
     }
 
     /**
      * reads the new files and then expands everyone's MBR so that they are equal
-     * @param toMerge the tile raster representing the sea
+     *
+     * @param toMerge   the tile raster representing the sea
      * @param filenames all the files with MPAs geometries
      * @return a unique GeomVectorField holding all the shapes.
      */
-    public  static GeomVectorField readShapeAndMergeWithRaster(GeomGridField toMerge, String... filenames)
-    {
-        if(filenames.length < 1)
+    public static GeomVectorField readShapeAndMergeWithRaster(GeomGridField toMerge, String... filenames) {
+        if (filenames.length < 1)
             throw new IllegalArgumentException("Must have at least one shape file!");
 
         GeomVectorField vectorField = readShapeFile(filenames[0]);
 
         //now for all others filenames we are just going to copy paste the arguments in the first one
-        for(int i=1;i<filenames.length; i++)
-        {
-            assert  i>0;
-            GeomVectorField tmp =  readShapeFile(filenames[i]);
+        for (int i = 1; i < filenames.length; i++) {
+            assert i > 0;
+            GeomVectorField tmp = readShapeFile(filenames[i]);
 
             Envelope globalMBR = vectorField.getMBR();
             globalMBR.expandToInclude(tmp.getMBR());
             vectorField.setMBR(globalMBR);
 
-            for(Object geometry : tmp.getGeometries())
+            for (Object geometry : tmp.getGeometries())
                 vectorField.addGeometry((MasonGeometry) geometry);
         }
         //synchronize MBRs
@@ -97,15 +95,15 @@ public class GISReaders {
         globalMBR.expandToInclude(toMerge.getMBR());
         toMerge.setMBR(globalMBR);
         vectorField.setMBR(globalMBR);
-        return  vectorField;
+        return vectorField;
     }
 
     public static GeomVectorField readShapeFile(String filename) {
         URL resource = GISReaders.class.getClassLoader().getResource(filename);
         File input = null;
-        if(resource!= null)
+        if (resource != null)
             input = new File(resource.getFile());
-        if(resource == null || !input.exists())
+        if (resource == null || !input.exists())
             //it's not a resource, maybe it's an external file
             input = Paths.get(filename).toFile();
 

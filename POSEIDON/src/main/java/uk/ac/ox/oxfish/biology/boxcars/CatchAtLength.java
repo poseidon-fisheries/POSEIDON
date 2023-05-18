@@ -10,8 +10,10 @@ public class CatchAtLength {
     private final double totalCount;
 
 
-    public CatchAtLength(StructuredAbundance abundance,
-                         Species species, double lengthBinCm, int numberOfBins) {
+    public CatchAtLength(
+        StructuredAbundance abundance,
+        Species species, double lengthBinCm, int numberOfBins
+    ) {
         int currentCount = 0;
         catchAtLength = new double[numberOfBins];
         for (int bin = 0; bin < abundance.getBins(); bin++) {
@@ -23,11 +25,11 @@ public class CatchAtLength {
                     int countBin = (int) Math.floor((lengthHere) / lengthBinCm);
                     if (countBin >= catchAtLength.length) {
                         //we could be using a bad or simplified lengthInfinity
-                       // assert species.getLength(subdivision, bin) >= lengthInfinity;
+                        // assert species.getLength(subdivision, bin) >= lengthInfinity;
                         countBin = catchAtLength.length - 1;
                     }
                     catchAtLength[countBin] +=
-                            abundanceHere;
+                        abundanceHere;
                     currentCount += abundanceHere;
                 }
 

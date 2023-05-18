@@ -18,18 +18,8 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.stream.IntStream.range;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
 import junit.framework.TestCase;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -38,6 +28,17 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.GlobalBiomassLogger;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Function;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.stream.IntStream.range;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class AbundanceAggregatorTest extends TestCase {
 
@@ -136,17 +137,14 @@ public class AbundanceAggregatorTest extends TestCase {
 
     }
 
-    private static ImmutableMap<Species, Double> getBiomasses(
+    private static Map<Species, Double> getBiomasses(
         final FishState fishState,
-        final Collection<Species> species,
-        final Collection<AbundanceLocalBiology> extractedBiologies
+        final Collection<Species> species
     ) {
-        //noinspection UnstableApiUsage
-        return Streams.zip(
-            species.stream(),
-            GlobalBiomassLogger.getBiomassesStream(fishState, extractedBiologies),
-            FishStateUtilities::entry
-        ).collect(toImmutableMap(Entry::getKey, Entry::getValue));
+        return species.stream().collect(toImmutableMap(
+            Function.identity(),
+            fishState::getTotalBiomass
+        ));
     }
 
     private static void compareBiomasses(
@@ -158,14 +156,17 @@ public class AbundanceAggregatorTest extends TestCase {
         );
     }
 
-    private static Map<Species, Double> getBiomasses(
+    private static ImmutableMap<Species, Double> getBiomasses(
         final FishState fishState,
-        final Collection<Species> species
+        final Collection<Species> species,
+        final Collection<AbundanceLocalBiology> extractedBiologies
     ) {
-        return species.stream().collect(toImmutableMap(
-            Function.identity(),
-            fishState::getTotalBiomass
-        ));
+        //noinspection UnstableApiUsage
+        return Streams.zip(
+            species.stream(),
+            GlobalBiomassLogger.getBiomassesStream(fishState, extractedBiologies),
+            FishStateUtilities::entry
+        ).collect(toImmutableMap(Entry::getKey, Entry::getValue));
     }
 
 }

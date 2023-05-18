@@ -27,9 +27,9 @@ public interface InitialBiomass {
 
 
     public double getInitialBiomass(
-            NauticalMap map,
-            Species species,
-            int numberOfHabitableCells
+        NauticalMap map,
+        Species species,
+        int numberOfHabitableCells
     );
 
 }

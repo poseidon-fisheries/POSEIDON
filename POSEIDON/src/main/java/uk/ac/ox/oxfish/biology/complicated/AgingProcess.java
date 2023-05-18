@@ -32,10 +32,9 @@ import java.util.Collection;
 public interface AgingProcess {
 
 
-
-
     /**
      * called after the aging process has been constructed but before it is run.
+     *
      * @param species
      */
     public void start(Species species);
@@ -43,14 +42,16 @@ public interface AgingProcess {
 
     /**
      * as a side-effect ages the local biology according to its rules
-     * @param localBiology list of local biologies to age
-     * @param model link to the model
-     * @param rounding whether we expect numbers to be rounded to integers
+     *
+     * @param localBiology   list of local biologies to age
+     * @param model          link to the model
+     * @param rounding       whether we expect numbers to be rounded to integers
      * @param daysToSimulate simulation days
      */
     public void age(
-            Collection<AbundanceLocalBiology> localBiology, Species species,
-            FishState model, boolean rounding, int daysToSimulate);
+        Collection<AbundanceLocalBiology> localBiology, Species species,
+        FishState model, boolean rounding, int daysToSimulate
+    );
 
 
 }

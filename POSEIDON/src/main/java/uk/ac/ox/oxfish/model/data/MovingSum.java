@@ -21,27 +21,24 @@
 package uk.ac.ox.oxfish.model.data;
 
 /**
- *  Sum up the last x observations fed in
+ * Sum up the last x observations fed in
  * Created by carrknight on 8/14/15.
  */
-
 
 
 import java.util.LinkedList;
 
 
-public class MovingSum<T extends Number>
-{
-
-    /**
-     * Where we keep all the observations
-     */
-    LinkedList<T> lastElements = new LinkedList<>();
+public class MovingSum<T extends Number> {
 
     /**
      * The size of the queue
      */
     final private int size;
+    /**
+     * Where we keep all the observations
+     */
+    LinkedList<T> lastElements = new LinkedList<>();
 
     public MovingSum(int size) {
         this.size = size;
@@ -51,15 +48,15 @@ public class MovingSum<T extends Number>
      * Add a new observation to the moving average
      * @param observation number to add
      */
-    public void addObservation(T observation){
+    public void addObservation(T observation) {
 
         //add the last observation
         lastElements.addLast(observation);
         //if the queue is full, remove the first guy
-        if(lastElements.size()>size)
+        if (lastElements.size() > size)
             lastElements.removeFirst();
 
-        assert lastElements.size() <=size;
+        assert lastElements.size() <= size;
 
 
     }
@@ -70,13 +67,12 @@ public class MovingSum<T extends Number>
      *
      * @return the smoothed observation
      */
-    public double getSmoothedObservation()
-    {
-        if(!isReady())
+    public double getSmoothedObservation() {
+        if (!isReady())
             return Float.NaN;
 
-        float total  =0;
-        for(T element : lastElements)
+        float total = 0;
+        for (T element : lastElements)
             total += element.doubleValue();
 
         return total;
@@ -91,12 +87,11 @@ public class MovingSum<T extends Number>
     }
 
 
-
     public int getSize() {
         return size;
     }
 
-    public int numberOfObservations(){
+    public int numberOfObservations() {
         return lastElements.size();
     }
 }

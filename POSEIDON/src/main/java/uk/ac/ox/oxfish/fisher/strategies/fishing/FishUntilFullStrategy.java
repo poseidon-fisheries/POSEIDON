@@ -22,22 +22,18 @@ package uk.ac.ox.oxfish.fisher.strategies.fishing;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * The fisher keeps fishing until the percentage of hold filled is above a threshold.
- *
+ * <p>
  * Created by carrknight on 5/5/15.
  */
 public class FishUntilFullStrategy implements FishingStrategy {
 
-    private double minimumPercentageFull;
-
     private final static double EPSILON = .001;
+    private double minimumPercentageFull;
 
     public FishUntilFullStrategy(double minimumPercentageFull) {
         this.minimumPercentageFull = minimumPercentageFull;
@@ -47,15 +43,15 @@ public class FishUntilFullStrategy implements FishingStrategy {
      * This is called by the fisher to decide whether or not to fish and then each step after that to decide whether or
      * not to continue fishing
      *
-     *
      * @param random the randomizer
      * @param model  the model itself   @return true if the fisher should fish here, false otherwise
      */
     @Override
     public boolean shouldFish(
-            Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip) {
+        Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip
+    ) {
         return fisher.getTotalWeightOfCatchInHold() + EPSILON <
-                fisher.getMaximumHold() * minimumPercentageFull  ;
+            fisher.getMaximumHold() * minimumPercentageFull;
     }
 
     public double getMinimumPercentageFull() {
@@ -74,6 +70,7 @@ public class FishUntilFullStrategy implements FishingStrategy {
 
     /**
      * ignored
+     *
      * @param fisher
      */
     @Override

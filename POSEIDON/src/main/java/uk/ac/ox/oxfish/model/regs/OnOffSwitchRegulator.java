@@ -41,24 +41,38 @@ import java.util.List;
 public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
 
 
-
-    private Stoppable receipt;
-
-
-    private PermitAllocationPolicy allocationPolicy;
-
     /**
      * a list of tags that denote those who participate in the fishery;
      * if empty, everybody is in.
      */
     private final Collection<String> tagsOfParticipants;
+    private Stoppable receipt;
+    private PermitAllocationPolicy allocationPolicy;
 
 
     public OnOffSwitchRegulator(
-            PermitAllocationPolicy allocationPolicy,
-            Collection<String> tagsOfParticipants) {
+        PermitAllocationPolicy allocationPolicy,
+        Collection<String> tagsOfParticipants
+    ) {
         this.allocationPolicy = allocationPolicy;
         this.tagsOfParticipants = tagsOfParticipants;
+    }
+
+    /**
+     * trawl through the startables in fishstate and turn off all the ones that are OnOffSwitchRegulators
+     *
+     * @param state
+     */
+    public static void turnOffAllSwitchRegulators(FishState state) {
+        for (Startable viewStartable : state.viewStartables()) {
+            if (viewStartable instanceof OnOffSwitchRegulator)
+                if (((OnOffSwitchRegulator) viewStartable).isStarted())
+                    viewStartable.turnOff();
+        }
+    }
+
+    public boolean isStarted() {
+        return receipt != null;
     }
 
     /**
@@ -70,19 +84,62 @@ public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
     @Override
     public void start(FishState model) {
 
-        Preconditions.checkArgument(receipt==null, "Already started!");
+        Preconditions.checkArgument(receipt == null, "Already started!");
 
         //should start every year, first day of the year.
         model.scheduleOnceInXDays(
-                new Steppable() {
-                    @Override
-                    public void step(SimState simState) {
-                        receipt = model.scheduleEveryYear(OnOffSwitchRegulator.this::step, StepOrder.DAWN);
-                    }
+            new Steppable() {
+                @Override
+                public void step(SimState simState) {
+                    receipt = model.scheduleEveryYear(OnOffSwitchRegulator.this::step, StepOrder.DAWN);
                 }
-                , StepOrder.DAWN, 1);
+            }
+            , StepOrder.DAWN, 1);
 
         step(model);
+    }
+
+    @Override
+    public void step(SimState simState) {
+
+        FishState state = (FishState) simState;
+
+        List<Fisher> participants = new ArrayList<>();
+
+        //add all fishers who match at least one tag
+        fisherloop:
+        for (Fisher fisher : state.getFishers()) {
+
+            if (tagsOfParticipants.isEmpty()) {
+                assert fisher.getRegulation() instanceof OffSwitchDecorator;
+                participants.add(fisher);
+            } else {
+                for (String validTag : tagsOfParticipants) {
+                    if (fisher.getTags().contains(validTag)) {
+                        assert fisher.getRegulation() instanceof OffSwitchDecorator;
+                        participants.add(fisher);
+                        continue fisherloop;
+                    }
+                }
+            }
+
+
+        }
+
+        List<Fisher> allowedFishers = allocationPolicy.computeWhichFishersAreAllowed(
+            participants,
+            state
+        );
+
+        for (Fisher allowedFisher : allowedFishers) {
+            ((OffSwitchDecorator) allowedFisher.getRegulation()).setTurnedOff(false);
+
+        }
+        participants.removeAll(allowedFishers);
+        for (Fisher notAllowedFisher : participants)
+            ((OffSwitchDecorator) notAllowedFisher.getRegulation()).setTurnedOff(true);
+
+
     }
 
     /**
@@ -91,54 +148,8 @@ public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
     @Override
     public void turnOff() {
 
-        if(receipt!=null)
+        if (receipt != null)
             receipt.stop();
-
-    }
-
-
-    @Override
-    public void step(SimState simState) {
-
-        FishState state = (FishState)simState;
-
-        List<Fisher> participants = new ArrayList<>();
-
-        //add all fishers who match at least one tag
-        fisherloop:
-        for (Fisher fisher : state.getFishers()) {
-
-            if(tagsOfParticipants.isEmpty()) {
-                assert  fisher.getRegulation() instanceof OffSwitchDecorator;
-                participants.add(fisher);
-            }
-            else{
-                for (String validTag : tagsOfParticipants) {
-                    if(fisher.getTags().contains(validTag))
-                    {
-                        assert fisher.getRegulation() instanceof OffSwitchDecorator;
-                        participants.add(fisher);
-                        continue  fisherloop;
-                    }
-                }
-            }
-
-
-
-        }
-
-        List<Fisher> allowedFishers = allocationPolicy.computeWhichFishersAreAllowed(participants,
-                                                                              state);
-
-        for (Fisher allowedFisher : allowedFishers) {
-            ((OffSwitchDecorator) allowedFisher.getRegulation()).setTurnedOff(false);
-
-        }
-        participants.removeAll(allowedFishers);
-        for(Fisher notAllowedFisher : participants)
-            ((OffSwitchDecorator) notAllowedFisher.getRegulation()).setTurnedOff(true);
-
-
 
     }
 
@@ -167,23 +178,5 @@ public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
      */
     public Collection<String> getTagsOfParticipants() {
         return tagsOfParticipants;
-    }
-
-
-    public boolean isStarted(){
-        return receipt!=null;
-    }
-
-
-    /**
-     * trawl through the startables in fishstate and turn off all the ones that are OnOffSwitchRegulators
-     * @param state
-     */
-    public static void turnOffAllSwitchRegulators(FishState state){
-        for (Startable viewStartable : state.viewStartables()) {
-            if (viewStartable instanceof OnOffSwitchRegulator)
-                if(((OnOffSwitchRegulator) viewStartable).isStarted())
-                    viewStartable.turnOff();
-        }
     }
 }

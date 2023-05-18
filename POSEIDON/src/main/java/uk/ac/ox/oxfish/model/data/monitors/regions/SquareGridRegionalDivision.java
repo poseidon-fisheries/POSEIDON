@@ -69,11 +69,6 @@ abstract class SquareGridRegionalDivision extends RegionalDivision {
 
     }
 
-    @Override
-    public Collection<Region> getRegions() {
-        return regions;
-    }
-
     private int getRegionIndex(final Int2D gridXY) {
         final int n = numberOfDivisions;
         final double regionWidth = (double) getMapExtent().getGridWidth() / n;
@@ -81,6 +76,11 @@ abstract class SquareGridRegionalDivision extends RegionalDivision {
         final int x = (int) floor(gridXY.x / regionWidth);
         final int y = (int) floor(gridXY.y / regionHeight);
         return (x + y * n);
+    }
+
+    @Override
+    public Collection<Region> getRegions() {
+        return regions;
     }
 
 }

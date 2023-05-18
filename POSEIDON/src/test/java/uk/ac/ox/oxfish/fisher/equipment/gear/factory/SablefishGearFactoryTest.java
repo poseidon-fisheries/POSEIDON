@@ -39,24 +39,25 @@ public class SablefishGearFactoryTest {
     public void correct() throws Exception {
 
 
+        MeristicsInput sablefish = new MeristicsInput(59, 30, 0.5, 25.8, 56.2, 0.419, 3.6724E-06, 3.250904,
+            0.065, 0.5, 25.8, 64, 0.335, 3.4487E-06, 3.26681,
+            0.08, 58, -0.13, 1, 0, 40741397,
+            0.6, false
+        );
 
-        MeristicsInput sablefish = new MeristicsInput(59, 30 , 0.5, 25.8, 56.2, 0.419, 3.6724E-06, 3.250904,
-                                                                          0.065, 0.5, 25.8, 64, 0.335, 3.4487E-06, 3.26681,
-                                                                          0.08, 58, -0.13, 1, 0, 40741397,
-                                                                          0.6, false);
-
-        Species species = new Species("Sablefish",sablefish);
+        Species species = new Species("Sablefish", sablefish);
 
         SablefishGearFactory factory = new SablefishGearFactory(.1,
-                                                                45.5128, 3.12457,0.910947,
-                                                                100);
+            45.5128, 3.12457, 0.910947,
+            100
+        );
         FishState st = new FishState();
         HomogeneousAbundanceGear gear = factory.apply(st);
 
         //filtered and rounded if there are 10000 males in this cell, all aged 1, only 9 will actually be caught
-        double[][] abundance = new double[2][sablefish.getMaxAge()+1];
+        double[][] abundance = new double[2][sablefish.getMaxAge() + 1];
         abundance[FishStateUtilities.MALE][1] = 10000;
-        assertEquals(gear.filter(species, abundance)[FishStateUtilities.MALE][1],9,.001);
+        assertEquals(gear.filter(species, abundance)[FishStateUtilities.MALE][1], 9, .001);
 
 
     }

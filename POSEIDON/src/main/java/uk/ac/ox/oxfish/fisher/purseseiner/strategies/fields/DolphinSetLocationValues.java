@@ -20,12 +20,11 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import sim.util.Int2D;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 
 import java.util.Map;
 import java.util.function.Function;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 
 @SuppressWarnings("rawtypes")
 public class DolphinSetLocationValues extends SetLocationValues<DolphinSetAction> {

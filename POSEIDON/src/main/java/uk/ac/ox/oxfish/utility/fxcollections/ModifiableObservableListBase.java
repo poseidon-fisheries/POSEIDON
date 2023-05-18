@@ -31,7 +31,7 @@ import java.util.ListIterator;
 
 /**
  * Abstract class that serves as a base class for {@link ObservableList} implementations that are modifiable.
- *
+ * <p>
  * To implement a modifiable {@code ObservableList} class, you just need to implement the following set of methods:
  * <ul>
  * <li> {@link #get(int)  get(int)}
@@ -40,7 +40,7 @@ import java.util.ListIterator;
  * <li> {@link #doRemove(int) doRemove(int)}
  * <li> {@link #doSet(int, java.lang.Object) doSet(int, Object)}
  * </ul>
- *
+ * <p>
  * and the notifications and built and fired automatically for you.
  *
  * <p>Example of a simple {@code ObservableList} delegating to another {@code List} would look like this:
@@ -154,6 +154,25 @@ public abstract class ModifiableObservableListBase<E> extends ObservableListBase
         endChange();
     }
 
+    /**
+     * Adds the {@code element} to the List at the position of {@code index}.
+     *
+     * <p>For the description of possible exceptions, please refer to the documentation
+     * of {@link #add(java.lang.Object) } method.
+     *
+     * @param index   the position where to add the element
+     * @param element the element that will be added
+     * @throws ClassCastException        if the type of the specified element is
+     *                                   incompatible with this list
+     * @throws NullPointerException      if the specified arguments contain one or
+     *                                   more null elements
+     * @throws IllegalArgumentException  if some property of this element
+     *                                   prevents it from being added to this list
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *                                   {@code (index < 0 || index > size())}
+     */
+    protected abstract void doAdd(int index, E element);
+
     @Override
     public E set(int index, E element) {
         E old = doSet(index, element);
@@ -163,10 +182,30 @@ public abstract class ModifiableObservableListBase<E> extends ObservableListBase
         return old;
     }
 
+    /**
+     * Sets the {@code element} in the List at the position of {@code index}.
+     *
+     * <p>For the description of possible exceptions, please refer to the documentation
+     * of {@link #set(int, java.lang.Object) } method.
+     *
+     * @param index   the position where to set the element
+     * @param element the element that will be set at the specified position
+     * @return the old element at the specified position
+     * @throws ClassCastException        if the type of the specified element is
+     *                                   incompatible with this list
+     * @throws NullPointerException      if the specified arguments contain one or
+     *                                   more null elements
+     * @throws IllegalArgumentException  if some property of this element
+     *                                   prevents it from being added to this list
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *                                   {@code (index < 0 || index >= size())}
+     */
+    protected abstract E doSet(int index, E element);
+
     @Override
     public boolean remove(Object o) {
         int i = indexOf(o);
-        if (i != - 1) {
+        if (i != -1) {
             remove(i);
             return true;
         }
@@ -183,6 +222,16 @@ public abstract class ModifiableObservableListBase<E> extends ObservableListBase
         return old;
     }
 
+    /**
+     * Removes the element at position of {@code index}.
+     *
+     * @param index the index of the removed element
+     * @return the removed element
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *                                   {@code (index < 0 || index >= size())}
+     */
+    protected abstract E doRemove(int index);
+
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
         return new SubObservableList(super.subList(fromIndex, toIndex));
@@ -194,64 +243,13 @@ public abstract class ModifiableObservableListBase<E> extends ObservableListBase
     @Override
     public abstract int size();
 
-    /**
-     * Adds the {@code element} to the List at the position of {@code index}.
-     *
-     * <p>For the description of possible exceptions, please refer to the documentation
-     * of {@link #add(java.lang.Object) } method.
-     *
-     * @param index the position where to add the element
-     * @param element the element that will be added
-
-     * @throws ClassCastException if the type of the specified element is
-     * incompatible with this list
-     * @throws NullPointerException if the specified arguments contain one or
-     * more null elements
-     * @throws IllegalArgumentException if some property of this element
-     * prevents it from being added to this list
-     * @throws IndexOutOfBoundsException if the index is out of range
-     *         {@code (index < 0 || index > size())}
-     */
-    protected abstract void doAdd(int index, E element);
-
-    /**
-     * Sets the {@code element} in the List at the position of {@code index}.
-     *
-     * <p>For the description of possible exceptions, please refer to the documentation
-     * of {@link #set(int, java.lang.Object) } method.
-     *
-     * @param index the position where to set the element
-     * @param element the element that will be set at the specified position
-     * @return the old element at the specified position
-     *
-     * @throws ClassCastException if the type of the specified element is
-     * incompatible with this list
-     * @throws NullPointerException if the specified arguments contain one or
-     * more null elements
-     * @throws IllegalArgumentException if some property of this element
-     * prevents it from being added to this list
-     * @throws IndexOutOfBoundsException if the index is out of range
-     *         {@code (index < 0 || index >= size())}
-     */
-    protected abstract E doSet(int index, E element);
-
-    /**
-     * Removes the element at position of {@code index}.
-     *
-     * @param index the index of the removed element
-     * @return the removed element
-     *
-     * @throws IndexOutOfBoundsException if the index is out of range
-     *         {@code (index < 0 || index >= size())}
-     */
-    protected abstract E doRemove(int index);
-
     private class SubObservableList implements List<E> {
+
+        private List<E> sublist;
 
         public SubObservableList(List<E> sublist) {
             this.sublist = sublist;
         }
-        private List<E> sublist;
 
         @Override
         public int size() {

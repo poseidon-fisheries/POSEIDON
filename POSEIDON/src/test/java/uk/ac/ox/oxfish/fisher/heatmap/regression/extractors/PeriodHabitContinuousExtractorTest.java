@@ -42,7 +42,7 @@ public class PeriodHabitContinuousExtractorTest {
     public void continuousHabit() throws Exception {
 
 
-        Fisher fisher = mock(Fisher.class,RETURNS_DEEP_STUBS);
+        Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
 
         LinkedList<Integer> visits = new LinkedList<>();
         visits.add(1);
@@ -51,43 +51,52 @@ public class PeriodHabitContinuousExtractorTest {
         visits.add(50);
 
         when(fisher.getDiscretizedLocationMemory().getVisits(0)).thenReturn(
-                visits
+            visits
         );
         MapDiscretization discretization = mock(MapDiscretization.class);
         when(discretization.getGroup(any(SeaTile.class))).thenReturn(0);
 
         //with a period of 20 days
         PeriodHabitContinuousExtractor extractor = new PeriodHabitContinuousExtractor(
-                discretization,
-                20
+            discretization,
+            20
         );
         //at day 60, you ought to remember 1 visit!
         FishState model = mock(FishState.class);
         when(model.getDay()).thenReturn(60);
 
         assertEquals(1,
-                     extractor.extract(mock(SeaTile.class),
-                                       -1,
-                                       fisher,
-                                       model),.0001);
+            extractor.extract(
+                mock(SeaTile.class),
+                -1,
+                fisher,
+                model
+            ), .0001
+        );
 
         //at day 200, though, there ought to be no visit
         when(model.getDay()).thenReturn(200);
         assertEquals(0,
-                     extractor.extract(mock(SeaTile.class),
-                                       -1,
-                                       fisher,
-                                       model),.0001);
+            extractor.extract(
+                mock(SeaTile.class),
+                -1,
+                fisher,
+                model
+            ), .0001
+        );
 
         //if I enlarge the period to 196 days we ought to see 3 visits (all except the one at day 1)
         extractor = new PeriodHabitContinuousExtractor(
-                discretization,
-                196
+            discretization,
+            196
         );
         assertEquals(3,
-                     extractor.extract(mock(SeaTile.class),
-                                       -1,
-                                       fisher,
-                                       model),.0001);
+            extractor.extract(
+                mock(SeaTile.class),
+                -1,
+                fisher,
+                model
+            ), .0001
+        );
     }
 }

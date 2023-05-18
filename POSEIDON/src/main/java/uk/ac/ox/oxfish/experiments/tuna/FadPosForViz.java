@@ -35,7 +35,11 @@ import java.util.Collection;
 
 public class FadPosForViz {
     private static final Path basePath = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
-    private static final Path scenarioPath = basePath.resolve(Paths.get("calibrations", "2019-12-13_2-all_targets", "tuna_calibrated.yaml"));
+    private static final Path scenarioPath = basePath.resolve(Paths.get(
+        "calibrations",
+        "2019-12-13_2-all_targets",
+        "tuna_calibrated.yaml"
+    ));
     private static final Path outputPath = basePath.resolve(Paths.get("runs", "fad_pos_for_viz"));
 
     public static void main(String[] args) throws IOException {

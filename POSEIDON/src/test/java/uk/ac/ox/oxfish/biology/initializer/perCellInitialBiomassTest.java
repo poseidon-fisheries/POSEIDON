@@ -33,11 +33,14 @@ public class perCellInitialBiomassTest {
     @Test
     public void multiply() {
 
-        PerCellInitialBiomass bio = new PerCellInitialBiomass(100);
-        assertEquals(bio.getInitialBiomass(mock(NauticalMap.class),
-                                           mock(Species.class),
-                                           10),
-                     1000,.0001);
+        final PerCellInitialBiomass bio = new PerCellInitialBiomass(100);
+        assertEquals(bio.getInitialBiomass(
+                mock(NauticalMap.class),
+                mock(Species.class),
+                10
+            ),
+            1000, .0001
+        );
 
 
     }

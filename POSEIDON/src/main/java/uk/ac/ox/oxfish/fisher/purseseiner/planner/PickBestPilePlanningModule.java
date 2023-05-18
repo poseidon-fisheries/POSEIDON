@@ -11,7 +11,6 @@ import java.util.PriorityQueue;
 /**
  * weighs each fad by an abstract function and always picks the discretized area that maximizes the SUM
  * of weights
- *
  */
 public abstract class PickBestPilePlanningModule extends DiscretizedOwnFadPlanningModule {
     public PickBestPilePlanningModule(OwnFadSetDiscretizedActionGenerator optionsGenerator) {
@@ -19,14 +18,16 @@ public abstract class PickBestPilePlanningModule extends DiscretizedOwnFadPlanni
     }
 
     @Override
-    protected PlannedAction chooseFadSet(Plan currentPlanSoFar, Fisher fisher,
-                                         FishState model, NauticalMap map,
-                                         OwnFadSetDiscretizedActionGenerator optionsGenerator) {
+    protected PlannedAction chooseFadSet(
+        Plan currentPlanSoFar, Fisher fisher,
+        FishState model, NauticalMap map,
+        OwnFadSetDiscretizedActionGenerator optionsGenerator
+    ) {
 
         final int now = model.getStep();
 
         List<Pair<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options =
-                optionsGenerator.peekAllFads();
+            optionsGenerator.peekAllFads();
 
         //if there are no options, don't bother
         if (options == null || options.isEmpty())
@@ -44,12 +45,12 @@ public abstract class PickBestPilePlanningModule extends DiscretizedOwnFadPlanni
         int fadGroupChosen = -1;
         for (Pair<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer> option : options) {
             double weightHere =
-                    option.getFirst().stream().mapToDouble(
-                            valuedFad -> {
+                option.getFirst().stream().mapToDouble(
+                    valuedFad -> {
 
-                                return weighFad(now, valuedFad);
-                            }
-                    ).sum();
+                        return weighFad(now, valuedFad);
+                    }
+                ).sum();
             if (weightHere > bestWeight) {
                 bestWeight = weightHere;
                 fadGroupChosen = option.getSecond();
@@ -59,11 +60,13 @@ public abstract class PickBestPilePlanningModule extends DiscretizedOwnFadPlanni
 
         //all fads are empty, don't bother setting on any!
         if (fadGroupChosen < 0 ||
-                fadGroupChosen >= optionsGenerator.getNumberOfGroups())
+            fadGroupChosen >= optionsGenerator.getNumberOfGroups())
             return null;
         return optionsGenerator.chooseFad(fadGroupChosen);
     }
 
-    protected abstract double weighFad(int currentModelStep,
-                                       OwnFadSetDiscretizedActionGenerator.ValuedFad valuedFad);
+    protected abstract double weighFad(
+        int currentModelStep,
+        OwnFadSetDiscretizedActionGenerator.ValuedFad valuedFad
+    );
 }

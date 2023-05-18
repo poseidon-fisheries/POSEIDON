@@ -8,7 +8,8 @@ import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GiveUpAfterSomeLossesThisYearFactoryTest {
 
@@ -29,11 +30,10 @@ public class GiveUpAfterSomeLossesThisYearFactoryTest {
         state.setScenario(scenario);
         state.start();
 
-        for(int i=0; i<150; i++)
+        for (int i = 0; i < 150; i++)
             state.schedule.step(state);
 
-        assertTrue(state.getLatestDailyObservation("Fishers at Sea")>0);
-
+        assertTrue(state.getLatestDailyObservation("Fishers at Sea") > 0);
 
 
     }
@@ -47,7 +47,7 @@ public class GiveUpAfterSomeLossesThisYearFactoryTest {
         final GiveUpAfterSomeLossesThisYearFactory departingStrategy = new GiveUpAfterSomeLossesThisYearFactory();
         departingStrategy.setDelegate(new MaxHoursPerYearDepartingFactory(9999999));
         scenario.setDepartingStrategy(
-                departingStrategy
+            departingStrategy
         );
         scenario.setFishers(20);
         final FixedPriceMarketFactory market = new FixedPriceMarketFactory();
@@ -59,16 +59,15 @@ public class GiveUpAfterSomeLossesThisYearFactoryTest {
         state.setScenario(scenario);
         state.start();
 
-        for(int i=0; i<150; i++)
+        for (int i = 0; i < 150; i++)
             state.schedule.step(state);
 
-        assertEquals(state.getLatestDailyObservation("Fishers at Sea"), 0,.0001);
+        assertEquals(state.getLatestDailyObservation("Fishers at Sea"), 0, .0001);
         //rests at the beginning of the year
-        while(state.getYear()<1)
+        while (state.getYear() < 1)
             state.schedule.step(state);
         state.schedule.step(state);
-        assertTrue(state.getLatestDailyObservation("Fishers at Sea")>0);
-
+        assertTrue(state.getLatestDailyObservation("Fishers at Sea") > 0);
 
 
     }
@@ -82,7 +81,7 @@ public class GiveUpAfterSomeLossesThisYearFactoryTest {
         final GiveUpAfterSomeLossesThisYearFactory departingStrategy = new GiveUpAfterSomeLossesThisYearFactory();
         departingStrategy.setDelegate(new MaxHoursPerYearDepartingFactory(9999999));
         scenario.setDepartingStrategy(
-                departingStrategy
+            departingStrategy
         );
 
         scenario.setFishers(20);
@@ -99,14 +98,13 @@ public class GiveUpAfterSomeLossesThisYearFactoryTest {
         for (Fisher fisher : state.getFishers()) {
             ((GiveUpAfterSomeLossesThisYearDecorator) fisher.getDepartingStrategy()).disable();
         }
-        for(int i=0; i<150; i++) {
+        for (int i = 0; i < 150; i++) {
             state.schedule.step(state);
             System.out.println(state.getLatestDailyObservation("Fishers at Sea"));
         }
-       // assertEquals(state.getLatestDailyObservation("Fishers at Sea"), 0,.0001);
+        // assertEquals(state.getLatestDailyObservation("Fishers at Sea"), 0,.0001);
 
-        assertTrue(state.getLatestDailyObservation("Fishers at Sea")>0);
-
+        assertTrue(state.getLatestDailyObservation("Fishers at Sea") > 0);
 
 
     }

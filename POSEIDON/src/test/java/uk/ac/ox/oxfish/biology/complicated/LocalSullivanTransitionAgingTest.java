@@ -36,23 +36,28 @@ public class LocalSullivanTransitionAgingTest {
     @Test
     public void agesAtRightTime() {
 
-        SullivanTransitionProbability probability = new SullivanTransitionProbability(Math.sqrt(.1),
-                                                                                      95,
-                                                                                      0.1627,
-                                                                                      25,
-                                                                                      5,
-                                                                                      1);
+        SullivanTransitionProbability probability = new SullivanTransitionProbability(
+            Math.sqrt(.1),
+            95,
+            0.1627,
+            25,
+            5,
+            1
+        );
 
-        LocalSullivanTransitionAging aging = new LocalSullivanTransitionAging(new SullivanTransitionProbability[]{probability},
-                                                                              2);
+        LocalSullivanTransitionAging aging = new LocalSullivanTransitionAging(
+            new SullivanTransitionProbability[]{probability},
+            2
+        );
 
 
         double[] lengths = new double[25];
-        for(int i=0; i<lengths.length; i++)
-            lengths[i] = i*5+2.5;
+        for (int i = 0; i < lengths.length; i++)
+            lengths[i] = i * 5 + 2.5;
 
         Species species = new Species("test",
-                                      new GrowthBinByList(1,lengths,new double[25]),false);
+            new GrowthBinByList(1, lengths, new double[25]), false
+        );
         GlobalBiology biology = new GlobalBiology(species);
 
         AbundanceLocalBiology bio = new AbundanceLocalBiology(biology);
@@ -65,18 +70,17 @@ public class LocalSullivanTransitionAgingTest {
         when(mock.getDay()).thenReturn(1); //does not step on odd days
         aging.start(species);
         aging.ageLocally(bio, species, mock, false, 1);
-        assertEquals(bio.getAbundance(species).asMatrix()[0][9],1000d,.0001);
+        assertEquals(bio.getAbundance(species).asMatrix()[0][9], 1000d, .0001);
         //again!
         when(mock.getDay()).thenReturn(2); //does not step on odd days
         aging.ageLocally(bio, species, mock, false, 1);
         //now there ought to be only 12% or so of the fish in that bin!
-        assertEquals(bio.getAbundance(species).asMatrix()[0][9],130.91,.01);
+        assertEquals(bio.getAbundance(species).asMatrix()[0][9], 130.91, .01);
 
         when(mock.getDay()).thenReturn(4); //does not step on odd days
         aging.ageLocally(bio, species, mock, false, 1);
         //now there ought to be only 12% or so of the fish in that bin!
-        assertEquals(bio.getAbundance(species).asMatrix()[0][9],17.14,.01);
-
+        assertEquals(bio.getAbundance(species).asMatrix()[0][9], 17.14, .01);
 
 
     }

@@ -39,9 +39,10 @@ public class NoMovement implements BiomassMovementRule {
      */
     @Override
     public void move(
-            Species species, SeaTile here, double biomassHere, SeaTile there, double biomassThere, double delta,
-            double carryingCapacityHere, double carryingCapacityThere, VariableBiomassBasedBiology biologyHere,
-            VariableBiomassBasedBiology biologyThere) {
+        Species species, SeaTile here, double biomassHere, SeaTile there, double biomassThere, double delta,
+        double carryingCapacityHere, double carryingCapacityThere, VariableBiomassBasedBiology biologyHere,
+        VariableBiomassBasedBiology biologyThere
+    ) {
 
     }
 }

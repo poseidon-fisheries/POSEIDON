@@ -29,8 +29,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * Returns an empty network
  * Created by carrknight on 7/1/15.
  */
-public class EmptyNetworkBuilder implements NetworkBuilder
-{
+public class EmptyNetworkBuilder implements NetworkBuilder {
 
     /**
      * Applies this function to the given argument.
@@ -48,7 +47,8 @@ public class EmptyNetworkBuilder implements NetworkBuilder
      */
     @Override
     public void addFisher(
-            Fisher newAddition, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+        Fisher newAddition, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state
+    ) {
         //ignored
         assert !currentNetwork.containsVertex(newAddition);
     }
@@ -58,7 +58,8 @@ public class EmptyNetworkBuilder implements NetworkBuilder
      */
     @Override
     public void removeFisher(
-            Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+        Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state
+    ) {
         assert !currentNetwork.containsVertex(toRemove);
 
     }

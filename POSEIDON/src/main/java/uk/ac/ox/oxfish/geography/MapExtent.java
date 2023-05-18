@@ -47,33 +47,6 @@ public final class MapExtent {
         this.coordinateField = new CoordinateField(this);
     }
 
-    public static MapExtent from(final NauticalMap map) {
-        return from(map.getWidth(), map.getHeight(), map.getRasterBathymetry().getMBR());
-    }
-
-    public static MapExtent from(final int gridWidth, final int gridHeight, final Envelope envelope) {
-        return cache.getUnchecked(new MapExtent(gridWidth, gridHeight, envelope));
-    }
-
-    /**
-     * Transforms a lon/lat coordinate to an x/y coordinate that can be used with a continuous field
-     * covering the same space as the nautical map. This is basically a floating point version of
-     * vectors.size().toXCoord/.toYCoord; not sure why it doesn't exist in GeomVectorField in the
-     * first place...
-     */
-    public static Double2D coordinateToXY(
-        final Coordinate coordinate,
-        final double gridWidth,
-        final double gridHeight,
-        final Envelope mbr
-    ) {
-        final double pixelWidth = mbr.getWidth() / gridWidth;
-        final double pixelHeight = mbr.getHeight() / gridHeight;
-        final double x = (coordinate.x - mbr.getMinX()) / pixelWidth;
-        final double y = (mbr.getMaxY() - coordinate.y) / pixelHeight;
-        return new Double2D(x, y);
-    }
-
     public int getGridWidth() {
         return gridWidth;
     }
@@ -82,12 +55,12 @@ public final class MapExtent {
         return gridHeight;
     }
 
-    /**
-     * Returns a copy of the map's envelope. The Envelope class is mutable, so we don't
-     * want to expose a copy of our envelope and risk it being changed under our feet.
-     */
-    public Envelope getEnvelope() {
-        return new Envelope(envelope);
+    public static MapExtent from(final NauticalMap map) {
+        return from(map.getWidth(), map.getHeight(), map.getRasterBathymetry().getMBR());
+    }
+
+    public static MapExtent from(final int gridWidth, final int gridHeight, final Envelope envelope) {
+        return cache.getUnchecked(new MapExtent(gridWidth, gridHeight, envelope));
     }
 
     @Override
@@ -123,6 +96,33 @@ public final class MapExtent {
             getGridHeight(),
             getEnvelope()
         );
+    }
+
+    /**
+     * Transforms a lon/lat coordinate to an x/y coordinate that can be used with a continuous field
+     * covering the same space as the nautical map. This is basically a floating point version of
+     * vectors.size().toXCoord/.toYCoord; not sure why it doesn't exist in GeomVectorField in the
+     * first place...
+     */
+    public static Double2D coordinateToXY(
+        final Coordinate coordinate,
+        final double gridWidth,
+        final double gridHeight,
+        final Envelope mbr
+    ) {
+        final double pixelWidth = mbr.getWidth() / gridWidth;
+        final double pixelHeight = mbr.getHeight() / gridHeight;
+        final double x = (coordinate.x - mbr.getMinX()) / pixelWidth;
+        final double y = (mbr.getMaxY() - coordinate.y) / pixelHeight;
+        return new Double2D(x, y);
+    }
+
+    /**
+     * Returns a copy of the map's envelope. The Envelope class is mutable, so we don't
+     * want to expose a copy of our envelope and risk it being changed under our feet.
+     */
+    public Envelope getEnvelope() {
+        return new Envelope(envelope);
     }
 
     public Coordinate getCoordinates(final int gridX, final int gridY) {

@@ -75,28 +75,28 @@ public class FisherDefinition {
      * factory to produce departing strategy
      */
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategy =
-            new FixedRestTimeDepartingFactory();
+        new FixedRestTimeDepartingFactory();
 
     /**
      * factory to produce departing strategy
      */
     private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy =
-            new PerTripImitativeDestinationFactory();
+        new PerTripImitativeDestinationFactory();
     /**
      * factory to produce fishing strategy
      */
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategy =
-            new MaximumStepsFactory();
+        new MaximumStepsFactory();
 
     private AlgorithmFactory<? extends GearStrategy> gearStrategy =
-            new FixedGearStrategyFactory();
+        new FixedGearStrategyFactory();
 
     private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy = new NoDiscardingFactory();
 
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
-            new IgnoreWeatherFactory();
+        new IgnoreWeatherFactory();
 
-    private AlgorithmFactory<? extends Regulation> regulation =  new AnarchyFactory();
+    private AlgorithmFactory<? extends Regulation> regulation = new AnarchyFactory();
 
     private DoubleParameter fuelTankSize = new FixedDoubleParameter(100000);
 
@@ -118,11 +118,11 @@ public class FisherDefinition {
      */
     private AlgorithmFactory<? extends Gear> gear = new RandomCatchabilityTrawlFactory();
 
-    private LinkedHashMap<String,Number> initialFishersPerPort = new LinkedHashMap<>();
+    private LinkedHashMap<String, Number> initialFishersPerPort = new LinkedHashMap<>();
 
 
     private AlgorithmFactory<? extends LogbookInitializer> logbook =
-            new NoLogbookFactory();
+        new NoLogbookFactory();
 
 
     private DoubleParameter enginePower = new NormalDoubleParameter(5000, 100);
@@ -153,18 +153,140 @@ public class FisherDefinition {
      * [portA portA portB]
      */
     private String[] flatPortArray;
+    /**
+     * other additional setups we may want to add to the fisher;
+     */
+    private List<Consumer<Fisher>> additionalSetups = new LinkedList<>();
+    //keeps track of how many fish have been built so far
+    //so that we can match each to a specific port
+    //when we have built enough, fishCreation resets to 0
+    private int fishCreationIndex = 0;
 
-    private void updateNumberOfInitialFishers()
-    {
+    public Pair<FisherFactory, List<Fisher>> instantiateFishers(
+        FishState model, List<Port> ports, int firstFisherID,
+        Consumer<Fisher>... additionalSetups
+    ) {
+        FisherFactory factory = getFisherFactory(model, ports, firstFisherID);
 
-        int numberOfInitialFishers =0;
+        List<Fisher> fishers = new LinkedList<>();
+        for (Consumer<Fisher> additionalSetup : additionalSetups)
+            factory.getAdditionalSetups().add(additionalSetup);
+
+        for (int i = 0; i < flatPortArray.length; i++)
+            fishers.add(factory.buildFisher(model));
+
+        return new Pair<>(factory, fishers);
+    }
+
+    public FisherFactory getFisherFactory(FishState model, List<Port> ports, int firstFisherID) {
+
+        final GlobalBiology biology = model.getBiology();
+        final MersenneTwisterFast random = model.random;
+
+        updateNumberOfInitialFishers();
+        //   Preconditions.checkState(flatPortArray.length>0,"No fisher can be built because no port was provided!");
+
+
+        //create logbook initializer
+        LogbookInitializer log = logbook.apply(model);
+        log.start(model);
+
+        //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
+        //while the model is running
+        Supplier<Boat> boatSupplier = makeBoatSupplier(random);
+        Supplier<Hold> holdSupplier = makeHoldSupplier(random, biology);
+
+        FisherFactory fisherFactory = new FisherFactory(
+            //default to grabbing first port!
+            new Supplier<Port>() {
+                @Override
+                public Port get() {
+                    return getNextFisher(ports, model);
+                }
+            },
+            regulation,
+            departingStrategy,
+            destinationStrategy,
+            fishingStrategy,
+            discardingStrategy,
+            gearStrategy,
+            weatherStrategy,
+            boatSupplier,
+            holdSupplier,
+            gear,
+            firstFisherID
+        );
+
+        //add variable costs, if needed:
+        fisherFactory.getAdditionalSetups().add(
+            new Consumer<Fisher>() {
+                @Override
+                public void accept(Fisher fisher) {
+
+                    ///////////////////////////////////////////////////////////////////////
+                    // VARIABLE COSTS
+                    //don't bother if we don't have any variable costs
+                    if (hourlyVariableCost == null || hourlyVariableCost instanceof NullParameter)
+                        return;
+                    double vc = hourlyVariableCost.applyAsDouble(fisher.grabRandomizer());
+                    //don't bother if variable costs are negative!
+                    if (vc > 0)
+                        fisher.getAdditionalTripCosts().add(
+                            new HourlyCost(vc)
+                        );
+
+                    ///////////////////////////////////////////////////////////////////////
+                    // EFFORT COSTS
+                    if (hourlyEffortCost == null || hourlyEffortCost instanceof NullParameter)
+                        return;
+                    double effortCost = hourlyEffortCost.applyAsDouble(fisher.grabRandomizer());
+                    //don't bother if variable costs are negative!
+                    if (effortCost > 0)
+                        fisher.getAdditionalTripCosts().add(
+                            new EffortCost(effortCost)
+                        );
+                }
+            }
+        );
+
+        fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
+            @Override
+            public void accept(Fisher fisher) {
+                log.add(fisher, model);
+            }
+        });
+
+        //adds predictors to the fisher if the usepredictors flag is up.
+        //without predictors agents do not participate in ITQs
+
+        fisherFactory.getAdditionalSetups().add(
+            FishStateUtilities.predictorSetup(
+                usePredictors,
+                model.getBiology()
+            )
+        );
+
+        //add tags to fisher definition
+        final List<String> tags = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(this.tags);
+        if (!tags.isEmpty()) fisherFactory.getAdditionalSetups().add(fisher -> fisher.getTags().addAll(tags));
+
+        //add other setups
+        fisherFactory.getAdditionalSetups().addAll(additionalSetups);
+
+
+        return fisherFactory;
+    }
+
+    private void updateNumberOfInitialFishers() {
+
+        int numberOfInitialFishers = 0;
         for (Map.Entry<String, ? extends Number> portNumber : initialFishersPerPort.entrySet()) {
-            numberOfInitialFishers+= ((int)portNumber.getValue().intValue());
+            numberOfInitialFishers += ((int) portNumber.getValue().intValue());
         }
         flatPortArray = new String[numberOfInitialFishers];
-        int i=0;
+        int i = 0;
         for (Map.Entry<String, ? extends Number> portNumber : initialFishersPerPort.entrySet()) {
-            for(int fishersToAdd=0; fishersToAdd< portNumber.getValue().intValue(); fishersToAdd++) {
+            for (int fishersToAdd = 0; fishersToAdd < portNumber.getValue().intValue(); fishersToAdd++) {
                 flatPortArray[i] = portNumber.getKey();
                 i++;
             }
@@ -173,29 +295,30 @@ public class FisherDefinition {
 
     }
 
+    Supplier<Boat> makeBoatSupplier(MersenneTwisterFast random) {
+        return () -> new Boat(10, 10,
+            makeEngineSupplier(random).get(),
+            makeFuelTankSupplier(random).get()
+        );
+    }
 
-    /**
-     * other additional setups we may want to add to the fisher;
-     */
-    private List<Consumer<Fisher>> additionalSetups = new LinkedList<>();
+    Supplier<Hold> makeHoldSupplier(MersenneTwisterFast random, GlobalBiology biology) {
+        return () -> new Hold(holdSize.applyAsDouble(random), biology);
+    }
 
-
-    //keeps track of how many fish have been built so far
-    //so that we can match each to a specific port
-    //when we have built enough, fishCreation resets to 0
-    private int fishCreationIndex =0;
-    public Port getNextFisher(List<Port> ports,
-                              FishState model)
-    {
+    public Port getNextFisher(
+        List<Port> ports,
+        FishState model
+    ) {
         // this assret is not true anymore; now after creating the first batch of fishers the rest is randomized assert fishCreationIndex <flatPortArray.length;
         String portName;
         //you are creating the original fishers!
-        if(fishCreationIndex< flatPortArray.length) {
-            portName= flatPortArray[fishCreationIndex];
+        if (fishCreationIndex < flatPortArray.length) {
+            portName = flatPortArray[fishCreationIndex];
         }
         //you are creating additional fishers!, then pick stochastically
         else {
-            assert model.getDay()>0;
+            assert model.getDay() > 0;
             portName = flatPortArray[model.getRandom().nextInt(flatPortArray.length)];
         }
 
@@ -215,142 +338,16 @@ public class FisherDefinition {
     }
 
     Supplier<Engine> makeEngineSupplier(MersenneTwisterFast random) {
-        return () -> new Engine(enginePower.applyAsDouble(random), literPerKilometer.applyAsDouble(random), speedInKmh.applyAsDouble(random));
+        return () -> new Engine(
+            enginePower.applyAsDouble(random),
+            literPerKilometer.applyAsDouble(random),
+            speedInKmh.applyAsDouble(random)
+        );
     }
 
     Supplier<FuelTank> makeFuelTankSupplier(MersenneTwisterFast random) {
         return () -> new FuelTank(fuelTankSize.applyAsDouble(random));
     }
-
-    Supplier<Hold> makeHoldSupplier(MersenneTwisterFast random, GlobalBiology biology) {
-        return () -> new Hold(holdSize.applyAsDouble(random), biology);
-    }
-
-    Supplier<Boat> makeBoatSupplier(MersenneTwisterFast random) {
-        return () -> new Boat(10, 10,
-            makeEngineSupplier(random).get(),
-            makeFuelTankSupplier(random).get()
-        );
-    }
-
-    public FisherFactory getFisherFactory(FishState model, List<Port> ports, int firstFisherID){
-
-        final GlobalBiology biology = model.getBiology();
-        final MersenneTwisterFast random = model.random;
-
-        updateNumberOfInitialFishers();
-        //   Preconditions.checkState(flatPortArray.length>0,"No fisher can be built because no port was provided!");
-
-
-
-        //create logbook initializer
-        LogbookInitializer log = logbook.apply(model);
-        log.start(model);
-
-        //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
-        //while the model is running
-        Supplier<Boat> boatSupplier = makeBoatSupplier(random);
-        Supplier<Hold> holdSupplier = makeHoldSupplier(random, biology);
-
-        FisherFactory fisherFactory = new FisherFactory(
-                //default to grabbing first port!
-                new Supplier<Port>() {
-                    @Override
-                    public Port get() {
-                        return getNextFisher(ports,  model);
-                    }
-                },
-                regulation,
-                departingStrategy,
-                destinationStrategy,
-                fishingStrategy,
-                discardingStrategy,
-                gearStrategy,
-                weatherStrategy,
-                boatSupplier,
-                holdSupplier,
-                gear,
-                firstFisherID);
-
-        //add variable costs, if needed:
-        fisherFactory.getAdditionalSetups().add(
-                new Consumer<Fisher>() {
-                    @Override
-                    public void accept(Fisher fisher) {
-
-                        ///////////////////////////////////////////////////////////////////////
-                        // VARIABLE COSTS
-                        //don't bother if we don't have any variable costs
-                        if(hourlyVariableCost == null || hourlyVariableCost instanceof NullParameter)
-                            return;
-                        double vc = hourlyVariableCost.applyAsDouble(fisher.grabRandomizer());
-                        //don't bother if variable costs are negative!
-                        if(vc>0)
-                            fisher.getAdditionalTripCosts().add(
-                                    new HourlyCost(vc)
-                            );
-
-                        ///////////////////////////////////////////////////////////////////////
-                        // EFFORT COSTS
-                        if(hourlyEffortCost == null || hourlyEffortCost instanceof NullParameter)
-                                return;
-                        double effortCost = hourlyEffortCost.applyAsDouble(fisher.grabRandomizer());
-                        //don't bother if variable costs are negative!
-                        if(effortCost>0)
-                            fisher.getAdditionalTripCosts().add(
-                                    new EffortCost(effortCost)
-                            );
-                    }
-                }
-        );
-
-        fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
-            @Override
-            public void accept(Fisher fisher) {
-                log.add(fisher,model);
-            }
-        });
-
-        //adds predictors to the fisher if the usepredictors flag is up.
-        //without predictors agents do not participate in ITQs
-
-        fisherFactory.getAdditionalSetups().add(
-                FishStateUtilities.predictorSetup(
-                        usePredictors,
-                        model.getBiology()
-                )
-        );
-
-        //add tags to fisher definition
-        final List<String> tags = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(this.tags);
-        if (!tags.isEmpty()) fisherFactory.getAdditionalSetups().add(fisher -> fisher.getTags().addAll(tags));
-
-        //add other setups
-        fisherFactory.getAdditionalSetups().addAll(additionalSetups);
-
-
-
-
-
-        return fisherFactory;
-    }
-
-    public Pair<FisherFactory,List<Fisher>> instantiateFishers(FishState model, List<Port> ports, int firstFisherID,
-                                                               Consumer<Fisher>... additionalSetups)
-    {
-        FisherFactory factory = getFisherFactory(model, ports, firstFisherID);
-
-        List<Fisher> fishers = new LinkedList<>();
-        for(Consumer<Fisher> additionalSetup : additionalSetups)
-            factory.getAdditionalSetups().add(additionalSetup);
-
-        for(int i=0; i<flatPortArray.length; i++)
-            fishers.add(factory.buildFisher(model));
-
-        return new Pair<>(factory,fishers);
-    }
-
-
 
     /**
      * Getter for property 'departingStrategy'.
@@ -367,7 +364,8 @@ public class FisherDefinition {
      * @param departingStrategy Value to set for property 'departingStrategy'.
      */
     public void setDepartingStrategy(
-            AlgorithmFactory<? extends DepartingStrategy> departingStrategy) {
+        AlgorithmFactory<? extends DepartingStrategy> departingStrategy
+    ) {
         this.departingStrategy = departingStrategy;
     }
 
@@ -386,7 +384,8 @@ public class FisherDefinition {
      * @param destinationStrategy Value to set for property 'destinationStrategy'.
      */
     public void setDestinationStrategy(
-            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
+        AlgorithmFactory<? extends DestinationStrategy> destinationStrategy
+    ) {
         this.destinationStrategy = destinationStrategy;
     }
 
@@ -405,7 +404,8 @@ public class FisherDefinition {
      * @param fishingStrategy Value to set for property 'fishingStrategy'.
      */
     public void setFishingStrategy(
-            AlgorithmFactory<? extends FishingStrategy> fishingStrategy) {
+        AlgorithmFactory<? extends FishingStrategy> fishingStrategy
+    ) {
         this.fishingStrategy = fishingStrategy;
     }
 
@@ -424,7 +424,8 @@ public class FisherDefinition {
      * @param gearStrategy Value to set for property 'gearStrategy'.
      */
     public void setGearStrategy(
-            AlgorithmFactory<? extends GearStrategy> gearStrategy) {
+        AlgorithmFactory<? extends GearStrategy> gearStrategy
+    ) {
         this.gearStrategy = gearStrategy;
     }
 
@@ -443,7 +444,8 @@ public class FisherDefinition {
      * @param discardingStrategy Value to set for property 'discardingStrategy'.
      */
     public void setDiscardingStrategy(
-            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy) {
+        AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy
+    ) {
         this.discardingStrategy = discardingStrategy;
     }
 
@@ -462,7 +464,8 @@ public class FisherDefinition {
      * @param weatherStrategy Value to set for property 'weatherStrategy'.
      */
     public void setWeatherStrategy(
-            AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy) {
+        AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy
+    ) {
         this.weatherStrategy = weatherStrategy;
     }
 
@@ -481,7 +484,8 @@ public class FisherDefinition {
      * @param regulation Value to set for property 'regulation'.
      */
     public void setRegulation(
-            AlgorithmFactory<? extends Regulation> regulation) {
+        AlgorithmFactory<? extends Regulation> regulation
+    ) {
         this.regulation = regulation;
     }
 
@@ -647,7 +651,8 @@ public class FisherDefinition {
      * @param logbook Value to set for property 'logbook'.
      */
     public void setLogbook(
-            AlgorithmFactory<? extends LogbookInitializer> logbook) {
+        AlgorithmFactory<? extends LogbookInitializer> logbook
+    ) {
         this.logbook = logbook;
     }
 
@@ -660,7 +665,7 @@ public class FisherDefinition {
     }
 
     /**
-     *  not sure about exposing this to YAML constructor; that's why it's "grab" and not "get"
+     * not sure about exposing this to YAML constructor; that's why it's "grab" and not "get"
      */
     public List<Consumer<Fisher>> grabAdditionalSetups() {
         return additionalSetups;

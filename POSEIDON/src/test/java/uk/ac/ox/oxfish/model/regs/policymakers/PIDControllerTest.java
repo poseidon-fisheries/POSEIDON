@@ -43,23 +43,22 @@ public class PIDControllerTest {
         double[] inflow = new double[1];
 
         PIDController controller = new PIDController(
-                (Sensor<FishState, Double>) fisher -> tank[0],
-                (Sensor<FishState, Double>) fisher -> 10d,
-                (subject, policy, model) -> inflow[0] = policy,
-                1,
-                .05,
-                .1,
-                0,
-                0
+            (Sensor<FishState, Double>) fisher -> tank[0],
+            (Sensor<FishState, Double>) fisher -> 10d,
+            (subject, policy, model) -> inflow[0] = policy,
+            1,
+            .05,
+            .1,
+            0,
+            0
         );
 
-        for(int i=0; i<500; i++)
-        {
+        for (int i = 0; i < 500; i++) {
             controller.step(mock(FishState.class));
-            tank[0] += inflow[0]-outflow;
+            tank[0] += inflow[0] - outflow;
 
         }
-        Assert.assertEquals(tank[0],10d,.001);
+        Assert.assertEquals(tank[0], 10d, .001);
 
     }
 }

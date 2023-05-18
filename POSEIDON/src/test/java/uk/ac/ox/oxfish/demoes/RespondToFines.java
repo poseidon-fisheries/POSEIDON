@@ -36,8 +36,7 @@ public class RespondToFines {
 
     //if there is fish that carries a fine, ignore it!
     @Test
-    public void avoidFinedFish()
-    {
+    public void avoidFinedFish() {
 
 
         PrototypeScenario scenario = new PrototypeScenario();
@@ -53,7 +52,7 @@ public class RespondToFines {
         ((FixedPriceMarket) state.getAllMarketsForThisSpecie((state.getBiology().getSpecie(1))).get(0)).setPrice(-50);
 
         //lspiRun it for 1000 steps
-        for(int i=0; i<1000; i++)
+        for (int i = 0; i < 1000; i++)
             state.schedule.step(state);
 
         //now check the hotspots. Lower hotspots should not be more than 5%
@@ -61,14 +60,12 @@ public class RespondToFines {
         double allHotspots = 0;
         double lowerHotSpots = 0;
         IntGrid2D hotspots = state.getMap().getDailyTrawlsMap();
-        for(int x =0; x<state.getMap().getWidth(); x++)
-        {
-            for (int y = 0; y < state.getMap().getHeight(); y++)
-            {
+        for (int x = 0; x < state.getMap().getWidth(); x++) {
+            for (int y = 0; y < state.getMap().getHeight(); y++) {
                 double hotspot = hotspots.get(x, y);
                 allHotspots += hotspot;
                 //down on the gui is up on the grid since the top left corner is the 0,0
-                if(y>state.getMap().getHeight()/2+1)
+                if (y > state.getMap().getHeight() / 2 + 1)
                     lowerHotSpots += hotspot;
 
 
@@ -79,7 +76,7 @@ public class RespondToFines {
         //on the line fishing make up at least 50% of all recent fishing
         Log.info("all spots ---- lower spots");
         Log.info(allHotspots + " --- " + lowerHotSpots);
-        Log.info("percentage fished on the bottom : " + lowerHotSpots/allHotspots);
+        Log.info("percentage fished on the bottom : " + lowerHotSpots / allHotspots);
         Assert.assertTrue(allHotspots * .05 >= lowerHotSpots);
         Assert.assertTrue(allHotspots > 0);
     }

@@ -48,7 +48,7 @@ public class PseudoLogisticLoggerTest {
         when(state.getYear()).thenReturn(123);
         when(state.getDayOfTheYear()).thenReturn(456); //meaningless, just to check that it gets logged correctly
         MapDiscretization discretization = new MapDiscretization(
-                new SquaresMapDiscretizer(3,3));
+            new SquaresMapDiscretizer(3, 3));
         discretization.discretize(state.getMap());
 
         ObservationExtractor[] extractors = new ObservationExtractor[3];
@@ -58,33 +58,35 @@ public class PseudoLogisticLoggerTest {
         extractors[2] = (tile, timeOfObservation, agent, model) -> model.getDay();
 
         //prepare everything
-        LogisticLog log = new LogisticLog(new String[]{"x","y"},0);
-        PseudoLogisticLogger logger = new PseudoLogisticLogger(discretization,
-                                                               extractors,
-                                                               log,
-                                                               mock(Fisher.class),
-                                                               state,
-                                                               new MersenneTwisterFast());
+        LogisticLog log = new LogisticLog(new String[]{"x", "y"}, 0);
+        PseudoLogisticLogger logger = new PseudoLogisticLogger(
+            discretization,
+            extractors,
+            log,
+            mock(Fisher.class),
+            state,
+            new MersenneTwisterFast()
+        );
 
         TripRecord record = mock(TripRecord.class);
         //the destination will be ignored since the logger assumes the first trip is random
         SeaTile destination = state.
-                getMap().getSeaTile(1, 1);
+            getMap().getSeaTile(1, 1);
         when(record.getMostFishedTileInTrip()).thenReturn(destination);
-        logger.reactToFinishedTrip(record, mock(Fisher.class,RETURNS_DEEP_STUBS));
+        logger.reactToFinishedTrip(record, mock(Fisher.class, RETURNS_DEEP_STUBS));
 
         //this destination will not be ignored, but it will be associated with the inputs recorded at the end of previous trip
         destination = state.
-                getMap().getSeaTile(0, 1);
+            getMap().getSeaTile(0, 1);
         when(record.getMostFishedTileInTrip()).thenReturn(destination);
         when(state.getDay()).thenReturn(100);
-        logger.reactToFinishedTrip(record, mock(Fisher.class,RETURNS_DEEP_STUBS));
+        logger.reactToFinishedTrip(record, mock(Fisher.class, RETURNS_DEEP_STUBS));
 
         System.out.print(log.getData().toString());
         String[] csv = log.getData().toString().trim().split("\n");
         assertEquals(csv.length, 16); //it comes in long format
         //0,1 is actually group 4 (square goes vertical first)
-        for(int row=0; row<16; row++) {
+        for (int row = 0; row < 16; row++) {
             if (row == 4)
                 assertTrue(csv[row].contains("yes"));
             else
@@ -98,9 +100,9 @@ public class PseudoLogisticLoggerTest {
 
         //add one more observation
         destination = state.
-                getMap().getSeaTile(0, 0);
+            getMap().getSeaTile(0, 0);
         when(record.getMostFishedTileInTrip()).thenReturn(destination);
-        logger.reactToFinishedTrip(record, mock(Fisher.class,RETURNS_DEEP_STUBS));
+        logger.reactToFinishedTrip(record, mock(Fisher.class, RETURNS_DEEP_STUBS));
 
 
         System.out.println("***************************************");
@@ -108,7 +110,7 @@ public class PseudoLogisticLoggerTest {
         csv = log.getData().toString().trim().split("\n");
         assertEquals(csv.length, 32); //it comes in long format
         //0,1 is actually group 4 (square goes vertical first)
-        for(int row=16; row<32; row++) {
+        for (int row = 16; row < 32; row++) {
             if (row == 16)
                 assertTrue(csv[row].contains("yes"));
             else

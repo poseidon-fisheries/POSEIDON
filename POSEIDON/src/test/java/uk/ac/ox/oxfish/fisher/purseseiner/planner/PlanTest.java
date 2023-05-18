@@ -24,7 +24,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
@@ -36,30 +36,32 @@ public class PlanTest {
         final FishState fishState = mock(FishState.class);
         final NauticalMap map = makeMap(4, 4);
 
-        Plan plan = new Plan(map.getSeaTile(0, 0),
-                             map.getSeaTile(0,0));
+        Plan plan = new Plan(
+            map.getSeaTile(0, 0),
+            map.getSeaTile(0, 0)
+        );
         assertEquals(0, plan.getGridXCentroid(), .0001);
         assertEquals(0, plan.getGridYCentroid(), .0001);
 
         plan.insertAction(
-                new PlannedAction.Deploy(map.getSeaTile(1, 1)),
-                1,0.1
+            new PlannedAction.Deploy(map.getSeaTile(1, 1)),
+            1, 0.1
 
         );
         plan.insertAction(
-                new PlannedAction.Deploy(map.getSeaTile(1, 3)),
-                1,0.1
+            new PlannedAction.Deploy(map.getSeaTile(1, 3)),
+            1, 0.1
 
         );
         assertEquals(plan.getGridXCentroid(), 0.5, .0001);
         assertEquals(plan.getGridYCentroid(), 1, .0001);
 
         PlannedAction nextAction = plan.pollNextAction();
-        assertEquals(nextAction.getLocation().getGridX(),0);
-        assertEquals(nextAction.getLocation().getGridY(),0);
+        assertEquals(nextAction.getLocation().getGridX(), 0);
+        assertEquals(nextAction.getLocation().getGridY(), 0);
         nextAction = plan.pollNextAction();
-        assertEquals(nextAction.getLocation().getGridX(),1);
-        assertEquals(nextAction.getLocation().getGridY(),3);
+        assertEquals(nextAction.getLocation().getGridX(), 1);
+        assertEquals(nextAction.getLocation().getGridY(), 3);
 
         assertEquals(plan.getGridXCentroid(), 0.5, .0001);
         assertEquals(plan.getGridYCentroid(), 0.5, .0001);

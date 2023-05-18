@@ -47,13 +47,15 @@ public class ThresholdProbabilityFactory implements AlgorithmFactory<ThresholdEx
     public ThresholdExplorationProbability apply(FishState fishState) {
         final double actualThreshold = threshold.applyAsDouble(fishState.getRandom());
 
-        return new ThresholdExplorationProbability(1d,
-                                                   new Function<FishState, Double>() {
-                                                       @Override
-                                                       public Double apply(FishState fishState) {
-                                                           return actualThreshold;
-                                                       }
-                                                   });
+        return new ThresholdExplorationProbability(
+            1d,
+            new Function<FishState, Double>() {
+                @Override
+                public Double apply(FishState fishState) {
+                    return actualThreshold;
+                }
+            }
+        );
     }
 
     /**

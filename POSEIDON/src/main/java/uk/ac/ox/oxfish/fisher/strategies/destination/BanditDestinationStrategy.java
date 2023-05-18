@@ -42,59 +42,52 @@ import java.util.function.Function;
  * A purely bandit-algorithm using destination strategy
  * Created by carrknight on 11/10/16.
  */
-public class BanditDestinationStrategy implements DestinationStrategy{
+public class BanditDestinationStrategy implements DestinationStrategy {
 
 
-
+    final ObjectiveFunction<Fisher> objective;
     private final BanditAlgorithm algorithm;
-
     private final MapDiscretization discretization;
-
     private final FavoriteDestinationStrategy delegate;
-
     /**
      * the index represents the "bandit arm" index, the number in teh array at that index represents
      * the discretemap group. This is done to skip areas that are just land
      */
     private final BanditSwitch banditSwitch;
-
     private final BanditAverage banditAverage;
-
-    final ObjectiveFunction<Fisher> objective;
-
-    private Adaptation concreteAdaptation;
-
-    private Fisher fisher;
-
     final private boolean respectMPA;
-    private FishState model;
-
     private final boolean ignoreWastelands;
-
+    private Adaptation concreteAdaptation;
+    private Fisher fisher;
+    private FishState model;
     private boolean imitate = false;
 
     /**
      * the constructor looks a bit weird but it's just due to the fact that we need to first
      * figure out the right number of arms from the discretization
-     * @param averagerMaker builds the bandit average given the number of arms
-     * @param banditMaker builds the bandit algorithm given the bandit average
-     * @param delegate the delegate strategy
+     *
+     * @param averagerMaker    builds the bandit average given the number of arms
+     * @param banditMaker      builds the bandit algorithm given the bandit average
+     * @param delegate         the delegate strategy
      * @param objective
      * @param respectMPA
      * @param ignoreWastelands
      */
     public BanditDestinationStrategy(
-            Function<Integer, BanditAverage> averagerMaker,
-            BanditSupplier banditMaker,
-            MapDiscretization discretization,
-            FavoriteDestinationStrategy delegate,
-            ObjectiveFunction<Fisher> objective,
-            boolean respectMPA, boolean ignoreWastelands) {
+        Function<Integer, BanditAverage> averagerMaker,
+        BanditSupplier banditMaker,
+        MapDiscretization discretization,
+        FavoriteDestinationStrategy delegate,
+        ObjectiveFunction<Fisher> objective,
+        boolean respectMPA, boolean ignoreWastelands
+    ) {
         //map arms to valid map groups
         this.discretization = discretization;
 
-        this.banditSwitch = new BanditSwitch(discretization.getNumberOfGroups(),
-                                             discretization::isValid);
+        this.banditSwitch = new BanditSwitch(
+            discretization.getNumberOfGroups(),
+            discretization::isValid
+        );
 
         //create the bandit algorithm
         banditAverage = averagerMaker.apply(banditSwitch.getNumberOfArms());
@@ -106,65 +99,31 @@ public class BanditDestinationStrategy implements DestinationStrategy{
         this.ignoreWastelands = ignoreWastelands;
     }
 
-    private int fromBanditArmToMapGroup(int banditArm){
-
-        return banditSwitch.getGroup(banditArm);
-    }
-
-    private int fromMapGroupToBanditArm(int mapGroup){
-
-        return banditSwitch.getArm(mapGroup);
-
-    }
-
-
-    public void choose(SeaTile lastDestination, double reward, MersenneTwisterFast random){
-
-
-        Integer group = discretization.getGroup(lastDestination);
-        if(group!= null) {
-            int armPlayed = fromMapGroupToBanditArm(group);
-            algorithm.observeReward(reward, armPlayed);
-        }
-        //make new decision
-        int armToPlay = algorithm.chooseArm(random);
-        int groupToFishIn = fromBanditArmToMapGroup(armToPlay);
-        assert discretization.isValid(groupToFishIn);
-        //assuming here the map discretization has already removed all the land tiles
-        List<SeaTile> mapGroup = discretization.getGroup(groupToFishIn);
-        SeaTile tile = FishStateUtilities.getValidSeatileFromGroup(random, mapGroup, respectMPA, fisher, model, ignoreWastelands,
-                                                                   100);
-        if(tile!=null)
-            delegate.setFavoriteSpot(tile);
-    }
-
     @Override
     public void start(FishState model, Fisher fisher) {
 
         this.fisher = fisher;
         this.model = model;
-        delegate.start(model,fisher);
+        delegate.start(model, fisher);
         concreteAdaptation = new Adaptation() {
             @Override
             public void adapt(Fisher toAdapt, FishState state, MersenneTwisterFast random) {
                 // observe previous trip
                 SeaTile lastDestination = toAdapt.getLastFinishedTrip().getMostFishedTileInTrip() == null ?
-                        delegate.getFavoriteSpot() : toAdapt.getLastFinishedTrip().getMostFishedTileInTrip();
+                    delegate.getFavoriteSpot() : toAdapt.getLastFinishedTrip().getMostFishedTileInTrip();
                 assert toAdapt.getLastFinishedTrip().getMostFishedTileInTrip() == null ||
-                        toAdapt.getLastFinishedTrip().getMostFishedTileInTrip().equals(lastDestination);
-                double reward = objective.computeCurrentFitness(fisher,fisher);
+                    toAdapt.getLastFinishedTrip().getMostFishedTileInTrip().equals(lastDestination);
+                double reward = objective.computeCurrentFitness(fisher, fisher);
 
                 //peek at friends?
-                if(imitate)
-                    for (Fisher friend : fisher.getDirectedFriends())
-                    {
+                if (imitate)
+                    for (Fisher friend : fisher.getDirectedFriends()) {
                         TripRecord friendTrip = friend.getLastFinishedTrip();
-                        if(friendTrip != null && friendTrip.getMostFishedTileInTrip() != null)
-                        {
+                        if (friendTrip != null && friendTrip.getMostFishedTileInTrip() != null) {
                             algorithm.observeReward(
-                                    objective.computeCurrentFitness(fisher,friend),
-                                    fromMapGroupToBanditArm(discretization.getGroup(
-                                            friendTrip.getMostFishedTileInTrip()))
+                                objective.computeCurrentFitness(fisher, friend),
+                                fromMapGroupToBanditArm(discretization.getGroup(
+                                    friendTrip.getMostFishedTileInTrip()))
                             );
                         }
 
@@ -189,6 +148,43 @@ public class BanditDestinationStrategy implements DestinationStrategy{
 
     }
 
+    private int fromMapGroupToBanditArm(int mapGroup) {
+
+        return banditSwitch.getArm(mapGroup);
+
+    }
+
+
+    public void choose(SeaTile lastDestination, double reward, MersenneTwisterFast random) {
+
+
+        Integer group = discretization.getGroup(lastDestination);
+        if (group != null) {
+            int armPlayed = fromMapGroupToBanditArm(group);
+            algorithm.observeReward(reward, armPlayed);
+        }
+        //make new decision
+        int armToPlay = algorithm.chooseArm(random);
+        int groupToFishIn = fromBanditArmToMapGroup(armToPlay);
+        assert discretization.isValid(groupToFishIn);
+        //assuming here the map discretization has already removed all the land tiles
+        List<SeaTile> mapGroup = discretization.getGroup(groupToFishIn);
+        SeaTile tile = FishStateUtilities.getValidSeatileFromGroup(random,
+            mapGroup,
+            respectMPA,
+            fisher,
+            model,
+            ignoreWastelands,
+            100
+        );
+        if (tile != null)
+            delegate.setFavoriteSpot(tile);
+    }
+
+    private int fromBanditArmToMapGroup(int banditArm) {
+
+        return banditSwitch.getGroup(banditArm);
+    }
 
     /**
      * decides where to go.
@@ -200,7 +196,8 @@ public class BanditDestinationStrategy implements DestinationStrategy{
      */
     @Override
     public SeaTile chooseDestination(
-            Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
+        Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction
+    ) {
         return delegate.chooseDestination(fisher, random, model, currentAction);
     }
 
@@ -208,7 +205,7 @@ public class BanditDestinationStrategy implements DestinationStrategy{
     @Override
     public void turnOff(Fisher fisher) {
         delegate.turnOff(fisher);
-        if(concreteAdaptation != null)
+        if (concreteAdaptation != null)
             fisher.removePerTripAdaptation(concreteAdaptation);
 
     }

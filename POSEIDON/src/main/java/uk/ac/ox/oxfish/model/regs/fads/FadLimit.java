@@ -33,11 +33,13 @@ public class FadLimit implements ConditionalLimit {
         this.limit = limit;
     }
 
-    @Override public int getLimit() {
+    @Override
+    public int getLimit() {
         return limit;
     }
 
-    @Override public boolean test(final Fisher fisher) {
+    @Override
+    public boolean test(final Fisher fisher) {
         return predicate.test(fisher);
     }
 

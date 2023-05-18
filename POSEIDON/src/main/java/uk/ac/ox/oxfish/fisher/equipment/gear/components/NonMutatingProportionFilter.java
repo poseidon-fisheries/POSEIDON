@@ -18,10 +18,10 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
+import uk.ac.ox.oxfish.biology.Species;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.stream;
-
-import uk.ac.ox.oxfish.biology.Species;
 
 public class NonMutatingProportionFilter
     implements AbundanceFilter {

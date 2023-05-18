@@ -18,14 +18,15 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import static java.lang.Math.min;
-import static java.util.stream.IntStream.range;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-
-import java.util.Map.Entry;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+
+import java.util.Map.Entry;
+
+import static java.lang.Math.min;
+import static java.util.stream.IntStream.range;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class AbundanceCatchMaker implements CatchMaker<AbundanceLocalBiology> {
 

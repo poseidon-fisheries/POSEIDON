@@ -42,9 +42,10 @@ public class FavoriteDestinationStrategyTest {
     @Test
     public void depart() throws Exception {
         Fisher fisher = mock(Fisher.class);
-        SeaTile portTile = new SeaTile(0,0,1, new TileHabitat(0d));
-        SeaTile favoriteTile = new SeaTile(1,1,-1, new TileHabitat(0d));
-        Port port = mock(Port.class); when(port.getLocation()).thenReturn(portTile);
+        SeaTile portTile = new SeaTile(0, 0, 1, new TileHabitat(0d));
+        SeaTile favoriteTile = new SeaTile(1, 1, -1, new TileHabitat(0d));
+        Port port = mock(Port.class);
+        when(port.getLocation()).thenReturn(portTile);
         when(fisher.getHomePort()).thenReturn(port);
 
         when(fisher.getDestination()).thenReturn(portTile);
@@ -53,10 +54,11 @@ public class FavoriteDestinationStrategyTest {
 
         FavoriteDestinationStrategy strategy = new FavoriteDestinationStrategy(favoriteTile);
         SeaTile destination = strategy.chooseDestination(fisher,
-                                                           new MersenneTwisterFast(), mock(FishState.class),
-                                                           mock(AtPort.class));
+            new MersenneTwisterFast(), mock(FishState.class),
+            mock(AtPort.class)
+        );
 
-        assertEquals(destination,favoriteTile);
+        assertEquals(destination, favoriteTile);
 
 
     }
@@ -66,10 +68,11 @@ public class FavoriteDestinationStrategyTest {
     @Test
     public void keepGoing() throws Exception {
         Fisher fisher = mock(Fisher.class);
-        SeaTile portTile = new SeaTile(0,0,1, new TileHabitat(0d));
-        SeaTile favoriteTile = new SeaTile(1,1,-1, new TileHabitat(0d));
-        SeaTile transitTile = new SeaTile(1,0,-1, new TileHabitat(0d));
-        Port port = mock(Port.class); when(port.getLocation()).thenReturn(portTile);
+        SeaTile portTile = new SeaTile(0, 0, 1, new TileHabitat(0d));
+        SeaTile favoriteTile = new SeaTile(1, 1, -1, new TileHabitat(0d));
+        SeaTile transitTile = new SeaTile(1, 0, -1, new TileHabitat(0d));
+        Port port = mock(Port.class);
+        when(port.getLocation()).thenReturn(portTile);
         when(fisher.getHomePort()).thenReturn(port);
 
         when(fisher.getDestination()).thenReturn(favoriteTile);
@@ -78,10 +81,11 @@ public class FavoriteDestinationStrategyTest {
 
         FavoriteDestinationStrategy strategy = new FavoriteDestinationStrategy(favoriteTile);
         SeaTile destination = strategy.chooseDestination(fisher,
-                                                           new MersenneTwisterFast(), mock(FishState.class),
-                                                           mock(AtPort.class));
+            new MersenneTwisterFast(), mock(FishState.class),
+            mock(AtPort.class)
+        );
 
-        assertEquals(destination,favoriteTile);
+        assertEquals(destination, favoriteTile);
 
 
     }
@@ -90,9 +94,10 @@ public class FavoriteDestinationStrategyTest {
     @Test
     public void goBack() throws Exception {
         Fisher fisher = mock(Fisher.class);
-        SeaTile portTile = new SeaTile(0,0,1, new TileHabitat(0d));
-        SeaTile favoriteTile = new SeaTile(1,1,-1, new TileHabitat(0d));
-        Port port = mock(Port.class); when(port.getLocation()).thenReturn(portTile);
+        SeaTile portTile = new SeaTile(0, 0, 1, new TileHabitat(0d));
+        SeaTile favoriteTile = new SeaTile(1, 1, -1, new TileHabitat(0d));
+        Port port = mock(Port.class);
+        when(port.getLocation()).thenReturn(portTile);
         when(fisher.getHomePort()).thenReturn(port);
 
         when(fisher.getDestination()).thenReturn(favoriteTile);
@@ -101,9 +106,10 @@ public class FavoriteDestinationStrategyTest {
 
         FavoriteDestinationStrategy strategy = new FavoriteDestinationStrategy(favoriteTile);
         SeaTile destination = strategy.chooseDestination(fisher,
-                                                           new MersenneTwisterFast(), mock(FishState.class),
-                                                           mock(AtPort.class));
-        assertEquals(destination,portTile);
+            new MersenneTwisterFast(), mock(FishState.class),
+            mock(AtPort.class)
+        );
+        assertEquals(destination, portTile);
 
 
     }
@@ -112,11 +118,12 @@ public class FavoriteDestinationStrategyTest {
     @Test
     public void keepGoingBack() throws Exception {
         Fisher fisher = mock(Fisher.class);
-        SeaTile portTile = new SeaTile(0,0,1, new TileHabitat(0d));
-        SeaTile favoriteTile = new SeaTile(1,1,-1, new TileHabitat(0d));
-        SeaTile transitTile = new SeaTile(1,0,-1, new TileHabitat(0d));
+        SeaTile portTile = new SeaTile(0, 0, 1, new TileHabitat(0d));
+        SeaTile favoriteTile = new SeaTile(1, 1, -1, new TileHabitat(0d));
+        SeaTile transitTile = new SeaTile(1, 0, -1, new TileHabitat(0d));
 
-        Port port = mock(Port.class); when(port.getLocation()).thenReturn(portTile);
+        Port port = mock(Port.class);
+        when(port.getLocation()).thenReturn(portTile);
         when(fisher.getHomePort()).thenReturn(port);
         when(fisher.isGoingToPort()).thenReturn(true);
 
@@ -125,10 +132,11 @@ public class FavoriteDestinationStrategyTest {
 
         FavoriteDestinationStrategy strategy = new FavoriteDestinationStrategy(favoriteTile);
         SeaTile destination = strategy.chooseDestination(fisher,
-                                                           new MersenneTwisterFast(), mock(FishState.class),
-                                                           mock(AtPort.class));
+            new MersenneTwisterFast(), mock(FishState.class),
+            mock(AtPort.class)
+        );
 
-        assertEquals(destination,portTile);
+        assertEquals(destination, portTile);
 
 
     }

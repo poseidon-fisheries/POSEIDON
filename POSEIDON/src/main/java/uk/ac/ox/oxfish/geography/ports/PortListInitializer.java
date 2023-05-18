@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.PortReader;
 
 import java.util.ArrayList;
@@ -37,28 +36,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBoxcarPulseRecruitmentFactory.forceThroughYaml;
-
 /**
  * Created by carrknight on 3/13/17.
  */
 public class PortListInitializer implements PortInitializer {
 
 
-    private LinkedHashMap<String,Coordinate> ports;
-
     /**
      * if this is set to false, we assume the coordinates provided are geographical coordinates;
      * if this is set to true, we assume the coordinates provided are grid coordinates
      */
     private final boolean usingGridCoordinates;
+    private LinkedHashMap<String, Coordinate> ports;
 
     public PortListInitializer(LinkedHashMap<String, Coordinate> ports, boolean usingGridCoordinates) {
 //        this.ports = forceThroughYaml(ports,
 //                Coordinate.class);;
         this.ports = ports;
         this.usingGridCoordinates = usingGridCoordinates;
-        Preconditions.checkArgument(ports.size()>0);
+        Preconditions.checkArgument(ports.size() > 0);
     }
 
     /**
@@ -75,39 +71,40 @@ public class PortListInitializer implements PortInitializer {
      */
     @Override
     public List<Port> buildPorts(
-            NauticalMap map, MersenneTwisterFast mapmakerRandom, Function<SeaTile, MarketMap> marketFactory,
-            FishState model, GasPriceMaker gasPriceMaker) {
+        NauticalMap map, MersenneTwisterFast mapmakerRandom, Function<SeaTile, MarketMap> marketFactory,
+        FishState model, GasPriceMaker gasPriceMaker
+    ) {
         List<Port> toReturn = new ArrayList<>(ports.size());
-        for(Map.Entry<String,Coordinate> entry : ports.entrySet()) {
+        for (Map.Entry<String, Coordinate> entry : ports.entrySet()) {
 
 
             SeaTile location;
-            if(usingGridCoordinates)
-                location = map.getSeaTile((int) entry.getValue().x,
-                        (int) entry.getValue().y);
-            else
-            {
+            if (usingGridCoordinates)
+                location = map.getSeaTile(
+                    (int) entry.getValue().x,
+                    (int) entry.getValue().y
+                );
+            else {
                 location = PortReader.correctLocation(
-                        map.getSeaTile(
-                                entry.getValue()
-                        ),
-                        map,
-                        entry.getKey()
+                    map.getSeaTile(
+                        entry.getValue()
+                    ),
+                    map,
+                    entry.getKey()
                 );
             }
 
-            Port newPort = new Port(entry.getKey(),
-                    location,
-                    marketFactory.apply(location),
-                    //ports start with price = 0 because I assume the scenario will have its own rules for gas price
+            Port newPort = new Port(
+                entry.getKey(),
+                location,
+                marketFactory.apply(location),
+                //ports start with price = 0 because I assume the scenario will have its own rules for gas price
 
-                    0
+                0
             );
             toReturn.add(newPort);
             map.addPort(newPort);
         }
-
-
 
 
         return toReturn;

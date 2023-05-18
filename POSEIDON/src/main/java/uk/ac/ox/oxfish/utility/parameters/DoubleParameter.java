@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.utility.parameters;
 
 import ec.util.MersenneTwisterFast;
 
-import java.util.function.DoubleFunction;
 import java.util.function.ToDoubleFunction;
 
 /**

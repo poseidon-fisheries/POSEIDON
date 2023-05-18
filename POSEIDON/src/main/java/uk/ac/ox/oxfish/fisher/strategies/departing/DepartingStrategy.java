@@ -29,21 +29,23 @@ import uk.ac.ox.oxfish.model.FisherStartable;
  * The strategy used by the fisher to decide whether to leave port or not
  * Created by carrknight on 4/2/15.
  */
-public interface DepartingStrategy extends FisherStartable{
+public interface DepartingStrategy extends FisherStartable {
 
     /**
      * The fisher asks himself if he wants to leave the warm comfort of his bed.
-     * @return  true if the fisherman wants to leave port.
+     *
+     * @return true if the fisherman wants to leave port.
      */
     boolean shouldFisherLeavePort(Fisher fisher, FishState model, MersenneTwisterFast random);
 
 
     /**
      * The fisher asks himself how many more days out at sea they can go out this year
+     *
      * @return number of days the fisher thinks it can still go out
      */
-    default int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random){
-        return 365-model.getDayOfTheYear();
+    default int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random) {
+        return 365 - model.getDayOfTheYear();
     }
 
 

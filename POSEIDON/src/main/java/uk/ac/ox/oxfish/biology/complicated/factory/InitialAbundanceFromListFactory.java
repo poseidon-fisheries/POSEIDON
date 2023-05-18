@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
 import com.beust.jcommander.internal.Lists;
-import uk.ac.ox.oxfish.biology.complicated.PremadeInitialAbundance;
 import uk.ac.ox.oxfish.biology.complicated.RepeatingInitialAbundance;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -33,9 +32,7 @@ import java.util.List;
  * so that, for example. 100,200,300 implies 100 male and 100 female of age[0] in the world
  * Created by carrknight on 7/8/17.
  */
-public class InitialAbundanceFromListFactory implements AlgorithmFactory<RepeatingInitialAbundance>
-{
-
+public class InitialAbundanceFromListFactory implements AlgorithmFactory<RepeatingInitialAbundance> {
 
 
     private List<Double> fishPerBinPerSex = Lists.newArrayList(10000000d, 1000000d, 10000d);
@@ -54,10 +51,8 @@ public class InitialAbundanceFromListFactory implements AlgorithmFactory<Repeati
         double[] abundance = new double[fishPerBinPerSex.size()];
 
 
-
         //fill it up
-        for(int bin=0; bin<fishPerBinPerSex.size(); bin++)
-        {
+        for (int bin = 0; bin < fishPerBinPerSex.size(); bin++) {
             abundance[bin] = fishPerBinPerSex.get(bin);
         }
         //return it

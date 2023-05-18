@@ -52,13 +52,13 @@ public class KnifeEdgeCashflowObjectiveTest {
 
         KnifeEdgeCashflowFactory factory = new KnifeEdgeCashflowFactory();
         factory.setThreshold(new FixedDoubleParameter(6));
-        factory.setPeriod(new FixedDoubleParameter(6));;
+        factory.setPeriod(new FixedDoubleParameter(6));
+        ;
         KnifeEdgeCashflowObjective knifeEdge = factory.apply(mock(FishState.class));
         factory.setThreshold(new FixedDoubleParameter(7));
         KnifeEdgeCashflowObjective knifeEdge2 = factory.apply(mock(FishState.class));
 
-        for(int i=0; i<100; i++)
-        {
+        for (int i = 0; i < 100; i++) {
             when(fisher.getBankBalance()).thenReturn(((double) i));
             data.step(mock(FishState.class));
 
@@ -69,8 +69,7 @@ public class KnifeEdgeCashflowObjectiveTest {
         assertEquals(-1, knifeEdge2.computeCurrentFitness(fisher, fisher), .0001);
 
         //let's add some garbage
-        for(int i=0; i<6; i++)
-        {
+        for (int i = 0; i < 6; i++) {
             when(fisher.getBankBalance()).thenReturn(0d);
             data.step(mock(FishState.class));
         }

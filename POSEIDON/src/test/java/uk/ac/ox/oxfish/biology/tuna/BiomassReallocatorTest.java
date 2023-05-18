@@ -48,9 +48,9 @@ public class BiomassReallocatorTest extends TestCase {
     public void test() {
         final ImmutableList<DoubleGrid2D> grids = Stream
             .of(
-                new double[][] {{1, 1, 1}, {0, 0, 0}, {0, 0, 0}},
-                new double[][] {{0, 0, 0}, {1, 1, 1}, {0, 0, 0}},
-                new double[][] {{0, 0, 0}, {0, 0, 0}, {1, 1, 1}}
+                new double[][]{{1, 1, 1}, {0, 0, 0}, {0, 0, 0}},
+                new double[][]{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}},
+                new double[][]{{0, 0, 0}, {0, 0, 0}, {1, 1, 1}}
             )
             .map(DoubleGrid2D::new)
             .map(AllocationGridsSupplier::normalize)
@@ -60,8 +60,8 @@ public class BiomassReallocatorTest extends TestCase {
         final NauticalMap nauticalMap = makeMap(3, 3);
         nauticalMap.getAllSeaTilesAsList().forEach(seaTile ->
             seaTile.setBiology(new BiomassLocalBiology(
-                    new double[] {1, 1},
-                    new double[] {POSITIVE_INFINITY, POSITIVE_INFINITY}
+                    new double[]{1, 1},
+                    new double[]{POSITIVE_INFINITY, POSITIVE_INFINITY}
                 )
             )
         );
@@ -102,12 +102,12 @@ public class BiomassReallocatorTest extends TestCase {
         );
 
         assertArrayEquals(
-            new double[][] {{3, 3, 3}, {0, 0, 0}, {0, 0, 0}},
+            new double[][]{{3, 3, 3}, {0, 0, 0}, {0, 0, 0}},
             getBiomassArray(nauticalMap, globalBiology.getSpecie(0))
         );
 
         assertArrayEquals(
-            new double[][] {{0, 0, 0}, {0, 0, 0}, {3, 3, 3}},
+            new double[][]{{0, 0, 0}, {0, 0, 0}, {3, 3, 3}},
             getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
         );
 
@@ -119,12 +119,12 @@ public class BiomassReallocatorTest extends TestCase {
         );
 
         assertArrayEquals(
-            new double[][] {{0, 0, 0}, {3, 3, 3}, {0, 0, 0}},
+            new double[][]{{0, 0, 0}, {3, 3, 3}, {0, 0, 0}},
             getBiomassArray(nauticalMap, globalBiology.getSpecie(0))
         );
 
         assertArrayEquals(
-            new double[][] {{0, 0, 0}, {3, 3, 3}, {0, 0, 0}},
+            new double[][]{{0, 0, 0}, {3, 3, 3}, {0, 0, 0}},
             getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
         );
 
@@ -144,12 +144,12 @@ public class BiomassReallocatorTest extends TestCase {
         );
 
         assertArrayEquals(
-            new double[][] {{0, 0, 0}, {0, 0, 0}, {6, 6, 6}},
+            new double[][]{{0, 0, 0}, {0, 0, 0}, {6, 6, 6}},
             getBiomassArray(nauticalMap, globalBiology.getSpecie(0))
         );
 
         assertArrayEquals(
-            new double[][] {{6, 6, 6}, {0, 0, 0}, {0, 0, 0}},
+            new double[][]{{6, 6, 6}, {0, 0, 0}, {0, 0, 0}},
             getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
         );
 

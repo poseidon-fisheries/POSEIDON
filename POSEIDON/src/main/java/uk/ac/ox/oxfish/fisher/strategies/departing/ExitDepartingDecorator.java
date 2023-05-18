@@ -40,16 +40,12 @@ public class ExitDepartingDecorator implements DepartingStrategy {
 
 
     private final DepartingStrategy decorated;
-
-    private boolean hasQuit =false;
-
     private final int consecutiveYearsNegative;
-
+    private boolean hasQuit = false;
     private Stoppable stoppable;
 
 
-    public ExitDepartingDecorator(DepartingStrategy decorated, int consecutiveYearsNegative)
-    {
+    public ExitDepartingDecorator(DepartingStrategy decorated, int consecutiveYearsNegative) {
         this.decorated = decorated;
         this.consecutiveYearsNegative = consecutiveYearsNegative;
     }
@@ -64,8 +60,9 @@ public class ExitDepartingDecorator implements DepartingStrategy {
      */
     @Override
     public boolean shouldFisherLeavePort(
-            Fisher fisher, FishState model, MersenneTwisterFast random) {
-        if(hasQuit)
+        Fisher fisher, FishState model, MersenneTwisterFast random
+    ) {
+        if (hasQuit)
             return false;
         else
             return decorated.shouldFisherLeavePort(fisher, model, random);
@@ -75,8 +72,8 @@ public class ExitDepartingDecorator implements DepartingStrategy {
     public void start(FishState model, Fisher fisher) {
 
         //shedule yourself to check for profits every year
-        if(stoppable != null)
-            throw  new RuntimeException("Already started!");
+        if (stoppable != null)
+            throw new RuntimeException("Already started!");
 
         Steppable steppable = new Steppable() {
             @Override
@@ -85,8 +82,27 @@ public class ExitDepartingDecorator implements DepartingStrategy {
             }
         };
         this.stoppable = model.scheduleEveryYear(steppable, StepOrder.DAWN);
-        decorated.start(model,fisher);
+        decorated.start(model, fisher);
 
+    }
+
+    public void checkIfQuit(Fisher fisher) {
+        if (!hasQuit) {
+            DataColumn earningsData = fisher.getYearlyData().getColumn(FisherYearlyTimeSeries.EARNINGS);
+            DataColumn costData = fisher.getYearlyData().getColumn(FisherYearlyTimeSeries.VARIABLE_COSTS);
+            if (earningsData.size() >= consecutiveYearsNegative) {
+                Iterator<Double> earningsIterator = earningsData.descendingIterator();
+                Iterator<Double> costsIterator = costData.descendingIterator();
+                double sum = 0;
+                for (int i = 0; i < consecutiveYearsNegative; i++) {
+                    sum += earningsIterator.next();
+                    sum -= costsIterator.next();
+                }
+                //you are here, all your profits were negative!
+                if (sum < 0)
+                    hasQuit = true;
+            }
+        }
     }
 
     @Override
@@ -97,31 +113,9 @@ public class ExitDepartingDecorator implements DepartingStrategy {
         decorated.turnOff(fisher);
     }
 
-
-
-
-    public void checkIfQuit(Fisher fisher){
-        if(!hasQuit) {
-            DataColumn earningsData = fisher.getYearlyData().getColumn(FisherYearlyTimeSeries.EARNINGS);
-            DataColumn costData = fisher.getYearlyData().getColumn(FisherYearlyTimeSeries.VARIABLE_COSTS);
-            if(earningsData.size() >= consecutiveYearsNegative) {
-                Iterator<Double> earningsIterator = earningsData.descendingIterator();
-                Iterator<Double> costsIterator = costData.descendingIterator();
-                double sum = 0;
-                for(int i=0; i<consecutiveYearsNegative; i++) {
-                    sum+=earningsIterator.next();
-                    sum-=costsIterator.next();
-                }
-                //you are here, all your profits were negative!
-                if(sum<0)
-                    hasQuit = true;
-            }
-        }
-    }
-
     @Override
     public int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random) {
-        if(hasQuit)
+        if (hasQuit)
             return 0;
         else
             return decorated.predictedDaysLeftFishingThisYear(fisher, model, random);

@@ -36,11 +36,11 @@ public class ExponentialMovingAverageTest {
         ExponentialMovingAverage<Integer> averager = new ExponentialMovingAverage<>(.2);
 
         averager.addObservation(1);
-        assertEquals(1,averager.getSmoothedObservation(),.0001);
+        assertEquals(1, averager.getSmoothedObservation(), .0001);
         averager.addObservation(2);
         averager.addObservation(3);
         averager.addObservation(4);
-        assertEquals(2.048,averager.getSmoothedObservation(),.0001);
+        assertEquals(2.048, averager.getSmoothedObservation(), .0001);
 
     }
 }

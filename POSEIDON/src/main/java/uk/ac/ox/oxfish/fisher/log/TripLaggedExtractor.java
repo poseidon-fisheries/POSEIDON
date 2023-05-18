@@ -39,47 +39,104 @@ import java.util.function.Function;
 
 /**
  * self checks all trip records for the given fishers and collect its average through the year.
- *
  */
 public class TripLaggedExtractor implements Startable, Steppable, ObservationExtractor {
 
 
     /**
-     * this is either a fisher you are following or null, in which case I expect to look at all fishers!
-     */
-    private Fisher fisherTracked;
-
-    /**
      * this function is applied uncritically to all TripRecords to obtain a numerical value from them
      * which is then collected here
      */
-    private final Function<TripRecord,Double> variableOfInterest;
-
-
+    private final Function<TripRecord, Double> variableOfInterest;
     /**
      * you want to keep a separate average for each group in the discretization
      */
     private final MapDiscretization discretization;
-
-
     /**
      * the last average you computed
      */
     private final double[] lastYearAverage;
+    /**
+     * this is either a fisher you are following or null, in which case I expect to look at all fishers!
+     */
+    private Fisher fisherTracked;
     private Stoppable stoppable;
 
 
     public TripLaggedExtractor(
-            Function<TripRecord, Double> variableOfInterest,
-            MapDiscretization discretization) {
+        Function<TripRecord, Double> variableOfInterest,
+        MapDiscretization discretization
+    ) {
         this.variableOfInterest = variableOfInterest;
         this.discretization = discretization;
         this.lastYearAverage = new double[discretization.getNumberOfGroups()];
     }
 
+    /**
+     * returns the last year average observed
+     *
+     * @return
+     */
+    @Override
+    public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
+        return lastYearAverage[discretization.getGroup(tile)];
+    }
+
+    /**
+     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
+     * or just to percolate a reference to the model
+     *
+     * @param model the model
+     */
+    @Override
+    public void start(FishState model) {
+        if (stoppable == null)
+            stoppable = model.scheduleEveryYear(this, StepOrder.DAWN);
+    }
+
+    /**
+     * tell the startable to turnoff,
+     */
+    @Override
+    public void turnOff() {
+        Preconditions.checkArgument(stoppable != null);
+        stoppable.stop();
+        stoppable = null;
+    }
+
+    @Override
+    public void step(SimState simState) {
+
+        FishState model = (FishState) simState;
+
+
+        //if there is nobody to track you are going to sample the entire fishery!
+        if (fisherTracked != null)
+            update(
+                fisherTracked.getFinishedTrips(),
+                model.getDay()
+            );
+        else {
+            //get all trips!
+            List<TripRecord> allTrips = new LinkedList<>();
+            for (Fisher fisher : model.getFishers()) {
+                allTrips.addAll(fisher.getFinishedTrips());
+            }
+            update(
+                allTrips,
+                model.getDay()
+            );
+
+        }
+
+
+    }
+
     //updates the averages with the new observations
-    private void update(List<TripRecord> totalLogs,
-                        int dateToday){
+    private void update(
+        List<TripRecord> totalLogs,
+        int dateToday
+    ) {
 
         //prepare to take averages
         DoubleSummaryStatistics[] stats = new DoubleSummaryStatistics[discretization.getNumberOfGroups()];
@@ -92,14 +149,14 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
             //ignore stuff that is too old
             if (tripRecord.getTripDay() >= dateToday - 365) {
                 SeaTile mostFishedTileInTrip = tripRecord.getMostFishedTileInTrip();
-                if(mostFishedTileInTrip==null) //if you failed to fish anywhere, don't bother
+                if (mostFishedTileInTrip == null) //if you failed to fish anywhere, don't bother
                     continue;
 
                 int group = discretization.getGroup(mostFishedTileInTrip);
                 Double observation = variableOfInterest.apply(tripRecord);
-                if(Double.isFinite(observation))
+                if (Double.isFinite(observation))
                     stats[group].accept(
-                            observation
+                        observation
                     );
             }
 
@@ -108,71 +165,6 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
         //turn them into averages
         for (int i = 0; i < lastYearAverage.length; i++) {
             lastYearAverage[i] = stats[i].getAverage();
-        }
-
-
-
-
-
-    }
-
-
-    /**
-     * returns the last year average observed
-     * @return
-     */
-    @Override
-    public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-        return lastYearAverage[discretization.getGroup(tile)];
-    }
-
-
-    /**
-     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
-     * or just to percolate a reference to the model
-     *
-     * @param model the model
-     */
-    @Override
-    public void start(FishState model) {
-        if(stoppable==null)
-            stoppable = model.scheduleEveryYear(this, StepOrder.DAWN);
-    }
-
-    /**
-     * tell the startable to turnoff,
-     */
-    @Override
-    public void turnOff() {
-        Preconditions.checkArgument(stoppable!=null);
-        stoppable.stop();
-        stoppable = null;
-    }
-
-    @Override
-    public void step(SimState simState) {
-
-        FishState model = (FishState) simState;
-
-
-        //if there is nobody to track you are going to sample the entire fishery!
-        if(fisherTracked != null)
-            update(
-                    fisherTracked.getFinishedTrips(),
-                    model.getDay()
-            );
-        else
-        {
-            //get all trips!
-            List<TripRecord> allTrips = new LinkedList<>();
-            for (Fisher fisher : model.getFishers()) {
-                allTrips.addAll(fisher.getFinishedTrips());
-            }
-            update(
-                    allTrips,
-                    model.getDay()
-            );
-
         }
 
 

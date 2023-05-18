@@ -20,8 +20,6 @@
 
 package uk.ac.ox.oxfish.model.event;
 
-import java.util.LinkedHashMap;
-import java.util.List;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.tuna.Extractor;
@@ -29,6 +27,9 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.OneSpecieGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Created by carrknight on 5/25/17.
@@ -40,7 +41,8 @@ public class BiomassDrivenFixedExogenousCatches extends AbstractYearlyTargetExog
 
 
     public BiomassDrivenFixedExogenousCatches(
-            LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg, boolean allowMortalityOnFads) {
+        LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg, boolean allowMortalityOnFads
+    ) {
         super(exogenousYearlyCatchesInKg, "Exogenous catches of ");
         this.allowMortalityOnFads = allowMortalityOnFads;
     }
@@ -55,42 +57,46 @@ public class BiomassDrivenFixedExogenousCatches extends AbstractYearlyTargetExog
     /**
      * simulate exogenous catch
      *
-     * @param model the model
-     * @param target   species to kill
-     * @param tile     where to kill it
-     * @param step     how much at most to kill
+     * @param model  the model
+     * @param target species to kill
+     * @param tile   where to kill it
+     * @param step   how much at most to kill
      * @return
      */
     @Override
     protected Catch mortalityEvent(
-            FishState model, Species target, LocalBiology tile, double step) {
-        return biomassSimpleMortalityEvent(model,
-                                           target,
-                                           tile,
-                                           step);
+        FishState model, Species target, LocalBiology tile, double step
+    ) {
+        return biomassSimpleMortalityEvent(
+            model,
+            target,
+            tile,
+            step
+        );
     }
 
 
     public static Catch biomassSimpleMortalityEvent(
-            FishState model, Species target, LocalBiology tile, double step) {
+        FishState model, Species target, LocalBiology tile, double step
+    ) {
         //take it as a fixed proportion catchability (and never more than it is available anyway)
         assert tile.getBiomass(target) > FishStateUtilities.EPSILON;
-        double proportionToCatch = Math.min(1,step/tile.getBiomass(target));
+        double proportionToCatch = Math.min(1, step / tile.getBiomass(target));
         //simulate the catches as a fixed proportion gear
-        OneSpecieGear gear = new OneSpecieGear(target,proportionToCatch);
+        OneSpecieGear gear = new OneSpecieGear(target, proportionToCatch);
         //catch it
-        Catch fish = gear.fish(null, tile,null , 1, model.getBiology());
+        Catch fish = gear.fish(null, tile, null, 1, model.getBiology());
         //round to be supersafe
-        if(fish.totalCatchWeight()>tile.getBiomass(target)) {
+        if (fish.totalCatchWeight() > tile.getBiomass(target)) {
             //should be by VERY little!
             assert tile.getBiomass(target) + FishStateUtilities.EPSILON > fish.getTotalWeight();
-            assert proportionToCatch >=1.0;
+            assert proportionToCatch >= 1.0;
             //bound it to what is available
-            fish = new Catch(target,tile.getBiomass(target),model.getBiology());
-            assert (fish.totalCatchWeight()<=tile.getBiomass(target));
+            fish = new Catch(target, tile.getBiomass(target), model.getBiology());
+            assert (fish.totalCatchWeight() <= tile.getBiomass(target));
         }
-        assert (fish.totalCatchWeight()<=tile.getBiomass(target));
-        tile.reactToThisAmountOfBiomassBeingFished(fish,fish,model.getBiology());
+        assert (fish.totalCatchWeight() <= tile.getBiomass(target));
+        tile.reactToThisAmountOfBiomassBeingFished(fish, fish, model.getBiology());
         return fish;
     }
 }

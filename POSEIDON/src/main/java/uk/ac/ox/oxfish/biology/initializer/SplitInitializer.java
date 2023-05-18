@@ -36,24 +36,27 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class SplitInitializer extends TwoSpeciesBoxInitializer {
 
 
-    public SplitInitializer(DoubleParameter carryingCapacity,
-                            double percentageLimitOnDailyMovement,
-                            double differentialPercentageToMove,
-                            LogisticGrowerInitializer grower
+    public SplitInitializer(
+        DoubleParameter carryingCapacity,
+        double percentageLimitOnDailyMovement,
+        double differentialPercentageToMove,
+        LogisticGrowerInitializer grower
     ) {
         //box top Y will have to be reset when generateLocal is called as the map doesn't exist just yet
-        super(0,0,Integer.MAX_VALUE,Integer.MAX_VALUE,false,
-              carryingCapacity,
-              new FixedDoubleParameter(1d),
-              percentageLimitOnDailyMovement,
-              differentialPercentageToMove,
-              grower);
+        super(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, false,
+            carryingCapacity,
+            new FixedDoubleParameter(1d),
+            percentageLimitOnDailyMovement,
+            differentialPercentageToMove,
+            grower
+        );
 
     }
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *  @param biology          the global biology (species' list) object
+     *
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
@@ -62,8 +65,9 @@ public class SplitInitializer extends TwoSpeciesBoxInitializer {
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
+        GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
+        int mapWidthInCells, NauticalMap map
+    ) {
 
         setLowestY(mapHeightInCells / 2);
         return super.generateLocal(biology, seaTile, random, mapHeightInCells, mapWidthInCells, map);

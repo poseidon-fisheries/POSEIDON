@@ -17,13 +17,6 @@ public class NonAssociatedSetFromLocationValuePlanningModule<B extends LocalBiol
 
     public NonAssociatedSetFromLocationValuePlanningModule(
         final NonAssociatedSetLocationValues locationValues,
-        final CatchSamplerPlannedActionGenerator.NonAssociatedActionGenerator<B> generator
-    ) {
-        super(locationValues, generator);
-    }
-
-    public NonAssociatedSetFromLocationValuePlanningModule(
-        final NonAssociatedSetLocationValues locationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
         final double additionalWaitTime,
@@ -49,6 +42,13 @@ public class NonAssociatedSetFromLocationValuePlanningModule<B extends LocalBiol
                 rangeInSeaTiles
             )
         );
+    }
+
+    public NonAssociatedSetFromLocationValuePlanningModule(
+        final NonAssociatedSetLocationValues locationValues,
+        final CatchSamplerPlannedActionGenerator.NonAssociatedActionGenerator<B> generator
+    ) {
+        super(locationValues, generator);
     }
 
     @Override

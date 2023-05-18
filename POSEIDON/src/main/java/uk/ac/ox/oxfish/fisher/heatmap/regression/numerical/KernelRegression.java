@@ -33,7 +33,7 @@ import java.util.PriorityQueue;
  * A kernel regression with a limited
  * Created by carrknight on 9/2/16.
  */
-public class KernelRegression  implements GeographicalRegression<Double>{
+public class KernelRegression implements GeographicalRegression<Double> {
 
 
     /**
@@ -59,7 +59,6 @@ public class KernelRegression  implements GeographicalRegression<Double>{
     private final int maximumNumberOfObservationsToKeep;
 
 
-
     /**
      * observations
      */
@@ -67,18 +66,17 @@ public class KernelRegression  implements GeographicalRegression<Double>{
 
 
     public KernelRegression(
-            int maximumNumberOfObservationsToKeep,
-            RegressionDistance kernel,
-            Pair<ObservationExtractor,Double>... extractorsAndBandwidths)
-    {
+        int maximumNumberOfObservationsToKeep,
+        RegressionDistance kernel,
+        Pair<ObservationExtractor, Double>... extractorsAndBandwidths
+    ) {
 
         this.bandwidths = new double[extractorsAndBandwidths.length];
         this.extractors = new ObservationExtractor[extractorsAndBandwidths.length];
         this.kernel = kernel;
 
 
-        for(int i=0; i< extractorsAndBandwidths.length; i++)
-        {
+        for (int i = 0; i < extractorsAndBandwidths.length; i++) {
             this.extractors[i] = extractorsAndBandwidths[i].getFirst();
             this.bandwidths[i] = extractorsAndBandwidths[i].getSecond();
         }
@@ -90,6 +88,7 @@ public class KernelRegression  implements GeographicalRegression<Double>{
 
     /**
      * adds an observation and if there are too many removes the oldest one
+     *
      * @param observation
      * @param fisher
      * @param model
@@ -97,9 +96,8 @@ public class KernelRegression  implements GeographicalRegression<Double>{
 
     public void addObservation(GeographicalObservation observation, Fisher fisher, FishState model) {
         observations.add(observation);
-        if(observations.size()>maximumNumberOfObservationsToKeep)
-        {
-            assert observations.size()==maximumNumberOfObservationsToKeep+1;
+        if (observations.size() > maximumNumberOfObservationsToKeep) {
+            assert observations.size() == maximumNumberOfObservationsToKeep + 1;
             observations.poll();
         }
     }
@@ -113,10 +111,10 @@ public class KernelRegression  implements GeographicalRegression<Double>{
      */
     @Override
     public double extractNumericalYFromObservation(
-            GeographicalObservation<Double> observation, Fisher fisher) {
-        return  observation.getValue();
+        GeographicalObservation<Double> observation, Fisher fisher
+    ) {
+        return observation.getValue();
     }
-
 
 
     /**
@@ -134,32 +132,32 @@ public class KernelRegression  implements GeographicalRegression<Double>{
 
         double kernelSum = 0;
         double numerator = 0;
-        for(GeographicalObservation<Double> observation : observations)
-        {
+        for (GeographicalObservation<Double> observation : observations) {
             double currentKernel = 1;
-            for(int i=0; i<bandwidths.length; i++) {
+            for (int i = 0; i < bandwidths.length; i++) {
                 kernel.setBandwidth(bandwidths[i]);
                 currentKernel *= kernel.distance(
-                        extractors[i].extract(tile,time,fisher,model ),
-                        extractors[i].extract(observation.getTile(),
-                                              observation.getTime(),
-                                              fisher, model)
+                    extractors[i].extract(tile, time, fisher, model),
+                    extractors[i].extract(observation.getTile(),
+                        observation.getTime(),
+                        fisher, model
+                    )
                 );
                 //don't bother if it's a 0
-                if((currentKernel )<.00001)
+                if ((currentKernel) < .00001)
                     break;
             }
 
-            if((currentKernel )>.00001) {
+            if ((currentKernel) > .00001) {
                 kernelSum += currentKernel;
                 numerator += currentKernel * observation.getValue();
             }
         }
 
-        if(kernelSum <.00001)
+        if (kernelSum < .00001)
             return Double.NaN;
 
-        return numerator/kernelSum;
+        return numerator / kernelSum;
 
 
     }
@@ -196,7 +194,7 @@ public class KernelRegression  implements GeographicalRegression<Double>{
     public void setParameters(double[] parameterArray) {
 
         assert parameterArray.length == bandwidths.length;
-        System.arraycopy(parameterArray,0,bandwidths,0,bandwidths.length);
+        System.arraycopy(parameterArray, 0, bandwidths, 0, bandwidths.length);
     }
 
 

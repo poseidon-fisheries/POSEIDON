@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class AbstractNetworkBuilder implements NetworkBuilder{
+public abstract class AbstractNetworkBuilder implements NetworkBuilder {
 
 
     private List<AlgorithmFactory<NetworkPredicate>> predicates = new LinkedList<>();
@@ -35,14 +35,14 @@ public abstract class AbstractNetworkBuilder implements NetworkBuilder{
     /**
      * more of a support of legacy code, we translate this back into an algorithm factory
      */
-    public void addPredicate(NetworkPredicate predicate){
+    public void addPredicate(NetworkPredicate predicate) {
 
         predicates.add(state -> predicate);
 
     }
 
 
-    protected List<NetworkPredicate> computePredicates(FishState state){
+    protected List<NetworkPredicate> computePredicates(FishState state) {
 
         LinkedList<NetworkPredicate> toReturn = new LinkedList<>();
         for (AlgorithmFactory<NetworkPredicate> predicate : predicates) {
@@ -71,7 +71,8 @@ public abstract class AbstractNetworkBuilder implements NetworkBuilder{
      * @param predicates Value to set for property 'predicates'.
      */
     public void setPredicates(
-            List<AlgorithmFactory<NetworkPredicate>> predicates) {
+        List<AlgorithmFactory<NetworkPredicate>> predicates
+    ) {
         this.predicates = predicates;
     }
 }

@@ -12,22 +12,21 @@ public class CalibratedParameter extends UniformDoubleParameter {
         this(0, Integer.MAX_VALUE);
     }
 
-    public CalibratedParameter(final double defaultValue) {
-        this(0, Integer.MAX_VALUE, defaultValue);
-    }
-
-    public CalibratedParameter(
-        final double minimumValue,
-        final double maximumValue,
-        final double hardMinimum,
-        final double hardMaximum
-    ) {
+    public CalibratedParameter(final double minimumValue, final double maximumValue) {
         this(
             minimumValue,
             maximumValue,
-            hardMinimum,
-            hardMaximum,
             (minimumValue + maximumValue) / 2
+        );
+    }
+
+    public CalibratedParameter(final double minimumValue, final double maximumValue, final double defaultValue) {
+        this(
+            minimumValue,
+            maximumValue,
+            Math.min(minimumValue, 0),
+            Math.max(maximumValue, Integer.MAX_VALUE),
+            defaultValue
         );
     }
 
@@ -49,20 +48,21 @@ public class CalibratedParameter extends UniformDoubleParameter {
         this.defaultValue = defaultValue;
     }
 
-    public CalibratedParameter(final double minimumValue, final double maximumValue, final double defaultValue) {
-        this(
-            minimumValue,
-            maximumValue,
-            Math.min(minimumValue, 0),
-            Math.max(maximumValue, Integer.MAX_VALUE),
-            defaultValue
-        );
+    public CalibratedParameter(final double defaultValue) {
+        this(0, Integer.MAX_VALUE, defaultValue);
     }
 
-    public CalibratedParameter(final double minimumValue, final double maximumValue) {
+    public CalibratedParameter(
+        final double minimumValue,
+        final double maximumValue,
+        final double hardMinimum,
+        final double hardMaximum
+    ) {
         this(
             minimumValue,
             maximumValue,
+            hardMinimum,
+            hardMaximum,
             (minimumValue + maximumValue) / 2
         );
     }

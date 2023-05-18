@@ -39,32 +39,34 @@ import java.util.List;
 public class KernelTransduction implements GeographicalRegression<Double> {
 
 
-    private final HashMap<SeaTile,KernelTilePredictor> kernels;
+    private final HashMap<SeaTile, KernelTilePredictor> kernels;
 
     private final double forgettingFactor;
 
     public KernelTransduction(
-            NauticalMap map,
-            double forgettingFactor,
-            Pair<ObservationExtractor,Double>... extractorsAndBandwidths) {
+        NauticalMap map,
+        double forgettingFactor,
+        Pair<ObservationExtractor, Double>... extractorsAndBandwidths
+    ) {
 
         this.forgettingFactor = forgettingFactor;
         List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
         kernels = new HashMap<>(tiles.size());
-        for(SeaTile tile : tiles)
-            kernels.put(tile,new KernelTilePredictor(forgettingFactor,tile, extractorsAndBandwidths));
+        for (SeaTile tile : tiles)
+            kernels.put(tile, new KernelTilePredictor(forgettingFactor, tile, extractorsAndBandwidths));
 
     }
 
     /**
      * returns the current kernel prediction
+     *
      * @return
      */
     @Override
     public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
         KernelTilePredictor kernel = kernels.get(tile);
-        if(kernel==null)
+        if (kernel == null)
             return Double.NaN;
         else
             return kernel.getCurrentPrediction();
@@ -74,6 +76,7 @@ public class KernelTransduction implements GeographicalRegression<Double> {
 
     /**
      * returns the current geographical prediction
+     *
      * @param newObservation
      * @param fisher
      * @param model
@@ -82,9 +85,8 @@ public class KernelTransduction implements GeographicalRegression<Double> {
     public void addObservation(GeographicalObservation newObservation, Fisher fisher, FishState model) {
 
         //go through all the tiles
-        for(KernelTilePredictor kernel : kernels.values())
-        {
-           kernel.addObservation(newObservation,fisher, model);
+        for (KernelTilePredictor kernel : kernels.values()) {
+            kernel.addObservation(newObservation, fisher, model);
         }
     }
 
@@ -97,7 +99,7 @@ public class KernelTransduction implements GeographicalRegression<Double> {
      * ignored
      */
     @Override
-    public void start(FishState model,Fisher fisher) {
+    public void start(FishState model, Fisher fisher) {
 
     }
 
@@ -115,21 +117,22 @@ public class KernelTransduction implements GeographicalRegression<Double> {
      */
     @Override
     public double extractNumericalYFromObservation(
-            GeographicalObservation<Double> observation, Fisher fisher) {
+        GeographicalObservation<Double> observation, Fisher fisher
+    ) {
         return observation.getValue();
     }
 
 
     /**
-     *  The only hyper-parameter really is the forgetting value
+     * The only hyper-parameter really is the forgetting value
      */
     @Override
     public double[] getParametersAsArray() {
 
         double[] bandwidths = kernels.values().iterator().next().getBandwidths();
         //check that they all have the same bandwidths!
-        assert  kernels.values().stream().allMatch(
-                kernelTile -> Arrays.equals(kernelTile.getBandwidths(),bandwidths));
+        assert kernels.values().stream().allMatch(
+            kernelTile -> Arrays.equals(kernelTile.getBandwidths(), bandwidths));
         return bandwidths;
 
     }

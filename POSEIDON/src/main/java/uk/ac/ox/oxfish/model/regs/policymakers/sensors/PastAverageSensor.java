@@ -8,7 +8,7 @@ import java.util.function.Function;
 /**
  * reads column name, returns the average of its last X observations
  */
-public class PastAverageSensor implements Sensor<FishState,Double> {
+public class PastAverageSensor implements Sensor<FishState, Double> {
 
 
     private final UnchangingPastSensor delegate;
@@ -17,9 +17,9 @@ public class PastAverageSensor implements Sensor<FishState,Double> {
     public PastAverageSensor(String indicatorColumnName, int yearsToLookBack) {
 
         delegate = new UnchangingPastSensor(
-                indicatorColumnName,
-                1d,
-                yearsToLookBack
+            indicatorColumnName,
+            1d,
+            yearsToLookBack
         );
 
     }

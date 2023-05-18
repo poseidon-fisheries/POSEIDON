@@ -16,9 +16,11 @@ public class ThresholdWeightPrice implements PricingStrategy {
 
     final private double weightThreshold;
 
-    public ThresholdWeightPrice(double priceAboveThreshold,
-                                double priceBelowThreshold,
-                                double weightThreshold) {
+    public ThresholdWeightPrice(
+        double priceAboveThreshold,
+        double priceBelowThreshold,
+        double weightThreshold
+    ) {
         this.priceAboveThreshold = priceAboveThreshold;
         this.priceBelowThreshold = priceBelowThreshold;
         this.weightThreshold = weightThreshold;
@@ -31,9 +33,9 @@ public class ThresholdWeightPrice implements PricingStrategy {
 
     @Override
     public double getPricePerKg(Species speciesBeingSold, Fisher seller, int biologicalBin, double quantitySold) {
-        if(
-                speciesBeingSold.getWeight(0,biologicalBin) <
-                        weightThreshold)
+        if (
+            speciesBeingSold.getWeight(0, biologicalBin) <
+                weightThreshold)
             return priceBelowThreshold;
         else
             return priceAboveThreshold;
@@ -46,6 +48,6 @@ public class ThresholdWeightPrice implements PricingStrategy {
 
     @Override
     public double getMarginalPrice() {
-        return (priceBelowThreshold+priceAboveThreshold)/2;
+        return (priceBelowThreshold + priceAboveThreshold) / 2;
     }
 }

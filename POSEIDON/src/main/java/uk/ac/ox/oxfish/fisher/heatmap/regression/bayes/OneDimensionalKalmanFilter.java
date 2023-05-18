@@ -56,8 +56,9 @@ public class OneDimensionalKalmanFilter {
 
 
     public OneDimensionalKalmanFilter(
-            double transitionMultiplier, double emissionMultiplier, double uncertainty, double stateEstimate,
-            double drift) {
+        double transitionMultiplier, double emissionMultiplier, double uncertainty, double stateEstimate,
+        double drift
+    ) {
         this.transitionMultiplier = transitionMultiplier;
         this.emissionMultiplier = emissionMultiplier;
         this.uncertainty = uncertainty;
@@ -68,28 +69,27 @@ public class OneDimensionalKalmanFilter {
     /**
      * when elapsing time we multiply the current estimate of the state by A and then we increase P by the Sigma_m
      */
-    public void elapseTime()
-    {
+    public void elapseTime() {
         stateEstimate = stateEstimate * transitionMultiplier;
-        uncertainty = uncertainty *(transitionMultiplier*transitionMultiplier)+drift;
+        uncertainty = uncertainty * (transitionMultiplier * transitionMultiplier) + drift;
     }
 
     /**
      * updates state estimate with new evidence
-     * @param evidence the measurement
+     *
+     * @param evidence            the measurement
      * @param evidenceUncertainty the Sigma_m of the kalman filter, that is the uncertainty we have regarding
      *                            the quality of the measurement
      */
-    public void observe(double evidence, double evidenceUncertainty)
-    {
+    public void observe(double evidence, double evidenceUncertainty) {
 
         //weighs the importance of this new observation
-        double kalmanGain =  uncertainty * emissionMultiplier /
-                (uncertainty * emissionMultiplier * emissionMultiplier +evidenceUncertainty);
+        double kalmanGain = uncertainty * emissionMultiplier /
+            (uncertainty * emissionMultiplier * emissionMultiplier + evidenceUncertainty);
         //update estimate in proportion to how far off the mark the prediction is (weighted by the kalman gain)
-        stateEstimate = stateEstimate + kalmanGain *(evidence - emissionMultiplier*stateEstimate);
+        stateEstimate = stateEstimate + kalmanGain * (evidence - emissionMultiplier * stateEstimate);
         //reduces uncertainty depending on the quality of the observation
-        uncertainty = uncertainty - uncertainty * kalmanGain  * emissionMultiplier;
+        uncertainty = uncertainty - uncertainty * kalmanGain * emissionMultiplier;
     }
 
 
@@ -103,6 +103,15 @@ public class OneDimensionalKalmanFilter {
     }
 
     /**
+     * Setter for property 'uncertainty'.
+     *
+     * @param uncertainty Value to set for property 'uncertainty'.
+     */
+    public void setUncertainty(double uncertainty) {
+        this.uncertainty = uncertainty;
+    }
+
+    /**
      * Getter for property 'stateEstimate'.
      *
      * @return Value for property 'stateEstimate'.
@@ -111,13 +120,21 @@ public class OneDimensionalKalmanFilter {
         return stateEstimate;
     }
 
-    public double getStandardDeviation(){
-        return Math.sqrt(uncertainty);
+    /**
+     * Setter for property 'stateEstimate'.
+     *
+     * @param stateEstimate Value to set for property 'stateEstimate'.
+     */
+    public void setStateEstimate(double stateEstimate) {
+        this.stateEstimate = stateEstimate;
     }
 
-    public double getProbabilityStateIsThis(double guess)
-    {
-        return FishStateUtilities.normalPDF(stateEstimate,getStandardDeviation()).apply(guess);
+    public double getProbabilityStateIsThis(double guess) {
+        return FishStateUtilities.normalPDF(stateEstimate, getStandardDeviation()).apply(guess);
+    }
+
+    public double getStandardDeviation() {
+        return Math.sqrt(uncertainty);
     }
 
     /**
@@ -145,24 +162,6 @@ public class OneDimensionalKalmanFilter {
      */
     public void setEmissionMultiplier(double emissionMultiplier) {
         this.emissionMultiplier = emissionMultiplier;
-    }
-
-    /**
-     * Setter for property 'uncertainty'.
-     *
-     * @param uncertainty Value to set for property 'uncertainty'.
-     */
-    public void setUncertainty(double uncertainty) {
-        this.uncertainty = uncertainty;
-    }
-
-    /**
-     * Setter for property 'stateEstimate'.
-     *
-     * @param stateEstimate Value to set for property 'stateEstimate'.
-     */
-    public void setStateEstimate(double stateEstimate) {
-        this.stateEstimate = stateEstimate;
     }
 
     /**

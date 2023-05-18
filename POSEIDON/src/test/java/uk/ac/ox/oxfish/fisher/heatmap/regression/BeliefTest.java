@@ -49,12 +49,12 @@ public class BeliefTest {
 
         Belief<Double> belief = new Belief<>(particles);
         double[] summary = Belief.getSummaryStatistics(belief);
-        assertEquals(summary[0],3.75,.001);
-        assertEquals(summary[1],0.82916,.001);
+        assertEquals(summary[0], 3.75, .001);
+        assertEquals(summary[1], 0.82916, .001);
 
         LinkedList<Double> sample = belief.sample(new MersenneTwisterFast(), 100);
-        for(Double temp : sample)
-            assertTrue(temp==3 || temp==4 || temp==5);
+        for (Double temp : sample)
+            assertTrue(temp == 3 || temp == 4 || temp == 5);
 
     }
 }

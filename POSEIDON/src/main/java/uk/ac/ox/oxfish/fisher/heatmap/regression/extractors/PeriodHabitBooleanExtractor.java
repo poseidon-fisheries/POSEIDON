@@ -36,20 +36,22 @@ public class PeriodHabitBooleanExtractor implements ObservationExtractor {
     private final int period;
 
 
-
-    public PeriodHabitBooleanExtractor(MapDiscretization discretization,
-                                       final int period) {
+    public PeriodHabitBooleanExtractor(
+        MapDiscretization discretization,
+        final int period
+    ) {
         this.discretization = discretization;
         this.period = period;
     }
 
     @Override
     public double extract(
-            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
+        SeaTile tile, double timeOfObservation, Fisher agent, FishState model
+    ) {
         //it it has been less than ```period``` days since you went there, you get the habit bonus!
-        return  model.getDay() -
-                agent.getDiscretizedLocationMemory()
-                        .getLastDayVisited(discretization.getGroup(tile)) < period ?
-                1 : 0;
+        return model.getDay() -
+            agent.getDiscretizedLocationMemory()
+                .getLastDayVisited(discretization.getGroup(tile)) < period ?
+            1 : 0;
     }
 }

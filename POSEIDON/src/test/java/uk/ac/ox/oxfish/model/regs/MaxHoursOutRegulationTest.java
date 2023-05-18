@@ -48,29 +48,31 @@ public class MaxHoursOutRegulationTest {
         Fisher fisher = mock(Fisher.class);
         when(fisher.getHoursAtSeaThisYear()).thenReturn(20d);
 
-        assertTrue(hoursOut.allowedAtSea(fisher,model));
+        assertTrue(hoursOut.allowedAtSea(fisher, model));
 
         when(fisher.getHoursAtSeaThisYear()).thenReturn(120d);
-        assertFalse(hoursOut.allowedAtSea(fisher,model));
+        assertFalse(hoursOut.allowedAtSea(fisher, model));
 
     }
 
     @Test
     public void delegates() {
 
-     //if the delegate says no, it's still a no.
+        //if the delegate says no, it's still a no.
         FishState model = mock(FishState.class);
         Regulation delegate = mock(Regulation.class);
-        when(delegate.allowedAtSea(any(),any())).thenReturn(false);
+        when(delegate.allowedAtSea(any(), any())).thenReturn(false);
 
 
-        MaxHoursOutRegulation hoursOut = new MaxHoursOutRegulation(delegate,
-                                                                   100);
+        MaxHoursOutRegulation hoursOut = new MaxHoursOutRegulation(
+            delegate,
+            100
+        );
         Fisher fisher = mock(Fisher.class);
         when(fisher.getHoursAtSeaThisYear()).thenReturn(20d);
 
 
-        assertFalse(hoursOut.allowedAtSea(fisher,model));
+        assertFalse(hoursOut.allowedAtSea(fisher, model));
 
     }
 }

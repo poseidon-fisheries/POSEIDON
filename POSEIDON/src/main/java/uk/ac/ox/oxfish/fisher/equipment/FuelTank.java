@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.equipment;
 
 /**
- *  Just a dedicated counter to keep track of the fuel left!
+ * Just a dedicated counter to keep track of the fuel left!
  * Created by carrknight on 7/15/15.
  */
 public class FuelTank {
@@ -35,8 +35,7 @@ public class FuelTank {
     /**
      * how much fuel left in tank
      */
-    private double  litersOfFuelInTank;
-
+    private double litersOfFuelInTank;
 
 
     public FuelTank(double fuelCapacityInLiters) {
@@ -56,19 +55,18 @@ public class FuelTank {
 
     /**
      * fill the tank to the brim.
+     *
      * @return how much gas had to be put in
      */
-    public double refill()
-    {
+    public double refill() {
         double added = fuelCapacityInLiters - litersOfFuelInTank;
-        assert  added >=0;
+        assert added >= 0;
         litersOfFuelInTank = fuelCapacityInLiters;
         return added;
     }
 
-    public void consume(double litersOfGasConsumed)
-    {
-        litersOfFuelInTank-=litersOfGasConsumed;
-      //  litersOfFuelInTank = FishStateUtilities.round(litersOfFuelInTank);
+    public void consume(double litersOfGasConsumed) {
+        litersOfFuelInTank -= litersOfGasConsumed;
+        //  litersOfFuelInTank = FishStateUtilities.round(litersOfFuelInTank);
     }
 }

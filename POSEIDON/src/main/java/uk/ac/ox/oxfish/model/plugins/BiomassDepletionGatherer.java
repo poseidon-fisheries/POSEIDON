@@ -45,11 +45,10 @@ public class BiomassDepletionGatherer implements AdditionalStartable {
     public static final String MSY = "Landings/MSY";
 
 
-
     /**
      * optionally you can get also msy collected
      */
-    private final HashMap<String,Double> msy;
+    private final HashMap<String, Double> msy;
 
 
     public BiomassDepletionGatherer(HashMap<String, Double> msy) {
@@ -66,56 +65,59 @@ public class BiomassDepletionGatherer implements AdditionalStartable {
     public void start(FishState model) {
         for (Species species : model.getBiology().getSpecies()) {
 
-            model.getYearlyDataSet().registerGatherer(DEPLETION_COLUMN_NAME + " " + species.getName(),
-                                                      new Gatherer<FishState>() {
-                                                          @Override
-                                                          public Double apply(FishState state) {
+            model.getYearlyDataSet().registerGatherer(
+                DEPLETION_COLUMN_NAME + " " + species.getName(),
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState state) {
 
-                                                              double bt = state.getTotalBiomass(species);
-                                                              double k = state.getMap().getAllSeaTilesExcludingLandAsList().stream().mapToDouble(
-                                                                      new ToDoubleFunction<SeaTile>() {
-                                                                          @Override
-                                                                          public double applyAsDouble(SeaTile value) {
-                                                                              if(!value.isFishingEvenPossibleHere())
-                                                                                  return 0d;
+                        double bt = state.getTotalBiomass(species);
+                        double k = state.getMap().getAllSeaTilesExcludingLandAsList().stream().mapToDouble(
+                            new ToDoubleFunction<SeaTile>() {
+                                @Override
+                                public double applyAsDouble(SeaTile value) {
+                                    if (!value.isFishingEvenPossibleHere())
+                                        return 0d;
 
-                                                                              return ((BiomassLocalBiology) value.getBiology()).getCarryingCapacity(species);
-                                                                          }
-                                                                      }
-                                                              ).sum();
-                                                              return bt/k;
+                                    return ((BiomassLocalBiology) value.getBiology()).getCarryingCapacity(species);
+                                }
+                            }
+                        ).sum();
+                        return bt / k;
 
 
-                                                          }
-                                                      },
-                                                      Double.NaN);
+                    }
+                },
+                Double.NaN
+            );
 
         }
 
         for (Map.Entry<String, Double> msyEntry : msy.entrySet()) {
 
             Species species = model.getBiology().getSpecie(msyEntry.getKey());
-            Preconditions.checkState(species!=null);
-            model.getYearlyDataSet().registerGatherer(MSY + " " + species.getName(),
-                                                      new Gatherer<FishState>() {
-                                                          @Override
-                                                          public Double apply(FishState state) {
+            Preconditions.checkState(species != null);
+            model.getYearlyDataSet().registerGatherer(
+                MSY + " " + species.getName(),
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState state) {
 
-                                                              Double landings = FishStateUtilities.generateYearlySum(
-                                                                      state.getDailyDataSet().getColumn(
-                                                                              species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME
-                                                                                      )).apply(
-                                                                      state);
+                        Double landings = FishStateUtilities.generateYearlySum(
+                            state.getDailyDataSet().getColumn(
+                                species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME
+                            )).apply(
+                            state);
 
-                                                              return landings / msyEntry.getValue();
+                        return landings / msyEntry.getValue();
 
 
-                                                          }
-                                                      },
-                                                      Double.NaN);
+                    }
+                },
+                Double.NaN
+            );
 
         }
-
 
 
     }

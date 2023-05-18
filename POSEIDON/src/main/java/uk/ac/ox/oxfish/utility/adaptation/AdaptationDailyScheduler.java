@@ -34,11 +34,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- *A list of adaptation to step every x days
+ * A list of adaptation to step every x days
  * Created by carrknight on 8/10/15.
  */
-public class AdaptationDailyScheduler implements FisherStartable, Steppable
-{
+public class AdaptationDailyScheduler implements FisherStartable, Steppable {
 
 
     private final List<Adaptation> adaptations = new LinkedList<>();
@@ -62,12 +61,11 @@ public class AdaptationDailyScheduler implements FisherStartable, Steppable
         this.agent = fisher;
 
         //if there is anything to "adapt"
-        if(!adaptations.isEmpty())
-        {
-            for(Adaptation a : adaptations)
+        if (!adaptations.isEmpty()) {
+            for (Adaptation a : adaptations)
                 a.start(model, fisher);
 
-            stoppable = model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE,period);
+            stoppable = model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE, period);
 
         }
 
@@ -76,30 +74,28 @@ public class AdaptationDailyScheduler implements FisherStartable, Steppable
 
     /**
      * add an adaptation algorithm to the list. Start it if we have already started
+     *
      * @param adaptation
      */
-    public void registerAdaptation(Adaptation adaptation)
-    {
+    public void registerAdaptation(Adaptation adaptation) {
 
         adaptations.add(adaptation);
-        if(model!=null)
-        {
+        if (model != null) {
             adaptation.start(model, agent);
-            if(stoppable == null)
-                stoppable = model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE,period);
+            if (stoppable == null)
+                stoppable = model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE, period);
         }
 
     }
 
 
-    public void removeAdaptation(Adaptation adaptation)
-    {
+    public void removeAdaptation(Adaptation adaptation) {
         adaptations.remove(adaptation);
     }
 
     @Override
     public void turnOff(Fisher fisher) {
-        if(stoppable != null)
+        if (stoppable != null)
             stoppable.stop();
         stoppable = null;
         adaptations.clear();
@@ -107,9 +103,9 @@ public class AdaptationDailyScheduler implements FisherStartable, Steppable
 
     @Override
     public void step(SimState simState) {
-        if(adaptations.size()>1)
-            Collections.shuffle(adaptations,new Random(model.getRandom().nextLong()));
-        for(Adaptation a : adaptations)
-            a.adapt(agent, ((FishState) simState),agent.grabRandomizer());
+        if (adaptations.size() > 1)
+            Collections.shuffle(adaptations, new Random(model.getRandom().nextLong()));
+        for (Adaptation a : adaptations)
+            a.adapt(agent, ((FishState) simState), agent.grabRandomizer());
     }
 }

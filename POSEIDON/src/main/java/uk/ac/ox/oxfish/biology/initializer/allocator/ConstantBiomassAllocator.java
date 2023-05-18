@@ -34,7 +34,7 @@ public class ConstantBiomassAllocator implements BiomassAllocator {
     private final double constant;
 
     public ConstantBiomassAllocator() {
-        constant=1;
+        constant = 1;
     }
 
     public ConstantBiomassAllocator(double constant) {
@@ -51,9 +51,10 @@ public class ConstantBiomassAllocator implements BiomassAllocator {
      */
     @Override
     public double allocate(
-            SeaTile tile,
-            NauticalMap map,
-            MersenneTwisterFast random) {
+        SeaTile tile,
+        NauticalMap map,
+        MersenneTwisterFast random
+    ) {
         return constant;
     }
 }

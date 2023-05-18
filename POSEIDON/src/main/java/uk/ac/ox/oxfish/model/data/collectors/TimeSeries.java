@@ -94,7 +94,11 @@ public class TimeSeries<T> implements Steppable {
      *                     an instance of MeasuredDataColumn and store the unit so it can be used for display or conversion.
      */
     public <Q extends Quantity<Q>> DataColumn registerGatherer(
-        final String title, final Gatherer<T> gatherer, final double defaultValue, final Unit<Q> unit, final String yLabel
+        final String title,
+        final Gatherer<T> gatherer,
+        final double defaultValue,
+        final Unit<Q> unit,
+        final String yLabel
     ) {
         Preconditions.checkArgument(!data.containsKey(title), "Column already exists: " + title);
         final int size = noGatherers() ? 0 : numberOfObservations();

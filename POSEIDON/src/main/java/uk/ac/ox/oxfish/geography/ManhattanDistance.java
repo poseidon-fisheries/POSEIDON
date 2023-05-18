@@ -34,11 +34,11 @@ public class ManhattanDistance implements Distance {
      */
     @Override
     public double distance(SeaTile start, SeaTile end, NauticalMap map) {
-        return  distance(start,end);
+        return distance(start, end);
     }
 
 
     public double distance(SeaTile start, SeaTile end) {
-        return  Math.abs(start.getGridX()-end.getGridX()) +  Math.abs(start.getGridY()-end.getGridY());
+        return Math.abs(start.getGridX() - end.getGridX()) + Math.abs(start.getGridY() - end.getGridY());
     }
 }

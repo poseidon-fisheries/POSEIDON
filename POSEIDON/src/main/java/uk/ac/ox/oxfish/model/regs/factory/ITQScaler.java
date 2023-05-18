@@ -40,9 +40,11 @@ class ITQScaler implements Startable {
         for (int i = 0; i < model.getSpecies().size(); i++) {
             double availableQuota = toScale.getQuotaRemaining(i);
             if (Double.isFinite(availableQuota))
-                toScale.setYearlyQuota(i,
-                                       availableQuota /
-                                               (double)model.getNumberOfFishers());
+                toScale.setYearlyQuota(
+                    i,
+                    availableQuota /
+                        (double) model.getNumberOfFishers()
+                );
         }
 
     }

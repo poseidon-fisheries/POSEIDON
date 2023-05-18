@@ -101,8 +101,10 @@ public class RockyPyramidsHabitatInitializer implements HabitatInitializer {
                     SeaTile border = map.getSeaTile(x + w, y - spread);
                     if (border != null && border.isWater()) {
                         border.setHabitat(new TileHabitat(
-                            Math.min(border.getRockyPercentage() + Math.pow(smoothingValue.applyAsDouble(random),
-                                spread), 1)
+                            Math.min(border.getRockyPercentage() + Math.pow(
+                                smoothingValue.applyAsDouble(random),
+                                spread
+                            ), 1)
 
 
                         ));

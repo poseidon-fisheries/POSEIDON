@@ -32,63 +32,52 @@ import uk.ac.ox.oxfish.model.FisherStartable;
  * or not
  * Created by carrknight on 5/2/15.
  */
-public interface Regulation extends FisherStartable
-{
-
-    /**
-     * can the agent fish at this location?
-     * @param agent the agent that wants to fish
-     * @param tile the tile the fisher is trying to fish on
-     * @param model a link to the model
-     * @param timeStep the time step at which the action should be considered
-     * @return true if the fisher can fish
-     */
-    boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep);
+public interface Regulation extends FisherStartable {
 
     default boolean canFishHere(Fisher agent, SeaTile tile, FishState model) {
         return canFishHere(agent, tile, model, model.getStep());
     }
 
     /**
-     * how much of this species biomass is sellable. Zero means it is unsellable
-     * @param agent the fisher selling its catch
-     * @param species the species we are being asked about
-     * @param model a link to the model
+     * can the agent fish at this location?
+     *
+     * @param agent    the agent that wants to fish
+     * @param tile     the tile the fisher is trying to fish on
+     * @param model    a link to the model
      * @param timeStep the time step at which the action should be considered
-     * @return a positive biomass if it sellable. Zero if you need to throw everything away
+     * @return true if the fisher can fish
      */
-    double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep);
+    boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep);
 
     default double maximumBiomassSellable(Fisher agent, Species species, FishState model) {
         return maximumBiomassSellable(agent, species, model, model.getStep());
     }
 
     /**
-     * Can this fisher be at sea?
-     * @param fisher the  fisher
-     * @param model the model
+     * how much of this species biomass is sellable. Zero means it is unsellable
+     *
+     * @param agent    the fisher selling its catch
+     * @param species  the species we are being asked about
+     * @param model    a link to the model
      * @param timeStep the time step at which the action should be considered
-     * @return true if it can be out. When it's false the fisher can't leave port and ought to go back to port if he is
-     * at sea
+     * @return a positive biomass if it sellable. Zero if you need to throw everything away
      */
-    boolean allowedAtSea(Fisher fisher, FishState model, int timeStep);
+    double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep);
 
     default boolean allowedAtSea(Fisher fisher, FishState model) {
         return allowedAtSea(fisher, model, model.getStep());
     }
 
     /**
-     * tell the regulation object this much has been caught
-     * @param where where the fishing occurred
-     * @param who who did the fishing
-     * @param fishCaught catch object
-     * @param fishRetained
-     * @param hoursSpentFishing how many hours were spent fishing
-     * @param timeStep the time step at which the fishing happened should be considered
+     * Can this fisher be at sea?
+     *
+     * @param fisher   the  fisher
+     * @param model    the model
+     * @param timeStep the time step at which the action should be considered
+     * @return true if it can be out. When it's false the fisher can't leave port and ought to go back to port if he is
+     * at sea
      */
-    default void reactToFishing(
-        SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-        int hoursSpentFishing, FishState model, int timeStep) {}
+    boolean allowedAtSea(Fisher fisher, FishState model, int timeStep);
 
     default void reactToFishing(
         SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model
@@ -97,21 +86,47 @@ public interface Regulation extends FisherStartable
     }
 
     /**
-     * tell the regulation object this much of this species has been sold
-     * @param species the species of fish sold
-     * @param seller agent selling the fish
-     * @param biomass how much biomass has been sold
-     * @param revenue how much money was made off it
-     * @param timeStep the time step at which the sale happened should be considered
+     * tell the regulation object this much has been caught
+     *
+     * @param where             where the fishing occurred
+     * @param who               who did the fishing
+     * @param fishCaught        catch object
+     * @param fishRetained
+     * @param hoursSpentFishing how many hours were spent fishing
+     * @param timeStep          the time step at which the fishing happened should be considered
      */
-    default void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {}
+    default void reactToFishing(
+        SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
+        int hoursSpentFishing, FishState model, int timeStep
+    ) {
+    }
 
     default void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model) {
         reactToSale(species, seller, biomass, revenue, model, model.getStep());
     }
 
     /**
+     * tell the regulation object this much of this species has been sold
+     *
+     * @param species  the species of fish sold
+     * @param seller   agent selling the fish
+     * @param biomass  how much biomass has been sold
+     * @param revenue  how much money was made off it
+     * @param timeStep the time step at which the sale happened should be considered
+     */
+    default void reactToSale(
+        Species species,
+        Fisher seller,
+        double biomass,
+        double revenue,
+        FishState model,
+        int timeStep
+    ) {
+    }
+
+    /**
      * returns a copy of the regulation, used defensively
+     *
      * @return
      */
     Regulation makeCopy();

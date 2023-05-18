@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class FadSetObservation{
+public class FadSetObservation {
 
     private final Coordinate locationInData;
 

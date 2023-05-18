@@ -39,33 +39,31 @@ public class MonthlyDepartingDecoratorTest {
 
         //january and may
         MonthlyDepartingDecorator strategy = new MonthlyDepartingDecorator(new MaxHoursPerYearDepartingStrategy(999999),
-                                                                           0, 4);
+            0, 4
+        );
 
         //you can depart in january
         FishState state = mock(FishState.class);
         when(state.getDayOfTheYear()).thenReturn(1);
         assertTrue(
-                strategy.shouldFisherLeavePort(mock(Fisher.class), state, new MersenneTwisterFast()));
+            strategy.shouldFisherLeavePort(mock(Fisher.class), state, new MersenneTwisterFast()));
 
 
         when(state.getDayOfTheYear()).thenReturn(20);
         assertTrue(
-                strategy.shouldFisherLeavePort(mock(Fisher.class), state, new MersenneTwisterFast()));
-
-
+            strategy.shouldFisherLeavePort(mock(Fisher.class), state, new MersenneTwisterFast()));
 
 
         //cannot depart february
         when(state.getDayOfTheYear()).thenReturn(40);
         assertFalse(
-                strategy.shouldFisherLeavePort(mock(Fisher.class), state, new MersenneTwisterFast()));
-
+            strategy.shouldFisherLeavePort(mock(Fisher.class), state, new MersenneTwisterFast()));
 
 
         //can depart May
         when(state.getDayOfTheYear()).thenReturn(140);
         assertTrue(
-                strategy.shouldFisherLeavePort(mock(Fisher.class), state, new MersenneTwisterFast()));
+            strategy.shouldFisherLeavePort(mock(Fisher.class), state, new MersenneTwisterFast()));
 
 
     }

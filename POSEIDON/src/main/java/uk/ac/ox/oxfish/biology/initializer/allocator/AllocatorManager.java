@@ -44,12 +44,12 @@ public class AllocatorManager {
     /**
      * created weight maps from seatile to weight for each species
      */
-    final private LinkedHashMap<Species,Map<SeaTile,Double>> weightMaps;
+    final private LinkedHashMap<Species, Map<SeaTile, Double>> weightMaps;
 
     /**
      * list of allocators, one for each species
      */
-    final private Map<Species,BiomassAllocator> allocators;
+    final private Map<Species, BiomassAllocator> allocators;
 
 
     /**
@@ -61,47 +61,50 @@ public class AllocatorManager {
     private boolean started = false;
 
 
-
     public AllocatorManager(
-            boolean normalize,
-            Map<Species,BiomassAllocator> allocators,
-            GlobalBiology biology) {
+        boolean normalize,
+        Map<Species, BiomassAllocator> allocators,
+        GlobalBiology biology
+    ) {
         this.normalize = normalize;
         this.allocators = allocators;
-        Preconditions.checkArgument(biology.getSize()==allocators.size(),
-                                    "size mismatch between # of species and # of allocators");
+        Preconditions.checkArgument(
+            biology.getSize() == allocators.size(),
+            "size mismatch between # of species and # of allocators"
+        );
 
         weightMaps = new LinkedHashMap<>(biology.getSpecies().size());
         //prepare the maps
-        for(Species species : biology.getSpecies())
-            weightMaps.put(species,new HashMap<>());
+        for (Species species : biology.getSpecies())
+            weightMaps.put(species, new HashMap<>());
 
     }
 
     public AllocatorManager(
-            boolean normalize,
-            Species singleSpecies,
-            BiomassAllocator allocator,
-            GlobalBiology biology) {
+        boolean normalize,
+        Species singleSpecies,
+        BiomassAllocator allocator,
+        GlobalBiology biology
+    ) {
         this.normalize = normalize;
-
 
 
         this.allocators = new HashMap<>(1);
-        allocators.put(singleSpecies,allocator);
-        Preconditions.checkArgument(biology.getSize()==allocators.size(),
-                                    "size mismatch between # of species and # of allocators");
+        allocators.put(singleSpecies, allocator);
+        Preconditions.checkArgument(
+            biology.getSize() == allocators.size(),
+            "size mismatch between # of species and # of allocators"
+        );
 
         weightMaps = new LinkedHashMap<>(biology.getSpecies().size());
         //prepare the maps
-        for(Species species : biology.getSpecies())
-            weightMaps.put(species,new HashMap<>());
+        for (Species species : biology.getSpecies())
+            weightMaps.put(species, new HashMap<>());
 
     }
 
 
-    public void start(NauticalMap map, MersenneTwisterFast random)
-    {
+    public void start(NauticalMap map, MersenneTwisterFast random) {
 
         Preconditions.checkArgument(!started);
         started = true;
@@ -109,7 +112,7 @@ public class AllocatorManager {
         Preconditions.checkArgument(!weightMaps.isEmpty());
 
         //pre-compute only if you need to normalize
-        if(normalize || !zeroedArea.isEmpty()) {
+        if (normalize || !zeroedArea.isEmpty()) {
             double[] sums = new double[allocators.size()];
 
 
@@ -120,17 +123,17 @@ public class AllocatorManager {
                 for (Map.Entry<Species, Map<SeaTile, Double>> speciesMap : weightMaps.entrySet()) {
                     //what's the weight here?
                     double weightHere =
-                            //weight is always 0 above ground (or zeroed out)
-                            tile.isLand() || zeroedArea.contains(tile)?
-                                    0 :
-                                    //otherwise allocate according to the right allocator
-                                    allocators.get(speciesMap.getKey()).allocate(
-                                            tile,
-                                            map,
-                                            random
-                                    );
-                    if(Double.isFinite(weightHere))
-                    sums[index] += weightHere;
+                        //weight is always 0 above ground (or zeroed out)
+                        tile.isLand() || zeroedArea.contains(tile) ?
+                            0 :
+                            //otherwise allocate according to the right allocator
+                            allocators.get(speciesMap.getKey()).allocate(
+                                tile,
+                                map,
+                                random
+                            );
+                    if (Double.isFinite(weightHere))
+                        sums[index] += weightHere;
                     //add to map
                     speciesMap.getValue().put(tile, weightHere);
                     index++;
@@ -143,55 +146,51 @@ public class AllocatorManager {
         }
     }
 
-
-    /**
-     * returns the weight associated with this tile and this species
-     * @param species t
-     * @param tile
-     * @param map
-     *@param random @return
-     */
-    public double getWeight(Species species, SeaTile tile, NauticalMap map, MersenneTwisterFast random){
-
-        //with normalization we precomputed
-        if(normalize)
-            return weightMaps.get(species).get(tile);
-        else
-        {
-            return
-                    //if it's above land, return 0
-                    tile.isLand() ?
-                            0 :
-                            //otherwise allocate according to the right allocator
-                            allocators.get(species).allocate(
-                                    tile,
-                                    map,
-                                    random
-                            );
-        }
-    }
-
-    private void normalizeMaps(double[] sums,NauticalMap map)
-    {
+    private void normalizeMaps(double[] sums, NauticalMap map) {
         List<SeaTile> tiles = map.getAllSeaTilesAsList();
 
         int index = 0;
         //go through every item and divide it
-        for (Map.Entry<Species, Map<SeaTile, Double>> speciesMap : weightMaps.entrySet())
-        {
+        for (Map.Entry<Species, Map<SeaTile, Double>> speciesMap : weightMaps.entrySet()) {
 
 
-            for(SeaTile tile : tiles)
-            {
+            for (SeaTile tile : tiles) {
 
                 //normalize
                 Map<SeaTile, Double> currentMapping = speciesMap.getValue();
-                currentMapping.put(tile, currentMapping.get(tile)/sums[index]);
+                currentMapping.put(tile, currentMapping.get(tile) / sums[index]);
 
             }
 
             index++;
 
+        }
+    }
+
+    /**
+     * returns the weight associated with this tile and this species
+     *
+     * @param species t
+     * @param tile
+     * @param map
+     * @param random  @return
+     */
+    public double getWeight(Species species, SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
+
+        //with normalization we precomputed
+        if (normalize)
+            return weightMaps.get(species).get(tile);
+        else {
+            return
+                //if it's above land, return 0
+                tile.isLand() ?
+                    0 :
+                    //otherwise allocate according to the right allocator
+                    allocators.get(species).allocate(
+                        tile,
+                        map,
+                        random
+                    );
         }
     }
 

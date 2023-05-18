@@ -19,16 +19,17 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
-import static com.google.common.primitives.ImmutableDoubleArray.of;
-import static org.junit.Assert.assertEquals;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.ImmutableDoubleArray;
 import ec.util.MersenneTwisterFast;
-import java.util.Map;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+
+import java.util.Map;
+
+import static com.google.common.primitives.ImmutableDoubleArray.of;
+import static org.junit.Assert.assertEquals;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class CatchSamplerTest {
 

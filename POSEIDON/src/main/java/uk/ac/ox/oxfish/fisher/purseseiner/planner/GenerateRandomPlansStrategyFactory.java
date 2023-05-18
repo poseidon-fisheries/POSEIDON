@@ -21,8 +21,10 @@ public class GenerateRandomPlansStrategyFactory implements AlgorithmFactory<Plan
             hourDelayBetweenFishing.applyAsDouble(state.getRandom()), 100000000
         );
         final Map<ActionType, Double> plannableActionWeights = new HashMap<>();
-        plannableActionWeights.put(ActionType.FishingOnTile,
-            100d); //should normalize (actually probably ignore it altogether)
+        plannableActionWeights.put(
+            ActionType.FishingOnTile,
+            100d
+        ); //should normalize (actually probably ignore it altogether)
         final HashMap<ActionType, PlanningModule> planModules = new HashMap<>();
         planModules.put(ActionType.FishingOnTile, fishingAtRandom);
 

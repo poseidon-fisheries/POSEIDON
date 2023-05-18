@@ -26,8 +26,8 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 /**
  * Within the bound it allocates weight (1-x/width)^exponent
- *
- *
+ * <p>
+ * <p>
  * Created by carrknight on 6/30/17.
  */
 public class FromLeftToRightBiomassAllocator implements BiomassAllocator {
@@ -45,11 +45,12 @@ public class FromLeftToRightBiomassAllocator implements BiomassAllocator {
 
 
     public FromLeftToRightBiomassAllocator(
-            double lowestX,
-            double lowestY,
-            double highestX,
-            double highestY,
-            double exponent) {
+        double lowestX,
+        double lowestY,
+        double highestX,
+        double highestY,
+        double exponent
+    ) {
         this.lowestX = lowestX;
         this.lowestY = lowestY;
         this.highestX = highestX;
@@ -68,12 +69,13 @@ public class FromLeftToRightBiomassAllocator implements BiomassAllocator {
      */
     @Override
     public double allocate(
-            SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
-        if(tile.getGridY()>=lowestY && tile.getGridY()<=highestY &&
-                tile.getGridX()>=lowestX && tile.getGridX()<=highestX)
+        SeaTile tile, NauticalMap map, MersenneTwisterFast random
+    ) {
+        if (tile.getGridY() >= lowestY && tile.getGridY() <= highestY &&
+            tile.getGridX() >= lowestX && tile.getGridX() <= highestX)
             return Math.pow(
-                    (1-tile.getGridX()/(double)map.getWidth())
-                    ,exponent);
+                (1 - tile.getGridX() / (double) map.getWidth())
+                , exponent);
         else
             return 0;
     }

@@ -33,8 +33,6 @@ import java.util.function.Supplier;
  */
 public class AbundanceDiffusers {
 
-    private AbundanceDiffusers() { }
-
     /**
      * the list of all registered CONSTRUCTORS
      */
@@ -49,6 +47,9 @@ public class AbundanceDiffusers {
         NAMES.put(ConstantRateDiffuserFactory.class, "Constant Rate Diffusion");
         NAMES.put(AgeLimitedConstantRateDiffuserFactory.class, "Bin-Restricted Diffusion");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
+    }
+
+    private AbundanceDiffusers() {
     }
 
 }

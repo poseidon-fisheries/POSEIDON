@@ -20,8 +20,8 @@
 
 package uk.ac.ox.oxfish.biology.initializer;
 
-import uk.ac.ox.oxfish.biology.tuna.BiomassInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.*;
+import uk.ac.ox.oxfish.biology.tuna.BiomassInitializerFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 
@@ -52,7 +52,10 @@ public class BiologyInitializers {
         NAMES.put(TwoSpeciesRockyLogisticFactory.class, "Habitat-Aware 2 Species");
         NAMES.put(FromLeftToRightFactory.class, "From Left To Right Fixed");
         NAMES.put(FromLeftToRightLogisticFactory.class, "From Left To Right Logistic");
-        NAMES.put(FromLeftToRightLogisticPlusClimateChangeFactory.class, "From Left To Right Logistic with Climate Change");
+        NAMES.put(
+            FromLeftToRightLogisticPlusClimateChangeFactory.class,
+            "From Left To Right Logistic with Climate Change"
+        );
         NAMES.put(FromLeftToRightMixedFactory.class, "From Left To Right Well-Mixed");
         NAMES.put(RandomConstantBiologyFactory.class, "Random Smoothed and Fixed");
         NAMES.put(HalfBycatchFactory.class, "Half Bycatch");
@@ -78,7 +81,8 @@ public class BiologyInitializers {
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private BiologyInitializers() {}
+    private BiologyInitializers() {
+    }
 
     public static void add(
         final String name,

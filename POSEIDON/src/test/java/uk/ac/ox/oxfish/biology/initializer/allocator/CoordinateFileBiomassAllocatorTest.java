@@ -25,22 +25,24 @@ public class CoordinateFileBiomassAllocatorTest {
         FromFileMapInitializer initializer = new FromFileMapInitializer(
             path, 2, DEFAULT_MAP_PADDING_IN_DEGREES, true, false
         );
-        NauticalMap map = initializer.makeMap(new MersenneTwisterFast(),
-                new GlobalBiology(mock(Species.class)),
-                mock(FishState.class));
-        assertEquals(map.getHeight(),2);
-        assertEquals(map.getWidth(),2);
+        NauticalMap map = initializer.makeMap(
+            new MersenneTwisterFast(),
+            new GlobalBiology(mock(Species.class)),
+            mock(FishState.class)
+        );
+        assertEquals(map.getHeight(), 2);
+        assertEquals(map.getWidth(), 2);
 
         //let's just read the depth flipped upside down for abundance
         path = Paths.get("inputs", "tests", "flipped_map.csv");
         CoordinateFileBiomassAllocator allocator = new CoordinateFileBiomassAllocator(
-                 path,true
+            path, true
         );
-        assertEquals(6,allocator.allocate(map.getSeaTile(0,0),map,new MersenneTwisterFast()),.0001);
-        assertEquals(6,allocator.allocate(map.getSeaTile(0,1),map,new MersenneTwisterFast()),.0001);
+        assertEquals(6, allocator.allocate(map.getSeaTile(0, 0), map, new MersenneTwisterFast()), .0001);
+        assertEquals(6, allocator.allocate(map.getSeaTile(0, 1), map, new MersenneTwisterFast()), .0001);
         //this ought to be neutralized by the initializer
-        assertEquals(-10,allocator.allocate(map.getSeaTile(1,1),map,new MersenneTwisterFast()),.0001);
-        assertEquals(-10,allocator.allocate(map.getSeaTile(1,1),map,new MersenneTwisterFast()),.0001);
+        assertEquals(-10, allocator.allocate(map.getSeaTile(1, 1), map, new MersenneTwisterFast()), .0001);
+        assertEquals(-10, allocator.allocate(map.getSeaTile(1, 1), map, new MersenneTwisterFast()), .0001);
 
 
     }

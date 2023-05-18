@@ -31,16 +31,15 @@ import uk.ac.ox.oxfish.model.FishState;
 public class UnfishableLocalBiologyDecorator implements LocalBiology {
 
     private final int yearAfterWhichBiomassStopsBeingProtected;
-
+    private final LocalBiology decorated;
     /**
      * reference needed to check the time
      */
     private FishState state;
 
-    private final LocalBiology decorated;
-
     public UnfishableLocalBiologyDecorator(
-            int yearAfterWhichBiomassStopsBeingProtected, LocalBiology decorated) {
+        int yearAfterWhichBiomassStopsBeingProtected, LocalBiology decorated
+    ) {
         this.yearAfterWhichBiomassStopsBeingProtected = yearAfterWhichBiomassStopsBeingProtected;
         this.decorated = decorated;
     }
@@ -65,10 +64,11 @@ public class UnfishableLocalBiologyDecorator implements LocalBiology {
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-            Catch caught, Catch notDiscarded, GlobalBiology biology) {
+        Catch caught, Catch notDiscarded, GlobalBiology biology
+    ) {
 
-        Preconditions.checkArgument(state!=null, "Not started or already turned off!");
-        if(state.getYear()>=yearAfterWhichBiomassStopsBeingProtected)
+        Preconditions.checkArgument(state != null, "Not started or already turned off!");
+        if (state.getYear() >= yearAfterWhichBiomassStopsBeingProtected)
             decorated.reactToThisAmountOfBiomassBeingFished(caught, notDiscarded, biology);
 
     }

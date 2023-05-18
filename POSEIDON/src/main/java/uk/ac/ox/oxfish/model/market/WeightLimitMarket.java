@@ -13,7 +13,7 @@ import java.util.DoubleSummaryStatistics;
 /**
  * market with two prices, one below and one above weight limit.
  * If there are multiple subdivisions, the bin price depends on the average weight;
- *
+ * <p>
  * mostly delegates to PerBinMarket (set up during the set species)
  */
 public class WeightLimitMarket implements MarketWithCounter {
@@ -25,7 +25,7 @@ public class WeightLimitMarket implements MarketWithCounter {
 
     private final double weightLimitInKg;
 
-    private  PerBinMarket delegate;
+    private PerBinMarket delegate;
 
 
     public WeightLimitMarket(double priceBelowWeightLimit, double priceAboveWeightLimit, double weightLimitInKg) {
@@ -35,14 +35,19 @@ public class WeightLimitMarket implements MarketWithCounter {
     }
 
     @Override
+    public Species getSpecies() {
+        return delegate.getSpecies();
+    }
+
+    @Override
     public void setSpecies(Species species) {
         double[] pricePerBin = new double[species.getNumberOfBins()];
-        for(int age =0; age<species.getNumberOfBins();age++) {
+        for (int age = 0; age < species.getNumberOfBins(); age++) {
             DoubleSummaryStatistics binWeight = new DoubleSummaryStatistics();
             for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++) {
-                binWeight.accept(species.getWeight(subdivision,age));
+                binWeight.accept(species.getWeight(subdivision, age));
             }
-            if(binWeight.getAverage()<weightLimitInKg)
+            if (binWeight.getAverage() < weightLimitInKg)
                 pricePerBin[age] = priceBelowWeightLimit;
             else
                 pricePerBin[age] = priceAboveWeightLimit;
@@ -53,15 +58,9 @@ public class WeightLimitMarket implements MarketWithCounter {
     }
 
     @Override
-    public Species getSpecies() {
-        return delegate.getSpecies();
-    }
-
-    @Override
     public void turnOff() {
         delegate.turnOff();
     }
-
 
 
     @Override

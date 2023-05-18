@@ -32,6 +32,8 @@ public class BiomassLostEvent {
         this.biomassLost = ImmutableMap.copyOf(biomassLost);
     }
 
-    public Map<Species, Double> getBiomassLost() { return biomassLost; }
+    public Map<Species, Double> getBiomassLost() {
+        return biomassLost;
+    }
 
 }
