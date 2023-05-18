@@ -36,41 +36,42 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertTrue;
 
 
-
 public class TACNotCaresAboutMileage {
 
 
     @Test
     public void tacNotCaresAboutMileage() throws Exception {
 
-        FishState state=
-                MarketFirstDemo.generateAndRunMarketDemo(MarketFirstDemo.MarketDemoPolicy.TAC,
-                                                         new FixedDoubleParameter(.1),
-                                                         new UniformDoubleParameter(0, 20),
-                                                         Paths.get("runs", "market1", "tacOil.csv").toFile(),
-                                                         5, System.currentTimeMillis(), true);
+        final FishState state =
+            MarketFirstDemo.generateAndRunMarketDemo(MarketFirstDemo.MarketDemoPolicy.TAC,
+                new FixedDoubleParameter(.1),
+                new UniformDoubleParameter(0, 20),
+                Paths.get("runs", "market1", "tacOil.csv").toFile(),
+                5, System.currentTimeMillis(), true
+            );
+
+        state.getRandom().setSeed(0);
 
         //the correlation ought to be very small
-        Species species = state.getSpecies().get(0);
+        final Species species = state.getSpecies().get(0);
 
-        double[] mileage = new double[state.getFishers().size()];
-        double[] catches =  new double[state.getFishers().size()];
+        final double[] mileage = new double[state.getFishers().size()];
+        final double[] catches = new double[state.getFishers().size()];
 
-        int i=0;
-        for(Fisher fisher : state.getFishers())
-        {
+        int i = 0;
+        for (final Fisher fisher : state.getFishers()) {
             mileage[i] = (((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished());
             catches[i] = fisher.getLatestYearlyObservation(
-                    species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
+                species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
 
             i++;
         }
 
-        double correlation = FishStateUtilities.computeCorrelation(mileage, catches);
+        final double correlation = FishStateUtilities.computeCorrelation(mileage, catches);
         System.out.println("the correlation between mileage and TAC is: " + correlation);
         System.out.println("Ideally it should be, in absolute value, less than .3");
-        assertTrue(correlation <.3);
-        assertTrue(correlation >-.3);
+        assertTrue(correlation < .3);
+        assertTrue(correlation > -.3);
 
 
     }
