@@ -36,7 +36,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.BoatColors;
 import uk.ac.ox.oxfish.utility.FixedMap;
 import uk.ac.ox.oxfish.utility.Pair;
-import uk.ac.ox.oxfish.utility.adaptation.SimplePortAdaptation;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -269,14 +268,6 @@ public class FlexibleScenario implements Scenario {
                                 fisher.getTags().add(
                                         portColorTags.get(fisher.getHomePort())
                                 );
-                        }
-                    },
-                    new Consumer<Fisher>() {
-                        @Override
-                        public void accept(Fisher fisher) {
-                            if (portSwitching)
-                                fisher.addYearlyAdaptation(new SimplePortAdaptation());
-
                         }
                     });
 

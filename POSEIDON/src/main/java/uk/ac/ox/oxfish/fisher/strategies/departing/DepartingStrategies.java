@@ -19,10 +19,8 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.GenerateRandomPlansStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.*;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.UnifiedAmateurishDynamicFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 
@@ -52,7 +50,6 @@ public class DepartingStrategies {
         NAMES.put(FixedRestTimeDepartingFactory.class, "Fixed Rest");
         NAMES.put(DoubleLogisticDepartingFactory.class, "Double Logistic");
         NAMES.put(MonthlyDepartingFactory.class, "Monthly Departing");
-        NAMES.put(UnifiedAmateurishDynamicFactory.class, "Unified Amateurish Dynamic Programming");
         NAMES.put(MaxHoursPerYearDepartingFactory.class, "Max Hours Per Year");
         NAMES.put(MaxHoursOutWithRestingTimeDepartingStrategy.class, "Max Hours Per Year Plus Resting Time");
         NAMES.put(LonglineFloridaLogisticDepartingFactory.class, "WFS Longline");

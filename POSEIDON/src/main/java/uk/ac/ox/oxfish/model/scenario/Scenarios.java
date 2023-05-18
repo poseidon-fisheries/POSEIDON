@@ -61,24 +61,9 @@ public class Scenarios {
             GeneralizedScenario::new
         );
         add(
-            "California Map Scenario",
-            "A simple test on how well does the model read and construct a world from bathymetry data",
-            CaliforniaAbundanceScenario::new
-        );
-        add(
             "Abstract 2 Populations",
             "The current model, modular and using two populations",
             TwoPopulationsScenario::new
-        );
-        add(
-            "Simple California",
-            "California Scenario with DS biology",
-            DerisoCaliforniaScenario::new
-        );
-        add(
-            "Indonesia",
-            "Minimum Working Model of Indonesia",
-            IndonesiaScenario::new
         );
         add(
             "EPO Biomass",

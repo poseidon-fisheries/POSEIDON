@@ -76,9 +76,6 @@ dependencies {
     //commons math
     implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 
-    //burlap : Reinforcement Learning helper
-    implementation group: 'edu.brown.cs.burlap', name: 'burlap', version: '3.0.1'
-
     //discrete choosers
     implementation fileTree(dir: 'libs/discrete-choosers', include: '*.jar')
 

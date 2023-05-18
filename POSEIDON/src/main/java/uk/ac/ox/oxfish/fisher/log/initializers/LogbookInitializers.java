@@ -40,7 +40,6 @@ public class LogbookInitializers {
 
     static {
         NAMES.put(NoLogbookFactory.class, "No Logbook");
-        NAMES.put(LogisticLogbookFactory.class, "Logit-like Logbook");
         NAMES.put(TowAndAltitudeFactory.class, "Tows and Altitude");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }

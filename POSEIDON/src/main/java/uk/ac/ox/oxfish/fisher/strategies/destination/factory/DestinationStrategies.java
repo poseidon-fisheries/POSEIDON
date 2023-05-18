@@ -57,17 +57,9 @@ public class DestinationStrategies {
         NAMES.put(HeatmapDestinationFactory.class, "Heatmap Based");
         NAMES.put(PlanningHeatmapDestinationFactory.class, "Heatmap Planning");
         NAMES.put(GravitationalSearchDestinationFactory.class, "GSA");
-        NAMES.put(UnifiedAmateurishDynamicFactory.class, "Unified Amateurish Dynamic Programming");
         NAMES.put(BanditDestinationFactory.class, "Discretized Bandit");
-        NAMES.put(SimpleRUMDestinationFactory.class, "Simple Random Utility Model");
-        NAMES.put(FloridaLogitDestinationFactory.class, "Florida Longliner");
-        NAMES.put(BarebonesFloridaDestinationFactory.class, "Boolean Bare Bones");
-        NAMES.put(BarebonesContinuousDestinationFactory.class, "Continuous Bare Bones");
-        NAMES.put(BarebonesContinuousInterceptedDestinationFactory.class, "Continuous Bare Bones With Intercepts");
         NAMES.put(ClampedDestinationFactory.class, "Clamped to Data");
-        NAMES.put(LogitRPUEDestinationFactory.class, "Perfect RPUE Logit");
         NAMES.put(PerfectDestinationFactory.class, "Perfect Knowledge");
-        NAMES.put(ReplicatorDestinationFactory.class, "Replicator");
         NAMES.put(GeneralizedCognitiveStrategyFactory.class, "Generalized Cognitive Strategy");
         NAMES.put(GravityDestinationStrategyFactory.class, "Gravity Destination Strategy");
         NAMES.put(GenerateRandomPlansStrategyFactory.class, "Random Fishing Plans Strategy");

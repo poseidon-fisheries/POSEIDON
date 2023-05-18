@@ -62,7 +62,6 @@ public class Regulations {
         NAMES.put(MultiQuotaMapFactory.class, "Multi-Quotas from Map");
         NAMES.put(ThresholdSingleSpeciesTaxation.class, "Single Species Threshold Taxation");
         NAMES.put(SingleSpeciesPIDTaxationOnLandingsFactory.class, "Single Species PID Taxation");
-        NAMES.put(ShodanFromFileFactory.class, "Open/Close Shodan from File");
         NAMES.put(TemporaryProtectedAreasFactory.class, "Temporary MPA");
         NAMES.put(TemporaryRegulationFactory.class, "Temporary Regulation");
         NAMES.put(MultipleRegulationsFactory.class, "Multiple Regulations");

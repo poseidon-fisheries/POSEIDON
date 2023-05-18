@@ -29,8 +29,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.market.FlexibleAbundanceMarket;
-import uk.ac.ox.oxfish.model.market.NThresholdsMarket;
-import uk.ac.ox.oxfish.model.market.PerBinMarket;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.util.function.ToDoubleFunction;

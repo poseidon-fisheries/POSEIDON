@@ -44,8 +44,6 @@ public class BanditAlgorithms {
 
     static {
         NAMES.put(EpsilonGreedyBanditFactory.class, "Epsilon Greedy Bandit");
-        NAMES.put(SoftmaxBanditFactory.class, "Softmax Bandit");
-        NAMES.put(UCB1BanditFactory.class, "UCB1 Bandit");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

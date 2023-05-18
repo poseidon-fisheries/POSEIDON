@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
+import uk.ac.ox.poseidon.burlap.LogisticMultiClassifier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
