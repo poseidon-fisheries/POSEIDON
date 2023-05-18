@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -66,7 +65,7 @@ public class AgeBasedPurseSeinerFishingStrategy<B extends LocalBiology>
 
     @Override
     protected double valueOfSetAction(
-        @NotNull final AbstractSetAction action,
+        final AbstractSetAction action,
         final Collection<Species> species
     ) {
         //if we know it is a fad action (own fad, not opportunistic)

@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import ec.util.MersenneTwisterFast;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
@@ -87,7 +86,6 @@ public abstract class AbstractCompressedAbundanceFadInitializerFactory
         );
     }
 
-    @NotNull
     FishAbundanceAttractor makeFishAttractor(
         final FishState fishState,
         final double[] compressionExponents,

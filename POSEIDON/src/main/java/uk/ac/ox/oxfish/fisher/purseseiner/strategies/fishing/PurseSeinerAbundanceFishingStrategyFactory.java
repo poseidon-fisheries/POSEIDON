@@ -18,7 +18,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -67,7 +66,6 @@ public class PurseSeinerAbundanceFishingStrategyFactory
         );
     }
 
-    @NotNull
     @Override
     protected PurseSeinerFishingStrategy<AbundanceLocalBiology> callConstructor(
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,

@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
 import com.google.common.collect.*;
 import ec.util.MersenneTwisterFast;
-import org.jetbrains.annotations.NotNull;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -243,7 +242,7 @@ public class PurseSeinerFishingStrategy<B extends LocalBiology>
     }
 
     double valueOfSetAction(
-        @NotNull final AbstractSetAction action,
+        final AbstractSetAction action,
         final Collection<Species> species
     ) {
         final double totalBiomass = action.getTargetBiology().getTotalBiomass(species);

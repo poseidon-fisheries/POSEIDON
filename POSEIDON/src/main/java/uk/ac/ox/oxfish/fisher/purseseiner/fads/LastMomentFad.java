@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import org.jetbrains.annotations.Nullable;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -103,7 +102,6 @@ public abstract class LastMomentFad extends Fad {
         this.state = fishState; //hang on to this link if possible
     }
 
-    @Nullable
     protected double[] getCurrentCatchabilityPerSpecies() {
 
         double multiplier = 0;

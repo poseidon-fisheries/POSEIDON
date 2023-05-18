@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -63,25 +62,6 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
 
 
     private int numberOfBins = 100;
-
-    @NotNull
-
-    public static double[] bertalanffyLengthAtAge(
-        final double LInfinity, final double LZero,
-        final double kParameter, final int maximumAgeTracked
-    ) {
-        final double[] lengthAtAge = new double[100];
-        lengthAtAge[0] = LZero;
-        for (int i = 1; i < maximumAgeTracked; i++) {
-            lengthAtAge[i] = LInfinity + ((LZero - LInfinity)) *
-                Math.exp(-kParameter * i);
-        }
-        return lengthAtAge;
-    }
-
-    public static double bertnalanffyLengthToWeight(final double alpha, final double beta, final double currentLength) {
-        return alpha * Math.pow(currentLength, beta) / 1000d;
-    }
 
     /**
      * Applies this function to the given argument.
@@ -138,6 +118,24 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
         );
 
 
+    }
+
+    public static double bertnalanffyLengthToWeight(final double alpha, final double beta, final double currentLength) {
+        return alpha * Math.pow(currentLength, beta) / 1000d;
+    }
+
+
+    public static double[] bertalanffyLengthAtAge(
+        final double LInfinity, final double LZero,
+        final double kParameter, final int maximumAgeTracked
+    ) {
+        final double[] lengthAtAge = new double[100];
+        lengthAtAge[0] = LZero;
+        for (int i = 1; i < maximumAgeTracked; i++) {
+            lengthAtAge[i] = LInfinity + ((LZero - LInfinity)) *
+                Math.exp(-kParameter * i);
+        }
+        return lengthAtAge;
     }
 
     /**

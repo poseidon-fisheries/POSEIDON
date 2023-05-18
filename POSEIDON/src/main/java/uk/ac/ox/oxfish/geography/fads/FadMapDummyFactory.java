@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -49,7 +48,6 @@ public class FadMapDummyFactory implements AlgorithmFactory<FadMap> {
 
     }
 
-    @NotNull
     protected ConstantCurrentVector getCurrentVectors(final FishState fishState, final NauticalMap map) {
         return new ConstantCurrentVector(
             fixedXCurrent.applyAsDouble(fishState.getRandom()),

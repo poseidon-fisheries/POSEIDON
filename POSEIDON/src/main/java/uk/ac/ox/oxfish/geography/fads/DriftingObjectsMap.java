@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import org.jetbrains.annotations.Nullable;
 import sim.field.continuous.Continuous2D;
 import sim.util.Bag;
 import sim.util.Double2D;
@@ -113,7 +112,6 @@ public class DriftingObjectsMap {
         onMoveCallbacks.put(object, onMove);
     }
 
-    @Nullable
     Double2D getObjectLocation(final Object object) {
         return field.getObjectLocation(object);
     }

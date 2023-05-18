@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.fisher.purseseiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
-import org.jetbrains.annotations.NotNull;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
@@ -178,7 +177,6 @@ public class PurseSeinerFleetFactory
         this.vesselsFile = vesselsFile;
     }
 
-    @NotNull
     public FisherFactory makeFisherFactory(final FishState fishState) {
         final FisherFactory fisherFactory =
             new FisherFactory(

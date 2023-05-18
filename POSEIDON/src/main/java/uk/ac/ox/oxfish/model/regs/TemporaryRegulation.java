@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.model.regs;
 
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -28,77 +27,97 @@ public class TemporaryRegulation implements Regulation {
     private final Regulation delegateWhenActive;
     private final Regulation delegateWhenInactive;
 
-    public TemporaryRegulation(int startDay, int endDay, Regulation delegateWhenActive,
-                               Regulation delegateWhenInactive) {
+    public TemporaryRegulation(final int startDay, final int endDay, final Regulation delegateWhenActive) {
+        this(startDay, endDay, delegateWhenActive, new Anarchy());
+
+    }
+
+
+    public TemporaryRegulation(
+        final int startDay, final int endDay, final Regulation delegateWhenActive,
+        final Regulation delegateWhenInactive
+    ) {
 
         this.dayOfTheYearPredicate = dayOfTheYear -> {
             assert dayOfTheYear >= 1 && dayOfTheYear <= 365;
             return startDay <= endDay
-                    ? dayOfTheYear >= startDay && dayOfTheYear <= endDay
-                    : dayOfTheYear >= startDay || dayOfTheYear <= endDay;
+                ? dayOfTheYear >= startDay && dayOfTheYear <= endDay
+                : dayOfTheYear >= startDay || dayOfTheYear <= endDay;
         };
         this.delegateWhenActive = delegateWhenActive;
         this.delegateWhenInactive = delegateWhenInactive;
     }
 
-
-    public TemporaryRegulation(int startDay, int endDay, Regulation delegateWhenActive) {
-        this(startDay,endDay,delegateWhenActive,new Anarchy());
-
-    }
-
-    public TemporaryRegulation(Predicate<Integer> dayOfTheYearPredicate, Regulation delegateWhenActive) {
+    public TemporaryRegulation(final Predicate<Integer> dayOfTheYearPredicate, final Regulation delegateWhenActive) {
         this.dayOfTheYearPredicate = dayOfTheYearPredicate;
         this.delegateWhenActive = delegateWhenActive;
         this.delegateWhenInactive = new Anarchy();
     }
 
-    public boolean isActive(int dayOfTheYear) {
-        return dayOfTheYearPredicate.test(dayOfTheYear);
-
-    }
-
-    @NotNull public Regulation delegateAtStep(FishState model, int timeStep) {
-        return isActive(model.getDayOfTheYear(timeStep)) ? delegateWhenActive : delegateWhenInactive;
-    }
-
-    @Override public void turnOff(Fisher fisher) {
+    @Override
+    public void turnOff(final Fisher fisher) {
         delegateWhenActive.turnOff(fisher);
         delegateWhenInactive.turnOff(fisher);
     }
 
-    @Override public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) {
+    @Override
+    public boolean canFishHere(final Fisher agent, final SeaTile tile, final FishState model, final int timeStep) {
         return delegateAtStep(model, timeStep).canFishHere(agent, tile, model, timeStep);
     }
 
-    @Override public double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep) {
+    public Regulation delegateAtStep(final FishState model, final int timeStep) {
+        return isActive(model.getDayOfTheYear(timeStep)) ? delegateWhenActive : delegateWhenInactive;
+    }
+
+    public boolean isActive(final int dayOfTheYear) {
+        return dayOfTheYearPredicate.test(dayOfTheYear);
+
+    }
+
+    @Override
+    public double maximumBiomassSellable(
+        final Fisher agent,
+        final Species species,
+        final FishState model,
+        final int timeStep
+    ) {
         return delegateAtStep(model, timeStep).maximumBiomassSellable(agent, species, model, timeStep);
     }
 
-    @Override public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
+    @Override
+    public boolean allowedAtSea(final Fisher fisher, final FishState model, final int timeStep) {
         return delegateAtStep(model, timeStep).allowedAtSea(fisher, model, timeStep);
     }
 
-    @Override public void reactToFishing(
-        SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-        int hoursSpentFishing, FishState model, int timeStep
+    @Override
+    public void reactToFishing(
+        final SeaTile where, final Fisher who, final Catch fishCaught, final Catch fishRetained,
+        final int hoursSpentFishing, final FishState model, final int timeStep
     ) {
         delegateAtStep(model, timeStep).reactToFishing(
             where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep
         );
     }
 
-    @Override public void reactToSale(
-        Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep
+    @Override
+    public void reactToSale(
+        final Species species,
+        final Fisher seller,
+        final double biomass,
+        final double revenue,
+        final FishState model,
+        final int timeStep
     ) {
         delegateAtStep(model, timeStep).reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 
-    @NotNull @Override public Regulation makeCopy() {
+    @Override
+    public Regulation makeCopy() {
         return new TemporaryRegulation(dayOfTheYearPredicate, delegateWhenActive.makeCopy());
     }
 
-    @Override public void start(FishState model, Fisher fisher) {
+    @Override
+    public void start(final FishState model, final Fisher fisher) {
         delegateWhenActive.start(model, fisher);
         delegateWhenInactive.start(model, fisher);
     }

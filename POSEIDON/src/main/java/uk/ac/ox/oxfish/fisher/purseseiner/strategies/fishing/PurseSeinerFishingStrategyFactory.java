@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 import com.google.common.collect.ImmutableMap;
 import com.univocity.parsers.common.record.Record;
 import com.vividsolutions.jts.geom.Coordinate;
-import org.jetbrains.annotations.NotNull;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -424,7 +423,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
         );
     }
 
-    @NotNull
     protected PurseSeinerFishingStrategy<B> callConstructor(
         final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeights,
         final Function<Fisher, SetOpportunityDetector<B>> opportunityDetector,
@@ -573,7 +571,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
      * and thus that fishers are slightly less tolerant of strong currents away from the equator but the
      * difference is small enough to ignore and doing thing the right way would massively complicate things.
      */
-    @NotNull
     private PurseSeinerActionClassToDouble getMaxCurrentSpeeds(final NauticalMap nauticalMap) {
         final Coordinate coordinate = new Coordinate(0, 0);
         final MapExtent mapExtent = nauticalMap.getMapExtent();

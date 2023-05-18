@@ -20,8 +20,6 @@
 
 package uk.ac.ox.oxfish.model.data.collectors;
 
-import org.jetbrains.annotations.Nullable;
-
 import javax.measure.Unit;
 import java.io.Serializable;
 import java.util.Iterator;
@@ -30,14 +28,13 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.units.indriya.AbstractUnit.ONE;
 
 /**
  * basically a linked-list for double values that cannot be modified easily
  * Created by carrknight on 6/9/15.
  */
-public class DataColumn implements Iterable<Double>, Serializable{
+public class DataColumn implements Iterable<Double>, Serializable {
 
     private final LinkedList<Double> data = new LinkedList<>();
 
@@ -45,18 +42,19 @@ public class DataColumn implements Iterable<Double>, Serializable{
     private final Unit<?> unit;
     private final String yLabel;
 
+    public DataColumn(final String name) {
+        this(name, null, null);
+    }
+
     public DataColumn(final String name, final Unit<?> unit, final String yLabel) {
         this.name = name;
         this.unit = unit == null ? ONE : unit;
         this.yLabel = yLabel == null ? "" : yLabel;
     }
 
-    public DataColumn(String name) {
-        this(name, null, null);
-    }
-
     /**
      * name of the column
+     *
      * @return
      */
     public String getName() {
@@ -71,28 +69,32 @@ public class DataColumn implements Iterable<Double>, Serializable{
      * <p>Dimensionless quantities should have a unit of
      * {@code tech.units.indriya.AbstractUnit#ONE}.
      */
-    public Unit<?> getUnit() { return unit; }
+    public Unit<?> getUnit() {
+        return unit;
+    }
 
     /**
      * The suggested y-label for externally produced plots.
      */
-    public String getYLabel() { return yLabel; }
+    public String getYLabel() {
+        return yLabel;
+    }
 
     /**
      * add latest observation
+     *
      * @param newValue latest observation to add
      */
-    public void add(Double newValue)
-    {
+    public void add(final Double newValue) {
         data.addLast(newValue);
     }
 
     /**
      * the latest value added or NaN if there is none
+     *
      * @return the latest value added or NaN if there is none
      */
-    public Double getLatest()
-    {
+    public Double getLatest() {
         return data.isEmpty() ? Double.NaN : data.peekLast();
     }
 
@@ -103,13 +105,12 @@ public class DataColumn implements Iterable<Double>, Serializable{
      * @return the element at the specified position in this list
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public Double get(int index) {
+    public Double get(final int index) {
         return data.get(index);
     }
 
-    public Double getDatumXStepsAgo(int daysAgo)
-    {
-        return data.get(data.size()-daysAgo-1);
+    public Double getDatumXStepsAgo(final int daysAgo) {
+        return data.get(data.size() - daysAgo - 1);
     }
 
     /**
@@ -140,13 +141,15 @@ public class DataColumn implements Iterable<Double>, Serializable{
     }
 
     /**
+     *
      */
     @Override
-    public void forEach(Consumer<? super Double> action) {
+    public void forEach(final Consumer<? super Double> action) {
         data.forEach(action);
     }
 
     /**
+     *
      */
     @Override
     public Spliterator<Double> spliterator() {
@@ -162,11 +165,9 @@ public class DataColumn implements Iterable<Double>, Serializable{
      * {@code CONCURRENT}, or <em>late-binding</em>. (See {@link #spliterator()}
      * for details.)
      *
-     * @implSpec
-     * The default implementation creates a sequential {@code Stream} from the
-     * collection's {@code Spliterator}.
-     *
      * @return a sequential {@code Stream} over the elements in this collection
+     * @implSpec The default implementation creates a sequential {@code Stream} from the
+     * collection's {@code Spliterator}.
      * @since 1.8
      */
     public Stream<Double> stream() {
@@ -174,23 +175,19 @@ public class DataColumn implements Iterable<Double>, Serializable{
     }
 
 
-
-
-
-    public LinkedList<Double> copy(){
+    public LinkedList<Double> copy() {
         return new LinkedList<>(data);
     }
 
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("DataColumn{");
-        sb.append("data=").append(data);
-        sb.append('}');
-        return sb.toString();
+        String sb = "DataColumn{" + "data=" + data +
+            '}';
+        return sb;
     }
 
-    public void clear(){
+    public void clear() {
         data.clear();
     }
 }

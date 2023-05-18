@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
-import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
@@ -28,31 +27,31 @@ import uk.ac.ox.oxfish.model.FisherStartable;
 /**
  * an interface describing a component for the a planner: it is given a current path, it must both (a) generate new actions/candidates
  * (b) choose among them only one to return
- *
  */
 public interface PlanningModule extends FisherStartable {
 
 
-    @Nullable
-    public PlannedAction chooseNextAction(Plan currentPlanSoFar);
+    PlannedAction chooseNextAction(Plan currentPlanSoFar);
 
-    public boolean isStarted();
+    boolean isStarted();
 
     /**
      * this is like the start(...) but gets called when we want the module to be aware that a new plan is starting
+     *
      * @param state
      * @param fisher
      */
-    public void prepareForReplanning(FishState state, Fisher fisher);
+    void prepareForReplanning(FishState state, Fisher fisher);
 
     /**
      * if a plan is about to start, how many times are we allowed to call this planning module (it may fail before then, the
      * point of this function is to deal with regulations or other constraints)
+     *
      * @param state
      * @param fisher
      * @return
      */
-    public int maximumActionsInAPlan(FishState state, Fisher fisher);
+    int maximumActionsInAPlan(FishState state, Fisher fisher);
 
     @Override
     void start(FishState model, Fisher fisher);

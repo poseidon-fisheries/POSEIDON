@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
@@ -42,17 +41,14 @@ import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EFFOR
 public class SPRAgent implements AdditionalStartable, Steppable {
 
 
+    /**
+     * object sampling fishers to keep track of their landings
+     */
+    final protected CatchAtLengthSampler sampler;
     private final String surveyTag;
-
     private final Species species;
-
     private final double assumedLinf;
-
-
     private final double assumedKParameter;
-
-    private double assumedNaturalMortality;
-
     private final int assumedMaxAge;
 
     private final double assumedVirginRecruits;
@@ -66,50 +62,46 @@ public class SPRAgent implements AdditionalStartable, Steppable {
     private final double assumedLenghtAtMaturity;
 
     private final Function<Pair<Integer, Integer>, Double> binLengthToWeightFunction;
-
-    /**
-     * object sampling fishers to keep track of their landings
-     */
-    final protected CatchAtLengthSampler sampler;
-
     final private SPRFormula formula;
+    private double assumedNaturalMortality;
 
 
     public SPRAgent(
-            String surveyTag, Species species,
-            Predicate<Fisher> samplingSelector,
-            double assumedLinf,
-            double assumedKParameter, double assumedNaturalMortality,
-            int assumedMaxAge,
-            double assumedVirginRecruits,
-            double assumedLengthBinCm, double assumedVarA, double assumedVarB, double assumedLenghtAtMaturity,
-            SPRFormula formula) {
+        final String surveyTag, final Species species,
+        final Predicate<Fisher> samplingSelector,
+        final double assumedLinf,
+        final double assumedKParameter, final double assumedNaturalMortality,
+        final int assumedMaxAge,
+        final double assumedVirginRecruits,
+        final double assumedLengthBinCm, final double assumedVarA, final double assumedVarB, final double assumedLenghtAtMaturity,
+        final SPRFormula formula
+    ) {
 
         this(
-                surveyTag,
-                species,
-                new StochasticCatchSampler(samplingSelector,species,surveyTag),
-                assumedLinf,
-                assumedKParameter, assumedNaturalMortality,
-                assumedMaxAge,
-                assumedVirginRecruits,
-                assumedLengthBinCm, assumedVarA, assumedVarB, assumedLenghtAtMaturity,
-                formula
+            surveyTag,
+            species,
+            new StochasticCatchSampler(samplingSelector, species, surveyTag),
+            assumedLinf,
+            assumedKParameter, assumedNaturalMortality,
+            assumedMaxAge,
+            assumedVirginRecruits,
+            assumedLengthBinCm, assumedVarA, assumedVarB, assumedLenghtAtMaturity,
+            formula
         );
-
 
 
     }
 
     public SPRAgent(
-            String surveyTag, Species species,
-            CatchAtLengthSampler sampler,
-            double assumedLinf,
-            double assumedKParameter, double assumedNaturalMortality,
-            int assumedMaxAge,
-            double assumedVirginRecruits,
-            double assumedLengthBinCm, double assumedVarA, double assumedVarB, double assumedLenghtAtMaturity,
-            SPRFormula formula) {
+        final String surveyTag, final Species species,
+        final CatchAtLengthSampler sampler,
+        final double assumedLinf,
+        final double assumedKParameter, final double assumedNaturalMortality,
+        final int assumedMaxAge,
+        final double assumedVirginRecruits,
+        final double assumedLengthBinCm, final double assumedVarA, final double assumedVarB, final double assumedLenghtAtMaturity,
+        final SPRFormula formula
+    ) {
         /**
          * object that returns true whenever the fisher is to be sampled for this SPR computation
          */
@@ -126,10 +118,12 @@ public class SPRAgent implements AdditionalStartable, Steppable {
         this.assumedLenghtAtMaturity = assumedLenghtAtMaturity;
         binLengthToWeightFunction = new Function<Pair<Integer, Integer>, Double>() {
             @Override
-            public Double apply(Pair<Integer, Integer> subBinPair) {
+            public Double apply(final Pair<Integer, Integer> subBinPair) {
 
-                return assumedVarA / 1000 * Math.pow(species.getLength(subBinPair.getFirst(),
-                        subBinPair.getSecond()), assumedVarB);
+                return assumedVarA / 1000 * Math.pow(species.getLength(
+                    subBinPair.getFirst(),
+                    subBinPair.getSecond()
+                ), assumedVarB);
             }
         };
         this.sampler = sampler;
@@ -137,130 +131,34 @@ public class SPRAgent implements AdditionalStartable, Steppable {
 
     }
 
-
-    //this is just the yearly reporter
-    @VisibleForTesting
-    public double computeSPR() {
-
-
-        return formula.computeSPR(this,new StructuredAbundance(sampler.getAbundance(
-                binLengthToWeightFunction
-        )));
-
-    }
-
-    @NotNull
     public Function<Integer, Double> getAgeToMaturityFunction() {
         return new Function<Integer, Double>() {
             @Override
-            public Double apply(Integer age) {
+            public Double apply(final Integer age) {
                 return species.getLengthAtAge(age, 0) < assumedLenghtAtMaturity ? 0d : 1d;
             }
 
         };
     }
 
-    @NotNull
     public Function<Integer, Double> getAgeToWeightFunction() {
         return new Function<Integer, Double>() {
             @Override
-            public Double apply(Integer age) {
+            public Double apply(final Integer age) {
                 return assumedVarA / 1000 * Math.pow(species.getLengthAtAge(age, 0), assumedVarB);
             }
         };
     }
 
-
-    /**
-     * computes % of ABUNDANCE (raw number) of the catch above Lmat
-     * @return
-     */
-    @VisibleForTesting
-    public double computeMaturityRatio(){
-        double matureCatch = 0;
-        double allCatches = 0;
-        double[][] abundance = sampler.getAbundance(
-                binLengthToWeightFunction
-        );
-        for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++) {
-            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
-                assert Double.isFinite(abundance[subdivision][bin]) || bin==0; //for some formulas weight at 0 length is undefined
-                if(Double.isFinite(abundance[subdivision][bin])) {
-                    allCatches += abundance[subdivision][bin];
-                    if (species.getLength(subdivision, bin) >= assumedLenghtAtMaturity)
-                        matureCatch += abundance[subdivision][bin];
-                }
-            }
-        }
-        assert matureCatch <= allCatches;
-        return matureCatch/allCatches;
-    }
-
-    public double computeMeanLength(){
-        double numberOfObservations = 0;
-        double sumLength = 0;
-        double[][] abundance = sampler.getAbundance(
-                binLengthToWeightFunction
-        );
-        for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++) {
-            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
-                assert Double.isFinite(abundance[subdivision][bin]) || bin==0; //for some formulas weight at 0 length is undefined
-                if(Double.isFinite(abundance[subdivision][bin])) {
-                    numberOfObservations += abundance[subdivision][bin];
-                    sumLength += abundance[subdivision][bin] * species.getLength(subdivision, bin);
-                }
-            }
-        }
-
-        return sumLength/numberOfObservations;
-    }
-
-    /**
-     * computes % of ABUNDANCE (raw number) of the catch above lopt
-     * @return
-     */
-    @VisibleForTesting
-    public double computeLoptRatio(){
-        /**
-         * the guessed length at which you'd catch it if you had perfect info would be...
-         *
-         * formula is embedded in the sql computations but you can find it, for example, in https://doi.org/10.1093/icesjms/fsy078
-         * rounded to keep it consistent
-         */
-        int lopt = (int) Math.round(assumedLinf * (3/(3+assumedNaturalMortality/assumedKParameter)));
-
-
-
-        double superMatureCatch = 0;
-        double allCatches = 0;
-        //weight abundance for each bin
-        double[][] abundance = sampler.getAbundance(
-                binLengthToWeightFunction
-        );
-        for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++) {
-            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
-                assert Double.isFinite(abundance[subdivision][bin]) || bin == 0; //for some formulas weight at 0 length is undefined
-                if (Double.isFinite(abundance[subdivision][bin])) {
-                    allCatches += abundance[subdivision][bin];
-                    if (species.getLength(subdivision, bin) >= lopt)
-                        superMatureCatch += abundance[subdivision][bin];
-                }
-            }
-        }
-        assert superMatureCatch <= allCatches;
-        return superMatureCatch/allCatches;
-    }
-
-
-
     /**
      * this is the daily step: delegate the observation to the catch sampler. This agent self-schedules so there is
      * no need to call this directly
+     *
      * @param simState
      */
     @VisibleForTesting
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         sampler.observeDaily(
 
 
@@ -274,7 +172,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
         //Preconditions.checkArgument(sampler==null, "SPR Agent already Started!!");
         sampler.start(model);
@@ -283,124 +181,223 @@ public class SPRAgent implements AdditionalStartable, Steppable {
         model.scheduleEveryDay(this, StepOrder.DAILY_DATA_GATHERING);
 
         model.scheduleEveryYear(
-                new Steppable() {
-                    @Override
-                    public void step(SimState simState) {
-                        sampler.resetCatchObservations();
-                    }
-                },
-                StepOrder.DATA_RESET
+            new Steppable() {
+                @Override
+                public void step(final SimState simState) {
+                    sampler.resetCatchObservations();
+                }
+            },
+            StepOrder.DATA_RESET
         );
 
 
         model.getYearlyDataSet().registerGatherer("SPR " + species + " " + surveyTag,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        double spr = computeSPR();
-                        return spr;
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(final FishState fishState) {
+                    final double spr = computeSPR();
+                    return spr;
 
-                    }
-                },Double.NaN);
+                }
+            }, Double.NaN
+        );
 
 
         model.getYearlyDataSet().registerGatherer("CPUE " + species + " " + surveyTag,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        double numerator = 0;
-                        final double[][] observedLandings = sampler.getLandings();
-                        for (double[] landingsPerSubdivision : observedLandings) {
-                            for (double landingsPerBin : landingsPerSubdivision) {
-                                numerator+=landingsPerBin;
-                            }
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(final FishState fishState) {
+                    double numerator = 0;
+                    final double[][] observedLandings = sampler.getLandings();
+                    for (final double[] landingsPerSubdivision : observedLandings) {
+                        for (final double landingsPerBin : landingsPerSubdivision) {
+                            numerator += landingsPerBin;
                         }
-                        double denominator=0;
-                        for (Fisher fisher : sampler.viewObservedFishers())
-                            denominator+=fisher.getYearlyCounterColumn(EFFORT);
-                        return numerator/denominator;
                     }
-                },Double.NaN);
-
+                    double denominator = 0;
+                    for (final Fisher fisher : sampler.viewObservedFishers())
+                        denominator += fisher.getYearlyCounterColumn(EFFORT);
+                    return numerator / denominator;
+                }
+            }, Double.NaN
+        );
 
 
         model.getYearlyDataSet().registerGatherer("Landings " + species + " " + surveyTag,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        double landings = 0;
-                        final double[][] observedLandings = sampler.getLandings();
-                        for (double[] landingsPerSubdivision : observedLandings) {
-                            for (double landingsPerBin : landingsPerSubdivision) {
-                                landings+=landingsPerBin;
-                            }
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(final FishState fishState) {
+                    double landings = 0;
+                    final double[][] observedLandings = sampler.getLandings();
+                    for (final double[] landingsPerSubdivision : observedLandings) {
+                        for (final double landingsPerBin : landingsPerSubdivision) {
+                            landings += landingsPerBin;
                         }
-                        return landings;
                     }
-                },Double.NaN);
+                    return landings;
+                }
+            }, Double.NaN
+        );
 
         model.getYearlyDataSet().registerGatherer("Percentage Mature Catches " + species + " " + surveyTag,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        double ratio = computeMaturityRatio();
-                        return ratio;
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(final FishState fishState) {
+                    final double ratio = computeMaturityRatio();
+                    return ratio;
 
-                    }
-                },Double.NaN);
+                }
+            }, Double.NaN
+        );
 
         model.getYearlyDataSet().registerGatherer("Percentage Lopt Catches " + species + " " + surveyTag,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        double ratio = computeLoptRatio();
-                        return ratio;
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(final FishState fishState) {
+                    final double ratio = computeLoptRatio();
+                    return ratio;
 
-                    }
-                },Double.NaN);
+                }
+            }, Double.NaN
+        );
 
         model.getYearlyDataSet().registerGatherer("Mean Length Caught " + species + " " + surveyTag,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        return computeMeanLength();
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(final FishState fishState) {
+                    return computeMeanLength();
 
-                    }
-                },Double.NaN);
+                }
+            }, Double.NaN
+        );
 
-        for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++) {
+        for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++) {
             for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
-                int finalSubdivision = subdivision;
-                int finalBin = bin;
-                String columnName = species + " " + "Catches(#) " + subdivision + "." + bin + " " + surveyTag;
+                final int finalSubdivision = subdivision;
+                final int finalBin = bin;
+                final String columnName = species + " " + "Catches(#) " + subdivision + "." + bin + " " + surveyTag;
                 model.getYearlyDataSet().registerGatherer(
-                        columnName,
-                        new Gatherer<FishState>() {
-                            @Override
-                            public Double apply(FishState fishState) {
+                    columnName,
+                    new Gatherer<FishState>() {
+                        @Override
+                        public Double apply(final FishState fishState) {
 
-                                return sampler.getAbundance(
-                                        new Function<Pair<Integer, Integer>, Double>() {
-                                            @Override
-                                            public Double apply(Pair<Integer, Integer> subdivisionBinPair) {
-                                                return  assumedVarA/1000 * Math.pow(
-                                                        species.getLength(subdivisionBinPair.getFirst(),
-                                                                subdivisionBinPair.getSecond()),
-                                                        assumedVarB);
+                            return sampler.getAbundance(
+                                new Function<Pair<Integer, Integer>, Double>() {
+                                    @Override
+                                    public Double apply(final Pair<Integer, Integer> subdivisionBinPair) {
+                                        return assumedVarA / 1000 * Math.pow(
+                                            species.getLength(
+                                                subdivisionBinPair.getFirst(),
+                                                subdivisionBinPair.getSecond()
+                                            ),
+                                            assumedVarB
+                                        );
 
-                                            }
-                                        }
+                                    }
+                                }
 
-                                )[finalSubdivision][finalBin];
-                            }
-                        }, Double.NaN
+                            )[finalSubdivision][finalBin];
+                        }
+                    }, Double.NaN
                 );
             }
 
         }
 
 
+    }
 
+    //this is just the yearly reporter
+    @VisibleForTesting
+    public double computeSPR() {
+
+
+        return formula.computeSPR(this, new StructuredAbundance(sampler.getAbundance(
+            binLengthToWeightFunction
+        )));
+
+    }
+
+    /**
+     * computes % of ABUNDANCE (raw number) of the catch above Lmat
+     *
+     * @return
+     */
+    @VisibleForTesting
+    public double computeMaturityRatio() {
+        double matureCatch = 0;
+        double allCatches = 0;
+        final double[][] abundance = sampler.getAbundance(
+            binLengthToWeightFunction
+        );
+        for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++) {
+            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
+                assert Double.isFinite(abundance[subdivision][bin]) || bin == 0; //for some formulas weight at 0 length is undefined
+                if (Double.isFinite(abundance[subdivision][bin])) {
+                    allCatches += abundance[subdivision][bin];
+                    if (species.getLength(subdivision, bin) >= assumedLenghtAtMaturity)
+                        matureCatch += abundance[subdivision][bin];
+                }
+            }
+        }
+        assert matureCatch <= allCatches;
+        return matureCatch / allCatches;
+    }
+
+    /**
+     * computes % of ABUNDANCE (raw number) of the catch above lopt
+     *
+     * @return
+     */
+    @VisibleForTesting
+    public double computeLoptRatio() {
+        /**
+         * the guessed length at which you'd catch it if you had perfect info would be...
+         *
+         * formula is embedded in the sql computations but you can find it, for example, in https://doi.org/10.1093/icesjms/fsy078
+         * rounded to keep it consistent
+         */
+        final int lopt = (int) Math.round(assumedLinf * (3 / (3 + assumedNaturalMortality / assumedKParameter)));
+
+
+        double superMatureCatch = 0;
+        double allCatches = 0;
+        //weight abundance for each bin
+        final double[][] abundance = sampler.getAbundance(
+            binLengthToWeightFunction
+        );
+        for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++) {
+            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
+                assert Double.isFinite(abundance[subdivision][bin]) || bin == 0; //for some formulas weight at 0 length is undefined
+                if (Double.isFinite(abundance[subdivision][bin])) {
+                    allCatches += abundance[subdivision][bin];
+                    if (species.getLength(subdivision, bin) >= lopt)
+                        superMatureCatch += abundance[subdivision][bin];
+                }
+            }
+        }
+        assert superMatureCatch <= allCatches;
+        return superMatureCatch / allCatches;
+    }
+
+    public double computeMeanLength() {
+        double numberOfObservations = 0;
+        double sumLength = 0;
+        final double[][] abundance = sampler.getAbundance(
+            binLengthToWeightFunction
+        );
+        for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++) {
+            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
+                assert Double.isFinite(abundance[subdivision][bin]) || bin == 0; //for some formulas weight at 0 length is undefined
+                if (Double.isFinite(abundance[subdivision][bin])) {
+                    numberOfObservations += abundance[subdivision][bin];
+                    sumLength += abundance[subdivision][bin] * species.getLength(subdivision, bin);
+                }
+            }
+        }
+
+        return sumLength / numberOfObservations;
     }
 
     /**
@@ -434,6 +431,10 @@ public class SPRAgent implements AdditionalStartable, Steppable {
         return assumedNaturalMortality;
     }
 
+    public void setAssumedNaturalMortality(final double assumedNaturalMortality) {
+        this.assumedNaturalMortality = assumedNaturalMortality;
+    }
+
     public int getAssumedMaxAge() {
         return assumedMaxAge;
     }
@@ -460,11 +461,6 @@ public class SPRAgent implements AdditionalStartable, Steppable {
 
     public Function<Pair<Integer, Integer>, Double> getBinLengthToWeightFunction() {
         return binLengthToWeightFunction;
-    }
-
-
-    public void setAssumedNaturalMortality(double assumedNaturalMortality) {
-        this.assumedNaturalMortality = assumedNaturalMortality;
     }
 
     public String getSurveyTag() {

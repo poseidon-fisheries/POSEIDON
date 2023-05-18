@@ -1,7 +1,5 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
@@ -21,42 +19,85 @@ import java.util.Arrays;
 public class TargetToTACController extends Controller {
 
 
-
     public static final Actuator<FishState, Double> POLICY_TO_ALLSPECIESTAC_ACTUATOR = new Actuator<FishState, Double>() {
         @Override
-        public void apply(FishState subject, Double tac, FishState model) {
+        public void apply(final FishState subject, final Double tac, final FishState model) {
             if (!Double.isFinite(tac))
                 return;
 
             final MonoQuotaRegulation quotaRegulation =
-                    new MonoQuotaRegulation(
-                            tac
-                    );
-            for (Fisher fisher : model.getFishers()) {
+                new MonoQuotaRegulation(
+                    tac
+                );
+            for (final Fisher fisher : model.getFishers()) {
                 fisher.setRegulation(quotaRegulation);
             }
         }
     };
 
-    public static final Actuator<FishState, Double> POLICY_TO_ONESPECIES_TAC_ACTUATOR(String specificSpeciesRegulated) {
+    public TargetToTACController(
+        final ISlope islope
+    ) {
+        this(
+            islope,
+            islope.getMaxTimeLag() * 365
+        );
+    }
+
+    public TargetToTACController(
+        final Sensor<FishState, Double> target,
+        final int intervalInDays
+    ) {
+        super(
+            (Sensor<FishState, Double>) system -> -1d,
+            target,
+            POLICY_TO_ALLSPECIESTAC_ACTUATOR, intervalInDays
+        );
+    }
+
+    public TargetToTACController(
+        final ISlope islope,
+        final String speciesAffectedByQuota
+    ) {
+        this(
+            islope,
+            islope.getMaxTimeLag() * 365,
+            speciesAffectedByQuota
+        );
+    }
+
+    public TargetToTACController(
+        final Sensor<FishState, Double> target,
+        final int intervalInDays,
+        final String speciesAffectedByQuota
+    ) {
+        super(
+            (Sensor<FishState, Double>) system -> -1d,
+            target,
+            POLICY_TO_ONESPECIES_TAC_ACTUATOR(speciesAffectedByQuota),
+            intervalInDays
+        );
+    }
+
+    public static final Actuator<FishState, Double> POLICY_TO_ONESPECIES_TAC_ACTUATOR(final String specificSpeciesRegulated) {
         return new Actuator<FishState, Double>() {
             @Override
-            public void apply(FishState subject, Double tac, FishState model) {
+            public void apply(final FishState subject, final Double tac, final FishState model) {
                 if (!Double.isFinite(tac))
                     return;
 
-                System.out.println("Building quota for " +specificSpeciesRegulated);
-                double[] realTac = new double[model.getSpecies().size()];
-                Arrays.fill(realTac,Double.POSITIVE_INFINITY);
+                System.out.println("Building quota for " + specificSpeciesRegulated);
+                final double[] realTac = new double[model.getSpecies().size()];
+                Arrays.fill(realTac, Double.POSITIVE_INFINITY);
                 final int importantSpecies = model.getSpecies(specificSpeciesRegulated).getIndex();
                 realTac[importantSpecies] = tac;
 
 
                 final MultiQuotaRegulation quotaRegulation =
-                        new MultiQuotaRegulation(
-                                realTac,model
-                        );
-                for (Fisher fisher : model.getFishers()) {
+                    new MultiQuotaRegulation(
+                        realTac, model
+                    );
+                for (final Fisher fisher : model.getFishers()) {
                     fisher.setRegulation(quotaRegulation);
                 }
             }
@@ -64,84 +105,53 @@ public class TargetToTACController extends Controller {
     }
 
     public TargetToTACController(
-                                 Sensor<FishState, Double> target,
-                                 int intervalInDays) {
-        super(
-                (Sensor<FishState, Double>) system -> -1d,
-                target,
-                POLICY_TO_ALLSPECIESTAC_ACTUATOR, intervalInDays);
+        final ITarget itarget
+    ) {
+        this(
+            itarget,
+            itarget.getTimeInterval() * 365
+        );
     }
 
     public TargetToTACController(
-            Sensor<FishState, Double> target,
-            int intervalInDays,
-            @NotNull
-            String speciesAffectedByQuota) {
-        super(
-                (Sensor<FishState, Double>) system -> -1d,
-                target,
-                POLICY_TO_ONESPECIES_TAC_ACTUATOR(speciesAffectedByQuota),
-                intervalInDays);
-    }
-
-    public TargetToTACController(
-            ISlope islope
-    ){
-        this(islope,
-                islope.getMaxTimeLag()*365);
-    }
-
-
-    public TargetToTACController(
-            ISlope islope,
-            String speciesAffectedByQuota
-    ){
-        this(islope,
-                islope.getMaxTimeLag()*365,
-                speciesAffectedByQuota);
-    }
-
-    public TargetToTACController(
-            ITarget itarget
-    ){
-        this(itarget,
-                itarget.getTimeInterval()*365);
-    }
-
-    public TargetToTACController(
-            ITarget itarget,
-            String speciesAffectedByQuota
-    ){
-        this(itarget,
-                itarget.getTimeInterval()*365,
-                speciesAffectedByQuota);
+        final ITarget itarget,
+        final String speciesAffectedByQuota
+    ) {
+        this(
+            itarget,
+            itarget.getTimeInterval() * 365,
+            speciesAffectedByQuota
+        );
     }
 
 
     @Override
-    public double computePolicy(double currentVariable,
-                                double target,
-                                FishState model,
-                                double oldPolicy) {
-        assert currentVariable==-1;
+    public double computePolicy(
+        final double currentVariable,
+        final double target,
+        final FishState model,
+        final double oldPolicy
+    ) {
+        assert currentVariable == -1;
 
         System.out.println("target TAC is: " + target);
         return target;
     }
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         super.start(model);
 
         model.getYearlyDataSet().registerGatherer(
 
-                "TAC from TARGET-TAC Controller",
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        return getPolicy();
-                    }
-                },
-                Double.NaN);
+            "TAC from TARGET-TAC Controller",
+            new Gatherer<FishState>() {
+                @Override
+                public Double apply(final FishState fishState) {
+                    return getPolicy();
+                }
+            },
+            Double.NaN
+        );
     }
 }

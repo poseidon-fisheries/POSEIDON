@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -110,7 +109,6 @@ public class BiomassAggregatingFad
         return getBiology().getCurrentBiomass();
     }
 
-    @NotNull
     @Override
     public Catch addCatchesToFad(
         final LocalBiology seaTileBiology,

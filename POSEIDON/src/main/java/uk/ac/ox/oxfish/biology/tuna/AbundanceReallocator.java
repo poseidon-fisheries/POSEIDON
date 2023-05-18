@@ -18,7 +18,6 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import org.jetbrains.annotations.NotNull;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -93,7 +92,6 @@ public class AbundanceReallocator
         });
     }
 
-    @NotNull
     private Map<Species, DoubleGrid2D[]> getGrids(
         final GlobalBiology globalBiology,
         final Map<?, DoubleGrid2D> allocationGrids

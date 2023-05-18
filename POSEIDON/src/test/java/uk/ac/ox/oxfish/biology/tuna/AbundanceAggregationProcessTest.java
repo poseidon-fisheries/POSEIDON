@@ -1,32 +1,29 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
-import junit.framework.TestCase;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertEquals;
 
 public class AbundanceAggregationProcessTest {
 
     @Test
-    public void AbundanceAggregationProcessTester(){
+    public void AbundanceAggregationProcessTester() {
         //final BiologicalProcess<AbundanceLocalBiology> aggregationProcess = new AbundanceAggregationProcess();
-        AbundanceAggregator aggregator = new AbundanceAggregator();
-        Species species1 = new Species("Piano Tuna");
-        GlobalBiology globalBiology = new GlobalBiology(species1);
+        final AbundanceAggregator aggregator = new AbundanceAggregator();
+        final Species species1 = new Species("Piano Tuna");
+        final GlobalBiology globalBiology = new GlobalBiology(species1);
 
-        List<AbundanceLocalBiology> localBiologies;
+        final List<AbundanceLocalBiology> localBiologies;
         localBiologies = new ArrayList<>();
 
-        HashMap<Species, double[][]> abundance = new HashMap<>();
+        final HashMap<Species, double[][]> abundance = new HashMap<>();
         abundance.put(species1, new double[][]{{10, 5, 1}, {1, 2, 3}});
         localBiologies.add(new AbundanceLocalBiology(abundance));
 
@@ -34,19 +31,18 @@ public class AbundanceAggregationProcessTest {
         localBiologies.add(new AbundanceLocalBiology(abundance));
 
 
-      //  final FishState fishState = mock(FishState.class);
-
+        //  final FishState fishState = mock(FishState.class);
 
 
         assertEquals(
-                30,
-                aggregator.apply(globalBiology, localBiologies).getAbundance(species1).asMatrix()[0][0],
-                0
+            30,
+            aggregator.apply(globalBiology, localBiologies).getAbundance(species1).asMatrix()[0][0],
+            0
         );
         assertEquals(
-                1,
-                aggregator.apply(globalBiology, localBiologies).getAbundance(species1).asMatrix()[1][0],
-                0
+            1,
+            aggregator.apply(globalBiology, localBiologies).getAbundance(species1).asMatrix()[1][0],
+            0
         );
     }
 }

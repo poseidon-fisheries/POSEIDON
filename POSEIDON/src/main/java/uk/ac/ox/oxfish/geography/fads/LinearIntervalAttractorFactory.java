@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
@@ -58,7 +57,6 @@ public class LinearIntervalAttractorFactory
         );
     }
 
-    @NotNull
     private HeterogeneousLinearIntervalAttractor generateFishAttractor(final FishState fishState) {
         final HeterogeneousLinearIntervalAttractor attractor = new HeterogeneousLinearIntervalAttractor(
             (int) getDaysInWaterBeforeAttraction().applyAsDouble(fishState.getRandom()),

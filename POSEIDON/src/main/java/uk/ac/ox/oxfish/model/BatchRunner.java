@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.model;
 
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -62,7 +61,6 @@ public class BatchRunner {
     /**
      * where to print output
      */
-    @Nullable
     private final Path outputFolder;
 
     /**
@@ -110,8 +108,8 @@ public class BatchRunner {
     private List<String> dailyColumnsToPrint = new LinkedList<>();
 
     public BatchRunner(
-        final Path yamlFile, final int yearsToRun, @Nullable final List<String> columnsToPrint,
-        @Nullable final Path outputFolder, final Path policyFile, final long initialSeed,
+        final Path yamlFile, final int yearsToRun, final List<String> columnsToPrint,
+        final Path outputFolder, final Path policyFile, final long initialSeed,
         final Integer heatmapGathererStartYear
     ) {
         this.yamlFile = yamlFile;
@@ -135,7 +133,7 @@ public class BatchRunner {
         this.scaleSeedWithRunsDone = scaleSeedWithRunsDone;
     }
 
-    public StringBuffer run(@Nullable final StringBuffer writer) throws IOException {
+    public StringBuffer run(final StringBuffer writer) throws IOException {
 
 
         final String simulationName = guessSimulationName() + "_" + runsDone;

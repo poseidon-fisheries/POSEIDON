@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.geography.fads;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 import sim.util.Bag;
@@ -230,7 +229,6 @@ public class ExogenousFadSetterFromDataTest {
 
     }
 
-    @NotNull
     private FishState generateAndRunOneYearOfAbstractFadScenario(
         final InputPath setterFile,
         final int neighborhoodSearchSize,

@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableMap;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import ec.util.MersenneTwisterFast;
-import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -1107,16 +1106,15 @@ public class FishStateUtilities {
 
     public static FishState run(
         final String simulationName, final Path scenarioYaml,
-        @Nullable final Path outputFolder,
+        final Path outputFolder,
         final Long seed, final String logLevel, final boolean additionalData,
         final String policyScript, final int yearsToRun,
         final boolean saveOnExit, final Integer heatmapGathererYear,
-        @Nullable final Consumer<Scenario> scenarioSetup,
-        @Nullable final Consumer<FishState> preStartSetup,
+        final Consumer<Scenario> scenarioSetup,
+        final Consumer<FishState> preStartSetup,
         //if any of returns true, it stops the simulation before it is over!
-        @Nullable final LinkedList<Pair<Integer,
-            AlgorithmFactory<? extends AdditionalStartable>>> outsidePlugins,
-        @Nullable final List<Predicate<FishState>> circuitBreakers
+        final LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>> outsidePlugins,
+        final List<Predicate<FishState>> circuitBreakers
     ) throws IOException {
 
 

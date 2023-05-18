@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -57,7 +56,6 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
      */
     private final Function<Species, double[]> maturity;
 
-    @Nullable
     private final double[] relativeFecundity;
 
     /**
@@ -74,26 +72,27 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
 
 
     public RecruitmentBySpawningBiomass(
-            int virginRecruits,
-            double steepness,
-            double cumulativePhi, boolean addRelativeFecundityToSpawningBiomass, double[] maturity,
-            @Nullable double[] relativeFecundity, int femaleSubdivision, boolean recruitEveryDay) {
+        final int virginRecruits,
+        final double steepness,
+        final double cumulativePhi, final boolean addRelativeFecundityToSpawningBiomass, final double[] maturity,
+        final double[] relativeFecundity, final int femaleSubdivision, final boolean recruitEveryDay
+    ) {
 
 
         super(recruitEveryDay);
-        this.cumulativePhi =cumulativePhi;
-        double[] givenMaturity = Arrays.copyOf(maturity, maturity.length);
+        this.cumulativePhi = cumulativePhi;
+        final double[] givenMaturity = Arrays.copyOf(maturity, maturity.length);
         this.maturity =
-                species -> givenMaturity
+            species -> givenMaturity
         ;
-        if(addRelativeFecundityToSpawningBiomass)
-            this.relativeFecundity = Arrays.copyOf(relativeFecundity,relativeFecundity.length);
+        if (addRelativeFecundityToSpawningBiomass)
+            this.relativeFecundity = Arrays.copyOf(relativeFecundity, relativeFecundity.length);
         else
-            this.relativeFecundity=null;
-        Preconditions.checkArgument(femaleSubdivision>=0);
+            this.relativeFecundity = null;
+        Preconditions.checkArgument(femaleSubdivision >= 0);
         this.femaleSubdivision = femaleSubdivision;
-        Preconditions.checkArgument(virginRecruits>0);
-        Preconditions.checkArgument(steepness>0);
+        Preconditions.checkArgument(virginRecruits > 0);
+        Preconditions.checkArgument(steepness > 0);
         this.virginRecruits = virginRecruits;
         this.steepness = steepness;
         this.addRelativeFecundityToSpawningBiomass = addRelativeFecundityToSpawningBiomass;
@@ -101,22 +100,23 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
 
 
     public RecruitmentBySpawningBiomass(
-            int virginRecruits,
-            double steepness,
-            double cumulativePhi, boolean addRelativeFecundityToSpawningBiomass,
-            Function<Species, double[]> maturity,
-            @Nullable double[] relativeFecundity, int femaleSubdivision, boolean recruitEveryDay) {
+        final int virginRecruits,
+        final double steepness,
+        final double cumulativePhi, final boolean addRelativeFecundityToSpawningBiomass,
+        final Function<Species, double[]> maturity,
+        final double[] relativeFecundity, final int femaleSubdivision, final boolean recruitEveryDay
+    ) {
         super(recruitEveryDay);
-        this.cumulativePhi =cumulativePhi;
+        this.cumulativePhi = cumulativePhi;
         this.maturity = maturity;
-        if(addRelativeFecundityToSpawningBiomass)
-            this.relativeFecundity = Arrays.copyOf(relativeFecundity,relativeFecundity.length);
+        if (addRelativeFecundityToSpawningBiomass)
+            this.relativeFecundity = Arrays.copyOf(relativeFecundity, relativeFecundity.length);
         else
-            this.relativeFecundity=null;
-        Preconditions.checkArgument(femaleSubdivision>=0);
+            this.relativeFecundity = null;
+        Preconditions.checkArgument(femaleSubdivision >= 0);
         this.femaleSubdivision = femaleSubdivision;
-        Preconditions.checkArgument(virginRecruits>0);
-        Preconditions.checkArgument(steepness>0);
+        Preconditions.checkArgument(virginRecruits > 0);
+        Preconditions.checkArgument(steepness > 0);
         this.virginRecruits = virginRecruits;
         this.steepness = steepness;
         this.addRelativeFecundityToSpawningBiomass = addRelativeFecundityToSpawningBiomass;
@@ -126,56 +126,58 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
     /**
      * go through all females
      *
-     * @param species      the species of fish examined
-     * @param meristics    the biological characteristics of the fish
+     * @param species   the species of fish examined
+     * @param meristics the biological characteristics of the fish
      * @param abundance
-     *@return the number of male and female recruits
+     * @return the number of male and female recruits
      */
     @Override
     public double computeYearlyRecruitment(
-            Species species, Meristics meristics, StructuredAbundance abundance)
-    {
+        final Species species, final Meristics meristics, final StructuredAbundance abundance
+    ) {
 
         //you need to sum up the spawning biomass of the fish:
-        int cohorts = meristics.getNumberOfBins();
+        final int cohorts = meristics.getNumberOfBins();
 
-        Preconditions.checkArgument(abundance.getSubdivisions()>=
-                                            femaleSubdivision, "This recruitment function is looking for the FEMALE cohort but ran out of bounds");
+        Preconditions.checkArgument(abundance.getSubdivisions() >=
+            femaleSubdivision, "This recruitment function is looking for the FEMALE cohort but ran out of bounds");
 
         final double[] femalePerAge = abundance.asMatrix()[femaleSubdivision];
-        double[] actualMaturity = maturity.apply(species);
+        final double[] actualMaturity = maturity.apply(species);
 
-        Preconditions.checkArgument(femalePerAge.length == cohorts,
-                                    "The number of cohorts is not equal to maxAge + 1");
-        Preconditions.checkArgument(femalePerAge.length == actualMaturity.length,
-                                    "Mismatch length between maturity and female per age!");
+        Preconditions.checkArgument(
+            femalePerAge.length == cohorts,
+            "The number of cohorts is not equal to maxAge + 1"
+        );
+        Preconditions.checkArgument(
+            femalePerAge.length == actualMaturity.length,
+            "Mismatch length between maturity and female per age!"
+        );
         double spawningBiomass = 0;
         //compute the cumulative spawning biomass
-        for(int i=0; i< cohorts; i++)
-        {
-            if(meristics.getWeight(femaleSubdivision,i) > 0)
-                if(!addRelativeFecundityToSpawningBiomass)
-                    spawningBiomass += meristics.getWeight(femaleSubdivision,i) *
-                            actualMaturity[i] * femalePerAge[i];
+        for (int i = 0; i < cohorts; i++) {
+            if (meristics.getWeight(femaleSubdivision, i) > 0)
+                if (!addRelativeFecundityToSpawningBiomass)
+                    spawningBiomass += meristics.getWeight(femaleSubdivision, i) *
+                        actualMaturity[i] * femalePerAge[i];
                 else {
                     assert relativeFecundity != null;
                     spawningBiomass += meristics.getWeight(femaleSubdivision, i) *
-                            actualMaturity[i] * femalePerAge[i]
-                            * relativeFecundity[i];
+                        actualMaturity[i] * femalePerAge[i]
+                        * relativeFecundity[i];
                 }
         }
 
         //turn it into recruits.
-        double recruits = FishStateUtilities.round(
-                (1d + noisemaker.get()) * Math.min(
-                        (4 * steepness * virginRecruits * spawningBiomass) /
-                                ((virginRecruits * cumulativePhi * (1 - steepness)) +
-                                        (((5 * steepness) - 1) * spawningBiomass)),virginRecruits
-                )
+        final double recruits = FishStateUtilities.round(
+            (1d + noisemaker.get()) * Math.min(
+                (4 * steepness * virginRecruits * spawningBiomass) /
+                    ((virginRecruits * cumulativePhi * (1 - steepness)) +
+                        (((5 * steepness) - 1) * spawningBiomass)), virginRecruits
+            )
         );
         return
-                recruits;
-
+            recruits;
 
 
     }
@@ -186,7 +188,7 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
      * @param noiseMaker the function that generates percentage changes. 0 means no noise.
      */
     @Override
-    public void addNoise(NoiseMaker noiseMaker) {
+    public void addNoise(final NoiseMaker noiseMaker) {
         this.noisemaker = noiseMaker;
     }
 
@@ -241,7 +243,6 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
      *
      * @return Value for property 'relativeFecundity'.
      */
-    @Nullable
     public double[] getRelativeFecundity() {
         return relativeFecundity;
     }

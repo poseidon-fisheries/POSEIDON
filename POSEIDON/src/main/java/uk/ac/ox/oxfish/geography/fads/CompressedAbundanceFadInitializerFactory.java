@@ -19,7 +19,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import ec.util.MersenneTwisterFast;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -46,7 +45,6 @@ public class CompressedAbundanceFadInitializerFactory
         super(abundanceFiltersFactory, speciesCodesSupplier, speciesNames);
     }
 
-    @NotNull
     protected DoubleSupplier buildCapacityGenerator(
         final MersenneTwisterFast rng,
         final double maximumCarryingCapacity

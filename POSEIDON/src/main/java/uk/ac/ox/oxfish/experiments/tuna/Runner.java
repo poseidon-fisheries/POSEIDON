@@ -25,7 +25,6 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
@@ -205,7 +204,6 @@ public final class Runner<S extends Scenario> {
         );
     }
 
-    @NotNull
     private State startRun(
         final Policy<? super S> policy,
         final int runNumber,

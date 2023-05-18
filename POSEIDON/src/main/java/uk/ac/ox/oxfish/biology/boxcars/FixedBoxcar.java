@@ -22,7 +22,6 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * The fixed boxcar method is not really kosher but it's very simple and
@@ -35,7 +34,7 @@ public class FixedBoxcar {
     /**
      * population, split into length bins
      */
-    private final  double[] currentDistribution;
+    private final double[] currentDistribution;
 
     /**
      * proportion graduating each time step
@@ -47,9 +46,11 @@ public class FixedBoxcar {
      */
     private final double[] lengthPerBin;
 
-    private FixedBoxcar(double[] currentDistribution,
-                        double[] proportionGraduating,
-                        double[] lengthPerBin) {
+    private FixedBoxcar(
+        final double[] currentDistribution,
+        final double[] proportionGraduating,
+        final double[] lengthPerBin
+    ) {
         this.currentDistribution = currentDistribution;
         this.proportionGraduating = proportionGraduating;
         this.lengthPerBin = lengthPerBin;
@@ -57,31 +58,31 @@ public class FixedBoxcar {
 
     /**
      * Von Bertalanfy growth; equally spaced (by length) bins
-     * @param LZero minimum length
-     * @param LInfinity maximum length
-     * @param K YEARLY growth as defined by Von Bertalanffy
+     *
+     * @param LZero       minimum length
+     * @param LInfinity   maximum length
+     * @param K           YEARLY growth as defined by Von Bertalanffy
      * @param daysPerStep how many days pass between each graduation
      * @return a Fixed Boxcar tuned to these parameters
      */
     public static FixedBoxcar buildEquallySpacedVB(
-            double LZero,
-            double LInfinity,
-            double K,
-            int daysPerStep,
-            int numberOfBins
-    )
-    {
+        final double LZero,
+        final double LInfinity,
+        final double K,
+        final int daysPerStep,
+        final int numberOfBins
+    ) {
         Preconditions.checkArgument(numberOfBins > 1);
         Preconditions.checkArgument(LZero > 0);
         Preconditions.checkArgument(LInfinity > LZero);
         Preconditions.checkArgument(K > 0);
         Preconditions.checkArgument(daysPerStep > 0);
         //set the length per bin (they should be all equal)
-        double increment = (LInfinity - LZero)/(numberOfBins-1);
-        double[] lengths = new double[numberOfBins];
+        final double increment = (LInfinity - LZero) / (numberOfBins - 1);
+        final double[] lengths = new double[numberOfBins];
         lengths[0] = LZero;
-        for(int i=1;i<lengths.length; i++)
-            lengths[i] = lengths[i-1] + increment;
+        for (int i = 1; i < lengths.length; i++)
+            lengths[i] = lengths[i - 1] + increment;
 
 
         /**
@@ -91,39 +92,63 @@ public class FixedBoxcar {
 
     }
 
+    private static FixedBoxcar buildBoxcarFromLengthBins(
+        final double LInfinity, final double K, final int daysPerStep, final int numberOfBins, final double[] lenghts
+    ) {
+        final double deltaT = daysPerStep / 365f; //scaling factor to turn yearly VB to daily
+        //this is just the derivative of VB per time
+        final double[] growthPerBin = new double[numberOfBins];
+        for (int i = 0; i < numberOfBins; i++)
+            growthPerBin[i] = K * (LInfinity - lenghts[i]) * deltaT;
+        //turn this into graduating proportion
+        //which is basically what % of length distance has been covered within deltaT (by growthPerBin)
+        final double[] proportionGraduating = new double[numberOfBins];
+        for (int i = 0; i < numberOfBins - 1; i++)
+            proportionGraduating[i] = Math.max(growthPerBin[i] / (lenghts[i + 1] - lenghts[i]), 0);
+        proportionGraduating[numberOfBins - 1] = Double.NaN;
+
+
+        return new FixedBoxcar(
+            new double[numberOfBins],
+            proportionGraduating,
+            lenghts
+        );
+    }
+
     /**
      * Von Bertalanffy growth, Bins are of different length (smaller increments at first)
-     * @param LZero minimum length
-     * @param LInfinity maximum length
-     * @param K YEARLY growth as defined by Von Bertalanffy
-     * @param daysPerStep how many days pass between each graduation
+     *
+     * @param LZero                      minimum length
+     * @param LInfinity                  maximum length
+     * @param K                          YEARLY growth as defined by Von Bertalanffy
+     * @param daysPerStep                how many days pass between each graduation
      * @param factor1
-     *@param cohortCoefficientVariation @return a Fixed Boxcar tuned to these parameters
+     * @param cohortCoefficientVariation @return a Fixed Boxcar tuned to these parameters
      */
     public static FixedBoxcar buildVariableWidthVB(
-            double LZero,
-            double LInfinity,
-            double K,
-            int daysPerStep,
-            int numberOfBins,
-            double factor1,
-            double cohortCoefficientVariation)
-    {
+        final double LZero,
+        final double LInfinity,
+        final double K,
+        final int daysPerStep,
+        final int numberOfBins,
+        final double factor1,
+        final double cohortCoefficientVariation
+    ) {
         Preconditions.checkArgument(numberOfBins > 1);
         Preconditions.checkArgument(LZero > 0);
         Preconditions.checkArgument(LInfinity > LZero);
         Preconditions.checkArgument(K > 0);
         Preconditions.checkArgument(daysPerStep > 0);
         //set the length per bin following's Peter formula
-        double[] increments = new double[numberOfBins];
-        for(int i=0;i<increments.length; i++)
+        final double[] increments = new double[numberOfBins];
+        for (int i = 0; i < increments.length; i++)
             increments[i] = factor1 * 2 * LZero * cohortCoefficientVariation * cohortCoefficientVariation *
-                    (double) Math.pow(1 + factor1 * 2 * cohortCoefficientVariation * cohortCoefficientVariation,i);
+                Math.pow(1 + factor1 * 2 * cohortCoefficientVariation * cohortCoefficientVariation, i);
 
-        double[] lengths = new double[numberOfBins];
+        final double[] lengths = new double[numberOfBins];
         lengths[0] = increments[0];
-        for(int i=1; i<increments.length; i++ )
-            lengths[i] = lengths[i-1] + increments[i];
+        for (int i = 1; i < increments.length; i++)
+            lengths[i] = lengths[i - 1] + increments[i];
 
         /**
          * set graduating proportion
@@ -132,44 +157,21 @@ public class FixedBoxcar {
 
     }
 
-    @NotNull
-    private static FixedBoxcar buildBoxcarFromLengthBins(
-            double LInfinity, double K, int daysPerStep, int numberOfBins, double[] lenghts) {
-        double deltaT = daysPerStep/365f; //scaling factor to turn yearly VB to daily
-        //this is just the derivative of VB per time
-        double[] growthPerBin = new double[numberOfBins];
-        for(int i = 0; i<numberOfBins; i++)
-            growthPerBin[i] = K * (LInfinity - lenghts[i]) * deltaT;
-        //turn this into graduating proportion
-        //which is basically what % of length distance has been covered within deltaT (by growthPerBin)
-        double[] proportionGraduating = new double[numberOfBins];
-        for(int i = 0; i<numberOfBins-1; i++)
-            proportionGraduating[i] = Math.max(growthPerBin[i]/(lenghts[i+1]-lenghts[i]),0);
-        proportionGraduating[numberOfBins-1] = Double.NaN;
-
-
-        return new FixedBoxcar(
-                new double[numberOfBins],
-                proportionGraduating,
-                lenghts
-        );
-    }
-
-
     /**
      * just the VB growth function
-     * @param time time (which is usually years, but can be whatever depending on how K is scaled)
-     * @param K the growth parameter
+     *
+     * @param time      time (which is usually years, but can be whatever depending on how K is scaled)
+     * @param K         the growth parameter
      * @param LInfinite the maximum average length for the oldest fish
-     * @param LZero length at recruitment
+     * @param LZero     length at recruitment
      * @return length at specified time
      */
     public static double VonBertalanffyLength(
-            double time,
-            double K,
-            double LInfinite,
-            double LZero
-    ){
+        final double time,
+        final double K,
+        final double LInfinite,
+        final double LZero
+    ) {
         return (LZero + ((LInfinite - LZero) * (1 - Math.exp(-K * time))));
     }
 

@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.model.data.monitors;
 
-import org.jetbrains.annotations.Nullable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
@@ -45,10 +44,11 @@ abstract public class AbstractMonitor<O, V, Q extends Quantity<Q>> implements Mo
     private final FishStateSteppable resetter;
     private Stoppable stoppable = null;
     private Accumulator<V> accumulator;
+
     AbstractMonitor(
-        @Nullable String baseName,
-        IntervalPolicy resetInterval,
-        Supplier<Accumulator<V>> accumulatorSupplier,
+        final String baseName,
+        final IntervalPolicy resetInterval,
+        final Supplier<Accumulator<V>> accumulatorSupplier,
         final Unit<Q> unit,
         final String yLabel
     ) {
@@ -61,15 +61,25 @@ abstract public class AbstractMonitor<O, V, Q extends Quantity<Q>> implements Mo
         this.resetter = __ -> this.accumulator = this.accumulatorSupplier.get();
     }
 
-    public String getYLabel() { return yLabel; }
+    public String getYLabel() {
+        return yLabel;
+    }
 
-    public String getBaseName() { return baseName; }
+    public String getBaseName() {
+        return baseName;
+    }
 
-    @Override public Unit<Q> getUnit() { return unit; }
+    @Override
+    public Unit<Q> getUnit() {
+        return unit;
+    }
 
-    public Accumulator<V> getAccumulator() { return accumulator; }
+    public Accumulator<V> getAccumulator() {
+        return accumulator;
+    }
 
-    @Override public void registerWith(TimeSeries<FishState> timeSeries) {
+    @Override
+    public void registerWith(final TimeSeries<FishState> timeSeries) {
         if (baseName != null) // a null baseName indicates we don't want to register the accumulator
             timeSeries.registerGatherer(
                 accumulator.makeName(baseName),
@@ -80,12 +90,14 @@ abstract public class AbstractMonitor<O, V, Q extends Quantity<Q>> implements Mo
             );
     }
 
-    @Override public void start(FishState fishState) {
+    @Override
+    public void start(final FishState fishState) {
         checkState(stoppable == null, "Already started!");
         stoppable = fishState.schedulePerPolicy(resetter, DATA_RESET, resetInterval);
     }
 
-    @Override public void observe(O observable) {
+    @Override
+    public void observe(final O observable) {
         checkState(stoppable != null, "Not started!");
         extractValues(observable).forEach(accumulator::accumulate);
     }

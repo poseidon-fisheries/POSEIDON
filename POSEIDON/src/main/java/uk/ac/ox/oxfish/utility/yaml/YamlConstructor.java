@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.*;
@@ -31,7 +30,7 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.*;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,12 +44,10 @@ import java.util.Objects;
  * </ul>
  * Created by carrknight on 7/10/15.
  */
-public class YamlConstructor extends  Constructor {
+public class YamlConstructor extends Constructor {
 
 
-    public YamlConstructor()
-    {
-
+    public YamlConstructor() {
 
 
         //add the ability to read/write coordinates
@@ -74,10 +71,10 @@ public class YamlConstructor extends  Constructor {
 
         //intercept the scalar nodes to see if they are actually Factories or DoubleParameters
         this.yamlClassConstructors.put(
-                NodeId.scalar, new Constructor.ConstructScalar(){
-                    @Override
-                    public Object construct(Node nnode) {
-                        //if field you are trying to fill is a coordinate
+            NodeId.scalar, new Constructor.ConstructScalar() {
+                @Override
+                public Object construct(final Node nnode) {
+                    //if field you are trying to fill is a coordinate
                         /*
                         if(nnode.getType().equals(Coordinate.class))
                         {
@@ -87,42 +84,43 @@ public class YamlConstructor extends  Constructor {
                         }
                         */
 
-                        //if the field you are trying to fill is a double parameter
-                        if(nnode.getType().equals(DoubleParameter.class))
-                            //then a simple scalar must be a fixed double parameter. Build it
-                            return doubleParameterSplit((ScalarNode) nnode);
-                        //if it's a path type we write and read it as string rather than with the ugly !! notation
-                        if(nnode.getType().equals(Path.class))
-                            return Paths.get(((ScalarNode) nnode).getValue());
-                        //it's also possible that the scalar is an algorithm factory without any settable field
-                        //this is rare since factories are represented as maps, but this might be one of the simple
-                        //ones like AnarchyFactory
-                        if(AlgorithmFactory.class.isAssignableFrom(nnode.getType()))
-                            return AlgorithmFactories.constructorLookup((String) constructScalar((ScalarNode) nnode));
-                            //otherwise I guess it's really a normal scalar!
-                        else
-                            return super.construct(nnode);                }
-                });
+                    //if the field you are trying to fill is a double parameter
+                    if (nnode.getType().equals(DoubleParameter.class))
+                        //then a simple scalar must be a fixed double parameter. Build it
+                        return doubleParameterSplit((ScalarNode) nnode);
+                    //if it's a path type we write and read it as string rather than with the ugly !! notation
+                    if (nnode.getType().equals(Path.class))
+                        return Paths.get(((ScalarNode) nnode).getValue());
+                    //it's also possible that the scalar is an algorithm factory without any settable field
+                    //this is rare since factories are represented as maps, but this might be one of the simple
+                    //ones like AnarchyFactory
+                    if (AlgorithmFactory.class.isAssignableFrom(nnode.getType()))
+                        return AlgorithmFactories.constructorLookup(constructScalar((ScalarNode) nnode));
+                        //otherwise I guess it's really a normal scalar!
+                    else
+                        return super.construct(nnode);
+                }
+            });
 
         //intercept maps as well, some of them could be factories
-        this.yamlClassConstructors.put(NodeId.mapping, new Constructor.ConstructMapping(){
+        this.yamlClassConstructors.put(NodeId.mapping, new Constructor.ConstructMapping() {
 
             @Override
-            public Object construct(Node node) {
+            public Object construct(final Node node) {
 
-                if(AlgorithmFactory.class.isAssignableFrom(node.getType())) {
+                if (AlgorithmFactory.class.isAssignableFrom(node.getType())) {
                     //try super constructor first, most of the time it works
                     try {
                         return super.construct(node);
-                    } catch (YAMLException e) {
+                    } catch (final YAMLException e) {
                         //the original construct failed, hopefully this means it's an algorithm factory
                         //written as a map, so get its name and look it up
                         final AlgorithmFactory toReturn = AlgorithmFactories.constructorLookup(
-                                ((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue());
+                            ((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue());
                         //now take all the elements of the submap, we are going to place them by setter
                         //todo might have to flatten here!
                         ((MappingNode) node).setValue(
-                                ((MappingNode)((MappingNode) node).getValue().get(0).getValueNode()).getValue());
+                            ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
                         assert toReturn != null;
                         //need to set the node to the correct return or the reflection magic of snakeYAML wouldn't work
                         node.setType(toReturn.getClass());
@@ -133,47 +131,47 @@ public class YamlConstructor extends  Constructor {
                     }
                 }
                 //try a similar approach for scenarios
-                if(Scenario.class.isAssignableFrom(node.getType()))
-                {
-                    try{
+                if (Scenario.class.isAssignableFrom(node.getType())) {
+                    try {
                         //might have been written correctly as it is!
                         return super.construct(node);
-                    }
-                    catch (YAMLException e)
-                    {
+                    } catch (final YAMLException e) {
                         //this either means it's badly written somehow or more likely it's written in a "prettyfied" style
 
                         //grab first element, ought to be the name of the scenario
-                        final  Scenario scenario =
-                                Scenarios.SCENARIOS.get(((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue()).get();
+                        final Scenario scenario =
+                            Scenarios.SCENARIOS.get(((ScalarNode) ((MappingNode) node).getValue()
+                                .get(0)
+                                .getKeyNode()).getValue()).get();
 
                         //now we can deal with filling it through beans
                         //first allocate subnodes correctly
                         ((MappingNode) node).setValue(
-                                ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
+                            ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
                         //set type correctly
                         node.setType(scenario.getClass());
-                        constructJavaBean2ndStep((MappingNode) node,scenario);
+                        constructJavaBean2ndStep((MappingNode) node, scenario);
                         return scenario;
 
 
                     }
                 }
 
-                if(((MappingNode) node).getValue().size()>0) {
+                if (((MappingNode) node).getValue().size() > 0) {
                     //again for policy scripts
                     if (PolicyScript.class.isAssignableFrom(node.getType()) ||
-                            Objects.equals(
-                                    ((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue(),
-                                    "PolicyScript")) {
+                        Objects.equals(
+                            ((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue(),
+                            "PolicyScript"
+                        )) {
 
-                        PolicyScript script = new PolicyScript();
+                        final PolicyScript script = new PolicyScript();
 
 
                         //now we can deal with filling it through beans
                         //first allocate subnodes correctly
                         ((MappingNode) node).setValue(
-                                ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
+                            ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
                         //set type correctly
                         node.setType(PolicyScript.class);
                         constructJavaBean2ndStep((MappingNode) node, script);
@@ -191,12 +189,12 @@ public class YamlConstructor extends  Constructor {
                         //set type correctly
 
                         node.setType(PolicyScripts.class);
-                        for (NodeTuple partialScript : ((MappingNode) ((MappingNode) node).getValue().get(
-                                0).getValueNode()).getValue()) {
+                        for (final NodeTuple partialScript : ((MappingNode) ((MappingNode) node).getValue().get(
+                            0).getValueNode()).getValue()) {
                             partialScript.getKeyNode().setType(Integer.class);
                             partialScript.getValueNode().setType(PolicyScript.class);
                         }
-                        PolicyScripts script = new PolicyScripts();
+                        final PolicyScripts script = new PolicyScripts();
                         constructJavaBean2ndStep((MappingNode) node, script);
                         return script;
 
@@ -209,23 +207,21 @@ public class YamlConstructor extends  Constructor {
         });
     }
 
-    @NotNull
-    public static Coordinate convertToCoordinate(String val) {
-        String[] split = val.replaceAll("x:","").replaceAll("y:","").split(",");
-        return new Coordinate(
-                Double.parseDouble(split[0].trim().replaceAll("'","").replaceAll("\"","")),
-                Double.parseDouble(split[1].trim().replaceAll("'","").replaceAll("\"","")));
-    }
-
-
-    private DoubleParameter doubleParameterSplit(ScalarNode node)
-    {
+    private DoubleParameter doubleParameterSplit(final ScalarNode node) {
 
         //get it as a string
-        String nodeContent = (String) constructScalar(node);
+        final String nodeContent = constructScalar(node);
         return DoubleParameter.parseDoubleParameter(nodeContent);
 
 
+    }
+
+    public static Coordinate convertToCoordinate(final String val) {
+        final String[] split = val.replaceAll("x:", "").replaceAll("y:", "").split(",");
+        return new Coordinate(
+            Double.parseDouble(split[0].trim().replaceAll("'", "").replaceAll("\"", "")),
+            Double.parseDouble(split[1].trim().replaceAll("'", "").replaceAll("\"", ""))
+        );
     }
 
 

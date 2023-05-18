@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import ec.util.MersenneTwisterFast;
-import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -48,28 +47,22 @@ public class DummyFishingPlanningModule implements PlanningModule {
 
     private FishState model;
 
-    public DummyFishingPlanningModule(double delayAfterFishingInHours, int maximumNumberOfFishingActionsInTrip) {
+    public DummyFishingPlanningModule(final double delayAfterFishingInHours, final int maximumNumberOfFishingActionsInTrip) {
         this.delayAfterFishingInHours = delayAfterFishingInHours;
         this.maximumNumberOfFishingActionsInTrip = maximumNumberOfFishingActionsInTrip;
     }
 
-    @Nullable
     @Override
-    public PlannedAction chooseNextAction(Plan currentPlanSoFar) {
+    public PlannedAction chooseNextAction(final Plan currentPlanSoFar) {
 
 
         for (int trial = 0; trial < MAXIMUM_NUMBER_OF_TRIES; trial++) {
-            List<SeaTile> options = map.getAllSeaTilesExcludingLandAsList();
-            SeaTile seaTile = options.get(random.nextInt(options.size()));
-            if(seaTile.isFishingEvenPossibleHere() && fisher.isAllowedToFishHere(seaTile,model))
-                return new PlannedAction.Fishing(seaTile,delayAfterFishingInHours);
+            final List<SeaTile> options = map.getAllSeaTilesExcludingLandAsList();
+            final SeaTile seaTile = options.get(random.nextInt(options.size()));
+            if (seaTile.isFishingEvenPossibleHere() && fisher.isAllowedToFishHere(seaTile, model))
+                return new PlannedAction.Fishing(seaTile, delayAfterFishingInHours);
         }
         return null;
-    }
-
-    @Override
-    public boolean isStarted() {
-        return map != null;
     }
 
     /**
@@ -79,8 +72,13 @@ public class DummyFishingPlanningModule implements PlanningModule {
      * @param fisher
      */
     @Override
-    public void prepareForReplanning(FishState state, Fisher fisher) {
+    public void prepareForReplanning(final FishState state, final Fisher fisher) {
         assert isStarted();
+    }
+
+    @Override
+    public boolean isStarted() {
+        return map != null;
     }
 
     /**
@@ -93,20 +91,20 @@ public class DummyFishingPlanningModule implements PlanningModule {
      * @return
      */
     @Override
-    public int maximumActionsInAPlan(FishState state, Fisher fisher) {
+    public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
         return maximumNumberOfFishingActionsInTrip;
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         map = model.getMap();
         random = model.getRandom();
-        this.fisher=fisher;
-        this.model=model;
+        this.fisher = fisher;
+        this.model = model;
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         map = null;
     }
 }

@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.Nullable;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -76,7 +75,6 @@ public abstract class AbstractAbundanceLinearIntervalAttractor
         this.model = model;
     }
 
-    @Nullable
     @Override
     public WeightedObject<AbundanceLocalBiology> attractImplementation(
         final LocalBiology seaTileBiology,

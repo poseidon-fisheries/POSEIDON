@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.fisher.actions;
 
 import com.vividsolutions.jts.geom.Envelope;
 import ec.util.MersenneTwisterFast;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
@@ -68,36 +67,6 @@ import static org.mockito.Mockito.*;
 
 public class MovingTest {
     //all sea tiles!
-    public static FishState generateSimple4x4Map() {
-        final ObjectGrid2D grid2D = new ObjectGrid2D(4, 4);
-        //2x2, first column sea, second  column land
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < 4; j++)
-                grid2D.field[i][j] = new SeaTile(i, j, -100, new TileHabitat(0d));
-
-        final GeomGridField rasterBathymetry = new GeomGridField(grid2D);
-        rasterBathymetry.setMBR(new Envelope(0, 1, 0, 1));
-
-        //great
-        final NauticalMap map = new NauticalMap(rasterBathymetry, new GeomVectorField(),
-            new EquirectangularDistance(0.0, 1), new StraightLinePathfinder()
-        );
-        return initModel(map);
-    }
-
-
-//path from A to A is empty
-
-    @NotNull
-    private static FishState initModel(final NauticalMap map) {
-        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
-        when(model.getMap()).thenReturn(map);
-        when(model.getStepsPerDay()).thenReturn(1);
-        when(model.getHoursPerStep()).thenReturn(24d);
-        return model;
-    }
-
-    //all sea tiles!
     public static FishState generateSimple50x50Map() {
         final ObjectGrid2D grid2D = new ObjectGrid2D(50, 50);
         //2x2, first column sea, second  column land
@@ -110,6 +79,17 @@ public class MovingTest {
             new EquirectangularDistance(0.0, 1), new StraightLinePathfinder()
         );
         return initModel(map);
+    }
+
+
+//path from A to A is empty
+
+    private static FishState initModel(final NauticalMap map) {
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        when(model.getMap()).thenReturn(map);
+        when(model.getStepsPerDay()).thenReturn(1);
+        when(model.getHoursPerStep()).thenReturn(24d);
+        return model;
     }
 
     //all sea tiles!
@@ -206,6 +186,24 @@ public class MovingTest {
         assertEquals(1, route.size());
     }
 
+    //all sea tiles!
+    public static FishState generateSimple4x4Map() {
+        final ObjectGrid2D grid2D = new ObjectGrid2D(4, 4);
+        //2x2, first column sea, second  column land
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                grid2D.field[i][j] = new SeaTile(i, j, -100, new TileHabitat(0d));
+
+        final GeomGridField rasterBathymetry = new GeomGridField(grid2D);
+        rasterBathymetry.setMBR(new Envelope(0, 1, 0, 1));
+
+        //great
+        final NauticalMap map = new NauticalMap(rasterBathymetry, new GeomVectorField(),
+            new EquirectangularDistance(0.0, 1), new StraightLinePathfinder()
+        );
+        return initModel(map);
+    }
+
     @Test
     public void moveInPlace() {
 
@@ -241,7 +239,6 @@ public class MovingTest {
 
     }
 
-    @NotNull
     private Fisher initFisher(final NauticalMap map) {
         //lots of crap to initialize.
         final Port port = mock(Port.class);

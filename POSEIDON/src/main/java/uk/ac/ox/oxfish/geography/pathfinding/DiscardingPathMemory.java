@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.geography.pathfinding;
 
 import com.google.common.collect.ImmutableList;
-import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Collection;
@@ -13,11 +12,20 @@ import java.util.Optional;
 public class DiscardingPathMemory implements PathMemory {
 
     @SuppressWarnings("OptionalAssignedToNull")
-    @Override public @Nullable Optional<ImmutableList<SeaTile>> getPath(SeaTile start, SeaTile end) { return null; }
+    @Override
+    public Optional<ImmutableList<SeaTile>> getPath(final SeaTile start, final SeaTile end) {
+        return null;
+    }
 
-    @Override public void putPath(SeaTile start, SeaTile end, Collection<SeaTile> path) {} // do nothing
+    @Override
+    public void putPath(final SeaTile start, final SeaTile end, final Collection<SeaTile> path) {
+    } // do nothing
 
-    @Override public void putPath(SeaTile start, SeaTile end, ImmutableList<SeaTile> path) {} // do nothing
+    @Override
+    public void putPath(final SeaTile start, final SeaTile end, final ImmutableList<SeaTile> path) {
+    } // do nothing
 
-    @Override public void putImpossiblePath(SeaTile start, SeaTile end) {} // do nothing
+    @Override
+    public void putImpossiblePath(final SeaTile start, final SeaTile end) {
+    } // do nothing
 }

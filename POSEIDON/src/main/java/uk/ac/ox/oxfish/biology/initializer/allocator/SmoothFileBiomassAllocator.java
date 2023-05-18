@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.biology.initializer.allocator;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -36,31 +35,33 @@ public class SmoothFileBiomassAllocator extends FileBiomassAllocator {
     private final GeographicalRegression<Double> smoother;
 
     public SmoothFileBiomassAllocator(
-            @NotNull Path csvFile, boolean inputFileHasHeader,
-            GeographicalRegression<Double> smoother) {
+        final Path csvFile, final boolean inputFileHasHeader,
+        final GeographicalRegression<Double> smoother
+    ) {
         super(csvFile, inputFileHasHeader);
         this.smoother = smoother;
     }
 
     @Override
     protected void observePoint(
-            NauticalMap map, Double currentX, Double currentY, Double nextValue) {
+        final NauticalMap map, final Double currentX, final Double currentY, final Double nextValue
+    ) {
 
         smoother.addObservation(
-                new GeographicalObservation<Double>(
-                        map.getSeaTile(new Coordinate(currentX,currentY)),0,
-                        nextValue
+            new GeographicalObservation<Double>(
+                map.getSeaTile(new Coordinate(currentX, currentY)), 0,
+                nextValue
 
 
-
-        ),null,null);
+            ), null, null);
 
 
     }
 
     @Override
     protected double allocateNumerically(
-            SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
-        return smoother.predict(tile,0,null,null);
+        final SeaTile tile, final NauticalMap map, final MersenneTwisterFast random
+    ) {
+        return smoother.predict(tile, 0, null, null);
     }
 }

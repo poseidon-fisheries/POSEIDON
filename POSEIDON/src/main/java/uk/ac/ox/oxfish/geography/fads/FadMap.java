@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -106,12 +105,10 @@ public class FadMap
             .map(Fad.class::cast);
     }
 
-    @NotNull
     public Optional<SeaTile> getFadTile(final Fad fad) {
         return getFadLocation(fad).flatMap(this::getSeaTile);
     }
 
-    @NotNull
     private Optional<LocalBiology> getTileBiology(final SeaTile seaTile) {
         return Optional.of(seaTile)
             .map(SeaTile::getBiology)
@@ -119,12 +116,10 @@ public class FadMap
             .map(localBiologyClass::cast);
     }
 
-    @NotNull
     public Optional<Double2D> getFadLocation(final Fad fad) {
         return Optional.ofNullable(driftingObjectsMap.getObjectLocation(fad));
     }
 
-    @NotNull
     private Optional<SeaTile> getSeaTile(final Double2D location) {
         return Optional.ofNullable(
             nauticalMap.getSeaTile((int) (location.x), (int) (location.y))
@@ -143,7 +138,6 @@ public class FadMap
         driftingObjectsMap.add(fad, location, onMove(fad));
     }
 
-    @NotNull
     private BiConsumer<Double2D, Optional<Double2D>> onMove(final Fad fad) {
         return (oldLoc, newLoc) -> {
             final Optional<SeaTile> newSeaTile = newLoc.flatMap(this::getSeaTile);
@@ -188,12 +182,10 @@ public class FadMap
         remove(fad);
     }
 
-    @NotNull
     public Bag fadsAt(final SeaTile seaTile) {
         return fadsAt(seaTile.getGridX(), seaTile.getGridY());
     }
 
-    @NotNull
     private Bag fadsAt(final int x, final int y) {
         final Int2D location = new Int2D(x, y);
         final Bag bag = driftingObjectsMap.getField().getObjectsAtDiscretizedLocation(location);
@@ -204,7 +196,6 @@ public class FadMap
      * Returns the Continuous2D field backing the floating objects map. Only public because the GUI
      * portrayal needs to access it.
      */
-    @NotNull
     public Continuous2D getField() {
         return driftingObjectsMap.getField();
     }

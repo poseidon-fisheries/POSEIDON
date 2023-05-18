@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.parameters;
 
 import com.google.common.collect.Streams;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.maximization.generic.ParameterAddressBuilder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -28,7 +27,6 @@ public class ParameterExtractor<P extends DoubleParameter> {
         this.parameterClass = parameterClass;
     }
 
-    @NotNull
     private static List<PropertyDescriptor> getPropertyDescriptors(final Object object) {
         try {
             return Arrays
@@ -78,7 +76,6 @@ public class ParameterExtractor<P extends DoubleParameter> {
             });
     }
 
-    @NotNull
     private Stream<Parameter> getParametersFromObject(
         final Object o,
         final ParameterAddressBuilder addressBuilder

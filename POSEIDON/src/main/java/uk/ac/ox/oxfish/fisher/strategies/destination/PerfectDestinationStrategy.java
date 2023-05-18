@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import ec.util.MersenneTwisterFast;
-import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
@@ -37,13 +36,16 @@ public class PerfectDestinationStrategy implements DestinationStrategy, TripList
     private final double maxHoursOut;
 
     private final FavoriteDestinationStrategy delegate;
+    private FishState model;
+    private Fisher fisher;
 
-
-    public PerfectDestinationStrategy(double maxHoursOut,
-                                      NauticalMap map,
-                                      MersenneTwisterFast random) {
+    public PerfectDestinationStrategy(
+        final double maxHoursOut,
+        final NauticalMap map,
+        final MersenneTwisterFast random
+    ) {
         this.maxHoursOut = maxHoursOut;
-        delegate = new FavoriteDestinationStrategy(map,random);
+        delegate = new FavoriteDestinationStrategy(map, random);
     }
 
     /**
@@ -57,33 +59,44 @@ public class PerfectDestinationStrategy implements DestinationStrategy, TripList
      */
     @Override
     public SeaTile chooseDestination(
-            Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
+        final Fisher fisher, final MersenneTwisterFast random, final FishState model, final Action currentAction
+    ) {
 
         return delegate.chooseDestination(fisher, random, model, currentAction);
 
     }
 
-    @Nullable
-    private SeaTile pickBest(Fisher fisher, FishState model) {
-        ProfitFunction simulator = new ProfitFunction(new LameTripSimulator(),
-                                                      maxHoursOut);
+    @Override
+    public void start(final FishState model, final Fisher fisher) {
+
+        delegate.setFavoriteSpot(pickBest(fisher, model));
+
+        this.model = model;
+        this.fisher = fisher;
+        fisher.addTripListener(this);
+    }
+
+    private SeaTile pickBest(final Fisher fisher, final FishState model) {
+        final ProfitFunction simulator = new ProfitFunction(
+            new LameTripSimulator(),
+            maxHoursOut
+        );
 
         SeaTile best = null;
         double bestProfits = Double.NEGATIVE_INFINITY;
-        for (SeaTile seaTile : model.getMap().getAllSeaTilesExcludingLandAsList()) {
-            if(seaTile.isFishingEvenPossibleHere() &&
-                    fisher.isAllowedToFishHere(seaTile,model))
-            {
-                double profitsHere = simulator.hourlyProfitFromHypotheticalTripHere(
-                        fisher,seaTile,model,fisher.getGear().expectedHourlyCatch(fisher, seaTile,
-                                                                                  1,
-                                                                                  model.getBiology()),
-                        false
+        for (final SeaTile seaTile : model.getMap().getAllSeaTilesExcludingLandAsList()) {
+            if (seaTile.isFishingEvenPossibleHere() &&
+                fisher.isAllowedToFishHere(seaTile, model)) {
+                final double profitsHere = simulator.hourlyProfitFromHypotheticalTripHere(
+                    fisher, seaTile, model, fisher.getGear().expectedHourlyCatch(fisher, seaTile,
+                        1,
+                        model.getBiology()
+                    ),
+                    false
                 );
-                if(profitsHere>bestProfits)
-                {
+                if (profitsHere > bestProfits) {
                     bestProfits = profitsHere;
-                    best=seaTile;
+                    best = seaTile;
                 }
             }
         }
@@ -91,29 +104,15 @@ public class PerfectDestinationStrategy implements DestinationStrategy, TripList
         return best;
     }
 
-    private FishState model;
-
-    private Fisher fisher;
-
     @Override
-    public void start(FishState model, Fisher fisher) {
-
-        delegate.setFavoriteSpot(pickBest(fisher,model));
-
-        this.model=model;
-        this.fisher=fisher;
-        fisher.addTripListener(this);
-    }
-
-    @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         fisher.removeTripListener(this);
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-        SeaTile favoriteSpot = pickBest(this.fisher, model);
-        if(favoriteSpot!=null) //not going to make a selection when you are not allowed out!
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
+        final SeaTile favoriteSpot = pickBest(this.fisher, model);
+        if (favoriteSpot != null) //not going to make a selection when you are not allowed out!
             delegate.setFavoriteSpot(favoriteSpot);
     }
 }

@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
@@ -151,7 +150,6 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         this.successfulSetProbability = successfulSetProbability;
     }
 
-    @NotNull
     FadManager makeFadManager(final FishState fishState) {
         checkNotNull(fadInitializerFactory);
         final ActiveActionRegulations actionSpecificRegulations = new ActiveActionRegulations(

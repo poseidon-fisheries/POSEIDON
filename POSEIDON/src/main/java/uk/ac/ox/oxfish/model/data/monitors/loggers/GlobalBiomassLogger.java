@@ -19,7 +19,6 @@
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
 
 import com.google.common.collect.ImmutableList;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
@@ -71,7 +70,6 @@ public class GlobalBiomassLogger implements RowProvider {
         );
     }
 
-    @NotNull
     public static Stream<Double> getBiomassesStream(
         final FishState fishState,
         final Collection<? extends LocalBiology> biologies

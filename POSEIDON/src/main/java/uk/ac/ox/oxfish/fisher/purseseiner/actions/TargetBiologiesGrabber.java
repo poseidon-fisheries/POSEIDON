@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -123,7 +122,6 @@ public class TargetBiologiesGrabber<B extends LocalBiology> {
             .map(localBiologyClass::cast);
     }
 
-    @NotNull
     private List<B> getNeighbourBiologies(
         final SeaTile tile,
         final NauticalMap nauticalMap,

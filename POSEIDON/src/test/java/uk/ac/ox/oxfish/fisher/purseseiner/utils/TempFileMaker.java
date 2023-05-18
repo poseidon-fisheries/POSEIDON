@@ -19,22 +19,20 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class TempFileMaker {
 
-    @NotNull public static Path makeTempFile(final String content) {
+    public static Path makeTempFile(final String content) {
         try {
             final Path path;
             path = Files.createTempFile(null, null);
             path.toFile().deleteOnExit();
             Files.write(path, content.getBytes());
             return path;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
     }

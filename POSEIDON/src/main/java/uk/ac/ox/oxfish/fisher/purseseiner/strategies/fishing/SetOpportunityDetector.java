@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
@@ -60,7 +59,6 @@ public class SetOpportunityDetector<B extends LocalBiology> {
         this.searchBonus = searchBonus;
     }
 
-    @NotNull
     Stream<AbstractSetAction> possibleSetActions() {
         final double bonus = hasSearched ? searchBonus : 0;
         hasSearched = false;

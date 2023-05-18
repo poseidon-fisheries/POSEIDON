@@ -13,7 +13,6 @@ import eva2.optimization.strategies.ClusterBasedNichingEA;
 import eva2.optimization.strategies.NelderMeadSimplex;
 import eva2.optimization.strategies.ParticleSwarmOptimizationGCPSO;
 import eva2.problems.SimpleProblemWrapper;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.maximization.generic.AbstractLastStepFixedDataTarget;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -128,7 +127,6 @@ public class TunaCalibrator {
         }
     }
 
-    @NotNull
     private Path makeOutputFolder() {
         String outputFolderName =
             new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date());

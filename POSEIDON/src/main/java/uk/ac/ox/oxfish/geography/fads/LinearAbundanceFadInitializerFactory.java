@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.CompressedExponentialAttractionProbability;
@@ -23,7 +22,6 @@ public class LinearAbundanceFadInitializerFactory extends CompressedAbundanceFad
         super(abundanceFiltersFactory, speciesCodesSupplier, speciesNames);
     }
 
-    @NotNull
     @Override
     FishAbundanceAttractor makeFishAttractor(
         final FishState fishState,

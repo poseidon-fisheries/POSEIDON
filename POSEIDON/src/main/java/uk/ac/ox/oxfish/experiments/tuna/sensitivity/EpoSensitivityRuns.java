@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.experiments.tuna.sensitivity;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.SelectivityAbundanceFadInitializerFactory;
@@ -99,7 +98,6 @@ public class EpoSensitivityRuns {
         return fadLimitsFactory;
     }
 
-    @NotNull
     private static List<Policy<? super EpoPathPlannerAbundanceScenario>> betAvoidancePolicies() {
         return makePolicyList(
             new Policy<>(
@@ -142,7 +140,6 @@ public class EpoSensitivityRuns {
             .build();
     }
 
-    @NotNull
     private static List<Policy<? super EpoPathPlannerAbundanceScenario>> noTemperatureLayerPolicies() {
         return makePolicyList(
             new Policy<>(

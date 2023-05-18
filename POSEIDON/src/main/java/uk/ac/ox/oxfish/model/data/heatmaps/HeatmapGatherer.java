@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.model.data.heatmaps;
 
 import com.google.common.collect.ImmutableList;
 import com.vividsolutions.jts.geom.Coordinate;
-import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.grid.DoubleGrid2D;
@@ -34,7 +33,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,13 +87,16 @@ public class HeatmapGatherer implements AdditionalStartable, Steppable, RowProvi
         this.merger = merger;
     }
 
-    int getNumObservations() { return numObservations; }
+    int getNumObservations() {
+        return numObservations;
+    }
 
     public double maxValueSeen() {
         return grids.values().stream().mapToDouble(DoubleGrid2D::max).max().orElse(NaN);
     }
 
-    @Override public void step(final SimState simState) {
+    @Override
+    public void step(final SimState simState) {
 
         final NauticalMap map = fishState.getMap();
 
@@ -118,8 +119,8 @@ public class HeatmapGatherer implements AdditionalStartable, Steppable, RowProvi
         }
     }
 
-    private DoubleGrid2D extractValues(NauticalMap map) {
-        DoubleGrid2D grid = new DoubleGrid2D(map.getWidth(), map.getHeight());
+    private DoubleGrid2D extractValues(final NauticalMap map) {
+        final DoubleGrid2D grid = new DoubleGrid2D(map.getWidth(), map.getHeight());
         for (int x = 0; x < grid.getWidth(); ++x) {
             for (int y = 0; y < grid.getHeight(); ++y) {
                 grid.set(x, y, numericExtractor.applyAsDouble(map.getSeaTile(x, y)));
@@ -131,7 +132,7 @@ public class HeatmapGatherer implements AdditionalStartable, Steppable, RowProvi
     /**
      * Mutates the old grid!
      */
-    private void mergeGrid(DoubleGrid2D oldGrid, DoubleGrid2D newGrid) {
+    private void mergeGrid(final DoubleGrid2D oldGrid, final DoubleGrid2D newGrid) {
         for (int x = 0; x < oldGrid.getWidth(); ++x) {
             for (int y = 0; y < newGrid.getHeight(); ++y) {
                 oldGrid.set(x, y, merger.applyAsDouble(oldGrid.get(x, y), newGrid.get(x, y)));
@@ -139,16 +140,21 @@ public class HeatmapGatherer implements AdditionalStartable, Steppable, RowProvi
         }
     }
 
-    @Override public void start(final FishState fishState) {
+    @Override
+    public void start(final FishState fishState) {
         this.fishState = fishState;
         if (numericExtractor instanceof Startable)
             ((Startable) numericExtractor).start(fishState);
         fishState.scheduleEveryStep(this, StepOrder.DAILY_DATA_GATHERING);
     }
 
-    @Override public List<String> getHeaders() { return HEADERS; }
+    @Override
+    public List<String> getHeaders() {
+        return HEADERS;
+    }
 
-    @Override public Iterable<List<?>> getRows() {
+    @Override
+    public Iterable<List<?>> getRows() {
         return getGrids().entrySet().stream().flatMap(entry -> {
             final Integer step = entry.getKey();
             final DoubleGrid2D grid = entry.getValue();
@@ -160,25 +166,31 @@ public class HeatmapGatherer implements AdditionalStartable, Steppable, RowProvi
         }).collect(toImmutableList());
     }
 
-    public Map<Integer, DoubleGrid2D> getGrids() { return Collections.unmodifiableMap(grids); }
+    public Map<Integer, DoubleGrid2D> getGrids() {
+        return Collections.unmodifiableMap(grids);
+    }
 
-    @NotNull private Stream<List<?>> makeRow(final int step, final DoubleGrid2D grid, final int x, final int y) {
+    private Stream<List<?>> makeRow(final int step, final DoubleGrid2D grid, final int x, final int y) {
         final Coordinate coordinates = fishState.getMap().getCoordinates(x, y);
         final double value = grid.get(x, y);
         return value == 0
             ? Stream.empty()
             : Stream.of(ImmutableList.of(
-                getName(),
-                step,
-                coordinates.x,
-                coordinates.y,
-                value,
-                getUnit()
-            ));
+            getName(),
+            step,
+            coordinates.x,
+            coordinates.y,
+            value,
+            getUnit()
+        ));
     }
 
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
-    public String getUnit() { return unit; }
+    public String getUnit() {
+        return unit;
+    }
 
 }

@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.model.regs.policymakers.factory;
 
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
@@ -11,8 +10,8 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.policymakers.CloseReopenOnEffortDecorator;
 import uk.ac.ox.oxfish.model.regs.policymakers.IndexTargetController;
 import uk.ac.ox.oxfish.model.regs.policymakers.LBSPREffortPolicyFactory;
-import uk.ac.ox.oxfish.model.regs.policymakers.sensors.UnchangingPastSensor;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.PastAverageSensor;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.UnchangingPastSensor;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -52,63 +51,67 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
     private DoubleParameter yearsToLookBackForTarget = new FixedDoubleParameter(5);
 
     @Override
-    public AdditionalStartable apply(FishState fishState) {
-        Preconditions.checkArgument(LBSPREffortPolicyFactory.EFFORT_ACTUATORS.containsKey(effortDefinition),
-                "The valid effort actuators are " + LBSPREffortPolicyFactory.EFFORT_ACTUATORS.keySet());
+    public AdditionalStartable apply(final FishState fishState) {
+        Preconditions.checkArgument(
+            LBSPREffortPolicyFactory.EFFORT_ACTUATORS.containsKey(effortDefinition),
+            "The valid effort actuators are " + LBSPREffortPolicyFactory.EFFORT_ACTUATORS.keySet()
+        );
 
-        final Actuator<FishState, Double> effortActuator = LBSPREffortPolicyFactory.EFFORT_ACTUATORS.get(effortDefinition);
+        final Actuator<FishState, Double> effortActuator = LBSPREffortPolicyFactory.EFFORT_ACTUATORS.get(
+            effortDefinition);
 
 
         return new AdditionalStartable() {
             @Override
-            public void start(FishState model) {
-                if(yearsBeforeStarting<=0)
-                    starterMethod(model,effortActuator).step(model);
+            public void start(final FishState model) {
+                if (yearsBeforeStarting <= 0)
+                    starterMethod(model, effortActuator).step(model);
                 else
                     fishState.scheduleOnceInXDays(
-                            starterMethod(model, effortActuator),
-                            StepOrder.DAWN,
-                            365 * yearsBeforeStarting + 1
+                        starterMethod(model, effortActuator),
+                        StepOrder.DAWN,
+                        365 * yearsBeforeStarting + 1
 
                     );
             }
         };
     }
 
-    @NotNull
-    private Steppable starterMethod(FishState model, Actuator<FishState, Double> effortActuator) {
+    private Steppable starterMethod(final FishState model, final Actuator<FishState, Double> effortActuator) {
         return new Steppable() {
             @Override
-            public void step(SimState simState) {
-                IndexTargetController controller =
-                        new IndexTargetController(
-                                new PastAverageSensor(
-                                        indicatorColumnName,
-                                        1
-                                ),
-                                new UnchangingPastSensor(
-                                        indicatorColumnName,
-                                        multiplier.applyAsDouble(model.getRandom()),
-                                    (int)yearsToLookBackForTarget.applyAsDouble(model.getRandom())
-                                ),
-                                blockEntryWhenSeasonIsNotFull ? new CloseReopenOnEffortDecorator(effortActuator) :
-                                        effortActuator, 365,
-                                maxChangePerYear.applyAsDouble(model.getRandom()),
-                                false,
+            public void step(final SimState simState) {
+                final IndexTargetController controller =
+                    new IndexTargetController(
+                        new PastAverageSensor(
+                            indicatorColumnName,
+                            1
+                        ),
+                        new UnchangingPastSensor(
+                            indicatorColumnName,
+                            multiplier.applyAsDouble(model.getRandom()),
+                            (int) yearsToLookBackForTarget.applyAsDouble(model.getRandom())
+                        ),
+                        blockEntryWhenSeasonIsNotFull ? new CloseReopenOnEffortDecorator(effortActuator) :
+                            effortActuator, 365,
+                        maxChangePerYear.applyAsDouble(model.getRandom()),
+                        false,
 
 
-                                false);
+                        false
+                    );
 
                 controller.start(model);
                 controller.step(model);
                 model.getYearlyDataSet().registerGatherer("Index Ratio",
-                        new Gatherer<FishState>() {
-                            @Override
-                            public Double apply(FishState fishState) {
-                                return controller.getLastPolicy();
-                            }
+                    new Gatherer<FishState>() {
+                        @Override
+                        public Double apply(final FishState fishState) {
+                            return controller.getLastPolicy();
                         }
-                        , Double.NaN);
+                    }
+                    , Double.NaN
+                );
 
             }
         };
@@ -119,7 +122,7 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
         return indicatorColumnName;
     }
 
-    public void setIndicatorColumnName(String indicatorColumnName) {
+    public void setIndicatorColumnName(final String indicatorColumnName) {
         this.indicatorColumnName = indicatorColumnName;
     }
 
@@ -127,7 +130,7 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
         return multiplier;
     }
 
-    public void setMultiplier(DoubleParameter multiplier) {
+    public void setMultiplier(final DoubleParameter multiplier) {
         this.multiplier = multiplier;
     }
 
@@ -135,7 +138,7 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
         return maxChangePerYear;
     }
 
-    public void setMaxChangePerYear(DoubleParameter maxChangePerYear) {
+    public void setMaxChangePerYear(final DoubleParameter maxChangePerYear) {
         this.maxChangePerYear = maxChangePerYear;
     }
 
@@ -143,7 +146,7 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
         return effortDefinition;
     }
 
-    public void setEffortDefinition(String effortDefinition) {
+    public void setEffortDefinition(final String effortDefinition) {
         this.effortDefinition = effortDefinition;
     }
 
@@ -151,7 +154,7 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
         return blockEntryWhenSeasonIsNotFull;
     }
 
-    public void setBlockEntryWhenSeasonIsNotFull(boolean blockEntryWhenSeasonIsNotFull) {
+    public void setBlockEntryWhenSeasonIsNotFull(final boolean blockEntryWhenSeasonIsNotFull) {
         this.blockEntryWhenSeasonIsNotFull = blockEntryWhenSeasonIsNotFull;
     }
 
@@ -159,7 +162,7 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
         return yearsBeforeStarting;
     }
 
-    public void setYearsBeforeStarting(int yearsBeforeStarting) {
+    public void setYearsBeforeStarting(final int yearsBeforeStarting) {
         this.yearsBeforeStarting = yearsBeforeStarting;
     }
 
@@ -167,7 +170,7 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
         return yearsToLookBackForTarget;
     }
 
-    public void setYearsToLookBackForTarget(DoubleParameter yearsToLookBackForTarget) {
+    public void setYearsToLookBackForTarget(final DoubleParameter yearsToLookBackForTarget) {
         this.yearsToLookBackForTarget = yearsToLookBackForTarget;
     }
 }

@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.experiments;
 
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
@@ -230,7 +229,6 @@ public class FriendsAndTac {
 
     }
 
-    @NotNull
     private static FileWriter writeHeading(final File outputFile, final String commonRows) throws IOException {
         final FileWriter writer = new FileWriter(outputFile);
         //writer.write("price_low,price_high,landings,earnings,cash-flow,landings_0,landings_1,landings_2,discarding_agents,catches_0");

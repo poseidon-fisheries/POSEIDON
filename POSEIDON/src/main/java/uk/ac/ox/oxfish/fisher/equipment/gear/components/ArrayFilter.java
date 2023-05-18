@@ -20,11 +20,8 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.ImmutableDoubleArray;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -38,10 +35,10 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
  * Useful for things like Sablefish which have no set formula.
  * Created by carrknight on 3/21/17.
  */
-public class ArrayFilter  implements AbundanceFilter{
+public class ArrayFilter implements AbundanceFilter {
 
 
-    private final double filters[][];
+    private final double[][] filters;
 
     /**
      * do we round abundances so that only integer number of fish can be caught?
@@ -49,29 +46,26 @@ public class ArrayFilter  implements AbundanceFilter{
     private final boolean round;
 
 
-    public ArrayFilter(boolean round, double[]... filters) {
+    public ArrayFilter(final boolean round, final double[]... filters) {
         this.filters = new double[filters.length][];
-        for(int i=0; i< filters.length; i++)
-            this.filters[i] = filters[i];
+        System.arraycopy(filters, 0, this.filters, 0, filters.length);
         this.round = round;
     }
 
 
     public static ArrayFilter nonMutatingArrayFilter(final Collection<Collection<Double>> filters) {
-        double[][] filterArray = convertCollectionToPOJOArray(filters);
-        return new ArrayFilter(false,filterArray);
+        final double[][] filterArray = convertCollectionToPOJOArray(filters);
+        return new ArrayFilter(false, filterArray);
     }
 
-    @NotNull
-    protected static double[][] convertCollectionToPOJOArray(Collection<Collection<Double>> filters) {
-        ImmutableList<ImmutableDoubleArray> collected = filters.stream()
-                .map(ImmutableDoubleArray::copyOf)
-                .collect(toImmutableList());
-        double[][] filterArray = new double[collected.size()][collected.get(0).length()];
+    protected static double[][] convertCollectionToPOJOArray(final Collection<Collection<Double>> filters) {
+        final ImmutableList<ImmutableDoubleArray> collected = filters.stream()
+            .map(ImmutableDoubleArray::copyOf)
+            .collect(toImmutableList());
+        final double[][] filterArray = new double[collected.size()][collected.get(0).length()];
         for (int row = 0; row < collected.size(); row++) {
-            for(int bin =0; bin< collected.get(0).length(); bin++)
-            {
-                filterArray[row][bin]=collected.get(row).get(bin);
+            for (int bin = 0; bin < collected.get(0).length(); bin++) {
+                filterArray[row][bin] = collected.get(row).get(bin);
             }
         }
         return filterArray;
@@ -81,19 +75,18 @@ public class ArrayFilter  implements AbundanceFilter{
     /**
      * returns a int[subdivisions][age+1] array with male and female fish that are not filtered out
      *
-     * @param species the species of fish
+     * @param species   the species of fish
      * @param abundance
      * @return an int[2][age+1] array for all the stuff that is caught/selected and so on
      */
     @Override
-    public double[][] filter(Species species, double[][] abundance) {
+    public double[][] filter(final Species species, final double[][] abundance) {
 
-        for(int subdivision =0; subdivision < abundance.length; subdivision++)
-        {
+        for (int subdivision = 0; subdivision < abundance.length; subdivision++) {
             for (int age = 0; age < abundance[subdivision].length; age++) {
                 abundance[subdivision][age] = (filters[subdivision][age] * abundance[subdivision][age]);
                 if (round) {
-                    abundance[subdivision][age] =FishStateUtilities.quickRounding(abundance[subdivision][age]);
+                    abundance[subdivision][age] = FishStateUtilities.quickRounding(abundance[subdivision][age]);
                 }
 
             }
@@ -101,16 +94,16 @@ public class ArrayFilter  implements AbundanceFilter{
         return abundance;
     }
 
-    public double getFilterValue(int subdivision, int bin) {
+    public double getFilterValue(final int subdivision, final int bin) {
         return filters[subdivision][bin];
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ArrayFilter that = (ArrayFilter) o;
+        final ArrayFilter that = (ArrayFilter) o;
 
         if (round != that.round) return false;
         return Arrays.deepEquals(filters, that.filters);

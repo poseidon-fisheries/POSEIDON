@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.biology.growers;
 
 import com.google.common.collect.ImmutableList;
-import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -152,7 +151,6 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
         return concat(fadBiologies(fishState), seaTileBiologies.stream());
     }
 
-    @NotNull
     private static Stream<BiomassLocalBiology> fadBiologies(final FishState fishState) {
         return new Extractor<>(BiomassLocalBiology.class, true, false)
             .apply(fishState)

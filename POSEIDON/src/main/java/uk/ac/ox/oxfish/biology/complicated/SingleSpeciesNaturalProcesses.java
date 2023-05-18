@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
@@ -30,7 +29,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -43,49 +41,36 @@ import java.util.function.ToDoubleFunction;
  * and aging to each fish
  * Created by carrknight on 3/7/16.
  */
-public class SingleSpeciesNaturalProcesses implements Steppable, Startable
-{
-
+public class SingleSpeciesNaturalProcesses implements Steppable, Startable {
 
 
     /**
      * creates new recruits
      */
     private final RecruitmentProcess recruitment;
-
-
+    private final Species species;
+    private final boolean rounding;
+    private final AgingProcess agingProcess;
+    private final AbundanceDiffuser diffuser;
+    private final NaturalMortalityProcess mortality;
+    final private boolean daily;
+    private final Map<SeaTile, AbundanceLocalBiology> biologies = new LinkedHashMap<>();
     /**
      * total recruits last step
      */
     private double lastRecruits = 0;
-
-    private final Species species;
-
-
-    private final boolean rounding;
-
-
-    private final AgingProcess agingProcess;
-
-
-    private final AbundanceDiffuser diffuser;
-
-
-    private final NaturalMortalityProcess mortality;
-
     /**
      * if this is given the recruited biomass is distributed according to this table, otherwise it is distributed based
      * on where there is more biomass
      */
     private BiomassAllocator recruitsAllocator;
-
-    final private boolean daily;
-
+    private boolean randomRounding = true;
 
     public SingleSpeciesNaturalProcesses(
-            RecruitmentProcess recruitment, Species species,
-            boolean rounding, AgingProcess agingProcess, AbundanceDiffuser diffuser,
-            NaturalMortalityProcess mortality, boolean daily) {
+        final RecruitmentProcess recruitment, final Species species,
+        final boolean rounding, final AgingProcess agingProcess, final AbundanceDiffuser diffuser,
+        final NaturalMortalityProcess mortality, final boolean daily
+    ) {
         this.species = species;
         this.recruitment = recruitment;
         this.rounding = rounding;
@@ -95,56 +80,45 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         this.daily = daily;
     }
 
-    private final Map<SeaTile,AbundanceLocalBiology> biologies = new LinkedHashMap<>();
-
     /**
      * schedules itself every year
      *
      * @param model the model
      */
     @Override
-    public void start(FishState model)
-    {
+    public void start(final FishState model) {
 
         this.agingProcess.start(species);
-        if(!daily) {
+        if (!daily) {
             model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
             model.scheduleEveryDay(new Steppable() {
                 @Override
-                public void step(SimState simState) {
+                public void step(final SimState simState) {
                     diffuser.step(species, biologies, model);
                 }
             }, StepOrder.BIOLOGY_PHASE);
-        }
-        else
+        } else
         //will have to make sure diffuser and natural processes happen in sync;
         // in this case it means that the diffuser will act BEFORE the natural process, always
         {
             model.scheduleEveryDay(new Steppable() {
                 @Override
-                public void step(SimState simState) {
+                public void step(final SimState simState) {
                     diffuser.step(species, biologies, model);
                     SingleSpeciesNaturalProcesses.this.step(simState);
                 }
-            }, StepOrder.BIOLOGY_PHASE);        }
+            }, StepOrder.BIOLOGY_PHASE);
+        }
     }
 
     /**
-     * tell the startable to turnoff,
+     * Recruitment + Mortality + Aging + Allocation of new Recruits <br>
+     * New recruits are allocated proportional to the areas that have more biomass.
      */
     @Override
-    public void turnOff() {
-    }
+    public void step(final SimState simState) {
 
-    /**
-     *  Recruitment + Mortality + Aging + Allocation of new Recruits <br>
-     *  New recruits are allocated proportional to the areas that have more biomass.
-     *
-     */
-    @Override
-    public void step(SimState simState) {
-
-        FishState model = (FishState) simState;
+        final FishState model = (FishState) simState;
 
         /***
          *      ___                 _ _                 _
@@ -154,16 +128,18 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *
          */
         //we need to sum up all the abundances
-        List<StructuredAbundance> abundances = new LinkedList<>();
-        for (AbundanceLocalBiology biology : biologies.values()) {
+        final List<StructuredAbundance> abundances = new LinkedList<>();
+        for (final AbundanceLocalBiology biology : biologies.values()) {
             abundances.add(biology.getAbundance(species));
         }
         //now create the total number of recruits
         lastRecruits = recruitment.recruit(species, species.getMeristics(),
-                                           StructuredAbundance.sum(abundances, abundances.get(0).getBins(),
-                                                                   abundances.get(0).getSubdivisions()),
-                                           model.getDayOfTheYear(),
-                                           daysSimulated());
+            StructuredAbundance.sum(abundances, abundances.get(0).getBins(),
+                abundances.get(0).getSubdivisions()
+            ),
+            model.getDayOfTheYear(),
+            daysSimulated()
+        );
         if (rounding)
             lastRecruits = (int) (lastRecruits);
         abundances.clear();
@@ -190,11 +166,13 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *     /_/ \_\__, |_|_||_\__, |
          *           |___/       |___/
          */
-        agingProcess.age(biologies.values(),
-                         species,
-                         model,
-                         rounding,
-                         daysSimulated());
+        agingProcess.age(
+            biologies.values(),
+            species,
+            model,
+            rounding,
+            daysSimulated()
+        );
 
 
         /***
@@ -205,46 +183,52 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *
          */
         //allocate new recruits in a weighted fashion
-        if(lastRecruits > 0) {
+        if (lastRecruits > 0) {
             allocate(biomassWeight);
 
 
         }
     }
 
-    @NotNull
-    private LinkedHashMap<AbundanceLocalBiology, Double> prepareAllocation(FishState model) {
-        final LinkedHashMap<AbundanceLocalBiology, Double> biomassWeight= new LinkedHashMap<>();
+    private int daysSimulated() {
+        return daily ? 1 : 365;
+    }
+
+    private LinkedHashMap<AbundanceLocalBiology, Double> prepareAllocation(final FishState model) {
+        final LinkedHashMap<AbundanceLocalBiology, Double> biomassWeight = new LinkedHashMap<>();
         if (lastRecruits > 0) {
             if (recruitsAllocator != null) {
 
                 double sum = 0;
-                for (Map.Entry<SeaTile, AbundanceLocalBiology> entry : biologies.entrySet()) {
-                    double weight = recruitsAllocator.allocate(entry.getKey(),
-                                                               model.getMap(),
-                                                               model.getRandom());
+                for (final Map.Entry<SeaTile, AbundanceLocalBiology> entry : biologies.entrySet()) {
+                    final double weight = recruitsAllocator.allocate(
+                        entry.getKey(),
+                        model.getMap(),
+                        model.getRandom()
+                    );
                     sum += weight;
                     biomassWeight.put(entry.getValue(), weight);
 
                 }
                 Preconditions.checkArgument(sum > 0, "No area valid for recruits!");
-                for (AbundanceLocalBiology biology : biologies.values()) {
+                for (final AbundanceLocalBiology biology : biologies.values()) {
                     biomassWeight.replace(biology, biomassWeight.get(biology) / sum);
-                    Preconditions.checkArgument(Double.isFinite(biomassWeight.get(biology)),
-                                                "some weights are not finite");
+                    Preconditions.checkArgument(
+                        Double.isFinite(biomassWeight.get(biology)),
+                        "some weights are not finite"
+                    );
                 }
 
-            }
-            else {
+            } else {
                 //map for each biology its total weight
-                double totalBiomass = biologies.values().stream().mapToDouble(
-                        value -> {
-                            Double biomass = value.getBiomass(species);
-                            biomassWeight.put(value, biomass);
-                            return biomass;
-                        }).sum();
+                final double totalBiomass = biologies.values().stream().mapToDouble(
+                    value -> {
+                        final Double biomass = value.getBiomass(species);
+                        biomassWeight.put(value, biomass);
+                        return biomass;
+                    }).sum();
                 //reweight so they add up to 1
-                for (AbundanceLocalBiology bio : biomassWeight.keySet())
+                for (final AbundanceLocalBiology bio : biomassWeight.keySet())
                     biomassWeight.put(bio, biomassWeight.get(bio) / totalBiomass);
 
 
@@ -253,37 +237,44 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         return biomassWeight;
     }
 
-    private void allocate(@NotNull LinkedHashMap<AbundanceLocalBiology, Double> biomassWeight) {
+    private void kill() {
+        for (final AbundanceLocalBiology abundanceBasedLocalBiology : biologies.values()) {
+            mortality.cull(
+                species.getMeristics(), rounding,
+                abundanceBasedLocalBiology.getAbundance(species), daysSimulated()
+            );
+        }
+    }
+
+    private void allocate(final LinkedHashMap<AbundanceLocalBiology, Double> biomassWeight) {
         //make sure it all sum up to 1!
         assert Math.abs(biomassWeight.values().stream().
-                mapToDouble(
-                        new ToDoubleFunction<Double>() {
-                            @Override
-                            public double applyAsDouble(Double value) {
-                                return value;
-                            }
-                        }).sum()-1d)<.001d;
+            mapToDouble(
+                new ToDoubleFunction<Double>() {
+                    @Override
+                    public double applyAsDouble(final Double value) {
+                        return value;
+                    }
+                }).sum() - 1d) < .001d;
         double leftOver = 0;
-        for (Map.Entry<AbundanceLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
-            double ratio = biologyBiomass.getValue();
+        for (final Map.Entry<AbundanceLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
+            final double ratio = biologyBiomass.getValue();
             double recruitsHere = ((lastRecruits + leftOver) * ratio);
-            StructuredAbundance abundance = biologyBiomass.getKey().getAbundance(species);
+            final StructuredAbundance abundance = biologyBiomass.getKey().getAbundance(species);
 
-            if(rounding)
-            {
+            if (rounding) {
                 recruitsHere = (int) recruitsHere;
                 int totalAllocated = 0;
-                for(int subdivision = 0; subdivision <abundance.getSubdivisions(); subdivision++) {
-                    abundance.asMatrix()[subdivision][0] += ((int) recruitsHere) / (abundance.getSubdivisions());
-                    totalAllocated+= ((int) recruitsHere) / (abundance.getSubdivisions());
-                }
-                leftOver = ((lastRecruits + leftOver) * ratio) -totalAllocated;
-
-
-            }
-            else {
                 for (int subdivision = 0; subdivision < abundance.getSubdivisions(); subdivision++) {
-                    abundance.asMatrix()[subdivision][0] += (recruitsHere) / ((double)abundance.getSubdivisions());
+                    abundance.asMatrix()[subdivision][0] += ((int) recruitsHere) / (abundance.getSubdivisions());
+                    totalAllocated += ((int) recruitsHere) / (abundance.getSubdivisions());
+                }
+                leftOver = ((lastRecruits + leftOver) * ratio) - totalAllocated;
+
+
+            } else {
+                for (int subdivision = 0; subdivision < abundance.getSubdivisions(); subdivision++) {
+                    abundance.asMatrix()[subdivision][0] += (recruitsHere) / ((double) abundance.getSubdivisions());
 
                 }
             }
@@ -291,40 +282,32 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         }
     }
 
-    private void kill() {
-        for (AbundanceLocalBiology abundanceBasedLocalBiology : biologies.values()) {
-            mortality.cull(
-                    species.getMeristics(), rounding,
-                    abundanceBasedLocalBiology.getAbundance(species), daysSimulated());
-        }
-    }
-
-    private int daysSimulated() {
-        return daily ? 1 : 365;
+    /**
+     * tell the startable to turnoff,
+     */
+    @Override
+    public void turnOff() {
     }
 
     /**
      * register this biology so that it can be accessed by recruits and so on
      */
-    public void add(AbundanceLocalBiology localBiology, SeaTile tile) {
+    public void add(final AbundanceLocalBiology localBiology, final SeaTile tile) {
         Preconditions.checkArgument(!biologies.containsKey(tile));
         Preconditions.checkArgument(!biologies.containsKey(localBiology));
         biologies.put(tile, localBiology);
     }
 
-
-
     public double getLastRecruits() {
         return lastRecruits;
     }
 
-
-
     /**
      * give a function to generate noise as % of recruits this year
+     *
      * @param noiseMaker the function that generates percentage changes. 1 means no noise.
      */
-    public void addNoise(NoiseMaker noiseMaker) {
+    public void addNoise(final NoiseMaker noiseMaker) {
         recruitment.addNoise(noiseMaker);
     }
 
@@ -336,7 +319,6 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     public AbundanceDiffuser getDiffuser() {
         return diffuser;
     }
-
 
     /**
      * Getter for property 'recruitsAllocator'.
@@ -352,11 +334,9 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
      *
      * @param recruitsAllocator Value to set for property 'recruitsAllocator'.
      */
-    public void setRecruitsAllocator(BiomassAllocator recruitsAllocator) {
+    public void setRecruitsAllocator(final BiomassAllocator recruitsAllocator) {
         this.recruitsAllocator = recruitsAllocator;
     }
-
-    private boolean randomRounding = true;
 
     /**
      * Getter for property 'randomRounding'.
@@ -372,7 +352,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
      *
      * @param randomRounding Value to set for property 'randomRounding'.
      */
-    public void setRandomRounding(boolean randomRounding) {
+    public void setRandomRounding(final boolean randomRounding) {
         this.randomRounding = randomRounding;
     }
 

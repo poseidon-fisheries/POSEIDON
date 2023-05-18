@@ -2,12 +2,14 @@ package uk.ac.ox.oxfish.geography.currents;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.jetbrains.annotations.NotNull;
 import sim.util.Double2D;
 import sim.util.Int2D;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
@@ -39,7 +41,7 @@ public class CurrentVectorsEPO implements CurrentVectors {
     ) {
         this(
             vectorMaps,
-            step -> step < 365 ? Y2016 : (step < 730 ? Y2017: Y2018),
+            step -> step < 365 ? Y2016 : (step < 730 ? Y2017 : Y2018),
             gridWidth,
             gridHeight,
             stepsPerDay
@@ -60,7 +62,6 @@ public class CurrentVectorsEPO implements CurrentVectors {
         this.stepsPerDay = stepsPerDay;
     }
 
-    @NotNull
     public static Double2D getInterpolatedVector(
         final Double2D vectorBefore, final int offsetBefore,
         final Double2D vectorAfter, final int offsetAfter

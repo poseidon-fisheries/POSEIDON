@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
-import org.jetbrains.annotations.Nullable;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -87,7 +86,6 @@ public abstract class Fad implements Locatable {
     }
 
 
-    @Nullable
     public TripRecord getTripDeployed() {
         return tripDeployed;
     }

@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -91,7 +90,6 @@ public class LastMomentAbundanceFad extends LastMomentFad {
         return extractFadBiologyFromLocalBiology(state, catchability, biology, selectivityFilters);
     }
 
-    @NotNull
     public static AbundanceLocalBiology extractFadBiologyFromLocalBiology(
         final FishState state,
         final double[] catchability,

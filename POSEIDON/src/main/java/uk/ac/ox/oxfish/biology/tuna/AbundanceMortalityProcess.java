@@ -18,20 +18,20 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.Arrays.stream;
-import static java.util.stream.IntStream.range;
-
 import com.google.common.primitives.ImmutableDoubleArray;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.model.FishState;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.jetbrains.annotations.NotNull;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.model.FishState;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.Arrays.stream;
+import static java.util.stream.IntStream.range;
 
 /**
  * A proportional mortality process. Note that "proportional mortality" here means mortality as a
@@ -76,7 +76,6 @@ public class AbundanceMortalityProcess implements BiologicalProcess<AbundanceLoc
         ).collect(toImmutableList());
     }
 
-    @NotNull
     private double[][] applyMortality(final Species species, final double[][] abundance) {
         final int subs = species.getNumberOfSubdivisions();
         final int bins = species.getNumberOfBins();

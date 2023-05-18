@@ -18,7 +18,6 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
-import org.jetbrains.annotations.NotNull;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -40,7 +39,6 @@ public class BiomassFadInitializer
         super(globalBiology, fishAttractor, fishReleaseProbability, timeStepSupplier, carryingCapacityInitializer);
     }
 
-    @NotNull
     public BiomassLocalBiology makeBiology(final GlobalBiology globalBiology) {
         final double[] carryingCapacities = DoubleStream
             .generate(() -> Double.POSITIVE_INFINITY)

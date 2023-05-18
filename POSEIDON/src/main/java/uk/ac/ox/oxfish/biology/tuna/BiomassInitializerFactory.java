@@ -18,7 +18,6 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.NoMovement;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
@@ -114,7 +113,6 @@ public class BiomassInitializerFactory
      * @param initialAllocators A map from species names to allocators.
      * @param speciesCodes      The object to use to map species codes to names
      */
-    @NotNull
     private List<SingleSpeciesBiomassInitializer> makeBiomassInitializers(
         final Map<String, ? extends GridAllocator> initialAllocators,
         final SpeciesCodes speciesCodes

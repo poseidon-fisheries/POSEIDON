@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
@@ -38,13 +37,22 @@ public class HoldLimitingDecoratorGear implements GearDecorator {
 
     private Gear delegate;
 
-    public HoldLimitingDecoratorGear(Gear delegate) {
+    public HoldLimitingDecoratorGear(final Gear delegate) {
         this.delegate = delegate;
     }
 
-    public static Catch limitToHoldCapacity(Catch original, Hold hold, GlobalBiology globalBiology) {
+    @Override
+    public Catch fish(
+        final Fisher fisher, final LocalBiology localBiology, final SeaTile context,
+        final int hoursSpentFishing, final GlobalBiology modelBiology
+    ) {
+        final Catch original = delegate.fish(fisher, localBiology, context, hoursSpentFishing, modelBiology);
+        return limitToHoldCapacity(original, fisher.getHold(), modelBiology);
+    }
 
-        double spaceLeft = hold.getMaximumLoad() - hold.getTotalWeightOfCatchInHold();
+    public static Catch limitToHoldCapacity(final Catch original, final Hold hold, final GlobalBiology globalBiology) {
+
+        final double spaceLeft = hold.getMaximumLoad() - hold.getTotalWeightOfCatchInHold();
         assert spaceLeft >= 0;
         if (spaceLeft == 0) {
             return original.hasAbundanceInformation() ?
@@ -55,13 +63,14 @@ public class HoldLimitingDecoratorGear implements GearDecorator {
         }
     }
 
-    @NotNull
-    public static Catch boundCatchToLimit(Catch original,
-                                           GlobalBiology globalBiology,
-                                           double maximumCatchAllowed) {
+    public static Catch boundCatchToLimit(
+        final Catch original,
+        final GlobalBiology globalBiology,
+        final double maximumCatchAllowed
+    ) {
         //biomassArray gets changed as a side effect!
-        double[] biomassArray = original.getBiomassArray();
-        double proportionKept = Hold.throwOverboard(biomassArray, maximumCatchAllowed);
+        final double[] biomassArray = original.getBiomassArray();
+        final double proportionKept = Hold.throwOverboard(biomassArray, maximumCatchAllowed);
         //if there isn't abundance information you are already done
         if (!original.hasAbundanceInformation())
             return new Catch(biomassArray);
@@ -73,13 +82,17 @@ public class HoldLimitingDecoratorGear implements GearDecorator {
         }
     }
 
-    @NotNull
-    public static Catch keepOnlyProportionOfCatch(Catch original, GlobalBiology globalBiology, double[] biomassArray, double proportionKept) {
-        StructuredAbundance[] abundances = new StructuredAbundance[biomassArray.length];
+    public static Catch keepOnlyProportionOfCatch(
+        final Catch original,
+        final GlobalBiology globalBiology,
+        final double[] biomassArray,
+        final double proportionKept
+    ) {
+        final StructuredAbundance[] abundances = new StructuredAbundance[biomassArray.length];
         for (int i = 0; i < globalBiology.getSpecies().size(); i++) {
             //multiply every item by the proportion kept
             abundances[i] = original.getAbundance(i);
-            double[][] structuredAbundance = abundances[i].asMatrix();
+            final double[][] structuredAbundance = abundances[i].asMatrix();
             for (int j = 0; j < structuredAbundance.length; j++)
                 for (int k = 0; k < structuredAbundance[j].length; k++) {
                     assert structuredAbundance[j][k] * proportionKept <= structuredAbundance[j][k];
@@ -91,15 +104,6 @@ public class HoldLimitingDecoratorGear implements GearDecorator {
         return new Catch(abundances, globalBiology);
     }
 
-    @Override
-    public Catch fish(
-        Fisher fisher, LocalBiology localBiology, SeaTile context,
-        int hoursSpentFishing, GlobalBiology modelBiology
-    ) {
-        Catch original = delegate.fish(fisher, localBiology, context, hoursSpentFishing, modelBiology);
-        return limitToHoldCapacity(original, fisher.getHold(), modelBiology);
-    }
-
     /**
      * get how much gas is consumed by fishing a spot with this gear
      *
@@ -109,15 +113,17 @@ public class HoldLimitingDecoratorGear implements GearDecorator {
      */
     @Override
     public double getFuelConsumptionPerHourOfFishing(
-            Fisher fisher, Boat boat, SeaTile where) {
-        return delegate.getFuelConsumptionPerHourOfFishing(fisher,boat,where);
+        final Fisher fisher, final Boat boat, final SeaTile where
+    ) {
+        return delegate.getFuelConsumptionPerHourOfFishing(fisher, boat, where);
     }
 
     @Override
     public double[] expectedHourlyCatch(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
-        double[] expectation = this.delegate.expectedHourlyCatch(fisher, where, hoursSpentFishing, modelBiology);
-        Hold.throwOverboard(expectation,fisher.getMaximumHold());
+        final Fisher fisher, final SeaTile where, final int hoursSpentFishing, final GlobalBiology modelBiology
+    ) {
+        final double[] expectation = this.delegate.expectedHourlyCatch(fisher, where, hoursSpentFishing, modelBiology);
+        Hold.throwOverboard(expectation, fisher.getMaximumHold());
         return expectation;
 
     }
@@ -125,15 +131,15 @@ public class HoldLimitingDecoratorGear implements GearDecorator {
     @Override
     public Gear makeCopy() {
         return
-                new HoldLimitingDecoratorGear(delegate.makeCopy());
+            new HoldLimitingDecoratorGear(delegate.makeCopy());
     }
 
 
     @Override
-    public boolean isSame(Gear o) {
+    public boolean isSame(final Gear o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        HoldLimitingDecoratorGear that = (HoldLimitingDecoratorGear) o;
+        final HoldLimitingDecoratorGear that = (HoldLimitingDecoratorGear) o;
         return delegate.isSame(that.delegate);
     }
 
@@ -143,7 +149,7 @@ public class HoldLimitingDecoratorGear implements GearDecorator {
     }
 
     @Override
-    public void setDelegate(Gear delegate) {
+    public void setDelegate(final Gear delegate) {
         this.delegate = delegate;
     }
 }

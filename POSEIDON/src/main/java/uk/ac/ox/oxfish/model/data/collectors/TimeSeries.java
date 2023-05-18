@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.model.data.collectors;
 
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.Nullable;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -36,16 +35,15 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static uk.ac.ox.oxfish.utility.Measures.*;
 import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
+import static uk.ac.ox.oxfish.utility.Measures.Money;
 
 /**
  * Basically a map<String,Double> to collect data about an object of type T
  * Created by carrknight on 5/2/15.
  */
-public class TimeSeries<T> implements Steppable
-{
-    final private LinkedHashMap<String,ColumnGatherer<T>> data;
+public class TimeSeries<T> implements Steppable {
+    final private LinkedHashMap<String, ColumnGatherer<T>> data;
 
 
     /**
@@ -54,11 +52,24 @@ public class TimeSeries<T> implements Steppable
     private final IntervalPolicy policy;
 
     private final StepOrder stepOrder;
-
-    private T observed;
-
     // The currency to use to set the unit of money related columns.
     Unit<Money> currency = DOLLAR;
+    private T observed;
+    private Stoppable receipt = null;
+
+    public TimeSeries(final IntervalPolicy policy) {
+        this(
+            policy,
+            policy.equals(IntervalPolicy.EVERY_YEAR) ? StepOrder.YEARLY_DATA_GATHERING : StepOrder.DAILY_DATA_GATHERING
+        );
+    }
+
+
+    public TimeSeries(final IntervalPolicy policy, final StepOrder stepOrder) {
+        this.policy = policy;
+        this.stepOrder = stepOrder;
+        data = new LinkedHashMap<>();
+    }
 
     /**
      * Create a new data column
@@ -68,7 +79,7 @@ public class TimeSeries<T> implements Steppable
      * @param defaultValue the value to fill the rows with if this gatherer is added after other columns already have
      *                     some rows filled
      */
-    public DataColumn registerGatherer(String title, Gatherer<T> gatherer, double defaultValue) {
+    public DataColumn registerGatherer(final String title, final Gatherer<T> gatherer, final double defaultValue) {
         return registerGatherer(title, gatherer, defaultValue, null, "");
     }
 
@@ -83,132 +94,117 @@ public class TimeSeries<T> implements Steppable
      *                     an instance of MeasuredDataColumn and store the unit so it can be used for display or conversion.
      */
     public <Q extends Quantity<Q>> DataColumn registerGatherer(
-        String title, Gatherer<T> gatherer, double defaultValue, @Nullable Unit<Q> unit, String yLabel
+        final String title, final Gatherer<T> gatherer, final double defaultValue, final Unit<Q> unit, final String yLabel
     ) {
         Preconditions.checkArgument(!data.containsKey(title), "Column already exists: " + title);
-        int size =noGatherers() ? 0 : numberOfObservations();
-        DataColumn column = new DataColumn(title, unit, yLabel);
+        final int size = noGatherers() ? 0 : numberOfObservations();
+        final DataColumn column = new DataColumn(title, unit, yLabel);
         //fill if needed
-        for(int i=0; i<size; i++)
+        for (int i = 0; i < size; i++)
             column.add(defaultValue);
-        data.put(title, new ColumnGatherer<>(column,gatherer));
+        data.put(title, new ColumnGatherer<>(column, gatherer));
 
         assert consistencyCheck();
         return column;
-    }
-
-
-    public DataColumn removeGatherer(String title)
-    {
-        DataColumn removed = data.remove(title).getColumn();
-        assert removed!=null;
-
-        return removed;
-
-
-
-    }
-
-
-    private Stoppable receipt = null;
-    /**
-     * call this to start the observation
-     * @param state model
-     * @param observed the object to observe
-     */
-    public void start(FishState state, T observed)
-    {
-        assert  this.observed == null;
-        this.observed = observed;
-
-        receipt = state.schedulePerPolicy(this,stepOrder,policy);
-
-
-    }
-
-    public void turnOff()
-    {
-        if(receipt!=null) {
-            receipt.stop();
-        }
-        reset();
-
-    }
-
-    @Override
-    public void step(SimState simState) {
-
-        for(Map.Entry<String,ColumnGatherer<T>> columns : data.entrySet())
-        {
-            Gatherer<T> gatherer = columns.getValue().getGatherer();
-            columns.getValue().getColumn().add(gatherer.apply(observed));
-        }
-        assert consistencyCheck();
-
-    }
-
-
-    public TimeSeries(IntervalPolicy policy, StepOrder stepOrder) {
-        this.policy = policy;
-        this.stepOrder = stepOrder;
-        data = new LinkedHashMap<>();
-    }
-
-    public TimeSeries(IntervalPolicy policy) {
-        this(policy, policy.equals(IntervalPolicy.EVERY_YEAR) ? StepOrder.YEARLY_DATA_GATHERING : StepOrder.DAILY_DATA_GATHERING);
-    }
-
-    public boolean isEmpty(){
-        return noGatherers() || numberOfObservations() == 0;
     }
 
     public boolean noGatherers() {
         return data.isEmpty();
     }
 
-    public int getNumberOfColumns(){
-        return data.size();
-    }
-
     public int numberOfObservations() {
         return data.values().iterator().next().getColumn().size();
     }
 
-    private boolean consistencyCheck()
-    {
+    private boolean consistencyCheck() {
         //all elements have the same size
-        if(isEmpty())
+        if (isEmpty())
             return true;
-        else
-        {
+        else {
 
 
-            int size = numberOfObservations();
-            return data.values().stream().allMatch(column -> column.getColumn().size()==size);
+            final int size = numberOfObservations();
+            return data.values().stream().allMatch(column -> column.getColumn().size() == size);
         }
     }
 
+    public boolean isEmpty() {
+        return noGatherers() || numberOfObservations() == 0;
+    }
+
+    public DataColumn removeGatherer(final String title) {
+        final DataColumn removed = data.remove(title).getColumn();
+        assert removed != null;
+
+        return removed;
 
 
-    public Double getLatestObservation(String columnName)
-    {
+    }
+
+    /**
+     * call this to start the observation
+     *
+     * @param state    model
+     * @param observed the object to observe
+     */
+    public void start(final FishState state, final T observed) {
+        assert this.observed == null;
+        this.observed = observed;
+
+        receipt = state.schedulePerPolicy(this, stepOrder, policy);
+
+
+    }
+
+    public void turnOff() {
+        if (receipt != null) {
+            receipt.stop();
+        }
+        reset();
+
+    }
+
+    protected void reset() {
+        for (final ColumnGatherer<T> value : data.values()) {
+            value.getColumn().clear();
+        }
+        data.clear();
+    }
+
+    @Override
+    public void step(final SimState simState) {
+
+        for (final Map.Entry<String, ColumnGatherer<T>> columns : data.entrySet()) {
+            final Gatherer<T> gatherer = columns.getValue().getGatherer();
+            columns.getValue().getColumn().add(gatherer.apply(observed));
+        }
+        assert consistencyCheck();
+
+    }
+
+    public int getNumberOfColumns() {
+        return data.size();
+    }
+
+    public Double getLatestObservation(final String columnName) {
         return data.get(columnName).getColumn().getLatest();
     }
+
     /**
      * get a specific column
      */
-    public DataColumn getColumn(String name){
-        ColumnGatherer<T> current = data.get(name);
-        if(current==null) {
+    public DataColumn getColumn(final String name) {
+        final ColumnGatherer<T> current = data.get(name);
+        if (current == null) {
             return null;
         }
         return current.getColumn();
     }
 
-    public Collection<DataColumn> getColumns(){
+    public Collection<DataColumn> getColumns() {
 
-        ArrayList<DataColumn> columns = new ArrayList<>(data.size());
-        for (ColumnGatherer<T> gatherer : data.values()) {
+        final ArrayList<DataColumn> columns = new ArrayList<>(data.size());
+        for (final ColumnGatherer<T> gatherer : data.values()) {
             columns.add(gatherer.getColumn());
         }
         return columns;
@@ -222,17 +218,13 @@ public class TimeSeries<T> implements Steppable
         return observed;
     }
 
-
-    protected void reset(){
-        for (ColumnGatherer<T> value : data.values()) {
-            value.getColumn().clear();
-        }
-        data.clear();
+    public Unit<Money> getCurrency() {
+        return currency;
     }
 
-    public Unit<Money> getCurrency() { return currency; }
-
-    public void setCurrency(final Unit<Money> currency) { this.currency = currency; }
+    public void setCurrency(final Unit<Money> currency) {
+        this.currency = currency;
+    }
 
 }
 
@@ -240,14 +232,14 @@ public class TimeSeries<T> implements Steppable
 /**
  * a pairing of gatherer and column it fills. Makes it faster to loop at step time
  */
-final class ColumnGatherer<T>{
+final class ColumnGatherer<T> {
 
 
     private final DataColumn column;
 
     private final Gatherer<T> gatherer;
 
-    public ColumnGatherer(DataColumn column, Gatherer<T> gatherer) {
+    public ColumnGatherer(final DataColumn column, final Gatherer<T> gatherer) {
         this.column = column;
         this.gatherer = gatherer;
     }

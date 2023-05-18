@@ -22,16 +22,8 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import org.jetbrains.annotations.NotNull;
 import org.jfree.util.Log;
-import uk.ac.ox.oxfish.biology.BiomassDiffuserContainer;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.BiomassMovementRule;
-import uk.ac.ox.oxfish.biology.ConstantBiomassDecorator;
-import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.AllocatorManager;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
@@ -47,8 +39,7 @@ import java.util.Map;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
 
-public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
-
+public class SingleSpeciesBiomassInitializer implements BiologyInitializer {
 
 
     final private InitialBiomass initialTotalBiomass;
@@ -68,14 +59,11 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
     final private BiomassAllocator carryingCapacityAllocator;
 
 
-
-
     final private BiomassMovementRule movementRule;
 
 
     final private String speciesName;
 
-    @NotNull
     final private LogisticGrowerInitializer grower;
 
 
@@ -87,8 +75,6 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
     final private boolean normalizeAllocators;
 
 
-
-
     /**
      * you can set this true and biomass diffuser won't be generated when processing the map
      */
@@ -98,17 +84,20 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
     private boolean hasAlreadyWarned = false;
 
 
-
     private boolean unfishable;
-
+    //helpers, instantiated when "globalBiology" is called
+    private AllocatorManager initialDistribution;
+    private AllocatorManager habitabilityDistribution;
+    private int numberOfHabitableCells = 0;
 
     public SingleSpeciesBiomassInitializer(
-            InitialBiomass initialTotalBiomass,
-            BiomassAllocator initialAllocator, InitialBiomass totalCapacity,
-            BiomassAllocator carryingCapacityAllocator, BiomassMovementRule movementRule,
-            String speciesName,
-            @NotNull LogisticGrowerInitializer grower,
-            boolean normalizeAllocators, boolean unfishable) {
+        final InitialBiomass initialTotalBiomass,
+        final BiomassAllocator initialAllocator, final InitialBiomass totalCapacity,
+        final BiomassAllocator carryingCapacityAllocator, final BiomassMovementRule movementRule,
+        final String speciesName,
+        final LogisticGrowerInitializer grower,
+        final boolean normalizeAllocators, final boolean unfishable
+    ) {
         this.initialTotalBiomass = initialTotalBiomass;
         this.initialAllocator = initialAllocator;
         this.totalCapacity = totalCapacity;
@@ -125,6 +114,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
     /**
      * this constructor assumes that the biomassAllocators will not be normalized and their output
      * provides the raw amount of biomass available/carrying capacity
+     *
      * @param initialAllocator
      * @param carryingCapacityAllocator
      * @param speciesName
@@ -132,11 +122,12 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
      * @param unfishable
      */
     public SingleSpeciesBiomassInitializer(
-            BiomassAllocator initialAllocator,
-            BiomassAllocator carryingCapacityAllocator,
-            BiomassMovementRule movementRule,
-            String speciesName,
-            @NotNull LogisticGrowerInitializer grower, boolean unfishable) {
+        final BiomassAllocator initialAllocator,
+        final BiomassAllocator carryingCapacityAllocator,
+        final BiomassMovementRule movementRule,
+        final String speciesName,
+        final LogisticGrowerInitializer grower, final boolean unfishable
+    ) {
         this.unfishable = unfishable;
         this.initialTotalBiomass = new ConstantInitialBiomass(1);
         this.totalCapacity = new ConstantInitialBiomass(1);
@@ -150,12 +141,6 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
         this.normalizeAllocators = false;
     }
 
-    //helpers, instantiated when "globalBiology" is called
-    private AllocatorManager initialDistribution;
-    private AllocatorManager habitabilityDistribution;
-
-
-    private int numberOfHabitableCells = 0;
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
      *
@@ -168,26 +153,30 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
      */
     @Override
     public LocalBiology generateLocal(
-            GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells, NauticalMap map) {
+        final GlobalBiology biology,
+        final SeaTile seaTile,
+        final MersenneTwisterFast random,
+        final int mapHeightInCells,
+        final int mapWidthInCells,
+        final NauticalMap map
+    ) {
         //we are going to work on a single species!
-        Species species = biology.getSpecie(speciesName);
+        final Species species = biology.getSpecie(speciesName);
 
-        if(!initialDistribution.isStarted()) {
+        if (!initialDistribution.isStarted()) {
             habitabilityDistribution.start(map, random);
 
             //if we are dealing with normalized allocators, it's a good idea to
             //zero out the weights for areas where there can be no fish
-            if(normalizeAllocators)
-            {
-                SeaTile tile = map.getAllSeaTilesExcludingLandAsList().iterator().next();
-                double weight = habitabilityDistribution.getWeight(
-                        species,
-                        tile,
-                        map,
-                        random
+            if (normalizeAllocators) {
+                final SeaTile tile = map.getAllSeaTilesExcludingLandAsList().iterator().next();
+                final double weight = habitabilityDistribution.getWeight(
+                    species,
+                    tile,
+                    map,
+                    random
                 );
-                if(Double.isNaN(weight) || weight<=0)
+                if (Double.isNaN(weight) || weight <= 0)
                     initialDistribution.getZeroedArea().add(tile);
             }
 
@@ -195,29 +184,30 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
         }
 
 
-
-        double habitability = habitabilityDistribution.getWeight(species,
-                seaTile,
-                map,
-                random);
+        final double habitability = habitabilityDistribution.getWeight(
+            species,
+            seaTile,
+            map,
+            random
+        );
 
 
         //we return an empty biology object. We will fill it in the processing phase
-        if(habitability <=0 || !Double.isFinite(habitability))
+        if (habitability <= 0 || !Double.isFinite(habitability))
             return new EmptyLocalBiology();
-        else{
+        else {
             numberOfHabitableCells++;
-            double[] currentBiomass = new double[biology.getSize()];
-            double[] carryingCapacity = new double[biology.getSize()];
-            Arrays.fill(currentBiomass,0d);
-            Arrays.fill(carryingCapacity,0d);
-            return new BiomassLocalBiology(currentBiomass,
-                    carryingCapacity);
+            final double[] currentBiomass = new double[biology.getSize()];
+            final double[] carryingCapacity = new double[biology.getSize()];
+            Arrays.fill(currentBiomass, 0d);
+            Arrays.fill(carryingCapacity, 0d);
+            return new BiomassLocalBiology(
+                currentBiomass,
+                carryingCapacity
+            );
 
 
         }
-
-
 
 
     }
@@ -233,101 +223,110 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
+        final GlobalBiology biology, final NauticalMap map, final MersenneTwisterFast random, final FishState model
+    ) {
         //we are going to work on a single species!
-        Species species = biology.getSpecie(speciesName);
+        final Species species = biology.getSpecie(speciesName);
 
 
         //generate correct numbers of starting biomass!
-        double totalCarryingCapacity = totalCapacity.getInitialBiomass(
-                map,
-                species,
-                numberOfHabitableCells
-        ) ;
-        double totalStartingBiomass = initialTotalBiomass.getInitialBiomass(
-                map,
-                species,
-                numberOfHabitableCells
-        ) ;
+        final double totalCarryingCapacity = totalCapacity.getInitialBiomass(
+            map,
+            species,
+            numberOfHabitableCells
+        );
+        final double totalStartingBiomass = initialTotalBiomass.getInitialBiomass(
+            map,
+            species,
+            numberOfHabitableCells
+        );
 
-        Map<SeaTile,BiomassLocalBiology> habitableAreas = new HashMap<>();
+        final Map<SeaTile, BiomassLocalBiology> habitableAreas = new HashMap<>();
         //for each tile of the map
-        for(SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList())
-        {
+        for (final SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
 
-            double habitability = habitabilityDistribution.getWeight(species,
-                    seaTile,
-                    map,
-                    random);
+            final double habitability = habitabilityDistribution.getWeight(
+                species,
+                seaTile,
+                map,
+                random
+            );
 
             //don't bother if you can't live there
-            if(habitability<=0 || Double.isNaN(habitability))
+            if (habitability <= 0 || Double.isNaN(habitability))
                 continue;
 
 
             //create and assign amount of fish available initially
-            double carryingCapacity = totalCarryingCapacity * habitability;
+            final double carryingCapacity = totalCarryingCapacity * habitability;
             double startingBiomass;
-            if(!normalizeAllocators)
+            if (!normalizeAllocators)
                 startingBiomass = totalStartingBiomass *
-                        initialDistribution.getWeight(species,
-                                seaTile,
-                                map,
-                                random);
-            //when normalizing, the initialDistribution only tells us the proportion of carrying capacity present
-            else
-                startingBiomass = initialDistribution.getWeight(species,
+                    initialDistribution.getWeight(
+                        species,
                         seaTile,
                         map,
-                        random) * carryingCapacity;
+                        random
+                    );
+                //when normalizing, the initialDistribution only tells us the proportion of carrying capacity present
+            else
+                startingBiomass = initialDistribution.getWeight(
+                    species,
+                    seaTile,
+                    map,
+                    random
+                ) * carryingCapacity;
 
-            if(startingBiomass<=0 || Double.isNaN(startingBiomass))
+            if (startingBiomass <= 0 || Double.isNaN(startingBiomass))
                 startingBiomass = 0;
 
             //if inconsistent, carrying capacity limits initial biomass!
-            if(startingBiomass > carryingCapacity) {
+            if (startingBiomass > carryingCapacity) {
                 startingBiomass = carryingCapacity;
-                if(!hasAlreadyWarned)
-                {
-                    Log.warn("Initialized a cell with more initial biomass than carrying capacity; reduced initial biomass to current capacity");
+                if (!hasAlreadyWarned) {
+                    Log.warn(
+                        "Initialized a cell with more initial biomass than carrying capacity; reduced initial biomass to current capacity");
                     hasAlreadyWarned = true;
                 }
             }
-            BiomassLocalBiology local = (BiomassLocalBiology) seaTile.getBiology();
+            final BiomassLocalBiology local = (BiomassLocalBiology) seaTile.getBiology();
             local.setCarryingCapacity(
-                    species,
-                    carryingCapacity
+                species,
+                carryingCapacity
             );
             local.setCurrentBiomass(
-                    species,
-                    startingBiomass
+                species,
+                startingBiomass
             );
-            habitableAreas.put(seaTile,local);
+            habitableAreas.put(seaTile, local);
 
-            Preconditions.checkArgument(startingBiomass<=carryingCapacity,
-                    "carrying capacity allocated less than initial biomass allocated! ");
+            Preconditions.checkArgument(
+                startingBiomass <= carryingCapacity,
+                "carrying capacity allocated less than initial biomass allocated! "
+            );
 
-            if(unfishable)
+            if (unfishable)
                 seaTile.setBiology(new ConstantBiomassDecorator(local));
 
         }
-        Preconditions.checkArgument(habitableAreas.size()==numberOfHabitableCells,
-                "failure at computing the correct number of habitable cells");
+        Preconditions.checkArgument(
+            habitableAreas.size() == numberOfHabitableCells,
+            "failure at computing the correct number of habitable cells"
+        );
 
 
         //initialize the grower
-        grower.initializeGrower(habitableAreas, model, random,species);
+        grower.initializeGrower(habitableAreas, model, random, species);
         //initialize the diffuser
-        if(!forceMovementOff) {
-            BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
-                    new Pair<>(
-                            species,
-                            movementRule
-                    )
+        if (!forceMovementOff) {
+            final BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
+                new Pair<>(
+                    species,
+                    movementRule
+                )
             );
             model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
         }
-
 
 
     }
@@ -341,23 +340,24 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
      */
     @Override
     public GlobalBiology generateGlobal(
-            MersenneTwisterFast random, FishState modelBeingInitialized) {
+        final MersenneTwisterFast random, final FishState modelBeingInitialized
+    ) {
 
 
-        Species species = new Species(speciesName);
-        GlobalBiology independentGlobalBiology = new GlobalBiology(species);
+        final Species species = new Species(speciesName);
+        final GlobalBiology independentGlobalBiology = new GlobalBiology(species);
         //create maps of where the fish is
         initialDistribution = new AllocatorManager(
-                false,
-                species,
-                initialAllocator,
-                independentGlobalBiology
+            false,
+            species,
+            initialAllocator,
+            independentGlobalBiology
         );
         habitabilityDistribution = new AllocatorManager(
-                normalizeAllocators,
-                species,
-                carryingCapacityAllocator,
-                independentGlobalBiology
+            normalizeAllocators,
+            species,
+            carryingCapacityAllocator,
+            independentGlobalBiology
         );
 
         final String columnName = species + " Recruitment";
@@ -426,7 +426,6 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
      *
      * @return Value for property 'grower'.
      */
-    @NotNull
     public LogisticGrowerInitializer getGrower() {
         return grower;
     }
@@ -454,7 +453,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
      *
      * @param forceMovementOff Value to set for property 'forceMovementOff'.
      */
-    public void setForceMovementOff(boolean forceMovementOff) {
+    public void setForceMovementOff(final boolean forceMovementOff) {
         this.forceMovementOff = forceMovementOff;
     }
 
@@ -472,7 +471,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
      *
      * @param unfishable Value to set for property 'unfishable'.
      */
-    public void setUnfishable(boolean unfishable) {
+    public void setUnfishable(final boolean unfishable) {
         this.unfishable = unfishable;
     }
 }
