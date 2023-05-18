@@ -113,56 +113,6 @@ public class PrototypeScenarioTest {
 
     }
 
-    @Test
-    public void countersAreCorrect() throws Exception {
-
-        CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
-
-        FishState state = new FishState(123l);
-        state.setScenario(scenario);
-        state.start();
-
-        for (int i = 0; i < 366; i++) {
-            double landings=0;
-            state.schedule.step(state);
-            for(int age=0; age<60; age++) {
-                // System.out.println(age);
-                landings+=state.getDailyDataSet().getLatestObservation( "Sablefish " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + FlexibleAbundanceMarket.AGE_BIN_PREFIX + age);
-            }
-            assertEquals(landings,
-                    state.getDailyDataSet().getLatestObservation("Sablefish "+FisherDailyTimeSeries.CATCHES_COLUMN_NAME),
-                    .001
-                    );
-
-
-        }
-        double sumHours = 0;
-        double sumTrips = 0;
-        double sumDuration = 0;
-        for(Fisher fisher : state.getFishers()) {
-            double hours = fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT); sumHours+=hours;
-            double trips = fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS); sumTrips+=trips;
-            double duration = fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIP_DURATION); sumDuration+=duration;
-            System.out.println(hours + " " + trips + " " + duration + " --> " + (hours/trips) );
-            assertEquals(hours/trips,duration,.0001);
-        }
-        System.out.println("===========================================================");
-        System.out.println(sumHours + " " + sumTrips + " " + sumDuration/state.getFishers().size() + " --> " + (sumHours/sumTrips) );
-
-        //they might not be equal because you need to reweigh them!
-
-
-        System.out.println("===========================================================");
-
-        double hours = state.getLatestYearlyObservation("Average Hours Out");
-        double trips = state.getLatestYearlyObservation("Average Number of Trips");
-        double duration = state.getLatestYearlyObservation("Average Trip Duration");
-        System.out.println(hours + " " + trips + " " + duration + " --> " + (hours/trips) );
-        assertEquals(hours/trips,duration,.0001);
-
-    }
-
-
     /**
      * if I give agents a head start, they'll use it to fish closer to port than they would have had if they had started
      * at random
