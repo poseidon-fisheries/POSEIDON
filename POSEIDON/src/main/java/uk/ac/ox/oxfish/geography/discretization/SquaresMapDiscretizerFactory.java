@@ -24,7 +24,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 /**
  * The factory building squared maps
@@ -41,9 +40,12 @@ public class SquaresMapDiscretizerFactory implements AlgorithmFactory<SquaresMap
     public SquaresMapDiscretizerFactory() {
     }
 
-    public SquaresMapDiscretizerFactory(final int horizontalSplits, final int verticalSplits) {
-        this.horizontalSplits = new FixedDoubleParameter(horizontalSplits);
-        this.verticalSplits = new FixedDoubleParameter(verticalSplits);
+    public SquaresMapDiscretizerFactory(
+        final DoubleParameter horizontalSplits,
+        final DoubleParameter verticalSplits
+    ) {
+        this.horizontalSplits = horizontalSplits;
+        this.verticalSplits = verticalSplits;
     }
 
     /**

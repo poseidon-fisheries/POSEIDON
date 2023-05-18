@@ -17,7 +17,7 @@ public abstract class PlanningModuleFactory<T extends PlanningModule> implements
      * go through a few relevant ones
      */
     private AlgorithmFactory<? extends MapDiscretizer> discretization =
-        new SquaresMapDiscretizerFactory(6, 3);
+        new SquaresMapDiscretizerFactory();
 
     @Override
     public T apply(final FishState fishState) {
