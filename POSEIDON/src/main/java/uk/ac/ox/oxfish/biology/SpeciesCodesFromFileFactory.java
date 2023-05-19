@@ -53,6 +53,8 @@ public class SpeciesCodesFromFileFactory implements Supplier<SpeciesCodes> {
 
     @Override
     public SpeciesCodes get() {
+        System.out.println(speciesCodeFile.get());
+        System.out.println(cache.getCache().asMap());
         return cache.apply(speciesCodeFile.get());
     }
 }

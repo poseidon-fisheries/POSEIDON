@@ -13,10 +13,13 @@ import java.util.function.Function;
 public class CacheByFile<T> implements Function<Path, T> {
     private final Cache<Object, T> cache;
     private final Function<Path, T> readFunction;
-
     public CacheByFile(final Function<Path, T> readFunction) {
         this.readFunction = readFunction;
         this.cache = CacheBuilder.newBuilder().build();
+    }
+
+    public Cache<Object, T> getCache() {
+        return cache;
     }
 
     @Override
