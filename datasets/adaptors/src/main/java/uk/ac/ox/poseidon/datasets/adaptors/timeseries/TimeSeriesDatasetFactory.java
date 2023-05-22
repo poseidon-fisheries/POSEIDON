@@ -12,17 +12,13 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public abstract class TimeSeriesDatasetFactory implements DatasetFactory {
 
-    abstract TimeSeries<?> getTimeSeries(FishState fishState);
-
-    abstract String getIndexColumnName();
-
     @Override
     public Entry<String, Dataset> apply(final Object o) {
         checkArgument(test(o));
         final FishState fishState = (FishState) o;
         return entry(
             getDatasetName(),
-            new TimeSeriesDataSetAdaptor(getTimeSeries(fishState), getIndexColumnName())
+            makeDataset(fishState)
         );
     }
 
@@ -30,6 +26,12 @@ public abstract class TimeSeriesDatasetFactory implements DatasetFactory {
     public boolean test(final Object o) {
         return FishState.class.isAssignableFrom(o.getClass());
     }
+
+    abstract Dataset makeDataset(FishState fishState);
+
+    abstract TimeSeries<?> getTimeSeries(FishState fishState);
+
+    abstract String getIndexColumnName();
 
     @Override
     public boolean isAutoRegistered() {

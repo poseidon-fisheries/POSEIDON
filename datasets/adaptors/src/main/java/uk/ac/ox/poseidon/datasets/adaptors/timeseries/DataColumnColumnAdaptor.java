@@ -10,7 +10,7 @@ public class DataColumnColumnAdaptor implements Column<Double> {
     private final String name;
     private final DataColumn dataColumn;
 
-    public DataColumnColumnAdaptor(final String name, final DataColumn dataColumn) {
+    DataColumnColumnAdaptor(final String name, final DataColumn dataColumn) {
         this.name = name;
         this.dataColumn = dataColumn;
     }

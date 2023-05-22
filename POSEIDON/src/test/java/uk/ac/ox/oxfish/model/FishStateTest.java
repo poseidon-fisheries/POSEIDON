@@ -227,11 +227,11 @@ public class FishStateTest {
         fishState.scheduleOnce(
             simState1 -> {
                 final FishState fs1 = (FishState) simState1;
-                assertEquals(fs1.getStartDate(), fs1.getDate());
+                assertEquals(fs1.getScenario().getStartDate(), fs1.getDate());
                 fishState.scheduleOnceInXDays(
                     simState2 -> {
                         final FishState fs2 = (FishState) simState2;
-                        assertEquals(fs2.getStartDate().plusDays(daysFromNow), fs2.getDate());
+                        assertEquals(fs2.getScenario().getStartDate().plusDays(daysFromNow), fs2.getDate());
                     },
                     DAWN,
                     daysFromNow

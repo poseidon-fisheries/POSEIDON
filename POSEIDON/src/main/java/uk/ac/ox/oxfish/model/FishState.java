@@ -155,8 +155,6 @@ public class FishState extends SimState {
 
     private List<EntryPlugin> entryPlugins;
 
-    private LocalDate startDate;
-
     public FishState() {
         this(System.currentTimeMillis(), 1);
     }
@@ -239,7 +237,6 @@ public class FishState extends SimState {
         for (final Entry<StepOrder, AggregateSteppable> steppable : aggregateDailySteppables.entrySet())
             schedule.scheduleRepeating(steppable.getValue(), steppable.getKey().ordinal(), stepsPerDay);
 
-        this.startDate = scenario.getStartDate();
         final ScenarioEssentials initialization = scenario.start(this);
 
         //read raster bathymetry
@@ -330,14 +327,6 @@ public class FishState extends SimState {
         return map.getPortMap();
     }
 
-    public Scenario getScenario() {
-        return scenario;
-    }
-
-    public void setScenario(final Scenario scenario) {
-        this.scenario = scenario;
-    }
-
     public SparseGrid2D getFisherGrid() {
         return map.getFisherGrid();
     }
@@ -358,11 +347,15 @@ public class FishState extends SimState {
         // we add year and "day of the year" separately because our simulation years
         // are always 365 days, so adding `getDays()` would get us out of sync for
         // when leap years occur
-        return getStartDate().plusYears(getYear()).plusDays(getDayOfTheYear() - 1);
+        return getScenario().getStartDate().plusYears(getYear()).plusDays(getDayOfTheYear() - 1);
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public Scenario getScenario() {
+        return scenario;
+    }
+
+    public void setScenario(final Scenario scenario) {
+        this.scenario = scenario;
     }
 
     public int getYear() {

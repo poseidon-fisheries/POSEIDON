@@ -1,4 +1,4 @@
-package uk.ac.ox.poseidon.datasets.core;
+package uk.ac.ox.poseidon.datasets.adaptors.timeseries;
 
 import uk.ac.ox.poseidon.datasets.api.Column;
 
@@ -6,12 +6,12 @@ import java.util.Iterator;
 
 import static com.google.common.collect.Streams.mapWithIndex;
 
-public class IndexColumn implements Column<Long> {
+public abstract class IndexColumn<T> implements Column<T> {
 
     private final String name;
     private final Column<?> indexedColumn;
 
-    public IndexColumn(final String name, final Column<?> indexedColumn) {
+    IndexColumn(final String name, final Column<?> indexedColumn) {
         this.name = name;
         this.indexedColumn = indexedColumn;
     }
@@ -22,7 +22,9 @@ public class IndexColumn implements Column<Long> {
     }
 
     @Override
-    public Iterator<Long> iterator() {
-        return mapWithIndex(indexedColumn.stream(), (from, index) -> index).iterator();
+    public Iterator<T> iterator() {
+        return mapWithIndex(indexedColumn.stream(), (from, index) -> mapIndex(index)).iterator();
     }
+
+    protected abstract T mapIndex(final long index);
 }

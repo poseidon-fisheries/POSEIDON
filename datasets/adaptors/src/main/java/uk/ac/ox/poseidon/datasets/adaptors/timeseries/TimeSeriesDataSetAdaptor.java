@@ -10,12 +10,12 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-public class TimeSeriesDataSetAdaptor implements Dataset {
+public abstract class TimeSeriesDataSetAdaptor implements Dataset {
 
     private final TimeSeries<?> timeSeries;
     private final String indexColumnName;
 
-    public TimeSeriesDataSetAdaptor(
+    TimeSeriesDataSetAdaptor(
         final TimeSeries<?> timeSeries,
         final String indexColumnName
     ) {
@@ -23,15 +23,8 @@ public class TimeSeriesDataSetAdaptor implements Dataset {
         this.indexColumnName = indexColumnName;
     }
 
-    @Override
-    public List<String> getTableNames() {
-        return dataColumnStream()
-            .map(DataColumn::getName)
-            .collect(toImmutableList());
-    }
-
-    private Stream<DataColumn> dataColumnStream() {
-        return timeSeries.getColumns().stream();
+    String getIndexColumnName() {
+        return indexColumnName;
     }
 
     @Override
@@ -41,9 +34,11 @@ public class TimeSeriesDataSetAdaptor implements Dataset {
             .collect(toImmutableList());
     }
 
-    private DataColumnTableAdaptor makeTable(final DataColumn dataColumn) {
-        return new DataColumnTableAdaptor(indexColumnName, dataColumn);
+    private Stream<DataColumn> dataColumnStream() {
+        return timeSeries.getColumns().stream();
     }
+
+    abstract DataColumnTableAdaptor makeTable(final DataColumn dataColumn);
 
     @Override
     public Table getTable(final String name) {
@@ -58,5 +53,12 @@ public class TimeSeriesDataSetAdaptor implements Dataset {
                     getTableNames()
                 )
             ));
+    }
+
+    @Override
+    public List<String> getTableNames() {
+        return dataColumnStream()
+            .map(DataColumn::getName)
+            .collect(toImmutableList());
     }
 }

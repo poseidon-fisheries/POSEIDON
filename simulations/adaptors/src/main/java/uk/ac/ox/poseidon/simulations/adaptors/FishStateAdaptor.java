@@ -18,6 +18,7 @@ public class FishStateAdaptor implements Simulation {
 
     FishStateAdaptor(final FishState fishState) {
         this.fishState = fishState;
+        System.out.println(fishState);
         this.datasets = Services
             .loadAll(
                 DatasetFactory.class,

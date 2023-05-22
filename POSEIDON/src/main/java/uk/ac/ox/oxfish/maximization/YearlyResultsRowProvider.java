@@ -54,7 +54,7 @@ public class YearlyResultsRowProvider implements RowProvider {
 
     @Override
     public Iterable<? extends Collection<?>> getRows() {
-        final int startYear = fishState.getStartDate().getYear();
+        final int startYear = fishState.getScenario().getStartDate().getYear();
         return fishState
             .getYearlyDataSet()
             .getColumns()
