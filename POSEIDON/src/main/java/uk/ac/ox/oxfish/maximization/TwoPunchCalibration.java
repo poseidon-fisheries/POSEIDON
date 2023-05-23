@@ -97,7 +97,7 @@ public class TwoPunchCalibration {
         );
         secondStep.setPopulationSize(50);
         secondStep.setMaxProcessorsToUse(parallelThreads);
-        secondStep.setNumberOfRunsPerSettingOverride(2);
+        secondStep.setNumberOfRunsPerSettingOverride(3);
         secondStep.setMaxFitnessCalls(maxLocalCalls);
         secondStep.setParameterRange(17);
         secondStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());

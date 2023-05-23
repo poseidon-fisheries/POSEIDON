@@ -62,14 +62,14 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * a multiplier applied to the action weight of own fad (since it's quite low in the data)
      */
     private DoubleParameter ownFadActionWeightBias =
-        new CalibratedParameter(1, 180, 22);
+        new CalibratedParameter(1, 1000, 22);
     /**
      * a multiplier applied to the action weight of DPL
      */
     private DoubleParameter deploymentBias =
-        new CalibratedParameter(1, 75, 10);
+        new CalibratedParameter(1, 1000, 10);
     private DoubleParameter noaBias =
-        new CalibratedParameter(0.2, 1.1, 0.6);
+        new CalibratedParameter(0.2, 2, 0.6);
     private DoubleParameter minimumPercentageOfTripDurationAllowed =
         new CalibratedParameter(0.4, 0.9, 0, 1, 0.7);
     private boolean noaSetsCanPoachFads = false;
