@@ -9,6 +9,7 @@ import com.univocity.parsers.annotations.Parsed;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.maximization.generic.FixedDataTarget;
+import uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
@@ -40,6 +41,8 @@ public class OneAtATimeSensitivity {
     private int iterations = 5;
     @Parameter(names = {"-y", "--num_year_to_run"})
     private int numYearsToRun = 2;
+    @Parameter(names = {"-b", "--bounds_only"})
+    private boolean boundsOnly = false;
 
     @SuppressWarnings("WeakerAccess")
     public OneAtATimeSensitivity() {
@@ -75,13 +78,15 @@ public class OneAtATimeSensitivity {
         final double[] solution = new SolutionExtractor(folder.resolve(logFile)).bestSolution().getKey();
         final Path outputFolder = folder.resolve("ofat_outputs");
         writeBounds(genericOptimization, solution, outputFolder.resolve("bounds.csv"));
-        new Runner<>(() -> genericOptimization.buildScenario(solution), outputFolder)
-            .setPolicies(buildVariations(genericOptimization))
-            .registerRowProvider(
-                "results.csv",
-                fishState -> new ResultsProvider(genericOptimization, fishState)
-            )
-            .run(numYearsToRun, iterations);
+        if (!boundsOnly) {
+            new Runner<>(() -> genericOptimization.buildScenario(solution), outputFolder)
+                .setPolicies(buildVariations(genericOptimization))
+                .registerRowProvider(
+                    "results.csv",
+                    fishState -> new ResultsProvider(genericOptimization, fishState)
+                )
+                .run(numYearsToRun, iterations);
+        }
     }
 
     private void writeBounds(
@@ -93,17 +98,26 @@ public class OneAtATimeSensitivity {
         final Stream<List<?>> rows =
             genericOptimization.getParameters()
                 .stream()
-                .filter(p -> p instanceof SimpleOptimizationParameter)
-                .map(p -> (SimpleOptimizationParameter) p)
+                .filter(p -> p instanceof HardEdgeOptimizationParameter)
+                .map(p -> (HardEdgeOptimizationParameter) p)
                 .map(p -> ImmutableList.of(
                     p.getAddressToModify(),
                     p.getMinimum(),
                     p.getMaximum(),
+                    p.getHardMinimum(),
+                    p.getHardMaximum(),
                     p.getValue(scenario)
                 ));
         CsvParserUtil.writeRows(
             outputFile,
-            ImmutableList.of("parameter", "minimum", "maximum", "value"),
+            ImmutableList.of(
+                "parameter",
+                "soft_minimum",
+                "soft_maximum",
+                "hard_minimum",
+                "hard_maximum",
+                "value"
+            ),
             rows::iterator
         );
     }
@@ -152,6 +166,14 @@ public class OneAtATimeSensitivity {
     ) {
         final double delta = maximum - minimum;
         return range(0, steps).mapToDouble(i -> minimum + delta * ((double) i / (steps - 1)));
+    }
+
+    public boolean isBoundsOnly() {
+        return boundsOnly;
+    }
+
+    public void setBoundsOnly(final boolean boundsOnly) {
+        this.boundsOnly = boundsOnly;
     }
 
     private List<FixedDataTarget> getTargets(final GenericOptimization genericOptimization) {
