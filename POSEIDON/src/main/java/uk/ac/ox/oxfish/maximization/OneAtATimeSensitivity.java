@@ -25,6 +25,8 @@ import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.util.stream.LongStream.range;
 
 public class OneAtATimeSensitivity {
@@ -48,6 +50,7 @@ public class OneAtATimeSensitivity {
     public OneAtATimeSensitivity() {
     }
 
+    @SuppressWarnings("unused")
     public OneAtATimeSensitivity(
         final String calibrationFile,
         final String logFile,
@@ -79,8 +82,9 @@ public class OneAtATimeSensitivity {
         final Path outputFolder = folder.resolve("ofat_outputs");
         writeBounds(genericOptimization, solution, outputFolder.resolve("bounds.csv"));
         if (!boundsOnly) {
+            final Scenario scenario = genericOptimization.buildScenario(solution);
             new Runner<>(() -> genericOptimization.buildScenario(solution), outputFolder)
-                .setPolicies(buildVariations(genericOptimization))
+                .setPolicies(buildVariations(genericOptimization, scenario))
                 .registerRowProvider(
                     "results.csv",
                     fishState -> new ResultsProvider(genericOptimization, fishState)
@@ -123,12 +127,14 @@ public class OneAtATimeSensitivity {
     }
 
     private List<Variation> buildVariations(
-        final GenericOptimization genericOptimization
+        final GenericOptimization genericOptimization,
+        final Scenario optimizedScenario
     ) {
+
         return getParameters(genericOptimization)
             .stream()
             .flatMap(parameter ->
-                valueRange(parameter, steps).mapToObj(value ->
+                valueRange(parameter, parameter.getValue(optimizedScenario), steps).mapToObj(value ->
                     new Variation(
                         parameter.getAddressToModify(),
                         value,
@@ -150,11 +156,12 @@ public class OneAtATimeSensitivity {
 
     private DoubleStream valueRange(
         final SimpleOptimizationParameter parameter,
+        final double parameterValue,
         final int steps
     ) {
         return valueRange(
-            parameter.getMinimum(),
-            parameter.getMaximum(),
+            min(parameterValue, parameter.getMinimum()),
+            max(parameterValue, parameter.getMaximum()),
             steps
         );
     }
@@ -168,10 +175,12 @@ public class OneAtATimeSensitivity {
         return range(0, steps).mapToDouble(i -> minimum + delta * ((double) i / (steps - 1)));
     }
 
+    @SuppressWarnings("unused")
     public boolean isBoundsOnly() {
         return boundsOnly;
     }
 
+    @SuppressWarnings("unused")
     public void setBoundsOnly(final boolean boundsOnly) {
         this.boundsOnly = boundsOnly;
     }
@@ -184,6 +193,7 @@ public class OneAtATimeSensitivity {
             .collect(toImmutableList());
     }
 
+    @SuppressWarnings("unused")
     public Path getFolder() {
         return folder;
     }
