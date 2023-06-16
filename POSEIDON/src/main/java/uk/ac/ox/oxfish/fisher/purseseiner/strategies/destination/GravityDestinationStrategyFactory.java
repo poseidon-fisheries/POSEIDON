@@ -24,7 +24,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.FisherValuesFromFileCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionField;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsSupplier;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
@@ -65,7 +65,7 @@ public class GravityDestinationStrategyFactory
     private final Predicate<SeaTile> isValidDestination =
         seaTile -> !(seaTile.getGridX() > 72 && seaTile.getBiology() instanceof EmptyLocalBiology);
     private int targetYear;
-    private AttractionFieldsSupplier attractionFieldsSupplier;
+    private AttractionFieldsFactory attractionFieldsFactory;
     private InputPath actionWeightsFile;
     private InputPath maxTripDurationFile;
 
@@ -73,12 +73,12 @@ public class GravityDestinationStrategyFactory
         final int targetYear,
         final InputPath actionWeightsFile,
         final InputPath maxTripDurationFile,
-        final AttractionFieldsSupplier attractionFieldsSupplier
+        final AttractionFieldsFactory attractionFieldsFactory
     ) {
         this.targetYear = targetYear;
         this.actionWeightsFile = actionWeightsFile;
         this.maxTripDurationFile = maxTripDurationFile;
-        this.attractionFieldsSupplier = attractionFieldsSupplier;
+        this.attractionFieldsFactory = attractionFieldsFactory;
     }
 
     public GravityDestinationStrategyFactory() {
@@ -135,7 +135,7 @@ public class GravityDestinationStrategyFactory
             this::loadActionWeights,
             this::loadMaxTripDuration,
             this.isValidDestination,
-            attractionFieldsSupplier.get()
+            attractionFieldsFactory.apply(fishState)
         );
     }
 
@@ -187,12 +187,12 @@ public class GravityDestinationStrategyFactory
         );
     }
 
-    public AttractionFieldsSupplier getAttractionFieldsSupplier() {
-        return attractionFieldsSupplier;
+    public AttractionFieldsFactory getAttractionFieldsSupplier() {
+        return attractionFieldsFactory;
     }
 
-    public void setAttractionFieldsSupplier(final AttractionFieldsSupplier attractionFieldsSupplier) {
-        this.attractionFieldsSupplier = attractionFieldsSupplier;
+    public void setAttractionFieldsSupplier(final AttractionFieldsFactory attractionFieldsFactory) {
+        this.attractionFieldsFactory = attractionFieldsFactory;
     }
 
 }

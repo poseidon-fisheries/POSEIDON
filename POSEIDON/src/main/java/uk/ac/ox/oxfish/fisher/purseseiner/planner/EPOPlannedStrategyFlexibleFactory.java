@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
@@ -80,21 +80,21 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         new CalibratedParameter(0, 5, 0, 5, 3);
     private boolean uniqueCatchSamplerForEachStrategy = false;
     private AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModuleFactory;
-    private LocationValuesSupplier locationValuesSupplier;
+    private LocationValuesFactory locationValuesFactory;
 
     public EPOPlannedStrategyFlexibleFactory() {
     }
 
     public EPOPlannedStrategyFlexibleFactory(
         final int targetYear,
-        final LocationValuesSupplier locationValuesSupplier,
+        final LocationValuesFactory locationValuesFactory,
         final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModuleFactory,
         final CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory,
         final InputPath actionWeightsFile,
         final InputPath maxTripDurationFile
     ) {
         this.targetYear = targetYear;
-        this.locationValuesSupplier = locationValuesSupplier;
+        this.locationValuesFactory = locationValuesFactory;
         this.fadModuleFactory = fadModuleFactory;
         this.catchSamplersFactory = catchSamplersFactory;
         this.actionWeightsFile = actionWeightsFile;
@@ -153,7 +153,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             (int) noaSetsRangeInSeatiles.applyAsDouble(state.getRandom()),
             (int) delSetsRangeInSeatiles.applyAsDouble(state.getRandom()),
             fadModuleFactory,
-            locationValuesSupplier.get()
+            locationValuesFactory.apply(state)
         );
 
         return proxy;
@@ -297,18 +297,18 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.fadModuleFactory = fadModuleFactory;
     }
 
-    public LocationValuesSupplier getLocationValuesSupplier() {
-        return locationValuesSupplier;
+    public LocationValuesFactory getLocationValuesSupplier() {
+        return locationValuesFactory;
     }
 
     @SuppressWarnings("unused")
-    public void setLocationValuesSupplier(final LocationValuesSupplier locationValuesSupplier) {
-        this.locationValuesSupplier = locationValuesSupplier;
+    public void setLocationValuesSupplier(final LocationValuesFactory locationValuesFactory) {
+        this.locationValuesFactory = locationValuesFactory;
     }
 
     @Override
     public void useDummyData(final InputPath dummyDataFolder) {
-        locationValuesSupplier.setLocationValuesFile(dummyDataFolder.path("dummy_location_values.csv"));
+        locationValuesFactory.setLocationValuesFile(dummyDataFolder.path("dummy_location_values.csv"));
         actionWeightsFile = dummyDataFolder.path("dummy_action_weights.csv");
         maxTripDurationFile = dummyDataFolder.path("dummy_boats.csv");
     }

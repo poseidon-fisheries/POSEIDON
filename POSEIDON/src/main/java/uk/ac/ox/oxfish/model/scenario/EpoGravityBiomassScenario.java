@@ -27,8 +27,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsSupplier;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesSupplier;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
@@ -82,9 +82,13 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
                 getTargetYear(),
                 getInputFolder().path("action_weights.csv"),
                 getInputFolder().path("vessels.csv"),
-                new AttractionFieldsSupplier(
-                    new LocationValuesSupplier(
+                new AttractionFieldsFactory(
+                    new LocationValuesFactory(
                         getInputFolder().path("location_values.csv"),
+                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
+                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
+                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
+                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
                         getTargetYear()
                     ),
                     getInputFolder().path("max_current_speeds.csv")

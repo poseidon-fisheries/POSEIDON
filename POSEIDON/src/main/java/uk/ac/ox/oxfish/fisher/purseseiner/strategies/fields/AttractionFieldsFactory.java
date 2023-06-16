@@ -3,7 +3,9 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.PurseSeinerActionClassToDouble;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionSupplier;
 
 import java.util.Map;
@@ -13,8 +15,8 @@ import java.util.function.Supplier;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
-public class AttractionFieldsSupplier implements Supplier<Set<AttractionField>> {
-    private LocationValuesSupplier locationValuesSupplier;
+public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionField>> {
+    private LocationValuesFactory locationValuesFactory;
     private InputPath maxCurrentSpeedsFile;
     private Supplier<? extends DoubleUnaryOperator>
         pctHoldSpaceLeftModulationFunction =
@@ -43,23 +45,23 @@ public class AttractionFieldsSupplier implements Supplier<Set<AttractionField>> 
     private double actionDistanceExponent = 10;
     private double destinationDistanceExponent = 2;
 
-    public AttractionFieldsSupplier() {
+    public AttractionFieldsFactory() {
     }
 
-    public AttractionFieldsSupplier(
-        final LocationValuesSupplier locationValuesSupplier,
+    public AttractionFieldsFactory(
+        final LocationValuesFactory locationValuesFactory,
         final InputPath maxCurrentSpeedsFile
     ) {
-        this.locationValuesSupplier = locationValuesSupplier;
+        this.locationValuesFactory = locationValuesFactory;
         this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
     }
 
-    public LocationValuesSupplier getLocationValuesSupplier() {
-        return locationValuesSupplier;
+    public LocationValuesFactory getLocationValuesSupplier() {
+        return locationValuesFactory;
     }
 
-    public void setLocationValuesSupplier(final LocationValuesSupplier locationValuesSupplier) {
-        this.locationValuesSupplier = locationValuesSupplier;
+    public void setLocationValuesSupplier(final LocationValuesFactory locationValuesFactory) {
+        this.locationValuesFactory = locationValuesFactory;
     }
 
     public Supplier<? extends DoubleUnaryOperator> getPctHoldSpaceLeftModulationFunction() {
@@ -143,9 +145,9 @@ public class AttractionFieldsSupplier implements Supplier<Set<AttractionField>> 
     }
 
     @Override
-    public Set<AttractionField> get() {
+    public Set<AttractionField> apply(final FishState fishState) {
         final Map<Class<? extends PurseSeinerAction>, LocationValues> locationValues =
-            locationValuesSupplier.get();
+            locationValuesFactory.apply(fishState);
         final PurseSeinerActionClassToDouble maxCurrentSpeed =
             PurseSeinerActionClassToDouble.fromFile(
                 getMaxCurrentSpeedsFile().get(), "action", "speed"
@@ -240,4 +242,5 @@ public class AttractionFieldsSupplier implements Supplier<Set<AttractionField>> 
     public void setMaxCurrentSpeedsFile(final InputPath maxCurrentSpeedsFile) {
         this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
     }
+
 }
