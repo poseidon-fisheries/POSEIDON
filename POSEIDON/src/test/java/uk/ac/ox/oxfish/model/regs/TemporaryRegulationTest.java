@@ -7,8 +7,9 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import java.util.Map;
+
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -27,11 +28,11 @@ public class TemporaryRegulationTest {
         ));
     }
 
-    private void isActiveTest(int startDay, int endDay, ImmutableMap<Integer, Boolean> cases) {
+    private void isActiveTest(final int startDay, final int endDay, final Map<Integer, Boolean> cases) {
         final TemporaryRegulation temporaryRegulation =
-            new TemporaryRegulation(startDay, endDay, mock(Regulation.class));
+            new TemporaryRegulation(new NoFishing(), startDay, endDay);
         cases.forEach((day, expected) ->
-            assertEquals("on day " + day, expected, temporaryRegulation.isActive(day))
+            assertEquals("on day " + day, expected, temporaryRegulation.appliesOn(day))
         );
     }
 
@@ -64,14 +65,15 @@ public class TemporaryRegulationTest {
         final SeaTile tile = mock(SeaTile.class);
         when(tile.isProtected()).thenReturn(true);
         final FishState state = mock(FishState.class);
+        when(fisher.grabState()).thenReturn(state);
         when(state.getDayOfTheYear(anyInt())).thenReturn(100);
         final ProtectedAreasOnly protectedAreasOnly = new ProtectedAreasOnly();
 
         ImmutableMap.of(
-            new TemporaryRegulation(10, 300, protectedAreasOnly), false,
-            new TemporaryRegulation(100, 100, protectedAreasOnly), false,
-            new TemporaryRegulation(10, 30, protectedAreasOnly), true,
-            new TemporaryRegulation(150, 300, protectedAreasOnly), true
+            new TemporaryRegulation(protectedAreasOnly, 10, 300), false,
+            new TemporaryRegulation(protectedAreasOnly, 100, 100), false,
+            new TemporaryRegulation(protectedAreasOnly, 10, 30), true,
+            new TemporaryRegulation(protectedAreasOnly, 150, 300), true
         ).forEach((reg, expected) -> {
             reg.start(state, fisher);
             assertEquals(reg.canFishHere(fisher, tile, state), expected);
@@ -89,27 +91,23 @@ public class TemporaryRegulationTest {
         //active regulation mean you can't go out
         final Regulation active = mock(Regulation.class);
         when(active.allowedAtSea(any(), any())).thenReturn(false);
-        //inactive regulation means you can go out
-        final Regulation inactive = mock(Regulation.class);
-        when(active.allowedAtSea(any(), any())).thenReturn(true);
 
-        TemporaryRegulationFactory factory =
+        final TemporaryRegulationFactory factory =
             new TemporaryRegulationFactory(
-                100, 200,
-                fishState -> active
+                fishState -> active, 100, 200
             );
-        factory.setInactiveDelegate(fishState -> inactive);
 
         final TemporaryRegulation regulation = factory.apply(state);
 
         //day 10 :  allowed at sea
         final Fisher fisher = mock(Fisher.class);
+        when(fisher.grabState()).thenReturn(state);
         when(state.getDayOfTheYear(anyInt())).thenReturn(10);
         assertTrue(regulation.allowedAtSea(fisher, state));
 
         //day 150: not allowed at sea
         when(state.getDayOfTheYear(anyInt())).thenReturn(150);
-        assertTrue(!regulation.allowedAtSea(fisher, state));
+        assertFalse(regulation.allowedAtSea(fisher, state));
 
 
         //day 250: allowed at sea

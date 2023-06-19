@@ -20,7 +20,9 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
+import uk.ac.ox.oxfish.model.regs.ConjunctiveRegulationsFactory;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.TaggedRegulationFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 
@@ -64,13 +66,16 @@ public class Regulations {
         NAMES.put(SingleSpeciesPIDTaxationOnLandingsFactory.class, "Single Species PID Taxation");
         NAMES.put(TemporaryProtectedAreasFactory.class, "Temporary MPA");
         NAMES.put(TemporaryRegulationFactory.class, "Temporary Regulation");
+        NAMES.put(TaggedRegulationFactory.class, "Tagged Regulation");
         NAMES.put(MultipleRegulationsFactory.class, "Multiple Regulations");
+        NAMES.put(ConjunctiveRegulationsFactory.class, "Conjunctive Regulations");
         NAMES.put(WeakMultiTACStringFactory.class, "Weak Multi-TAC by List");
         NAMES.put(PortBasedWaitTimesFactory.class, "Port Based Wait Times");
         NAMES.put(MaxHoursOutFactory.class, "Max Hours Out");
         NAMES.put(TriggerRegulationFactory.class, "Trigger Regulation");
         NAMES.put(OffSwitchFactory.class, "Off Switch Decorator");
         NAMES.put(NoFishingFactory.class, "No Fishing");
+        NAMES.put(ProtectedAreasFromFolderFactory.class, "Protected Areas from Folder");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

@@ -50,7 +50,7 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
         );
 
     private PurseSeinerFleetFactory purseSeinerFleetFactory =
-        new EpoPurseSeinerFleetFactory<>(
+        new EpoPurseSeinerFleetFactory(
             getTargetYear(),
             getInputFolder(),
             getSpeciesCodesSupplier(),

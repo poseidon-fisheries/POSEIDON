@@ -28,7 +28,10 @@ import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * Created by carrknight on 7/26/16.
+ *
+ * @deprecated Use {@link TemporaryRegulation instead.}
  */
+@Deprecated
 public class TemporaryProtectedArea implements Regulation {
 
 
@@ -42,7 +45,7 @@ public class TemporaryProtectedArea implements Regulation {
     private final Anarchy inactiveDelegate = new Anarchy();
 
 
-    public TemporaryProtectedArea(int firstDay, int finalDay) {
+    public TemporaryProtectedArea(final int firstDay, final int finalDay) {
         this.firstDay = firstDay;
         this.finalDay = finalDay;
         Preconditions.checkArgument(firstDay <= finalDay);
@@ -59,7 +62,7 @@ public class TemporaryProtectedArea implements Regulation {
      */
     @Override
     public boolean canFishHere(
-        Fisher agent, SeaTile tile, FishState model, int timeStep
+        final Fisher agent, final SeaTile tile, final FishState model, final int timeStep
     ) {
         return getCorrectDelegate(model).canFishHere(agent, tile, model, timeStep);
     }
@@ -70,7 +73,7 @@ public class TemporaryProtectedArea implements Regulation {
      * @param state link to the model (to get current date)
      * @return appropriate delegate
      */
-    private Regulation getCorrectDelegate(FishState state) {
+    private Regulation getCorrectDelegate(final FishState state) {
         if (state.getDayOfTheYear() >= firstDay && state.getDayOfTheYear() <= finalDay)
             return activeDelegate;
         else
@@ -88,7 +91,7 @@ public class TemporaryProtectedArea implements Regulation {
      */
     @Override
     public double maximumBiomassSellable(
-        Fisher agent, Species species, FishState model, int timeStep
+        final Fisher agent, final Species species, final FishState model, final int timeStep
     ) {
         return getCorrectDelegate(model).maximumBiomassSellable(agent, species, model, timeStep);
     }
@@ -102,7 +105,7 @@ public class TemporaryProtectedArea implements Regulation {
      * at sea
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
+    public boolean allowedAtSea(final Fisher fisher, final FishState model, final int timeStep) {
         return getCorrectDelegate(model).allowedAtSea(fisher, model, timeStep);
     }
 
@@ -120,7 +123,7 @@ public class TemporaryProtectedArea implements Regulation {
      * ignored
      */
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         activeDelegate.start(model, fisher);
         inactiveDelegate.start(model, fisher);
     }
@@ -129,7 +132,7 @@ public class TemporaryProtectedArea implements Regulation {
      * ignored
      */
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         activeDelegate.turnOff(fisher);
         inactiveDelegate.turnOff(fisher);
     }

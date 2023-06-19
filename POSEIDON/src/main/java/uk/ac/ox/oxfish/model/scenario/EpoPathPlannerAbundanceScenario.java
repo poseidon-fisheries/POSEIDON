@@ -34,7 +34,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
         );
 
     private PurseSeinerFleetFactory purseSeinerFleetFactory =
-        new EpoPurseSeinerFleetFactory<>(
+        new EpoPurseSeinerFleetFactory(
             getTargetYear(),
             getInputFolder(),
             getSpeciesCodesSupplier(),

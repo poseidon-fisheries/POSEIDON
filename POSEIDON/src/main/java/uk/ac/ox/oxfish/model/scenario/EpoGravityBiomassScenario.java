@@ -44,7 +44,7 @@ import java.util.List;
 public class EpoGravityBiomassScenario extends EpoBiomassScenario {
 
     private PurseSeinerFleetFactory purseSeinerFleetFactory =
-        new EpoPurseSeinerFleetFactory<>(
+        new EpoPurseSeinerFleetFactory(
             getTargetYear(),
             getInputFolder(),
             getSpeciesCodesSupplier(),

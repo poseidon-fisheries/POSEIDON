@@ -34,7 +34,7 @@ import uk.ac.ox.oxfish.model.FisherStartable;
  */
 public interface Regulation extends FisherStartable {
 
-    default boolean canFishHere(Fisher agent, SeaTile tile, FishState model) {
+    default boolean canFishHere(final Fisher agent, final SeaTile tile, final FishState model) {
         return canFishHere(agent, tile, model, model.getStep());
     }
 
@@ -49,7 +49,7 @@ public interface Regulation extends FisherStartable {
      */
     boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep);
 
-    default double maximumBiomassSellable(Fisher agent, Species species, FishState model) {
+    default double maximumBiomassSellable(final Fisher agent, final Species species, final FishState model) {
         return maximumBiomassSellable(agent, species, model, model.getStep());
     }
 
@@ -64,7 +64,7 @@ public interface Regulation extends FisherStartable {
      */
     double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep);
 
-    default boolean allowedAtSea(Fisher fisher, FishState model) {
+    default boolean allowedAtSea(final Fisher fisher, final FishState model) {
         return allowedAtSea(fisher, model, model.getStep());
     }
 
@@ -80,7 +80,7 @@ public interface Regulation extends FisherStartable {
     boolean allowedAtSea(Fisher fisher, FishState model, int timeStep);
 
     default void reactToFishing(
-        SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model
+        final SeaTile where, final Fisher who, final Catch fishCaught, final Catch fishRetained, final int hoursSpentFishing, final FishState model
     ) {
         reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, model.getStep());
     }
@@ -96,12 +96,12 @@ public interface Regulation extends FisherStartable {
      * @param timeStep          the time step at which the fishing happened should be considered
      */
     default void reactToFishing(
-        SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-        int hoursSpentFishing, FishState model, int timeStep
+        final SeaTile where, final Fisher who, final Catch fishCaught, final Catch fishRetained,
+        final int hoursSpentFishing, final FishState model, final int timeStep
     ) {
     }
 
-    default void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model) {
+    default void reactToSale(final Species species, final Fisher seller, final double biomass, final double revenue, final FishState model) {
         reactToSale(species, seller, biomass, revenue, model, model.getStep());
     }
 
@@ -115,12 +115,12 @@ public interface Regulation extends FisherStartable {
      * @param timeStep the time step at which the sale happened should be considered
      */
     default void reactToSale(
-        Species species,
-        Fisher seller,
-        double biomass,
-        double revenue,
-        FishState model,
-        int timeStep
+        final Species species,
+        final Fisher seller,
+        final double biomass,
+        final double revenue,
+        final FishState model,
+        final int timeStep
     ) {
     }
 
