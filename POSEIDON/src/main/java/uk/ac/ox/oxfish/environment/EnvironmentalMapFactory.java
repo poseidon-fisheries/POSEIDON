@@ -24,23 +24,48 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.oxfish.utility.parameters.StringParameter;
 
 public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStartable> {
 
-    public String mapVariableName;
+    public StringParameter mapVariableName;
     private InputPath gridFile;
-    private int mapPeriod;
+    private IntegerParameter mapPeriod;
 
     public EnvironmentalMapFactory() {
     }
 
-    public EnvironmentalMapFactory(final String mapVariableName, final InputPath gridFile) {
-        this(mapVariableName, gridFile, 365);
+    public EnvironmentalMapFactory(
+        final StringParameter mapVariableName,
+        final InputPath gridFile
+    ) {
+        this(mapVariableName, gridFile, new IntegerParameter(365));
     }
 
-    public EnvironmentalMapFactory(final String mapVariableName, final InputPath gridFile, final int mapPeriod) {
+    public EnvironmentalMapFactory(
+        final StringParameter mapVariableName,
+        final InputPath gridFile,
+        final IntegerParameter mapPeriod
+    ) {
         this.mapVariableName = mapVariableName;
         this.gridFile = gridFile;
+        this.mapPeriod = mapPeriod;
+    }
+
+    public StringParameter getMapVariableName() {
+        return mapVariableName;
+    }
+
+    public void setMapVariableName(final StringParameter mapVariableName) {
+        this.mapVariableName = mapVariableName;
+    }
+
+    public IntegerParameter getMapPeriod() {
+        return mapPeriod;
+    }
+
+    public void setMapPeriod(final IntegerParameter mapPeriod) {
         this.mapPeriod = mapPeriod;
     }
 
@@ -54,21 +79,21 @@ public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStart
                 final SimpleGridsSupplier supplier = new SimpleGridsSupplier(
                     gridFile.get(),
                     model.getMap().getMapExtent(),
-                    mapPeriod,
+                    mapPeriod.getValue(),
                     false,
-                    mapVariableName
+                    mapVariableName.getValue()
                 );
 
                 final GenericGrids<String> grids = supplier.get();
                 model.getMap().getAdditionalMaps().put(
-                    mapVariableName,
-                    () -> grids.atOrBeforeStep(model.getStep()).get(mapVariableName)
+                    mapVariableName.getValue(),
+                    () -> grids.atOrBeforeStep(model.getStep()).get(mapVariableName.getValue())
                 );
             }
 
             @Override
             public void turnOff() {
-                model.getMap().getAdditionalMaps().remove(mapVariableName);
+                model.getMap().getAdditionalMaps().remove(mapVariableName.getValue());
             }
         };
 
@@ -82,19 +107,4 @@ public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStart
         this.gridFile = gridFile;
     }
 
-    public int getMapPeriod() {
-        return mapPeriod;
-    }
-
-    public void setMapPeriod(final int mapPeriod) {
-        this.mapPeriod = mapPeriod;
-    }
-
-    public String getMapVariableName() {
-        return mapVariableName;
-    }
-
-    public void setMapVariableName(final String mapVariableName) {
-        this.mapVariableName = mapVariableName;
-    }
 }

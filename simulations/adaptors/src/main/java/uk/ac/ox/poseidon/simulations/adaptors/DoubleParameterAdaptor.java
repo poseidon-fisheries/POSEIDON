@@ -42,14 +42,14 @@ public class DoubleParameterAdaptor
     @Override
     public void setValue(final Object value) {
         checkArgument(
-            value instanceof Double,
-            "Value of parameter %s needs to be of type Double but got %s",
+            value instanceof Number,
+            "Value of parameter %s needs to be of type Number but got %s",
             getName(),
             value.getClass()
         );
         new ParameterAddress(getName())
             .getSetter(scenarioAdaptor.getDelegate())
-            .accept(new FixedDoubleParameter((Double) value));
+            .accept(new FixedDoubleParameter(((Number) value).doubleValue()));
     }
 
     @Override

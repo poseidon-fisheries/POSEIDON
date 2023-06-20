@@ -121,7 +121,7 @@ public class FishYAMLTest {
         final DiffusingLogisticFactory factory = (DiffusingLogisticFactory) scenario.getBiologyInitializer();
         //reads double parameters correctly
         Assert.assertTrue(factory.getCarryingCapacity() instanceof FixedDoubleParameter);
-        Assert.assertEquals(((FixedDoubleParameter) factory.getCarryingCapacity()).getFixedValue(), 14.0, .001);
+        Assert.assertEquals(((FixedDoubleParameter) factory.getCarryingCapacity()).getValue(), 14.0, .001);
         //reads normal doubles correctly
         final double[] possibleValues = ((SelectDoubleParameter) factory.getPercentageLimitOnDailyMovement()).getPossibleValues();
         Assert.assertEquals(possibleValues[0], .2, .0001);
@@ -172,7 +172,7 @@ public class FishYAMLTest {
         Assert.assertTrue(((PrototypeScenario) scenario2).getRegulation() instanceof ProtectedAreasOnlyFactory);
         //make sure three recursions in this is still correct.
         Assert.assertEquals(
-            ((FixedDoubleParameter) ((DiffusingLogisticFactory) ((PrototypeScenario) scenario2).getBiologyInitializer()).getDifferentialPercentageToMove()).getFixedValue(),
+            ((FixedDoubleParameter) ((DiffusingLogisticFactory) ((PrototypeScenario) scenario2).getBiologyInitializer()).getDifferentialPercentageToMove()).getValue(),
             .9,
             .0001
         );

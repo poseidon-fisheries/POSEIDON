@@ -55,21 +55,21 @@ class YamlRepresenter extends Representer {
     YamlRepresenter() {
 
         //go through all the double parameters and make them print as a single line "pretty" format
-        this.representers.put(
-            FixedDoubleParameter.class,
-            data -> representData(String.valueOf(((FixedDoubleParameter) data).getFixedValue()))
+
+        this.multiRepresenters.put(
+            FixedParameter.class,
+            data -> representData(((FixedParameter<?>) data).getValue())
         );
 
         this.multiRepresenters.put(
             CalibratedParameter.class,
-            data -> representData(String.valueOf(((CalibratedParameter) data).getDefaultValue()))
+            data -> representData(((CalibratedParameter) data).getDefaultValue())
         );
 
         this.representers.put(
             NullParameter.class,
             data -> representData("nullparameter")
         );
-
 
         this.representers.put(
             NormalDoubleParameter.class,

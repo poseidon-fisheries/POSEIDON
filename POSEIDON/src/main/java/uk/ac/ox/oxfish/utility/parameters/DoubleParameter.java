@@ -31,10 +31,9 @@ import java.util.function.ToDoubleFunction;
  * To do that we use DoubleParameter (or one of its cognate) which is just a supplier of double values
  * Created by carrknight on 6/7/15.
  */
-public interface DoubleParameter extends ToDoubleFunction<MersenneTwisterFast> {
+public interface DoubleParameter extends ToDoubleFunction<MersenneTwisterFast>, Parameter {
 
-
-    static DoubleParameter parseDoubleParameter(String nodeContent) {
+    static DoubleParameter parseDoubleParameter(final String nodeContent) {
         //trim and split
         final String[] split = nodeContent.trim().replaceAll("(')|(\")", "").split("\\s+");
 
@@ -45,25 +44,25 @@ public interface DoubleParameter extends ToDoubleFunction<MersenneTwisterFast> {
             //fixed
             return new FixedDoubleParameter(Double.parseDouble(split[0]));
 
-        if (split[0].toLowerCase().equals("normal"))
+        if (split[0].equalsIgnoreCase("normal"))
             return new NormalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
 
-        if (split[0].toLowerCase().equals("uniform"))
+        if (split[0].equalsIgnoreCase("uniform"))
             return new UniformDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
 
-        if (split[0].toLowerCase().equals("sin"))
+        if (split[0].equalsIgnoreCase("sin"))
             return new SinusoidalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
 
-        if (split[0].toLowerCase().equals("select"))
+        if (split[0].equalsIgnoreCase("select"))
             return new SelectDoubleParameter(nodeContent.trim().replace("select", ""));
 
-        if (split[0].toLowerCase().equals("beta"))
+        if (split[0].equalsIgnoreCase("beta"))
             return new BetaDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
 
-        if (split[0].toLowerCase().equals("weibull"))
+        if (split[0].equalsIgnoreCase("weibull"))
             return new WeibullDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
 
-        if (split[0].toLowerCase().equals("conditional"))
+        if (split[0].equalsIgnoreCase("conditional"))
             return new ConditionalDoubleParameter(
                 Boolean.parseBoolean(split[1]),
                 DoubleParameter.parseDoubleParameter(split[2])

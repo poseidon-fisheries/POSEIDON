@@ -42,16 +42,16 @@ public class PolicyScriptsTest {
     @Test
     public void callsCorrectly() throws Exception {
 
-        HashMap<Integer, PolicyScript> map = new HashMap<>();
+        final HashMap<Integer, PolicyScript> map = new HashMap<>();
 
-        PolicyScript tenYear = mock(PolicyScript.class);
+        final PolicyScript tenYear = mock(PolicyScript.class);
         map.put(10, tenYear);
-        PolicyScript twentyYear = mock(PolicyScript.class);
+        final PolicyScript twentyYear = mock(PolicyScript.class);
         map.put(20, twentyYear);
 
-        PolicyScripts scripts = new PolicyScripts(map);
+        final PolicyScripts scripts = new PolicyScripts(map);
 
-        FishState state = mock(FishState.class);
+        final FishState state = mock(FishState.class);
         when(state.scheduleEveryYear(any(), any())).thenReturn(mock(Stoppable.class));
 
         //check that starts schedules it
@@ -94,7 +94,7 @@ public class PolicyScriptsTest {
     @Test
     public void fromYamlCorrectly() {
 
-        String yaml = "scripts:\n" +
+        final String yaml = "scripts:\n" +
             "  1:\n" +
             "    PolicyScript:\n" +
             "      changeInNumberOfFishers: 100\n" +
@@ -114,16 +114,16 @@ public class PolicyScriptsTest {
             "      regulation:\n" +
             "        Mono-ITQ:\n" +
             "          individualQuota: '5000.0'\n";
-        FishYAML yamler = new FishYAML();
-        PolicyScripts scripts = yamler.loadAs(yaml, PolicyScripts.class);
+        final FishYAML yamler = new FishYAML();
+        final PolicyScripts scripts = yamler.loadAs(yaml, PolicyScripts.class);
         Assert.assertEquals(scripts.getScripts().size(), 2);
-        PolicyScript firstYearPolicyScript = scripts.getScripts().get(1);
-        PolicyScript secondYearPolicyScript = scripts.getScripts().get(10);
+        final PolicyScript firstYearPolicyScript = scripts.getScripts().get(1);
+        final PolicyScript secondYearPolicyScript = scripts.getScripts().get(10);
         Assert.assertNull(firstYearPolicyScript.getFishingStrategy());
         Assert.assertNull(secondYearPolicyScript.getFishingStrategy());
         Assert.assertTrue(firstYearPolicyScript.getGear() instanceof FixedProportionGearFactory);
         Assert.assertEquals(
-            ((FixedDoubleParameter) ((FixedProportionGearFactory) firstYearPolicyScript.getGear()).getCatchabilityPerHour()).getFixedValue()
+            ((FixedDoubleParameter) ((FixedProportionGearFactory) firstYearPolicyScript.getGear()).getCatchabilityPerHour()).getValue()
             , .06, .0001);
 
 
@@ -132,7 +132,7 @@ public class PolicyScriptsTest {
     @Test
     public void fromYamlCorrectlyOneScript() {
 
-        String yaml = "PolicyScript:\n" +
+        final String yaml = "PolicyScript:\n" +
             "  changeInNumberOfFishers: 100\n" +
             "  departingStrategy: null\n" +
             "  destinationStrategy: null\n" +
@@ -142,12 +142,12 @@ public class PolicyScriptsTest {
             "      catchabilityPerHour: '0.06'\n" +
             "  regulation: null\n" +
             "  weatherStrategy: null";
-        FishYAML yamler = new FishYAML();
-        PolicyScript script = yamler.loadAs(yaml, PolicyScript.class);
+        final FishYAML yamler = new FishYAML();
+        final PolicyScript script = yamler.loadAs(yaml, PolicyScript.class);
         Assert.assertNull(script.getFishingStrategy());
         Assert.assertTrue(script.getGear() instanceof FixedProportionGearFactory);
         Assert.assertEquals(
-            ((FixedDoubleParameter) ((FixedProportionGearFactory) script.getGear()).getCatchabilityPerHour()).getFixedValue()
+            ((FixedDoubleParameter) ((FixedProportionGearFactory) script.getGear()).getCatchabilityPerHour()).getValue()
             , .06, .0001);
 
 

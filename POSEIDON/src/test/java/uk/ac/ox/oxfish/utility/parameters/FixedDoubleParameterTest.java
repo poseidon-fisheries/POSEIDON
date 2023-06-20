@@ -33,7 +33,7 @@ public class FixedDoubleParameterTest {
 
         final FixedDoubleParameter parameter = new FixedDoubleParameter(100);
         assertEquals(parameter.applyAsDouble(new MersenneTwisterFast()), 100, .0001);
-        parameter.setFixedValue(-1);
+        parameter.setValue(-1);
         assertEquals(parameter.applyAsDouble(new MersenneTwisterFast()), -1, .0001);
 
 

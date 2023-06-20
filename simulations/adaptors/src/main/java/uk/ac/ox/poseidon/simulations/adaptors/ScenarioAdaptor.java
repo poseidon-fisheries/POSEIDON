@@ -9,6 +9,7 @@ import uk.ac.ox.poseidon.simulations.api.Scenario;
 import uk.ac.ox.poseidon.simulations.api.Simulation;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
@@ -22,10 +23,13 @@ public abstract class ScenarioAdaptor<S extends uk.ac.ox.oxfish.model.scenario.S
 
     @Override
     public Map<String, Parameter> getParameters() {
-        return new ParameterExtractor<>(DoubleParameter.class)
-            .getParameters(getDelegate())
-            .map(delegate -> new DoubleParameterAdaptor(delegate, this))
-            .collect(toImmutableMap(DoubleParameterAdaptor::getName, identity()));
+        final Stream<DoubleParameterAdaptor> doubleParameters =
+            new ParameterExtractor<>(DoubleParameter.class)
+                .getParameters(getDelegate())
+                .map(delegate -> new DoubleParameterAdaptor(delegate, this));
+
+        return doubleParameters
+            .collect(toImmutableMap(Parameter::getName, identity()));
     }
 
     @Override

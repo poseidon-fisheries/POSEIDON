@@ -49,41 +49,11 @@ public class YamlConstructor extends Constructor {
 
     public YamlConstructor() {
 
-
-        //add the ability to read/write coordinates
-
-/*
-        this.yamlConstructors.put(new Tag("!coord"), new Construct() {
-            @Override
-            public Object construct(Node node) {
-                String val = (String) constructScalar((ScalarNode) node);
-                return convertToCoordinate(val);
-
-            }
-
-            @Override
-            public void construct2ndStep(Node node, Object object) {
-
-            }
-        });
-
-*/
-
         //intercept the scalar nodes to see if they are actually Factories or DoubleParameters
         this.yamlClassConstructors.put(
             NodeId.scalar, new Constructor.ConstructScalar() {
                 @Override
                 public Object construct(final Node nnode) {
-                    //if field you are trying to fill is a coordinate
-                        /*
-                        if(nnode.getType().equals(Coordinate.class))
-                        {
-                            String val = (String) constructScalar((ScalarNode) nnode);
-                            return convertToCoordinate(val);
-
-                        }
-                        */
-
                     //if the field you are trying to fill is a double parameter
                     if (nnode.getType().equals(DoubleParameter.class))
                         //then a simple scalar must be a fixed double parameter. Build it
@@ -98,6 +68,9 @@ public class YamlConstructor extends Constructor {
                         return AlgorithmFactories.constructorLookup(constructScalar((ScalarNode) nnode));
                         //otherwise I guess it's really a normal scalar!
                     else
+                        // other FixedParameter subclasses will be handled here, as
+                        // SnakeYAML is able to identify the one-argument constructor
+                        // needed to build the right objects
                         return super.construct(nnode);
                 }
             });
@@ -208,12 +181,9 @@ public class YamlConstructor extends Constructor {
     }
 
     private DoubleParameter doubleParameterSplit(final ScalarNode node) {
-
         //get it as a string
         final String nodeContent = constructScalar(node);
         return DoubleParameter.parseDoubleParameter(nodeContent);
-
-
     }
 
     public static Coordinate convertToCoordinate(final String val) {

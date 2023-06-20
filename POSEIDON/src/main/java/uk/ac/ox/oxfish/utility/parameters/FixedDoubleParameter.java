@@ -26,17 +26,19 @@ import ec.util.MersenneTwisterFast;
  * The parameter returned is always the same
  * Created by carrknight on 6/7/15.
  */
-public class FixedDoubleParameter implements DoubleParameter {
+public class FixedDoubleParameter extends FixedParameter<Double> implements DoubleParameter {
 
-    private double fixedValue;
-
-    public FixedDoubleParameter() {
+    public FixedDoubleParameter(final double value) {
+        super(value);
     }
 
-    public FixedDoubleParameter(double fixedValue) {
-        this.fixedValue = fixedValue;
+    public FixedDoubleParameter(final Double value) {
+        super(value);
     }
 
+    public void setValue(final double value) {
+        super.setValue(value);
+    }
 
     /**
      * Applies this function to the given argument.
@@ -45,20 +47,12 @@ public class FixedDoubleParameter implements DoubleParameter {
      * @return the function result
      */
     @Override
-    public double applyAsDouble(MersenneTwisterFast mersenneTwisterFast) {
-        return fixedValue;
-    }
-
-    public double getFixedValue() {
-        return fixedValue;
-    }
-
-    public void setFixedValue(double fixedValue) {
-        this.fixedValue = fixedValue;
+    public double applyAsDouble(final MersenneTwisterFast mersenneTwisterFast) {
+        return getValue();
     }
 
     @Override
     public FixedDoubleParameter makeCopy() {
-        return new FixedDoubleParameter(fixedValue);
+        return new FixedDoubleParameter(getValue());
     }
 }

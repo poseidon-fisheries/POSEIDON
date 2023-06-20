@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.parameters;
 import com.google.common.collect.Streams;
 import uk.ac.ox.oxfish.maximization.generic.ParameterAddressBuilder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.Parameter;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ParameterExtractor<P extends DoubleParameter> {
+public class ParameterExtractor<P extends Parameter> {
 
     private final Class<? extends P> parameterClass;
 

@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
 import uk.ac.ox.oxfish.utility.Locker;
+import uk.ac.ox.oxfish.utility.parameters.BooleanParameter;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
@@ -72,13 +73,13 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         new CalibratedParameter(0.2, 2, 0.6);
     private DoubleParameter minimumPercentageOfTripDurationAllowed =
         new CalibratedParameter(0.4, 0.9, 0, 1, 0.7);
-    private boolean noaSetsCanPoachFads = false;
-    private boolean purgeIllegalActionsImmediately = true;
+    private BooleanParameter noaSetsCanPoachFads = new BooleanParameter(false);
+    private BooleanParameter purgeIllegalActionsImmediately = new BooleanParameter(true);
     private DoubleParameter noaSetsRangeInSeatiles =
         new CalibratedParameter(0, 5, 0, 5, 3);
     private DoubleParameter delSetsRangeInSeatiles =
         new CalibratedParameter(0, 5, 0, 5, 3);
-    private boolean uniqueCatchSamplerForEachStrategy = false;
+    private BooleanParameter uniqueCatchSamplerForEachStrategy = new BooleanParameter(false);
     private AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModuleFactory;
     private LocationValuesFactory locationValuesFactory;
 
@@ -99,6 +100,22 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.catchSamplersFactory = catchSamplersFactory;
         this.actionWeightsFile = actionWeightsFile;
         this.maxTripDurationFile = maxTripDurationFile;
+    }
+
+    public BooleanParameter getNoaSetsCanPoachFads() {
+        return noaSetsCanPoachFads;
+    }
+
+    public void setNoaSetsCanPoachFads(final BooleanParameter noaSetsCanPoachFads) {
+        this.noaSetsCanPoachFads = noaSetsCanPoachFads;
+    }
+
+    public BooleanParameter getPurgeIllegalActionsImmediately() {
+        return purgeIllegalActionsImmediately;
+    }
+
+    public void setPurgeIllegalActionsImmediately(final BooleanParameter purgeIllegalActionsImmediately) {
+        this.purgeIllegalActionsImmediately = purgeIllegalActionsImmediately;
     }
 
     public int getTargetYear() {
@@ -130,7 +147,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
 
 
         final PlannedStrategyProxy proxy = new PlannedStrategyProxy(
-            uniqueCatchSamplerForEachStrategy ? catchSamplersFactory.apply(state) :
+            uniqueCatchSamplerForEachStrategy.getValue() ? catchSamplersFactory.apply(state) :
                 catchSamplerLocker.presentKey(
                     state,
                     () -> catchSamplersFactory.apply(state)
@@ -148,8 +165,8 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             hoursWastedOnFailedSearches.applyAsDouble(state.getRandom()),
             planningHorizonInHours.applyAsDouble(state.getRandom()),
             minimumPercentageOfTripDurationAllowed.applyAsDouble(state.getRandom()),
-            noaSetsCanPoachFads,
-            purgeIllegalActionsImmediately,
+            noaSetsCanPoachFads.getValue(),
+            purgeIllegalActionsImmediately.getValue(),
             (int) noaSetsRangeInSeatiles.applyAsDouble(state.getRandom()),
             (int) delSetsRangeInSeatiles.applyAsDouble(state.getRandom()),
             fadModuleFactory,
@@ -241,22 +258,6 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
     }
 
-    public boolean isNoaSetsCanPoachFads() {
-        return noaSetsCanPoachFads;
-    }
-
-    public void setNoaSetsCanPoachFads(final boolean noaSetsCanPoachFads) {
-        this.noaSetsCanPoachFads = noaSetsCanPoachFads;
-    }
-
-    public boolean isPurgeIllegalActionsImmediately() {
-        return purgeIllegalActionsImmediately;
-    }
-
-    public void setPurgeIllegalActionsImmediately(final boolean purgeIllegalActionsImmediately) {
-        this.purgeIllegalActionsImmediately = purgeIllegalActionsImmediately;
-    }
-
     public DoubleParameter getNoaSetsRangeInSeatiles() {
         return noaSetsRangeInSeatiles;
     }
@@ -281,11 +282,11 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.delSetsRangeInSeatiles = delSetsRangeInSeatiles;
     }
 
-    public boolean isUniqueCatchSamplerForEachStrategy() {
+    public BooleanParameter getUniqueCatchSamplerForEachStrategy() {
         return uniqueCatchSamplerForEachStrategy;
     }
 
-    public void setUniqueCatchSamplerForEachStrategy(final boolean uniqueCatchSamplerForEachStrategy) {
+    public void setUniqueCatchSamplerForEachStrategy(final BooleanParameter uniqueCatchSamplerForEachStrategy) {
         this.uniqueCatchSamplerForEachStrategy = uniqueCatchSamplerForEachStrategy;
     }
 

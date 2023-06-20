@@ -2,6 +2,7 @@ package uk.ac.ox.poseidon.simulations.adaptors;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
+import uk.ac.ox.oxfish.utility.parameters.PathParameter;
 
 import java.nio.file.Path;
 
@@ -20,6 +21,6 @@ public abstract class EpoScenarioAdaptor<
 
     @Override
     public void setInputFolder(final Path path) {
-        getDelegate().getInputFolder().setPath(path);
+        getDelegate().getInputFolder().setPath(new PathParameter(path));
     }
 }

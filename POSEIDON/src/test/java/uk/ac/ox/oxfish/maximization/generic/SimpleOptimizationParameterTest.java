@@ -44,7 +44,7 @@ public class SimpleOptimizationParameterTest {
         scenario.setBiologyInitializer(biologyInitializer);
 
 
-        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(),
             100, .0001
         );
 
@@ -59,7 +59,7 @@ public class SimpleOptimizationParameterTest {
         );
 
 
-        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(),
             200, .0001
         );
     }
@@ -70,7 +70,7 @@ public class SimpleOptimizationParameterTest {
         scenario.setSpeedInKmh(new FixedDoubleParameter(150));
 
 
-        assertEquals(((FixedDoubleParameter) scenario.getSpeedInKmh()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) scenario.getSpeedInKmh()).getValue(),
             150, .0001
         );
 
@@ -84,7 +84,7 @@ public class SimpleOptimizationParameterTest {
             new double[]{0}
         );
 
-        assertEquals(((FixedDoubleParameter) scenario.getSpeedInKmh()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) scenario.getSpeedInKmh()).getValue(),
             10, .0001
         );
     }
@@ -104,10 +104,10 @@ public class SimpleOptimizationParameterTest {
         second.setGrower(new CommonLogisticGrowerFactory(.567));
 
 
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
             .567, .0001
         );
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getValue(),
             .567, .0001
         );
 
@@ -129,10 +129,10 @@ public class SimpleOptimizationParameterTest {
         );
 
 
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
             .567, .0001
         );
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getValue(),
             10, .0001
         );
     }

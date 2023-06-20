@@ -52,7 +52,7 @@ public class EpoScenarioTest extends TestCase {
         saveAndLoadYaml(EpoAbundanceScenario.class);
     }
 
-    public void testSaveAndLoadEpoPathPlanningAbundanceScenario() {
+    public void testSaveAndLoadEpoPathPlannerAbundanceScenario() {
         saveAndLoadYaml(EpoPathPlannerAbundanceScenario.class);
     }
 

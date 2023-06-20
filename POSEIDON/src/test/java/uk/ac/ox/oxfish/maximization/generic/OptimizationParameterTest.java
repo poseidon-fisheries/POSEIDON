@@ -47,7 +47,7 @@ public class OptimizationParameterTest {
         scenario.setBiologyInitializer(biologyInitializer);
 
 
-        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(),
             100, .0001
         );
 
@@ -58,7 +58,7 @@ public class OptimizationParameterTest {
         );
 
 
-        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(),
             200, .0001
         );
     }
@@ -100,10 +100,10 @@ public class OptimizationParameterTest {
         second.setGrower(new CommonLogisticGrowerFactory(.567));
 
 
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
             .567, .0001
         );
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getValue(),
             .567, .0001
         );
 
@@ -114,10 +114,10 @@ public class OptimizationParameterTest {
         );
 
 
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
             .567, .0001
         );
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getFixedValue(),
+        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getValue(),
             10, .0001
         );
     }
@@ -171,7 +171,7 @@ public class OptimizationParameterTest {
 
         assertEquals(
             ((FixedDoubleParameter) gears.gears.get("Pristipomoides multidens")
-                .getAverageCatchability()).getFixedValue(),
+                .getAverageCatchability()).getValue(),
             .01,
             .0001
         );
@@ -183,7 +183,7 @@ public class OptimizationParameterTest {
         );
         assertEquals(
             ((FixedDoubleParameter) gears.gears.get("Pristipomoides multidens")
-                .getAverageCatchability()).getFixedValue(),
+                .getAverageCatchability()).getValue(),
             22,
             .0001
         );

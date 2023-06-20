@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
+import uk.ac.ox.oxfish.utility.parameters.PathParameter;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Supplier;
@@ -7,12 +9,12 @@ import java.util.function.Supplier;
 public class InputPath implements Supplier<Path> {
 
     private InputPath parent;
-    private Path path;
+    private PathParameter path;
 
     public InputPath() {
     }
 
-    private InputPath(final InputPath parent, final Path path) {
+    private InputPath(final InputPath parent, final PathParameter path) {
         this.parent = parent;
         this.path = path;
     }
@@ -22,7 +24,7 @@ public class InputPath implements Supplier<Path> {
     }
 
     public static InputPath of(final Path path) {
-        return new InputPath(null, path);
+        return new InputPath(null, new PathParameter(path));
     }
 
     public InputPath getParent() {
@@ -33,11 +35,11 @@ public class InputPath implements Supplier<Path> {
         this.parent = parent;
     }
 
-    public Path getPath() {
+    public PathParameter getPath() {
         return path;
     }
 
-    public void setPath(final Path path) {
+    public void setPath(final PathParameter path) {
         this.path = path;
     }
 
@@ -46,12 +48,12 @@ public class InputPath implements Supplier<Path> {
     }
 
     public InputPath path(final Path path) {
-        return new InputPath(this, path);
+        return new InputPath(this, new PathParameter(path));
     }
 
     @Override
     public Path get() {
-        return parent == null ? path : parent.get().resolve(path);
+        return parent == null ? path.getValue() : parent.get().resolve(path.getValue());
     }
 
     @Override

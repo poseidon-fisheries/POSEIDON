@@ -2,22 +2,23 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 public class FadZapperFactory implements AlgorithmFactory<FadZapper> {
-    private DoubleParameter maxFadAge =
-        new CalibratedParameter(100, 500, 150);
-    private int minGridX = 20;
+    private DoubleParameter maxFadAge;
+    private IntegerParameter minGridX;
 
+    @SuppressWarnings("unused")
     public FadZapperFactory() {
     }
 
-    public FadZapperFactory(final DoubleParameter maxFadAge, final int minGridX) {
+    public FadZapperFactory(final DoubleParameter maxFadAge, final IntegerParameter minGridX) {
         this.maxFadAge = maxFadAge;
         this.minGridX = minGridX;
     }
 
+    @SuppressWarnings("unused")
     public DoubleParameter getMaxFadAge() {
         return maxFadAge;
     }
@@ -26,11 +27,13 @@ public class FadZapperFactory implements AlgorithmFactory<FadZapper> {
         this.maxFadAge = maxFadAge;
     }
 
-    public int getMinGridX() {
+    @SuppressWarnings("unused")
+    public IntegerParameter getMinGridX() {
         return minGridX;
     }
 
-    public void setMinGridX(final int minGridX) {
+    @SuppressWarnings("unused")
+    public void setMinGridX(final IntegerParameter minGridX) {
         this.minGridX = minGridX;
     }
 
@@ -38,7 +41,7 @@ public class FadZapperFactory implements AlgorithmFactory<FadZapper> {
     public FadZapper apply(final FishState fishState) {
         final double maxFadAge = this.maxFadAge.applyAsDouble(fishState.getRandom());
         return new FadZapper(fad ->
-            fad.getLocation().getGridX() <= minGridX ||
+            fad.getLocation().getGridX() <= minGridX.getValue() ||
                 fishState.getStep() - fad.getStepDeployed() > maxFadAge
         );
     }

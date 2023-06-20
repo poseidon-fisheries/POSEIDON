@@ -252,7 +252,7 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
 
     public Supplier<Double> getGetter(final Scenario scenario) {
         final Supplier<Object> getter = new ParameterAddress(addressToModify).getGetter(scenario);
-        return () -> ((FixedDoubleParameter) getter.get()).getFixedValue();
+        return () -> ((FixedDoubleParameter) getter.get()).getValue();
     }
 
     public Consumer<Double> getSetter(final Scenario scenario) {
