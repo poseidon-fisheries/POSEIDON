@@ -2,41 +2,37 @@ package uk.ac.ox.poseidon.simulations.adaptors;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.maximization.generic.ParameterAddress;
-import uk.ac.ox.oxfish.parameters.ParameterExtractor;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.poseidon.common.Adaptor;
-import uk.ac.ox.poseidon.simulations.api.Parameter;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class DoubleParameterAdaptor
-    extends Adaptor<ParameterExtractor<DoubleParameter>.Parameter>
-    implements Parameter {
+public class DoubleParameterAdaptor extends ParameterAdaptor<DoubleParameter> {
 
-    private final ScenarioAdaptor<?> scenarioAdaptor;
     private final MersenneTwisterFast rng;
 
-
-    DoubleParameterAdaptor(
-        final ParameterExtractor<DoubleParameter>.Parameter delegate,
-        final ScenarioAdaptor<?> scenarioAdaptor
+    public DoubleParameterAdaptor(
+        final DoubleParameter parameter,
+        final String name,
+        final Scenario scenario
     ) {
-        this(delegate, scenarioAdaptor, new MersenneTwisterFast());
+        this(parameter, name, scenario, new MersenneTwisterFast());
     }
 
-    private DoubleParameterAdaptor(
-        final ParameterExtractor<DoubleParameter>.Parameter delegate,
-        final ScenarioAdaptor<?> scenarioAdaptor, final MersenneTwisterFast rng
+    public DoubleParameterAdaptor(
+        final DoubleParameter parameter,
+        final String name,
+        final Scenario scenario,
+        final MersenneTwisterFast rng
     ) {
-        super(delegate);
-        this.scenarioAdaptor = scenarioAdaptor;
+        super(parameter, name, scenario);
         this.rng = rng;
     }
 
     @Override
     public Double getValue() {
-        return getDelegate().getObject().applyAsDouble(rng);
+        return getDelegate().applyAsDouble(rng);
     }
 
     @Override
@@ -48,12 +44,8 @@ public class DoubleParameterAdaptor
             value.getClass()
         );
         new ParameterAddress(getName())
-            .getSetter(scenarioAdaptor.getDelegate())
+            .getSetter(scenario)
             .accept(new FixedDoubleParameter(((Number) value).doubleValue()));
     }
 
-    @Override
-    public String getName() {
-        return getDelegate().getAddress();
-    }
 }
