@@ -13,10 +13,11 @@ import java.util.Map;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
-public class ScenarioAdaptor<S extends uk.ac.ox.oxfish.model.scenario.Scenario>
-    extends Adaptor<S> implements Scenario {
+public class ScenarioAdaptor
+    extends Adaptor<uk.ac.ox.oxfish.model.scenario.Scenario>
+    implements Scenario {
 
-    ScenarioAdaptor(final S delegate) {
+    ScenarioAdaptor(final uk.ac.ox.oxfish.model.scenario.Scenario delegate) {
         super(delegate);
     }
 
