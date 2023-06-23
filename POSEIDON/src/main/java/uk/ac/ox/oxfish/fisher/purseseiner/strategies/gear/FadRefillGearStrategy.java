@@ -30,7 +30,6 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.getBoatId;
 
 public class FadRefillGearStrategy implements GearStrategy {
 
@@ -50,7 +49,7 @@ public class FadRefillGearStrategy implements GearStrategy {
         final Action currentAction
     ) {
         final FadManager fadManager = getFadManager(fisher);
-        final String boatId = getBoatId(fisher);
+        final String boatId = fisher.getId();
         final int maxFads = checkNotNull(
             maxFadsPerFisher.get(boatId),
             "Max number of FADs not found for fisher %s", boatId

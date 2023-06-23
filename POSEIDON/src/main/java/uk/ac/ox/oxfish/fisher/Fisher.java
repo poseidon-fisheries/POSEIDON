@@ -65,6 +65,7 @@ import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationDailyScheduler;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
+import uk.ac.ox.poseidon.agents.api.Agent;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -78,7 +79,7 @@ import static java.util.stream.Collectors.joining;
  * Strategies are instead the fisher way to deal with decision points (should I go fish or not? Where do I go?)
  * Created by carrknight on 4/2/15.
  */
-public class Fisher implements Steppable, Startable {
+public class Fisher implements Steppable, Startable, Agent {
 
 
     /***
@@ -1119,10 +1120,6 @@ public class Fisher implements Steppable, Startable {
         return memory.getYearlyCounter();
     }
 
-    public int getID() {
-        return fisherID;
-    }
-
     public boolean isGoingToPort() {
         return status.isGoingToPort();
     }
@@ -1571,5 +1568,25 @@ public class Fisher implements Steppable, Startable {
      */
     public LinkedList<Cost> getAdditionalTripCosts() {
         return status.getAdditionalTripCosts();
+    }
+
+    /**
+     * Currently returns the Fisher's first tag, which currently contains the ID in
+     * EPO scenarios, and falls back on the numeric ID if no tags are defined.
+     * <p>
+     * TODO: this should be fixed by having a proper String id field in the Fisher class
+     * sooner rather than later.
+     *
+     * @return the Fisher's id.
+     */
+    @Override
+    public String getId() {
+        return getTags().stream()
+            .findFirst()
+            .orElse(String.valueOf(getID()));
+    }
+
+    public int getID() {
+        return fisherID;
     }
 }

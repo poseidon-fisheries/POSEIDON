@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Collections.emptyMap;
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.getBoatId;
 
 /**
  * Caches based on this class store values loaded from a file and uniquely identified by:
@@ -51,7 +50,7 @@ public abstract class FisherValuesFromFileCache<T> {
     ) {
         final T value = cache.apply(valuesFile)
             .getOrDefault(targetYear, emptyMap())
-            .get(getBoatId(fisher));
+            .get(fisher.getId());
         return Optional.ofNullable(value);
     }
 

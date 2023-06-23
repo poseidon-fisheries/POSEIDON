@@ -43,6 +43,9 @@ sourceSets {
 
 //here we add all the dependencies notice that mason and geomason are not on maven so we need to add them separately
 dependencies {
+
+    implementation(project(":regulations:api"))
+
     //mason libraries. They aren't on maven so we have to lug their jars around
     api fileTree(dir: 'libs/mason', include: '*.jar')
     api fileTree(dir: 'libs/geomason', include: '*.jar')

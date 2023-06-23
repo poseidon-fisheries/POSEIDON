@@ -111,12 +111,6 @@ public abstract class EpoScenario<B extends LocalBiology>
         return LocalDate.of(year, month, dayOfMonth).getDayOfYear();
     }
 
-    public static String getBoatId(final Fisher fisher) {
-        return fisher.getTags().stream()
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("Boat id not set for " + fisher));
-    }
-
     public int getTargetYear() {
         return targetYear;
     }
