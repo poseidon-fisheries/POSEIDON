@@ -1,9 +1,13 @@
 rootProject.name = "POSEIDON"
+include("agents:api")
 include("simulations:api")
 include("simulations:adaptors")
 include("datasets:api")
 include("datasets:core")
 include("datasets:adaptors")
+include("regulations:api")
+include("regulations:core")
 include("common")
 include("POSEIDON")
 include("poseidon-r")
+include("agents")
