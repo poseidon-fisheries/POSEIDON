@@ -20,6 +20,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
 import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
 import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
+import uk.ac.ox.oxfish.regulations.factories.EverythingPermittedRegulationsFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -39,6 +40,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
             getInputFolder(),
             getSpeciesCodesSupplier(),
             new AbundancePurseSeineGearFactory(
+                new EverythingPermittedRegulationsFactory<>(),
                 new SelectivityAbundanceFadInitializerFactory(
                     // see https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1545974455
                     // for Weibull parameter values, obtained by fitting the distributions to observer data

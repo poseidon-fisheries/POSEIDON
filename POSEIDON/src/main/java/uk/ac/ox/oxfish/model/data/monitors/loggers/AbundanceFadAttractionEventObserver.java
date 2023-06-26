@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFadAttractionEvent;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
+import uk.ac.ox.poseidon.common.api.Observer;
 
 import java.util.List;
 

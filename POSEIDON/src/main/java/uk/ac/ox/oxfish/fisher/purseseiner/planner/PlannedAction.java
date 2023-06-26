@@ -26,11 +26,13 @@ public interface PlannedAction {
         final Fisher fisher,
         final SeaTile location,
         final FadManager fadManager,
-        final Class<? extends PurseSeinerAction> actionClass
+        final PurseSeinerAction action
     ) {
         return fisher.isAllowedAtSea() &&
+            // TODO: get a proper action context
+            fadManager.getRegulations().isPermitted(action, null) &&
             //fad setting ought not to be banned
-            !fadManager.getActionSpecificRegulations().isForbidden(actionClass, fisher) &&
+            !fadManager.getActionSpecificRegulations().isForbidden(action.getClass(), fisher) &&
             //we should be allowed to fish here
             fisher.isAllowedToFishHere(location, fisher.grabState());
     }
@@ -130,10 +132,15 @@ public interface PlannedAction {
         public static boolean isFadSetAllowed(
             final Fisher fisher,
             final FadManager fadManager,
-            final Fad set
+            final Fad fad
         ) {
-            return !set.isLost() && //the fad has not since been destroyed
-                isActionAllowed(fisher, set.getLocation(), fadManager, FadSetAction.class);
+            return !fad.isLost() && //the fad has not since been destroyed
+                isActionAllowed(
+                    fisher,
+                    fad.getLocation(),
+                    fadManager,
+                    new FadSetAction(fad, fisher, 0) // fake action just to check for legality
+                );
         }
 
         @Override
@@ -194,7 +201,7 @@ public interface PlannedAction {
                 fisher,
                 getLocation(),
                 FadManager.getFadManager(fisher),
-                OpportunisticFadSetAction.class
+                new OpportunisticFadSetAction(null, fisher, 0) // fake action just to check for legality
             );
         }
 
@@ -363,7 +370,7 @@ public interface PlannedAction {
                 fisher,
                 getLocation(),
                 FadManager.getFadManager(fisher),
-                getTypeOfActionPlanned()
+                makeDummyPlannedAction(fisher)
             );
         }
 
@@ -372,7 +379,25 @@ public interface PlannedAction {
             return position;
         }
 
-        abstract protected Class<? extends AbstractSetAction> getTypeOfActionPlanned();
+        AbstractSetAction makeDummyPlannedAction(final Fisher fisher) {
+            return createSet(
+                null,
+                null,
+                fisher,
+                0,
+                getLocation(),
+                null
+            );
+        }
+
+        abstract protected AbstractSetAction createSet(
+            final B potentialCatch,
+            final List<B> targetBiologies,
+            final Fisher fisher,
+            final double fishingTime,
+            final SeaTile location,
+            final CatchMaker<B> catchMaker
+        );
 
         /**
          * list of actions that need to take place for the planned action to take place
@@ -404,20 +429,11 @@ public interface PlannedAction {
             return targetBiologiesGrabber;
         }
 
-        abstract protected AbstractSetAction createSet(
-            final B potentialCatch,
-            final List<B> targetBiologies,
-            final Fisher fisher,
-            final double fishingTime,
-            final SeaTile location,
-            final CatchMaker<B> catchMaker
-        );
-
         @Override
         public String toString() {
             return "Planned set{" +
                 "position=" + position +
-                "type=" + getTypeOfActionPlanned() +
+                "type=" + this.getClass() +
                 ", searchTimeInHours=" + searchTimeInHours +
                 ", setDurationInHours=" + setDurationInHours +
                 '}';
@@ -476,12 +492,7 @@ public interface PlannedAction {
                 localBiologyClass
             );
         }
-
-        @Override
-        protected Class<? extends AbstractSetAction> getTypeOfActionPlanned() {
-            return DolphinSetAction.class;
-        }
-
+        
         @Override
         protected AbstractSetAction createSet(
             final B potentialCatch,
@@ -522,11 +533,6 @@ public interface PlannedAction {
                 rangeInSeaTiles,
                 localBiologyClass
             );
-        }
-
-        @Override
-        protected Class<? extends AbstractSetAction> getTypeOfActionPlanned() {
-            return NonAssociatedSetAction.class;
         }
 
         @Override

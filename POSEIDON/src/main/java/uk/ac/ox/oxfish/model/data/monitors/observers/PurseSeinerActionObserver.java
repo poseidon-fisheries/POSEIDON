@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.model.data.monitors.observers;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.poseidon.common.api.Observer;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 

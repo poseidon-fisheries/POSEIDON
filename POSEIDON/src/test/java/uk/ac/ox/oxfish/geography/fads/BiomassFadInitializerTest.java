@@ -16,6 +16,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.regulations.core.EverythingPermitted;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -43,7 +44,12 @@ public class BiomassFadInitializerTest {
                 BiomassLocalBiology.class
             );
         final FadManager fadManager =
-            new FadManager(fadMap, fadInitializer, new ReliableFishValueCalculator(globalBiology));
+            new FadManager(
+                new EverythingPermitted<>(),
+                fadMap,
+                fadInitializer,
+                new ReliableFishValueCalculator(globalBiology)
+            );
         final SeaTile seaTile = mock(SeaTile.class);
         when(seaTile.getGridX()).thenReturn(0);
         when(seaTile.getGridY()).thenReturn(0);

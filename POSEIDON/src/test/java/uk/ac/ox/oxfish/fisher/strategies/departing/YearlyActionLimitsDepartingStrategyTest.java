@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.model.regs.fads.SetLimits;
+import uk.ac.ox.poseidon.regulations.core.EverythingPermitted;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -61,6 +62,7 @@ public class YearlyActionLimitsDepartingStrategyTest {
         final SetLimits setLimits = new SetLimits(fishState::registerStartable, __ -> 3);
 
         final FadManager fadManager = new FadManager(
+            new EverythingPermitted<>(),
             null,
             fadInitializer,
             new ReliableFishValueCalculator(fishState.getBiology())

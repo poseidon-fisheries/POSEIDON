@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
+import uk.ac.ox.poseidon.common.api.Observer;
 
 public interface ActionSpecificRegulation extends Startable, Steppable, Observer<PurseSeinerAction> {
 
@@ -34,15 +34,15 @@ public interface ActionSpecificRegulation extends Startable, Steppable, Observer
 
     boolean isForbidden(Class<? extends PurseSeinerAction> action, Fisher fisher);
 
-    default void observe(PurseSeinerAction action) {
+    default void observe(final PurseSeinerAction action) {
     }
 
     @Override
-    default void step(SimState simState) {
+    default void step(final SimState simState) {
     }
 
     @Override
-    default void start(FishState model) {
+    default void start(final FishState model) {
     }
 
 }

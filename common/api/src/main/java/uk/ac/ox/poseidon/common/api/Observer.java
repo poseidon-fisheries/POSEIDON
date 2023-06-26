@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.oxfish.model.data.monitors.observers;
+package uk.ac.ox.poseidon.common.api;
 
 @FunctionalInterface
 public interface Observer<O> {

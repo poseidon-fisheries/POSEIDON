@@ -5,7 +5,8 @@ plugins {
 
 dependencies {
     implementation("com.google.guava:guava:31.1-jre")
-    implementation(project(":common"))
+    implementation(project(":common:api"))
+    implementation(project(":common:core"))
     implementation(project(":simulations:api"))
     runtimeOnly(project(":simulations:adaptors"))
 }

@@ -3,7 +3,7 @@ package uk.ac.ox.poseidon.simulations.adaptors;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.parameters.ParameterExtractor;
 import uk.ac.ox.oxfish.utility.parameters.*;
-import uk.ac.ox.poseidon.common.Adaptor;
+import uk.ac.ox.poseidon.common.core.AbstractAdaptor;
 import uk.ac.ox.poseidon.simulations.api.Parameter;
 import uk.ac.ox.poseidon.simulations.api.Scenario;
 import uk.ac.ox.poseidon.simulations.api.Simulation;
@@ -14,7 +14,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
 public class ScenarioAdaptor
-    extends Adaptor<uk.ac.ox.oxfish.model.scenario.Scenario>
+    extends AbstractAdaptor<uk.ac.ox.oxfish.model.scenario.Scenario>
     implements Scenario {
 
     ScenarioAdaptor(final uk.ac.ox.oxfish.model.scenario.Scenario delegate) {

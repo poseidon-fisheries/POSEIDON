@@ -22,9 +22,11 @@ package uk.ac.ox.oxfish.model.data.monitors.observers;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
+import uk.ac.ox.poseidon.common.api.Observer;
 
 import java.util.Collection;
 import java.util.function.Supplier;
+
 
 public class Observers {
 

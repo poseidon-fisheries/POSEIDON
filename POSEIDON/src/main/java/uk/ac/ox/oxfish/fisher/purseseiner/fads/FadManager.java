@@ -34,10 +34,11 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
-import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
 import uk.ac.ox.oxfish.model.data.monitors.observers.Observers;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
+import uk.ac.ox.poseidon.common.api.Observer;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import javax.measure.quantity.Mass;
 import java.util.Collections;
@@ -62,6 +63,7 @@ public class FadManager {
             DolphinSetAction.class,
             NonAssociatedSetAction.class
         );
+    private final Regulations<PurseSeinerActionContext> regulations;
     private final FadMap fadMap;
     private final Observers observers = new Observers();
     private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>>
@@ -74,11 +76,13 @@ public class FadManager {
     private int numFadsInStock;
 
     public FadManager(
+        final Regulations<PurseSeinerActionContext> regulations,
         final FadMap fadMap,
         final FadInitializer<?, ?> fadInitializer,
         final FishValueCalculator fishValueCalculator
     ) {
         this(
+            regulations,
             fadMap,
             fadInitializer,
             ImmutableSet.of(),
@@ -99,6 +103,7 @@ public class FadManager {
      */
     @SuppressWarnings("rawtypes")
     public FadManager(
+        final Regulations<PurseSeinerActionContext> regulations,
         final FadMap fadMap,
         final FadInitializer<?, ?> fadInitializer,
         final Iterable<Observer<FadDeploymentAction>> fadDeploymentObservers,
@@ -110,6 +115,7 @@ public class FadManager {
         final ActiveActionRegulations actionSpecificRegulations,
         final FishValueCalculator fishValueCalculator
     ) {
+        this.regulations = regulations;
         this.fadMap = fadMap;
         this.fadInitializer = fadInitializer;
         this.biomassLostMonitor = biomassLostMonitor;
@@ -165,6 +171,10 @@ public class FadManager {
         final Fisher fisher
     ) {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
+    }
+
+    public Regulations<PurseSeinerActionContext> getRegulations() {
+        return regulations;
     }
 
     public FishValueCalculator getFishValueCalculator() {

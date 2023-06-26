@@ -1,4 +1,6 @@
-package uk.ac.ox.poseidon.common;
+package uk.ac.ox.poseidon.common.core;
+
+import uk.ac.ox.poseidon.common.api.AdaptorFactory;
 
 import java.util.Iterator;
 import java.util.List;
@@ -9,7 +11,22 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
 
 public class Services {
-    public static <S> S loadFirst(final Class<S> service, final Predicate<S> predicate) {
+
+    public static <D, T, F extends AdaptorFactory<D, T>> F loadAdaptorFactory(
+        final Class<F> adaptorFactoryClass,
+        final Class<D> delegateClass
+    ) {
+        final F adaptorFactory = Services.loadFirst(
+            adaptorFactoryClass,
+            f -> f.getDelegateClass().isAssignableFrom(delegateClass)
+        );
+        return adaptorFactoryClass.cast(adaptorFactory);
+    }
+
+    public static <S> S loadFirst(
+        final Class<S> service,
+        final Predicate<? super S> predicate
+    ) {
         final Iterator<S> it = ServiceLoader.load(service).iterator();
         if (!it.hasNext()) {
             throw new IllegalStateException(String.format(
@@ -30,7 +47,10 @@ public class Services {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    public static <S> List<S> loadAll(final Class<S> service, final Predicate<S> predicate) {
+    public static <S> List<S> loadAll(
+        final Class<? extends S> service,
+        final Predicate<? super S> predicate
+    ) {
         return stream(ServiceLoader.load(service).iterator())
             .filter(predicate)
             .collect(toImmutableList());

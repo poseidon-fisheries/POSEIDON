@@ -31,6 +31,7 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.poseidon.regulations.core.EverythingPermitted;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -51,7 +52,7 @@ public class FadManagerTest extends TestCase {
         final FadMap fadMap = mock(FadMap.class);
 
         final FadManager fadManager =
-            new FadManager(fadMap, fadInitializer, null);
+            new FadManager(new EverythingPermitted<>(), fadMap, fadInitializer, null);
 
         final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);

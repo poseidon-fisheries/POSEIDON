@@ -34,6 +34,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.geography.fads.CompressedBiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.regulations.factories.EverythingPermittedRegulationsFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 
 import java.util.List;
@@ -49,6 +50,7 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
             getInputFolder(),
             getSpeciesCodesSupplier(),
             new BiomassPurseSeineGearFactory(
+                new EverythingPermittedRegulationsFactory<>(),
                 new CompressedBiomassFadInitializerFactory(
                     getSpeciesCodesSupplier(),
                     // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml

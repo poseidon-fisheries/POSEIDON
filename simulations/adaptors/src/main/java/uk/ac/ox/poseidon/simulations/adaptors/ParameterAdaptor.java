@@ -1,10 +1,10 @@
 package uk.ac.ox.poseidon.simulations.adaptors;
 
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.poseidon.common.Adaptor;
+import uk.ac.ox.poseidon.common.core.AbstractAdaptor;
 
 public abstract class ParameterAdaptor<P extends uk.ac.ox.oxfish.utility.parameters.Parameter>
-    extends Adaptor<P>
+    extends AbstractAdaptor<P>
     implements uk.ac.ox.poseidon.simulations.api.Parameter {
     final Scenario scenario;
     private final String name;

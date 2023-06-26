@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
-import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
+import uk.ac.ox.poseidon.common.api.Observer;
 
 import java.util.function.Predicate;
 
@@ -28,8 +28,8 @@ public class LocalizedActionCounter implements Observer<AbstractFadSetAction>, A
     private final String counterName;
 
     public LocalizedActionCounter(
-        Predicate<AbstractFadSetAction> passThisIfYouWantToBeCounted,
-        String counterName
+        final Predicate<AbstractFadSetAction> passThisIfYouWantToBeCounted,
+        final String counterName
     ) {
         this.passThisIfYouWantToBeCounted = passThisIfYouWantToBeCounted;
         this.counterName = counterName;
@@ -40,26 +40,26 @@ public class LocalizedActionCounter implements Observer<AbstractFadSetAction>, A
 
 
     @Override
-    public void observe(AbstractFadSetAction observable) {
+    public void observe(final AbstractFadSetAction observable) {
         if (passThisIfYouWantToBeCounted.test(observable)) {
             validActions.count("Number of Actions", 1.0);
             if (observable.getCatchesKept().isPresent())
                 validActions.count(
                     "Total Catch",
-                    ((Catch) observable.getCatchesKept().get()).getTotalWeight()
+                    observable.getCatchesKept().get().getTotalWeight()
                 );
 
         }
     }
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
         validActions.start(model);
         model.getYearlyDataSet().registerGatherer(counterName + ": Number of Actions",
             new Gatherer<FishState>() {
                 @Override
-                public Double apply(FishState fishState) {
+                public Double apply(final FishState fishState) {
                     return getNumberOfActionsThisYearSoFar();
                 }
             }, Double.NaN
@@ -67,7 +67,7 @@ public class LocalizedActionCounter implements Observer<AbstractFadSetAction>, A
         model.getYearlyDataSet().registerGatherer(counterName + ": Total Catch",
             new Gatherer<FishState>() {
                 @Override
-                public Double apply(FishState fishState) {
+                public Double apply(final FishState fishState) {
                     return getTotalCatchThisYearSoFar();
                 }
             }, Double.NaN

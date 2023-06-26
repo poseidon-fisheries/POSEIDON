@@ -4,7 +4,8 @@ plugins {
 
 dependencies {
     implementation(project(":POSEIDON"))
-    implementation(project(":common"))
+    implementation(project(":common:core"))
+    compileOnly(project(":common:api"))
     compileOnly(project(":simulations:api"))
     compileOnly(project(":datasets:api"))
     runtimeOnly(project(":datasets:adaptors"))

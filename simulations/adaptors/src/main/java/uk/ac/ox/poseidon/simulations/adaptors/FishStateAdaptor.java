@@ -1,7 +1,7 @@
 package uk.ac.ox.poseidon.simulations.adaptors;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.poseidon.common.Services;
+import uk.ac.ox.poseidon.common.core.Services;
 import uk.ac.ox.poseidon.datasets.api.Dataset;
 import uk.ac.ox.poseidon.datasets.api.DatasetFactory;
 import uk.ac.ox.poseidon.simulations.api.Simulation;

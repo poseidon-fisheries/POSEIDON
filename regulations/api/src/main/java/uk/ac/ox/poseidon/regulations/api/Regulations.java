@@ -2,22 +2,22 @@ package uk.ac.ox.poseidon.regulations.api;
 
 import uk.ac.ox.poseidon.agents.api.Action;
 
-import static uk.ac.ox.poseidon.regulations.api.Regulation.Mode.*;
+import static uk.ac.ox.poseidon.regulations.api.Regulations.Mode.*;
 
-public interface Regulation<A extends Action, C> {
+public interface Regulations<C> {
 
-    default boolean isObligatory(final A action, final C context) {
+    default boolean isObligatory(final Action action, final C context) {
         return mode(action, context) == OBLIGATORY;
     }
 
-    Mode mode(A action, C context);
+    Mode mode(Action action, C context);
 
-    default boolean isPermitted(final A action, final C context) {
+    default boolean isPermitted(final Action action, final C context) {
         final Mode mode = mode(action, context);
         return mode == PERMITTED || mode == OBLIGATORY;
     }
 
-    default boolean isForbidden(final A action, final C context) {
+    default boolean isForbidden(final Action action, final C context) {
         return mode(action, context) == FORBIDDEN;
     }
 

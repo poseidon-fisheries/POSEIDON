@@ -3,7 +3,7 @@ package uk.ac.ox.poseidon.simulations.adaptors;
 import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
-import uk.ac.ox.poseidon.common.AdaptorFactory;
+import uk.ac.ox.poseidon.common.core.Services;
 import uk.ac.ox.poseidon.simulations.api.FileScenarioLoader;
 
 import java.io.FileInputStream;
@@ -23,7 +23,7 @@ public class YamlScenarioLoader implements FileScenarioLoader {
         try (final FileInputStream fileInputStream = new FileInputStream(scenarioPath.toFile())) {
             final InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, UTF_8);
             final Scenario scenario = new FishYAML().loadAs(inputStreamReader, Scenario.class);
-            return AdaptorFactory.loadFor(ScenarioAdaptorFactory.class, Scenario.class).apply(scenario);
+            return Services.loadAdaptorFactory(ScenarioAdaptorFactory.class, Scenario.class).apply(scenario);
         } catch (final FileNotFoundException e) {
             throw new IllegalArgumentException("Can't find scenario file: " + scenarioPath, e);
         } catch (final IOException e) {

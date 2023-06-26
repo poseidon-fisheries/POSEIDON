@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
+import uk.ac.ox.poseidon.agents.api.Agent;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -32,8 +33,8 @@ import java.util.Optional;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
-public abstract class PurseSeinerAction implements Action, Locatable {
-
+public abstract class PurseSeinerAction
+    implements Action, Locatable, uk.ac.ox.poseidon.agents.api.Action {
     private final Fisher fisher;
     private final SeaTile location;
     private final int step;
@@ -57,15 +58,26 @@ public abstract class PurseSeinerAction implements Action, Locatable {
     }
 
     public boolean checkIfPermitted() {
-        final boolean forbidden =
-            Optional.of(getFadManager(getFisher()))
+        final Optional<FadManager> fadManager =
+            Optional.of(getFadManager(getFisher()));
+        final boolean forbiddenByRegulations = fadManager
+            .map(FadManager::getRegulations)
+            .map(reg -> reg.isForbidden(this, null))
+            .orElse(false);
+        final boolean forbiddenByActionSpecificRegulations =
+            fadManager
                 .map(FadManager::getActionSpecificRegulations)
                 .map(reg -> reg.isForbidden(this.getClass(), getFisher()))
                 .orElse(false);
-        return !forbidden;
+        return !(forbiddenByRegulations || forbiddenByActionSpecificRegulations);
     }
 
     public Fisher getFisher() {
+        return fisher;
+    }
+
+    @Override
+    public Agent getAgent() {
         return fisher;
     }
 

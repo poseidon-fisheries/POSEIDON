@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.model.regs.fads;
 import com.google.common.collect.ImmutableSetMultimap;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
-import uk.ac.ox.oxfish.model.data.monitors.observers.Observer;
+import uk.ac.ox.poseidon.common.api.Observer;
 
 import java.util.Map;
 import java.util.Optional;

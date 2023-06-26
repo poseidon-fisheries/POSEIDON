@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.regulations.core.EverythingPermitted;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -73,7 +74,12 @@ public class FadMapTest {
         fishState.schedule = schedule;
 
         final FadManager fadManager =
-            new FadManager(fadMap, fadInitializer, new ReliableFishValueCalculator(globalBiology));
+            new FadManager(
+                new EverythingPermitted<>(),
+                fadMap,
+                fadInitializer,
+                new ReliableFishValueCalculator(globalBiology)
+            );
         final Fisher fisher = mock(Fisher.class, RETURNS_MOCKS);
         when(fisher.grabRandomizer()).thenReturn(rng);
         when(fisher.grabState()).thenReturn(fishState);
