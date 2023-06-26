@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.agents.core.MultisetYearlyActionCounter;
 import uk.ac.ox.poseidon.common.api.Observer;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
 
@@ -177,6 +178,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
             regulationsFactory.apply(fishState),
             fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
+            MultisetYearlyActionCounter.create(),
             fadDeploymentObserversCache.get(fishState),
             allSetsObserversCache.get(fishState),
             fadSetObserversCache.get(fishState),

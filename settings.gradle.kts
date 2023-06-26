@@ -12,3 +12,5 @@ include("common:core")
 include("POSEIDON")
 include("poseidon-r")
 include("agents")
+include("agents:core")
+findProject(":agents:core")?.name = "core"

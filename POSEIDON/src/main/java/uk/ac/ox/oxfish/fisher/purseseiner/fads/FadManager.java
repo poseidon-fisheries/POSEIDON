@@ -37,6 +37,7 @@ import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.observers.Observers;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
+import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
 import uk.ac.ox.poseidon.common.api.Observer;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
 
@@ -66,6 +67,7 @@ public class FadManager {
     private final Regulations<PurseSeinerActionContext> regulations;
     private final FadMap fadMap;
     private final Observers observers = new Observers();
+    private final YearlyActionCounter yearlyActionCounter;
     private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>>
         biomassLostMonitor;
     private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
@@ -85,6 +87,7 @@ public class FadManager {
             regulations,
             fadMap,
             fadInitializer,
+            null,
             ImmutableSet.of(),
             ImmutableSet.of(),
             ImmutableSet.of(),
@@ -106,6 +109,7 @@ public class FadManager {
         final Regulations<PurseSeinerActionContext> regulations,
         final FadMap fadMap,
         final FadInitializer<?, ?> fadInitializer,
+        final YearlyActionCounter yearlyActionCounter,
         final Iterable<Observer<FadDeploymentAction>> fadDeploymentObservers,
         final Iterable<Observer<AbstractSetAction>> allSetsObservers,
         final Iterable<Observer<AbstractFadSetAction>> fadSetObservers,
@@ -118,9 +122,22 @@ public class FadManager {
         this.regulations = regulations;
         this.fadMap = fadMap;
         this.fadInitializer = fadInitializer;
+        this.yearlyActionCounter = yearlyActionCounter;
         this.biomassLostMonitor = biomassLostMonitor;
         this.actionSpecificRegulations = actionSpecificRegulations;
         this.fishValueCalculator = fishValueCalculator;
+
+        if (yearlyActionCounter != null) {
+            Stream.of(
+                FadDeploymentAction.class,
+                FadSetAction.class,
+                OpportunisticFadSetAction.class,
+                NonAssociatedSetAction.class,
+                DolphinSetAction.class
+            ).forEach(actionClass ->
+                registerObserver(actionClass, yearlyActionCounter)
+            );
+        }
 
         fadDeploymentObservers.forEach(observer -> registerObserver(
             FadDeploymentAction.class,
@@ -322,5 +339,9 @@ public class FadManager {
      */
     public void putFadBackInStock() {
         numFadsInStock++;
+    }
+
+    PurseSeinerActionContext getActionContext() {
+        return new PurseSeinerActionContext(yearlyActionCounter);
     }
 }

@@ -109,7 +109,7 @@ public class Monitors {
                     isOnOwnFad ? "own" : "others'"
                 ),
                 fadSet -> ImmutableList.of(fadSet.isOwnFad()),
-                __ -> action -> ((Optional<Catch>) action.getCatchesKept())
+                __ -> action -> action.getCatchesKept()
                     .map(catchesKept -> catchesKept.getWeightCaught(species))
                     .orElse(0.0)
             )
@@ -260,7 +260,7 @@ public class Monitors {
             "Biomass",
             fishState.getSpecies(),
             species -> region -> action ->
-                ((Optional<Catch>) action.getCatchesKept())
+                action.getCatchesKept()
                     .map(catchesKept -> catchesKept.getWeightCaught(species))
                     .orElse(0.0),
             regionalDivision

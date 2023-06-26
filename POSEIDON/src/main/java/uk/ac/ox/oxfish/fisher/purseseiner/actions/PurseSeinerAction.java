@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 import uk.ac.ox.poseidon.agents.api.Agent;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
 
@@ -81,6 +82,15 @@ public abstract class PurseSeinerAction
         return fisher;
     }
 
+    @Override
+    public LocalDateTime getDateTime() {
+        return LocalDateTime.of(getDate(), getTime().orElse(LocalTime.MIN));
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
     public Optional<LocalTime> getTime() {
         return Optional.ofNullable(time);
     }
@@ -120,9 +130,5 @@ public abstract class PurseSeinerAction
      */
     public Class<? extends PurseSeinerAction> getClassForWeighting() {
         return this.getClass();
-    }
-
-    public LocalDate getDate() {
-        return date;
     }
 }
