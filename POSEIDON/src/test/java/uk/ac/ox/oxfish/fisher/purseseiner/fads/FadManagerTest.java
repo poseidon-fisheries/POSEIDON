@@ -52,7 +52,7 @@ public class FadManagerTest extends TestCase {
         final FadMap fadMap = mock(FadMap.class);
 
         final FadManager fadManager =
-            new FadManager(new EverythingPermitted<>(), fadMap, fadInitializer, null);
+            new FadManager(new EverythingPermitted<>(), fadMap, fadInitializer, null, null);
 
         final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);

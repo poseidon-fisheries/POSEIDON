@@ -34,4 +34,9 @@ public class DolphinSetAction<B extends LocalBiology> extends SchoolSetAction<B>
     ) {
         super(targetBiology, fisher, setDuration, sourceBiologies, catchMaker);
     }
+
+    @Override
+    public String getCode() {
+        return "DEL";
+    }
 }

@@ -4,8 +4,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 
 import java.util.function.DoubleUnaryOperator;
 
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
-
 public class GlobalSetAttractionModulator implements GlobalAttractionModulator {
 
     private final DoubleUnaryOperator pctHoldAvailableModulationFunction;
@@ -30,11 +28,11 @@ public class GlobalSetAttractionModulator implements GlobalAttractionModulator {
     }
 
     private static double pctSetsRemaining(final Fisher fisher) {
-        return getFadManager(fisher)
-            .getActionSpecificRegulations()
-            .getSetLimits()
-            .map(reg -> reg.getPctLimitRemaining(fisher))
-            .orElse(1.0);
+        // TODO: now that set limits are implemented with the unified
+        // regulation system, this should be should be adapted to
+        // query getFadManager(fisher).getRegulations() and find
+        // the appropriate regulation if it exists.
+        throw new RuntimeException("Not implemented");
     }
 
 }

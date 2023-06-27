@@ -2,9 +2,15 @@ package uk.ac.ox.poseidon.regulations.api;
 
 import uk.ac.ox.poseidon.agents.api.Action;
 
+import java.util.stream.Stream;
+
 import static uk.ac.ox.poseidon.regulations.api.Regulations.Mode.*;
 
 public interface Regulations<C> {
+
+    default Stream<Regulations<C>> asStream() {
+        return Stream.of(this);
+    }
 
     default boolean isObligatory(final Action action, final C context) {
         return mode(action, context) == OBLIGATORY;

@@ -78,6 +78,7 @@ public class FadMapTest {
                 new EverythingPermitted<>(),
                 fadMap,
                 fadInitializer,
+                null,
                 new ReliableFishValueCalculator(globalBiology)
             );
         final Fisher fisher = mock(Fisher.class, RETURNS_MOCKS);

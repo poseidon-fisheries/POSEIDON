@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
+import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
@@ -31,11 +32,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
+import java.util.Set;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public abstract class PurseSeinerAction
     implements Action, Locatable, uk.ac.ox.poseidon.agents.api.Action {
+
+    public static final Set<String> ACTION_CODES =
+        ImmutableSet.of("FAD", "OFS", "NOA", "DEL", "DPL");
     private final Fisher fisher;
     private final SeaTile location;
     private final int step;
@@ -62,8 +67,7 @@ public abstract class PurseSeinerAction
         final Optional<FadManager> fadManager =
             Optional.of(getFadManager(getFisher()));
         final boolean forbiddenByRegulations = fadManager
-            .map(FadManager::getRegulations)
-            .map(reg -> reg.isForbidden(this, null))
+            .map(fm -> fm.getRegulations().isForbidden(this, fm.getActionContext()))
             .orElse(false);
         final boolean forbiddenByActionSpecificRegulations =
             fadManager

@@ -41,4 +41,8 @@ public class FadSetAction extends AbstractFadSetAction {
         return true;
     }
 
+    @Override
+    public String getCode() {
+        return "FAD";
+    }
 }

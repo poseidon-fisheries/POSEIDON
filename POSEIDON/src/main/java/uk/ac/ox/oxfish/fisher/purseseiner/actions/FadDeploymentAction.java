@@ -107,4 +107,9 @@ public class FadDeploymentAction extends PurseSeinerAction implements FadRelated
     public Fad getFad() {
         return fad;
     }
+
+    @Override
+    public String getCode() {
+        return "DPL";
+    }
 }

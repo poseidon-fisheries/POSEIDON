@@ -14,7 +14,6 @@ public class ActionSpecificRegulations {
 
     static {
         NAMES.put(ActiveFadLimitsFactory.class, "Active FAD limits");
-        NAMES.put(SetLimitsFactory.class, "General set limits");
         NAMES.put(DelLicenseRegulationFactory.class, "License required for dolphin-associated sets");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }

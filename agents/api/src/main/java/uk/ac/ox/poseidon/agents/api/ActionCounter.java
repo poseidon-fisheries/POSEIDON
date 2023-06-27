@@ -5,5 +5,5 @@ import uk.ac.ox.poseidon.common.api.Observer;
 public interface ActionCounter extends Observer<Action> {
     void observe(Action observable);
 
-    int getCount(Agent agent, Class<? extends Action> action);
+    int getCount(Agent agent, String actionCode);
 }

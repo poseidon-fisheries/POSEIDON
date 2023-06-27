@@ -24,11 +24,11 @@ public class MultisetYearlyActionCounter implements YearlyActionCounter {
     public int getCount(
         final int year,
         final Agent agent,
-        final Class<? extends Action> action
+        final String actionCode
     ) {
         return counts
             .computeIfAbsent(year, __ -> MultisetActionCounter.create())
-            .getCount(agent, action);
+            .getCount(agent, actionCode);
     }
 
     @Override

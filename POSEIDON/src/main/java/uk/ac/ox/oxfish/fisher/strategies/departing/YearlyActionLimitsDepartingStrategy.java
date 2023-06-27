@@ -21,9 +21,18 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.PurseSeinerActionContext;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
+import uk.ac.ox.poseidon.agents.api.Agent;
+import uk.ac.ox.poseidon.agents.api.YearlyActionCounts;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
+import uk.ac.ox.poseidon.regulations.core.YearlyActionCountLimit;
 
+import java.util.List;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction.ACTION_CODES;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
@@ -32,12 +41,35 @@ public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
      * Only leave port if fisher has remaining yearly-limited actions
      */
     @Override
-    public boolean shouldFisherLeavePort(Fisher fisher, FishState model, MersenneTwisterFast random) {
-        return shouldFisherLeavePort(getFadManager(fisher).getActionSpecificRegulations(), fisher);
+    public boolean shouldFisherLeavePort(final Fisher fisher, final FishState model, final MersenneTwisterFast random) {
+        final int year = fisher.grabState().getDate().getYear();
+        final FadManager fadManager = getFadManager(fisher);
+        final PurseSeinerActionContext actionContext = fadManager.getActionContext();
+        return anyYearlyActionsRemaining(fisher, year, fadManager.getRegulations(), actionContext);
     }
 
-    boolean shouldFisherLeavePort(ActiveActionRegulations activeActionRegulations, Fisher fisher) {
-        return activeActionRegulations.anyYearlyLimitedActionRemaining(fisher);
+    private static boolean anyYearlyActionsRemaining(
+        final Agent fisher,
+        final int year,
+        final Regulations<? super PurseSeinerActionContext> regulations,
+        final YearlyActionCounts actionContext
+    ) {
+        final List<YearlyActionCountLimit> yearlyActionCountLimits =
+            regulations
+                .asStream()
+                .filter(r -> r instanceof YearlyActionCountLimit)
+                .map(r -> (YearlyActionCountLimit) r)
+                .collect(toImmutableList());
+        return ACTION_CODES
+            .stream()
+            .mapToInt(actionCode ->
+                yearlyActionCountLimits
+                    .stream()
+                    .mapToInt(r -> r.getRemainingActions(year, fisher, actionCode, actionContext))
+                    .min()
+                    .orElse(Integer.MAX_VALUE)
+            )
+            .anyMatch(remaining -> remaining > 0);
     }
 
 }

@@ -35,4 +35,8 @@ public class NonAssociatedSetAction<B extends LocalBiology> extends SchoolSetAct
         super(targetBiology, fisher, setDuration, sourceBiologies, catchMaker);
     }
 
+    @Override
+    public String getCode() {
+        return "NOA";
+    }
 }

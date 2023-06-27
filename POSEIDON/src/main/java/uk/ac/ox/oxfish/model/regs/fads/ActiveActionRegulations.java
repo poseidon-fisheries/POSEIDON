@@ -43,9 +43,6 @@ public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final Optional<ActiveFadLimits> activeFadLimits;
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private final Optional<SetLimits> setLimits;
-
     public ActiveActionRegulations() {
         this(ImmutableSetMultimap.of());
     }
@@ -72,15 +69,6 @@ public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
                 .values()
                 .stream()
                 .filter(reg -> reg instanceof ActiveFadLimits).map(reg -> (ActiveFadLimits) reg)
-                .findFirst();
-
-        this.setLimits =
-            actionSpecificRegulations
-                .values()
-                .stream()
-                .filter(reg -> reg instanceof SetLimits).map(reg -> (SetLimits) reg)
-                // There are multiple references to set limit in the multimap values,
-                // but they should all refer to the same instance
                 .findFirst();
 
     }
@@ -129,10 +117,5 @@ public class ActiveActionRegulations implements Observer<PurseSeinerAction> {
                 reg.getNumRemainingActions(fisher) > 0
             );
     }
-
-    public Optional<SetLimits> getSetLimits() {
-        return setLimits;
-    }
-
 
 }

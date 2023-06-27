@@ -87,6 +87,7 @@ public class ExogenousFadMaker<B extends LocalBiology, F extends Fad> implements
             new EverythingPermitted<>(),
             model.getFadMap(),
             fadInitializer,
+            null,
             new ReliableFishValueCalculator(model.getBiology())
         );
 

@@ -11,9 +11,9 @@ import java.util.Map;
 
 public class MultisetActionCounter implements ActionCounter {
 
-    private final Map<? super Agent, Multiset<Class<? extends Action>>> counts;
+    private final Map<? super Agent, Multiset<String>> counts;
 
-    private MultisetActionCounter(final Map<? super Agent, Multiset<Class<? extends Action>>> counts) {
+    private MultisetActionCounter(final Map<? super Agent, Multiset<String>> counts) {
         this.counts = counts;
     }
 
@@ -25,13 +25,13 @@ public class MultisetActionCounter implements ActionCounter {
     public void observe(final Action action) {
         counts
             .computeIfAbsent(action.getAgent(), __ -> HashMultiset.create())
-            .add(action.getClass());
+            .add(action.getCode());
     }
 
     @Override
-    public int getCount(final Agent agent, final Class<? extends Action> action) {
+    public int getCount(final Agent agent, final String actionCode) {
         return counts
             .computeIfAbsent(agent, __ -> HashMultiset.create())
-            .count(action);
+            .count(actionCode);
     }
 }

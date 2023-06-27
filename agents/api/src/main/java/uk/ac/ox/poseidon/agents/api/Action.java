@@ -6,4 +6,6 @@ public interface Action {
     Agent getAgent();
 
     LocalDateTime getDateTime();
+
+    String getCode();
 }

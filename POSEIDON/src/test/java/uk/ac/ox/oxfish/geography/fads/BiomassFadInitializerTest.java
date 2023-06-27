@@ -48,6 +48,7 @@ public class BiomassFadInitializerTest {
                 new EverythingPermitted<>(),
                 fadMap,
                 fadInitializer,
+                null,
                 new ReliableFishValueCalculator(globalBiology)
             );
         final SeaTile seaTile = mock(SeaTile.class);

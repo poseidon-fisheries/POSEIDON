@@ -41,4 +41,8 @@ public class OpportunisticFadSetAction extends AbstractFadSetAction {
         return false;
     }
 
+    @Override
+    public String getCode() {
+        return "OFS";
+    }
 }

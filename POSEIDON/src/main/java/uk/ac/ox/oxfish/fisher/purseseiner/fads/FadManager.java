@@ -64,7 +64,7 @@ public class FadManager {
             DolphinSetAction.class,
             NonAssociatedSetAction.class
         );
-    private final Regulations<PurseSeinerActionContext> regulations;
+    private final Regulations<? super PurseSeinerActionContext> regulations;
     private final FadMap fadMap;
     private final Observers observers = new Observers();
     private final YearlyActionCounter yearlyActionCounter;
@@ -78,16 +78,17 @@ public class FadManager {
     private int numFadsInStock;
 
     public FadManager(
-        final Regulations<PurseSeinerActionContext> regulations,
+        final Regulations<? super PurseSeinerActionContext> regulations,
         final FadMap fadMap,
         final FadInitializer<?, ?> fadInitializer,
+        final YearlyActionCounter yearlyActionCounter,
         final FishValueCalculator fishValueCalculator
     ) {
         this(
             regulations,
             fadMap,
             fadInitializer,
-            null,
+            yearlyActionCounter,
             ImmutableSet.of(),
             ImmutableSet.of(),
             ImmutableSet.of(),
@@ -106,7 +107,7 @@ public class FadManager {
      */
     @SuppressWarnings("rawtypes")
     public FadManager(
-        final Regulations<PurseSeinerActionContext> regulations,
+        final Regulations<? super PurseSeinerActionContext> regulations,
         final FadMap fadMap,
         final FadInitializer<?, ?> fadInitializer,
         final YearlyActionCounter yearlyActionCounter,
@@ -190,7 +191,7 @@ public class FadManager {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
     }
 
-    public Regulations<PurseSeinerActionContext> getRegulations() {
+    public Regulations<? super PurseSeinerActionContext> getRegulations() {
         return regulations;
     }
 
@@ -341,7 +342,7 @@ public class FadManager {
         numFadsInStock++;
     }
 
-    PurseSeinerActionContext getActionContext() {
+    public PurseSeinerActionContext getActionContext() {
         return new PurseSeinerActionContext(yearlyActionCounter);
     }
 }

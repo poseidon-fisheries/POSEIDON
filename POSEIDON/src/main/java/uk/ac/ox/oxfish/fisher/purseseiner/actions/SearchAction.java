@@ -63,4 +63,9 @@ public class SearchAction extends PurseSeinerAction {
     public Class<? extends PurseSeinerAction> getClassForWeighting() {
         return this.classForWeighting;
     }
+
+    @Override
+    public String getCode() {
+        return "SEARCH";
+    }
 }

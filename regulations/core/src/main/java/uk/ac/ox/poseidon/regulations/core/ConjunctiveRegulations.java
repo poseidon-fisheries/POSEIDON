@@ -1,6 +1,5 @@
 package uk.ac.ox.poseidon.regulations.core;
 
-import com.google.common.collect.ImmutableList;
 import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
 
@@ -10,18 +9,16 @@ import java.util.stream.Collectors;
 
 import static uk.ac.ox.poseidon.regulations.api.Regulations.Mode.*;
 
-public class ConjunctiveRegulations<C> implements Regulations<C> {
+public class ConjunctiveRegulations<C> extends AbstractCompositeRegulations<C> {
 
-    private final Collection<Regulations<C>> regulations;
-
-    public ConjunctiveRegulations(final Collection<Regulations<C>> regulations) {
-        this.regulations = ImmutableList.copyOf(regulations);
+    protected ConjunctiveRegulations(final Collection<Regulations<C>> subRegulations) {
+        super(subRegulations);
     }
 
     @Override
     public Mode mode(final Action action, final C context) {
         final Set<Mode> modes =
-            regulations.stream()
+            getSubRegulations().stream()
                 .map(r -> r.mode(action, context))
                 .collect(Collectors.toSet());
         final boolean forbidden = modes.contains(FORBIDDEN);
