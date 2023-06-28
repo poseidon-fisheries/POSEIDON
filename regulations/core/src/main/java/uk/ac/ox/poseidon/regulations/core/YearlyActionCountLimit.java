@@ -70,7 +70,7 @@ public final class YearlyActionCountLimit
             .orElse(Integer.MAX_VALUE);
     }
 
-    private Stream<Entry<Set<String>, Integer>> getApplicableLimits(final String actionCode) {
+    public Stream<Entry<Set<String>, Integer>> getApplicableLimits(final String actionCode) {
         return limits
             .entrySet()
             .stream()

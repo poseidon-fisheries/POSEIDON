@@ -39,8 +39,10 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 public abstract class PurseSeinerAction
     implements Action, Locatable, uk.ac.ox.poseidon.agents.api.Action {
 
-    public static final Set<String> ACTION_CODES =
-        ImmutableSet.of("FAD", "OFS", "NOA", "DEL", "DPL");
+    public static final Set<String> SET_ACTION_CODES =
+        ImmutableSet.of("FAD", "OFS", "NOA", "DEL");
+    public static final Set<String> ALL_ACTION_CODES =
+        ImmutableSet.<String>builder().addAll(SET_ACTION_CODES).add("DPL").build();
     private final Fisher fisher;
     private final SeaTile location;
     private final int step;

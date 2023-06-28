@@ -42,6 +42,7 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.poseidon.regulations.core.EverythingPermitted;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -72,6 +73,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         when(gear.getFadManager()).thenReturn(mock(FadManager.class));
         when(gear.isSafe(any())).thenReturn(true);
         final FadManager fadManager = gear.getFadManager();
+        when(fadManager.getRegulations()).thenReturn(new EverythingPermitted<>());
         when(fadManager.getFadMap()).thenReturn(fadMap);
         when(fadManager.getFisher()).thenReturn(fisher);
 
@@ -160,6 +162,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         when(gear.isSafe(any())).thenReturn(true);
         final FadManager fadManager = gear.getFadManager();
         when(fadManager.getFisher()).thenReturn(fisher);
+        when(fadManager.getRegulations()).thenReturn(new EverythingPermitted<>());
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);
@@ -220,6 +223,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
             );
         final FadManager fadManager = gear.getFadManager();
         when(fadManager.getFisher()).thenReturn(fisher);
+        when(fadManager.getRegulations()).thenReturn(new EverythingPermitted<>());
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);

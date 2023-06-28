@@ -33,15 +33,17 @@ public class FisherMocker {
 
     private final String idPrefix = "Fisher";
 
-    public List<Fisher> mockFishers(int numFishers) {
+    public List<Fisher> mockFishers(final int numFishers) {
         return range(0, numFishers)
             .mapToObj(this::mockFisher)
             .collect(toImmutableList());
     }
 
-    private Fisher mockFisher(int id) {
+    private Fisher mockFisher(final int id) {
         final Fisher fisher = mock(Fisher.class);
-        when(fisher.getTags()).thenReturn(ImmutableList.of(idPrefix + id));
+        final String fisherId = idPrefix + id;
+        when(fisher.getId()).thenReturn(fisherId);
+        when(fisher.getTags()).thenReturn(ImmutableList.of(fisherId));
         return fisher;
     }
 

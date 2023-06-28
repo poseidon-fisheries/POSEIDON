@@ -32,7 +32,7 @@ import uk.ac.ox.poseidon.regulations.core.YearlyActionCountLimit;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction.ACTION_CODES;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction.ALL_ACTION_CODES;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
@@ -60,7 +60,7 @@ public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
                 .filter(r -> r instanceof YearlyActionCountLimit)
                 .map(r -> (YearlyActionCountLimit) r)
                 .collect(toImmutableList());
-        return ACTION_CODES
+        return ALL_ACTION_CODES
             .stream()
             .mapToInt(actionCode ->
                 yearlyActionCountLimits
