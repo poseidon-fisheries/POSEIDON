@@ -39,7 +39,7 @@ import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
 import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
 import uk.ac.ox.poseidon.common.api.Observer;
-import uk.ac.ox.poseidon.regulations.api.Regulations;
+import uk.ac.ox.poseidon.regulations.api.Regulation;
 
 import javax.measure.quantity.Mass;
 import java.util.Collections;
@@ -64,7 +64,7 @@ public class FadManager {
             DolphinSetAction.class,
             NonAssociatedSetAction.class
         );
-    private final Regulations<? super PurseSeinerActionContext> regulations;
+    private final Regulation<? super PurseSeinerActionContext> regulation;
     private final FadMap fadMap;
     private final Observers observers = new Observers();
     private final YearlyActionCounter yearlyActionCounter;
@@ -78,14 +78,14 @@ public class FadManager {
     private int numFadsInStock;
 
     public FadManager(
-        final Regulations<? super PurseSeinerActionContext> regulations,
+        final Regulation<? super PurseSeinerActionContext> regulation,
         final FadMap fadMap,
         final FadInitializer<?, ?> fadInitializer,
         final YearlyActionCounter yearlyActionCounter,
         final FishValueCalculator fishValueCalculator
     ) {
         this(
-            regulations,
+            regulation,
             fadMap,
             fadInitializer,
             yearlyActionCounter,
@@ -107,7 +107,7 @@ public class FadManager {
      */
     @SuppressWarnings("rawtypes")
     public FadManager(
-        final Regulations<? super PurseSeinerActionContext> regulations,
+        final Regulation<? super PurseSeinerActionContext> regulation,
         final FadMap fadMap,
         final FadInitializer<?, ?> fadInitializer,
         final YearlyActionCounter yearlyActionCounter,
@@ -120,7 +120,7 @@ public class FadManager {
         final ActiveActionRegulations actionSpecificRegulations,
         final FishValueCalculator fishValueCalculator
     ) {
-        this.regulations = regulations;
+        this.regulation = regulation;
         this.fadMap = fadMap;
         this.fadInitializer = fadInitializer;
         this.yearlyActionCounter = yearlyActionCounter;
@@ -191,8 +191,8 @@ public class FadManager {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
     }
 
-    public Regulations<? super PurseSeinerActionContext> getRegulations() {
-        return regulations;
+    public Regulation<? super PurseSeinerActionContext> getRegulations() {
+        return regulation;
     }
 
     public FishValueCalculator getFishValueCalculator() {

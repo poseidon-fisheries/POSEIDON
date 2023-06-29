@@ -16,11 +16,11 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.poseidon.regulations.core.EverythingPermitted;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
 public class BiomassFadInitializerTest {
 
@@ -45,7 +45,7 @@ public class BiomassFadInitializerTest {
             );
         final FadManager fadManager =
             new FadManager(
-                new EverythingPermitted<>(),
+                PERMITTED,
                 fadMap,
                 fadInitializer,
                 null,

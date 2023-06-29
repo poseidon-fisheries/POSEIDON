@@ -12,13 +12,14 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.poseidon.regulations.core.EverythingPermitted;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+
+import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
 /**
  * this object deploys and sets on FADs but without an associated boat or owner. In other words
@@ -84,7 +85,7 @@ public class ExogenousFadMaker<B extends LocalBiology, F extends Fad> implements
 
         //create the fad manager
         fadManager = new FadManager(
-            new EverythingPermitted<>(),
+            PERMITTED,
             model.getFadMap(),
             fadInitializer,
             null,

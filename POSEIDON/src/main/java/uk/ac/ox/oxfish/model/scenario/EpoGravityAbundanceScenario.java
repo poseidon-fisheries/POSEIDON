@@ -34,7 +34,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.geography.fads.LinearAbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.regulations.factories.EverythingPermittedRegulationsFactory;
+import uk.ac.ox.oxfish.regulations.factories.EverythingPermittedRegulationFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 
 import java.util.List;
@@ -56,7 +56,7 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
             getInputFolder(),
             getSpeciesCodesSupplier(),
             new AbundancePurseSeineGearFactory(
-                new EverythingPermittedRegulationsFactory<>(),
+                new EverythingPermittedRegulationFactory(),
                 new LinearAbundanceFadInitializerFactory(
                     getAbundanceFiltersFactory(),
                     getSpeciesCodesSupplier(),

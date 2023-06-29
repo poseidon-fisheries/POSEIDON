@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.poseidon.agents.core.MultisetYearlyActionCounter;
 import uk.ac.ox.poseidon.common.api.Observer;
-import uk.ac.ox.poseidon.regulations.api.Regulations;
+import uk.ac.ox.poseidon.regulations.api.Regulation;
 
 import javax.measure.quantity.Mass;
 import java.util.LinkedHashSet;
@@ -75,13 +75,13 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     private InputPath locationValuesFile;
     private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory;
     private AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory;
-    private AlgorithmFactory<? extends Regulations<PurseSeinerActionContext>> regulationsFactory;
+    private AlgorithmFactory<? extends Regulation<? super PurseSeinerActionContext>> regulationsFactory;
 
     public PurseSeineGearFactory() {
     }
 
     public PurseSeineGearFactory(
-        final AlgorithmFactory<? extends Regulations<PurseSeinerActionContext>> regulationsFactory,
+        final AlgorithmFactory<? extends Regulation<? super PurseSeinerActionContext>> regulationsFactory,
         final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory,
         final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory
     ) {
@@ -90,11 +90,11 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         this.fishValueCalculatorFactory = fishValueCalculatorFactory;
     }
 
-    public AlgorithmFactory<? extends Regulations<PurseSeinerActionContext>> getRegulationsFactory() {
+    public AlgorithmFactory<? extends Regulation<? super PurseSeinerActionContext>> getRegulationsFactory() {
         return regulationsFactory;
     }
 
-    public void setRegulationsFactory(final AlgorithmFactory<? extends Regulations<PurseSeinerActionContext>> regulationsFactory) {
+    public void setRegulationsFactory(final AlgorithmFactory<Regulation<? super PurseSeinerActionContext>> regulationsFactory) {
         this.regulationsFactory = regulationsFactory;
     }
 

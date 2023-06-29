@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.PurseSeinerActionContext;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.poseidon.agents.api.Agent;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounts;
-import uk.ac.ox.poseidon.regulations.api.Regulations;
+import uk.ac.ox.poseidon.regulations.api.Regulation;
 import uk.ac.ox.poseidon.regulations.core.YearlyActionCountLimit;
 
 import java.util.List;
@@ -51,11 +51,11 @@ public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
     private static boolean anyYearlyActionsRemaining(
         final Agent fisher,
         final int year,
-        final Regulations<? super PurseSeinerActionContext> regulations,
+        final Regulation<? super PurseSeinerActionContext> regulation,
         final YearlyActionCounts actionContext
     ) {
         final List<YearlyActionCountLimit> yearlyActionCountLimits =
-            regulations
+            regulation
                 .asStream()
                 .filter(r -> r instanceof YearlyActionCountLimit)
                 .map(r -> (YearlyActionCountLimit) r)

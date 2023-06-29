@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.agents.api.Agent;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounts;
-import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,11 +11,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
-import static uk.ac.ox.poseidon.regulations.api.Regulations.Mode.FORBIDDEN;
-import static uk.ac.ox.poseidon.regulations.api.Regulations.Mode.PERMITTED;
 
-public final class YearlyActionCountLimit
-    implements Regulations<YearlyActionCounts> {
+public final class YearlyActionCountLimit extends Interdiction<YearlyActionCounts> {
 
     private final Map<Set<String>, Integer> limits;
 
@@ -37,10 +33,8 @@ public final class YearlyActionCountLimit
     }
 
     @Override
-    public Mode mode(final Action action, final YearlyActionCounts yearlyActionCounts) {
-        return getRemainingActions(action, yearlyActionCounts) > 0
-            ? PERMITTED
-            : FORBIDDEN;
+    public boolean test(final Action action, final YearlyActionCounts yearlyActionCounts) {
+        return getRemainingActions(action, yearlyActionCounts) <= 0;
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -76,5 +70,4 @@ public final class YearlyActionCountLimit
             .stream()
             .filter(entry -> entry.getKey().contains(actionCode));
     }
-
 }

@@ -13,7 +13,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.poseidon.regulations.core.EverythingPermitted;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -24,6 +23,7 @@ import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
+import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
 public class FadMapTest {
 
@@ -75,7 +75,7 @@ public class FadMapTest {
 
         final FadManager fadManager =
             new FadManager(
-                new EverythingPermitted<>(),
+                PERMITTED,
                 fadMap,
                 fadInitializer,
                 null,
