@@ -44,7 +44,7 @@ import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 import uk.ac.ox.oxfish.utility.parameters.StringParameter;
 
@@ -92,7 +92,7 @@ public abstract class EpoScenario<B extends LocalBiology>
     private List<AlgorithmFactory<? extends Startable>> additionalStartables =
         Stream.of(
             new FadZapperFactory(
-                new CalibratedParameter(100, 500, 150),
+                new FixedDoubleParameter(300),
                 new IntegerParameter(20)
             ),
             new EnvironmentalMapFactory(
