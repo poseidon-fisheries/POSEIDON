@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.BooleanParameter;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Map;
 
@@ -48,7 +49,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * $ a stolen fad needs to have accumulated before we even try to target it
      */
     private DoubleParameter minimumValueOpportunisticFadSets =
-        new CalibratedParameter(0, 15000, 1000);
+        new FixedDoubleParameter(18135.37); // based on 10t of SKJ at 2017 price
     /**
      * if you tried to steal and failed, how many hours does it take for you to fish this out
      */
