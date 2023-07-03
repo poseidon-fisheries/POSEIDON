@@ -33,17 +33,17 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * hours wasted after each DEL set
      */
     private DoubleParameter additionalHourlyDelayDolphinSets =
-        new CalibratedParameter(11, 20, 0, 24, 16);
+        new CalibratedParameter(12.63818, 21.06363, 0, 24, 16);
     /**
      * hours wasted after every DPL
      */
     private DoubleParameter additionalHourlyDelayDeployment =
-        new CalibratedParameter(0, 5, 0, 24, 0);
+        new CalibratedParameter(0.538688, 0.897813, 0, 24, 0);
     /**
      * hours wasted after every NOA
      */
     private DoubleParameter additionalHourlyDelayNonAssociatedSets =
-        new CalibratedParameter(0, 15, 0, 24, 6);
+        new CalibratedParameter(7.758563, 12.93094, 0, 24, 6);
     /**
      * $ a stolen fad needs to have accumulated before we even try to target it
      */
