@@ -82,9 +82,11 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                     )
                 ),
                 // ref: https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1549923263
+                // For fixed parameter values see:
+                // https://github.com/poseidon-fisheries/tuna-issues/issues/202#issue-1779551927
                 new UnreliableFishValueCalculatorFactory(new LogNormalErrorOperatorFactory(
-                    new CalibratedParameter(-.2, .2, -.4, .4),
-                    new CalibratedParameter(.2, .3, .01, .5)
+                    new FixedDoubleParameter(-0.14452),
+                    new FixedDoubleParameter(0.14097)
                 ))
             ),
             new EPOPlannedStrategyFlexibleFactory(
