@@ -19,7 +19,7 @@ public abstract class FadInitializerFactory<
     private Map<String, DoubleParameter> catchabilities;
     private CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory;
     private DoubleParameter daysInWaterBeforeAttraction =
-        new CalibratedParameter(13, 30, 5, 60, 14);
+        new CalibratedParameter(13, 30, 5, 30, 14);
     private DoubleParameter fishReleaseProbabilityInPercent =
         new CalibratedParameter(0.0, 3.5, 0, 10, 3.3);
 
