@@ -24,10 +24,10 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 import java.util.Collection;
+import java.util.Map.Entry;
 
 /**
  * The algorithmic part of the adaptation routine of agents. There are always 3 possible actions:
@@ -89,7 +89,7 @@ public interface AdaptationAlgorithm<T> {
      * @param sensor            the function that maps Fisher--->current decision
      * @return a pair of the new decision to take AND the friend imitated (which can be null)
      */
-    Pair<T, Fisher> imitate(
+    Entry<T, Fisher> imitate(
         MersenneTwisterFast random,
         Fisher agent, double fitness,
         T current,

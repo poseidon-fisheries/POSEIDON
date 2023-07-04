@@ -55,13 +55,8 @@ public class SimulatedProfitWithCPUEObjectiveFunctionTest {
 
         ProfitFunction simulation = mock(ProfitFunction.class);
         // the simulator is fake, will just add all the CPUEs
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                return Arrays.stream((double[])
-                    invocation.getArguments()[3]).sum();
-            }
-        })
+        doAnswer(invocation -> Arrays.stream((double[])
+            invocation.getArguments()[3]).sum())
             .when(simulation).hourlyProfitFromHypotheticalTripHere(any(), any(), any(), any(), anyBoolean());
 
         SimulatedProfitWithCPUEObjectiveFunction function = new SimulatedProfitWithCPUEObjectiveFunction(
@@ -93,13 +88,8 @@ public class SimulatedProfitWithCPUEObjectiveFunctionTest {
 
         ProfitFunction simulation = mock(ProfitFunction.class);
         // the simulator is fake, will just add all the CPUEs
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                return Arrays.stream((double[])
-                    invocation.getArguments()[3]).sum();
-            }
-        })
+        doAnswer(invocation -> Arrays.stream((double[])
+            invocation.getArguments()[3]).sum())
             .when(simulation).hourlyProfitFromHypotheticalTripHere(any(), any(), any(), any(), anyBoolean());
 
         SimulatedProfitWithCPUEObjectiveFunction function = new SimulatedProfitWithCPUEObjectiveFunction(

@@ -49,6 +49,7 @@ public abstract class AbstractAbundanceLinearIntervalAttractor
     implements FishAttractor<AbundanceLocalBiology, AbundanceAggregatingFad>,
     Steppable {
 
+    private static final long serialVersionUID = -4518063352770580734L;
     protected final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves;
     protected final FishState model;
     private final int daysInWaterBeforeAttraction;

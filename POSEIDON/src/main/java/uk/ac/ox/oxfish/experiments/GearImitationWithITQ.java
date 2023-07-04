@@ -52,23 +52,20 @@ public class GearImitationWithITQ {
 
         final Path directory = Paths.get("docs", "20151014 corollaries");
 
-        FishState state = gearImitationWithITQ(System.currentTimeMillis(), 10, new Consumer<FishState>() {
-                @Override
-                public void accept(FishState state) {
+        FishState state = gearImitationWithITQ(System.currentTimeMillis(), 10, state1 -> {
 
-                    //initial distributions
-                    FishStateUtilities.pollHistogramToFile(
-                        state.getFishers(),
-                        directory.resolve("initial_red.csv").toFile(),
-                        fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0]
-                    );
-                    FishStateUtilities.pollHistogramToFile(
-                        state.getFishers(),
-                        directory.resolve("initial_blue.csv").toFile(),
-                        fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1]
-                    );
-                }
-            }
+            //initial distributions
+            FishStateUtilities.pollHistogramToFile(
+                state1.getFishers(),
+                directory.resolve("initial_red.csv").toFile(),
+                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0]
+            );
+            FishStateUtilities.pollHistogramToFile(
+                state1.getFishers(),
+                directory.resolve("initial_blue.csv").toFile(),
+                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1]
+            );
+        }
 
         );
 
@@ -142,26 +139,13 @@ public class GearImitationWithITQ {
                         new ExploreImitateAdaptation<RandomCatchabilityTrawl>(
                             (Predicate<Fisher>) fisher1 -> true,
                             new BeamHillClimbing<RandomCatchabilityTrawl>(
-                                new RandomStep<RandomCatchabilityTrawl>() {
-                                    @Override
-                                    public RandomCatchabilityTrawl randomStep(
-                                        FishState state, MersenneTwisterFast random, Fisher fisher,
-                                        RandomCatchabilityTrawl current
-                                    ) {
-                                        return gearFactory.apply(state);
-                                    }
-                                }
+                                (state12, random, fisher12, current) -> gearFactory.apply(state12)
                             ),
                             (fisher1, change, state1) -> fisher1.setGear(
                                 change),
                             fisher1 -> ((RandomCatchabilityTrawl) fisher1.getGear()),
                             new CashFlowObjective(365),
-                            .1, .8, new Predicate<RandomCatchabilityTrawl>() {
-                            @Override
-                            public boolean test(RandomCatchabilityTrawl a) {
-                                return true;
-                            }
-                        }
+                            .1, .8, a -> true
                         );
 
                     //tell the fisher to use this once a year

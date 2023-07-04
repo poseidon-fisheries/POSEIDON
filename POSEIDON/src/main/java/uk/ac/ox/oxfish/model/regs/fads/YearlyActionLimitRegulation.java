@@ -30,48 +30,49 @@ import java.util.function.Consumer;
 
 public abstract class YearlyActionLimitRegulation implements ActionSpecificRegulation {
 
+    private static final long serialVersionUID = 5818383237466189702L;
     private final FisherRelativeLimits limits;
     private int counter = 0;
 
     YearlyActionLimitRegulation(
-        Consumer<Startable> startableConsumer,
-        FisherRelativeLimits limits
+        final Consumer<Startable> startableConsumer,
+        final FisherRelativeLimits limits
     ) {
         this.limits = limits;
         startableConsumer.accept(this);
     }
 
     @Override
-    public boolean isForbidden(Class<? extends PurseSeinerAction> action, Fisher fisher) {
+    public boolean isForbidden(final Class<? extends PurseSeinerAction> action, final Fisher fisher) {
         assert getApplicableActions().contains(action);
         return counter >= getLimit(fisher);
     }
 
-    public int getLimit(Fisher fisher) {
+    public int getLimit(final Fisher fisher) {
         return limits.getLimit(fisher);
     }
 
-    public double getPctLimitRemaining(Fisher fisher) {
-        int limit = getLimit(fisher);
+    public double getPctLimitRemaining(final Fisher fisher) {
+        final int limit = getLimit(fisher);
         return (double) (limit - counter) / limit;
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         counter = 0;
     }
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         model.scheduleEveryYear(this, StepOrder.DAWN);
     }
 
-    public int getNumRemainingActions(Fisher fisher) {
+    public int getNumRemainingActions(final Fisher fisher) {
         return getLimit(fisher) - counter;
     }
 
     @Override
-    public void observe(PurseSeinerAction action) {
+    public void observe(final PurseSeinerAction action) {
         assert getApplicableActions().contains(action.getClass());
         counter++;
     }

@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
+import uk.ac.ox.oxfish.utility.MasonUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,6 +36,8 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
+
+import static java.util.stream.Collectors.toCollection;
 
 /**
  * Reads a list of ports and returns an hashmap of it
@@ -80,21 +83,18 @@ public class PortReader {
             final Port port = ports.
                 computeIfAbsent(
                     portName,
-                    new Function<String, Port>() {
-                        @Override
-                        public Port apply(final String s) {
-                            final SeaTile location = computePortLocation(
-                                map, portName,
-                                Double.parseDouble(splitLine[2]),
-                                Double.parseDouble(splitLine[3])
-                            );
-                            //build the port
-                            final Port toReturn = new Port(portName, location, marketmap.apply(location),
-                                gasPriceMaker.supplyInitialPrice(location, portName)
-                            );
-                            gasPriceMaker.start(toReturn, model);
-                            return toReturn;
-                        }
+                    s -> {
+                        final SeaTile location = computePortLocation(
+                            map, portName,
+                            Double.parseDouble(splitLine[2]),
+                            Double.parseDouble(splitLine[3])
+                        );
+                        //build the port
+                        final Port toReturn1 = new Port(portName, location, marketmap.apply(location),
+                            gasPriceMaker.supplyInitialPrice(location, portName)
+                        );
+                        gasPriceMaker.start(toReturn1, model);
+                        return toReturn1;
                     }
                 );
             toReturn.put(port, Integer.parseInt(splitLine[1]));
@@ -144,7 +144,9 @@ public class PortReader {
         //look in the neighborhood
         final LinkedList<SeaTile> alreadyExplored = new LinkedList<>();
         for (int i = 1; i < MAXIMUM_NEIGHBORHOOD; i++) {
-            final LinkedList<SeaTile> neighbors = new LinkedList<SeaTile>(map.getMooreNeighbors(originalSeatile, i));
+            final LinkedList<SeaTile> neighbors =
+                MasonUtils.<SeaTile>bagToStream(map.getMooreNeighbors(originalSeatile, i))
+                    .collect(toCollection(LinkedList<SeaTile>::new));
             neighbors.removeAll(alreadyExplored);
             final Optional<SeaTile> acceptableNeighbor = neighbors.stream()
                 .filter(seaTile -> isCorrectLocationForPort(seaTile, map)).
@@ -187,12 +189,8 @@ public class PortReader {
      * @return
      */
     public static boolean isCorrectLocationForPort(final SeaTile tile, final NauticalMap map) {
-        if (tile.isLand()) {
-            final LinkedList<SeaTile> neighbors = new LinkedList<SeaTile>(map.getMooreNeighbors(tile, 1));
-            return neighbors.stream().anyMatch(SeaTile::isWater);
-        }
-
-        return false;
+        return tile.isLand() &&
+            map.getMooreNeighborsStream(tile, 1).anyMatch(SeaTile::isWater);
     }
 
     /**

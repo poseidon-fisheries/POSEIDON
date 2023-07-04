@@ -61,16 +61,16 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.restrictions.RegionalRestrictions;
 import uk.ac.ox.oxfish.model.restrictions.ReputationalRestrictions;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationDailyScheduler;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
 import uk.ac.ox.poseidon.agents.api.Agent;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import static java.util.stream.Collectors.joining;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * The boat catching all that delicious fish.
@@ -92,6 +92,7 @@ public class Fisher implements Steppable, Startable, Agent {
 
     //ten thousands liter of fuel means that you don't really need to worry about checking for fuel emergency
     private static final int LARGE_AMOUNT_OF_GAS = 10000;
+    private static final long serialVersionUID = -3650930851458635298L;
     /**
      * the id of the fisher. Hopefully unique
      */
@@ -832,7 +833,7 @@ public class Fisher implements Steppable, Startable, Agent {
      * @param localBiology      this is what will need to "react" to the amount caught
      * @return the fish caught and stored (barring overcapacity)
      */
-    public Pair<Catch, Catch> fishHere(
+    public Entry<Catch, Catch> fishHere(
         final GlobalBiology modelBiology,
         final int hoursSpentFishing,
         final FishState state,
@@ -843,7 +844,7 @@ public class Fisher implements Steppable, Startable, Agent {
         assert here.isWater() : "can't fish on land!";
         //Preconditions.checkState(here.isWater(), );
         //compute the catches (but kill nothing yet)
-        final Pair<Catch, Catch> catchesAndKept = computeCatchesHere(
+        final Entry<Catch, Catch> catchesAndKept = computeCatchesHere(
             status.getLocation(),
             localBiology,
             hoursSpentFishing,
@@ -851,13 +852,13 @@ public class Fisher implements Steppable, Startable, Agent {
             state
         );
         //make local react to catches (involves killing, usually)
-        removeFishAfterFishing(modelBiology, catchesAndKept.getFirst(), catchesAndKept.getSecond(), localBiology);
+        removeFishAfterFishing(modelBiology, catchesAndKept.getKey(), catchesAndKept.getValue(), localBiology);
         //pull the fish up, store it, and burn fuel
-        recordAndHaulCatch(hoursSpentFishing, here, catchesAndKept.getFirst(), catchesAndKept.getSecond(), state);
+        recordAndHaulCatch(hoursSpentFishing, here, catchesAndKept.getKey(), catchesAndKept.getValue(), state);
         return catchesAndKept;
     }
 
-    private Pair<Catch, Catch> computeCatchesHere(
+    private Entry<Catch, Catch> computeCatchesHere(
         final SeaTile context,
         final LocalBiology biology,
         final int hoursSpentFishing, final GlobalBiology modelBiology, final FishState state
@@ -879,7 +880,7 @@ public class Fisher implements Steppable, Startable, Agent {
             state,
             grabRandomizer()
         );
-        return new Pair<>(catchOfTheDay, kept);
+        return entry(catchOfTheDay, kept);
     }
 
     private void removeFishAfterFishing(
@@ -1071,7 +1072,7 @@ public class Fisher implements Steppable, Startable, Agent {
         if (friends.contains(friend))
             return memory.getTripsSharedWith(friend);
         else
-            return new ArrayList<SharedTripRecord>();
+            return new ArrayList<>();
     }
 
     /**
@@ -1093,7 +1094,7 @@ public class Fisher implements Steppable, Startable, Agent {
 
     @Override
     public String toString() {
-        return "Fisher " + fisherID + "; " + getTags().stream().collect(joining(" - "));
+        return "Fisher " + fisherID + "; " + String.join(" - ", getTags());
     }
 
     /**

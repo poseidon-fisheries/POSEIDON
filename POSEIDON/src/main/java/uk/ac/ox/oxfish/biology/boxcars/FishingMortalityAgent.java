@@ -39,6 +39,7 @@ import java.util.Arrays;
 public class FishingMortalityAgent implements AdditionalStartable, Steppable {
 
 
+    private static final long serialVersionUID = -5314260056907711315L;
     /**
      * given the total count of fish everywhere, returns the vulnerable part. This ought to be a selectivity curve
      */
@@ -63,9 +64,9 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
     private double[][] lastMeasuredYearlyAbundance = null;
 
     public FishingMortalityAgent(
-        AbundanceFilter vulnerabilityFilter,
-        Species species,
-        boolean computeDailyFishingMortality
+        final AbundanceFilter vulnerabilityFilter,
+        final Species species,
+        final boolean computeDailyFishingMortality
     ) {
         this.vulnerabilityFilter = vulnerabilityFilter;
         this.species = species;
@@ -91,7 +92,7 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
         //let's look at abundance now
         lastMeasuredYearlyAbundance = model.getTotalAbundance(species);
@@ -106,29 +107,20 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
         dailyStoppable =
             model.scheduleEveryDay(this, StepOrder.DAILY_DATA_GATHERING);
         yearlyStoppable =
-            model.scheduleEveryYear(new Steppable() {
-                @Override
-                public void step(SimState simState) {
-                    //observe abundance
-                    lastMeasuredYearlyAbundance = model.getTotalAbundance(species);
+            model.scheduleEveryYear((Steppable) simState -> {
+                //observe abundance
+                lastMeasuredYearlyAbundance = model.getTotalAbundance(species);
 
 
-                    //clear landings observed
-                    for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++)
-                        Arrays.fill(yearlyCatchesInWeight[subdivision], 0);
-                }
+                //clear landings observed
+                for (int subdivision = 0; subdivision < species.getNumberOfSubdivisions(); subdivision++)
+                    Arrays.fill(yearlyCatchesInWeight[subdivision], 0);
             }, StepOrder.DATA_RESET);
 
 
         if (computeDailyFishingMortality) {
-            DataColumn dailyColumn = model.getDailyDataSet().registerGatherer("Daily Fishing Mortality " + species,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-                        return lastDailyMortality;
-
-                    }
-                }, Double.NaN
+            final DataColumn dailyColumn = model.getDailyDataSet().registerGatherer("Daily Fishing Mortality " + species,
+                (Gatherer<FishState>) fishState -> lastDailyMortality, Double.NaN
             );
 
 
@@ -143,13 +135,7 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
         }
 
         model.getYearlyDataSet().registerGatherer("Yearly Fishing Mortality " + species,
-            new Gatherer<FishState>() {
-                @Override
-                public Double apply(FishState fishState) {
-                    return computeYearlyMortality();
-
-                }
-            }, Double.NaN
+            (Gatherer<FishState>) fishState -> computeYearlyMortality(), Double.NaN
         );
 
 
@@ -180,11 +166,11 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
      * @return
      */
     public double computeMortality(
-        double[][] catches,
-        double[][] totalAbundance
+        final double[][] catches,
+        final double[][] totalAbundance
     ) {
 
-        double[][] vulnerable = vulnerabilityFilter.filter(species, totalAbundance);
+        final double[][] vulnerable = vulnerabilityFilter.filter(species, totalAbundance);
 
         double numerator = 0;
         double denominator = 0;
@@ -206,7 +192,7 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
 
         dailyCatchSampler.resetCatchObservations();
@@ -228,7 +214,7 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
      * @param model
      * @return
      */
-    public double computeDailyMortality(FishState model) {
+    public double computeDailyMortality(final FishState model) {
 
 
         return computeMortality(

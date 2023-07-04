@@ -33,7 +33,7 @@ public class DiscardingStrategies {
 
     public static final LinkedHashMap<String, Supplier<AlgorithmFactory<? extends DiscardingStrategy>>> CONSTRUCTORS;
 
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
         NAMES.put(NoDiscardingFactory.class, "No Discarding");

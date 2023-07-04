@@ -24,7 +24,6 @@ import uk.ac.ox.oxfish.biology.weather.initializer.CSVWeatherInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.CsvColumnToList;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -40,8 +39,9 @@ public class TimeSeriesWeatherFactory implements AlgorithmFactory<CSVWeatherInit
     /**
      * locker holding the weather object
      */
-    private final Locker<String, CSVWeatherInitializer> weatherLocker = new Locker<>();
-
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, CSVWeatherInitializer> weatherLocker =
+        new uk.ac.ox.oxfish.utility.Locker<>();
 
     private CsvColumnToList reader = new CsvColumnToList(
         Paths.get("inputs", "test", "weather.csv").toAbsolutePath().toString(),

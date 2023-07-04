@@ -26,7 +26,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaITQRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Arrays;
@@ -43,12 +42,17 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
     /**
      * an array of order books for each "model" lspiRun
      */
-    private final Locker<String, HashMap<Integer, ITQOrderBook>> orderBooks = new Locker<>();
+
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, HashMap<Integer, ITQOrderBook>> orderBooks =
+        new uk.ac.ox.oxfish.utility.Locker<>();
 
     /**
      * an array of order book makers for each model lspiRun
      */
-    private final Locker<String, ITQMarketBuilder[]> orderBooksBuilder = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, ITQMarketBuilder[]> orderBooksBuilder =
+        new uk.ac.ox.oxfish.utility.Locker<>();
 
     /**
      * The string we are going to turn into rule, "0:100 ,2:uniform 1 100" means that EACH FISHER gets 100 quotas a year
@@ -80,9 +84,10 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
 
         final int numberOfSpecies = state.getSpecies().size();
         //create map of quotas
-        final Map<String, String> quotasInputted = Splitter.on(",")
-            .withKeyValueSeparator(":")
-            .split(yearlyQuotaMaps.trim());
+        @SuppressWarnings("UnstableApiUsage") final Map<String, String> quotasInputted =
+            Splitter.on(",")
+                .withKeyValueSeparator(":")
+                .split(yearlyQuotaMaps.trim());
         Preconditions.checkArgument(quotasInputted.size() > 0, "You provided no quota for the ITQ!");
 
         //here we store the quotas
@@ -90,10 +95,10 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
         Arrays.fill(quotas, Double.POSITIVE_INFINITY);
         //read them in
         for (final Map.Entry<String, String> input : quotasInputted.entrySet()) {
-            final Double yearlyQuota = DoubleParameter.parseDoubleParameter(input.getValue().trim())
+            final double yearlyQuota = DoubleParameter
+                .parseDoubleParameter(input.getValue().trim())
                 .applyAsDouble(state.getRandom());
             Preconditions.checkArgument(yearlyQuota > 0);
-            Preconditions.checkArgument(!yearlyQuota.isNaN());
             quotas[Integer.parseInt(input.getKey().trim())] = yearlyQuota;
         }
 
@@ -101,9 +106,10 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
         //create function of tick sizes
         final Function<Integer, Integer> volumePerMatch;
         if (minimumQuotaTraded.contains(":")) {
-            final Map<String, String> volumesIn = Splitter.on(",")
-                .withKeyValueSeparator(":")
-                .split(minimumQuotaTraded.trim());
+            @SuppressWarnings("UnstableApiUsage") final Map<String, String> volumesIn =
+                Splitter.on(",")
+                    .withKeyValueSeparator(":")
+                    .split(minimumQuotaTraded.trim());
             Preconditions.checkArgument(
                 volumesIn.size() == quotasInputted.size(),
                 "Mismatch between number of markets and minimum quota traded provided"
@@ -124,14 +130,11 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
             //it's not a map, ergo all tick sizes are of the same size
             final int tradeTick = Integer.parseInt(minimumQuotaTraded.trim());
 
-            volumePerMatch =
-                speciesIndex -> {
-                    return tradeTick;
-                };
+            volumePerMatch = speciesIndex -> tradeTick;
         }
 
 
-        /***
+        /*
          *      __  __   _   ___ _  _____ _____   ___ _   _ ___ _    ___  ___ ___  ___
          *     |  \/  | /_\ | _ \ |/ / __|_   _| | _ ) | | |_ _| |  |   \| __| _ \/ __|
          *     | |\/| |/ _ \|   / ' <| _|  | |   | _ \ |_| || || |__| |) | _||   /\__ \
@@ -222,7 +225,8 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
      *
      * @return Value for property 'orderBooksBuilder'.
      */
-    public Locker<String, ITQMarketBuilder[]> getOrderBooksBuilder() {
+    @SuppressWarnings("deprecation")
+    public uk.ac.ox.oxfish.utility.Locker<String, ITQMarketBuilder[]> getOrderBooksBuilder() {
         return orderBooksBuilder;
     }
 }

@@ -33,40 +33,32 @@ public class ITargetTACFactory implements AlgorithmFactory<AdditionalStartable> 
 
     @Override
     public AdditionalStartable apply(FishState fishState) {
-        return new AdditionalStartable() {
-            @Override
-            public void start(FishState model) {
-                fishState.scheduleOnceInXDays(
-                    new Steppable() {
-                        @Override
-                        public void step(SimState simState) {
-                            TargetToTACController controller;
-                            final ITarget itarget = new ITarget(
-                                catchColumnName,
-                                indicatorColumnName,
-                                precautionaryScaling.applyAsDouble(model.getRandom()),
-                                indicatorMultiplier.applyAsDouble(model.getRandom()),
-                                interval,
-                                interval * 2
-                            );
-                            if (targetedSpecies.trim().isEmpty()) {
-                                controller = new TargetToTACController(
-                                    itarget
-                                );
-                            } else
-                                controller = new TargetToTACController(
-                                    itarget,
-                                    targetedSpecies
-                                );
-                            controller.start(model);
-                            controller.step(model);
-                        }
-                    },
-                    StepOrder.DAWN,
-                    365 * startingYear + 1
+        return model -> fishState.scheduleOnceInXDays(
+            (Steppable) simState -> {
+                TargetToTACController controller;
+                final ITarget itarget = new ITarget(
+                    catchColumnName,
+                    indicatorColumnName,
+                    precautionaryScaling.applyAsDouble(model.getRandom()),
+                    indicatorMultiplier.applyAsDouble(model.getRandom()),
+                    interval,
+                    interval * 2
                 );
-            }
-        };
+                if (targetedSpecies.trim().isEmpty()) {
+                    controller = new TargetToTACController(
+                        itarget
+                    );
+                } else
+                    controller = new TargetToTACController(
+                        itarget,
+                        targetedSpecies
+                    );
+                controller.start(model);
+                controller.step(model);
+            },
+            StepOrder.DAWN,
+            365 * startingYear + 1
+        );
 
     }
 

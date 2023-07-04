@@ -31,7 +31,7 @@ public class BiomassPurseSeineGearFactory extends PurseSeineGearFactory {
 
     public BiomassPurseSeineGearFactory(
         final AlgorithmFactory<? extends Regulation<? super PurseSeinerActionContext>> regulationsFactory,
-        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory,
+        final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory,
         final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory
     ) {
         super(regulationsFactory, fadInitializerFactory, fishValueCalculatorFactory);

@@ -108,15 +108,12 @@ public class ITQCostManagerTest {
         FishState model = mock(FishState.class);
         when(model.getSpecies()).thenReturn(Lists.newArrayList(firstSpecies, secondSpecies));
 
-        ITQCostManager costManager = new ITQCostManager(new Function<Species, ITQOrderBook>() {
-            @Override
-            public ITQOrderBook apply(Species species) {
-                if (species == firstSpecies)
-                    return first;
-                else {
-                    assert species == secondSpecies;
-                    return second;
-                }
+        ITQCostManager costManager = new ITQCostManager(species -> {
+            if (species == firstSpecies)
+                return first;
+            else {
+                assert species == secondSpecies;
+                return second;
             }
         });
 

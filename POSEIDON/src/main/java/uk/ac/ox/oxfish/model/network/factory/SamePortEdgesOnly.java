@@ -36,11 +36,6 @@ public class SamePortEdgesOnly implements AlgorithmFactory<NetworkPredicate> {
      */
     @Override
     public NetworkPredicate apply(FishState state) {
-        return new NetworkPredicate() {
-            @Override
-            public boolean test(Fisher from, Fisher to) {
-                return from.getHomePort().equals(to.getHomePort());
-            }
-        };
+        return (from, to) -> from.getHomePort().equals(to.getHomePort());
     }
 }

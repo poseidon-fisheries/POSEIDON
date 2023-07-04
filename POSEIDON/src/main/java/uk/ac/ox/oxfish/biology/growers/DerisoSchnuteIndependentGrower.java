@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 public class DerisoSchnuteIndependentGrower implements Startable, Steppable {
 
 
+    private static final long serialVersionUID = -3873286697091078743L;
     /**
      * this is the time series of biomass we use to initialize the model.
      * Assume the "last" element of the list is the newest.
@@ -57,17 +58,17 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable {
     /**
      * map containing previous end of the year biomasses, last is the latest/newest
      */
-    private Map<VariableBiomassBasedBiology, LinkedList<Double>> previousBiomasses =
+    private final Map<VariableBiomassBasedBiology, LinkedList<Double>> previousBiomasses =
         new HashMap<>();
 
     /**
      * map containing survival rates after fishing has occurred, last is the latest/newest
      */
-    private Map<VariableBiomassBasedBiology, LinkedList<Double>> actualSurvivalRates =
+    private final Map<VariableBiomassBasedBiology, LinkedList<Double>> actualSurvivalRates =
         new HashMap<>();
 
 
-    private Map<VariableBiomassBasedBiology, Double> previousRecruits = new HashMap<>();
+    private final Map<VariableBiomassBasedBiology, Double> previousRecruits = new HashMap<>();
 
     /**
      * set up when starting
@@ -75,13 +76,13 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable {
     private Stoppable stoppable;
 
 
-    private double initialRecruits;
+    private final double initialRecruits;
 
     public DerisoSchnuteIndependentGrower(
-        List<Double> empiricalYearlyBiomasses, double rho, double naturalSurvivalRate, double recruitmentSteepness,
-        int recruitmentLag, int speciesIndex,
-        double weightAtRecruitment, double weightAtRecruitmentMinus1,
-        double virginBiomass, double initialRecruits
+        final List<Double> empiricalYearlyBiomasses, final double rho, final double naturalSurvivalRate, final double recruitmentSteepness,
+        final int recruitmentLag, final int speciesIndex,
+        final double weightAtRecruitment, final double weightAtRecruitmentMinus1,
+        final double virginBiomass, final double initialRecruits
     ) {
         this.empiricalYearlyBiomasses = empiricalYearlyBiomasses;
         this.rho = rho;
@@ -103,20 +104,20 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
         Preconditions.checkArgument(stoppable == null, "already started!");
 
-        double numberOfCells = biologies.size();
+        final double numberOfCells = biologies.size();
 
-        for (VariableBiomassBasedBiology biology : biologies) {
+        for (final VariableBiomassBasedBiology biology : biologies) {
             //populates biomasses from data
-            LinkedList<Double> biomasses = new LinkedList<>();
+            final LinkedList<Double> biomasses = new LinkedList<>();
             for (int i = 0; i < recruitmentLag; i++)
                 biomasses.addFirst(empiricalYearlyBiomasses.
                     get(empiricalYearlyBiomasses.size() - i - 1) / numberOfCells);
             assert biomasses.size() == recruitmentLag;
-            LinkedList<Double> survivalRates = new LinkedList<>();
+            final LinkedList<Double> survivalRates = new LinkedList<>();
 
             //todo add fishing rate here like in the common grower
             survivalRates.add(naturalSurvivalRate);
@@ -139,7 +140,7 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable {
      * the operation is in progress.  (Note that this will occur if the
      * specified collection is this list, and it's nonempty.)
      */
-    public boolean addAll(Collection<BiomassLocalBiology> c) {
+    public boolean addAll(final Collection<BiomassLocalBiology> c) {
         return biologies.addAll(c);
     }
 
@@ -153,7 +154,7 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
 
         //remove all the biologies that stopped
@@ -161,16 +162,16 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable {
             logisticLocalBiology -> !logisticLocalBiology.isStopped()).collect(Collectors.toList());
 
         //for each place
-        for (VariableBiomassBasedBiology biology : biologies) {
+        for (final VariableBiomassBasedBiology biology : biologies) {
 
             //basic current info
-            double currentBiomass = biology.getCurrentBiomass()[speciesIndex];
-            double virginBiomass = biology.getCarryingCapacity(speciesIndex);
-            LinkedList<Double> previousBiomasses = this.previousBiomasses.get(biology);
-            LinkedList<Double> actualSurvivalRates = this.actualSurvivalRates.get(biology);
+            final double currentBiomass = biology.getCurrentBiomass()[speciesIndex];
+            final double virginBiomass = biology.getCarryingCapacity(speciesIndex);
+            final LinkedList<Double> previousBiomasses = this.previousBiomasses.get(biology);
+            final LinkedList<Double> actualSurvivalRates = this.actualSurvivalRates.get(biology);
 
 
-            DerisoSchnuteStep derisoSchnuteStep = computeNewBiomassDerisoSchnute(currentBiomass, virginBiomass,
+            final DerisoSchnuteStep derisoSchnuteStep = computeNewBiomassDerisoSchnute(currentBiomass, virginBiomass,
                 previousBiomasses,
                 actualSurvivalRates,
                 naturalSurvivalRate, recruitmentLag,
@@ -205,23 +206,23 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable {
      * @return weight of new biomass (it's the caller responsibility to actually insert this number in the model)
      */
     public static DerisoSchnuteStep computeNewBiomassDerisoSchnute(
-        double currentBiomass, double virginBiomass, LinkedList<Double> previousBiomasses,
-        LinkedList<Double> actualSurvivalRates,
-        double naturalSurvivalRate,
-        int recruitmentLag,
-        double recruitmentSteepness,
-        double weightAtRecruitment,
-        double rho,
-        double weightAtRecruitmentMinus1,
-        double previousNumberOfRecruits
+        final double currentBiomass, final double virginBiomass, final LinkedList<Double> previousBiomasses,
+        final LinkedList<Double> actualSurvivalRates,
+        final double naturalSurvivalRate,
+        final int recruitmentLag,
+        final double recruitmentSteepness,
+        final double weightAtRecruitment,
+        final double rho,
+        final double weightAtRecruitmentMinus1,
+        final double previousNumberOfRecruits
     ) {
-        double virginRecruits =
+        final double virginRecruits =
             virginBiomass * (1d - (1 + rho) * naturalSurvivalRate + rho * naturalSurvivalRate * naturalSurvivalRate)
                 /
                 (weightAtRecruitment - rho * naturalSurvivalRate * weightAtRecruitmentMinus1);
 
-        double alpha = (1d - recruitmentSteepness) / (4d * recruitmentSteepness * virginRecruits);
-        double beta = (5 * recruitmentSteepness - 1d) / (4d * recruitmentSteepness * virginRecruits);
+        final double alpha = (1d - recruitmentSteepness) / (4d * recruitmentSteepness * virginRecruits);
+        final double beta = (5 * recruitmentSteepness - 1d) / (4d * recruitmentSteepness * virginRecruits);
         return computeNewBiomassDerisoSchnute(currentBiomass, virginBiomass, previousBiomasses, actualSurvivalRates,
             naturalSurvivalRate, recruitmentLag, weightAtRecruitment, rho, weightAtRecruitmentMinus1,
             previousNumberOfRecruits, alpha, beta
@@ -253,41 +254,41 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable {
      * @return weight of new biomass (it's the caller responsibility to actually insert this number in the model)
      */
     public static DerisoSchnuteStep computeNewBiomassDerisoSchnute(
-        double currentBiomass, double virginBiomass,
-        LinkedList<Double> previousBiomasses,
-        LinkedList<Double> actualSurvivalRates,
-        double naturalSurvivalRate,
-        int recruitmentLag,
-        double weightAtRecruitment,
-        double rho,
-        double weightAtRecruitmentMinus1,
-        double previousNumberOfRecruits,
-        double alpha,
-        double beta
+        final double currentBiomass, final double virginBiomass,
+        final LinkedList<Double> previousBiomasses,
+        final LinkedList<Double> actualSurvivalRates,
+        final double naturalSurvivalRate,
+        final int recruitmentLag,
+        final double weightAtRecruitment,
+        final double rho,
+        final double weightAtRecruitmentMinus1,
+        final double previousNumberOfRecruits,
+        final double alpha,
+        final double beta
     ) {
 
-        Double previousBiomass = previousBiomasses.get(previousBiomasses.size() - 2); //last is "current*fishingMortality" which isn't right for this equation
+        final Double previousBiomass = previousBiomasses.get(previousBiomasses.size() - 2); //last is "current*fishingMortality" which isn't right for this equation
 
         //compute the new actual survival rate
         double trueSurvivalRate = currentBiomass / previousBiomasses.getLast();
         trueSurvivalRate *= naturalSurvivalRate;
-        LinkedList<Double> survivalRates = actualSurvivalRates;
+        final LinkedList<Double> survivalRates = actualSurvivalRates;
         survivalRates.remove(); //remove oldest
         survivalRates.add(trueSurvivalRate); //add new
         assert survivalRates.size() == 2; //you only need to keep track of the first two
 
         //store current biomass in the queue to simulate yearly delays in recruitment
         //basically spawners is biomass x years ago
-        LinkedList<Double> queue = previousBiomasses;
+        final LinkedList<Double> queue = previousBiomasses;
         assert queue.size() == recruitmentLag;
-        double spawners = queue.remove();
+        final double spawners = queue.remove();
 
 
         //new number of recruits
-        double recruits = (spawners / virginBiomass) / (alpha + beta * spawners / virginBiomass);
+        final double recruits = (spawners / virginBiomass) / (alpha + beta * spawners / virginBiomass);
 
 
-        double biomass = (1 + rho) * currentBiomass * naturalSurvivalRate - //we already kept track of the fishing mortality (the model did, anyway)
+        final double biomass = (1 + rho) * currentBiomass * naturalSurvivalRate - //we already kept track of the fishing mortality (the model did, anyway)
             rho * survivalRates.get(0) * survivalRates.get(1) * previousBiomass -
             rho * survivalRates.get(1) * weightAtRecruitmentMinus1 * previousNumberOfRecruits +
             weightAtRecruitment * recruits;
@@ -306,7 +307,7 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable {
         private final double biomass;
         private final double recruits;
 
-        public DerisoSchnuteStep(double biomass, double recruits) {
+        public DerisoSchnuteStep(final double biomass, final double recruits) {
             this.biomass = biomass;
             this.recruits = recruits;
         }

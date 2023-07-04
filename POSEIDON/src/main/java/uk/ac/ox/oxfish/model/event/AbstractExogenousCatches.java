@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.model.event;
 
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -21,6 +20,7 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 public abstract class AbstractExogenousCatches implements ExogenousCatches {
 
 
+    private static final long serialVersionUID = 3886767741185374010L;
     protected final LinkedHashMap<Species, Double> lastExogenousCatchesMade = new LinkedHashMap<>();
     private final String columnName;
     private Stoppable stoppable;
@@ -32,11 +32,11 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
     }
 
 
-    protected List<? extends LocalBiology> getAllCatchableBiologies(FishState model) {
+    protected List<? extends LocalBiology> getAllCatchableBiologies(final FishState model) {
         return model.getMap().getAllSeaTilesExcludingLandAsList();
     }
 
-    protected Double getFishableBiomass(Species target, LocalBiology seaTile) {
+    protected Double getFishableBiomass(final Species target, final LocalBiology seaTile) {
 
         return seaTile.getBiomass(target);
     }
@@ -48,30 +48,22 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
         //schedule yourself at the end of the year!
-        model.scheduleOnceInXDays(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                AbstractExogenousCatches.this.step(model);
-                stoppable = model.scheduleEveryYear(
-                    AbstractExogenousCatches.this,
-                    StepOrder.BIOLOGY_PHASE
-                );
-            }
+        model.scheduleOnceInXDays((Steppable) simState -> {
+            AbstractExogenousCatches.this.step(model);
+            stoppable = model.scheduleEveryYear(
+                AbstractExogenousCatches.this,
+                StepOrder.BIOLOGY_PHASE
+            );
         }, StepOrder.BIOLOGY_PHASE, 364);
 
 
-        for (Species species : model.getSpecies()) {
+        for (final Species species : model.getSpecies()) {
             model.getYearlyDataSet().registerGatherer(
                 columnName + species,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState state) {
-                        return lastExogenousCatchesMade.get(species);
-                    }
-                },
+                (Gatherer<FishState>) state -> lastExogenousCatchesMade.get(species),
                 0,
                 KILOGRAM,
                 "Biomass"

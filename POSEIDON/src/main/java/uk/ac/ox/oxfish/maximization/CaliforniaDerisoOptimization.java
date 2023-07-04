@@ -40,6 +40,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
     private static final double[] PROFITS = new double[]{134405.5, 21331}; // new double[]{89308, 21331};
     private static final double MINIMUM_CATCHABILITY = 1.0e-05;
     private static final double MAXIMUM_CATCHABILITY = 1.0e-03;
+    private static final long serialVersionUID = -3491362798670969631L;
     ///home/carrknight/code/oxfish/docs/groundfish/calibration/step1_catchability/logit
     private String scenarioFile =
         Paths.get("docs", "groundfish", "calibration", "northquota_yesgarbage",
@@ -164,18 +165,18 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     }
 
-    public static void main(String[] args) throws IOException {
-        double[] best = new double[]{
+    public static void main(final String[] args) throws IOException {
+        final double[] best = new double[]{
             -2.850, -0.822, 8.506, -0.121, -3.353, -3.860, 5.221
 
 
         };
 
-        CaliforniaDerisoOptimization optimization = new CaliforniaDerisoOptimization();
-        FishYAML yaml = new FishYAML();
+        final CaliforniaDerisoOptimization optimization = new CaliforniaDerisoOptimization();
+        final FishYAML yaml = new FishYAML();
 
 
-        Scenario scenario = yaml.loadAs(
+        final Scenario scenario = yaml.loadAs(
             new FileReader(Paths.get(optimization.scenarioFile).toFile()),
             Scenario.class
         );
@@ -188,23 +189,36 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     }
 
+    public void prepareScenario(final double[] evaParameters, final Scenario justReadScenario) {
+        int parameter = 0;
+        for (final OptimizationParameter optimizationParameter : parameters) {
+            optimizationParameter.parametrize(
+                justReadScenario,
+                Arrays.copyOfRange(evaParameters, parameter,
+                    parameter + optimizationParameter.size()
+                )
+            );
+            parameter += optimizationParameter.size();
+        }
+    }
+
     @Override
-    public double[] evaluate(double[] x) {
+    public double[] evaluate(final double[] x) {
 
         try {
             double error = 0;
-            Path scenarioPath = Paths.get(scenarioFile);
+            final Path scenarioPath = Paths.get(scenarioFile);
 
 
             for (int i = 0; i < runsPerSetting; i++) {
-                FishYAML yaml = new FishYAML();
+                final FishYAML yaml = new FishYAML();
 
 
-                Scenario scenario = yaml.loadAs(new FileReader(Paths.get(scenarioFile).toFile()), Scenario.class);
+                final Scenario scenario = yaml.loadAs(new FileReader(Paths.get(scenarioFile).toFile()), Scenario.class);
                 prepareScenario(x, scenario);
 
 
-                FishState model = new FishState(System.currentTimeMillis());
+                final FishState model = new FishState(System.currentTimeMillis());
                 model.setScenario(scenario);
                 model.start();
                 System.out.println("starting run");
@@ -215,7 +229,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
 
                 //catches errors
-                double soleError = deviationAttainment(
+                final double soleError = deviationAttainment(
                     model.getYearlyDataSet().getColumn("Dover Sole Landings"),
                     DOVER_QUOTA,
                     DOVER_ATTAINMENT[0],
@@ -224,7 +238,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                 );
                 error +=
                     soleError;
-                double longspineLandings = deviationAttainment(
+                final double longspineLandings = deviationAttainment(
                     model.getYearlyDataSet().getColumn("Longspine Thornyhead Landings"),
                     LONGSPINE_QUOTA,
                     LONGSPINE_ATTAINMENT[0],
@@ -233,7 +247,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                 );
                 error +=
                     longspineLandings;
-                double shortspineLanding = deviationAttainment(
+                final double shortspineLanding = deviationAttainment(
                     model.getYearlyDataSet().getColumn("Shortspine Thornyhead Landings"),
                     SHORTSPINE_QUOTA,
                     SHORTSPINE_ATTAINMENT[0],
@@ -243,7 +257,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                 error +=
                     shortspineLanding;
 
-                double rockfishLandings = deviationAttainment(
+                final double rockfishLandings = deviationAttainment(
                     model.getYearlyDataSet().getColumn("Yelloweye Rockfish Landings"),
                     YELLOW_QUOTA,
                     YELLOW_ATTAINMENT[0],
@@ -253,7 +267,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                 error +=
                     rockfishLandings;
 
-                double sablefishLandings = deviationAttainment(
+                final double sablefishLandings = deviationAttainment(
                     model.getYearlyDataSet().getColumn("Sablefish Landings"),
                     SABLEFISH_QUOTA,
                     SABLEFISH_ATTAINMENT[0],
@@ -264,7 +278,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                     sablefishLandings;
 
 
-                double actualAverageHoursOut = deviation(
+                final double actualAverageHoursOut = deviation(
                     model.getYearlyDataSet().getColumn("Actual Average Hours Out"),
                     HOURS_AT_SEA[0],
                     HOURS_AT_SEA[1],
@@ -273,7 +287,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                 error +=
                     actualAverageHoursOut;
 
-                double cashflow = deviation(
+                final double cashflow = deviation(
                     model.getYearlyDataSet().getColumn("Average Cash-Flow"),
                     PROFITS[0],
                     PROFITS[1],
@@ -324,7 +338,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
             }
 
-            error /= (double) runsPerSetting;
+            error /= runsPerSetting;
             //write summary file
             Files.write(
                 Paths.get(summaryDirectory).resolve(
@@ -340,7 +354,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
             return new double[]{error};
 
 
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
             throw new RuntimeException("failed to read input file!");
         }
@@ -348,26 +362,13 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     }
 
-    public void prepareScenario(double[] evaParameters, Scenario justReadScenario) {
-        int parameter = 0;
-        for (OptimizationParameter optimizationParameter : parameters) {
-            optimizationParameter.parametrize(
-                justReadScenario,
-                Arrays.copyOfRange(evaParameters, parameter,
-                    parameter + optimizationParameter.size()
-                )
-            );
-            parameter += optimizationParameter.size();
-        }
-    }
-
     // abs(100*data/quota-attainment)/standardDeviation
     public static double deviationAttainment(
-        DataColumn data,
-        double quota,
+        final DataColumn data,
+        final double quota,
         double attainment,
         double standardDeviation,
-        int yearsToSkip
+        final int yearsToSkip
     ) {
 
         attainment = attainment / 100d;
@@ -381,10 +382,10 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     //computes abs(x-mu)/sigma
     public static double deviation(
-        DataColumn data,
-        double target,
-        double standardDeviation,
-        int yearsToSkip
+        final DataColumn data,
+        final double target,
+        final double standardDeviation,
+        final int yearsToSkip
     ) {
 
         return Math.abs(
@@ -403,7 +404,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
         return scenarioFile;
     }
 
-    public void setScenarioFile(String scenarioFile) {
+    public void setScenarioFile(final String scenarioFile) {
         this.scenarioFile = scenarioFile;
     }
 
@@ -411,7 +412,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
         return seed;
     }
 
-    public void setSeed(long seed) {
+    public void setSeed(final long seed) {
         this.seed = seed;
     }
 
@@ -419,7 +420,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
         return summaryDirectory;
     }
 
-    public void setSummaryDirectory(String summaryDirectory) {
+    public void setSummaryDirectory(final String summaryDirectory) {
         this.summaryDirectory = summaryDirectory;
     }
 
@@ -428,7 +429,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
         return yearsToRun;
     }
 
-    public void setYearsToRun(int yearsToRun) {
+    public void setYearsToRun(final int yearsToRun) {
         this.yearsToRun = yearsToRun;
     }
 
@@ -436,7 +437,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
         return yearsToIgnore;
     }
 
-    public void setYearsToIgnore(int yearsToIgnore) {
+    public void setYearsToIgnore(final int yearsToIgnore) {
         this.yearsToIgnore = yearsToIgnore;
     }
 
@@ -445,7 +446,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
         return runsPerSetting;
     }
 
-    public void setRunsPerSetting(int runsPerSetting) {
+    public void setRunsPerSetting(final int runsPerSetting) {
         this.runsPerSetting = runsPerSetting;
     }
 
@@ -454,7 +455,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
         return parameters;
     }
 
-    public void setParameters(List<OptimizationParameter> parameters) {
+    public void setParameters(final List<OptimizationParameter> parameters) {
         this.parameters = parameters;
     }
 }

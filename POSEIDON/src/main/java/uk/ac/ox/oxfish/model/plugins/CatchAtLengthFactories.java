@@ -12,7 +12,7 @@ public class CatchAtLengthFactories {
 
 
     public static final LinkedHashMap<String, Supplier<CatchAtLengthFactory>> CONSTRUCTORS = new LinkedHashMap<>();
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
         //these three probably need a linkedhashmap of their own::

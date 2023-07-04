@@ -19,6 +19,7 @@ import static uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter.c
 public class SurplusProductionStockAssessment implements Sensor<FishState, SurplusProductionResult> {
 
 
+    private static final long serialVersionUID = -3953252428762078327L;
     private final double[] carryingCapacityBounds;
     private final double[] logisticGrowthBounds;
     private final double[] catchabilityBounds;
@@ -36,11 +37,11 @@ public class SurplusProductionStockAssessment implements Sensor<FishState, Surpl
 
 
     public SurplusProductionStockAssessment(
-        double[] carryingCapacityBounds,
-        double[] logisticGrowthBounds,
-        double[] catchabilityBounds,
-        String indicatorColumnName,
-        String catchColumnName
+        final double[] carryingCapacityBounds,
+        final double[] logisticGrowthBounds,
+        final double[] catchabilityBounds,
+        final String indicatorColumnName,
+        final String catchColumnName
     ) {
         this.carryingCapacityBounds = carryingCapacityBounds;
         this.logisticGrowthBounds = logisticGrowthBounds;
@@ -50,7 +51,7 @@ public class SurplusProductionStockAssessment implements Sensor<FishState, Surpl
     }
 
     @Override
-    public SurplusProductionResult scan(FishState system) {
+    public SurplusProductionResult scan(final FishState system) {
 
 
         final DataColumn catchColumn = system.getYearlyDataSet().getColumn(catchColumnName);
@@ -78,14 +79,14 @@ public class SurplusProductionStockAssessment implements Sensor<FishState, Surpl
 
     @Nullable
     public static SurplusProductionResult assess(
-        double[] observedLandings,
-        double[] observedCPUE,
-        double[] carryingCapacityBounds,
-        double[] logisticGrowthBounds,
-        double[] catchabilityBounds
+        final double[] observedLandings,
+        final double[] observedCPUE,
+        final double[] carryingCapacityBounds,
+        final double[] logisticGrowthBounds,
+        final double[] catchabilityBounds
     ) {
 
-        SimpleProblemWrapper problem = new SimpleProblemWrapper();
+        final SimpleProblemWrapper problem = new SimpleProblemWrapper();
         problem.setSimpleProblem(new MatchCPUEProblem(
             observedLandings,
             observedCPUE,
@@ -95,7 +96,7 @@ public class SurplusProductionStockAssessment implements Sensor<FishState, Surpl
 
         ));
         problem.setParallelThreads(1);
-        OptimizationParameters params = OptimizerFactory.makeParams(
+        final OptimizationParameters params = OptimizerFactory.makeParams(
             NelderMeadSimplex.createNelderMeadSimplex(
 
                 problem
@@ -104,19 +105,21 @@ public class SurplusProductionStockAssessment implements Sensor<FishState, Surpl
 
         );
         params.setTerminator(new EvaluationTerminator(5000));
-        double[] bestMultiplier = OptimizerFactory.optimizeToDouble(
+        final double[] bestMultiplier = OptimizerFactory.optimizeToDouble(
             params
         );
 
         //run it with optimal parameters
-        double carryingCapacity =
-            computeNumericValueFromEVABounds(bestMultiplier[0],
+        final double carryingCapacity =
+            computeNumericValueFromEVABounds(
+                bestMultiplier[0],
                 carryingCapacityBounds[0],
                 carryingCapacityBounds[1],
-                true);
-        double logisticGrowth =
+                true
+            );
+        final double logisticGrowth =
             computeNumericValueFromEVABounds(bestMultiplier[1], logisticGrowthBounds[0], logisticGrowthBounds[1], true);
-        double catchability =
+        final double catchability =
             computeNumericValueFromEVABounds(bestMultiplier[2], catchabilityBounds[0], catchabilityBounds[1], true);
 
 
@@ -144,10 +147,10 @@ public class SurplusProductionStockAssessment implements Sensor<FishState, Surpl
     }
 
     public static SurplusProductionResult simulateSchaefer(
-        double carryingCapacity,
-        double logisticGrowth,
-        double catchability,
-        double[] observedLandings
+        final double carryingCapacity,
+        final double logisticGrowth,
+        final double catchability,
+        final double[] observedLandings
     ) {
 
         Preconditions.checkArgument(observedLandings.length > 0);
@@ -174,12 +177,12 @@ public class SurplusProductionStockAssessment implements Sensor<FishState, Surpl
 //        )
 
         //these represent "end of the year" numbers
-        double[] biomass = new double[observedLandings.length];
-        double[] depletion = new double[observedLandings.length];
-        double[] cpues = new double[observedLandings.length];
+        final double[] biomass = new double[observedLandings.length];
+        final double[] depletion = new double[observedLandings.length];
+        final double[] cpues = new double[observedLandings.length];
 
         for (int i = 0; i < biomass.length; i++) {
-            double previousBiomass = i == 0 ? carryingCapacity : biomass[i - 1];
+            final double previousBiomass = i == 0 ? carryingCapacity : biomass[i - 1];
             biomass[i] = previousBiomass +
                 logisticGrowth * previousBiomass *
                     (1 - previousBiomass / carryingCapacity) -
@@ -225,7 +228,7 @@ public class SurplusProductionStockAssessment implements Sensor<FishState, Surpl
         return indicatorTransformer;
     }
 
-    public void setIndicatorTransformer(Function<Double, Double> indicatorTransformer) {
+    public void setIndicatorTransformer(final Function<Double, Double> indicatorTransformer) {
         this.indicatorTransformer = indicatorTransformer;
     }
 
@@ -233,11 +236,12 @@ public class SurplusProductionStockAssessment implements Sensor<FishState, Surpl
         return catchTransformer;
     }
 
-    public void setCatchTransformer(Function<Double, Double> catchTransformer) {
+    public void setCatchTransformer(final Function<Double, Double> catchTransformer) {
         this.catchTransformer = catchTransformer;
     }
 
     private static class MatchCPUEProblem extends SimpleProblemDouble {
+        private static final long serialVersionUID = -7071847783180806663L;
         private final double[] observedLandings;
 
         private final double[] observedCPUE;
@@ -250,11 +254,11 @@ public class SurplusProductionStockAssessment implements Sensor<FishState, Surpl
 
 
         public MatchCPUEProblem(
-            double[] observedLandings,
-            double[] observedCPUE,
-            double[] carryingCapacityBounds,
-            double[] logisticGrowthBounds,
-            double[] catchabilityBounds
+            final double[] observedLandings,
+            final double[] observedCPUE,
+            final double[] carryingCapacityBounds,
+            final double[] logisticGrowthBounds,
+            final double[] catchabilityBounds
         ) {
             this.observedLandings = observedLandings;
             this.observedCPUE = observedCPUE;
@@ -264,12 +268,12 @@ public class SurplusProductionStockAssessment implements Sensor<FishState, Surpl
         }
 
         @Override
-        public double[] evaluate(double[] x) {
-            double carryingCapacity =
+        public double[] evaluate(final double[] x) {
+            final double carryingCapacity =
                 computeNumericValueFromEVABounds(x[0], carryingCapacityBounds[0], carryingCapacityBounds[1], true);
-            double logisticGrowth =
+            final double logisticGrowth =
                 computeNumericValueFromEVABounds(x[1], logisticGrowthBounds[0], logisticGrowthBounds[1], true);
-            double catchability =
+            final double catchability =
                 computeNumericValueFromEVABounds(x[2], catchabilityBounds[0], catchabilityBounds[1], true);
 
             final SurplusProductionResult result = SurplusProductionStockAssessment.simulateSchaefer(
@@ -279,7 +283,7 @@ public class SurplusProductionStockAssessment implements Sensor<FishState, Surpl
                 observedLandings
             );
 
-            double[] simulatedCPUE = result.getCpue();
+            final double[] simulatedCPUE = result.getCpue();
             double sumDistance = 0;
             for (int year = 0; year < simulatedCPUE.length; year++) {
                 if (simulatedCPUE[year] < 0) //negative CPUE is unacceptable

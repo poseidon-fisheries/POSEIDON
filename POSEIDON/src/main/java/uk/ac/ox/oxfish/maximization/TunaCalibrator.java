@@ -174,6 +174,8 @@ public class TunaCalibrator {
             problemWrapper = new SimpleProblemWrapper();
         } else {
             problemWrapper = new SimpleProblemWrapper() {
+                private static final long serialVersionUID = -6383210801237058759L;
+
                 @Override
                 public void initializePopulation(final Population population) {
 

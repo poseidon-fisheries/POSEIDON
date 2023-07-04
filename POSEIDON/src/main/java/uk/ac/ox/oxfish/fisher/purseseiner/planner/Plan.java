@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class Plan {
 
     private final LinkedList<PlannedAction> plannedActions = new LinkedList<>();
@@ -28,7 +29,7 @@ public class Plan {
      * this is where the plan ought to end!
      */
     private final SeaTile finalPosition;
-    private final IterativeAgerageBackAndForth<Integer> centroid[] = new IterativeAgerageBackAndForth[2];
+    private final IterativeAgerageBackAndForth<Integer>[] centroid = new IterativeAgerageBackAndForth[2];
     private double hoursEstimatedThisPlanWillTake = 0;
 
     {
@@ -44,8 +45,8 @@ public class Plan {
      * @param finalPosition
      */
     public Plan(
-        SeaTile initialPosition,
-        SeaTile finalPosition
+        final SeaTile initialPosition,
+        final SeaTile finalPosition
     ) {
         this.initialPosition = initialPosition;
         this.finalPosition = finalPosition;
@@ -61,8 +62,8 @@ public class Plan {
 
 
     public void insertAction(
-        PlannedAction newAction, int indexInPathOfNewAction,
-        double additionalHoursEstimatedToTake
+        final PlannedAction newAction, final int indexInPathOfNewAction,
+        final double additionalHoursEstimatedToTake
     ) {
         Preconditions.checkArgument(
             indexInPathOfNewAction > 0,
@@ -92,7 +93,7 @@ public class Plan {
     }
 
     public PlannedAction pollNextAction() {
-        PlannedAction toReturn = plannedActions.poll();
+        final PlannedAction toReturn = plannedActions.poll();
         if (plannedActions.size() >= 1) {
             if (toReturn.getLocation() != null) {
                 //weird exception that can occur when you are targeting a moving object that has since left the map
@@ -120,13 +121,11 @@ public class Plan {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Plan{");
-        sb.append("plannedActions=").append(plannedActions.stream().
+        String sb = "Plan{" + "plannedActions=" + plannedActions.stream().
             map(plannedAction -> plannedAction.toString()).
-            collect(Collectors.joining("\n"))
-        );
-        sb.append('}');
-        return sb.toString();
+            collect(Collectors.joining("\n")) +
+            '}';
+        return sb;
     }
 
     /**
@@ -134,7 +133,7 @@ public class Plan {
      *
      * @param additionalHoursSpent
      */
-    public void addHoursEstimatedItWillTake(double additionalHoursSpent) {
+    public void addHoursEstimatedItWillTake(final double additionalHoursSpent) {
         hoursEstimatedThisPlanWillTake += additionalHoursSpent;
     }
 

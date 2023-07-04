@@ -29,12 +29,7 @@ public class BiologyCheck {
             null, 2,
             false,
             -1, null,
-            new Consumer<FishState>() {
-                @Override
-                public void accept(final FishState state) {
-                    state.registerStartable(new AbundanceHistogrammer());
-                }
-            },
+            state -> state.registerStartable(new AbundanceHistogrammer()),
             null,
             null
         );

@@ -40,6 +40,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBasedBiology
     implements Steppable, Startable {
 
+    private static final long serialVersionUID = -7464424618406733266L;
     /**
      * how many years before current spawns enter the biomass proper
      */
@@ -75,8 +76,8 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
 
 
     public SingleSpecieLogisticDelayGrowthBiology(
-        Species species, double currentBiomass, double maxBiomass, int yearDelays, double aParameter,
-        double bParameter
+        final Species species, final double currentBiomass, final double maxBiomass, final int yearDelays, final double aParameter,
+        final double bParameter
     ) {
         checkArgument(yearDelays > 0, "Use undelayed biology rather than feeding 0 to a delayed one");
         checkArgument(maxBiomass > 0);
@@ -100,7 +101,7 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
      * @return the biomass of this species
      */
     @Override
-    public double getBiomass(Species species) {
+    public double getBiomass(final Species species) {
         checkArgument(species == this.species, "%s != %s", species, this.species);
         return currentBiomass;
     }
@@ -114,10 +115,10 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-        Catch caught, Catch notDiscarded, GlobalBiology biology
+        final Catch caught, final Catch notDiscarded, final GlobalBiology biology
     ) {
         //focus on only the one you care about!
-        double biomassFished = caught.getWeightCaught(this.species);
+        final double biomassFished = caught.getWeightCaught(this.species);
 
         checkArgument(biomassFished <= currentBiomass);
         currentBiomass -= biomassFished;
@@ -125,11 +126,11 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
-        double biologyAtRecruitment = pastBiomass.poll();
+        final double biologyAtRecruitment = pastBiomass.poll();
         assert pastBiomass.remainingCapacity() == 1;
-        double recruitment = aParameter * biologyAtRecruitment / (bParameter + biologyAtRecruitment);
+        final double recruitment = aParameter * biologyAtRecruitment / (bParameter + biologyAtRecruitment);
 
         currentBiomass = Math.min(currentBiomass + recruitment, maxBiomass);
         pastBiomass.add(currentBiomass);
@@ -144,7 +145,7 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         stoppable = model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
     }
 

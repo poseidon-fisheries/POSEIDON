@@ -50,16 +50,17 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+@SuppressWarnings("overloads")
 public interface ObservableList<E> extends List<E>, Observable {
-    public static <E> ObservableList<E> observableList(List<E> list) {
+    static <E> ObservableList<E> observableList(final List<E> list) {
         checkNotNull(list);
         if (list instanceof ArrayList)
             return new ObservableListWrapper<E>(list);
         else {
             //this ideally should be replaced by a constructor call that isn't stupid
             // but the new mockito seem to throw nullpointers when I do!
-            ArrayList<E> backer = new ArrayList<>();
-            for (E e : list) {
+            final ArrayList<E> backer = new ArrayList<>();
+            for (final E e : list) {
                 backer.add(e);
             }
             return new ObservableListWrapper<E>(backer);
@@ -67,9 +68,13 @@ public interface ObservableList<E> extends List<E>, Observable {
 
     }
 
-    public static <E> ObservableList<E> observableList(E... items) {
-
-        return new ObservableListWrapper<E>(Lists.newArrayList(items));
+    @SafeVarargs
+    static <E> ObservableList<E> observableList(final E... items) {
+        final ArrayList<E> list = Lists.newArrayList();
+        for (final E e : list) {
+            list.add(e);
+        }
+        return new ObservableListWrapper<>(list);
     }
 
     /**
@@ -77,7 +82,7 @@ public interface ObservableList<E> extends List<E>, Observable {
      *
      * @param listener the listener for listening to the list changes
      */
-    public void addListener(ListChangeListener<? super E> listener);
+    void addListener(ListChangeListener<? super E> listener);
 
     /**
      * Tries to remove a listener from this observable list. If the listener is not
@@ -85,7 +90,7 @@ public interface ObservableList<E> extends List<E>, Observable {
      *
      * @param listener a listener to remove
      */
-    public void removeListener(ListChangeListener<? super E> listener);
+    void removeListener(ListChangeListener<? super E> listener);
 
     /**
      * A convenience method for var-arg addition of elements.
@@ -93,7 +98,8 @@ public interface ObservableList<E> extends List<E>, Observable {
      * @param elements the elements to add
      * @return true (as specified by Collection.add(E))
      */
-    public boolean addAll(E... elements);
+    @SuppressWarnings("unchecked")
+    boolean addAll(E... elements);
 
     /**
      * Clears the ObservableList and adds all the elements passed as var-args.
@@ -102,7 +108,8 @@ public interface ObservableList<E> extends List<E>, Observable {
      * @return true (as specified by Collection.add(E))
      * @throws NullPointerException if the specified arguments contain one or more null elements
      */
-    public boolean setAll(E... elements);
+    @SuppressWarnings("unchecked")
+    boolean setAll(E... elements);
 
     /**
      * Clears the ObservableList and adds all elements from the collection.
@@ -111,7 +118,7 @@ public interface ObservableList<E> extends List<E>, Observable {
      * @return true (as specified by Collection.add(E))
      * @throws NullPointerException if the specified collection contains one or more null elements
      */
-    public boolean setAll(Collection<? extends E> col);
+    boolean setAll(Collection<? extends E> col);
 
     /**
      * A convenience method for var-arg usage of the {@link #removeAll(Collection) removeAll} method.
@@ -119,7 +126,8 @@ public interface ObservableList<E> extends List<E>, Observable {
      * @param elements the elements to be removed
      * @return true if list changed as a result of this call
      */
-    public boolean removeAll(E... elements);
+    @SuppressWarnings("unchecked")
+    boolean removeAll(E... elements);
 
     /**
      * A convenience method for var-arg usage of the {@link #retainAll(Collection) retainAll} method.
@@ -127,7 +135,8 @@ public interface ObservableList<E> extends List<E>, Observable {
      * @param elements the elements to be retained
      * @return true if list changed as a result of this call
      */
-    public boolean retainAll(E... elements);
+    @SuppressWarnings("unchecked")
+    boolean retainAll(E... elements);
 
     /**
      * A simplified way of calling {@code sublist(from, to).clear()}. As this is a common operation,
@@ -137,7 +146,7 @@ public interface ObservableList<E> extends List<E>, Observable {
      * @param to   the end of the range to remove (exclusive)
      * @throws IndexOutOfBoundsException if an illegal range is provided
      */
-    public void remove(int from, int to);
+    void remove(int from, int to);
 
 
 }

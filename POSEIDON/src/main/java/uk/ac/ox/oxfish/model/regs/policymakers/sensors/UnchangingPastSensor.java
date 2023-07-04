@@ -18,6 +18,7 @@ public class UnchangingPastSensor implements
     Sensor<FishState, Double> {
 
 
+    private static final long serialVersionUID = -6222385701893032674L;
     private final String indicatorColumnName;
     /**
      * do we need to multiply the average by something?
@@ -33,21 +34,21 @@ public class UnchangingPastSensor implements
     private Function<Double, Double> indicatorTransformer = indicator -> indicator;
     private double targetSet = Double.NaN;
 
-    public UnchangingPastSensor(String indicatorColumnName, double indicatorMultiplier, int yearsToLookBack) {
+    public UnchangingPastSensor(final String indicatorColumnName, final double indicatorMultiplier, final int yearsToLookBack) {
         this.indicatorColumnName = indicatorColumnName;
         this.indicatorMultiplier = indicatorMultiplier;
         this.yearsToLookBack = yearsToLookBack;
     }
 
 
-    public UnchangingPastSensor(String indicatorColumnName, int yearsToLookBack) {
+    public UnchangingPastSensor(final String indicatorColumnName, final int yearsToLookBack) {
         this.indicatorColumnName = indicatorColumnName;
         this.indicatorMultiplier = 1.0;
         this.yearsToLookBack = yearsToLookBack;
     }
 
     @Override
-    public Double scan(FishState system) {
+    public Double scan(final FishState system) {
 
         //if you have already set the target, go no further
         if (Double.isFinite(targetSet))
@@ -59,7 +60,7 @@ public class UnchangingPastSensor implements
             return Double.NaN;
 
         final Iterator<Double> indicatorIterator = indicatorColumn.descendingIterator();
-        DoubleSummaryStatistics indicators = new DoubleSummaryStatistics();
+        final DoubleSummaryStatistics indicators = new DoubleSummaryStatistics();
 
 
         for (int lag = 0; lag < yearsToLookBack;
@@ -73,7 +74,7 @@ public class UnchangingPastSensor implements
 
         // get the target
 
-        double indicatorAve = indicators.getAverage();
+        final double indicatorAve = indicators.getAverage();
         targetSet = indicatorAve * indicatorMultiplier;
         return targetSet;
 
@@ -89,7 +90,7 @@ public class UnchangingPastSensor implements
         return indicatorTransformer;
     }
 
-    public void setIndicatorTransformer(Function<Double, Double> indicatorTransformer) {
+    public void setIndicatorTransformer(final Function<Double, Double> indicatorTransformer) {
         this.indicatorTransformer = indicatorTransformer;
     }
 
@@ -105,7 +106,7 @@ public class UnchangingPastSensor implements
         return targetSet;
     }
 
-    public void setTargetSet(double targetSet) {
+    public void setTargetSet(final double targetSet) {
         this.targetSet = targetSet;
     }
 }

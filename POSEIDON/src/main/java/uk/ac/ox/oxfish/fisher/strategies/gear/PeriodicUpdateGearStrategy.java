@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.GearDecorator;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.selfanalysis.DiscreteRandomAlgorithm;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
@@ -38,10 +37,8 @@ import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
 import java.util.List;
 import java.util.OptionalInt;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -88,36 +85,15 @@ public class PeriodicUpdateGearStrategy implements GearStrategy {
         options = null;
         this.yearly = yearly;
         this.gearAdaptation = new ExploreImitateAdaptation<>(
-            new Predicate<Fisher>() {
-                @Override
-                public boolean test(final Fisher fisher1) {
-                    return true;
-                }
-            },
+            fisher1 -> true,
             new BeamHillClimbing<>(true,
                 true, DEFAULT_DYNAMIC_NETWORK,
                 explorationStep
             ),
-            new Actuator<Fisher, Gear>() {
-                @Override
-                public void apply(final Fisher fisher, final Gear change, final FishState model) {
-
-                    toReturn = change.makeCopy();
-                }
-            },
-            new Sensor<Fisher, Gear>() {
-                @Override
-                public Gear scan(final Fisher fisher) {
-                    return fisher.getGear();
-                }
-            },
+            (fisher, change, model) -> toReturn = change.makeCopy(),
+            (Sensor<Fisher, Gear>) fisher -> fisher.getGear(),
             yearly ? new CashFlowObjective(365) : new CashFlowObjective(60),
-            probability, new Predicate<Gear>() {
-            @Override
-            public boolean test(final Gear a) {
-                return true;
-            }
-        }
+            probability, a -> true
         );
     }
 
@@ -137,68 +113,24 @@ public class PeriodicUpdateGearStrategy implements GearStrategy {
         this.options = options;
         this.yearly = yearly;
         this.gearAdaptation = new ExploreImitateAdaptation<>(
-            new Predicate<Fisher>() {
-                @Override
-                public boolean test(final Fisher fisher1) {
-                    return true;
-                }
-            },
+            fisher1 -> true,
             new DiscreteRandomAlgorithm<>(options),
-            new Actuator<Fisher, Gear>() {
-                @Override
-                public void apply(
-                    final Fisher fisher,
-                    final Gear change,
-                    final FishState model
-                ) {
-                    tagYourself(fisher, change, options);
-                    toReturn = change.makeCopy();
-                }
+            (fisher, change, model) -> {
+                tagYourself(fisher, change, options);
+                toReturn = change.makeCopy();
             },
-            new Sensor<Fisher, Gear>() {
-                @Override
-                public Gear scan(final Fisher fisher) {
-                    return fisher.getGear();
-                }
-            },
+            (Sensor<Fisher, Gear>) fisher -> fisher.getGear(),
             yearly ? new CashFlowObjective(365) : new CashFlowObjective(60),
-            probability, new Predicate<Gear>() {
-            @Override
-            public boolean test(final Gear a) {
-                return true;
-            }
-        },
+            probability, a -> true,
             //copy only from others who have one of these gears!
-            new Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>>() {
-                @Override
-                public Collection<Fisher> apply(
-                    final Pair<Fisher, MersenneTwisterFast> input
-                ) {
-                    return input.getFirst().getDirectedFriends().stream().filter(
-                        new Predicate<Fisher>() {
-                            @Override
-                            public boolean test(final Fisher friend) {
-                                return options.stream().anyMatch(new Predicate<Gear>() {
-                                    @Override
-                                    public boolean test(final Gear gear) {
-                                        return friend.getGear().isSame(gear);
-                                    }
-                                });
-                            }
-                        }
-                    ).collect(Collectors.toList());
-                }
-            }
+            input -> input.getKey().getDirectedFriends().stream().filter(
+                friend -> options.stream().anyMatch(gear -> friend.getGear().isSame(gear))
+            ).collect(Collectors.toList())
         );
     }
 
     public void tagYourself(final Fisher fisher, final Gear change, final List<Gear> options) {
-        final List<String> newTags = fisher.getTags().stream().filter(new Predicate<String>() {
-            @Override
-            public boolean test(final String s) {
-                return !s.startsWith(tag);
-            }
-        }).collect(Collectors.toList());
+        final List<String> newTags = fisher.getTags().stream().filter(s -> !s.startsWith(tag)).collect(Collectors.toList());
 
         final OptionalInt indexOpt = IntStream.range(0, options.size())
             .filter(i ->

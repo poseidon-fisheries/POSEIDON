@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 public class OneGearExampleMaximization extends SimpleProblemDouble {
 
 
+    private static final long serialVersionUID = 8514838882100771859L;
     private String scenarioFile =
         Paths.get("coe_new.yaml").toString();
 
@@ -46,28 +47,28 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
     private String speciesName = "Peter Snapper";
 
     @Override
-    public double[] evaluate(double[] x) {
-        FishYAML yaml = new FishYAML();
-        Path scenarioPath = Paths.get(scenarioFile);
+    public double[] evaluate(final double[] x) {
+        final FishYAML yaml = new FishYAML();
+        final Path scenarioPath = Paths.get(scenarioFile);
 
         try {
             double error = 0;
             for (int i = 0; i < runsPerSetting; i++) {
-                FlexibleScenario scenario = yaml.loadAs(
+                final FlexibleScenario scenario = yaml.loadAs(
                     new FileReader(scenarioPath.toFile()),
                     FlexibleScenario.class
                 );
 
-                double catchability = ((x[0] + 10) / 20) * (maxCatchability - minCatchability);
+                final double catchability = ((x[0] + 10) / 20) * (maxCatchability - minCatchability);
 
-                for (FisherDefinition definition : scenario.getFisherDefinitions()) {
+                for (final FisherDefinition definition : scenario.getFisherDefinitions()) {
                     ((RandomCatchabilityTrawlFactory) definition.getGear()).setMeanCatchabilityFirstSpecies(
                         new FixedDoubleParameter(catchability)
                     );
                 }
 
 
-                FishState model = new FishState(System.currentTimeMillis());
+                final FishState model = new FishState(System.currentTimeMillis());
                 model.setScenario(scenario);
                 model.start();
                 System.out.println("starting run");
@@ -87,7 +88,7 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
 
             return new double[]{
                 error / (double) runsPerSetting};
-        } catch (IOException exception) {
+        } catch (final IOException exception) {
             throw new RuntimeException("failed to read or deal with files!");
         }
     }
@@ -103,7 +104,7 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
         return scenarioFile;
     }
 
-    public void setScenarioFile(String scenarioFile) {
+    public void setScenarioFile(final String scenarioFile) {
         this.scenarioFile = scenarioFile;
     }
 
@@ -111,7 +112,7 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
         return summaryFile;
     }
 
-    public void setSummaryFile(String summaryFile) {
+    public void setSummaryFile(final String summaryFile) {
         this.summaryFile = summaryFile;
     }
 
@@ -119,7 +120,7 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
         return landingData;
     }
 
-    public void setLandingData(String landingData) {
+    public void setLandingData(final String landingData) {
         this.landingData = landingData;
     }
 
@@ -127,7 +128,7 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
         return seed;
     }
 
-    public void setSeed(long seed) {
+    public void setSeed(final long seed) {
         this.seed = seed;
     }
 
@@ -135,7 +136,7 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
         return maxCatchability;
     }
 
-    public void setMaxCatchability(double maxCatchability) {
+    public void setMaxCatchability(final double maxCatchability) {
         this.maxCatchability = maxCatchability;
     }
 
@@ -143,7 +144,7 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
         return minCatchability;
     }
 
-    public void setMinCatchability(double minCatchability) {
+    public void setMinCatchability(final double minCatchability) {
         this.minCatchability = minCatchability;
     }
 
@@ -151,7 +152,7 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
         return yearsToRun;
     }
 
-    public void setYearsToRun(int yearsToRun) {
+    public void setYearsToRun(final int yearsToRun) {
         this.yearsToRun = yearsToRun;
     }
 
@@ -159,7 +160,7 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
         return yearsToIgnore;
     }
 
-    public void setYearsToIgnore(int yearsToIgnore) {
+    public void setYearsToIgnore(final int yearsToIgnore) {
         this.yearsToIgnore = yearsToIgnore;
     }
 
@@ -167,7 +168,7 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
         return runsPerSetting;
     }
 
-    public void setRunsPerSetting(int runsPerSetting) {
+    public void setRunsPerSetting(final int runsPerSetting) {
         this.runsPerSetting = runsPerSetting;
     }
 
@@ -175,7 +176,7 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
         return speciesName;
     }
 
-    public void setSpeciesName(String speciesName) {
+    public void setSpeciesName(final String speciesName) {
         this.speciesName = speciesName;
     }
 }

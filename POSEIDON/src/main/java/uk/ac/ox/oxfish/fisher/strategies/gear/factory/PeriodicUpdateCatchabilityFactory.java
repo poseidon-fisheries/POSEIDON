@@ -83,37 +83,31 @@ public class PeriodicUpdateCatchabilityFactory implements AlgorithmFactory<Perio
 
         return new PeriodicUpdateGearStrategy(
             yearly,
-            new RandomStep<Gear>() {
-                @Override
-                public Gear randomStep(
-                    final FishState state, final MersenneTwisterFast random, final Fisher fisher,
-                    final Gear current1
-                ) {
-                    Preconditions.checkArgument(
-                        current1.getClass().equals(RandomCatchabilityTrawl.class),
-                        "PeriodicUpdateMileageFactory works only with RandomCatchabilityTrawl gear while we got " +
-                            current1.getClass()
-                    );
-                    assert current1.getClass().equals(RandomCatchabilityTrawl.class);
-                    final RandomCatchabilityTrawl current = ((RandomCatchabilityTrawl) current1);
+            (state, random, fisher, current1) -> {
+                Preconditions.checkArgument(
+                    current1.getClass().equals(RandomCatchabilityTrawl.class),
+                    "PeriodicUpdateMileageFactory works only with RandomCatchabilityTrawl gear while we got " +
+                        current1.getClass()
+                );
+                assert current1.getClass().equals(RandomCatchabilityTrawl.class);
+                final RandomCatchabilityTrawl current = ((RandomCatchabilityTrawl) current1);
 
-                    final double[] original = current.getCatchabilityMeanPerSpecie();
-                    final double[] catchability = Arrays.copyOf(original, original.length);
-                    for (int i = 0; i < original.length; i++) {
-                        double currentShock = random.nextDouble() * shock * (maxCatchability - minCatchability);
-                        if (random.nextBoolean())
-                            currentShock -= currentShock;
-                        catchability[i] = original[i] + currentShock;
-                        catchability[i] = Math.max(catchability[i], minCatchability);
-                        catchability[i] = Math.min(catchability[i], maxCatchability);
+                final double[] original = current.getCatchabilityMeanPerSpecie();
+                final double[] catchability = Arrays.copyOf(original, original.length);
+                for (int i = 0; i < original.length; i++) {
+                    double currentShock = random.nextDouble() * shock * (maxCatchability - minCatchability);
+                    if (random.nextBoolean())
+                        currentShock -= currentShock;
+                    catchability[i] = original[i] + currentShock;
+                    catchability[i] = Math.max(catchability[i], minCatchability);
+                    catchability[i] = Math.min(catchability[i], maxCatchability);
 
-                    }
-                    return new RandomCatchabilityTrawl(
-                        catchability,
-                        current.getCatchabilityDeviationPerSpecie(),
-                        current.getGasPerHourFished()
-                    );
                 }
+                return new RandomCatchabilityTrawl(
+                    catchability,
+                    current.getCatchabilityDeviationPerSpecie(),
+                    current.getGasPerHourFished()
+                );
             }
             ,
             probability.apply(model)

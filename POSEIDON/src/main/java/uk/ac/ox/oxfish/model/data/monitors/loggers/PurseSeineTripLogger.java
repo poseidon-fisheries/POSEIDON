@@ -20,6 +20,7 @@ public class PurseSeineTripLogger
     private static final List<String> HEADERS = ImmutableList.of(
         "ves_no", "trip_id", "event", "date", "port_name", "lon", "lat"
     );
+    private static final long serialVersionUID = 2562852069866501476L;
 
     private final FishState fishState;
 
@@ -29,11 +30,11 @@ public class PurseSeineTripLogger
     }
 
     @Override
-    public void reactToNewTrip(TripRecord record, Fisher fisher) {
+    public void reactToNewTrip(final TripRecord record, final Fisher fisher) {
         logTripEvent(record, fisher, "trip_start");
     }
 
-    private void logTripEvent(TripRecord record, Fisher fisher, String event) {
+    private void logTripEvent(final TripRecord record, final Fisher fisher, final String event) {
         final Port port = fisher.getHomePort();
         final Coordinate portCoordinates = fishState.getMap().getCoordinates(port.getLocation());
         addRow(
@@ -48,12 +49,12 @@ public class PurseSeineTripLogger
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
         logTripEvent(record, fisher, "trip_end");
     }
 
     @Override
-    public void start(FishState fishState) {
+    public void start(final FishState fishState) {
         checkArgument(fishState == this.fishState);
         fishState.getFishers().forEach(fisher -> fisher.addTripListener(this));
     }

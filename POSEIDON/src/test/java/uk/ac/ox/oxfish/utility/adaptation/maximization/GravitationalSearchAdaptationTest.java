@@ -85,17 +85,11 @@ public class GravitationalSearchAdaptationTest {
                             return variable;
                         }
                     },
-                    new ObjectiveFunction<Fisher>() {
-                        @Override
-                        public double computeCurrentFitness(
-                            final Fisher observer, final Fisher observed
-                        ) {
-                            final double[] coord = coordinates.get(observed);
-                            return -Math.pow(coord[0] - 10, 2)
-                                - Math.pow(coord[1] - 20, 2)
-                                - Math.pow(coord[2] - 30, 2);
-                        }
-
+                    (observer, observed) -> {
+                        final double[] coord = coordinates.get(observed);
+                        return -Math.pow(coord[0] - 10, 2)
+                            - Math.pow(coord[1] - 20, 2)
+                            - Math.pow(coord[2] - 30, 2);
                     },
                     100,
                     10,

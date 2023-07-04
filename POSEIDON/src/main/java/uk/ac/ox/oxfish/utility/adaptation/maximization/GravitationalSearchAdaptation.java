@@ -25,7 +25,6 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.MutablePair;
 import uk.ac.ox.oxfish.utility.adaptation.AbstractAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
@@ -48,19 +47,19 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T> {
      * we work in a space of numbers but we might be controlling solutions that are
      * in fact not numbers but something else. This transforms back and forth
      */
-    private CoordinateTransformer<T> transformer;
+    private final CoordinateTransformer<T> transformer;
     /**
      * how the agent should judge himself and others, which in this algorithm is really the mass
      */
-    private ObjectiveFunction<Fisher> mass;
+    private final ObjectiveFunction<Fisher> mass;
     /**
      * the higher it is the faster you move towards higher mass
      */
-    private double gravitationalConstant;
+    private final double gravitationalConstant;
     /**
      * you only copy this many people, and always the best ones
      */
-    private int explorationMaximum;
+    private final int explorationMaximum;
     /**
      * you need this in memory rather than always calling the transformer because you might lose information in terms
      * of discretization
@@ -70,21 +69,16 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T> {
     /**
      * bounds up and down the coordinates
      */
-    private Consumer<double[]> coordinatesBounder = new Consumer<double[]>() {
-        @Override
-        public void accept(double[] doubles) {
-        }
+    private Consumer<double[]> coordinatesBounder = doubles -> {
     };
-
-
     public GravitationalSearchAdaptation(
-        Sensor<Fisher, T> sensor, Actuator<Fisher, T> actuator,
-        Predicate<Fisher> validator,
-        CoordinateTransformer<T> transformer,
-        ObjectiveFunction<Fisher> mass, double gravitationalConstant,
-        int explorationMaximum,
-        DoubleParameter initialSpeed,
-        MersenneTwisterFast random
+        final Sensor<Fisher, T> sensor, final Actuator<Fisher, T> actuator,
+        final Predicate<Fisher> validator,
+        final CoordinateTransformer<T> transformer,
+        final ObjectiveFunction<Fisher> mass, final double gravitationalConstant,
+        final int explorationMaximum,
+        final DoubleParameter initialSpeed,
+        final MersenneTwisterFast random
     ) {
         super(sensor, actuator, validator);
         this.transformer = transformer;
@@ -97,12 +91,12 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T> {
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
 
     }
 
     @Override
-    protected void onStart(FishState model, Fisher fisher) {
+    protected void onStart(final FishState model, final Fisher fisher) {
         currentCoordinates = transformer.toCoordinates(
             getSensor().scan(fisher),
             fisher,
@@ -114,14 +108,14 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T> {
         }
     }
 
-    private void initializeSpeed(FishState model) {
+    private void initializeSpeed(final FishState model) {
         speed = new double[currentCoordinates.length];
         for (int i = 0; i < speed.length; i++)
             speed[i] = initialSpeed.applyAsDouble(model.getRandom());
     }
 
     @Override
-    public T concreteAdaptation(Fisher toAdapt, FishState state, MersenneTwisterFast random) {
+    public T concreteAdaptation(final Fisher toAdapt, final FishState state, final MersenneTwisterFast random) {
         if (currentCoordinates == null) {
             currentCoordinates = transformer.toCoordinates(
                 getSensor().scan(toAdapt),
@@ -141,7 +135,7 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T> {
 
 
         //turn list of fishers into a list of coordinates--->utility
-        List<MutablePair<double[], Double>> masses = state.getFishers().stream().map(
+        final List<MutablePair<double[], Double>> masses = state.getFishers().stream().map(
                 fisher ->
                     new MutablePair<>(
                         transformer.toCoordinates(getSensor().scan(fisher), fisher, state),
@@ -162,7 +156,7 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T> {
         //get best and worst
         double max = -Double.MAX_VALUE;
         double min = Double.MAX_VALUE;
-        for (MutablePair<double[], Double> currentMass : masses) {
+        for (final MutablePair<double[], Double> currentMass : masses) {
             if (max < currentMass.getSecond())
                 max = currentMass.getSecond();
             if (min > currentMass.getSecond())
@@ -173,31 +167,31 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T> {
             addSpeedAndReturn(new double[speed.length], random, toAdapt, state);
 
         assert max > min;
-        double ratio = max - min;
+        final double ratio = max - min;
         //reweigh everything (need to do this twice!)
         double sum = 0; //first we bound
-        for (MutablePair<double[], Double> currentMass : masses) {
-            double newValue = (currentMass.getSecond() - min) / ratio;
+        for (final MutablePair<double[], Double> currentMass : masses) {
+            final double newValue = (currentMass.getSecond() - min) / ratio;
             currentMass.setSecond(newValue);
             sum += newValue;
         }
         //and then we normalize
-        for (MutablePair<double[], Double> currentMass : masses) {
+        for (final MutablePair<double[], Double> currentMass : masses) {
             currentMass.setSecond(currentMass.getSecond() / sum);
         }
         personalMass = Math.max(((personalMass - min) / ratio) / sum, .00001);
 
 
         //get top K
-        List<MutablePair<double[], Double>> topMasses = masses.stream().sorted(
+        final List<MutablePair<double[], Double>> topMasses = masses.stream().sorted(
                 (o1, o2) -> -Double.compare(o1.getSecond(), o2.getSecond())).
             limit(explorationMaximum).collect(Collectors.toList());
 
 
         //compute forces
-        double[] force = new double[currentCoordinates.length];
-        for (MutablePair<double[], Double> topMass : topMasses) {
-            double distance = euclideanDistance(currentCoordinates, topMass.getFirst());
+        final double[] force = new double[currentCoordinates.length];
+        for (final MutablePair<double[], Double> topMass : topMasses) {
+            final double distance = euclideanDistance(currentCoordinates, topMass.getFirst());
             if (distance > 0) {
                 for (int d = 0; d < currentCoordinates.length; d++) {
                     force[d] += random.nextDouble() *
@@ -215,11 +209,10 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T> {
 
     }
 
-
     public T addSpeedAndReturn(
-        double[] acceleration, MersenneTwisterFast random,
-        Fisher fisher,
-        FishState model
+        final double[] acceleration, final MersenneTwisterFast random,
+        final Fisher fisher,
+        final FishState model
     ) {
         assert acceleration.length == speed.length;
         assert currentCoordinates.length == speed.length;
@@ -236,16 +229,55 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T> {
         return transformer.fromCoordinates(currentCoordinates, fisher, model);
     }
 
-
-    private double euclideanDistance(double[] coordinate1, double[] coordinate2) {
+    private double euclideanDistance(final double[] coordinate1, final double[] coordinate2) {
         double distance = 0;
         for (int i = 0; i < coordinate1.length; i++)
             distance += Math.pow(coordinate1[i] - coordinate2[i], 2);
         return distance;
     }
 
-    public void setCoordinatesBounder(Consumer<double[]> coordinatesBounder) {
+    public void setCoordinatesBounder(final Consumer<double[]> coordinatesBounder) {
         this.coordinatesBounder = coordinatesBounder;
+    }
+
+    public class MutablePair<A, B> {
+
+
+        private A first;
+
+        private B second;
+
+        public MutablePair(final A first, final B second) {
+            this.first = first;
+            this.second = second;
+        }
+
+
+        public A getFirst() {
+            return first;
+        }
+
+        /**
+         * Setter for property 'first'.
+         *
+         * @param first Value to set for property 'first'.
+         */
+        public void setFirst(final A first) {
+            this.first = first;
+        }
+
+        public B getSecond() {
+            return second;
+        }
+
+        /**
+         * Setter for property 'second'.
+         *
+         * @param second Value to set for property 'second'.
+         */
+        public void setSecond(final B second) {
+            this.second = second;
+        }
     }
 
 }

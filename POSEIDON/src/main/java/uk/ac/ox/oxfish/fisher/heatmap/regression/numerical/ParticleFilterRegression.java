@@ -102,12 +102,9 @@ public class ParticleFilterRegression implements GeographicalRegression<Double> 
     public void start(FishState model, Fisher fisher) {
 
         //every morning drift out a bit
-        receipt = model.scheduleEveryDay(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                for (ParticleFilter<Double> filter : filters.values())
-                    filter.drift(random);
-            }
+        receipt = model.scheduleEveryDay((Steppable) simState -> {
+            for (ParticleFilter<Double> filter : filters.values())
+                filter.drift(random);
         }, StepOrder.DAWN);
 
     }

@@ -26,8 +26,8 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
 
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A list of adaptations to fire each time the fisher finishes a trip
@@ -35,33 +35,32 @@ import java.util.List;
  */
 public class AdaptationPerTripScheduler implements TripListener, FisherStartable {
 
-    private final List<Adaptation> adaptations = new LinkedList<>();
+    private static final long serialVersionUID = 6191310505350347880L;
+    private final Collection<Adaptation> adaptations = new LinkedList<>();
     private FishState model;
     private Fisher fisher;
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         this.model = model;
         this.fisher = fisher;
         fisher.addTripListener(this);
 
-        for (Adaptation a : adaptations)
+        for (final Adaptation a : adaptations)
             a.start(model, fisher);
 
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         if (this.fisher != null)
             this.fisher.removeTripListener(this);
     }
 
     /**
      * add an adaptation algorithm to the list. Start it if we have already started
-     *
-     * @param adaptation
      */
-    public void registerAdaptation(Adaptation adaptation) {
+    public void registerAdaptation(final Adaptation adaptation) {
 
         adaptations.add(adaptation);
         if (model != null)
@@ -71,13 +70,13 @@ public class AdaptationPerTripScheduler implements TripListener, FisherStartable
     }
 
 
-    public void removeAdaptation(Adaptation adaptation) {
+    public void removeAdaptation(final Adaptation adaptation) {
         adaptations.remove(adaptation);
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-        for (Adaptation a : adaptations)
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
+        for (final Adaptation a : adaptations)
             a.adapt(this.fisher, model, this.fisher.grabRandomizer());
     }
 }

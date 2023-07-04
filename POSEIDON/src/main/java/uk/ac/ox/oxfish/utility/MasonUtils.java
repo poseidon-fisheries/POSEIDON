@@ -37,12 +37,11 @@ public class MasonUtils {
     }
 
     public static Object oneOf(final Bag candidates, final MersenneTwisterFast random) {
-        //noinspection unchecked
         validateCandidates(candidates);
         return candidates.get(oneOfIndices(candidates, random));
     }
 
-    private static <E> void validateCandidates(final Collection<E> candidates) {
+    private static void validateCandidates(final Collection<?> candidates) {
         checkNotNull(candidates, "collection of candidates must not be null");
         checkArgument(!candidates.isEmpty(), "collection of must not be empty");
     }
@@ -51,7 +50,6 @@ public class MasonUtils {
         @SuppressWarnings("rawtypes") final Collection candidates,
         final MersenneTwisterFast random
     ) {
-        //noinspection unchecked
         validateCandidates(candidates);
         final int n = candidates.size();
         return n == 1 ? 0 : random.nextInt(n);

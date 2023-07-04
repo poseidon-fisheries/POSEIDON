@@ -12,12 +12,13 @@ import java.util.function.Function;
  */
 public class SurplusProductionDepletionSensor implements Sensor<FishState, Double> {
 
+    private static final long serialVersionUID = 3818329073309046080L;
     private final SurplusProductionStockAssessment assessment;
 
     public SurplusProductionDepletionSensor(
-        double[] carryingCapacityBounds, double[] logisticGrowthBounds,
-        double[] catchabilityBounds, String indicatorColumnName,
-        String catchColumnName
+        final double[] carryingCapacityBounds, final double[] logisticGrowthBounds,
+        final double[] catchabilityBounds, final String indicatorColumnName,
+        final String catchColumnName
     ) {
 
         assessment = new SurplusProductionStockAssessment(
@@ -31,7 +32,7 @@ public class SurplusProductionDepletionSensor implements Sensor<FishState, Doubl
 
 
     @Override
-    public Double scan(FishState system) {
+    public Double scan(final FishState system) {
 
         final SurplusProductionResult assessmentResult = assessment.scan(system);
         if (assessmentResult == null)
@@ -46,7 +47,7 @@ public class SurplusProductionDepletionSensor implements Sensor<FishState, Doubl
         return assessment.getCatchTransformer();
     }
 
-    public void setCatchTransformer(Function<Double, Double> catchTransformer) {
+    public void setCatchTransformer(final Function<Double, Double> catchTransformer) {
         assessment.setCatchTransformer(catchTransformer);
     }
 
@@ -54,7 +55,7 @@ public class SurplusProductionDepletionSensor implements Sensor<FishState, Doubl
         return assessment.getIndicatorTransformer();
     }
 
-    public void setIndicatorTransformer(Function<Double, Double> indicatorTransformer) {
+    public void setIndicatorTransformer(final Function<Double, Double> indicatorTransformer) {
         assessment.setIndicatorTransformer(indicatorTransformer);
     }
 

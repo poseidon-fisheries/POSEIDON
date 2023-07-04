@@ -28,9 +28,10 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelTransduction;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * Simple Kernel transduction all using rbf values
@@ -56,25 +57,26 @@ public class DefaultRBFKernelTransductionFactory implements AlgorithmFactory<Ker
      * @param state the function argument
      * @return the function result
      */
+    @SuppressWarnings("unchecked")
     @Override
     public KernelTransduction apply(final FishState state) {
 
         return new KernelTransduction(
             state.getMap(),
             forgettingFactor.applyAsDouble(state.getRandom()),
-            new Pair<>(
+            entry(
                 new GridXExtractor(),
                 xBandwidth.applyAsDouble(state.getRandom())
             ),
-            new Pair<>(
+            entry(
                 new GridYExtractor(),
                 yBandwidth.applyAsDouble(state.getRandom())
             ),
-            new Pair<>(
+            entry(
                 new PortDistanceExtractor(new ManhattanDistance(), 1d),
                 distanceFromPortBandwidth.applyAsDouble(state.getRandom())
             ),
-            new Pair<>(
+            entry(
                 new HabitatExtractor(),
                 habitatBandwidth.applyAsDouble(state.getRandom())
             )

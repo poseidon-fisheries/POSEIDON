@@ -38,6 +38,7 @@ import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 public abstract class Controller implements Steppable, Startable {
 
 
+    private static final long serialVersionUID = -5683828673774977268L;
     /**
      * returns the current value of the variable we are trying to manipulate
      */
@@ -68,10 +69,10 @@ public abstract class Controller implements Steppable, Startable {
 
 
     public Controller(
-        Sensor<FishState, Double> observed,
-        Sensor<FishState, Double> target,
-        Actuator<FishState, Double> actuator,
-        int intervalInDays
+        final Sensor<FishState, Double> observed,
+        final Sensor<FishState, Double> target,
+        final Actuator<FishState, Double> actuator,
+        final int intervalInDays
     ) {
         this.observed = observed;
         this.target = target;
@@ -80,11 +81,11 @@ public abstract class Controller implements Steppable, Startable {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
-        FishState model = (FishState) simState;
-        double currentVariable = observed.scan(model);
-        double currentTarget = target.scan(model);
+        final FishState model = (FishState) simState;
+        final double currentVariable = observed.scan(model);
+        final double currentTarget = target.scan(model);
 
         policy = computePolicy(currentVariable, currentTarget, model, policy);
 
@@ -106,7 +107,7 @@ public abstract class Controller implements Steppable, Startable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         Preconditions.checkArgument(receipt == null);
         receipt = model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE, intervalInDays);
     }

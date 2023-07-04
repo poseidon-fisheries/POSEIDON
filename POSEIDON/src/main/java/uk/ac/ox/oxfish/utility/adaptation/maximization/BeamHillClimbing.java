@@ -25,11 +25,13 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 import java.util.Collection;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * An hill=climber that tries a new step on "randomize", copy a friend in "imitate" and stays put in "exploit".
@@ -45,17 +47,12 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T> {
      */
     public final static boolean DEFAULT_ALWAYS_COPY_BEST = true;
 
-    ;
     public final static boolean DEFAULT_BACKTRACKS_ON_BAD_EXPLORATION = true;
     /**
      * the default state of the unfriendPredicate field
      */
-    public final static Predicate<Pair<Double, Double>> DEFAULT_DYNAMIC_NETWORK = new Predicate<Pair<Double, Double>>() {
-        @Override
-        public boolean test(Pair<Double, Double> doubleDoublePair) {
-            return false;
-        }
-    };
+    public final static Predicate<Entry<Double, Double>> DEFAULT_DYNAMIC_NETWORK =
+        doubleDoublePair -> false;
     /**
      * if true imitation occurs by looking at your friend who is performing better, otherwise it
      * works by looking at a random friend. <br>
@@ -66,7 +63,7 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T> {
      * A function that judges whether to change a friend after imitating given the pair (previous fitness,newfitness).
      * When the function returns true, we will replace whoever we imitated with somebody at random
      */
-    private final Predicate<Pair<Double, Double>> unfriendPredicate;
+    private final Predicate<Entry<Double, Double>> unfriendPredicate;
     /**
      * what is the result of an exploration step
      */
@@ -77,7 +74,7 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T> {
     private final boolean backtracksOnBadExploration;
     private FishState model;
 
-    public BeamHillClimbing(RandomStep<T> randomStep) {
+    public BeamHillClimbing(final RandomStep<T> randomStep) {
         this(DEFAULT_ALWAYS_COPY_BEST,
             true, DEFAULT_DYNAMIC_NETWORK,
             randomStep
@@ -85,10 +82,10 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T> {
     }
 
     public BeamHillClimbing(
-        boolean copyAlwaysBest,
-        boolean backtracksOnBadExploration,
-        Predicate<Pair<Double, Double>> unfriendPredicate,
-        RandomStep<T> randomStep
+        final boolean copyAlwaysBest,
+        final boolean backtracksOnBadExploration,
+        final Predicate<Entry<Double, Double>> unfriendPredicate,
+        final RandomStep<T> randomStep
     ) {
         this.copyAlwaysBest = copyAlwaysBest;
         this.unfriendPredicate = unfriendPredicate;
@@ -97,7 +94,7 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T> {
     }
 
     @Override
-    public void start(FishState model, Fisher agent, T initial) {
+    public void start(final FishState model, final Fisher agent, final T initial) {
         this.model = model;
     }
 
@@ -105,11 +102,16 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T> {
      * new random step
      */
     @Override
-    public T randomize(MersenneTwisterFast random, Fisher agent, double currentFitness, T current) {
+    public T randomize(
+        final MersenneTwisterFast random,
+        final Fisher agent,
+        final double currentFitness,
+        final T current
+    ) {
         return randomStep(this.model, random, agent, current);
     }
 
-    public T randomStep(FishState state, MersenneTwisterFast random, Fisher fisher, T current) {
+    public T randomStep(final FishState state, final MersenneTwisterFast random, final Fisher fisher, final T current) {
         return randomStep.randomStep(state, random, fisher, current);
 
     }
@@ -118,9 +120,14 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T> {
      * copy friend. No problem
      */
     @Override
-    public Pair<T, Fisher> imitate(
-        MersenneTwisterFast random, Fisher agent, double fitness, T current, Collection<Fisher> friends,
-        ObjectiveFunction<Fisher> objectiveFunction, Sensor<Fisher, T> sensor
+    public Entry<T, Fisher> imitate(
+        final MersenneTwisterFast random,
+        final Fisher agent,
+        final double fitness,
+        final T current,
+        final Collection<Fisher> friends,
+        final ObjectiveFunction<Fisher> objectiveFunction,
+        final Sensor<Fisher, T> sensor
     ) {
         if (copyAlwaysBest)
             return FishStateUtilities.imitateBestFriend(random, agent,
@@ -136,8 +143,12 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T> {
 
     @Override
     public T judgeRandomization(
-        MersenneTwisterFast random, Fisher agent, double previousFitness, double currentFitness, T previous,
-        T current
+        final MersenneTwisterFast random,
+        final Fisher agent,
+        final double previousFitness,
+        final double currentFitness,
+        final T previous,
+        final T current
     ) {
         if (backtracksOnBadExploration && previousFitness > currentFitness)
             return previous;
@@ -147,7 +158,12 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T> {
 
     //stay still!
     @Override
-    public T exploit(MersenneTwisterFast random, Fisher agent, double currentFitness, T current) {
+    public T exploit(
+        final MersenneTwisterFast random,
+        final Fisher agent,
+        final double currentFitness,
+        final T current
+    ) {
         return current;
     }
 
@@ -156,11 +172,15 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T> {
      */
     @Override
     public T judgeImitation(
-        MersenneTwisterFast random, Fisher agent, Fisher friendImitated, double fitnessBeforeImitating,
-        double fitnessAfterImitating, T previous,
-        T current
+        final MersenneTwisterFast random,
+        final Fisher agent,
+        final Fisher friendImitated,
+        final double fitnessBeforeImitating,
+        final double fitnessAfterImitating,
+        final T previous,
+        final T current
     ) {
-        if (unfriendPredicate.test(new Pair<>(fitnessBeforeImitating, fitnessAfterImitating)))
+        if (unfriendPredicate.test(entry(fitnessBeforeImitating, fitnessAfterImitating)))
             agent.replaceFriend(friendImitated, true);
         if (fitnessBeforeImitating > fitnessAfterImitating)
             return previous;

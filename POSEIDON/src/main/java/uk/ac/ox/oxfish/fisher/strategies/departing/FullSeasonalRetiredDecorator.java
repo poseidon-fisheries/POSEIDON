@@ -24,14 +24,11 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-
-import java.util.function.ToDoubleFunction;
 
 /**
  * a departing strategy where every year the fisher has to decide whether to be full-time, seasonal or retired.
@@ -80,11 +77,11 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy {
 
 
     public FullSeasonalRetiredDecorator(
-        EffortStatus status,
-        double targetIncome,
-        double minimumIncome,
-        int maxHoursOutWhenSeasonal,
-        DepartingStrategy delegate, String targetVariable
+        final EffortStatus status,
+        final double targetIncome,
+        final double minimumIncome,
+        final int maxHoursOutWhenSeasonal,
+        final DepartingStrategy delegate, final String targetVariable
     ) {
 
         this(status, targetIncome, minimumIncome, maxHoursOutWhenSeasonal, delegate, targetVariable, -1);
@@ -92,13 +89,13 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy {
 
 
     public FullSeasonalRetiredDecorator(
-        EffortStatus status,
-        double targetIncome,
-        double minimumIncome,
-        int maxHoursOutWhenSeasonal,
-        DepartingStrategy delegate,
-        String targetVariable,
-        int neverSwitchBeforeThisYear
+        final EffortStatus status,
+        final double targetIncome,
+        final double minimumIncome,
+        final int maxHoursOutWhenSeasonal,
+        final DepartingStrategy delegate,
+        final String targetVariable,
+        final int neverSwitchBeforeThisYear
     ) {
         this(status, targetIncome, minimumIncome, maxHoursOutWhenSeasonal, delegate,
             targetVariable, neverSwitchBeforeThisYear, 1, true
@@ -107,15 +104,15 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy {
     }
 
     public FullSeasonalRetiredDecorator(
-        EffortStatus status,
-        double targetIncome,
-        double minimumIncome,
-        int maxHoursOutWhenSeasonal,
-        DepartingStrategy delegate,
-        String targetVariable,
-        int neverSwitchBeforeThisYear,
-        int inertia,
-        boolean canReturnFromRetirement
+        final EffortStatus status,
+        final double targetIncome,
+        final double minimumIncome,
+        final int maxHoursOutWhenSeasonal,
+        final DepartingStrategy delegate,
+        final String targetVariable,
+        final int neverSwitchBeforeThisYear,
+        final int inertia,
+        final boolean canReturnFromRetirement
     ) {
         this.targetVariable = targetVariable;
         this.canReturnFromRetirement = canReturnFromRetirement;
@@ -141,7 +138,8 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy {
      * @return true if the fisherman wants to leave port.
      */
     @Override
-    public boolean shouldFisherLeavePort(Fisher fisher, FishState model, MersenneTwisterFast random) {
+    @SuppressWarnings("fallthrough")
+    public boolean shouldFisherLeavePort(final Fisher fisher, final FishState model, final MersenneTwisterFast random) {
 
         switch (status) {
             case FULLTIME:
@@ -162,14 +160,12 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy {
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         Preconditions.checkState(stoppable == null, "Already started!!");
-        stoppable = model.scheduleEveryYear(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                updateEffortLevel(fisher, model);
-            }
-        }, StepOrder.AFTER_DATA);
+        stoppable = model.scheduleEveryYear(
+            (Steppable) simState -> updateEffortLevel(fisher, model),
+            StepOrder.AFTER_DATA
+        );
         fisher.getAdditionalVariables().put(SEASONALITY_VARIABLE_NAME, status);
 
     }
@@ -186,7 +182,7 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy {
      * @param state
      */
     @VisibleForTesting
-    public void updateEffortLevel(Fisher fisher, FishState state) {
+    public void updateEffortLevel(final Fisher fisher, final FishState state) {
 
         //don't bother the first year
         if (state.getDay() < 364)
@@ -195,7 +191,7 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy {
             return;
 
 
-        double currentIncome = fisher.getLatestYearlyObservation(targetVariable);
+        final double currentIncome = fisher.getLatestYearlyObservation(targetVariable);
 
         //if you couldn't make an observation, you can't adapt!
         if (!Double.isFinite(currentIncome))
@@ -260,15 +256,12 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy {
             case RETIRED:
                 if (!canReturnFromRetirement)
                     break;
-                double maxFriendsProfits = fisher.getDirectedFriends()
+                final double maxFriendsProfits = fisher.getDirectedFriends()
                     .stream()
-                    .mapToDouble(new ToDoubleFunction<Fisher>() {
-                        @Override
-                        public double applyAsDouble(Fisher value) {
-                            if (value.getYearlyData().getColumn(targetVariable) == null)
-                                throw new RuntimeException("Could not observe" + targetVariable + " for fisher " + value);
-                            return value.getLatestYearlyObservation(targetVariable);
-                        }
+                    .mapToDouble(value -> {
+                        if (value.getYearlyData().getColumn(targetVariable) == null)
+                            throw new RuntimeException("Could not observe" + targetVariable + " for fisher " + value);
+                        return value.getLatestYearlyObservation(targetVariable);
                     })
                     .max()
                     .orElse(Double.NaN);
@@ -285,7 +278,7 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy {
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         stoppable.stop();
     }
 
@@ -301,7 +294,7 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy {
         return delegate;
     }
 
-    public void setDelegate(DepartingStrategy delegate) {
+    public void setDelegate(final DepartingStrategy delegate) {
         this.delegate = delegate;
     }
 
@@ -322,8 +315,9 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy {
         return canReturnFromRetirement;
     }
 
+    @SuppressWarnings("fallthrough")
     @Override
-    public int predictedDaysLeftFishingThisYear(Fisher fisher, FishState model, MersenneTwisterFast random) {
+    public int predictedDaysLeftFishingThisYear(final Fisher fisher, final FishState model, final MersenneTwisterFast random) {
 
         switch (status) {
             case FULLTIME:

@@ -94,21 +94,13 @@ public abstract class AbstractMarket implements MarketWithCounter {
         //start the data-set where we are going to store the history of the counter
         dailyObservations.start(state, this);
         //the gatherers reset the counters as a side effect
-        dailyObservations.registerGatherer(EARNINGS_COLUMN_NAME, new Gatherer<Market>() {
-                @Override
-                public Double apply(final Market market) {
-                    return dailyCounter.getColumn(EARNINGS_COLUMN_NAME);
-                }
-            },
+        dailyObservations.registerGatherer(EARNINGS_COLUMN_NAME,
+            (Gatherer<Market>) market -> dailyCounter.getColumn(EARNINGS_COLUMN_NAME),
             Double.NaN, dailyObservations.getCurrency(), "Earnings"
         );
 
-        dailyObservations.registerGatherer(LANDINGS_COLUMN_NAME, new Gatherer<Market>() {
-                @Override
-                public Double apply(final Market market) {
-                    return dailyCounter.getColumn(LANDINGS_COLUMN_NAME);
-                }
-            },
+        dailyObservations.registerGatherer(LANDINGS_COLUMN_NAME,
+            (Gatherer<Market>) market -> dailyCounter.getColumn(LANDINGS_COLUMN_NAME),
             Double.NaN, KILOGRAM, "Biomass"
         );
 

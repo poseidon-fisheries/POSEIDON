@@ -129,14 +129,9 @@ public class PrototypeScenarioTest {
             state.schedule.step(state);
 
         double distanceWithHeadStart = state.getFishers().stream().mapToDouble(
-            new ToDoubleFunction<Fisher>() {
-                @Override
-                public double applyAsDouble(Fisher value) {
-                    return state.getMap()
-                        .distance(value.getHomePort().getLocation(),
-                            value.getLastFinishedTrip().getMostFishedTileInTrip());
-                }
-            }
+            value -> state.getMap()
+                .distance(value.getHomePort().getLocation(),
+                    value.getLastFinishedTrip().getMostFishedTileInTrip())
         ).average().getAsDouble();
 
         scenario = new PrototypeScenario();
@@ -147,14 +142,9 @@ public class PrototypeScenarioTest {
         for (int i = 0; i < 10; i++)
             state.schedule.step(state);
         double distanceWithoutHeadStart = state.getFishers().stream().mapToDouble(
-            new ToDoubleFunction<Fisher>() {
-                @Override
-                public double applyAsDouble(Fisher value) {
-                    return state2.getMap()
-                        .distance(value.getHomePort().getLocation(),
-                            value.getLastFinishedTrip().getMostFishedTileInTrip());
-                }
-            }
+            value -> state2.getMap()
+                .distance(value.getHomePort().getLocation(),
+                    value.getLastFinishedTrip().getMostFishedTileInTrip())
         ).average().getAsDouble();
 
         System.out.println(distanceWithHeadStart);

@@ -93,19 +93,16 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return new SPRAgent(
             surveyTag,
             fishState.getBiology().getSpecie(speciesName),
-            new Predicate<Fisher>() {
-                @Override
-                public boolean test(Fisher fisher) {
-                    for (Map.Entry<String, Double> tagProbability : probabilityOfSamplingEachTag.entrySet()) {
-                        if (fisher.getTags()
-                            .contains(tagProbability.getKey()) && random.nextDouble() < tagProbability.getValue()) {
-                            return true;
-                        }
-
-
+            fisher -> {
+                for (Map.Entry<String, Double> tagProbability : probabilityOfSamplingEachTag.entrySet()) {
+                    if (fisher.getTags()
+                        .contains(tagProbability.getKey()) && random.nextDouble() < tagProbability.getValue()) {
+                        return true;
                     }
-                    return false;
+
+
                 }
+                return false;
             },
             assumedLinf.applyAsDouble(random),
             assumedKParameter.applyAsDouble(random),

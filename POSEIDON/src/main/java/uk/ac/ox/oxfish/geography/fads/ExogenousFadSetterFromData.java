@@ -9,9 +9,12 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
+import uk.ac.ox.oxfish.utility.MasonUtils;
 
 import java.util.*;
 import java.util.function.Function;
+
+import static java.util.stream.Collectors.toList;
 
 public class ExogenousFadSetterFromData extends ExogenousFadSetter implements OutputPlugin {
 
@@ -25,6 +28,7 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter implements Ou
      * in the simulation to match it to
      */
     public final static double DEFAULT_MISSING_FAD_ERROR = 10000;
+    private static final long serialVersionUID = -6460566846566873720L;
     private final Map<Integer, List<FadSetObservation>> fadSetsPerDayInData;
     private final Counter counter = new Counter(IntervalPolicy.EVERY_YEAR);
     /**
@@ -102,7 +106,9 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter implements Ou
         //now that we have arranged observations by area, match observations with simulated fads
         for (final Map.Entry<SeaTile, List<FadSetObservation>> setsPerTile : fadObservations.entrySet()) {
             //get all observable matches (i.e. all fads in the same tile)
-            final ArrayList<Fad> matchableFads = new ArrayList<>(getFadMap().fadsAt(setsPerTile.getKey()));
+            final List<Fad> matchableFads =
+                MasonUtils.<Fad>bagToStream(getFadMap().fadsAt(setsPerTile.getKey()))
+                    .collect(toList());
             //if you are looking in the neighborhood size...
             if (neighborhoodSearchSize > 0) {
                 //get all seatile neighbors and add their fads to the matchable list
@@ -111,7 +117,7 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter implements Ou
                     if (mooreNeighbor == setsPerTile.getKey()) //don't add yourself
                         continue;
                     matchableFads.addAll(
-                        getFadMap().fadsAt(((SeaTile) mooreNeighbor))
+                        MasonUtils.<Fad>bagToStream(getFadMap().fadsAt(((SeaTile) mooreNeighbor))).collect(toList())
                     );
                 }
 
@@ -120,7 +126,7 @@ public class ExogenousFadSetterFromData extends ExogenousFadSetter implements Ou
             matchableFads.removeAll(matchedFadsToFishOut);
             assert (matchableFads.size() == (new HashSet<>(matchableFads)).size()) : "some fads seem to appear in multiple spots";
             //sort them by size (to get consistent errors)
-            Collections.sort(matchableFads, (o1, o2) -> -Double.compare(
+            matchableFads.sort((o1, o2) -> -Double.compare(
                 o1.getBiology().getTotalBiomass(model.getSpecies()),
                 o2.getBiology().getTotalBiomass(model.getSpecies())
             ));

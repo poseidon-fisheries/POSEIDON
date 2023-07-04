@@ -22,19 +22,22 @@ package uk.ac.ox.oxfish.utility.dynapro;
 
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * Batch dynamic program (makes oscillations less likely) using OLS
  * on all data
  * Created by carrknight on 12/15/16.
  */
+@SuppressWarnings({"varargs"})
 public class OLSDynamicProgram {
 
 
@@ -73,6 +76,10 @@ public class OLSDynamicProgram {
      */
     private final LinkedList<Double>[] rewards;
     /**
+     * functions that extract a feature from the fishstate and the previous feature
+     */
+    private final Function<Entry<FishState, Double>, Double>[] features;
+    /**
      * store the linear parameters as they are regressed
      */
     protected double[][] temporaryParameters;
@@ -80,25 +87,23 @@ public class OLSDynamicProgram {
      * each array is the "beta"s of the linear approximation
      */
     private double[][] linearParameters;
-    /**
-     * functions that extract a feature from the fishstate and the previous feature
-     */
-    private Function<Pair<FishState, Double>, Double>[] features;
     private double[] oldFeatures;
     private int lastAction;
     private double errorRate;
 
+    @SafeVarargs
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public OLSDynamicProgram(
-        int possibleActions,
-        Function<FishState, Double> rewardFunction,
-        boolean addSquares,
-        boolean addCubes,
-        boolean addInteractions,
-        boolean addCumulative,
-        boolean addAverages,
-        boolean addLags,
-        double errorRate, Predicate<double[]> lastStep,
-        Function<Pair<FishState, Double>, Double>... features
+        final int possibleActions,
+        final Function<FishState, Double> rewardFunction,
+        final boolean addSquares,
+        final boolean addCubes,
+        final boolean addInteractions,
+        final boolean addCumulative,
+        final boolean addAverages,
+        final boolean addLags,
+        final double errorRate, final Predicate<double[]> lastStep,
+        final Function<Entry<FishState, Double>, Double>... features
     ) {
         this.possibleActions = possibleActions;
         this.rewardFunction = rewardFunction;
@@ -129,9 +134,9 @@ public class OLSDynamicProgram {
         regressionDimension = dimensions;
         linearParameters = new double[possibleActions][regressionDimension];
 
-        preDecisionStates = new LinkedList[possibleActions];
-        postDecisionStates = new LinkedList[possibleActions];
-        rewards = new LinkedList[possibleActions];
+        preDecisionStates = (LinkedList<double[]>[]) new LinkedList[possibleActions];
+        postDecisionStates = (LinkedList<double[]>[]) new LinkedList[possibleActions];
+        rewards = (LinkedList<Double>[]) new LinkedList[possibleActions];
         for (int action = 0; action < possibleActions; action++) {
             preDecisionStates[action] = new LinkedList<>();
             postDecisionStates[action] = new LinkedList<>();
@@ -141,18 +146,18 @@ public class OLSDynamicProgram {
 
     }
 
-    public int step(FishState state) {
+    public int step(final FishState state) {
         return step(state, lastAction);
     }
 
-    public int step(FishState state, int previousAction) {
+    public int step(final FishState state, final int previousAction) {
 
-        double[] currentFeatures = featurize(state, oldFeatures == null ?
+        final double[] currentFeatures = featurize(state, oldFeatures == null ?
             new double[regressionDimension] : oldFeatures);
-        double reward = rewardFunction.apply(state);
+        final double reward = rewardFunction.apply(state);
 
         //find action by maximizing q value
-        lastAction = pickBestAction(currentFeatures).getFirst();
+        lastAction = pickBestAction(currentFeatures).getKey();
         //randomize if needed
         if (state.getRandom().nextDouble() < errorRate)
             lastAction = state.getRandom().nextInt(getPossibleActions());
@@ -168,14 +173,14 @@ public class OLSDynamicProgram {
 
     }
 
-    private double[] featurize(FishState state, double[] previousFactors) {
-        double[] toReturn = new double[regressionDimension];
-        double[] originals = new double[features.length];
+    private double[] featurize(final FishState state, final double[] previousFactors) {
+        final double[] toReturn = new double[regressionDimension];
+        final double[] originals = new double[features.length];
         int i = 0;
         toReturn[i] = 1;
         i++; //intercept
         for (int j = 0; j < originals.length; j++, i++) {
-            originals[j] = features[j].apply(new Pair<>(state, previousFactors[j + 1]));
+            originals[j] = features[j].apply(entry(state, previousFactors[j + 1]));
             toReturn[i] = originals[j];
         }
         assert i == originals.length + 1;
@@ -219,16 +224,16 @@ public class OLSDynamicProgram {
      * @param currentFeatures
      * @return
      */
-    private Pair<Integer, Double> pickBestAction(double[] currentFeatures) {
-        double[] scores = scoreEachAction(currentFeatures);
+    private Entry<Integer, Double> pickBestAction(final double[] currentFeatures) {
+        final double[] scores = scoreEachAction(currentFeatures);
         int bestAction = 0;
         for (int i = 1; i < scores.length; i++) {
-            double candidate = scores[i];
+            final double candidate = scores[i];
             if ((candidate > scores[bestAction])) {
                 bestAction = i;
             }
         }
-        return new Pair<>(bestAction, scores[bestAction]);
+        return entry(bestAction, scores[bestAction]);
     }
 
     /**
@@ -247,8 +252,8 @@ public class OLSDynamicProgram {
      * @param currentFeatures the features to use to extract the q value (and whatever else)
      * @return an array producing the scores
      */
-    protected double[] scoreEachAction(double[] currentFeatures) {
-        double[] qValues = new double[getPossibleActions()];
+    protected double[] scoreEachAction(final double[] currentFeatures) {
+        final double[] qValues = new double[getPossibleActions()];
         for (int i = 0; i < qValues.length; i++)
             qValues[i] = qValue(currentFeatures, i);
         return qValues;
@@ -262,13 +267,13 @@ public class OLSDynamicProgram {
      * @param action   action we take
      * @return the value function if the next action is constrained
      */
-    public double qValue(double[] features, int action) {
+    public double qValue(final double[] features, final int action) {
         //q value is 0 when the game ends!
         if (lastStep.test(features))
             return 0;
 
         double sum = 0;
-        double[] beta = linearParameters[action];
+        final double[] beta = linearParameters[action];
         assert beta.length == features.length;
         for (int i = 0; i < features.length; i++)
             sum += beta[i] * features[i];
@@ -285,25 +290,25 @@ public class OLSDynamicProgram {
         for (int i = 0; i < linearParameters.length; i++) {
             assert preDecisionStates[i].size() == postDecisionStates[i].size();
             assert preDecisionStates[i].size() == rewards[i].size();
-            double[][] x = new double[preDecisionStates[i].size()][getRegressionDimension()];
-            double[] y = new double[preDecisionStates[i].size()];
-            Iterator<double[]> pre = preDecisionStates[i].iterator();
-            Iterator<double[]> post = postDecisionStates[i].iterator();
-            Iterator<Double> rewardIterator = rewards[i].iterator();
+            final double[][] x = new double[preDecisionStates[i].size()][getRegressionDimension()];
+            final double[] y = new double[preDecisionStates[i].size()];
+            final Iterator<double[]> pre = preDecisionStates[i].iterator();
+            final Iterator<double[]> post = postDecisionStates[i].iterator();
+            final Iterator<Double> rewardIterator = rewards[i].iterator();
             //create design matrix
             int j = 0;
             while (pre.hasNext()) {
-                double[] features = pre.next();
+                final double[] features = pre.next();
                 x[j] = Arrays.copyOf(features, features.length);
                 //y is just reward plus max Q
-                double reward = rewardIterator.next();
-                double[] postFeatures = Arrays.copyOf(post.next(), features.length);
-                double maxQ = pickBestAction(postFeatures).getSecond();
+                final double reward = rewardIterator.next();
+                final double[] postFeatures = Arrays.copyOf(post.next(), features.length);
+                final double maxQ = pickBestAction(postFeatures).getValue();
                 y[j] = reward + maxQ;
                 j++;
             }
             ///feed it
-            OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
+            final OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
             regression.setNoIntercept(true); //we bring our own
             regression.newSampleData(y, x);
             updateLinearParametersGivenRegression(i, regression, x);
@@ -323,9 +328,9 @@ public class OLSDynamicProgram {
     }
 
     protected void updateLinearParametersGivenRegression(
-        int i,
-        OLSMultipleLinearRegression regression,
-        double[][] x
+        final int i,
+        final OLSMultipleLinearRegression regression,
+        final double[][] x
     ) {
         temporaryParameters[i] = regression.estimateRegressionParameters();
     }
@@ -371,7 +376,7 @@ public class OLSDynamicProgram {
      *
      * @param errorRate Value to set for property 'errorRate'.
      */
-    public void setErrorRate(double errorRate) {
+    public void setErrorRate(final double errorRate) {
         this.errorRate = errorRate;
     }
 

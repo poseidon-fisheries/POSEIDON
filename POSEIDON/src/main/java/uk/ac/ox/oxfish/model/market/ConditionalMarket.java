@@ -61,25 +61,15 @@ public class ConditionalMarket implements Market {
         //start the data-set where we are going to store the history of the counter
         dailyObservations.start(model, this);
         //the gatherers reset the counters as a side effect
-        dailyObservations.registerGatherer(EARNINGS_COLUMN_NAME, new Gatherer<Market>() {
-                @Override
-                public Double apply(Market market) {
-                    return defaultMarket.getDailyCounter().getColumn(EARNINGS_COLUMN_NAME) +
-                        passThePredicateMarket.getDailyCounter().getColumn(EARNINGS_COLUMN_NAME)
-                        ;
-                }
-            },
+        dailyObservations.registerGatherer(EARNINGS_COLUMN_NAME,
+            (Gatherer<Market>) market -> defaultMarket.getDailyCounter().getColumn(EARNINGS_COLUMN_NAME) +
+                passThePredicateMarket.getDailyCounter().getColumn(EARNINGS_COLUMN_NAME),
             Double.NaN
         );
 
-        dailyObservations.registerGatherer(LANDINGS_COLUMN_NAME, new Gatherer<Market>() {
-                @Override
-                public Double apply(Market market) {
-                    return defaultMarket.getDailyCounter().getColumn(LANDINGS_COLUMN_NAME) +
-                        passThePredicateMarket.getDailyCounter().getColumn(LANDINGS_COLUMN_NAME)
-                        ;
-                }
-            },
+        dailyObservations.registerGatherer(LANDINGS_COLUMN_NAME,
+            (Gatherer<Market>) market -> defaultMarket.getDailyCounter().getColumn(LANDINGS_COLUMN_NAME) +
+                passThePredicateMarket.getDailyCounter().getColumn(LANDINGS_COLUMN_NAME),
             Double.NaN
         );
 

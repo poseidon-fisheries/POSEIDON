@@ -84,6 +84,7 @@ import java.util.List;
  * @see ModifiableObservableListBase
  * @since JavaFX 8.0
  */
+@SuppressWarnings("unchecked")
 public abstract class ObservableListBase<E> extends AbstractList<E> implements ObservableList<E> {
 
     private final ListChangeBuilder<E> changeBuilder = new ListChangeBuilder<E>(this);
@@ -96,7 +97,7 @@ public abstract class ObservableListBase<E> extends AbstractList<E> implements O
      *
      * @param pos the position in the list where the updated element resides.
      */
-    protected final void nextUpdate(int pos) {
+    protected final void nextUpdate(final int pos) {
         changeBuilder.nextUpdate(pos);
     }
 
@@ -109,7 +110,7 @@ public abstract class ObservableListBase<E> extends AbstractList<E> implements O
      * @param idx the index of the item that was set
      * @param old the old value at the {@code idx} position.
      */
-    protected final void nextSet(int idx, E old) {
+    protected final void nextSet(final int idx, final E old) {
         changeBuilder.nextSet(idx, old);
     }
 
@@ -123,7 +124,7 @@ public abstract class ObservableListBase<E> extends AbstractList<E> implements O
      * @param to      the end index (exclusive) of the range where the new items reside
      * @param removed the list of items that were removed
      */
-    protected final void nextReplace(int from, int to, List<? extends E> removed) {
+    protected final void nextReplace(final int from, final int to, final List<? extends E> removed) {
         changeBuilder.nextReplace(from, to, removed);
     }
 
@@ -135,7 +136,7 @@ public abstract class ObservableListBase<E> extends AbstractList<E> implements O
      * @param idx     the index where the items were removed
      * @param removed the list of items that were removed
      */
-    protected final void nextRemove(int idx, List<? extends E> removed) {
+    protected final void nextRemove(final int idx, final List<? extends E> removed) {
         changeBuilder.nextRemove(idx, removed);
     }
 
@@ -147,7 +148,7 @@ public abstract class ObservableListBase<E> extends AbstractList<E> implements O
      * @param idx     the index where the item was removed
      * @param removed the item that was removed
      */
-    protected final void nextRemove(int idx, E removed) {
+    protected final void nextRemove(final int idx, final E removed) {
         changeBuilder.nextRemove(idx, removed);
     }
 
@@ -164,7 +165,7 @@ public abstract class ObservableListBase<E> extends AbstractList<E> implements O
      * @param perm the permutation in that range. Even if {@code from != 0}, the array should
      *             contain the indexes of the list. Therefore, such permutation would not contain indexes of range {@code (0, from)}
      */
-    protected final void nextPermutation(int from, int to, int[] perm) {
+    protected final void nextPermutation(final int from, final int to, final int[] perm) {
         changeBuilder.nextPermutation(from, to, perm);
     }
 
@@ -178,7 +179,7 @@ public abstract class ObservableListBase<E> extends AbstractList<E> implements O
      * @param from marks the beginning (inclusive) of the range that was added
      * @param to   marks the end (exclusive) of the range that was added
      */
-    protected final void nextAdd(int from, int to) {
+    protected final void nextAdd(final int from, final int to) {
         changeBuilder.nextAdd(from, to);
     }
 
@@ -209,22 +210,22 @@ public abstract class ObservableListBase<E> extends AbstractList<E> implements O
     }
 
     @Override
-    public final void addListener(InvalidationListener listener) {
+    public final void addListener(final InvalidationListener listener) {
         listenerHelper = ListListenerHelper.addListener(listenerHelper, listener);
     }
 
     @Override
-    public final void removeListener(InvalidationListener listener) {
+    public final void removeListener(final InvalidationListener listener) {
         listenerHelper = ListListenerHelper.removeListener(listenerHelper, listener);
     }
 
     @Override
-    public final void addListener(ListChangeListener<? super E> listener) {
+    public final void addListener(final ListChangeListener<? super E> listener) {
         listenerHelper = ListListenerHelper.addListener(listenerHelper, listener);
     }
 
     @Override
-    public final void removeListener(ListChangeListener<? super E> listener) {
+    public final void removeListener(final ListChangeListener<? super E> listener) {
         listenerHelper = ListListenerHelper.removeListener(listenerHelper, listener);
     }
 
@@ -233,7 +234,7 @@ public abstract class ObservableListBase<E> extends AbstractList<E> implements O
      *
      * @param change an object representing the change that was done
      */
-    protected final void fireChange(ListChangeListener.Change<? extends E> change) {
+    protected final void fireChange(final ListChangeListener.Change<? extends E> change) {
         ListListenerHelper.fireValueChangedEvent(listenerHelper, change);
     }
 
@@ -247,32 +248,32 @@ public abstract class ObservableListBase<E> extends AbstractList<E> implements O
     }
 
     @Override
-    public boolean addAll(E... elements) {
+    public boolean addAll(final E... elements) {
         return addAll(Arrays.asList(elements));
     }
 
     @Override
-    public boolean setAll(E... elements) {
+    public boolean setAll(final E... elements) {
         return setAll(Arrays.asList(elements));
     }
 
     @Override
-    public boolean setAll(Collection<? extends E> col) {
+    public boolean setAll(final Collection<? extends E> col) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean removeAll(E... elements) {
+    public boolean removeAll(final E... elements) {
         return removeAll(Arrays.asList(elements));
     }
 
     @Override
-    public boolean retainAll(E... elements) {
+    public boolean retainAll(final E... elements) {
         return retainAll(Arrays.asList(elements));
     }
 
     @Override
-    public void remove(int from, int to) {
+    public void remove(final int from, final int to) {
         removeRange(from, to);
     }
 }

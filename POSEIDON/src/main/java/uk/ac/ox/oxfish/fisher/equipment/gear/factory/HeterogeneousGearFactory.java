@@ -27,7 +27,6 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.HeterogeneousAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NullParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -35,6 +34,7 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Created by carrknight on 5/17/16.
@@ -52,13 +52,13 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
         gears.clear();
     }
 
+    @SuppressWarnings("unchecked")
     public HeterogeneousGearFactory(
-        final Pair<String, HomogeneousGearFactory>...
-            given
+        final Entry<String, HomogeneousGearFactory>... given
     ) {
         gears.clear();
-        for (final Pair<String, HomogeneousGearFactory> pair : given) {
-            gears.put(pair.getFirst(), pair.getSecond());
+        for (final Entry<String, HomogeneousGearFactory> pair : given) {
+            gears.put(pair.getKey(), pair.getValue());
         }
     }
 
@@ -73,7 +73,7 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
 
         final HashMap<Species, HomogeneousAbundanceGear> gearsPerSpecies = new HashMap<>();
 
-        for (final Map.Entry<String, HomogeneousGearFactory>
+        for (final Entry<String, HomogeneousGearFactory>
             entry : getGears().entrySet()) {
             gearsPerSpecies.put(
                 state.getBiology().getSpecie(entry.getKey()),
@@ -98,33 +98,37 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
      *
      * @return Value for property 'gears'.
      */
+    @SuppressWarnings({"unchecked", "rawtypes", "DataFlowIssue"})
     public HashMap<String, HomogeneousGearFactory> getGears() {
         if (!(gears.values().iterator().next() instanceof HomogeneousGearFactory)) {
             //there is an annoying bug with yaml that doesn't really read maps correctly
             //so we'll have to force it here
+            // (NP 2023-07-04): the aforementioned bug means that the runtime map content
+            // violates its type parameters, which explains the need to rely on raw types
+            // and unchecked casts. It is truly a thing of horror.
             final FishYAML yaml = new FishYAML();
             final HashMap<String, HomogeneousGearFactory> cleaned = new LinkedHashMap<>();
             for (final Map.Entry entry : gears.entrySet()) {
                 final String key = (String) entry.getKey();
-                final HashMap<String, LinkedHashMap<String, String>> container = (HashMap<String, LinkedHashMap<String, String>>) entry.getValue();
+                final Map<String, LinkedHashMap<String, String>> container =
+                    (HashMap<String, LinkedHashMap<String, String>>) entry.getValue();
                 assert container.size() == 1;
-                final Map.Entry<String, LinkedHashMap<String, String>> constructor = container.entrySet()
+                final Entry<String, LinkedHashMap<String, String>> constructor = container.entrySet()
                     .iterator()
                     .next();
                 final StringBuilder cleanedYaml = new StringBuilder();
                 cleanedYaml.append(constructor.getKey()).append(":").append("\n");
-                for (final Map.Entry parameter : constructor.getValue().entrySet()) {
+                for (final Entry<String, String> parameter : constructor.getValue().entrySet()) {
                     if (parameter.getValue() != null)
                         cleanedYaml.append("  ")
-                            .append(parameter.getKey().toString())
+                            .append(parameter.getKey())
                             .append(": '")
-                            .append(parameter.getValue().toString())
+                            .append(parameter.getValue())
                             .append("'")
                             .append("\n");
                 }
                 cleaned.put(key, yaml.loadAs(cleanedYaml.toString(), HomogeneousGearFactory.class));
             }
-
             gears = cleaned;
         }
         return gears;

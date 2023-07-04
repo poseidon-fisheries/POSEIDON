@@ -39,7 +39,7 @@ public class DestinationStrategies {
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     public static final Map<String, Supplier<AlgorithmFactory<? extends DestinationStrategy>>> CONSTRUCTORS;
 

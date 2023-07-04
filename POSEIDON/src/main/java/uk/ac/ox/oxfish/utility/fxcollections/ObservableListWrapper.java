@@ -30,6 +30,7 @@ import java.util.*;
 /**
  * A List wrapper class that implements observability.
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class ObservableListWrapper<E> extends ModifiableObservableListBase<E> implements
     ObservableList<E>, RandomAccess {
 
@@ -38,34 +39,24 @@ public class ObservableListWrapper<E> extends ModifiableObservableListBase<E> im
     private final ElementObserver elementObserver;
     private SortHelper helper;
 
-    public ObservableListWrapper(List<E> list) {
+    public ObservableListWrapper(final List<E> list) {
         backingList = list;
         elementObserver = null;
     }
 
 
-    public ObservableListWrapper(List<E> list, Callback<E, Observable[]> extractor) {
+    public ObservableListWrapper(final List<E> list, final Callback<E, Observable[]> extractor) {
         backingList = list;
-        this.elementObserver = new ElementObserver(extractor, new Callback<E, InvalidationListener>() {
-
-            @Override
-            public InvalidationListener call(final E e) {
-                return new InvalidationListener() {
-
-                    @Override
-                    public void invalidated(Observable observable) {
-                        beginChange();
-                        int i = 0;
-                        final int size = size();
-                        for (; i < size; ++i) {
-                            if (get(i) == e) {
-                                nextUpdate(i);
-                            }
-                        }
-                        endChange();
-                    }
-                };
+        this.elementObserver = new ElementObserver(extractor, (Callback<E, InvalidationListener>) e -> observable -> {
+            beginChange();
+            int i = 0;
+            final int size = size();
+            for (; i < size; ++i) {
+                if (get(i) == e) {
+                    nextUpdate(i);
+                }
             }
+            endChange();
         }, this);
         final int sz = backingList.size();
         for (int i = 0; i < sz; ++i) {
@@ -79,20 +70,20 @@ public class ObservableListWrapper<E> extends ModifiableObservableListBase<E> im
     }
 
     @Override
-    public E get(int index) {
+    public E get(final int index) {
         return backingList.get(index);
     }
 
     @Override
-    protected void doAdd(int index, E element) {
+    protected void doAdd(final int index, final E element) {
         if (elementObserver != null)
             elementObserver.attachListener(element);
         backingList.add(index, element);
     }
 
     @Override
-    protected E doSet(int index, E element) {
-        E removed = backingList.set(index, element);
+    protected E doSet(final int index, final E element) {
+        final E removed = backingList.set(index, element);
         if (elementObserver != null) {
             elementObserver.detachListener(removed);
             elementObserver.attachListener(element);
@@ -101,30 +92,30 @@ public class ObservableListWrapper<E> extends ModifiableObservableListBase<E> im
     }
 
     @Override
-    protected E doRemove(int index) {
-        E removed = backingList.remove(index);
+    protected E doRemove(final int index) {
+        final E removed = backingList.remove(index);
         if (elementObserver != null)
             elementObserver.detachListener(removed);
         return removed;
     }
 
     @Override
-    public int indexOf(Object o) {
+    public int indexOf(final Object o) {
         return backingList.indexOf(o);
     }
 
     @Override
-    public int lastIndexOf(Object o) {
+    public int lastIndexOf(final Object o) {
         return backingList.lastIndexOf(o);
     }
 
     @Override
-    public boolean contains(Object o) {
+    public boolean contains(final Object o) {
         return backingList.contains(o);
     }
 
     @Override
-    public boolean containsAll(Collection<?> c) {
+    public boolean containsAll(final Collection<?> c) {
         return backingList.containsAll(c);
     }
 
@@ -148,7 +139,7 @@ public class ObservableListWrapper<E> extends ModifiableObservableListBase<E> im
     }
 
     @Override
-    public void remove(int fromIndex, int toIndex) {
+    public void remove(final int fromIndex, final int toIndex) {
         beginChange();
         for (int i = fromIndex; i < toIndex; ++i) {
             remove(fromIndex);
@@ -157,9 +148,9 @@ public class ObservableListWrapper<E> extends ModifiableObservableListBase<E> im
     }
 
     @Override
-    public boolean removeAll(Collection<?> c) {
+    public boolean removeAll(final Collection<?> c) {
         beginChange();
-        BitSet bs = new BitSet(c.size());
+        final BitSet bs = new BitSet(c.size());
         for (int i = 0; i < size(); ++i) {
             if (c.contains(get(i))) {
                 bs.set(i);
@@ -176,9 +167,9 @@ public class ObservableListWrapper<E> extends ModifiableObservableListBase<E> im
     }
 
     @Override
-    public boolean retainAll(Collection<?> c) {
+    public boolean retainAll(final Collection<?> c) {
         beginChange();
-        BitSet bs = new BitSet(c.size());
+        final BitSet bs = new BitSet(c.size());
         for (int i = 0; i < size(); ++i) {
             if (!c.contains(get(i))) {
                 bs.set(i);
@@ -195,11 +186,11 @@ public class ObservableListWrapper<E> extends ModifiableObservableListBase<E> im
     }
 
     @Override
-    public void sort(Comparator<? super E> comparator) {
+    public void sort(final Comparator<? super E> comparator) {
         if (backingList.isEmpty()) {
             return;
         }
-        int[] perm = getSortHelper().sort(backingList, comparator);
+        final int[] perm = getSortHelper().sort(backingList, comparator);
         fireChange(new NonIterableChange.SimplePermutationChange<E>(0, size(), perm, this));
     }
 

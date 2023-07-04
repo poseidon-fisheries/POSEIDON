@@ -24,7 +24,6 @@ import org.jfree.util.Log;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -40,17 +39,17 @@ public class LogisticClassifierTest {
     public void simpleTest() throws Exception {
 
 
-        FishState state = mock(FishState.class);
-        Fisher fisher = mock(Fisher.class);
+        final FishState state = mock(FishState.class);
+        final Fisher fisher = mock(Fisher.class);
 
         Log.info("The logistic regression tested here is just xb=1*id-2*dayOfTheYear");
 
-        LogisticClassifier classifier =
+        final LogisticClassifier classifier =
             new LogisticClassifier(
-                new Pair<>(
+                new Entry<>(
                     (tile, timeOfObservation, agent, model) -> agent.getID(), 1d
                 ),
-                new Pair<>(
+                new Entry<>(
                     (tile, timeOfObservation, agent, model) -> model.getDayOfTheYear(), -2d
                 )
             );

@@ -31,8 +31,10 @@ import uk.ac.ox.oxfish.model.FishState;
  * Created by carrknight on 3/22/17.
  */
 public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
+    private static final long serialVersionUID = 7391961486075543098L;
+
     public MockNaturalProcess(
-        Species species
+        final Species species
     ) {
         super(null, species, true, null, new NoAbundanceDiffusion(),
             new DummyNaturalMortality(), false
@@ -46,7 +48,7 @@ public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
     }
 
     /**
@@ -63,7 +65,7 @@ public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
      * @param simState
      */
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
     }
 
     /**
@@ -73,7 +75,7 @@ public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
      * @param tile
      */
     @Override
-    public void add(AbundanceLocalBiology abundanceLocalBiology, SeaTile tile) {
+    public void add(final AbundanceLocalBiology abundanceLocalBiology, final SeaTile tile) {
     }
 
     @Override
@@ -88,7 +90,7 @@ public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
      * @param noiseMaker the function that generates percentage changes. 1 means no noise.
      */
     @Override
-    public void addNoise(NoiseMaker noiseMaker) {
+    public void addNoise(final NoiseMaker noiseMaker) {
     }
 
     /**
@@ -118,6 +120,6 @@ public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
      * @param recruitsAllocator Value to set for property 'recruitsAllocator'.
      */
     @Override
-    public void setRecruitsAllocator(BiomassAllocator recruitsAllocator) {
+    public void setRecruitsAllocator(final BiomassAllocator recruitsAllocator) {
     }
 }

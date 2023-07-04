@@ -9,14 +9,15 @@ import uk.ac.ox.oxfish.model.StepOrder;
 
 public class AbundanceHistogrammer implements OutputPlugin, AdditionalStartable, Steppable {
 
-    private StringBuilder builder = new StringBuilder().append("species,subdivision,bin,abundance,day").append("\n");
+    private static final long serialVersionUID = 5639052969513542116L;
+    private final StringBuilder builder = new StringBuilder().append("species,subdivision,bin,abundance,day").append("\n");
 
 
     @Override
-    public void step(SimState simState) {
-        FishState model = (FishState) simState;
-        for (Species species : model.getSpecies()) {
-            double[][] totalAbundance = model.getTotalAbundance(species);
+    public void step(final SimState simState) {
+        final FishState model = (FishState) simState;
+        for (final Species species : model.getSpecies()) {
+            final double[][] totalAbundance = model.getTotalAbundance(species);
             for (int i = 0; i < species.getNumberOfSubdivisions(); i++) {
                 for (int j = 0; j < species.getNumberOfBins(); j++) {
                     builder.append(species.getName()).
@@ -38,13 +39,13 @@ public class AbundanceHistogrammer implements OutputPlugin, AdditionalStartable,
     }
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         model.getOutputPlugins().add(this);
         model.scheduleEveryDay(this, StepOrder.AGGREGATE_DATA_GATHERING);
     }
 
     @Override
-    public void reactToEndOfSimulation(FishState state) {
+    public void reactToEndOfSimulation(final FishState state) {
         //ignored
     }
 

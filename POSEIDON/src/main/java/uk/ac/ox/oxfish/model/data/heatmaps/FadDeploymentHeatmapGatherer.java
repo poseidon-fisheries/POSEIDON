@@ -25,6 +25,8 @@ import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SummingMerger;
 
 public class FadDeploymentHeatmapGatherer extends HeatmapGatherer {
 
+    private static final long serialVersionUID = 4206026222834786284L;
+
     public FadDeploymentHeatmapGatherer(
         final int interval
     ) {

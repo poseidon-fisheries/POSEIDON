@@ -56,13 +56,8 @@ public class SocialAnnealingProbabilityFactory implements AlgorithmFactory<Thres
     public ThresholdExplorationProbability apply(FishState state) {
         return new ThresholdExplorationProbability(
             multiplier.applyAsDouble(state.getRandom()),
-            new Function<FishState, Double>() {
-                @Override
-                public Double apply(FishState model) {
-                    return model.getLatestDailyObservation(
-                        FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
-                }
-            }
+            model -> model.getLatestDailyObservation(
+                FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS)
         );
     }
 

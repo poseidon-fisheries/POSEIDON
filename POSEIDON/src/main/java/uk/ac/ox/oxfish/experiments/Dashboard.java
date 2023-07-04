@@ -213,14 +213,11 @@ public class Dashboard {
         //just add a daily average
         final DataColumn mileage =
             state.getDailyDataSet().registerGatherer("Average Gas Consumption",
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(final FishState state) {
-                        double consumption = 0;
-                        for (final Fisher f : state.getFishers())
-                            consumption += ((RandomCatchabilityTrawl) f.getGear()).getGasPerHourFished();
-                        return consumption / state.getFishers().size();
-                    }
+                (Gatherer<FishState>) state1 -> {
+                    double consumption = 0;
+                    for (final Fisher f : state1.getFishers())
+                        consumption += ((RandomCatchabilityTrawl) f.getGear()).getGasPerHourFished();
+                    return consumption / state1.getFishers().size();
                 }, Double.NaN
             );
 
@@ -292,14 +289,9 @@ public class Dashboard {
                     );
 
                 model.getDailyDataSet().registerGatherer("Average Hypothetical Quota",
-                    new Gatherer<FishState>() {
-                        @Override
-                        public Double apply(final FishState state) {
-                            return state.getFishers().stream().mapToDouble(
-                                value -> value.getDailyData()
-                                    .getLatestObservation("Reservation Lambda Owning 1000 quotas")).sum() / 100d;
-                        }
-                    }, Double.NaN
+                    (Gatherer<FishState>) state1 -> state1.getFishers().stream().mapToDouble(
+                        value -> value.getDailyData()
+                            .getLatestObservation("Reservation Lambda Owning 1000 quotas")).sum() / 100d, Double.NaN
                 );
             }
 

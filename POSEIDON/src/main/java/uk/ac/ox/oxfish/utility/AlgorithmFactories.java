@@ -106,9 +106,9 @@ public class AlgorithmFactories {
 
     //notice the <? extends AlgorithmFactory>. It's the need for hacks like these that explains why so many engineers
     //join terrorist organizations
-    public static final Map<Class, Map<String, ? extends Supplier<? extends AlgorithmFactory<?>>>>
+    public static final Map<Class<?>, Map<String, ? extends Supplier<? extends AlgorithmFactory<?>>>>
         CONSTRUCTOR_MAP = new HashMap<>();
-    public static final Map<Class, Map<Class<? extends AlgorithmFactory>, String>> NAMES_MAP =
+    public static final Map<Class<?>, Map<Class<? extends AlgorithmFactory<?>>, String>> NAMES_MAP =
         new HashMap<>();
 
     static {
@@ -237,7 +237,7 @@ public class AlgorithmFactories {
      * @param name the name
      * @return the factory or null if there isn't any!
      */
-    public static AlgorithmFactory constructorLookup(final String name) {
+    public static AlgorithmFactory<?> constructorLookup(final String name) {
         for (final Map<String, ? extends Supplier<? extends AlgorithmFactory<?>>> map : CONSTRUCTOR_MAP.values()) {
             final Supplier<? extends AlgorithmFactory<?>> supplier = map.get(name);
             if (supplier != null) {
@@ -254,8 +254,8 @@ public class AlgorithmFactories {
      * @param factory the name
      * @return the factory or null if there isn't any!
      */
-    public static String nameLookup(final Class<? extends AlgorithmFactory> factory) {
-        for (final Map<Class<? extends AlgorithmFactory>, String> map : NAMES_MAP.values()) {
+    public static String nameLookup(final Class<?> factory) {
+        for (final Map<Class<? extends AlgorithmFactory<?>>, String> map : NAMES_MAP.values()) {
             final String name = map.get(factory);
             if (name != null) {
                 return name;
@@ -268,9 +268,9 @@ public class AlgorithmFactories {
     /**
      * returns a list with all the factories available in the constructor Maps
      */
-    public static List<Class<? extends AlgorithmFactory>> getAllAlgorithmFactories() {
-        final List<Class<? extends AlgorithmFactory>> classes = new LinkedList<>();
-        for (final Map<Class<? extends AlgorithmFactory>, String> names : NAMES_MAP.values()) {
+    public static List<Class<? extends AlgorithmFactory<?>>> getAllAlgorithmFactories() {
+        final List<Class<? extends AlgorithmFactory<?>>> classes = new LinkedList<>();
+        for (final Map<Class<? extends AlgorithmFactory<?>>, String> names : NAMES_MAP.values()) {
             classes.addAll(names.keySet());
         }
         return classes;

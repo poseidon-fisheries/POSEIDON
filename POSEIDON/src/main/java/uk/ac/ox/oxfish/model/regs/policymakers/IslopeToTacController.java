@@ -5,12 +5,13 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ISlope;
-import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 public class IslopeToTacController extends Controller {
+    private static final long serialVersionUID = 7992488101173826992L;
+
     public IslopeToTacController(
-        ISlope islope
+        final ISlope islope
     ) {
         super(
             //this is a simplified controller where target to policy requires no adjustment
@@ -18,19 +19,16 @@ public class IslopeToTacController extends Controller {
             islope,
             //actuator just take the quota and sets it as a single TAC
             //for everybody!
-            new Actuator<FishState, Double>() {
-                @Override
-                public void apply(FishState subject, Double tac, FishState model) {
-                    if (!Double.isFinite(tac))
-                        return;
+            (subject, tac, model) -> {
+                if (!Double.isFinite(tac))
+                    return;
 
-                    final MonoQuotaRegulation quotaRegulation =
-                        new MonoQuotaRegulation(
-                            tac
-                        );
-                    for (Fisher fisher : model.getFishers()) {
-                        fisher.setRegulation(quotaRegulation);
-                    }
+                final MonoQuotaRegulation quotaRegulation =
+                    new MonoQuotaRegulation(
+                        tac
+                    );
+                for (final Fisher fisher : model.getFishers()) {
+                    fisher.setRegulation(quotaRegulation);
                 }
             },
             islope.getMaxTimeLag() * 365
@@ -39,23 +37,18 @@ public class IslopeToTacController extends Controller {
 
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         super.start(model);
 
         model.getYearlyDataSet().registerGatherer(
             "TAC from ISLOPE-TAC Controller",
-            new Gatherer<FishState>() {
-                @Override
-                public Double apply(FishState fishState) {
-                    return getPolicy();
-                }
-            },
+            (Gatherer<FishState>) fishState -> getPolicy(),
             Double.NaN
         );
     }
 
     @Override
-    public double computePolicy(double currentVariable, double target, FishState model, double oldPolicy) {
+    public double computePolicy(final double currentVariable, final double target, final FishState model, final double oldPolicy) {
         assert currentVariable == -1;
 
         System.out.println("target TAC is: " + target);

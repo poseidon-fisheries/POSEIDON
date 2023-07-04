@@ -10,6 +10,7 @@ import java.util.List;
 public class FixedDataLastStepTargetFromFile implements DataTarget {
 
 
+    private static final long serialVersionUID = 6998271990016935372L;
     private final FixedDataLastStepTarget delegate = new FixedDataLastStepTarget();
     private String pathToCsvFile;
 
@@ -18,15 +19,15 @@ public class FixedDataLastStepTargetFromFile implements DataTarget {
     }
 
     @Override
-    public double computeError(FishState model) {
+    public double computeError(final FishState model) {
 
 
         try {
-            List<String> strings = Files.readAllLines(Paths.get(pathToCsvFile));
+            final List<String> strings = Files.readAllLines(Paths.get(pathToCsvFile));
             delegate.setFixedTarget(Double.parseDouble(
                 strings.get(strings.size() - 1)));
 
-        } catch (IOException e) {
+        } catch (final IOException e) {
 
             throw new RuntimeException("can't read " + pathToCsvFile + " because of " + e);
         }
@@ -37,7 +38,7 @@ public class FixedDataLastStepTargetFromFile implements DataTarget {
         return pathToCsvFile;
     }
 
-    public void setPathToCsvFile(String pathToCsvFile) {
+    public void setPathToCsvFile(final String pathToCsvFile) {
         this.pathToCsvFile = pathToCsvFile;
     }
 
@@ -45,7 +46,7 @@ public class FixedDataLastStepTargetFromFile implements DataTarget {
         return delegate.getColumnName();
     }
 
-    public void setYearlyDataColumnName(String columnName) {
+    public void setYearlyDataColumnName(final String columnName) {
         delegate.setColumnName(columnName);
     }
 
@@ -53,7 +54,7 @@ public class FixedDataLastStepTargetFromFile implements DataTarget {
         return delegate.getExponent();
     }
 
-    public void setExponent(double exponent) {
+    public void setExponent(final double exponent) {
         delegate.setExponent(exponent);
     }
 }

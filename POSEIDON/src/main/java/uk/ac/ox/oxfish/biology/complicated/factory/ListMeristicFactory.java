@@ -54,14 +54,7 @@ public class ListMeristicFactory implements AlgorithmFactory<FromListMeristics> 
 
 
         //turn into weights array
-        ToDoubleFunction<String> mapper = new ToDoubleFunction<String>() {
-            @Override
-            public double applyAsDouble(String s) {
-                {
-                    return Double.parseDouble(s.trim());
-                }
-            }
-        };
+        ToDoubleFunction<String> mapper = s -> Double.parseDouble(s.trim());
 
         double[] weights = Arrays.stream(weightsPerBin.split(",")).mapToDouble(mapper).toArray();
 

@@ -30,7 +30,10 @@ import sim.field.grid.ObjectGrid2D;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -42,6 +45,7 @@ import java.util.logging.Logger;
 public class SampledMap implements Serializable {
 
 
+    private static final long serialVersionUID = 336168355423244254L;
     /**
      * collects the biological grids, each objectGrid2D is made of a LinkedList of doubles
      */
@@ -143,7 +147,7 @@ public class SampledMap implements Serializable {
         final Table<Integer, Integer, LinkedList<Double>> backingGrid = HashBasedTable.create(gridWith, gridHeight);
         for (int x = 0; x < gridWith; x++)
             for (int y = 0; y < gridHeight; y++)
-                backingGrid.put(x, y, new LinkedList<Double>());
+                backingGrid.put(x, y, new LinkedList<>());
         final Iterator<Double> eastings = preformattedCSV.getFirstCoordinate().iterator();
         final Iterator<Double> northings = preformattedCSV.getSecondCoordinate().iterator();
         final Iterator<Double> observations = preformattedCSV.getObservations().iterator();
@@ -153,7 +157,7 @@ public class SampledMap implements Serializable {
             final double obs = observations.next();
             //the very edge might get cut
             if (x >= 0 && x < gridWith && y >= 0 && y < gridHeight)
-                ((List) backingGrid.get(x, y)).add(obs);
+                backingGrid.get(x, y).add(obs);
             if (i % 10000 == 0) {
                 final int finalI = i;
                 Logger.getGlobal().fine(() -> "Transformed " + finalI + "  sampled lines into a grid");

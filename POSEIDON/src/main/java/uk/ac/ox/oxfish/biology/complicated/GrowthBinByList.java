@@ -22,6 +22,8 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import javax.annotation.Nullable;
 
+import static java.lang.Math.min;
+
 /**
  * computes nothing, is given a list of weights and lengths and just spit them out.
  * It assumes that each bin is one year apart unless a lengthAtAge array is provided
@@ -42,7 +44,7 @@ public class GrowthBinByList implements Meristics {
     private final double[] lengthAtAge;
 
 
-    public GrowthBinByList(int subdivisions, double[] lenghts, double[] weights) {
+    public GrowthBinByList(final int subdivisions, final double[] lenghts, final double[] weights) {
 
         this(subdivisions, lenghts, weights, null);
     }
@@ -55,8 +57,8 @@ public class GrowthBinByList implements Meristics {
      * @param lengthAtAge  an array with [age]---> length at all subdivisions <br> NULL if each bin described in lengths is also one year apart
      */
     public GrowthBinByList(
-        int subdivisions, double[] lenghts, double[] weights,
-        @Nullable
+        final int subdivisions, final double[] lenghts, final double[] weights,
+        @Nullable final
         double[] lengthAtAge
     ) {
         this.lenghts = lenghts;
@@ -66,7 +68,7 @@ public class GrowthBinByList implements Meristics {
     }
 
     @Override
-    public double getWeight(int subdivision, int bin) {
+    public double getWeight(final int subdivision, final int bin) {
 
         return weights[bin];
     }
@@ -104,12 +106,12 @@ public class GrowthBinByList implements Meristics {
      * @return the length of the fish
      */
     @Override
-    public double getLengthAtAge(int ageInYears, int subdivision) {
+    public double getLengthAtAge(final int ageInYears, final int subdivision) {
 
         if (lengthAtAge == null)
-            return getLength(subdivision, ageInYears <= (lenghts.length - 1) ? (int) ageInYears : lenghts.length - 1);
+            return getLength(subdivision, min(ageInYears, (lenghts.length - 1)));
         else
-            return lengthAtAge[ageInYears <= (lengthAtAge.length - 1) ? (int) ageInYears : lengthAtAge.length - 1];
+            return lengthAtAge[min(ageInYears, (lengthAtAge.length - 1))];
     }
 
     /**
@@ -117,7 +119,7 @@ public class GrowthBinByList implements Meristics {
      */
 
     @Override
-    public double getLength(int subdivision, int bin) {
+    public double getLength(final int subdivision, final int bin) {
         return lenghts[bin];
     }
 }

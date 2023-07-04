@@ -26,9 +26,9 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Arrays;
+import java.util.Map.Entry;
 
 /**
  * A recursive kernel predictor. Because it needs to predict always in the same spot time will be a forgetting factor
@@ -50,10 +50,11 @@ public class KernelTilePredictor {
     private double currentDenominator = 0;
     private double[] bandwidths;
 
+    @SuppressWarnings("unchecked")
     public KernelTilePredictor(
-        double forgettingFactor,
-        SeaTile whereAmIPredicting,
-        Pair<ObservationExtractor, Double>... extractorsAndBandwidths
+        final double forgettingFactor,
+        final SeaTile whereAmIPredicting,
+        final Entry<ObservationExtractor, Double>... extractorsAndBandwidths
     ) {
         this.forgettingFactor = forgettingFactor;
         this.whereAmIPredicting = whereAmIPredicting;
@@ -61,12 +62,16 @@ public class KernelTilePredictor {
         extractors = new ObservationExtractor[extractorsAndBandwidths.length];
         bandwidths = new double[extractorsAndBandwidths.length];
         for (int i = 0; i < extractorsAndBandwidths.length; i++) {
-            extractors[i] = extractorsAndBandwidths[i].getFirst();
-            bandwidths[i] = extractorsAndBandwidths[i].getSecond();
+            extractors[i] = extractorsAndBandwidths[i].getKey();
+            bandwidths[i] = extractorsAndBandwidths[i].getValue();
         }
     }
 
-    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher, FishState model) {
+    public void addObservation(
+        final GeographicalObservation<Double> observation,
+        final Fisher fisher,
+        final FishState model
+    ) {
         //compute kernel
         double kernel = 1;
         for (int i = 0; i < extractors.length; i++) {
@@ -119,7 +124,7 @@ public class KernelTilePredictor {
      *
      * @param bandwidths Value to set for property 'bandwidths'.
      */
-    public void setBandwidths(double[] bandwidths) {
+    public void setBandwidths(final double[] bandwidths) {
         this.bandwidths = bandwidths;
     }
 }

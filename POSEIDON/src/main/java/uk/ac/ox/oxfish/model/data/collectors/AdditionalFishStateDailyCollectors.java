@@ -61,54 +61,37 @@ public class AdditionalFishStateDailyCollectors implements AdditionalStartable {
             String title = "Biomass " + species.getName();
             model.getDailyDataSet().registerGatherer(
                 title,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState state) {
-                        return state.getTotalBiomass(species);
-
-                    }
-                },
+                (Gatherer<FishState>) state -> state.getTotalBiomass(species),
                 0d
             );
             gatherersMade.add(title);
         }
 
 
-        model.getDailyDataSet().registerGatherer("Average Cash-Flow", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState observed) {
-                ObservableList<Fisher> fishers = observed.getFishers();
-                if (fishers.size() == 0)
-                    return 0d;
+        model.getDailyDataSet().registerGatherer("Average Cash-Flow", (Gatherer<FishState>) observed -> {
+            ObservableList<Fisher> fishers = observed.getFishers();
+            if (fishers.size() == 0)
+                return 0d;
 
-                double sum = 0;
-                for (Fisher fisher : observed.getFishers()) {
-                    sum += fisher.getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
+            double sum = 0;
+            for (Fisher fisher : observed.getFishers()) {
+                sum += fisher.getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
 
-                }
-
-                return sum / (double) fishers.size();
             }
+
+            return sum / (double) fishers.size();
         }, 0d);
 
 
         //fishers who are actually out
-        model.getDailyDataSet().registerGatherer("Fishers at Sea", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                return model.getFishers().stream().mapToDouble(
-                    value -> value.getLocation().equals(value.getHomePort().getLocation()) ? 0 : 1).sum();
-            }
-        }, 0d);
+        model.getDailyDataSet().registerGatherer("Fishers at Sea",
+            (Gatherer<FishState>) ignored -> model.getFishers().stream().mapToDouble(
+                value -> value.getLocation().equals(value.getHomePort().getLocation()) ? 0 : 1).sum(), 0d);
 
 
         //number of fishers
-        model.getDailyDataSet().registerGatherer("Number of Fishers", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                return (double) model.getFishers().size();
-            }
-        }, 0d);
+        model.getDailyDataSet().registerGatherer("Number of Fishers",
+            (Gatherer<FishState>) ignored -> (double) model.getFishers().size(), 0d);
 
 
 //        for(Species species : model.getSpecies())

@@ -76,12 +76,9 @@ public class TunaBiomassSensitivity {
                 "yellowfin.csv"
             )
         );
-        model.registerStartable(new Startable() {
-            @Override
-            public void start(final FishState model) {
-                for (final Fisher fisher : model.getFishers()) {
-                    fisher.setRegulation(new FishingSeason(true, 0));
-                }
+        model.registerStartable(model1 -> {
+            for (final Fisher fisher : model1.getFishers()) {
+                fisher.setRegulation(new FishingSeason(true, 0));
             }
         });
         while (model.getStep() <= 365)

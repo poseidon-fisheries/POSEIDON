@@ -60,8 +60,11 @@ public class YamlMain {
         final String simulationName = Files.getNameWithoutExtension(inputFile.getFileName().toString());
 
         final YamlMain main = new YamlMain();
-        if (args.length > 1) //if there are multiple parameters, read them up!
-            new JCommander(main, Arrays.copyOfRange(args, 1, args.length));
+        if (args.length > 1) {
+            //if there are multiple parameters, read them up!
+            final JCommander jCommander = new JCommander(main);
+            jCommander.parse(Arrays.copyOfRange(args, 1, args.length));
+        }
         FishStateUtilities.run(simulationName, inputFile, Paths.get("output", simulationName), main.seed, main.logLevel,
             main.additionalData, main.policyScript,
             main.yearsToRun, main.saveOnExit,

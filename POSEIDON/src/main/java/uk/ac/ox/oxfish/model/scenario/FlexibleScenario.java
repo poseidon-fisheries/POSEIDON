@@ -37,12 +37,14 @@ import uk.ac.ox.oxfish.model.network.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.BoatColors;
 import uk.ac.ox.oxfish.utility.FixedMap;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -98,7 +100,7 @@ public class FlexibleScenario implements Scenario {
     }
 
     {
-        FisherDefinition fisherDefinition = new FisherDefinition();
+        final FisherDefinition fisherDefinition = new FisherDefinition();
         fisherDefinition.getInitialFishersPerPort().put("Port 0", 50);
         fisherDefinition.getInitialFishersPerPort().put("Port 1", 50);
         //fisherDefinition.setTags("small,canoe");
@@ -117,9 +119,9 @@ public class FlexibleScenario implements Scenario {
      * @return a scenario-result object containing the map, the list of agents and the biology object
      */
     @Override
-    public ScenarioEssentials start(FishState model) {
+    public ScenarioEssentials start(final FishState model) {
 
-        MersenneTwisterFast originalRandom = model.random;
+        final MersenneTwisterFast originalRandom = model.random;
 
         MersenneTwisterFast mapMakerRandom = model.random;
         if (mapMakerDedicatedRandomSeed != null)
@@ -128,18 +130,18 @@ public class FlexibleScenario implements Scenario {
         model.random = mapMakerRandom;
 
 
-        BiologyInitializer biology = biologyInitializer.apply(model);
-        WeatherInitializer weather = weatherInitializer.apply(model);
+        final BiologyInitializer biology = biologyInitializer.apply(model);
+        final WeatherInitializer weather = weatherInitializer.apply(model);
 
         //create global biology
-        GlobalBiology global = biology.generateGlobal(mapMakerRandom, model);
+        final GlobalBiology global = biology.generateGlobal(mapMakerRandom, model);
 
 
-        MapInitializer mapMaker = mapInitializer.apply(model);
-        NauticalMap map = mapMaker.makeMap(mapMakerRandom, global, model);
+        final MapInitializer mapMaker = mapInitializer.apply(model);
+        final NauticalMap map = mapMaker.makeMap(mapMakerRandom, global, model);
 
         //set habitats
-        HabitatInitializer habitat = habitatInitializer.apply(model);
+        final HabitatInitializer habitat = habitatInitializer.apply(model);
         habitat.applyHabitats(map, mapMakerRandom, model);
 
 
@@ -150,25 +152,22 @@ public class FlexibleScenario implements Scenario {
         );
 
 
-        List<Port> ports = portInitializer.apply(model).buildPorts(
+        final List<Port> ports = portInitializer.apply(model).buildPorts(
             map,
             mapMakerRandom,
-            new Function<SeaTile, MarketMap>() {
-                @Override
-                public MarketMap apply(SeaTile seaTile) {
-                    //create fixed price market
-                    MarketMap marketMap = new MarketMap(global);
-                    //set market for each species
-                    for (Species species : global.getSpecies())
-                        marketMap.addMarket(species, market.apply(model));
-                    return marketMap;
-                }
+            seaTile -> {
+                //create fixed price market
+                final MarketMap marketMap = new MarketMap(global);
+                //set market for each species
+                for (final Species species : global.getSpecies())
+                    marketMap.addMarket(species, market.apply(model));
+                return marketMap;
             },
             model,
             new FixedGasPrice(gasPricePerLiter.applyAsDouble(mapMakerRandom))
         );
-        Iterator<String> colorIterator = BoatColors.BOAT_COLORS.keySet().iterator();
-        for (Port port : ports) {
+        final Iterator<String> colorIterator = BoatColors.BOAT_COLORS.keySet().iterator();
+        for (final Port port : ports) {
             portColorTags.put(
                 port,
                 colorIterator.next()
@@ -189,79 +188,63 @@ public class FlexibleScenario implements Scenario {
      * @return a list of agents
      */
     @Override
-    public ScenarioPopulation populateModel(FishState model) {
+    public ScenarioPopulation populateModel(final FishState model) {
 
         final NauticalMap map = model.getMap();
 
 
         if (!allowFriendshipsAcrossPorts) {
             //no friends from separate ports
-            networkBuilder.addPredicate(new NetworkPredicate() {
-                @Override
-                public boolean test(Fisher from, Fisher to) {
-                    return from.getHomePort().equals(to.getHomePort());
-                }
-            });
+            networkBuilder.addPredicate((NetworkPredicate) (from, to) -> from.getHomePort().equals(to.getHomePort()));
         }
 
-        Port[] ports = map.getPorts().toArray(new Port[map.getPorts().size()]);
+        final Port[] ports = map.getPorts().toArray(new Port[map.getPorts().size()]);
 
-        List<Fisher> fishers = new LinkedList<>();
+        final List<Fisher> fishers = new LinkedList<>();
         //arbitrary fisher factory
-        Map<String, FisherFactory> factory = new LinkedHashMap<>();
+        final Map<String, FisherFactory> factory = new LinkedHashMap<>();
         int definitionIndex = 0;
-        for (FisherDefinition fisherDefinition : fisherDefinitions) {
+        for (final FisherDefinition fisherDefinition : fisherDefinitions) {
             final int populationNumber = definitionIndex;
-            Pair<FisherFactory, List<Fisher>> generated = fisherDefinition.instantiateFishers(
+            final Map.Entry<FisherFactory, List<Fisher>> generated = fisherDefinition.instantiateFishers(
                 model,
                 map.getPorts(),
                 definitionIndex * 10000,
-                new Consumer<Fisher>() {
-                    @Override
-                    public void accept(Fisher fisher) {
-                        fisher.setCheater(cheaters);
-                        //todo move this somewhere else
-                        fisher.addFeatureExtractor(
-                            SNALSARutilities.PROFIT_FEATURE,
-                            new RememberedProfitsExtractor(true)
-                        );
-                        fisher.addFeatureExtractor(
-                            FeatureExtractor.AVERAGE_PROFIT_FEATURE,
-                            new FeatureExtractor<SeaTile>() {
-                                @Override
-                                public HashMap<SeaTile, Double> extractFeature(
-                                    Collection<SeaTile> toRepresent, FishState model, Fisher fisher
-                                ) {
-                                    double averageProfits = model.getLatestDailyObservation(
-                                        FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
-                                    return new FixedMap<>(
-                                        averageProfits,
-                                        toRepresent
-                                    );
-                                }
-                            }
-                        );
-                    }
-                },
-                new Consumer<Fisher>() {
-                    @Override
-                    public void accept(Fisher fisher) {
-                        //add population tag
-                        fisher.getTags().add("population" + populationNumber);
-
-
-                        //do not over-write given color tags!
-                        if (!BoatColors.hasColorTag(fisher))
-                            fisher.getTags().add(
-                                portColorTags.get(fisher.getHomePort())
+                fisher -> {
+                    fisher.setCheater(cheaters);
+                    //todo move this somewhere else
+                    fisher.addFeatureExtractor(
+                        SNALSARutilities.PROFIT_FEATURE,
+                        new RememberedProfitsExtractor(true)
+                    );
+                    fisher.addFeatureExtractor(
+                        FeatureExtractor.AVERAGE_PROFIT_FEATURE,
+                        (toRepresent, model1, fisher1) -> {
+                            final double averageProfits = model1.getLatestDailyObservation(
+                                FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
+                            return new FixedMap<>(
+                                averageProfits,
+                                toRepresent
                             );
-                    }
+                        }
+                    );
+                },
+                fisher -> {
+                    //add population tag
+                    fisher.getTags().add("population" + populationNumber);
+
+
+                    //do not over-write given color tags!
+                    if (!BoatColors.hasColorTag(fisher))
+                        fisher.getTags().add(
+                            portColorTags.get(fisher.getHomePort())
+                        );
                 }
             );
 
 
-            factory.put("population" + populationNumber, generated.getFirst());
-            fishers.addAll(generated.getSecond());
+            factory.put("population" + populationNumber, generated.getKey());
+            fishers.addAll(generated.getValue());
             definitionIndex++;
             //add population number in
             if (fisherDefinitions.size() > 1) {
@@ -277,7 +260,7 @@ public class FlexibleScenario implements Scenario {
 
 
         //start additional elements
-        for (AlgorithmFactory<? extends AdditionalStartable> additionalElement : plugins) {
+        for (final AlgorithmFactory<? extends AdditionalStartable> additionalElement : plugins) {
             model.registerStartable(
                 additionalElement.apply(model)
             );
@@ -290,7 +273,7 @@ public class FlexibleScenario implements Scenario {
         //add exogenous catches
         //start it!
 
-        ExogenousCatches catches = exogenousCatches.apply(model);
+        final ExogenousCatches catches = exogenousCatches.apply(model);
         model.registerStartable(catches);
 
 
@@ -304,11 +287,11 @@ public class FlexibleScenario implements Scenario {
     /**
      * extract landing time series by classic tags
      */
-    private void addTagLandingTimeSeries(FishState state) {
+    private void addTagLandingTimeSeries(final FishState state) {
 
-        for (String tag : tagsToTrackSeparately.split(",")) {
+        for (final String tag : tagsToTrackSeparately.split(",")) {
             //landings
-            for (Species species : state.getBiology().getSpecies())
+            for (final Species species : state.getBiology().getSpecies())
                 state.getYearlyDataSet().registerGatherer(
                     species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME + " of " + tag,
                     fishState -> fishState.getFishers().stream().
@@ -324,7 +307,7 @@ public class FlexibleScenario implements Scenario {
                         mapToDouble(value -> {
 
                             double sum = 0;
-                            for (Species species : state.getBiology().getSpecies())
+                            for (final Species species : state.getBiology().getSpecies())
                                 sum += value.getLatestYearlyObservation(
                                     species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
                             return sum;
@@ -365,18 +348,13 @@ public class FlexibleScenario implements Scenario {
 
 
             state.getYearlyDataSet().registerGatherer("Actual Average Variable Costs of " + tag,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState observed) {
-                        return observed.getFishers().stream().
-                            filter(fisher -> fisher.hasBeenActiveThisYear() &&
-                                fisher.getTags().contains(tag)).
-                            mapToDouble(value -> value.getLatestYearlyObservation(
-                                FisherYearlyTimeSeries.VARIABLE_COSTS)).
-                            filter(Double::isFinite).average().
-                            orElse(Double.NaN);
-                    }
-                }, Double.NaN
+                (Gatherer<FishState>) observed -> observed.getFishers().stream().
+                    filter(fisher -> fisher.hasBeenActiveThisYear() &&
+                        fisher.getTags().contains(tag)).
+                    mapToDouble(value -> value.getLatestYearlyObservation(
+                        FisherYearlyTimeSeries.VARIABLE_COSTS)).
+                    filter(Double::isFinite).average().
+                    orElse(Double.NaN), Double.NaN
             );
 
             state.getYearlyDataSet().registerGatherer("Average Distance From Port of " + tag,
@@ -390,18 +368,13 @@ public class FlexibleScenario implements Scenario {
             );
 
             state.getYearlyDataSet().registerGatherer("Actual Average Distance From Port of " + tag,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState observed) {
-                        return observed.getFishers().stream().
-                            filter(fisher -> fisher.hasBeenActiveThisYear() &&
-                                fisher.getTags().contains(tag)).
-                            mapToDouble(value -> value.getLatestYearlyObservation(
-                                FisherYearlyTimeSeries.FISHING_DISTANCE)).
-                            filter(Double::isFinite).average().
-                            orElse(Double.NaN);
-                    }
-                }, Double.NaN
+                (Gatherer<FishState>) observed -> observed.getFishers().stream().
+                    filter(fisher -> fisher.hasBeenActiveThisYear() &&
+                        fisher.getTags().contains(tag)).
+                    mapToDouble(value -> value.getLatestYearlyObservation(
+                        FisherYearlyTimeSeries.FISHING_DISTANCE)).
+                    filter(Double::isFinite).average().
+                    orElse(Double.NaN), Double.NaN
             );
 
 
@@ -436,34 +409,24 @@ public class FlexibleScenario implements Scenario {
             );
 
             //do not just average the trip duration per fisher because otherwise you don't weigh them according to how many trips they actually did
-            state.getYearlyDataSet().registerGatherer("Average Trip Duration of " + tag, new Gatherer<FishState>() {
-                @Override
-                public Double apply(FishState observed) {
+            state.getYearlyDataSet().registerGatherer("Average Trip Duration of " + tag,
+                (Gatherer<FishState>) observed -> {
 
-                    List<Fisher> taggedFishers = observed.getFishers().stream().
-                        filter(new Predicate<Fisher>() {
-                            @Override
-                            public boolean test(Fisher fisher) {
-                                return fisher.getTags().contains(tag);
-                            }
-                        }).collect(Collectors.toList());
+                    final List<Fisher> taggedFishers = observed.getFishers().stream().
+                        filter(fisher -> fisher.getTags().contains(tag)).collect(Collectors.toList());
 
                     //skip boats that made no trips
-                    double hoursOut = taggedFishers.stream().mapToDouble(
+                    final double hoursOut = taggedFishers.stream().mapToDouble(
                             value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT)).
-                        filter(value -> Double.isFinite(value)).sum();
-                    double trips = taggedFishers.stream().mapToDouble(
+                        filter(Double::isFinite).sum();
+                    //skip boats that made no trips
+                    final double trips = taggedFishers.stream().mapToDouble(
                             value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS)).
-                        filter(new DoublePredicate() { //skip boats that made no trips
-                            @Override
-                            public boolean test(double value) {
-                                return Double.isFinite(value);
-                            }
-                        }).sum();
+                        filter(Double::isFinite).sum();
 
                     return trips > 0 ? hoursOut / trips : 0d;
-                }
-            }, 0d);
+                }, 0d
+            );
 
             state.getYearlyDataSet().registerGatherer(
                 "Number Of Fishers of " + tag,
@@ -478,12 +441,7 @@ public class FlexibleScenario implements Scenario {
                 "Number Of Active Fishers of " + tag,
                 fishState ->
                     (double) fishState.getFishers().stream().
-                        filter(new Predicate<Fisher>() {
-                            @Override
-                            public boolean test(Fisher fisher) {
-                                return fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS) > 0;
-                            }
-                        }).
+                        filter(fisher -> fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS) > 0).
                         filter(fisher ->
                             fisher.getTags().contains(tag)).count(),
                 Double.NaN
@@ -491,54 +449,28 @@ public class FlexibleScenario implements Scenario {
 
 
             state.getYearlyDataSet().registerGatherer("Average Cash-Flow of " + tag,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState observed) {
-                        List<Fisher> fishers = observed.getFishers().stream().
-                            filter(new Predicate<Fisher>() {
-                                @Override
-                                public boolean test(Fisher fisher) {
-                                    return fisher.getTags().contains(tag);
-                                }
-                            }).collect(Collectors.toList());
-                        return fishers.stream().
-                            mapToDouble(
-                                new ToDoubleFunction<Fisher>() {
-                                    @Override
-                                    public double applyAsDouble(Fisher value) {
-                                        return value.getLatestYearlyObservation(
-                                            FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
-                                    }
-                                }).sum() /
-                            fishers.size();
-                    }
+                (Gatherer<FishState>) observed -> {
+                    final List<Fisher> fishers = observed.getFishers().stream().
+                        filter(fisher -> fisher.getTags().contains(tag)).collect(Collectors.toList());
+                    return fishers.stream().
+                        mapToDouble(
+                            value -> value.getLatestYearlyObservation(
+                                FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum() /
+                        fishers.size();
                 }, Double.NaN
             );
 
 
             state.getYearlyDataSet().registerGatherer("Actual Average Cash-Flow of " + tag,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState observed) {
-                        List<Fisher> fishers = observed.getFishers().stream().
-                            filter(new Predicate<Fisher>() {
-                                @Override
-                                public boolean test(Fisher fisher) {
-                                    return fisher.hasBeenActiveThisYear() &&
-                                        fisher.getTags().contains(tag);
-                                }
-                            }).collect(Collectors.toList());
-                        return fishers.stream().
-                            mapToDouble(
-                                new ToDoubleFunction<Fisher>() {
-                                    @Override
-                                    public double applyAsDouble(Fisher value) {
-                                        return value.getLatestYearlyObservation(
-                                            FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
-                                    }
-                                }).sum() /
-                            fishers.size();
-                    }
+                (Gatherer<FishState>) observed -> {
+                    final List<Fisher> fishers = observed.getFishers().stream().
+                        filter(fisher -> fisher.hasBeenActiveThisYear() &&
+                            fisher.getTags().contains(tag)).collect(Collectors.toList());
+                    return fishers.stream().
+                        mapToDouble(
+                            value -> value.getLatestYearlyObservation(
+                                FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum() /
+                        fishers.size();
                 }, Double.NaN
             );
 
@@ -553,7 +485,7 @@ public class FlexibleScenario implements Scenario {
      * @param state
      * @param number
      */
-    private void addTimeSeriesToSubgroup(FishState state, int number) {
+    private void addTimeSeriesToSubgroup(final FishState state, final int number) {
 
     }
 
@@ -561,7 +493,7 @@ public class FlexibleScenario implements Scenario {
         return biologyInitializer;
     }
 
-    public void setBiologyInitializer(AlgorithmFactory<? extends BiologyInitializer> biologyInitializer) {
+    public void setBiologyInitializer(final AlgorithmFactory<? extends BiologyInitializer> biologyInitializer) {
         this.biologyInitializer = biologyInitializer;
     }
 
@@ -569,7 +501,7 @@ public class FlexibleScenario implements Scenario {
         return weatherInitializer;
     }
 
-    public void setWeatherInitializer(AlgorithmFactory<? extends WeatherInitializer> weatherInitializer) {
+    public void setWeatherInitializer(final AlgorithmFactory<? extends WeatherInitializer> weatherInitializer) {
         this.weatherInitializer = weatherInitializer;
     }
 
@@ -577,7 +509,7 @@ public class FlexibleScenario implements Scenario {
         return mapInitializer;
     }
 
-    public void setMapInitializer(AlgorithmFactory<? extends MapInitializer> mapInitializer) {
+    public void setMapInitializer(final AlgorithmFactory<? extends MapInitializer> mapInitializer) {
         this.mapInitializer = mapInitializer;
     }
 
@@ -586,7 +518,7 @@ public class FlexibleScenario implements Scenario {
         return portInitializer;
     }
 
-    public void setPortInitializer(AlgorithmFactory<? extends PortInitializer> portInitializer) {
+    public void setPortInitializer(final AlgorithmFactory<? extends PortInitializer> portInitializer) {
         this.portInitializer = portInitializer;
     }
 
@@ -594,7 +526,7 @@ public class FlexibleScenario implements Scenario {
         return cheaters;
     }
 
-    public void setCheaters(boolean cheaters) {
+    public void setCheaters(final boolean cheaters) {
         this.cheaters = cheaters;
     }
 
@@ -602,7 +534,7 @@ public class FlexibleScenario implements Scenario {
         return gasPricePerLiter;
     }
 
-    public void setGasPricePerLiter(DoubleParameter gasPricePerLiter) {
+    public void setGasPricePerLiter(final DoubleParameter gasPricePerLiter) {
         this.gasPricePerLiter = gasPricePerLiter;
     }
 
@@ -610,7 +542,7 @@ public class FlexibleScenario implements Scenario {
         return fisherDefinitions;
     }
 
-    public void setFisherDefinitions(List<FisherDefinition> fisherDefinitions) {
+    public void setFisherDefinitions(final List<FisherDefinition> fisherDefinitions) {
         this.fisherDefinitions = fisherDefinitions;
     }
 
@@ -618,7 +550,7 @@ public class FlexibleScenario implements Scenario {
         return networkBuilder;
     }
 
-    public void setNetworkBuilder(NetworkBuilder networkBuilder) {
+    public void setNetworkBuilder(final NetworkBuilder networkBuilder) {
         this.networkBuilder = networkBuilder;
     }
 
@@ -626,7 +558,7 @@ public class FlexibleScenario implements Scenario {
         return habitatInitializer;
     }
 
-    public void setHabitatInitializer(AlgorithmFactory<? extends HabitatInitializer> habitatInitializer) {
+    public void setHabitatInitializer(final AlgorithmFactory<? extends HabitatInitializer> habitatInitializer) {
         this.habitatInitializer = habitatInitializer;
     }
 
@@ -634,7 +566,7 @@ public class FlexibleScenario implements Scenario {
         return market;
     }
 
-    public void setMarket(AlgorithmFactory<? extends Market> market) {
+    public void setMarket(final AlgorithmFactory<? extends Market> market) {
         this.market = market;
     }
 
@@ -643,7 +575,7 @@ public class FlexibleScenario implements Scenario {
         return plugins;
     }
 
-    public void setPlugins(List<AlgorithmFactory<? extends AdditionalStartable>> plugins) {
+    public void setPlugins(final List<AlgorithmFactory<? extends AdditionalStartable>> plugins) {
         this.plugins = plugins;
     }
 
@@ -652,7 +584,7 @@ public class FlexibleScenario implements Scenario {
         return portSwitching;
     }
 
-    public void setPortSwitching(boolean portSwitching) {
+    public void setPortSwitching(final boolean portSwitching) {
         this.portSwitching = portSwitching;
     }
 
@@ -660,7 +592,7 @@ public class FlexibleScenario implements Scenario {
         return mapMakerDedicatedRandomSeed;
     }
 
-    public void setMapMakerDedicatedRandomSeed(Long mapMakerDedicatedRandomSeed) {
+    public void setMapMakerDedicatedRandomSeed(final Long mapMakerDedicatedRandomSeed) {
         this.mapMakerDedicatedRandomSeed = mapMakerDedicatedRandomSeed;
     }
 
@@ -678,7 +610,7 @@ public class FlexibleScenario implements Scenario {
      *
      * @param allowFriendshipsAcrossPorts Value to set for property 'allowFriendshipsAcrossPorts'.
      */
-    public void setAllowFriendshipsAcrossPorts(boolean allowFriendshipsAcrossPorts) {
+    public void setAllowFriendshipsAcrossPorts(final boolean allowFriendshipsAcrossPorts) {
         this.allowFriendshipsAcrossPorts = allowFriendshipsAcrossPorts;
     }
 
@@ -696,7 +628,7 @@ public class FlexibleScenario implements Scenario {
      *
      * @param tagsToTrackSeparately Value to set for property 'tagsToTrackSeparately'.
      */
-    public void setTagsToTrackSeparately(String tagsToTrackSeparately) {
+    public void setTagsToTrackSeparately(final String tagsToTrackSeparately) {
         this.tagsToTrackSeparately = tagsToTrackSeparately;
     }
 
@@ -716,7 +648,7 @@ public class FlexibleScenario implements Scenario {
      * @param exogenousCatches Value to set for property 'exogenousCatches'.
      */
     public void setExogenousCatches(
-        AlgorithmFactory<? extends ExogenousCatches> exogenousCatches
+        final AlgorithmFactory<? extends ExogenousCatches> exogenousCatches
     ) {
         this.exogenousCatches = exogenousCatches;
     }

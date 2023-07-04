@@ -48,14 +48,14 @@ public class ShodanFisheries {
     public static final int VALUE_FUNCTION_DIMENSION = 32;
     private static final int SIMULATION_PER_STEP = 3;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException {
 
 
         //do one lspiRun everything open
-        Shodan shodan = new Shodan(0, 0);
+        final Shodan shodan = new Shodan(0, 0);
         FishState initialRun = oneRun(shodan, 0);
         double initialScore = 0;
-        for (Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
+        for (final Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
             initialScore += landing;
 
         BufferedWriter writer = new BufferedWriter(
@@ -68,7 +68,7 @@ public class ShodanFisheries {
         shodan.setErrorRate(1);
         initialRun = oneRun(shodan, 0);
         initialScore = 0;
-        for (Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
+        for (final Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
             initialScore += landing;
 
         writer = new BufferedWriter(
@@ -98,11 +98,11 @@ public class ShodanFisheries {
             }
             shodan.regress();
             //make one lspiRun with error rate 0
-            double errorRate = shodan.getErrorRate();
+            final double errorRate = shodan.getErrorRate();
             shodan.setErrorRate(0d);
-            FishState referenceRun = oneRun(shodan, 0);
+            final FishState referenceRun = oneRun(shodan, 0);
             double score = 0;
-            for (Double landing : referenceRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
+            for (final Double landing : referenceRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
                 score += landing;
 
             shodan.setErrorRate(errorRate);
@@ -119,18 +119,13 @@ public class ShodanFisheries {
 
     private static FishState oneRun(final Shodan shodan, final long seed) {
         //object we use to control season
-        ExternalOpenCloseSeason controller = new ExternalOpenCloseSeason();
-        PrototypeScenario scenario = new PrototypeScenario();
+        final ExternalOpenCloseSeason controller = new ExternalOpenCloseSeason();
+        final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setFishers(300);
 
-        scenario.setRegulation(new AlgorithmFactory<Regulation>() {
-            @Override
-            public Regulation apply(FishState state) {
-                return controller;
-            }
-        });
+        scenario.setRegulation(state -> controller);
 
-        FishState state = new FishState(seed);
+        final FishState state = new FishState(seed);
         state.attachAdditionalGatherers();
         state.setScenario(scenario);
         state.start();
@@ -145,17 +140,14 @@ public class ShodanFisheries {
         }, Double.NaN);
 
 
-        state.scheduleEveryXDay(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                if (state.getDay() < 30)
-                    return;
+        state.scheduleEveryXDay((Steppable) simState -> {
+            if (state.getDay() < 30)
+                return;
 
-                shodan.step(simState);
-                controller.setOpen(shodan.action == 0);
+            shodan.step(simState);
+            controller.setOpen(shodan.action == 0);
 
-                System.out.println("Is controller open? " + controller.isOpen());
-            }
+            System.out.println("Is controller open? " + controller.isOpen());
         }, StepOrder.AFTER_DATA, 30);
 
         while (state.getDay() <= 7200)
@@ -169,6 +161,7 @@ public class ShodanFisheries {
 
         public static final int INTERCEPT = VALUE_FUNCTION_DIMENSION - 1;
         public static final int MONTHS_LEFT_INDEX = 4;
+        private static final long serialVersionUID = 8906053088218433647L;
         private double[] oldFeatures;
 
         private Integer action;
@@ -181,15 +174,15 @@ public class ShodanFisheries {
         /*
          * store the features of S and S' separately. S will be used as x, S' will be used to compute Q.
          */
-        private LinkedList<double[]> openPreDecisionState = new LinkedList<>();
-        private LinkedList<double[]> openPostDecisionState = new LinkedList<>();
+        private final LinkedList<double[]> openPreDecisionState = new LinkedList<>();
+        private final LinkedList<double[]> openPostDecisionState = new LinkedList<>();
         /*
          * contains rewards observed
          */
-        private LinkedList<Double> openRewards = new LinkedList<>();
-        private LinkedList<Double> closedRewards = new LinkedList<>();
-        private LinkedList<double[]> closedPreDecisionState = new LinkedList<>();
-        private LinkedList<double[]> closedPostDecisionState = new LinkedList<>();
+        private final LinkedList<Double> openRewards = new LinkedList<>();
+        private final LinkedList<Double> closedRewards = new LinkedList<>();
+        private final LinkedList<double[]> closedPreDecisionState = new LinkedList<>();
+        private final LinkedList<double[]> closedPostDecisionState = new LinkedList<>();
         /**
          * the betas of the linear regression when action is close
          */
@@ -199,7 +192,7 @@ public class ShodanFisheries {
          */
         private double[] qParameterOpen = new double[VALUE_FUNCTION_DIMENSION];
 
-        public Shodan(int action, double errorRate) {
+        public Shodan(final int action, final double errorRate) {
             this.errorRate = errorRate;
             this.action = action;
             Arrays.fill(qParameterOpen, 0d);
@@ -230,34 +223,34 @@ public class ShodanFisheries {
         ) {
             assert postDecision.size() == preDecision.size();
             assert preDecision.size() == rewards.size();
-            double[][] x = new double[preDecision.size()][VALUE_FUNCTION_DIMENSION];
-            double[] y = new double[preDecision.size()];
-            Iterator<double[]> pre = preDecision.iterator();
-            Iterator<double[]> post = postDecision.iterator();
-            Iterator<Double> rewardIterator = rewards.iterator();
+            final double[][] x = new double[preDecision.size()][VALUE_FUNCTION_DIMENSION];
+            final double[] y = new double[preDecision.size()];
+            final Iterator<double[]> pre = preDecision.iterator();
+            final Iterator<double[]> post = postDecision.iterator();
+            final Iterator<Double> rewardIterator = rewards.iterator();
             int i = 0;
             while (pre.hasNext()) {
-                double[] features = pre.next();
+                final double[] features = pre.next();
                 x[i] = Arrays.copyOf(features, features.length);
                 //y is just reward plus max Q
-                double reward = rewardIterator.next();
-                double[] postFeatures = post.next();
-                double maxQ = Math.max(qValue(postFeatures, true), qValue(postFeatures, false));
+                final double reward = rewardIterator.next();
+                final double[] postFeatures = post.next();
+                final double maxQ = Math.max(qValue(postFeatures, true), qValue(postFeatures, false));
                 y[i] = reward + maxQ;
                 i++;
             }
-            OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
+            final OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
             regression.setNoIntercept(true); //we bring our own
             regression.newSampleData(y, x);
             return regression.estimateRegressionParameters();
         }
 
-        public double qValue(double[] features, boolean open) {
+        public double qValue(final double[] features, final boolean open) {
 
             if (features[MONTHS_LEFT_INDEX] <= FishStateUtilities.EPSILON)
                 return 0;
             double sum = 0;
-            double[] beta;
+            final double[] beta;
             if (open)
                 beta = qParameterOpen;
             else
@@ -271,19 +264,19 @@ public class ShodanFisheries {
         }
 
         @Override
-        public void step(SimState simState) {
+        public void step(final SimState simState) {
 
-            FishState state = (FishState) simState;
-            double[] currentFeatures = factorize(state, oldFeatures == null ?
+            final FishState state = (FishState) simState;
+            final double[] currentFeatures = factorize(state, oldFeatures == null ?
                 new double[VALUE_FUNCTION_DIMENSION] : oldFeatures);
-            Iterator<Double> landings = state.getDailyDataSet().getColumn(
+            final Iterator<Double> landings = state.getDailyDataSet().getColumn(
                 "Average Cash-Flow").descendingIterator();
             double reward = 0;
             for (int i = 0; i < 30; i++)
                 reward += landings.next();
 
 
-            int previousAction = action;
+            final int previousAction = action;
             //update your actions
             action = qValue(currentFeatures, true) >= qValue(currentFeatures, false) ? 0 : 1;
             //random chance
@@ -310,12 +303,12 @@ public class ShodanFisheries {
                             generation + ".csv").toFile(), true));
                     writer.newLine();
                     //old features
-                    for (double feature : oldFeatures) {
+                    for (final double feature : oldFeatures) {
                         writer.write(Double.toString(feature));
                         writer.write(",");
                     }
                     //new features
-                    for (double feature : currentFeatures) {
+                    for (final double feature : currentFeatures) {
                         writer.write(Double.toString(feature));
                         writer.write(",");
                     }
@@ -329,7 +322,7 @@ public class ShodanFisheries {
                     writer.flush();
                     writer.close();
 
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -341,7 +334,7 @@ public class ShodanFisheries {
 
         }
 
-        private double[] factorize(FishState state, double[] previousFactors) {
+        private double[] factorize(final FishState state, final double[] previousFactors) {
 
             //landings, distance from port, cpue, % of tows south, months left till the end
             //averages daily landings, total distance, total cpue, total tows south
@@ -349,38 +342,38 @@ public class ShodanFisheries {
             // sqrt
             // inter-products
 
-            double[] factors = new double[VALUE_FUNCTION_DIMENSION];
+            final double[] factors = new double[VALUE_FUNCTION_DIMENSION];
             //landings
-            Iterator<Double> landings = state.getDailyDataSet().getColumn(
+            final Iterator<Double> landings = state.getDailyDataSet().getColumn(
                 "Species 0 Landings").descendingIterator();
             for (int i = 0; i < 30; i++)
                 factors[0] += landings.next();
             //distance from port
-            Iterator<Double> distance = state.getDailyDataSet().getColumn(
+            final Iterator<Double> distance = state.getDailyDataSet().getColumn(
                 "Average Distance From Port").descendingIterator();
             for (int i = 0; i < 30; i++)
                 factors[1] += distance.next();
             factors[1] /= 30;
             //cpue
-            Iterator<Double> effort = state.getDailyDataSet().getColumn(
+            final Iterator<Double> effort = state.getDailyDataSet().getColumn(
                 "Total Effort").descendingIterator();
             for (int i = 0; i < 30; i++)
                 factors[2] += effort.next();
-            double totalEffort = factors[2];
+            final double totalEffort = factors[2];
             factors[2] = factors[2] > 0 ? factors[0] / factors[2] : 0;
             factors[2] /= 30;
             factors[0] /= 30;
 
             //south
-            Iterator<Double> south = state.getDailyDataSet().getColumn(
+            final Iterator<Double> south = state.getDailyDataSet().getColumn(
                 "# of South Tows").descendingIterator();
             for (int i = 0; i < 30; i++)
                 factors[3] += south.next();
             factors[3] /= 30;
 
             //month-left
-            factors[MONTHS_LEFT_INDEX] = (int) (240 - state.getDay() / 30);
-            double month = state.getDay() / 30;
+            factors[MONTHS_LEFT_INDEX] = 240 - state.getDay() / 30;
+            final double month = state.getDay() / 30;
 
             //total daily landings, total distance, total cpue, total tows south
             factors[5] = previousFactors[5] + (-previousFactors[5] + factors[0]) / (month - 1);
@@ -401,7 +394,7 @@ public class ShodanFisheries {
             factors[16] = Math.sqrt(factors[3]);
 
             //months gone out
-            ExternalOpenCloseSeason controller = (ExternalOpenCloseSeason) state.getFishers().get(0).getRegulation();
+            final ExternalOpenCloseSeason controller = (ExternalOpenCloseSeason) state.getFishers().get(0).getRegulation();
             if (controller.isOpen())
                 factors[17] = 0;
             else
@@ -454,7 +447,7 @@ public class ShodanFisheries {
          *
          * @param errorRate Value to set for property 'errorRate'.
          */
-        public void setErrorRate(double errorRate) {
+        public void setErrorRate(final double errorRate) {
             this.errorRate = errorRate;
         }
     }

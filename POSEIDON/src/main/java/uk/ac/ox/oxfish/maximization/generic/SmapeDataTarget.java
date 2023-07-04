@@ -20,6 +20,8 @@
 package uk.ac.ox.oxfish.maximization.generic;
 
 public class SmapeDataTarget extends AbstractLastStepFixedDataTarget {
+    private static final long serialVersionUID = 97333632955836419L;
+
     public SmapeDataTarget(
         final String columnName,
         final double fixedTarget

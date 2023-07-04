@@ -75,12 +75,7 @@ public class ExitDepartingDecorator implements DepartingStrategy {
         if (stoppable != null)
             throw new RuntimeException("Already started!");
 
-        Steppable steppable = new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                checkIfQuit(fisher);
-            }
-        };
+        Steppable steppable = simState -> checkIfQuit(fisher);
         this.stoppable = model.scheduleEveryYear(steppable, StepOrder.DAWN);
         decorated.start(model, fisher);
 

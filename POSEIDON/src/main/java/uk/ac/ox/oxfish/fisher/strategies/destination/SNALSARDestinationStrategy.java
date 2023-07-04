@@ -49,6 +49,7 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
     TripListener {
 
 
+    private static final long serialVersionUID = 7953893846167351953L;
     /**
      * the utility object where we put all the filters and sequentially goes through them.
      */
@@ -65,13 +66,13 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
 
 
     public SNALSARDestinationStrategy(
-        EroteticAnswer<SeaTile> safetyFilter,
-        EroteticAnswer<SeaTile> notKnownToFailProfitFilter,
-        EroteticAnswer<SeaTile> legalFilter,
-        EroteticAnswer<SeaTile> sociallyAppropriateFilter,
-        EroteticAnswer<SeaTile> knownToHaveAcceptableProfits,
-        FavoriteDestinationStrategy delegate,
-        FisherStartable startable
+        final EroteticAnswer<SeaTile> safetyFilter,
+        final EroteticAnswer<SeaTile> notKnownToFailProfitFilter,
+        final EroteticAnswer<SeaTile> legalFilter,
+        final EroteticAnswer<SeaTile> sociallyAppropriateFilter,
+        final EroteticAnswer<SeaTile> knownToHaveAcceptableProfits,
+        final FavoriteDestinationStrategy delegate,
+        final FisherStartable startable
     ) {
         this.chooser = new EroteticChooser<>();
         this.chooser.add(safetyFilter);
@@ -93,13 +94,13 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
      */
     @Override
     public SeaTile chooseDestination(
-        Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction
+        final Fisher fisher, final MersenneTwisterFast random, final FishState model, final Action currentAction
     ) {
         return delegate.chooseDestination(fisher, random, model, currentAction);
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         startable.start(model, fisher);
         this.model = model;
         this.fisher = fisher;
@@ -108,14 +109,14 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         delegate.turnOff(fisher);
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
         //all choices
-        List<SeaTile> options = model.getMap().getAllSeaTilesExcludingLandAsList();
+        final List<SeaTile> options = model.getMap().getAllSeaTilesExcludingLandAsList();
         delegate.setFavoriteSpot(chooser.answer(options,
                 this.fisher.getTileRepresentation(),
                 model, this.fisher

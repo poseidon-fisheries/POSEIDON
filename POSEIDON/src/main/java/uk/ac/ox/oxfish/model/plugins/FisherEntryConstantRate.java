@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 public class FisherEntryConstantRate implements EntryPlugin {
 
 
+    private static final long serialVersionUID = 6221890834987769724L;
     /**
      * which population of boats are we growing; this has to be both the name of the fishery factory and a tag so that we know
      * which boats belong to it
@@ -44,12 +45,12 @@ public class FisherEntryConstantRate implements EntryPlugin {
     private boolean isEntryPaused = false;
 
 
-    public FisherEntryConstantRate(double growthRateInPercentage, String populationName) {
+    public FisherEntryConstantRate(final double growthRateInPercentage, final String populationName) {
         this(growthRateInPercentage, populationName, -1);
     }
 
 
-    public FisherEntryConstantRate(double growthRateInPercentage, String populationName, int doNotGrowBeforeThisYear) {
+    public FisherEntryConstantRate(final double growthRateInPercentage, final String populationName, final int doNotGrowBeforeThisYear) {
         this.growthRateInPercentage = growthRateInPercentage;
         this.populationName = populationName;
         this.doNotGrowBeforeThisYear = doNotGrowBeforeThisYear;
@@ -62,7 +63,7 @@ public class FisherEntryConstantRate implements EntryPlugin {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         Preconditions.checkArgument(stoppable == null, "already started!");
         stoppable = model.scheduleEveryYear(
             this,
@@ -87,23 +88,23 @@ public class FisherEntryConstantRate implements EntryPlugin {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
-        FishState model = ((FishState) simState);
+        final FishState model = ((FishState) simState);
         if (isEntryPaused || model.getYear() < doNotGrowBeforeThisYear)
             return;
 
 
         double currentActiveFishers = 0;
         // count the fisher as active if it has been on at least a trip in the past 365 days!
-        for (Fisher fisher : model.getFishers()) {
+        for (final Fisher fisher : model.getFishers()) {
             if (fisher.getTags().contains(populationName) && fisher.hasBeenActiveThisYear())
                 currentActiveFishers++;
 
 
         }
 
-        long newEntrants = Math.round(currentActiveFishers * growthRateInPercentage);
+        final long newEntrants = Math.round(currentActiveFishers * growthRateInPercentage);
         for (int i = 0; i < newEntrants; i++)
             model.createFisher(populationName);
 
@@ -123,7 +124,7 @@ public class FisherEntryConstantRate implements EntryPlugin {
      *
      * @param growthRateInPercentage Value to set for property 'growthRateInPercentage'.
      */
-    public void setGrowthRateInPercentage(double growthRateInPercentage) {
+    public void setGrowthRateInPercentage(final double growthRateInPercentage) {
         this.growthRateInPercentage = growthRateInPercentage;
     }
 
@@ -142,7 +143,7 @@ public class FisherEntryConstantRate implements EntryPlugin {
     }
 
     @Override
-    public void setEntryPaused(boolean entryPaused) {
+    public void setEntryPaused(final boolean entryPaused) {
         isEntryPaused = entryPaused;
     }
 }

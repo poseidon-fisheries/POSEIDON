@@ -32,6 +32,7 @@ import java.util.Iterator;
  */
 public class AverageDataTarget implements DataTarget {
 
+    private static final long serialVersionUID = 7198572238820872411L;
     private double fixedTarget = 100;
 
     private String yearlyDataColumnName = "Average Cash-Flow";
@@ -53,11 +54,11 @@ public class AverageDataTarget implements DataTarget {
      * @return distance from target (0 best, the higher the number the further away from optimum we are)
      */
     @Override
-    public double computeError(FishState model) {
+    public double computeError(final FishState model) {
 
-        DataColumn simulationOutput = model.getYearlyDataSet().getColumn(yearlyDataColumnName);
-        DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
-        Iterator<Double> iterator = simulationOutput.iterator();
+        final DataColumn simulationOutput = model.getYearlyDataSet().getColumn(yearlyDataColumnName);
+        final DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
+        final Iterator<Double> iterator = simulationOutput.iterator();
         for (int skips = 0; skips < yearsToSkip; skips++) {
             iterator.next();
         }
@@ -84,7 +85,7 @@ public class AverageDataTarget implements DataTarget {
      *
      * @param fixedTarget Value to set for property 'fixedTarget'.
      */
-    public void setFixedTarget(double fixedTarget) {
+    public void setFixedTarget(final double fixedTarget) {
         this.fixedTarget = fixedTarget;
     }
 
@@ -102,7 +103,7 @@ public class AverageDataTarget implements DataTarget {
      *
      * @param yearlyDataColumnName Value to set for property 'yearlyDataColumnName'.
      */
-    public void setYearlyDataColumnName(String yearlyDataColumnName) {
+    public void setYearlyDataColumnName(final String yearlyDataColumnName) {
         this.yearlyDataColumnName = yearlyDataColumnName;
     }
 
@@ -120,7 +121,7 @@ public class AverageDataTarget implements DataTarget {
      *
      * @param weightInverse Value to set for property 'weight'.
      */
-    public void setWeightInverse(double weightInverse) {
+    public void setWeightInverse(final double weightInverse) {
         this.weightInverse = weightInverse;
     }
 
@@ -138,7 +139,7 @@ public class AverageDataTarget implements DataTarget {
      *
      * @param yearsToSkip Value to set for property 'yearsToSkip'.
      */
-    public void setYearsToSkip(int yearsToSkip) {
+    public void setYearsToSkip(final int yearsToSkip) {
         this.yearsToSkip = yearsToSkip;
     }
 }

@@ -29,6 +29,7 @@ import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 public class AsymmetricFixedDataLastStepTarget implements DataTarget {
 
 
+    private static final long serialVersionUID = 7106016076182841188L;
     public static boolean VERBOSE = true;
     private double fixedTarget = 100;
     private double exponentAbove = 1;
@@ -37,7 +38,7 @@ public class AsymmetricFixedDataLastStepTarget implements DataTarget {
 
 
     public AsymmetricFixedDataLastStepTarget(
-        double fixedTarget, double exponentAbove, double exponentBelow, String columnName
+        final double fixedTarget, final double exponentAbove, final double exponentBelow, final String columnName
     ) {
         this.fixedTarget = fixedTarget;
         this.exponentAbove = exponentAbove;
@@ -56,11 +57,11 @@ public class AsymmetricFixedDataLastStepTarget implements DataTarget {
      * @return distance from target (0 best, the higher the number the further away from optimum we are)
      */
     @Override
-    public double computeError(FishState model) {
+    public double computeError(final FishState model) {
 
-        DataColumn simulationOutput = model.getYearlyDataSet().getColumn(columnName);
+        final DataColumn simulationOutput = model.getYearlyDataSet().getColumn(columnName);
 
-        double error;
+        final double error;
         if (simulationOutput.getLatest() > fixedTarget)
             error = Math.pow(Math.abs(simulationOutput.getLatest() - fixedTarget), exponentAbove);
         else
@@ -93,7 +94,7 @@ public class AsymmetricFixedDataLastStepTarget implements DataTarget {
      *
      * @param fixedTarget Value to set for property 'fixedTarget'.
      */
-    public void setFixedTarget(double fixedTarget) {
+    public void setFixedTarget(final double fixedTarget) {
         this.fixedTarget = fixedTarget;
     }
 
@@ -111,7 +112,7 @@ public class AsymmetricFixedDataLastStepTarget implements DataTarget {
      *
      * @param columnName Value to set for property 'columnName'.
      */
-    public void setColumnName(String columnName) {
+    public void setColumnName(final String columnName) {
         this.columnName = columnName;
     }
 
@@ -130,7 +131,7 @@ public class AsymmetricFixedDataLastStepTarget implements DataTarget {
      *
      * @param exponentAbove Value to set for property 'exponentAbove'.
      */
-    public void setExponentAbove(double exponentAbove) {
+    public void setExponentAbove(final double exponentAbove) {
         this.exponentAbove = exponentAbove;
     }
 
@@ -148,7 +149,7 @@ public class AsymmetricFixedDataLastStepTarget implements DataTarget {
      *
      * @param exponentBelow Value to set for property 'exponentBelow'.
      */
-    public void setExponentBelow(double exponentBelow) {
+    public void setExponentBelow(final double exponentBelow) {
         this.exponentBelow = exponentBelow;
     }
 

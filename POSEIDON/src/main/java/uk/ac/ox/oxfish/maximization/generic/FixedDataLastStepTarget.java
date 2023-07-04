@@ -35,6 +35,7 @@ import static java.lang.Math.abs;
 public class FixedDataLastStepTarget implements FixedDataTarget {
 
 
+    private static final long serialVersionUID = -6514839874424402025L;
     public static boolean VERBOSE = false;
     private double fixedTarget = 100;
     private double exponent = 1;
@@ -44,7 +45,7 @@ public class FixedDataLastStepTarget implements FixedDataTarget {
     public FixedDataLastStepTarget() {
     }
 
-    public FixedDataLastStepTarget(double fixedTarget, String columnName) {
+    public FixedDataLastStepTarget(final double fixedTarget, final String columnName) {
         this.fixedTarget = fixedTarget;
         this.columnName = columnName;
     }
@@ -57,16 +58,16 @@ public class FixedDataLastStepTarget implements FixedDataTarget {
      * @return
      */
     public static FixedDataLastStepTarget lastStepTarget(
-        Path file, String columnName
+        final Path file, final String columnName
     ) {
         try {
-            List<String> strings = Files.readAllLines(file);
+            final List<String> strings = Files.readAllLines(file);
             return new FixedDataLastStepTarget(
                 Double.parseDouble(
                     strings.get(strings.size() - 1)),
                 columnName
             );
-        } catch (IOException e) {
+        } catch (final IOException e) {
 
             throw new RuntimeException("can't read " + file + " because of " + e);
         }
@@ -81,7 +82,7 @@ public class FixedDataLastStepTarget implements FixedDataTarget {
      * @return distance from target (0 best, the higher the number the further away from optimum we are)
      */
     @Override
-    public double computeError(FishState model) {
+    public double computeError(final FishState model) {
 
         final double value = getValue(model);
         final double error = Math.pow(abs(value - fixedTarget), exponent);
@@ -117,7 +118,7 @@ public class FixedDataLastStepTarget implements FixedDataTarget {
      *
      * @param fixedTarget Value to set for property 'fixedTarget'.
      */
-    public void setFixedTarget(double fixedTarget) {
+    public void setFixedTarget(final double fixedTarget) {
         this.fixedTarget = fixedTarget;
     }
 
@@ -136,7 +137,7 @@ public class FixedDataLastStepTarget implements FixedDataTarget {
      *
      * @param columnName Value to set for property 'columnName'.
      */
-    public void setColumnName(String columnName) {
+    public void setColumnName(final String columnName) {
         this.columnName = columnName;
     }
 
@@ -145,7 +146,7 @@ public class FixedDataLastStepTarget implements FixedDataTarget {
         return exponent;
     }
 
-    public void setExponent(double exponent) {
+    public void setExponent(final double exponent) {
         this.exponent = exponent;
     }
 }

@@ -35,6 +35,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 public class TowHeatmapGatherer implements Steppable, Startable {
 
 
+    private static final long serialVersionUID = 7246978782446924067L;
     /**
      * which year should we start collecting data?
      */
@@ -46,7 +47,7 @@ public class TowHeatmapGatherer implements Steppable, Startable {
     private Stoppable receipt;
 
 
-    public TowHeatmapGatherer(int startYear) {
+    public TowHeatmapGatherer(final int startYear) {
         this.startYear = startYear;
     }
 
@@ -57,17 +58,17 @@ public class TowHeatmapGatherer implements Steppable, Startable {
      * @param state the model
      */
     @Override
-    public void start(FishState state) {
+    public void start(final FishState state) {
         towHeatmap = new double[state.getMap().getWidth()][state.getMap().getHeight()];
         receipt = state.scheduleEveryDay(this, StepOrder.DAILY_DATA_GATHERING);
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
-        FishState model = (FishState) simState;
+        final FishState model = (FishState) simState;
         if (model.getYear() >= startYear) {
-            IntGrid2D trawls = model.getMap().getDailyTrawlsMap();
+            final IntGrid2D trawls = model.getMap().getDailyTrawlsMap();
 
             //remember to flip it
             for (int x = 0; x < model.getMap().getWidth(); x++)

@@ -54,19 +54,11 @@ public class SingleSpeciesAbundanceInitializerTest {
         final SingleSpeciesAbundanceFactory factory = new SingleSpeciesAbundanceFactory();
         factory.setDiffuser(new NoDiffuserFactory());
         factory.setRecruitAllocator(
-            new AlgorithmFactory<BiomassAllocator>() {
-                @Override
-                public BiomassAllocator apply(final FishState state) {
-                    return new BiomassAllocator() {
-                        @Override
-                        public double allocate(final SeaTile tile, final NauticalMap map, final MersenneTwisterFast random) {
-                            if (tile.getGridX() == 0 && tile.getGridY() == 0)
-                                return 1d;
-                            else
-                                return 0d;
-                        }
-                    };
-                }
+            state -> (tile, map, random) -> {
+                if (tile.getGridX() == 0 && tile.getGridY() == 0)
+                    return 1d;
+                else
+                    return 0d;
             }
         );
 

@@ -99,21 +99,15 @@ public class LinearGetterBiologyInitializer implements BiologyInitializer {
         Species species = biology.getSpecie(0);
         return new GetterLocalBiology(
             species,
-            new Function<FishState, Double>() {
-                @Override
-                public Double apply(FishState state) {
-                    return intercept +
-                        seaTile.getGridX() * x +
-                        seaTile.getGridY() * y +
-                        seaTile.getGridX() * state.getDayOfTheYear() * xDay +
-                        seaTile.getGridY() * state.getDayOfTheYear() * yDay +
-                        seaTile.getRockyPercentage() * rocky +
-                        seaTile.getGridX() * seaTile.getRockyPercentage() * xRocky +
-                        seaTile.getGridY() * seaTile.getRockyPercentage() * yRocky +
-                        state.getDayOfTheYear() * seaTile.getRockyPercentage() * dayRocky;
-
-                }
-            }
+            state -> intercept +
+                seaTile.getGridX() * x +
+                seaTile.getGridY() * y +
+                seaTile.getGridX() * state.getDayOfTheYear() * xDay +
+                seaTile.getGridY() * state.getDayOfTheYear() * yDay +
+                seaTile.getRockyPercentage() * rocky +
+                seaTile.getGridX() * seaTile.getRockyPercentage() * xRocky +
+                seaTile.getGridY() * seaTile.getRockyPercentage() * yRocky +
+                state.getDayOfTheYear() * seaTile.getRockyPercentage() * dayRocky
         );
 
     }

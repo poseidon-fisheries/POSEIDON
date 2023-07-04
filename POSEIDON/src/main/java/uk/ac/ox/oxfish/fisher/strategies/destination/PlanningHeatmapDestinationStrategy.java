@@ -39,33 +39,47 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
  * Like a heatmap destination strategy but uses the profit function regression to learn and predict
  * Created by carrknight on 7/14/16.
  */
-public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrategy {
+public class PlanningHeatmapDestinationStrategy
+    extends AbstractHeatmapDestinationStrategy<TripRecord> {
 
-
+    private static final long serialVersionUID = -5616412244667234466L;
     private final ProfitFunctionRegression regression;
 
 
     public PlanningHeatmapDestinationStrategy(
-        ProfitFunctionRegression profitRegression,
-        AcquisitionFunction acquisition, boolean ignoreFailedTrips,
-        AdaptationProbability probability,
-        NauticalMap map, MersenneTwisterFast random, int stepSize
+        final ProfitFunctionRegression profitRegression,
+        final AcquisitionFunction acquisition,
+        final boolean ignoreFailedTrips,
+        final AdaptationProbability probability,
+        final NauticalMap map,
+        final MersenneTwisterFast random,
+        final int stepSize
     ) {
-        super(profitRegression, acquisition, ignoreFailedTrips, probability, map, random, stepSize, null);
+        super(
+            profitRegression,
+            acquisition,
+            ignoreFailedTrips,
+            probability,
+            map,
+            random,
+            stepSize,
+            null
+        );
         this.regression = profitRegression;
 
     }
 
 
     public static PlanningHeatmapDestinationStrategy AlmostPerfectKnowledge(
-        double maxHours, int numberOfSpecies,
-        AcquisitionFunction acquisition, boolean ignoreFailedTrips,
-        AdaptationProbability probability,
-        NauticalMap map, MersenneTwisterFast random, int stepSize,
-        GlobalBiology biology
+        final double maxHours, final int numberOfSpecies,
+        final AcquisitionFunction acquisition, final boolean ignoreFailedTrips,
+        final AdaptationProbability probability,
+        final NauticalMap map, final MersenneTwisterFast random, final int stepSize,
+        final GlobalBiology biology
     ) {
 
-        GeographicalRegression<Double>[] catches = new GeographicalRegression[numberOfSpecies];
+        @SuppressWarnings({"unchecked", "rawtypes"}) final GeographicalRegression<Double>[] catches =
+            new GeographicalRegression[numberOfSpecies];
         for (int i = 0; i < catches.length; i++)
             catches[i] = new AlmostPerfectKnowledgeRegression(i, biology);
         return new PlanningHeatmapDestinationStrategy(
@@ -81,14 +95,15 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
 
     @Override
     protected void learnFromTripRecord(
-        TripRecord record, SeaTile mostFishedTile, Fisher fisherThatMadeTheTrip, FishState model
+        final TripRecord record,
+        final SeaTile mostFishedTile,
+        final Fisher fisherThatMadeTheTrip,
+        final FishState model
     ) {
-
         regression.addObservation(
-            new GeographicalObservation<>(mostFishedTile, model.getHoursSinceStart(),
-                record
-            ),
-            fisherThatMadeTheTrip, model
+            new GeographicalObservation<>(mostFishedTile, model.getHoursSinceStart(), record),
+            fisherThatMadeTheTrip,
+            model
         );
 
     }
@@ -113,13 +128,13 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
         private final GlobalBiology biology;
 
 
-        public AlmostPerfectKnowledgeRegression(int speciesIndex, GlobalBiology biology) {
+        public AlmostPerfectKnowledgeRegression(final int speciesIndex, final GlobalBiology biology) {
             this.speciesIndex = speciesIndex;
             this.biology = biology;
         }
 
         @Override
-        public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
+        public double predict(final SeaTile tile, final double time, final Fisher fisher, final FishState model) {
             return fisher.getGear().expectedHourlyCatch(fisher, tile, 1, biology)[speciesIndex];
         }
 
@@ -127,7 +142,7 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
         //ignored
         @Override
         public void addObservation(
-            GeographicalObservation<Double> observation, Fisher fisher, FishState model
+            final GeographicalObservation<Double> observation, final Fisher fisher, final FishState model
         ) {
 
         }
@@ -136,7 +151,7 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
          * ignored
          */
         @Override
-        public void start(FishState model, Fisher fisher) {
+        public void start(final FishState model, final Fisher fisher) {
 
         }
 
@@ -144,7 +159,7 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
          * ignored
          */
         @Override
-        public void turnOff(Fisher fisher) {
+        public void turnOff(final Fisher fisher) {
 
         }
 
@@ -153,7 +168,7 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
          */
         @Override
         public double extractNumericalYFromObservation(
-            GeographicalObservation<Double> observation, Fisher fisher
+            final GeographicalObservation<Double> observation, final Fisher fisher
         ) {
             return observation.getValue();
         }
@@ -176,7 +191,7 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
          * @param parameterArray the new parameters for this regresssion
          */
         @Override
-        public void setParameters(double[] parameterArray) {
+        public void setParameters(final double[] parameterArray) {
             Preconditions.checkState(false, "perfect knowledge has no parameters to set!");
         }
     }

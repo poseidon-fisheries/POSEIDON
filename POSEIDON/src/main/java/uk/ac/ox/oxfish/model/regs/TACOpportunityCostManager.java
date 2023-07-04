@@ -42,6 +42,7 @@ import uk.ac.ox.oxfish.utility.fxcollections.ListChangeListener;
 public class TACOpportunityCostManager implements TripListener, Startable, Steppable, ListChangeListener<Fisher> {
 
     public static final int MOVING_AVERAGE_SIZE = 10;
+    private static final long serialVersionUID = -5499519512606016930L;
 
     final private MovingAverage<Double>[] smoothedDailyLandings;
     final private MovingAverage<Double> smoothedHoursAtSea;
@@ -55,8 +56,8 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
     private FishState model;
 
 
-    @SuppressWarnings("unchecked")
-    public TACOpportunityCostManager(MultiQuotaRegulation quotaRegulationToUse) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public TACOpportunityCostManager(final MultiQuotaRegulation quotaRegulationToUse) {
         this.quotaRegulationToUse = quotaRegulationToUse;
         smoothedDailyLandings = new MovingAverage[quotaRegulationToUse.getNumberOfSpeciesTracked()];
         smoothedHoursAtSea = new MovingAverage<>(MOVING_AVERAGE_SIZE);
@@ -69,7 +70,7 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
         this.model = model;
         /*
@@ -79,7 +80,7 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
 
 
         //listen to all trips
-        for (Fisher fisher : model.getFishers())
+        for (final Fisher fisher : model.getFishers())
             fisher.addTripListener(this);
 
         //trick to use "this" inside an anonymous function
@@ -88,7 +89,7 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
 
 
         //creates the averages
-        for (Species selectedSpecies : model.getSpecies()) {
+        for (final Species selectedSpecies : model.getSpecies()) {
             smoothedDailyLandings[selectedSpecies.getIndex()] = new MovingAverage<>(MOVING_AVERAGE_SIZE);
 
         }
@@ -101,7 +102,7 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
      * @param simState
      */
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
         //if there is a fishing ban in place, no point in counting
         if (quotaRegulationToUse.isFishingStillAllowed()) {
@@ -111,10 +112,10 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
 
 
             //for each specie
-            for (Species selectedSpecies : model.getSpecies()) {
+            for (final Species selectedSpecies : model.getSpecies()) {
 
                 //read what were yesterday's landings
-                Double observation = model.getLatestDailyObservation(selectedSpecies +
+                final Double observation = model.getLatestDailyObservation(selectedSpecies +
                     " " +
                     AbstractMarket.LANDINGS_COLUMN_NAME);
 
@@ -135,15 +136,15 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
      * @param fisher
      */
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
 
         hoursAtSeaCounter += record.getDurationInHours();
 
-        for (Species selectedSpecies : model.getSpecies()) {
+        for (final Species selectedSpecies : model.getSpecies()) {
 
             //daily catches
-            double averageDailyCatches = smoothedDailyLandings[selectedSpecies.getIndex()].getSmoothedObservation();
-            double averageHoursAtSea = smoothedHoursAtSea.getSmoothedObservation();
+            final double averageDailyCatches = smoothedDailyLandings[selectedSpecies.getIndex()].getSmoothedObservation();
+            final double averageHoursAtSea = smoothedHoursAtSea.getSmoothedObservation();
 
             if (!Double.isFinite(averageDailyCatches) || !Double.isFinite(averageHoursAtSea) || averageHoursAtSea == 0) //if we have no credible observation
                 continue;
@@ -155,21 +156,21 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
 
 
             //make it hourly
-            double hourlyCatches = averageDailyCatches / averageHoursAtSea;
+            final double hourlyCatches = averageDailyCatches / averageHoursAtSea;
 
 
             //hourly average catches * trip length (including portside preparation)
-            double actualTripCatches = record.getSoldCatch()[selectedSpecies.getIndex()];
+            final double actualTripCatches = record.getSoldCatch()[selectedSpecies.getIndex()];
             assert actualTripCatches >= 0;
 
-            double actualHourlyCatches = actualTripCatches / record.getDurationInHours();
+            final double actualHourlyCatches = actualTripCatches / record.getDurationInHours();
 
-            double differenceInCatchesFromAverage = hourlyCatches - actualHourlyCatches;
+            final double differenceInCatchesFromAverage = hourlyCatches - actualHourlyCatches;
             //if this is positive, you are being slower than the average so in a way you are wasting quotas. If this is negative
             //then you are siphoning off quotas from competitors and that's a good thing (for you at least)
-            double price = record.getImplicitPriceReceived(selectedSpecies);
+            final double price = record.getImplicitPriceReceived(selectedSpecies);
 
-            double opportunityCosts = price * differenceInCatchesFromAverage * record.getDurationInHours();
+            final double opportunityCosts = price * differenceInCatchesFromAverage * record.getDurationInHours();
             record.recordOpportunityCosts(opportunityCosts);
 
 
@@ -179,9 +180,9 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
     }
 
 
-    public double predictedHourlyCatches(int speciesIndex) {
-        double averageDailyCatches = smoothedDailyLandings[speciesIndex].getSmoothedObservation();
-        double averageHoursAtSea = smoothedHoursAtSea.getSmoothedObservation();
+    public double predictedHourlyCatches(final int speciesIndex) {
+        final double averageDailyCatches = smoothedDailyLandings[speciesIndex].getSmoothedObservation();
+        final double averageHoursAtSea = smoothedHoursAtSea.getSmoothedObservation();
         return averageDailyCatches / averageHoursAtSea;
     }
 
@@ -193,7 +194,7 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
     public void turnOff() {
         stoppable.stop();
         model.getFishers().removeListener(this);
-        for (Fisher fisher : model.getFishers())
+        for (final Fisher fisher : model.getFishers())
             fisher.removeTripListener(this);
     }
 
@@ -201,10 +202,10 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
      * Listen to the trips of new fishers, if there are any
      */
     @Override
-    public void onChanged(Change<? extends Fisher> c) {
-        for (Fisher removed : c.getRemoved())
+    public void onChanged(final Change<? extends Fisher> c) {
+        for (final Fisher removed : c.getRemoved())
             removed.removeTripListener(this);
-        for (Fisher added : c.getAddedSubList())
+        for (final Fisher added : c.getAddedSubList())
             added.addTripListener(this);
     }
 }

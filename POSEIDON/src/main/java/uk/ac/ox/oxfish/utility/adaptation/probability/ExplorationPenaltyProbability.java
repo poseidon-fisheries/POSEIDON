@@ -69,12 +69,7 @@ public class ExplorationPenaltyProbability implements AdaptationProbability {
         delegate.start(model, fisher);
         fisher.getDailyData().registerGatherer(
             "Exploration Probability",
-            new Gatherer<Fisher>() {
-                @Override
-                public Double apply(Fisher fisher1) {
-                    return ExplorationPenaltyProbability.this.getExplorationProbability();
-                }
-            },
+            (Gatherer<Fisher>) fisher1 -> ExplorationPenaltyProbability.this.getExplorationProbability(),
             Double.NaN
         );
     }

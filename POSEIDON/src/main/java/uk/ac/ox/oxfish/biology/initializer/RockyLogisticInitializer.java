@@ -132,12 +132,11 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer {
     public void processMap(
         final GlobalBiology biology, final NauticalMap map, final MersenneTwisterFast random, final FishState model
     ) {
-
-
-        final BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
-            differentialPercentageToMove,
-            percentageLimitOnDailyMovement
-        );
+        @SuppressWarnings("deprecation") final BiomassDiffuserContainer diffuser =
+            new BiomassDiffuserContainer(map, random, biology,
+                differentialPercentageToMove,
+                percentageLimitOnDailyMovement
+            );
         model.scheduleEveryDay(diffuser, StepOrder.DAWN);
 
         for (final Species species : biology.getSpecies())

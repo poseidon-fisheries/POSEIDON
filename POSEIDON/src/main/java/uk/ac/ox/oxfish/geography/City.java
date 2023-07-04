@@ -31,11 +31,12 @@ import sim.util.geo.MasonGeometry;
 public class City extends MasonGeometry {
 
 
+    private static final long serialVersionUID = -5412037980975763417L;
     private final String name;
 
     private final int population;
 
-    public City(Geometry g, String name, int population) {
+    public City(final Geometry g, final String name, final int population) {
         super(g);
         this.name = name;
         this.population = population;

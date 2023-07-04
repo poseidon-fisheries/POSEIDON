@@ -26,6 +26,8 @@ import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SummingMerger;
 
 public class CatchFromFadSetsHeatmapGatherer extends HeatmapGatherer {
 
+    private static final long serialVersionUID = -5817405487796554775L;
+
     public CatchFromFadSetsHeatmapGatherer(
         final int interval,
         final Species species

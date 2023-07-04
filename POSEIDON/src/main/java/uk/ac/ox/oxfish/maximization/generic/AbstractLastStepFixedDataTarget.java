@@ -26,6 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractLastStepFixedDataTarget implements FixedDataTarget {
 
+    private static final long serialVersionUID = -1736401434755470061L;
     private final ForecastErrorMeasure forecastErrorMeasure;
 
     private double fixedTarget;

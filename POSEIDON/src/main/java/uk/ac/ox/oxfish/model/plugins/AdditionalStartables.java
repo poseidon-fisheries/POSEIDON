@@ -31,7 +31,7 @@ import java.util.function.Supplier;
 public class AdditionalStartables {
 
     public static final LinkedHashMap<String, Supplier<AlgorithmFactory<? extends AdditionalStartable>>> CONSTRUCTORS;
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
         NAMES.put(TowAndAltitudePluginFactory.class, "Tow Heatmapper");

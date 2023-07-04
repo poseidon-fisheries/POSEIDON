@@ -43,6 +43,7 @@ import java.util.function.Function;
 public class TripLaggedExtractor implements Startable, Steppable, ObservationExtractor {
 
 
+    private static final long serialVersionUID = -339389020566475362L;
     /**
      * this function is applied uncritically to all TripRecords to obtain a numerical value from them
      * which is then collected here
@@ -64,8 +65,8 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
 
 
     public TripLaggedExtractor(
-        Function<TripRecord, Double> variableOfInterest,
-        MapDiscretization discretization
+        final Function<TripRecord, Double> variableOfInterest,
+        final MapDiscretization discretization
     ) {
         this.variableOfInterest = variableOfInterest;
         this.discretization = discretization;
@@ -78,7 +79,7 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
      * @return
      */
     @Override
-    public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
+    public double extract(final SeaTile tile, final double timeOfObservation, final Fisher agent, final FishState model) {
         return lastYearAverage[discretization.getGroup(tile)];
     }
 
@@ -89,7 +90,7 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         if (stoppable == null)
             stoppable = model.scheduleEveryYear(this, StepOrder.DAWN);
     }
@@ -105,9 +106,9 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
-        FishState model = (FishState) simState;
+        final FishState model = (FishState) simState;
 
 
         //if there is nobody to track you are going to sample the entire fishery!
@@ -118,8 +119,8 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
             );
         else {
             //get all trips!
-            List<TripRecord> allTrips = new LinkedList<>();
-            for (Fisher fisher : model.getFishers()) {
+            final List<TripRecord> allTrips = new LinkedList<>();
+            for (final Fisher fisher : model.getFishers()) {
                 allTrips.addAll(fisher.getFinishedTrips());
             }
             update(
@@ -134,26 +135,26 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
 
     //updates the averages with the new observations
     private void update(
-        List<TripRecord> totalLogs,
-        int dateToday
+        final List<TripRecord> totalLogs,
+        final int dateToday
     ) {
 
         //prepare to take averages
-        DoubleSummaryStatistics[] stats = new DoubleSummaryStatistics[discretization.getNumberOfGroups()];
+        final DoubleSummaryStatistics[] stats = new DoubleSummaryStatistics[discretization.getNumberOfGroups()];
         for (int i = 0; i < stats.length; i++) {
             stats[i] = new DoubleSummaryStatistics();
         }
 
         //collect all observations
-        for (TripRecord tripRecord : totalLogs) {
+        for (final TripRecord tripRecord : totalLogs) {
             //ignore stuff that is too old
             if (tripRecord.getTripDay() >= dateToday - 365) {
-                SeaTile mostFishedTileInTrip = tripRecord.getMostFishedTileInTrip();
+                final SeaTile mostFishedTileInTrip = tripRecord.getMostFishedTileInTrip();
                 if (mostFishedTileInTrip == null) //if you failed to fish anywhere, don't bother
                     continue;
 
-                int group = discretization.getGroup(mostFishedTileInTrip);
-                Double observation = variableOfInterest.apply(tripRecord);
+                final int group = discretization.getGroup(mostFishedTileInTrip);
+                final Double observation = variableOfInterest.apply(tripRecord);
                 if (Double.isFinite(observation))
                     stats[group].accept(
                         observation
@@ -194,7 +195,7 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
      *
      * @param fisherTracked Value to set for property 'fisherTracked'.
      */
-    public void setFisherTracked(Fisher fisherTracked) {
+    public void setFisherTracked(final Fisher fisherTracked) {
         this.fisherTracked = fisherTracked;
     }
 }

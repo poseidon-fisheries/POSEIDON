@@ -46,14 +46,7 @@ public class HillClimbingMovementTest {
 
         //if new is better than old, go random
         final BeamHillClimbing<SeaTile> algo = new BeamHillClimbing<SeaTile>(
-            new RandomStep<SeaTile>() {
-                @Override
-                public SeaTile randomStep(
-                    final FishState state, final MersenneTwisterFast random, final Fisher fisher, final SeaTile current
-                ) {
-                    return newTile;
-                }
-            }
+            (state, random1, fisher, current1) -> newTile
         );
 
         assertEquals(newTile, algo.randomize(random, mock(Fisher.class), 0, current));

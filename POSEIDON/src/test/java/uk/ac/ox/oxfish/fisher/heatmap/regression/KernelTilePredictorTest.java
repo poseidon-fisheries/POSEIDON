@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservati
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelTilePredictor;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import static org.mockito.Mockito.mock;
 
@@ -42,17 +41,17 @@ public class KernelTilePredictorTest {
     @Test
     public void kernelSpace() throws Exception {
 
-        FishState state = MovingTest.generateSimple50x50Map();
-        NauticalMap map = state.getMap();
+        final FishState state = MovingTest.generateSimple50x50Map();
+        final NauticalMap map = state.getMap();
 
-        KernelTilePredictor predictor = new KernelTilePredictor(
+        final KernelTilePredictor predictor = new KernelTilePredictor(
             1d,
             map.getSeaTile(25, 25),
-            new Pair<>(
+            new Entry<>(
                 new GridXExtractor(),
                 1d
             ),
-            new Pair<>(
+            new Entry<>(
                 new GridYExtractor(),
                 1d
             )
@@ -97,29 +96,29 @@ public class KernelTilePredictorTest {
     @Test
     public void forgettingVsNotForgetting() throws Exception {
 
-        FishState state = MovingTest.generateSimple50x50Map();
-        NauticalMap map = state.getMap();
+        final FishState state = MovingTest.generateSimple50x50Map();
+        final NauticalMap map = state.getMap();
 
-        KernelTilePredictor forgetting = new KernelTilePredictor(
+        final KernelTilePredictor forgetting = new KernelTilePredictor(
             .8d,
             map.getSeaTile(25, 25),
-            new Pair<>(
+            new Entry<>(
                 new GridXExtractor(),
                 1d
             ),
-            new Pair<>(
+            new Entry<>(
                 new GridYExtractor(),
                 1d
             )
         );
-        KernelTilePredictor notForgetting = new KernelTilePredictor(
+        final KernelTilePredictor notForgetting = new KernelTilePredictor(
             1d,
             map.getSeaTile(25, 25),
-            new Pair<>(
+            new Entry<>(
                 new GridXExtractor(),
                 1d
             ),
-            new Pair<>(
+            new Entry<>(
                 new GridYExtractor(),
                 1d
             )

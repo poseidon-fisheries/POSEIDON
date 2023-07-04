@@ -72,15 +72,7 @@ public class ITQMarketBuilder implements Startable {
         this.speciesIndex = speciesIndex;
         this.priceGeneratorMaker = priceGeneratorMaker;
         market = new ITQOrderBook(speciesIndex, 1,
-            new PricingPolicy() {
-                @Override
-                public double tradePrice(
-                    double askPrice, double bidPrice, double secondBestAsk,
-                    double secondBestBid
-                ) {
-                    return askPrice;
-                }
-            }, 7
+            (PricingPolicy) (askPrice, bidPrice, secondBestAsk, secondBestBid) -> askPrice, 7
         );
 
     }
@@ -102,24 +94,14 @@ public class ITQMarketBuilder implements Startable {
         if (model.getDailyDataSet().getColumn("ITQ Trades Of " + speciesName) == null) {
 
             //gather market data
-            model.getDailyDataSet().registerGatherer("ITQ Trades Of " + speciesName, new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState state1) {
-                        return market.getDailyMatches();
-                    }
-                },
+            model.getDailyDataSet().registerGatherer("ITQ Trades Of " + speciesName,
+                (Gatherer<FishState>) state1 -> market.getDailyMatches(),
                 Double.NaN
             );
             DataColumn priceGatherer =
                 model.getDailyDataSet().registerGatherer(
                     "ITQ Prices Of " + speciesName,
-                    new Gatherer<FishState>() {
-                        @Override
-                        public Double apply(FishState state1) {
-                            return market.getDailyAveragePrice();
-                        }
-
-                    },
+                    (Gatherer<FishState>) state1 -> market.getDailyAveragePrice(),
                     Double.NaN
                 );
             model.getYearlyDataSet().registerGatherer(
@@ -159,32 +141,29 @@ public class ITQMarketBuilder implements Startable {
             //these is probably more correct as a measure of what the prices of stuff traded were!
             model.getYearlyDataSet().registerGatherer(
                 "ITQ Weighted Prices Of " + speciesName,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
+                (Gatherer<FishState>) fishState -> {
 
-                        final Iterator<Double> numeratorIterator = tradeValueColumn.descendingIterator();
-                        final Iterator<Double> denominatorIterator = volumeGatherer.descendingIterator();
-                        if (!numeratorIterator.hasNext()) //not ready/year 1
-                            return Double.NaN;
-                        double numerator = 0;
-                        double denominator = 0;
-                        for (int i = 0; i < 365; i++) {
-                            //it should be step 365 times at most, but it's possible that this agent was added halfway through
-                            //and only has a partially filled collection
-                            if (numeratorIterator.hasNext()) {
-                                assert denominatorIterator.hasNext();
-                                Double tradeValue = numeratorIterator.next();
-                                if (Double.isFinite(tradeValue))
-                                    numerator += tradeValue;
-                                denominator += denominatorIterator.next();
-                            }
+                    final Iterator<Double> numeratorIterator = tradeValueColumn.descendingIterator();
+                    final Iterator<Double> denominatorIterator = volumeGatherer.descendingIterator();
+                    if (!numeratorIterator.hasNext()) //not ready/year 1
+                        return Double.NaN;
+                    double numerator = 0;
+                    double denominator = 0;
+                    for (int i = 0; i < 365; i++) {
+                        //it should be step 365 times at most, but it's possible that this agent was added halfway through
+                        //and only has a partially filled collection
+                        if (numeratorIterator.hasNext()) {
+                            assert denominatorIterator.hasNext();
+                            Double tradeValue = numeratorIterator.next();
+                            if (Double.isFinite(tradeValue))
+                                numerator += tradeValue;
+                            denominator += denominatorIterator.next();
                         }
-
-                        return numerator / denominator;
-
-
                     }
+
+                    return numerator / denominator;
+
+
                 },
                 Double.NaN
             );

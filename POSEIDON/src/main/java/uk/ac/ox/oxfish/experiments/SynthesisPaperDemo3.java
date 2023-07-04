@@ -113,56 +113,35 @@ public class SynthesisPaperDemo3 {
 
         columns.put(
             "id",
-            new Function<Fisher, String>() {
-                @Override
-                public String apply(final Fisher fisher) {
-                    return String.valueOf(fisher.getID());
-                }
-            }
+            fisher -> String.valueOf(fisher.getID())
         );
 
         columns.put(
             "successors",
-            new Function<Fisher, String>() {
-                @Override
-                public String apply(final Fisher fisher) {
-                    final Collection<Fisher> directedNeighbors = fisher.getSocialNetwork().getDirectedNeighbors(
-                        fisher);
-                    return String.valueOf(directedNeighbors != null ? directedNeighbors.size() : 0);
-                }
+            fisher -> {
+                final Collection<Fisher> directedNeighbors = fisher.getSocialNetwork().getDirectedNeighbors(
+                    fisher);
+                return String.valueOf(directedNeighbors != null ? directedNeighbors.size() : 0);
             }
         );
 
         columns.put(
             "predecessors",
-            new Function<Fisher, String>() {
-                @Override
-                public String apply(final Fisher fisher) {
-                    final Collection<Fisher> predecessors = fisher.getSocialNetwork().getPredecessors(fisher);
-                    return String.valueOf(predecessors != null ? predecessors.size() : 0);
-                }
+            fisher -> {
+                final Collection<Fisher> predecessors = fisher.getSocialNetwork().getPredecessors(fisher);
+                return String.valueOf(predecessors != null ? predecessors.size() : 0);
             }
         );
 
         columns.put(
             "cash_flow",
-            new Function<Fisher, String>() {
-                @Override
-                public String apply(final Fisher fisher) {
-                    return String.valueOf(fisher.getLatestYearlyObservation(
-                        FisherYearlyTimeSeries.CASH_FLOW_COLUMN));
-                }
-            }
+            fisher -> String.valueOf(fisher.getLatestYearlyObservation(
+                FisherYearlyTimeSeries.CASH_FLOW_COLUMN))
         );
         columns.put(
             "landings",
-            new Function<Fisher, String>() {
-                @Override
-                public String apply(final Fisher fisher) {
-                    return String.valueOf(fisher.getLatestYearlyObservation(
-                        "Species 0 " + AbstractMarket.LANDINGS_COLUMN_NAME));
-                }
-            }
+            fisher -> String.valueOf(fisher.getLatestYearlyObservation(
+                "Species 0 " + AbstractMarket.LANDINGS_COLUMN_NAME))
         );
 
     }

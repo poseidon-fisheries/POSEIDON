@@ -109,36 +109,20 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
      * @return the function result
      */
     @Override
-    public ExploreExploitImitateDestinationStrategy apply(FishState state) {
+    public ExploreExploitImitateDestinationStrategy apply(final FishState state) {
 
-        MersenneTwisterFast random = state.random;
-        NauticalMap map = state.getMap();
-        double probabilityUnfriending = dropInUtilityNeededForUnfriend.applyAsDouble(state.getRandom());
-        DefaultBeamHillClimbing algorithm;
+        final MersenneTwisterFast random = state.random;
+        final NauticalMap map = state.getMap();
+        final double probabilityUnfriending = dropInUtilityNeededForUnfriend.applyAsDouble(state.getRandom());
+        final DefaultBeamHillClimbing algorithm;
 
         Predicate<SeaTile> explorationValidator = automaticallyIgnoreMPAs ?
-            new Predicate<SeaTile>() {
-                @Override
-                public boolean test(SeaTile tile) {
-                    return !tile.isProtected();
-                }
-            } :
-            new Predicate<SeaTile>() {
-                @Override
-                public boolean test(SeaTile tile) {
-                    return true;
-                }
-            };
+            tile -> !tile.isProtected() :
+            tile -> true;
 
         if (automaticallyIgnoreAreasWhereFishNeverGrows) {
             explorationValidator =
-                explorationValidator.and(new Predicate<SeaTile>() {
-                    @Override
-                    public boolean test(SeaTile seaTile) {
-                        return
-                            seaTile.isFishingEvenPossibleHere();
-                    }
-                });
+                explorationValidator.and(seaTile -> seaTile.isFishingEvenPossibleHere());
         }
         if (probabilityUnfriending <= 0) { //no unfriending
 
@@ -181,20 +165,17 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
 
     }
 
-    private void registerGatherer(FishState state, final String exploringColumnName) {
+    private void registerGatherer(final FishState state, final String exploringColumnName) {
         state.getYearlyDataSet().registerGatherer(exploringColumnName,
-            new Gatherer<FishState>() {
-                @Override
-                public Double apply(FishState fishState) {
-                    double sum = 0;
-                    for (Fisher fisher : fishState.getFishers()) {
-                        if (fisher.getYearlyCounter().hasColumn(
-                            exploringColumnName))
-                            sum += fisher.getYearlyCounter().getColumn(
-                                exploringColumnName);
-                    }
-                    return sum;
+            (Gatherer<FishState>) fishState -> {
+                double sum = 0;
+                for (final Fisher fisher : fishState.getFishers()) {
+                    if (fisher.getYearlyCounter().hasColumn(
+                        exploringColumnName))
+                        sum += fisher.getYearlyCounter().getColumn(
+                            exploringColumnName);
                 }
+                return sum;
             }, Double.NaN
         );
     }
@@ -203,7 +184,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
         return stepSize;
     }
 
-    public void setStepSize(DoubleParameter stepSize) {
+    public void setStepSize(final DoubleParameter stepSize) {
         this.stepSize = stepSize;
     }
 
@@ -211,7 +192,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
         return ignoreEdgeDirection;
     }
 
-    public void setIgnoreEdgeDirection(boolean ignoreEdgeDirection) {
+    public void setIgnoreEdgeDirection(final boolean ignoreEdgeDirection) {
         this.ignoreEdgeDirection = ignoreEdgeDirection;
     }
 
@@ -221,7 +202,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
 
 
     public void setProbability(
-        AlgorithmFactory<? extends AdaptationProbability> probability
+        final AlgorithmFactory<? extends AdaptationProbability> probability
     ) {
         this.probability = probability;
     }
@@ -232,7 +213,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
     }
 
     public void setDropInUtilityNeededForUnfriend(
-        DoubleParameter dropInUtilityNeededForUnfriend
+        final DoubleParameter dropInUtilityNeededForUnfriend
     ) {
         this.dropInUtilityNeededForUnfriend = dropInUtilityNeededForUnfriend;
     }
@@ -241,7 +222,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
         return alwaysCopyBest;
     }
 
-    public void setAlwaysCopyBest(boolean alwaysCopyBest) {
+    public void setAlwaysCopyBest(final boolean alwaysCopyBest) {
         this.alwaysCopyBest = alwaysCopyBest;
     }
 
@@ -261,7 +242,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
      * @param objectiveFunction Value to set for property 'objectiveFunction'.
      */
     public void setObjectiveFunction(
-        AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction
+        final AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction
     ) {
         this.objectiveFunction = objectiveFunction;
     }
@@ -281,7 +262,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
      *
      * @param backtracksOnBadExploration Value to set for property 'backtracksOnBadExploration'.
      */
-    public void setBacktracksOnBadExploration(boolean backtracksOnBadExploration) {
+    public void setBacktracksOnBadExploration(final boolean backtracksOnBadExploration) {
         this.backtracksOnBadExploration = backtracksOnBadExploration;
     }
 
@@ -299,7 +280,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
      *
      * @param automaticallyIgnoreMPAs Value to set for property 'automaticallyIgnoreMPAs'.
      */
-    public void setAutomaticallyIgnoreMPAs(boolean automaticallyIgnoreMPAs) {
+    public void setAutomaticallyIgnoreMPAs(final boolean automaticallyIgnoreMPAs) {
         this.automaticallyIgnoreMPAs = automaticallyIgnoreMPAs;
     }
 
@@ -317,7 +298,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
      *
      * @param automaticallyIgnoreAreasWhereFishNeverGrows Value to set for property 'automaticallyIgnoreAreasWhereFishNeverGrows'.
      */
-    public void setAutomaticallyIgnoreAreasWhereFishNeverGrows(boolean automaticallyIgnoreAreasWhereFishNeverGrows) {
+    public void setAutomaticallyIgnoreAreasWhereFishNeverGrows(final boolean automaticallyIgnoreAreasWhereFishNeverGrows) {
         this.automaticallyIgnoreAreasWhereFishNeverGrows = automaticallyIgnoreAreasWhereFishNeverGrows;
     }
 
@@ -336,7 +317,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
      *
      * @param ignoreFailedTrips Value to set for property 'ignoreFailedTrips'.
      */
-    public void setIgnoreFailedTrips(boolean ignoreFailedTrips) {
+    public void setIgnoreFailedTrips(final boolean ignoreFailedTrips) {
         this.ignoreFailedTrips = ignoreFailedTrips;
     }
 
@@ -355,7 +336,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
      *
      * @param maxInitialDistance Value to set for property 'maxInitialDistance'.
      */
-    public void setMaxInitialDistance(double maxInitialDistance) {
+    public void setMaxInitialDistance(final double maxInitialDistance) {
         this.maxInitialDistance = maxInitialDistance;
     }
 }

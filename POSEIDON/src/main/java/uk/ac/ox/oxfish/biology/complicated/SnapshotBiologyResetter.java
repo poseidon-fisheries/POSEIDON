@@ -89,49 +89,43 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
     @Override
     public void start(final FishState model) {
         //record biology on day 1
-        model.scheduleOnce(new Steppable() {
-            @Override
-            public void step(final SimState simState) {
-                for (final Map.Entry<BiologyResetter, SnapshotBiomassAllocator> resetter : resetters.entrySet()) {
-                    resetter.getKey().recordHowMuchBiomassThereIs(model);
+        model.scheduleOnce((Steppable) simState -> {
+            for (final Map.Entry<BiologyResetter, SnapshotBiomassAllocator> resetter : resetters.entrySet()) {
+                resetter.getKey().recordHowMuchBiomassThereIs(model);
 
-                    if (restoreOriginalLocations)
-                        resetter.getValue().takeSnapshort(
-                            model.getMap(),
-                            resetter.getKey().getSpecies()
-                        );
-
-                }
+                if (restoreOriginalLocations)
+                    resetter.getValue().takeSnapshort(
+                        model.getMap(),
+                        resetter.getKey().getSpecies()
+                    );
 
             }
+
         }, StepOrder.DAWN);
 
 
         //reset it at year X
         model.scheduleOnceAtTheBeginningOfYear(
-            new Steppable() {
-                @Override
-                public void step(final SimState simState) {
-                    System.out.println("Resetted biomass at day " + model.getDay());
+            (Steppable) simState -> {
+                System.out.println("Resetted biomass at day " + model.getDay());
 
-                    for (final Map.Entry<BiologyResetter, SnapshotBiomassAllocator>
-                        resetter : resetters.entrySet()) {
-                        if (!restoreOriginalLocations) {
-                            resetter.getValue().takeSnapshort(
-                                model.getMap(),
-                                resetter.getKey().getSpecies()
-                            );
-                        }
-
-                        final double biomassBefore = ((FishState) simState)
-                            .getTotalBiomass(resetter.getKey().getSpecies());
-
-                        resetter.getKey().resetAbundance(model.getMap(), model.getRandom());
-
+                for (final Map.Entry<BiologyResetter, SnapshotBiomassAllocator>
+                    resetter : resetters.entrySet()) {
+                    if (!restoreOriginalLocations) {
+                        resetter.getValue().takeSnapshort(
+                            model.getMap(),
+                            resetter.getKey().getSpecies()
+                        );
                     }
 
+                    final double biomassBefore = ((FishState) simState)
+                        .getTotalBiomass(resetter.getKey().getSpecies());
+
+                    resetter.getKey().resetAbundance(model.getMap(), model.getRandom());
 
                 }
+
+
             },
             DATA_RESET,
             yearsBeforeReset

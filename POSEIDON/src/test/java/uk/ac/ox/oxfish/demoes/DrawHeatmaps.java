@@ -35,7 +35,6 @@ import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,7 +52,7 @@ public class DrawHeatmaps {
     public static final FishState FISH_STATE = MovingTest.generateSimple10x10MapWithVaryingDepth();
 
 
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         distancePlot(new NearestNeighborRegression(
             1, new double[]{1, 1},
             new GridXExtractor(),
@@ -83,23 +82,23 @@ public class DrawHeatmaps {
         distancePlot(new KernelRegression(
             100,
             new EpanechinikovKernel(0),
-            new Pair<>(new GridXExtractor(), 30d),
-            new Pair<>(new GridYExtractor(), 30d)
+            new Entry<>(new GridXExtractor(), 30d),
+            new Entry<>(new GridYExtractor(), 30d)
         ), "epa_simple");
 
 
         distancePlot(new KernelRegression(
             100,
             new EpanechinikovKernel(0),
-            new Pair<>(new GridXExtractor(), 30d),
-            new Pair<>(new GridYExtractor(), 30d)
+            new Entry<>(new GridXExtractor(), 30d),
+            new Entry<>(new GridYExtractor(), 30d)
         ), "epa_tilded");
 
 
         distancePlot(new KernelRegression(
             100,
             new EpanechinikovKernel(0),
-            new Pair<>(new PortDistanceExtractor(new ManhattanDistance(), 1d), 30d)
+            new Entry<>(new PortDistanceExtractor(new ManhattanDistance(), 1d), 30d)
         ), "epa_port");
 
 
@@ -117,11 +116,11 @@ public class DrawHeatmaps {
                 (
                     FISH_STATE.getMap(),
                     1,
-                    new Pair<>(
+                    new Entry<>(
                         new GridXExtractor(),
                         20d
                     ),
-                    new Pair<>(
+                    new Entry<>(
                         new GridYExtractor(),
                         20d
                     )
@@ -165,8 +164,8 @@ public class DrawHeatmaps {
     ) throws Exception {
 
 
-        Fisher mock = mock(Fisher.class);
-        Port port = new Port("porto", FISH_STATE.getMap().getSeaTile(9, 9), null, 0.01);
+        final Fisher mock = mock(Fisher.class);
+        final Port port = new Port("porto", FISH_STATE.getMap().getSeaTile(9, 9), null, 0.01);
         when(mock.getHomePort()).thenReturn(port);
         regression.addObservation(
             new GeographicalObservation<>(
@@ -193,7 +192,7 @@ public class DrawHeatmaps {
             ), mock, mock(FishState.class)
         );
 
-        StringBuilder output = new StringBuilder("x,y,value").append("\n");
+        final StringBuilder output = new StringBuilder("x,y,value").append("\n");
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
                 output.append((x + 1) + "," + (y + 1) + "," + regression.predict(

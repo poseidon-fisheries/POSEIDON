@@ -25,7 +25,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -35,7 +34,9 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class DepthMPAFactory implements AlgorithmFactory<ProtectedAreasOnly> {
 
 
-    private final Locker<String, ProtectedAreasOnly> locker = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, ProtectedAreasOnly> locker =
+        new uk.ac.ox.oxfish.utility.Locker<>();
     private DoubleParameter minDepth = new FixedDoubleParameter(0);
     private DoubleParameter maxDepth = new FixedDoubleParameter(200);
 

@@ -8,6 +8,7 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadMana
 
 public class NumberOfActiveFadsGatherer implements Gatherer<Fisher> {
     public static final String COLUMN_NAME = "Number of active FADs";
+    private static final long serialVersionUID = 723996416595525339L;
 
     @Override
     public Double apply(final Fisher fisher) {

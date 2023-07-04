@@ -32,10 +32,11 @@ import java.util.LinkedList;
 public class LogisticLogs extends LinkedList<LogisticLog> implements OutputPlugin {
 
 
+    private static final long serialVersionUID = -4644229479131089976L;
     private String filename = "logistic_long.csv";
 
     @Override
-    public void reactToEndOfSimulation(FishState state) {
+    public void reactToEndOfSimulation(final FishState state) {
         //ignored
     }
 
@@ -49,7 +50,7 @@ public class LogisticLogs extends LinkedList<LogisticLog> implements OutputPlugi
      *
      * @param filename Value to set for property 'filename'.
      */
-    public void setFileName(String filename) {
+    public void setFileName(final String filename) {
         this.filename = filename;
     }
 
@@ -63,9 +64,9 @@ public class LogisticLogs extends LinkedList<LogisticLog> implements OutputPlugi
         if (isEmpty())
             return "";
 
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append(get(0).getColumnNames()).append("\n");
-        for (LogisticLog log : this)
+        for (final LogisticLog log : this)
             builder.append(log.getData().toString());
         return builder.toString();
 

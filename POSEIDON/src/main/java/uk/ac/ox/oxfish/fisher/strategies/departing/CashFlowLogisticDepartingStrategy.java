@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.model.FishState;
 public class CashFlowLogisticDepartingStrategy extends LogisticDepartingStrategy {
 
 
+    private static final long serialVersionUID = 6578231870710138020L;
     private final double cashflowTarget;
 
     private final int cashflowPeriod;
@@ -45,8 +46,8 @@ public class CashFlowLogisticDepartingStrategy extends LogisticDepartingStrategy
      * @param cashflowPeriod
      */
     public CashFlowLogisticDepartingStrategy(
-        double l, double k, double x0,
-        double cashflowTarget, int cashflowPeriod
+        final double l, final double k, final double x0,
+        final double cashflowTarget, final int cashflowPeriod
     ) {
         super(l, k, x0);
         this.cashflowTarget = cashflowTarget;
@@ -71,9 +72,9 @@ public class CashFlowLogisticDepartingStrategy extends LogisticDepartingStrategy
      * @param model  a link to the model
      */
     @Override
-    public double computeX(Fisher fisher, FishState model) {
-        double cash = fisher.getBankBalance();
-        double previousCash = fisher.numberOfDailyObservations() > cashflowPeriod ?
+    public double computeX(final Fisher fisher, final FishState model) {
+        final double cash = fisher.getBankBalance();
+        final double previousCash = fisher.numberOfDailyObservations() > cashflowPeriod ?
             fisher.balanceXDaysAgo(cashflowPeriod) :
             0;
 

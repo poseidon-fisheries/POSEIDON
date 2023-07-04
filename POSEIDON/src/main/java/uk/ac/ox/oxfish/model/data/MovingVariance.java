@@ -48,7 +48,7 @@ public class MovingVariance<T extends Number> {
     private double variance = Double.NaN;
 
 
-    public MovingVariance(int size) {
+    public MovingVariance(final int size) {
         this.size = size;
     }
 
@@ -57,7 +57,7 @@ public class MovingVariance<T extends Number> {
      *
      * @param newObservation a new observation!
      */
-    public void addObservation(T newObservation) {
+    public void addObservation(final T newObservation) {
 
         assert observations.size() < size || (observations.size() == size && Double.isFinite(variance)) :
             variance + "----" + newObservation + " ---- " + (observations.size() < size);
@@ -68,9 +68,9 @@ public class MovingVariance<T extends Number> {
             variance = computeInitialVarianceThroughCompensatedSummation(average);
         } else if (observations.size() > size) {
             //need to correct!
-            double oldestValue = observations.pop().doubleValue();
+            final double oldestValue = observations.pop().doubleValue();
             final double newValue = newObservation.doubleValue();
-            double oldAverage = average;
+            final double oldAverage = average;
             average = average + (newValue - oldestValue) / size;
             variance = variance + (newValue - average + oldestValue - oldAverage) * (newValue - oldestValue) / (size);
             //might have to add a Max(0,variance) if there are numerical issues!
@@ -80,7 +80,7 @@ public class MovingVariance<T extends Number> {
 
     private double computeBatchAverage() {
         double sum = 0;
-        for (T n : observations)
+        for (final T n : observations)
             sum += n.doubleValue();
 
         return sum / observations.size();
@@ -93,12 +93,12 @@ public class MovingVariance<T extends Number> {
 
         double squaredSum = 0;
         double compensatingSum = 0;
-        for (T observation : observations) {
+        for (final T observation : observations) {
             squaredSum += Math.pow(observation.doubleValue() - currentAverage, 2);
             compensatingSum += observation.doubleValue() - currentAverage;
         }
 
-        return (double) ((squaredSum - Math.pow(compensatingSum, 2) / observations.size()) / observations.size());
+        return (squaredSum - Math.pow(compensatingSum, 2) / observations.size()) / observations.size();
 
     }
 
@@ -110,7 +110,7 @@ public class MovingVariance<T extends Number> {
     public double getSmoothedObservation() {
 
 
-        double currentVariance = variance;
+        final double currentVariance = variance;
 
         //use preliminary variance
         if (observations.size() >= 2 && Double.isNaN(variance))

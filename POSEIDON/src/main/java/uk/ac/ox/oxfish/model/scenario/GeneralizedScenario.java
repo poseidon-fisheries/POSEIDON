@@ -335,40 +335,27 @@ public class GeneralizedScenario implements Scenario {
         );
         //add predictor setup to the factory
         fisherFactory.getAdditionalSetups().add(predictorSetup);
-        fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
-            @Override
-            public void accept(final Fisher fisher) {
-                log.add(fisher, model);
-            }
-        });
+        fisherFactory.getAdditionalSetups().add(fisher -> log.add(fisher, model));
 
         //add snalsar info which should be moved elsewhere at some point
-        fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
-            @Override
-            public void accept(final Fisher fisher) {
-                fisher.setCheater(cheaters);
-                //todo move this somewhere else
-                fisher.addFeatureExtractor(
-                    SNALSARutilities.PROFIT_FEATURE,
-                    new RememberedProfitsExtractor(true)
-                );
-                fisher.addFeatureExtractor(
-                    FeatureExtractor.AVERAGE_PROFIT_FEATURE,
-                    new FeatureExtractor<SeaTile>() {
-                        @Override
-                        public HashMap<SeaTile, Double> extractFeature(
-                            final Collection<SeaTile> toRepresent, final FishState model, final Fisher fisher
-                        ) {
-                            final double averageProfits = model.getLatestDailyObservation(
-                                FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
-                            return new FixedMap<>(
-                                averageProfits,
-                                toRepresent
-                            );
-                        }
-                    }
-                );
-            }
+        fisherFactory.getAdditionalSetups().add(fisher -> {
+            fisher.setCheater(cheaters);
+            //todo move this somewhere else
+            fisher.addFeatureExtractor(
+                SNALSARutilities.PROFIT_FEATURE,
+                new RememberedProfitsExtractor(true)
+            );
+            fisher.addFeatureExtractor(
+                FeatureExtractor.AVERAGE_PROFIT_FEATURE,
+                (toRepresent, model1, fisher1) -> {
+                    final double averageProfits = model1.getLatestDailyObservation(
+                        FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
+                    return new FixedMap<>(
+                        averageProfits,
+                        toRepresent
+                    );
+                }
+            );
         });
 
 

@@ -36,12 +36,12 @@ public class Averages {
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String, Supplier<AlgorithmFactory<? extends Averager>>> CONSTRUCTORS;
+    public static final Map<String, Supplier<AlgorithmFactory<? extends Averager<?>>>> CONSTRUCTORS;
 
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
         NAMES.put(IterativeAverageFactory.class, "Average");

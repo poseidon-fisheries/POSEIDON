@@ -29,6 +29,8 @@ import java.util.function.Function;
 @SuppressWarnings("rawtypes")
 public class DolphinSetLocationValues extends SetLocationValues<DolphinSetAction> {
 
+    private static final long serialVersionUID = 1369414470936907511L;
+
     public DolphinSetLocationValues(
         final Function<Fisher, Map<Int2D, Double>> loadValues,
         final double decayRate

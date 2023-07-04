@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.utility.MTFApache;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.PriorityQueue;
 
 /**
@@ -60,7 +61,7 @@ public class ValuePerSetFadModule
         final Plan currentPlanSoFar, final Fisher fisher, final FishState model, final NauticalMap map,
         final OwnFadSetDiscretizedActionGenerator optionsGenerator
     ) {
-        final List<uk.ac.ox.oxfish.utility.Pair<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options =
+        final List<Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options =
             optionsGenerator.peekAllFads();
 
         //if there are no options, don't bother
@@ -68,22 +69,22 @@ public class ValuePerSetFadModule
             return null;
         //if there is only one option, also don't bother
         if (options.size() == 1) {
-            if (options.get(0).getSecond() > 0)
-                return optionsGenerator.chooseFad(options.get(0).getSecond());
+            if (options.get(0).getValue() > 0)
+                return optionsGenerator.chooseFad(options.get(0).getValue());
             else return null;
         }
 
         //let's go through the value per set options
         double sumOfItAll = 0;
         final List<Pair<Integer, Double>> probabilities = new LinkedList<>();
-        for (final uk.ac.ox.oxfish.utility.Pair<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>,
+        for (final Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>,
             Integer> option : options) {
 
             double totalValueOfOption = 0;
             double numberOfOptions = 0;
             double avgGridX = 0;
             //sum up the raw $ amount you expect to make
-            for (final OwnFadSetDiscretizedActionGenerator.ValuedFad fadInGroup : option.getFirst()) {
+            for (final OwnFadSetDiscretizedActionGenerator.ValuedFad fadInGroup : option.getKey()) {
                 if (Double.isFinite(fadInGroup.getValue())) {
                     //int x=fadInGroup.getFirst().getLocation().getGridX();
                     //int width = model.getMap().getWidth();
@@ -96,7 +97,7 @@ public class ValuePerSetFadModule
             final double probability;
             //The actual "probability" variation is dampened to be more like uniform at random
             probability = dampen + (1 - dampen) * totalValueOfOption / numberOfOptions;
-            probabilities.add(new Pair<>(option.getSecond(), probability));
+            probabilities.add(new Pair<>(option.getValue(), probability));
             sumOfItAll += probability;
 
         }

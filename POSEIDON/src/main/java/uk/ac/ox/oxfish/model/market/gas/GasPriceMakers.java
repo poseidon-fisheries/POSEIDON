@@ -36,7 +36,7 @@ public class GasPriceMakers {
      */
     public static final LinkedHashMap<String, Supplier<AlgorithmFactory<? extends GasPriceMaker>>> CONSTRUCTORS;
 
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
         NAMES.put(FixedGasFactory.class, "Fixed Gas Price");

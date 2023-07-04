@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
  */
 public class SpendSaveInvestEntry implements EntryPlugin {
 
+    private static final long serialVersionUID = 119775768311783218L;
     private final double moneyNeededForANewEntry;
 
     private final double yearlyExpenses;
@@ -30,9 +31,9 @@ public class SpendSaveInvestEntry implements EntryPlugin {
 
 
     public SpendSaveInvestEntry(
-        double moneyNeededForANewEntry,
-        double yearlyExpenses,
-        String populationName
+        final double moneyNeededForANewEntry,
+        final double yearlyExpenses,
+        final String populationName
     ) {
         this.moneyNeededForANewEntry = moneyNeededForANewEntry;
         this.yearlyExpenses = yearlyExpenses;
@@ -46,7 +47,7 @@ public class SpendSaveInvestEntry implements EntryPlugin {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         Preconditions.checkArgument(stoppable == null, "already started!");
         stoppable = model.scheduleEveryYear(
             this,
@@ -68,15 +69,15 @@ public class SpendSaveInvestEntry implements EntryPlugin {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         if (isPaused())
             return;
-        FishState model = ((FishState) simState);
+        final FishState model = ((FishState) simState);
 
 
         int boatsToAdd = 0;
         // count the fisher as active if it has been on at least a trip in the past 365 days!
-        for (Fisher fisher : model.getFishers()) {
+        for (final Fisher fisher : model.getFishers()) {
             if (fisher.getTags().contains(populationName) && fisher.hasBeenActiveThisYear()) {
                 //spend your daily trip
                 fisher.spendExogenously(yearlyExpenses);
@@ -100,7 +101,7 @@ public class SpendSaveInvestEntry implements EntryPlugin {
         return paused;
     }
 
-    public void setPaused(boolean paused) {
+    public void setPaused(final boolean paused) {
         this.paused = paused;
     }
 
@@ -117,7 +118,7 @@ public class SpendSaveInvestEntry implements EntryPlugin {
         return newEntryAllowed;
     }
 
-    public void setNewEntryAllowed(boolean newEntryAllowed) {
+    public void setNewEntryAllowed(final boolean newEntryAllowed) {
         this.newEntryAllowed = newEntryAllowed;
     }
 
@@ -127,7 +128,7 @@ public class SpendSaveInvestEntry implements EntryPlugin {
     }
 
     @Override
-    public void setEntryPaused(boolean entryPaused) {
+    public void setEntryPaused(final boolean entryPaused) {
         paused = entryPaused;
     }
 }

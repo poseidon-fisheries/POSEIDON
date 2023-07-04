@@ -30,6 +30,7 @@ import java.util.List;
 public class AsymmetricFixedDataLastStepTargetFromFile implements DataTarget {
 
 
+    private static final long serialVersionUID = -6320842414260869689L;
     private final AsymmetricFixedDataLastStepTarget delegate = new AsymmetricFixedDataLastStepTarget();
     private String pathToCsvFile;
 
@@ -38,15 +39,15 @@ public class AsymmetricFixedDataLastStepTargetFromFile implements DataTarget {
     }
 
     @Override
-    public double computeError(FishState model) {
+    public double computeError(final FishState model) {
 
 
         try {
-            List<String> strings = Files.readAllLines(Paths.get(pathToCsvFile));
+            final List<String> strings = Files.readAllLines(Paths.get(pathToCsvFile));
             delegate.setFixedTarget(Double.parseDouble(
                 strings.get(strings.size() - 1)));
 
-        } catch (IOException e) {
+        } catch (final IOException e) {
 
             throw new RuntimeException("can't read " + pathToCsvFile + " because of " + e);
         }
@@ -57,7 +58,7 @@ public class AsymmetricFixedDataLastStepTargetFromFile implements DataTarget {
         return pathToCsvFile;
     }
 
-    public void setPathToCsvFile(String pathToCsvFile) {
+    public void setPathToCsvFile(final String pathToCsvFile) {
         this.pathToCsvFile = pathToCsvFile;
     }
 
@@ -65,7 +66,7 @@ public class AsymmetricFixedDataLastStepTargetFromFile implements DataTarget {
         return delegate.getColumnName();
     }
 
-    public void setYearlyDataColumnName(String columnName) {
+    public void setYearlyDataColumnName(final String columnName) {
         delegate.setColumnName(columnName);
     }
 
@@ -84,7 +85,7 @@ public class AsymmetricFixedDataLastStepTargetFromFile implements DataTarget {
      *
      * @param exponentAbove Value to set for property 'exponentAbove'.
      */
-    public void setExponentAbove(double exponentAbove) {
+    public void setExponentAbove(final double exponentAbove) {
         delegate.setExponentAbove(exponentAbove);
     }
 
@@ -102,7 +103,7 @@ public class AsymmetricFixedDataLastStepTargetFromFile implements DataTarget {
      *
      * @param exponentBelow Value to set for property 'exponentBelow'.
      */
-    public void setExponentBelow(double exponentBelow) {
+    public void setExponentBelow(final double exponentBelow) {
         delegate.setExponentBelow(exponentBelow);
     }
 }

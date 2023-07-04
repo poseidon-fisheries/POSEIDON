@@ -43,7 +43,7 @@ public class BiologyInitializers {
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
         NAMES.put(IndependentLogisticFactory.class, "Independent Logistic");
@@ -86,7 +86,7 @@ public class BiologyInitializers {
 
     public static void add(
         final String name,
-        Class<? extends AlgorithmFactory> factoryClass
+        final Class<? extends AlgorithmFactory<?>> factoryClass
     ) {
         NAMES.put(factoryClass, name);
         CONSTRUCTORS.put(name, Constructors.getSupplier(factoryClass));

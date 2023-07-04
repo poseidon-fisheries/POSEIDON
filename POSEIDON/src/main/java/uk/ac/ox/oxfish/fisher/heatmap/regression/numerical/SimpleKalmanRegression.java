@@ -113,12 +113,9 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
     @Override
     public void start(FishState model, Fisher fisher) {
         //every morning drift out a bit
-        receipt = model.scheduleEveryDay(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                for (OneDimensionalKalmanFilter filter : filters.values())
-                    filter.elapseTime();
-            }
+        receipt = model.scheduleEveryDay((Steppable) simState -> {
+            for (OneDimensionalKalmanFilter filter : filters.values())
+                filter.elapseTime();
         }, StepOrder.DAWN);
     }
 

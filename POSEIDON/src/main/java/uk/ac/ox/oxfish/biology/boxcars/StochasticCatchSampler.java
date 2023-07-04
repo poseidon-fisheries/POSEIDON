@@ -24,13 +24,13 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.fxcollections.ListChangeListener;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -67,9 +67,9 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
 
 
     public StochasticCatchSampler(
-        Predicate<Fisher> samplingSelector,
-        Species species,
-        @Nullable String surveyTag
+        final Predicate<Fisher> samplingSelector,
+        final Species species,
+        @Nullable final String surveyTag
     ) {
         Preconditions.checkArgument(species != null);
         this.samplingSelector = samplingSelector;
@@ -82,7 +82,7 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
     }
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         Preconditions.checkArgument(this.model == null);
         this.model = model;
         checkWhichFisherToObserve(model);
@@ -94,11 +94,11 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
      *
      * @param model the model
      */
-    private void checkWhichFisherToObserve(FishState model) {
+    private void checkWhichFisherToObserve(final FishState model) {
 
         resetObservedFishers();
 
-        for (Fisher fisher : model.getFishers()) {
+        for (final Fisher fisher : model.getFishers()) {
             checkIfAddFisherToSurvey(fisher);
         }
 
@@ -110,15 +110,15 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
      */
     private void resetObservedFishers() {
         if (surveyTag != null) {
-            String totalTag = surveyTag + " " + species;
-            for (Fisher fisher : observedFishers) {
+            final String totalTag = surveyTag + " " + species;
+            for (final Fisher fisher : observedFishers) {
                 fisher.getTags().remove(totalTag);
             }
         }
         observedFishers.clear();
     }
 
-    private void checkIfAddFisherToSurvey(Fisher fisher) {
+    private void checkIfAddFisherToSurvey(final Fisher fisher) {
         if (samplingSelector.test(fisher)) {
             if (surveyTag != null)
                 fisher.getTags().add(surveyTag + " " + species);
@@ -154,7 +154,7 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
         return delegate.getAbundance();
     }
 
-    public double[][] getAbundance(Function<Pair<Integer, Integer>, Double> subdivisionBinToWeightFunction) {
+    public double[][] getAbundance(final Function<Entry<Integer, Integer>, Double> subdivisionBinToWeightFunction) {
         return delegate.getAbundance(subdivisionBinToWeightFunction);
     }
 
@@ -179,9 +179,9 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
 
 
     @Override
-    public void onChanged(Change<? extends Fisher> c) {
+    public void onChanged(final Change<? extends Fisher> c) {
         while (c.next()) {
-            for (Fisher newFisher : c.getAddedSubList()) {
+            for (final Fisher newFisher : c.getAddedSubList()) {
                 checkIfAddFisherToSurvey(newFisher);
             }
         }

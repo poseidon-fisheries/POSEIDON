@@ -25,11 +25,11 @@ import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * simple biology initializer where there are a bunch of schools that swim around
@@ -41,7 +41,7 @@ public class OneSpeciesInfiniteSchoolsInitializer extends AbstractBiologyInitial
     private final int numberOfSchools;
 
 
-    private final Pair<Integer, Integer>[] waypoints;
+    private final Entry<Integer, Integer>[] waypoints;
 
     private final DoubleParameter startingX;
 
@@ -58,7 +58,7 @@ public class OneSpeciesInfiniteSchoolsInitializer extends AbstractBiologyInitial
 
     public OneSpeciesInfiniteSchoolsInitializer(
         final int numberOfSchools,
-        final Pair<Integer, Integer>[] waypoints, final DoubleParameter startingX,
+        final Entry<Integer, Integer>[] waypoints, final DoubleParameter startingX,
         final DoubleParameter startingY, final DoubleParameter diameter,
         final DoubleParameter speedInDays, final DoubleParameter biomassEach
     ) {

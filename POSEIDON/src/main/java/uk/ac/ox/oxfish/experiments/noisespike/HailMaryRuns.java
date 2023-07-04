@@ -34,7 +34,6 @@ import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileNotFoundException;
@@ -48,6 +47,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * basically we throw a whole lot of runs at a set of acceptable ranges and we hope some pass, which we store
@@ -174,7 +175,7 @@ public class HailMaryRuns {
 
     }
 
-    public static void mainSweep(String[] args) throws IOException {
+    public static void mainSweep(final String[] args) throws IOException {
         sweep(outputFile, parameters, scenarioFile, System.currentTimeMillis(),
             MAX_YEARS_TO_RUN, NUMBER_OF_TRIES
         );
@@ -184,12 +185,12 @@ public class HailMaryRuns {
         final Path outputFile,
         final List<SimpleOptimizationParameter> parameters,
         final Path scenarioFile,
-        long originalSeed, final int maxYearsToRun, final int numberOfTries
+        final long originalSeed, final int maxYearsToRun, final int numberOfTries
     ) throws IOException {
 
-        FileWriter writer = new FileWriter(outputFile.toFile());
+        final FileWriter writer = new FileWriter(outputFile.toFile());
         writer.write("seed");
-        for (SimpleOptimizationParameter parameter : HailMaryRuns.parameters) {
+        for (final SimpleOptimizationParameter parameter : HailMaryRuns.parameters) {
             writer.write(",");
             writer.write(parameter.getAddressToModify());
         }
@@ -197,18 +198,18 @@ public class HailMaryRuns {
         writer.write("\n");
         writer.flush();
 
-        MersenneTwisterFast fast = new MersenneTwisterFast(originalSeed);
+        final MersenneTwisterFast fast = new MersenneTwisterFast(originalSeed);
 
         for (int i = 0; i < numberOfTries; i++) {
 
-            Pair<Scenario, double[]> scenarioPair = setupScenario(fast, parameters, scenarioFile);
-            long seed = fast.nextLong();
-            ((FlexibleScenario) scenarioPair.getFirst()).setMapMakerDedicatedRandomSeed(seed);
+            final Map.Entry<Scenario, double[]> scenarioPair = setupScenario(fast, parameters, scenarioFile);
+            final long seed = fast.nextLong();
+            ((FlexibleScenario) scenarioPair.getKey()).setMapMakerDedicatedRandomSeed(seed);
 
 
             //run the model
-            FishState model = new FishState(seed);
-            model.setScenario(scenarioPair.getFirst());
+            final FishState model = new FishState(seed);
+            model.setScenario(scenarioPair.getKey());
             model.start();
             while (model.getYear() <= maxYearsToRun) {
                 model.schedule.step(model);
@@ -219,7 +220,7 @@ public class HailMaryRuns {
             for (validYear = maxYearsToRun; validYear > 0; validYear--) {
 
                 boolean valid = true;
-                for (AcceptableRangePredicate predicate : predicates) {
+                for (final AcceptableRangePredicate predicate : predicates) {
                     valid = valid & predicate.test(model, validYear);
                 }
                 System.out.println(validYear + " -- " + valid);
@@ -227,12 +228,11 @@ public class HailMaryRuns {
 
                 if (valid)
                     break;
-                ;
 
 
             }
             writer.write(String.valueOf(seed));
-            for (double value : scenarioPair.getSecond()) {
+            for (final double value : scenarioPair.getValue()) {
                 writer.write(",");
                 writer.write(String.valueOf(value));
             }
@@ -242,12 +242,12 @@ public class HailMaryRuns {
 
             writer.flush();
 
-            FileWriter scenarioSave = new FileWriter(outputFile.getParent()
+            final FileWriter scenarioSave = new FileWriter(outputFile.getParent()
                 .resolve("dump")
                 .resolve("test" + i + ".yaml")
                 .toFile());
-            FishYAML yaml = new FishYAML();
-            scenarioSave.write(yaml.dump(scenarioPair.getFirst()));
+            final FishYAML yaml = new FishYAML();
+            scenarioSave.write(yaml.dump(scenarioPair.getKey()));
             scenarioSave.flush();
             scenarioSave.close();
 
@@ -269,37 +269,37 @@ public class HailMaryRuns {
      * @return a pair with the scenario object and the real values applied to its parameters
      * @throws FileNotFoundException
      */
-    public static Pair<Scenario, double[]> setupScenario(
-        MersenneTwisterFast random,
+    public static Map.Entry<Scenario, double[]> setupScenario(
+        final MersenneTwisterFast random,
         final List<SimpleOptimizationParameter> parameters,
         final Path scenarioFile
     ) throws FileNotFoundException {
 
-        double[] randomValues = new double[parameters.size()];
+        final double[] randomValues = new double[parameters.size()];
         for (int i = 0; i < randomValues.length; i++) {
             randomValues[i] = random.nextDouble() * 20 - 10;
         }
 
 
-        FishYAML yaml = new FishYAML();
-        Scenario scenario = yaml.loadAs(new FileReader(scenarioFile.toFile()), Scenario.class);
+        final FishYAML yaml = new FishYAML();
+        final Scenario scenario = yaml.loadAs(new FileReader(scenarioFile.toFile()), Scenario.class);
 
         return setupScenario(scenario, randomValues, parameters, false);
     }
 
 
-    public static Pair<Scenario, double[]> setupScenario(
-        Scenario scenario,
-        double[] randomValues,
-        List<SimpleOptimizationParameter> parameters,
+    public static Map.Entry<Scenario, double[]> setupScenario(
+        final Scenario scenario,
+        final double[] randomValues,
+        final List<SimpleOptimizationParameter> parameters,
         //if this flag is true, you are passing real values
-        boolean realValues
+        final boolean realValues
     ) {
 
         Preconditions.checkState(parameters.size() == randomValues.length);
-        double[] values = new double[randomValues.length];
+        final double[] values = new double[randomValues.length];
         for (int i = 0; i < randomValues.length; i++) {
-            double real;
+            final double real;
             if (realValues) {
                 real =
                     parameters.get(i).parametrizeRealValue(
@@ -316,13 +316,13 @@ public class HailMaryRuns {
         }
 
 
-        return new Pair<>(scenario, values);
+        return entry(scenario, values);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException {
 
 
-        List<String> columnsToPrint = Lists.newArrayList(
+        final List<String> columnsToPrint = Lists.newArrayList(
             "Bt/K Red Fish",
             "Red Fish Landings",
             "Average Cash-Flow",
@@ -360,20 +360,17 @@ public class HailMaryRuns {
         HailMaryRuns.runPolicyAnalysis(
             Paths.get("docs", "20190129 spr_project", "policy", "fiftyyearsinputs.csv"),
             0, 2, 1,
-            new Consumer<FishState>() {
-                @Override
-                public void accept(FishState state) {
+            state -> {
 
 
-                    FishingSeasonFactory season = new FishingSeasonFactory(120, true);
-                    //new fishers are also only allowed 5 days at sea
-                    for (Map.Entry<String, FisherFactory> fisherFactory : state.getFisherFactories()) {
-                        fisherFactory.getValue().setRegulations(new FishingSeasonFactory(0, false));
-                    }
+                final FishingSeasonFactory season = new FishingSeasonFactory(120, true);
+                //new fishers are also only allowed 5 days at sea
+                for (final Map.Entry<String, FisherFactory> fisherFactory : state.getFisherFactories()) {
+                    fisherFactory.getValue().setRegulations(new FishingSeasonFactory(0, false));
+                }
 
-                    for (Fisher fisher : state.getFishers()) {
-                        fisher.setRegulation(season.apply(state));
-                    }
+                for (final Fisher fisher : state.getFishers()) {
+                    fisher.setRegulation(season.apply(state));
                 }
             },
             parameters,
@@ -499,46 +496,46 @@ public class HailMaryRuns {
     }
 
     static public void runPolicyAnalysis(
-        Path fileWithAcceptableParameters,
-        int groupColumnIndex,
-        int randomSeedColumnIndex,
-        int yearsToRunColumn,
-        Consumer<FishState> policyToImplement,
-        List<SimpleOptimizationParameter> parameterObjects,
-        String simulationTitle,
-        Path scenarioFile,
-        Path outputFolder,
-        List<String> columnsToPrint,
-        int maxYearsToRun
+        final Path fileWithAcceptableParameters,
+        final int groupColumnIndex,
+        final int randomSeedColumnIndex,
+        final int yearsToRunColumn,
+        final Consumer<FishState> policyToImplement,
+        final List<SimpleOptimizationParameter> parameterObjects,
+        final String simulationTitle,
+        final Path scenarioFile,
+        final Path outputFolder,
+        final List<String> columnsToPrint,
+        final int maxYearsToRun
     ) throws IOException {
 
 
         System.out.println("Starting: " + simulationTitle);
-        FileWriter fileWriter = new FileWriter(outputFolder.resolve(simulationTitle + ".csv").toFile());
+        final FileWriter fileWriter = new FileWriter(outputFolder.resolve(simulationTitle + ".csv").toFile());
         fileWriter.write("run,year,group,seed,shock_year,variable,value\n");
         fileWriter.flush();
 
         //open the file with acceptable parameters
-        List<String> parameterFile = Files.readAllLines(fileWithAcceptableParameters);
+        final List<String> parameterFile = Files.readAllLines(fileWithAcceptableParameters);
         //first column I assume it's a header
-        String header = parameterFile.get(0);
-        String[] columns = header.split(",");
+        final String header = parameterFile.get(0);
+        final String[] columns = header.split(",");
         //one column is the group, one column is the years to run, one column is the random seed;
         //the rest are all parameters
         Preconditions.checkArgument(columns.length > 3);
 
         //here we store the real parameters
-        double[][] parameters = new double[parameterFile.size() - 1][columns.length - 3];
+        final double[][] parameters = new double[parameterFile.size() - 1][columns.length - 3];
         //here we store the group associated with each column
-        int[] groups = new int[parameterFile.size() - 1];
-        long[] randomSeeds = new long[parameterFile.size() - 1]; //random seeds here
-        int[] yearsToPolicy = new int[parameterFile.size() - 1];
+        final int[] groups = new int[parameterFile.size() - 1];
+        final long[] randomSeeds = new long[parameterFile.size() - 1]; //random seeds here
+        final int[] yearsToPolicy = new int[parameterFile.size() - 1];
 
         //fill up the parameters now
         parameterFile.remove(0); //pop the header out
         for (int row = 0; row < parameterFile.size(); row++) {
 
-            String[] splitRow = parameterFile.get(row).split(",");
+            final String[] splitRow = parameterFile.get(row).split(",");
             Preconditions.checkArgument(splitRow.length == parameters[0].length + 3);
 
             int columnsAlreadyFilled = 0;
@@ -563,7 +560,7 @@ public class HailMaryRuns {
         }
 
 
-        BatchRunner runner = new BatchRunner(
+        final BatchRunner runner = new BatchRunner(
             scenarioFile,
             maxYearsToRun,
             columnsToPrint,
@@ -573,42 +570,34 @@ public class HailMaryRuns {
             -1
 
         );
-        runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-            @Override
-            public void consume(StringBuffer writer, FishState model, Integer year) {
-                writer.append(groups[runner.getRunsDone()]).append(",").
-                    append(randomSeeds[runner.getRunsDone()]).append(",").
-                    append(yearsToPolicy[runner.getRunsDone()]).append(",");
-            }
-        });
+        runner.setColumnModifier((writer, model, year) -> writer.append(groups[runner.getRunsDone()]).append(",").
+            append(randomSeeds[runner.getRunsDone()]).append(",").
+            append(yearsToPolicy[runner.getRunsDone()]).append(","));
 
-        Consumer<Scenario> scenarioConsumer = new Consumer<Scenario>() {
-            @Override
-            public void accept(Scenario scenario) {
-                //first, let's make sure we set up the right seed
-                int currentRow = runner.getRunsDone();
-                ((FlexibleScenario) scenario).setMapMakerDedicatedRandomSeed(randomSeeds[currentRow]);
-                //then let's update all the parameters
-                setupScenario(scenario, parameters[currentRow], parameterObjects, true);
-                //then schedule yourself to change policy at the right year
-                ((FlexibleScenario) scenario).getPlugins().add(state -> new AdditionalStartable() {
-                    @Override
-                    public void start(FishState model) {
-                        state.scheduleOnceAtTheBeginningOfYear(
-                            (Steppable) simState -> policyToImplement.accept(((FishState) simState)),
-                            StepOrder.DAWN,
-                            yearsToPolicy[currentRow] + 1
-                        );
-                    }
+        final Consumer<Scenario> scenarioConsumer = scenario -> {
+            //first, let's make sure we set up the right seed
+            final int currentRow = runner.getRunsDone();
+            ((FlexibleScenario) scenario).setMapMakerDedicatedRandomSeed(randomSeeds[currentRow]);
+            //then let's update all the parameters
+            setupScenario(scenario, parameters[currentRow], parameterObjects, true);
+            //then schedule yourself to change policy at the right year
+            ((FlexibleScenario) scenario).getPlugins().add(state -> new AdditionalStartable() {
+                @Override
+                public void start(final FishState model) {
+                    state.scheduleOnceAtTheBeginningOfYear(
+                        (Steppable) simState -> policyToImplement.accept(((FishState) simState)),
+                        StepOrder.DAWN,
+                        yearsToPolicy[currentRow] + 1
+                    );
+                }
 
-                    @Override
-                    public void turnOff() {
-                        //YOU FOOLS I CANNOT EVER BE STOPPED
-                    }
-                });
+                @Override
+                public void turnOff() {
+                    //YOU FOOLS I CANNOT EVER BE STOPPED
+                }
+            });
 
 
-            }
         };
 
         runner.setScenarioSetup(scenarioConsumer);
@@ -616,7 +605,7 @@ public class HailMaryRuns {
         //ugh done
 
         for (int runs = 0; runs < parameters.length; runs++) {
-            StringBuffer tidy = new StringBuffer();
+            final StringBuffer tidy = new StringBuffer();
             runner.run(tidy);
             fileWriter.write(tidy.toString());
             fileWriter.flush();

@@ -33,6 +33,7 @@ public class ExogenousFadMaker<B extends LocalBiology, F extends Fad> implements
      * when in the model order are fads deployed.
      */
     public static final StepOrder EXOGENOUS_FAD_MAKER_STEPORDER = StepOrder.DAWN;
+    private static final long serialVersionUID = -3662614779301930240L;
     /**
      * contains the rules on the nature of the fad we need to create
      */

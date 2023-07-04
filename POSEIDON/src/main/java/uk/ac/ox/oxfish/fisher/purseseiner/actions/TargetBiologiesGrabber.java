@@ -39,18 +39,18 @@ public class TargetBiologiesGrabber<B extends LocalBiology> {
     private final boolean canPoachFromFads;
     private final int rangeInSeaTiles;
     private final Aggregator<B> aggregator;
-    private final Class<B> localBiologyClass;
+    private final Class<? extends B> localBiologyClass;
 
+    @SuppressWarnings("unchecked")
     public TargetBiologiesGrabber(
         final boolean canPoachFromFads,
         final int rangeInSeaTiles,
-        final Class<B> localBiologyClass
+        final Class<? extends B> localBiologyClass
     ) {
         checkArgument(rangeInSeaTiles >= 0);
         this.canPoachFromFads = canPoachFromFads;
         this.rangeInSeaTiles = rangeInSeaTiles;
         this.localBiologyClass = localBiologyClass;
-        //noinspection unchecked
         this.aggregator = (Aggregator<B>) AGGREGATORS.get(localBiologyClass);
     }
 

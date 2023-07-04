@@ -25,7 +25,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.WeakMultiQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 
 /**
  * Like the TAC String factory, but generates a "weak TAC" that is a TAC where you are allowed to go out
@@ -38,7 +37,9 @@ public class WeakMultiTACStringFactory implements AlgorithmFactory<WeakMultiQuot
     /**
      * for each model there is only one quota object being shared
      */
-    private final Locker<String, WeakMultiQuotaRegulation> modelQuota = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, WeakMultiQuotaRegulation> modelQuota =
+        new uk.ac.ox.oxfish.utility.Locker<>();
     /**
      * The string we are going to turn into rule, "0:100 ,2:uniform 1 100" means that EACH FISHER gets 100 quotas a year
      * for species 0 and a random quota of 1 to 100 for species 2. The other species are then assumed NOT TO BE PROTECTED
@@ -65,12 +66,7 @@ public class WeakMultiTACStringFactory implements AlgorithmFactory<WeakMultiQuot
                 for (final Species species : state.getSpecies()) {
                     state.getYearlyDataSet().registerGatherer(
                         "Last Season Day of " + species,
-                        new Gatherer<FishState>() {
-                            @Override
-                            public Double apply(final FishState state1) {
-                                return (double) quotas.getLastSeasonDay()[species.getIndex()];
-                            }
-                        },
+                        (Gatherer<FishState>) state1 -> (double) quotas.getLastSeasonDay()[species.getIndex()],
                         365d
                     );
                 }

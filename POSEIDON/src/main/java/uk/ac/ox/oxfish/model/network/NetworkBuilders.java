@@ -37,7 +37,7 @@ public class NetworkBuilders {
     public static final LinkedHashMap<String, Supplier<NetworkBuilder>> CONSTRUCTORS =
         new LinkedHashMap<>();
 
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
 

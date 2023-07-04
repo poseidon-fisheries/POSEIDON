@@ -38,6 +38,7 @@ import java.util.Map;
  */
 public class DiscretizationHistogrammer implements TripListener, OutputPlugin {
 
+    private static final long serialVersionUID = -7859791471165153842L;
     private final MapDiscretization discretization;
 
 
@@ -52,7 +53,7 @@ public class DiscretizationHistogrammer implements TripListener, OutputPlugin {
 
     private String fileName = "location_histogram.csv";
 
-    public DiscretizationHistogrammer(MapDiscretization discretization, boolean effortCounter) {
+    public DiscretizationHistogrammer(final MapDiscretization discretization, final boolean effortCounter) {
         this.discretization = discretization;
         this.effortCounter = effortCounter;
         counts = new Integer[discretization.getNumberOfGroups()];
@@ -61,7 +62,7 @@ public class DiscretizationHistogrammer implements TripListener, OutputPlugin {
     }
 
     @Override
-    public void reactToEndOfSimulation(FishState state) {
+    public void reactToEndOfSimulation(final FishState state) {
 
     }
 
@@ -72,13 +73,13 @@ public class DiscretizationHistogrammer implements TripListener, OutputPlugin {
      * @param fisher
      */
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
         if (!effortCounter) {
-            SeaTile mostFishedTileInTrip = record.getMostFishedTileInTrip();
+            final SeaTile mostFishedTileInTrip = record.getMostFishedTileInTrip();
             if (mostFishedTileInTrip != null && discretization.getGroup(mostFishedTileInTrip) != null)
                 counts[discretization.getGroup(mostFishedTileInTrip)]++;
         } else {
-            for (Map.Entry<SeaTile, FishingRecord> effort : record.getFishingRecords()) {
+            for (final Map.Entry<SeaTile, FishingRecord> effort : record.getFishingRecords()) {
                 counts[discretization.getGroup(effort.getKey())] += effort.getValue().getHoursSpentFishing();
             }
         }
@@ -122,7 +123,7 @@ public class DiscretizationHistogrammer implements TripListener, OutputPlugin {
      *
      * @param fileName Value to set for property 'fileName'.
      */
-    public void setFileName(String fileName) {
+    public void setFileName(final String fileName) {
         this.fileName = fileName;
     }
 
@@ -133,7 +134,7 @@ public class DiscretizationHistogrammer implements TripListener, OutputPlugin {
 
     @Override
     public String toString() {
-        Joiner joiner = Joiner.on(",").skipNulls();
+        final Joiner joiner = Joiner.on(",").skipNulls();
         return joiner.join(counts);
     }
 }

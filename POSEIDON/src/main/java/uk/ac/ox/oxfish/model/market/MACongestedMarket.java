@@ -37,6 +37,7 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
  */
 public class MACongestedMarket extends AbstractBiomassMarket implements Steppable {
 
+    private static final long serialVersionUID = -4752839280611670081L;
     /**
      * the moving average holding the previous days sales and whose smoothed value represents the price congestion
      */
@@ -70,7 +71,7 @@ public class MACongestedMarket extends AbstractBiomassMarket implements Steppabl
      * @param demandSlope           the slope ($/biomass) of the demand curve defining how much
      * @param observationWindow     the size of the moving average holding previous days sales as "congestion"
      */
-    public MACongestedMarket(double priceWithNoCongestion, double demandSlope, int observationWindow) {
+    public MACongestedMarket(final double priceWithNoCongestion, final double demandSlope, final int observationWindow) {
         this.priceWithNoCongestion = priceWithNoCongestion;
         todayPrice = priceWithNoCongestion;
         Preconditions.checkArgument(
@@ -88,7 +89,7 @@ public class MACongestedMarket extends AbstractBiomassMarket implements Steppabl
      * @param state the model
      */
     @Override
-    public void start(FishState state) {
+    public void start(final FishState state) {
         super.start(state);
         stoppable = state.scheduleEveryDay(this, StepOrder.POLICY_UPDATE);
     }
@@ -115,10 +116,10 @@ public class MACongestedMarket extends AbstractBiomassMarket implements Steppabl
      */
     @Override
     protected TradeInfo sellFishImplementation(
-        double biomass, Fisher fisher, Regulation regulation, FishState state, Species species
+        final double biomass, final Fisher fisher, final Regulation regulation, final FishState state, final Species species
     ) {
         //find out legal biomass sold
-        double biomassActuallySellable = Math.min(
+        final double biomassActuallySellable = Math.min(
             biomass,
             regulation.maximumBiomassSellable(fisher, species, state)
         );
@@ -128,7 +129,7 @@ public class MACongestedMarket extends AbstractBiomassMarket implements Steppabl
         assert biomassActuallySellable > 0;
         todayCongestion += biomassActuallySellable;
         assert todayCongestion > 0;
-        double revenue = biomassActuallySellable * todayPrice;
+        final double revenue = biomassActuallySellable * todayPrice;
 
 
         assert revenue >= 0;
@@ -152,7 +153,7 @@ public class MACongestedMarket extends AbstractBiomassMarket implements Steppabl
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         congestion.addObservation(todayCongestion);
         todayCongestion = 0;
         todayPrice = Math.max(0, priceWithNoCongestion - demandSlope * congestion.getSmoothedObservation());

@@ -8,21 +8,22 @@ import uk.ac.ox.oxfish.model.FishState;
  */
 public class IntermittentSensorDecorator<T> implements Sensor<FishState, T> {
 
+    private static final long serialVersionUID = 4215633694359433508L;
     private final Sensor<FishState, T> delegate;
     private final int minInterval;
     private T lastScan;
     private int lastYearCalled;
 
     public IntermittentSensorDecorator(
-        Sensor<FishState, T> delegate,
-        int minInterval
+        final Sensor<FishState, T> delegate,
+        final int minInterval
     ) {
         this.delegate = delegate;
         this.minInterval = minInterval;
     }
 
     @Override
-    public T scan(FishState system) {
+    public T scan(final FishState system) {
 
         if (lastScan == null ||
             system.getYear() - lastYearCalled >= minInterval) {

@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import static java.lang.Math.max;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 
@@ -55,32 +56,32 @@ public class CaliforniaStockAssessmentGrowthBinParameters implements Meristics {
      * @param ageYoungMale           what year the male fish is considered young
      */
     public CaliforniaStockAssessmentGrowthBinParameters(
-        int maxAge, double youngLengthMale,
-        double oldLengthMale,
-        double weightParameterAMale,
-        double weightParameterBMale,
-        double KParameterMale,
-        double youngLengthFemale,
-        double oldLengthFemale,
-        double weightParameterAFemale,
-        double weightParameterBFemale,
-        double KParameterFemale,
-        double ageOld,
-        double ageYoungMale,
-        double ageYoungFemale
+        final int maxAge, final double youngLengthMale,
+        final double oldLengthMale,
+        final double weightParameterAMale,
+        final double weightParameterBMale,
+        final double KParameterMale,
+        final double youngLengthFemale,
+        final double oldLengthFemale,
+        final double weightParameterAFemale,
+        final double weightParameterBFemale,
+        final double KParameterFemale,
+        final double ageOld,
+        final double ageYoungMale,
+        final double ageYoungFemale
     ) {
 
 
         this.maxAge = maxAge;
         //compute L-Inf for Von Bertalanffy
-        double LInfFemale =
+        final double LInfFemale =
             youngLengthFemale < ageOld
                 ?
                 youngLengthFemale + ((oldLengthFemale - youngLengthFemale) /
                     (1 - Math.exp(-KParameterFemale * (ageOld - ageYoungFemale))))
                 :
                 oldLengthFemale;
-        double LInfMale =
+        final double LInfMale =
             youngLengthMale < ageOld
                 ?
                 youngLengthMale + ((oldLengthMale - youngLengthMale) /
@@ -120,7 +121,7 @@ public class CaliforniaStockAssessmentGrowthBinParameters implements Meristics {
     }
 
     @Override
-    public double getWeight(int subdivision, int bin) {
+    public double getWeight(final int subdivision, final int bin) {
 
         return weights[subdivision][bin];
     }
@@ -153,13 +154,12 @@ public class CaliforniaStockAssessmentGrowthBinParameters implements Meristics {
      * @return the length of the fish
      */
     @Override
-    public double getLengthAtAge(int ageInYears, int subdivision) {
-
-        return getLength(subdivision, ageInYears > maxAge ? (int) ageInYears : maxAge);
+    public double getLengthAtAge(final int ageInYears, final int subdivision) {
+        return getLength(subdivision, max(ageInYears, maxAge));
     }
 
     @Override
-    public double getLength(int subdivision, int bin) {
+    public double getLength(final int subdivision, final int bin) {
         return lengths[subdivision][bin];
     }
 }

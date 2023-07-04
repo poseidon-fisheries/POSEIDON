@@ -38,7 +38,7 @@ public class Markets {
      */
     public static final LinkedHashMap<String, Supplier<AlgorithmFactory<? extends Market>>> CONSTRUCTORS;
 
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
         NAMES.put(FixedPriceMarketFactory.class, "Fixed Price Market");

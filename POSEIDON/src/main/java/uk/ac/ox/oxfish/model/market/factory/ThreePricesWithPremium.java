@@ -55,12 +55,7 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
         return new ConditionalMarket(
             nonPremium,
             premium,
-            new Predicate<Fisher>() {
-                @Override
-                public boolean test(Fisher fisher) {
-                    return fisher.getTags().contains(tagNeededToAccessToPremium);
-                }
-            }
+            fisher -> fisher.getTags().contains(tagNeededToAccessToPremium)
         );
     }
 

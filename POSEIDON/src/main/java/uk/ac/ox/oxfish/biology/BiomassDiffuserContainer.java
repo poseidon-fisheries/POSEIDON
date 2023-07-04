@@ -28,10 +28,9 @@ import sim.util.Bag;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.*;
-import java.util.function.Predicate;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +40,7 @@ import java.util.stream.Collectors;
 public class BiomassDiffuserContainer implements Steppable {
 
 
+    private static final long serialVersionUID = 5603405335493670502L;
     private final NauticalMap map;
 
     private final MersenneTwisterFast random;
@@ -60,10 +60,11 @@ public class BiomassDiffuserContainer implements Steppable {
      * @param random
      * @param biology
      */
+    @SuppressWarnings("unchecked")
     public BiomassDiffuserContainer(
         final NauticalMap map, final MersenneTwisterFast random,
         final GlobalBiology biology,
-        final Pair<Species, BiomassMovementRule>... movementRules
+        final Entry<Species, BiomassMovementRule>... movementRules
     ) {
         this.map = map;
         this.random = random;
@@ -71,14 +72,14 @@ public class BiomassDiffuserContainer implements Steppable {
         this.biology = biology;
 
         if (movementRules != null)
-            for (final Pair<Species, BiomassMovementRule> movementRule : movementRules) {
-                if (movementRule.getSecond() instanceof NoMovement)
+            for (final Entry<Species, BiomassMovementRule> movementRule : movementRules) {
+                if (movementRule.getValue() instanceof NoMovement)
                     continue;
                 Preconditions.checkArgument(
-                    !this.movementRules.containsKey(movementRule.getFirst()),
+                    !this.movementRules.containsKey(movementRule.getKey()),
                     "Already provided movement rule for this species!"
                 );
-                this.movementRules.put(movementRule.getFirst(), movementRule.getSecond());
+                this.movementRules.put(movementRule.getKey(), movementRule.getValue());
             }
 
     }
@@ -119,13 +120,11 @@ public class BiomassDiffuserContainer implements Steppable {
 
 
         //get all the tiles that are in the sea
-        final List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList().stream().filter(new Predicate<SeaTile>() {
-            @Override
-            public boolean test(final SeaTile tile) {
-                return tile.isWater() && tile.getBiology() instanceof BiomassLocalBiology;
-            }
-        }).collect(
-            Collectors.toList());
+        final List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList()
+            .stream()
+            .filter(tile -> tile.isWater() && tile.getBiology() instanceof BiomassLocalBiology)
+            .collect(
+                Collectors.toList());
         //shuffle them
         Collections.shuffle(tiles, new Random(random.nextLong()));
 
@@ -140,7 +139,7 @@ public class BiomassDiffuserContainer implements Steppable {
             //for each neighbor
             for (final SeaTile neighbor : neighborList) {
                 //for each specie
-                for (final Map.Entry<Species, BiomassMovementRule> movementRuleEntry : movementRules.entrySet()) {
+                for (final Entry<Species, BiomassMovementRule> movementRuleEntry : movementRules.entrySet()) {
 
                     //if here there are more than there
                     final Species species = movementRuleEntry.getKey();

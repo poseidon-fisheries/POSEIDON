@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
  */
 public class HardEdgeOptimizationParameter extends SimpleOptimizationParameter {
 
+    private static final long serialVersionUID = 2757943884587032368L;
     private double hardMinimum = Integer.MIN_VALUE;
     private double hardMaximum = Integer.MAX_VALUE;
 

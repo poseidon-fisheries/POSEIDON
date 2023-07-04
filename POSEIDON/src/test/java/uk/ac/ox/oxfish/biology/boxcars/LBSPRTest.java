@@ -303,12 +303,7 @@ public class LBSPRTest {
         SPRAgent agent =
             new SPRAgent("tag",
                 fish,
-                new Predicate<Fisher>() {
-                    @Override
-                    public boolean test(Fisher fisher) {
-                        return fisher.getID() == 1;
-                    }
-                },
+                fisher -> fisher.getID() == 1,
                 100d,
                 1, 1.5, 100, 1000, 5,
                 1, 3,

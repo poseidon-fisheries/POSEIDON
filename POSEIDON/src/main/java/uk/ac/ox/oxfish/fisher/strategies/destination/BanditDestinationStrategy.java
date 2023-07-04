@@ -74,12 +74,12 @@ public class BanditDestinationStrategy implements DestinationStrategy {
      * @param ignoreWastelands
      */
     public BanditDestinationStrategy(
-        Function<Integer, BanditAverage> averagerMaker,
-        BanditSupplier banditMaker,
-        MapDiscretization discretization,
-        FavoriteDestinationStrategy delegate,
-        ObjectiveFunction<Fisher> objective,
-        boolean respectMPA, boolean ignoreWastelands
+        final Function<Integer, BanditAverage> averagerMaker,
+        final BanditSupplier banditMaker,
+        final MapDiscretization discretization,
+        final FavoriteDestinationStrategy delegate,
+        final ObjectiveFunction<Fisher> objective,
+        final boolean respectMPA, final boolean ignoreWastelands
     ) {
         //map arms to valid map groups
         this.discretization = discretization;
@@ -100,25 +100,25 @@ public class BanditDestinationStrategy implements DestinationStrategy {
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
 
         this.fisher = fisher;
         this.model = model;
         delegate.start(model, fisher);
         concreteAdaptation = new Adaptation() {
             @Override
-            public void adapt(Fisher toAdapt, FishState state, MersenneTwisterFast random) {
+            public void adapt(final Fisher toAdapt, final FishState state, final MersenneTwisterFast random) {
                 // observe previous trip
-                SeaTile lastDestination = toAdapt.getLastFinishedTrip().getMostFishedTileInTrip() == null ?
+                final SeaTile lastDestination = toAdapt.getLastFinishedTrip().getMostFishedTileInTrip() == null ?
                     delegate.getFavoriteSpot() : toAdapt.getLastFinishedTrip().getMostFishedTileInTrip();
                 assert toAdapt.getLastFinishedTrip().getMostFishedTileInTrip() == null ||
                     toAdapt.getLastFinishedTrip().getMostFishedTileInTrip().equals(lastDestination);
-                double reward = objective.computeCurrentFitness(fisher, fisher);
+                final double reward = objective.computeCurrentFitness(fisher, fisher);
 
                 //peek at friends?
                 if (imitate)
-                    for (Fisher friend : fisher.getDirectedFriends()) {
-                        TripRecord friendTrip = friend.getLastFinishedTrip();
+                    for (final Fisher friend : fisher.getDirectedFriends()) {
+                        final TripRecord friendTrip = friend.getLastFinishedTrip();
                         if (friendTrip != null && friendTrip.getMostFishedTileInTrip() != null) {
                             algorithm.observeReward(
                                 objective.computeCurrentFitness(fisher, friend),
@@ -135,12 +135,12 @@ public class BanditDestinationStrategy implements DestinationStrategy {
             }
 
             @Override
-            public void start(FishState model, Fisher fisher) {
+            public void start(final FishState model, final Fisher fisher) {
 
             }
 
             @Override
-            public void turnOff(Fisher fisher) {
+            public void turnOff(final Fisher fisher) {
 
             }
         };
@@ -148,28 +148,29 @@ public class BanditDestinationStrategy implements DestinationStrategy {
 
     }
 
-    private int fromMapGroupToBanditArm(int mapGroup) {
+    private int fromMapGroupToBanditArm(final int mapGroup) {
 
         return banditSwitch.getArm(mapGroup);
 
     }
 
 
-    public void choose(SeaTile lastDestination, double reward, MersenneTwisterFast random) {
+    public void choose(final SeaTile lastDestination, final double reward, final MersenneTwisterFast random) {
 
 
-        Integer group = discretization.getGroup(lastDestination);
+        final Integer group = discretization.getGroup(lastDestination);
         if (group != null) {
-            int armPlayed = fromMapGroupToBanditArm(group);
+            final int armPlayed = fromMapGroupToBanditArm(group);
             algorithm.observeReward(reward, armPlayed);
         }
         //make new decision
-        int armToPlay = algorithm.chooseArm(random);
-        int groupToFishIn = fromBanditArmToMapGroup(armToPlay);
+        final int armToPlay = algorithm.chooseArm(random);
+        final int groupToFishIn = fromBanditArmToMapGroup(armToPlay);
         assert discretization.isValid(groupToFishIn);
         //assuming here the map discretization has already removed all the land tiles
-        List<SeaTile> mapGroup = discretization.getGroup(groupToFishIn);
-        SeaTile tile = FishStateUtilities.getValidSeatileFromGroup(random,
+        final List<SeaTile> mapGroup = discretization.getGroup(groupToFishIn);
+        final SeaTile tile = FishStateUtilities.getValidSeatileFromGroup(
+            random,
             mapGroup,
             respectMPA,
             fisher,
@@ -181,7 +182,7 @@ public class BanditDestinationStrategy implements DestinationStrategy {
             delegate.setFavoriteSpot(tile);
     }
 
-    private int fromBanditArmToMapGroup(int banditArm) {
+    private int fromBanditArmToMapGroup(final int banditArm) {
 
         return banditSwitch.getGroup(banditArm);
     }
@@ -196,25 +197,25 @@ public class BanditDestinationStrategy implements DestinationStrategy {
      */
     @Override
     public SeaTile chooseDestination(
-        Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction
+        final Fisher fisher, final MersenneTwisterFast random, final FishState model, final Action currentAction
     ) {
         return delegate.chooseDestination(fisher, random, model, currentAction);
     }
 
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         delegate.turnOff(fisher);
         if (concreteAdaptation != null)
             fisher.removePerTripAdaptation(concreteAdaptation);
 
     }
 
-    public int getNumberOfObservations(int arm) {
+    public int getNumberOfObservations(final int arm) {
         return banditAverage.getNumberOfObservations(arm);
     }
 
-    public double getAverage(int arm) {
+    public double getAverage(final int arm) {
         return banditAverage.getAverage(arm);
     }
 
@@ -267,7 +268,7 @@ public class BanditDestinationStrategy implements DestinationStrategy {
      *
      * @param imitate Value to set for property 'imitate'.
      */
-    public void setImitate(boolean imitate) {
+    public void setImitate(final boolean imitate) {
         this.imitate = imitate;
     }
 }

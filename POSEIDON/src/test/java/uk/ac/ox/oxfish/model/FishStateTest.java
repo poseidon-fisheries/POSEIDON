@@ -151,26 +151,11 @@ public class FishStateTest {
         state.setScenario(mock(Scenario.class, RETURNS_DEEP_STUBS));
         state.start();
         //increase array after 300 days
-        state.scheduleOnceInXDays(new Steppable() {
-            @Override
-            public void step(final SimState simState) {
-                stepCounter[0]++;
-            }
-        }, DAWN, 300);
+        state.scheduleOnceInXDays((Steppable) simState -> stepCounter[0]++, DAWN, 300);
         //increase array after 800 days
-        state.scheduleOnceInXDays(new Steppable() {
-            @Override
-            public void step(final SimState simState) {
-                stepCounter[0]++;
-            }
-        }, DAWN, 800);
+        state.scheduleOnceInXDays((Steppable) simState -> stepCounter[0]++, DAWN, 800);
         //increase array at the end of year 1
-        state.scheduleOnceAtTheBeginningOfYear(new Steppable() {
-            @Override
-            public void step(final SimState simState) {
-                stepCounter[1]++;
-            }
-        }, DAWN, 1);
+        state.scheduleOnceAtTheBeginningOfYear((Steppable) simState -> stepCounter[1]++, DAWN, 1);
 
         for (int day = 0; day < 350; day++) {
             state.schedule.step(state);

@@ -39,6 +39,7 @@ import java.util.List;
 public class SimpleEroteticDestinationStrategy implements DestinationStrategy,
     TripListener {
 
+    private static final long serialVersionUID = 6172875513192915377L;
     private final EroteticChooser<SeaTile> chooser = new EroteticChooser<>();
 
     /**
@@ -62,8 +63,8 @@ public class SimpleEroteticDestinationStrategy implements DestinationStrategy,
      * @param thresholder
      */
     public SimpleEroteticDestinationStrategy(
-        EroteticAnswer<SeaTile> thresholder,
-        FavoriteDestinationStrategy delegate
+        final EroteticAnswer<SeaTile> thresholder,
+        final FavoriteDestinationStrategy delegate
     ) {
         chooser.add(thresholder);
         this.delegate = delegate;
@@ -79,16 +80,16 @@ public class SimpleEroteticDestinationStrategy implements DestinationStrategy,
      */
     @Override
     public SeaTile chooseDestination(
-        Fisher fisher, MersenneTwisterFast random,
-        FishState model, Action currentAction
+        final Fisher fisher, final MersenneTwisterFast random,
+        final FishState model, final Action currentAction
     ) {
         return delegate.chooseDestination(fisher, random, model, currentAction);
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
         //all choices
-        List<SeaTile> options = model.getMap().getAllSeaTilesExcludingLandAsList();
+        final List<SeaTile> options = model.getMap().getAllSeaTilesExcludingLandAsList();
         delegate.setFavoriteSpot(chooser.answer(options,
                 this.fisher.getTileRepresentation(),
                 model, this.fisher
@@ -97,20 +98,20 @@ public class SimpleEroteticDestinationStrategy implements DestinationStrategy,
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
 
         this.fisher = fisher;
         this.model = model;
         fisher.addTripListener(this);
-        for (EroteticAnswer<SeaTile> filter : chooser)
+        for (final EroteticAnswer<SeaTile> filter : chooser)
             filter.start(model);
     }
 
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         this.fisher.removeTripListener(this);
-        for (EroteticAnswer<SeaTile> filter : chooser)
+        for (final EroteticAnswer<SeaTile> filter : chooser)
             filter.turnOff();
         this.fisher = null;
     }

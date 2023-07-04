@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.beanutils.BeanUtils;
-import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadZapperFactory;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.maximization.TunaEvaluator;
@@ -76,7 +75,7 @@ public class QuickAndDirtyTunaSensitivity {
 //            * should I fix hazard rate at 4%? (and therefore remove it from calibration)
         if (hazardRate != null && Double.isFinite(hazardRate)) {
             //set the scenario
-            final AlgorithmFactory<? extends FadInitializer> fadInitializer =
+            final AlgorithmFactory<?> fadInitializer =
                 scenario
                     .getPurseSeinerFleetFactory()
                     .getPurseSeineGearFactory()
@@ -110,7 +109,7 @@ public class QuickAndDirtyTunaSensitivity {
         if (maxAttractionRate) {
 
             //set the scenario
-            final AlgorithmFactory<? extends FadInitializer> fadInitializer =
+            final AlgorithmFactory<?> fadInitializer =
                 scenario
                     .getPurseSeinerFleetFactory()
                     .getPurseSeineGearFactory()
@@ -148,7 +147,7 @@ public class QuickAndDirtyTunaSensitivity {
 
         if (forceWaitingTime13) {
             //set the scenario
-            final AlgorithmFactory<? extends FadInitializer> fadInitializer =
+            final AlgorithmFactory<?> fadInitializer =
                 scenario
                     .getPurseSeinerFleetFactory()
                     .getPurseSeineGearFactory()

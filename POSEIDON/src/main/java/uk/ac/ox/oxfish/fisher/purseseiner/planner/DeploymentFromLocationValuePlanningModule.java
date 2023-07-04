@@ -31,6 +31,7 @@ import uk.ac.ox.oxfish.model.FishState;
 /**
  * simply uses DeploymentPlannedActionGenerator to draw a new DPL spot, and returns it as an action
  */
+@SuppressWarnings("rawtypes")
 public class DeploymentFromLocationValuePlanningModule
     extends LocationValuePlanningModule {
 
@@ -44,6 +45,7 @@ public class DeploymentFromLocationValuePlanningModule
 
     }
 
+    @SuppressWarnings("unchecked")
     public DeploymentFromLocationValuePlanningModule(
         final DeploymentLocationValues locationValues,
         final NauticalMap map,

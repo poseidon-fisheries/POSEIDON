@@ -37,7 +37,7 @@ public class MapDiscretizers {
      */
     public static final LinkedHashMap<String, Supplier<AlgorithmFactory<? extends MapDiscretizer>>> CONSTRUCTORS;
 
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
         NAMES.put(SquaresMapDiscretizerFactory.class, "Squared Discretization");

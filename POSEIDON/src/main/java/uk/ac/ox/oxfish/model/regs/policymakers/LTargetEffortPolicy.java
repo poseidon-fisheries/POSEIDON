@@ -7,17 +7,18 @@ import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 
 public class LTargetEffortPolicy extends Controller {
 
+    private static final long serialVersionUID = -3365800714403551902L;
     final private double proportionAverageToTarget;
 
 
     private double suggestedEffort = 1;
 
     public LTargetEffortPolicy(
-        String meanLengthColumnName,
-        double proportionAverageToTarget,
-        int yearsBackToAverage,
-        Actuator<FishState, Double> effortActuator,
-        boolean closeEntryWhenNeeded, int updateEffortPeriodInYears
+        final String meanLengthColumnName,
+        final double proportionAverageToTarget,
+        final int yearsBackToAverage,
+        final Actuator<FishState, Double> effortActuator,
+        final boolean closeEntryWhenNeeded, final int updateEffortPeriodInYears
     ) {
 
         super(
@@ -38,8 +39,8 @@ public class LTargetEffortPolicy extends Controller {
 
     @Override
     public double computePolicy(
-        double recentAverageLength, double historicalAverageLength,
-        FishState model,
+        final double recentAverageLength, final double historicalAverageLength,
+        final FishState model,
         double oldPolicy
     ) {
         if (!Double.isFinite(oldPolicy))
@@ -54,21 +55,21 @@ public class LTargetEffortPolicy extends Controller {
 
 
     public static double computePolicyMultiplier(
-        double recentIndex,
-        double historicalIndex,
-        double proportionAverageToTarget,
-        double proportionAverageToIndexZero
+        final double recentIndex,
+        final double historicalIndex,
+        final double proportionAverageToTarget,
+        final double proportionAverageToIndexZero
     ) {
 
-        double indexZero = historicalIndex * proportionAverageToIndexZero;
+        final double indexZero = historicalIndex * proportionAverageToIndexZero;
         final double lengthTarget = historicalIndex * proportionAverageToTarget;
 
         if (recentIndex < indexZero)
             return 0.5 * Math.pow(recentIndex / indexZero, 2);
         else {
             //0.5 *   (1 + ((Lrecent - L0)/(Ltarget - L0)))
-            double numerator = recentIndex - indexZero;
-            double denominator = lengthTarget - indexZero;
+            final double numerator = recentIndex - indexZero;
+            final double denominator = lengthTarget - indexZero;
             return 0.5 * (1 + (numerator / denominator));
         }
 

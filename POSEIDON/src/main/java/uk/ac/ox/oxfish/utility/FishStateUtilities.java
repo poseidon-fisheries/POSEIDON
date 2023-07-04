@@ -58,6 +58,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -188,7 +189,7 @@ public class FishStateUtilities {
         return toClean;
     }
 
-    public static <T> Pair<T, Fisher> imitateFriendAtRandom(
+    public static <T> Entry<T, Fisher> imitateFriendAtRandom(
         final MersenneTwisterFast random, final double fitness, final T current, final Collection<Fisher> friends,
         final ObjectiveFunction<Fisher> objectiveFunction, final Sensor<Fisher, T> sensor,
         final Fisher fisherThinkingOfImitating
@@ -202,7 +203,7 @@ public class FishStateUtilities {
 
         assert friends.size() > 0;
         if (friendList.isEmpty())
-            return new Pair<>(current, null);
+            return entry(current, null);
         else {
             final Fisher friend = friendList.get(random.nextInt(friendList.size()));
             final double friendFitness = objectiveFunction.computeCurrentFitness(
@@ -210,14 +211,21 @@ public class FishStateUtilities {
                 friend
             );
             if (friendFitness > fitness && Double.isFinite(friendFitness) && Double.isFinite(fitness)) {
-                return new Pair<>(sensor.scan(friend), friend);
+                return entry(sensor.scan(friend), friend);
             } else
-                return new Pair<>(current, null);
+                return entry(current, null);
         }
 
     }
 
-    public static <T> Pair<T, Fisher> imitateBestFriend(
+    /**
+     * Just makes it nicer to create AbstractMap.SimpleImmutableEntry objects.
+     */
+    public static <K, V> AbstractMap.SimpleImmutableEntry<K, V> entry(final K k, final V v) {
+        return new AbstractMap.SimpleImmutableEntry<>(k, v);
+    }
+
+    public static <T> Entry<T, Fisher> imitateBestFriend(
         final MersenneTwisterFast random, final Fisher fisherDoingTheImitation, final double fitness,
         final T current, final Collection<Fisher> friends,
         final ObjectiveFunction<Fisher> objectiveFunction,
@@ -226,39 +234,36 @@ public class FishStateUtilities {
 
         //if you have no friends, keep doing what you currently are doing
         if (friends.isEmpty())
-            return new Pair<>(current, null);
+            return entry(current, null);
 
         //associate a fitness to each friend and compute the maxFitness
         final double[] maxFitness = {fitness};
-        final Set<Map.Entry<Fisher, Double>> friendsFitnesses = friends.stream().
+        final Set<Entry<Fisher, Double>> friendsFitnesses = friends.stream().
             //ignore friends who we can't imitate
                 filter(fisher -> sensor.scan(fisher) != null).
             //ignore fishers who aren't allowed out anyway
                 collect(
-                Collectors.toMap((friend) -> friend, new Function<Fisher, Double>() {
-                    @Override
-                    public Double apply(final Fisher fisher) {
-                        //get your friend fitness
-                        final double friendFitness = objectiveFunction.computeCurrentFitness(
-                            fisherDoingTheImitation, fisher);
-                        //if it is finite check if it is better than what we already have
-                        if (Double.isFinite(friendFitness))
-                            maxFitness[0] = Math.max(maxFitness[0], friendFitness);
-                        //return it
-                        return friendFitness;
-                    }
+                Collectors.toMap((friend) -> friend, fisher -> {
+                    //get your friend fitness
+                    final double friendFitness = objectiveFunction.computeCurrentFitness(
+                        fisherDoingTheImitation, fisher);
+                    //if it is finite check if it is better than what we already have
+                    if (Double.isFinite(friendFitness))
+                        maxFitness[0] = Math.max(maxFitness[0], friendFitness);
+                    //return it
+                    return friendFitness;
                 })).entrySet();
 
         //make sure it's finite and at least as good as our current fitness
         if (Double.isNaN(fitness) && Double.isNaN(maxFitness[0]))
-            return new Pair<>(current, null);
+            return entry(current, null);
 
         assert Double.isFinite(maxFitness[0]);
         assert maxFitness[0] >= fitness;
 
         //if you are doing better than your friends, keep doing what you are doing
         if (Math.abs(maxFitness[0] - fitness) < EPSILON)
-            return new Pair<>(current, null);
+            return entry(current, null);
 
         //prepare to store the possible imitation options
         final List<Fisher> bestFriends = new LinkedList<>();
@@ -278,7 +283,7 @@ public class FishStateUtilities {
             bestFriends.get(0) :
             bestFriends.get(random.nextInt(bestFriends.size()));
         assert bestFriend != null;
-        return new Pair<>(sensor.scan(bestFriend), bestFriend);
+        return entry(sensor.scan(bestFriend), bestFriend);
 
 
     }
@@ -346,38 +351,6 @@ public class FishStateUtilities {
             e.printStackTrace();
         }
 
-    }
-
-    public static void pollFishersToFile(
-        final Collection<Fisher> fishers,
-        final File file, final Sensor<Fisher, Double>... pollers
-    ) {
-        // File histogramFile = Paths.get("runs", "lambda", "hist100.csv").toFile();
-        final ArrayList<String> histogram = new ArrayList<>(fishers.size());
-        for (final Fisher fisher : fishers) {
-
-            final StringBuilder row = new StringBuilder();
-            row.append(fisher.getID());
-            for (final Sensor<Fisher, Double> poller : pollers) {
-                row.append(",");
-                row.append(poller.scan(fisher));
-            }
-            histogram.add(
-                row.toString());
-
-
-        }
-
-        final String csvColumn = histogram.stream().reduce((t, u) -> t + "\n" + u).get();
-
-        try {
-            final FileWriter writer = new FileWriter(file);
-            writer.write(csvColumn);
-            writer.flush();
-            writer.close();
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static void pollHistogramToFile(
@@ -468,26 +441,23 @@ public class FishStateUtilities {
      */
     public static <T> Gatherer<T> generateYearlyAverage(final DataColumn column) {
 
-        return new Gatherer<T>() {
-            @Override
-            public Double apply(final T state) {
-                //get the iterator
-                final Iterator<Double> iterator = column.descendingIterator();
-                if (!iterator.hasNext()) //not ready/year 1
-                    return Double.NaN;
-                final DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
-                for (int i = 0; i < 365; i++) {
-                    //it should be step 365 times at most, but it's possible that this agent was added halfway through
-                    //and only has a partially filled collection
-                    if (iterator.hasNext()) {
-                        final Double next = iterator.next();
-                        if (Double.isFinite(next))
-                            statistics.accept(next);
-                    }
+        return state -> {
+            //get the iterator
+            final Iterator<Double> iterator = column.descendingIterator();
+            if (!iterator.hasNext()) //not ready/year 1
+                return Double.NaN;
+            final DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
+            for (int i = 0; i < 365; i++) {
+                //it should be step 365 times at most, but it's possible that this agent was added halfway through
+                //and only has a partially filled collection
+                if (iterator.hasNext()) {
+                    final Double next = iterator.next();
+                    if (Double.isFinite(next))
+                        statistics.accept(next);
                 }
-
-                return statistics.getAverage();
             }
+
+            return statistics.getAverage();
         };
     }
 
@@ -1006,16 +976,8 @@ public class FishStateUtilities {
     }
 
     public static Function<Double, Double> normalPDF(final double mean, final double standardDeviation) {
-        return new Function<Double, Double>() {
-
-
-            @Override
-            public Double apply(final Double x) {
-                return Math.exp(-Math.pow(x - mean, 2) / (2 * standardDeviation * standardDeviation)) /
-                    Math.sqrt(2 * standardDeviation * standardDeviation * Math.PI);
-
-            }
-        };
+        return x -> Math.exp(-Math.pow(x - mean, 2) / (2 * standardDeviation * standardDeviation)) /
+            Math.sqrt(2 * standardDeviation * standardDeviation * Math.PI);
     }
 
     public static String printTablePerPort(
@@ -1042,7 +1004,7 @@ public class FishStateUtilities {
                     fisher.getYearlyData().getColumn(fisherYearlyColumn).get(year));
             }
 
-            for (final Map.Entry<String, DoubleSummaryStatistics> average : averages.entrySet())
+            for (final Entry<String, DoubleSummaryStatistics> average : averages.entrySet())
                 portColumns.get(average.getKey()).add(average.getValue().getAverage());
 
 
@@ -1113,7 +1075,7 @@ public class FishStateUtilities {
         final Consumer<Scenario> scenarioSetup,
         final Consumer<FishState> preStartSetup,
         //if any of returns true, it stops the simulation before it is over!
-        final LinkedList<Pair<Integer, AlgorithmFactory<? extends AdditionalStartable>>> outsidePlugins,
+        final LinkedList<Entry<Integer, AlgorithmFactory<? extends AdditionalStartable>>> outsidePlugins,
         final List<Predicate<FishState>> circuitBreakers
     ) throws IOException {
 
@@ -1193,12 +1155,12 @@ public class FishStateUtilities {
 
 
                 if (outsidePlugins != null)
-                    for (final Pair<Integer,
+                    for (final Entry<Integer,
                         AlgorithmFactory<? extends AdditionalStartable>> outsidePlugin : outsidePlugins) {
 
-                        if (outsidePlugin.getFirst() == model.getYear()) {
+                        if (outsidePlugin.getKey() == model.getYear()) {
                             System.out.println("started new plugin");
-                            model.registerStartable(outsidePlugin.getSecond().apply(model));
+                            model.registerStartable(outsidePlugin.getValue().apply(model));
                         }
 
                     }
@@ -1296,65 +1258,58 @@ public class FishStateUtilities {
     ) {
 
         if (!usePredictors)
-            return new Consumer<Fisher>() {
-                @Override
-                public void accept(final Fisher fisher) {
+            return fisher -> {
 
-                }
             };
         else
-            return new Consumer<Fisher>() {
-                @Override
-                public void accept(final Fisher fisher) {
+            return fisher -> {
 
-                    for (final Species species : biology.getSpecies()) {
+                for (final Species species : biology.getSpecies()) {
 
-                        //create the predictors
+                    //create the predictors
 
-                        fisher.setDailyCatchesPredictor(
-                            species.getIndex(),
-                            MovingAveragePredictor.dailyMAPredictor(
-                                "Predicted Daily Catches of " + species,
-                                fisher1 ->
-                                    //check the daily counter but do not input new values
-                                    //if you were not allowed at sea
-                                    fisher1.getDailyCounter().getLandingsPerSpecie(
-                                        species.getIndex())
-
-                                ,
-                                365
-                            )
-                        );
-
-
-                        fisher.setProfitPerUnitPredictor(species.getIndex(), MovingAveragePredictor.perTripMAPredictor(
-                            "Predicted Unit Profit " + species,
-                            fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(species.getIndex()),
-                            30
-                        ));
-
-
-                    }
-
-
-                    //daily profits predictor
-                    fisher.assignDailyProfitsPredictor(
-                        MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
+                    fisher.setDailyCatchesPredictor(
+                        species.getIndex(),
+                        MovingAveragePredictor.dailyMAPredictor(
+                            "Predicted Daily Catches of " + species,
                             fisher1 ->
                                 //check the daily counter but do not input new values
                                 //if you were not allowed at sea
-                                fisher1.isAllowedAtSea() ?
-                                    fisher1.getDailyCounter().
-                                        getColumn(
-                                            FisherYearlyTimeSeries.CASH_FLOW_COLUMN)
-                                    :
-                                    Double.NaN
-                            ,
+                                fisher1.getDailyCounter().getLandingsPerSpecie(
+                                    species.getIndex())
 
-                            7
-                        ));
+                            ,
+                            365
+                        )
+                    );
+
+
+                    fisher.setProfitPerUnitPredictor(species.getIndex(), MovingAveragePredictor.perTripMAPredictor(
+                        "Predicted Unit Profit " + species,
+                        fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(species.getIndex()),
+                        30
+                    ));
+
 
                 }
+
+
+                //daily profits predictor
+                fisher.assignDailyProfitsPredictor(
+                    MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
+                        fisher1 ->
+                            //check the daily counter but do not input new values
+                            //if you were not allowed at sea
+                            fisher1.isAllowedAtSea() ?
+                                fisher1.getDailyCounter().
+                                    getColumn(
+                                        FisherYearlyTimeSeries.CASH_FLOW_COLUMN)
+                                :
+                                Double.NaN
+                        ,
+
+                        7
+                    ));
 
             };
     }
@@ -1490,20 +1445,13 @@ public class FishStateUtilities {
     }
 
     /**
-     * Just makes it nicer to create AbstractMap.SimpleImmutableEntry objects.
-     */
-    public static <K, V> AbstractMap.SimpleImmutableEntry<K, V> entry(final K k, final V v) {
-        return new AbstractMap.SimpleImmutableEntry<>(k, v);
-    }
-
-    /**
      * Builds an immutable map where each element of {@code keys}
      * is associated with the corresponding element of {@code values}.
      */
     public static <K, V> ImmutableMap<K, V> zipToMap(final Iterable<K> keys, final Iterable<V> values) {
         //noinspection UnstableApiUsage
         return zip(stream(keys), stream(values), AbstractMap.SimpleImmutableEntry::new)
-            .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+            .collect(toImmutableMap(Entry::getKey, Entry::getValue));
     }
 
     /**

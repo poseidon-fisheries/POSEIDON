@@ -34,6 +34,7 @@ import java.util.function.Supplier;
 public class SimpleOptimizationParameter implements OptimizationParameter, Serializable {
 
 
+    private static final long serialVersionUID = 1148689356037897712L;
     private String addressToModify = "literPerKilometer";
 
 

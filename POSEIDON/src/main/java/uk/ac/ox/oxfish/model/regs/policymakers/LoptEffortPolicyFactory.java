@@ -44,43 +44,30 @@ public class LoptEffortPolicyFactory implements AlgorithmFactory<AdditionalStart
         );
 
 
-        return new AdditionalStartable() {
-            @Override
-            public void start(FishState model) {
-                fishState.scheduleOnceInXDays(
-                    new Steppable() {
-                        @Override
-                        public void step(SimState simState) {
-                            LoptEffortPolicy lopt = new LoptEffortPolicy(
-                                meanLengthColumnName,
-                                1d - bufferValue.applyAsDouble(fishState.getRandom()),
-                                targetLength.applyAsDouble(fishState.getRandom()),
-                                (int) howManyYearsToLookBackTo.applyAsDouble(fishState.getRandom()),
-                                effortActuators.get(effortDefinition),
-                                blockEntryWhenSeasonIsNotFull
-                            );
-                            lopt.start(model);
-                            lopt.step(model);
-
-
-                            //creaqte also a collector
-                            fishState.getYearlyDataSet().registerGatherer(
-                                "LoptEffortPolicy output",
-                                new Gatherer<FishState>() {
-                                    @Override
-                                    public Double apply(FishState fishState) {
-                                        return lopt.getTheoreticalSuggestedEffort();
-                                    }
-                                },
-                                Double.NaN
-                            );
-                        }
-                    },
-                    StepOrder.DAWN,
-                    365 * startingYear + 1
+        return model -> fishState.scheduleOnceInXDays(
+            (Steppable) simState -> {
+                LoptEffortPolicy lopt = new LoptEffortPolicy(
+                    meanLengthColumnName,
+                    1d - bufferValue.applyAsDouble(fishState.getRandom()),
+                    targetLength.applyAsDouble(fishState.getRandom()),
+                    (int) howManyYearsToLookBackTo.applyAsDouble(fishState.getRandom()),
+                    effortActuators.get(effortDefinition),
+                    blockEntryWhenSeasonIsNotFull
                 );
-            }
-        };
+                lopt.start(model);
+                lopt.step(model);
+
+
+                //creaqte also a collector
+                fishState.getYearlyDataSet().registerGatherer(
+                    "LoptEffortPolicy output",
+                    (Gatherer<FishState>) fishState1 -> lopt.getTheoreticalSuggestedEffort(),
+                    Double.NaN
+                );
+            },
+            StepOrder.DAWN,
+            365 * startingYear + 1
+        );
     }
 
 

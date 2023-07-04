@@ -17,19 +17,20 @@ import java.util.function.Supplier;
  */
 public class BiomassLocationResetter implements AdditionalStartable, Steppable {
 
+    private static final long serialVersionUID = -9211019562781696380L;
     private final Species species;
 
     //a supplier because I want a "new" biomass allocator each time step
     private final Supplier<BiomassAllocator> biomassAllocator;
 
 
-    public BiomassLocationResetter(Species species, Supplier<BiomassAllocator> biomassAllocator) {
+    public BiomassLocationResetter(final Species species, final Supplier<BiomassAllocator> biomassAllocator) {
         this.species = species;
         this.biomassAllocator = biomassAllocator;
     }
 
 
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
 
         model.scheduleEveryYear(this, StepOrder.AFTER_DATA);
@@ -41,16 +42,16 @@ public class BiomassLocationResetter implements AdditionalStartable, Steppable {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
-        FishState state = (FishState) simState;
+        final FishState state = (FishState) simState;
 
-        BiomassAllocator thisYearAllocator = this.biomassAllocator.get();
+        final BiomassAllocator thisYearAllocator = this.biomassAllocator.get();
         Double totalAllocation = 0d;
-        double totalBiomass = computeBiomassNextYear((FishState) simState);
-        HashMap<SeaTile, Double> hashMap = new HashMap<>();
+        final double totalBiomass = computeBiomassNextYear((FishState) simState);
+        final HashMap<SeaTile, Double> hashMap = new HashMap<>();
         //for all the areas of the seas that are livable
-        for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList()) {
+        for (final SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList()) {
             //skip if it's unlivable
 
             if (((VariableBiomassBasedBiology) tile.getBiology()).getCarryingCapacity(species) <= 0)
@@ -78,9 +79,9 @@ public class BiomassLocationResetter implements AdditionalStartable, Steppable {
         assert totalAllocation >= 0;
 
         //now loop again and place it!
-        for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList()) {
+        for (final SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList()) {
             if (tile.getBiology() instanceof VariableBiomassBasedBiology) {
-                VariableBiomassBasedBiology biology = (VariableBiomassBasedBiology) tile.getBiology();
+                final VariableBiomassBasedBiology biology = (VariableBiomassBasedBiology) tile.getBiology();
                 if (biology.getCarryingCapacity(species) > 0) {
                     biology.setCurrentBiomass(
                         species,
@@ -97,7 +98,7 @@ public class BiomassLocationResetter implements AdditionalStartable, Steppable {
         }
     }
 
-    protected double computeBiomassNextYear(FishState simState) {
+    protected double computeBiomassNextYear(final FishState simState) {
         return simState.getTotalBiomass(species);
     }
 }

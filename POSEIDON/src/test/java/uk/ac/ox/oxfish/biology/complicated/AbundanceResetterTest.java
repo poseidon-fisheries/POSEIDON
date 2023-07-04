@@ -53,15 +53,12 @@ public class AbundanceResetterTest {
         fishState.getMap().getSeaTile(1, 1).setBiology(oneone);
 
         //biomass allocator wants to reallocate everythin to 0,1 (and triple it too)
-        BiomassAllocator biomassAllocator = new BiomassAllocator() {
-            @Override
-            public double allocate(SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
-                if (tile == fishState.getMap().getSeaTile(0, 1))
-                    return 3d;
-                else
-                    return 0;
+        BiomassAllocator biomassAllocator = (tile, map, random) -> {
+            if (tile == fishState.getMap().getSeaTile(0, 1))
+                return 3d;
+            else
+                return 0;
 
-            }
         };
 
         //record the abundance as it is

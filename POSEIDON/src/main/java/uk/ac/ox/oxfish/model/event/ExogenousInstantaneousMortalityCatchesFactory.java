@@ -9,13 +9,13 @@ public class ExogenousInstantaneousMortalityCatchesFactory implements
     AlgorithmFactory<ExogenousInstantaneousMortalityCatches> {
 
 
-    private LinkedHashMap<String, Double> exogenousMortalities = new LinkedHashMap();
+    private LinkedHashMap<String, Double> exogenousMortalities = new LinkedHashMap<>();
 
     private boolean isAbundanceBased = true;
 
 
     @Override
-    public ExogenousInstantaneousMortalityCatches apply(FishState fishState) {
+    public ExogenousInstantaneousMortalityCatches apply(final FishState fishState) {
 
 
         return new ExogenousInstantaneousMortalityCatches(
@@ -31,7 +31,7 @@ public class ExogenousInstantaneousMortalityCatchesFactory implements
         return exogenousMortalities;
     }
 
-    public void setExogenousMortalities(LinkedHashMap<String, Double> exogenousMortalities) {
+    public void setExogenousMortalities(final LinkedHashMap<String, Double> exogenousMortalities) {
         this.exogenousMortalities = exogenousMortalities;
     }
 
@@ -39,7 +39,7 @@ public class ExogenousInstantaneousMortalityCatchesFactory implements
         return isAbundanceBased;
     }
 
-    public void setAbundanceBased(boolean abundanceBased) {
+    public void setAbundanceBased(final boolean abundanceBased) {
         isAbundanceBased = abundanceBased;
     }
 }

@@ -25,8 +25,8 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.Map;
 import java.util.function.Predicate;
 
 /**
@@ -36,52 +36,47 @@ import java.util.function.Predicate;
 public class DefaultBeamHillClimbing extends BeamHillClimbing<SeaTile> {
 
 
-    public DefaultBeamHillClimbing(int maxStep, int attempts) {
+    public DefaultBeamHillClimbing(final int maxStep, final int attempts) {
         this(DEFAULT_ALWAYS_COPY_BEST, DEFAULT_DYNAMIC_NETWORK, maxStep, attempts, true);
     }
 
     public DefaultBeamHillClimbing(
-        boolean copyAlwaysBest, Predicate<Pair<Double, Double>> unfriendPredicate,
-        int maxStep, int attempts, final boolean backtracksOnBadExploration
+        final boolean copyAlwaysBest, final Predicate<Map.Entry<Double, Double>> unfriendPredicate,
+        final int maxStep, final int attempts, final boolean backtracksOnBadExploration
     ) {
         super(copyAlwaysBest, backtracksOnBadExploration, unfriendPredicate,
             DEFAULT_RANDOM_STEP(maxStep, attempts)
         );
     }
 
-    final public static RandomStep<SeaTile> DEFAULT_RANDOM_STEP(int maxStep, int attempts) {
-        return new RandomStep<SeaTile>() {
-            @Override
-            public SeaTile randomStep(
-                FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current
-            ) {
-                for (int i = 0; i < attempts; i++) {
-                    int x = current.getGridX() + (random.nextBoolean() ? random.nextInt(maxStep + 1) : -random.nextInt(
-                        maxStep + 1));
-                    int y = current.getGridY() + (random.nextBoolean() ? random.nextInt(maxStep + 1) : -random.nextInt(
-                        maxStep + 1));
-                    SeaTile candidate = state.getMap().getSeaTile(x, y);
-                    if (candidate != null && current != candidate && candidate.isWater()
-                        && !fisher.getHomePort().getLocation().equals(candidate))
-                        return candidate;
-                }
-
-                //stay where you are
-                return current;
+    final public static RandomStep<SeaTile> DEFAULT_RANDOM_STEP(final int maxStep, final int attempts) {
+        return (state, random, fisher, current) -> {
+            for (int i = 0; i < attempts; i++) {
+                final int x = current.getGridX() + (random.nextBoolean() ? random.nextInt(maxStep + 1) : -random.nextInt(
+                    maxStep + 1));
+                final int y = current.getGridY() + (random.nextBoolean() ? random.nextInt(maxStep + 1) : -random.nextInt(
+                    maxStep + 1));
+                final SeaTile candidate = state.getMap().getSeaTile(x, y);
+                if (candidate != null && current != candidate && candidate.isWater()
+                    && !fisher.getHomePort().getLocation().equals(candidate))
+                    return candidate;
             }
+
+            //stay where you are
+            return current;
         };
     }
 
     static public DefaultBeamHillClimbing BeamHillClimbingWithUnfriending(
-        boolean alwaysCopyBest,
+        final boolean alwaysCopyBest,
         final double unfriendingThreshold,
-        int maxSteps, int attempts
+        final int maxSteps, final int attempts
     ) {
         Preconditions.checkArgument(unfriendingThreshold >= 0, "Unfriending threshold should be above 0!");
         return new DefaultBeamHillClimbing(alwaysCopyBest,
             oldFitnessAndNew ->
-                unfriendingThreshold * oldFitnessAndNew.getFirst() >
-                    oldFitnessAndNew.getSecond(),
+                unfriendingThreshold * oldFitnessAndNew.getKey() >
+                    oldFitnessAndNew.getValue(),
             maxSteps,
             attempts, true
         );

@@ -26,8 +26,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
 import java.util.Map;
 import java.util.function.Function;
 
-@SuppressWarnings("rawtypes")
-public class OpportunisticFadSetLocationValues extends SetLocationValues {
+public class OpportunisticFadSetLocationValues extends SetLocationValues<OpportunisticFadSetAction> {
+
+    private static final long serialVersionUID = -2109718892320968451L;
 
     public OpportunisticFadSetLocationValues(
         final Function<Fisher, Map<Int2D, Double>> loadValues,

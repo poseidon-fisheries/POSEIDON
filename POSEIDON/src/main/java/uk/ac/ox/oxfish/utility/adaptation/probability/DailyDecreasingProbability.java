@@ -33,6 +33,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 public class DailyDecreasingProbability implements AdaptationProbability, Steppable {
 
 
+    private static final long serialVersionUID = -6968617763812609008L;
     private final double dailyDecreaseMultiplier;
 
 
@@ -42,8 +43,8 @@ public class DailyDecreasingProbability implements AdaptationProbability, Steppa
 
 
     public DailyDecreasingProbability(
-        double explorationProbability, double imitationProbability,
-        double dailyDecreaseMultiplier, double explorationThreshold
+        final double explorationProbability, final double imitationProbability,
+        final double dailyDecreaseMultiplier, final double explorationThreshold
     ) {
         this.probability = new FixedProbability(explorationProbability, imitationProbability);
         this.dailyDecreaseMultiplier = dailyDecreaseMultiplier;
@@ -55,7 +56,7 @@ public class DailyDecreasingProbability implements AdaptationProbability, Steppa
         return probability.getExplorationProbability();
     }
 
-    public void setExplorationProbability(double explorationProbability) {
+    public void setExplorationProbability(final double explorationProbability) {
         probability.setExplorationProbability(explorationProbability);
     }
 
@@ -64,12 +65,12 @@ public class DailyDecreasingProbability implements AdaptationProbability, Steppa
         return probability.getImitationProbability();
     }
 
-    public void setImitationProbability(double imitationProbability) {
+    public void setImitationProbability(final double imitationProbability) {
         probability.setImitationProbability(imitationProbability);
     }
 
     @Override
-    public void judgeExploration(double previousFitness, double currentFitness) {
+    public void judgeExploration(final double previousFitness, final double currentFitness) {
         probability.judgeExploration(previousFitness, currentFitness);
     }
 
@@ -79,7 +80,7 @@ public class DailyDecreasingProbability implements AdaptationProbability, Steppa
      * @param model the model
      */
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         model.scheduleEveryDay(
             this,
             StepOrder.DAWN
@@ -88,7 +89,7 @@ public class DailyDecreasingProbability implements AdaptationProbability, Steppa
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         probability.
             setExplorationProbability(
                 Math.max(
@@ -103,7 +104,7 @@ public class DailyDecreasingProbability implements AdaptationProbability, Steppa
      * @param fisher
      */
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
 
     }
 

@@ -39,6 +39,7 @@ import java.util.Queue;
 public class BiomassDrivenTimeSeriesExogenousCatches implements ExogenousCatches {
 
 
+    private static final long serialVersionUID = -1942521220632352315L;
     private final LinkedHashMap<Species, Queue<Double>> landingsTimeSeries;
 
     private final AbstractYearlyTargetExogenousCatches delegate;
@@ -47,13 +48,13 @@ public class BiomassDrivenTimeSeriesExogenousCatches implements ExogenousCatches
 
 
     public BiomassDrivenTimeSeriesExogenousCatches(
-        LinkedHashMap<Species, Queue<Double>> landingsTimeSeries, final boolean allowMortalityOnFads
+        final LinkedHashMap<Species, Queue<Double>> landingsTimeSeries, final boolean allowMortalityOnFads
     ) {
 
         this.landingsTimeSeries = landingsTimeSeries;
 
-        LinkedHashMap<Species, Double> exogenousCatches = new LinkedHashMap<>();
-        for (Species species : landingsTimeSeries.keySet())
+        final LinkedHashMap<Species, Double> exogenousCatches = new LinkedHashMap<>();
+        for (final Species species : landingsTimeSeries.keySet())
             exogenousCatches.put(species, Double.NaN); //start them at NaN
         delegate = new BiomassDrivenFixedExogenousCatches(exogenousCatches, allowMortalityOnFads);
 
@@ -61,11 +62,11 @@ public class BiomassDrivenTimeSeriesExogenousCatches implements ExogenousCatches
 
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         delegate.step(simState);
     }
 
-    public Double getFishableBiomass(Species target, SeaTile seaTile) {
+    public Double getFishableBiomass(final Species target, final SeaTile seaTile) {
         return delegate.getFishableBiomass(target, seaTile);
     }
 
@@ -76,7 +77,7 @@ public class BiomassDrivenTimeSeriesExogenousCatches implements ExogenousCatches
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         Preconditions.checkArgument(stoppable == null, "Already started!");
         delegate.start(model);
 
@@ -95,12 +96,12 @@ public class BiomassDrivenTimeSeriesExogenousCatches implements ExogenousCatches
      */
     public void updateYearlyCatches() {
 
-        for (Map.Entry<Species, Queue<Double>> speciesTimeSeries : landingsTimeSeries.entrySet()) {
+        for (final Map.Entry<Species, Queue<Double>> speciesTimeSeries : landingsTimeSeries.entrySet()) {
 
-            Species species = speciesTimeSeries.getKey();
-            Queue<Double> timeSeries = speciesTimeSeries.getValue();
+            final Species species = speciesTimeSeries.getKey();
+            final Queue<Double> timeSeries = speciesTimeSeries.getValue();
             if (timeSeries.size() > 0) {
-                Double newLandings = timeSeries.poll(); //grab top and remove!
+                final Double newLandings = timeSeries.poll(); //grab top and remove!
                 assert newLandings != null; //otherwise the size call is off!
                 delegate.updateExogenousCatches(species, newLandings);
             }

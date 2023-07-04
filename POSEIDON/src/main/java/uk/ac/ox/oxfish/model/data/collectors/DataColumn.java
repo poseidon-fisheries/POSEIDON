@@ -36,6 +36,7 @@ import static tech.units.indriya.AbstractUnit.ONE;
  */
 public class DataColumn implements Iterable<Double>, Serializable {
 
+    private static final long serialVersionUID = 6931226317085531711L;
     private final LinkedList<Double> data = new LinkedList<>();
 
     private final String name;
@@ -182,7 +183,7 @@ public class DataColumn implements Iterable<Double>, Serializable {
 
     @Override
     public String toString() {
-        String sb = "DataColumn{" + "data=" + data +
+        final String sb = "DataColumn{" + "data=" + data +
             '}';
         return sb;
     }

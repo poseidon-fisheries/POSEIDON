@@ -39,6 +39,7 @@ import java.util.*;
 public class CarryingCapacityDiffuser implements Steppable, Startable {
 
 
+    private static final long serialVersionUID = -127171881509546094L;
     private final double dailyMigration;
 
     /**
@@ -64,7 +65,7 @@ public class CarryingCapacityDiffuser implements Steppable, Startable {
 
 
     public CarryingCapacityDiffuser(
-        double dailyMigration, int biasNorth, int biasWest, int speciesIndex
+        final double dailyMigration, final int biasNorth, final int biasWest, final int speciesIndex
     ) {
         Preconditions.checkArgument(biasNorth == 0 || biasNorth == 1 || biasNorth == -1);
         Preconditions.checkArgument(biasWest == 0 || biasWest == 1 || biasWest == -1);
@@ -75,9 +76,9 @@ public class CarryingCapacityDiffuser implements Steppable, Startable {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
-        FishState model = (FishState) simState;
+        final FishState model = (FishState) simState;
 
 
         //get all the tiles that are in the sea
@@ -86,10 +87,10 @@ public class CarryingCapacityDiffuser implements Steppable, Startable {
         Collections.shuffle(tiles, new Random(model.getRandom().nextLong()));
 
 
-        Species species = model.getSpecies().get(speciesIndex);
+        final Species species = model.getSpecies().get(speciesIndex);
         //go through them
         tileloop:
-        for (SeaTile here : tiles) {
+        for (final SeaTile here : tiles) {
 
 
             //grab neighbors
@@ -97,11 +98,11 @@ public class CarryingCapacityDiffuser implements Steppable, Startable {
                 here,
                 model.getMap()
             ));
-            List<SeaTile> neighborList = neighbors.get(here);
+            final List<SeaTile> neighborList = neighbors.get(here);
             //for each neighbour
-            for (SeaTile neighbour : neighborList) {
+            for (final SeaTile neighbour : neighborList) {
 
-                for (Direction direction : Direction.getDirection(here, neighbour)) {
+                for (final Direction direction : Direction.getDirection(here, neighbour)) {
                     //if your carrying capacity is 0 do not diffuse
                     if (((VariableBiomassBasedBiology) here.getBiology()).getCarryingCapacity(species) <= FishStateUtilities.EPSILON)
                         continue tileloop;
@@ -127,15 +128,15 @@ public class CarryingCapacityDiffuser implements Steppable, Startable {
     }
 
     private void migrate(
-        BiomassLocalBiology from, BiomassLocalBiology to,
-        Species species
+        final BiomassLocalBiology from, final BiomassLocalBiology to,
+        final Species species
     ) {
 
         //differential is just a proportion of the carrying apacity or epsilon if there is very little carrying capacity left
-        double differential = from.getCarryingCapacity(species) <= FishStateUtilities.EPSILON ? from.getCarryingCapacity(
+        final double differential = from.getCarryingCapacity(species) <= FishStateUtilities.EPSILON ? from.getCarryingCapacity(
             species) :
             from.getCarryingCapacity(species) * dailyMigration;
-        double biomassMovement = Math.min(from.getBiomass(species), differential);
+        final double biomassMovement = Math.min(from.getBiomass(species), differential);
 
         //move the fish out
         from.setCurrentBiomass(species, from.getBiomass(species) - biomassMovement);
@@ -155,7 +156,7 @@ public class CarryingCapacityDiffuser implements Steppable, Startable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         Preconditions.checkArgument(stoppable == null, "already started");
         stoppable = model.scheduleEveryDay(this, StepOrder.BIOLOGY_PHASE);
     }
@@ -170,7 +171,7 @@ public class CarryingCapacityDiffuser implements Steppable, Startable {
             stoppable.stop();
     }
 
-    private static enum Direction {
+    private enum Direction {
 
         NORTH,
 
@@ -201,8 +202,8 @@ public class CarryingCapacityDiffuser implements Steppable, Startable {
         private int biasNorth;
         private int biasWest;
 
-        public static List<Direction> getDirection(SeaTile from, SeaTile to) {
-            List<Direction> directions = new LinkedList<>();
+        public static List<Direction> getDirection(final SeaTile from, final SeaTile to) {
+            final List<Direction> directions = new LinkedList<>();
             //directions!
             if (to.getGridX() > from.getGridX())
                 directions.add(EAST);

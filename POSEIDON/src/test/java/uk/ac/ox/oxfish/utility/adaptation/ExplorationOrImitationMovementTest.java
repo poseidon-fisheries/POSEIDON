@@ -64,40 +64,17 @@ public class ExplorationOrImitationMovementTest {
 
         //imitate best friend
         final AdaptationAlgorithm<SeaTile> algorithm = spy(new BeamHillClimbing<SeaTile>(
-            new RandomStep<SeaTile>() {
-                @Override
-                public SeaTile randomStep(
-                    final FishState state, final MersenneTwisterFast random, final Fisher fisher, final SeaTile current
-                ) {
-                    return null;
-                }
-            }
+            (state, random, fisher, current) -> null
         ));
 
         final ExploreImitateAdaptation<SeaTile> test = new ExploreImitateAdaptation<SeaTile>(
             fisher -> true,
             algorithm,
             (fisher, change, model) -> newObjective[0] = change,
-            new Sensor<Fisher, SeaTile>() {
-                @Override
-                public SeaTile scan(final Fisher fisher) {
-                    return locations.get(fisher);
-                }
-            },
-            new ObjectiveFunction<Fisher>() {
-                @Override
-                public double computeCurrentFitness(final Fisher observer, final Fisher observed) {
-                    return fitness.get(observed);
-                }
-
-            },
+            (Sensor<Fisher, SeaTile>) fisher -> locations.get(fisher),
+            (observer, observed) -> fitness.get(observed),
             0d,
-            1d, new Predicate<SeaTile>() {
-            @Override
-            public boolean test(final SeaTile a) {
-                return true;
-            }
-        }
+            1d, a -> true
         );
 
 
@@ -137,14 +114,7 @@ public class ExplorationOrImitationMovementTest {
 
         //imitate best friend
         final AdaptationAlgorithm<SeaTile> algorithm = spy(new BeamHillClimbing<SeaTile>(
-            new RandomStep<SeaTile>() {
-                @Override
-                public SeaTile randomStep(
-                    final FishState state, final MersenneTwisterFast random, final Fisher fisher, final SeaTile current
-                ) {
-                    return randomized;
-                }
-            }
+            (state, random, fisher, current) -> randomized
 
         ));
 
@@ -153,20 +123,9 @@ public class ExplorationOrImitationMovementTest {
             algorithm,
             (fisher, change, model) -> newObjective[0] = change,
             fisher -> locations.get(fisher),
-            new ObjectiveFunction<Fisher>() {
-                @Override
-                public double computeCurrentFitness(final Fisher observer, final Fisher observed) {
-                    return fitness.get(observed);
-                }
-
-            },
+            (observer, observed) -> fitness.get(observed),
             0d,
-            1d, new Predicate<SeaTile>() {
-            @Override
-            public boolean test(final SeaTile a) {
-                return true;
-            }
-        }
+            1d, a -> true
         );
 
 
@@ -202,14 +161,7 @@ public class ExplorationOrImitationMovementTest {
         //imitate best friend
         final AdaptationAlgorithm<SeaTile> algorithm = spy(
             new BeamHillClimbing<SeaTile>(
-                new RandomStep<SeaTile>() {
-                    @Override
-                    public SeaTile randomStep(
-                        final FishState state, final MersenneTwisterFast random, final Fisher fisher, final SeaTile current
-                    ) {
-                        return randomized;
-                    }
-                }
+                (state, random, fisher, current) -> randomized
             )
         );
 
@@ -218,20 +170,9 @@ public class ExplorationOrImitationMovementTest {
             algorithm,
             (fisher, change, model) -> newObjective[0] = change,
             fisher -> locations.get(fisher),
-            new ObjectiveFunction<Fisher>() {
-                @Override
-                public double computeCurrentFitness(final Fisher observer, final Fisher observed) {
-                    return fitness.get(observed);
-                }
-
-            },
+            (observer, observed) -> fitness.get(observed),
             1d,
-            1d, new Predicate<SeaTile>() {
-            @Override
-            public boolean test(final SeaTile a) {
-                return true;
-            }
-        }
+            1d, a -> true
         );
 
 

@@ -27,9 +27,12 @@ import java.util.function.Supplier;
  * Very simple container. You can put an item in there with a key. If you give back the same key you get back
  * the same item, otherwise the item is destroyed
  * Created by carrknight on 11/15/16.
+ * <p>
  *
  * @deprecated Use {@link uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState} or another Guava
  * cache instead, as those allow multiple keys and have more flexible eviction policies.
+ * There is also a danger if Locker is ever used in a context where multiple FishState object try
+ * to access it in parallel, where one instance will override the value stored for the other.
  */
 @Deprecated
 public class Locker<K, I> {

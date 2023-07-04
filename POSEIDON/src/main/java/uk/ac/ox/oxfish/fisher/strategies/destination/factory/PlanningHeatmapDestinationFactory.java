@@ -27,11 +27,10 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborRegressi
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.tripbased.ProfitFunctionRegression;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.ProfitFunction;
-import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.AbstractHeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PlanningHeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -46,7 +45,9 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
     /**
      * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
      */
-    private final Locker<String, String> locker = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, String> locker =
+        new uk.ac.ox.oxfish.utility.Locker<>();
     private boolean ignoreFailedTrips = false;
     /**
      * step size when exploring
@@ -126,7 +127,7 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
                     double total = 0;
                     for (final Fisher fisher1 : state.getFishers()) {
                         final DoubleSummaryStatistics errors = new DoubleSummaryStatistics();
-                        for (final Double error : ((HeatmapDestinationStrategy) fisher1.getDestinationStrategy()).getErrors())
+                        for (final Double error : ((AbstractHeatmapDestinationStrategy<?>) fisher1.getDestinationStrategy()).getErrors())
                             errors.accept(error);
                         total += errors.getAverage();
                     }

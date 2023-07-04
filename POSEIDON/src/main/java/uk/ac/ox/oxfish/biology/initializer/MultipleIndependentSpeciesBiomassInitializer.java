@@ -27,10 +27,12 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInitializer {
 
@@ -44,7 +46,9 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
     private final boolean unfishable;
 
     public MultipleIndependentSpeciesBiomassInitializer(
-        List<SingleSpeciesBiomassInitializer> initializers, boolean addImaginarySpecies, boolean unfishable
+        final List<SingleSpeciesBiomassInitializer> initializers,
+        final boolean addImaginarySpecies,
+        final boolean unfishable
     ) {
         this.initializers = initializers;
         this.addImaginarySpecies = addImaginarySpecies;
@@ -56,14 +60,18 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
      */
     @Override
     public LocalBiology generateLocal(
-        GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-        int mapWidthInCells, NauticalMap map
+        final GlobalBiology biology,
+        final SeaTile seaTile,
+        final MersenneTwisterFast random,
+        final int mapHeightInCells,
+        final int mapWidthInCells,
+        final NauticalMap map
     ) {
         assert !initializers.isEmpty();
 
         LocalBiology toReturn = null;
-        for (SingleSpeciesBiomassInitializer initializer : initializers) {
-            LocalBiology lastgen = initializer.generateLocal(
+        for (final SingleSpeciesBiomassInitializer initializer : initializers) {
+            final LocalBiology lastgen = initializer.generateLocal(
                 biology,
                 seaTile,
                 random,
@@ -92,18 +100,18 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
      */
     @Override
     public void processMap(
-        GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model
+        final GlobalBiology biology, final NauticalMap map, final MersenneTwisterFast random, final FishState model
     ) {
 
 
-        ArrayList<Pair<Species, BiomassMovementRule>> movements = new ArrayList<>(initializers.size());
-        for (SingleSpeciesBiomassInitializer initializer : initializers) {
+        final ArrayList<Entry<Species, BiomassMovementRule>> movements = new ArrayList<>(initializers.size());
+        for (final SingleSpeciesBiomassInitializer initializer : initializers) {
             //do not let them create their own movement!
             initializer.setForceMovementOff(true);
 
             initializer.processMap(biology, map, random, model);
             movements.add(
-                new Pair<>(
+                entry(
                     biology.getSpecie(initializer.getSpeciesName()),
                     initializer.getMovementRule()
                 )
@@ -112,7 +120,7 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
 
 
         if (unfishable) {
-            for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
+            for (final SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
                 if (!(seaTile.getBiology() instanceof EmptyLocalBiology))
                     seaTile.setBiology(new ConstantBiomassDecorator((BiomassLocalBiology) seaTile.getBiology()));
             }
@@ -120,9 +128,10 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
 
 
         //create a single movement now
-        BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(
-            map, random, biology, movements.toArray(new Pair[movements.size()])
-        );
+        @SuppressWarnings({"unchecked", "rawtypes"}) final BiomassDiffuserContainer diffuser =
+            new BiomassDiffuserContainer(
+                map, random, biology, movements.toArray(new Entry[movements.size()])
+            );
         model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
 
 
@@ -136,13 +145,13 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
      * @return
      */
     @Override
-    public GlobalBiology generateGlobal(MersenneTwisterFast random, FishState modelBeingInitialized) {
+    public GlobalBiology generateGlobal(final MersenneTwisterFast random, final FishState modelBeingInitialized) {
 
 
-        List<Species> species = new ArrayList<>();
-        for (SingleSpeciesBiomassInitializer initializer : initializers) {
+        final List<Species> species = new ArrayList<>();
+        for (final SingleSpeciesBiomassInitializer initializer : initializers) {
 
-            GlobalBiology individualBiology = initializer.generateGlobal(random, modelBeingInitialized);
+            final GlobalBiology individualBiology = initializer.generateGlobal(random, modelBeingInitialized);
             assert individualBiology.getSize() == 1;
             species.add(individualBiology.getSpecie(0));
         }

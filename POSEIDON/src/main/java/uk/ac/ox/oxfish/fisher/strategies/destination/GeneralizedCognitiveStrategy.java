@@ -72,16 +72,16 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
     boolean pickNewSite = true;
 
     public GeneralizedCognitiveStrategy(
-        double minAbsoluteSatisfactoryProfit,
-        double minRelativeSatisfactoryProfit,
-        double weightProfit,
-        double weightLaw,
-        double weightCommunal,
-        double weightReputation,
-        TimeScalarFunction timeScalarFunction,
+        final double minAbsoluteSatisfactoryProfit,
+        final double minRelativeSatisfactoryProfit,
+        final double weightProfit,
+        final double weightLaw,
+        final double weightCommunal,
+        final double weightReputation,
+        final TimeScalarFunction timeScalarFunction,
 //			double timeScalarParameter1,
 //			double timeScalarParameter2,
-        double kExplore/*,
+        final double kExplore/*,
 			double numberOfTerritorySites*/
     ) {
         this.minAbsoluteSatisfactoryProfit = minAbsoluteSatisfactoryProfit;
@@ -99,22 +99,22 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         numberOfSpecies = model.getSpecies().size();
         tripSharer = new TripSharer(fisher);
 //		addTerritories(model.getMap(), model.random, (int)numberOfTerritorySites);
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
     }
 
     @Override
     public SeaTile chooseDestination(
-        Fisher fisher,
-        MersenneTwisterFast random,
-        FishState model,
-        Action currentAction
+        final Fisher fisher,
+        final MersenneTwisterFast random,
+        final FishState model,
+        final Action currentAction
     ) {
         //if we have arrived
         if (fisher.getLocation().equals(chosenFishingSite)) {
@@ -142,39 +142,39 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
     }
 
     private SeaTile pickNewSite(
-        Fisher fisher,
-        MersenneTwisterFast random,
-        FishState model,
-        Action currentAction
+        final Fisher fisher,
+        final MersenneTwisterFast random,
+        final FishState model,
+        final Action currentAction
     ) {
 
         SeaTile finalDestination = fisher.getHomePort().getLocation();
 
         //Start with all water tiles
-        List<SeaTile> allSeaTiles = model.getMap().getAllSeaTilesExcludingLandAsList();
+        final List<SeaTile> allSeaTiles = model.getMap().getAllSeaTilesExcludingLandAsList();
 
         //if (true) return allSeaTiles.get(model.getRandom().nextInt(allSeaTiles.size()));
 
-        List<ViableDestination> viableDestinations = new ArrayList<>();
-        List<ViableDestination> unviableDestinations = new ArrayList<>();
+        final List<ViableDestination> viableDestinations = new ArrayList<>();
+        final List<ViableDestination> unviableDestinations = new ArrayList<>();
 
-        for (SeaTile destination : allSeaTiles) {
-            ViableDestination viableDestination = new ViableDestination();
+        for (final SeaTile destination : allSeaTiles) {
+            final ViableDestination viableDestination = new ViableDestination();
             viableDestination.destination = destination;
             viableDestination.expectedCatch = new double[numberOfSpecies];
             viableDestinations.add(viableDestination);
         }
 
         boolean noObservations = true;
-        List<ViableDestination> observedDestinations = new ArrayList<>();
+        final List<ViableDestination> observedDestinations = new ArrayList<>();
 
         //Now go through the finished trips and calculate expected catch at all locations
-        for (TripRecord trip : fisher.getFinishedTrips()) {
+        for (final TripRecord trip : fisher.getFinishedTrips()) {
             //Calculate the time scalar for this trip based on the time
-            int t = model.getDay() - trip.getTripDay();
-            double scalar = timeScalar(t);
-            SeaTile tripDestination = trip.getMostFishedTileInTrip();
-            for (ViableDestination viableDestination : viableDestinations) {
+            final int t = model.getDay() - trip.getTripDay();
+            final double scalar = timeScalar(t);
+            final SeaTile tripDestination = trip.getMostFishedTileInTrip();
+            for (final ViableDestination viableDestination : viableDestinations) {
                 if (viableDestination.destination.equals(tripDestination)) {
                     viableDestination.setObserved();
                     if (!observedDestinations.contains(viableDestination))
@@ -190,18 +190,18 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
         }
 
         //Now go through trips shared by friends and add them to the mix
-        Collection<Fisher> myFriends = fisher.getSocialNetwork().getDirectedNeighbors(fisher);
+        final Collection<Fisher> myFriends = fisher.getSocialNetwork().getDirectedNeighbors(fisher);
 
         if (myFriends != null && !myFriends.isEmpty()) {
-            for (Fisher friend : myFriends) {
-                List<SharedTripRecord> friendSharedTrips = friend.getTripsSharedWith(fisher);
+            for (final Fisher friend : myFriends) {
+                final List<SharedTripRecord> friendSharedTrips = friend.getTripsSharedWith(fisher);
                 if (!friendSharedTrips.isEmpty()) {
-                    for (SharedTripRecord friendSharedTrip : friendSharedTrips) {
-                        TripRecord trip = friendSharedTrip.getTrip();
-                        int t = model.getDay() - trip.getTripDay();
-                        double scalar = timeScalar(t);
-                        SeaTile tripDestination = trip.getMostFishedTileInTrip();
-                        for (ViableDestination viableDestination : viableDestinations) {
+                    for (final SharedTripRecord friendSharedTrip : friendSharedTrips) {
+                        final TripRecord trip = friendSharedTrip.getTrip();
+                        final int t = model.getDay() - trip.getTripDay();
+                        final double scalar = timeScalar(t);
+                        final SeaTile tripDestination = trip.getMostFishedTileInTrip();
+                        for (final ViableDestination viableDestination : viableDestinations) {
                             if (viableDestination.destination.equals(tripDestination)) {
                                 viableDestination.setObserved();
                                 if (!observedDestinations.contains(viableDestination))
@@ -219,7 +219,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
             }
         }
 
-        for (ViableDestination viableDestination : viableDestinations) {
+        for (final ViableDestination viableDestination : viableDestinations) {
             for (int i = 0; i < numberOfSpecies; i++) {
                 //if there have been no trips there, just zero out the expected catch
                 viableDestination.expectedCatch[i] *= (viableDestination.scalarTotal > 0 ? (1.0 / viableDestination.scalarTotal) : 0);
@@ -229,16 +229,16 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
             //that location
 
             //figure out the expected price per species
-            Port homePort = fisher.getHomePort();
-            MarketMap marketMap = homePort.getMarketMap(fisher);
+            final Port homePort = fisher.getHomePort();
+            final MarketMap marketMap = homePort.getMarketMap(fisher);
 
             for (int i = 0; i < numberOfSpecies; i++) {
-                double speciesPrice = marketMap.getSpeciesPrice(i);
+                final double speciesPrice = marketMap.getSpeciesPrice(i);
                 viableDestination.expectedProfit += viableDestination.expectedCatch[i] * speciesPrice;
             }
             //figure out the expected operational cost
             //figure out the expected trip cost
-            double expectedCost = estimateTripCost(viableDestination.destination, fisher, model);
+            final double expectedCost = estimateTripCost(viableDestination.destination, fisher, model);
             viableDestination.expectedProfit += -expectedCost;
 
         }
@@ -246,7 +246,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
         //If there is no history, then set the expected profit of EVERY location to be equal so
         //they have a chance to fish anywhere
         if (noObservations) {
-            for (ViableDestination viableDestination : viableDestinations) {
+            for (final ViableDestination viableDestination : viableDestinations) {
                 viableDestination.expectedProfit = this.minAbsoluteSatisfactoryProfit;
 
                 //This will enforce that the fisher will give preference to territorial sites
@@ -256,15 +256,15 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
         } else {
             //Otherwise go through all viable locations with no observations we estimate them using inverse distance weighting
             //This is pretty flexible and can be tuned by the exponent
-            for (ViableDestination destination : viableDestinations) {
+            for (final ViableDestination destination : viableDestinations) {
                 if (!observedDestinations.contains(destination)) {
                     double sumScalars = 0.0;
                     destination.expectedProfit = 0.0;
-                    for (ViableDestination observedDestination : observedDestinations) {
-                        double distance = model.getMap()
+                    for (final ViableDestination observedDestination : observedDestinations) {
+                        final double distance = model.getMap()
                             .distance(observedDestination.destination, destination.destination);
                         if (distance > 0) {
-                            double scalar = 1.0 / Math.pow(distance, inverseDistanceExponent);
+                            final double scalar = 1.0 / Math.pow(distance, inverseDistanceExponent);
                             destination.expectedProfit += scalar * observedDestination.expectedProfit;
                             sumScalars += scalar;
                         } else { //If for some reason there is another SeaTile on top of an observed seatile...
@@ -283,18 +283,18 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
 
         double minSocialSatisfactoryProfit = 0;
         if (myFriends != null) {
-            int nToBeat = (int) Math.floor(myFriends.size() * minRelativeSatisfactoryProfit);
-            double[] friendProfits = new double[myFriends.size()];
+            final int nToBeat = (int) Math.floor(myFriends.size() * minRelativeSatisfactoryProfit);
+            final double[] friendProfits = new double[myFriends.size()];
             if (nToBeat > 0) {
                 int i = 0;
-                for (Fisher friend : myFriends) {
+                for (final Fisher friend : myFriends) {
                     friendProfits[i] = getPublicProfit(friend);
                     i++;
                 }
                 for (i = 0; i < friendProfits.length - 1; i++) {
                     for (int j = i + 1; j < friendProfits.length; j++) {
                         if (friendProfits[j] < friendProfits[i]) {
-                            double tempProfit = friendProfits[j];
+                            final double tempProfit = friendProfits[j];
                             friendProfits[j] = friendProfits[i];
                             friendProfits[i] = tempProfit;
                         }
@@ -304,22 +304,22 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
             }
         }
 
-        double profitCutoff = Math.max(minAbsoluteSatisfactoryProfit, minSocialSatisfactoryProfit);
+        final double profitCutoff = Math.max(minAbsoluteSatisfactoryProfit, minSocialSatisfactoryProfit);
 
         //Remove any destinations that don't offer satisfactory profit
-        for (ViableDestination d : viableDestinations)
+        for (final ViableDestination d : viableDestinations)
             if (d.expectedProfit < profitCutoff) unviableDestinations.add(d);
         viableDestinations.removeAll(unviableDestinations);
         unviableDestinations.clear();
 
 
         double highestProfit = 0.0;
-        for (ViableDestination viableDestination : viableDestinations) {
+        for (final ViableDestination viableDestination : viableDestinations) {
             highestProfit = Math.max(highestProfit, viableDestination.expectedProfit);
         }
 
 
-        for (ViableDestination viableDestination : viableDestinations) {
+        for (final ViableDestination viableDestination : viableDestinations) {
             //Now we scale the expected profit to be a number maxed out at 1
             viableDestination.attractiveness = weightProfit * viableDestination.expectedProfit / highestProfit -
                 weightLaw * (fisher.isAllowedToFishHere(viableDestination.destination, model) ? 0 : 1) -
@@ -330,7 +330,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
                 weightReputation * (fisher.isAllowedReputationToFishHere(viableDestination.destination, model) ? 0 : 1);
         }
         //Remove any destinations with negative attractiveness
-        for (ViableDestination d : viableDestinations)
+        for (final ViableDestination d : viableDestinations)
             if (d.attractiveness < 0) unviableDestinations.add(d);
         viableDestinations.removeAll(unviableDestinations);
         unviableDestinations.clear();
@@ -348,7 +348,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
         SeaTile mostAttractiveDestination = null;
         double bestAttraction = -10000000;
         double totalProfits = 0;
-        for (ViableDestination viableDestination : viableDestinations) {
+        for (final ViableDestination viableDestination : viableDestinations) {
             totalProfits += viableDestination.expectedProfit;
             if (viableDestination.attractiveness > bestAttraction) {
                 mostAttractiveDestination = viableDestination.destination;
@@ -365,7 +365,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
         //See if they had a previous trip and we need to update 'n'
         //The number of explorations that have not paid off:
         if (needToUpdateN) {
-            double lastProfit = (fisher.getLastFinishedTrip() != null) ? fisher.getLastFinishedTrip()
+            final double lastProfit = (fisher.getLastFinishedTrip() != null) ? fisher.getLastFinishedTrip()
                 .getTotalTripProfit() : 0;
             if (thisTripWasExploration && lastProfit > profitBest) {
                 //Exploration paid off, reset N
@@ -378,13 +378,13 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
 
         needToUpdateN = true;
 //        System.out.println("Number of viable destinations: "+viableDestinations.size());
-        boolean goExploring = (viableDestinations.size() > 1) ? shouldIExplore(random) : false;
+        final boolean goExploring = viableDestinations.size() > 1 && shouldIExplore(random);
         if (goExploring) {
             totalProfits -= profitBest;
             thisTripWasExploration = true;
             {
 //            	double checkSum=0;
-                for (ViableDestination d : viableDestinations) {
+                for (final ViableDestination d : viableDestinations) {
                     if (d.destination == mostAttractiveDestination) {
                         d.probability = 0;
                     } else {
@@ -403,7 +403,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
     	            }*/
             }
             double randDouble = random.nextDouble();
-            for (ViableDestination viableDestination : viableDestinations) {
+            for (final ViableDestination viableDestination : viableDestinations) {
                 randDouble -= viableDestination.probability;
                 if (randDouble <= 0) {
                     finalDestination = viableDestination.destination;
@@ -419,28 +419,28 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
         return finalDestination;
     }
 
-    double timeScalar(double t) {
+    double timeScalar(final double t) {
         return timeScalarFunction.timeScalar(t);
     }
 
-    double estimateTripCost(SeaTile destination, Fisher fisher, FishState model) {
+    double estimateTripCost(final SeaTile destination, final Fisher fisher, final FishState model) {
         double estimatedCost = 0;
 
-        List<Cost> additionalCosts = fisher.getAdditionalTripCosts();
-        SeaTile homePort = fisher.getHomePort().getLocation();
-        double expectedFuel = fisher.getExpectedFuelConsumption(model.getMap().distance(destination, homePort));
-        double fuelPrice = fisher.getHomePort().getGasPricePerLiter();
-        for (Cost realCosts : additionalCosts) {
+        final List<Cost> additionalCosts = fisher.getAdditionalTripCosts();
+        final SeaTile homePort = fisher.getHomePort().getLocation();
+        final double expectedFuel = fisher.getExpectedFuelConsumption(model.getMap().distance(destination, homePort));
+        final double fuelPrice = fisher.getHomePort().getGasPricePerLiter();
+        for (final Cost realCosts : additionalCosts) {
             //We want to account for the additional costs of the trip - but since it is the same for all destinations, perhaps it doesn't matter.
         }
         estimatedCost += fuelPrice * expectedFuel;
         return estimatedCost;
     }
 
-    double getPublicProfit(Fisher fisher) {
+    double getPublicProfit(final Fisher fisher) {
         double publicProfitValue = 0;
         if (publicProfit != null) {
-            for (PubliclySharedProfit publicFisherProfit : publicProfit) {
+            for (final PubliclySharedProfit publicFisherProfit : publicProfit) {
                 if (publicFisherProfit.getFisher() == fisher) {
                     publicProfitValue = publicFisherProfit.getProfit();
                     break;
@@ -450,9 +450,9 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
         return publicProfitValue;
     }
 
-    void setPublicProfit(Fisher fisher, double profit) {
+    void setPublicProfit(final Fisher fisher, final double profit) {
         boolean inList = false;
-        for (PubliclySharedProfit publicFisherProfit : publicProfit) {
+        for (final PubliclySharedProfit publicFisherProfit : publicProfit) {
             if (publicFisherProfit.getFisher() == fisher) {
                 publicFisherProfit.setProfit(profit);
                 inList = true;
@@ -464,32 +464,33 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
         }
     }
 
-    boolean shouldIExplore(MersenneTwisterFast random) {
+    boolean shouldIExplore(final MersenneTwisterFast random) {
 //		System.out.println("n="+nExplore+", k="+kExplore+", Prob of explore: "+1/Math.pow(nExplore,kExplore));
         return (random.nextBoolean(1 / Math.pow(nExplore, kExplore)));
     }
 
     class TripSharer implements Steppable {
+        private static final long serialVersionUID = 6634055835870014205L;
         Stoppable dailyShare;
         Fisher fisher;
 
-        TripSharer(Fisher fisher) {
+        TripSharer(final Fisher fisher) {
             this.fisher = fisher;
         }
 
-        void startSharing(FishState model) {
+        void startSharing(final FishState model) {
             dailyShare = model.scheduleEveryDay(this, StepOrder.FISHER_PHASE);
         }
 
-        public void step(SimState simState) {
+        public void step(final SimState simState) {
             //pick from among the 10 most profitable trips, or fewer if fewer trips have been logged
-            List<TripRecord> finishedTrips = fisher.getFinishedTrips();
-            int nChoices = Math.min(10, finishedTrips.size());
+            final List<TripRecord> finishedTrips = fisher.getFinishedTrips();
+            final int nChoices = Math.min(10, finishedTrips.size());
             if (nChoices > 0) {
-                TripRecord[] bestTrips = new TripRecord[nChoices];
+                final TripRecord[] bestTrips = new TripRecord[nChoices];
                 //Go through the trips, and put them into this array starting with index 0.
                 //bump them down the list if there is a better one.
-                for (TripRecord finishedTrip : finishedTrips) {
+                for (final TripRecord finishedTrip : finishedTrips) {
                     for (int i = 0; i < nChoices; i++) {
                         if (bestTrips[i] == null) {
                             bestTrips[i] = finishedTrip;
@@ -506,7 +507,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
                     }
                 }
                 //now pick one of these trips at random and share it with my social network:
-                MersenneTwisterFast random = new MersenneTwisterFast();
+                final MersenneTwisterFast random = new MersenneTwisterFast();
                 fisher.shareTrip(bestTrips[random.nextInt(nChoices)], true, null);
             }
         }
@@ -530,7 +531,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
         double profit;
         Fisher fisher;
 
-        public PubliclySharedProfit(double profit, Fisher fisher) {
+        public PubliclySharedProfit(final double profit, final Fisher fisher) {
             this.profit = profit;
             this.fisher = fisher;
         }
@@ -539,7 +540,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
             return profit;
         }
 
-        void setProfit(double profit) {
+        void setProfit(final double profit) {
             this.profit = profit;
         }
 

@@ -14,6 +14,7 @@ import java.util.function.Function;
  */
 public class ISlope implements Sensor<FishState, Double> {
 
+    private static final long serialVersionUID = 153083663790670385L;
     /**
      * FROM THE DLM TOOLKIT DOC:
      * The TAC is calculated as:
@@ -49,11 +50,11 @@ public class ISlope implements Sensor<FishState, Double> {
     private double lastTacGiven = Double.NaN;
 
     public ISlope(
-        String catchColumnName,
-        String indicatorColumnName,
-        double gainParameterLambda,
-        double precautionaryScaling,
-        int maxTimeLag
+        final String catchColumnName,
+        final String indicatorColumnName,
+        final double gainParameterLambda,
+        final double precautionaryScaling,
+        final int maxTimeLag
     ) {
         this.catchColumnName = catchColumnName;
         this.indicatorColumnName = indicatorColumnName;
@@ -63,7 +64,7 @@ public class ISlope implements Sensor<FishState, Double> {
     }
 
     @Override
-    public Double scan(FishState system) {
+    public Double scan(final FishState system) {
 
         final DataColumn catchColumn = system.getYearlyDataSet().getColumn(catchColumnName);
         final DataColumn indicatorColumn = system.getYearlyDataSet().getColumn(indicatorColumnName);
@@ -76,8 +77,8 @@ public class ISlope implements Sensor<FishState, Double> {
 
         //go backward and grab the last maxTimeLag observations
         //transforming them if necessary
-        DoubleSummaryStatistics catches = new DoubleSummaryStatistics();
-        double[] indicators = new double[stepsBackToLook];
+        final DoubleSummaryStatistics catches = new DoubleSummaryStatistics();
+        final double[] indicators = new double[stepsBackToLook];
         final Iterator<Double> catchesIterator = catchColumn.descendingIterator();
         final Iterator<Double> indicatorIterator = indicatorColumn.descendingIterator();
         for (int lag = 0; lag < stepsBackToLook;
@@ -97,19 +98,19 @@ public class ISlope implements Sensor<FishState, Double> {
             timeStep[lag] = lag + 1;
         }
         //we want the slope of the indicator
-        LinearRegression regression = new LinearRegression(
+        final LinearRegression regression = new LinearRegression(
             timeStep, indicators
         );
-        double indicatorSlope = regression.slope();
+        final double indicatorSlope = regression.slope();
 
         //the first time we are supposed to use precautionary adjustment on average catch
         //but later on we just adjust from the previous TAC
-        double baseline = Double.isFinite(lastTacGiven) ?
+        final double baseline = Double.isFinite(lastTacGiven) ?
             lastTacGiven :
             catches.getAverage() * precautionaryScaling;
 
         //TAC∗(1+λI)
-        double newTAC = baseline * (1 + indicatorSlope * gainParameterLambda);
+        final double newTAC = baseline * (1 + indicatorSlope * gainParameterLambda);
         if (Double.isFinite(newTAC)) {
             lastTacGiven = newTAC;
             return lastTacGiven;
@@ -127,7 +128,7 @@ public class ISlope implements Sensor<FishState, Double> {
         return catchTransformer;
     }
 
-    public void setCatchTransformer(Function<Double, Double> catchTransformer) {
+    public void setCatchTransformer(final Function<Double, Double> catchTransformer) {
         this.catchTransformer = catchTransformer;
     }
 
@@ -139,7 +140,7 @@ public class ISlope implements Sensor<FishState, Double> {
         return indicatorTransformer;
     }
 
-    public void setIndicatorTransformer(Function<Double, Double> indicatorTransformer) {
+    public void setIndicatorTransformer(final Function<Double, Double> indicatorTransformer) {
         this.indicatorTransformer = indicatorTransformer;
     }
 

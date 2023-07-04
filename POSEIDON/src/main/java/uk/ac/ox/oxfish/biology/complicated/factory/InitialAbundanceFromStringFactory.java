@@ -46,12 +46,7 @@ public class InitialAbundanceFromStringFactory implements AlgorithmFactory<Repea
     public RepeatingInitialAbundance apply(FishState state) {
 
         //turn into weights array
-        Function<String, Integer> mapper = new Function<String, Integer>() {
-            @Override
-            public Integer apply(String s) {
-                return Integer.parseInt(s.trim());
-            }
-        };
+        Function<String, Integer> mapper = s -> Integer.parseInt(s.trim());
 
         Integer[] fish = Arrays.stream(fishPerBinPerSex.split(",")).map(mapper).toArray(Integer[]::new);
 

@@ -43,6 +43,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.getValidSeatileFromGrou
  */
 public class ClampedDestinationStrategy implements DestinationStrategy, TripListener {
 
+    private static final long serialVersionUID = -8119756872465334912L;
     private final MapDiscretization discretization;
 
     private final double distanceMaximum;
@@ -57,17 +58,17 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
 
 
     public ClampedDestinationStrategy(
-        FavoriteDestinationStrategy delegate,
-        MapDiscretization discretization, double distanceMaximum, double[] propensities
+        final FavoriteDestinationStrategy delegate,
+        final MapDiscretization discretization, final double distanceMaximum, final double[] propensities
     ) {
         this(delegate, discretization, distanceMaximum, propensities, true, true);
     }
 
     public ClampedDestinationStrategy(
-        FavoriteDestinationStrategy delegate,
-        MapDiscretization discretization, double distanceMaximum, double[] propensities,
-        boolean respectMPA,
-        boolean avoidWastelands
+        final FavoriteDestinationStrategy delegate,
+        final MapDiscretization discretization, final double distanceMaximum, final double[] propensities,
+        final boolean respectMPA,
+        final boolean avoidWastelands
     ) {
         Preconditions.checkArgument(propensities.length == discretization.getNumberOfGroups());
         this.discretization = discretization;
@@ -86,7 +87,7 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
      * @param fisher
      */
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         delegate.start(model, fisher);
         this.fisher = fisher;
         this.state = model;
@@ -99,7 +100,7 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
      * @param fisher
      */
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         if (state != null) {
             delegate.turnOff(fisher);
             fisher.removeTripListener(this);
@@ -117,21 +118,21 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
      */
     @Override
     public SeaTile chooseDestination(
-        Fisher fisher, MersenneTwisterFast random, FishState model,
-        Action currentAction
+        final Fisher fisher, final MersenneTwisterFast random, final FishState model,
+        final Action currentAction
     ) {
         return delegate.chooseDestination(fisher, random, model, currentAction);
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
         double sum = 0;
-        MersenneTwisterFast random = state.getRandom();
-        NauticalMap map = state.getMap();
+        final MersenneTwisterFast random = state.getRandom();
+        final NauticalMap map = state.getMap();
         //grab a random seatile for each group
-        SeaTile[] candidates = new SeaTile[discretization.getNumberOfGroups()];
+        final SeaTile[] candidates = new SeaTile[discretization.getNumberOfGroups()];
         for (int group = 0; group < discretization.getNumberOfGroups(); group++) {
-            List<SeaTile> tileGroup = discretization.getGroup(group);
+            final List<SeaTile> tileGroup = discretization.getGroup(group);
             if (tileGroup.size() > 0)
                 candidates[group] = getValidSeatileFromGroup(
                     random,
@@ -144,7 +145,7 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
                 );
         }
         assert candidates.length == propensities.length;
-        double[] currentPropensities = Arrays.copyOf(propensities, candidates.length);
+        final double[] currentPropensities = Arrays.copyOf(propensities, candidates.length);
 
 
         //set propensity to 0 for all tiles further than the max distance
@@ -159,7 +160,7 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
         }
 
         //turn it into a cumulative distribution
-        double[] cdf = new double[currentPropensities.length];
+        final double[] cdf = new double[currentPropensities.length];
         cdf[0] = currentPropensities[0] / sum;
         for (int i = 1; i < currentPropensities.length; i++)
             cdf[i] = cdf[i - 1] + currentPropensities[i] / sum;
@@ -168,9 +169,8 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
         if (sum > 0) {
             int index = Arrays.binarySearch(cdf, random.nextDouble());
             index = (index >= 0) ? index : (-index - 1);
-            SeaTile candidate = candidates[index];
+            final SeaTile candidate = candidates[index];
             delegate.setFavoriteSpot(candidate);
-            return;
         }
 
 

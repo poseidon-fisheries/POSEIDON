@@ -52,15 +52,12 @@ public class SingleSpeciesPIDTaxman implements Startable {
             observed, target,
             //for each port and each market set the price by adding new tax and taking away the old one
             //this hopefully will mean that changes to price from other sources aren't lost
-            new Actuator<FishState, Double>() {
-                @Override
-                public void apply(FishState subject, Double policy, FishState model) {
-                    for (Port port : model.getPorts()) {
-                        FixedPriceMarket market = (FixedPriceMarket) port.getDefaultMarketMap().getMarket(species);
-                        market.setPrice(market.getPrice() - policy + taxPreviouslyImposed);
-                    }
-                    taxPreviouslyImposed = policy;
+            (subject, policy, model) -> {
+                for (Port port : model.getPorts()) {
+                    FixedPriceMarket market = (FixedPriceMarket) port.getDefaultMarketMap().getMarket(species);
+                    market.setPrice(market.getPrice() - policy + taxPreviouslyImposed);
                 }
+                taxPreviouslyImposed = policy;
             },
             interval,
             p, i, d, 0

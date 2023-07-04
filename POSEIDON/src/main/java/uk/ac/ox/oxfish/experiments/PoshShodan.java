@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.experiments;
 
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
@@ -31,7 +30,6 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.dynapro.OLSDynamicProgram;
 import uk.ac.ox.oxfish.utility.dynapro.OLSDynamicProgramUCB;
 
@@ -41,7 +39,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Iterator;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -54,7 +51,7 @@ public class PoshShodan {
     public static final int GENERATIONS = 500;
     private static final int SIMULATION_PER_STEP = 10;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException {
 
         //countingGas();
         //countingDays();
@@ -64,18 +61,15 @@ public class PoshShodan {
     }
 
     private static void kitchensinkUCB() throws IOException {
-        OLSDynamicProgram shodan = new OLSDynamicProgramUCB(
+        @SuppressWarnings("unchecked") final OLSDynamicProgram shodan = new OLSDynamicProgramUCB(
             2,
-            new Function<FishState, Double>() {
-                @Override
-                public Double apply(FishState state) {
-                    Iterator<Double> landings = state.getDailyDataSet().getColumn(
-                        "Average Cash-Flow").descendingIterator();
-                    double reward = 0;
-                    for (int i = 0; i < 30; i++)
-                        reward += landings.next();
-                    return reward;
-                }
+            state -> {
+                final Iterator<Double> landings = state.getDailyDataSet().getColumn(
+                    "Average Cash-Flow").descendingIterator();
+                double reward = 0;
+                for (int i = 0; i < 30; i++)
+                    reward += landings.next();
+                return reward;
             },
             true,
             true,
@@ -84,67 +78,46 @@ public class PoshShodan {
             true,
             true,
             0,
-            new Predicate<double[]>() {
-                @Override
-                public boolean test(double[] doubles) {
-                    return doubles[1] <= FishStateUtilities.EPSILON;
-                }
-            },
+            doubles -> doubles[1] <= FishStateUtilities.EPSILON,
             1.5,
             //months lefts
             //gas price
             //landings
             //effort
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    return (double) Math.round(240 - fishStateDoublePair.getFirst().getDay() / 30);
-                }
+            fishStateDoublePair -> (double) Math.round(240 - fishStateDoublePair.getKey().getDay() / 30),
+            fishStateDoublePair -> {
+                final Iterator<Double> landings = fishStateDoublePair.getKey()
+                    .getDailyDataSet().getColumn(
+                        "Average X Towed").descendingIterator();
+                double sum = 0;
+                for (int i = 0; i < 30; i++)
+                    sum += landings.next();
+                return sum;
             },
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    Iterator<Double> landings = fishStateDoublePair.getFirst()
-                        .getDailyDataSet().getColumn(
-                            "Average X Towed").descendingIterator();
-                    double sum = 0;
-                    for (int i = 0; i < 30; i++)
-                        sum += landings.next();
-                    return sum;
-                }
+            fishStateDoublePair -> {
+                final Iterator<Double> landings = fishStateDoublePair.getKey()
+                    .getDailyDataSet().getColumn(
+                        "Species 0 Landings").descendingIterator();
+                double sum = 0;
+                for (int i = 0; i < 30; i++)
+                    sum += landings.next();
+                return sum;
             },
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    Iterator<Double> landings = fishStateDoublePair.getFirst()
-                        .getDailyDataSet().getColumn(
-                            "Species 0 Landings").descendingIterator();
-                    double sum = 0;
-                    for (int i = 0; i < 30; i++)
-                        sum += landings.next();
-                    return sum;
-                }
-            },
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    Iterator<Double> effort = fishStateDoublePair.getFirst()
-                        .getDailyDataSet().getColumn(
-                            "Total Effort").descendingIterator();
-                    double sum = 0;
-                    for (int i = 0; i < 30; i++)
-                        sum += effort.next();
-                    return sum;
-                }
+            fishStateDoublePair -> {
+                final Iterator<Double> effort = fishStateDoublePair.getKey()
+                    .getDailyDataSet().getColumn(
+                        "Total Effort").descendingIterator();
+                double sum = 0;
+                for (int i = 0; i < 30; i++)
+                    sum += effort.next();
+                return sum;
             }
-
-
         );
         mainLoop(shodan, "kitchensink_ucb_2", .15, .05);
     }
 
     private static void mainLoop(
-        OLSDynamicProgram shodan, final String name, final double initialErrorRate, final double minErrorRate
+        final OLSDynamicProgram shodan, final String name, final double initialErrorRate, final double minErrorRate
     ) throws IOException {
 
         Paths.get("runs", "posh_shodan", name).toFile().mkdirs();
@@ -152,10 +125,10 @@ public class PoshShodan {
         //do one lspiRun everything open
         FishState initialRun = gasRun(shodan, 0);
         double initialScore = 0;
-        for (Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
+        for (final Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
             initialScore += landing;
 
-        File masterCSV = Paths.get("runs", "posh_shodan", name, "shodan.csv").toFile();
+        final File masterCSV = Paths.get("runs", "posh_shodan", name, "shodan.csv").toFile();
         BufferedWriter writer = new BufferedWriter(
             new FileWriter(masterCSV, false));
         writer.newLine();
@@ -167,7 +140,7 @@ public class PoshShodan {
         shodan.setErrorRate(1);
         initialRun = gasRun(shodan, 0);
         initialScore = 0;
-        for (Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
+        for (final Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
             initialScore += landing;
 
         writer = new BufferedWriter(
@@ -188,7 +161,7 @@ public class PoshShodan {
             }
             shodan.regress();
             //save regression coefficients
-            File regressionFile = Paths.get("runs", "posh_shodan", name, "coefficients_" + generation + ".txt")
+            final File regressionFile = Paths.get("runs", "posh_shodan", name, "coefficients_" + generation + ".txt")
                 .toFile();
             writer = new BufferedWriter(
                 new FileWriter(regressionFile, false));
@@ -196,11 +169,11 @@ public class PoshShodan {
             writer.close();
             System.out.println(FishStateUtilities.deepToStringArray(shodan.getLinearParameters(), ",", "\n"));
             //make one lspiRun with error rate 0
-            double errorRate = shodan.getErrorRate();
+            final double errorRate = shodan.getErrorRate();
             shodan.setErrorRate(0d);
-            FishState referenceRun = gasRun(shodan, 0);
+            final FishState referenceRun = gasRun(shodan, 0);
             double score = 0;
-            for (Double landing : referenceRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
+            for (final Double landing : referenceRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
                 score += landing;
 
             shodan.setErrorRate(errorRate);
@@ -215,39 +188,31 @@ public class PoshShodan {
 
     private static FishState gasRun(final OLSDynamicProgram shodan, final long seed) {
         //object we use to control season
-        ExternalOpenCloseSeason controller = new ExternalOpenCloseSeason();
-        PrototypeScenario scenario = new PrototypeScenario();
+        final ExternalOpenCloseSeason controller = new ExternalOpenCloseSeason();
+        final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setFishers(100);
 
-        scenario.setRegulation(new AlgorithmFactory<Regulation>() {
-            @Override
-            public Regulation apply(FishState state) {
-                return controller;
-            }
-        });
+        scenario.setRegulation(state -> controller);
 
-        FishState state = new FishState(seed);
+        final FishState state = new FishState(seed);
         state.attachAdditionalGatherers();
         state.registerStartable(new AdditionalFishStateDailyCollectors());
         state.setScenario(scenario);
         state.start();
 
 
-        state.scheduleEveryXDay(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                if (state.getDay() < 30)
-                    return;
+        state.scheduleEveryXDay((Steppable) simState -> {
+            if (state.getDay() < 30)
+                return;
 
-                //change oil price
-                for (Port port : state.getPorts())
-                    port.setGasPricePerLiter(state.getDayOfTheYear() / 1000d);
+            //change oil price
+            for (final Port port : state.getPorts())
+                port.setGasPricePerLiter(state.getDayOfTheYear() / 1000d);
 
-                int action = shodan.step(state);
-                controller.setOpen(action == 0);
+            final int action = shodan.step(state);
+            controller.setOpen(action == 0);
 
-                System.out.println("Is controller open? " + controller.isOpen());
-            }
+            System.out.println("Is controller open? " + controller.isOpen());
         }, StepOrder.AFTER_DATA, 30);
 
         while (state.getDay() <= 7200)
@@ -256,18 +221,15 @@ public class PoshShodan {
     }
 
     private static void kitchensink() throws IOException {
-        OLSDynamicProgram shodan = new OLSDynamicProgram(
+        @SuppressWarnings("unchecked") final OLSDynamicProgram shodan = new OLSDynamicProgram(
             2,
-            new Function<FishState, Double>() {
-                @Override
-                public Double apply(FishState state) {
-                    Iterator<Double> landings = state.getDailyDataSet().getColumn(
-                        "Average Cash-Flow").descendingIterator();
-                    double reward = 0;
-                    for (int i = 0; i < 30; i++)
-                        reward += landings.next();
-                    return reward;
-                }
+            state -> {
+                final Iterator<Double> landings = state.getDailyDataSet().getColumn(
+                    "Average Cash-Flow").descendingIterator();
+                double reward = 0;
+                for (int i = 0; i < 30; i++)
+                    reward += landings.next();
+                return reward;
             },
             false,
             false,
@@ -276,77 +238,57 @@ public class PoshShodan {
             true,
             true,
             0,
-            new Predicate<double[]>() {
-                @Override
-                public boolean test(double[] doubles) {
-                    return doubles[1] <= FishStateUtilities.EPSILON;
-                }
-            },
+            doubles -> doubles[1] <= FishStateUtilities.EPSILON,
             //months lefts
             //gas price
             //landings
             //effort
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    return (double) Math.round(240 - fishStateDoublePair.getFirst().getDay() / 30);
-                }
+            fishStateDoublePair ->
+                (double) Math.round(240 - fishStateDoublePair.getKey()
+                    .getDay() / 30),
+            fishStateDoublePair -> {
+                final Iterator<Double> landings = fishStateDoublePair.getKey()
+                    .getDailyDataSet().getColumn(
+                        "Average X Towed").descendingIterator();
+                double sum = 0;
+                for (int i = 0; i < 30; i++)
+                    sum += landings.next();
+                return sum;
             },
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    Iterator<Double> landings = fishStateDoublePair.getFirst()
-                        .getDailyDataSet().getColumn(
-                            "Average X Towed").descendingIterator();
-                    double sum = 0;
-                    for (int i = 0; i < 30; i++)
-                        sum += landings.next();
-                    return sum;
-                }
+            fishStateDoublePair -> {
+                final Iterator<Double> landings = fishStateDoublePair.getKey()
+                    .getDailyDataSet().getColumn(
+                        "Species 0 Landings").descendingIterator();
+                double sum = 0;
+                for (int i = 0; i < 30; i++)
+                    sum += landings.next();
+                return sum;
             },
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    Iterator<Double> landings = fishStateDoublePair.getFirst()
-                        .getDailyDataSet().getColumn(
-                            "Species 0 Landings").descendingIterator();
-                    double sum = 0;
-                    for (int i = 0; i < 30; i++)
-                        sum += landings.next();
-                    return sum;
-                }
-            },
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    Iterator<Double> effort = fishStateDoublePair.getFirst()
-                        .getDailyDataSet().getColumn(
-                            "Total Effort").descendingIterator();
-                    double sum = 0;
-                    for (int i = 0; i < 30; i++)
-                        sum += effort.next();
-                    return sum;
-                }
+            fishStateDoublePair -> {
+                final Iterator<Double> effort = fishStateDoublePair.getKey()
+                    .getDailyDataSet().getColumn(
+                        "Total Effort").descendingIterator();
+                double sum = 0;
+                for (int i = 0; i < 30; i++)
+                    sum += effort.next();
+                return sum;
             }
-
-
         );
+
+
         mainLoop(shodan, "kitchensink", .9, .15);
     }
 
     private static void countingDays() throws IOException {
-        OLSDynamicProgram shodan = new OLSDynamicProgram(
+        @SuppressWarnings("unchecked") final OLSDynamicProgram shodan = new OLSDynamicProgram(
             2,
-            new Function<FishState, Double>() {
-                @Override
-                public Double apply(FishState state) {
-                    Iterator<Double> landings = state.getDailyDataSet().getColumn(
-                        "Average Cash-Flow").descendingIterator();
-                    double reward = 0;
-                    for (int i = 0; i < 30; i++)
-                        reward += landings.next();
-                    return reward;
-                }
+            state -> {
+                final Iterator<Double> landings = state.getDailyDataSet().getColumn(
+                    "Average Cash-Flow").descendingIterator();
+                double reward = 0;
+                for (int i = 0; i < 30; i++)
+                    reward += landings.next();
+                return reward;
             },
             false,
             false,
@@ -355,51 +297,30 @@ public class PoshShodan {
             false,
             false,
             0,
-            new Predicate<double[]>() {
-                @Override
-                public boolean test(double[] doubles) {
-                    return doubles[1] <= FishStateUtilities.EPSILON;
-                }
-            },
+            doubles -> doubles[1] <= FishStateUtilities.EPSILON,
             //months lefts
             //gas price
             //landings
             //effort
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    return (double) Math.round(240 - fishStateDoublePair.getFirst().getDay() / 30);
-                }
+            fishStateDoublePair -> (double) Math.round(240 - fishStateDoublePair.getKey().getDay() / 30),
+            fishStateDoublePair -> (double) fishStateDoublePair.getKey().getDayOfTheYear(),
+            fishStateDoublePair -> {
+                final Iterator<Double> landings = fishStateDoublePair.getKey()
+                    .getDailyDataSet().getColumn(
+                        "Species 0 Landings").descendingIterator();
+                double sum = 0;
+                for (int i = 0; i < 30; i++)
+                    sum += landings.next();
+                return sum;
             },
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    return (double) fishStateDoublePair.getFirst().getDayOfTheYear();
-                }
-            },
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    Iterator<Double> landings = fishStateDoublePair.getFirst()
-                        .getDailyDataSet().getColumn(
-                            "Species 0 Landings").descendingIterator();
-                    double sum = 0;
-                    for (int i = 0; i < 30; i++)
-                        sum += landings.next();
-                    return sum;
-                }
-            },
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    Iterator<Double> effort = fishStateDoublePair.getFirst()
-                        .getDailyDataSet().getColumn(
-                            "Total Effort").descendingIterator();
-                    double sum = 0;
-                    for (int i = 0; i < 30; i++)
-                        sum += effort.next();
-                    return sum;
-                }
+            fishStateDoublePair -> {
+                final Iterator<Double> effort = fishStateDoublePair.getKey()
+                    .getDailyDataSet().getColumn(
+                        "Total Effort").descendingIterator();
+                double sum = 0;
+                for (int i = 0; i < 30; i++)
+                    sum += effort.next();
+                return sum;
             }
 
 
@@ -408,18 +329,15 @@ public class PoshShodan {
     }
 
     private static void countingGas() throws IOException {
-        OLSDynamicProgram shodan = new OLSDynamicProgram(
+        @SuppressWarnings("unchecked") final OLSDynamicProgram shodan = new OLSDynamicProgram(
             2,
-            new Function<FishState, Double>() {
-                @Override
-                public Double apply(FishState state) {
-                    Iterator<Double> landings = state.getDailyDataSet().getColumn(
-                        "Average Cash-Flow").descendingIterator();
-                    double reward = 0;
-                    for (int i = 0; i < 30; i++)
-                        reward += landings.next();
-                    return reward;
-                }
+            state -> {
+                final Iterator<Double> landings = state.getDailyDataSet().getColumn(
+                    "Average Cash-Flow").descendingIterator();
+                double reward = 0;
+                for (int i = 0; i < 30; i++)
+                    reward += landings.next();
+                return reward;
             },
             false,
             false,
@@ -428,54 +346,31 @@ public class PoshShodan {
             false,
             false,
             0,
-            new Predicate<double[]>() {
-                @Override
-                public boolean test(double[] doubles) {
-                    return doubles[1] <= FishStateUtilities.EPSILON;
-                }
-            },
+            doubles -> doubles[1] <= FishStateUtilities.EPSILON,
             //months lefts
             //gas price
             //landings
             //effort
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    return (double) Math.round(240 - fishStateDoublePair.getFirst().getDay() / 30);
-                }
+            fishStateDoublePair -> (double) Math.round(240 - fishStateDoublePair.getKey().getDay() / 30),
+            fishStateDoublePair -> fishStateDoublePair.getKey().getPorts().iterator().next().getGasPricePerLiter(),
+            fishStateDoublePair -> {
+                final Iterator<Double> landings = fishStateDoublePair.getKey()
+                    .getDailyDataSet().getColumn(
+                        "Species 0 Landings").descendingIterator();
+                double sum = 0;
+                for (int i = 0; i < 30; i++)
+                    sum += landings.next();
+                return sum;
             },
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    return fishStateDoublePair.getFirst().getPorts().iterator().next().getGasPricePerLiter();
-                }
-            },
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    Iterator<Double> landings = fishStateDoublePair.getFirst()
-                        .getDailyDataSet().getColumn(
-                            "Species 0 Landings").descendingIterator();
-                    double sum = 0;
-                    for (int i = 0; i < 30; i++)
-                        sum += landings.next();
-                    return sum;
-                }
-            },
-            new Function<Pair<FishState, Double>, Double>() {
-                @Override
-                public Double apply(Pair<FishState, Double> fishStateDoublePair) {
-                    Iterator<Double> effort = fishStateDoublePair.getFirst()
-                        .getDailyDataSet().getColumn(
-                            "Total Effort").descendingIterator();
-                    double sum = 0;
-                    for (int i = 0; i < 30; i++)
-                        sum += effort.next();
-                    return sum;
-                }
+            fishStateDoublePair -> {
+                final Iterator<Double> effort = fishStateDoublePair.getKey()
+                    .getDailyDataSet().getColumn(
+                        "Total Effort").descendingIterator();
+                double sum = 0;
+                for (int i = 0; i < 30; i++)
+                    sum += effort.next();
+                return sum;
             }
-
-
         );
         mainLoop(shodan, "counting_gas", .9, .15);
     }

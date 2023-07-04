@@ -46,8 +46,8 @@ public class Observers {
         this.observers.remove(observedClass, observer);
     }
 
+    @SuppressWarnings("unchecked")
     public <O> void reactTo(final O observable) {
-        //noinspection unchecked
         this.observers
             .get(observable.getClass())
             .forEach(observer -> ((Observer<O>) observer).observe(observable));
@@ -57,11 +57,11 @@ public class Observers {
      * This method will only construct the observable if it's class is one we're interested in.
      * Useful when observable construction is costly.
      */
+    @SuppressWarnings("unchecked")
     public <O> void reactTo(final Class<O> observedClass, final Supplier<O> observableSupplier) {
         final Collection<Observer<?>> relevantObservers = this.observers.get(observedClass);
         if (!relevantObservers.isEmpty()) {
             final O observable = observableSupplier.get();
-            //noinspection unchecked
             relevantObservers.forEach(observer -> ((Observer<O>) observer).observe(observable));
         }
     }

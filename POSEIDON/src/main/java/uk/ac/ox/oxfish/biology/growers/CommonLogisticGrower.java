@@ -21,6 +21,7 @@ import java.util.List;
  */
 public class CommonLogisticGrower implements Startable, Steppable {
 
+    private static final long serialVersionUID = 5857933215089238267L;
     protected final Species species;
     /**
      * the uninpeded growth rate of each species
@@ -34,7 +35,7 @@ public class CommonLogisticGrower implements Startable, Steppable {
     private final List<BiomassLocalBiology> biologies = new ArrayList<>();
     private Stoppable receipt;
 
-    public CommonLogisticGrower(double malthusianParameter, Species species, double distributionalWeight) {
+    public CommonLogisticGrower(final double malthusianParameter, final Species species, final double distributionalWeight) {
         this.malthusianParameter = malthusianParameter;
         this.species = species;
         this.distributionalWeight = distributionalWeight;
@@ -49,15 +50,15 @@ public class CommonLogisticGrower implements Startable, Steppable {
      * @param distributionalWeight the higher, the more biomass will in proportion flow towards areas with higher carrying capacity
      */
     public static void allocateBiomassProportionally(
-        List<? extends VariableBiomassBasedBiology> biologyList,
-        double biomassToAllocate,
-        int speciesIndex, double distributionalWeight
+        final List<? extends VariableBiomassBasedBiology> biologyList,
+        final double biomassToAllocate,
+        final int speciesIndex, final double distributionalWeight
     ) {
 
         if (biomassToAllocate < FishStateUtilities.EPSILON) //don't bother with super tiny numbers
             return;
         double totalEmptySpace = 0;
-        for (VariableBiomassBasedBiology local : biologyList) {
+        for (final VariableBiomassBasedBiology local : biologyList) {
             totalEmptySpace += Math.pow(
                 local.getCarryingCapacity(speciesIndex) - local.getCurrentBiomass()[speciesIndex],
                 distributionalWeight
@@ -75,15 +76,15 @@ public class CommonLogisticGrower implements Startable, Steppable {
 
         //if there is less empty space than recruitment, just fill it all up!
         if (totalEmptySpace <= biomassToAllocate) {
-            for (VariableBiomassBasedBiology local : biologyList) {
+            for (final VariableBiomassBasedBiology local : biologyList) {
                 local.getCurrentBiomass()[speciesIndex] = local.getCarryingCapacity(speciesIndex);
             }
         } else {
             //reallocate proportional to the empty space here compared to the total empty space
-            for (VariableBiomassBasedBiology local : biologyList) {
-                double emptySpace = Math.pow(local.getCarryingCapacity(speciesIndex) -
+            for (final VariableBiomassBasedBiology local : biologyList) {
+                final double emptySpace = Math.pow(local.getCarryingCapacity(speciesIndex) -
                     local.getCurrentBiomass()[speciesIndex], distributionalWeight);
-                double addHere = biomassToAllocate * emptySpace / totalEmptySpace;
+                final double addHere = biomassToAllocate * emptySpace / totalEmptySpace;
                 if (local.getCurrentBiomass()[speciesIndex] + addHere > local.getCarryingCapacity(speciesIndex)) {
                     leftOver += (addHere - (local.getCarryingCapacity(speciesIndex)) - local.getCurrentBiomass()[speciesIndex]);
                     local.getCurrentBiomass()[speciesIndex] = local.getCarryingCapacity(speciesIndex);
@@ -104,16 +105,16 @@ public class CommonLogisticGrower implements Startable, Steppable {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         grow((FishState) simState, this.biologies);
     }
 
-    protected void grow(FishState model, List<BiomassLocalBiology> biologies) {
+    protected void grow(final FishState model, final List<BiomassLocalBiology> biologies) {
 
         double current = 0;
         double capacity = 0;
         //for each place
-        for (VariableBiomassBasedBiology biology : biologies) {
+        for (final VariableBiomassBasedBiology biology : biologies) {
             current += biology.getBiomass(species);
             capacity += biology.getCarryingCapacity(species);
         }
@@ -153,7 +154,7 @@ public class CommonLogisticGrower implements Startable, Steppable {
     }
 
     protected double recruit(
-        double current, double capacity,
+        final double current, final double capacity,
         final double malthusianParameter
     ) {
         return IndependentLogisticBiomassGrower.logisticRecruitment(
@@ -171,7 +172,7 @@ public class CommonLogisticGrower implements Startable, Steppable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         //schedule yourself
         Preconditions.checkArgument(receipt == null, "Already started!");
         receipt = model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);

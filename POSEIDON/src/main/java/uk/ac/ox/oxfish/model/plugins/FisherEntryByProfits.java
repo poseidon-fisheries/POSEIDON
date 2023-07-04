@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 public class FisherEntryByProfits implements EntryPlugin {
 
 
+    private static final long serialVersionUID = 5035339135094933553L;
     private final String profitDataColumnName;
 
     private final String costsFinalColumnName;
@@ -47,8 +48,8 @@ public class FisherEntryByProfits implements EntryPlugin {
     private Stoppable stoppable;
 
     public FisherEntryByProfits(
-        String profitDataColumnName, String costsFinalColumnName, String populationName,
-        double rateToEntryMultiplier, int maxEntrantsPerYear, double minProfitsToCoverFixedCosts
+        final String profitDataColumnName, final String costsFinalColumnName, final String populationName,
+        final double rateToEntryMultiplier, final int maxEntrantsPerYear, final double minProfitsToCoverFixedCosts
     ) {
         this.profitDataColumnName = profitDataColumnName;
         this.costsFinalColumnName = costsFinalColumnName;
@@ -65,7 +66,7 @@ public class FisherEntryByProfits implements EntryPlugin {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         Preconditions.checkArgument(stoppable == null, "already started!");
         stoppable = model.scheduleEveryYear(
             this,
@@ -87,10 +88,10 @@ public class FisherEntryByProfits implements EntryPlugin {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         if (isEntryPaused())
             return;
-        FishState model = ((FishState) simState);
+        final FishState model = ((FishState) simState);
         int newEntrants = newEntrants(
             model.getLatestYearlyObservation(profitDataColumnName),
             model.getLatestYearlyObservation(costsFinalColumnName)
@@ -106,9 +107,9 @@ public class FisherEntryByProfits implements EntryPlugin {
         return paused;
     }
 
-    public int newEntrants(double averageProfits, double averageCosts) {
+    public int newEntrants(final double averageProfits, final double averageCosts) {
 
-        double profitRate = (averageProfits - minProfitsToCoverFixedCosts) / (averageCosts + minProfitsToCoverFixedCosts);
+        final double profitRate = (averageProfits - minProfitsToCoverFixedCosts) / (averageCosts + minProfitsToCoverFixedCosts);
         System.out.println("profit rate: " + profitRate);
 
         if (profitRate <= 0 || !Double.isFinite(profitRate))
@@ -119,7 +120,7 @@ public class FisherEntryByProfits implements EntryPlugin {
 
     }
 
-    public void setEntryPaused(boolean paused) {
+    public void setEntryPaused(final boolean paused) {
         this.paused = paused;
     }
 }

@@ -35,6 +35,8 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 public abstract class SetLocationValues<A extends AbstractSetAction>
     extends MutableLocationValues<A> {
 
+    private static final long serialVersionUID = -6469174194098636736L;
+
     SetLocationValues(
         final Class<A> observedClass,
         final Function<Fisher, Map<Int2D, Double>> loadValues,
@@ -50,7 +52,7 @@ public abstract class SetLocationValues<A extends AbstractSetAction>
         final ReliableFishValueCalculator fishValueCalculator =
             new ReliableFishValueCalculator(fisher.grabState().getBiology());
         final double[] prices = fisher.getHomePort().getMarketMap(fisher).getPrices();
-        return ((Optional<Catch>) setAction.getCatchesKept())
+        return setAction.getCatchesKept()
             .map(catchesKept -> fishValueCalculator.valueOf(catchesKept, prices))
             .map(valueOfCatch -> entry(gridLocation, valueOfCatch));
     }

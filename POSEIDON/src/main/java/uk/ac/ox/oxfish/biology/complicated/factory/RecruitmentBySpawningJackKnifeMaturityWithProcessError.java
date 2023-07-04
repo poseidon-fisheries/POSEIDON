@@ -69,6 +69,7 @@ public class RecruitmentBySpawningJackKnifeMaturityWithProcessError implements A
      */
     public static class YearAwareLogNormalNoiseMaker implements NoiseMaker {
 
+        private static final long serialVersionUID = 7421074856003089457L;
         private final int yearToStart;
 
 

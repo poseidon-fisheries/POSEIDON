@@ -38,6 +38,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable {
 
 
+    private static final long serialVersionUID = -2135134307495634407L;
     /**
      * if this is set to anything above 0, then quota season is in this many days rather than yearly
      */
@@ -58,12 +59,12 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      * @param yearlyQuota the yearly quota
      */
 
-    public MonoQuotaRegulation(double yearlyQuota) {
+    public MonoQuotaRegulation(final double yearlyQuota) {
 
         this(yearlyQuota, -1);
     }
 
-    public MonoQuotaRegulation(double yearlyQuota, int quotaPeriodInDays) {
+    public MonoQuotaRegulation(final double yearlyQuota, final int quotaPeriodInDays) {
         this.yearlyQuota = yearlyQuota;
         this.quotaRemaining = yearlyQuota;
         this.quotaPeriodInDays = quotaPeriodInDays;
@@ -75,7 +76,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      * @param simState the quota
      */
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         quotaRemaining = yearlyQuota;
     }
 
@@ -89,7 +90,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      */
     @Override
     public boolean canFishHere(
-        Fisher agent, SeaTile tile, FishState model, int timeStep
+        final Fisher agent, final SeaTile tile, final FishState model, final int timeStep
     ) {
         return isFishingStillAllowed();
     }
@@ -108,7 +109,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      */
     @Override
     public double maximumBiomassSellable(
-        Fisher agent, Species species, FishState model, int timeStep
+        final Fisher agent, final Species species, final FishState model, final int timeStep
     ) {
         return quotaRemaining;
     }
@@ -122,7 +123,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      * at sea
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
+    public boolean allowedAtSea(final Fisher fisher, final FishState model, final int timeStep) {
         return isFishingStillAllowed();
     }
 
@@ -136,12 +137,12 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      */
     @Override
     public void reactToSale(
-        Species species,
-        Fisher seller,
-        double biomass,
-        double revenue,
-        FishState model,
-        int timeStep
+        final Species species,
+        final Fisher seller,
+        final double biomass,
+        final double revenue,
+        final FishState model,
+        final int timeStep
     ) {
 
         quotaRemaining -= biomass;
@@ -152,7 +153,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
         return yearlyQuota;
     }
 
-    public void setYearlyQuota(double yearlyQuota) {
+    public void setYearlyQuota(final double yearlyQuota) {
         this.yearlyQuota = yearlyQuota;
     }
 
@@ -162,7 +163,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      * @param specieIndex ignored
      * @return
      */
-    public double getQuotaRemaining(int specieIndex) {
+    public double getQuotaRemaining(final int specieIndex) {
         return quotaRemaining;
     }
 
@@ -172,7 +173,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      * @param specieIndex    ignored since the quota is for any specie
      * @param quotaRemaining the quota remaining
      */
-    public void setQuotaRemaining(int specieIndex, double quotaRemaining) {
+    public void setQuotaRemaining(final int specieIndex, final double quotaRemaining) {
         this.quotaRemaining = quotaRemaining;
         Preconditions.checkArgument(quotaRemaining >= 0);
     }
@@ -188,7 +189,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         if (quotaPeriodInDays <= 0)
             model.scheduleEveryYear(this, StepOrder.POLICY_UPDATE);
         else

@@ -11,10 +11,11 @@ import java.util.function.Function;
 public class PastAverageSensor implements Sensor<FishState, Double> {
 
 
+    private static final long serialVersionUID = 3782345834340742854L;
     private final UnchangingPastSensor delegate;
 
 
-    public PastAverageSensor(String indicatorColumnName, int yearsToLookBack) {
+    public PastAverageSensor(final String indicatorColumnName, final int yearsToLookBack) {
 
         delegate = new UnchangingPastSensor(
             indicatorColumnName,
@@ -26,7 +27,7 @@ public class PastAverageSensor implements Sensor<FishState, Double> {
 
 
     @Override
-    public Double scan(FishState system) {
+    public Double scan(final FishState system) {
         final Double scan = delegate.scan(system);
         delegate.setTargetSet(Double.NaN);
         return scan;
@@ -41,7 +42,7 @@ public class PastAverageSensor implements Sensor<FishState, Double> {
         return delegate.getIndicatorTransformer();
     }
 
-    public void setIndicatorTransformer(Function<Double, Double> indicatorTransformer) {
+    public void setIndicatorTransformer(final Function<Double, Double> indicatorTransformer) {
         delegate.setIndicatorTransformer(indicatorTransformer);
     }
 

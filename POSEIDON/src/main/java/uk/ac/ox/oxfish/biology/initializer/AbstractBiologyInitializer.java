@@ -60,15 +60,8 @@ public abstract class AbstractBiologyInitializer implements BiologyInitializer {
                 columnName);
             modelBeingInitialized.getYearlyDataSet().registerGatherer(
                 columnName,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(
-                        FishState state
-                    ) {
-                        return modelBeingInitialized.getYearlyCounter().getColumn(
-                            columnName);
-                    }
-                }, 0d
+                (Gatherer<FishState>) state -> modelBeingInitialized.getYearlyCounter().getColumn(
+                    columnName), 0d
             );
         }
 

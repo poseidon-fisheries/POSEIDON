@@ -1,9 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.gear.factory;
 
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.DecoratorGearPair;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.SelectivityAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.LogisticAbundanceFilter;
 import uk.ac.ox.oxfish.fisher.strategies.gear.PeriodicUpdateGearStrategy;
@@ -11,8 +9,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 
@@ -71,7 +67,9 @@ public class PeriodicUpdateSelectivityFactory implements AlgorithmFactory<Period
     /**
      * locker to make sure data collectors are done only once
      */
-    private final Locker<String, Startable> locker = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, Startable> locker =
+        new uk.ac.ox.oxfish.utility.Locker<>();
     /**
      * probability this gets activated
      */
@@ -99,41 +97,33 @@ public class PeriodicUpdateSelectivityFactory implements AlgorithmFactory<Period
         return new PeriodicUpdateGearStrategy
             (
                 yearly,
-                new RandomStep<Gear>() {
-                    @Override
-                    public Gear randomStep(
-                        final FishState state,
-                        final MersenneTwisterFast random,
-                        final Fisher fisher,
-                        final Gear current
-                    ) {
-                        final SelectivityAbundanceGear actualGear =
-                            (SelectivityAbundanceGear)
-                                DecoratorGearPair.getActualGear(current).getDecorated();
+                (state, random, fisher, current) -> {
+                    final SelectivityAbundanceGear actualGear =
+                        (SelectivityAbundanceGear)
+                            DecoratorGearPair.getActualGear(current).getDecorated();
 
 
-                        final double newAParameter = actualGear.getaParameter() * (1d - maxPercentageChangeA + 2 * random.nextDouble() * maxPercentageChangeA);
-                        final double newBParameter = actualGear.getbParameter() * (1d - maxPercentageChangeB + 2 * random.nextDouble() * maxPercentageChangeB);
-                        if (actualGear.getRetention() == null)
-                            return new SelectivityAbundanceGear(
-                                actualGear.getLitersOfGasConsumedEachHourFishing(),
-                                actualGear.getCatchabilityFilter(),
-                                new LogisticAbundanceFilter(newAParameter, newBParameter,
-                                    actualGear.getSelectivity().isMemoization(),
-                                    actualGear.getSelectivity().isRounding(), true
-                                )
-                            );
-                        else
-                            return new SelectivityAbundanceGear(
-                                actualGear.getLitersOfGasConsumedEachHourFishing(),
-                                actualGear.getCatchabilityFilter(),
-                                new LogisticAbundanceFilter(newAParameter, newBParameter,
-                                    actualGear.getSelectivity().isMemoization(),
-                                    actualGear.getSelectivity().isRounding(), true
-                                ),
-                                actualGear.getRetention()
-                            );
-                    }
+                    final double newAParameter = actualGear.getaParameter() * (1d - maxPercentageChangeA + 2 * random.nextDouble() * maxPercentageChangeA);
+                    final double newBParameter = actualGear.getbParameter() * (1d - maxPercentageChangeB + 2 * random.nextDouble() * maxPercentageChangeB);
+                    if (actualGear.getRetention() == null)
+                        return new SelectivityAbundanceGear(
+                            actualGear.getLitersOfGasConsumedEachHourFishing(),
+                            actualGear.getCatchabilityFilter(),
+                            new LogisticAbundanceFilter(newAParameter, newBParameter,
+                                actualGear.getSelectivity().isMemoization(),
+                                actualGear.getSelectivity().isRounding(), true
+                            )
+                        );
+                    else
+                        return new SelectivityAbundanceGear(
+                            actualGear.getLitersOfGasConsumedEachHourFishing(),
+                            actualGear.getCatchabilityFilter(),
+                            new LogisticAbundanceFilter(newAParameter, newBParameter,
+                                actualGear.getSelectivity().isMemoization(),
+                                actualGear.getSelectivity().isRounding(), true
+                            ),
+                            actualGear.getRetention()
+                        );
                 },
                 probability.apply(model)
             );

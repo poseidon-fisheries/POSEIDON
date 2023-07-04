@@ -35,8 +35,8 @@ public enum ActionClass {
         this.actionClass = actionClass;
     }
 
+    @SuppressWarnings("unchecked")
     public static Class<? extends AbstractSetAction> getSetActionClass(final String setActionCode) {
-        //noinspection unchecked
         return Optional
             .of(ActionClass.valueOf(setActionCode.toUpperCase()).getActionClass())
             .filter(AbstractSetAction.class::isAssignableFrom)

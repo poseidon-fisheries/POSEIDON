@@ -66,11 +66,8 @@ public class CsvTimeSeriesGasFactory implements AlgorithmFactory<TimeSeriesGasPr
             true,
             separator,
             columnNumber,
-            new Function<Double, Double>() {
-                @Override
-                public Double apply(Double dollarsPerGallon) {
-                    return dollarsPerGallon * scaling; //ratio
-                }
+            dollarsPerGallon -> {
+                return dollarsPerGallon * scaling; //ratio
             }
         );
 

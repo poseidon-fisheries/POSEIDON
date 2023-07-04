@@ -35,6 +35,7 @@ import java.util.function.ToDoubleFunction;
  * Here what we do is simply creating a proxy; this decorates a plannedstrategy but manages its
  * life cycle so that everything is loaded from files only when start is called
  */
+@SuppressWarnings("unchecked")
 public class PlannedStrategyProxy implements FishingStrategy, DestinationStrategy {
 
     /**
@@ -162,6 +163,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         this.noaSetsRangeInSeatiles = noaSetsRangeInSeatiles;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public void start(final FishState model, final Fisher fisher) {
         Preconditions.checkState(delegate == null, "Already started!");

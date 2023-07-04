@@ -41,6 +41,7 @@ public abstract class MutableLocationValues<A>
     implements LocationValues, Steppable {
 
     private static final int MAXIMUM_NUMBER_OF_VALUES = 50;
+    private static final long serialVersionUID = 8981125814239200579L;
 
     private final Function<Fisher, Map<Int2D, Double>> valueLoader;
     private final double decayRate;

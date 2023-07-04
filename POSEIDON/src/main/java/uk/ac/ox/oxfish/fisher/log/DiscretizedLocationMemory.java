@@ -24,6 +24,10 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Holds on to the last day any group of the map was last visited
@@ -34,33 +38,34 @@ public class DiscretizedLocationMemory {
 
     private final MapDiscretization discretization;
 
-    private final LinkedList<Integer>[] visits;
+    private final List<LinkedList<Integer>> visits;
 
 
-    public DiscretizedLocationMemory(MapDiscretization discretization) {
+    public DiscretizedLocationMemory(final MapDiscretization discretization) {
         this.discretization = discretization;
-        this.visits = new LinkedList[discretization.getNumberOfGroups()];
-        for (int i = 0; i < visits.length; i++)
-            visits[i] = new LinkedList<>();
+        this.visits = Stream
+            .generate(LinkedList<Integer>::new)
+            .limit(discretization.getNumberOfGroups())
+            .collect(toList());
     }
 
-    public void registerVisit(int group, int day) {
-        visits[group].add(day);
+    public void registerVisit(final int group, final int day) {
+        visits.get(group).add(day);
     }
 
-    public void registerVisit(SeaTile tile, int day) {
-        Integer group = discretization.getGroup(tile);
+    public void registerVisit(final SeaTile tile, final int day) {
+        final Integer group = discretization.getGroup(tile);
         if (group != null)
-            visits[group].add(day);
+            visits.get(group).add(day);
     }
 
 
-    public int getLastDayVisited(int group) {
-        return visits[group].isEmpty() ? -10000 : visits[group].getLast();
+    public int getLastDayVisited(final int group) {
+        return visits.get(group).isEmpty() ? -10000 : visits.get(group).getLast();
     }
 
-    public LinkedList<Integer> getVisits(int group) {
-        return visits[group];
+    public LinkedList<Integer> getVisits(final int group) {
+        return visits.get(group);
     }
 
 }

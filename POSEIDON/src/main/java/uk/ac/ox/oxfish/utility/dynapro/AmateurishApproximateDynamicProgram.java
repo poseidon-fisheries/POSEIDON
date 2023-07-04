@@ -22,7 +22,10 @@ package uk.ac.ox.oxfish.utility.dynapro;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.Pair;
+
+import java.util.Map.Entry;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * Basically the poor man's version of approximate post-decision dynamic programming using the dumbest state approximation (linear)
@@ -47,9 +50,13 @@ public class AmateurishApproximateDynamicProgram {
     /**
      * Usually called "alpha"
      */
-    private double learningRate;
+    private final double learningRate;
 
-    public AmateurishApproximateDynamicProgram(int possibleActions, int valueFunctionDimension, double learningRate) {
+    public AmateurishApproximateDynamicProgram(
+        final int possibleActions,
+        final int valueFunctionDimension,
+        final double learningRate
+    ) {
         this.possibleActions = possibleActions;
         linearParameters = new double[possibleActions][];
         for (int i = 0; i < possibleActions; i++)
@@ -65,11 +72,11 @@ public class AmateurishApproximateDynamicProgram {
      * @param featuresAtTheTime   the state of the world when you took your previous action
      */
     public void updateActionDueToImmediateReward(
-        int actionTaken, double instantaneousReward, double discountFactor,
-        double[] featuresAtTheTime, double[] featuresNow
+        final int actionTaken, final double instantaneousReward, final double discountFactor,
+        final double[] featuresAtTheTime, final double[] featuresNow
     ) {
-        Pair<Integer, Double> currentBest = chooseBestAction(featuresNow);
-        updateAction(actionTaken, instantaneousReward + discountFactor * currentBest.getFirst(), featuresAtTheTime);
+        final Entry<Integer, Double> currentBest = chooseBestAction(featuresNow);
+        updateAction(actionTaken, instantaneousReward + discountFactor * currentBest.getKey(), featuresAtTheTime);
 
     }
 
@@ -79,18 +86,18 @@ public class AmateurishApproximateDynamicProgram {
      * @param stateFeatures the features of the state
      * @return the action commanding the highest value and the value function
      */
-    public Pair<Integer, Double> chooseBestAction(double... stateFeatures) {
+    public Entry<Integer, Double> chooseBestAction(final double... stateFeatures) {
         int bestAction = 0;
         double highestValue = judgeAction(0, stateFeatures);
         for (int i = 1; i < possibleActions; i++) {
-            double value = judgeAction(i, stateFeatures);
+            final double value = judgeAction(i, stateFeatures);
             if (value > highestValue) {
                 bestAction = i;
                 highestValue = value;
             }
         }
 
-        return new Pair<>(bestAction, highestValue);
+        return entry(bestAction, highestValue);
 
     }
 
@@ -103,15 +110,15 @@ public class AmateurishApproximateDynamicProgram {
      * @param featuresAtTheTime the features describing the state when the last decision was taken!
      */
     public void updateAction(
-        int actionTaken, double rewardObservation,
-        double... featuresAtTheTime
+        final int actionTaken, final double rewardObservation,
+        final double... featuresAtTheTime
     ) {
 
-        double[] parameters = linearParameters[actionTaken];
+        final double[] parameters = linearParameters[actionTaken];
         Preconditions.checkArgument(featuresAtTheTime.length == parameters.length, "dimension mismatch");
 
         //get back your old prediction
-        double predictedValue = judgeAction(actionTaken, featuresAtTheTime);
+        final double predictedValue = judgeAction(actionTaken, featuresAtTheTime);
 
 
         //w = w + a * (sample - prediction) * feature
@@ -119,7 +126,7 @@ public class AmateurishApproximateDynamicProgram {
             parameters[i] = parameters[i] + learningRate * (rewardObservation - predictedValue) * featuresAtTheTime[i];
             Preconditions.checkState(
                 Double.isFinite(parameters[i]),
-                rewardObservation + " " + predictedValue + " " + featuresAtTheTime[i] + "\n" + toString()
+                rewardObservation + " " + predictedValue + " " + featuresAtTheTime[i] + "\n" + this
             );
 
         }
@@ -133,7 +140,7 @@ public class AmateurishApproximateDynamicProgram {
      * @param stateFeatures the measurements summarising the state we are at
      * @return a number, the higher the better
      */
-    public double judgeAction(int action, double... stateFeatures) {
+    public double judgeAction(final int action, final double... stateFeatures) {
 
         Preconditions.checkArgument(stateFeatures.length == linearParameters[action].length, "dimension mismatch");
         double value = 0;

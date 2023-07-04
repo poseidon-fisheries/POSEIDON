@@ -33,12 +33,13 @@ import java.util.LinkedHashMap;
 
 public class AbundanceDrivenGearExogenousCatches extends AbstractYearlyTargetExogenousCatches {
 
+    private static final long serialVersionUID = 6539129502515659817L;
     private final HashMap<Species, HomogeneousAbundanceGear> gears;
 
 
     public AbundanceDrivenGearExogenousCatches(
-        LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg,
-        HashMap<Species, HomogeneousAbundanceGear> gears
+        final LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg,
+        final HashMap<Species, HomogeneousAbundanceGear> gears
     ) {
         super(exogenousYearlyCatchesInKg, "Exogenous landings of ");
         this.gears = gears;
@@ -56,28 +57,28 @@ public class AbundanceDrivenGearExogenousCatches extends AbstractYearlyTargetExo
      */
     @Override
     protected Catch mortalityEvent(
-        FishState simState, Species target, LocalBiology tile, double step
+        final FishState simState, final Species target, final LocalBiology tile, final double step
     ) {
 
-        HomogeneousAbundanceGear gear = gears.get(target);
+        final HomogeneousAbundanceGear gear = gears.get(target);
         Preconditions.checkArgument(gear != null, "Exogenous catches impossible without providing gear");
 
 
-        StructuredAbundance[] structuredAbundances = new StructuredAbundance[simState.getBiology().getSize()];
+        final StructuredAbundance[] structuredAbundances = new StructuredAbundance[simState.getBiology().getSize()];
         for (int i = 0; i < structuredAbundances.length; i++)
             structuredAbundances[i] = new StructuredAbundance(
                 simState.getBiology().getSpecie(i).getNumberOfSubdivisions(),
                 simState.getBiology().getSpecie(i).getNumberOfBins()
             );
         structuredAbundances[target.getIndex()] = gear.catchesAsAbundanceForThisSpecies(tile, 1, target);
-        Catch fish = new Catch(
+        final Catch fish = new Catch(
             structuredAbundances,
             simState.getBiology()
         );
-        double totalWeight = fish.getTotalWeight();
+        final double totalWeight = fish.getTotalWeight();
         //adjust for excess
         if (totalWeight > step)
-            for (double[] row : fish.getAbundance(target.getIndex()).asMatrix()) {
+            for (final double[] row : fish.getAbundance(target.getIndex()).asMatrix()) {
                 for (int i = 0; i < row.length; i++) {
                     row[i] = row[i] * step / totalWeight;
                 }

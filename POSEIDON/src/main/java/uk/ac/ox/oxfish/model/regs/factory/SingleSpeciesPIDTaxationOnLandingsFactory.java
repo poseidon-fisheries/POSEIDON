@@ -66,25 +66,17 @@ public class SingleSpeciesPIDTaxationOnLandingsFactory implements AlgorithmFacto
             //creates the pid taxman, targeting landings
             SingleSpeciesPIDTaxman pid = new SingleSpeciesPIDTaxman(
                 species,
-                new Sensor<FishState, Double>() {
-                    @Override
-                    public Double scan(FishState fisher) {
-                        DataColumn landings = fisher.getDailyDataSet().getColumn(
-                            species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
-                        double totalLandings = 0;
-                        int toCycle = Math.min(days, landings.size());
-                        for (int i = 0; i < toCycle; i++)
-                            totalLandings += landings.getDatumXStepsAgo(i);
+                (Sensor<FishState, Double>) fisher -> {
+                    DataColumn landings = fisher.getDailyDataSet().getColumn(
+                        species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
+                    double totalLandings = 0;
+                    int toCycle = Math.min(days, landings.size());
+                    for (int i = 0; i < toCycle; i++)
+                        totalLandings += landings.getDatumXStepsAgo(i);
 
-                        return totalLandings;
-                    }
+                    return totalLandings;
                 },
-                new Sensor<FishState, Double>() {
-                    @Override
-                    public Double scan(FishState system) {
-                        return target;
-                    }
-                },
+                (Sensor<FishState, Double>) system -> target,
                 days,
                 -p.applyAsDouble(fishState.getRandom()),
                 -i.applyAsDouble(fishState.getRandom()),

@@ -49,16 +49,11 @@ public class ThresholdAnswerTest {
         options.add(2d);
         options.add(3d);
         extractor = new FeatureExtractors<>();
-        extractor.addFeatureExtractor("feature", new FeatureExtractor<Double>() {
-            @Override
-            public HashMap<Double, Double> extractFeature(
-                Collection<Double> toRepresent, FishState model, Fisher fisher
-            ) {
-                HashMap<Double, Double> toReturn = new HashMap<>();
-                for (Double number : toRepresent)
-                    toReturn.put(number, number);
-                return toReturn;
-            }
+        extractor.addFeatureExtractor("feature", (toRepresent, model, fisher) -> {
+            HashMap<Double, Double> toReturn = new HashMap<>();
+            for (Double number : toRepresent)
+                toReturn.put(number, number);
+            return toReturn;
         });
     }
 

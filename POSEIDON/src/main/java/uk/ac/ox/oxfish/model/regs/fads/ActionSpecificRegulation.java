@@ -30,6 +30,8 @@ import uk.ac.ox.poseidon.common.api.Observer;
 
 public interface ActionSpecificRegulation extends Startable, Steppable, Observer<PurseSeinerAction> {
 
+    long serialVersionUID = 1L;
+
     ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions();
 
     boolean isForbidden(Class<? extends PurseSeinerAction> action, Fisher fisher);

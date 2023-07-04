@@ -42,7 +42,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 
 /**
@@ -129,12 +131,14 @@ class YamlRepresenter extends Representer {
 
         //get a reference to this we can use from the outside
         final YamlRepresenter outer = this;
-        //get all the algorithm factories
-        final List<Class<? extends AlgorithmFactory>> allAlgorithmFactories = AlgorithmFactories.getAllAlgorithmFactories();
-        //including the super-class
-        allAlgorithmFactories.add(AlgorithmFactory.class); //add the super class
+        //get all the algorithm factories including the super-class
+        @SuppressWarnings("rawtypes") final List<Class<? extends AlgorithmFactory>> allAlgorithmFactories =
+            Stream.concat(
+                AlgorithmFactories.getAllAlgorithmFactories().stream(),
+                Stream.of(AlgorithmFactory.class)
+            ).collect(toList());
         //for each class create a representer that shows it as a map
-        for (final Class<? extends AlgorithmFactory> c : allAlgorithmFactories) {
+        for (final Class<?> c : allAlgorithmFactories) {
             this.addClassTag(c, Tag.MAP);
             this.representers.put(c, data -> {
                 //prepare the node

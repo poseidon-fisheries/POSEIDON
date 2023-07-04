@@ -34,44 +34,40 @@ import java.util.function.Function;
  */
 public class ThresholdExplorationProbability implements AdaptationProbability, TripListener {
 
+    private static final long serialVersionUID = -8615983199895930922L;
     private final double multiplier;
     final private Function<FishState, Double> threshold;
     private boolean exploring = true;
     private FishState model;
 
-    public ThresholdExplorationProbability(double multiplier, Function<FishState, Double> threshold) {
+    public ThresholdExplorationProbability(final double multiplier, final Function<FishState, Double> threshold) {
         this.multiplier = multiplier;
         this.threshold = threshold;
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         fisher.addTripListener(this);
         fisher.getDailyData().registerGatherer(
             "Exploration Probability",
-            new Gatherer<Fisher>() {
-                @Override
-                public Double apply(Fisher fisher1) {
-                    return exploring ? 1d : 0d;
-                }
-            },
+            (Gatherer<Fisher>) fisher1 -> exploring ? 1d : 0d,
             Double.NaN
         );
         this.model = model;
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         fisher.removeTripListener(this);
         this.model = null;
     }
 
 
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-        Double ourProfits = record.getProfitPerHour(true);
-        Double toBeat = threshold.apply(model);
-        double correctMultiplier = toBeat >= 0 ? multiplier : 1d / multiplier;
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
+        final Double ourProfits = record.getProfitPerHour(true);
+        final Double toBeat = threshold.apply(model);
+        final double correctMultiplier = toBeat >= 0 ? multiplier : 1d / multiplier;
         exploring = !Double.isFinite(toBeat) || ourProfits <= correctMultiplier * toBeat;
 
     }
@@ -99,7 +95,7 @@ public class ThresholdExplorationProbability implements AdaptationProbability, T
      * @param currentFitness  post-exploration fitness
      */
     @Override
-    public void judgeExploration(double previousFitness, double currentFitness) {
+    public void judgeExploration(final double previousFitness, final double currentFitness) {
 
     }
 

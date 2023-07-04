@@ -37,7 +37,7 @@ public class GeographicalObservation<V> implements Comparable<GeographicalObserv
 
     private final SeaTile tile;
 
-    public GeographicalObservation(SeaTile tile, double time, V value) {
+    public GeographicalObservation(final SeaTile tile, final double time, final V value) {
         this.tile = tile;
         this.time = time;
         this.value = value;
@@ -72,7 +72,7 @@ public class GeographicalObservation<V> implements Comparable<GeographicalObserv
      * inconsistent with equals: the ordering is over time alone
      */
     @Override
-    public int compareTo(GeographicalObservation o) {
+    public int compareTo(final GeographicalObservation<V> o) {
         return Double.compare(this.getTime(), o.getTime());
     }
 
@@ -95,12 +95,12 @@ public class GeographicalObservation<V> implements Comparable<GeographicalObserv
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GeographicalObservation<V> that = (GeographicalObservation) o;
+        final GeographicalObservation<?> that = (GeographicalObservation<?>) o;
         return Double.compare(that.time, time) == 0 &&
-            Objects.equals(that.value, value) &&
+            Objects.equals(value, that.value) &&
             Objects.equals(tile, that.tile);
     }
 

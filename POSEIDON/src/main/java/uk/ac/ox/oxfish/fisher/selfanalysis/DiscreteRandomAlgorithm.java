@@ -24,13 +24,15 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Function;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * A simple exploration-imitaiton-exploitation decision where the random part occurs by choosing from a list
@@ -39,32 +41,37 @@ import java.util.function.Function;
 public class DiscreteRandomAlgorithm<T> implements AdaptationAlgorithm<T> {
 
 
-    private final Function<Pair<T, MersenneTwisterFast>, T> randomChooser;
+    private final Function<Entry<T, MersenneTwisterFast>, T> randomChooser;
 
 
     public DiscreteRandomAlgorithm(
-        List<T> randomChoices
+        final List<T> randomChoices
     ) {
         this.randomChooser = pair -> {
             if (randomChoices.isEmpty()) //if there is nothing randomizable, don't bother
-                return pair.getFirst();
+                return pair.getKey();
             //otherwise randomize!
-            return randomChoices.get(pair.getSecond().nextInt(randomChoices.size()));
+            return randomChoices.get(pair.getValue().nextInt(randomChoices.size()));
         };
     }
 
     @Override
     public T randomize(
-        MersenneTwisterFast random, Fisher agent, double currentFitness, T current
+        final MersenneTwisterFast random, final Fisher agent, final double currentFitness, final T current
     ) {
-        return randomChooser.apply(new Pair<T, MersenneTwisterFast>(current, random));
+        return randomChooser.apply(entry(current, random));
     }
 
 
     @Override
-    public Pair<T, Fisher> imitate(
-        MersenneTwisterFast random, Fisher agent, double fitness, T current, Collection<Fisher> friends,
-        ObjectiveFunction<Fisher> objectiveFunction, Sensor<Fisher, T> sensor
+    public Entry<T, Fisher> imitate(
+        final MersenneTwisterFast random,
+        final Fisher agent,
+        final double fitness,
+        final T current,
+        final Collection<Fisher> friends,
+        final ObjectiveFunction<Fisher> objectiveFunction,
+        final Sensor<Fisher, T> sensor
     ) {
         return FishStateUtilities.imitateFriendAtRandom(random, fitness,
             current, friends,
@@ -76,7 +83,12 @@ public class DiscreteRandomAlgorithm<T> implements AdaptationAlgorithm<T> {
 
 
     @Override
-    public T exploit(MersenneTwisterFast random, Fisher agent, double currentFitness, T current) {
+    public T exploit(
+        final MersenneTwisterFast random,
+        final Fisher agent,
+        final double currentFitness,
+        final T current
+    ) {
         return current; //nothing happens
     }
 
@@ -86,8 +98,12 @@ public class DiscreteRandomAlgorithm<T> implements AdaptationAlgorithm<T> {
      */
     @Override
     public T judgeRandomization(
-        MersenneTwisterFast random, Fisher agent, double previousFitness, double currentFitness, T previous,
-        T current
+        final MersenneTwisterFast random,
+        final Fisher agent,
+        final double previousFitness,
+        final double currentFitness,
+        final T previous,
+        final T current
     ) {
         return null;
     }
@@ -97,15 +113,19 @@ public class DiscreteRandomAlgorithm<T> implements AdaptationAlgorithm<T> {
      */
     @Override
     public T judgeImitation(
-        MersenneTwisterFast random, Fisher agent, Fisher friendImitated, double fitnessBeforeImitating,
-        double fitnessAfterImitating, T previous,
-        T current
+        final MersenneTwisterFast random,
+        final Fisher agent,
+        final Fisher friendImitated,
+        final double fitnessBeforeImitating,
+        final double fitnessAfterImitating,
+        final T previous,
+        final T current
     ) {
         return null;
     }
 
     @Override
-    public void start(FishState model, Fisher agent, T initial) {
+    public void start(final FishState model, final Fisher agent, final T initial) {
         //nothing, no need for a setup
     }
 }

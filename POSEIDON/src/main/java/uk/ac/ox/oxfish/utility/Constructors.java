@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.throwingMerger;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class Constructors {
 
     /**
@@ -18,7 +19,7 @@ public class Constructors {
      * Note: not sure that the return result *has* to be a LinkedHashMap.
      */
     public static <T> LinkedHashMap<String, Supplier<AlgorithmFactory<? extends T>>> fromNames(
-        Map<Class<? extends AlgorithmFactory>, String> names
+        final Map<Class<? extends AlgorithmFactory<?>>, String> names
     ) {
         return names.entrySet().stream().collect(toMap(
             Map.Entry::getValue,
@@ -31,17 +32,17 @@ public class Constructors {
     /**
      * Given a class object, returns a Supplier based on either its constructor or a getInstance method.
      */
-    public static <T> Supplier<AlgorithmFactory<? extends T>> getSupplier(Class<? extends AlgorithmFactory> classObject) {
+    public static <T> Supplier<AlgorithmFactory<? extends T>> getSupplier(final Class<? extends AlgorithmFactory> classObject) {
         try {
             // First try to access a possibly provided `getInstance` method
             final Method getInstance = classObject.getMethod("getInstance");
             return wrap(() -> (AlgorithmFactory<? extends T>) getInstance.invoke(null));
-        } catch (NoSuchMethodException | SecurityException e) {
+        } catch (final NoSuchMethodException | SecurityException e) {
             // Otherwise, get the public argument-less constructor
             try {
                 final Constructor<? extends AlgorithmFactory> constructor = classObject.getConstructor();
-                return wrap(() -> constructor.newInstance());
-            } catch (NoSuchMethodException | SecurityException ex) {
+                return wrap(constructor::newInstance);
+            } catch (final NoSuchMethodException | SecurityException ex) {
                 throw new RuntimeException(
                     "Can't find `getInstance` method or argument-less public constructor for class " + classObject, ex
                 );
@@ -51,13 +52,14 @@ public class Constructors {
 
     /**
      * This is a convenience method to get around the fact that Java won't allow lambdas to
-     * throw checked Exceptions. Adapted from https://stackoverflow.com/a/14045585/487946.
+     * throw checked Exceptions. Adapted from
+     * <a href="https://stackoverflow.com/a/14045585/487946">https://stackoverflow.com/a/14045585/487946</a>.
      */
-    private static <T> Supplier<T> wrap(Callable<T> callable) {
+    private static <T> Supplier<T> wrap(final Callable<? extends T> callable) {
         return () -> {
             try {
                 return callable.call();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new RuntimeException(e);
             }
         };

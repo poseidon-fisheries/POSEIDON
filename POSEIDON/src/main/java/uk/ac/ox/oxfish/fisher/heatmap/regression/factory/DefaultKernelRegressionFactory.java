@@ -20,18 +20,20 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.EpanechinikovKernel;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFDistance;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.*;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridYExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.HabitatExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.PortDistanceExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelRegression;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * Created by carrknight on 9/2/16.
@@ -59,37 +61,31 @@ public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRe
      * @param state the function argument
      * @return the function result
      */
+    @SuppressWarnings("unchecked")
     @Override
     public KernelRegression apply(final FishState state) {
 
         return new KernelRegression(
             (int) numberOfObservations.applyAsDouble(state.getRandom()),
             rbfKernel ? new RBFDistance(0) : new EpanechinikovKernel(0),
-            new Pair<>(
+            entry(
                 new GridXExtractor(),
                 xBandwidth.applyAsDouble(state.getRandom())
             ),
-            new Pair<>(
+            entry(
                 new GridYExtractor(),
                 yBandwidth.applyAsDouble(state.getRandom())
             ),
-            new Pair<>(
+            entry(
                 new PortDistanceExtractor(new ManhattanDistance(), 1d),
                 distanceFromPortBandwidth.applyAsDouble(state.getRandom())
             ),
-            new Pair<>(
+            entry(
                 new HabitatExtractor(),
                 habitatBandwidth.applyAsDouble(state.getRandom())
             ),
-            new Pair<>(
-                new ObservationExtractor() {
-                    @Override
-                    public double extract(
-                        final SeaTile tile, final double timeOfObservation, final Fisher agent, final FishState model
-                    ) {
-                        return Math.sqrt(timeOfObservation + 1);
-                    }
-                },
+            entry(
+                (tile, timeOfObservation, agent, model) -> Math.sqrt(timeOfObservation + 1),
                 timeBandwidth.applyAsDouble(state.getRandom())
             )
         );

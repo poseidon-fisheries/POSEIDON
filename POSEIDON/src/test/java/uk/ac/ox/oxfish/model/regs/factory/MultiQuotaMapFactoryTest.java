@@ -32,7 +32,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -162,7 +161,7 @@ public class MultiQuotaMapFactoryTest {
         model.setScenario(scenario);
         final MultiQuotaMapFactory factory = new MultiQuotaMapFactory(
             MultiQuotaMapFactory.QuotaType.IQ,
-            new Pair<>("Species 0", 100.0)
+            new Entry<>("Species 0", 100.0)
         );
         scenario.setRegulation(factory);
 
@@ -200,7 +199,7 @@ public class MultiQuotaMapFactoryTest {
         model.setScenario(scenario);
         final MultiQuotaMapFactory factory = new MultiQuotaMapFactory(
             MultiQuotaMapFactory.QuotaType.ITQ,
-            new Pair<>("Species 0", 100.0)
+            new Entry<>("Species 0", 100.0)
         );
         final HashMap<String, Double> quotaExchangedPerMatch = new HashMap<>();
         quotaExchangedPerMatch.put("Species 0", 200.0);

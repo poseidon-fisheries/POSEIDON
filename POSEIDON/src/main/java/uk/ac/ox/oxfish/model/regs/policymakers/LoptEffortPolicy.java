@@ -12,6 +12,7 @@ import java.util.DoubleSummaryStatistics;
 public class LoptEffortPolicy extends Controller {
 
 
+    private static final long serialVersionUID = 8467863582546296898L;
     private final double buffer;
 
 
@@ -21,17 +22,17 @@ public class LoptEffortPolicy extends Controller {
 
 
     public LoptEffortPolicy(
-        String meanLengthColumnName,
-        double buffer,
-        double lengthTarget,
-        int averageMeanLengthOverTheseManyYears,
-        Actuator<FishState, Double> effortActuator,
-        boolean closeEntryWhenNeeded
+        final String meanLengthColumnName,
+        final double buffer,
+        final double lengthTarget,
+        final int averageMeanLengthOverTheseManyYears,
+        final Actuator<FishState, Double> effortActuator,
+        final boolean closeEntryWhenNeeded
     ) {
 
         super(
             (Sensor<FishState, Double>) system -> {
-                DoubleSummaryStatistics lengthSummaryStatistic = new DoubleSummaryStatistics();
+                final DoubleSummaryStatistics lengthSummaryStatistic = new DoubleSummaryStatistics();
                 for (int yearBack = 0; yearBack < averageMeanLengthOverTheseManyYears; yearBack++) {
                     lengthSummaryStatistic.accept(
                         system.getYearlyDataSet().getColumn(meanLengthColumnName).
@@ -54,15 +55,15 @@ public class LoptEffortPolicy extends Controller {
 
     @Override
     public double computePolicy(
-        double meanLengthColumn,
-        double lengthTarget,
-        FishState model, double oldPolicy
+        final double meanLengthColumn,
+        final double lengthTarget,
+        final FishState model, final double oldPolicy
     ) {
 
 
-        double ratio = meanLengthColumn / lengthTarget;
+        final double ratio = meanLengthColumn / lengthTarget;
         //TAE((1−buffer)(w+(1−w)r))
-        double effort = theoreticalSuggestedEffort * ((1 - buffer) * (0.5 + 0.5 * ratio));
+        final double effort = theoreticalSuggestedEffort * ((1 - buffer) * (0.5 + 0.5 * ratio));
 
         theoreticalSuggestedEffort = Math.max(
             Math.min(effort, theoreticalSuggestedEffort * (1d + maxChangePerYear)),
@@ -81,7 +82,7 @@ public class LoptEffortPolicy extends Controller {
         return theoreticalSuggestedEffort;
     }
 
-    public void setTheoreticalSuggestedEffort(double theoreticalSuggestedEffort) {
+    public void setTheoreticalSuggestedEffort(final double theoreticalSuggestedEffort) {
         this.theoreticalSuggestedEffort = theoreticalSuggestedEffort;
     }
 
@@ -99,7 +100,7 @@ public class LoptEffortPolicy extends Controller {
      *
      * @param maxChangePerYear Value to set for property 'maxChangePerYear'.
      */
-    public void setMaxChangePerYear(double maxChangePerYear) {
+    public void setMaxChangePerYear(final double maxChangePerYear) {
         this.maxChangePerYear = maxChangePerYear;
     }
 }

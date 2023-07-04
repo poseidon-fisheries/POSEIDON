@@ -53,13 +53,7 @@ public class AbundanceGatherers implements AdditionalStartable {
                     String columnName = species + " " + "Abundance " + subdivision + "." + bin + " at day " + dayOfMeasurement;
                     model.getYearlyDataSet().registerGatherer(
                         columnName,
-                        new Gatherer<FishState>() {
-                            @Override
-                            public Double apply(FishState fishState) {
-
-                                return abundancePerSpecies[species.getIndex()][finalSubdivision][finalBin];
-                            }
-                        }, Double.NaN
+                        (Gatherer<FishState>) fishState -> abundancePerSpecies[species.getIndex()][finalSubdivision][finalBin], Double.NaN
                     );
                     columnsCreated.add(columnName);
                 }
@@ -76,20 +70,8 @@ public class AbundanceGatherers implements AdditionalStartable {
             dayOfMeasurement);
 
         //other steps
-        stoppable = model.scheduleEveryYear(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                model.scheduleOnceInXDays(new Steppable() {
-                    @Override
-                    public void step(SimState simState) {
-
-                        updateStep(model);
-
-
-                    }
-                }, StepOrder.YEARLY_DATA_GATHERING, dayOfMeasurement);
-            }
-        }, StepOrder.DAWN);
+        stoppable = model.scheduleEveryYear((Steppable) simState -> model.scheduleOnceInXDays((Steppable) simState1 -> updateStep(
+            model), StepOrder.YEARLY_DATA_GATHERING, dayOfMeasurement), StepOrder.DAWN);
 
 
     }

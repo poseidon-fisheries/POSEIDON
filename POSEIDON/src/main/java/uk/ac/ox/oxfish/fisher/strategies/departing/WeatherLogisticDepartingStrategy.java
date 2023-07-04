@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.model.FishState;
 public class WeatherLogisticDepartingStrategy extends LogisticDepartingStrategy {
 
 
+    private static final long serialVersionUID = -1394247525382580346L;
     /**
      * how much windspeed affects "environment harshness"
      */
@@ -49,8 +50,8 @@ public class WeatherLogisticDepartingStrategy extends LogisticDepartingStrategy 
 
 
     public WeatherLogisticDepartingStrategy(
-        double l, double k, double x0, double windspeedSensitivity, double boatLengthSensitivity,
-        double harshnessIntercept
+        final double l, final double k, final double x0, final double windspeedSensitivity, final double boatLengthSensitivity,
+        final double harshnessIntercept
     ) {
         super(l, k, x0);
         this.windspeedSensitivity = windspeedSensitivity;
@@ -65,7 +66,7 @@ public class WeatherLogisticDepartingStrategy extends LogisticDepartingStrategy 
      * @param fisher the fisher making the decision
      * @param model  the state
      */
-    public double computeX(Fisher fisher, FishState model) {
+    public double computeX(final Fisher fisher, final FishState model) {
 
 
         return fisher.getLocation().getWindSpeedInKph() * windspeedSensitivity +

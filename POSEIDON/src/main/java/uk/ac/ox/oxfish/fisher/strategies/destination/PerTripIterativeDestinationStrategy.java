@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripObjective;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
@@ -48,7 +47,7 @@ import java.util.function.Predicate;
 public class PerTripIterativeDestinationStrategy implements DestinationStrategy {
 
 
-    private final Adaptation<SeaTile> algorithm;
+    private final Adaptation algorithm;
 
     /**
      * this strategy works by modifying the "favorite" destination of its delegate
@@ -62,8 +61,8 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
 
 
     public PerTripIterativeDestinationStrategy(
-        FavoriteDestinationStrategy delegate,
-        Adaptation<SeaTile> adaptation
+        final FavoriteDestinationStrategy delegate,
+        final Adaptation adaptation
     ) {
         this.delegate = delegate;
         this.algorithm = adaptation;
@@ -73,9 +72,9 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
 
     public PerTripIterativeDestinationStrategy(
         final FavoriteDestinationStrategy delegate,
-        AdaptationAlgorithm<SeaTile> algorithm,
-        double randomizationProbability,
-        double imitationProbability, final HourlyProfitInTripObjective objective,
+        final AdaptationAlgorithm<SeaTile> algorithm,
+        final double randomizationProbability,
+        final double imitationProbability, final HourlyProfitInTripObjective objective,
         final Predicate<SeaTile> explorationValidator
     ) {
         this(delegate, algorithm, new FixedProbability(randomizationProbability, imitationProbability),
@@ -84,44 +83,33 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     }
 
     public PerTripIterativeDestinationStrategy(
-        FavoriteDestinationStrategy delegate,
-        AdaptationAlgorithm<SeaTile> algorithm,
-        AdaptationProbability probability,
+        final FavoriteDestinationStrategy delegate,
+        final AdaptationAlgorithm<SeaTile> algorithm,
+        final AdaptationProbability probability,
         final ObjectiveFunction<Fisher> objective,
         final Predicate<SeaTile> explorationValidator,
-        boolean ignoreFailedTrips
+        final boolean ignoreFailedTrips
     ) {
         this.delegate = delegate;
         this.algorithm = new ExploreImitateAdaptation<SeaTile>(
-            new Predicate<Fisher>() {
-                @Override
-                public boolean test(Fisher fisher) {
-                    return !(ignoreFailedTrips && fisher.getLastFinishedTrip().isCutShort());
-                }
-            },
+            fisher -> !(ignoreFailedTrips && fisher.getLastFinishedTrip().isCutShort()),
 
 
             algorithm,
-            new Actuator<Fisher, SeaTile>() {
-                @Override
-                public void apply(Fisher fisher, SeaTile change, FishState model) {
-                    if (change.isWater()) //ignores "go to land" commands
-                        delegate.setFavoriteSpot(change);
-                }
+            (fisher, change, model) -> {
+                if (change.isWater()) //ignores "go to land" commands
+                    delegate.setFavoriteSpot(change);
             },
-            new Sensor<Fisher, SeaTile>() {
-                @Override
-                public SeaTile scan(Fisher fisher1) {
-                    TripRecord trip = fisher1.getLastFinishedTrip();
-                    if (trip == null || !trip.isCompleted() ||
-                        trip.getTilesFished().isEmpty())
-                        if (fisher1 == fisher)
-                            return delegate.getFavoriteSpot();
-                        else
-                            return null;
+            (Sensor<Fisher, SeaTile>) fisher1 -> {
+                final TripRecord trip = fisher1.getLastFinishedTrip();
+                if (trip == null || !trip.isCompleted() ||
+                    trip.getTilesFished().isEmpty())
+                    if (fisher1 == fisher)
+                        return delegate.getFavoriteSpot();
                     else
-                        return trip.getMostFishedTileInTrip();
-                }
+                        return null;
+                else
+                    return trip.getMostFishedTileInTrip();
             },
             objective,
             probability, explorationValidator
@@ -135,7 +123,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
      * @param fisher
      */
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         delegate.turnOff(fisher);
         fisher.removePerTripAdaptation(algorithm);
 
@@ -145,7 +133,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
      * starts a per-trip adaptation
      */
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         delegate.start(model, fisher);
 
 
@@ -164,9 +152,9 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
      */
     @Override
     public SeaTile chooseDestination(
-        Fisher fisher, MersenneTwisterFast random,
-        FishState model,
-        Action currentAction
+        final Fisher fisher, final MersenneTwisterFast random,
+        final FishState model,
+        final Action currentAction
     ) {
         return delegate.chooseDestination(fisher, random, model, currentAction);
     }
@@ -181,7 +169,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
         return delegate;
     }
 
-    public Adaptation<SeaTile> getAlgorithm() {
+    public Adaptation getAlgorithm() {
         return algorithm;
     }
 
@@ -191,7 +179,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     }
 
 
-    public void forceFavoriteSpot(SeaTile newFavoriteSpot) {
+    public void forceFavoriteSpot(final SeaTile newFavoriteSpot) {
         delegate.setFavoriteSpot(newFavoriteSpot);
     }
 }

@@ -38,7 +38,7 @@ public class WeatherStrategies {
      */
     public static final LinkedHashMap<String, Supplier<AlgorithmFactory<? extends WeatherEmergencyStrategy>>> CONSTRUCTORS;
 
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
         NAMES.put(IgnoreWeatherFactory.class, "Ignore Weather");

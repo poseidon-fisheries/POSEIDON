@@ -52,8 +52,8 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer {
 
 
     public RockyRectanglesHabitatInitializer(
-        int minRockyWidth, int maxRockyWidth, int minRockyHeight, int maxRockyHeight,
-        int numberOfRectangles
+        final int minRockyWidth, final int maxRockyWidth, final int minRockyHeight, final int maxRockyHeight,
+        final int numberOfRectangles
     ) {
         this(new RandomRockyRectangles(
             new UniformDoubleParameter(minRockyWidth, maxRockyHeight),
@@ -67,18 +67,18 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer {
 
     }
 
-    public RockyRectanglesHabitatInitializer(RockyRectangleMaker maker) {
+    public RockyRectanglesHabitatInitializer(final RockyRectangleMaker maker) {
         this.maker = maker;
     }
 
 
-    public RockyRectanglesHabitatInitializer(int x, int y, int width, int height) {
+    public RockyRectanglesHabitatInitializer(final int x, final int y, final int width, final int height) {
         this((random, map) -> new RockyRectangle[]{new RockyRectangle(x, y, width, height)});
     }
 
     public RockyRectanglesHabitatInitializer(
-        DoubleParameter rockyHeight, DoubleParameter rockyWidth,
-        int numberOfRectangles
+        final DoubleParameter rockyHeight, final DoubleParameter rockyWidth,
+        final int numberOfRectangles
     ) {
         this(new RandomRockyRectangles(rockyHeight, rockyWidth, numberOfRectangles));
     }
@@ -90,27 +90,27 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer {
      * @param model
      */
     @Override
-    public void applyHabitats(NauticalMap map, MersenneTwisterFast random, FishState model) {
+    public void applyHabitats(final NauticalMap map, final MersenneTwisterFast random, final FishState model) {
 
         //here I assume everything is sandy at first. I do not force it in case at some point I want to chain a series
         //of initializers (unlikely as it is)
 
 
         //ask the maker to give you rectangles
-        RockyRectangle[] rectangles = maker.buildRectangles(random, map);
+        final RockyRectangle[] rectangles = maker.buildRectangles(random, map);
 
         //turn rectangles into the real thing
-        for (RockyRectangle rectangle : rectangles) {
+        for (final RockyRectangle rectangle : rectangles) {
             //strip the rectangle class
-            int x = rectangle.getTopLeftX();
-            int y = rectangle.getTopLeftY();
-            int rockyWidth = rectangle.getWidth();
-            int rockyHeight = rectangle.getHeight();
+            final int x = rectangle.getTopLeftX();
+            final int y = rectangle.getTopLeftY();
+            final int rockyWidth = rectangle.getWidth();
+            final int rockyHeight = rectangle.getHeight();
             //for each tile in the rectangle
             for (int w = 0; w < rockyWidth; w++) {
                 for (int h = 0; h < rockyHeight; h++) {
 
-                    SeaTile tile = map.getSeaTile(x + w, y + h);
+                    final SeaTile tile = map.getSeaTile(x + w, y + h);
                     //if it's in the sea
                     if (tile != null && tile.isWater()) {
                         //make it rocky
@@ -161,9 +161,9 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer {
 
         model.getDailyDataSet().registerGatherer(ROCKY_FISHING_INTENSITY,
             state -> {
-                double total = Arrays.stream(map.getDailyTrawlsMap().toArray()).sum();
+                final double total = Arrays.stream(map.getDailyTrawlsMap().toArray()).sum();
                 double rocky = 0;
-                for (SeaTile tile : rockyTiles)
+                for (final SeaTile tile : rockyTiles)
                     rocky += map.getDailyTrawlsMap().field[tile.getGridX()][tile.getGridY()];
 
                 return 100 * rocky / total;
@@ -173,9 +173,9 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer {
 
         model.getDailyDataSet().registerGatherer(BORDER_FISHING_INTENSITY,
             state -> {
-                double total = Arrays.stream(map.getDailyTrawlsMap().toArray()).sum();
+                final double total = Arrays.stream(map.getDailyTrawlsMap().toArray()).sum();
                 double rocky = 0;
-                for (SeaTile tile : borderTiles)
+                for (final SeaTile tile : borderTiles)
                     rocky += map.getDailyTrawlsMap().field[tile.getGridX()][tile.getGridY()];
 
                 return 100 * rocky / total;
@@ -183,38 +183,6 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer {
             }, Double.NaN
         );
 
-    }
-}
-
-class RockyRectangle {
-
-    private final int topLeftX;
-    private final int topLeftY;
-    private final int width;
-    private final int height;
-
-
-    public RockyRectangle(int topLeftX, int topLeftY, int width, int height) {
-        this.topLeftX = topLeftX;
-        this.topLeftY = topLeftY;
-        this.width = width;
-        this.height = height;
-    }
-
-    public int getTopLeftX() {
-        return topLeftX;
-    }
-
-    public int getTopLeftY() {
-        return topLeftY;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
     }
 }
 

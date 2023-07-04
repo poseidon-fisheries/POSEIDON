@@ -3,9 +3,9 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.PriorityQueue;
 
 /**
@@ -13,20 +13,20 @@ import java.util.PriorityQueue;
  * of weights
  */
 public abstract class PickBestPilePlanningModule extends DiscretizedOwnFadPlanningModule {
-    public PickBestPilePlanningModule(OwnFadSetDiscretizedActionGenerator optionsGenerator) {
+    public PickBestPilePlanningModule(final OwnFadSetDiscretizedActionGenerator optionsGenerator) {
         super(optionsGenerator);
     }
 
     @Override
     protected PlannedAction chooseFadSet(
-        Plan currentPlanSoFar, Fisher fisher,
-        FishState model, NauticalMap map,
-        OwnFadSetDiscretizedActionGenerator optionsGenerator
+        final Plan currentPlanSoFar, final Fisher fisher,
+        final FishState model, final NauticalMap map,
+        final OwnFadSetDiscretizedActionGenerator optionsGenerator
     ) {
 
         final int now = model.getStep();
 
-        List<Pair<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options =
+        final List<Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options =
             optionsGenerator.peekAllFads();
 
         //if there are no options, don't bother
@@ -34,8 +34,8 @@ public abstract class PickBestPilePlanningModule extends DiscretizedOwnFadPlanni
             return null;
         //if there is only one option, also don't bother
         if (options.size() == 1) {
-            if (options.get(0).getSecond() > 0)
-                return optionsGenerator.chooseFad(options.get(0).getSecond());
+            if (options.get(0).getValue() > 0)
+                return optionsGenerator.chooseFad(options.get(0).getValue());
             else return null;
         }
 
@@ -43,9 +43,9 @@ public abstract class PickBestPilePlanningModule extends DiscretizedOwnFadPlanni
         //go through every valid discretized list of fads
         double bestWeight = -1;
         int fadGroupChosen = -1;
-        for (Pair<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer> option : options) {
-            double weightHere =
-                option.getFirst().stream().mapToDouble(
+        for (final Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer> option : options) {
+            final double weightHere =
+                option.getKey().stream().mapToDouble(
                     valuedFad -> {
 
                         return weighFad(now, valuedFad);
@@ -53,7 +53,7 @@ public abstract class PickBestPilePlanningModule extends DiscretizedOwnFadPlanni
                 ).sum();
             if (weightHere > bestWeight) {
                 bestWeight = weightHere;
-                fadGroupChosen = option.getSecond();
+                fadGroupChosen = option.getValue();
             }
         }
 

@@ -28,12 +28,12 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 
 public class SearchAction extends PurseSeinerAction {
 
-    private final SetOpportunityDetector setOpportunityDetector;
+    private final SetOpportunityDetector<?> setOpportunityDetector;
     private final Class<? extends PurseSeinerAction> classForWeighting;
 
     public SearchAction(
         final Fisher fisher,
-        final SetOpportunityDetector setOpportunityDetector,
+        final SetOpportunityDetector<?> setOpportunityDetector,
         final Class<? extends PurseSeinerAction> classForWeighting
     ) {
         super(fisher, fisher.getLocation(), 1);

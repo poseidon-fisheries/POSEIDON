@@ -8,6 +8,7 @@ import java.util.Map.Entry;
  */
 public class WeightedObject<KEY> extends Number {
 
+    private static final long serialVersionUID = -5677501710132261821L;
     private final KEY objectBeingWeighted;
 
     private final double totalWeight;

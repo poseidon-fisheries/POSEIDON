@@ -72,17 +72,12 @@ public class ProfitFunctionRegressionTest {
             state
         );
         Fisher fisher = state.getFishers().get(0);
-        fisher.addTripListener(new TripListener() {
-            @Override
-            public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-                regression.addObservation(new GeographicalObservation<>(
-                        record.getMostFishedTileInTrip(),
-                        state.getHoursSinceStart(),
-                        record
-                    ), fisher, state
-                );
-            }
-        });
+        fisher.addTripListener((TripListener) (record, fisher1) -> regression.addObservation(new GeographicalObservation<>(
+                record.getMostFishedTileInTrip(),
+                state.getHoursSinceStart(),
+                record
+            ), fisher1, state
+        ));
 
 
         //make him go to 20,20

@@ -4,10 +4,10 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.PriorityQueue;
 
 
@@ -49,7 +49,7 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
         final NauticalMap map,
         final OwnFadSetDiscretizedActionGenerator optionsGenerator
     ) {
-        final List<Pair<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options =
+        final List<Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options =
             optionsGenerator.peekAllFads();
 
         //if there are no options, don't bother
@@ -57,8 +57,8 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
             return null;
         //if there is only one option, also don't bother
         if (options.size() == 1) {
-            if (options.get(0).getSecond() > 0)
-                return optionsGenerator.chooseFad(options.get(0).getSecond());
+            if (options.get(0).getValue() > 0)
+                return optionsGenerator.chooseFad(options.get(0).getValue());
             else return null;
         }
 
@@ -78,15 +78,15 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
 
     public static int selectFadByCheapestInsertion(
         final Plan currentPlanSoFar, final Fisher fisher, final NauticalMap map,
-        final List<Pair<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options,
+        final List<Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options,
         final double boatSpeed, final int numberOfAdditionalFadToCount
     ) {
         double maxProfitsSoFar = 0;
         int fadGroupChosen = -1;
 
-        for (final Pair<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer> option : options) {
+        for (final Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer> option : options) {
             //get the fads in centroid
-            final PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad> fads = option.getFirst();
+            final PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad> fads = option.getKey();
             //if there are none, don't bother
             if (fads.isEmpty() || fads == null)
                 continue;
@@ -120,7 +120,7 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
             final double profitHere = revenuesHere - costHere;
             if (profitHere > maxProfitsSoFar) {
                 maxProfitsSoFar = profitHere;
-                fadGroupChosen = option.getSecond();
+                fadGroupChosen = option.getValue();
             }
 
         }

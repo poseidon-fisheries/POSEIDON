@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model.regs;
 
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.Species;
@@ -37,6 +36,7 @@ import java.util.Arrays;
  */
 public class WeakMultiQuotaRegulation extends MultiQuotaRegulation {
 
+    private static final long serialVersionUID = 4776807752025664410L;
     /**
      * contains the last day where that species was still allowed to be fished
      */
@@ -44,7 +44,7 @@ public class WeakMultiQuotaRegulation extends MultiQuotaRegulation {
     private Stoppable receipt;
 
 
-    public WeakMultiQuotaRegulation(double[] yearlyQuota, FishState state) {
+    public WeakMultiQuotaRegulation(final double[] yearlyQuota, final FishState state) {
         super(yearlyQuota, state);
         lastSeasonDay = new int[state.getSpecies().size()];
         Arrays.fill(lastSeasonDay, 365);
@@ -62,33 +62,30 @@ public class WeakMultiQuotaRegulation extends MultiQuotaRegulation {
      */
     @Override
     public void reactToSale(
-        Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep
+        final Species species, final Fisher seller, final double biomass, final double revenue, final FishState model, final int timeStep
     ) {
-        double before = super.getQuotaRemaining(species.getIndex());
+        final double before = super.getQuotaRemaining(species.getIndex());
         super.reactToSale(species, seller, biomass, revenue, model, timeStep);
         //if this was the landing that broke the quota, record the day
-        double after = super.getQuotaRemaining(species.getIndex());
+        final double after = super.getQuotaRemaining(species.getIndex());
         if (before > FishStateUtilities.EPSILON && after < FishStateUtilities.EPSILON)
             lastSeasonDay[species.getIndex()] = super.getState().getDayOfTheYear();
 
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         super.start(model, fisher);
-        receipt = model.scheduleEveryYear(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                Arrays.fill(lastSeasonDay, 365);
-
-            }
-        }, StepOrder.DATA_RESET);
+        receipt = model.scheduleEveryYear(
+            (Steppable) simState -> Arrays.fill(lastSeasonDay, 365),
+            StepOrder.DATA_RESET
+        );
 
 
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         super.turnOff(fisher);
         if (receipt != null)
             receipt.stop();

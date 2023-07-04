@@ -53,18 +53,15 @@ public class CatchAtBinGatherer implements AdditionalStartable {
                     int finalAge = age;
                     DataColumn dailyCatches = model.getDailyDataSet().registerGatherer(
                         columnName,
-                        new Gatherer<FishState>() {
-                            @Override
-                            public Double apply(FishState state) {
+                        (Gatherer<FishState>) state -> {
 
-                                double sum = 0;
-                                for (Fisher fisher : state.getFishers()) {
-                                    sum += fisher.getCountedLandingsPerBin(species, finalAge);
-                                }
-
-                                return sum;
-
+                            double sum = 0;
+                            for (Fisher fisher : state.getFishers()) {
+                                sum += fisher.getCountedLandingsPerBin(species, finalAge);
                             }
+
+                            return sum;
+
                         }, 0
                     );
                     model.getYearlyDataSet().registerGatherer(

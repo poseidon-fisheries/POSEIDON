@@ -37,7 +37,7 @@ public class FishingStrategies {
     public static final LinkedHashMap<String, Supplier<AlgorithmFactory<? extends FishingStrategy>>>
         CONSTRUCTORS;
 
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES =
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory<?>>, String> NAMES =
         new LinkedHashMap<>();
 
     static {

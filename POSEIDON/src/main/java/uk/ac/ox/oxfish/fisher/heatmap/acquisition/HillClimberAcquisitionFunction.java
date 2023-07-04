@@ -41,7 +41,7 @@ public class HillClimberAcquisitionFunction implements AcquisitionFunction {
     private final int stepSize;
 
 
-    public HillClimberAcquisitionFunction(int stepSize) {
+    public HillClimberAcquisitionFunction(final int stepSize) {
         this.stepSize = stepSize;
     }
 
@@ -56,23 +56,26 @@ public class HillClimberAcquisitionFunction implements AcquisitionFunction {
      */
     @Override
     public SeaTile pick(
-        NauticalMap map, GeographicalRegression regression,
-        FishState state, Fisher fisher, SeaTile current
+        final NauticalMap map,
+        final GeographicalRegression<?> regression,
+        final FishState state,
+        final Fisher fisher,
+        final SeaTile current
     ) {
 
-        double time = state.getHoursSinceStart();
+        final double time = state.getHoursSinceStart();
 
         //start at a random location
-        List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
+        final List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
         //start at current best if you have it
         SeaTile location = current == null ? tiles.get(state.getRandom().nextInt(tiles.size())) : current;
         Bag mooreNeighbors = new Bag(map.getMooreNeighbors(location, stepSize));
         mooreNeighbors.shuffle(state.getRandom());
-        Set<SeaTile> checkedAlready = new HashSet<>();
+        final Set<SeaTile> checkedAlready = new HashSet<>();
         //as long as there are neighbors you aren't done
         while (!mooreNeighbors.isEmpty()) {
             //remove a neighbor
-            SeaTile option = (SeaTile) mooreNeighbors.remove(0);
+            final SeaTile option = (SeaTile) mooreNeighbors.remove(0);
             //if it is better, restart search at that neighbor!
             if (option.isWater() && !checkedAlready.contains(option) &&
                 regression.predict(location, time, fisher, state)

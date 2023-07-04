@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -37,7 +36,9 @@ public class ClampedDestinationFactory implements AlgorithmFactory<ClampedDestin
     /**
      * share the same discretization
      */
-    private final Locker<String, MapDiscretization> discretizationLocker = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, MapDiscretization> discretizationLocker =
+        new uk.ac.ox.oxfish.utility.Locker<>();
     private AlgorithmFactory<? extends MapDiscretizer> discretizer =
         new CentroidMapFileFactory();
 

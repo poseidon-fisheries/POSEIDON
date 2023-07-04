@@ -30,15 +30,11 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.CoordinateTransformer;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.GravitationalSearchAdaptation;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Created by carrknight on 10/6/16.
@@ -60,48 +56,35 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
      * @return the function result
      */
     @Override
-    public PerTripIterativeDestinationStrategy apply(FishState state) {
-        MersenneTwisterFast random = state.random;
-        NauticalMap map = state.getMap();
+    public PerTripIterativeDestinationStrategy apply(final FishState state) {
+        final MersenneTwisterFast random = state.random;
+        final NauticalMap map = state.getMap();
 
 
-        FavoriteDestinationStrategy delegate = new FavoriteDestinationStrategy(map, random);
-        GravitationalSearchAdaptation<SeaTile> search = new GravitationalSearchAdaptation<>(
-            new Sensor<Fisher, SeaTile>() {
-                @Override
-                public SeaTile scan(Fisher fisher) {
+        final FavoriteDestinationStrategy delegate = new FavoriteDestinationStrategy(map, random);
+        final GravitationalSearchAdaptation<SeaTile> search = new GravitationalSearchAdaptation<>(
+            (Sensor<Fisher, SeaTile>) fisher -> {
 
-                    if (
-                        fisher.getDestinationStrategy() instanceof PerTripIterativeDestinationStrategy &&
-                            ((PerTripIterativeDestinationStrategy) fisher.getDestinationStrategy()).getDelegate()
-                                .equals(
-                                    delegate))
-                        return delegate.getFavoriteSpot();
-                    else {
-                        TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
-                        return lastFinishedTrip == null ? null : lastFinishedTrip.getMostFishedTileInTrip();
+                if (
+                    fisher.getDestinationStrategy() instanceof PerTripIterativeDestinationStrategy &&
+                        ((PerTripIterativeDestinationStrategy) fisher.getDestinationStrategy()).getDelegate()
+                            .equals(
+                                delegate))
+                    return delegate.getFavoriteSpot();
+                else {
+                    final TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
+                    return lastFinishedTrip == null ? null : lastFinishedTrip.getMostFishedTileInTrip();
 
-                    }
                 }
             },
-            new Actuator<Fisher, SeaTile>() {
-                @Override
-                public void apply(Fisher fisher, SeaTile change, FishState model) {
-                    delegate.setFavoriteSpot(change);
-                }
-            },
-            new Predicate<Fisher>() {
-                @Override
-                public boolean test(Fisher fisher) {
-                    return true;
-                }
-            },
+            (fisher, change, model) -> delegate.setFavoriteSpot(change),
+            fisher -> true,
             new CoordinateTransformer<SeaTile>() {
                 @Override
                 public double[] toCoordinates(
-                    SeaTile variable,
-                    Fisher fisher,
-                    FishState model
+                    final SeaTile variable,
+                    final Fisher fisher,
+                    final FishState model
                 ) {
                     return variable == null ? null :
                         new double[]{
@@ -111,9 +94,9 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
 
                 @Override
                 public SeaTile fromCoordinates(
-                    double[] variable,
-                    Fisher fisher,
-                    FishState model
+                    final double[] variable,
+                    final Fisher fisher,
+                    final FishState model
                 ) {
                     return model.getMap().getSeaTile(
                         (int) variable[0],
@@ -129,28 +112,23 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
 
         );
         //bound and randomize if you end up on land!
-        search.setCoordinatesBounder(new Consumer<double[]>() {
-            @Override
-            public void accept(double[] variable) {
-                variable[0] = Math.max(Math.min(variable[0], state.getMap().getWidth() - 1), 0);
-                variable[1] = Math.max(Math.min(variable[1], state.getMap().getHeight() - 1), 0);
+        search.setCoordinatesBounder(variable -> {
+            variable[0] = Math.max(Math.min(variable[0], state.getMap().getWidth() - 1), 0);
+            variable[1] = Math.max(Math.min(variable[1], state.getMap().getHeight() - 1), 0);
 
-                SeaTile presumedLocation = map.getSeaTile((int) variable[0], (int) variable[1]);
-                if (presumedLocation.isLand()) {
-                    Object[] options = map.getMooreNeighbors(presumedLocation, 3).stream().filter(new Predicate() {
-                        @Override
-                        public boolean test(Object o) {
-                            return ((SeaTile) o).isWater();
-                        }
-                    }).toArray();
-                    SeaTile tile;
-                    if (options.length > 0)
-                        tile = (SeaTile) options[random.nextInt(options.length)];
-                    else
-                        tile = map.getRandomBelowWaterLineSeaTile(random);
-                    variable[0] = tile.getGridX();
-                    variable[1] = tile.getGridY();
-                }
+            final SeaTile presumedLocation = map.getSeaTile((int) variable[0], (int) variable[1]);
+            if (presumedLocation.isLand()) {
+                final Object[] options = map
+                    .getMooreNeighborsStream(presumedLocation, 3)
+                    .filter(SeaTile::isWater)
+                    .toArray();
+                final SeaTile tile;
+                if (options.length > 0)
+                    tile = (SeaTile) options[random.nextInt(options.length)];
+                else
+                    tile = map.getRandomBelowWaterLineSeaTile(random);
+                variable[0] = tile.getGridX();
+                variable[1] = tile.getGridY();
             }
         });
         return new PerTripIterativeDestinationStrategy(
@@ -175,7 +153,7 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
      *
      * @param explorationSize Value to set for property 'explorationSize'.
      */
-    public void setExplorationSize(DoubleParameter explorationSize) {
+    public void setExplorationSize(final DoubleParameter explorationSize) {
         this.explorationSize = explorationSize;
     }
 
@@ -193,7 +171,7 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
      *
      * @param initialSpeed Value to set for property 'initialSpeed'.
      */
-    public void setInitialSpeed(DoubleParameter initialSpeed) {
+    public void setInitialSpeed(final DoubleParameter initialSpeed) {
         this.initialSpeed = initialSpeed;
     }
 
@@ -211,7 +189,7 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
      *
      * @param gravitationalConstant Value to set for property 'gravitationalConstant'.
      */
-    public void setGravitationalConstant(DoubleParameter gravitationalConstant) {
+    public void setGravitationalConstant(final DoubleParameter gravitationalConstant) {
         this.gravitationalConstant = gravitationalConstant;
     }
 }

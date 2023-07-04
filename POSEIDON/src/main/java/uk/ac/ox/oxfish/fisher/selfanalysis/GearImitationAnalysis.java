@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
-import ec.util.MersenneTwisterFast;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.DockingListener;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -34,10 +33,8 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 /**
@@ -53,6 +50,7 @@ public class GearImitationAnalysis {
             Logger.getGlobal().fine(() -> fisher1 + " is about to change gear");
             //predictions are wrong: reset at the end of the trip
             fisher1.addDockingListener(new DockingListener() {
+                private static final long serialVersionUID = 2925530753028037648L;
                 boolean active = true;
 
                 @Override
@@ -94,31 +92,17 @@ public class GearImitationAnalysis {
             final ExploreImitateAdaptation<Hold> holdAdaptation = new ExploreImitateAdaptation<>(
                 fisher1 -> true,
                 new BeamHillClimbing<Hold>(
-                    new RandomStep<Hold>() {
-                        public Hold randomStep(
-                            final FishState state,
-                            final MersenneTwisterFast random,
-                            final Fisher fisher,
-                            final Hold current
-                        ) {
-                            return new Hold(
-                                fisher.getMaximumHold() *
-                                    (.8 + .4 * random.nextDouble()),
-                                state.getBiology()
-                            );
-                        }
-                    }
+                    (state, random, fisher12, current) -> new Hold(
+                        fisher12.getMaximumHold() *
+                            (.8 + .4 * random.nextDouble()),
+                        state.getBiology()
+                    )
 
                 ), (fisher1, change, model1) -> fisher1.changeHold(change),
                 fisher1 -> {
                     //create a new hold for scanning. Helps with safety plus we can't get Fisher hold
                     return new Hold(fisher1.getMaximumHold(), model.getBiology());
-                }, new CashFlowObjective(60), .15, .6, new Predicate<Hold>() {
-                @Override
-                public boolean test(final Hold a) {
-                    return true;
-                }
-            }
+                }, new CashFlowObjective(60), .15, .6, a -> true
             );
 
 
@@ -162,29 +146,18 @@ public class GearImitationAnalysis {
                 = new ExploreImitateAdaptation<>(
                 fisher1 -> true,
                 new BeamHillClimbing<FixedProbabilityDepartingStrategy>(
-                    new RandomStep<FixedProbabilityDepartingStrategy>() {
-                        @Override
-                        public FixedProbabilityDepartingStrategy randomStep(
-                            final FishState state, final MersenneTwisterFast random, final Fisher fisher,
-                            final FixedProbabilityDepartingStrategy current
-                        ) {
-                            double probability = current.getProbabilityToLeavePort();
-                            final double shock = (2 * shockSize) * random.nextDouble() - shockSize;
-                            probability = probability * (1 + shock);
-                            probability = Math.min(Math.max(0, probability), 1);
-                            return new FixedProbabilityDepartingStrategy(probability, false);
-                        }
+                    (state, random, fisher12, current) -> {
+                        double probability = current.getProbabilityToLeavePort();
+                        final double shock = (2 * shockSize) * random.nextDouble() - shockSize;
+                        probability = probability * (1 + shock);
+                        probability = Math.min(Math.max(0, probability), 1);
+                        return new FixedProbabilityDepartingStrategy(probability, false);
                     }
                 ),
                 (fisher1, change, model1) -> fisher1.setDepartingStrategy(change),
                 fisher1 -> ((FixedProbabilityDepartingStrategy) fisher1.getDepartingStrategy()),
                 new CashFlowObjective(60),
-                explorationProbability, imitationProbability, new Predicate<FixedProbabilityDepartingStrategy>() {
-                @Override
-                public boolean test(final FixedProbabilityDepartingStrategy a) {
-                    return true;
-                }
-            }
+                explorationProbability, imitationProbability, a -> true
             );
             fisher.addBiMonthlyAdaptation(departingChance);
 

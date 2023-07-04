@@ -28,9 +28,10 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map.Entry;
 
 /**
  * "An infinite school" of fish. It exists in a radius around a point. Moves towards waypoints.
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 public class InfiniteSchool implements Startable, Steppable {
 
 
+    private static final long serialVersionUID = 6982466809540285530L;
     /**
      * after how many days we move
      */
@@ -56,12 +58,12 @@ public class InfiniteSchool implements Startable, Steppable {
      * the species simulated by this school
      */
     private final Species species;
-    private int positionX;
-    private int positionY;
     /**
      * the positions this school moves toward
      */
-    private ArrayList<Pair<Integer, Integer>> waypoints;
+    private final ArrayList<Entry<Integer, Integer>> waypoints;
+    private int positionX;
+    private int positionY;
     /**
      * which waypoint we are currently going to
      */
@@ -72,9 +74,15 @@ public class InfiniteSchool implements Startable, Steppable {
     private int daysWaiting = 0;
     private Stoppable stoppable;
 
+    @SuppressWarnings("unchecked")
     public InfiniteSchool(
-        int positionX, int positionY, int speedInDays, double diameter, double biomassPerCell,
-        Species species, Pair<Integer, Integer>... waypoints
+        final int positionX,
+        final int positionY,
+        final int speedInDays,
+        final double diameter,
+        final double biomassPerCell,
+        final Species species,
+        final Entry<Integer, Integer>... waypoints
     ) {
         this.positionX = positionX;
         this.positionY = positionY;
@@ -85,15 +93,14 @@ public class InfiniteSchool implements Startable, Steppable {
 
         Preconditions.checkArgument(waypoints.length >= 2);
         this.waypoints = new ArrayList<>(waypoints.length);
-        for (Pair<Integer, Integer> waypoint : waypoints)
-            this.waypoints.add(waypoint);
+        Collections.addAll(this.waypoints, waypoints);
 
         updateWaypoint();
     }
 
     public void updateWaypoint() {
-        Pair<Integer, Integer> waypoint = waypoints.get(currentWaypoint);
-        if (positionX == waypoint.getFirst() && positionY == waypoint.getSecond()) {
+        final Entry<Integer, Integer> waypoint = waypoints.get(currentWaypoint);
+        if (positionX == waypoint.getKey() && positionY == waypoint.getValue()) {
             currentWaypoint++;
             if (currentWaypoint >= waypoints.size())
                 currentWaypoint = 0;
@@ -109,7 +116,7 @@ public class InfiniteSchool implements Startable, Steppable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         Preconditions.checkState(stoppable == null);
         this.stoppable = model.scheduleEveryDay(this, StepOrder.BIOLOGY_PHASE);
     }
@@ -124,14 +131,14 @@ public class InfiniteSchool implements Startable, Steppable {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
         daysWaiting++;
         if (daysWaiting >= speedInDays) {
-            Pair<Integer, Integer> waypoint = waypoints.get(currentWaypoint);
+            final Entry<Integer, Integer> waypoint = waypoints.get(currentWaypoint);
 
-            positionX += Math.signum(waypoint.getFirst() - positionX);
-            positionY += Math.signum(waypoint.getSecond() - positionY);
+            positionX += Math.signum(waypoint.getKey() - positionX);
+            positionY += Math.signum(waypoint.getValue() - positionY);
 
             daysWaiting = 0;
             updateWaypoint();
@@ -139,7 +146,7 @@ public class InfiniteSchool implements Startable, Steppable {
 
     }
 
-    public boolean contains(SeaTile tile) {
+    public boolean contains(final SeaTile tile) {
 
         return Math.pow(tile.getGridX() - positionX, 2) + Math.pow(tile.getGridY() - positionY, 2) <= diameterSquared;
     }

@@ -38,7 +38,9 @@ import java.util.function.Function;
  * of a given species and this function actually simulating profits for each
  * Created by carrknight on 7/14/16.
  */
-public class ProfitFunctionRegression implements Function<SeaTile, double[]>, GeographicalRegression<TripRecord> {
+public class ProfitFunctionRegression
+    implements Function<SeaTile, double[]>,
+    GeographicalRegression<TripRecord> {
 
 
     private final ProfitFunction profit;
@@ -53,10 +55,11 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
     private FishState state;
 
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public ProfitFunctionRegression(
-        ProfitFunction function,
-        AlgorithmFactory<? extends GeographicalRegression> regressionMaker,
-        FishState state
+        final ProfitFunction function,
+        final AlgorithmFactory<? extends GeographicalRegression<Double>> regressionMaker,
+        final FishState state
     ) {
         catches = new GeographicalRegression[state.getSpecies().size()];
         for (int i = 0; i < catches.length; i++) {
@@ -67,8 +70,8 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
     }
 
     public ProfitFunctionRegression(
-        ProfitFunction function,
-        GeographicalRegression<Double>[] catches
+        final ProfitFunction function,
+        final GeographicalRegression<Double>[] catches
     ) {
         this.catches = catches;
         this.profit = function;
@@ -77,7 +80,7 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
 
     @Override
     public double predict(
-        SeaTile tile, double time, Fisher fisher, FishState model
+        final SeaTile tile, final double time, final Fisher fisher, final FishState model
     ) {
 
         return this.predict(tile, time, state, fisher, false);
@@ -87,7 +90,7 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
 
 
     public double predict(
-        SeaTile tile, double time, FishState state, Fisher fisher, boolean verbose
+        final SeaTile tile, final double time, final FishState state, final Fisher fisher, final boolean verbose
     ) {
 
         this.state = state;
@@ -105,9 +108,9 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
      * @return the function result
      */
     @Override
-    public double[] apply(SeaTile tile) {
+    public double[] apply(final SeaTile tile) {
 
-        double[] expectedHourlyCatches = new double[catches.length];
+        final double[] expectedHourlyCatches = new double[catches.length];
         for (int i = 0; i < expectedHourlyCatches.length; i++)
             expectedHourlyCatches[i] = Math.max(
                 0,
@@ -119,11 +122,14 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
 
     @Override
     public void addObservation(
-        GeographicalObservation<TripRecord> observation, Fisher fisher, FishState model
+        final GeographicalObservation<TripRecord> observation,
+        final Fisher fisher,
+        final FishState model
     ) {
         for (int i = 0; i < catches.length; i++) {
             catches[i].addObservation(
-                new GeographicalObservation<>(observation.getTile(),
+                new GeographicalObservation<>(
+                    observation.getTile(),
                     observation.getTime(),
                     //check only the very last hour spent fishing, otherwise it's too optimistic!
                     observation.getValue().getLastFishingRecordOfTile(
@@ -145,17 +151,17 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
     //ignored
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         this.state = model;
-        for (GeographicalRegression reg : catches)
+        for (final GeographicalRegression<?> reg : catches)
             reg.start(model, fisher);
     }
 
     //ignored
 
     @Override
-    public void turnOff(Fisher fisher) {
-        for (GeographicalRegression reg : catches)
+    public void turnOff(final Fisher fisher) {
+        for (final GeographicalRegression<?> reg : catches)
             reg.turnOff(fisher);
     }
 
@@ -164,7 +170,7 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
      */
     @Override
     public double extractNumericalYFromObservation(
-        GeographicalObservation<TripRecord> observation, Fisher fisher
+        final GeographicalObservation<TripRecord> observation, final Fisher fisher
     ) {
         return observation.getValue().getProfitPerHour(true);
     }
@@ -193,13 +199,13 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
      * @param parameterArray the new parameters for this regresssion
      */
     @Override
-    public void setParameters(double[] parameterArray) {
+    public void setParameters(final double[] parameterArray) {
 
 
-        int numberOfParameters = catches[0].getParametersAsArray().length;
+        final int numberOfParameters = catches[0].getParametersAsArray().length;
         assert parameterArray.length == numberOfParameters * catches.length;
         if (numberOfParameters > 0) {
-            List<double[]> parameters = FishStateUtilities.splitArray(parameterArray, numberOfParameters);
+            final List<double[]> parameters = FishStateUtilities.splitArray(parameterArray, numberOfParameters);
             assert parameters.size() == catches.length;
             for (int i = 0; i < catches.length; i++)
                 catches[i].setParameters(parameters.get(i));

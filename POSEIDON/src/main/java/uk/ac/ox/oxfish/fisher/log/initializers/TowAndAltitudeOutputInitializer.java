@@ -61,12 +61,7 @@ public class TowAndAltitudeOutputInitializer implements AdditionalStartable, Log
             if (state.getYear() >= histogrammerStartYear)
                 fisher.addTripListener(tows);
             else
-                state.scheduleOnceAtTheBeginningOfYear(new Steppable() {
-                    @Override
-                    public void step(SimState simState) {
-                        fisher.addTripListener(tows);
-                    }
-                }, StepOrder.DAWN, histogrammerStartYear);
+                state.scheduleOnceAtTheBeginningOfYear((Steppable) simState -> fisher.addTripListener(tows), StepOrder.DAWN, histogrammerStartYear);
         }
 
 

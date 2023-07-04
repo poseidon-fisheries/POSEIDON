@@ -30,15 +30,16 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
  */
 public class FisherDailyCounter extends Counter {
 
-    private double[] landings;
+    private static final long serialVersionUID = 9169901162655878415L;
+    private final double[] landings;
 
-    private double[] catches;
+    private final double[] catches;
 
-    private double[] earnings;
+    private final double[] earnings;
 
-    private double[][][] landingsPerBin;
+    private final double[][][] landingsPerBin;
 
-    public FisherDailyCounter(int numberOfSpecies) {
+    public FisherDailyCounter(final int numberOfSpecies) {
         super(IntervalPolicy.EVERY_DAY);
         landings = new double[numberOfSpecies];
         earnings = new double[numberOfSpecies];
@@ -49,7 +50,7 @@ public class FisherDailyCounter extends Counter {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         super.step(simState);
 
         for (int i = 0; i < landings.length; i++) {
@@ -69,46 +70,48 @@ public class FisherDailyCounter extends Counter {
      *
      * @param add by how much to increment
      */
-    public void countLanding(Species species, double add) {
+    public void countLanding(final Species species, final double add) {
         landings[species.getIndex()] += add;
     }
 
 
-    public void countLandinngPerBin(Species species, Catch catchOfTheDay) {
+    public void countLandinngPerBin(final Species species, final Catch catchOfTheDay) {
 
         if (landingsPerBin[species.getIndex()] == null)
             landingsPerBin[species.getIndex()] = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
 
         for (int subdivision = 0; subdivision < landingsPerBin[species.getIndex()].length; subdivision++)
             for (int bin = 0; bin < landingsPerBin[species.getIndex()][0].length; bin++)
-                landingsPerBin[species.getIndex()][subdivision][bin] += catchOfTheDay.getWeightCaught(species,
+                landingsPerBin[species.getIndex()][subdivision][bin] += catchOfTheDay.getWeightCaught(
+                    species,
                     subdivision,
-                    bin);
+                    bin
+                );
 
     }
 
-    public void countEarnings(Species species, double add) {
+    public void countEarnings(final Species species, final double add) {
         earnings[species.getIndex()] += add;
     }
 
-    public void countCatches(Species species, double add) {
+    public void countCatches(final Species species, final double add) {
         catches[species.getIndex()] += add;
     }
 
-    public double getLandingsPerSpecie(int index) {
+    public double getLandingsPerSpecie(final int index) {
         return landings[index];
     }
 
-    public double getEarningsPerSpecie(int index) {
+    public double getEarningsPerSpecie(final int index) {
         return earnings[index];
     }
 
-    public double getCatchesPerSpecie(int index) {
+    public double getCatchesPerSpecie(final int index) {
         return catches[index];
     }
 
 
-    public double getSpecificLandings(Species species, int bin) {
+    public double getSpecificLandings(final Species species, final int bin) {
         if (landingsPerBin[species.getIndex()] == null)
             return 0d;
         else {
@@ -119,7 +122,7 @@ public class FisherDailyCounter extends Counter {
         }
     }
 
-    public double getSpecificLandings(Species species, int subdivision, int bin) {
+    public double getSpecificLandings(final Species species, final int subdivision, final int bin) {
         if (landingsPerBin[species.getIndex()] == null)
             return 0d;
         else {

@@ -38,6 +38,7 @@ import java.util.*;
 public class LocationMemories<T> implements Startable, Steppable {
 
 
+    private static final long serialVersionUID = 3423123730692395603L;
     /**
      * a map of each sea-tile with its most recent memory
      */
@@ -52,9 +53,9 @@ public class LocationMemories<T> implements Startable, Steppable {
     private Stoppable receipt;
 
     public LocationMemories(
-        double dailyForgettingProbability,
-        int minimumMemoryAgeInDaysBeforeForgetting,
-        int minimumNumberOfMemoriesBeforeForgetting
+        final double dailyForgettingProbability,
+        final int minimumMemoryAgeInDaysBeforeForgetting,
+        final int minimumNumberOfMemoriesBeforeForgetting
     ) {
         this.memories = new HashMap<>();
         this.dailyForgettingProbability = dailyForgettingProbability;
@@ -69,7 +70,7 @@ public class LocationMemories<T> implements Startable, Steppable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         receipt = model.scheduleEveryYear(this, StepOrder.DATA_RESET);
     }
 
@@ -82,13 +83,13 @@ public class LocationMemories<T> implements Startable, Steppable {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
-        LinkedList<SeaTile> toRemove = new LinkedList<>();
+        final LinkedList<SeaTile> toRemove = new LinkedList<>();
 
         if (memories.size() > minimumNumberOfMemoriesBeforeForgetting) {
-            for (Map.Entry<SeaTile, LocationMemory<T>> memory : memories.entrySet()) {
-                int age = memory.getValue().age();
+            for (final Map.Entry<SeaTile, LocationMemory<T>> memory : memories.entrySet()) {
+                final int age = memory.getValue().age();
                 if (age >= minimumMemoryAgeInDaysBeforeForgetting)
                     if (dailyForgettingProbability >= 1 ||
                         ((FishState) simState).getRandom().nextBoolean(dailyForgettingProbability))
@@ -104,9 +105,9 @@ public class LocationMemories<T> implements Startable, Steppable {
     /**
      * grab the location whose memory is "best" according to the given comparator
      */
-    public SeaTile getBestFishingSpotInMemory(Comparator<LocationMemory<T>> comparator) {
+    public SeaTile getBestFishingSpotInMemory(final Comparator<LocationMemory<T>> comparator) {
 
-        Optional<LocationMemory<T>> best = memories.values().stream().max(comparator);
+        final Optional<LocationMemory<T>> best = memories.values().stream().max(comparator);
 
         if (best.isPresent())
             return best.get().getSpot();
@@ -119,15 +120,15 @@ public class LocationMemories<T> implements Startable, Steppable {
      *
      * @param memory what to remember
      */
-    public void memorize(T memory, SeaTile tile) {
+    public void memorize(final T memory, final SeaTile tile) {
         memories.put(tile, new LocationMemory<>(tile, memory));
     }
 
     /**
      *
      */
-    public T getMemory(SeaTile key) {
-        LocationMemory<T> memory = memories.get(key);
+    public T getMemory(final SeaTile key) {
+        final LocationMemory<T> memory = memories.get(key);
         if (memory != null)
             return memory.getInformation();
         else

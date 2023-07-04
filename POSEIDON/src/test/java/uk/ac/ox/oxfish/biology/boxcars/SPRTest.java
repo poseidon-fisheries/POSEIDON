@@ -70,18 +70,8 @@ public class SPRTest {
             100,
             1000,
             5,
-            new Function<Integer, Double>() {
-                @Override
-                public Double apply(Integer age) {
-                    return 0.02d / 1000 * Math.pow(meristics.getLengthAtAge(age, 0), 2.94);
-                }
-            },
-            new Function<Integer, Double>() {
-                @Override
-                public Double apply(Integer age) {
-                    return meristics.getLengthAtAge(age, 0) < 48 ? 0d : 1d;
-                }
-            }, false
+            age -> 0.02d / 1000 * Math.pow(meristics.getLengthAtAge(age, 0), 2.94),
+            age -> meristics.getLengthAtAge(age, 0) < 48 ? 0d : 1d, false
 
         );
 
@@ -126,18 +116,8 @@ public class SPRTest {
             100,
             1000,
             5,
-            new Function<Integer, Double>() {
-                @Override
-                public Double apply(Integer age) {
-                    return 0.0128d / 1000 * Math.pow(meristics.getLengthAtAge(age, 0), 2.94);
-                }
-            },
-            new Function<Integer, Double>() {
-                @Override
-                public Double apply(Integer age) {
-                    return meristics.getLengthAtAge(age, 0) < 34 ? 0d : 1d;
-                }
-            }, false
+            age -> 0.0128d / 1000 * Math.pow(meristics.getLengthAtAge(age, 0), 2.94),
+            age -> meristics.getLengthAtAge(age, 0) < 34 ? 0d : 1d, false
 
         );
 

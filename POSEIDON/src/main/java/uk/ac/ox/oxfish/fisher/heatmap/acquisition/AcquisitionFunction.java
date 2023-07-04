@@ -41,8 +41,8 @@ public interface AcquisitionFunction {
      * @param fisher
      * @param current
      */
-    public SeaTile pick(
-        NauticalMap map, GeographicalRegression regression, FishState state, Fisher fisher, SeaTile current
+    SeaTile pick(
+        NauticalMap map, GeographicalRegression<?> regression, FishState state, Fisher fisher, SeaTile current
     );
 
 

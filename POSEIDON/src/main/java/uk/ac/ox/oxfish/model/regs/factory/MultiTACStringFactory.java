@@ -26,7 +26,6 @@ import com.google.common.base.Splitter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Arrays;
@@ -38,7 +37,9 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
     /**
      * for each model there is only one quota object being shared
      */
-    private final Locker<String, MultiQuotaRegulation> modelQuota = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, MultiQuotaRegulation> modelQuota =
+        new uk.ac.ox.oxfish.utility.Locker<>();
     /**
      * The string we are going to turn into rule, "0:100 ,2:uniform 1 100" means that ALL FISHERS gets 100 quotas a year
      * for species 0 and a random quota of 1 to 100 for species 2. The other species are then assumed NOT TO BE PROTECTED

@@ -70,6 +70,7 @@ public abstract class AggregatingFad<
         return carryingCapacity;
     }
 
+    @SuppressWarnings("unchecked")
     WeightedObject<B> attractFish(final LocalBiology seaTileBiology) {
         return fishAttractor.attract(seaTileBiology, (F) this);
     }

@@ -18,12 +18,9 @@ public class IndexTargetControllerTest {
         IndexTargetController controller = new IndexTargetController(
             (Sensor<FishState, Double>) system -> 100d,
             (Sensor<FishState, Double>) system -> 200d,
-            new Actuator<FishState, Double>() {
-                @Override
-                public void apply(FishState subject, Double policy, FishState model) {
-                    testsRan[0]++;
-                    assertEquals(policy, 0.5d, .0001);
-                }
+            (subject, policy, model) -> {
+                testsRan[0]++;
+                assertEquals(policy, 0.5d, .0001);
             },
             365,
             1d,
@@ -44,12 +41,9 @@ public class IndexTargetControllerTest {
         IndexTargetController controller = new IndexTargetController(
             (Sensor<FishState, Double>) system -> 100d,
             (Sensor<FishState, Double>) system -> 200d,
-            new Actuator<FishState, Double>() {
-                @Override
-                public void apply(FishState subject, Double policy, FishState model) {
-                    testsRan[0]++;
-                    assertEquals(policy, 0.8d, .0001);
-                }
+            (subject, policy, model) -> {
+                testsRan[0]++;
+                assertEquals(policy, 0.8d, .0001);
             },
             365,
             .2d,
@@ -71,12 +65,9 @@ public class IndexTargetControllerTest {
         IndexTargetController controller = new IndexTargetController(
             (Sensor<FishState, Double>) system -> 300d,
             (Sensor<FishState, Double>) system -> 200d,
-            new Actuator<FishState, Double>() {
-                @Override
-                public void apply(FishState subject, Double policy, FishState model) {
-                    testsRan[0]++;
-                    assertEquals(policy, 1d, .0001);
-                }
+            (subject, policy, model) -> {
+                testsRan[0]++;
+                assertEquals(policy, 1d, .0001);
             },
             365,
             .2d,
@@ -97,12 +88,9 @@ public class IndexTargetControllerTest {
         IndexTargetController controller = new IndexTargetController(
             (Sensor<FishState, Double>) system -> -300d,
             (Sensor<FishState, Double>) system -> 200d,
-            new Actuator<FishState, Double>() {
-                @Override
-                public void apply(FishState subject, Double policy, FishState model) {
-                    testsRan[0]++;
-                    assertEquals(policy, 0d, .0001);
-                }
+            (subject, policy, model) -> {
+                testsRan[0]++;
+                assertEquals(policy, 0d, .0001);
             },
             365,
             1d,
@@ -121,12 +109,9 @@ public class IndexTargetControllerTest {
         IndexTargetController controller = new IndexTargetController(
             (Sensor<FishState, Double>) system -> 100d,
             (Sensor<FishState, Double>) system -> 200d,
-            new Actuator<FishState, Double>() {
-                @Override
-                public void apply(FishState subject, Double policy, FishState model) {
-                    testsRan[0]++;
-                    assertEquals(policy, 1d, .0001);
-                }
+            (subject, policy, model) -> {
+                testsRan[0]++;
+                assertEquals(policy, 1d, .0001);
             },
             365,
             1d,

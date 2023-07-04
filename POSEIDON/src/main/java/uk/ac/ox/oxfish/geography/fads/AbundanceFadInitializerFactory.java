@@ -15,7 +15,7 @@ public abstract class AbundanceFadInitializerFactory
     private AbundanceFiltersFactory abundanceFiltersFactory;
 
     public AbundanceFadInitializerFactory(
-        final CarryingCapacityInitializerFactory carryingCapacityInitializerFactory,
+        final CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory,
         final Map<String, DoubleParameter> catchabilities,
         final DoubleParameter daysInWaterBeforeAttraction,
         final DoubleParameter fishReleaseProbabilityInPercent,

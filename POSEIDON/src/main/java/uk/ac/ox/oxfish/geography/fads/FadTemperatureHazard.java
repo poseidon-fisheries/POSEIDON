@@ -31,6 +31,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 
 public class FadTemperatureHazard implements AdditionalStartable, Steppable {
 
+    private static final long serialVersionUID = 4951714317148361470L;
     private final int minimumDaysBeforeHazardCanTakePlace;
 
     private final double valueBelowWhichHazardHappens;

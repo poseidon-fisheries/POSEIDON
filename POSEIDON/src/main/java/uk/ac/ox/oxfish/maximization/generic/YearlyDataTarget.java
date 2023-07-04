@@ -38,6 +38,7 @@ import java.util.List;
 public class YearlyDataTarget implements DataTarget {
 
 
+    private static final long serialVersionUID = 7444409907050847523L;
     private double exponent = 1;
     private boolean cumulative;
 
@@ -66,9 +67,9 @@ public class YearlyDataTarget implements DataTarget {
      * @param cumulative
      */
     public YearlyDataTarget(
-        String pathToCsvFile, String yearlyDataColumnName, boolean hasHeader,
-        double coefficientOfVariation,
-        double exponent, boolean cumulative
+        final String pathToCsvFile, final String yearlyDataColumnName, final boolean hasHeader,
+        final double coefficientOfVariation,
+        final double exponent, final boolean cumulative
     ) {
         this.pathToCsvFile = pathToCsvFile;
         this.yearlyDataColumnName = yearlyDataColumnName;
@@ -83,28 +84,28 @@ public class YearlyDataTarget implements DataTarget {
     public YearlyDataTarget() {
     }
 
-    public double computeError(FishState model) {
+    public double computeError(final FishState model) {
 
-        DataColumn simulationOutput = model.getYearlyDataSet().getColumn(yearlyDataColumnName);
+        final DataColumn simulationOutput = model.getYearlyDataSet().getColumn(yearlyDataColumnName);
 
         try {
-            List<String> lines = Files.readAllLines(Paths.get(pathToCsvFile));
-            ArrayList<Double> realData = new ArrayList<>();
+            final List<String> lines = Files.readAllLines(Paths.get(pathToCsvFile));
+            final ArrayList<Double> realData = new ArrayList<>();
 
-            DoubleSummaryStatistics stats = new DoubleSummaryStatistics();
+            final DoubleSummaryStatistics stats = new DoubleSummaryStatistics();
             for (int i = hasHeader ? 1 : 0; i < lines.size(); i++) {
-                double realTimeSeriesElement = Double.parseDouble(lines.get(i));
+                final double realTimeSeriesElement = Double.parseDouble(lines.get(i));
                 realData.add(realTimeSeriesElement);
                 stats.accept(realTimeSeriesElement);
 
             }
-            double plainDistance = FishStateUtilities.timeSeriesDistance(
+            final double plainDistance = FishStateUtilities.timeSeriesDistance(
                 simulationOutput,
                 realData, exponent,
                 cumulative
             ) / stats.getCount();
 
-            double std = stats.getAverage() * coefficientOfVariation;
+            final double std = stats.getAverage() * coefficientOfVariation;
             if (std <= 0 || !Double.isFinite(std))
                 return plainDistance;
             else
@@ -114,7 +115,7 @@ public class YearlyDataTarget implements DataTarget {
                 return plainDistance / std;
             }
 
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -134,7 +135,7 @@ public class YearlyDataTarget implements DataTarget {
      *
      * @param pathToCsvFile Value to set for property 'pathToCsvFile'.
      */
-    public void setPathToCsvFile(String pathToCsvFile) {
+    public void setPathToCsvFile(final String pathToCsvFile) {
         this.pathToCsvFile = pathToCsvFile;
     }
 
@@ -152,7 +153,7 @@ public class YearlyDataTarget implements DataTarget {
      *
      * @param yearlyDataColumnName Value to set for property 'yearlyDataColumnName'.
      */
-    public void setYearlyDataColumnName(String yearlyDataColumnName) {
+    public void setYearlyDataColumnName(final String yearlyDataColumnName) {
         this.yearlyDataColumnName = yearlyDataColumnName;
     }
 
@@ -170,7 +171,7 @@ public class YearlyDataTarget implements DataTarget {
      *
      * @param hasHeader Value to set for property 'hasHeader'.
      */
-    public void setHasHeader(boolean hasHeader) {
+    public void setHasHeader(final boolean hasHeader) {
         this.hasHeader = hasHeader;
     }
 
@@ -188,7 +189,7 @@ public class YearlyDataTarget implements DataTarget {
      *
      * @param coefficientOfVariation Value to set for property 'coefficientOfVariation'.
      */
-    public void setCoefficientOfVariation(double coefficientOfVariation) {
+    public void setCoefficientOfVariation(final double coefficientOfVariation) {
         this.coefficientOfVariation = coefficientOfVariation;
     }
 
@@ -196,7 +197,7 @@ public class YearlyDataTarget implements DataTarget {
         return exponent;
     }
 
-    public void setExponent(double exponent) {
+    public void setExponent(final double exponent) {
         this.exponent = exponent;
     }
 
@@ -204,7 +205,7 @@ public class YearlyDataTarget implements DataTarget {
         return cumulative;
     }
 
-    public void setCumulative(boolean cumulative) {
+    public void setCumulative(final boolean cumulative) {
         this.cumulative = cumulative;
     }
 }

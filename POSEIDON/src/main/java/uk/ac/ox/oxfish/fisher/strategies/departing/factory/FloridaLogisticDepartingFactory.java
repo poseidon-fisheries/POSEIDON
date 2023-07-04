@@ -60,10 +60,10 @@ public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLo
     @Override
     public DailyLogisticDepartingStrategy apply(final FishState state) {
 
-        final LinkedHashMap<ObservationExtractor, Double> betas = new LinkedHashMap();
+        final LinkedHashMap<ObservationExtractor, Double> betas = new LinkedHashMap<>();
 
 
-        Double coefficient = intercept.applyAsDouble(state.getRandom());
+        double coefficient = intercept.applyAsDouble(state.getRandom());
         if (Double.isFinite(coefficient))
             betas.put(new InterceptExtractor(), coefficient);
         coefficient = spring.applyAsDouble(state.getRandom());

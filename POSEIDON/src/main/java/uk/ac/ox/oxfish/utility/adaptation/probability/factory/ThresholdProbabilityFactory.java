@@ -49,12 +49,7 @@ public class ThresholdProbabilityFactory implements AlgorithmFactory<ThresholdEx
 
         return new ThresholdExplorationProbability(
             1d,
-            new Function<FishState, Double>() {
-                @Override
-                public Double apply(FishState fishState) {
-                    return actualThreshold;
-                }
-            }
+            fishState1 -> actualThreshold
         );
     }
 

@@ -48,6 +48,7 @@ import java.util.Map;
 public class GoodBadRegression implements GeographicalRegression<Double>, Steppable {
 
 
+    private static final long serialVersionUID = 8188489285591761023L;
     /**
      * what subjective probability do we give to this spot being good
      */
@@ -71,19 +72,19 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      * its inverse penalizes observations that are far so that the priors are stronger
      * the penalty comes by dividing sigma by the the RBF Kernel
      */
-    private RBFDistance distancePenalty;
+    private final RBFDistance distancePenalty;
     private Stoppable receipt;
 
 
     public GoodBadRegression(
-        NauticalMap map,
-        Distance distance,
-        MersenneTwisterFast random,
-        double badAverage,
-        double goodAverage,
-        double deviation,
-        double distanceBandwidth,
-        double drift
+        final NauticalMap map,
+        final Distance distance,
+        final MersenneTwisterFast random,
+        final double badAverage,
+        final double goodAverage,
+        final double deviation,
+        final double distanceBandwidth,
+        final double drift
     ) {
         this.map = map;
         this.drift = drift;
@@ -95,8 +96,8 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
 
         //each tile its own random probability
         spots = new HashMap<>();
-        List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
-        for (SeaTile tile : tiles) {
+        final List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
+        for (final SeaTile tile : tiles) {
             spots.put(tile, random.nextDouble());
         }
 
@@ -109,19 +110,19 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      * @param model the model
      */
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         receipt = model.scheduleEveryDay(
             this, StepOrder.DAWN);
     }
 
 
     @Override
-    public void step(SimState simState) {
-        for (Map.Entry<SeaTile, Double> probability : spots.entrySet()) {
-            double good = probability.getValue();
+    public void step(final SimState simState) {
+        for (final Map.Entry<SeaTile, Double> probability : spots.entrySet()) {
+            final double good = probability.getValue();
             Preconditions.checkArgument(good >= 0);
             Preconditions.checkArgument(good <= 1);
-            double bad = 1 - good;
+            final double bad = 1 - good;
             probability.setValue((good + drift) / (good + drift + bad + drift));
         }
     }
@@ -135,36 +136,36 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      */
     @Override
     public void addObservation(
-        GeographicalObservation<Double> observation, Fisher fisher, FishState model
+        final GeographicalObservation<Double> observation, final Fisher fisher, final FishState model
     ) {
 
-        for (Map.Entry<SeaTile, Double> probability : spots.entrySet()) {
-            double distance = this.distance.distance(
+        for (final Map.Entry<SeaTile, Double> probability : spots.entrySet()) {
+            final double distance = this.distance.distance(
                 probability.getKey(),
                 observation.getTile(),
                 map
             );
-            double rbf = distancePenalty.transform(distance);
+            final double rbf = distancePenalty.transform(distance);
             //if the evidence has even a shred of strenght, update
             if (rbf >= FishStateUtilities.EPSILON) {
-                double evidenceStrength = 1d / rbf;
+                final double evidenceStrength = 1d / rbf;
 
 
                 //all that follows is standard bayes
 
 
-                double goodPrior = probability.getValue();
-                double goodLikelihood = FishStateUtilities.normalPDF(
+                final double goodPrior = probability.getValue();
+                final double goodLikelihood = FishStateUtilities.normalPDF(
                     goodAverage, standardDeviation * evidenceStrength).apply(observation.getValue());
-                double goodPosterior = goodPrior * goodLikelihood;
+                final double goodPosterior = goodPrior * goodLikelihood;
                 assert Double.isFinite(goodPosterior);
                 assert goodPosterior >= 0;
 
 
-                double badPrior = 1d - probability.getValue();
-                double badLikelihood = FishStateUtilities.normalPDF(
+                final double badPrior = 1d - probability.getValue();
+                final double badLikelihood = FishStateUtilities.normalPDF(
                     badAverage, standardDeviation * evidenceStrength).apply(observation.getValue());
-                double badPosterior = badPrior * badLikelihood;
+                final double badPosterior = badPrior * badLikelihood;
                 assert badPosterior >= 0;
                 assert Double.isFinite(badPosterior);
 
@@ -187,7 +188,7 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      * tell the startable to turnoff,
      */
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         if (receipt != null)
             receipt.stop();
     }
@@ -202,9 +203,9 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
+    public double predict(final SeaTile tile, final double time, final Fisher fisher, final FishState model) {
 
-        Double probabilityGood = spots.get(tile);
+        final Double probabilityGood = spots.get(tile);
         if (probabilityGood == null)
             return Double.NaN;
         else {
@@ -223,7 +224,7 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      */
     @Override
     public double extractNumericalYFromObservation(
-        GeographicalObservation<Double> observation, Fisher fisher
+        final GeographicalObservation<Double> observation, final Fisher fisher
     ) {
         return observation.getValue();
     }
@@ -251,7 +252,7 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      * @param parameterArray the new parameters for this regresssion
      */
     @Override
-    public void setParameters(double[] parameterArray) {
+    public void setParameters(final double[] parameterArray) {
 
         assert parameterArray.length == 4;
         distancePenalty.setBandwidth(parameterArray[0]);

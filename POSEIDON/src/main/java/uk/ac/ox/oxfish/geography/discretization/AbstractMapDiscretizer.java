@@ -36,12 +36,7 @@ public abstract class AbstractMapDiscretizer implements MapDiscretizer {
     /**
      * this predicate initially returns always true, but can be augmented by additional predicates
      */
-    private Predicate<SeaTile> filter = new Predicate<SeaTile>() {
-        @Override
-        public boolean test(SeaTile tile) {
-            return true;
-        }
-    };
+    private Predicate<SeaTile> filter = tile -> true;
 
 
     /**

@@ -28,6 +28,7 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class ActiveFadLimits implements ActionSpecificRegulation {
 
+    private static final long serialVersionUID = 7308188248946187229L;
     private final ImmutableSet<Class<? extends PurseSeinerAction>> applicableActions =
         ImmutableSet.of(FadDeploymentAction.class);
     private final FisherRelativeLimits limits;

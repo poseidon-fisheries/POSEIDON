@@ -18,7 +18,7 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
 
     private InputPath deploymentsFile; // = "./inputs/tests/fad_dummy_deploy.csv";
 
-    private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory =
+    private AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory =
         new CompressedBiomassFadInitializerFactory(null);
 
     /**
@@ -30,7 +30,7 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
 
     public ExogenousFadMakerCSVFactory(
         final InputPath deploymentsFile,
-        @SuppressWarnings("rawtypes") final CompressedExponentialFadInitializerFactory fadInitializerFactory
+        @SuppressWarnings("rawtypes") final CompressedExponentialFadInitializerFactory<?, ?> fadInitializerFactory
     ) {
         this.deploymentsFile = deploymentsFile;
         this.fadInitializerFactory = fadInitializerFactory;
@@ -39,7 +39,7 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
     @Override
     public AdditionalStartable apply(final FishState state) {
         return model -> {
-            final ExogenousFadMaker maker = new ExogenousFadMaker(
+            final ExogenousFadMaker<?, ?> maker = new ExogenousFadMaker<>(
                 fadInitializerFactory.apply(model),
                 recordStream(deploymentsFile.get()).collect(groupingBy(
                     record -> record.getInt("day"),
@@ -61,11 +61,11 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
         this.deploymentsFile = deploymentsFile;
     }
 
-    public AlgorithmFactory<? extends FadInitializer> getFadInitializer() {
+    public AlgorithmFactory<? extends FadInitializer<?, ?>> getFadInitializer() {
         return fadInitializerFactory;
     }
 
-    public void setFadInitializer(final AlgorithmFactory<? extends FadInitializer> fadInitializer) {
+    public void setFadInitializer(final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializer) {
         this.fadInitializerFactory = fadInitializer;
     }
 

@@ -42,19 +42,19 @@ public class CsvColumnsToLists {
     /**
      * path to file
      */
-    private String pathToCSV;
+    private final String pathToCSV;
 
     /**
      * csv separator
      */
-    private char separator;
+    private final char separator;
 
     /**
      * columnNames to read
      */
-    private String[] columnNames;
+    private final String[] columnNames;
 
-    public CsvColumnsToLists(String pathToCSV, char separator, String[] columnNames) {
+    public CsvColumnsToLists(final String pathToCSV, final char separator, final String[] columnNames) {
         this.pathToCSV = pathToCSV;
         this.separator = separator;
         this.columnNames = columnNames;
@@ -64,19 +64,20 @@ public class CsvColumnsToLists {
             columnNames[i] = columnNames[i].replace("\"", "").trim().toLowerCase();
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public LinkedList<Double>[] readColumns() {
 
 
         //turn the csv column into a list of doubles
         try {
-            FileReader io = new FileReader(pathToCSV);
-            CSVReader reader = new CSVReader(io, separator);
+            final FileReader io = new FileReader(pathToCSV);
+            final CSVReader reader = new CSVReader(io, separator);
 
 
-            Iterator<String[]> iterator = reader.iterator();
+            final Iterator<String[]> iterator = reader.iterator();
 
-            String[] heading = iterator.next();
-            LinkedList<Integer> indices = new LinkedList<Integer>();
+            final String[] heading = iterator.next();
+            final LinkedList<Integer> indices = new LinkedList<Integer>();
 
             //find the column index of each column name
             headloop:
@@ -93,20 +94,20 @@ public class CsvColumnsToLists {
             }
 
             //create an array of columns to return
-            LinkedList<Double>[] column = new LinkedList[columnNames.length];
+            final LinkedList<Double>[] column = new LinkedList[columnNames.length];
             for (int i = 0; i < column.length; i++)
                 column[i] = new LinkedList<>();
 
             assert column.length == indices.size();
             while (iterator.hasNext()) {
-                String[] line = iterator.next();
+                final String[] line = iterator.next();
                 for (int i = 0; i < column.length; i++)
                     column[i].add(Double.parseDouble(line[indices.get(i)]));
             }
             reader.close();
             io.close();
             return column;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException("failed to read or parse " + pathToCSV + " with exception " + e);
         }
     }

@@ -77,7 +77,9 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
  */
 public class FishState extends SimState {
 
+
     public static final String DEFAULT_POPULATION_NAME = "default_population";
+    private static final long serialVersionUID = 6085587632144345700L;
     private final String uniqueID = UUID.randomUUID().toString();
     /**
      * Dataset of all the columns that are updated daily
@@ -263,12 +265,7 @@ public class FishState extends SimState {
             }
             for (final Species species : biology.getSpecies())
                 dailyDataSet.registerGatherer("Price of " + species + " at " + port.getName(),
-                    new Gatherer<FishState>() {
-                        @Override
-                        public Double apply(final FishState fishState) {
-                            return port.getMarginalPrice(species);
-                        }
-                    }
+                    (Gatherer<FishState>) fishState -> port.getMarginalPrice(species)
                     , Double.NaN
                 );
         }
@@ -408,15 +405,12 @@ public class FishState extends SimState {
         final int year
     ) {
 
-        final Steppable container = new Steppable() {
-            @Override
-            public void step(final SimState simState) {
-                //the plus one is because when this is stepped it's the 365th day
-                if (((FishState) simState).getYear() + 1 == year) {
-                    steppable.step(simState);
-                }
-
+        final Steppable container = simState -> {
+            //the plus one is because when this is stepped it's the 365th day
+            if (((FishState) simState).getYear() + 1 == year) {
+                steppable.step(simState);
             }
+
         };
         return scheduleEveryYear(container, order);
 
@@ -477,20 +471,10 @@ public class FishState extends SimState {
     public double getTotalAbundance(final Species species, final int bin) {
         return
             map.getAllSeaTilesExcludingLandAsList().stream().filter(
-                    new Predicate<SeaTile>() {
-                        @Override
-                        public boolean test(final SeaTile seaTile) {
-                            return !(seaTile.getBiology() instanceof EmptyLocalBiology);
-                        }
-                    }
+                    seaTile -> !(seaTile.getBiology() instanceof EmptyLocalBiology)
                 ).
                 mapToDouble(
-                    new ToDoubleFunction<SeaTile>() {
-                        @Override
-                        public double applyAsDouble(final SeaTile value) {
-                            return value.getAbundance(species).getAbundanceInBin(bin);
-                        }
-                    }
+                    value -> value.getAbundance(species).getAbundanceInBin(bin)
                 ).sum();
     }
 
@@ -723,62 +707,56 @@ public class FishState extends SimState {
         );
 
         this.dailyDataSet.registerGatherer("% of Tows on the Line",
-            new Gatherer<FishState>() {
-                @Override
-                public Double apply(final FishState state) {
+            (Gatherer<FishState>) state -> {
 
-                    double trawlsSum = 0;
-                    double lineSum = 0;
-                    final NauticalMap map = state.getMap();
-                    for (final SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
-                        final int trawlsHere = map.getDailyTrawlsMap().get(
-                            tile.getGridX(),
-                            tile.getGridY()
-                        );
-                        trawlsSum += trawlsHere;
-                        if (map.getTilesOnTheMPALine().contains(tile)) {
-                            lineSum += trawlsHere;
-                        }
+                double trawlsSum = 0;
+                double lineSum = 0;
+                final NauticalMap map = state.getMap();
+                for (final SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
+                    final int trawlsHere = map.getDailyTrawlsMap().get(
+                        tile.getGridX(),
+                        tile.getGridY()
+                    );
+                    trawlsSum += trawlsHere;
+                    if (map.getTilesOnTheMPALine().contains(tile)) {
+                        lineSum += trawlsHere;
                     }
-                    if (trawlsSum == 0)
-                        return Double.NaN;
-                    assert trawlsSum >= lineSum;
-                    return lineSum / trawlsSum;
-
                 }
+                if (trawlsSum == 0)
+                    return Double.NaN;
+                assert trawlsSum >= lineSum;
+                return lineSum / trawlsSum;
+
             }
             , Double.NaN
         );
 
 
         this.yearlyDataSet.registerGatherer("Mileage-Catch Correlation",
-            new Gatherer<FishState>() {
-                @Override
-                public Double apply(final FishState state) {
+            (Gatherer<FishState>) state -> {
 
-                    final LinkedList<Double> mileage = new LinkedList<>();
-                    final LinkedList<Double> catches = new LinkedList<>();
+                final LinkedList<Double> mileage = new LinkedList<>();
+                final LinkedList<Double> catches = new LinkedList<>();
 
-                    final Species first = biology.getSpecie(0);
+                final Species first = biology.getSpecie(0);
 
-                    for (final Fisher fisher : fishers) {
-                        final Gear gear = fisher.getGear();
-                        if (gear instanceof RandomCatchabilityTrawl) {
-                            mileage.add(((RandomCatchabilityTrawl) gear).getGasPerHourFished());
-                            catches.add(fisher.getLatestYearlyObservation(first.getName() + " Landings"));
-                        }
+                for (final Fisher fisher : fishers) {
+                    final Gear gear = fisher.getGear();
+                    if (gear instanceof RandomCatchabilityTrawl) {
+                        mileage.add(((RandomCatchabilityTrawl) gear).getGasPerHourFished());
+                        catches.add(fisher.getLatestYearlyObservation(first.getName() + " Landings"));
                     }
-
-                    if (mileage.size() > 0)
-                        return FishStateUtilities.computeCorrelation(
-                            Doubles.toArray(mileage),
-                            Doubles.toArray(catches)
-                        );
-                    else
-                        return Double.NaN;
-
-
                 }
+
+                if (mileage.size() > 0)
+                    return FishStateUtilities.computeCorrelation(
+                        Doubles.toArray(mileage),
+                        Doubles.toArray(catches)
+                    );
+                else
+                    return Double.NaN;
+
+
             }
             , Double.NaN
         );

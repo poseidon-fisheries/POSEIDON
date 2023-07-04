@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -41,23 +40,21 @@ public class IdentityDiscretizer extends AbstractMapDiscretizer {
      * @param tiles the list of valid seatiles
      * @return groups
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public List<SeaTile>[] discretize(NauticalMap map, List<SeaTile> tiles) {
+    public List<SeaTile>[] discretize(final NauticalMap map, final List<SeaTile> tiles) {
 
-        tiles.sort(new Comparator<SeaTile>() {
-            @Override
-            public int compare(SeaTile o1, SeaTile o2) {
-                //sort by x, and if that fails by y
-                int x = Integer.compare(o1.getGridX(), o2.getGridX());
-                if (x != 0)
-                    return x;
-                else
-                    return Integer.compare(o1.getGridY(), o2.getGridY());
+        tiles.sort((o1, o2) -> {
+            //sort by x, and if that fails by y
+            final int x = Integer.compare(o1.getGridX(), o2.getGridX());
+            if (x != 0)
+                return x;
+            else
+                return Integer.compare(o1.getGridY(), o2.getGridY());
 
-            }
         });
 
-        List<SeaTile>[] groups = new List[tiles.size()];
+        final List<SeaTile>[] groups = new List[tiles.size()];
 
         for (int i = 0; i < tiles.size(); i++) {
             groups[i] = ImmutableList.of(tiles.get(i));

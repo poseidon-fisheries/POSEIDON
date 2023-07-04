@@ -39,7 +39,7 @@ public class CentroidMapDiscretizer extends AbstractMapDiscretizer {
     final private ArrayList<Coordinate> centroids;
 
 
-    public CentroidMapDiscretizer(ArrayList<Coordinate> centroids) {
+    public CentroidMapDiscretizer(final ArrayList<Coordinate> centroids) {
         this.centroids = centroids;
     }
 
@@ -51,24 +51,25 @@ public class CentroidMapDiscretizer extends AbstractMapDiscretizer {
      * @param tiles the list of valid seatiles
      * @return groups
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public List<SeaTile>[] discretize(NauticalMap map, List<SeaTile> tiles) {
+    public List<SeaTile>[] discretize(final NauticalMap map, final List<SeaTile> tiles) {
 
-        List<SeaTile>[] groups = new List[centroids.size()];
+        final List<SeaTile>[] groups = new List[centroids.size()];
         for (int i = 0; i < groups.length; i++)
             groups[i] = new LinkedList<>();
 
         //for every tile look for the closest centroid
-        for (SeaTile tile : tiles) {
+        for (final SeaTile tile : tiles) {
             //standard find the minimum index
             int minimumIndex = 0;
-            Coordinate tileCoordinates = map.getCoordinates(tile);
+            final Coordinate tileCoordinates = map.getCoordinates(tile);
             double minimumDistance = distance(
                 centroids.get(0).x, tileCoordinates.x,
                 centroids.get(0).y, tileCoordinates.y
             );
             for (int i = 1; i < groups.length; i++) {
-                double distance = distance(
+                final double distance = distance(
                     centroids.get(i).x, tileCoordinates.x,
                     centroids.get(i).y, tileCoordinates.y
                 );
@@ -84,7 +85,7 @@ public class CentroidMapDiscretizer extends AbstractMapDiscretizer {
         return groups;
     }
 
-    private double distance(double x1, double x2, double y1, double y2) {
+    private double distance(final double x1, final double x2, final double y1, final double y2) {
         return Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2);
     }
 }

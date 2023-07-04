@@ -28,10 +28,9 @@ import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * Created by carrknight on 7/26/16.
- *
- * @deprecated Use {@link TemporaryRegulation instead.}
+ * <p>
+ * To be deprecated. Use {@link TemporaryRegulation instead.}
  */
-@Deprecated
 public class TemporaryProtectedArea implements Regulation {
 
 

@@ -32,44 +32,36 @@ public class ISlopeToTACControllerFactory implements AlgorithmFactory<Additional
 
     @Override
     public AdditionalStartable apply(FishState fishState) {
-        return new AdditionalStartable() {
-            @Override
-            public void start(FishState model) {
-                fishState.scheduleOnceInXDays(
-                    new Steppable() {
-                        @Override
-                        public void step(SimState simState) {
-                            TargetToTACController controller;
-                            if (targetedSpecies.trim().isEmpty())
-                                controller = new TargetToTACController(
-                                    new ISlope(
-                                        catchColumnName,
-                                        indicatorColumnName,
-                                        gainLambdaParameter.applyAsDouble(model.getRandom()),
-                                        precautionaryScaling.applyAsDouble(model.getRandom()),
-                                        interval
-                                    )
-                                );
-                            else
-                                controller = new TargetToTACController(
-                                    new ISlope(
-                                        catchColumnName,
-                                        indicatorColumnName,
-                                        gainLambdaParameter.applyAsDouble(model.getRandom()),
-                                        precautionaryScaling.applyAsDouble(model.getRandom()),
-                                        interval
-                                    ),
-                                    targetedSpecies
-                                );
-                            controller.start(model);
-                            controller.step(model);
-                        }
-                    },
-                    StepOrder.DAWN,
-                    365 * startingYear + 1
-                );
-            }
-        };
+        return model -> fishState.scheduleOnceInXDays(
+            (Steppable) simState -> {
+                TargetToTACController controller;
+                if (targetedSpecies.trim().isEmpty())
+                    controller = new TargetToTACController(
+                        new ISlope(
+                            catchColumnName,
+                            indicatorColumnName,
+                            gainLambdaParameter.applyAsDouble(model.getRandom()),
+                            precautionaryScaling.applyAsDouble(model.getRandom()),
+                            interval
+                        )
+                    );
+                else
+                    controller = new TargetToTACController(
+                        new ISlope(
+                            catchColumnName,
+                            indicatorColumnName,
+                            gainLambdaParameter.applyAsDouble(model.getRandom()),
+                            precautionaryScaling.applyAsDouble(model.getRandom()),
+                            interval
+                        ),
+                        targetedSpecies
+                    );
+                controller.start(model);
+                controller.step(model);
+            },
+            StepOrder.DAWN,
+            365 * startingYear + 1
+        );
 
     }
 

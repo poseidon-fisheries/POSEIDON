@@ -38,8 +38,8 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
 
 
     public AbstractKernelRegression(
-        int maximumNumberOfObservations,
-        double bandwidth
+        final int maximumNumberOfObservations,
+        final double bandwidth
     ) {
         this.maximumNumberOfObservations = maximumNumberOfObservations;
         this.bandwidth = bandwidth;
@@ -54,7 +54,11 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
      * @param model
      */
     @Override
-    public void addObservation(GeographicalObservation observation, Fisher fisher, FishState model) {
+    public void addObservation(
+        final GeographicalObservation<Double> observation,
+        final Fisher fisher,
+        final FishState model
+    ) {
         observations.add(observation);
         if (observations.size() > maximumNumberOfObservations) {
             assert observations.size() == maximumNumberOfObservations + 1;
@@ -63,7 +67,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
     }
 
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
+    public double predict(final SeaTile tile, final double time, final Fisher fisher, final FishState model) {
 
         if (tile.isLand())
             return Double.NaN;
@@ -71,7 +75,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
             return predict(tile.getGridX(), tile.getGridY(), time);
     }
 
-    public Double predict(int x, int y, double time) {
+    public Double predict(final int x, final int y, final double time) {
 
         if (getObservations().size() == 0)
             return 0d;
@@ -79,7 +83,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
             return getObservations().peek().getValue();
 
 
-        double[] prediction = generatePrediction(x, y, time);
+        final double[] prediction = generatePrediction(x, y, time);
         return prediction[0] / prediction[1];
 
 
@@ -103,11 +107,11 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
      * @param time the time (in hours) you want to predict to
      * @return an array with numerator and denominator
      */
-    public double[] generatePrediction(int x, int y, double time) {
+    public double[] generatePrediction(final int x, final int y, final double time) {
         double kernelSum = 0;
         double numerator = 0;
-        for (GeographicalObservation<Double> observation : getObservations()) {
-            double distance = distance(
+        for (final GeographicalObservation<Double> observation : getObservations()) {
+            final double distance = distance(
                 observation.getXCoordinate(),
                 observation.getYCoordinate(),
                 observation.getTime(),
@@ -115,7 +119,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
                 y,
                 time
             );
-            double kernel = kernel(distance / getBandwidth());
+            final double kernel = kernel(distance / getBandwidth());
             kernelSum += kernel;
             numerator += kernel * observation.getValue();
         }
@@ -129,7 +133,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
         double toX, double toY, double toTime
     );
 
-    public double kernel(double u) {
+    public double kernel(final double u) {
         return Math.max(1d / (Math.exp(u) + 2 + Math.exp(-u)), 0);
     }
 
@@ -147,7 +151,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
      *
      * @param bandwidth Value to set for property 'bandwidth'.
      */
-    public void setBandwidth(double bandwidth) {
+    public void setBandwidth(final double bandwidth) {
         this.bandwidth = bandwidth;
     }
 
@@ -167,7 +171,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
      * @param model the model
      */
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
 
     }
 
@@ -175,7 +179,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
      * tell the startable to turnoff,
      */
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
 
     }
 
@@ -184,7 +188,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
      */
     @Override
     public double extractNumericalYFromObservation(
-        GeographicalObservation<Double> observation, Fisher fisher
+        final GeographicalObservation<Double> observation, final Fisher fisher
     ) {
         return observation.getValue();
     }
@@ -209,7 +213,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
      * @param parameterArray the new parameters for this regresssion
      */
     @Override
-    public void setParameters(double[] parameterArray) {
+    public void setParameters(final double[] parameterArray) {
         assert parameterArray.length == 1;
 
         setBandwidth(parameterArray[0]);

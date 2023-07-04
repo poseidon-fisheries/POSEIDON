@@ -14,7 +14,6 @@ import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -23,25 +22,21 @@ import java.util.function.Function;
 public class HerfindalIndexCollector implements AdditionalStartable, TripListener {
 
 
+    private static final long serialVersionUID = -5628924718776795651L;
     private Table<Integer, Integer, Double> effort;
 
     private Table<Integer, Integer, Double> catches;
 
 
     @Override
-    public void start(FishState model) {
-        for (Fisher fisher : model.getFishers()) {
+    public void start(final FishState model) {
+        for (final Fisher fisher : model.getFishers()) {
             fisher.addTripListener(this);
         }
 
-        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
+        for (final Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
             fisherFactory.getValue().getAdditionalSetups().add(
-                new Consumer<Fisher>() {
-                    @Override
-                    public void accept(Fisher fisher) {
-                        fisher.addTripListener(HerfindalIndexCollector.this);
-                    }
-                }
+                fisher -> fisher.addTripListener(HerfindalIndexCollector.this)
             );
         }
 
@@ -56,73 +51,67 @@ public class HerfindalIndexCollector implements AdditionalStartable, TripListene
 
         //register the gatherer (which in our case will also reset the table)
         model.getYearlyDataSet().registerGatherer("Effort Herfindal",
-            new Gatherer<FishState>() {
-                @Override
-                public Double apply(FishState fishState) {
-                    double hhi = computeHerfindalIndex(HerfindalIndexCollector.this.effort);
+            (Gatherer<FishState>) fishState -> {
+                final double hhi = computeHerfindalIndex(HerfindalIndexCollector.this.effort);
 
-                    effort = HashBasedTable.create(
-                        model.getMap().getWidth(),
-                        model.getMap().getHeight()
-                    );
+                effort = HashBasedTable.create(
+                    model.getMap().getWidth(),
+                    model.getMap().getHeight()
+                );
 
-                    return hhi;
+                return hhi;
 
-                }
             }, 1d
         );
 
         model.getYearlyDataSet().registerGatherer("Catch Herfindal",
-            new Gatherer<FishState>() {
-                @Override
-                public Double apply(FishState fishState) {
-                    double hhi = computeHerfindalIndex(HerfindalIndexCollector.this.catches);
+            (Gatherer<FishState>) fishState -> {
+                final double hhi = computeHerfindalIndex(HerfindalIndexCollector.this.catches);
 
-                    catches = HashBasedTable.create(
-                        model.getMap().getWidth(),
-                        model.getMap().getHeight()
-                    );
+                catches = HashBasedTable.create(
+                    model.getMap().getWidth(),
+                    model.getMap().getHeight()
+                );
 
-                    return hhi;
+                return hhi;
 
-                }
             }, 1d
         );
     }
 
-    private double computeHerfindalIndex(Table<Integer, Integer, Double> table) {
+    private double computeHerfindalIndex(final Table<Integer, Integer, Double> table) {
         double sumOfEffort = 0;
-        for (Double effort : table.values()) {
+        for (final Double effort : table.values()) {
             sumOfEffort += effort;
         }
         double hhi = 0d;
-        for (Double effort : table.values()) {
+        for (final Double effort : table.values()) {
             hhi += Math.pow(effort / sumOfEffort, 2);
         }
         return hhi;
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
 
 
-        Map<Table<Integer, Integer, Double>,
+        final Map<Table<Integer, Integer, Double>,
             Function<FishingRecord, Double>> tablesToUpdate =
             new HashMap<>();
         tablesToUpdate.put(
             effort,
-            (Function<FishingRecord, Double>) fishingRecord -> Double.valueOf(fishingRecord.getHoursSpentFishing())
+            fishingRecord -> Double.valueOf(fishingRecord.getHoursSpentFishing())
         );
         tablesToUpdate.put(
             catches,
-            (Function<FishingRecord, Double>) fishingRecord -> Double.valueOf(fishingRecord.getFishCaught()
+            fishingRecord -> Double.valueOf(fishingRecord.getFishCaught()
                 .getTotalWeight())
         );
 
-        for (Map.Entry<Table<Integer, Integer, Double>, Function<FishingRecord, Double>> table : tablesToUpdate.entrySet()) {
+        for (final Map.Entry<Table<Integer, Integer, Double>, Function<FishingRecord, Double>> table : tablesToUpdate.entrySet()) {
 
 
-            for (Map.Entry<SeaTile, FishingRecord> fishingEntry : record.getFishingRecords()) {
+            for (final Map.Entry<SeaTile, FishingRecord> fishingEntry : record.getFishingRecords()) {
 
                 Double previousEffort =
                     table.getKey().get(

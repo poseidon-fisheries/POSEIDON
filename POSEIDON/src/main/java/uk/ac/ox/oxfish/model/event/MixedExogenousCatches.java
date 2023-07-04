@@ -28,8 +28,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.LinkedHashMap;
 
 public class MixedExogenousCatches extends AbstractYearlyTargetExogenousCatches {
+    private static final long serialVersionUID = 2386335733872357021L;
+
     public MixedExogenousCatches(
-        LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg
+        final LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg
     ) {
         super(exogenousYearlyCatchesInKg, "Exogenous catches of ");
     }
@@ -45,7 +47,7 @@ public class MixedExogenousCatches extends AbstractYearlyTargetExogenousCatches 
      */
     @Override
     protected Catch mortalityEvent(
-        FishState simState, Species target, LocalBiology tile, double step
+        final FishState simState, final Species target, final LocalBiology tile, final double step
     ) {
 
         if (target.getNumberOfBins() > 1)

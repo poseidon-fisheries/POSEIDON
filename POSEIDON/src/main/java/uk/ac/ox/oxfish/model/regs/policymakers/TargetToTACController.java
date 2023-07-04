@@ -19,21 +19,19 @@ import java.util.Arrays;
 public class TargetToTACController extends Controller {
 
 
-    public static final Actuator<FishState, Double> POLICY_TO_ALLSPECIESTAC_ACTUATOR = new Actuator<FishState, Double>() {
-        @Override
-        public void apply(final FishState subject, final Double tac, final FishState model) {
-            if (!Double.isFinite(tac))
-                return;
+    public static final Actuator<FishState, Double> POLICY_TO_ALLSPECIESTAC_ACTUATOR = (subject, tac, model) -> {
+        if (!Double.isFinite(tac))
+            return;
 
-            final MonoQuotaRegulation quotaRegulation =
-                new MonoQuotaRegulation(
-                    tac
-                );
-            for (final Fisher fisher : model.getFishers()) {
-                fisher.setRegulation(quotaRegulation);
-            }
+        final MonoQuotaRegulation quotaRegulation =
+            new MonoQuotaRegulation(
+                tac
+            );
+        for (final Fisher fisher : model.getFishers()) {
+            fisher.setRegulation(quotaRegulation);
         }
     };
+    private static final long serialVersionUID = 4033938011419507367L;
 
     public TargetToTACController(
         final ISlope islope
@@ -80,26 +78,23 @@ public class TargetToTACController extends Controller {
     }
 
     public static final Actuator<FishState, Double> POLICY_TO_ONESPECIES_TAC_ACTUATOR(final String specificSpeciesRegulated) {
-        return new Actuator<FishState, Double>() {
-            @Override
-            public void apply(final FishState subject, final Double tac, final FishState model) {
-                if (!Double.isFinite(tac))
-                    return;
+        return (subject, tac, model) -> {
+            if (!Double.isFinite(tac))
+                return;
 
-                System.out.println("Building quota for " + specificSpeciesRegulated);
-                final double[] realTac = new double[model.getSpecies().size()];
-                Arrays.fill(realTac, Double.POSITIVE_INFINITY);
-                final int importantSpecies = model.getSpecies(specificSpeciesRegulated).getIndex();
-                realTac[importantSpecies] = tac;
+            System.out.println("Building quota for " + specificSpeciesRegulated);
+            final double[] realTac = new double[model.getSpecies().size()];
+            Arrays.fill(realTac, Double.POSITIVE_INFINITY);
+            final int importantSpecies = model.getSpecies(specificSpeciesRegulated).getIndex();
+            realTac[importantSpecies] = tac;
 
 
-                final MultiQuotaRegulation quotaRegulation =
-                    new MultiQuotaRegulation(
-                        realTac, model
-                    );
-                for (final Fisher fisher : model.getFishers()) {
-                    fisher.setRegulation(quotaRegulation);
-                }
+            final MultiQuotaRegulation quotaRegulation =
+                new MultiQuotaRegulation(
+                    realTac, model
+                );
+            for (final Fisher fisher : model.getFishers()) {
+                fisher.setRegulation(quotaRegulation);
             }
         };
     }
@@ -145,12 +140,7 @@ public class TargetToTACController extends Controller {
         model.getYearlyDataSet().registerGatherer(
 
             "TAC from TARGET-TAC Controller",
-            new Gatherer<FishState>() {
-                @Override
-                public Double apply(final FishState fishState) {
-                    return getPolicy();
-                }
-            },
+            (Gatherer<FishState>) fishState -> getPolicy(),
             Double.NaN
         );
     }

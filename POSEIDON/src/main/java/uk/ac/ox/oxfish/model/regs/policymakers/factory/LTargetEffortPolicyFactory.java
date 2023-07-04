@@ -48,43 +48,30 @@ public class LTargetEffortPolicyFactory implements AlgorithmFactory<AdditionalSt
         );
 
 
-        return new AdditionalStartable() {
-            @Override
-            public void start(FishState model) {
-                fishState.scheduleOnceInXDays(
-                    new Steppable() {
-                        @Override
-                        public void step(SimState simState) {
-                            LTargetEffortPolicy ltargetE = new LTargetEffortPolicy(
-                                meanLengthColumnName,
-                                proportionAverageToTarget.applyAsDouble(model.getRandom()),
-                                (int) yearsBackToAverage.applyAsDouble(fishState.getRandom()),
-                                effortActuators.get(effortDefinition),
-                                blockEntryWhenSeasonIsNotFull,
-                                (int) updateEffortPeriodInYears.applyAsDouble(fishState.getRandom())
-                            );
-                            ltargetE.start(model);
-                            ltargetE.step(model);
-
-
-                            //creaqte also a collector
-                            fishState.getYearlyDataSet().registerGatherer(
-                                "LTargetE output",
-                                new Gatherer<FishState>() {
-                                    @Override
-                                    public Double apply(FishState fishState) {
-                                        return ltargetE.getSuggestedEffort();
-                                    }
-                                },
-                                Double.NaN
-                            );
-                        }
-                    },
-                    StepOrder.DAWN,
-                    365 * startingYear + 1
+        return model -> fishState.scheduleOnceInXDays(
+            (Steppable) simState -> {
+                LTargetEffortPolicy ltargetE = new LTargetEffortPolicy(
+                    meanLengthColumnName,
+                    proportionAverageToTarget.applyAsDouble(model.getRandom()),
+                    (int) yearsBackToAverage.applyAsDouble(fishState.getRandom()),
+                    effortActuators.get(effortDefinition),
+                    blockEntryWhenSeasonIsNotFull,
+                    (int) updateEffortPeriodInYears.applyAsDouble(fishState.getRandom())
                 );
-            }
-        };
+                ltargetE.start(model);
+                ltargetE.step(model);
+
+
+                //creaqte also a collector
+                fishState.getYearlyDataSet().registerGatherer(
+                    "LTargetE output",
+                    (Gatherer<FishState>) fishState1 -> ltargetE.getSuggestedEffort(),
+                    Double.NaN
+                );
+            },
+            StepOrder.DAWN,
+            365 * startingYear + 1
+        );
     }
 
 

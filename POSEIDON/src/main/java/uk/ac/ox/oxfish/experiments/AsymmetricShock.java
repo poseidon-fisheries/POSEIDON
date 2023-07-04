@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.experiments;
 
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
@@ -51,27 +50,24 @@ public class AsymmetricShock {
 
     final static private double[] gasPrices = new double[]{.05, .25, .01};
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(final String[] args) throws FileNotFoundException {
 
-        for (double gasPrice : gasPrices)
+        for (final double gasPrice : gasPrices)
             for (int run = 0; run < RUNS; run++) {
-                FishYAML yaml = new FishYAML();
-                Scenario scenario = yaml.loadAs(
+                final FishYAML yaml = new FishYAML();
+                final Scenario scenario = yaml.loadAs(
                     new FileReader(MAIN_DIRECTORY.resolve("baseline.yaml").toFile()),
                     Scenario.class
                 );
 
-                FishState state = new FishState(run);
+                final FishState state = new FishState(run);
                 state.setScenario(scenario);
                 state.start();
                 //at year 5: shock!
                 state.scheduleOnceInXDays(
-                    new Steppable() {
-                        @Override
-                        public void step(SimState simState) {
-                            for (Port port : state.getPorts())
-                                port.setGasPricePerLiter(gasPrice);
-                        }
+                    (Steppable) simState -> {
+                        for (final Port port : state.getPorts())
+                            port.setGasPricePerLiter(gasPrice);
                     },
                     StepOrder.POLICY_UPDATE,
                     5 * 365 - 1 //at the end of year 5!

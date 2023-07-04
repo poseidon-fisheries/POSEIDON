@@ -40,6 +40,7 @@ import java.util.logging.Logger;
  */
 public class MultiQuotaRegulation implements QuotaPerSpecieRegulation, Steppable {
 
+    private static final long serialVersionUID = -5481639270374933438L;
     protected final double[] quotaRemaining;
     private final double[] yearlyQuota;
     private final FishState state;

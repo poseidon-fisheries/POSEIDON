@@ -43,11 +43,11 @@ public class SimulatedHourlyRevenueExtractor implements ObservationExtractor {
 
     @Override
     public double extract(
-        SeaTile tile, double timeOfObservation, Fisher agent, FishState model
+        final SeaTile tile, final double timeOfObservation, final Fisher agent, final FishState model
     ) {
 
 
-        TripRecord simulation = simulator.simulateRecord(
+        final TripRecord simulation = LameTripSimulator.simulateRecord(
             agent,
             tile,
             model,

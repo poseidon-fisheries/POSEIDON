@@ -39,6 +39,7 @@ import java.util.function.Predicate;
 public class BiologicalEvent implements Startable, Steppable {
 
 
+    private static final long serialVersionUID = -8429759389362721433L;
     /**
      * this gets checked every step to see whether the event occurs today
      */
@@ -59,8 +60,8 @@ public class BiologicalEvent implements Startable, Steppable {
 
 
     public BiologicalEvent(
-        Predicate<FishState> trigger, Predicate<SeaTile> appliesHere,
-        Consumer<SeaTile> event
+        final Predicate<FishState> trigger, final Predicate<SeaTile> appliesHere,
+        final Consumer<SeaTile> event
     ) {
         this.trigger = trigger;
         this.appliesHere = appliesHere;
@@ -68,7 +69,7 @@ public class BiologicalEvent implements Startable, Steppable {
     }
 
     @Override
-    public void step(SimState state) {
+    public void step(final SimState state) {
         //if the trigger applies
         if (trigger.test(((FishState) state)))
             //for all the seatiles that qualify apply the event
@@ -83,7 +84,7 @@ public class BiologicalEvent implements Startable, Steppable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         stoppable = model.scheduleEveryDay(this, StepOrder.BIOLOGY_PHASE);
     }
 

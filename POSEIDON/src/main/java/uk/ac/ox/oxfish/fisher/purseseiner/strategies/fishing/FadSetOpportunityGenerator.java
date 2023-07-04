@@ -50,6 +50,7 @@ public class FadSetOpportunityGenerator<
         this.actionMaker = actionMaker;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Collection<A> apply(final Fisher fisher) {
         return getFadManager(fisher)

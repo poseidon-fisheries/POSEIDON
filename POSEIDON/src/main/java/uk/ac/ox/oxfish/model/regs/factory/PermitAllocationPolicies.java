@@ -31,7 +31,7 @@ import java.util.function.Supplier;
 public class PermitAllocationPolicies {
 
     public static final LinkedHashMap<String, Supplier<AlgorithmFactory<? extends PermitAllocationPolicy>>> CONSTRUCTORS;
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
 
     static {

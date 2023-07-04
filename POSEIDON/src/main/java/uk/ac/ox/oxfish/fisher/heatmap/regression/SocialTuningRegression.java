@@ -20,14 +20,12 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
-import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
-import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.AbstractHeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -36,7 +34,6 @@ import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 
 import java.util.Arrays;
@@ -48,12 +45,10 @@ import java.util.function.Predicate;
  */
 public class SocialTuningRegression<V> implements GeographicalRegression<V> {
 
-    final static private Sensor<Fisher, double[]> parameterSensor = new Sensor<Fisher, double[]>() {
-        @Override
-        public double[] scan(Fisher fisher) {
-            return ((HeatmapDestinationStrategy) fisher.getDestinationStrategy()).getHeatmap().getParametersAsArray();
-        }
-    };
+    final static private Sensor<Fisher, double[]> parameterSensor =
+        fisher -> ((AbstractHeatmapDestinationStrategy<?>) fisher.getDestinationStrategy())
+            .getHeatmap()
+            .getParametersAsArray();
     /**
      * the underlying regression doing all the work
      */
@@ -65,9 +60,9 @@ public class SocialTuningRegression<V> implements GeographicalRegression<V> {
 
 
     public SocialTuningRegression(
-        GeographicalRegression<V> delegate,
-        AdaptationProbability probability,
-        boolean yearly
+        final GeographicalRegression<V> delegate,
+        final AdaptationProbability probability,
+        final boolean yearly
     ) {
         this.delegate = delegate;
         this.probability = probability;
@@ -76,17 +71,11 @@ public class SocialTuningRegression<V> implements GeographicalRegression<V> {
 
 
         optimizer = new BeamHillClimbing<double[]>(
-            new RandomStep<double[]>() {
-                @Override
-                public double[] randomStep(
-                    FishState state, MersenneTwisterFast random, Fisher fisher,
-                    double[] current
-                ) {
-                    double[] toReturn = Arrays.copyOf(current, current.length);
-                    for (int i = 0; i < current.length; i++)
-                        toReturn[i] = toReturn[i] * (.95 + random.nextDouble() * .1);
-                    return toReturn;
-                }
+            (state, random, fisher, current) -> {
+                final double[] toReturn = Arrays.copyOf(current, current.length);
+                for (int i = 0; i < current.length; i++)
+                    toReturn[i] = toReturn[i] * (.95 + random.nextDouble() * .1);
+                return toReturn;
             }
         );
 
@@ -94,31 +83,17 @@ public class SocialTuningRegression<V> implements GeographicalRegression<V> {
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         delegate.start(model, fisher);
         //start the optimizer!
-        Predicate<Fisher> predictate = new Predicate<Fisher>() {
-            @Override
-            public boolean test(Fisher fisher) {
-                return fisher.getDestinationStrategy() instanceof HeatmapDestinationStrategy;
-            }
-        };
-        Actuator<Fisher, double[]> actuator = new Actuator<Fisher, double[]>() {
-            @Override
-            public void apply(Fisher fisher, double[] change, FishState model) {
-                model.scheduleOnce(
-                    new Steppable() {
-                        @Override
-                        public void step(SimState simState) {
-                            ((HeatmapDestinationStrategy) fisher.getDestinationStrategy()).getHeatmap().setParameters(
-                                Arrays.copyOf(change, change.length));
-                        }
-                    },
-                    StepOrder.DAWN
-                );
-
-            }
-        };
+        final Predicate<Fisher> predictate = fisher12 -> fisher12.getDestinationStrategy() instanceof AbstractHeatmapDestinationStrategy;
+        final Actuator<Fisher, double[]> actuator = (fisher1, change, model1) -> model1.scheduleOnce(
+            (Steppable) simState ->
+                ((AbstractHeatmapDestinationStrategy<?>) fisher1.getDestinationStrategy())
+                    .getHeatmap()
+                    .setParameters(Arrays.copyOf(change, change.length)),
+            StepOrder.DAWN
+        );
 
         if (yearly) {
             adaptation = new ExploreImitateAdaptation<>(
@@ -126,12 +101,7 @@ public class SocialTuningRegression<V> implements GeographicalRegression<V> {
                 optimizer,
                 actuator,
                 parameterSensor,
-                new CashFlowObjective(365), probability, new Predicate<double[]>() {
-                @Override
-                public boolean test(double[] a) {
-                    return true;
-                }
-            }
+                new CashFlowObjective(365), probability, a -> true
             );
             fisher.addYearlyAdaptation(
                 adaptation);
@@ -143,12 +113,7 @@ public class SocialTuningRegression<V> implements GeographicalRegression<V> {
                 optimizer,
                 actuator,
                 parameterSensor,
-                new CashFlowObjective(60), 0, 1, new Predicate<double[]>() {
-                @Override
-                public boolean test(double[] a) {
-                    return true;
-                }
-            }
+                new CashFlowObjective(60), 0, 1, a -> true
             );
             fisher.addBiMonthlyAdaptation(adaptation);
         }
@@ -157,7 +122,7 @@ public class SocialTuningRegression<V> implements GeographicalRegression<V> {
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         delegate.turnOff(fisher);
         if (adaptation != null) {
             if (yearly)
@@ -177,7 +142,7 @@ public class SocialTuningRegression<V> implements GeographicalRegression<V> {
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
+    public double predict(final SeaTile tile, final double time, final Fisher fisher, final FishState model) {
         return delegate.predict(tile, time, fisher, model);
     }
 
@@ -190,8 +155,8 @@ public class SocialTuningRegression<V> implements GeographicalRegression<V> {
      */
     @Override
     public void addObservation(
-        GeographicalObservation<V> observation,
-        Fisher fisher, FishState model
+        final GeographicalObservation<V> observation,
+        final Fisher fisher, final FishState model
     ) {
         delegate.addObservation(observation, fisher, model);
     }
@@ -205,8 +170,8 @@ public class SocialTuningRegression<V> implements GeographicalRegression<V> {
      */
     @Override
     public double extractNumericalYFromObservation(
-        GeographicalObservation<V> observation,
-        Fisher fisher
+        final GeographicalObservation<V> observation,
+        final Fisher fisher
     ) {
         return delegate.extractNumericalYFromObservation(observation, fisher);
     }
@@ -229,7 +194,7 @@ public class SocialTuningRegression<V> implements GeographicalRegression<V> {
      * @param parameterArray the new parameters for this regresssion
      */
     @Override
-    public void setParameters(double[] parameterArray) {
+    public void setParameters(final double[] parameterArray) {
         delegate.setParameters(parameterArray);
     }
 

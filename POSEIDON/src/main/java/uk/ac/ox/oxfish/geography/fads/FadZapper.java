@@ -17,6 +17,7 @@ import static java.util.stream.Collectors.toList;
  */
 public class FadZapper implements Steppable, AdditionalStartable {
 
+    private static final long serialVersionUID = -6875322207517588809L;
     private final Predicate<? super Fad> validator;
 
     public FadZapper(final Predicate<? super Fad> validator) {

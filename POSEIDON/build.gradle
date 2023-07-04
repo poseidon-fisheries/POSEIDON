@@ -1,8 +1,7 @@
 plugins {
-    id 'java-library'
-    id 'application'
+    id("poseidon.java-conventions")
     id 'jacoco'
-    id "com.github.johnrengelman.shadow" version "7.1.0"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
     id "com.github.spotbugs" version "4.7.2"
 }
 
@@ -10,11 +9,6 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(8))
     }
-}
-
-application {
-    mainClass = 'uk.ac.ox.oxfish.Main'
-    applicationDefaultJvmArgs = ["-Xms1024m", "-Xmx2048m"]
 }
 
 repositories {
@@ -44,9 +38,9 @@ sourceSets {
 //here we add all the dependencies notice that mason and geomason are not on maven so we need to add them separately
 dependencies {
 
-    implementation(project(":regulations:core"))
-    implementation(project(":agents:core"))
     api(project(":common:api"))
+    implementation(project(":agents:core"))
+    implementation(project(":regulations:core"))
 
     //mason libraries. They aren't on maven so we have to lug their jars around
     api fileTree(dir: 'libs/mason', include: '*.jar')
@@ -56,7 +50,8 @@ dependencies {
     implementation fileTree(dir: 'libs/fxbase/', include: '*.jar')
 
 
-    //csv helper
+    // CSV helpers
+    // DO NOT use opencsv for new code, as we want to phase it out.
     implementation "com.opencsv:opencsv:3.8"
     implementation "com.univocity:univocity-parsers:2.9.1"
 
@@ -104,11 +99,6 @@ processTestResources.doFirst {
     // explicitly allow overriding files when copying resources
     duplicatesStrategy = "include"
 }
-
-// Duplicate handling strategy need to be explicitly specified as of Gradle 6
-processResources { duplicatesStrategy = DuplicatesStrategy.INCLUDE }
-distTar { duplicatesStrategy = DuplicatesStrategy.INCLUDE }
-distZip { duplicatesStrategy = DuplicatesStrategy.INCLUDE }
 
 //this makes tests multi-threaded when called from gradle. Useful!
 test {

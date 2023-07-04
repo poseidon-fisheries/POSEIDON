@@ -24,6 +24,8 @@ import uk.ac.ox.oxfish.model.data.heatmaps.mergers.SnapshotMerger;
 
 public class BiomassHeatmapGatherer extends HeatmapGatherer {
 
+    private static final long serialVersionUID = -5404037198329298196L;
+
     public BiomassHeatmapGatherer(
         final int interval,
         final Species species

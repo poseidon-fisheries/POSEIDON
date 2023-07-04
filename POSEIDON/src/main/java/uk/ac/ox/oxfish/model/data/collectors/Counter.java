@@ -38,6 +38,7 @@ import java.util.Set;
  */
 public class Counter implements Startable, Steppable {
 
+    private static final long serialVersionUID = 6991537107843888670L;
     final private Map<String, Double> data;
 
     final private IntervalPolicy policy;
@@ -52,18 +53,18 @@ public class Counter implements Startable, Steppable {
     private String lazyColumnToInsert = null;
     private double lazyValueToAdd = 0;
 
-    public Counter(IntervalPolicy policy) {
+    public Counter(final IntervalPolicy policy) {
         this.data = new LinkedHashMap<>();
         this.policy = policy;
     }
 
-    public void start(FishState state) {
+    public void start(final FishState state) {
         Preconditions.checkState(receipt == null, "Already Started!");
         receipt = state.schedulePerPolicy(this, StepOrder.DATA_RESET, policy);
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         /**
          * reset all stuff
          */
@@ -75,7 +76,7 @@ public class Counter implements Startable, Steppable {
      *
      * @param columnName the name of the column
      */
-    public void addColumn(String columnName) {
+    public void addColumn(final String columnName) {
         Preconditions.checkArgument(!hasColumn(columnName), columnName + " column already exists!");
         data.put(columnName, 0d);
     }
@@ -86,7 +87,7 @@ public class Counter implements Startable, Steppable {
      * @param columnName
      * @return
      */
-    public boolean hasColumn(String columnName) {
+    public boolean hasColumn(final String columnName) {
         return data.containsKey(columnName);
     }
 
@@ -96,7 +97,7 @@ public class Counter implements Startable, Steppable {
      * @param columnName the column to increment
      * @param add        by how much to increment
      */
-    public void count(String columnName, double add) {
+    public void count(final String columnName, final double add) {
 
         if (add == 0)
             return;
@@ -138,7 +139,7 @@ public class Counter implements Startable, Steppable {
     }
 
 
-    public Double getColumn(String columnName) {
+    public Double getColumn(final String columnName) {
         if (lazyColumnToInsert != null)
             flushLazyValueInCounter();
         return data.get(columnName);

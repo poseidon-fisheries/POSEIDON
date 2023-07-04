@@ -26,9 +26,10 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridYExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelTransduction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class KernelTransductionFactory implements AlgorithmFactory<KernelTransduction> {
 
@@ -45,15 +46,15 @@ public class KernelTransductionFactory implements AlgorithmFactory<KernelTransdu
      * @param state the function argument
      * @return the function result
      */
+    @SuppressWarnings("unchecked")
     @Override
     public KernelTransduction apply(final FishState state) {
         final double bandwidth = spaceBandwidth.applyAsDouble(state.getRandom());
         return new KernelTransduction(
             state.getMap(),
             forgettingFactor.applyAsDouble(state.getRandom()),
-            new Pair<>(new GridXExtractor(), bandwidth),
-
-            new Pair<>(new GridYExtractor(), bandwidth)
+            entry(new GridXExtractor(), bandwidth),
+            entry(new GridYExtractor(), bandwidth)
         );
     }
 

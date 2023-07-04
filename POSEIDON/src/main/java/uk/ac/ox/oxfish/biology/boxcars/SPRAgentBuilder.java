@@ -99,12 +99,7 @@ public class SPRAgentBuilder implements CatchAtLengthFactory {
         return new SPRAgent(
             surveyTag,
             fishState.getBiology().getSpecie(speciesName),
-            new Predicate<Fisher>() {
-                @Override
-                public boolean test(final Fisher fisher) {
-                    return random.nextDouble() < samplingProbability;
-                }
-            },
+            fisher -> random.nextDouble() < samplingProbability,
             assumedLinf.applyAsDouble(random),
             assumedKParameter.applyAsDouble(random),
             assumedNaturalMortality.applyAsDouble(random),

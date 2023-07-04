@@ -35,6 +35,7 @@ public class HeterogeneousLinearIntervalAttractor
     extends AbstractAbundanceLinearIntervalAttractor implements FadRemovalListener {
 
 
+    private static final long serialVersionUID = 9016254769011047135L;
     private final double minAbundanceThreshold;
     private final int daysItTakesToFillUp;
     private final Map<Fad, HashMap<Species, double[][]>> dailyAttractionThreshold = new HashMap<>();

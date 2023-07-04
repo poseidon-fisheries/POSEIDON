@@ -26,7 +26,6 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.components.ArrayFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.FixedProportionFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.RetentionAbundanceFilter;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -57,7 +56,9 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
             0.221026, 0.220753, 0.220479, 0.220207, 0.219934, 0.219662, 0.21939, 0.21939, 0.21939, 0.21939, 0.21939,
             0.21939, 0.21939, 0.21939, 0.21939, 0.21939
         };
-    private final Locker<String, ArrayFilter> selectivity = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, ArrayFilter> selectivity =
+        new uk.ac.ox.oxfish.utility.Locker<>();
     /**
      * retention inflection parameter
      */

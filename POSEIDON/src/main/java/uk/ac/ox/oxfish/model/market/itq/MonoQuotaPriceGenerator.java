@@ -29,9 +29,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.QuotaPerSpecieRegulation;
-import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +41,7 @@ import java.util.stream.Collectors;
 public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable {
 
 
+    private static final long serialVersionUID = -4016462555754666213L;
     private final int specieIndex;
     /**
      * whether to include or not daily profits in the reservation price computation. This was something I attempted
@@ -67,15 +66,15 @@ public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable {
     private Stoppable receipt;
 
     public MonoQuotaPriceGenerator(
-        int specieIndex,
-        boolean includeDailyProfits
+        final int specieIndex,
+        final boolean includeDailyProfits
     ) {
         this.specieIndex = specieIndex;
         this.includeDailyProfits = includeDailyProfits;
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         this.fisher = fisher;
         this.state = model;
         //only works with the right kind of regulation!
@@ -86,12 +85,7 @@ public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable {
             //ugly hack to deal with multiple regulations: just grab the first one that shows up!
             quotas = (MonoQuotaRegulation)
                 ((MultipleRegulations) fisher.getRegulation()).getRegulations().stream().filter(
-                    new Predicate<Regulation>() {
-                        @Override
-                        public boolean test(Regulation regulation) {
-                            return regulation instanceof QuotaPerSpecieRegulation;
-                        }
-                    }).collect(Collectors.toList()).get(0);
+                    regulation -> regulation instanceof QuotaPerSpecieRegulation).collect(Collectors.toList()).get(0);
 
 
         receipt = model.scheduleEveryDay(this, StepOrder.AGGREGATE_DATA_GATHERING);
@@ -107,7 +101,7 @@ public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable {
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         //todo remove gatherer
         if (receipt != null) {
             receipt.stop();
@@ -118,7 +112,7 @@ public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         lastLambda = computeLambda();
     }
 
@@ -128,10 +122,11 @@ public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable {
             return Double.NaN;
         if (state.getDayOfTheYear() == 365)
             return Double.NaN;
-        int amountOfDaysLeftFishing = fisher.getDepartingStrategy()
+        final int amountOfDaysLeftFishing = fisher.getDepartingStrategy()
             .predictedDaysLeftFishingThisYear(fisher, state, state.getRandom());
 
-        double probability = 1 - fisher.probabilitySumDailyCatchesBelow(specieIndex,
+        final double probability = 1 - fisher.probabilitySumDailyCatchesBelow(
+            specieIndex,
             quotas.getQuotaRemaining(specieIndex),
             amountOfDaysLeftFishing
         );

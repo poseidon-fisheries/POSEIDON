@@ -32,7 +32,6 @@ import uk.ac.ox.oxfish.utility.bandit.BanditSwitch;
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Tries to fill up a LogisticLog when you are not actually using a LogitDestination
@@ -40,6 +39,7 @@ import java.util.function.Function;
  */
 public class PseudoLogisticLogger implements TripListener {
 
+    private static final long serialVersionUID = -5326879775306243081L;
     /**
      * the discretization allegedly used to make the logit choice
      */
@@ -68,11 +68,11 @@ public class PseudoLogisticLogger implements TripListener {
 
 
     public PseudoLogisticLogger(
-        MapDiscretization discretization,
-        LogisticInputMaker inputter, LogisticLog log,
-        Fisher fisher,
-        FishState state,
-        Set<Integer> allowedGroups
+        final MapDiscretization discretization,
+        final LogisticInputMaker inputter, final LogisticLog log,
+        final Fisher fisher,
+        final FishState state,
+        final Set<Integer> allowedGroups
     ) {
         this.discretization = discretization;
         //only model arms for which we have both at least a tile in the map AND is listed in the input file
@@ -88,12 +88,12 @@ public class PseudoLogisticLogger implements TripListener {
     }
 
     public PseudoLogisticLogger(
-        MapDiscretization discretization,
-        ObservationExtractor[] commonExtractors,
-        LogisticLog log,
-        Fisher fisher,
-        FishState state,
-        MersenneTwisterFast random
+        final MapDiscretization discretization,
+        final ObservationExtractor[] commonExtractors,
+        final LogisticLog log,
+        final Fisher fisher,
+        final FishState state,
+        final MersenneTwisterFast random
     ) {
         this.discretization = discretization;
         //only model arms for which we have both at least a tile in the map AND is listed in the input file
@@ -101,16 +101,13 @@ public class PseudoLogisticLogger implements TripListener {
             discretization.getNumberOfGroups(),
             integer -> discretization.isValid(integer)
         );
-        ObservationExtractor[][] extractors = new ObservationExtractor[switcher.getNumberOfArms()][];
+        final ObservationExtractor[][] extractors = new ObservationExtractor[switcher.getNumberOfArms()][];
         for (int arm = 0; arm < extractors.length; arm++)
             extractors[arm] = commonExtractors;
 
-        this.inputter = new LogisticInputMaker(extractors, new Function<Integer, SeaTile>() {
-            @Override
-            public SeaTile apply(Integer arm) {
-                List<SeaTile> group = discretization.getGroup(switcher.getGroup(arm));
-                return group.get(random.nextInt(group.size()));
-            }
+        this.inputter = new LogisticInputMaker(extractors, arm -> {
+            final List<SeaTile> group = discretization.getGroup(switcher.getGroup(arm));
+            return group.get(random.nextInt(group.size()));
         });
         this.log = log;
         this.fisher = fisher;
@@ -118,7 +115,7 @@ public class PseudoLogisticLogger implements TripListener {
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
         //if we recorded an input at the end of the last trip, now we reveal the choice
         if (log.waitingForChoice()) {
             if (record.getMostFishedTileInTrip() == null || discretization.getGroup(

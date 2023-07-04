@@ -34,7 +34,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.ToDoubleFunction;
 
 /**
  * An aggregator of natural processes that applies recruitment, mortality
@@ -44,6 +43,7 @@ import java.util.function.ToDoubleFunction;
 public class SingleSpeciesNaturalProcesses implements Steppable, Startable {
 
 
+    private static final long serialVersionUID = -5901650742160045897L;
     /**
      * creates new recruits
      */
@@ -91,22 +91,17 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable {
         this.agingProcess.start(species);
         if (!daily) {
             model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
-            model.scheduleEveryDay(new Steppable() {
-                @Override
-                public void step(final SimState simState) {
-                    diffuser.step(species, biologies, model);
-                }
-            }, StepOrder.BIOLOGY_PHASE);
+            model.scheduleEveryDay(
+                (Steppable) simState -> diffuser.step(species, biologies, model),
+                StepOrder.BIOLOGY_PHASE
+            );
         } else
         //will have to make sure diffuser and natural processes happen in sync;
         // in this case it means that the diffuser will act BEFORE the natural process, always
         {
-            model.scheduleEveryDay(new Steppable() {
-                @Override
-                public void step(final SimState simState) {
-                    diffuser.step(species, biologies, model);
-                    SingleSpeciesNaturalProcesses.this.step(simState);
-                }
+            model.scheduleEveryDay((Steppable) simState -> {
+                diffuser.step(species, biologies, model);
+                SingleSpeciesNaturalProcesses.this.step(simState);
             }, StepOrder.BIOLOGY_PHASE);
         }
     }
@@ -250,12 +245,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable {
         //make sure it all sum up to 1!
         assert Math.abs(biomassWeight.values().stream().
             mapToDouble(
-                new ToDoubleFunction<Double>() {
-                    @Override
-                    public double applyAsDouble(final Double value) {
-                        return value;
-                    }
-                }).sum() - 1d) < .001d;
+                value -> value).sum() - 1d) < .001d;
         double leftOver = 0;
         for (final Map.Entry<AbundanceLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
             final double ratio = biologyBiomass.getValue();

@@ -38,6 +38,7 @@ public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
 
     public static final String CASH_COLUMN = FisherYearlyTimeSeries.CASH_COLUMN;
     public static final String CATCHES_COLUMN_NAME = "Catches (kg)";
+    private static final long serialVersionUID = 8984044800147873148L;
 
 
     public FisherDailyTimeSeries() {
@@ -52,24 +53,20 @@ public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
      * @param observed the object to observe
      */
     @Override
-    public void start(FishState state, Fisher observed) {
+    public void start(final FishState state, final Fisher observed) {
 
-        registerGatherer(CASH_COLUMN, new Gatherer<Fisher>() {
-            @Override
-            public Double apply(Fisher fisher) {
-                return fisher.getBankBalance();
-            }
-        }, Double.NaN);
+        registerGatherer(CASH_COLUMN, (Gatherer<Fisher>) Fisher::getBankBalance, Double.NaN);
 
 
         registerGatherer(FisherYearlyTimeSeries.CASH_FLOW_COLUMN,
             new Gatherer<Fisher>() {
 
+                private static final long serialVersionUID = -8952359471788512912L;
                 double oldCash = observed.getBankBalance();
 
                 @Override
-                public Double apply(Fisher fisher) {
-                    double flow = fisher.getBankBalance() - oldCash;
+                public Double apply(final Fisher fisher) {
+                    final double flow = fisher.getBankBalance() - oldCash;
                     oldCash = fisher.getBankBalance();
                     return flow;
                 }
@@ -82,17 +79,12 @@ public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
             0
         );
 
-        for (Species species : state.getSpecies()) {
+        for (final Species species : state.getSpecies()) {
             final String landings = species + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
 
             registerGatherer(
                 landings,
-                (new Gatherer<Fisher>() {
-                    @Override
-                    public Double apply(Fisher fisher) {
-                        return fisher.getDailyCounter().getLandingsPerSpecie(species.getIndex());
-                    }
-                }),
+                ((Gatherer<Fisher>) fisher -> fisher.getDailyCounter().getLandingsPerSpecie(species.getIndex())),
                 Double.NaN,
                 KILOGRAM,
                 "Biomass"
@@ -102,12 +94,7 @@ public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
 
             registerGatherer(
                 catches,
-                (new Gatherer<Fisher>() {
-                    @Override
-                    public Double apply(Fisher fisher) {
-                        return fisher.getDailyCounter().getCatchesPerSpecie(species.getIndex());
-                    }
-                }),
+                ((Gatherer<Fisher>) fisher -> fisher.getDailyCounter().getCatchesPerSpecie(species.getIndex())),
                 Double.NaN,
                 KILOGRAM,
                 "Biomass"
@@ -121,7 +108,7 @@ public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
     /*
         for(int i=0; i< monthlyAverageCatch.length; i++)

@@ -21,19 +21,16 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.google.common.base.Preconditions;
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
-import uk.ac.ox.oxfish.model.market.itq.PriceGenerator;
 import uk.ac.ox.oxfish.model.market.itq.ProportionalQuotaPriceGenerator;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaITQRegulation;
 import uk.ac.ox.oxfish.model.regs.QuotaPerSpecieRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -41,7 +38,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 /**
@@ -55,12 +51,16 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
     /**
      * an array of order books for each "model" lspiRun
      */
-    private final Locker<String, HashMap<Integer, ITQOrderBook>> orderBooks = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, HashMap<Integer, ITQOrderBook>> orderBooks =
+        new uk.ac.ox.oxfish.utility.Locker<>();
 
     /**
      * an array of order book makers for each model lspiRun
      */
-    private final Locker<String, ITQMarketBuilder[]> orderBooksBuilder = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, ITQMarketBuilder[]> orderBooksBuilder =
+        new uk.ac.ox.oxfish.utility.Locker<>();
 
     /**
      * The ITQ yearly quota to give the fisher to fish the first species
@@ -114,7 +114,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
             );
 
 
-        /***
+        /*
          *      __  __   _   ___ _  _____ _____   ___ _   _ ___ _    ___  ___ ___  ___
          *     |  \/  | /_\ | _ \ |/ / __|_   _| | _ ) | | |_ _| |  |   \| __| _ \/ __|
          *     | |\/| |/ _ \|   / ' <| _|  | |   | _ \ |_| || || |__| |) | _||   /\__ \
@@ -171,24 +171,14 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
                     builders[i] = new ITQMarketBuilder(
                         i,
                         //create proportional quota price generator
-                        new Supplier<PriceGenerator>() {
-                            @Override
-                            public PriceGenerator get() {
-                                return new ProportionalQuotaPriceGenerator(
-                                    markets,
-                                    specieIndex,
-                                    //reads the fisher regulation which we know
-                                    //what it is because we are supplying it now
-                                    new Sensor<Fisher, Double>() {
-                                        @Override
-                                        public Double scan(final Fisher fisher) {
-                                            return ((QuotaPerSpecieRegulation) fisher.getRegulation()).getQuotaRemaining(
-                                                specieIndex);
-                                        }
-                                    }
-                                );
-                            }
-                        }
+                        () -> new ProportionalQuotaPriceGenerator(
+                            markets,
+                            specieIndex,
+                            //reads the fisher regulation which we know
+                            //what it is because we are supplying it now
+                            (Sensor<Fisher, Double>) fisher -> ((QuotaPerSpecieRegulation) fisher.getRegulation()).getQuotaRemaining(
+                                specieIndex)
+                        )
                     );
                     final int speciesIndex = i;
                     final Startable setupStep = new Startable() {
@@ -211,12 +201,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
 
                         state.registerStartable(setupStep);
                     } else {
-                        state.scheduleOnce(new Steppable() {
-                            @Override
-                            public void step(final SimState simState) {
-                                setupStep.start(state);
-                            }
-                        }, StepOrder.DAWN);
+                        state.scheduleOnce((Steppable) simState -> setupStep.start(state), StepOrder.DAWN);
                     }
                 }
             }

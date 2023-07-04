@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.utility.adaptation.Sensor;
  */
 public class LBSPREffortPolicy extends Controller {
 
+    private static final long serialVersionUID = -7938732071691208894L;
     private final String columnNameSPR;
 
     private final double linearParameter;
@@ -28,10 +29,10 @@ public class LBSPREffortPolicy extends Controller {
 
 
     public LBSPREffortPolicy(
-        String columnNameSPR, double linearParameter,
-        double cubicParameter, double sprTarget,
-        double maxChangeInPercentage,
-        Actuator<FishState, Double> effortActuator, boolean blockEntryWhenSeasonIsNotFull
+        final String columnNameSPR, final double linearParameter,
+        final double cubicParameter, final double sprTarget,
+        final double maxChangeInPercentage,
+        final Actuator<FishState, Double> effortActuator, final boolean blockEntryWhenSeasonIsNotFull
     ) {
 
         super(
@@ -58,7 +59,7 @@ public class LBSPREffortPolicy extends Controller {
         final double targetSPR
     ) {
 
-        double ratio = currentSPR / targetSPR;
+        final double ratio = currentSPR / targetSPR;
         if (ratio > 1.25)
             return 1.1;
         if (ratio < 0.75)
@@ -69,10 +70,10 @@ public class LBSPREffortPolicy extends Controller {
 
     @Override
     public double computePolicy(
-        double currentSPR,
-        double targetSPR,
-        FishState model,
-        double oldPolicy
+        final double currentSPR,
+        final double targetSPR,
+        final FishState model,
+        final double oldPolicy
     ) {
         //numerical errors can happen; don't act then
         if (!Double.isFinite(currentSPR) || currentSPR < 0 || currentSPR > 1)
@@ -90,11 +91,11 @@ public class LBSPREffortPolicy extends Controller {
         accumulatedDelta = accumulatedDelta * (1 + deltaToday);
 
         if (accumulatedDelta >= 1 && blockEntryWhenSeasonIsNotFull)
-            for (EntryPlugin entryPlugin : model.getEntryPlugins()) {
+            for (final EntryPlugin entryPlugin : model.getEntryPlugins()) {
                 entryPlugin.setEntryPaused(false);
             }
         if (accumulatedDelta < 1 && blockEntryWhenSeasonIsNotFull)
-            for (EntryPlugin entryPlugin : model.getEntryPlugins()) {
+            for (final EntryPlugin entryPlugin : model.getEntryPlugins()) {
                 entryPlugin.setEntryPaused(true);
             }
 

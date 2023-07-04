@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
@@ -32,8 +31,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.probability.FixedProbability;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -46,16 +43,16 @@ public class HeatmapDestinationStrategyTest {
     public void addsObservationsWithImitation() throws Exception {
 
 
-        GeographicalRegression regression = mock(GeographicalRegression.class);
-        Fisher user = mock(Fisher.class);
-        Fisher friend = mock(Fisher.class);
+        final GeographicalRegression regression = mock(GeographicalRegression.class);
+        final Fisher user = mock(Fisher.class);
+        final Fisher friend = mock(Fisher.class);
         when(user.getDirectedFriends()).thenReturn(Lists.newArrayList(friend));
 
-        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
-        AcquisitionFunction optimizer = mock(AcquisitionFunction.class);
+        final AcquisitionFunction optimizer = mock(AcquisitionFunction.class);
 
-        HeatmapDestinationStrategy strategy = new HeatmapDestinationStrategy(
+        final HeatmapDestinationStrategy strategy = new HeatmapDestinationStrategy(
             regression,
             optimizer,
             false,
@@ -65,7 +62,7 @@ public class HeatmapDestinationStrategyTest {
             10,
             new HourlyProfitInTripObjective(true)
         );
-        SeaTile optimal = mock(SeaTile.class);
+        final SeaTile optimal = mock(SeaTile.class);
 
         when(optimal.isWater()).thenReturn(true);
         when(optimizer.pick(any(), any(), any(), any(), any())).thenReturn(optimal);
@@ -82,8 +79,10 @@ public class HeatmapDestinationStrategyTest {
         verify(regression, times(2)).addObservation(any(), any(), any());
 
         //one only now because we already added our friend's
-        strategy.reactToFinishedTrip(mock(TripRecord.class, RETURNS_DEEP_STUBS),
-            mock(Fisher.class, RETURNS_DEEP_STUBS));
+        strategy.reactToFinishedTrip(
+            mock(TripRecord.class, RETURNS_DEEP_STUBS),
+            mock(Fisher.class, RETURNS_DEEP_STUBS)
+        );
         verify(regression, times(3)).addObservation(any(), any(), any());
 
         //and now two more
@@ -100,16 +99,16 @@ public class HeatmapDestinationStrategyTest {
     public void addsObservationsWithoutImitation() throws Exception {
 
 
-        GeographicalRegression regression = mock(GeographicalRegression.class);
-        Fisher user = mock(Fisher.class);
-        Fisher friend = mock(Fisher.class);
+        final GeographicalRegression regression = mock(GeographicalRegression.class);
+        final Fisher user = mock(Fisher.class);
+        final Fisher friend = mock(Fisher.class);
         when(user.getDirectedFriends()).thenReturn(Lists.newArrayList(friend));
-        AcquisitionFunction optimizer = mock(AcquisitionFunction.class);
+        final AcquisitionFunction optimizer = mock(AcquisitionFunction.class);
 
-        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
 
-        HeatmapDestinationStrategy strategy = new HeatmapDestinationStrategy(
+        final HeatmapDestinationStrategy strategy = new HeatmapDestinationStrategy(
             regression,
             optimizer,
             false,
@@ -119,7 +118,7 @@ public class HeatmapDestinationStrategyTest {
             10,
             new HourlyProfitInTripObjective(true)
         );
-        SeaTile optimal = mock(SeaTile.class);
+        final SeaTile optimal = mock(SeaTile.class);
 
         when(optimal.isWater()).thenReturn(true);
         when(optimizer.pick(any(), any(), any(), any(), any())).thenReturn(optimal);
@@ -155,14 +154,14 @@ public class HeatmapDestinationStrategyTest {
     @Test
     public void acquisitionWorks() throws Exception {
 
-        Fisher user = mock(Fisher.class);
+        final Fisher user = mock(Fisher.class);
 
-        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
 
-        AcquisitionFunction optimizer = mock(AcquisitionFunction.class);
+        final AcquisitionFunction optimizer = mock(AcquisitionFunction.class);
 
-        HeatmapDestinationStrategy strategy = new HeatmapDestinationStrategy(
+        final HeatmapDestinationStrategy strategy = new HeatmapDestinationStrategy(
             mock(GeographicalRegression.class),
             optimizer,
             false,
@@ -177,7 +176,7 @@ public class HeatmapDestinationStrategyTest {
         strategy.start(model, user);
 
 
-        SeaTile optimal = mock(SeaTile.class);
+        final SeaTile optimal = mock(SeaTile.class);
         assertNotEquals(
             strategy.getFavoriteSpot(),
             optimal

@@ -101,11 +101,11 @@ public class BuildSampleInputs {
         directory = Paths.get("inputs", "YAML Samples", "components");
         directory.toFile().mkdirs();
         //the same for all
-        for (final Map.Entry<Class, Map<String, ? extends Supplier<? extends AlgorithmFactory<?>>>> algorithms : AlgorithmFactories.CONSTRUCTOR_MAP.entrySet()) {
+        for (final Map.Entry<Class<?>, Map<String, ? extends Supplier<? extends AlgorithmFactory<?>>>> algorithms : AlgorithmFactories.CONSTRUCTOR_MAP.entrySet()) {
             final String name = algorithms.getKey().getSimpleName();
             final Path file = directory.resolve(name + ".yaml");
             final StringBuilder buffer = new StringBuilder();
-            for (final Supplier<? extends AlgorithmFactory> factory : algorithms.getValue().values()) {
+            for (final Supplier<? extends AlgorithmFactory<?>> factory : algorithms.getValue().values()) {
                 buffer.append(yaml.dump(factory.get()));
                 buffer.append("-------");
                 buffer.append("\n");

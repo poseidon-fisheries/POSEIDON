@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -45,7 +44,9 @@ public class ProtectedAreasOnlyFactory implements AlgorithmFactory<ProtectedArea
      * for each model I need to create starting mpas from scratch. Here I store
      * the stoppable as a receipt to make sure I create the MPAs only once
      */
-    private final Locker<String, Startable> startReceipt = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, Startable> startReceipt =
+        new uk.ac.ox.oxfish.utility.Locker<>();
     private List<StartingMPA> startingMPAs = new LinkedList<>();
 
     /**
@@ -72,29 +73,26 @@ public class ProtectedAreasOnlyFactory implements AlgorithmFactory<ProtectedArea
                         model.getDailyDataSet().
                             registerGatherer(
                                 "% of Illegal Tows",
-                                new Gatherer<FishState>() {
-                                    @Override
-                                    public Double apply(final FishState state1) {
+                                (Gatherer<FishState>) state1 -> {
 
-                                        double trawlsSum = 0;
-                                        double illegalSum = 0;
-                                        final NauticalMap map = state1.getMap();
-                                        for (final SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
-                                            final int trawlsHere = map.getDailyTrawlsMap().get(
-                                                tile.getGridX(),
-                                                tile.getGridY()
-                                            );
-                                            trawlsSum += trawlsHere;
-                                            if (tile.isProtected()) {
-                                                illegalSum += trawlsHere;
-                                            }
+                                    double trawlsSum = 0;
+                                    double illegalSum = 0;
+                                    final NauticalMap map = state1.getMap();
+                                    for (final SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
+                                        final int trawlsHere = map.getDailyTrawlsMap().get(
+                                            tile.getGridX(),
+                                            tile.getGridY()
+                                        );
+                                        trawlsSum += trawlsHere;
+                                        if (tile.isProtected()) {
+                                            illegalSum += trawlsHere;
                                         }
-                                        if (trawlsSum == 0)
-                                            return Double.NaN;
-                                        assert trawlsSum >= illegalSum;
-                                        return illegalSum / trawlsSum;
-
                                     }
+                                    if (trawlsSum == 0)
+                                        return Double.NaN;
+                                    assert trawlsSum >= illegalSum;
+                                    return illegalSum / trawlsSum;
+
                                 }
                                 , Double.NaN
                             );

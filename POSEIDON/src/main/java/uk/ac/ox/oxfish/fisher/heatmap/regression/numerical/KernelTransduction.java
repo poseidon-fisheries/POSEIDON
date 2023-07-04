@@ -25,11 +25,11 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * Iterative kernel regression, focusing on the seatiles you want to predict for should make the prediction
@@ -43,16 +43,17 @@ public class KernelTransduction implements GeographicalRegression<Double> {
 
     private final double forgettingFactor;
 
+    @SuppressWarnings("unchecked")
     public KernelTransduction(
-        NauticalMap map,
-        double forgettingFactor,
-        Pair<ObservationExtractor, Double>... extractorsAndBandwidths
+        final NauticalMap map,
+        final double forgettingFactor,
+        final Entry<ObservationExtractor, Double>... extractorsAndBandwidths
     ) {
 
         this.forgettingFactor = forgettingFactor;
-        List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
+        final List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
         kernels = new HashMap<>(tiles.size());
-        for (SeaTile tile : tiles)
+        for (final SeaTile tile : tiles)
             kernels.put(tile, new KernelTilePredictor(forgettingFactor, tile, extractorsAndBandwidths));
 
     }
@@ -63,9 +64,9 @@ public class KernelTransduction implements GeographicalRegression<Double> {
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
+    public double predict(final SeaTile tile, final double time, final Fisher fisher, final FishState model) {
 
-        KernelTilePredictor kernel = kernels.get(tile);
+        final KernelTilePredictor kernel = kernels.get(tile);
         if (kernel == null)
             return Double.NaN;
         else
@@ -82,10 +83,14 @@ public class KernelTransduction implements GeographicalRegression<Double> {
      * @param model
      */
     @Override
-    public void addObservation(GeographicalObservation newObservation, Fisher fisher, FishState model) {
+    public void addObservation(
+        final GeographicalObservation<Double> newObservation,
+        final Fisher fisher,
+        final FishState model
+    ) {
 
         //go through all the tiles
-        for (KernelTilePredictor kernel : kernels.values()) {
+        for (final KernelTilePredictor kernel : kernels.values()) {
             kernel.addObservation(newObservation, fisher, model);
         }
     }
@@ -99,7 +104,7 @@ public class KernelTransduction implements GeographicalRegression<Double> {
      * ignored
      */
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
 
     }
 
@@ -107,7 +112,7 @@ public class KernelTransduction implements GeographicalRegression<Double> {
      * ignored
      */
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
 
     }
 
@@ -117,7 +122,7 @@ public class KernelTransduction implements GeographicalRegression<Double> {
      */
     @Override
     public double extractNumericalYFromObservation(
-        GeographicalObservation<Double> observation, Fisher fisher
+        final GeographicalObservation<Double> observation, final Fisher fisher
     ) {
         return observation.getValue();
     }
@@ -129,7 +134,7 @@ public class KernelTransduction implements GeographicalRegression<Double> {
     @Override
     public double[] getParametersAsArray() {
 
-        double[] bandwidths = kernels.values().iterator().next().getBandwidths();
+        final double[] bandwidths = kernels.values().iterator().next().getBandwidths();
         //check that they all have the same bandwidths!
         assert kernels.values().stream().allMatch(
             kernelTile -> Arrays.equals(kernelTile.getBandwidths(), bandwidths));
@@ -141,7 +146,7 @@ public class KernelTransduction implements GeographicalRegression<Double> {
      * receives and modifies the forgetting value
      */
     @Override
-    public void setParameters(double[] parameterArray) {
+    public void setParameters(final double[] parameterArray) {
 
         kernels.values().forEach(kernelTile -> kernelTile.setBandwidths(parameterArray));
 

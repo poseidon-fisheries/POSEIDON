@@ -35,7 +35,7 @@ public class GearStrategies {
 
     public static final LinkedHashMap<String, Supplier<AlgorithmFactory<? extends GearStrategy>>> CONSTRUCTORS;
 
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
         NAMES.put(FixedGearStrategyFactory.class, "Never Change Gear");

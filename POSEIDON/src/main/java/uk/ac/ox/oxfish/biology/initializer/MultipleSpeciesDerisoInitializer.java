@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
 import java.util.logging.Logger;
 
 /**
@@ -264,22 +263,11 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
 
                 assert Math.abs(localBiologies.values()
                     .stream()
-                    .mapToDouble(new ToDoubleFunction<VariableBiomassBasedBiology>() {
-
-                        @Override
-                        public double applyAsDouble(final VariableBiomassBasedBiology value) {
-                            return value.getCarryingCapacity(species);
-                        }
-                    })
+                    .mapToDouble(value -> value.getCarryingCapacity(species))
                     .sum() - virginBiomass) < FishStateUtilities.EPSILON;
                 assert Math.abs(localBiologies.values()
                     .stream()
-                    .mapToDouble(new ToDoubleFunction<VariableBiomassBasedBiology>() {
-                        @Override
-                        public double applyAsDouble(final VariableBiomassBasedBiology value) {
-                            return value.getBiomass(species);
-                        }
-                    })
+                    .mapToDouble(value -> value.getBiomass(species))
                     .sum() - currentBiomass) < .01;
 
 
@@ -325,11 +313,12 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
 
 
             //movement rates
-            final BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(
-                map,
-                random,
-                biology
-            );
+            @SuppressWarnings("unchecked") final BiomassDiffuserContainer diffuser =
+                new BiomassDiffuserContainer(
+                    map,
+                    random,
+                    biology
+                );
 
             for (final Map.Entry<Species, Double> movement : movementRate.entrySet()) {
                 assert movement.getValue() > 0;

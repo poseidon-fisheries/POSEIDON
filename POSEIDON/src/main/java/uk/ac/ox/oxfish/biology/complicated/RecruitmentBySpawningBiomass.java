@@ -63,12 +63,7 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
      */
     private final int femaleSubdivision;
 
-    private NoiseMaker noisemaker = new NoiseMaker() {
-        @Override
-        public Double get() {
-            return 0d;
-        }
-    };
+    private NoiseMaker noisemaker = () -> 0d;
 
 
     public RecruitmentBySpawningBiomass(

@@ -26,7 +26,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,7 +54,7 @@ public class CopyFriendSeaTileTest {
         SeaTile chosen = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(), mock(Fisher.class),
             0d, newT,
             new ArrayList<>(), friendFunction, fisher -> friendT
-        ).getFirst();
+        ).getKey();
 
 
         assertEquals(chosen, newT);
@@ -66,7 +65,7 @@ public class CopyFriendSeaTileTest {
             10d, newT,
             Collections.singletonList(mock(Fisher.class)), friendFunction,
             fisher -> friendT
-        ).getFirst();
+        ).getKey();
 
         assertEquals(chosen, newT);
 
@@ -76,7 +75,7 @@ public class CopyFriendSeaTileTest {
             10d, newT,
             Collections.singletonList(mock(Fisher.class)), friendFunction,
             fisher -> null
-        ).getFirst();
+        ).getKey();
 
         assertEquals(chosen, newT);
 
@@ -86,7 +85,7 @@ public class CopyFriendSeaTileTest {
             10d, newT,
             Collections.singletonList(mock(Fisher.class)), friendFunction,
             fisher -> friendT
-        ).getFirst();
+        ).getKey();
 
         assertEquals(chosen, newT);
 
@@ -105,7 +104,7 @@ public class CopyFriendSeaTileTest {
 
         //best fitness is the new
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(0d);
-        Pair<SeaTile, Fisher> imitation = FishStateUtilities.imitateBestFriend(
+        Entry<SeaTile, Fisher> imitation = FishStateUtilities.imitateBestFriend(
             new MersenneTwisterFast(),
             mock(Fisher.class),
             10d,
@@ -115,8 +114,8 @@ public class CopyFriendSeaTileTest {
             friendFunction,
             fisher -> friendT
         );
-        final SeaTile chosen = imitation.getFirst();
-        assertNull(imitation.getSecond()); // we didn't imitate anyone
+        final SeaTile chosen = imitation.getKey();
+        assertNull(imitation.getValue()); // we didn't imitate anyone
         assertEquals(chosen, newT);
 
         //best fitness is friend
@@ -129,8 +128,8 @@ public class CopyFriendSeaTileTest {
                 friend),
             friendFunction, fisher -> friendT
         );
-        assertEquals(imitation.getFirst(), friendT);
-        assertEquals(imitation.getSecond(), friend); // we imitated our friend
+        assertEquals(imitation.getKey(), friendT);
+        assertEquals(imitation.getValue(), friend); // we imitated our friend
 
         //friends lose ties
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(10d);
@@ -141,8 +140,8 @@ public class CopyFriendSeaTileTest {
                 mock(Fisher.class)),
             friendFunction, fisher -> friendT
         );
-        assertEquals(imitation.getFirst(), newT);
-        assertNull(imitation.getSecond()); // we didn't imitate anyone
+        assertEquals(imitation.getKey(), newT);
+        assertNull(imitation.getValue()); // we didn't imitate anyone
 
     }
 }

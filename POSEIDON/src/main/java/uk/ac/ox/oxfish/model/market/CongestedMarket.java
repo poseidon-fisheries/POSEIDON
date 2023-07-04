@@ -37,6 +37,7 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 public class CongestedMarket extends AbstractBiomassMarket implements Steppable {
 
 
+    private static final long serialVersionUID = -933273099826223546L;
     /**
      * if 1 the market consumes stock every day, otherwise the market consumes stock every x days (but multiplies the dailyConsumption accordingly)
      */
@@ -44,19 +45,19 @@ public class CongestedMarket extends AbstractBiomassMarket implements Steppable 
     /**
      * if in the market there is less than this biomass available, there is no penalty to price
      */
-    private double acceptableBiomassThreshold;
+    private final double acceptableBiomassThreshold;
     /**
      * maximum price of the market
      */
-    private double maxPrice;
+    private final double maxPrice;
     /**
      * by how much does price decrease in proportion to how much we are above biomass threshold. It's basically $/weight
      */
-    private double demandSlope;
+    private final double demandSlope;
     /**
      * how much biomass for this fish gets consumed each day (and removed from the market)
      */
-    private double dailyConsumption;
+    private final double dailyConsumption;
     /**
      * how much biomass is here, waiting to be consumed
      */
@@ -65,16 +66,16 @@ public class CongestedMarket extends AbstractBiomassMarket implements Steppable 
 
 
     public CongestedMarket(
-        double acceptableBiomassThreshold, double maxPrice, double discountRate,
-        double dailyConsumption
+        final double acceptableBiomassThreshold, final double maxPrice, final double discountRate,
+        final double dailyConsumption
     ) {
         this(acceptableBiomassThreshold, maxPrice, discountRate, dailyConsumption, 1);
     }
 
 
     public CongestedMarket(
-        double acceptableBiomassThreshold, double maxPrice, double discountRate,
-        double dailyConsumption, int consumptionPeriod
+        final double acceptableBiomassThreshold, final double maxPrice, final double discountRate,
+        final double dailyConsumption, final int consumptionPeriod
     ) {
         super();
         this.acceptableBiomassThreshold = acceptableBiomassThreshold;
@@ -91,7 +92,7 @@ public class CongestedMarket extends AbstractBiomassMarket implements Steppable 
      * @param state the model
      */
     @Override
-    public void start(FishState state) {
+    public void start(final FishState state) {
         super.start(state);
 
         if (consumptionPeriod == 1)
@@ -102,7 +103,7 @@ public class CongestedMarket extends AbstractBiomassMarket implements Steppable 
 
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         System.out.println(getMarginalPrice());
         biomassHere = Math.max(0, biomassHere - dailyConsumption * consumptionPeriod);
     }
@@ -111,11 +112,11 @@ public class CongestedMarket extends AbstractBiomassMarket implements Steppable 
         return computePrice(biomassHere);
     }
 
-    private double computePrice(double totalBiomassHere) {
+    private double computePrice(final double totalBiomassHere) {
         return Math.max(0, maxPrice - getOvershoot(totalBiomassHere) * demandSlope);
     }
 
-    private double getOvershoot(double totalBiomass) {
+    private double getOvershoot(final double totalBiomass) {
         return Math.max(0, totalBiomass - acceptableBiomassThreshold);
     }
 
@@ -140,12 +141,12 @@ public class CongestedMarket extends AbstractBiomassMarket implements Steppable 
      */
     @Override
     protected TradeInfo sellFishImplementation(
-        double biomass, Fisher fisher, Regulation regulation, FishState state,
-        Species species
+        final double biomass, final Fisher fisher, final Regulation regulation, final FishState state,
+        final Species species
     ) {
 
         //find out legal biomass sold
-        double biomassActuallySellable = Math.min(
+        final double biomassActuallySellable = Math.min(
             biomass,
             regulation.maximumBiomassSellable(fisher, species, state)
         );
@@ -154,7 +155,7 @@ public class CongestedMarket extends AbstractBiomassMarket implements Steppable 
 
 
         biomassHere += biomassActuallySellable;
-        double revenue = biomassActuallySellable * computePrice(biomassHere);
+        final double revenue = biomassActuallySellable * computePrice(biomassHere);
 
         assert revenue >= 0;
         //give fisher the money

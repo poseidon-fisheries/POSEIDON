@@ -105,32 +105,19 @@ public class SynthesisPaper {
         container.toFile().mkdirs();
 
 
-        Supplier<AlgorithmFactory<? extends Regulation>> regulation = new Supplier<AlgorithmFactory<? extends Regulation>>() {
-            @Override
-            public AlgorithmFactory<? extends Regulation> get() {
-                return new ProtectedAreasOnlyFactory();
-            }
-        };
+        Supplier<AlgorithmFactory<? extends Regulation>> regulation = () -> new ProtectedAreasOnlyFactory();
 
         demo1Sweep(runsPerScenario, scenarioYaml, container, regulation, "mpa");
 
 
-        regulation = new Supplier<AlgorithmFactory<? extends Regulation>>() {
-            @Override
-            public AlgorithmFactory<? extends Regulation> get() {
-                return new AnarchyFactory();
-            }
-        };
+        regulation = () -> new AnarchyFactory();
 
         demo1Sweep(runsPerScenario, scenarioYaml, container, regulation, "anarchy");
 
-        regulation = new Supplier<AlgorithmFactory<? extends Regulation>>() {
-            @Override
-            public AlgorithmFactory<? extends Regulation> get() {
-                final MultiITQStringFactory factory = new MultiITQStringFactory();
-                factory.setYearlyQuotaMaps("1:500");
-                return factory;
-            }
+        regulation = () -> {
+            final MultiITQStringFactory factory = new MultiITQStringFactory();
+            factory.setYearlyQuotaMaps("1:500");
+            return factory;
         };
 
         demo1Sweep(runsPerScenario, scenarioYaml, container, regulation, "itq");
@@ -209,6 +196,7 @@ public class SynthesisPaper {
         writer.close();
     }
 
+    @SuppressWarnings("unchecked")
     public static void demo1Sweep(
         final int numberOfRuns, final String readScenario, final Path outputFolder,
         final Supplier<AlgorithmFactory<? extends Regulation>> regulation, final String name

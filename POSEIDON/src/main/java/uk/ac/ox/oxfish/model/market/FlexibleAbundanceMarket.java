@@ -106,12 +106,8 @@ public class FlexibleAbundanceMarket extends AbstractMarket {
             String columnName = LANDINGS_COLUMN_NAME + AGE_BIN_PREFIX + age;
             getDailyCounter().addColumn(columnName);
             String finalColumnName1 = columnName;
-            getData().registerGatherer(columnName, new Gatherer<Market>() {
-                    @Override
-                    public Double apply(Market market) {
-                        return getDailyCounter().getColumn(finalColumnName1);
-                    }
-                },
+            getData().registerGatherer(columnName,
+                (Gatherer<Market>) market -> getDailyCounter().getColumn(finalColumnName1),
                 0
             );
 
@@ -119,12 +115,8 @@ public class FlexibleAbundanceMarket extends AbstractMarket {
             columnName = EARNINGS_COLUMN_NAME + " - age bin " + age;
             getDailyCounter().addColumn(columnName);
             String finalColumnName = columnName;
-            getData().registerGatherer(columnName, new Gatherer<Market>() {
-                    @Override
-                    public Double apply(Market market) {
-                        return getDailyCounter().getColumn(finalColumnName);
-                    }
-                },
+            getData().registerGatherer(columnName,
+                (Gatherer<Market>) market -> getDailyCounter().getColumn(finalColumnName),
                 0
             );
         }

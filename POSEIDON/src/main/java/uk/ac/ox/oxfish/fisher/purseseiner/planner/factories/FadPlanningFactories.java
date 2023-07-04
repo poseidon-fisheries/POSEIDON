@@ -15,7 +15,7 @@ public class FadPlanningFactories {
         CONSTRUCTORS;
 
     @SuppressWarnings("rawtypes")
-    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES =
+    public static final Map<Class<? extends AlgorithmFactory<?>>, String> NAMES =
         new LinkedHashMap<>();
 
     static {

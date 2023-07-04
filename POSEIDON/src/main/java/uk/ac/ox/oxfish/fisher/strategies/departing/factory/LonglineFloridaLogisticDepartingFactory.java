@@ -26,10 +26,11 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticClassifier;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DailyLogisticDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.Season;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * The logistic decision to go out or not parametrized for Longliners by Steve Saul
@@ -49,17 +50,18 @@ public class LonglineFloridaLogisticDepartingFactory implements AlgorithmFactory
      * @param state the function argument
      * @return the function result
      */
+    @SuppressWarnings("unchecked")
     @Override
     public DailyLogisticDepartingStrategy apply(final FishState state) {
 
         return new DailyLogisticDepartingStrategy(
             new LogisticClassifier(
                 //intercept:
-                new Pair<>(
+                entry(
                     new InterceptExtractor()
                     , intercept.applyAsDouble(state.getRandom())),
                 //summer?:
-                new Pair<>(
+                entry(
                     new SeasonExtractor(Season.SUMMER)
                     , summer.applyAsDouble(state.getRandom()))
             ));

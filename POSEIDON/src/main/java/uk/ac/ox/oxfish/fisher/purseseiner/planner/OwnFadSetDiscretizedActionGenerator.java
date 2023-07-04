@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import javax.annotation.Nonnull;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -64,6 +63,7 @@ public class OwnFadSetDiscretizedActionGenerator {
      *
      * @param fadManager
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void startOrReset(
         FadManager fadManager,
         MersenneTwisterFast random,
@@ -146,13 +146,13 @@ public class OwnFadSetDiscretizedActionGenerator {
      * @return
      */
     @Nonnull
-    public List<Pair<PriorityQueue<ValuedFad>, Integer>> peekAllFads() {
+    public List<Entry<PriorityQueue<ValuedFad>, Integer>> peekAllFads() {
         assert rankedFads != null : "not started";
-        List<Pair<PriorityQueue<ValuedFad>, Integer>> toReturn = new LinkedList<>();
+        List<Entry<PriorityQueue<ValuedFad>, Integer>> toReturn = new LinkedList<>();
         //for each group retrieve the best
         for (int group = 0; group < rankedFads.length; group++) {
             if (rankedFads[group].size() > 0)
-                toReturn.add(new Pair<>(rankedFads[group], group));
+                toReturn.add(entry(rankedFads[group], group));
         }
         return toReturn;
     }
@@ -186,6 +186,7 @@ public class OwnFadSetDiscretizedActionGenerator {
     }
 
     public static class ValuedFad extends SimpleImmutableEntry<Fad, Double> {
+        private static final long serialVersionUID = 1L;
 
         public ValuedFad(Fad first, Double second) {
             super(first, second);

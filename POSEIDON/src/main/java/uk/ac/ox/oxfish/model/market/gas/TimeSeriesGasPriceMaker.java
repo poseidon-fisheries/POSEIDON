@@ -76,12 +76,7 @@ public class TimeSeriesGasPriceMaker implements GasPriceMaker {
 
         TimeSeriesActuator actuator = new TimeSeriesActuator(
             timeSeries,
-            new Consumer<Double>() {
-                @Override
-                public void accept(Double price) {
-                    port.setGasPricePerLiter(price);
-                }
-            },
+            price -> port.setGasPricePerLiter(price),
             startOver
         );
         model.schedulePerPolicy(actuator, StepOrder.POLICY_UPDATE, interval);

@@ -29,6 +29,8 @@ import java.util.function.ToDoubleFunction;
 
 public class TrawlsHeatmapGatherer extends HeatmapGatherer {
 
+    private static final long serialVersionUID = -6726032286671834103L;
+
     public TrawlsHeatmapGatherer(final int interval) {
         super(
             "Trawls",

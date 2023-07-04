@@ -25,8 +25,8 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.Map.Entry;
 import java.util.PriorityQueue;
 
 /**
@@ -65,10 +65,11 @@ public class KernelRegression implements GeographicalRegression<Double> {
     private final PriorityQueue<GeographicalObservation<Double>> observations;
 
 
+    @SuppressWarnings("unchecked")
     public KernelRegression(
-        int maximumNumberOfObservationsToKeep,
-        RegressionDistance kernel,
-        Pair<ObservationExtractor, Double>... extractorsAndBandwidths
+        final int maximumNumberOfObservationsToKeep,
+        final RegressionDistance kernel,
+        final Entry<ObservationExtractor, Double>... extractorsAndBandwidths
     ) {
 
         this.bandwidths = new double[extractorsAndBandwidths.length];
@@ -77,8 +78,8 @@ public class KernelRegression implements GeographicalRegression<Double> {
 
 
         for (int i = 0; i < extractorsAndBandwidths.length; i++) {
-            this.extractors[i] = extractorsAndBandwidths[i].getFirst();
-            this.bandwidths[i] = extractorsAndBandwidths[i].getSecond();
+            this.extractors[i] = extractorsAndBandwidths[i].getKey();
+            this.bandwidths[i] = extractorsAndBandwidths[i].getValue();
         }
 
         this.maximumNumberOfObservationsToKeep = maximumNumberOfObservationsToKeep;
@@ -94,7 +95,11 @@ public class KernelRegression implements GeographicalRegression<Double> {
      * @param model
      */
 
-    public void addObservation(GeographicalObservation observation, Fisher fisher, FishState model) {
+    public void addObservation(
+        final GeographicalObservation<Double> observation,
+        final Fisher fisher,
+        final FishState model
+    ) {
         observations.add(observation);
         if (observations.size() > maximumNumberOfObservationsToKeep) {
             assert observations.size() == maximumNumberOfObservationsToKeep + 1;
@@ -111,7 +116,7 @@ public class KernelRegression implements GeographicalRegression<Double> {
      */
     @Override
     public double extractNumericalYFromObservation(
-        GeographicalObservation<Double> observation, Fisher fisher
+        final GeographicalObservation<Double> observation, final Fisher fisher
     ) {
         return observation.getValue();
     }
@@ -127,12 +132,12 @@ public class KernelRegression implements GeographicalRegression<Double> {
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
+    public double predict(final SeaTile tile, final double time, final Fisher fisher, final FishState model) {
 
 
         double kernelSum = 0;
         double numerator = 0;
-        for (GeographicalObservation<Double> observation : observations) {
+        for (final GeographicalObservation<Double> observation : observations) {
             double currentKernel = 1;
             for (int i = 0; i < bandwidths.length; i++) {
                 kernel.setBandwidth(bandwidths[i]);
@@ -164,12 +169,12 @@ public class KernelRegression implements GeographicalRegression<Double> {
 
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
 
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
 
     }
 
@@ -191,7 +196,7 @@ public class KernelRegression implements GeographicalRegression<Double> {
      * @param parameterArray the new parameters for this regresssion
      */
     @Override
-    public void setParameters(double[] parameterArray) {
+    public void setParameters(final double[] parameterArray) {
 
         assert parameterArray.length == bandwidths.length;
         System.arraycopy(parameterArray, 0, bandwidths, 0, bandwidths.length);

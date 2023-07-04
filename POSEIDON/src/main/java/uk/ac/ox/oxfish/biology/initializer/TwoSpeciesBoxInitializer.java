@@ -195,13 +195,14 @@ public class TwoSpeciesBoxInitializer extends AbstractBiologyInitializer {
         for (final Species species : biology.getSpecies())
             grower.initializeGrower(biologies, model, random, species);
 
-        final BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(
-            map,
-            random,
-            biology,
-            differentialPercentageToMove,
-            percentageLimitOnDailyMovement
-        );
+        @SuppressWarnings("deprecation") final BiomassDiffuserContainer diffuser =
+            new BiomassDiffuserContainer(
+                map,
+                random,
+                biology,
+                differentialPercentageToMove,
+                percentageLimitOnDailyMovement
+            );
 
         model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
 

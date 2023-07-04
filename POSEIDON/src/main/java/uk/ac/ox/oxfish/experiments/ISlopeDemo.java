@@ -4,7 +4,10 @@ import com.google.common.collect.Lists;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.model.*;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
+import uk.ac.ox.oxfish.model.BatchRunner;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.HerfindalndexCollectorFactory;
@@ -158,81 +161,54 @@ public class ISlopeDemo {
                     0,
                     -1
                 );
-                runner.setScenarioSetup(new Consumer<Scenario>() {
-                    @Override
-                    public void accept(final Scenario scenario) {
-                        final PrototypeScenario prototype = (PrototypeScenario) scenario;
-                        prototype.setFishers(200);
-                        prototype.getPlugins().add(
-                            new AlgorithmFactory<AdditionalStartable>() {
-                                @Override
-                                public AdditionalStartable apply(final FishState fishState) {
-                                    return new AdditionalStartable() {
-                                        @Override
-                                        public void start(final FishState model) {
-                                            fishState.scheduleOnceInXDays(
-                                                new Steppable() {
-                                                    @Override
-                                                    public void step(final SimState simState) {
-                                                        final IndexTargetController controller =
-                                                            new IndexTargetController(
-                                                                new PastAverageSensor(
-                                                                    indicator.getKey(),
-                                                                    1
-                                                                ),
-                                                                new UnchangingPastSensor(
-                                                                    indicator.getKey(),
-                                                                    indicator.getValue(),
-                                                                    5
-                                                                ),
-                                                                actuator.getValue(),
-                                                                365,
-                                                                .5,
-                                                                indicator.getValue() < 1,
+                runner.setScenarioSetup(scenario -> {
+                    final PrototypeScenario prototype = (PrototypeScenario) scenario;
+                    prototype.setFishers(200);
+                    prototype.getPlugins().add(
+                        fishState -> model -> fishState.scheduleOnceInXDays(
+                            (Steppable) simState -> {
+                                final IndexTargetController controller =
+                                    new IndexTargetController(
+                                        new PastAverageSensor(
+                                            indicator.getKey(),
+                                            1
+                                        ),
+                                        new UnchangingPastSensor(
+                                            indicator.getKey(),
+                                            indicator.getValue(),
+                                            5
+                                        ),
+                                        actuator.getValue(),
+                                        365,
+                                        .5,
+                                        indicator.getValue() < 1,
 
 
-                                                                false
-                                                            );
+                                        false
+                                    );
 
-                                                        controller.start(model);
-                                                        controller.step(model);
-                                                        model.getYearlyDataSet().registerGatherer("Index Ratio",
-                                                            new Gatherer<FishState>() {
-                                                                @Override
-                                                                public Double apply(final FishState fishState) {
-                                                                    return controller.getLastPolicy();
-                                                                }
-                                                            }
-                                                            , Double.NaN
-                                                        );
+                                controller.start(model);
+                                controller.step(model);
+                                model.getYearlyDataSet().registerGatherer("Index Ratio",
+                                    (Gatherer<FishState>) fishState1 -> controller.getLastPolicy()
+                                    , Double.NaN
+                                );
 
-                                                    }
-                                                },
-                                                StepOrder.DAWN,
-                                                365 * 10
+                            },
+                            StepOrder.DAWN,
+                            365 * 10
 
-                                            );
-                                        }
-                                    };
-
-                                }
-                            }
+                        )
 
 
-                        );
+                    );
 
-                    }
                 });
 
 
-                runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                    @Override
-                    public void consume(final StringBuffer writer, final FishState model, final Integer year) {
-                        writer.
-                            append(indicator).append(",").
-                            append(actuator.getKey()).append(",");
-                    }
-                });
+                runner.setColumnModifier((writer, model, year) -> writer.
+                    append(indicator).append(",").
+                    append(actuator.getKey()).append(","));
 
                 for (int run = 0; run < RUNS_TO_RUN; run++) {
                     System.out.println(indicator.getKey());
@@ -272,58 +248,36 @@ public class ISlopeDemo {
                 0,
                 -1
             );
-            runner.setScenarioSetup(new Consumer<Scenario>() {
-                @Override
-                public void accept(final Scenario scenario) {
-                    final PrototypeScenario prototype = (PrototypeScenario) scenario;
-                    prototype.setFishers(200);
-                    prototype.getPlugins().add(
-                        new AlgorithmFactory<AdditionalStartable>() {
-                            @Override
-                            public AdditionalStartable apply(final FishState fishState) {
-                                return new AdditionalStartable() {
-                                    @Override
-                                    public void start(final FishState model) {
-                                        fishState.scheduleOnceInXDays(
-                                            new Steppable() {
-                                                @Override
-                                                public void step(final SimState simState) {
-                                                    final TargetToTACController controller = new TargetToTACController(
-                                                        new ITarget(
-                                                            "Species 0 Landings",
-                                                            indicator,
-                                                            0,
-                                                            1.5,
-                                                            5, 5 * 2
-                                                        )
-                                                    );
-                                                    controller.start(model);
-                                                    controller.step(model);
-                                                }
-                                            },
-                                            StepOrder.DAWN,
-                                            1 + 365 * 10
-                                        );
-                                    }
-                                };
-
-                            }
-                        }
+            runner.setScenarioSetup(scenario -> {
+                final PrototypeScenario prototype = (PrototypeScenario) scenario;
+                prototype.setFishers(200);
+                prototype.getPlugins().add(
+                    fishState -> (AdditionalStartable) model -> fishState.scheduleOnceInXDays(
+                        (Steppable) simState -> {
+                            final TargetToTACController controller = new TargetToTACController(
+                                new ITarget(
+                                    "Species 0 Landings",
+                                    indicator,
+                                    0,
+                                    1.5,
+                                    5, 5 * 2
+                                )
+                            );
+                            controller.start(model);
+                            controller.step(model);
+                        },
+                        StepOrder.DAWN,
+                        1 + 365 * 10
+                    )
 
 
-                    );
+                );
 
-                }
             });
 
 
-            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                @Override
-                public void consume(final StringBuffer writer, final FishState model, final Integer year) {
-                    writer.
-                        append(indicator).append(",");
-                }
-            });
+            runner.setColumnModifier((writer, model, year) -> writer.
+                append(indicator).append(","));
 
             for (int run = 0; run < RUNS_TO_RUN; run++) {
                 final StringBuffer tidy = new StringBuffer();
@@ -360,61 +314,39 @@ public class ISlopeDemo {
                 0,
                 -1
             );
-            runner.setScenarioSetup(new Consumer<Scenario>() {
-                @Override
-                public void accept(final Scenario scenario) {
-                    final PrototypeScenario prototype = (PrototypeScenario) scenario;
-                    prototype.setFishers(200);
-                    prototype.getPlugins().add(
-                        new HerfindalndexCollectorFactory()
-                    );
-                    prototype.getPlugins().add(
-                        new AlgorithmFactory<AdditionalStartable>() {
-                            @Override
-                            public AdditionalStartable apply(final FishState fishState) {
-                                return new AdditionalStartable() {
-                                    @Override
-                                    public void start(final FishState model) {
-                                        fishState.scheduleOnceInXDays(
-                                            new Steppable() {
-                                                @Override
-                                                public void step(final SimState simState) {
-                                                    final TargetToTACController controller = new TargetToTACController(
-                                                        new ISlope(
-                                                            "Species 0 Landings",
-                                                            indicator,
-                                                            0.4,
-                                                            0.8,
-                                                            2
-                                                        )
-                                                    );
-                                                    controller.start(model);
-                                                    controller.step(model);
-                                                }
-                                            },
-                                            StepOrder.DAWN,
-                                            365 * FIRST_CONTROL_YEAR
-                                        );
-                                    }
-                                };
-
-                            }
-                        }
+            runner.setScenarioSetup(scenario -> {
+                final PrototypeScenario prototype = (PrototypeScenario) scenario;
+                prototype.setFishers(200);
+                prototype.getPlugins().add(
+                    new HerfindalndexCollectorFactory()
+                );
+                prototype.getPlugins().add(
+                    fishState -> (AdditionalStartable) model -> fishState.scheduleOnceInXDays(
+                        (Steppable) simState -> {
+                            final TargetToTACController controller = new TargetToTACController(
+                                new ISlope(
+                                    "Species 0 Landings",
+                                    indicator,
+                                    0.4,
+                                    0.8,
+                                    2
+                                )
+                            );
+                            controller.start(model);
+                            controller.step(model);
+                        },
+                        StepOrder.DAWN,
+                        365 * FIRST_CONTROL_YEAR
+                    )
 
 
-                    );
+                );
 
-                }
             });
 
 
-            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                @Override
-                public void consume(final StringBuffer writer, final FishState model, final Integer year) {
-                    writer.
-                        append(indicator).append(",");
-                }
-            });
+            runner.setColumnModifier((writer, model, year) -> writer.
+                append(indicator).append(","));
 
             for (int run = 0; run < RUNS_TO_RUN; run++) {
                 final StringBuffer tidy = new StringBuffer();
@@ -451,89 +383,62 @@ public class ISlopeDemo {
                 0,
                 -1
             );
-            runner.setScenarioSetup(new Consumer<Scenario>() {
-                @Override
-                public void accept(final Scenario scenario) {
-                    final PrototypeScenario prototype = (PrototypeScenario) scenario;
-                    prototype.setFishers(200);
-                    prototype.getPlugins().add(
-                        new HerfindalndexCollectorFactory()
-                    );
+            runner.setScenarioSetup(scenario -> {
+                final PrototypeScenario prototype = (PrototypeScenario) scenario;
+                prototype.setFishers(200);
+                prototype.getPlugins().add(
+                    new HerfindalndexCollectorFactory()
+                );
 
-                    prototype.getPlugins().add(
-                        new AlgorithmFactory<AdditionalStartable>() {
-                            @Override
-                            public AdditionalStartable apply(final FishState fishState) {
-                                return new AdditionalStartable() {
-                                    @Override
-                                    public void start(final FishState model) {
-                                        fishState.scheduleOnceInXDays(
-                                            new Steppable() {
-                                                @Override
-                                                public void step(final SimState simState) {
-                                                    final IndexTargetController controller =
-                                                        new IndexTargetController(
-                                                            new PastAverageSensor(
-                                                                indicator.getKey(),
-                                                                1
-                                                            ),
-                                                            new UnchangingPastSensor(
-                                                                indicator.getKey(),
-                                                                indicator.getValue(),
-                                                                5
-                                                            ),
-                                                            IndexTargetController.RATIO_TO_TAC(
-                                                                new PastAverageSensor(
-                                                                    "Species 0 Landings",
-                                                                    1
-                                                                ), 10000,
-                                                                9999999d
-                                                            ),
-                                                            365,
-                                                            .1,
-                                                            indicator.getValue() < 1,
+                prototype.getPlugins().add(
+                    fishState -> (AdditionalStartable) model -> fishState.scheduleOnceInXDays(
+                        (Steppable) simState -> {
+                            final IndexTargetController controller =
+                                new IndexTargetController(
+                                    new PastAverageSensor(
+                                        indicator.getKey(),
+                                        1
+                                    ),
+                                    new UnchangingPastSensor(
+                                        indicator.getKey(),
+                                        indicator.getValue(),
+                                        5
+                                    ),
+                                    IndexTargetController.RATIO_TO_TAC(
+                                        new PastAverageSensor(
+                                            "Species 0 Landings",
+                                            1
+                                        ), 10000,
+                                        9999999d
+                                    ),
+                                    365,
+                                    .1,
+                                    indicator.getValue() < 1,
 
 
-                                                            true
-                                                        );
+                                    true
+                                );
 
-                                                    controller.start(model);
-                                                    controller.step(model);
-                                                    model.getYearlyDataSet().registerGatherer(
-                                                        "TAC from TARGET-TAC Controller",
-                                                        new Gatherer<FishState>() {
-                                                            @Override
-                                                            public Double apply(final FishState fishState) {
-                                                                return controller.getLastPolicy();
-                                                            }
-                                                        },
-                                                        Double.NaN
-                                                    );
-                                                }
-                                            },
-                                            StepOrder.DAWN,
-                                            365 * FIRST_CONTROL_YEAR
-                                        );
-                                    }
-                                };
-
-                            }
-                        }
+                            controller.start(model);
+                            controller.step(model);
+                            model.getYearlyDataSet().registerGatherer(
+                                "TAC from TARGET-TAC Controller",
+                                (Gatherer<FishState>) fishState1 -> controller.getLastPolicy(),
+                                Double.NaN
+                            );
+                        },
+                        StepOrder.DAWN,
+                        365 * FIRST_CONTROL_YEAR
+                    )
 
 
-                    );
+                );
 
-                }
             });
 
 
-            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                @Override
-                public void consume(final StringBuffer writer, final FishState model, final Integer year) {
-                    writer.
-                        append(indicator).append(",");
-                }
-            });
+            runner.setColumnModifier((writer, model, year) -> writer.
+                append(indicator).append(","));
 
             for (int run = 0; run < RUNS_TO_RUN; run++) {
                 final StringBuffer tidy = new StringBuffer();
@@ -578,40 +483,32 @@ public class ISlopeDemo {
                 0,
                 -1
             );
-            runner.setScenarioSetup(new Consumer<Scenario>() {
-                @Override
-                public void accept(final Scenario scenario) {
-                    final PrototypeScenario prototype = (PrototypeScenario) scenario;
-                    prototype.setFishers(200);
-                    final PIDControllerIndicatorTarget pid = new PIDControllerIndicatorTarget();
-                    pid.setIndicatorColumnName(indicator);
-                    final double multiplier = pidMultipliers.get(indicator);
-                    pid.setIndicatorMultiplier(new FixedDoubleParameter(multiplier));
-                    pid.setNegative(!(multiplier < 1));
+            runner.setScenarioSetup(scenario -> {
+                final PrototypeScenario prototype = (PrototypeScenario) scenario;
+                prototype.setFishers(200);
+                final PIDControllerIndicatorTarget pid = new PIDControllerIndicatorTarget();
+                pid.setIndicatorColumnName(indicator);
+                final double multiplier = pidMultipliers.get(indicator);
+                pid.setIndicatorMultiplier(new FixedDoubleParameter(multiplier));
+                pid.setNegative(!(multiplier < 1));
 
-                    pid.setIntegrated(integrated);
-                    prototype.getPlugins().add(
-                        new HerfindalndexCollectorFactory()
-                    );
+                pid.setIntegrated(integrated);
+                prototype.getPlugins().add(
+                    new HerfindalndexCollectorFactory()
+                );
 
-                    //never turn it fully off
-                    pid.setMinimumTAC(10000);
+                //never turn it fully off
+                pid.setMinimumTAC(10000);
 
-                    prototype.getPlugins().add(
-                        pid
-                    );
+                prototype.getPlugins().add(
+                    pid
+                );
 
-                }
             });
 
 
-            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                @Override
-                public void consume(final StringBuffer writer, final FishState model, final Integer year) {
-                    writer.
-                        append(indicator).append(",");
-                }
-            });
+            runner.setColumnModifier((writer, model, year) -> writer.
+                append(indicator).append(","));
 
             for (int run = 0; run < RUNS_TO_RUN; run++) {
                 final StringBuffer tidy = new StringBuffer();
@@ -655,128 +552,69 @@ public class ISlopeDemo {
                 0,
                 -1
             );
-            runner.setScenarioSetup(new Consumer<Scenario>() {
-                @Override
-                public void accept(final Scenario scenario) {
-                    final PrototypeScenario prototype = (PrototypeScenario) scenario;
-                    prototype.setFishers(200);
-                    final SurplusProductionDepletionFormulaController sps =
-                        new SurplusProductionDepletionFormulaController();
-                    sps.setIndicatorColumnName(indicator);
+            runner.setScenarioSetup(scenario -> {
+                final PrototypeScenario prototype = (PrototypeScenario) scenario;
+                prototype.setFishers(200);
+                final SurplusProductionDepletionFormulaController sps =
+                    new SurplusProductionDepletionFormulaController();
+                sps.setIndicatorColumnName(indicator);
 
 
-                    //never turn it fully off
-                    sps.setMinimumTAC(new FixedDoubleParameter(10000));
+                //never turn it fully off
+                sps.setMinimumTAC(new FixedDoubleParameter(10000));
 
-                    prototype.getPlugins().add(
-                        sps
-                    );
+                prototype.getPlugins().add(
+                    sps
+                );
 
-                }
             });
             //add a scaled version of the biomass (should have used transformers but for now let's just do it through here
-            runner.setBeforeStartSetup(new Consumer<FishState>() {
-                @Override
-                public void accept(final FishState fishState) {
-                    fishState.registerStartable(new Startable() {
-                        @Override
-                        public void start(final FishState model) {
-                            model.getYearlyDataSet().registerGatherer(
-                                "Inverse Trip Variable Costs",
-                                new Gatherer<FishState>() {
-                                    @Override
-                                    public Double apply(final FishState ignored) {
-                                        final double variableCosts = ignored.getFishers().stream().mapToDouble(
-                                            new ToDoubleFunction<Fisher>() {
-                                                @Override
-                                                public double applyAsDouble(final Fisher value) {
-                                                    return value.getLatestYearlyObservation(FisherYearlyTimeSeries.VARIABLE_COSTS);
-                                                }
-                                            }).filter(new DoublePredicate() { //skip boats that made no trips
-                                            @Override
-                                            public boolean test(final double value) {
-                                                return Double.isFinite(value);
-                                            }
-                                        }).sum();
-                                        final double trips = ignored.getFishers().stream().mapToDouble(
-                                            new ToDoubleFunction<Fisher>() {
-                                                @Override
-                                                public double applyAsDouble(final Fisher value) {
-                                                    return value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS);
-                                                }
-                                            }).filter(new DoublePredicate() { //skip boats that made no trips
-                                            @Override
-                                            public boolean test(final double value) {
-                                                return Double.isFinite(value);
-                                            }
-                                        }).sum();
+            runner.setBeforeStartSetup(fishState -> fishState.registerStartable(model -> {
+                model.getYearlyDataSet().registerGatherer(
+                    "Inverse Trip Variable Costs",
+                    (Gatherer<FishState>) ignored -> {
+                        //skip boats that made no trips
+                        final double variableCosts = ignored.getFishers().stream().mapToDouble(
+                            value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.VARIABLE_COSTS)).filter(
+                            value -> Double.isFinite(value)).sum();
+                        //skip boats that made no trips
+                        final double trips = ignored.getFishers().stream().mapToDouble(
+                            value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS)).filter(value -> Double.isFinite(
+                            value)).sum();
 
-                                        return trips > 0 ? trips / variableCosts : 0d;
-                                    }
-                                },
-                                0d
-                            );
+                        return trips > 0 ? trips / variableCosts : 0d;
+                    },
+                    0d
+                );
 
 
-                            model.getYearlyDataSet().registerGatherer(
-                                "Inverse Trip Duration",
-                                new Gatherer<FishState>() {
-                                    @Override
-                                    public Double apply(final FishState ignored) {
-                                        final double hoursOut = ignored.getFishers().stream().mapToDouble(
-                                            new ToDoubleFunction<Fisher>() {
-                                                @Override
-                                                public double applyAsDouble(final Fisher value) {
-                                                    return value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT);
-                                                }
-                                            }).filter(new DoublePredicate() { //skip boats that made no trips
-                                            @Override
-                                            public boolean test(final double value) {
-                                                return Double.isFinite(value);
-                                            }
-                                        }).sum();
-                                        final double trips = ignored.getFishers().stream().mapToDouble(
-                                            new ToDoubleFunction<Fisher>() {
-                                                @Override
-                                                public double applyAsDouble(final Fisher value) {
-                                                    return value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS);
-                                                }
-                                            }).filter(new DoublePredicate() { //skip boats that made no trips
-                                            @Override
-                                            public boolean test(final double value) {
-                                                return Double.isFinite(value);
-                                            }
-                                        }).sum();
+                model.getYearlyDataSet().registerGatherer(
+                    "Inverse Trip Duration",
+                    (Gatherer<FishState>) ignored -> {
+                        //skip boats that made no trips
+                        final double hoursOut = ignored.getFishers().stream().mapToDouble(
+                            value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT)).filter(value -> Double.isFinite(
+                            value)).sum();
+                        //skip boats that made no trips
+                        final double trips = ignored.getFishers().stream().mapToDouble(
+                            value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS)).filter(value -> Double.isFinite(
+                            value)).sum();
 
-                                        return trips > 0 ? trips / hoursOut : 0d;
-                                    }
-                                },
-                                0d
-                            );
+                        return trips > 0 ? trips / hoursOut : 0d;
+                    },
+                    0d
+                );
 
-                            model.getYearlyDataSet().registerGatherer(
-                                "Biomass Species 0 dividedAMillion",
-                                new Gatherer<FishState>() {
-                                    @Override
-                                    public Double apply(final FishState fishState) {
-                                        return fishState.getTotalBiomass(fishState.getSpecies("Species 0")) / 1000000;
-                                    }
-                                },
-                                0d
-                            );
-                        }
-                    });
-                }
-            });
+                model.getYearlyDataSet().registerGatherer(
+                    "Biomass Species 0 dividedAMillion",
+                    (Gatherer<FishState>) fishState1 -> fishState1.getTotalBiomass(fishState1.getSpecies("Species 0")) / 1000000,
+                    0d
+                );
+            }));
 
 
-            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                @Override
-                public void consume(final StringBuffer writer, final FishState model, final Integer year) {
-                    writer.
-                        append(indicator).append(",");
-                }
-            });
+            runner.setColumnModifier((writer, model, year) -> writer.
+                append(indicator).append(","));
 
             for (int run = 0; run < RUNS_TO_RUN; run++) {
                 final StringBuffer tidy = new StringBuffer();
@@ -819,42 +657,34 @@ public class ISlopeDemo {
                 0,
                 -1
             );
-            runner.setScenarioSetup(new Consumer<Scenario>() {
-                @Override
-                public void accept(final Scenario scenario) {
-                    final PrototypeScenario prototype = (PrototypeScenario) scenario;
-                    prototype.setFishers(200);
-                    final PIDControllerIndicatorTarget pid = new PIDControllerIndicatorTarget();
-                    pid.setIndicatorColumnName("Species 0 CPHO Scaled Sample");
-                    pid.setOffsetColumnName("Species 0 Landings Scaled Sample");
-                    final double multiplier = 1.5;
-                    pid.setIndicatorMultiplier(new FixedDoubleParameter(multiplier));
-                    pid.setNegative(true);
-                    //never turn it fully off
-                    pid.setMinimumTAC(10000);
+            runner.setScenarioSetup(scenario -> {
+                final PrototypeScenario prototype = (PrototypeScenario) scenario;
+                prototype.setFishers(200);
+                final PIDControllerIndicatorTarget pid = new PIDControllerIndicatorTarget();
+                pid.setIndicatorColumnName("Species 0 CPHO Scaled Sample");
+                pid.setOffsetColumnName("Species 0 Landings Scaled Sample");
+                final double multiplier = 1.5;
+                pid.setIndicatorMultiplier(new FixedDoubleParameter(multiplier));
+                pid.setNegative(true);
+                //never turn it fully off
+                pid.setMinimumTAC(10000);
 
-                    prototype.getPlugins().add(
-                        pid
-                    );
+                prototype.getPlugins().add(
+                    pid
+                );
 
-                    final SimpleFishSamplerFactory samplerFactory = new SimpleFishSamplerFactory();
-                    samplerFactory.setPercentageSampled(new FixedDoubleParameter(probability));
-                    prototype.getPlugins().add(
-                        samplerFactory
-                    );
+                final SimpleFishSamplerFactory samplerFactory = new SimpleFishSamplerFactory();
+                samplerFactory.setPercentageSampled(new FixedDoubleParameter(probability));
+                prototype.getPlugins().add(
+                    samplerFactory
+                );
 
 
-                }
             });
 
 
-            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                @Override
-                public void consume(final StringBuffer writer, final FishState model, final Integer year) {
-                    writer.
-                        append(probability).append(",");
-                }
-            });
+            runner.setColumnModifier((writer, model, year) -> writer.
+                append(probability).append(","));
 
             for (int run = 0; run < RUNS_TO_RUN; run++) {
                 final StringBuffer tidy = new StringBuffer();

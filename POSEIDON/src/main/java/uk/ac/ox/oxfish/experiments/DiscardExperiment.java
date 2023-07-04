@@ -107,30 +107,24 @@ public class DiscardExperiment {
 */
         conditions.put(
             "itq",
-            new Consumer<PrototypeScenario>() {
-                @Override
-                public void accept(final PrototypeScenario prototypeScenario) {
-                    final MultiITQStringFactory regulation = new MultiITQStringFactory();
-                    regulation.setYearlyQuotaMaps(YEARLY_ITQ_MAPS);
-                    prototypeScenario.setRegulation(regulation);
-                    prototypeScenario.setDiscardingStrategy(new NoDiscardingFactory());
-                    prototypeScenario.setUsePredictors(true);
-                }
+            prototypeScenario -> {
+                final MultiITQStringFactory regulation = new MultiITQStringFactory();
+                regulation.setYearlyQuotaMaps(YEARLY_ITQ_MAPS);
+                prototypeScenario.setRegulation(regulation);
+                prototypeScenario.setDiscardingStrategy(new NoDiscardingFactory());
+                prototypeScenario.setUsePredictors(true);
             }
         );
 
         conditions.put(
             "itq_discarding",
-            new Consumer<PrototypeScenario>() {
-                @Override
-                public void accept(final PrototypeScenario prototypeScenario) {
-                    final MultiITQStringFactory regulation = new MultiITQStringFactory();
-                    regulation.setYearlyQuotaMaps(YEARLY_ITQ_MAPS);
-                    prototypeScenario.setRegulation(regulation);
-                    prototypeScenario.setDiscardingStrategy(new DiscardingAllUnsellableFactory());
-                    prototypeScenario.setUsePredictors(true);
+            prototypeScenario -> {
+                final MultiITQStringFactory regulation = new MultiITQStringFactory();
+                regulation.setYearlyQuotaMaps(YEARLY_ITQ_MAPS);
+                prototypeScenario.setRegulation(regulation);
+                prototypeScenario.setDiscardingStrategy(new DiscardingAllUnsellableFactory());
+                prototypeScenario.setUsePredictors(true);
 
-                }
             }
         );
 

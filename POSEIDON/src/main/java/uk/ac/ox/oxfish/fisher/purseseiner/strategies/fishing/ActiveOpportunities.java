@@ -13,6 +13,7 @@ import static java.util.stream.IntStream.range;
 
 public class ActiveOpportunities implements Startable, Steppable {
 
+    private static final long serialVersionUID = -1764676443556080828L;
     private final Multimap<Integer, Int2D> opportunities = HashMultimap.create();
     private boolean isStarted = false;
 

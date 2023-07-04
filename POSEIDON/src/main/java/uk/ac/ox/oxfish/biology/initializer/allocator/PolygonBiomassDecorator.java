@@ -60,12 +60,7 @@ public class PolygonBiomassDecorator implements BiomassAllocator {
     private boolean checkIfInside(SeaTile tile, NauticalMap map) {
         return
             insideUnion.computeIfAbsent(
-                tile, new Function<SeaTile, Boolean>() {
-                    @Override
-                    public Boolean apply(SeaTile seaTile) {
-                        return boundingPolygons.isInsideUnion(map.getCoordinates(tile));
-                    }
-                }
+                tile, seaTile -> boundingPolygons.isInsideUnion(map.getCoordinates(tile))
             );
 
     }

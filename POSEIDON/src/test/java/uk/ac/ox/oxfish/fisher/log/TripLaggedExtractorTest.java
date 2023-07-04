@@ -90,12 +90,7 @@ public class TripLaggedExtractorTest {
 
 
         TripLaggedExtractor extractor = new TripLaggedExtractor(
-            new Function<TripRecord, Double>() {
-                @Override
-                public Double apply(TripRecord tripRecord) {
-                    return tripRecord.getProfitPerHour(true);
-                }
-            },
+            tripRecord -> tripRecord.getProfitPerHour(true),
             discretizer
         );
         extractor.setFisherTracked(fakeFisher);
@@ -176,22 +171,12 @@ public class TripLaggedExtractorTest {
 
 
         TripLaggedExtractor extractorFisher1 = new TripLaggedExtractor(
-            new Function<TripRecord, Double>() {
-                @Override
-                public Double apply(TripRecord tripRecord) {
-                    return tripRecord.getProfitPerHour(true);
-                }
-            },
+            tripRecord -> tripRecord.getProfitPerHour(true),
             discretizer
         );
         extractorFisher1.setFisherTracked(fakeFisher1);
         TripLaggedExtractor fleetwideExtractor = new TripLaggedExtractor(
-            new Function<TripRecord, Double>() {
-                @Override
-                public Double apply(TripRecord tripRecord) {
-                    return tripRecord.getProfitPerHour(true);
-                }
-            },
+            tripRecord -> tripRecord.getProfitPerHour(true),
             discretizer
         );
 

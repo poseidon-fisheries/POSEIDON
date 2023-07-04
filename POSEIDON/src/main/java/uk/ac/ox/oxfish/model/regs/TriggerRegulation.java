@@ -38,6 +38,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 public class TriggerRegulation implements Regulation, Steppable {
 
 
+    private static final long serialVersionUID = -6086972340417316834L;
     private final double lowThreshold;
 
     private final double highThreshold;
@@ -52,8 +53,8 @@ public class TriggerRegulation implements Regulation, Steppable {
 
 
     public TriggerRegulation(
-        double lowThreshold, double highThreshold, String indicatorName,
-        Regulation businessAsUsual, Regulation emergency
+        final double lowThreshold, final double highThreshold, final String indicatorName,
+        final Regulation businessAsUsual, final Regulation emergency
     ) {
         Preconditions.checkArgument(lowThreshold <= highThreshold);
         this.lowThreshold = lowThreshold;
@@ -71,9 +72,9 @@ public class TriggerRegulation implements Regulation, Steppable {
      * @param simState
      */
     @Override
-    public void step(SimState simState) {
-        FishState model = (FishState) simState;
-        double indicator = model.getLatestYearlyObservation(indicatorName);
+    public void step(final SimState simState) {
+        final FishState model = (FishState) simState;
+        final double indicator = model.getLatestYearlyObservation(indicatorName);
         //if there is no observation, then NaN
         if (!Double.isFinite(indicator))
             return;
@@ -88,7 +89,7 @@ public class TriggerRegulation implements Regulation, Steppable {
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         businessAsUsual.start(model, fisher);
         emergency.start(model, fisher);
 
@@ -100,7 +101,7 @@ public class TriggerRegulation implements Regulation, Steppable {
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         businessAsUsual.turnOff(fisher);
         emergency.turnOff(fisher);
     }
@@ -114,7 +115,7 @@ public class TriggerRegulation implements Regulation, Steppable {
      * @return true if the fisher can fish
      */
     @Override
-    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) {
+    public boolean canFishHere(final Fisher agent, final SeaTile tile, final FishState model, final int timeStep) {
         return currentRegulation.canFishHere(agent, tile, model, timeStep);
     }
 
@@ -127,7 +128,7 @@ public class TriggerRegulation implements Regulation, Steppable {
      * @return a positive biomass if it sellable. Zero if you need to throw everything away
      */
     @Override
-    public double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep) {
+    public double maximumBiomassSellable(final Fisher agent, final Species species, final FishState model, final int timeStep) {
         return currentRegulation.maximumBiomassSellable(agent, species, model, timeStep);
     }
 
@@ -140,7 +141,7 @@ public class TriggerRegulation implements Regulation, Steppable {
      * at sea
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
+    public boolean allowedAtSea(final Fisher fisher, final FishState model, final int timeStep) {
         return currentRegulation.allowedAtSea(fisher, model, timeStep);
     }
 
@@ -155,13 +156,13 @@ public class TriggerRegulation implements Regulation, Steppable {
      */
     @Override
     public void reactToFishing(
-        SeaTile where,
-        Fisher who,
-        Catch fishCaught,
-        Catch fishRetained,
-        int hoursSpentFishing,
-        FishState model,
-        int timeStep
+        final SeaTile where,
+        final Fisher who,
+        final Catch fishCaught,
+        final Catch fishRetained,
+        final int hoursSpentFishing,
+        final FishState model,
+        final int timeStep
     ) {
         currentRegulation.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
     }
@@ -176,12 +177,12 @@ public class TriggerRegulation implements Regulation, Steppable {
      */
     @Override
     public void reactToSale(
-        Species species,
-        Fisher seller,
-        double biomass,
-        double revenue,
-        FishState model,
-        int timeStep
+        final Species species,
+        final Fisher seller,
+        final double biomass,
+        final double revenue,
+        final FishState model,
+        final int timeStep
     ) {
         currentRegulation.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }

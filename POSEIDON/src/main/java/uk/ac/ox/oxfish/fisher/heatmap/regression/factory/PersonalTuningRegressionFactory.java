@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.PersonalTuningRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
-import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.AbstractHeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -46,7 +46,7 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
      * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
      */
     private final Set<FishState> weakStateMap = Collections.newSetFromMap(new WeakHashMap<>());
-    private AlgorithmFactory<? extends GeographicalRegression> nested = new DefaultKernelRegressionFactory();
+    private AlgorithmFactory<? extends GeographicalRegression<Double>> nested = new DefaultKernelRegressionFactory();
     /**
      * the gradient is guessed numerically by checking prediction error at x +- percentageChangeToGuessGradient * x
      */
@@ -75,7 +75,7 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
     public PersonalTuningRegression apply(final FishState state) {
 
 
-        final GeographicalRegression delegate = this.nested.apply(state);
+        final GeographicalRegression<Double> delegate = this.nested.apply(state);
         final DoubleParameter[] zeros = new DoubleParameter[delegate.getParametersAsArray().length];
         Arrays.fill(zeros, new FixedDoubleParameter(0));
 
@@ -111,7 +111,7 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
                     double total = 0;
                     for (final Fisher fisher1 : state.getFishers()) {
                         total +=
-                            ((HeatmapDestinationStrategy) fisher1.getDestinationStrategy()).
+                            ((AbstractHeatmapDestinationStrategy) fisher1.getDestinationStrategy()).
                                 getHeatmap().getParametersAsArray()[finalI];
                     }
                     return total / size;
@@ -137,7 +137,7 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
      *
      * @return Value for property 'nested'.
      */
-    public AlgorithmFactory<? extends GeographicalRegression> getNested() {
+    public AlgorithmFactory<? extends GeographicalRegression<Double>> getNested() {
         return nested;
     }
 
@@ -147,7 +147,7 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
      * @param nested Value to set for property 'nested'.
      */
     public void setNested(
-        final AlgorithmFactory<? extends GeographicalRegression> nested
+        final AlgorithmFactory<? extends GeographicalRegression<Double>> nested
     ) {
         this.nested = nested;
     }

@@ -16,6 +16,7 @@ import uk.ac.ox.oxfish.model.regs.policymakers.sensors.ITarget;
 public class LBSPRPolicyUpdater implements Steppable, AdditionalStartable {
 
 
+    private static final long serialVersionUID = 5201719448928049885L;
     /**
      * keep the SPR internal so we can change its parameters on the spot
      */
@@ -47,9 +48,9 @@ public class LBSPRPolicyUpdater implements Steppable, AdditionalStartable {
     private final int startUpdatingAfterYear;
 
     public LBSPRPolicyUpdater(
-        SPRAgent internalSPRAgent, LBSPREffortPolicy controller,
-        double upperDiscrepancyThreshold, double lowerDiscrepancyThreshold,
-        int cpueHalfPeriod, double minimumMK, double maximumMK, int startUpdatingAfterYear
+        final SPRAgent internalSPRAgent, final LBSPREffortPolicy controller,
+        final double upperDiscrepancyThreshold, final double lowerDiscrepancyThreshold,
+        final int cpueHalfPeriod, final double minimumMK, final double maximumMK, final int startUpdatingAfterYear
     ) {
         this.internalSPRAgent = internalSPRAgent;
         this.controller = controller;
@@ -75,7 +76,7 @@ public class LBSPRPolicyUpdater implements Steppable, AdditionalStartable {
      * @param simState
      */
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
         final FishState model = (FishState) simState;
 
@@ -91,9 +92,9 @@ public class LBSPRPolicyUpdater implements Steppable, AdditionalStartable {
         )
             return;
 
-        double targetSPR = 0.4;
-        double currentSPR = model.getLatestYearlyObservation("SPR " + internalSPRAgent.getSpecies() + " " + internalSPRAgent.getSurveyTag());
-        double effortChangeSPR = LBSPREffortPolicy.lbsprPolicyEffortProportion(
+        final double targetSPR = 0.4;
+        final double currentSPR = model.getLatestYearlyObservation("SPR " + internalSPRAgent.getSpecies() + " " + internalSPRAgent.getSurveyTag());
+        final double effortChangeSPR = LBSPREffortPolicy.lbsprPolicyEffortProportion(
             controller.getLinearParameter(),
             controller.getCubicParameter(),
             currentSPR,
@@ -102,17 +103,17 @@ public class LBSPRPolicyUpdater implements Steppable, AdditionalStartable {
         double effortChangeCPUE = cpueToEffort.getPercentageChangeToTACDueToIndicator(model);
         effortChangeCPUE = effortChangeCPUE - 1;
 
-        double discrepancy = effortChangeCPUE - effortChangeSPR;
+        final double discrepancy = effortChangeCPUE - effortChangeSPR;
         if (discrepancy > upperDiscrepancyThreshold) {
             //increase M/K
-            double currentMK = internalSPRAgent.getAssumedNaturalMortality() / internalSPRAgent.getAssumedKParameter();
-            double newMortality = internalSPRAgent.getAssumedKParameter() * Math.min(currentMK + .1, maximumMK);
+            final double currentMK = internalSPRAgent.getAssumedNaturalMortality() / internalSPRAgent.getAssumedKParameter();
+            final double newMortality = internalSPRAgent.getAssumedKParameter() * Math.min(currentMK + .1, maximumMK);
             internalSPRAgent.setAssumedNaturalMortality(newMortality);
         }
         if (discrepancy < lowerDiscrepancyThreshold) {
             //decrease M/K
-            double currentMK = internalSPRAgent.getAssumedNaturalMortality() / internalSPRAgent.getAssumedKParameter();
-            double newMortality = internalSPRAgent.getAssumedKParameter() * Math.max(currentMK - .1, minimumMK);
+            final double currentMK = internalSPRAgent.getAssumedNaturalMortality() / internalSPRAgent.getAssumedKParameter();
+            final double newMortality = internalSPRAgent.getAssumedKParameter() * Math.max(currentMK - .1, minimumMK);
             internalSPRAgent.setAssumedNaturalMortality(newMortality);
         }
         System.out.println("M/K is now " + (internalSPRAgent.getAssumedNaturalMortality() / internalSPRAgent.getAssumedKParameter()));
@@ -126,7 +127,7 @@ public class LBSPRPolicyUpdater implements Steppable, AdditionalStartable {
     }
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         //we are going to intercept the start for the controller, because we want to step it always
         //before we update
         model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE, controller.getIntervalInDays());
@@ -135,12 +136,7 @@ public class LBSPRPolicyUpdater implements Steppable, AdditionalStartable {
         model.getYearlyDataSet().registerGatherer(
             "M/K ratio " + internalSPRAgent.getSpecies() + " " +
                 internalSPRAgent.getSurveyTag(),
-            new Gatherer<FishState>() {
-                @Override
-                public Double apply(FishState fishState) {
-                    return (internalSPRAgent.getAssumedNaturalMortality() / internalSPRAgent.getAssumedKParameter());
-                }
-            },
+            (Gatherer<FishState>) fishState -> (internalSPRAgent.getAssumedNaturalMortality() / internalSPRAgent.getAssumedKParameter()),
             Double.NaN
         );
 

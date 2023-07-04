@@ -17,7 +17,7 @@ public class ExogenousInstantaneousMortalityCatchesTest {
     @Test
     public void biomassTest() {
 
-        FlexibleScenario scenario = new FlexibleScenario();
+        final FlexibleScenario scenario = new FlexibleScenario();
         scenario.getFisherDefinitions().clear();
 
         ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).
@@ -27,10 +27,10 @@ public class ExogenousInstantaneousMortalityCatchesTest {
         ((SimpleLogisticGrowerFactory) ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).getGrower()).setSteepness(
             new FixedDoubleParameter(0d));
         // work!
-        FishState state = new FishState();
+        final FishState state = new FishState();
         state.setScenario(scenario);
 
-        ExogenousInstantaneousMortalityCatchesFactory factory = new ExogenousInstantaneousMortalityCatchesFactory();
+        final ExogenousInstantaneousMortalityCatchesFactory factory = new ExogenousInstantaneousMortalityCatchesFactory();
         factory.getExogenousMortalities().put("Species 0", .5);
         factory.setAbundanceBased(false);
 
@@ -63,7 +63,7 @@ public class ExogenousInstantaneousMortalityCatchesTest {
     @Test
     public void abundanceTest() {
 
-        FlexibleScenario scenario = new FlexibleScenario();
+        final FlexibleScenario scenario = new FlexibleScenario();
         scenario.getFisherDefinitions().clear();
 
 
@@ -72,6 +72,8 @@ public class ExogenousInstantaneousMortalityCatchesTest {
 
         // Feed an empty ExogenousCatches factory to the scenario, as we'll build our own later
         scenario.setExogenousCatches(__ -> new ExogenousCatches() {
+            private static final long serialVersionUID = 3903468230543739523L;
+
             @Override
             public void start(final FishState model) {
             }
@@ -86,10 +88,10 @@ public class ExogenousInstantaneousMortalityCatchesTest {
         //   boxy.setK(new FixedDoubleParameter(0d));
         //  boxy.setSteepness(new FixedDoubleParameter(0.0001d));
         // work!
-        FishState state = new FishState(0);
+        final FishState state = new FishState(0);
         state.setScenario(scenario);
 
-        ExogenousInstantaneousMortalityCatchesFactory factory = new ExogenousInstantaneousMortalityCatchesFactory();
+        final ExogenousInstantaneousMortalityCatchesFactory factory = new ExogenousInstantaneousMortalityCatchesFactory();
         factory.getExogenousMortalities().put("Red Fish", .5);
         factory.setAbundanceBased(true);
 

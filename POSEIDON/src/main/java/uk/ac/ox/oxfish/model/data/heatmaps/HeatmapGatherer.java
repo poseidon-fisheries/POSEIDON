@@ -48,6 +48,7 @@ import static java.util.stream.IntStream.range;
 public class HeatmapGatherer implements AdditionalStartable, Steppable, RowProvider {
 
     private static final List<String> HEADERS = ImmutableList.of("name", "step", "lon", "lat", "value", "unit");
+    private static final long serialVersionUID = 8647252101393373519L;
     private final String name;
     private final String unit;
     private final int interval;

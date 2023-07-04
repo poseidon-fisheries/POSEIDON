@@ -36,6 +36,7 @@ import java.util.Map;
  */
 public class AbundanceLinearIntervalAttractor extends AbstractAbundanceLinearIntervalAttractor {
 
+    private static final long serialVersionUID = 7394289863523406832L;
     final double[] dailyBiomassAttractedPerSpecies;
     final double minAbundanceThreshold;
     final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves;

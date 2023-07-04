@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -18,6 +17,7 @@ import static uk.ac.ox.oxfish.fisher.strategies.departing.FullSeasonalRetiredDec
  */
 public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy, TripListener {
 
+    private static final long serialVersionUID = 7095894182709786966L;
     private final int howManyBadTripsBeforeGivingUp;
     private final double minimumProfitPerTripRequired;
     private final DepartingStrategy delegate;
@@ -29,9 +29,9 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
     private Stoppable receipt = null;
 
     public GiveUpAfterSomeLossesThisYearDecorator(
-        int howManyBadTripsBeforeGivingUp,
-        double minimumProfitPerTripRequired,
-        DepartingStrategy delegate
+        final int howManyBadTripsBeforeGivingUp,
+        final double minimumProfitPerTripRequired,
+        final DepartingStrategy delegate
     ) {
         this.howManyBadTripsBeforeGivingUp = howManyBadTripsBeforeGivingUp;
         this.minimumProfitPerTripRequired = minimumProfitPerTripRequired;
@@ -39,25 +39,20 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
     }
 
     @Override
-    public boolean shouldFisherLeavePort(Fisher fisher, FishState model, MersenneTwisterFast random) {
+    public boolean shouldFisherLeavePort(final Fisher fisher, final FishState model, final MersenneTwisterFast random) {
 
 
         return (disabled || !givenUp) && delegate.shouldFisherLeavePort(fisher, model, random);
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
 
         this.fisherIAmConnectedTo = fisher;
         this.fisherIAmConnectedTo.addTripListener(this);
 
         receipt = model.scheduleEveryYear(
-            new Steppable() {
-                @Override
-                public void step(SimState simState) {
-                    reset();
-                }
-            },
+            (Steppable) simState -> reset(),
             StepOrder.DAWN
         );
         delegate.start(model, fisher);
@@ -75,7 +70,7 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         this.fisherIAmConnectedTo.removeTripListener(this);
         this.fisherIAmConnectedTo = null;
         if (this.receipt != null)
@@ -84,7 +79,7 @@ public class GiveUpAfterSomeLossesThisYearDecorator implements DepartingStrategy
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
         if (disabled)
             return;
 

@@ -33,6 +33,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 public class PerfectDestinationStrategy implements DestinationStrategy, TripListener {
 
+    private static final long serialVersionUID = -6575548648177199503L;
     private final double maxHoursOut;
 
     private final FavoriteDestinationStrategy delegate;

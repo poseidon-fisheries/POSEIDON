@@ -37,6 +37,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 public abstract class LogisticDepartingStrategy implements DepartingStrategy, Steppable {
 
 
+    private static final long serialVersionUID = -2228973914160031267L;
     private final double l;
 
     private final double k;
@@ -49,7 +50,7 @@ public abstract class LogisticDepartingStrategy implements DepartingStrategy, St
     private FishState model;
 
 
-    public LogisticDepartingStrategy(double l, double k, double x0) {
+    public LogisticDepartingStrategy(final double l, final double k, final double x0) {
         this.l = l;
         this.k = k;
         this.x0 = x0;
@@ -78,7 +79,7 @@ public abstract class LogisticDepartingStrategy implements DepartingStrategy, St
      */
     @Override
     public boolean shouldFisherLeavePort(
-        Fisher fisher, FishState model, MersenneTwisterFast random
+        final Fisher fisher, final FishState model, final MersenneTwisterFast random
     ) {
 
         //you have no countdown activated
@@ -88,7 +89,7 @@ public abstract class LogisticDepartingStrategy implements DepartingStrategy, St
             double x = computeX(fisher, model);
             x = Math.max(x, 0);
 
-            double dailyProbability = FishStateUtilities.logisticProbability(l, k, x0, x);
+            final double dailyProbability = FishStateUtilities.logisticProbability(l, k, x0, x);
             assert dailyProbability >= 0;
             assert dailyProbability <= 1;
 
@@ -110,19 +111,19 @@ public abstract class LogisticDepartingStrategy implements DepartingStrategy, St
 
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
 
         this.model = model;
         model.scheduleEveryDay(this, StepOrder.DAWN);
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
 
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         decisionTaken = null;
     }
 }

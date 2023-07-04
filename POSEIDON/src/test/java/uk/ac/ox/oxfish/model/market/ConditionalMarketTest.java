@@ -33,12 +33,7 @@ public class ConditionalMarketTest {
             new ConditionalMarket(
                 defaultMarket,
                 componentMarket,
-                new Predicate<Fisher>() {
-                    @Override
-                    public boolean test(Fisher fisher) {
-                        return fisher.equals(two);
-                    }
-                }
+                fisher -> fisher.equals(two)
             );
         Species species = mock(Species.class);
 

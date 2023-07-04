@@ -24,7 +24,6 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.FixedProbability;
@@ -32,8 +31,11 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.FixedProbability;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * A general algorithm to perform exploration/imitation/exploitation decisions possibly on a specific variable
@@ -58,11 +60,11 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
     /**
      * function to grab eligible friends
      */
-    private Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>> friendsExtractor;
+    private Function<Entry<Fisher, MersenneTwisterFast>, Collection<Fisher>> friendsExtractor;
     /**
      * holds the starting point of a randomization
      */
-    private Pair<T, Double> explorationStart;
+    private Entry<T, Double> explorationStart;
     private ImitationStart<T> imitationStart;
     /**
      * the last action taken was this kind of action
@@ -70,38 +72,31 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
     private ExploreImitateStatus status;
 
     public ExploreImitateAdaptation(
-        Predicate<Fisher> validator,
-        AdaptationAlgorithm<T> decision,
-        Actuator<Fisher, T> actuator,
-        Sensor<Fisher, T> sensor,
-        ObjectiveFunction<Fisher> objective, double explorationProbability,
-        double imitationProbability, final Predicate<T> explorationValidator
+        final Predicate<Fisher> validator,
+        final AdaptationAlgorithm<T> decision,
+        final Actuator<Fisher, T> actuator,
+        final Sensor<Fisher, T> sensor,
+        final ObjectiveFunction<Fisher> objective, final double explorationProbability,
+        final double imitationProbability, final Predicate<T> explorationValidator
     ) {
 
         this(validator,
             decision, actuator, sensor, objective,
             new FixedProbability(explorationProbability, imitationProbability),
             explorationValidator,
-            new Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>>() {
-                @Override
-                public Collection<Fisher> apply(
-                    Pair<Fisher, MersenneTwisterFast> input
-                ) {
-                    return input.getFirst().getDirectedFriends();
-                }
-            }
+            input -> input.getKey().getDirectedFriends()
         );
 
     }
 
     public ExploreImitateAdaptation(
-        Predicate<Fisher> validator,
-        AdaptationAlgorithm<T> decision,
-        Actuator<Fisher, T> actuator, Sensor<Fisher, T> sensor,
-        ObjectiveFunction<Fisher> objective,
-        AdaptationProbability probability,
-        Predicate<T> explorationValidator,
-        Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>> friendsExtractor
+        final Predicate<Fisher> validator,
+        final AdaptationAlgorithm<T> decision,
+        final Actuator<Fisher, T> actuator, final Sensor<Fisher, T> sensor,
+        final ObjectiveFunction<Fisher> objective,
+        final AdaptationProbability probability,
+        final Predicate<T> explorationValidator,
+        final Function<Entry<Fisher, MersenneTwisterFast>, Collection<Fisher>> friendsExtractor
     ) {
         super(sensor, actuator, validator);
         this.friendsExtractor = friendsExtractor;
@@ -112,29 +107,22 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
     }
 
     public ExploreImitateAdaptation(
-        Predicate<Fisher> validator,
-        AdaptationAlgorithm<T> decision,
-        Actuator<Fisher, T> actuator,
-        Sensor<Fisher, T> sensor,
-        ObjectiveFunction<Fisher> objective,
-        AdaptationProbability probability, final Predicate<T> explorationValidator
+        final Predicate<Fisher> validator,
+        final AdaptationAlgorithm<T> decision,
+        final Actuator<Fisher, T> actuator,
+        final Sensor<Fisher, T> sensor,
+        final ObjectiveFunction<Fisher> objective,
+        final AdaptationProbability probability, final Predicate<T> explorationValidator
     ) {
         this(validator, decision, actuator, sensor, objective, probability,
             explorationValidator,
-            new Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>>() {
-                @Override
-                public Collection<Fisher> apply(
-                    Pair<Fisher, MersenneTwisterFast> input
-                ) {
-                    return input.getFirst().getDirectedFriends();
-                }
-            }
+            input -> input.getKey().getDirectedFriends()
         );
 
     }
 
     @Override
-    public T concreteAdaptation(Fisher toAdapt, FishState state, MersenneTwisterFast random) {
+    public T concreteAdaptation(final Fisher toAdapt, final FishState state, final MersenneTwisterFast random) {
 
         //check your fitness and where you are
         double fitness = objective.computeCurrentFitness(toAdapt, toAdapt);
@@ -146,9 +134,9 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
             assert status == ExploreImitateStatus.EXPLORING;
 
 
-            Double previousFitness = explorationStart.getSecond();
-            T previous = explorationStart.getFirst();
-            T decision = this.algorithm.judgeRandomization(random, toAdapt,
+            final Double previousFitness = explorationStart.getValue();
+            final T previous = explorationStart.getKey();
+            final T decision = this.algorithm.judgeRandomization(random, toAdapt,
                 previousFitness,
                 fitness,
                 previous,
@@ -172,9 +160,9 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
         else if (imitationStart != null) {
             assert explorationStart == null;
             assert status == ExploreImitateStatus.IMITATING;
-            double previousFitness = imitationStart.getPreviousFitness();
-            T previous = imitationStart.getPreviousDecision();
-            T decision = this.algorithm.judgeImitation(random, toAdapt,
+            final double previousFitness = imitationStart.getPreviousFitness();
+            final T previous = imitationStart.getPreviousDecision();
+            final T decision = this.algorithm.judgeImitation(random, toAdapt,
                 imitationStart.getFriend(),
                 previousFitness,
                 fitness,
@@ -195,7 +183,7 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
         //you have no previous decisions to judge or you had but decided not to act upon them
         //you are now ready to check whether to explore or exploit
 
-        double explorationProbability = probability.getExplorationProbability();
+        final double explorationProbability = probability.getExplorationProbability();
         //explore?
         if (explorationProbability > 0 && random.nextBoolean(explorationProbability)) {
 
@@ -203,9 +191,9 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
             int attempts = 0;
 
             while (attempts < 100) {
-                T future = algorithm.randomize(random, toAdapt, fitness, current);
+                final T future = algorithm.randomize(random, toAdapt, fitness, current);
                 if (explorationCheck.test(future)) {
-                    explorationStart = new Pair<>(current, fitness);
+                    explorationStart = entry(current, fitness);
                     status = ExploreImitateStatus.EXPLORING;
                     return future;
                 }
@@ -220,14 +208,14 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
         assert explorationStart == null;
 
         //imitate?
-        double imitationProbability = probability.getImitationProbability();
+        final double imitationProbability = probability.getImitationProbability();
 
         //get your friends (but not those that have been banned from fishing)
         //todo might want to make this as a funtion of time since last out rather than allowed at sea
-        Collection<Fisher> friends = friendsExtractor.apply(new Pair<>(toAdapt, random));
+        Collection<Fisher> friends = friendsExtractor.apply(entry(toAdapt, random));
         if (friends != null) {
-            List<Fisher> list = new ArrayList<>();
-            for (Fisher friend : friends) {
+            final List<Fisher> list = new ArrayList<>();
+            for (final Fisher friend : friends) {
                 if (friend.isAllowedAtSea()) {
                     list.add(friend);
                 }
@@ -239,18 +227,18 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
             !friends.isEmpty() && random.nextBoolean(imitationProbability)) {
 
 
-            Pair<T, Fisher> imitation = algorithm.imitate(random,
+            final Entry<T, Fisher> imitation = algorithm.imitate(random,
                 toAdapt, fitness, current,
                 friends, objective, getSensor()
             );
             //if there is somebody to imitate and the imitation does not involve just doing what I am doing anyway
-            if (imitation.getSecond() != null
-                && !imitation.getFirst().equals(current)
-                && explorationCheck.test(imitation.getFirst())) {
-                imitationStart = new ImitationStart<>(imitation.getSecond(), fitness, imitation.getFirst());
+            if (imitation.getValue() != null
+                && !imitation.getKey().equals(current)
+                && explorationCheck.test(imitation.getKey())) {
+                imitationStart = new ImitationStart<>(imitation.getValue(), fitness, imitation.getKey());
 
                 status = ExploreImitateStatus.IMITATING;
-                return imitation.getFirst();
+                return imitation.getKey();
             }
 
         }
@@ -260,7 +248,7 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
         return current;
     }
 
-    public void onStart(FishState state, Fisher toAdapt) {
+    public void onStart(final FishState state, final Fisher toAdapt) {
         algorithm.start(state, toAdapt,
             getSensor().scan(toAdapt)
         );
@@ -269,18 +257,18 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
 
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
 
         probability.turnOff(fisher);
     }
 
 
-    public Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>> getFriendsExtractor() {
+    public Function<Entry<Fisher, MersenneTwisterFast>, Collection<Fisher>> getFriendsExtractor() {
         return friendsExtractor;
     }
 
     public void setFriendsExtractor(
-        Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>> friendsExtractor
+        final Function<Entry<Fisher, MersenneTwisterFast>, Collection<Fisher>> friendsExtractor
     ) {
         this.friendsExtractor = friendsExtractor;
     }
@@ -295,11 +283,11 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
     }
 
 
-    public Pair<T, Double> getExplorationStart() {
+    public Entry<T, Double> getExplorationStart() {
         return explorationStart;
     }
 
-    public void setExplorationStart(Pair<T, Double> explorationStart) {
+    public void setExplorationStart(final Entry<T, Double> explorationStart) {
         this.explorationStart = explorationStart;
     }
 
@@ -326,7 +314,7 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
         private final double previousFitness;
         private final K previousDecision;
 
-        public ImitationStart(Fisher friend, double previousFitness, K previousDecision) {
+        public ImitationStart(final Fisher friend, final double previousFitness, final K previousDecision) {
             this.friend = friend;
             this.previousFitness = previousFitness;
             this.previousDecision = previousDecision;

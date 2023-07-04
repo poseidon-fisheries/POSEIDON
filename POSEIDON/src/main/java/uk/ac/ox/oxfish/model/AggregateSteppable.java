@@ -38,31 +38,26 @@ import java.util.List;
  */
 public class AggregateSteppable implements Steppable {
 
+    private static final long serialVersionUID = 1437081239429619037L;
     List<Steppable> steppableList = new LinkedList<>();
 
 
     @Override
-    public void step(SimState simState) {
-        for (Steppable steppable : steppableList)
+    public void step(final SimState simState) {
+        for (final Steppable steppable : steppableList)
             steppable.step(simState);
     }
 
 
-    public Stoppable add(Steppable steppable) {
+    public Stoppable add(final Steppable steppable) {
         steppableList.add(steppable);
-
-        return new Stoppable() {
-            @Override
-            public void stop() {
-                remove(steppable);
-            }
-        };
+        return () -> remove(steppable);
     }
 
     /**
      *
      */
-    public boolean remove(Steppable o) {
+    public boolean remove(final Steppable o) {
         return steppableList.remove(o);
     }
 }

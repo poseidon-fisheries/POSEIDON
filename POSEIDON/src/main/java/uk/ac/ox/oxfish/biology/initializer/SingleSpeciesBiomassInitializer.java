@@ -31,13 +31,13 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class SingleSpeciesBiomassInitializer implements BiologyInitializer {
 
@@ -319,12 +319,16 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer {
         grower.initializeGrower(habitableAreas, model, random, species);
         //initialize the diffuser
         if (!forceMovementOff) {
-            final BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
-                new Pair<>(
-                    species,
-                    movementRule
-                )
-            );
+            @SuppressWarnings("unchecked") final BiomassDiffuserContainer diffuser =
+                new BiomassDiffuserContainer(
+                    map,
+                    random,
+                    biology,
+                    entry(
+                        species,
+                        movementRule
+                    )
+                );
             model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
         }
 

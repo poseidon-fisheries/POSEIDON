@@ -34,6 +34,7 @@ import java.util.function.Supplier;
 public class BiomassTotalResetter extends BiomassLocationResetter {
 
 
+    private static final long serialVersionUID = 7433500527073557372L;
     private final DoubleParameter yearlyBiomass;
 
     public BiomassTotalResetter(

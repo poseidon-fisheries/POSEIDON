@@ -150,14 +150,11 @@ public class PolicyScript {
                 ));
             }
             state.getFisherFactory(nameOfPopulation).getAdditionalSetups().add(
-                new Consumer<Fisher>() {
-                    @Override
-                    public void accept(Fisher fisher) {
-                        fisher.getAdditionalTripCosts().clear();
-                        fisher.getAdditionalTripCosts().add(new HourlyCost(
-                            hourlyTravellingCosts.applyAsDouble(state.getRandom())
-                        ));
-                    }
+                fisher -> {
+                    fisher.getAdditionalTripCosts().clear();
+                    fisher.getAdditionalTripCosts().add(new HourlyCost(
+                        hourlyTravellingCosts.applyAsDouble(state.getRandom())
+                    ));
                 }
             );
         }

@@ -27,7 +27,6 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.regs.FinedProtectedAreas;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -43,7 +42,9 @@ public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtect
     /**
      * makes sure you only schedule yourself to build the MPAs once
      */
-    private final Locker<String, FinedProtectedAreas> mpaBuilder = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, FinedProtectedAreas> mpaBuilder =
+        new uk.ac.ox.oxfish.utility.Locker<>();
     private String beingCaughtProbability = "1,.2";
     private String hourlyFines = "100,2000";
     private boolean canContemplateCheating = false;

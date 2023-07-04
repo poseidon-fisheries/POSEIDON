@@ -66,12 +66,7 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy {
             (fisher, change, model) -> delegate.setFavoriteSpot(change),
             fisher -> delegate.getFavoriteSpot(),
             new CashFlowObjective(360),
-            1d, 0d, new Predicate<SeaTile>() {
-            @Override
-            public boolean test(SeaTile a) {
-                return true;
-            }
-        }
+            1d, 0d, a -> true
         );
     }
 

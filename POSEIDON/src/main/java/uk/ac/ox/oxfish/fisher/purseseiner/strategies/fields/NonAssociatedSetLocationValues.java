@@ -26,8 +26,10 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import java.util.Map;
 import java.util.function.Function;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class NonAssociatedSetLocationValues extends SetLocationValues {
+
+    private static final long serialVersionUID = -1619232603124923180L;
 
     public NonAssociatedSetLocationValues(
         final Function<Fisher, Map<Int2D, Double>> loadValues,

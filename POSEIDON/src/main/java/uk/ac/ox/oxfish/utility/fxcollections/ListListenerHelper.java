@@ -30,12 +30,13 @@ import java.util.function.Predicate;
 /**
  *
  */
+@SuppressWarnings({"overloads", "unchecked", "rawtypes"})
 public abstract class ListListenerHelper<E> {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Static methods
 
-    public static <E> ListListenerHelper<E> addListener(ListListenerHelper<E> helper, InvalidationListener listener) {
+    public static <E> ListListenerHelper<E> addListener(final ListListenerHelper<E> helper, final InvalidationListener listener) {
         if (listener == null) {
             throw new NullPointerException();
         }
@@ -45,8 +46,8 @@ public abstract class ListListenerHelper<E> {
     protected abstract ListListenerHelper<E> addListener(InvalidationListener listener);
 
     public static <E> ListListenerHelper<E> removeListener(
-        ListListenerHelper<E> helper,
-        InvalidationListener listener
+        final ListListenerHelper<E> helper,
+        final InvalidationListener listener
     ) {
         if (listener == null) {
             throw new NullPointerException();
@@ -57,8 +58,8 @@ public abstract class ListListenerHelper<E> {
     protected abstract ListListenerHelper<E> removeListener(InvalidationListener listener);
 
     public static <E> ListListenerHelper<E> addListener(
-        ListListenerHelper<E> helper,
-        ListChangeListener<? super E> listener
+        final ListListenerHelper<E> helper,
+        final ListChangeListener<? super E> listener
     ) {
         if (listener == null) {
             throw new NullPointerException();
@@ -72,8 +73,8 @@ public abstract class ListListenerHelper<E> {
     // Common implementations
 
     public static <E> ListListenerHelper<E> removeListener(
-        ListListenerHelper<E> helper,
-        ListChangeListener<? super E> listener
+        final ListListenerHelper<E> helper,
+        final ListChangeListener<? super E> listener
     ) {
         if (listener == null) {
             throw new NullPointerException();
@@ -84,8 +85,8 @@ public abstract class ListListenerHelper<E> {
     protected abstract ListListenerHelper<E> removeListener(ListChangeListener<? super E> listener);
 
     public static <E> void fireValueChangedEvent(
-        ListListenerHelper<E> helper,
-        ListChangeListener.Change<? extends E> change
+        final ListListenerHelper<E> helper,
+        final ListChangeListener.Change<? extends E> change
     ) {
         if (helper != null) {
             change.reset();
@@ -95,15 +96,15 @@ public abstract class ListListenerHelper<E> {
 
     protected abstract void fireValueChangedEvent(ListChangeListener.Change<? extends E> change);
 
-    public static <E> boolean hasListeners(ListListenerHelper<E> helper) {
+    public static <E> boolean hasListeners(final ListListenerHelper<E> helper) {
         return helper != null;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Implementations
 
-    protected static int trim(int size, Object[] listeners) {
-        Predicate<Object> p = t -> false; // removed weaklistening
+    protected static int trim(int size, final Object[] listeners) {
+        final Predicate<Object> p = t -> false; // removed weaklistening
         int index = 0;
         for (; index < size; index++) {
             if (p.test(listeners[index])) {
@@ -116,7 +117,7 @@ public abstract class ListListenerHelper<E> {
                     listeners[index++] = listeners[src];
                 }
             }
-            int oldSize = size;
+            final int oldSize = size;
             size = index;
             for (; index < oldSize; index++) {
                 listeners[index] = null;
@@ -130,35 +131,35 @@ public abstract class ListListenerHelper<E> {
 
         private final InvalidationListener listener;
 
-        private SingleInvalidation(InvalidationListener listener) {
+        private SingleInvalidation(final InvalidationListener listener) {
             this.listener = listener;
         }
 
         @Override
-        protected ListListenerHelper<E> addListener(InvalidationListener listener) {
+        protected ListListenerHelper<E> addListener(final InvalidationListener listener) {
             return new Generic<E>(this.listener, listener);
         }
 
         @Override
-        protected ListListenerHelper<E> removeListener(InvalidationListener listener) {
+        protected ListListenerHelper<E> removeListener(final InvalidationListener listener) {
             return (listener.equals(this.listener)) ? null : this;
         }
 
         @Override
-        protected ListListenerHelper<E> addListener(ListChangeListener<? super E> listener) {
+        protected ListListenerHelper<E> addListener(final ListChangeListener<? super E> listener) {
             return new Generic<E>(this.listener, listener);
         }
 
         @Override
-        protected ListListenerHelper<E> removeListener(ListChangeListener<? super E> listener) {
+        protected ListListenerHelper<E> removeListener(final ListChangeListener<? super E> listener) {
             return this;
         }
 
         @Override
-        protected void fireValueChangedEvent(ListChangeListener.Change<? extends E> change) {
+        protected void fireValueChangedEvent(final ListChangeListener.Change<? extends E> change) {
             try {
                 listener.invalidated(change.getList());
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 Thread.currentThread().getUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
             }
         }
@@ -168,35 +169,35 @@ public abstract class ListListenerHelper<E> {
 
         private final ListChangeListener<? super E> listener;
 
-        private SingleChange(ListChangeListener<? super E> listener) {
+        private SingleChange(final ListChangeListener<? super E> listener) {
             this.listener = listener;
         }
 
         @Override
-        protected ListListenerHelper<E> addListener(InvalidationListener listener) {
+        protected ListListenerHelper<E> addListener(final InvalidationListener listener) {
             return new Generic<E>(listener, this.listener);
         }
 
         @Override
-        protected ListListenerHelper<E> removeListener(InvalidationListener listener) {
+        protected ListListenerHelper<E> removeListener(final InvalidationListener listener) {
             return this;
         }
 
         @Override
-        protected ListListenerHelper<E> addListener(ListChangeListener<? super E> listener) {
+        protected ListListenerHelper<E> addListener(final ListChangeListener<? super E> listener) {
             return new Generic<E>(this.listener, listener);
         }
 
         @Override
-        protected ListListenerHelper<E> removeListener(ListChangeListener<? super E> listener) {
+        protected ListListenerHelper<E> removeListener(final ListChangeListener<? super E> listener) {
             return (listener.equals(this.listener)) ? null : this;
         }
 
         @Override
-        protected void fireValueChangedEvent(ListChangeListener.Change<? extends E> change) {
+        protected void fireValueChangedEvent(final ListChangeListener.Change<? extends E> change) {
             try {
                 listener.onChanged(change);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 Thread.currentThread().getUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
             }
         }
@@ -210,17 +211,17 @@ public abstract class ListListenerHelper<E> {
         private int changeSize;
         private boolean locked;
 
-        private Generic(InvalidationListener listener0, InvalidationListener listener1) {
+        private Generic(final InvalidationListener listener0, final InvalidationListener listener1) {
             this.invalidationListeners = new InvalidationListener[]{listener0, listener1};
             this.invalidationSize = 2;
         }
 
-        private Generic(ListChangeListener<? super E> listener0, ListChangeListener<? super E> listener1) {
+        private Generic(final ListChangeListener<? super E> listener0, final ListChangeListener<? super E> listener1) {
             this.changeListeners = new ListChangeListener[]{listener0, listener1};
             this.changeSize = 2;
         }
 
-        private Generic(InvalidationListener invalidationListener, ListChangeListener<? super E> changeListener) {
+        private Generic(final InvalidationListener invalidationListener, final ListChangeListener<? super E> changeListener) {
             this.invalidationListeners = new InvalidationListener[]{invalidationListener};
             this.invalidationSize = 1;
             this.changeListeners = new ListChangeListener[]{changeListener};
@@ -228,7 +229,7 @@ public abstract class ListListenerHelper<E> {
         }
 
         @Override
-        protected Generic<E> addListener(InvalidationListener listener) {
+        protected Generic<E> addListener(final InvalidationListener listener) {
             if (invalidationListeners == null) {
                 invalidationListeners = new InvalidationListener[]{listener};
                 invalidationSize = 1;
@@ -250,7 +251,7 @@ public abstract class ListListenerHelper<E> {
         }
 
         @Override
-        protected ListListenerHelper<E> removeListener(InvalidationListener listener) {
+        protected ListListenerHelper<E> removeListener(final InvalidationListener listener) {
             if (invalidationListeners != null) {
                 for (int index = 0; index < invalidationSize; index++) {
                     if (listener.equals(invalidationListeners[index])) {
@@ -285,7 +286,7 @@ public abstract class ListListenerHelper<E> {
         }
 
         @Override
-        protected ListListenerHelper<E> addListener(ListChangeListener<? super E> listener) {
+        protected ListListenerHelper<E> addListener(final ListChangeListener<? super E> listener) {
             if (changeListeners == null) {
                 changeListeners = new ListChangeListener[]{listener};
                 changeSize = 1;
@@ -307,7 +308,7 @@ public abstract class ListListenerHelper<E> {
         }
 
         @Override
-        protected ListListenerHelper<E> removeListener(ListChangeListener<? super E> listener) {
+        protected ListListenerHelper<E> removeListener(final ListChangeListener<? super E> listener) {
             if (changeListeners != null) {
                 for (int index = 0; index < changeSize; index++) {
                     if (listener.equals(changeListeners[index])) {
@@ -342,7 +343,7 @@ public abstract class ListListenerHelper<E> {
         }
 
         @Override
-        protected void fireValueChangedEvent(ListChangeListener.Change<? extends E> change) {
+        protected void fireValueChangedEvent(final ListChangeListener.Change<? extends E> change) {
             final InvalidationListener[] curInvalidationList = invalidationListeners;
             final int curInvalidationSize = invalidationSize;
             final ListChangeListener<? super E>[] curChangeList = changeListeners;
@@ -353,7 +354,7 @@ public abstract class ListListenerHelper<E> {
                 for (int i = 0; i < curInvalidationSize; i++) {
                     try {
                         curInvalidationList[i].invalidated(change.getList());
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         Thread.currentThread()
                             .getUncaughtExceptionHandler()
                             .uncaughtException(Thread.currentThread(), e);
@@ -363,7 +364,7 @@ public abstract class ListListenerHelper<E> {
                     change.reset();
                     try {
                         curChangeList[i].onChanged(change);
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         Thread.currentThread()
                             .getUncaughtExceptionHandler()
                             .uncaughtException(Thread.currentThread(), e);

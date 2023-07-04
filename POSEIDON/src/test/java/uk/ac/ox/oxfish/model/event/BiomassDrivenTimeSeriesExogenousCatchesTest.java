@@ -83,14 +83,11 @@ public class BiomassDrivenTimeSeriesExogenousCatchesTest {
         exogenousLandingsSecondSpecies.add(2d);
         exogenousLandingsSecondSpecies.add(0d);
 
-        scenario.setExogenousCatches(new AlgorithmFactory<ExogenousCatches>() {
-            @Override
-            public ExogenousCatches apply(FishState state) {
-                LinkedHashMap<Species, Queue<Double>> exogenous = new LinkedHashMap<>();
-                exogenous.put(state.getSpecies().get(0), exogenousLandings);
-                exogenous.put(state.getSpecies().get(1), exogenousLandingsSecondSpecies);
-                return new BiomassDrivenTimeSeriesExogenousCatches(exogenous, false);
-            }
+        scenario.setExogenousCatches(state -> {
+            LinkedHashMap<Species, Queue<Double>> exogenous = new LinkedHashMap<>();
+            exogenous.put(state.getSpecies().get(0), exogenousLandings);
+            exogenous.put(state.getSpecies().get(1), exogenousLandingsSecondSpecies);
+            return new BiomassDrivenTimeSeriesExogenousCatches(exogenous, false);
         });
 
 

@@ -24,6 +24,8 @@ package uk.ac.ox.oxfish.biology.complicated;
  * Created by carrknight on 7/5/17.
  */
 public class NoNoiseMaker implements NoiseMaker {
+    private static final long serialVersionUID = 9016843157394339315L;
+
     /**
      * Gets a result.
      *

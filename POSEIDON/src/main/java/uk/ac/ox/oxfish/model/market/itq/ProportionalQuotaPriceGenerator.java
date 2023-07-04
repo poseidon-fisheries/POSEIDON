@@ -43,6 +43,7 @@ import java.util.HashMap;
 public class ProportionalQuotaPriceGenerator implements PriceGenerator, Steppable {
 
 
+    private static final long serialVersionUID = 225428497357627048L;
     /**
      * the order book for each specie
      */
@@ -76,8 +77,8 @@ public class ProportionalQuotaPriceGenerator implements PriceGenerator, Steppabl
 
 
     public ProportionalQuotaPriceGenerator(
-        HashMap<Integer, ITQOrderBook> orderBooks, int specieIndex,
-        Sensor<Fisher, Double> numberOfQuotasLeftGetter
+        final HashMap<Integer, ITQOrderBook> orderBooks, final int specieIndex,
+        final Sensor<Fisher, Double> numberOfQuotasLeftGetter
     ) {
         this.orderBooks = orderBooks;
         this.specieIndex = specieIndex;
@@ -85,7 +86,7 @@ public class ProportionalQuotaPriceGenerator implements PriceGenerator, Steppabl
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         this.fisher = fisher;
         this.state = model;
 
@@ -105,7 +106,7 @@ public class ProportionalQuotaPriceGenerator implements PriceGenerator, Steppabl
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         lastLambda = computeLambda();
     }
 
@@ -119,12 +120,12 @@ public class ProportionalQuotaPriceGenerator implements PriceGenerator, Steppabl
             return 0d;
 
         //if you have infinite quotas (unprotected species), you have no value for them
-        Double quotasLeft = numberOfQuotasLeftGetter.scan(fisher);
+        final Double quotasLeft = numberOfQuotasLeftGetter.scan(fisher);
         if (Double.isInfinite(quotasLeft))
             return Double.NaN;
 
         //if you expect to catch nothing, then the quota is worthless
-        double dailyCatchesPredicted = fisher.predictDailyCatches(specieIndex);
+        final double dailyCatchesPredicted = fisher.predictDailyCatches(specieIndex);
         if (dailyCatchesPredicted < FishStateUtilities.EPSILON) //if you predict no catches a day, you don't value the quota at all (the probability will be 0)
         {
             assert dailyCatchesPredicted > -FishStateUtilities.EPSILON;
@@ -138,7 +139,7 @@ public class ProportionalQuotaPriceGenerator implements PriceGenerator, Steppabl
         assert dailyCatchesPredicted > 0 : dailyCatchesPredicted;
 
         //365 - state.getDayOfTheYear();
-        int amountOfDaysLeftFishing = fisher.getDepartingStrategy()
+        final int amountOfDaysLeftFishing = fisher.getDepartingStrategy()
             .predictedDaysLeftFishingThisYear(fisher, state, state.getRandom());
         double probability = quotasLeft < FishStateUtilities.EPSILON ? 1 : 1 -
             fisher.probabilitySumDailyCatchesBelow(specieIndex, quotasLeft,
@@ -175,7 +176,7 @@ public class ProportionalQuotaPriceGenerator implements PriceGenerator, Steppabl
                 predictedCatches = FishStateUtilities.round5(predictedCatches);
                 predictedUnitProfit = FishStateUtilities.round5(predictedUnitProfit);
                 //quota price (0 if there is no market)
-                ITQOrderBook market = orderBooks.get(species);
+                final ITQOrderBook market = orderBooks.get(species);
                 double quotaPrice = market != null ? market.getLastClosingPrice() : 0;
                 quotaPrice = Double.isFinite(quotaPrice) ? quotaPrice : 0; //value it 0 if it's NAN
 
@@ -192,7 +193,7 @@ public class ProportionalQuotaPriceGenerator implements PriceGenerator, Steppabl
 
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         if (state != null) {
             this.fisher.getDailyData()
                 .removeGatherer("Reservation Quota Price of " + state.getSpecies().get(specieIndex));

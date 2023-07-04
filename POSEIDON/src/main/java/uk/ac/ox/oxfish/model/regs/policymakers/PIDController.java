@@ -34,6 +34,7 @@ import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 public class PIDController extends Controller {
 
 
+    private static final long serialVersionUID = 7614709761864687220L;
     /**
      * proportional gain
      */
@@ -68,12 +69,12 @@ public class PIDController extends Controller {
     private double minimumPolicy = Double.NEGATIVE_INFINITY;
 
     public PIDController(
-        Sensor<FishState, Double> observed,
-        Sensor<FishState, Double> target,
-        Actuator<FishState, Double> actuator,
-        int interval,
-        double p, double i, double d,
-        double offset
+        final Sensor<FishState, Double> observed,
+        final Sensor<FishState, Double> target,
+        final Actuator<FishState, Double> actuator,
+        final int interval,
+        final double p, final double i, final double d,
+        final double offset
     ) {
         super(observed, target, actuator, interval);
         this.p = p;
@@ -84,28 +85,23 @@ public class PIDController extends Controller {
 
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         super.start(model);
 
         model.getYearlyDataSet().registerGatherer(
 
             "Policy from PID Controller",
-            new Gatherer<FishState>() {
-                @Override
-                public Double apply(FishState fishState) {
-                    return getPolicy();
-                }
-            },
+            (Gatherer<FishState>) fishState -> getPolicy(),
             Double.NaN
         );
     }
 
     @Override
     public double computePolicy(
-        double currentVariable,
-        double target,
-        FishState model,
-        double oldPolicy
+        final double currentVariable,
+        final double target,
+        final FishState model,
+        final double oldPolicy
     ) {
         if (offsetSetter != null) {
             offset = offsetSetter.scan(model);
@@ -113,12 +109,12 @@ public class PIDController extends Controller {
         }
 
         //pid magic here
-        double error = target - currentVariable;
+        final double error = target - currentVariable;
         sumOfErrors += error;
-        double derivative = error - previousError;
+        final double derivative = error - previousError;
         previousError = error;
 
-        double pidPolicy = p * error + i * sumOfErrors + d * derivative;
+        final double pidPolicy = p * error + i * sumOfErrors + d * derivative;
 
 
         //do not accumulate error past zero?
@@ -151,7 +147,7 @@ public class PIDController extends Controller {
      *
      * @param p Value to set for property 'p'.
      */
-    public void setP(double p) {
+    public void setP(final double p) {
         this.p = p;
     }
 
@@ -169,7 +165,7 @@ public class PIDController extends Controller {
      *
      * @param i Value to set for property 'i'.
      */
-    public void setI(double i) {
+    public void setI(final double i) {
         this.i = i;
     }
 
@@ -187,7 +183,7 @@ public class PIDController extends Controller {
      *
      * @param d Value to set for property 'd'.
      */
-    public void setD(double d) {
+    public void setD(final double d) {
         this.d = d;
     }
 
@@ -205,7 +201,7 @@ public class PIDController extends Controller {
      *
      * @param offset Value to set for property 'offset'.
      */
-    public void setOffset(double offset) {
+    public void setOffset(final double offset) {
         this.offset = offset;
     }
 
@@ -213,7 +209,7 @@ public class PIDController extends Controller {
         return offsetSetter;
     }
 
-    public void setOffsetSetter(Sensor<FishState, Double> offsetSetter) {
+    public void setOffsetSetter(final Sensor<FishState, Double> offsetSetter) {
         this.offsetSetter = offsetSetter;
     }
 
@@ -230,7 +226,7 @@ public class PIDController extends Controller {
         return zeroOverflowProtection;
     }
 
-    public void setZeroOverflowProtection(boolean zeroOverflowProtection) {
+    public void setZeroOverflowProtection(final boolean zeroOverflowProtection) {
         this.zeroOverflowProtection = zeroOverflowProtection;
     }
 
@@ -238,7 +234,7 @@ public class PIDController extends Controller {
         return minimumPolicy;
     }
 
-    public void setMinimumPolicy(double minimumPolicy) {
+    public void setMinimumPolicy(final double minimumPolicy) {
         this.minimumPolicy = minimumPolicy;
     }
 

@@ -27,7 +27,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 
 import java.util.HashMap;
-import java.util.function.Function;
 
 /**
  * Like multiquota but with a reference to ITQs used to compute opportunity costs
@@ -36,11 +35,12 @@ import java.util.function.Function;
 public class MultiQuotaITQRegulation extends MultiQuotaRegulation {
 
 
+    private static final long serialVersionUID = 2582856276395324315L;
     final private HashMap<Integer, ITQOrderBook> orderBooks;
     private ITQCostManager cost;
 
     public MultiQuotaITQRegulation(
-        double[] yearlyQuota, FishState state, HashMap<Integer, ITQOrderBook> orderBooks
+        final double[] yearlyQuota, final FishState state, final HashMap<Integer, ITQOrderBook> orderBooks
     ) {
         super(yearlyQuota, state);
         this.orderBooks = orderBooks;
@@ -51,7 +51,7 @@ public class MultiQuotaITQRegulation extends MultiQuotaRegulation {
 
     @Override
     public boolean isFishingStillAllowed() {
-        for (double remaining : quotaRemaining) {
+        for (final double remaining : quotaRemaining) {
             if (remaining < 0)
                 return false;
         }
@@ -69,14 +69,9 @@ public class MultiQuotaITQRegulation extends MultiQuotaRegulation {
      * add yourself as an opportunity cost!
      */
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         assert cost == null;
-        cost = new ITQCostManager(new Function<Species, ITQOrderBook>() {
-            @Override
-            public ITQOrderBook apply(Species species) {
-                return orderBooks.get(species.getIndex());
-            }
-        });
+        cost = new ITQCostManager(species -> orderBooks.get(species.getIndex()));
 
         assert (!fisher.getOpportunityCosts().contains(cost));
         fisher.getOpportunityCosts().add(cost);
@@ -84,21 +79,21 @@ public class MultiQuotaITQRegulation extends MultiQuotaRegulation {
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         if (cost != null)
             fisher.getOpportunityCosts().remove(cost);
     }
 
     @Override
     public void reactToSale(
-        Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep
+        final Species species, final Fisher seller, final double biomass, final double revenue, final FishState model, final int timeStep
     ) {
         super.reactToSale(species, seller, biomass, revenue, model, timeStep);
 
     }
 
     @VisibleForTesting
-    public ITQOrderBook testOrderBook(Species species) {
+    public ITQOrderBook testOrderBook(final Species species) {
         return orderBooks.get(species.getIndex());
     }
 

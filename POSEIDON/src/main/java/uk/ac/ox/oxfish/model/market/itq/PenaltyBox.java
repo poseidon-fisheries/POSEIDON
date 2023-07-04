@@ -34,6 +34,7 @@ import java.util.HashMap;
 public class PenaltyBox implements Steppable {
 
 
+    private static final long serialVersionUID = -57133641329366083L;
     /**
      * we keep here all the fishers that need to stay out of trading
      */
@@ -46,7 +47,7 @@ public class PenaltyBox implements Steppable {
     private final int duration;
 
 
-    public PenaltyBox(int duration) {
+    public PenaltyBox(final int duration) {
         Preconditions.checkArgument(duration >= 0);
         this.duration = duration;
     }
@@ -57,7 +58,7 @@ public class PenaltyBox implements Steppable {
      *
      * @param trader trader to put in the box
      */
-    public void registerTrader(Fisher trader) {
+    public void registerTrader(final Fisher trader) {
         if (duration > 0)
             penaltyBox.put(trader, duration);
     }
@@ -69,7 +70,7 @@ public class PenaltyBox implements Steppable {
      * @param fisher
      * @return
      */
-    public boolean has(Fisher fisher) {
+    public boolean has(final Fisher fisher) {
         return penaltyBox.containsKey(fisher);
     }
 
@@ -79,13 +80,13 @@ public class PenaltyBox implements Steppable {
      * @param simState
      */
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
         if (duration == 0)
             return;
 
         //List<Fisher> toRemove = new LinkedList<>();
-        for (Fisher fisher : penaltyBox.keySet()) {
+        for (final Fisher fisher : penaltyBox.keySet()) {
             penaltyBox.merge(fisher, 0, (c, one) -> c - 1);
         }
         penaltyBox.entrySet().removeIf(entry -> entry.getValue() <= 0);

@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractYearlyTargetExogenousCatches extends AbstractExogenousCatches {
 
     private static final int MAX_STEPS = 10000;
+    private static final long serialVersionUID = -544958090778764508L;
     protected final LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg;
 
     public AbstractYearlyTargetExogenousCatches(

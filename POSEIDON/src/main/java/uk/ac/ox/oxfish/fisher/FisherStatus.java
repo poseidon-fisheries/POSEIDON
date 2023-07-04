@@ -50,6 +50,7 @@ import java.util.LinkedList;
 public class FisherStatus implements Serializable {
 
 
+    private static final long serialVersionUID = 5108217722345643799L;
     /**
      * randomizer
      */
@@ -129,10 +130,10 @@ public class FisherStatus implements Serializable {
     private boolean weatherEmergencyOverride = false;
 
     public FisherStatus(
-        MersenneTwisterFast random, Regulation regulation, Action action, Port homePort, SeaTile location,
-        SeaTile destination,
-        double hoursAtSea, double hoursAtPort,
-        double bankBalance, boolean fuelEmergencyOverride, SocialNetwork network
+        final MersenneTwisterFast random, final Regulation regulation, final Action action, final Port homePort, final SeaTile location,
+        final SeaTile destination,
+        final double hoursAtSea, final double hoursAtPort,
+        final double bankBalance, final boolean fuelEmergencyOverride, final SocialNetwork network
     ) {
         this.location = location;
         this.homePort = homePort;
@@ -157,7 +158,7 @@ public class FisherStatus implements Serializable {
      * @param homePort   home port
      */
     public FisherStatus(
-        MersenneTwisterFast random, Regulation regulation, Port homePort
+        final MersenneTwisterFast random, final Regulation regulation, final Port homePort
     ) {
         this.homePort = homePort;
         this.location = homePort.getLocation();
@@ -178,7 +179,7 @@ public class FisherStatus implements Serializable {
         return location;
     }
 
-    public void setLocation(SeaTile location) {
+    public void setLocation(final SeaTile location) {
         this.location = location;
     }
 
@@ -191,7 +192,7 @@ public class FisherStatus implements Serializable {
      *
      * @param homePort Value to set for property 'homePort'.
      */
-    public void setHomePort(Port homePort) {
+    public void setHomePort(final Port homePort) {
         this.homePort = homePort;
     }
 
@@ -199,7 +200,7 @@ public class FisherStatus implements Serializable {
         return destination;
     }
 
-    public void setDestination(SeaTile destination) {
+    public void setDestination(final SeaTile destination) {
         this.destination = destination;
     }
 
@@ -211,7 +212,7 @@ public class FisherStatus implements Serializable {
         return regulation;
     }
 
-    public void setRegulation(Regulation regulation) {
+    public void setRegulation(final Regulation regulation) {
         this.regulation = regulation;
     }
 
@@ -219,7 +220,7 @@ public class FisherStatus implements Serializable {
         return communalStandards;
     }
 
-    public void setCommunalStandards(RegionalRestrictions communalStandards) {
+    public void setCommunalStandards(final RegionalRestrictions communalStandards) {
         this.communalStandards = communalStandards;
     }
 
@@ -227,7 +228,7 @@ public class FisherStatus implements Serializable {
         return action;
     }
 
-    public void setAction(Action action) {
+    public void setAction(final Action action) {
         this.action = action;
     }
 
@@ -235,7 +236,7 @@ public class FisherStatus implements Serializable {
         return hoursAtSea;
     }
 
-    public void setHoursAtSea(double hoursAtSea) {
+    public void setHoursAtSea(final double hoursAtSea) {
         this.hoursAtSea = hoursAtSea;
     }
 
@@ -247,7 +248,7 @@ public class FisherStatus implements Serializable {
                                                                                             90);
                                                                                             */
 
-    public void setHoursAtPort(double hoursAtPort) {
+    public void setHoursAtPort(final double hoursAtPort) {
         this.hoursAtPort = hoursAtPort;
     }
             /*
@@ -269,7 +270,7 @@ public class FisherStatus implements Serializable {
                                                                                       365);
 */
 
-    public void setBankBalance(double bankBalance) {
+    public void setBankBalance(final double bankBalance) {
         this.bankBalance = bankBalance;
     }
 
@@ -277,7 +278,7 @@ public class FisherStatus implements Serializable {
         return network;
     }
 
-    public void setNetwork(SocialNetwork network) {
+    public void setNetwork(final SocialNetwork network) {
         this.network = network;
     }
 
@@ -285,7 +286,7 @@ public class FisherStatus implements Serializable {
         return fuelEmergencyOverride;
     }
 
-    public void setFuelEmergencyOverride(boolean fuelEmergencyOverride) {
+    public void setFuelEmergencyOverride(final boolean fuelEmergencyOverride) {
         this.fuelEmergencyOverride = fuelEmergencyOverride;
     }
 
@@ -293,7 +294,7 @@ public class FisherStatus implements Serializable {
         return weatherEmergencyOverride;
     }
 
-    public void setWeatherEmergencyOverride(boolean weatherEmergencyOverride) {
+    public void setWeatherEmergencyOverride(final boolean weatherEmergencyOverride) {
         this.weatherEmergencyOverride = weatherEmergencyOverride;
     }
 
@@ -345,7 +346,7 @@ public class FisherStatus implements Serializable {
      * @return true if it can be out. When it's false the fisher can't leave port and ought to go back to port if he is
      * at sea
      */
-    public boolean isAllowedAtSea(Fisher fisher, FishState model) {
+    public boolean isAllowedAtSea(final Fisher fisher, final FishState model) {
         return regulation.allowedAtSea(fisher, model);
     }
 
@@ -357,16 +358,16 @@ public class FisherStatus implements Serializable {
      * @param model a link to the model
      * @return true if the fisher can fish
      */
-    public boolean isAllowedToFishHere(Fisher agent, SeaTile tile, FishState model) {
+    public boolean isAllowedToFishHere(final Fisher agent, final SeaTile tile, final FishState model) {
         return regulation.canFishHere(agent, tile, model);
     }
 
-    public boolean isAllowedByCommunityStandardsToFishHere(Fisher agent, SeaTile tile, FishState model) {
+    public boolean isAllowedByCommunityStandardsToFishHere(final Fisher agent, final SeaTile tile, final FishState model) {
         if (communalStandards == null) System.out.println("My communal standards are not set!");
         return communalStandards.canFishHere(agent, tile, model);
     }
 
-    public boolean isAllowedReputationToFishHere(Fisher agent, SeaTile tile, FishState model) {
+    public boolean isAllowedReputationToFishHere(final Fisher agent, final SeaTile tile, final FishState model) {
         return reputationalRisk.canFishHere(agent, tile, model);
     }
 
@@ -384,7 +385,7 @@ public class FisherStatus implements Serializable {
      *
      * @param exogenousEmergencyOverride Value to set for property 'exogenousEmergencyOverride'.
      */
-    public void setExogenousEmergencyOverride(boolean exogenousEmergencyOverride) {
+    public void setExogenousEmergencyOverride(final boolean exogenousEmergencyOverride) {
         this.exogenousEmergencyOverride = exogenousEmergencyOverride;
     }
 
@@ -420,7 +421,7 @@ public class FisherStatus implements Serializable {
      *
      * @param dailyCatchesPredictor Value to set for property 'dailyCatchesPredictor'.
      */
-    public void setDailyCatchesPredictor(Predictor[] dailyCatchesPredictor) {
+    public void setDailyCatchesPredictor(final Predictor[] dailyCatchesPredictor) {
         this.dailyCatchesPredictor = dailyCatchesPredictor;
     }
 
@@ -438,7 +439,7 @@ public class FisherStatus implements Serializable {
      *
      * @param profitPerUnitPredictor Value to set for property 'profitPerUnitPredictor'.
      */
-    public void setProfitPerUnitPredictor(Predictor[] profitPerUnitPredictor) {
+    public void setProfitPerUnitPredictor(final Predictor[] profitPerUnitPredictor) {
         this.profitPerUnitPredictor = profitPerUnitPredictor;
     }
 
@@ -456,7 +457,7 @@ public class FisherStatus implements Serializable {
      *
      * @param dailyProfitsPredictor Value to set for property 'dailyProfitsPredictor'.
      */
-    public void setDailyProfitsPredictor(Predictor dailyProfitsPredictor) {
+    public void setDailyProfitsPredictor(final Predictor dailyProfitsPredictor) {
         this.dailyProfitsPredictor = dailyProfitsPredictor;
     }
 
@@ -477,7 +478,7 @@ public class FisherStatus implements Serializable {
         return reputationalRisk;
     }
 
-    public void setReputationalRisk(ReputationalRestrictions reputationalRisk) {
+    public void setReputationalRisk(final ReputationalRestrictions reputationalRisk) {
         this.reputationalRisk = reputationalRisk;
     }
 }

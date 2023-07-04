@@ -78,12 +78,7 @@ public class CentroidMapFileFactory implements AlgorithmFactory<CentroidMapDiscr
 
         CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(coordinates);
         if (automaticallyIgnoreWastelands)
-            discretizer.addFilter(new Predicate<SeaTile>() {
-                @Override
-                public boolean test(SeaTile tile) {
-                    return tile.isFishingEvenPossibleHere();
-                }
-            });
+            discretizer.addFilter(tile -> tile.isFishingEvenPossibleHere());
 
         return discretizer;
     }

@@ -223,12 +223,7 @@ public class SingleSpeciesNaturalProcessesTest {
 
         initializer.processMap(biology, map, random, model);
         processes.setRecruitsAllocator(
-            new BiomassAllocator() {
-                @Override
-                public double allocate(SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
-                    return allocator.get(((AbundanceLocalBiology) tile.getBiology()));
-                }
-            }
+            (tile, map1, random1) -> allocator.get(((AbundanceLocalBiology) tile.getBiology()))
         );
         //because the count is uniform I should see recruits distributed uniformly as well
         assertEquals(200, map.getSeaTile(0, 0).getAbundance(fakeSpecies).asMatrix()[FEMALE][0], .001);

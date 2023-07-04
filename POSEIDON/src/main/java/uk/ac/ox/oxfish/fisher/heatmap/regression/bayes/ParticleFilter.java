@@ -75,19 +75,9 @@ public class ParticleFilter<T> {
         int size, MersenneTwisterFast random
     ) {
         return new ParticleFilter<>(
-            new Function<MersenneTwisterFast, Double>() {
-                @Override
-                public Double apply(MersenneTwisterFast mersenneTwisterFast) {
-                    return mersenneTwisterFast.nextDouble() * (max - min) + min;
-                }
-            },
-            new Function<Double, Double>() {
-                @Override
-                public Double apply(Double previous) {
-                    return Math.max(
-                        Math.min(previous + random.nextGaussian() * drift, max), min);
-                }
-            },
+            mersenneTwisterFast -> mersenneTwisterFast.nextDouble() * (max - min) + min,
+            previous -> Math.max(
+                Math.min(previous + random.nextGaussian() * drift, max), min),
             size, random
         );
 

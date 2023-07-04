@@ -40,6 +40,7 @@ import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 public class SingleSpeciesBiomassTaxman implements Steppable, Startable {
 
 
+    private static final long serialVersionUID = 4315611477875895714L;
     final private Species species;
 
     /**
@@ -63,7 +64,7 @@ public class SingleSpeciesBiomassTaxman implements Steppable, Startable {
     private Stoppable stoppable;
 
     public SingleSpeciesBiomassTaxman(
-        Species species, double taxToImpose, double biomassThreshold, boolean imposeTaxWhenBiomassBelowThreshold
+        final Species species, final double taxToImpose, final double biomassThreshold, final boolean imposeTaxWhenBiomassBelowThreshold
     ) {
         this.species = species;
         this.taxToImpose = taxToImpose;
@@ -79,7 +80,7 @@ public class SingleSpeciesBiomassTaxman implements Steppable, Startable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         stoppable = model.scheduleEveryYear(this, StepOrder.POLICY_UPDATE);
     }
 
@@ -93,18 +94,18 @@ public class SingleSpeciesBiomassTaxman implements Steppable, Startable {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
 
-        FishState model = (FishState) simState;
+        final FishState model = (FishState) simState;
 
-        double biomass = model.getTotalBiomass(species);
+        final double biomass = model.getTotalBiomass(species);
 
         //if you need to impose a tax and it is currently not active, then activate it!
         if (taxShouldBeActive(biomass) && !taxImposed) {
             taxImposed = true;
-            for (Port port : model.getPorts()) {
-                FixedPriceMarket market = (FixedPriceMarket) port.getDefaultMarketMap().getMarket(species);
+            for (final Port port : model.getPorts()) {
+                final FixedPriceMarket market = (FixedPriceMarket) port.getDefaultMarketMap().getMarket(species);
                 market.setPrice(market.getPrice() - taxToImpose);
             }
 
@@ -114,8 +115,8 @@ public class SingleSpeciesBiomassTaxman implements Steppable, Startable {
         //if tax should not be activated but it is, take it off
         if (!taxShouldBeActive(biomass) && taxImposed) {
             taxImposed = false;
-            for (Port port : model.getPorts()) {
-                FixedPriceMarket market = (FixedPriceMarket) port.getDefaultMarketMap().getMarket(species);
+            for (final Port port : model.getPorts()) {
+                final FixedPriceMarket market = (FixedPriceMarket) port.getDefaultMarketMap().getMarket(species);
                 market.setPrice(market.getPrice() + taxToImpose);
             }
 
@@ -124,7 +125,7 @@ public class SingleSpeciesBiomassTaxman implements Steppable, Startable {
     }
 
 
-    private boolean taxShouldBeActive(double biomass) {
+    private boolean taxShouldBeActive(final double biomass) {
         return (biomass < biomassThreshold && imposeTaxWhenBiomassBelowThreshold) ||
             (biomass > biomassThreshold && !imposeTaxWhenBiomassBelowThreshold);
     }

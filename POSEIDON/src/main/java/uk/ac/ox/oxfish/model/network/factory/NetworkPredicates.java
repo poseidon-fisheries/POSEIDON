@@ -31,7 +31,7 @@ import java.util.function.Supplier;
 public class NetworkPredicates {
 
 
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     public static final Map<String, Supplier<AlgorithmFactory<? extends NetworkPredicate>>> CONSTRUCTORS;
 

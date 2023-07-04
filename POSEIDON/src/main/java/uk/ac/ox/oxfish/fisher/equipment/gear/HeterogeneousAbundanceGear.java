@@ -29,10 +29,10 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 /**
  * A map species ---> homogeneousAbudanceGear so that each species has a different selectivity and such.
@@ -58,24 +58,24 @@ public class HeterogeneousAbundanceGear implements Gear {
 
 
     @SafeVarargs
-    public HeterogeneousAbundanceGear(Pair<Species, HomogeneousAbundanceGear>... gearPairs) {
+    public HeterogeneousAbundanceGear(final Entry<Species, HomogeneousAbundanceGear>... gearPairs) {
         gears = new HashMap<>();
-        for (Pair<Species, HomogeneousAbundanceGear> gearPair : gearPairs) {
-            gears.put(gearPair.getFirst(), gearPair.getSecond());
+        for (final Entry<Species, HomogeneousAbundanceGear> gearPair : gearPairs) {
+            gears.put(gearPair.getKey(), gearPair.getValue());
         }
 
     }
 
     public HeterogeneousAbundanceGear(
-        HashMap<Species, HomogeneousAbundanceGear> gears
+        final HashMap<Species, HomogeneousAbundanceGear> gears
     ) {
         this.gears = gears;
     }
 
     @Override
     public Catch fish(
-        Fisher fisher, LocalBiology localBiology, SeaTile context,
-        int hoursSpentFishing, GlobalBiology modelBiology
+        final Fisher fisher, final LocalBiology localBiology, final SeaTile context,
+        final int hoursSpentFishing, final GlobalBiology modelBiology
     ) {
         Preconditions.checkArgument(hoursSpentFishing > 0);
         //create array containing biomass
@@ -83,12 +83,12 @@ public class HeterogeneousAbundanceGear implements Gear {
     }
 
     private StructuredAbundance[] catchesAsArray(
-        LocalBiology where, int hoursSpentFishing, GlobalBiology modelBiology
+        final LocalBiology where, final int hoursSpentFishing, final GlobalBiology modelBiology
     ) {
 
 
-        StructuredAbundance[] caught = new StructuredAbundance[modelBiology.getSize()];
-        for (Species species : modelBiology.getSpecies()) {
+        final StructuredAbundance[] caught = new StructuredAbundance[modelBiology.getSize()];
+        for (final Species species : modelBiology.getSpecies()) {
             if (species.isImaginary() || !gears.containsKey(species)) {
                 //if it's imaginary or not set or there is no fish, just return empty
                 //double[][] abundance = HomogeneousAbundanceGear.emptyAbundance(species);
@@ -103,12 +103,14 @@ public class HeterogeneousAbundanceGear implements Gear {
         return caught;
     }
 
-    private StructuredAbundance getEmptyCatches(GlobalBiology biology, Species species) {
+    private StructuredAbundance getEmptyCatches(final GlobalBiology biology, final Species species) {
         if (emptyCatchesCache == null)
             emptyCatchesCache = new StructuredAbundance[biology.getSize()];
         if (emptyCatchesCache[species.getIndex()] == null)
-            emptyCatchesCache[species.getIndex()] = new StructuredAbundance(species.getNumberOfSubdivisions(),
-                species.getNumberOfBins());
+            emptyCatchesCache[species.getIndex()] = new StructuredAbundance(
+                species.getNumberOfSubdivisions(),
+                species.getNumberOfBins()
+            );
         else
             for (int row = 0; row < species.getNumberOfSubdivisions(); row++)
                 Arrays.fill(emptyCatchesCache[species.getIndex()].asMatrix()[row], 0d);
@@ -117,13 +119,13 @@ public class HeterogeneousAbundanceGear implements Gear {
 
     @Override
     public double[] expectedHourlyCatch(
-        Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology
+        final Fisher fisher, final SeaTile where, final int hoursSpentFishing, final GlobalBiology modelBiology
     ) {
-        StructuredAbundance[] abundances = catchesAsArray(where, hoursSpentFishing, modelBiology);
+        final StructuredAbundance[] abundances = catchesAsArray(where, hoursSpentFishing, modelBiology);
         assert modelBiology.getSpecies().size() == abundances.length;
 
-        double[] weights = new double[abundances.length];
-        for (Species species : modelBiology.getSpecies())
+        final double[] weights = new double[abundances.length];
+        for (final Species species : modelBiology.getSpecies())
             weights[species.getIndex()] = abundances[species.getIndex()].computeWeight(species);
 
         return weights;
@@ -138,7 +140,7 @@ public class HeterogeneousAbundanceGear implements Gear {
      */
     @Override
     public double getFuelConsumptionPerHourOfFishing(
-        Fisher fisher, Boat boat, SeaTile where
+        final Fisher fisher, final Boat boat, final SeaTile where
     ) {
         if (hourlyGasPriceOverride != null && Double.isFinite(hourlyGasPriceOverride))
             return hourlyGasPriceOverride;
@@ -148,7 +150,7 @@ public class HeterogeneousAbundanceGear implements Gear {
 
     private double getComponentsAverage() {
         double sum = 0;
-        for (Gear gear : gears.values())
+        for (final Gear gear : gears.values())
             //this is a ugly hack but it's surprising how expensive this averaging gets
             sum += (gear.getFuelConsumptionPerHourOfFishing(null, null, null));
         return sum / gears.size();
@@ -156,20 +158,20 @@ public class HeterogeneousAbundanceGear implements Gear {
 
     @Override
     public Gear makeCopy() {
-        HeterogeneousAbundanceGear heterogeneousAbundanceGear = new HeterogeneousAbundanceGear(gears);
+        final HeterogeneousAbundanceGear heterogeneousAbundanceGear = new HeterogeneousAbundanceGear(gears);
         heterogeneousAbundanceGear.setHourlyGasPriceOverride(this.hourlyGasPriceOverride);
         return heterogeneousAbundanceGear;
     }
 
 
     @Override
-    public boolean isSame(Gear o) {
+    public boolean isSame(final Gear o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        HeterogeneousAbundanceGear that = (HeterogeneousAbundanceGear) o;
+        final HeterogeneousAbundanceGear that = (HeterogeneousAbundanceGear) o;
         if (!that.gears.keySet().equals(this.gears.keySet()))
             return false;
-        for (Species species : that.gears.keySet()) {
+        for (final Species species : that.gears.keySet()) {
             if (!that.gears.get(species).isSame(this.gears.get(species)))
                 return false;
 
@@ -193,7 +195,7 @@ public class HeterogeneousAbundanceGear implements Gear {
      *
      * @param hourlyGasPriceOverride Value to set for property 'hourlyGasPriceOverride'.
      */
-    public void setHourlyGasPriceOverride(Double hourlyGasPriceOverride) {
+    public void setHourlyGasPriceOverride(final Double hourlyGasPriceOverride) {
         this.hourlyGasPriceOverride = hourlyGasPriceOverride;
     }
 }

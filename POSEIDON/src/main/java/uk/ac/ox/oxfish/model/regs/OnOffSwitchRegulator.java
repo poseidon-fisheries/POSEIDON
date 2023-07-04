@@ -41,6 +41,7 @@ import java.util.List;
 public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
 
 
+    private static final long serialVersionUID = 5712743950451964367L;
     /**
      * a list of tags that denote those who participate in the fishery;
      * if empty, everybody is in.
@@ -51,8 +52,8 @@ public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
 
 
     public OnOffSwitchRegulator(
-        PermitAllocationPolicy allocationPolicy,
-        Collection<String> tagsOfParticipants
+        final PermitAllocationPolicy allocationPolicy,
+        final Collection<String> tagsOfParticipants
     ) {
         this.allocationPolicy = allocationPolicy;
         this.tagsOfParticipants = tagsOfParticipants;
@@ -63,8 +64,8 @@ public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
      *
      * @param state
      */
-    public static void turnOffAllSwitchRegulators(FishState state) {
-        for (Startable viewStartable : state.viewStartables()) {
+    public static void turnOffAllSwitchRegulators(final FishState state) {
+        for (final Startable viewStartable : state.viewStartables()) {
             if (viewStartable instanceof OnOffSwitchRegulator)
                 if (((OnOffSwitchRegulator) viewStartable).isStarted())
                     viewStartable.turnOff();
@@ -82,39 +83,34 @@ public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
         Preconditions.checkArgument(receipt == null, "Already started!");
 
         //should start every year, first day of the year.
         model.scheduleOnceInXDays(
-            new Steppable() {
-                @Override
-                public void step(SimState simState) {
-                    receipt = model.scheduleEveryYear(OnOffSwitchRegulator.this::step, StepOrder.DAWN);
-                }
-            }
+            (Steppable) simState -> receipt = model.scheduleEveryYear(OnOffSwitchRegulator.this::step, StepOrder.DAWN)
             , StepOrder.DAWN, 1);
 
         step(model);
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
-        FishState state = (FishState) simState;
+        final FishState state = (FishState) simState;
 
-        List<Fisher> participants = new ArrayList<>();
+        final List<Fisher> participants = new ArrayList<>();
 
         //add all fishers who match at least one tag
         fisherloop:
-        for (Fisher fisher : state.getFishers()) {
+        for (final Fisher fisher : state.getFishers()) {
 
             if (tagsOfParticipants.isEmpty()) {
                 assert fisher.getRegulation() instanceof OffSwitchDecorator;
                 participants.add(fisher);
             } else {
-                for (String validTag : tagsOfParticipants) {
+                for (final String validTag : tagsOfParticipants) {
                     if (fisher.getTags().contains(validTag)) {
                         assert fisher.getRegulation() instanceof OffSwitchDecorator;
                         participants.add(fisher);
@@ -126,17 +122,17 @@ public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
 
         }
 
-        List<Fisher> allowedFishers = allocationPolicy.computeWhichFishersAreAllowed(
+        final List<Fisher> allowedFishers = allocationPolicy.computeWhichFishersAreAllowed(
             participants,
             state
         );
 
-        for (Fisher allowedFisher : allowedFishers) {
+        for (final Fisher allowedFisher : allowedFishers) {
             ((OffSwitchDecorator) allowedFisher.getRegulation()).setTurnedOff(false);
 
         }
         participants.removeAll(allowedFishers);
-        for (Fisher notAllowedFisher : participants)
+        for (final Fisher notAllowedFisher : participants)
             ((OffSwitchDecorator) notAllowedFisher.getRegulation()).setTurnedOff(true);
 
 
@@ -167,7 +163,7 @@ public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
      *
      * @param allocationPolicy Value to set for property 'allocationPolicy'.
      */
-    public void setAllocationPolicy(PermitAllocationPolicy allocationPolicy) {
+    public void setAllocationPolicy(final PermitAllocationPolicy allocationPolicy) {
         this.allocationPolicy = allocationPolicy;
     }
 

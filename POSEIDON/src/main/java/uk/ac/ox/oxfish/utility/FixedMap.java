@@ -31,14 +31,15 @@ import java.util.HashMap;
 public class FixedMap<K, V> extends HashMap<K, V> {
 
 
+    private static final long serialVersionUID = -8761630040097802269L;
     protected V defaultValue;
 
 
-    public FixedMap(V defaultValue, Collection<K> keys) {
+    public FixedMap(final V defaultValue, final Collection<K> keys) {
 
         this.defaultValue = defaultValue;
 
-        for (K key : keys)
+        for (final K key : keys)
             put(key, defaultValue);
     }
 

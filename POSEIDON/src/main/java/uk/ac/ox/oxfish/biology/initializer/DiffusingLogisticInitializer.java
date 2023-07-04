@@ -47,11 +47,11 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
 
 
     public DiffusingLogisticInitializer(
-        DoubleParameter carryingCapacity,
-        DoubleParameter minInitialCapacity, DoubleParameter maxInitialCapacity,
-        double percentageLimitOnDailyMovement,
-        double differentialPercentageToMove,
-        LogisticGrowerInitializer grower
+        final DoubleParameter carryingCapacity,
+        final DoubleParameter minInitialCapacity, final DoubleParameter maxInitialCapacity,
+        final double percentageLimitOnDailyMovement,
+        final double differentialPercentageToMove,
+        final LogisticGrowerInitializer grower
     ) {
         super(carryingCapacity, minInitialCapacity, maxInitialCapacity, grower);
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
@@ -68,14 +68,15 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
      */
     @Override
     public void processMap(
-        GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model
+        final GlobalBiology biology, final NauticalMap map, final MersenneTwisterFast random, final FishState model
     ) {
         super.processMap(biology, map, random, model);
 
-        BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
-            differentialPercentageToMove,
-            percentageLimitOnDailyMovement
-        );
+        @SuppressWarnings("deprecation") final BiomassDiffuserContainer diffuser =
+            new BiomassDiffuserContainer(map, random, biology,
+                differentialPercentageToMove,
+                percentageLimitOnDailyMovement
+            );
         model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
 
 

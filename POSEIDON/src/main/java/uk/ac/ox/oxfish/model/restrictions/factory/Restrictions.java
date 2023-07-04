@@ -18,7 +18,7 @@ public class Restrictions {
     public static final Map<String, Supplier<AlgorithmFactory<? extends Restriction>>> CONSTRUCTORS =
         new LinkedHashMap<>();
 
-    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES =
+    public static final Map<Class<? extends AlgorithmFactory<?>>, String> NAMES =
         new LinkedHashMap<>();
 
     static {

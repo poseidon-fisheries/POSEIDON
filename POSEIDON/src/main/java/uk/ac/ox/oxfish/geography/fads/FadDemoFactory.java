@@ -33,12 +33,9 @@ public class FadDemoFactory implements AlgorithmFactory<AdditionalStartable> {
         );
         state.setFadMap(fadMap);
         final AdditionalStartable fadMaker = exogenousFadMaker.apply(state);
-        return new AdditionalStartable() {
-            @Override
-            public void start(final FishState model) {
-                fadMaker.start(model);
-                fadMap.start(state);
-            }
+        return model -> {
+            fadMaker.start(model);
+            fadMap.start(state);
         };
 
 
@@ -76,11 +73,11 @@ public class FadDemoFactory implements AlgorithmFactory<AdditionalStartable> {
         exogenousFadMaker.setDeploymentsFile(pathToFile);
     }
 
-    public AlgorithmFactory<? extends FadInitializer> getFadInitializer() {
+    public AlgorithmFactory<? extends FadInitializer<?, ?>> getFadInitializer() {
         return exogenousFadMaker.getFadInitializer();
     }
 
-    public void setFadInitializer(final CompressedExponentialFadInitializerFactory fadInitializer) {
+    public void setFadInitializer(final CompressedExponentialFadInitializerFactory<?, ?> fadInitializer) {
         exogenousFadMaker.setFadInitializer(fadInitializer);
     }
 }

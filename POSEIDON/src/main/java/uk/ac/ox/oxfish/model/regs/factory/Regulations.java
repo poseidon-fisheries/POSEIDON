@@ -41,7 +41,7 @@ public class Regulations {
      */
     public static final Map<String, Supplier<AlgorithmFactory<? extends Regulation>>> CONSTRUCTORS;
 
-    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
         NAMES.put(AnarchyFactory.class, "Anarchy");

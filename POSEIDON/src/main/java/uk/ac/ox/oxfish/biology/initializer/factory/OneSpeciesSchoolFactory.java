@@ -24,10 +24,13 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.initializer.OneSpeciesInfiniteSchoolsInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
+
+import java.util.Map.Entry;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * Creates the "chaser" biology with a school of fishers running around
@@ -57,17 +60,16 @@ public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfin
      * @param state the function argument
      * @return the function result
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public OneSpeciesInfiniteSchoolsInitializer apply(final FishState state) {
-
-
         final String[] splitString = waypoints.split(":");
-        final Pair<Integer, Integer>[] trueWayPoints = new Pair[splitString.length];
+        final Entry<Integer, Integer>[] trueWayPoints = new Entry[splitString.length];
         Preconditions.checkArgument(trueWayPoints.length >= 2);
         for (int i = 0; i < trueWayPoints.length; i++) {
             final String[] waypoint = splitString[i].split(",");
             assert waypoint.length == 2;
-            trueWayPoints[i] = new Pair<>(
+            trueWayPoints[i] = entry(
                 Integer.parseInt(waypoint[0].trim()),
                 Integer.parseInt(waypoint[1].trim())
             );

@@ -47,7 +47,7 @@ import java.util.Objects;
 public class YamlConstructor extends Constructor {
 
 
-    public YamlConstructor() {
+    YamlConstructor() {
 
         //intercept the scalar nodes to see if they are actually Factories or DoubleParameters
         this.yamlClassConstructors.put(
@@ -88,7 +88,7 @@ public class YamlConstructor extends Constructor {
                     } catch (final YAMLException e) {
                         //the original construct failed, hopefully this means it's an algorithm factory
                         //written as a map, so get its name and look it up
-                        final AlgorithmFactory toReturn = AlgorithmFactories.constructorLookup(
+                        final AlgorithmFactory<?> toReturn = AlgorithmFactories.constructorLookup(
                             ((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue());
                         //now take all the elements of the submap, we are going to place them by setter
                         //todo might have to flatten here!

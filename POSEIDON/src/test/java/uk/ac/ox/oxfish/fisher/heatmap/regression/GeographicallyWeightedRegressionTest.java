@@ -60,12 +60,7 @@ public class GeographicallyWeightedRegressionTest {
             map, 1d, distance, 10,
             new ObservationExtractor[]{
                 //this will actually be rerouted to read from the file
-                new ObservationExtractor() {
-                    @Override
-                    public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                        return timeOfObservation;
-                    }
-                }
+                (tile1, timeOfObservation, agent, model) -> timeOfObservation
             },
             0, 10,
             10000,
@@ -106,12 +101,7 @@ public class GeographicallyWeightedRegressionTest {
             map, .23d, distance, 10,
             new ObservationExtractor[]{
                 //this will actually be rerouted to read from the file
-                new ObservationExtractor() {
-                    @Override
-                    public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                        return timeOfObservation;
-                    }
-                }
+                (tile1, timeOfObservation, agent, model) -> timeOfObservation
             },
             0, 10,
             10000,

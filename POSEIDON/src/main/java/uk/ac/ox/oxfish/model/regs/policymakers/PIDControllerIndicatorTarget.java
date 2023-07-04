@@ -77,42 +77,39 @@ public class PIDControllerIndicatorTarget implements AlgorithmFactory<Additional
         controller.setMinimumPolicy(minimumTAC);
 
         return model -> fishState.scheduleOnceInXDays(
-            new Steppable() {
-                @Override
-                public void step(SimState simState) {
+            (Steppable) simState -> {
 //                        controller.setP(
 //                                - 0.1 *
 //                        );
-                    final Double meanIndicator = new PastAverageSensor(
-                        indicatorColumnName,
-                        numberOfYearsToLookBackForTarget
-                    ).scan(((FishState) simState));
-                    System.out.println("mean_index:" +
-                        meanIndicator);
-                    final Double meanOffset = new PastAverageSensor(
-                        offsetColumnName,
-                        numberOfYearsToLookBackForTarget
-                    ).scan(((FishState) simState));
-                    System.out.println("mean_offset:" +
-                        meanOffset);
+                final Double meanIndicator = new PastAverageSensor(
+                    indicatorColumnName,
+                    numberOfYearsToLookBackForTarget
+                ).scan(((FishState) simState));
+                System.out.println("mean_index:" +
+                    meanIndicator);
+                final Double meanOffset = new PastAverageSensor(
+                    offsetColumnName,
+                    numberOfYearsToLookBackForTarget
+                ).scan(((FishState) simState));
+                System.out.println("mean_offset:" +
+                    meanOffset);
 
-                    if (!integrated) {
-                        controller.setP(0.5 * (meanOffset / meanIndicator));
-                    } else {
-                        controller.setP(0.5 * (meanOffset / meanIndicator));
-                        controller.setI(0.05 * (meanOffset / meanIndicator));
+                if (!integrated) {
+                    controller.setP(0.5 * (meanOffset / meanIndicator));
+                } else {
+                    controller.setP(0.5 * (meanOffset / meanIndicator));
+                    controller.setI(0.05 * (meanOffset / meanIndicator));
 
-                    }
-                    if (negative) {
-                        controller.setP(-controller.getP());
-                        controller.setI(-controller.getI());
-
-                    }
-
-                    System.out.println("p controller: " + controller.getP());
-                    controller.start(model);
-                    controller.step(model);
                 }
+                if (negative) {
+                    controller.setP(-controller.getP());
+                    controller.setI(-controller.getI());
+
+                }
+
+                System.out.println("p controller: " + controller.getP());
+                controller.start(model);
+                controller.step(model);
             },
             StepOrder.DAWN,
             365 * startingYear + 1

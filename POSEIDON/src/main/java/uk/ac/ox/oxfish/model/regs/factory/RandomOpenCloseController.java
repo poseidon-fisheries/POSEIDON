@@ -20,13 +20,11 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.ExternalOpenCloseSeason;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 
 /**
  * Special use controller that is basically a random shodan. Not listed.
@@ -34,7 +32,9 @@ import uk.ac.ox.oxfish.utility.Locker;
  */
 public class RandomOpenCloseController implements AlgorithmFactory<ExternalOpenCloseSeason> {
 
-    private final Locker<String, ExternalOpenCloseSeason> locker = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, ExternalOpenCloseSeason> locker =
+        new uk.ac.ox.oxfish.utility.Locker<>();
 
     /**
      * Applies this function to the given argument.
@@ -50,12 +50,8 @@ public class RandomOpenCloseController implements AlgorithmFactory<ExternalOpenC
                 () -> {
                     final ExternalOpenCloseSeason toReturn = new ExternalOpenCloseSeason();
 
-                    fishState.scheduleEveryXDay(new Steppable() {
-                        @Override
-                        public void step(final SimState simState) {
-                            toReturn.setOpen(fishState.getRandom().nextBoolean());
-                        }
-                    }, StepOrder.POLICY_UPDATE, 30);
+                    fishState.scheduleEveryXDay((Steppable) simState -> toReturn.setOpen(fishState.getRandom()
+                        .nextBoolean()), StepOrder.POLICY_UPDATE, 30);
 
                     return toReturn;
                 }

@@ -37,11 +37,12 @@ import java.util.Map;
 public class TowOutput implements OutputPlugin, TripListener {
 
 
+    private static final long serialVersionUID = 3904451565853395807L;
     final private DoubleGrid2D tows;
     private String fileName = "tow_map.csv";
 
 
-    public TowOutput(NauticalMap map) {
+    public TowOutput(final NauticalMap map) {
         tows = new DoubleGrid2D(map.getWidth(), map.getHeight());
 
     }
@@ -53,10 +54,10 @@ public class TowOutput implements OutputPlugin, TripListener {
      * @param fisher
      */
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
 
-        for (Map.Entry<SeaTile, FishingRecord> effort : record.getFishingRecords()) {
-            SeaTile tile = effort.getKey();
+        for (final Map.Entry<SeaTile, FishingRecord> effort : record.getFishingRecords()) {
+            final SeaTile tile = effort.getKey();
 
             tows.set(tile.getGridX(), tile.getGridY(),
                 1 + tows.get(
@@ -71,7 +72,7 @@ public class TowOutput implements OutputPlugin, TripListener {
 
 
     @Override
-    public void reactToEndOfSimulation(FishState state) {
+    public void reactToEndOfSimulation(final FishState state) {
 
     }
 
@@ -80,13 +81,13 @@ public class TowOutput implements OutputPlugin, TripListener {
         return fileName;
     }
 
-    public void setFileName(String fileName) {
+    public void setFileName(final String fileName) {
         this.fileName = fileName;
     }
 
     @Override
     public String composeFileContents() {
-        StringBuilder builder = new StringBuilder(2000);
+        final StringBuilder builder = new StringBuilder(2000);
         builder.append("x,y,z").append("\n");
         for (int x = 0; x < tows.getWidth(); x++)
             for (int y = 0; y < tows.getHeight(); y++)

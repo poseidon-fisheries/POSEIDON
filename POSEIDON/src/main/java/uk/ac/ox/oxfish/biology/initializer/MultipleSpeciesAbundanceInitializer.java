@@ -280,16 +280,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
                 //if you want to keep recruits to spawn in the same places this is the time to do it
                 if (fixedRecruitmentDistribution) {
                     process.setRecruitsAllocator(
-                        new BiomassAllocator() {
-                            @Override
-                            public double allocate(
-                                final SeaTile tile,
-                                final NauticalMap map,
-                                final MersenneTwisterFast random
-                            ) {
-                                return currentWeightMap.get(locals.get(tile));
-                            }
-                        }
+                        (tile, map1, random1) -> currentWeightMap.get(locals.get(tile))
                     );
                 }
                 naturalProcesses.put(species, process);

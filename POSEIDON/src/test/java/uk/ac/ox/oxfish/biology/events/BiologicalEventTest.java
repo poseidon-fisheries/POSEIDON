@@ -52,12 +52,7 @@ public class BiologicalEventTest {
         when(trigger.test(any())).thenReturn(true, false, true);
 
         Predicate<SeaTile> mock = mock(Predicate.class);
-        doAnswer(new Answer() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                return ((SeaTile) invocation.getArguments()[0]).getGridX() == 0;
-            }
-        }).when(mock).test(any());
+        doAnswer(invocation -> ((SeaTile) invocation.getArguments()[0]).getGridX() == 0).when(mock).test(any());
 
         BiologicalEvent event = new BiologicalEvent(
 

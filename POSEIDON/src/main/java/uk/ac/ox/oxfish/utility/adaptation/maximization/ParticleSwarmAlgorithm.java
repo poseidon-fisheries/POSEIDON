@@ -25,15 +25,17 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * A somewhat generic PSO. Requires a lot of inputs because PSO is a somewhat weird optimization.
@@ -67,12 +69,12 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
 
 
     public ParticleSwarmAlgorithm(
-        double inertia, double memoryWeight, double socialWeight, int dimensions,
-        Function<Fisher, T> getBestMemory,
-        CoordinateTransformer<T> transformers,
-        double[] velocityShocks,
-        MersenneTwisterFast random,
-        DoubleParameter[] initialVelocities
+        final double inertia, final double memoryWeight, final double socialWeight, final int dimensions,
+        final Function<Fisher, T> getBestMemory,
+        final CoordinateTransformer<T> transformers,
+        final double[] velocityShocks,
+        final MersenneTwisterFast random,
+        final DoubleParameter[] initialVelocities
     ) {
         this.inertia = inertia;
         this.memoryWeight = memoryWeight;
@@ -93,35 +95,28 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
      * premade PSO algorithm for seatile optimization
      */
     public static ParticleSwarmAlgorithm<SeaTile> defaultSeatileParticleSwarm(
-        double inertia, double memoryWeight, double socialWeight,
-        double velocityShock, DoubleParameter[] initialVelocity,
-        MersenneTwisterFast random, int mapWidth, int mapHeight
+        final double inertia, final double memoryWeight, final double socialWeight,
+        final double velocityShock, final DoubleParameter[] initialVelocity,
+        final MersenneTwisterFast random, final int mapWidth, final int mapHeight
     ) {
-        ParticleSwarmAlgorithm<SeaTile> seaTileParticleSwarmAlgorithm =
+        final ParticleSwarmAlgorithm<SeaTile> seaTileParticleSwarmAlgorithm =
             new ParticleSwarmAlgorithm<SeaTile>(
                 inertia,
                 memoryWeight,
                 socialWeight,
                 2,
-                new Function<Fisher, SeaTile>() {
-                    @Override
-                    public SeaTile apply(
-                        Fisher fisher
-                    ) {
-                        return fisher.getBestSpotForTripsRemembered(
-                            (o1, o2) -> Double.compare(
-                                o1.getInformation().getProfitPerHour(true),
-                                o2.getInformation().getProfitPerHour(true)
-                            )
-                        );
-                    }
-                },
+                fisher -> fisher.getBestSpotForTripsRemembered(
+                    (o1, o2) -> Double.compare(
+                        o1.getInformation().getProfitPerHour(true),
+                        o2.getInformation().getProfitPerHour(true)
+                    )
+                ),
                 new CoordinateTransformer<SeaTile>() {
                     @Override
                     public double[] toCoordinates(
-                        SeaTile variable,
-                        Fisher fisher,
-                        FishState model
+                        final SeaTile variable,
+                        final Fisher fisher,
+                        final FishState model
                     ) {
                         return variable == null ? null :
                             new double[]{
@@ -131,9 +126,9 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
 
                     @Override
                     public SeaTile fromCoordinates(
-                        double[] variable,
-                        Fisher fisher,
-                        FishState model
+                        final double[] variable,
+                        final Fisher fisher,
+                        final FishState model
                     ) {
                         return model.getMap().getSeaTile(
                             (int) variable[0],
@@ -146,19 +141,16 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
                 initialVelocity
             );
         //add bounds
-        seaTileParticleSwarmAlgorithm.setCoordinatesBounder(new Consumer<double[]>() {
-            @Override
-            public void accept(double[] coordinates) {
-                coordinates[0] = Math.min(Math.max(0, coordinates[0]), mapWidth - 1);
-                coordinates[1] = Math.min(Math.max(0, coordinates[1]), mapHeight - 1);
-            }
+        seaTileParticleSwarmAlgorithm.setCoordinatesBounder(coordinates -> {
+            coordinates[0] = Math.min(Math.max(0, coordinates[0]), mapWidth - 1);
+            coordinates[1] = Math.min(Math.max(0, coordinates[1]), mapHeight - 1);
         });
         return seaTileParticleSwarmAlgorithm;
 
     }
 
     @Override
-    public void start(FishState model, Fisher agent, T initial) {
+    public void start(final FishState model, final Fisher agent, final T initial) {
         this.model = model;
         currentCoordinates = transformers.toCoordinates(initial, agent, model);
     }
@@ -167,7 +159,12 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
      * shocks all velocities; use sparingly
      */
     @Override
-    public T randomize(MersenneTwisterFast random, Fisher agent, double currentFitness, T current) {
+    public T randomize(
+        final MersenneTwisterFast random,
+        final Fisher agent,
+        final double currentFitness,
+        final T current
+    ) {
         assert velocities.length == dimensions;
         assert currentCoordinates.length == dimensions;
         for (int i = 0; i < dimensions; i++)
@@ -180,7 +177,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
     /**
      * add speed to each parameter
      */
-    private T move(Fisher agent) {
+    private T move(final Fisher agent) {
         for (int i = 0; i < dimensions; i++)
             currentCoordinates[i] += velocities[i];
         coordinatesBounder.accept(currentCoordinates);
@@ -192,8 +189,8 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
      */
     @Override
     public T judgeRandomization(
-        MersenneTwisterFast random, Fisher agent, double previousFitness,
-        double currentFitness, T previous, T current
+        final MersenneTwisterFast random, final Fisher agent, final double previousFitness,
+        final double currentFitness, final T previous, final T current
     ) {
         return current;
     }
@@ -203,31 +200,34 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
      * best memory and best friend
      */
     @Override
-    public Pair<T, Fisher> imitate(
-        MersenneTwisterFast random, Fisher agent, double fitness, T current, Collection<Fisher> friends,
-        ObjectiveFunction<Fisher> objectiveFunction, Sensor<Fisher, T> sensor
+    public Map.Entry<T, Fisher> imitate(
+        final MersenneTwisterFast random,
+        final Fisher agent,
+        final double fitness,
+        final T current,
+        final Collection<Fisher> friends,
+        final ObjectiveFunction<Fisher> objectiveFunction,
+        final Sensor<Fisher, T> sensor
     ) {
 
         //get best memory
-        T bestMemory = getBestMemory.apply(agent);
-        double[] memoryCoordinates = bestMemory == null ? null : transformers.toCoordinates(
+        final T bestMemory = getBestMemory.apply(agent);
+        final double[] memoryCoordinates = bestMemory == null ? null : transformers.toCoordinates(
             bestMemory,
             agent,
             model
         );
         //now get your best friend
-        Optional<Fisher> bestFriend = friends.stream().max(new Comparator<Fisher>() {
-            @Override
-            public int compare(Fisher o1, Fisher o2) {
-                return Double.compare(
-                    objectiveFunction.computeCurrentFitness(o1, o1),
-                    objectiveFunction.computeCurrentFitness(o1, o2)
-                );
-            }
-        });
+        final Optional<Fisher> bestFriend = friends.stream().max((o1, o2) -> Double.compare(
+            objectiveFunction.computeCurrentFitness(o1, o1),
+            objectiveFunction.computeCurrentFitness(o1, o2)
+        ));
 
 
-        double[] socialCoordinates = bestFriend.isPresent() && objectiveFunction.computeCurrentFitness(agent, agent) <
+        final double[] socialCoordinates = bestFriend.isPresent() && objectiveFunction.computeCurrentFitness(
+            agent,
+            agent
+        ) <
             objectiveFunction.computeCurrentFitness(agent, bestFriend.get()) ?
             transformers.toCoordinates(getBestMemory.apply(bestFriend.get()),
                 agent, model
@@ -242,7 +242,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
                 velocities[i] += socialWeight * (socialCoordinates[i] - currentCoordinates[i]);
         }
 
-        return new Pair<>(move(agent), bestFriend.orElse(null));
+        return entry(move(agent), bestFriend.orElse(null));
 
     }
 
@@ -250,7 +250,12 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
      * just drift slowing down through inertia. Useful if you are without friends
      */
     @Override
-    public T exploit(MersenneTwisterFast random, Fisher agent, double currentFitness, T current) {
+    public T exploit(
+        final MersenneTwisterFast random,
+        final Fisher agent,
+        final double currentFitness,
+        final T current
+    ) {
         for (int i = 0; i < dimensions; i++) {
             velocities[i] = velocities[i] * inertia;
         }
@@ -263,8 +268,13 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
      */
     @Override
     public T judgeImitation(
-        MersenneTwisterFast random, Fisher agent, Fisher friendImitated, double fitnessBeforeImitating,
-        double fitnessAfterImitating, T previous, T current
+        final MersenneTwisterFast random,
+        final Fisher agent,
+        final Fisher friendImitated,
+        final double fitnessBeforeImitating,
+        final double fitnessAfterImitating,
+        final T previous,
+        final T current
     ) {
         return null;
     }
@@ -277,7 +287,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
         return coordinatesBounder;
     }
 
-    public void setCoordinatesBounder(Consumer<double[]> coordinatesBounder) {
+    public void setCoordinatesBounder(final Consumer<double[]> coordinatesBounder) {
         this.coordinatesBounder = coordinatesBounder;
     }
 
@@ -289,7 +299,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
         return currentCoordinates;
     }
 
-    public void setCurrentCoordinates(double[] currentCoordinates) {
+    public void setCurrentCoordinates(final double[] currentCoordinates) {
         this.currentCoordinates = currentCoordinates;
     }
 
@@ -301,7 +311,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
         return inertia;
     }
 
-    public void setInertia(double inertia) {
+    public void setInertia(final double inertia) {
         this.inertia = inertia;
     }
 
@@ -321,7 +331,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T> {
         return model;
     }
 
-    public void setModel(FishState model) {
+    public void setModel(final FishState model) {
         this.model = model;
     }
 }

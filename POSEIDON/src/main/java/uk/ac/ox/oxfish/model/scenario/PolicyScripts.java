@@ -37,11 +37,12 @@ import java.util.Map;
  */
 public class PolicyScripts implements Steppable, Startable {
 
+    private static final long serialVersionUID = 4383256184626931293L;
     private HashMap<Integer, PolicyScript> scripts;
     private Stoppable receipt;
 
 
-    public PolicyScripts(HashMap<Integer, PolicyScript> scripts) {
+    public PolicyScripts(final HashMap<Integer, PolicyScript> scripts) {
         this.scripts = scripts;
     }
 
@@ -80,10 +81,10 @@ public class PolicyScripts implements Steppable, Startable {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         Preconditions.checkNotNull(receipt);
-        FishState model = ((FishState) simState);
-        for (Map.Entry<Integer, PolicyScript> policy : scripts.entrySet())
+        final FishState model = ((FishState) simState);
+        for (final Map.Entry<Integer, PolicyScript> policy : scripts.entrySet())
             if (model.getYear() + 1 == policy.getKey())
                 policy.getValue().apply(model);
     }
@@ -95,7 +96,7 @@ public class PolicyScripts implements Steppable, Startable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         receipt = model.scheduleEveryYear(this, StepOrder.DAWN);
     }
 
@@ -118,7 +119,7 @@ public class PolicyScripts implements Steppable, Startable {
         return scripts;
     }
 
-    public void setScripts(HashMap<Integer, PolicyScript> scripts) {
+    public void setScripts(final HashMap<Integer, PolicyScript> scripts) {
         this.scripts = scripts;
     }
 }

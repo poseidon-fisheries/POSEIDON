@@ -25,7 +25,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,11 +61,12 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
     }
 
 
-    public MultiQuotaMapFactory(final QuotaType quotaType, final Pair<String, Double>... pairs) {
+    @SuppressWarnings("unchecked")
+    public MultiQuotaMapFactory(final QuotaType quotaType, final Map.Entry<String, Double>... pairs) {
 
         this.quotaType = quotaType;
-        for (final Pair<String, Double> pair : pairs)
-            initialQuotas.put(pair.getFirst(), pair.getSecond());
+        for (final Map.Entry<String, Double> pair : pairs)
+            initialQuotas.put(pair.getKey(), pair.getValue());
     }
 
     /**

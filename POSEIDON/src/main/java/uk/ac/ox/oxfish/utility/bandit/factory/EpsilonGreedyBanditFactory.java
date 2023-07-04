@@ -46,13 +46,8 @@ public class EpsilonGreedyBanditFactory implements
      */
     @Override
     public BanditSupplier apply(FishState state) {
-        return new BanditSupplier() {
-            @Override
-            public EpsilonGreedyBanditAlgorithm apply(BanditAverage banditAverage) {
-                return new EpsilonGreedyBanditAlgorithm(banditAverage,
-                    explorationRate.applyAsDouble(state.getRandom()));
-            }
-        };
+        return banditAverage -> new EpsilonGreedyBanditAlgorithm(banditAverage,
+            explorationRate.applyAsDouble(state.getRandom()));
     }
 
     /**

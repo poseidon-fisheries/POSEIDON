@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.model.market.Market;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -47,12 +46,13 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
 
 
     public static final String AVERAGE_LAST_TRIP_HOURLY_PROFITS = "Average Last Trip Hourly Profits";
+    private static final long serialVersionUID = 5025205691102195656L;
 
     public FishStateDailyTimeSeries() {
         super(IntervalPolicy.EVERY_DAY, StepOrder.YEARLY_DATA_GATHERING);
     }
 
-    public static List<String> getAllMarketColumns(Collection<Market> markets) {
+    public static List<String> getAllMarketColumns(final Collection<? extends Market> markets) {
         //get all important columns
         return markets.stream()
             .flatMap(market -> market.getData().getColumns().stream().map(DataColumn::getName))
@@ -67,7 +67,7 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
      * @param observed the object to observe
      */
     @Override
-    public void start(FishState state, FishState observed) {
+    public void start(final FishState state, final FishState observed) {
 
         //get all the markets for this species
         //now register each
@@ -82,69 +82,50 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         );
 
         //add a counter for all catches (including discards) by asking each fisher individually
-        for (Species species : observed.getSpecies()) {
+        for (final Species species : observed.getSpecies()) {
 
-            String catchesColumn = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
-            registerGatherer(catchesColumn,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState ignored) {
-                        return observed.getFishers().stream().mapToDouble(
-                            new ToDoubleFunction<Fisher>() {
-                                @Override
-                                public double applyAsDouble(Fisher value) {
-                                    return value.getDailyCounter().getCatchesPerSpecie(species.getIndex());
-                                }
-                            }).sum();
-                    }
-                }, 0d, KILOGRAM, "Biomass"
+            final String catchesColumn = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
+            registerGatherer(
+                catchesColumn,
+                (Gatherer<FishState>) ignored -> observed.getFishers().stream().mapToDouble(
+                    value -> value.getDailyCounter().getCatchesPerSpecie(species.getIndex())).sum(),
+                0d,
+                KILOGRAM,
+                "Biomass"
             );
         }
 
         final List<Fisher> fishers = state.getFishers();
 
 
-        registerGatherer("Total Effort", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                return observed.getFishers().stream().mapToDouble(
-                    new ToDoubleFunction<Fisher>() {
-                        @Override
-                        public double applyAsDouble(Fisher value) {
-                            return value.getDailyCounter().getColumn(FisherYearlyTimeSeries.EFFORT);
-                        }
-                    }).sum();
-            }
-        }, 0d, HOUR, "Effort");
+        registerGatherer("Total Effort", (Gatherer<FishState>) ignored -> observed.getFishers().stream().mapToDouble(
+            value -> value.getDailyCounter().getColumn(FisherYearlyTimeSeries.EFFORT)).sum(), 0d, HOUR, "Effort");
 
 
-        registerGatherer(AVERAGE_LAST_TRIP_HOURLY_PROFITS, new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
+        registerGatherer(AVERAGE_LAST_TRIP_HOURLY_PROFITS, (Gatherer<FishState>) ignored -> {
 
-                if (fishers.size() == 0)
-                    return 0d;
+            if (fishers.size() == 0)
+                return 0d;
 
-                double sum = 0;
-                for (Fisher fisher : observed.getFishers()) {
-                    TripRecord lastTrip = fisher.getLastFinishedTrip();
-                    if (lastTrip != null) {
-                        double lastProfits = lastTrip.getProfitPerHour(true);
-                        if (Double.isFinite(lastProfits)) //NaN or Infinite are assumed to be 0 here
-                            sum += lastProfits;
-                    }
-
+            double sum = 0;
+            for (final Fisher fisher : observed.getFishers()) {
+                final TripRecord lastTrip = fisher.getLastFinishedTrip();
+                if (lastTrip != null) {
+                    final double lastProfits = lastTrip.getProfitPerHour(true);
+                    if (Double.isFinite(lastProfits)) //NaN or Infinite are assumed to be 0 here
+                        sum += lastProfits;
                 }
 
-                return sum / (double) fishers.size();
             }
+
+            return sum / (double) fishers.size();
         }, 0d);
 
 
         super.start(state, observed);
     }
 
-    private void registerSummaryGatherers(Iterable<DataColumn> allColumns, String nameTemplate) {
+    private void registerSummaryGatherers(final Iterable<? extends DataColumn> allColumns, final String nameTemplate) {
         stream(allColumns)
             .collect(groupingBy(DataColumn::getName))
             .forEach((name, columns) -> {

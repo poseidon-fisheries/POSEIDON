@@ -6,6 +6,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.DolphinSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 
 public class DelLicenseRegulation implements ActionSpecificRegulation {
+    private static final long serialVersionUID = -8254268505482170775L;
+
     @Override
     public ImmutableSet<Class<? extends PurseSeinerAction>> getApplicableActions() {
         return ImmutableSet.of(DolphinSetAction.class);

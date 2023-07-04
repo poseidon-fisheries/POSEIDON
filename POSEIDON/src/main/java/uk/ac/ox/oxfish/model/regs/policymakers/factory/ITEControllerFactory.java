@@ -61,59 +61,48 @@ public class ITEControllerFactory implements AlgorithmFactory<AdditionalStartabl
             effortDefinition);
 
 
-        return new AdditionalStartable() {
-            @Override
-            public void start(final FishState model) {
-                if (yearsBeforeStarting <= 0)
-                    starterMethod(model, effortActuator).step(model);
-                else
-                    fishState.scheduleOnceInXDays(
-                        starterMethod(model, effortActuator),
-                        StepOrder.DAWN,
-                        365 * yearsBeforeStarting + 1
+        return model -> {
+            if (yearsBeforeStarting <= 0)
+                starterMethod(model, effortActuator).step(model);
+            else
+                fishState.scheduleOnceInXDays(
+                    starterMethod(model, effortActuator),
+                    StepOrder.DAWN,
+                    365 * yearsBeforeStarting + 1
 
-                    );
-            }
+                );
         };
     }
 
     private Steppable starterMethod(final FishState model, final Actuator<FishState, Double> effortActuator) {
-        return new Steppable() {
-            @Override
-            public void step(final SimState simState) {
-                final IndexTargetController controller =
-                    new IndexTargetController(
-                        new PastAverageSensor(
-                            indicatorColumnName,
-                            1
-                        ),
-                        new UnchangingPastSensor(
-                            indicatorColumnName,
-                            multiplier.applyAsDouble(model.getRandom()),
-                            (int) yearsToLookBackForTarget.applyAsDouble(model.getRandom())
-                        ),
-                        blockEntryWhenSeasonIsNotFull ? new CloseReopenOnEffortDecorator(effortActuator) :
-                            effortActuator, 365,
-                        maxChangePerYear.applyAsDouble(model.getRandom()),
-                        false,
+        return simState -> {
+            final IndexTargetController controller =
+                new IndexTargetController(
+                    new PastAverageSensor(
+                        indicatorColumnName,
+                        1
+                    ),
+                    new UnchangingPastSensor(
+                        indicatorColumnName,
+                        multiplier.applyAsDouble(model.getRandom()),
+                        (int) yearsToLookBackForTarget.applyAsDouble(model.getRandom())
+                    ),
+                    blockEntryWhenSeasonIsNotFull ? new CloseReopenOnEffortDecorator(effortActuator) :
+                        effortActuator, 365,
+                    maxChangePerYear.applyAsDouble(model.getRandom()),
+                    false,
 
 
-                        false
-                    );
-
-                controller.start(model);
-                controller.step(model);
-                model.getYearlyDataSet().registerGatherer("Index Ratio",
-                    new Gatherer<FishState>() {
-                        @Override
-                        public Double apply(final FishState fishState) {
-                            return controller.getLastPolicy();
-                        }
-                    }
-                    , Double.NaN
+                    false
                 );
 
-            }
+            controller.start(model);
+            controller.step(model);
+            model.getYearlyDataSet().registerGatherer("Index Ratio",
+                (Gatherer<FishState>) fishState -> controller.getLastPolicy()
+                , Double.NaN
+            );
+
         };
     }
 

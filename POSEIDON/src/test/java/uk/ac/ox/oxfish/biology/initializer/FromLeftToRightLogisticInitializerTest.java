@@ -52,12 +52,7 @@ public class FromLeftToRightLogisticInitializerTest {
         factory.setCarryingCapacity(new FixedDoubleParameter(100d));
         factory.setExponent(new FixedDoubleParameter(1d));
         factory.setMinCapacityRatio(new FixedDoubleParameter(.1d));
-        factory.setGrower(new AlgorithmFactory<LogisticGrowerInitializer>() {
-            @Override
-            public LogisticGrowerInitializer apply(final FishState state) {
-                return mock(LogisticGrowerInitializer.class, RETURNS_DEEP_STUBS);
-            }
-        });
+        factory.setGrower(state -> mock(LogisticGrowerInitializer.class, RETURNS_DEEP_STUBS));
 
 
         final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);

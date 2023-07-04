@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesFactory;
@@ -9,7 +11,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.BooleanParameter;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -19,7 +20,11 @@ import java.util.Map;
 
 public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<PlannedStrategyProxy>, Dummyable {
 
-    private final Locker<FishState, Map> catchSamplerLocker = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<
+        FishState,
+        Map<Class<? extends AbstractSetAction>, ? extends CatchSampler<? extends LocalBiology>>
+        > catchSamplerLocker = new uk.ac.ox.oxfish.utility.Locker<>();
     private int targetYear;
     /**
      * object used to draw catches for DEL and NOA
@@ -148,11 +153,9 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
 
 
         final PlannedStrategyProxy proxy = new PlannedStrategyProxy(
-            uniqueCatchSamplerForEachStrategy.getValue() ? catchSamplersFactory.apply(state) :
-                catchSamplerLocker.presentKey(
-                    state,
-                    () -> catchSamplersFactory.apply(state)
-                )
+            uniqueCatchSamplerForEachStrategy.getValue()
+                ? catchSamplersFactory.apply(state)
+                : catchSamplerLocker.presentKey(state, () -> catchSamplersFactory.apply(state))
             ,
             PurseSeinerFishingStrategyFactory.loadActionWeights(targetYear, actionWeightsFile.get()),
             GravityDestinationStrategyFactory.loadMaxTripDuration(targetYear, maxTripDurationFile.get()),

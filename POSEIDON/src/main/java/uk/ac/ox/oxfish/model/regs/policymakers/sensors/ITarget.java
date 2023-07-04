@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.function.Function;
 
 public class ITarget implements Sensor<FishState, Double> {
+    private static final long serialVersionUID = -1299564909312928986L;
 
 //    The TAC is calculated as: If Irecent≥I0:
 //    TAC=0.5TAC∗[1+(Irecent−I0)/(Itarget−I0)]
@@ -56,9 +57,9 @@ public class ITarget implements Sensor<FishState, Double> {
 
 
     public ITarget(
-        String catchColumnName, String indicatorColumnName,
-        double precautionaryScaling, double indicatorMultiplier,
-        int timeInterval, int yearsToLookBackToTarget
+        final String catchColumnName, final String indicatorColumnName,
+        final double precautionaryScaling, final double indicatorMultiplier,
+        final int timeInterval, final int yearsToLookBackToTarget
     ) {
         //the historical average does not get updated with time, so we need
         //a fixed sensor
@@ -75,7 +76,7 @@ public class ITarget implements Sensor<FishState, Double> {
     }
 
     @Override
-    public Double scan(FishState system) {
+    public Double scan(final FishState system) {
 
 
         final DataColumn catchColumn = system.getYearlyDataSet().getColumn(catchColumnName);
@@ -83,13 +84,13 @@ public class ITarget implements Sensor<FishState, Double> {
         if (catchColumn.size() < historicalAverageIndex.getYearsToLookBack()) //need a long enough time series!
             return Double.NaN;
 
-        double percentageChangeDueToIndicator = getPercentageChangeToTACDueToIndicator(system);
+        final double percentageChangeDueToIndicator = getPercentageChangeToTACDueToIndicator(system);
 
         final int stepsBackToLook = Math.min(timeInterval, catchColumn.size());
 
         //if this is the first time we do policy, look at average catches to form a TAC baseline
         if (!Double.isFinite(lastPolicy)) {
-            DoubleSummaryStatistics catchesThisInterval = new DoubleSummaryStatistics();
+            final DoubleSummaryStatistics catchesThisInterval = new DoubleSummaryStatistics();
             final Iterator<Double> catchesIterator = catchColumn.descendingIterator();
 
 
@@ -105,7 +106,7 @@ public class ITarget implements Sensor<FishState, Double> {
             }
 
 
-            double catches = catchesThisInterval.getAverage();
+            final double catches = catchesThisInterval.getAverage();
 
 
             lastPolicy = catches * (1 - precautionaryScaling);
@@ -115,10 +116,10 @@ public class ITarget implements Sensor<FishState, Double> {
         return lastPolicy * percentageChangeDueToIndicator;
     }
 
-    public Double getPercentageChangeToTACDueToIndicator(FishState system) {
+    public Double getPercentageChangeToTACDueToIndicator(final FishState system) {
         final DataColumn indicatorColumn = system.getYearlyDataSet().getColumn(indicatorColumnName);
         final int stepsBackToLook = Math.min(timeInterval, indicatorColumn.size());
-        DoubleSummaryStatistics indicatorThisInterval = new DoubleSummaryStatistics();
+        final DoubleSummaryStatistics indicatorThisInterval = new DoubleSummaryStatistics();
         final Iterator<Double> indicatorIterator = indicatorColumn.descendingIterator();
         for (int lag = 0; lag < stepsBackToLook;
              lag++) {
@@ -143,7 +144,7 @@ public class ITarget implements Sensor<FishState, Double> {
         return catchTransformer;
     }
 
-    public void setCatchTransformer(Function<Double, Double> catchTransformer) {
+    public void setCatchTransformer(final Function<Double, Double> catchTransformer) {
         this.catchTransformer = catchTransformer;
     }
 
@@ -155,7 +156,7 @@ public class ITarget implements Sensor<FishState, Double> {
         return indicatorTransformer;
     }
 
-    public void setIndicatorTransformer(Function<Double, Double> indicatorTransformer) {
+    public void setIndicatorTransformer(final Function<Double, Double> indicatorTransformer) {
         this.indicatorTransformer = indicatorTransformer;
     }
 

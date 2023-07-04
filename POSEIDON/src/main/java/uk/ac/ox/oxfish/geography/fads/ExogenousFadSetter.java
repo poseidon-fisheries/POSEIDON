@@ -21,6 +21,7 @@ public abstract class ExogenousFadSetter implements AdditionalStartable, Steppab
      * when in the model order are fads set.
      */
     public static final StepOrder EXOGENOUS_FAD_SETTER_STEPORDER = StepOrder.FISHER_PHASE;
+    private static final long serialVersionUID = 7911977966491034626L;
 
 
     /**

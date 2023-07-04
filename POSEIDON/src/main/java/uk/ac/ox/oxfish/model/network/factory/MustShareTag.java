@@ -60,38 +60,35 @@ public class MustShareTag implements AlgorithmFactory<NetworkPredicate> {
 
         Preconditions.checkArgument(tags.size() > 0, "No valid tags for network predicate");
 
-        return new NetworkPredicate() {
-            @Override
-            public boolean test(Fisher from, Fisher to) {
+        return (from, to) -> {
 
-                //empty is easy
-                if (from.getTags().isEmpty())
-                    return true;
+            //empty is easy
+            if (from.getTags().isEmpty())
+                return true;
 
 
-                boolean atLeastOneMismatch = false;
+            boolean atLeastOneMismatch = false;
 
 
-                // go through all the tags
-                for (String tag : tags) {
-                    //if there is a match you are done
-                    if (from.getTags().contains(tag))
-                        if (to.getTags().contains(tag)) {
-                            return true;
-                        } else {
-                            //otherwise remember there was a mismatch
-                            atLeastOneMismatch = true;
-                        }
+            // go through all the tags
+            for (String tag : tags) {
+                //if there is a match you are done
+                if (from.getTags().contains(tag))
+                    if (to.getTags().contains(tag)) {
+                        return true;
+                    } else {
+                        //otherwise remember there was a mismatch
+                        atLeastOneMismatch = true;
+                    }
 
-
-                }
-                //if there was a mismatch and no matches, you are done!
-                if (atLeastOneMismatch)
-                    return false;
-                else
-                    return true;
 
             }
+            //if there was a mismatch and no matches, you are done!
+            if (atLeastOneMismatch)
+                return false;
+            else
+                return true;
+
         };
     }
 

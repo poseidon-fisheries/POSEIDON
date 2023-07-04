@@ -29,9 +29,10 @@ import uk.ac.ox.oxfish.model.FishState;
 @FunctionalInterface
 public
 interface FishStateSteppable extends Steppable {
+    long serialVersionUID = 1L;
 
     @Override
-    default void step(SimState simState) {
+    default void step(final SimState simState) {
         step((FishState) simState);
     }
 

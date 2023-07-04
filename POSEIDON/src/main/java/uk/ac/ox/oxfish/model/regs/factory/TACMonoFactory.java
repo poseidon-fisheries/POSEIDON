@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.model.regs.factory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -41,7 +40,9 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation> {
     /**
      * for each model there is only one quota object being shared
      */
-    private final Locker<String, MonoQuotaRegulation> modelQuota = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, MonoQuotaRegulation> modelQuota =
+        new uk.ac.ox.oxfish.utility.Locker<>();
 
     /**
      * the quota to use

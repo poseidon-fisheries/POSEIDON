@@ -75,7 +75,7 @@ public abstract class AbstractSetAction extends PurseSeinerAction {
             // the action duration is rounded at construction but we still have to cast it
             catchesKept = fisher
                 .fishHere(globalBiology, (int) getDuration(), fishState, targetBiology)
-                .getSecond();
+                .getValue();
             fishState.recordFishing(getLocation()); // TODO: make listener
             reactToSuccessfulSet(fishState, getLocation());
         } else {

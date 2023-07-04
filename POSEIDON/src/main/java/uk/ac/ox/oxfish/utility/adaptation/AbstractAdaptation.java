@@ -29,7 +29,7 @@ import java.util.function.Predicate;
 /**
  * Created by carrknight on 10/4/16.
  */
-public abstract class AbstractAdaptation<T> implements Adaptation<T> {
+public abstract class AbstractAdaptation<T> implements Adaptation {
 
 
     /**
@@ -53,7 +53,7 @@ public abstract class AbstractAdaptation<T> implements Adaptation<T> {
 
 
     public AbstractAdaptation(
-        Sensor<Fisher, T> sensor, Actuator<Fisher, T> actuator, Predicate<Fisher> validator
+        final Sensor<Fisher, T> sensor, final Actuator<Fisher, T> actuator, final Predicate<Fisher> validator
     ) {
         this.sensor = sensor;
         this.actuator = actuator;
@@ -61,7 +61,7 @@ public abstract class AbstractAdaptation<T> implements Adaptation<T> {
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         this.model = model;
         onStart(model, fisher);
     }
@@ -76,12 +76,12 @@ public abstract class AbstractAdaptation<T> implements Adaptation<T> {
      * @param random  the randomizer
      */
     @Override
-    public void adapt(Fisher toAdapt, FishState state, MersenneTwisterFast random) {
+    public void adapt(final Fisher toAdapt, final FishState state, final MersenneTwisterFast random) {
         //are you ready?
         if (!validator.test(toAdapt))
             return;
 
-        T newVariable = concreteAdaptation(toAdapt, state, random);
+        final T newVariable = concreteAdaptation(toAdapt, state, random);
         if (newVariable != null && newVariable != sensor.scan(toAdapt))
             actuator.apply(toAdapt, newVariable, state);
 
@@ -106,7 +106,7 @@ public abstract class AbstractAdaptation<T> implements Adaptation<T> {
      *
      * @param sensor Value to set for property 'sensor'.
      */
-    public void setSensor(Sensor<Fisher, T> sensor) {
+    public void setSensor(final Sensor<Fisher, T> sensor) {
         this.sensor = sensor;
     }
 
@@ -124,7 +124,7 @@ public abstract class AbstractAdaptation<T> implements Adaptation<T> {
      *
      * @param actuator Value to set for property 'actuator'.
      */
-    public void setActuator(Actuator<Fisher, T> actuator) {
+    public void setActuator(final Actuator<Fisher, T> actuator) {
         this.actuator = actuator;
     }
 
@@ -142,7 +142,7 @@ public abstract class AbstractAdaptation<T> implements Adaptation<T> {
      *
      * @param validator Value to set for property 'validator'.
      */
-    public void setValidator(Predicate<Fisher> validator) {
+    public void setValidator(final Predicate<Fisher> validator) {
         this.validator = validator;
     }
 }

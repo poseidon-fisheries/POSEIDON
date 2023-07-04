@@ -56,6 +56,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FadAwareLogisticGrower implements Startable, Steppable {
 
+    private static final long serialVersionUID = 8736335648059735106L;
     private final Species species;
     private final double carryingCapacity;
     private final double malthusianParameter;
@@ -159,6 +160,7 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
     private class Memorizer implements Steppable, Startable {
 
+        private static final long serialVersionUID = -2846942786822557378L;
         private double memorizedBiomass;
 
         @Override

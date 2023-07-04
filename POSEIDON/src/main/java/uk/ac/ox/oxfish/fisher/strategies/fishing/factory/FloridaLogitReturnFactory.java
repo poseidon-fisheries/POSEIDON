@@ -29,9 +29,10 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.LogitReturnStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.MaximumDaysDecorator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * Implementation of the WFS logit regression
@@ -61,6 +62,7 @@ public class FloridaLogitReturnFactory implements AlgorithmFactory<DailyReturnDe
      * @param state the function argument
      * @return the function result
      */
+    @SuppressWarnings("unchecked")
     @Override
     public DailyReturnDecorator apply(final FishState state) {
         return
@@ -74,30 +76,30 @@ public class FloridaLogitReturnFactory implements AlgorithmFactory<DailyReturnDe
                             new LogisticClassifier
                                 (
                                     //intercept:
-                                    new Pair<>(
+                                    entry(
                                         new InterceptExtractor()
                                         , intercept.applyAsDouble(state.getRandom())),
                                     //price red grouper
-                                    new Pair<>(
+                                    entry(
                                         new FishPriceExtractor(
                                             state.getBiology().getSpecie("RedGrouper")
                                         ),
                                         priceRedGrouper.applyAsDouble(state.getRandom())
                                     ),
                                     //price gag grouper
-                                    new Pair<>(
+                                    entry(
                                         new FishPriceExtractor(
                                             state.getBiology().getSpecie("GagGrouper")
                                         ),
                                         priceGagGrouper.applyAsDouble(state.getRandom())
                                     ),
                                     //ratio catch to fish hold
-                                    new Pair<>(
+                                    entry(
                                         (tile, timeOfObservation, agent, model) -> agent.getTotalWeightOfCatchInHold() / agent.getMaximumHold(),
                                         ratioCatchToFishHold.applyAsDouble(state.getRandom())
                                     ),
                                     //weekend dummy
-                                    new Pair<>(
+                                    entry(
                                         new WeekendExtractor(),
                                         weekendDummy.applyAsDouble(state.getRandom())
                                     )

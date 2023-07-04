@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 public class FadMap
     implements AdditionalStartable, Steppable {
 
+    private static final long serialVersionUID = -4923511779083700503L;
     private final DriftingObjectsMap driftingObjectsMap;
     private final NauticalMap nauticalMap;
     private final GlobalBiology globalBiology;

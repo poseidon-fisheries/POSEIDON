@@ -29,11 +29,10 @@ import java.io.Serializable;
  * Created by carrknight on 6/17/15.
  */
 public interface TripListener extends Serializable {
+    long serialVersionUID = 3423123730692395603L;
 
-    default void reactToNewTrip(TripRecord record, Fisher fisher) {
+    default void reactToNewTrip(final TripRecord record, final Fisher fisher) {
     }
-
-    ;
 
     void reactToFinishedTrip(TripRecord record, Fisher fisher);
 

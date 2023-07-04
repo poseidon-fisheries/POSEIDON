@@ -20,18 +20,13 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.regs.ITQCostManager;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.function.Function;
 
 /**
  * Creates both individual quotas like the IQMonoFactory and a quota market for fishers to trade in
@@ -42,7 +37,9 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation> {
     /**
      * one market only for each fish-state
      */
-    private final Locker<String, ITQMarketBuilder> marketBuilders = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, ITQMarketBuilder> marketBuilders =
+        new uk.ac.ox.oxfish.utility.Locker<>();
 
     /**
      * quota available to each guy
@@ -82,14 +79,11 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation> {
 
         assert marketBuilder != null;
 
-        final ITQCostManager cost = new ITQCostManager(new Function<Species, ITQOrderBook>() {
-            @Override
-            public ITQOrderBook apply(final Species species) {
-                return marketBuilder.getMarket();
-            }
-        });
+        final ITQCostManager cost = new ITQCostManager(species -> marketBuilder.getMarket());
 
         final MonoQuotaRegulation toReturn = new MonoQuotaRegulation(individualQuota.applyAsDouble(state.getRandom())) {
+
+            private static final long serialVersionUID = -1064474201402947081L;
 
             @Override
             public void start(final FishState model, final Fisher fisher) {

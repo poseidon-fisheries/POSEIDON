@@ -27,10 +27,10 @@ import uk.ac.ox.oxfish.model.FisherStartable;
 
 /**
  * More of a marker than anything else, tells me that this method adapts some
- * object of class T to a fisher
+ * object to a fisher
  * Created by carrknight on 10/4/16.
  */
-public interface Adaptation<T> extends FisherStartable {
+public interface Adaptation extends FisherStartable {
 
 
     /**
@@ -40,5 +40,5 @@ public interface Adaptation<T> extends FisherStartable {
      * @param state
      * @param random  the randomizer
      */
-    public void adapt(Fisher toAdapt, FishState state, MersenneTwisterFast random);
+    void adapt(Fisher toAdapt, FishState state, MersenneTwisterFast random);
 }

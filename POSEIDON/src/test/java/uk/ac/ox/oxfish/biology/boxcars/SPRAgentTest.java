@@ -81,12 +81,7 @@ public class SPRAgentTest {
         SPRAgent agent = new SPRAgent(
             "testtag",
             fish,
-            new Predicate<Fisher>() {
-                @Override
-                public boolean test(Fisher fisher) {
-                    return fisher.getID() == 1;
-                }
-            },
+            fisher -> fisher.getID() == 1,
             81,
             0.4946723,
             0.394192,

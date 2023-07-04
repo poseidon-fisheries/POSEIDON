@@ -32,7 +32,6 @@ import uk.ac.ox.oxfish.model.data.OutputPlugin;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * listens to all trips and writes down a long data frame collecting where the tows occurred
@@ -42,8 +41,9 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
 
     final private static String HEADER = "fisherid,effort,x_cell,y_cell," +
         "date_trip_end_year,date_trip_end_day,tags";
+    private static final long serialVersionUID = 8801745951745956045L;
     private String fileName = "tow_log.csv";
-    private StringBuilder log = new StringBuilder().append(HEADER).append("\n");
+    private final StringBuilder log = new StringBuilder().append(HEADER).append("\n");
 
     private FishState model;
 
@@ -52,16 +52,16 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
     }
 
 
-    public TowLongLogger(String fileName) {
+    public TowLongLogger(final String fileName) {
         this.fileName = fileName;
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-        int year = (int) (record.getTripDay() / 365d);
+    public void reactToFinishedTrip(final TripRecord record, final Fisher fisher) {
+        final int year = (int) (record.getTripDay() / 365d);
 
 
-        for (Map.Entry<SeaTile, FishingRecord> fishingRecord : record.getFishingRecords()) {
+        for (final Map.Entry<SeaTile, FishingRecord> fishingRecord : record.getFishingRecords()) {
             log.append(fisher.getID()).append(",")
                 .append(fishingRecord.getValue().getHoursSpentFishing()).append(",")
                 .append(fishingRecord.getKey().getGridX()).append(",")
@@ -75,7 +75,7 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
 
 
     @Override
-    public void reactToEndOfSimulation(FishState state) {
+    public void reactToEndOfSimulation(final FishState state) {
         //nothing
     }
 
@@ -86,22 +86,19 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         Preconditions.checkState(this.model == null, "Already started!");
 
         this.model = model;
-        for (Fisher fisher : model.getFishers()) {
+        for (final Fisher fisher : model.getFishers()) {
             fisher.addTripListener(this);
         }
 
-        for (Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
+        for (final Map.Entry<String, FisherFactory> fisherFactory : model.getFisherFactories()) {
             fisherFactory.getValue().getAdditionalSetups().add(
-                new Consumer<Fisher>() {
-                    @Override
-                    public void accept(Fisher fisher) {
-                        if (TowLongLogger.this.model != null) //if i am still active
-                            fisher.addTripListener(TowLongLogger.this);
-                    }
+                fisher -> {
+                    if (TowLongLogger.this.model != null) //if i am still active
+                        fisher.addTripListener(TowLongLogger.this);
                 }
             );
         }
@@ -116,7 +113,7 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
     @Override
     public void turnOff() {
         Preconditions.checkState(model != null, "Not started!");
-        for (Fisher fisher : model.getFishers()) {
+        for (final Fisher fisher : model.getFishers()) {
             fisher.removeTripListener(this);
         }
 
@@ -135,7 +132,7 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
      *
      * @param fileName Value to set for property 'fileName'.
      */
-    public void setFileName(String fileName) {
+    public void setFileName(final String fileName) {
         this.fileName = fileName;
     }
 

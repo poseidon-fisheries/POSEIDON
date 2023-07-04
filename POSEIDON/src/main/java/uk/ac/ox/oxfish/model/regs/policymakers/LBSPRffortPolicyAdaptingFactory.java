@@ -53,59 +53,48 @@ public class LBSPRffortPolicyAdaptingFactory implements AlgorithmFactory<Additio
         final SPRAgent sprAgent = sprAgentDelegate.apply(fishState);
 
 
-        return new AdditionalStartable() {
-            @Override
-            public void start(FishState model) {
-                sprAgent.start(model);
+        return model -> {
+            sprAgent.start(model);
 
-                fishState.scheduleOnceInXDays(
-                    new Steppable() {
-                        @Override
-                        public void step(SimState simState) {
-                            final FishState model = (FishState) simState;
-                            LBSPRPolicyUpdater lbspr = new LBSPRPolicyUpdater(
-                                sprAgent,
-                                new LBSPREffortPolicy(
-                                    "SPR " +
-                                        sprAgentDelegate.getSpeciesName() + " " +
-                                        sprAgentDelegate.getSurveyTag(),
-                                    getLinearParameter().applyAsDouble(fishState.getRandom()),
-                                    getCubicParameter().applyAsDouble(fishState.getRandom()),
-                                    getSprTarget().applyAsDouble(fishState.getRandom()),
-                                    getMaxChangeEachYear().applyAsDouble(fishState.getRandom()),
-                                    EFFORT_ACTUATORS.get(getEffortDefinition()),
-                                    isBlockEntryWhenSeasonIsNotFull()
-                                ),
-                                upperDiscrepancyThreshold.applyAsDouble(model.getRandom()),
-                                lowerDiscrepancyThreshold.applyAsDouble(model.getRandom()),
-                                (int) cpueHalfPeriod.applyAsDouble(model.getRandom()),
-                                lowestMKAllowed.applyAsDouble(model.getRandom()),
-                                highestMKAllowed.applyAsDouble(model.getRandom()),
+            fishState.scheduleOnceInXDays(
+                (Steppable) simState -> {
+                    final FishState model1 = (FishState) simState;
+                    LBSPRPolicyUpdater lbspr = new LBSPRPolicyUpdater(
+                        sprAgent,
+                        new LBSPREffortPolicy(
+                            "SPR " +
+                                sprAgentDelegate.getSpeciesName() + " " +
+                                sprAgentDelegate.getSurveyTag(),
+                            getLinearParameter().applyAsDouble(fishState.getRandom()),
+                            getCubicParameter().applyAsDouble(fishState.getRandom()),
+                            getSprTarget().applyAsDouble(fishState.getRandom()),
+                            getMaxChangeEachYear().applyAsDouble(fishState.getRandom()),
+                            EFFORT_ACTUATORS.get(getEffortDefinition()),
+                            isBlockEntryWhenSeasonIsNotFull()
+                        ),
+                        upperDiscrepancyThreshold.applyAsDouble(model1.getRandom()),
+                        lowerDiscrepancyThreshold.applyAsDouble(model1.getRandom()),
+                        (int) cpueHalfPeriod.applyAsDouble(model1.getRandom()),
+                        lowestMKAllowed.applyAsDouble(model1.getRandom()),
+                        highestMKAllowed.applyAsDouble(model1.getRandom()),
 
 
-                                (int) startUpdatingMKAfterYear.applyAsDouble(model.getRandom())
-                            );
-                            lbspr.start(model);
-                            lbspr.step(model);
+                        (int) startUpdatingMKAfterYear.applyAsDouble(model1.getRandom())
+                    );
+                    lbspr.start(model1);
+                    lbspr.step(model1);
 
 
-                            //creaqte also a collector
-                            fishState.getYearlyDataSet().registerGatherer(
-                                "LBSPREffortPolicy output",
-                                new Gatherer<FishState>() {
-                                    @Override
-                                    public Double apply(FishState fishState) {
-                                        return lbspr.getAccumulatedDelta();
-                                    }
-                                },
-                                Double.NaN
-                            );
-                        }
-                    },
-                    StepOrder.DAWN,
-                    365 * getStartingYear() + 1
-                );
-            }
+                    //creaqte also a collector
+                    fishState.getYearlyDataSet().registerGatherer(
+                        "LBSPREffortPolicy output",
+                        (Gatherer<FishState>) fishState1 -> lbspr.getAccumulatedDelta(),
+                        Double.NaN
+                    );
+                },
+                StepOrder.DAWN,
+                365 * getStartingYear() + 1
+            );
         };
     }
 

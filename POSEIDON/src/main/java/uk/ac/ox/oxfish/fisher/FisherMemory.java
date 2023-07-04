@@ -33,6 +33,7 @@ import java.io.Serializable;
 import java.util.*;
 
 public class FisherMemory implements Serializable, FisherStartable {
+    private static final long serialVersionUID = -8769857714711371521L;
     /**
      * the data gatherer that fires once a year
      */
@@ -48,16 +49,16 @@ public class FisherMemory implements Serializable, FisherStartable {
     /**
      * the data gatherer that fires every day
      */
-    private FisherDailyTimeSeries dailyTimeSeries;
+    private final FisherDailyTimeSeries dailyTimeSeries;
     private DiscretizedLocationMemory discretizedLocationMemory;
     /**
      * any other thing I want the fisher to remember I will have to store in this very general object
      */
-    private HashMap<String, Object> database = new HashMap<>();
+    private final HashMap<String, Object> database = new HashMap<>();
     /**
      * an object to extract from seatiles a feature
      */
-    private FeatureExtractors<SeaTile> tileRepresentation = new FeatureExtractors<>();
+    private final FeatureExtractors<SeaTile> tileRepresentation = new FeatureExtractors<>();
 
     public FisherMemory() {
         this(
@@ -65,7 +66,7 @@ public class FisherMemory implements Serializable, FisherStartable {
     }
 
     public FisherMemory(
-        LocationMemories<TripRecord> tripMemories
+        final LocationMemories<TripRecord> tripMemories
     ) {
         yearlyTimeSeries = new FisherYearlyTimeSeries();
         yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
@@ -90,7 +91,7 @@ public class FisherMemory implements Serializable, FisherStartable {
         return dailyCounter;
     }
 
-    public void setDailyCounter(FisherDailyCounter dailyCounter) {
+    public void setDailyCounter(final FisherDailyCounter dailyCounter) {
         this.dailyCounter = dailyCounter;
     }
 
@@ -99,9 +100,9 @@ public class FisherMemory implements Serializable, FisherStartable {
     }
 
     //At this point, we will assume they are friends
-    public List<SharedTripRecord> getTripsSharedWith(Fisher friend) {
-        List<SharedTripRecord> sharedTripList = new ArrayList<SharedTripRecord>();
-        for (SharedTripRecord sharedTrip : sharedTrips) {
+    public List<SharedTripRecord> getTripsSharedWith(final Fisher friend) {
+        final List<SharedTripRecord> sharedTripList = new ArrayList<SharedTripRecord>();
+        for (final SharedTripRecord sharedTrip : sharedTrips) {
             if (sharedTrip.sharedWithAll() || sharedTrip.getSharedFriends().contains(friend)) {
                 sharedTripList.add(sharedTrip);
             }
@@ -109,10 +110,10 @@ public class FisherMemory implements Serializable, FisherStartable {
         return sharedTripList;
     }
 
-    public void shareTrip(TripRecord trip, boolean allFriends, Collection<Fisher> sharedFriends) {
+    public void shareTrip(final TripRecord trip, final boolean allFriends, final Collection<Fisher> sharedFriends) {
         //if it has been shared before, update allFriends or add to the sharedFriends collection
         boolean previouslyShared = false;
-        for (SharedTripRecord sharedTrip : sharedTrips) {
+        for (final SharedTripRecord sharedTrip : sharedTrips) {
             if (sharedTrip.getTrip() == trip) {
                 previouslyShared = true;
                 if (allFriends) sharedTrip.shareWithAllFriends();
@@ -121,7 +122,7 @@ public class FisherMemory implements Serializable, FisherStartable {
             }
         }
         if (!previouslyShared) {
-            SharedTripRecord newSharedTrip = new SharedTripRecord(trip, allFriends, sharedFriends);
+            final SharedTripRecord newSharedTrip = new SharedTripRecord(trip, allFriends, sharedFriends);
         }
     }
 
@@ -134,7 +135,7 @@ public class FisherMemory implements Serializable, FisherStartable {
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         yearlyCounter.addColumn(FisherYearlyTimeSeries.FUEL_CONSUMPTION);
         yearlyCounter.addColumn(FisherYearlyTimeSeries.FUEL_EXPENDITURE);
         yearlyCounter.addColumn(FisherYearlyTimeSeries.VARIABLE_COSTS);
@@ -150,18 +151,15 @@ public class FisherMemory implements Serializable, FisherStartable {
         dailyCounter.start(model);
         tripLogger.start(model);
         tripMemories.start(model);
-        tripLogger.addTripListener(new TripListener() {
-            @Override
-            public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-                SeaTile mostFishedTileInTrip = record.getMostFishedTileInTrip();
-                if (mostFishedTileInTrip != null)
-                    tripMemories.memorize(record, mostFishedTileInTrip);
-            }
+        tripLogger.addTripListener((TripListener) (record, fisher1) -> {
+            final SeaTile mostFishedTileInTrip = record.getMostFishedTileInTrip();
+            if (mostFishedTileInTrip != null)
+                tripMemories.memorize(record, mostFishedTileInTrip);
         });
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         tripMemories.turnOff();
         tripLogger.turnOff();
         dailyCounter.turnOff();
@@ -178,7 +176,7 @@ public class FisherMemory implements Serializable, FisherStartable {
     }
 
 
-    public double balanceXDaysAgo(int daysAgo) {
+    public double balanceXDaysAgo(final int daysAgo) {
         //    Preconditions.checkArgument(dailyTimeSeries.numberOfObservations() >daysAgo);
         return dailyTimeSeries.getColumn(FisherYearlyTimeSeries.CASH_COLUMN).getDatumXStepsAgo(daysAgo);
     }
@@ -192,7 +190,7 @@ public class FisherMemory implements Serializable, FisherStartable {
      * @param location
      * @return
      */
-    public TripRecord rememberLastTripHere(SeaTile location) {
+    public TripRecord rememberLastTripHere(final SeaTile location) {
 
         return getTripMemories().getMemory(location);
     }
@@ -211,19 +209,19 @@ public class FisherMemory implements Serializable, FisherStartable {
      * @param comparator how should the fisher compare each tile remembered
      */
     public SeaTile getBestSpotForTripsRemembered(
-        Comparator<LocationMemory<TripRecord>> comparator
+        final Comparator<LocationMemory<TripRecord>> comparator
     ) {
         return getTripMemories().getBestFishingSpotInMemory(comparator);
     }
 
     public void addFeatureExtractor(
-        String nameOfFeature,
-        FeatureExtractor<SeaTile> extractor
+        final String nameOfFeature,
+        final FeatureExtractor<SeaTile> extractor
     ) {
         tileRepresentation.addFeatureExtractor(nameOfFeature, extractor);
     }
 
-    public FeatureExtractor<SeaTile> removeFeatureExtractor(String nameOfFeature) {
+    public FeatureExtractor<SeaTile> removeFeatureExtractor(final String nameOfFeature) {
         return tileRepresentation.removeFeatureExtractor(nameOfFeature);
     }
 
@@ -243,8 +241,8 @@ public class FisherMemory implements Serializable, FisherStartable {
      * @param key  the key for the object
      * @param item the object to store
      */
-    public void memorize(String key, Object item) {
-        Object previous = database.put(key, item);
+    public void memorize(final String key, final Object item) {
+        final Object previous = database.put(key, item);
         Preconditions.checkState(previous == null, "The database already contains this key");
     }
 
@@ -253,7 +251,7 @@ public class FisherMemory implements Serializable, FisherStartable {
      *
      * @param key
      */
-    public void forget(String key) {
+    public void forget(final String key) {
         database.remove(key);
     }
 
@@ -262,7 +260,7 @@ public class FisherMemory implements Serializable, FisherStartable {
      *
      * @param key
      */
-    public Object remember(String key) {
+    public Object remember(final String key) {
         return database.get(key);
     }
 
@@ -270,7 +268,7 @@ public class FisherMemory implements Serializable, FisherStartable {
     /**
      * registers visit (if the memory exists)
      */
-    public void registerVisit(int group, int day) {
+    public void registerVisit(final int group, final int day) {
         if (discretizedLocationMemory != null)
             discretizedLocationMemory.registerVisit(group, day);
     }
@@ -278,7 +276,7 @@ public class FisherMemory implements Serializable, FisherStartable {
     /**
      * registers visit (if the memory exists)
      */
-    public void registerVisit(SeaTile tile, int day) {
+    public void registerVisit(final SeaTile tile, final int day) {
         if (discretizedLocationMemory != null)
             discretizedLocationMemory.registerVisit(tile, day);
     }
@@ -287,7 +285,7 @@ public class FisherMemory implements Serializable, FisherStartable {
         return discretizedLocationMemory;
     }
 
-    public void setDiscretizedLocationMemory(DiscretizedLocationMemory discretizedLocationMemory) {
+    public void setDiscretizedLocationMemory(final DiscretizedLocationMemory discretizedLocationMemory) {
         Preconditions.checkArgument(
             this.discretizedLocationMemory == null,
             "Rewriting a discretized location memory with another. Probably not what you want!"

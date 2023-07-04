@@ -67,26 +67,20 @@ public class BiomassDepletionGatherer implements AdditionalStartable {
 
             model.getYearlyDataSet().registerGatherer(
                 DEPLETION_COLUMN_NAME + " " + species.getName(),
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState state) {
+                (Gatherer<FishState>) state -> {
 
-                        double bt = state.getTotalBiomass(species);
-                        double k = state.getMap().getAllSeaTilesExcludingLandAsList().stream().mapToDouble(
-                            new ToDoubleFunction<SeaTile>() {
-                                @Override
-                                public double applyAsDouble(SeaTile value) {
-                                    if (!value.isFishingEvenPossibleHere())
-                                        return 0d;
+                    double bt = state.getTotalBiomass(species);
+                    double k = state.getMap().getAllSeaTilesExcludingLandAsList().stream().mapToDouble(
+                        value -> {
+                            if (!value.isFishingEvenPossibleHere())
+                                return 0d;
 
-                                    return ((BiomassLocalBiology) value.getBiology()).getCarryingCapacity(species);
-                                }
-                            }
-                        ).sum();
-                        return bt / k;
+                            return ((BiomassLocalBiology) value.getBiology()).getCarryingCapacity(species);
+                        }
+                    ).sum();
+                    return bt / k;
 
 
-                    }
                 },
                 Double.NaN
             );
@@ -99,20 +93,17 @@ public class BiomassDepletionGatherer implements AdditionalStartable {
             Preconditions.checkState(species != null);
             model.getYearlyDataSet().registerGatherer(
                 MSY + " " + species.getName(),
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState state) {
+                (Gatherer<FishState>) state -> {
 
-                        Double landings = FishStateUtilities.generateYearlySum(
-                            state.getDailyDataSet().getColumn(
-                                species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME
-                            )).apply(
-                            state);
+                    Double landings = FishStateUtilities.generateYearlySum(
+                        state.getDailyDataSet().getColumn(
+                            species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME
+                        )).apply(
+                        state);
 
-                        return landings / msyEntry.getValue();
+                    return landings / msyEntry.getValue();
 
 
-                    }
                 },
                 Double.NaN
             );

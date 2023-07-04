@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.FixedProbability;
 
 import java.util.function.Predicate;
@@ -37,7 +36,7 @@ import java.util.function.Predicate;
 /**
  * Created by carrknight on 2/14/17.
  */
-public class SocialNetworkAdaptation implements Adaptation<Integer> {
+public class SocialNetworkAdaptation implements Adaptation {
 
 
     private final ExploreImitateAdaptation<Integer> delegate;
@@ -54,34 +53,25 @@ public class SocialNetworkAdaptation implements Adaptation<Integer> {
             new ExploreImitateAdaptation<Integer>(
                 //don't change friends if you've been stuck a lot of time at home
 
-                (Predicate<Fisher>) fisher1 -> fisher1.getHoursAtPort() < 10 * 24,
-                new BeamHillClimbing<Integer>(new RandomStep<Integer>() {
-                    @Override
-                    public Integer randomStep(
-                        FishState state, MersenneTwisterFast random, Fisher fisher,
-                        Integer current
-                    ) {
-                        return Math.min(
-                            Math.max(
-                                random.nextBoolean() ?
-                                    current + random.nextInt(stepSize) + 1 :
-                                    current - random.nextInt(stepSize) - 1,
-                                0
-                            ),
-                            state.getFishers().size() - 1
-                        );
-                    }
-                })
+                fisher1 -> fisher1.getHoursAtPort() < 10 * 24,
+                new BeamHillClimbing<Integer>((state, random, fisher, current) -> Math.min(
+                    Math.max(
+                        random.nextBoolean() ?
+                            current + random.nextInt(stepSize) + 1 :
+                            current - random.nextInt(stepSize) - 1,
+                        0
+                    ),
+                    state.getFishers().size() - 1
+                ))
                 ,
-                (Actuator<Fisher, Integer>) (subject, policy, model) -> {
-                    int originalDirectedNeighbors = model.getSocialNetwork().getDirectedNeighbors(subject).size();
-                    int target = Math.min(Math.max(policy, 0), model.getFishers().size() - 1);
-                    int difference = target - model.getSocialNetwork().getBackingnetwork().getPredecessorCount(subject);
+                (subject, policy, model) -> {
+                    final int originalDirectedNeighbors = model.getSocialNetwork().getDirectedNeighbors(subject).size();
+                    final int target = Math.min(Math.max(policy, 0), model.getFishers().size() - 1);
+                    final int difference = target - model.getSocialNetwork().getBackingnetwork().getPredecessorCount(subject);
                     if (difference > 0) {
                         for (int i = 0; i < difference; i++)
                             model.getSocialNetwork()
                                 .addRandomConnection(subject, model.getFishers(), new MersenneTwisterFast());
-                        ;
                     } else if (difference < 0) {
                         for (int i = 0; i < -difference; i++) {
                             model.getSocialNetwork().removeRandomConnection(subject, model.getRandom());
@@ -96,7 +86,7 @@ public class SocialNetworkAdaptation implements Adaptation<Integer> {
                     .getPredecessorCount(system),
                 objective,
                 new FixedProbability(explorationProbability, 0),
-                (Predicate<Integer>) integer -> true
+                integer -> true
 
 
             );
@@ -104,12 +94,12 @@ public class SocialNetworkAdaptation implements Adaptation<Integer> {
 
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         delegate.start(model, fisher);
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         delegate.turnOff(fisher);
     }
 
@@ -121,7 +111,7 @@ public class SocialNetworkAdaptation implements Adaptation<Integer> {
      * @param random  the randomizer
      */
     @Override
-    public void adapt(Fisher toAdapt, FishState state, MersenneTwisterFast random) {
+    public void adapt(final Fisher toAdapt, final FishState state, final MersenneTwisterFast random) {
         delegate.adapt(toAdapt, state, random);
     }
 }

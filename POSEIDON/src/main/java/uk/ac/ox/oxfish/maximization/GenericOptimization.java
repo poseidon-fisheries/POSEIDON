@@ -37,6 +37,7 @@ import java.util.List;
 
 public class GenericOptimization extends SimpleProblemDouble implements Serializable {
 
+    private static final long serialVersionUID = 3621186016008983379L;
     private String scenarioFile;
 
     private double translateNANto = 10000000;

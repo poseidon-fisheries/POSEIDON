@@ -256,12 +256,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer {
 
 
         double sum = initialWeights.values().stream().mapToDouble(
-            new ToDoubleFunction<Double>() {
-                @Override
-                public double applyAsDouble(Double value) {
-                    return value;
-                }
-            }
+            value -> value
         ).sum();
 
 
@@ -279,12 +274,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer {
 
         final DataColumn recruitmentColumn = model.getDailyDataSet().registerGatherer(
             speciesName + " Recruits",
-            new Gatherer<FishState>() {
-                @Override
-                public Double apply(FishState fishState) {
-                    return processes.getLastRecruits();
-                }
-            },
+            (Gatherer<FishState>) fishState -> processes.getLastRecruits(),
             0d
         );
 

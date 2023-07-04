@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.util.ArrayList;
@@ -22,18 +21,18 @@ public class StochasticCatchSampleTest {
     @Test
     public void catchSampler() {
 
-        Fisher yesOne = mock(Fisher.class, RETURNS_DEEP_STUBS);
-        Fisher yesTwo = mock(Fisher.class, RETURNS_DEEP_STUBS);
-        Fisher wrong = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        final Fisher yesOne = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        final Fisher yesTwo = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        final Fisher wrong = mock(Fisher.class, RETURNS_DEEP_STUBS);
 
-        Species species = new Species(
+        final Species species = new Species(
             "test",
             new FromListMeristics(new double[]{1, 2}, new double[]{10, 100}, 1)
         );
 
-        FishState model = mock(FishState.class);
-        ArrayList<Fisher> fishers = (ArrayList) Lists.newArrayList(yesOne, yesTwo, wrong);
-        ObservableList fisherList = ObservableList.observableList(fishers);
+        final FishState model = mock(FishState.class);
+        final ArrayList<Fisher> fishers = (ArrayList) Lists.newArrayList(yesOne, yesTwo, wrong);
+        final ObservableList fisherList = ObservableList.observableList(fishers);
         when(model.getFishers()).thenReturn(fisherList);
 
         //one caught 10 small ones
@@ -46,12 +45,7 @@ public class StochasticCatchSampleTest {
         when(wrong.getDailyCounter().getSpecificLandings(species, 0, 0)).thenReturn(100d);
         when(wrong.getDailyCounter().getSpecificLandings(species, 0, 1)).thenReturn(200d);
 
-        StochasticCatchSampler sampler = new StochasticCatchSampler(new Predicate<Fisher>() {
-            @Override
-            public boolean test(Fisher fisher) {
-                return fisher != wrong;
-            }
-        }, species, null);
+        final StochasticCatchSampler sampler = new StochasticCatchSampler(fisher -> fisher != wrong, species, null);
 
         sampler.start(model);
         sampler.observeDaily();
@@ -66,12 +60,7 @@ public class StochasticCatchSampleTest {
         assertEquals(sampledAbundance[0][1], 10, .01);
 
         //feed it the wrong weight and you get the wrong count
-        sampledAbundance = sampler.getAbundance(new Function<Pair<Integer, Integer>, Double>() {
-            @Override
-            public Double apply(Pair<Integer, Integer> integerIntegerPair) {
-                return 1d;
-            }
-        });
+        sampledAbundance = sampler.getAbundance((Function<Entry<Integer, Integer>, Double>) integerIntegerPair -> 1d);
         assertEquals(sampledAbundance[0][0], 20, .01);
         assertEquals(sampledAbundance[0][1], 20, .01);
 

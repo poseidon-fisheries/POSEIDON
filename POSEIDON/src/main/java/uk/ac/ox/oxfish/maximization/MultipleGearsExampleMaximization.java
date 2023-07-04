@@ -47,6 +47,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
         "indonesia_hub",
         "runs", "712", "slice0", "calibration"
     );
+    private static final long serialVersionUID = 7096906726964459583L;
 
     private String scenarioFile =
         DEFAULT_PATH.resolve("712_optimistic_2014_perfect.yaml").toString();
@@ -76,7 +77,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
     private String speciesName = "Snapper";
 
     @Override
-    public double[] evaluate(double[] x) {
+    public double[] evaluate(final double[] x) {
 
 
         try {
@@ -84,20 +85,20 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
             double error = 0;
 
             //read landings
-            List<String> lines = Files.readAllLines(Paths.get(landingData));
-            Double[][] landings = new Double[populations][lines.size()];
+            final List<String> lines = Files.readAllLines(Paths.get(landingData));
+            final Double[][] landings = new Double[populations][lines.size()];
             for (int i = 0; i < lines.size(); i++) {
-                String[] split = lines.get(i).split(",");
+                final String[] split = lines.get(i).split(",");
                 for (int population = 0; population < populations; population++)
                     landings[population][i] = Double.parseDouble(split[population]);
             }
 
 
             for (int i = 0; i < runsPerSetting; i++) {
-                FlexibleScenario scenario = buildInput(x);
+                final FlexibleScenario scenario = buildInput(x);
 
 
-                FishState model = new FishState(System.currentTimeMillis());
+                final FishState model = new FishState(System.currentTimeMillis());
                 model.setScenario(scenario);
                 model.start();
                 System.out.println("starting run");
@@ -108,7 +109,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
 
                 if (populations > 1)
                     for (int population = 0; population < populations; population++) {
-                        List<Double> simulatedLandings = model.getYearlyDataSet().getColumn(
+                        final List<Double> simulatedLandings = model.getYearlyDataSet().getColumn(
                             speciesName + " Landings of population" + population
                         ).stream().collect(Collectors.toList());
                         for (int j = 0; j < yearsToIgnore; j++) //remove years to ignore!
@@ -121,7 +122,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
                         );
                     }
                 else {
-                    List<Double> simulatedLandings = model.getYearlyDataSet().getColumn(
+                    final List<Double> simulatedLandings = model.getYearlyDataSet().getColumn(
                         speciesName + " Landings").stream().collect(Collectors.toList());
 
                     for (int j = 0; j < yearsToIgnore; j++) //remove years to ignore!
@@ -138,7 +139,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
             }
 
 
-            double averageError = error / ((double) runsPerSetting * (double) populations);
+            final double averageError = error / ((double) runsPerSetting * (double) populations);
 
             //write summary file
             Files.write(
@@ -151,17 +152,17 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
 
             return new double[]{
                 averageError};
-        } catch (IOException exception) {
+        } catch (final IOException exception) {
             throw new RuntimeException("failed to read or deal with files!");
         }
     }
 
-    public FlexibleScenario buildInput(double[] x) throws FileNotFoundException {
-        FishYAML yaml = new FishYAML();
-        Path scenarioPath = Paths.get(scenarioFile);
+    public FlexibleScenario buildInput(final double[] x) throws FileNotFoundException {
+        final FishYAML yaml = new FishYAML();
+        final Path scenarioPath = Paths.get(scenarioFile);
 
 
-        FlexibleScenario scenario = yaml.loadAs(
+        final FlexibleScenario scenario = yaml.loadAs(
             new FileReader(scenarioPath.toFile()),
             FlexibleScenario.class
         );
@@ -169,8 +170,8 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
 
         assert x.length == populations;
         for (int k = 0; k < x.length; k++) {
-            double catchability = ((x[k] + 10) / 20) * (maxCatchability - minCatchability);
-            FisherDefinition definition = scenario.getFisherDefinitions().get(k);
+            final double catchability = ((x[k] + 10) / 20) * (maxCatchability - minCatchability);
+            final FisherDefinition definition = scenario.getFisherDefinitions().get(k);
             ((RandomCatchabilityTrawlFactory) definition.getGear()).setMeanCatchabilityFirstSpecies(
                 new FixedDoubleParameter(catchability)
             );
@@ -200,7 +201,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
         return scenarioFile;
     }
 
-    public void setScenarioFile(String scenarioFile) {
+    public void setScenarioFile(final String scenarioFile) {
         this.scenarioFile = scenarioFile;
     }
 
@@ -208,7 +209,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
         return summaryFile;
     }
 
-    public void setSummaryFile(String summaryFile) {
+    public void setSummaryFile(final String summaryFile) {
         this.summaryFile = summaryFile;
     }
 
@@ -216,7 +217,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
         return landingData;
     }
 
-    public void setLandingData(String landingData) {
+    public void setLandingData(final String landingData) {
         this.landingData = landingData;
     }
 
@@ -224,7 +225,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
         return seed;
     }
 
-    public void setSeed(long seed) {
+    public void setSeed(final long seed) {
         this.seed = seed;
     }
 
@@ -232,7 +233,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
         return maxCatchability;
     }
 
-    public void setMaxCatchability(double maxCatchability) {
+    public void setMaxCatchability(final double maxCatchability) {
         this.maxCatchability = maxCatchability;
     }
 
@@ -240,7 +241,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
         return minCatchability;
     }
 
-    public void setMinCatchability(double minCatchability) {
+    public void setMinCatchability(final double minCatchability) {
         this.minCatchability = minCatchability;
     }
 
@@ -249,7 +250,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
         return yearsToIgnore;
     }
 
-    public void setYearsToIgnore(int yearsToIgnore) {
+    public void setYearsToIgnore(final int yearsToIgnore) {
         this.yearsToIgnore = yearsToIgnore;
     }
 
@@ -257,7 +258,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
         return runsPerSetting;
     }
 
-    public void setRunsPerSetting(int runsPerSetting) {
+    public void setRunsPerSetting(final int runsPerSetting) {
         this.runsPerSetting = runsPerSetting;
     }
 
@@ -265,7 +266,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
         return speciesName;
     }
 
-    public void setSpeciesName(String speciesName) {
+    public void setSpeciesName(final String speciesName) {
         this.speciesName = speciesName;
     }
 
@@ -273,7 +274,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
         return populations;
     }
 
-    public void setPopulations(int populations) {
+    public void setPopulations(final int populations) {
         this.populations = populations;
     }
 }

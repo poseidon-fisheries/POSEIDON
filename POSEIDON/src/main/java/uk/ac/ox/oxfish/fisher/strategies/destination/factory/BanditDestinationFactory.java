@@ -32,7 +32,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Averager;
 import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
 import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
@@ -43,9 +42,11 @@ import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
 public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinationStrategy> {
 
 
-    private static final Locker<String, MapDiscretization> locker = new Locker();
+    @SuppressWarnings("deprecation")
+    private static final uk.ac.ox.oxfish.utility.Locker<String, MapDiscretization> locker =
+        new uk.ac.ox.oxfish.utility.Locker<>();
 
-    private AlgorithmFactory<? extends Averager> average = new ExponentialMovingAverageFactory();
+    private AlgorithmFactory<? extends Averager<?>> average = new ExponentialMovingAverageFactory();
 
     private AlgorithmFactory<? extends BanditSupplier> bandit = new EpsilonGreedyBanditFactory();
 
@@ -107,7 +108,7 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      *
      * @return Value for property 'average'.
      */
-    public AlgorithmFactory<? extends Averager> getAverage() {
+    public AlgorithmFactory<? extends Averager<?>> getAverage() {
         return average;
     }
 
@@ -116,7 +117,7 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      *
      * @param average Value to set for property 'average'.
      */
-    public void setAverage(final AlgorithmFactory<? extends Averager> average) {
+    public void setAverage(final AlgorithmFactory<? extends Averager<?>> average) {
         this.average = average;
     }
 

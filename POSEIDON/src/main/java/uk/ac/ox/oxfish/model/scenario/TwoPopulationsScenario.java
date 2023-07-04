@@ -391,28 +391,22 @@ public class TwoPopulationsScenario implements Scenario {
         smallFisherFactory.getAdditionalSetups().add(predictorSetup);
         largeFishersFactory.getAdditionalSetups().add(predictorSetup);
         //add tags
-        smallFisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
-            @Override
-            public void accept(final Fisher fisher) {
-                fisher.getTags().add("small");
-                fisher.getTags().add("yellow");
-                fisher.getTags().add("canoe");
-                //add hourly cost
-                fisher.getAdditionalTripCosts().add(
-                    new HourlyCost(hourlyTravellingCostSmall.applyAsDouble(model.getRandom()))
-                );
-            }
+        smallFisherFactory.getAdditionalSetups().add(fisher -> {
+            fisher.getTags().add("small");
+            fisher.getTags().add("yellow");
+            fisher.getTags().add("canoe");
+            //add hourly cost
+            fisher.getAdditionalTripCosts().add(
+                new HourlyCost(hourlyTravellingCostSmall.applyAsDouble(model.getRandom()))
+            );
         });
-        largeFishersFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
-            @Override
-            public void accept(final Fisher fisher) {
-                fisher.getTags().add("large");
-                fisher.getTags().add("ship");
-                fisher.getTags().add("red");
-                fisher.getAdditionalTripCosts().add(
-                    new HourlyCost(hourlyTravellingCostLarge.applyAsDouble(model.getRandom()))
-                );
-            }
+        largeFishersFactory.getAdditionalSetups().add(fisher -> {
+            fisher.getTags().add("large");
+            fisher.getTags().add("ship");
+            fisher.getTags().add("red");
+            fisher.getAdditionalTripCosts().add(
+                new HourlyCost(hourlyTravellingCostLarge.applyAsDouble(model.getRandom()))
+            );
         });
 
 
@@ -432,23 +426,13 @@ public class TwoPopulationsScenario implements Scenario {
 
         //don't let large boats befriend small boats
         if (!allowTwoPopulationFriendships) {
-            networkBuilder.addPredicate(new NetworkPredicate() {
-                @Override
-                public boolean test(final Fisher from, final Fisher to) {
-                    return (from.getTags().contains("small") && to.getTags().contains("small")) ||
-                        (from.getTags().contains("large") && to.getTags().contains("large"));
-                }
-            });
+            networkBuilder.addPredicate((NetworkPredicate) (from, to) -> (from.getTags().contains("small") && to.getTags().contains("small")) ||
+                (from.getTags().contains("large") && to.getTags().contains("large")));
         }
 
         if (!allowFriendshipsBetweenPorts) {
             //no friends from separate ports
-            networkBuilder.addPredicate(new NetworkPredicate() {
-                @Override
-                public boolean test(final Fisher from, final Fisher to) {
-                    return from.getHomePort().equals(to.getHomePort());
-                }
-            });
+            networkBuilder.addPredicate((NetworkPredicate) (from, to) -> from.getHomePort().equals(to.getHomePort()));
         }
 
         model.getYearlyDataSet().registerGatherer("Small Fishers Total Income",
@@ -490,48 +474,24 @@ public class TwoPopulationsScenario implements Scenario {
         //count effort too!
         final DataColumn smallEffort
             = model.getDailyDataSet().registerGatherer("Small Fishers Total Effort",
-            new Gatherer<FishState>() {
-                @Override
-                public Double apply(final FishState ignored) {
-                    return model.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(
-                            "small")).
-                        mapToDouble(
-                            new ToDoubleFunction<Fisher>() {
-                                @Override
-                                public double applyAsDouble(
-                                    final Fisher value
-                                ) {
-                                    return value.getDailyCounter().getColumn(
-                                        FisherYearlyTimeSeries.EFFORT);
-                                }
-                            }).sum();
-                }
-            }, 0d
+            (Gatherer<FishState>) ignored -> model.getFishers().stream().
+                filter(fisher -> fisher.getTags().contains(
+                    "small")).
+                mapToDouble(
+                    value -> value.getDailyCounter().getColumn(
+                        FisherYearlyTimeSeries.EFFORT)).sum(), 0d
         );
         model.getYearlyDataSet().registerGatherer("Small Fishers Total Effort",
             FishStateUtilities.generateYearlySum(smallEffort), Double.NaN
         );
         final DataColumn largeEffort
             = model.getDailyDataSet().registerGatherer("Large Fishers Total Effort",
-            new Gatherer<FishState>() {
-                @Override
-                public Double apply(final FishState ignored) {
-                    return model.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(
-                            "large")).
-                        mapToDouble(
-                            new ToDoubleFunction<Fisher>() {
-                                @Override
-                                public double applyAsDouble(
-                                    final Fisher value
-                                ) {
-                                    return value.getDailyCounter().getColumn(
-                                        FisherYearlyTimeSeries.EFFORT);
-                                }
-                            }).sum();
-                }
-            }, 0d
+            (Gatherer<FishState>) ignored -> model.getFishers().stream().
+                filter(fisher -> fisher.getTags().contains(
+                    "large")).
+                mapToDouble(
+                    value -> value.getDailyCounter().getColumn(
+                        FisherYearlyTimeSeries.EFFORT)).sum(), 0d
         );
         model.getYearlyDataSet().registerGatherer("Large Fishers Total Effort",
             FishStateUtilities.generateYearlySum(largeEffort), Double.NaN

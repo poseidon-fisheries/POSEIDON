@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 public class IndependentLogisticBiomassGrower implements Startable, Steppable {
 
 
+    private static final long serialVersionUID = 2221569851814511962L;
     /**
      * the uninpeded growth rate of each species
      */
@@ -57,43 +58,43 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable {
 
 
     public IndependentLogisticBiomassGrower(
-        double malthusianParameter,
-        Species species
+        final double malthusianParameter,
+        final Species species
     ) {
         this.malthusianParameter = malthusianParameter;
         this.species = species;
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
-        FishState model = ((FishState) simState);
+        final FishState model = ((FishState) simState);
 
         //remove all the biologies that stopped
         biologies = biologies.stream().filter(
             logisticLocalBiology -> !logisticLocalBiology.isStopped()).collect(Collectors.toList());
 
         //for each place
-        for (VariableBiomassBasedBiology biology : biologies) {
+        for (final VariableBiomassBasedBiology biology : biologies) {
             //grow fish
 
-            double[] currentBiomasses = biology.getCurrentBiomass();
+            final double[] currentBiomasses = biology.getCurrentBiomass();
 
 
-            int speciesIndex = species.getIndex();
+            final int speciesIndex = species.getIndex();
             assert currentBiomasses[speciesIndex] >= 0;
             //grows logistically
 
-            double carryingCapacity = biology.getCarryingCapacity(speciesIndex);
+            final double carryingCapacity = biology.getCarryingCapacity(speciesIndex);
             if (carryingCapacity > FishStateUtilities.EPSILON && carryingCapacity > currentBiomasses[speciesIndex]) {
-                double oldBiomass = currentBiomasses[speciesIndex];
+                final double oldBiomass = currentBiomasses[speciesIndex];
                 currentBiomasses[speciesIndex] = logisticStep(
                     currentBiomasses[speciesIndex],
                     carryingCapacity,
                     malthusianParameter
                 );
                 //store recruitment number, counter should have been initialized by factory!
-                double recruitment = currentBiomasses[speciesIndex] - oldBiomass;
+                final double recruitment = currentBiomasses[speciesIndex] - oldBiomass;
                 if (recruitment > FishStateUtilities.EPSILON)
                     model.getYearlyCounter().count(
                         model.getSpecies().get(speciesIndex) +
@@ -112,7 +113,7 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable {
     }
 
     public static double logisticStep(
-        double currentBiomasses, double carryingCapacity, double malthusianParameter
+        final double currentBiomasses, final double carryingCapacity, final double malthusianParameter
     ) {
         return Math.min(
             carryingCapacity,
@@ -130,9 +131,9 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable {
     }
 
     public static double logisticRecruitment(
-        double currentBiomasses,
-        double carryingCapacity,
-        double malthusianParameter
+        final double currentBiomasses,
+        final double carryingCapacity,
+        final double malthusianParameter
     ) {
         return malthusianParameter *
             (1d - currentBiomasses / carryingCapacity) * currentBiomasses;
@@ -145,7 +146,7 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         //schedule yourself
         Preconditions.checkArgument(receipt == null, "Already started!");
         receipt = model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);

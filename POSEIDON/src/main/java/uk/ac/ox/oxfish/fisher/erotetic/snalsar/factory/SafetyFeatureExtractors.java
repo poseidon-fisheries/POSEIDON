@@ -43,7 +43,7 @@ public class SafetyFeatureExtractors {
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
         NAMES.put(EverywhereTrueExtractorFactory.class, "Safe Everywhere");

@@ -15,6 +15,7 @@ import uk.ac.ox.oxfish.model.FishState;
 public class NonAssociatedSetFromLocationValuePlanningModule<B extends LocalBiology>
     extends LocationValuePlanningModule<B> {
 
+    @SuppressWarnings("unchecked")
     public NonAssociatedSetFromLocationValuePlanningModule(
         final NonAssociatedSetLocationValues locationValues,
         final NauticalMap map,

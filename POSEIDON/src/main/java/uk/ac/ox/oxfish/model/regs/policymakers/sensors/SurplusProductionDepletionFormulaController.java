@@ -62,37 +62,34 @@ public class SurplusProductionDepletionFormulaController implements
             );
 
         final TargetToTACController controller = new TargetToTACController(
-            new Sensor<FishState, Double>() {
-                @Override
-                public Double scan(FishState system) {
+            (Sensor<FishState, Double>) system -> {
 
-                    final SurplusProductionResult assessment = depletionSensor.scan(system);
-                    if (assessment == null) {
-                        System.out.println("stock assessment has failed!");
+                final SurplusProductionResult assessment = depletionSensor.scan(system);
+                if (assessment == null) {
+                    System.out.println("stock assessment has failed!");
+                    return minimumTAC.applyAsDouble(fishState.getRandom());
+                } else {
+                    double currentDepletion = assessment.getDepletion()[assessment.getDepletion().length - 1];
+
+                    //TAC=D*K*r/2
+                    //formula from here: https://dlmtool.github.io/DLMtool/reference/SPMSY.html
+                    final double tac = currentDepletion * assessment.getCarryingCapacity() *
+                        assessment.getLogisticGrowth() / 2d;
+                    System.out.println("tac: " + tac);
+                    System.out.println("current_depletion: " + currentDepletion);
+                    System.out.println("carrying_capacity: " + assessment.getCarryingCapacity());
+                    System.out.println("logistic_growth: " + assessment.getLogisticGrowth());
+
+                    lastAssessedCarryingCapacity = assessment.getCarryingCapacity();
+                    lastAssessedCurrentDepletion = currentDepletion;
+                    lastAssessedLogisticGrowth = assessment.getLogisticGrowth();
+
+                    if (tac < 0)
                         return minimumTAC.applyAsDouble(fishState.getRandom());
-                    } else {
-                        double currentDepletion = assessment.getDepletion()[assessment.getDepletion().length - 1];
 
-                        //TAC=D*K*r/2
-                        //formula from here: https://dlmtool.github.io/DLMtool/reference/SPMSY.html
-                        final double tac = currentDepletion * assessment.getCarryingCapacity() *
-                            assessment.getLogisticGrowth() / 2d;
-                        System.out.println("tac: " + tac);
-                        System.out.println("current_depletion: " + currentDepletion);
-                        System.out.println("carrying_capacity: " + assessment.getCarryingCapacity());
-                        System.out.println("logistic_growth: " + assessment.getLogisticGrowth());
-
-                        lastAssessedCarryingCapacity = assessment.getCarryingCapacity();
-                        lastAssessedCurrentDepletion = currentDepletion;
-                        lastAssessedLogisticGrowth = assessment.getLogisticGrowth();
-
-                        if (tac < 0)
-                            return minimumTAC.applyAsDouble(fishState.getRandom());
-
-                        return tac;
-                    }
-
+                    return tac;
                 }
+
             },
             interval * 365
         );
@@ -113,12 +110,9 @@ public class SurplusProductionDepletionFormulaController implements
 
 
             model.scheduleOnceInXDays(
-                new Steppable() {
-                    @Override
-                    public void step(SimState simState) {
-                        controller.start(model);
-                        controller.step(model);
-                    }
+                (Steppable) simState -> {
+                    controller.start(model);
+                    controller.step(model);
                 },
                 StepOrder.DAWN,
                 365 * startingYear + 1

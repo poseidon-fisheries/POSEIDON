@@ -19,12 +19,13 @@ public class FixedYearlyPricesBiomassMarket
     extends AbstractBiomassMarket
     implements Steppable {
 
+    private static final long serialVersionUID = -5976663174160387350L;
     private final Map<Integer, Double> yearlyPrices;
     private final int lastYear;
     private boolean defaultingToLastYear = true;
     private Integer currentYear;
 
-    public FixedYearlyPricesBiomassMarket(Map<Integer, Double> yearlyPrices) {
+    public FixedYearlyPricesBiomassMarket(final Map<Integer, Double> yearlyPrices) {
         this.yearlyPrices = ImmutableMap.copyOf(yearlyPrices);
         this.lastYear = yearlyPrices.keySet().stream()
             .max(naturalOrder())
@@ -33,11 +34,11 @@ public class FixedYearlyPricesBiomassMarket
 
     @Override
     protected TradeInfo sellFishImplementation(
-        double biomass,
-        Fisher fisher,
-        Regulation regulation,
-        FishState fishState,
-        Species species
+        final double biomass,
+        final Fisher fisher,
+        final Regulation regulation,
+        final FishState fishState,
+        final Species species
     ) {
         if (defaultingToLastYear) {
             checkArgument(
@@ -62,7 +63,7 @@ public class FixedYearlyPricesBiomassMarket
         return currentYear;
     }
 
-    public void setCurrentYear(int currentYear) {
+    public void setCurrentYear(final int currentYear) {
         if (yearlyPrices.containsKey(currentYear)) {
             this.currentYear = currentYear;
         } else if (defaultingToLastYear) {
@@ -79,13 +80,13 @@ public class FixedYearlyPricesBiomassMarket
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         final FishState fishState = (FishState) simState;
         setCurrentYear(fishState.getCalendarYear());
     }
 
     @Override
-    public void start(FishState fishState) {
+    public void start(final FishState fishState) {
         if (!isStarted()) {
             super.start(fishState);
             fishState.scheduleOnce(this, StepOrder.DAWN);
@@ -102,7 +103,7 @@ public class FixedYearlyPricesBiomassMarket
     }
 
     @SuppressWarnings("unused")
-    public void setDefaultingToLastYear(boolean defaultingToLastYear) {
+    public void setDefaultingToLastYear(final boolean defaultingToLastYear) {
         this.defaultingToLastYear = defaultingToLastYear;
     }
 }

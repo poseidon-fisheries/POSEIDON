@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.biology.initializer.factory;
 import uk.ac.ox.oxfish.biology.initializer.YellowBycatchInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -31,7 +30,9 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Created by carrknight on 1/21/17.
  */
 public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchInitializer> {
-    private final Locker<String, YellowBycatchInitializer> instance = new Locker<>();
+    @SuppressWarnings("deprecation")
+    private final uk.ac.ox.oxfish.utility.Locker<String, YellowBycatchInitializer> instance =
+        new uk.ac.ox.oxfish.utility.Locker<>();
     private boolean separateBycatchStock = false;
     private String targetSpeciesName = "Sablefish";
     private String bycatchSpeciesName = "Yelloweye Rockfish";

@@ -17,7 +17,7 @@ public class DolphinSetFromLocationValuePlanningModule<B extends LocalBiology>
 
     public DolphinSetFromLocationValuePlanningModule(
         final DolphinSetLocationValues locationValues,
-        final CatchSamplerPlannedActionGenerator.DolphinActionGenerator generator
+        final CatchSamplerPlannedActionGenerator.DolphinActionGenerator<B> generator
     ) {
         super(locationValues, generator);
     }

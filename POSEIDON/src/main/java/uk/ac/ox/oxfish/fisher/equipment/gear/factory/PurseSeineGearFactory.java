@@ -75,7 +75,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private InputPath locationValuesFile;
-    private AlgorithmFactory<? extends FadInitializer> fadInitializerFactory;
+    private AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory;
     private AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory;
     private AlgorithmFactory<? extends Regulation<? super PurseSeinerActionContext>> regulationsFactory;
 
@@ -84,7 +84,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
 
     public PurseSeineGearFactory(
         final AlgorithmFactory<? extends Regulation<? super PurseSeinerActionContext>> regulationsFactory,
-        final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory,
+        final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory,
         final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory
     ) {
         this.regulationsFactory = regulationsFactory;
@@ -120,11 +120,11 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         this.maxAllowableShear = maxAllowableShear;
     }
 
-    public AlgorithmFactory<? extends FadInitializer> getFadInitializerFactory() {
+    public AlgorithmFactory<? extends FadInitializer<?, ?>> getFadInitializerFactory() {
         return fadInitializerFactory;
     }
 
-    public void setFadInitializerFactory(final AlgorithmFactory<? extends FadInitializer> fadInitializerFactory) {
+    public void setFadInitializerFactory(final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory) {
         this.fadInitializerFactory = fadInitializerFactory;
     }
 
@@ -176,7 +176,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
 
         final MersenneTwisterFast rng = fishState.getRandom();
         final GlobalBiology globalBiology = fishState.getBiology();
-        final FadManager fadManager = new FadManager(
+        return new FadManager(
             regulationsFactory.apply(fishState),
             fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
@@ -190,7 +190,6 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
             actionSpecificRegulations,
             fishValueCalculatorFactory.apply(fishState)
         );
-        return fadManager;
     }
 
     public void addMonitors(final Monitors monitors) {

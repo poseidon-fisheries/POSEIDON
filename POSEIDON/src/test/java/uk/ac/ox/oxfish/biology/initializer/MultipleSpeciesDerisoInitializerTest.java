@@ -100,12 +100,7 @@ public class MultipleSpeciesDerisoInitializerTest {
             .0001d
         );
 
-        final double virginBiomass = map.getAllSeaTilesAsList().stream().mapToDouble(new ToDoubleFunction<SeaTile>() {
-            @Override
-            public double applyAsDouble(final SeaTile value) {
-                return ((VariableBiomassBasedBiology) value.getBiology()).getCarryingCapacity(fakeSpecies);
-            }
-        }).sum();
+        final double virginBiomass = map.getAllSeaTilesAsList().stream().mapToDouble(value -> ((VariableBiomassBasedBiology) value.getBiology()).getCarryingCapacity(fakeSpecies)).sum();
 
         //biomass should also have been scaled!
         assertEquals(virginBiomass, 4000d, .0001d);

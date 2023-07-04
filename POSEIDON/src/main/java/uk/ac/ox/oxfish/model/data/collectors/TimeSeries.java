@@ -43,6 +43,7 @@ import static uk.ac.ox.oxfish.utility.Measures.Money;
  * Created by carrknight on 5/2/15.
  */
 public class TimeSeries<T> implements Steppable {
+    private static final long serialVersionUID = -3947845104831065973L;
     final private LinkedHashMap<String, ColumnGatherer<T>> data;
 
 

@@ -29,6 +29,8 @@ import java.util.function.ToDoubleFunction;
 
 public class FadDensityHeatmapGatherer extends HeatmapGatherer {
 
+    private static final long serialVersionUID = -5707936919764634160L;
+
     public FadDensityHeatmapGatherer(
         final int interval
     ) {

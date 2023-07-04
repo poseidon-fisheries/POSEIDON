@@ -34,6 +34,7 @@ import java.io.Serializable;
  * a container for all the fisher equipment variables
  */
 public class FisherEquipment implements Serializable {
+    private static final long serialVersionUID = 7023995324809495505L;
     /**
      * boat statistics (also holds information about how much the boat has travelled so far)
      */
@@ -50,7 +51,7 @@ public class FisherEquipment implements Serializable {
     private Gear gear;
 
 
-    public FisherEquipment(Boat boat, Hold hold, Gear gear) {
+    public FisherEquipment(final Boat boat, final Hold hold, final Gear gear) {
         this.boat = boat;
         this.hold = hold;
         this.gear = gear;
@@ -60,7 +61,7 @@ public class FisherEquipment implements Serializable {
         return hold;
     }
 
-    public void setHold(Hold hold) {
+    public void setHold(final Hold hold) {
         this.hold = hold;
     }
 
@@ -68,7 +69,7 @@ public class FisherEquipment implements Serializable {
         return boat;
     }
 
-    public void setBoat(Boat boat) {
+    public void setBoat(final Boat boat) {
         this.boat = boat;
     }
 
@@ -76,7 +77,7 @@ public class FisherEquipment implements Serializable {
         return gear;
     }
 
-    public void setGear(Gear gear) {
+    public void setGear(final Gear gear) {
         this.gear = gear;
     }
 
@@ -84,7 +85,7 @@ public class FisherEquipment implements Serializable {
         return hold.getTotalWeightOfCatchInHold();
     }
 
-    public double getWeightOfCatchInHold(Species species) {
+    public double getWeightOfCatchInHold(final Species species) {
         return hold.getWeightOfCatchInHold(species);
     }
 
@@ -98,10 +99,11 @@ public class FisherEquipment implements Serializable {
 
 
     public FisherEquipment makeCopy() {
-        FuelTank tank = new FuelTank(boat.getFuelCapacityInLiters());
+        final FuelTank tank = new FuelTank(boat.getFuelCapacityInLiters());
         tank.refill();
         tank.consume(tank.getFuelCapacityInLiters() - boat.getLitersOfFuelInTank());
-        return new FisherEquipment(new Boat(boat.getLength(),
+        return new FisherEquipment(new Boat(
+            boat.getLength(),
             boat.getWidth(),
             new Engine(boat.getPowerInBhp(), boat.getEfficiencyAsLitersPerKm(), boat.getSpeedInKph()),
             tank

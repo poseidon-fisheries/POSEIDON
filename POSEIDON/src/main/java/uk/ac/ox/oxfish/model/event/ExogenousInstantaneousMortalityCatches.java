@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class ExogenousInstantaneousMortalityCatches extends AbstractExogenousCatches {
 
 
+    private static final long serialVersionUID = -4344067631722700547L;
     private final HashMap<String, Double> exponentialMortality;
 
 
@@ -28,9 +29,9 @@ public class ExogenousInstantaneousMortalityCatches extends AbstractExogenousCat
 
 
     public ExogenousInstantaneousMortalityCatches(
-        String dataColumnName,
-        LinkedHashMap<String, Double> exponentialMortality,
-        boolean isAbundanceBased
+        final String dataColumnName,
+        final LinkedHashMap<String, Double> exponentialMortality,
+        final boolean isAbundanceBased
     ) {
         super(dataColumnName);
         this.exponentialMortality = exponentialMortality;
@@ -38,27 +39,27 @@ public class ExogenousInstantaneousMortalityCatches extends AbstractExogenousCat
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         final FishState model = (FishState) simState;
 
-        List<? extends LocalBiology> allTiles = getAllCatchableBiologies(model);
+        final List<? extends LocalBiology> allTiles = getAllCatchableBiologies(model);
 
-        for (Map.Entry<String, Double> mortality : exponentialMortality.entrySet()) {
+        for (final Map.Entry<String, Double> mortality : exponentialMortality.entrySet()) {
             //total landed
             double totalLanded = 0;
 
             //get the species
-            Species target = model.getSpecies(mortality.getKey());
+            final Species target = model.getSpecies(mortality.getKey());
             Preconditions.checkArgument(target != null, "Couldn't find this species");
 
 
             //worry only about tiles that have this fish
-            List<? extends LocalBiology> tiles = allTiles.stream().filter(
+            final List<? extends LocalBiology> tiles = allTiles.stream().filter(
                 seaTile -> getFishableBiomass(target, seaTile) >
                     FishStateUtilities.EPSILON).collect(Collectors.toList());
 
             final Double instantMortality = mortality.getValue();
-            for (LocalBiology tile : tiles) {
+            for (final LocalBiology tile : tiles) {
                 if (isAbundanceBased) {
                     totalLanded += abundanceCatch(instantMortality,
                         model, target, tile
@@ -80,15 +81,15 @@ public class ExogenousInstantaneousMortalityCatches extends AbstractExogenousCat
     }
 
     private double abundanceCatch(
-        double mortality,
-        FishState fishstate, Species species, LocalBiology tile
+        final double mortality,
+        final FishState fishstate, final Species species, final LocalBiology tile
     ) {
-        HomogeneousAbundanceGear gear = new HomogeneousAbundanceGear(
+        final HomogeneousAbundanceGear gear = new HomogeneousAbundanceGear(
             0d,
             new ExponentialMortalityFilter(mortality)
         );
         final GlobalBiology biology = fishstate.getBiology();
-        StructuredAbundance[] structuredAbundances = new StructuredAbundance[biology.getSize()];
+        final StructuredAbundance[] structuredAbundances = new StructuredAbundance[biology.getSize()];
         for (int i = 0; i < structuredAbundances.length; i++)
             structuredAbundances[i] = new StructuredAbundance(
                 biology.getSpecie(i).getNumberOfSubdivisions(),
@@ -96,7 +97,7 @@ public class ExogenousInstantaneousMortalityCatches extends AbstractExogenousCat
             );
         structuredAbundances[species.getIndex()] =
             gear.catchesAsAbundanceForThisSpecies(tile, 1, species);
-        Catch fish = new Catch(
+        final Catch fish = new Catch(
             structuredAbundances,
             biology
         );
@@ -104,9 +105,9 @@ public class ExogenousInstantaneousMortalityCatches extends AbstractExogenousCat
         return fish.getTotalWeight();
     }
 
-    private double biomassCatch(FishState fishstate, Species target, Double instantMortality, LocalBiology tile) {
+    private double biomassCatch(final FishState fishstate, final Species target, final Double instantMortality, final LocalBiology tile) {
         assert tile.getBiomass(target) > FishStateUtilities.EPSILON;
-        double caught = tile.getBiomass(target) * (1 - Math.exp(-instantMortality));
+        final double caught = tile.getBiomass(target) * (1 - Math.exp(-instantMortality));
         Catch fish = new Catch(
             target,
             caught,

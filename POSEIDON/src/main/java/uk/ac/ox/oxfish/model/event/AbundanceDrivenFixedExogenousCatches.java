@@ -28,9 +28,10 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.FixedProportionFilter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.LinkedHashMap;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * Basically you are given a number of fish to kill each year and you do that
@@ -40,8 +41,10 @@ import java.util.LinkedHashMap;
 public class AbundanceDrivenFixedExogenousCatches extends AbstractYearlyTargetExogenousCatches {
 
 
+    private static final long serialVersionUID = -3491975654187985622L;
+
     public AbundanceDrivenFixedExogenousCatches(
-        LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg
+        final LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg
     ) {
         super(exogenousYearlyCatchesInKg, "Exogenous catches of ");
     }
@@ -55,7 +58,12 @@ public class AbundanceDrivenFixedExogenousCatches extends AbstractYearlyTargetEx
      * @param step   how much at most to kill
      * @return
      */
-    protected Catch mortalityEvent(FishState model, Species target, LocalBiology tile, double step) {
+    protected Catch mortalityEvent(
+        final FishState model,
+        final Species target,
+        final LocalBiology tile,
+        final double step
+    ) {
         return abundanceSimpleMortalityEvent(model, target, tile, step, true);
     }
 
@@ -70,23 +78,23 @@ public class AbundanceDrivenFixedExogenousCatches extends AbstractYearlyTargetEx
      * @return
      */
     public static Catch abundanceSimpleMortalityEvent(
-        FishState model, Species target, LocalBiology tile, double step, final boolean rounding
+        final FishState model, final Species target, final LocalBiology tile, final double step, final boolean rounding
     ) {
         //take it as a fixed proportion catchability (and never more than it is available anyway)
         assert tile.getBiomass(target) > FishStateUtilities.EPSILON;
-        double proportionToCatch = Math.min(1, step / tile.getBiomass(target));
+        final double proportionToCatch = Math.min(1, step / tile.getBiomass(target));
         //simulate the catches as a fixed proportion gear
-        HomogeneousAbundanceGear simulatedGear = new HomogeneousAbundanceGear(
+        final HomogeneousAbundanceGear simulatedGear = new HomogeneousAbundanceGear(
             0,
             new FixedProportionFilter(
                 proportionToCatch, rounding)
         );
         //hide it in an heterogeneous abundance gear so that only one species at a time gets aught!
-        HeterogeneousAbundanceGear gear = new HeterogeneousAbundanceGear(
-            new Pair<>(target, simulatedGear)
+        final HeterogeneousAbundanceGear gear = new HeterogeneousAbundanceGear(
+            entry(target, simulatedGear)
         );
         //catch it
-        Catch fish = gear.fish(null, tile, null, 1, model.getBiology());
+        final Catch fish = gear.fish(null, tile, null, 1, model.getBiology());
         tile.reactToThisAmountOfBiomassBeingFished(fish, fish, model.getBiology());
         return fish;
     }

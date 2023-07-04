@@ -35,43 +35,45 @@ import java.util.HashMap;
 public class ModelResults extends HashMap<String, Object> {
 
 
+    private static final long serialVersionUID = -5596654891501051700L;
+
     /**
      * Construct the hash-map. Ready for serialization!
      */
-    public ModelResults(FishState state) {
+    public ModelResults(final FishState state) {
 
 
         //dump columns of yearly data in
-        HashMap<String, Object> modelData = new HashMap<>(state.getYearlyDataSet().getColumns().size());
-        for (DataColumn column : state.getYearlyDataSet().getColumns())
+        final HashMap<String, Object> modelData = new HashMap<>(state.getYearlyDataSet().getColumns().size());
+        for (final DataColumn column : state.getYearlyDataSet().getColumns())
             modelData.put(column.getName(), column.copy());
         this.put("FishState", modelData);
 
         //also daily data
         //dump columns of yearly data in
-        HashMap<String, Object> dailyData = new HashMap<>(state.getDailyDataSet().getColumns().size());
-        for (DataColumn column : state.getDailyDataSet().getColumns())
+        final HashMap<String, Object> dailyData = new HashMap<>(state.getDailyDataSet().getColumns().size());
+        for (final DataColumn column : state.getDailyDataSet().getColumns())
             dailyData.put(column.getName(), column.copy());
         this.put("FishState Daily", dailyData);
 
         //Also prints out fisher's averages
         if (state.getFishers().size() > 0) {
-            HashMap<String, Object> fisherData = new HashMap<>();
-            Collection<DataColumn> fisherColumns = state.getFishers().get(0).getYearlyData().getColumns();
-            int years = fisherColumns.iterator().next().size();
-            for (DataColumn column : fisherColumns) {
-                HashMap<String, Object> columnData = new HashMap<>();
+            final HashMap<String, Object> fisherData = new HashMap<>();
+            final Collection<DataColumn> fisherColumns = state.getFishers().get(0).getYearlyData().getColumns();
+            final int years = fisherColumns.iterator().next().size();
+            for (final DataColumn column : fisherColumns) {
+                final HashMap<String, Object> columnData = new HashMap<>();
                 fisherData.put(column.getName(), columnData);
 
                 for (int year = 0; year < years; year++) {
 
-                    DoubleSummaryStatistics stats = new DoubleSummaryStatistics();
-                    for (Fisher fisher : state.getFishers())
+                    final DoubleSummaryStatistics stats = new DoubleSummaryStatistics();
+                    for (final Fisher fisher : state.getFishers())
                         if (fisher.getYearlyData().numberOfObservations() > year)
                             stats.accept(fisher.getYearlyData().getColumn(column.getName()).get(year));
                         else
                             stats.accept(Double.NaN);
-                    HashMap<String, Object> yearData = new HashMap<>();
+                    final HashMap<String, Object> yearData = new HashMap<>();
                     columnData.put(Integer.toString(year), yearData);
                     yearData.put("Average", stats.getAverage());
                     yearData.put("Max", stats.getMax());

@@ -25,10 +25,9 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Very simple logit regression returning true or false
@@ -43,15 +42,16 @@ public class LogisticClassifier {
     private final LinkedHashMap<ObservationExtractor, Double> betas;
 
 
-    public LogisticClassifier(Pair<ObservationExtractor, Double>... betas) {
+    @SuppressWarnings("unchecked")
+    public LogisticClassifier(final Entry<ObservationExtractor, Double>... betas) {
 
         this.betas = new LinkedHashMap<>();
-        for (Pair<ObservationExtractor, Double> beta : betas)
-            this.betas.put(beta.getFirst(), beta.getSecond());
+        for (final Entry<ObservationExtractor, Double> beta : betas)
+            this.betas.put(beta.getKey(), beta.getValue());
     }
 
     public LogisticClassifier(
-        LinkedHashMap<ObservationExtractor, Double> betas
+        final LinkedHashMap<ObservationExtractor, Double> betas
     ) {
         this.betas = betas;
     }
@@ -67,7 +67,11 @@ public class LogisticClassifier {
      * @return true or false
      */
     public boolean test(
-        Fisher agent, final double testTime, FishState model, SeaTile tile, MersenneTwisterFast random
+        final Fisher agent,
+        final double testTime,
+        final FishState model,
+        final SeaTile tile,
+        final MersenneTwisterFast random
     ) {
 
         return random.nextBoolean(getProbability(agent, testTime, model, tile));
@@ -83,10 +87,10 @@ public class LogisticClassifier {
      * @return a number between 0 and 1
      */
     public double getProbability(
-        Fisher agent, final double hoursSinceStart, FishState model, SeaTile tile
+        final Fisher agent, final double hoursSinceStart, final FishState model, final SeaTile tile
     ) {
         double linearComponent = 0;
-        for (Map.Entry<ObservationExtractor, Double> element : betas.entrySet()) {
+        for (final Entry<ObservationExtractor, Double> element : betas.entrySet()) {
             linearComponent += element.getKey().extract(
                 tile,
                 hoursSinceStart,
@@ -107,7 +111,7 @@ public class LogisticClassifier {
      * @return true or false
      */
     public boolean test(
-        Fisher agent, FishState model, SeaTile tile, MersenneTwisterFast random
+        final Fisher agent, final FishState model, final SeaTile tile, final MersenneTwisterFast random
     ) {
 
         return random.nextBoolean(getProbability(agent, model.getHoursSinceStart(), model, tile));

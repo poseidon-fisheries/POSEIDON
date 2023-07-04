@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.model;
 
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.dynapro.AmateurishApproximateDynamicProgram;
 
 import static org.junit.Assert.assertEquals;
@@ -39,9 +38,9 @@ public class AmateurishApproximateDynamicProgramTest {
 
         //it's always better to take action 0 when 2a > b + c (good state)
         //and action 1 viceversa. Can it show in the value function?
-        MersenneTwisterFast random = new MersenneTwisterFast();
+        final MersenneTwisterFast random = new MersenneTwisterFast();
 
-        AmateurishApproximateDynamicProgram program = new AmateurishApproximateDynamicProgram(2, 3, .05);
+        final AmateurishApproximateDynamicProgram program = new AmateurishApproximateDynamicProgram(2, 3, .05);
 
         double reward = Double.NaN;
         int actionTaken = -100;
@@ -52,23 +51,25 @@ public class AmateurishApproximateDynamicProgramTest {
 
 
             //state variables go from -1 to 1
-            double a = random.nextDouble() * 2;
-            double b = random.nextDouble() * 2;
-            double c = random.nextDouble() * 2;
+            final double a = random.nextDouble() * 2;
+            final double b = random.nextDouble() * 2;
+            final double c = random.nextDouble() * 2;
 
             //update at the new state if possible
             if (Double.isFinite(oldA))
-                program.updateActionDueToImmediateReward(actionTaken,
+                program.updateActionDueToImmediateReward(
+                    actionTaken,
                     reward,
                     1,
                     new double[]{oldA, oldB, oldC},
-                    new double[]{a, b, c});
+                    new double[]{a, b, c}
+                );
 
 
             //ask program to choose best action
-            Pair<Integer, Double> action = program.chooseBestAction(a, b, c);
-            actionTaken = action.getFirst();
-            boolean goodState = 2 * a > b + c;
+            final Entry<Integer, Double> action = program.chooseBestAction(a, b, c);
+            actionTaken = action.getKey();
+            final boolean goodState = 2 * a > b + c;
             //compute the reward
             if (goodState) {
                 if (actionTaken == 0) {
@@ -92,8 +93,8 @@ public class AmateurishApproximateDynamicProgramTest {
 
         System.out.println(program);
         //you should be able to make at least the easy decisions:
-        assertEquals(0, (int) program.chooseBestAction(1, .2, .2).getFirst());
-        assertEquals(1, (int) program.chooseBestAction(.3, .5, .5).getFirst());
+        assertEquals(0, (int) program.chooseBestAction(1, .2, .2).getKey());
+        assertEquals(1, (int) program.chooseBestAction(.3, .5, .5).getKey());
 
         //and the signs ought to be right
         assertTrue(program.getLinearParameters()[0][0] > 0);

@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.model.regs.factory;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.regs.ITQCostManager;
 import uk.ac.ox.oxfish.model.regs.SpecificQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -32,7 +31,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Like Mono factory but these quotas are not valid for all species but only for one of them
@@ -63,43 +61,42 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
      * @return the function result
      */
     @Override
-    public SpecificQuotaRegulation apply(FishState state) {
+    public SpecificQuotaRegulation apply(final FishState state) {
         //todo need to make this for multiple species
 
         //did we create a market already?
         if (!marketBuilders.containsKey(state)) {
             //if not, create it!
-            ITQMarketBuilder initializer = new ITQMarketBuilder(0);
+            final ITQMarketBuilder initializer = new ITQMarketBuilder(0);
             //make sure it will start with the model
             state.registerStartable(initializer);
             //put it in the map so we only create it once
             marketBuilders.put(state, initializer);
         }
-        ITQMarketBuilder marketBuilder = marketBuilders.get(state);
+        final ITQMarketBuilder marketBuilder = marketBuilders.get(state);
         assert marketBuilder != null;
         final Species protectedSpecies = state.getSpecies().get(specieIndex);
         //now I need to add the opportunity cost
-        ITQCostManager cost = new ITQCostManager(new Function<Species, ITQOrderBook>() {
-            @Override
-            public ITQOrderBook apply(Species species) {
-                if (species == protectedSpecies)
-                    return marketBuilder.getMarket();
-                else
-                    return null;
-            }
+        final ITQCostManager cost = new ITQCostManager(species -> {
+            if (species == protectedSpecies)
+                return marketBuilder.getMarket();
+            else
+                return null;
         });
-        SpecificQuotaRegulation regulation = new SpecificQuotaRegulation(
+        final SpecificQuotaRegulation regulation = new SpecificQuotaRegulation(
             individualQuota.applyAsDouble(state.getRandom()), state,
             protectedSpecies
         ) {
+            private static final long serialVersionUID = -67135632036921614L;
+
             @Override
-            public void start(FishState model, Fisher fisher) {
+            public void start(final FishState model, final Fisher fisher) {
                 super.start(model, fisher);
                 fisher.getOpportunityCosts().add(cost);
             }
 
             @Override
-            public void turnOff(Fisher fisher) {
+            public void turnOff(final Fisher fisher) {
                 super.turnOff(fisher);
                 fisher.getOpportunityCosts().remove(cost);
             }
@@ -115,7 +112,7 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
         return individualQuota;
     }
 
-    public void setIndividualQuota(DoubleParameter individualQuota) {
+    public void setIndividualQuota(final DoubleParameter individualQuota) {
         this.individualQuota = individualQuota;
     }
 
@@ -123,7 +120,7 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
         return specieIndex;
     }
 
-    public void setSpecieIndex(int specieIndex) {
+    public void setSpecieIndex(final int specieIndex) {
         this.specieIndex = specieIndex;
     }
 }

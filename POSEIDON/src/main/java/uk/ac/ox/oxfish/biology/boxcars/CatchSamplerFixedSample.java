@@ -8,9 +8,9 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable {
 
 
+    private static final long serialVersionUID = -550770280616787700L;
     private final LinkedHashMap<String, Integer> numberOfSamplesPerTag = new LinkedHashMap<>();
 
     private final HashSet<Fisher> observedFishers = new HashSet<>();
@@ -29,8 +30,8 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
     private Stoppable receipt;
 
     public CatchSamplerFixedSample(
-        LinkedHashMap<String, Integer> numberOfSamplesPerTag,
-        Species species
+        final LinkedHashMap<String, Integer> numberOfSamplesPerTag,
+        final Species species
     ) {
         this.delegate = new CatchSample(
             species,
@@ -58,7 +59,7 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
     }
 
     @Override
-    public double[][] getAbundance(Function<Pair<Integer, Integer>, Double> subdivisionBinToWeightFunction) {
+    public double[][] getAbundance(final Function<Entry<Integer, Integer>, Double> subdivisionBinToWeightFunction) {
         return delegate.getAbundance(subdivisionBinToWeightFunction);
     }
 
@@ -79,7 +80,7 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
 
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
         step(model);
         receipt = model.scheduleEveryYear(this, StepOrder.AFTER_DATA);
@@ -88,7 +89,7 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
         checkWhichFisherToObserve(((FishState) simState));
     }
 
@@ -97,7 +98,7 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
      *
      * @param model the model
      */
-    private void checkWhichFisherToObserve(FishState model) {
+    private void checkWhichFisherToObserve(final FishState model) {
 
         //remove fishers who do not go out anymore from the list of observations
         final List<Fisher> stillValidFishersToObserve = observedFishers.stream().filter(
@@ -108,15 +109,17 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
         observedFishers.addAll(stillValidFishersToObserve);
 
 
-        for (Map.Entry<String, Integer> tagToSample : numberOfSamplesPerTag.entrySet()) {
+        for (final Entry<String, Integer> tagToSample : numberOfSamplesPerTag.entrySet()) {
 
             //how many are you already monitoring?
-            long currentlyContained = observedFishers.stream().filter(
+            final long currentlyContained = observedFishers.stream().filter(
                 fisher -> fisher.getTags().contains(tagToSample.getKey())
             ).count();
             //how many do you need to add to the sample?
-            long shortfall = Math.max(tagToSample.getValue() - currentlyContained,
-                0); //could go negative if the tag is shared among many populations
+            final long shortfall = Math.max(
+                tagToSample.getValue() - currentlyContained,
+                0
+            ); //could go negative if the tag is shared among many populations
             if (shortfall > 0)
                 model.getFishers().stream().
                     //ignore fishers that quit
@@ -158,16 +161,16 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
         private final MersenneTwisterFast random;
 
 
-        public RandomComparator(MersenneTwisterFast random) {
+        public RandomComparator(final MersenneTwisterFast random) {
             this.random = random;
         }
 
         @Override
-        public int compare(T t1, T t2) {
+        public int compare(final T t1, final T t2) {
             return Integer.compare(valueFor(t1), valueFor(t2));
         }
 
-        private int valueFor(T t) {
+        private int valueFor(final T t) {
             synchronized (map) {
                 return map.computeIfAbsent(t, ignore -> random.nextInt());
             }

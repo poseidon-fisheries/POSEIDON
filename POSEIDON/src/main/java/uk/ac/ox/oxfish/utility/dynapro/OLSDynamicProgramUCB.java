@@ -23,8 +23,8 @@ package uk.ac.ox.oxfish.utility.dynapro;
 import com.google.common.base.Preconditions;
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -46,16 +46,33 @@ public class OLSDynamicProgramUCB extends OLSDynamicProgram {
     private double risk;
 
 
+    @SuppressWarnings("unchecked")
     public OLSDynamicProgramUCB(
-        int possibleActions,
-        Function<FishState, Double> rewardFunction, boolean addSquares,
-        boolean addCubes, boolean addInteractions, boolean addCumulative, boolean addAverages, boolean addLags,
-        double errorRate, Predicate<double[]> lastStep,
-        double risk, Function<Pair<FishState, Double>, Double>... features
+        final int possibleActions,
+        final Function<FishState, Double> rewardFunction,
+        final boolean addSquares,
+        final boolean addCubes,
+        final boolean addInteractions,
+        final boolean addCumulative,
+        final boolean addAverages,
+        final boolean addLags,
+        final double errorRate,
+        final Predicate<double[]> lastStep,
+        final double risk,
+        final Function<Entry<FishState, Double>, Double>... features
     ) {
-        super(possibleActions, rewardFunction, addSquares, addCubes, addInteractions, addCumulative, addAverages,
+        super(
+            possibleActions,
+            rewardFunction,
+            addSquares,
+            addCubes,
+            addInteractions,
+            addCumulative,
+            addAverages,
             addLags,
-            errorRate, lastStep, features
+            errorRate,
+            lastStep,
+            features
         );
         this.risk = risk;
 
@@ -68,17 +85,17 @@ public class OLSDynamicProgramUCB extends OLSDynamicProgram {
 
     @Override
     protected void updateLinearParametersGivenRegression(
-        int i, OLSMultipleLinearRegression regression, double[][] x
+        final int i, final OLSMultipleLinearRegression regression, final double[][] x
     ) {
 
 
         //compute variance as well
-        double[] residuals = regression.estimateResiduals();
+        final double[] residuals = regression.estimateResiduals();
         //square them then log them
         for (int j = 0; j < residuals.length; j++)
             residuals[j] = Math.log(residuals[j] * residuals[j]);
         //regress
-        OLSMultipleLinearRegression variance = new OLSMultipleLinearRegression();
+        final OLSMultipleLinearRegression variance = new OLSMultipleLinearRegression();
         variance.setNoIntercept(true);
         variance.newSampleData(residuals, x);
         temporaryVarianceCoefficients[i] = variance.estimateRegressionParameters();
@@ -105,8 +122,8 @@ public class OLSDynamicProgramUCB extends OLSDynamicProgram {
      * @return an array producing the scores
      */
     @Override
-    protected double[] scoreEachAction(double[] currentFeatures) {
-        double[] qValues = super.scoreEachAction(currentFeatures);
+    protected double[] scoreEachAction(final double[] currentFeatures) {
+        final double[] qValues = super.scoreEachAction(currentFeatures);
         for (int i = 0; i < qValues.length; i++) {
             double std = 0;
             for (int j = 0; j < getRegressionDimension(); j++)
@@ -124,7 +141,7 @@ public class OLSDynamicProgramUCB extends OLSDynamicProgram {
      * @param errorRate Value to set for property 'errorRate'.
      */
     @Override
-    public void setErrorRate(double errorRate) {
+    public void setErrorRate(final double errorRate) {
         super.setErrorRate(errorRate);
         if (errorRate == 0)
             setRisk(0);
@@ -146,7 +163,7 @@ public class OLSDynamicProgramUCB extends OLSDynamicProgram {
      *
      * @param risk Value to set for property 'risk'.
      */
-    public void setRisk(double risk) {
+    public void setRisk(final double risk) {
         this.risk = risk;
     }
 }

@@ -126,7 +126,7 @@ public class Aug22Calibrations {
 
         if (fixHazardAndWait) {
             //set the scenario
-            final AlgorithmFactory<? extends FadInitializer> fadInitializer = scenario.getPurseSeinerFleetFactory()
+            final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializer = scenario.getPurseSeinerFleetFactory()
                 .getPurseSeineGearFactory()
                 .getFadInitializerFactory();
             //weird but we know the name, not the class!

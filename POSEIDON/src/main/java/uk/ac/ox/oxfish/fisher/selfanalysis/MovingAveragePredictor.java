@@ -25,7 +25,6 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
@@ -41,6 +40,7 @@ import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 public abstract class MovingAveragePredictor implements Predictor, Steppable {
 
 
+    private static final long serialVersionUID = -9163159319036838257L;
     /**
      * name to use in the data column
      */
@@ -59,7 +59,7 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable {
     protected Stoppable stoppable;
 
 
-    private MovingAveragePredictor(String name, Sensor<Fisher, Double> sensor, int averageWindow) {
+    private MovingAveragePredictor(final String name, final Sensor<Fisher, Double> sensor, final int averageWindow) {
         this.name = name;
         this.sensor = sensor;
         averager = new MovingVariance<>(averageWindow);
@@ -76,26 +76,24 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable {
      * @return a concrete moving average
      */
     public static MovingAveragePredictor dailyMAPredictor(
-        String name,
-        Sensor<Fisher, Double> sensor,
-        int averageWindow
+        final String name,
+        final Sensor<Fisher, Double> sensor,
+        final int averageWindow
     ) {
 
         return new MovingAveragePredictor(name, sensor, averageWindow) {
+            private static final long serialVersionUID = 5367766376112011498L;
+
             @Override
-            public void start(FishState model, Fisher fisher) {
+            public void start(final FishState model, final Fisher fisher) {
 
                 this.fisher = fisher;
                 this.stoppable = model.scheduleEveryDay(this, StepOrder.YEARLY_DATA_GATHERING);
 
                 //store your prediction:
                 if (name != null)
-                    fisher.getDailyData().registerGatherer(name, new Gatherer<Fisher>() {
-                        @Override
-                        public Double apply(Fisher fisher1) {
-                            return latestAverage;
-                        }
-                    }, Double.NaN);
+                    fisher.getDailyData()
+                        .registerGatherer(name, (Gatherer<Fisher>) fisher1 -> latestAverage, Double.NaN);
             }
         };
 
@@ -110,36 +108,28 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable {
      * @return a concrete moving average
      */
     public static MovingAveragePredictor perTripMAPredictor(
-        String name,
-        Sensor<Fisher, Double> sensor, int averageWindow
+        final String name,
+        final Sensor<Fisher, Double> sensor, final int averageWindow
     ) {
         final TripListener[] tripListener = new TripListener[1]; //trick to remember to stop listening when turned off
         return new MovingAveragePredictor(name, sensor, averageWindow) {
+            private static final long serialVersionUID = -8807618673133476365L;
+
             @Override
-            public void start(FishState model, Fisher fisher) {
+            public void start(final FishState model, final Fisher fisher) {
 
                 this.fisher = fisher;
-                tripListener[0] = new TripListener() {
-                    @Override
-                    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
-                        step(model);
-                    }
-                };
+                tripListener[0] = (record, fisher12) -> step(model);
                 fisher.addTripListener(tripListener[0]);
 
                 //store your prediction (still every day)
                 fisher.getDailyData().registerGatherer(this.name,
-                    new Gatherer<Fisher>() {
-                        @Override
-                        public Double apply(Fisher fisher) {
-                            return latestAverage;
-                        }
-                    }, Double.NaN
+                    (Gatherer<Fisher>) fisher1 -> latestAverage, Double.NaN
                 );
             }
 
             @Override
-            public void turnOff(Fisher fisher) {
+            public void turnOff(final Fisher fisher) {
                 if (tripListener[0] != null)
                     this.fisher.removeTripListener(tripListener[0]);
             }
@@ -148,9 +138,9 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable {
     }
 
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
-        Double observation = sensor.scan(fisher);
+        final Double observation = sensor.scan(fisher);
         if (Double.isFinite(observation)) {
             averager.addObservation(observation);
             latestAverage = averager.getAverage();
@@ -169,7 +159,7 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable {
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         if (stoppable != null)
             stoppable.stop();
     }
@@ -196,11 +186,11 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable {
      * @return P(x < level)
      */
     @Override
-    public double probabilityBelowThis(double level) {
+    public double probabilityBelowThis(final double level) {
         if (averager.getSmoothedObservation() == 0)
             return level < averager.getAverage() ? 0 : 1;
 
-        double normalized = (level - averager.getAverage()) / Math.sqrt(averager.getSmoothedObservation());
+        final double normalized = (level - averager.getAverage()) / Math.sqrt(averager.getSmoothedObservation());
         if (Double.isFinite(normalized))
             return FishStateUtilities.CNDF(normalized);
         else
@@ -217,12 +207,12 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable {
      * @return a probability value
      */
     @Override
-    public double probabilitySumBelowThis(double level, int elementsInSum) {
+    public double probabilitySumBelowThis(final double level, final int elementsInSum) {
         if (averager.getSmoothedObservation() == 0)
             return level < averager.getAverage() ? 0 : 1;
 
         //sum of t normally distributed values is N(t*mu,t*sigma^2)
-        double normalized = (level - elementsInSum * averager.getAverage()) / Math.sqrt(
+        final double normalized = (level - elementsInSum * averager.getAverage()) / Math.sqrt(
             elementsInSum * averager.getSmoothedObservation());
         if (Double.isFinite(normalized))
             return FishStateUtilities.CNDF(normalized);

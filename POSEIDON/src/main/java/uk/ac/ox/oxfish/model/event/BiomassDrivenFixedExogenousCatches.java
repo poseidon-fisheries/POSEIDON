@@ -37,11 +37,12 @@ import java.util.List;
 public class BiomassDrivenFixedExogenousCatches extends AbstractYearlyTargetExogenousCatches {
 
 
+    private static final long serialVersionUID = 2876862531037871169L;
     private final boolean allowMortalityOnFads;
 
 
     public BiomassDrivenFixedExogenousCatches(
-        LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg, boolean allowMortalityOnFads
+        final LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg, final boolean allowMortalityOnFads
     ) {
         super(exogenousYearlyCatchesInKg, "Exogenous catches of ");
         this.allowMortalityOnFads = allowMortalityOnFads;
@@ -65,7 +66,7 @@ public class BiomassDrivenFixedExogenousCatches extends AbstractYearlyTargetExog
      */
     @Override
     protected Catch mortalityEvent(
-        FishState model, Species target, LocalBiology tile, double step
+        final FishState model, final Species target, final LocalBiology tile, final double step
     ) {
         return biomassSimpleMortalityEvent(
             model,
@@ -77,13 +78,13 @@ public class BiomassDrivenFixedExogenousCatches extends AbstractYearlyTargetExog
 
 
     public static Catch biomassSimpleMortalityEvent(
-        FishState model, Species target, LocalBiology tile, double step
+        final FishState model, final Species target, final LocalBiology tile, final double step
     ) {
         //take it as a fixed proportion catchability (and never more than it is available anyway)
         assert tile.getBiomass(target) > FishStateUtilities.EPSILON;
-        double proportionToCatch = Math.min(1, step / tile.getBiomass(target));
+        final double proportionToCatch = Math.min(1, step / tile.getBiomass(target));
         //simulate the catches as a fixed proportion gear
-        OneSpecieGear gear = new OneSpecieGear(target, proportionToCatch);
+        final OneSpecieGear gear = new OneSpecieGear(target, proportionToCatch);
         //catch it
         Catch fish = gear.fish(null, tile, null, 1, model.getBiology());
         //round to be supersafe

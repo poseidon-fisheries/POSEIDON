@@ -30,6 +30,7 @@ import java.util.function.Supplier;
  * Helper method to keep track of the average reward (and number of observations)
  * Created by carrknight on 11/10/16.
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class BanditAverage {
 
 
@@ -41,9 +42,9 @@ public class BanditAverage {
      * factory constructor
      */
     public BanditAverage(
-        int numberOfArms,
-        AlgorithmFactory<? extends Averager> factory,
-        FishState state
+        final int numberOfArms,
+        final AlgorithmFactory<? extends Averager> factory,
+        final FishState state
     ) {
         this(numberOfArms, () -> factory.apply(state));
 
@@ -56,24 +57,24 @@ public class BanditAverage {
      * @param numberOfArms
      * @param constructor
      */
-    public BanditAverage(int numberOfArms, Supplier<Averager<Double>> constructor) {
+    public BanditAverage(final int numberOfArms, final Supplier<Averager<Double>> constructor) {
         averages = new Averager[numberOfArms];
         observations = new int[numberOfArms];
         for (int i = 0; i < numberOfArms; i++)
             averages[i] = constructor.get();
     }
 
-    public void observeReward(double reward, int arm) {
+    public void observeReward(final double reward, final int arm) {
         averages[arm].addObservation(reward);
         observations[arm]++;
     }
 
 
-    public int getNumberOfObservations(int arm) {
+    public int getNumberOfObservations(final int arm) {
         return observations[arm];
     }
 
-    public double getAverage(int arm) {
+    public double getAverage(final int arm) {
         return averages[arm].getSmoothedObservation();
     }
 

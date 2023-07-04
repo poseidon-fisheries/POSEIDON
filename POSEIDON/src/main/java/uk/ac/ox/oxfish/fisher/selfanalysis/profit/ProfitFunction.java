@@ -44,26 +44,26 @@ public class ProfitFunction {
     /**
      * separate from the other because they are always there
      */
-    private Cost oilCosts = new GasCost();
+    private final Cost oilCosts = new GasCost();
 
 
     public ProfitFunction(
-        double maxHours
+        final double maxHours
     ) {
 
         this(new LameTripSimulator(), maxHours);
     }
 
     public ProfitFunction(
-        LameTripSimulator simulator, double maxHours
+        final LameTripSimulator simulator, final double maxHours
     ) {
         this.simulator = simulator;
         this.maxHours = maxHours;
     }
 
     public double hourlyProfitFromHypotheticalTripHere(
-        Fisher fisher, SeaTile where, FishState state,
-        double[] catchExpectations, boolean verbose
+        final Fisher fisher, final SeaTile where, final FishState state,
+        final double[] catchExpectations, final boolean verbose
     ) {
         return simulateHourlyProfits(
             fisher,
@@ -85,12 +85,12 @@ public class ProfitFunction {
      * @return $/hr profits of this trip
      */
     public Double simulateHourlyProfits(
-        Fisher fisher, double[] expectedCatches,
-        SeaTile where,
-        FishState state, boolean verbose
+        final Fisher fisher, final double[] expectedCatches,
+        final SeaTile where,
+        final FishState state, final boolean verbose
     ) {
 
-        TripRecord trip = simulateTrip(fisher, expectedCatches, where, state);
+        final TripRecord trip = simulateTrip(fisher, expectedCatches, where, state);
         if (trip == null)
             return Double.NaN;
         if (expectedCatches == null)
@@ -98,9 +98,9 @@ public class ProfitFunction {
 
 
         if (verbose) {
-            double expectedTotalCatchesPerHour = trip.getEffort() == 0 ? 0 :
+            final double expectedTotalCatchesPerHour = trip.getEffort() == 0 ? 0 :
                 Arrays.stream(trip.getTotalCatch()).sum() / trip.getEffort();
-            double hoursNeeded = expectedTotalCatchesPerHour == 0 ? Double.POSITIVE_INFINITY : fisher.getMaximumHold() / expectedTotalCatchesPerHour;
+            final double hoursNeeded = expectedTotalCatchesPerHour == 0 ? Double.POSITIVE_INFINITY : fisher.getMaximumHold() / expectedTotalCatchesPerHour;
             System.out.println("Going to " + trip.getMostFishedTileInTrip() + " I will spend "
                 + (trip.getDurationInHours() - trip.getEffort()) + " travelling plus " +
                 trip.getEffort() + " fishing, expecting " + expectedTotalCatchesPerHour + " lbs of " +
@@ -119,13 +119,18 @@ public class ProfitFunction {
         return trip.getProfitPerHour(true);
     }
 
-    public TripRecord simulateTrip(Fisher fisher, double[] expectedCatches, SeaTile where, FishState state) {
+    public TripRecord simulateTrip(
+        final Fisher fisher,
+        final double[] expectedCatches,
+        final SeaTile where,
+        final FishState state
+    ) {
 
         for (int i = 0; i < expectedCatches.length; i++)
             if (!Double.isFinite(expectedCatches[i]))
                 return null;
 
-        TripRecord trip = simulator.simulateRecord(
+        final TripRecord trip = LameTripSimulator.simulateRecord(
             fisher,
             where,
             state,
@@ -139,20 +144,20 @@ public class ProfitFunction {
         return trip;
     }
 
-    private void recordCostsToTrip(Fisher fisher, TripRecord trip, FishState state) {
-        double[] catches = trip.getSoldCatch();
+    private void recordCostsToTrip(final Fisher fisher, final TripRecord trip, final FishState state) {
+        final double[] catches = trip.getSoldCatch();
         double earnings = 0;
-        for (Species species : state.getSpecies())
+        for (final Species species : state.getSpecies())
             earnings += catches[species.getIndex()] * fisher.getHomePort().getMarginalPrice(species, fisher);
 
 
         double costs = oilCosts.cost(fisher, state, trip, earnings, trip.getDurationInHours());
-        for (Cost otherCost : fisher.getAdditionalTripCosts())
+        for (final Cost otherCost : fisher.getAdditionalTripCosts())
             costs += otherCost.cost(fisher, state, trip, earnings, trip.getDurationInHours());
         trip.recordCosts(costs);
 
         costs = 0;
-        for (Cost opportunity : fisher.getOpportunityCosts())
+        for (final Cost opportunity : fisher.getOpportunityCosts())
             costs += opportunity.cost(fisher, state, trip, earnings, trip.getDurationInHours());
         trip.recordOpportunityCosts(costs);
 

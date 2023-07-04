@@ -93,31 +93,24 @@ public class OscillatingWeatherInitializer implements WeatherInitializer {
         final double speedIncrement = (maxWindSpeed - minWindSpeed) / oscillationPeriod;
 
         //create a steppable to modify the weather
-        model.scheduleEveryDay(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                double day = model.getDay();
-                assert day >= 0;
+        model.scheduleEveryDay((Steppable) simState -> {
+            double day = model.getDay();
+            assert day >= 0;
 
-                // +1 increasing speed and temperature, -1 decreasing it
-                double multiplier = Math.floor(day / oscillationPeriod) % 2 == 0 ? 1 : -1;
-                singleInstance.setTemperature(singleInstance.getTemperatureInCelsius() +
-                    multiplier * temperatureIncrement);
-                singleInstance.setWindSpeed(singleInstance.getWindSpeedInKph() +
-                    multiplier * speedIncrement);
+            // +1 increasing speed and temperature, -1 decreasing it
+            double multiplier = Math.floor(day / oscillationPeriod) % 2 == 0 ? 1 : -1;
+            singleInstance.setTemperature(singleInstance.getTemperatureInCelsius() +
+                multiplier * temperatureIncrement);
+            singleInstance.setWindSpeed(singleInstance.getWindSpeedInKph() +
+                multiplier * speedIncrement);
 
 
-            }
         }, StepOrder.BIOLOGY_PHASE);
 
 
         //also add windspeed in the model aggregate data
-        model.getDailyDataSet().registerGatherer("Model WindSpeed", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState state) {
-                return singleInstance.getWindSpeedInKph();
-            }
-        }, Double.NaN);
+        model.getDailyDataSet().registerGatherer("Model WindSpeed",
+            (Gatherer<FishState>) state -> singleInstance.getWindSpeedInKph(), Double.NaN);
 
 
     }

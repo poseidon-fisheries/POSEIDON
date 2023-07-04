@@ -52,6 +52,7 @@ import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 class ScheduledBiologicalProcesses<B extends LocalBiology>
     implements Steppable, AdditionalStartable {
 
+    private static final long serialVersionUID = -5467692646048931777L;
     private final IntUnaryOperator stepMapper;
     private final Map<Integer, Collection<BiologicalProcess<B>>> schedule;
 

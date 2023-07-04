@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.model.FishState;
 public class SpecificQuotaRegulation extends MonoQuotaRegulation {
 
 
+    private static final long serialVersionUID = 7276006184488363070L;
     /**
      * specie to protect by quota
      */
@@ -43,7 +44,7 @@ public class SpecificQuotaRegulation extends MonoQuotaRegulation {
      * @param yearlyQuota the yearly quota
      * @param state       the model link to schedule on
      */
-    public SpecificQuotaRegulation(double yearlyQuota, FishState state, Species species) {
+    public SpecificQuotaRegulation(final double yearlyQuota, final FishState state, final Species species) {
         super(yearlyQuota);
         this.protectedSpecies = species;
     }
@@ -53,7 +54,7 @@ public class SpecificQuotaRegulation extends MonoQuotaRegulation {
      * Can this fisher be at sea?
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) {
+    public boolean allowedAtSea(final Fisher fisher, final FishState model) {
         return true;
     }
 
@@ -62,7 +63,7 @@ public class SpecificQuotaRegulation extends MonoQuotaRegulation {
      * You are allowed to fish, just never to sell the protected quota if you are wrong
      */
     @Override
-    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model) {
+    public boolean canFishHere(final Fisher agent, final SeaTile tile, final FishState model) {
         return true;
     }
 
@@ -71,12 +72,12 @@ public class SpecificQuotaRegulation extends MonoQuotaRegulation {
      */
     @Override
     public void reactToSale(
-        Species species,
-        Fisher seller,
-        double biomass,
-        double revenue,
-        FishState model,
-        int timeStep
+        final Species species,
+        final Fisher seller,
+        final double biomass,
+        final double revenue,
+        final FishState model,
+        final int timeStep
     ) {
         if (species == protectedSpecies)
             super.reactToSale(species, seller, biomass, revenue, model, timeStep);

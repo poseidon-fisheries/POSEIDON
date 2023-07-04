@@ -27,7 +27,6 @@ import com.google.common.collect.Table;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
 import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import sim.field.geo.GeomGridField;
@@ -50,9 +49,11 @@ import uk.ac.ox.oxfish.utility.MasonUtils;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.IntStream.range;
+import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 
 /**
  * This object stores the map/chart of the sea. It contains all the geometric fields holding locations and boundaries.
@@ -283,12 +284,7 @@ public class NauticalMap implements Startable {
         Preconditions.checkArgument(receipt == null);
         //reset fished map count
         receipt =
-            model.scheduleEveryDay(new Steppable() {
-                @Override
-                public void step(final SimState simState) {
-                    dailyTrawlsMap.setTo(0);
-                }
-            }, StepOrder.DAWN);
+            model.scheduleEveryDay((Steppable) simState -> dailyTrawlsMap.setTo(0), StepOrder.DAWN);
 
     }
 
@@ -484,8 +480,9 @@ public class NauticalMap implements Startable {
         if (lineTiles == null) {
             lineTiles = new HashSet<>();
             for (final SeaTile tile : getAllSeaTilesExcludingLandAsList()) {
-                if (!tile.isProtected() && getMooreNeighbors(tile, 1).stream().anyMatch(
-                    o -> ((SeaTile) o).isProtected())) {
+                if (!tile.isProtected() &&
+                    bagToStream(getMooreNeighbors(tile, 1))
+                        .anyMatch(o -> ((SeaTile) o).isProtected())) {
                     lineTiles.add(tile);
                 }
             }
@@ -510,6 +507,10 @@ public class NauticalMap implements Startable {
                 alreadyComputedNeighbors.put(tile, neighborhoodSize, neighbors);
         }
         return neighbors;
+    }
+
+    public Stream<SeaTile> getMooreNeighborsStream(final SeaTile tile, final int neighborhoodSize) {
+        return bagToStream(getMooreNeighbors(tile, neighborhoodSize));
     }
 
     public Pathfinder getPathfinder() {

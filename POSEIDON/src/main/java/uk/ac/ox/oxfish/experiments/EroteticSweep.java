@@ -124,12 +124,7 @@ public class EroteticSweep {
         }
 
         double cashflow = state.getYearlyDataSet().getColumn("Average Cash-Flow").stream().mapToDouble(
-            new ToDoubleFunction<Double>() {
-                @Override
-                public double applyAsDouble(Double value) {
-                    return value;
-                }
-            }).sum();
+            value -> value).sum();
 
         //"run,quota,acceptable,illegal,cashflow,red_biomass,blue_biomass,red_landings,blue_landings"
         writer.write(
@@ -175,12 +170,7 @@ public class EroteticSweep {
         }
 
         double cashflow = state.getYearlyDataSet().getColumn("Average Cash-Flow").stream().mapToDouble(
-            new ToDoubleFunction<Double>() {
-                @Override
-                public double applyAsDouble(Double value) {
-                    return value;
-                }
-            }).sum();
+            value -> value).sum();
 
         //"run,quota,acceptable,illegal,cashflow,red_biomass,blue_biomass,red_landings,blue_landings"
         writer.write(

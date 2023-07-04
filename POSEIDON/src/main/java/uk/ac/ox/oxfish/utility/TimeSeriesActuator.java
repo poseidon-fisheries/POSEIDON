@@ -40,6 +40,7 @@ import java.util.function.Consumer;
 public class TimeSeriesActuator implements Steppable {
 
 
+    private static final long serialVersionUID = -4793054678550494566L;
     /**
      * list containing the elements to set
      */
@@ -56,8 +57,8 @@ public class TimeSeriesActuator implements Steppable {
     private Iterator<Double> iterator;
 
     public TimeSeriesActuator(
-        List<Double> timeSeries,
-        Consumer<Double> actuator, boolean startOver
+        final List<Double> timeSeries,
+        final Consumer<Double> actuator, final boolean startOver
     ) {
         this.startOver = startOver;
         Preconditions.checkArgument(timeSeries.size() > 0);
@@ -74,16 +75,13 @@ public class TimeSeriesActuator implements Steppable {
      * @return the actuator to schedule
      */
     public static TimeSeriesActuator gasPriceDailySchedule(
-        LinkedList<Double> gasSchedule, List<Port> ports
+        final LinkedList<Double> gasSchedule, final List<Port> ports
     ) {
         return new TimeSeriesActuator(
             gasSchedule,
-            new Consumer<Double>() {
-                @Override
-                public void accept(Double nextPrice) {
-                    for (Port port : ports)
-                        port.setGasPricePerLiter(nextPrice);
-                }
+            nextPrice -> {
+                for (final Port port : ports)
+                    port.setGasPricePerLiter(nextPrice);
             },
             true
         );
@@ -98,16 +96,13 @@ public class TimeSeriesActuator implements Steppable {
      * @return the actuator to schedule
      */
     public static TimeSeriesActuator weatherDailySchedule(
-        LinkedList<Double> gasSchedule, List<ConstantWeather> weathers
+        final LinkedList<Double> gasSchedule, final List<ConstantWeather> weathers
     ) {
         return new TimeSeriesActuator(
             gasSchedule,
-            new Consumer<Double>() {
-                @Override
-                public void accept(Double windSpeed) {
-                    for (ConstantWeather weather : weathers)
-                        weather.setWindSpeed(windSpeed);
-                }
+            windSpeed -> {
+                for (final ConstantWeather weather : weathers)
+                    weather.setWindSpeed(windSpeed);
             },
             true
         );
@@ -118,7 +113,7 @@ public class TimeSeriesActuator implements Steppable {
      * next element of the time series is sent to actuator
      */
     @Override
-    public void step(SimState simState) {
+    public void step(final SimState simState) {
 
         //starting or finished the list? start again!
         if (iterator == null)
@@ -131,7 +126,7 @@ public class TimeSeriesActuator implements Steppable {
                 return;
         }
 
-        Double nextGasPrice = iterator.next();
+        final Double nextGasPrice = iterator.next();
         actuator.accept(nextGasPrice);
 
     }

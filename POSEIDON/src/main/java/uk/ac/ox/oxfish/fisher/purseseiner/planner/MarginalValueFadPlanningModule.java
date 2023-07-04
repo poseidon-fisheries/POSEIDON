@@ -24,9 +24,9 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.PriorityQueue;
 
 /**
@@ -60,7 +60,7 @@ public class MarginalValueFadPlanningModule
         final Plan currentPlanSoFar, final Fisher fisher, final FishState model, final NauticalMap map,
         final OwnFadSetDiscretizedActionGenerator optionsGenerator
     ) {
-        final List<Pair<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options =
+        final List<Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options =
             optionsGenerator.peekAllFads();
 
         //if there are no options, don't bother
@@ -68,9 +68,9 @@ public class MarginalValueFadPlanningModule
             return null;
         //if there is only one option, also don't bother
         if (options.size() == 1) {
-            if (options.get(0).getSecond() > 0) {
-                lastFadGroupChosen = options.get(0).getSecond();
-                return optionsGenerator.chooseFad(options.get(0).getSecond());
+            if (options.get(0).getValue() > 0) {
+                lastFadGroupChosen = options.get(0).getValue();
+                return optionsGenerator.chooseFad(options.get(0).getValue());
             } else return null;
         }
 

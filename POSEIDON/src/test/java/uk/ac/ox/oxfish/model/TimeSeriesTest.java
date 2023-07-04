@@ -34,10 +34,11 @@ public class TimeSeriesTest {
     @Test
     public void gathersCorrectly() throws Exception {
 
-        TimeSeries<String> gatherer = new TimeSeries<String>(IntervalPolicy.EVERY_YEAR) {
+        final TimeSeries<String> gatherer = new TimeSeries<String>(IntervalPolicy.EVERY_YEAR) {
+            private static final long serialVersionUID = 6885172630507659974L;
         };
 
-        FishState state = mock(FishState.class);
+        final FishState state = mock(FishState.class);
         gatherer.start(state, "12345");
         gatherer.registerGatherer("column1", Double::valueOf, -1);
 

@@ -46,6 +46,7 @@ public class ITQOrderBook implements Steppable, Startable {
     public static final String MATCHES_COLUMN_NAME = "MATCHES";
     public static final String QUOTA_COLUMN_NAME = "QUOTA_VOLUME";
     public static final String MONEY_COLUMN_NAME = "MONEY_VOLUME";
+    private static final long serialVersionUID = -2586250037744912625L;
     private final int yearOfImplementation;
     private final int specieIndex;
     /**
@@ -80,18 +81,8 @@ public class ITQOrderBook implements Steppable, Startable {
     ) {
 
         //create the queues holding on to the quotes
-        asks = new PriorityQueue<>(100, new Comparator<Quote>() {
-            @Override
-            public int compare(final Quote quote, final Quote o) {
-                return quote.compareTo(o);
-            }
-        });
-        bids = new PriorityQueue<>(100, new Comparator<Quote>() {
-            @Override
-            public int compare(final Quote o1, final Quote o2) {
-                return -o1.compareTo(o2);
-            }
-        });
+        asks = new PriorityQueue<>(100, (quote, o) -> quote.compareTo(o));
+        bids = new PriorityQueue<>(100, (o1, o2) -> -o1.compareTo(o2));
         this.specieIndex = specieIndex;
         this.yearOfImplementation = implementationYear;
         this.pricingPolicy = pricingPolicy;

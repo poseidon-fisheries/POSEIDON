@@ -67,39 +67,31 @@ public class LBSPREffortPolicyFactory implements AlgorithmFactory<AdditionalStar
         );
 
 
-        return new AdditionalStartable() {
-            @Override
-            public void start(FishState model) {
-                fishState.scheduleOnceInXDays(
-                    new Steppable() {
-                        @Override
-                        public void step(SimState simState) {
-                            LBSPREffortPolicy lbspr = new LBSPREffortPolicy(
-                                sprColumnName,
-                                linearParameter.applyAsDouble(fishState.getRandom()),
-                                cubicParameter.applyAsDouble(fishState.getRandom()),
-                                sprTarget.applyAsDouble(fishState.getRandom()),
-                                maxChangeEachYear.applyAsDouble(fishState.getRandom()),
-                                EFFORT_ACTUATORS.get(effortDefinition),
-                                blockEntryWhenSeasonIsNotFull
-                            );
-                            lbspr.start(model);
-                            lbspr.step(model);
-
-
-                            //creaqte also a collector
-                            fishState.getYearlyDataSet().registerGatherer(
-                                "LBSPREffortPolicy output",
-                                (Gatherer<FishState>) fishState1 -> lbspr.getAccumulatedDelta(),
-                                Double.NaN
-                            );
-                        }
-                    },
-                    StepOrder.DAWN,
-                    365 * startingYear + 1
+        return model -> fishState.scheduleOnceInXDays(
+            (Steppable) simState -> {
+                LBSPREffortPolicy lbspr = new LBSPREffortPolicy(
+                    sprColumnName,
+                    linearParameter.applyAsDouble(fishState.getRandom()),
+                    cubicParameter.applyAsDouble(fishState.getRandom()),
+                    sprTarget.applyAsDouble(fishState.getRandom()),
+                    maxChangeEachYear.applyAsDouble(fishState.getRandom()),
+                    EFFORT_ACTUATORS.get(effortDefinition),
+                    blockEntryWhenSeasonIsNotFull
                 );
-            }
-        };
+                lbspr.start(model);
+                lbspr.step(model);
+
+
+                //creaqte also a collector
+                fishState.getYearlyDataSet().registerGatherer(
+                    "LBSPREffortPolicy output",
+                    (Gatherer<FishState>) fishState1 -> lbspr.getAccumulatedDelta(),
+                    Double.NaN
+                );
+            },
+            StepOrder.DAWN,
+            365 * startingYear + 1
+        );
     }
 
     public String getSprColumnName() {
