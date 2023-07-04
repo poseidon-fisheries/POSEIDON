@@ -42,8 +42,10 @@ import java.util.logging.Logger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 
+@SuppressWarnings("unchecked")
 public class MultiQuotaMapFactoryTest {
 
 
@@ -161,7 +163,7 @@ public class MultiQuotaMapFactoryTest {
         model.setScenario(scenario);
         final MultiQuotaMapFactory factory = new MultiQuotaMapFactory(
             MultiQuotaMapFactory.QuotaType.IQ,
-            new Entry<>("Species 0", 100.0)
+            entry("Species 0", 100.0)
         );
         scenario.setRegulation(factory);
 
@@ -199,7 +201,7 @@ public class MultiQuotaMapFactoryTest {
         model.setScenario(scenario);
         final MultiQuotaMapFactory factory = new MultiQuotaMapFactory(
             MultiQuotaMapFactory.QuotaType.ITQ,
-            new Entry<>("Species 0", 100.0)
+            entry("Species 0", 100.0)
         );
         final HashMap<String, Double> quotaExchangedPerMatch = new HashMap<>();
         quotaExchangedPerMatch.put("Species 0", 200.0);

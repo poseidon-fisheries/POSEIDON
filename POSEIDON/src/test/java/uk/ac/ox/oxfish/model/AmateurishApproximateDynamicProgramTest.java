@@ -24,6 +24,8 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.utility.dynapro.AmateurishApproximateDynamicProgram;
 
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -67,7 +69,7 @@ public class AmateurishApproximateDynamicProgramTest {
 
 
             //ask program to choose best action
-            final Entry<Integer, Double> action = program.chooseBestAction(a, b, c);
+            final Map.Entry<Integer, Double> action = program.chooseBestAction(a, b, c);
             actionTaken = action.getKey();
             final boolean goodState = 2 * a > b + c;
             //compute the reward

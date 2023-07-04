@@ -35,8 +35,7 @@ import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.*;
 
 /**
  * Created by carrknight on 3/22/17.
@@ -137,7 +136,7 @@ public class GarbageGearDecoratorTest {
 
         final Gear gear = new GarbageGearDecorator(imaginary, .5,
             new HeterogeneousAbundanceGear(
-                new Entry<>(longspine, gear1)
+                entry(longspine, gear1)
             ), true
         );
 

@@ -26,7 +26,6 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,31 +52,32 @@ public class AdaptiveThresholdAnswerTest {
         options.add(3d);
         extractor = new FeatureExtractors<>();
         extractor.addFeatureExtractor("feature", (toRepresent, model, fisher) -> {
-            HashMap<Double, Double> toReturn = new HashMap<>();
-            for (Double number : toRepresent)
+            final HashMap<Double, Double> toReturn = new HashMap<>();
+            for (final Double number : toRepresent)
                 toReturn.put(number, number);
             return toReturn;
         });
     }
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void adapt() throws Exception {
 
 
         Log.info("needs at least 4 observations, has only 3");
-        FeatureExtractor<Double> adaptor = mock(FeatureExtractor.class);
+        final FeatureExtractor<Double> adaptor = mock(FeatureExtractor.class);
         extractor.addFeatureExtractor(
             "threshold",
             adaptor
         );
 
-        HashMap<Double, Double> adaptorAnswer = mock(HashMap.class);
+        final HashMap<Double, Double> adaptorAnswer = mock(HashMap.class);
         when(adaptor.extractFeature(anyCollection(),
             any(), any()
         )).thenReturn(adaptorAnswer);
 
-        FeatureThresholdAnswer<Double> filter = new FeatureThresholdAnswer<>(
+        final FeatureThresholdAnswer<Double> filter = new FeatureThresholdAnswer<>(
             3,
             "feature",
             "threshold"

@@ -40,25 +40,26 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
+@SuppressWarnings("unchecked")
 public class FishStateDailyTimeSeriesTest {
 
     @Test
     public void testAggregation() throws Exception {
 
-        FishStateDailyTimeSeries dataSet = new FishStateDailyTimeSeries();
+        final FishStateDailyTimeSeries dataSet = new FishStateDailyTimeSeries();
 
-        FishState state = mock(FishState.class);
+        final FishState state = mock(FishState.class);
         when(state.getFishers()).thenReturn(ObservableList.observableList(new ArrayList<>()));
         final NauticalMap map = mock(NauticalMap.class);
         when(map.getAllSeaTilesAsList()).thenReturn(new LinkedList<>());
         when(state.getMap()).thenReturn(map);
-        Species species = new Species("lalala");
+        final Species species = new Species("lalala");
         //1 species
         when(state.getSpecies()).thenReturn(Collections.singletonList(species));
 
         //===> aggregate over two markets
-        Market market1 = mock(Market.class);
-        TimeSeries<Market> data1 = mock(TimeSeries.class);
+        final Market market1 = mock(Market.class);
+        final TimeSeries<Market> data1 = mock(TimeSeries.class);
         final DataColumn landingsColumn1 = mock(DataColumn.class);
         when(landingsColumn1.getName()).thenReturn(AbstractMarket.LANDINGS_COLUMN_NAME);
         when(landingsColumn1.getLatest()).thenReturn(-100d);
@@ -68,8 +69,8 @@ public class FishStateDailyTimeSeriesTest {
         when(data1.getColumns()).thenReturn(ImmutableList.of(landingsColumn1, earningsColumn1));
         when(market1.getData()).thenReturn(data1);
 
-        Market market2 = mock(Market.class);
-        TimeSeries<Market> data2 = mock(TimeSeries.class);
+        final Market market2 = mock(Market.class);
+        final TimeSeries<Market> data2 = mock(TimeSeries.class);
         final DataColumn landingsColumn2 = mock(DataColumn.class);
         when(landingsColumn2.getName()).thenReturn(AbstractMarket.LANDINGS_COLUMN_NAME);
         when(landingsColumn2.getLatest()).thenReturn(-200d);
@@ -79,7 +80,7 @@ public class FishStateDailyTimeSeriesTest {
         when(data2.getColumns()).thenReturn(ImmutableList.of(landingsColumn2, earningsColumn2));
         when(market2.getData()).thenReturn(data2);
 
-        List<Market> markets = new LinkedList<>();
+        final List<Market> markets = new LinkedList<>();
         markets.add(market1);
         markets.add(market2);
         when(state.getAllMarketsForThisSpecie(species)).thenReturn(markets);

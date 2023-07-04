@@ -29,6 +29,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -40,8 +41,9 @@ import static org.mockito.Mockito.when;
 public class CopyFriendSeaTileTest {
 
 
+    @SuppressWarnings("unchecked")
     @Test
-    public void ignoreFriend() throws Exception {
+    public void ignoreFriend() {
 
 
         final SeaTile newT = mock(SeaTile.class);
@@ -91,6 +93,7 @@ public class CopyFriendSeaTileTest {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void fitnessMatters() throws Exception {
 
@@ -104,7 +107,7 @@ public class CopyFriendSeaTileTest {
 
         //best fitness is the new
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(0d);
-        Entry<SeaTile, Fisher> imitation = FishStateUtilities.imitateBestFriend(
+        Map.Entry<SeaTile, Fisher> imitation = FishStateUtilities.imitateBestFriend(
             new MersenneTwisterFast(),
             mock(Fisher.class),
             10d,

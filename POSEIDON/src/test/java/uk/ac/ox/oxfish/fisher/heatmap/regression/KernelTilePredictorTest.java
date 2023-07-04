@@ -31,10 +31,12 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.mockito.Mockito.mock;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * Created by carrknight on 7/8/16.
  */
+@SuppressWarnings("unchecked")
 public class KernelTilePredictorTest {
 
 
@@ -47,11 +49,11 @@ public class KernelTilePredictorTest {
         final KernelTilePredictor predictor = new KernelTilePredictor(
             1d,
             map.getSeaTile(25, 25),
-            new Entry<>(
+            entry(
                 new GridXExtractor(),
                 1d
             ),
-            new Entry<>(
+            entry(
                 new GridYExtractor(),
                 1d
             )
@@ -102,11 +104,11 @@ public class KernelTilePredictorTest {
         final KernelTilePredictor forgetting = new KernelTilePredictor(
             .8d,
             map.getSeaTile(25, 25),
-            new Entry<>(
+            entry(
                 new GridXExtractor(),
                 1d
             ),
-            new Entry<>(
+            entry(
                 new GridYExtractor(),
                 1d
             )
@@ -114,11 +116,11 @@ public class KernelTilePredictorTest {
         final KernelTilePredictor notForgetting = new KernelTilePredictor(
             1d,
             map.getSeaTile(25, 25),
-            new Entry<>(
+            entry(
                 new GridXExtractor(),
                 1d
             ),
-            new Entry<>(
+            entry(
                 new GridYExtractor(),
                 1d
             )

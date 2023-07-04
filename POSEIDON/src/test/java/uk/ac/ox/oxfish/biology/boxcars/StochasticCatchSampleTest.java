@@ -9,8 +9,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.util.ArrayList;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -18,6 +16,7 @@ import static org.mockito.Mockito.*;
 public class StochasticCatchSampleTest {
 
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     public void catchSampler() {
 
@@ -60,7 +59,7 @@ public class StochasticCatchSampleTest {
         assertEquals(sampledAbundance[0][1], 10, .01);
 
         //feed it the wrong weight and you get the wrong count
-        sampledAbundance = sampler.getAbundance((Function<Entry<Integer, Integer>, Double>) integerIntegerPair -> 1d);
+        sampledAbundance = sampler.getAbundance(integerIntegerPair -> 1d);
         assertEquals(sampledAbundance[0][0], 20, .01);
         assertEquals(sampledAbundance[0][1], 20, .01);
 

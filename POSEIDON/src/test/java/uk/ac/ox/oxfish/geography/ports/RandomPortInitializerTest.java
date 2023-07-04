@@ -41,6 +41,7 @@ import static org.mockito.Mockito.mock;
 public class RandomPortInitializerTest {
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void portsAreAllInSeparateAreas() throws Exception {
 

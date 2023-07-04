@@ -34,6 +34,7 @@ import java.util.function.Function;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class FishStateYearlyTimeSeriesTest {
 
 
@@ -41,11 +42,11 @@ public class FishStateYearlyTimeSeriesTest {
     public void summer() throws Exception {
 
 
-        DataColumn column = mock(DataColumn.class);
+        final DataColumn column = mock(DataColumn.class);
         final ListIterator iterator = mock(ListIterator.class);
         when(column.descendingIterator()).thenReturn(iterator);
 
-        FishStateYearlyTimeSeries dataSet = new FishStateYearlyTimeSeries(mock(FishStateDailyTimeSeries.class));
+        final FishStateYearlyTimeSeries dataSet = new FishStateYearlyTimeSeries(mock(FishStateDailyTimeSeries.class));
         final Function<FishState, Double> summer = FishStateUtilities.generateYearlySum(column);
         when(iterator.hasNext()).thenReturn(true);
         when(iterator.next()).thenReturn(5d);

@@ -26,8 +26,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -38,13 +37,15 @@ public class FixedProbabilityDepartingStrategyTest {
     @Test
     public void alwaysDeparts() throws Exception {
 
-        FixedProbabilityDepartingStrategy always = new FixedProbabilityDepartingStrategy(1.0, false);
+        final FixedProbabilityDepartingStrategy always = new FixedProbabilityDepartingStrategy(1.0, false);
 
 
         for (int i = 0; i < 50; i++) {
-            assertTrue(always.shouldFisherLeavePort(mock(Fisher.class),
+            assertTrue(always.shouldFisherLeavePort(
+                mock(Fisher.class),
                 mock(FishState.class),
-                new MersenneTwisterFast()));
+                new MersenneTwisterFast()
+            ));
         }
 
     }
@@ -52,23 +53,25 @@ public class FixedProbabilityDepartingStrategyTest {
     @Test
     public void neverDeparts() throws Exception {
 
-        FixedProbabilityDepartingStrategy never = new FixedProbabilityDepartingStrategy(0, false);
+        final FixedProbabilityDepartingStrategy never = new FixedProbabilityDepartingStrategy(0, false);
         for (int i = 0; i < 50; i++)
-            assertFalse(never.shouldFisherLeavePort(mock(Fisher.class),
+            assertFalse(never.shouldFisherLeavePort(
+                mock(Fisher.class),
                 mock(FishState.class),
-                new MersenneTwisterFast()));
+                new MersenneTwisterFast()
+            ));
 
     }
 
 
     @Test
     public void departsSometimes() throws Exception {
-        FixedProbabilityDepartingStrategy sometimes = new FixedProbabilityDepartingStrategy(.5, false);
+        final FixedProbabilityDepartingStrategy sometimes = new FixedProbabilityDepartingStrategy(.5, false);
 
         int departures = 0;
         for (int i = 0; i < 50; i++)
-            if (sometimes.shouldFisherLeavePort(mock(Fisher.class), mock(FishState.class), new MersenneTwisterFast())) ;
-        departures++;
+            if (sometimes.shouldFisherLeavePort(mock(Fisher.class), mock(FishState.class), new MersenneTwisterFast()))
+                departures++;
         assertTrue(departures < 50);
         assertTrue(departures > 0);
 
@@ -79,16 +82,16 @@ public class FixedProbabilityDepartingStrategyTest {
     public void checksOnlyOnceADay() throws Exception {
 
         //100% probability but you keep asking the same day, you will only get one yes
-        FixedProbabilityDepartingStrategy daily = new FixedProbabilityDepartingStrategy(1, true);
+        final FixedProbabilityDepartingStrategy daily = new FixedProbabilityDepartingStrategy(1, true);
 
-        FishState model = mock(FishState.class);
+        final FishState model = mock(FishState.class);
         when(model.getDay()).thenReturn(1);
         int departures = 0;
         for (int i = 0; i < 50; i++) {
             if (daily.shouldFisherLeavePort(mock(Fisher.class), model, new MersenneTwisterFast()))
                 departures++;
         }
-        assertTrue(departures == 1);
+        assertEquals(1, departures);
         when(model.getDay()).thenReturn(2);
         assertTrue(daily.shouldFisherLeavePort(mock(Fisher.class), model, new MersenneTwisterFast()));
     }

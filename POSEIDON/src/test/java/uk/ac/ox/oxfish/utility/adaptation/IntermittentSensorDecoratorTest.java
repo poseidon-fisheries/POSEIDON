@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 public class IntermittentSensorDecoratorTest {
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void intermittent() {
 

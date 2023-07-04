@@ -30,6 +30,7 @@ import static org.junit.Assert.assertEquals;
 public class LockerTest {
 
 
+    @SuppressWarnings("deprecation")
     @Test
     public void locker() throws Exception {
 

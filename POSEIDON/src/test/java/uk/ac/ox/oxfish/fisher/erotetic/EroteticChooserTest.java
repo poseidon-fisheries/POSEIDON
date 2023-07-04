@@ -41,21 +41,22 @@ import static org.mockito.Mockito.when;
  */
 public class EroteticChooserTest {
 
+    @SuppressWarnings("unchecked")
     @Test
     public void chooseCorrectly() throws Exception {
 
-        SeaTile one = mock(SeaTile.class);
-        SeaTile two = mock(SeaTile.class);
-        SeaTile three = mock(SeaTile.class);
-        List<SeaTile> toChoose = Arrays.asList(one, two, three);
+        final SeaTile one = mock(SeaTile.class);
+        final SeaTile two = mock(SeaTile.class);
+        final SeaTile three = mock(SeaTile.class);
+        final List<SeaTile> toChoose = Arrays.asList(one, two, three);
 
-        EroteticAnswer<SeaTile> fakeFilterOne = mock(EroteticAnswer.class);
-        List<SeaTile> fakeChoiceOne = Collections.singletonList(one);
+        final EroteticAnswer<SeaTile> fakeFilterOne = mock(EroteticAnswer.class);
+        final List<SeaTile> fakeChoiceOne = Collections.singletonList(one);
         when(fakeFilterOne.answer(anyList(), any(), any(), any())).thenReturn(fakeChoiceOne);
 
 
-        EroteticAnswer<SeaTile> fakeFilterTwo = mock(EroteticAnswer.class);
-        List<SeaTile> fakeChoiceTwo = Collections.singletonList(two);
+        final EroteticAnswer<SeaTile> fakeFilterTwo = mock(EroteticAnswer.class);
+        final List<SeaTile> fakeChoiceTwo = Collections.singletonList(two);
         when(fakeFilterTwo.answer(anyList(), any(), any(), any())).thenReturn(fakeChoiceTwo);
 
         EroteticChooser<SeaTile> chooser = new EroteticChooser<>();
@@ -87,27 +88,28 @@ public class EroteticChooserTest {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void getFirst() throws Exception {
-        SeaTile one = mock(SeaTile.class);
-        SeaTile two = mock(SeaTile.class);
-        SeaTile three = mock(SeaTile.class);
-        List<SeaTile> toChoose = Arrays.asList(one, two, three);
+        final SeaTile one = mock(SeaTile.class);
+        final SeaTile two = mock(SeaTile.class);
+        final SeaTile three = mock(SeaTile.class);
+        final List<SeaTile> toChoose = Arrays.asList(one, two, three);
 
-        EroteticAnswer<SeaTile> fakeFilterOne =
+        final EroteticAnswer<SeaTile> fakeFilterOne =
             new EroteticAnswer<SeaTile>() {
                 @Override
                 public List<SeaTile> answer(
-                    List<SeaTile> currentOptions, FeatureExtractors<SeaTile> representation,
-                    FishState state, Fisher fisher
+                    final List<SeaTile> currentOptions, final FeatureExtractors<SeaTile> representation,
+                    final FishState state, final Fisher fisher
                 ) {
-                    LinkedList<SeaTile> choices = new LinkedList<>(currentOptions);
+                    final LinkedList<SeaTile> choices = new LinkedList<>(currentOptions);
                     choices.remove(0);
                     return choices;
                 }
 
                 @Override
-                public void start(FishState model) {
+                public void start(final FishState model) {
 
                 }
 
@@ -117,7 +119,7 @@ public class EroteticChooserTest {
                 }
             };
 
-        EroteticChooser<SeaTile> chooser = new EroteticChooser<>();
+        final EroteticChooser<SeaTile> chooser = new EroteticChooser<>();
         //priority to one, one should be choosen
         chooser.add(fakeFilterOne);
         chooser.add(fakeFilterOne);

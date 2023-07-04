@@ -63,6 +63,7 @@ import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 public class OwnFadSetDiscretizedActionGeneratorTest {
 
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     public void test() {
 
@@ -153,6 +154,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
 
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     public void filterByValue() {
         final FishState fishState = mock(FishState.class);
@@ -211,6 +213,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
     }
 
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     public void banLocations() {
         final FishState fishState = mock(FishState.class);

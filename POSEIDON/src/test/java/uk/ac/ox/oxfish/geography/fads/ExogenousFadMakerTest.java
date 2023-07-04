@@ -25,6 +25,7 @@ import static org.mockito.Mockito.*;
 public class ExogenousFadMakerTest {
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void dropsFadsCorrectly() {
 

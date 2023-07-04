@@ -38,6 +38,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by carrknight on 6/28/16.
  */
+@SuppressWarnings("rawtypes")
 public class HillClimberAcquisitionFunctionTest {
 
 
@@ -48,18 +49,18 @@ public class HillClimberAcquisitionFunctionTest {
     public void hillclimbsTo2525() throws Exception {
 
 
-        MersenneTwisterFast random = new MersenneTwisterFast(System.currentTimeMillis());
-        FishState state = MovingTest.generateSimple50x50Map();
+        final MersenneTwisterFast random = new MersenneTwisterFast(System.currentTimeMillis());
+        final FishState state = MovingTest.generateSimple50x50Map();
         when(state.getRandom()).thenReturn(random);
         when(state.getHoursSinceStart()).thenReturn(120d);
 
-        HillClimberAcquisitionFunction acquisitionFunction = new HillClimberAcquisitionFunction(1);
-        HillClimberAcquisitionFunction acquisitionFunction2 = new HillClimberAcquisitionFunction(3);
+        final HillClimberAcquisitionFunction acquisitionFunction = new HillClimberAcquisitionFunction(1);
+        final HillClimberAcquisitionFunction acquisitionFunction2 = new HillClimberAcquisitionFunction(3);
 
-        GeographicalRegression regression = mock(GeographicalRegression.class);
+        final GeographicalRegression regression = mock(GeographicalRegression.class);
         when(regression.predict(any(SeaTile.class), eq(120d), any(), any())).thenAnswer((Answer<Double>) invocation -> {
-            SeaTile seaTile = (SeaTile) invocation.getArguments()[0];
-            double toReturn = -Math.abs(seaTile.getGridX() - 25) - Math.abs(seaTile.getGridY() - 25);
+            final SeaTile seaTile = (SeaTile) invocation.getArguments()[0];
+            final double toReturn = -Math.abs(seaTile.getGridX() - 25) - Math.abs(seaTile.getGridY() - 25);
             return toReturn;
         });
 

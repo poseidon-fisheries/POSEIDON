@@ -184,6 +184,7 @@ public class FishYAMLTest {
     }
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void canNavigateThroughObject() {
         final Yaml yaml = new Yaml();
@@ -491,6 +492,7 @@ public class FishYAMLTest {
     }
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void optimizationParameters() {
 
@@ -522,7 +524,6 @@ public class FishYAMLTest {
         final String output = yaml.dump(parameters);
         System.out.println(output);
 
-        parameters = null;
         parameters = yaml.loadAs(output, List.class);
         System.out.println(parameters);
         System.out.println(parameters.get(0).getClass());

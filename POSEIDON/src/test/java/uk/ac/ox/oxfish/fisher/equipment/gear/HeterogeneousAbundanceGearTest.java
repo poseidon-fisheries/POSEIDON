@@ -33,8 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.*;
 
 
 public class HeterogeneousAbundanceGearTest {
@@ -81,8 +80,8 @@ public class HeterogeneousAbundanceGearTest {
 
 
         final HeterogeneousAbundanceGear gear = new HeterogeneousAbundanceGear(
-            new Entry<>(species1, gear1),
-            new Entry<>(species2, gear2)
+            entry(species1, gear1),
+            entry(species2, gear2)
         );
 
         final GlobalBiology biology = new GlobalBiology(species1, species2);

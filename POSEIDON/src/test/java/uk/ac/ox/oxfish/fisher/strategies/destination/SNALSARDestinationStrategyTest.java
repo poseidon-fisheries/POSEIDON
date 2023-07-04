@@ -53,6 +53,7 @@ import static org.mockito.Mockito.*;
 /**
  * Created by carrknight on 6/8/16.
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class SNALSARDestinationStrategyTest {
 
 
@@ -60,10 +61,10 @@ public class SNALSARDestinationStrategyTest {
     public void extractorsStart() throws Exception {
 
 
-        SNALSARDestinationFactory factory = new SNALSARDestinationFactory();
-        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
-        SNALSARDestinationStrategy strategy = factory.apply(model);
-        Fisher test = mock(Fisher.class);
+        final SNALSARDestinationFactory factory = new SNALSARDestinationFactory();
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final SNALSARDestinationStrategy strategy = factory.apply(model);
+        final Fisher test = mock(Fisher.class);
 
         strategy.start(model, test);
         verify(test, times(6)).addFeatureExtractor(anyString(), any());
@@ -72,16 +73,16 @@ public class SNALSARDestinationStrategyTest {
     @Test
     public void randomizesAsDefault() throws Exception {
 
-        SNALSARDestinationFactory factory = new SNALSARDestinationFactory();
+        final SNALSARDestinationFactory factory = new SNALSARDestinationFactory();
 
-        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
-        SNALSARDestinationStrategy strategy = factory.apply(model);
-        SeaTile option1 = mock(SeaTile.class);
+        final SNALSARDestinationStrategy strategy = factory.apply(model);
+        final SeaTile option1 = mock(SeaTile.class);
         when(option1.isWater()).thenReturn(true);
-        SeaTile option2 = mock(SeaTile.class);
+        final SeaTile option2 = mock(SeaTile.class);
         when(option2.isWater()).thenReturn(true);
-        ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
+        final ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
 
         defaultSetup(model, strategy, options);
 
@@ -106,14 +107,14 @@ public class SNALSARDestinationStrategyTest {
 
     //creates an ALL PASS extractor
     public FeatureExtractors defaultSetup(
-        FishState model,
-        SNALSARDestinationStrategy strategy,
-        List<SeaTile> options
+        final FishState model,
+        final SNALSARDestinationStrategy strategy,
+        final List<SeaTile> options
     ) {
-        Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        final Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
 
         strategy.start(model, fisher);
-        FeatureExtractors<SeaTile> extractors = mock(FeatureExtractors.class);
+        final FeatureExtractors<SeaTile> extractors = mock(FeatureExtractors.class);
         when(fisher.getTileRepresentation()).thenReturn(extractors);
         //all safe profitable and legal
         when(extractors.extractFeature(
@@ -160,19 +161,19 @@ public class SNALSARDestinationStrategyTest {
     @Test
     public void safeWins() throws Exception {
 
-        SNALSARDestinationFactory factory = new SNALSARDestinationFactory();
+        final SNALSARDestinationFactory factory = new SNALSARDestinationFactory();
 
-        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
-        SNALSARDestinationStrategy strategy = factory.apply(model);
-        SeaTile option1 = mock(SeaTile.class);
+        final SNALSARDestinationStrategy strategy = factory.apply(model);
+        final SeaTile option1 = mock(SeaTile.class);
         when(option1.isWater()).thenReturn(true);
-        SeaTile option2 = mock(SeaTile.class);
+        final SeaTile option2 = mock(SeaTile.class);
         when(option2.isWater()).thenReturn(true);
-        ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
-        FeatureExtractors extractors = defaultSetup(model, strategy, options);
+        final ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
+        final FeatureExtractors extractors = defaultSetup(model, strategy, options);
 
-        HashMap<SeaTile, Double> safety = new HashMap<>();
+        final HashMap<SeaTile, Double> safety = new HashMap<>();
 
 
         safety.put(option1, 1d);
@@ -197,30 +198,30 @@ public class SNALSARDestinationStrategyTest {
             }
 
         }
-        assertTrue(timesOption1WasChosen == 100);
-        assertTrue(timesOption2WasChosen == 0);
+        assertEquals(100, timesOption1WasChosen);
+        assertEquals(0, timesOption2WasChosen);
 
     }
 
     @Test
     public void sociallyAcceptable() throws Exception {
 
-        SNALSARDestinationFactory factory = new SNALSARDestinationFactory();
+        final SNALSARDestinationFactory factory = new SNALSARDestinationFactory();
 
-        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
-        SNALSARDestinationStrategy strategy = factory.apply(model);
-        SeaTile option1 = mock(SeaTile.class);
+        final SNALSARDestinationStrategy strategy = factory.apply(model);
+        final SeaTile option1 = mock(SeaTile.class);
         when(option1.isWater()).thenReturn(true);
-        SeaTile option2 = mock(SeaTile.class);
+        final SeaTile option2 = mock(SeaTile.class);
         when(option2.isWater()).thenReturn(true);
-        SeaTile option3 = mock(SeaTile.class);
+        final SeaTile option3 = mock(SeaTile.class);
         when(option3.isWater()).thenReturn(true);
-        ArrayList<SeaTile> options = Lists.newArrayList(option1, option2, option3);
-        FeatureExtractors extractors = defaultSetup(model, strategy, options);
+        final ArrayList<SeaTile> options = Lists.newArrayList(option1, option2, option3);
+        final FeatureExtractors extractors = defaultSetup(model, strategy, options);
 
         //option 3 is unsafe
-        HashMap<SeaTile, Double> safety = new HashMap<>();
+        final HashMap<SeaTile, Double> safety = new HashMap<>();
         safety.put(option1, 1d);
         safety.put(option2, 1d);
         safety.put(option3, -1d);
@@ -232,7 +233,7 @@ public class SNALSARDestinationStrategyTest {
         )).thenReturn(safety);
 
         //option 1 is socially unacceptable
-        HashMap<SeaTile, Double> acceptable = new HashMap<>();
+        final HashMap<SeaTile, Double> acceptable = new HashMap<>();
         acceptable.put(option1, -1d);
         acceptable.put(option2, 1d);
         acceptable.put(option3, 1d);
@@ -257,30 +258,30 @@ public class SNALSARDestinationStrategyTest {
             }
 
         }
-        assertTrue(timesOption1WasChosen == 0);
-        assertTrue(timesOption2WasChosen == 100);
+        assertEquals(0, timesOption1WasChosen);
+        assertEquals(100, timesOption2WasChosen);
 
     }
 
     @Test
     public void avoidFailures() throws Exception {
 
-        SNALSARDestinationFactory factory = new SNALSARDestinationFactory();
+        final SNALSARDestinationFactory factory = new SNALSARDestinationFactory();
 
-        FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
-        SNALSARDestinationStrategy strategy = factory.apply(model);
+        final SNALSARDestinationStrategy strategy = factory.apply(model);
 
-        SeaTile option1 = mock(SeaTile.class);
+        final SeaTile option1 = mock(SeaTile.class);
         when(option1.isWater()).thenReturn(true);
-        SeaTile option2 = mock(SeaTile.class);
+        final SeaTile option2 = mock(SeaTile.class);
         when(option2.isWater()).thenReturn(true);
-        ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
+        final ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
 
-        FeatureExtractors extractors = defaultSetup(model, strategy, options);
+        final FeatureExtractors extractors = defaultSetup(model, strategy, options);
 
         //threshold profits are 10
-        HashMap<SeaTile, Double> profits = new HashMap<>();
+        final HashMap<SeaTile, Double> profits = new HashMap<>();
 
 
         profits.put(option1, 5d);
@@ -305,33 +306,33 @@ public class SNALSARDestinationStrategyTest {
             }
 
         }
-        assertTrue(timesOption1WasChosen == 0);
-        assertTrue(timesOption2WasChosen == 100);
+        assertEquals(0, timesOption1WasChosen);
+        assertEquals(100, timesOption2WasChosen);
 
     }
 
     @Test
     public void cheatingEmergence() throws Exception {
-        PrototypeScenario scenario = new PrototypeScenario();
+        final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setCheaters(true);
         scenario.getStartingMPAs().add(new StartingMPA(0, 0, 3, 15));
         //few fishers
         scenario.setFishers(25);
         //small map makes it faster
-        SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
+        final SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
         mapInitializer.setWidth(new FixedDoubleParameter(15));
         mapInitializer.setHeight(new FixedDoubleParameter(15));
         mapInitializer.setCoastalRoughness(new FixedDoubleParameter(0));
         scenario.setMapInitializer(mapInitializer);
         //snalsar!
-        SNALSARDestinationFactory snalsar = new SNALSARDestinationFactory();
+        final SNALSARDestinationFactory snalsar = new SNALSARDestinationFactory();
         //you need to make more than 5 to not be considered a failure!
-        FixedProfitThresholdFactory failureThreshold = new FixedProfitThresholdFactory();
+        final FixedProfitThresholdFactory failureThreshold = new FixedProfitThresholdFactory();
         failureThreshold.setFixedThreshold(new FixedDoubleParameter(5d));
         snalsar.setFailureThreshold(failureThreshold);
         scenario.setDestinationStrategy(snalsar);
 
-        FishState state = new FishState();
+        final FishState state = new FishState();
         state.setScenario(scenario);
 
 
@@ -383,14 +384,14 @@ public class SNALSARDestinationStrategyTest {
     public void itqAffectsGeographySNALSAR() throws Exception {
 
 
-        FishYAML yaml = new FishYAML();
-        String scenarioYaml = String.join("\n", Files.readAllLines(
+        final FishYAML yaml = new FishYAML();
+        final String scenarioYaml = String.join("\n", Files.readAllLines(
             Paths.get("inputs", "first_paper", "location_itq.yaml")));
-        PrototypeScenario scenario = yaml.loadAs(scenarioYaml, PrototypeScenario.class);
+        final PrototypeScenario scenario = yaml.loadAs(scenarioYaml, PrototypeScenario.class);
         //few fishers
         scenario.setFishers(25);
         //small map makes it faster
-        SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
+        final SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
         mapInitializer.setWidth(new FixedDoubleParameter(15));
         mapInitializer.setHeight(new FixedDoubleParameter(15));
         mapInitializer.setCoastalRoughness(new FixedDoubleParameter(0));
@@ -399,7 +400,7 @@ public class SNALSARDestinationStrategyTest {
         scenario.setPortPositionY(7);
         //add snalsar
         scenario.setDestinationStrategy(new SNALSARDestinationFactory());
-        FishState state = new FishState();
+        final FishState state = new FishState();
         state.setScenario(scenario);
 
 

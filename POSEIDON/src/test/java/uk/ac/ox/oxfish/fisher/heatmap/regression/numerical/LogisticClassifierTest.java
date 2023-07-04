@@ -28,10 +28,12 @@ import uk.ac.ox.oxfish.model.FishState;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * Created by carrknight on 12/2/16.
  */
+@SuppressWarnings("unchecked")
 public class LogisticClassifierTest {
 
 
@@ -46,10 +48,10 @@ public class LogisticClassifierTest {
 
         final LogisticClassifier classifier =
             new LogisticClassifier(
-                new Entry<>(
+                entry(
                     (tile, timeOfObservation, agent, model) -> agent.getID(), 1d
                 ),
-                new Entry<>(
+                entry(
                     (tile, timeOfObservation, agent, model) -> model.getDayOfTheYear(), -2d
                 )
             );

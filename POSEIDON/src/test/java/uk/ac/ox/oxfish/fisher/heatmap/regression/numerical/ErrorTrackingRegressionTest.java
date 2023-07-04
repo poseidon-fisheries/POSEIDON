@@ -34,14 +34,15 @@ import static org.mockito.Mockito.when;
 /**
  * Created by carrknight on 8/19/16.
  */
+@SuppressWarnings("unchecked")
 public class ErrorTrackingRegressionTest {
 
     @Test
     public void errorsAreStoredCorrectly() throws Exception {
 
 
-        GeographicalRegression<Double> fake = mock(GeographicalRegression.class);
-        ErrorTrackingRegression<Double> test = new ErrorTrackingRegression<Double>(fake, 3);
+        final GeographicalRegression<Double> fake = mock(GeographicalRegression.class);
+        final ErrorTrackingRegression<Double> test = new ErrorTrackingRegression<Double>(fake, 3);
 
         when(fake.predict(any(), anyDouble(), any(), any())).thenReturn(1d, 2d, 3d, 4d);
         when(fake.extractNumericalYFromObservation(any(), any())).thenReturn(0d, 0d, 0d, 0d);
@@ -53,7 +54,7 @@ public class ErrorTrackingRegressionTest {
 
         //it should have forgotten the first error
         double sum = 0;
-        for (double errors : test.getErrors())
+        for (final double errors : test.getErrors())
             sum += errors;
         assertEquals(4 + 9 + 16, sum, .001);
         assertEquals(test.getLatestError(), 16, .001d);

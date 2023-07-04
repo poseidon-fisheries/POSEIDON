@@ -27,6 +27,7 @@ import static org.mockito.Mockito.*;
 public class ExogenousFadSetterFromDataTest {
 
 
+    @SuppressWarnings("rawtypes")
     @Test
     public void choosesTheCorrectFADs() {
 
@@ -82,6 +83,7 @@ public class ExogenousFadSetterFromDataTest {
     }
 
 
+    @SuppressWarnings("rawtypes")
     @Test
     public void twoObservationsOneFad() {
 
@@ -148,6 +150,7 @@ public class ExogenousFadSetterFromDataTest {
 
     }
 
+    @SuppressWarnings("rawtypes")
     @Test
     public void outOfBoundsSetsAreAccountedSeparately() {
         //2 observed sets: both will be "out of the map"

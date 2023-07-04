@@ -40,6 +40,7 @@ import static org.mockito.Mockito.mock;
 public class TwoPortsInitializerTest {
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void createsPortWhereYouWant() throws Exception {
 

@@ -44,17 +44,17 @@ public class GasCostTest {
 
 
         //if I attach it to a fisher in a real simulation it should compute precisely the gas costs
-        PrototypeScenario scenario = new PrototypeScenario();
+        final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setFishers(1);
-        FishState state = new FishState(System.currentTimeMillis());
+        final FishState state = new FishState(System.currentTimeMillis());
         state.setScenario(scenario);
-        MaximumStepsFactory fishingStrategy = new MaximumStepsFactory();
+        final MaximumStepsFactory fishingStrategy = new MaximumStepsFactory();
         scenario.setFishingStrategy(fishingStrategy);
         state.start();
 
 
-        GasCost cost = new GasCost();
-        LameTripSimulator simulator = new LameTripSimulator();
+        final GasCost cost = new GasCost();
+        final LameTripSimulator simulator = new LameTripSimulator();
 
         final Fisher fisher = state.getFishers().get(0);
         fisher.addTripListener(
@@ -64,7 +64,7 @@ public class GasCostTest {
                     record.getTotalCosts(), .001d
                 );
                 if (record.getEffort() > 0) {
-                    TripRecord simulated = simulator.simulateRecord(
+                    final TripRecord simulated = LameTripSimulator.simulateRecord(
                         fisher1,
                         record.getMostFishedTileInTrip(),
                         state, 24 * 5,
@@ -93,7 +93,7 @@ public class GasCostTest {
 
     @Test
     public void additionalGasCost() {
-        Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        final Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
         //100$ per liter
         //2 liter per km
         when(fisher.getHomePort().getGasPricePerLiter()).thenReturn(100d);
@@ -102,7 +102,7 @@ public class GasCostTest {
         );
         //5 km travelled
         //===> 5 * 2 * 100
-        GasCost cost = new GasCost();
+        final GasCost cost = new GasCost();
         assertEquals(1000d, cost.expectedAdditionalCosts(fisher, 999, 888, 5),
             .0001
         );

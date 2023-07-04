@@ -42,6 +42,7 @@ import java.nio.file.Paths;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
  * Created by carrknight on 9/1/16.
@@ -52,6 +53,7 @@ public class DrawHeatmaps {
     public static final FishState FISH_STATE = MovingTest.generateSimple10x10MapWithVaryingDepth();
 
 
+    @SuppressWarnings("unchecked")
     public static void main(final String[] args) throws Exception {
         distancePlot(new NearestNeighborRegression(
             1, new double[]{1, 1},
@@ -82,23 +84,23 @@ public class DrawHeatmaps {
         distancePlot(new KernelRegression(
             100,
             new EpanechinikovKernel(0),
-            new Entry<>(new GridXExtractor(), 30d),
-            new Entry<>(new GridYExtractor(), 30d)
+            entry(new GridXExtractor(), 30d),
+            entry(new GridYExtractor(), 30d)
         ), "epa_simple");
 
 
         distancePlot(new KernelRegression(
             100,
             new EpanechinikovKernel(0),
-            new Entry<>(new GridXExtractor(), 30d),
-            new Entry<>(new GridYExtractor(), 30d)
+            entry(new GridXExtractor(), 30d),
+            entry(new GridYExtractor(), 30d)
         ), "epa_tilded");
 
 
         distancePlot(new KernelRegression(
             100,
             new EpanechinikovKernel(0),
-            new Entry<>(new PortDistanceExtractor(new ManhattanDistance(), 1d), 30d)
+            entry(new PortDistanceExtractor(new ManhattanDistance(), 1d), 30d)
         ), "epa_port");
 
 
@@ -116,11 +118,11 @@ public class DrawHeatmaps {
                 (
                     FISH_STATE.getMap(),
                     1,
-                    new Entry<>(
+                    entry(
                         new GridXExtractor(),
                         20d
                     ),
-                    new Entry<>(
+                    entry(
                         new GridYExtractor(),
                         20d
                     )

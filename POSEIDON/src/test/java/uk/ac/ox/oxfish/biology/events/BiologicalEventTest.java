@@ -21,8 +21,6 @@
 package uk.ac.ox.oxfish.biology.events;
 
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -40,21 +38,22 @@ import static org.mockito.Mockito.*;
 public class BiologicalEventTest {
 
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     public void calledTheRightAmountOfTimes() throws Exception {
 
         //the event increases this number
-        AtomicInteger counter = new AtomicInteger(0);
+        final AtomicInteger counter = new AtomicInteger(0);
 
-        FishState state = MovingTest.generateSimple4x4Map();
+        final FishState state = MovingTest.generateSimple4x4Map();
 
-        Predicate trigger = mock(Predicate.class);
+        final Predicate trigger = mock(Predicate.class);
         when(trigger.test(any())).thenReturn(true, false, true);
 
-        Predicate<SeaTile> mock = mock(Predicate.class);
+        final Predicate<SeaTile> mock = mock(Predicate.class);
         doAnswer(invocation -> ((SeaTile) invocation.getArguments()[0]).getGridX() == 0).when(mock).test(any());
 
-        BiologicalEvent event = new BiologicalEvent(
+        final BiologicalEvent event = new BiologicalEvent(
 
             trigger,
             mock,

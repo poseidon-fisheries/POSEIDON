@@ -16,6 +16,7 @@ import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 public class DeploymentPlannedActionGeneratorTest {
 
+    @SuppressWarnings("rawtypes")
     @Test
     public void drawsCorrectly() {
         final Fisher fisher = mock(Fisher.class);
@@ -36,7 +37,7 @@ public class DeploymentPlannedActionGeneratorTest {
         dplValues.start(fishState, fisher);
 
 
-        DeploymentPlannedActionGenerator generator = new DeploymentPlannedActionGenerator(
+        final DeploymentPlannedActionGenerator generator = new DeploymentPlannedActionGenerator(
             dplValues,
             map,
             new MersenneTwisterFast()
@@ -47,7 +48,7 @@ public class DeploymentPlannedActionGeneratorTest {
         int timesWeDeployAt11 = 0;
 
         for (int draws = 0; draws < 100; draws++) {
-            PlannedAction.Deploy plannedDeploy = generator.drawNewPlannedAction();
+            final PlannedAction.Deploy plannedDeploy = generator.drawNewPlannedAction();
             if (plannedDeploy.getLocation().getGridX() == 2 && plannedDeploy.getLocation().getGridY() == 2) {
                 timesWeDeployAt22++;
             } else {

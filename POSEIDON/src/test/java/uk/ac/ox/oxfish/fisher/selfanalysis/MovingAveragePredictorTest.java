@@ -31,6 +31,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
+@SuppressWarnings("unchecked")
 public class MovingAveragePredictorTest {
 
 
@@ -38,8 +39,8 @@ public class MovingAveragePredictorTest {
     public void notReadyGetsNaN() throws Exception {
 
 
-        Sensor<Fisher, Double> dummy = mock(Sensor.class);
-        MovingAveragePredictor predictor = MovingAveragePredictor.dailyMAPredictor("ignored", dummy, 30);
+        final Sensor<Fisher, Double> dummy = mock(Sensor.class);
+        final MovingAveragePredictor predictor = MovingAveragePredictor.dailyMAPredictor("ignored", dummy, 30);
         assertEquals(Double.NaN, predictor.predict(), 0);
 
     }
@@ -48,10 +49,10 @@ public class MovingAveragePredictorTest {
     public void noVarianceIsFine() throws Exception {
 
 
-        Sensor<Fisher, Double> dummy = mock(Sensor.class);
+        final Sensor<Fisher, Double> dummy = mock(Sensor.class);
 
 
-        MovingAveragePredictor predictor = MovingAveragePredictor.perTripMAPredictor("ignored", dummy, 30);
+        final MovingAveragePredictor predictor = MovingAveragePredictor.perTripMAPredictor("ignored", dummy, 30);
         assertEquals(Double.NaN, predictor.predict(), 0);
 
 
@@ -70,10 +71,10 @@ public class MovingAveragePredictorTest {
     public void someVarianceIsFine() throws Exception {
 
 
-        Sensor<Fisher, Double> dummy = mock(Sensor.class);
+        final Sensor<Fisher, Double> dummy = mock(Sensor.class);
 
 
-        MovingAveragePredictor predictor = MovingAveragePredictor.dailyMAPredictor("ignored", dummy, 10);
+        final MovingAveragePredictor predictor = MovingAveragePredictor.dailyMAPredictor("ignored", dummy, 10);
         assertEquals(Double.NaN, predictor.predict(), 0);
 
 
@@ -92,8 +93,8 @@ public class MovingAveragePredictorTest {
     @Test
     public void predictSumsCorrectly() throws Exception {
 
-        Sensor<Fisher, Double> dummy = mock(Sensor.class);
-        MovingAveragePredictor predictor = MovingAveragePredictor.dailyMAPredictor("summer", dummy, 10);
+        final Sensor<Fisher, Double> dummy = mock(Sensor.class);
+        final MovingAveragePredictor predictor = MovingAveragePredictor.dailyMAPredictor("summer", dummy, 10);
         assertEquals(Double.NaN, predictor.predict(), 0);
 
         for (int i = 1; i <= 10; i++) {

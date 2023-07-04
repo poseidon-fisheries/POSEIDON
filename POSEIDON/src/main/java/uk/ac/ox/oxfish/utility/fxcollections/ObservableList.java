@@ -68,13 +68,9 @@ public interface ObservableList<E> extends List<E>, Observable {
 
     }
 
-    @SafeVarargs
+    @SuppressWarnings("unchecked")
     static <E> ObservableList<E> observableList(final E... items) {
-        final ArrayList<E> list = Lists.newArrayList();
-        for (final E e : list) {
-            list.add(e);
-        }
-        return new ObservableListWrapper<>(list);
+        return new ObservableListWrapper<>(Lists.newArrayList(items));
     }
 
     /**

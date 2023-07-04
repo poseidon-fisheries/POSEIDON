@@ -38,6 +38,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by carrknight on 6/28/16.
  */
+@SuppressWarnings({"LocalCanBeFinal", "rawtypes"})
 public class ExhaustiveAcquisitionFunctionTest {
 
 

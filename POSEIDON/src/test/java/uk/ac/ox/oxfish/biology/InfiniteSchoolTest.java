@@ -26,18 +26,20 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.*;
 import static uk.ac.ox.oxfish.fisher.actions.MovingTest.generateSimple4x4Map;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 
 public class InfiniteSchoolTest {
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void small() throws Exception {
 
         final FishState state = generateSimple4x4Map();
         final NauticalMap map = state.getMap();
 
-        final InfiniteSchool school = new InfiniteSchool(1, 1, 1, 0, 100, null, new Entry<>(0, 0), new Entry<>(3, 3));
+        final InfiniteSchool school = new InfiniteSchool(1, 1, 1, 0, 100, null, entry(0, 0), entry(3, 3));
         assertTrue(school.contains(map.getSeaTile(1, 1)));
         assertFalse(school.contains(map.getSeaTile(0, 0)));
         assertFalse(school.contains(map.getSeaTile(2, 2)));
@@ -65,6 +67,7 @@ public class InfiniteSchoolTest {
     }
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void diameter() throws Exception {
 
@@ -72,7 +75,7 @@ public class InfiniteSchoolTest {
         final NauticalMap map = state.getMap();
 
         //diameter 1
-        final InfiniteSchool school = new InfiniteSchool(1, 1, 1, 1, 100, null, new Entry<>(0, 0), new Entry<>(3, 3));
+        final InfiniteSchool school = new InfiniteSchool(1, 1, 1, 1, 100, null, entry(0, 0), entry(3, 3));
         assertTrue(school.contains(map.getSeaTile(1, 1)));
         //doesn't contain the diagonal neighbors
         assertFalse(school.contains(map.getSeaTile(0, 0)));
@@ -87,6 +90,7 @@ public class InfiniteSchoolTest {
     }
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void slow() throws Exception {
 
@@ -94,7 +98,7 @@ public class InfiniteSchoolTest {
         final NauticalMap map = state.getMap();
 
         //moves every 2 days
-        final InfiniteSchool school = new InfiniteSchool(1, 1, 2, 0, 100, null, new Entry<>(0, 0), new Entry<>(3, 3));
+        final InfiniteSchool school = new InfiniteSchool(1, 1, 2, 0, 100, null, entry(0, 0), entry(3, 3));
 
 
         school.step(state);

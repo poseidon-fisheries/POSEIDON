@@ -35,6 +35,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by carrknight on 6/14/16.
  */
+@SuppressWarnings("unchecked")
 public class PeriodicUpdateFromListFactoryTest {
 
 
