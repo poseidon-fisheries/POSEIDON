@@ -21,8 +21,6 @@ package uk.ac.ox.oxfish.utility;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -952,20 +950,6 @@ public class FishStateUtilities {
         return extension;
     }
 
-    public static FishState readModelFromFile(final File file) {
-        Logger.getGlobal().info("Reading from File");
-        final XStream xstream = new XStream(new StaxDriver());
-        String xml = null;
-        try {
-            xml = new String(Files.readAllBytes(file.toPath()));
-            return (FishState) xstream.fromXML(xml);
-        } catch (final IOException e) {
-            e.printStackTrace();
-            Logger.getGlobal().severe("Failed to read file " + file);
-            return null;
-        }
-    }
-
     public static void deleteRecursively(final File f) throws IOException {
         if (f.isDirectory()) {
             for (final File c : f.listFiles())
@@ -1067,16 +1051,20 @@ public class FishStateUtilities {
     }
 
     public static FishState run(
-        final String simulationName, final Path scenarioYaml,
+        final String simulationName,
+        final Path scenarioYaml,
         final Path outputFolder,
-        final Long seed, final String logLevel, final boolean additionalData,
-        final String policyScript, final int yearsToRun,
-        final boolean saveOnExit, final Integer heatmapGathererYear,
-        final Consumer<Scenario> scenarioSetup,
-        final Consumer<FishState> preStartSetup,
+        final Long seed,
+        final String logLevel,
+        final boolean additionalData,
+        final String policyScript,
+        final int yearsToRun,
+        final Integer heatmapGathererYear,
+        final Consumer<? super Scenario> scenarioSetup,
+        final Consumer<? super FishState> preStartSetup,
         //if any of returns true, it stops the simulation before it is over!
-        final LinkedList<Entry<Integer, AlgorithmFactory<? extends AdditionalStartable>>> outsidePlugins,
-        final List<Predicate<FishState>> circuitBreakers
+        final Iterable<? extends Entry<Integer, AlgorithmFactory<? extends AdditionalStartable>>> outsidePlugins,
+        final Iterable<? extends Predicate<FishState>> circuitBreakers
     ) throws IOException {
 
 
@@ -1188,11 +1176,6 @@ public class FishStateUtilities {
 
             }
             writeAdditionalOutputsToFolder(outputFolder, model);
-            if (saveOnExit)
-                writeModelToFile(
-                    outputFolder.resolve(simulationName + ".checkpoint").toFile(),
-                    model
-                );
         }
 
 
@@ -1226,20 +1209,6 @@ public class FishStateUtilities {
             writer.write(plugin.composeFileContents());
             writer.close();
 
-        }
-    }
-
-    public static void writeModelToFile(final File file, final FishState state) {
-        final XStream xstream = new XStream(new StaxDriver());
-        Logger.getGlobal().info("Writing to file!");
-        final String xml = xstream.toXML(state);
-
-        try {
-            Files.write(file.toPath(), xml.getBytes());
-            Logger.getGlobal().info("State saved at " + file);
-        } catch (final IOException e) {
-            e.printStackTrace();
-            Logger.getGlobal().severe("Failed to write file " + file + "with error: " + e.getMessage());
         }
     }
 

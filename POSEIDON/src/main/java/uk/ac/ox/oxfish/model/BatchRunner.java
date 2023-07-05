@@ -145,7 +145,7 @@ public class BatchRunner {
             Level.INFO.getName(),
             true, policyFile == null ?
                 null : policyFile.toString(),
-            yearsToRun, false,
+            yearsToRun,
             heatmapGathererStartYear,
             getScenarioSetup(),
             beforeStartSetup,

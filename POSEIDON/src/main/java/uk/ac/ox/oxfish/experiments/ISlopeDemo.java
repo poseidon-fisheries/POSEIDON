@@ -1,9 +1,7 @@
 package uk.ac.ox.oxfish.experiments;
 
 import com.google.common.collect.Lists;
-import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
@@ -16,8 +14,6 @@ import uk.ac.ox.oxfish.model.regs.policymakers.PIDControllerIndicatorTarget;
 import uk.ac.ox.oxfish.model.regs.policymakers.TargetToTACController;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.*;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -29,9 +25,6 @@ import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.DoublePredicate;
-import java.util.function.ToDoubleFunction;
 import java.util.logging.Level;
 
 public class ISlopeDemo {
@@ -252,7 +245,7 @@ public class ISlopeDemo {
                 final PrototypeScenario prototype = (PrototypeScenario) scenario;
                 prototype.setFishers(200);
                 prototype.getPlugins().add(
-                    fishState -> (AdditionalStartable) model -> fishState.scheduleOnceInXDays(
+                    fishState -> model -> fishState.scheduleOnceInXDays(
                         (Steppable) simState -> {
                             final TargetToTACController controller = new TargetToTACController(
                                 new ITarget(
@@ -321,7 +314,7 @@ public class ISlopeDemo {
                     new HerfindalndexCollectorFactory()
                 );
                 prototype.getPlugins().add(
-                    fishState -> (AdditionalStartable) model -> fishState.scheduleOnceInXDays(
+                    fishState -> model -> fishState.scheduleOnceInXDays(
                         (Steppable) simState -> {
                             final TargetToTACController controller = new TargetToTACController(
                                 new ISlope(
@@ -391,7 +384,7 @@ public class ISlopeDemo {
                 );
 
                 prototype.getPlugins().add(
-                    fishState -> (AdditionalStartable) model -> fishState.scheduleOnceInXDays(
+                    fishState -> model -> fishState.scheduleOnceInXDays(
                         (Steppable) simState -> {
                             final IndexTargetController controller =
                                 new IndexTargetController(
@@ -578,9 +571,13 @@ public class ISlopeDemo {
                             value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.VARIABLE_COSTS)).filter(
                             value -> Double.isFinite(value)).sum();
                         //skip boats that made no trips
-                        final double trips = ignored.getFishers().stream().mapToDouble(
-                            value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS)).filter(value -> Double.isFinite(
-                            value)).sum();
+                        final double trips = ignored.getFishers()
+                            .stream()
+                            .mapToDouble(
+                                value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS))
+                            .filter(value -> Double.isFinite(
+                                value))
+                            .sum();
 
                         return trips > 0 ? trips / variableCosts : 0d;
                     },
@@ -592,13 +589,21 @@ public class ISlopeDemo {
                     "Inverse Trip Duration",
                     (Gatherer<FishState>) ignored -> {
                         //skip boats that made no trips
-                        final double hoursOut = ignored.getFishers().stream().mapToDouble(
-                            value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT)).filter(value -> Double.isFinite(
-                            value)).sum();
+                        final double hoursOut = ignored.getFishers()
+                            .stream()
+                            .mapToDouble(
+                                value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT))
+                            .filter(value -> Double.isFinite(
+                                value))
+                            .sum();
                         //skip boats that made no trips
-                        final double trips = ignored.getFishers().stream().mapToDouble(
-                            value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS)).filter(value -> Double.isFinite(
-                            value)).sum();
+                        final double trips = ignored.getFishers()
+                            .stream()
+                            .mapToDouble(
+                                value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS))
+                            .filter(value -> Double.isFinite(
+                                value))
+                            .sum();
 
                         return trips > 0 ? trips / hoursOut : 0d;
                     },
@@ -710,7 +715,6 @@ public class ISlopeDemo {
             false,
             null,
             15,
-            false,
             -1,
             null,
             null,

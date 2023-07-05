@@ -77,7 +77,6 @@ public class NoBoatsFadMatchingAnalysis {
             Level.ALL.getName(),
             false,
             null, 2,
-            false,
             -1, null, null, null, null
         );
 

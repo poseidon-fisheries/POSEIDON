@@ -1,13 +1,11 @@
 package uk.ac.ox.oxfish.experiments.tuna.abundance;
 
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.AbundanceHistogrammer;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class BiologyCheck {
@@ -27,7 +25,6 @@ public class BiologyCheck {
             Level.ALL.getName(),
             false,
             null, 2,
-            false,
             -1, null,
             state -> state.registerStartable(new AbundanceHistogrammer()),
             null,

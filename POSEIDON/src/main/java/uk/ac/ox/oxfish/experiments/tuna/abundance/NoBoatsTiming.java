@@ -29,7 +29,6 @@ public class NoBoatsTiming {
                 true,
                 null,
                 2,
-                false,
                 -1,
                 null,
                 null,
