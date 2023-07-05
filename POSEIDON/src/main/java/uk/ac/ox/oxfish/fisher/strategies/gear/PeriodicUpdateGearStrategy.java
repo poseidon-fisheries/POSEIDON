@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.GearDecorator;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.selfanalysis.DiscreteRandomAlgorithm;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
@@ -39,7 +38,6 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.OptionalInt;
-import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -130,7 +128,10 @@ public class PeriodicUpdateGearStrategy implements GearStrategy {
     }
 
     public void tagYourself(final Fisher fisher, final Gear change, final List<Gear> options) {
-        final List<String> newTags = fisher.getTags().stream().filter(s -> !s.startsWith(tag)).collect(Collectors.toList());
+        final List<String> newTags = fisher.getTagsList()
+            .stream()
+            .filter(s -> !s.startsWith(tag))
+            .collect(Collectors.toList());
 
         final OptionalInt indexOpt = IntStream.range(0, options.size())
             .filter(i ->
@@ -139,8 +140,8 @@ public class PeriodicUpdateGearStrategy implements GearStrategy {
         newTags.add(tag + "_" + indexOpt.orElse(-1));
         options.get(0).isSame(change);
         options.get(1).isSame(change);
-        fisher.getTags().clear();
-        fisher.getTags().addAll(newTags);
+        fisher.getTagsList().clear();
+        fisher.getTagsList().addAll(newTags);
     }
 
     /**

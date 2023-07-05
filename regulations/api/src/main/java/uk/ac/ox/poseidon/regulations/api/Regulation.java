@@ -2,31 +2,25 @@ package uk.ac.ox.poseidon.regulations.api;
 
 import uk.ac.ox.poseidon.agents.api.Action;
 
-import java.util.stream.Stream;
-
 import static uk.ac.ox.poseidon.regulations.api.Mode.FORBIDDEN;
 import static uk.ac.ox.poseidon.regulations.api.Mode.MANDATORY;
 
-public interface Regulation<C> {
+public interface Regulation {
 
-    default boolean isPermitted(final Action action, final C context) {
+    default boolean isPermitted(final Action action) {
         // the action is permitted of the mode is either
         // PERMITTED or MANDATORY, but not FORBIDDEN
-        return !isForbidden(action, context);
+        return !isForbidden(action);
     }
 
-    default boolean isForbidden(final Action action, final C context) {
-        return mode(action, context) == FORBIDDEN;
+    default boolean isForbidden(final Action action) {
+        return mode(action) == FORBIDDEN;
     }
 
-    Mode mode(Action action, C context);
+    Mode mode(Action action);
 
-    default boolean isMandatory(final Action action, final C context) {
-        return mode(action, context) == MANDATORY;
-    }
-
-    default Stream<Regulation<?>> asStream() {
-        return Stream.of(this);
+    default boolean isMandatory(final Action action) {
+        return mode(action) == MANDATORY;
     }
 
 }

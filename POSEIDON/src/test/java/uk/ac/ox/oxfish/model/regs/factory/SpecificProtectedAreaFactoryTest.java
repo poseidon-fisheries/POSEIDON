@@ -71,7 +71,7 @@ public class SpecificProtectedAreaFactoryTest extends TestCase {
                 .stream()
                 .flatMap(fisher ->
                     testPoints
-                        .get(getLast(fisher.getTags()))
+                        .get(getLast(fisher.getTagsList()))
                         .stream()
                         .filter(testPoint ->
                             testPoint.shouldBeAllowed !=

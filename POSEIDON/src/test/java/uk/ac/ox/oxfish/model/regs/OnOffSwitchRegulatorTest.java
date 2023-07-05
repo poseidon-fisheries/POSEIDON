@@ -91,10 +91,10 @@ public class OnOffSwitchRegulatorTest {
         when(four.getRegulation()).thenReturn(decorator4);
 
 
-        when(one.getTags()).thenReturn(Lists.newArrayList("okay"));
-        when(two.getTags()).thenReturn(Lists.newArrayList("okay"));
-        when(three.getTags()).thenReturn(Lists.newArrayList("okay"));
-        when(one.getTags()).thenReturn(Lists.newArrayList("nope"));
+        when(one.getTagsList()).thenReturn(Lists.newArrayList("okay"));
+        when(two.getTagsList()).thenReturn(Lists.newArrayList("okay"));
+        when(three.getTagsList()).thenReturn(Lists.newArrayList("okay"));
+        when(one.getTagsList()).thenReturn(Lists.newArrayList("nope"));
 
         final FishState state = mock(FishState.class);
         final ObservableList<Fisher> fishers = ObservableList.observableList(one, two, three, four);

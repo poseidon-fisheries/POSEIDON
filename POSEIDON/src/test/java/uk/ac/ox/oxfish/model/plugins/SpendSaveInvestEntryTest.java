@@ -14,7 +14,7 @@ public class SpendSaveInvestEntryTest {
     @Test
     public void spendSaveInvest() {
 
-        SpendSaveInvestEntry spendSaveInvestEntry = new SpendSaveInvestEntry(
+        final SpendSaveInvestEntry spendSaveInvestEntry = new SpendSaveInvestEntry(
             100,
             10,
             "population0"
@@ -22,18 +22,18 @@ public class SpendSaveInvestEntryTest {
         //there are 2 fishers; one has 150$ and the other 100;
         //after expenditure there ought to be 140 and 90
         //only one new fisher!
-        Fisher first = mock(Fisher.class);
+        final Fisher first = mock(Fisher.class);
         when(first.getBankBalance()).thenReturn(150d);
-        when(first.getTags()).thenReturn(Lists.newArrayList("population0"));
+        when(first.getTagsList()).thenReturn(Lists.newArrayList("population0"));
         when(first.hasBeenActiveThisYear()).thenReturn(true);
 
-        Fisher second = mock(Fisher.class);
+        final Fisher second = mock(Fisher.class);
         when(second.getBankBalance()).thenReturn(100d);
-        when(second.getTags()).thenReturn(Lists.newArrayList("population0"));
+        when(second.getTagsList()).thenReturn(Lists.newArrayList("population0"));
         when(second.hasBeenActiveThisYear()).thenReturn(true);
 
 
-        FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(state.getFishers()).thenReturn(
             ObservableList.observableList(
                 first, second));

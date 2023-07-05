@@ -72,7 +72,8 @@ public class YearlyActionLimitsDepartingStrategyTest {
                 ImmutableMap.of(
                     ImmutableSet.of("DPL"), 0,
                     ImmutableSet.of("FAD", "OFS", "NOA", "DEL"), 4
-                )
+                ),
+                yearlyActionCounts
             );
 
         final YearlyActionCounter yearlyActionCounter = MultisetYearlyActionCounter.create();

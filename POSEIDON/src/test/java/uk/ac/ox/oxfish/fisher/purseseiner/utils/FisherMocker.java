@@ -43,7 +43,7 @@ public class FisherMocker {
         final Fisher fisher = mock(Fisher.class);
         final String fisherId = idPrefix + id;
         when(fisher.getId()).thenReturn(fisherId);
-        when(fisher.getTags()).thenReturn(ImmutableList.of(fisherId));
+        when(fisher.getTagsList()).thenReturn(ImmutableList.of(fisherId));
         return fisher;
     }
 

@@ -62,7 +62,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
@@ -234,7 +233,7 @@ public class FisherDefinition {
 
         //add tags to fisher definition
         final List<String> tags = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(this.tags);
-        if (!tags.isEmpty()) fisherFactory.getAdditionalSetups().add(fisher -> fisher.getTags().addAll(tags));
+        if (!tags.isEmpty()) fisherFactory.getAdditionalSetups().add(fisher -> fisher.getTagsList().addAll(tags));
 
         //add other setups
         fisherFactory.getAdditionalSetups().addAll(additionalSetups);
@@ -289,9 +288,12 @@ public class FisherDefinition {
         }
 
 
-        final Port toReturn = ports.stream().filter(port -> port.getName().trim().equalsIgnoreCase(portName.trim())).findFirst().orElseGet(() -> {
-            throw new RuntimeException(portName + " not found!");
-        });
+        final Port toReturn = ports.stream()
+            .filter(port -> port.getName().trim().equalsIgnoreCase(portName.trim()))
+            .findFirst()
+            .orElseGet(() -> {
+                throw new RuntimeException(portName + " not found!");
+            });
 
         fishCreationIndex++;
 

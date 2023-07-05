@@ -23,7 +23,7 @@ public class BoatColors {
             .put("wheat", new Color(245, 222, 179))
             .build();
 
-    public static boolean hasColorTag(Fisher fisher) {
-        return fisher.getTags().stream().anyMatch(BOAT_COLORS::containsKey);
+    public static boolean hasColorTag(final Fisher fisher) {
+        return fisher.getTagsList().stream().anyMatch(BOAT_COLORS::containsKey);
     }
 }

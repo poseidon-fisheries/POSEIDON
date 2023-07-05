@@ -142,7 +142,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         private Map<String, Double> yftCatchPerSize;
 
         private ActionRecord(final PurseSeinerAction action) {
-            this.boatId = action.getFisher().getTags().get(0);
+            this.boatId = action.getFisher().getTagsList().get(0);
             this.actionType = ActionClass.classMap.get(action.getClass()).toString();
             final Coordinate coordinates = fishState.getMap().getCoordinates(action.getLocation());
             this.lon = coordinates.x;

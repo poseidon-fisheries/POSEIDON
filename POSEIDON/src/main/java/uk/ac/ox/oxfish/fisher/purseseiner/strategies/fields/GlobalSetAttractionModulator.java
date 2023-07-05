@@ -41,12 +41,12 @@ public class GlobalSetAttractionModulator implements GlobalAttractionModulator {
         final PurseSeinerActionContext actionContext = fadManager.getActionContext();
         final ImmutableSet<YearlyActionCountLimit> yearlyActionCountLimits =
             fadManager
-                .getRegulations()
+                .getRegulation()
                 .asStream()
                 .filter(reg -> reg instanceof YearlyActionCountLimit)
                 .map(reg -> (YearlyActionCountLimit) reg)
                 .collect(toImmutableSet());
-        
+
         // Take the highest percentage for every applicable limit for
         // every action code and return the maximum of all of those.
         return SET_ACTION_CODES

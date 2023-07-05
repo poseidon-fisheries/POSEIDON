@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.biology.boxcars;
 
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.CatchAtLengthFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -10,7 +9,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Predicate;
 
 /**
  * creates an SPR agent but this time it has a fixed probability of sampling a boat for each matching tag
@@ -58,17 +56,17 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
     }
 
     public SPRAgentBuilderSelectiveSampling(
-        String surveyTag, String speciesName,
-        LinkedHashMap<String, Double> probabilityOfSamplingEachTag,
-        double assumedLinf,
-        double assumedKParameter,
-        double assumedNaturalMortality,
-        int simulatedMaxAge,
-        double simulatedVirginRecruits,
-        double assumedLengthBinCm,
-        double assumedVarA,
-        double assumedVarB,
-        double assumedLengthAtMaturity
+        final String surveyTag, final String speciesName,
+        final LinkedHashMap<String, Double> probabilityOfSamplingEachTag,
+        final double assumedLinf,
+        final double assumedKParameter,
+        final double assumedNaturalMortality,
+        final int simulatedMaxAge,
+        final double simulatedVirginRecruits,
+        final double assumedLengthBinCm,
+        final double assumedVarA,
+        final double assumedVarB,
+        final double assumedLengthAtMaturity
     ) {
         this.surveyTag = surveyTag;
         this.speciesName = speciesName;
@@ -86,7 +84,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
 
 
     @Override
-    public SPRAgent apply(FishState fishState) {
+    public SPRAgent apply(final FishState fishState) {
         final MersenneTwisterFast random = fishState.getRandom();
 
 
@@ -94,8 +92,8 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
             surveyTag,
             fishState.getBiology().getSpecie(speciesName),
             fisher -> {
-                for (Map.Entry<String, Double> tagProbability : probabilityOfSamplingEachTag.entrySet()) {
-                    if (fisher.getTags()
+                for (final Map.Entry<String, Double> tagProbability : probabilityOfSamplingEachTag.entrySet()) {
+                    if (fisher.getTagsList()
                         .contains(tagProbability.getKey()) && random.nextDouble() < tagProbability.getValue()) {
                         return true;
                     }
@@ -124,7 +122,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return surveyTag;
     }
 
-    public void setSurveyTag(String surveyTag) {
+    public void setSurveyTag(final String surveyTag) {
         this.surveyTag = surveyTag;
     }
 
@@ -132,7 +130,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return speciesName;
     }
 
-    public void setSpeciesName(String speciesName) {
+    public void setSpeciesName(final String speciesName) {
         this.speciesName = speciesName;
     }
 
@@ -140,7 +138,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return probabilityOfSamplingEachTag;
     }
 
-    public void setProbabilityOfSamplingEachTag(LinkedHashMap<String, Double> probabilityOfSamplingEachTag) {
+    public void setProbabilityOfSamplingEachTag(final LinkedHashMap<String, Double> probabilityOfSamplingEachTag) {
         this.probabilityOfSamplingEachTag = probabilityOfSamplingEachTag;
     }
 
@@ -148,7 +146,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return assumedLinf;
     }
 
-    public void setAssumedLinf(DoubleParameter assumedLinf) {
+    public void setAssumedLinf(final DoubleParameter assumedLinf) {
         this.assumedLinf = assumedLinf;
     }
 
@@ -156,7 +154,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return assumedKParameter;
     }
 
-    public void setAssumedKParameter(DoubleParameter assumedKParameter) {
+    public void setAssumedKParameter(final DoubleParameter assumedKParameter) {
         this.assumedKParameter = assumedKParameter;
     }
 
@@ -164,7 +162,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return assumedNaturalMortality;
     }
 
-    public void setAssumedNaturalMortality(DoubleParameter assumedNaturalMortality) {
+    public void setAssumedNaturalMortality(final DoubleParameter assumedNaturalMortality) {
         this.assumedNaturalMortality = assumedNaturalMortality;
     }
 
@@ -172,7 +170,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return simulatedMaxAge;
     }
 
-    public void setSimulatedMaxAge(DoubleParameter simulatedMaxAge) {
+    public void setSimulatedMaxAge(final DoubleParameter simulatedMaxAge) {
         this.simulatedMaxAge = simulatedMaxAge;
     }
 
@@ -180,7 +178,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return simulatedVirginRecruits;
     }
 
-    public void setSimulatedVirginRecruits(DoubleParameter simulatedVirginRecruits) {
+    public void setSimulatedVirginRecruits(final DoubleParameter simulatedVirginRecruits) {
         this.simulatedVirginRecruits = simulatedVirginRecruits;
     }
 
@@ -188,7 +186,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return assumedLengthBinCm;
     }
 
-    public void setAssumedLengthBinCm(DoubleParameter assumedLengthBinCm) {
+    public void setAssumedLengthBinCm(final DoubleParameter assumedLengthBinCm) {
         this.assumedLengthBinCm = assumedLengthBinCm;
     }
 
@@ -196,7 +194,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return assumedVarA;
     }
 
-    public void setAssumedVarA(DoubleParameter assumedVarA) {
+    public void setAssumedVarA(final DoubleParameter assumedVarA) {
         this.assumedVarA = assumedVarA;
     }
 
@@ -204,7 +202,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return assumedVarB;
     }
 
-    public void setAssumedVarB(DoubleParameter assumedVarB) {
+    public void setAssumedVarB(final DoubleParameter assumedVarB) {
         this.assumedVarB = assumedVarB;
     }
 
@@ -212,7 +210,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return assumedLengthAtMaturity;
     }
 
-    public void setAssumedLengthAtMaturity(DoubleParameter assumedLengthAtMaturity) {
+    public void setAssumedLengthAtMaturity(final DoubleParameter assumedLengthAtMaturity) {
         this.assumedLengthAtMaturity = assumedLengthAtMaturity;
     }
 
@@ -220,7 +218,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return useTNCFormula;
     }
 
-    public void setUseTNCFormula(boolean useTNCFormula) {
+    public void setUseTNCFormula(final boolean useTNCFormula) {
         this.useTNCFormula = useTNCFormula;
     }
 
@@ -228,7 +226,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
         return removeSmallestPercentile;
     }
 
-    public void setRemoveSmallestPercentile(boolean removeSmallestPercentile) {
+    public void setRemoveSmallestPercentile(final boolean removeSmallestPercentile) {
         this.removeSmallestPercentile = removeSmallestPercentile;
     }
 }

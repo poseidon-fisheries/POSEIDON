@@ -44,7 +44,7 @@ public class FullSeasonalRetiredDataCollectors implements AdditionalStartable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
         if (model.getYearlyDataSet().getColumn("Full-time fishers") != null)
             return;
@@ -54,9 +54,9 @@ public class FullSeasonalRetiredDataCollectors implements AdditionalStartable {
             "Full-time fishers",
             (Gatherer<FishState>) state -> {
                 double sum = 0;
-                for (Fisher fisher : state.getFishers()) {
+                for (final Fisher fisher : state.getFishers()) {
 
-                    Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
+                    final Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
                     //either you are "full time" or you don't have a seasonal/nonseasonal
                     // variable at which point you are full time as long as you go on at least a trip
                     if (status == EffortStatus.FULLTIME || (status == null &&
@@ -74,9 +74,9 @@ public class FullSeasonalRetiredDataCollectors implements AdditionalStartable {
             "Seasonal fishers",
             (Gatherer<FishState>) state -> {
                 double sum = 0;
-                for (Fisher fisher : state.getFishers()) {
+                for (final Fisher fisher : state.getFishers()) {
 
-                    Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
+                    final Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
                     if (status == EffortStatus.SEASONAL)
                         sum++;
 
@@ -91,9 +91,9 @@ public class FullSeasonalRetiredDataCollectors implements AdditionalStartable {
             "Retired fishers",
             (Gatherer<FishState>) state -> {
                 double sum = 0;
-                for (Fisher fisher : state.getFishers()) {
+                for (final Fisher fisher : state.getFishers()) {
 
-                    Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
+                    final Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
                     //either you are "full time" or you don't have a seasonal/nonseasonal
                     // variable at which point you are full time as long as you go on at least a trip
                     if (status == EffortStatus.RETIRED || (status == null &&
@@ -108,15 +108,15 @@ public class FullSeasonalRetiredDataCollectors implements AdditionalStartable {
         );
 
 
-        for (Map.Entry<String, FisherFactory> factory : model.getFisherFactories()) {
+        for (final Map.Entry<String, FisherFactory> factory : model.getFisherFactories()) {
             model.getYearlyDataSet().registerGatherer(
                 "Full-time fishers of " + factory.getKey(),
                 (Gatherer<FishState>) state -> {
                     double sum = 0;
-                    for (Fisher fisher : state.getFishers()) {
-                        if (!fisher.getTags().contains(factory.getKey()))
+                    for (final Fisher fisher : state.getFishers()) {
+                        if (!fisher.getTagsList().contains(factory.getKey()))
                             continue;
-                        Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
+                        final Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
                         //either you are "full time" or you don't have a seasonal/nonseasonal
                         // variable at which point you are full time as long as you go on at least a trip
                         if (status == EffortStatus.FULLTIME || (status == null &&
@@ -134,10 +134,10 @@ public class FullSeasonalRetiredDataCollectors implements AdditionalStartable {
                 "Seasonal fishers of " + factory.getKey(),
                 (Gatherer<FishState>) state -> {
                     double sum = 0;
-                    for (Fisher fisher : state.getFishers()) {
-                        if (!fisher.getTags().contains(factory.getKey()))
+                    for (final Fisher fisher : state.getFishers()) {
+                        if (!fisher.getTagsList().contains(factory.getKey()))
                             continue;
-                        Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
+                        final Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
                         if (status == EffortStatus.SEASONAL)
                             sum++;
 
@@ -152,10 +152,10 @@ public class FullSeasonalRetiredDataCollectors implements AdditionalStartable {
                 "Retired fishers of " + factory.getKey(),
                 (Gatherer<FishState>) state -> {
                     double sum = 0;
-                    for (Fisher fisher : state.getFishers()) {
-                        if (!fisher.getTags().contains(factory.getKey()))
+                    for (final Fisher fisher : state.getFishers()) {
+                        if (!fisher.getTagsList().contains(factory.getKey()))
                             continue;
-                        Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
+                        final Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
                         //either you are "full time" or you don't have a seasonal/nonseasonal
                         // variable at which point you are full time as long as you go on at least a trip
                         if (status == EffortStatus.RETIRED || (status == null &&

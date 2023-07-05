@@ -42,9 +42,8 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
     final private static String HEADER = "fisherid,effort,x_cell,y_cell," +
         "date_trip_end_year,date_trip_end_day,tags";
     private static final long serialVersionUID = 8801745951745956045L;
-    private String fileName = "tow_log.csv";
     private final StringBuilder log = new StringBuilder().append(HEADER).append("\n");
-
+    private String fileName = "tow_log.csv";
     private FishState model;
 
 
@@ -68,7 +67,7 @@ public class TowLongLogger implements AdditionalStartable, OutputPlugin, TripLis
                 .append(fishingRecord.getKey().getGridY()).append(",")
                 .append(year).append(",")
                 .append(record.getTripDay()).append(",")
-                .append(String.join(";", fisher.getTags())).append("\n");
+                .append(String.join(";", fisher.getTagsList())).append("\n");
         }
 
     }

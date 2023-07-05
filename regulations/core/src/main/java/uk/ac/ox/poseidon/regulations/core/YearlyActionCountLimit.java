@@ -12,11 +12,17 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
-public final class YearlyActionCountLimit extends Interdiction<YearlyActionCounts> {
+public final class YearlyActionCountLimit extends PermittedIf {
 
+    final YearlyActionCounts yearlyActionCounts;
     private final Map<Set<String>, Integer> limits;
 
-    public YearlyActionCountLimit(final Map<Set<String>, Integer> limits) {
+    public YearlyActionCountLimit(
+        final Map<Set<String>, Integer> limits,
+        final YearlyActionCounts yearlyActionCounts
+    ) {
+        super(this::test);
+
         this.limits = limits
             .entrySet()
             .stream()
@@ -26,14 +32,10 @@ public final class YearlyActionCountLimit extends Interdiction<YearlyActionCount
                     Entry::getValue
                 )
             );
+        this.yearlyActionCounts = yearlyActionCounts;
     }
 
-    public Map<Set<String>, Integer> getLimits() {
-        return limits;
-    }
-
-    @Override
-    public boolean test(final Action action, final YearlyActionCounts yearlyActionCounts) {
+    public boolean test(final Action action) {
         return getRemainingActions(action, yearlyActionCounts) <= 0;
     }
 
@@ -69,5 +71,9 @@ public final class YearlyActionCountLimit extends Interdiction<YearlyActionCount
             .entrySet()
             .stream()
             .filter(entry -> entry.getKey().contains(actionCode));
+    }
+
+    public Map<Set<String>, Integer> getLimits() {
+        return limits;
     }
 }

@@ -20,8 +20,8 @@ public class TowAndAltitudePlugin implements AdditionalStartable {
 
 
     public TowAndAltitudePlugin(
-        int histogrammerStartYear, String identifier,
-        @Nullable
+        final int histogrammerStartYear, final String identifier,
+        @Nullable final
         String tag
     ) {
 
@@ -31,10 +31,10 @@ public class TowAndAltitudePlugin implements AdditionalStartable {
 
 
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         delegate.start(model);
-        for (Fisher fisher : model.getFishers()) {
-            if (tag == null || fisher.getTags().contains(tag)) {
+        for (final Fisher fisher : model.getFishers()) {
+            if (tag == null || fisher.getTagsList().contains(tag)) {
 
                 delegate.add(fisher, model);
 

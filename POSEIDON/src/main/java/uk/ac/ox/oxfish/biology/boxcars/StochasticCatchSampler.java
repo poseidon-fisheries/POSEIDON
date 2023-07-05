@@ -112,7 +112,7 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
         if (surveyTag != null) {
             final String totalTag = surveyTag + " " + species;
             for (final Fisher fisher : observedFishers) {
-                fisher.getTags().remove(totalTag);
+                fisher.getTagsList().remove(totalTag);
             }
         }
         observedFishers.clear();
@@ -121,7 +121,7 @@ public class StochasticCatchSampler implements ListChangeListener<Fisher>, Catch
     private void checkIfAddFisherToSurvey(final Fisher fisher) {
         if (samplingSelector.test(fisher)) {
             if (surveyTag != null)
-                fisher.getTags().add(surveyTag + " " + species);
+                fisher.getTagsList().add(surveyTag + " " + species);
             observedFishers.add(fisher);
         }
     }

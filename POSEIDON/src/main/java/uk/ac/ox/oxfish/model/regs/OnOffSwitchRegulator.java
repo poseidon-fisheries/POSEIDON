@@ -111,7 +111,7 @@ public class OnOffSwitchRegulator implements AdditionalStartable, Steppable {
                 participants.add(fisher);
             } else {
                 for (final String validTag : tagsOfParticipants) {
-                    if (fisher.getTags().contains(validTag)) {
+                    if (fisher.getTagsList().contains(validTag)) {
                         assert fisher.getRegulation() instanceof OffSwitchDecorator;
                         participants.add(fisher);
                         continue fisherloop;

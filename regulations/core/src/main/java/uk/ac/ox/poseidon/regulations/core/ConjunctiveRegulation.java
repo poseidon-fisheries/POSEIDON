@@ -8,17 +8,17 @@ import java.util.Collection;
 
 import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
-public class ConjunctiveRegulation<C> extends AbstractCompositeRegulation<C> {
+public class ConjunctiveRegulation extends AbstractCompositeRegulation {
 
-    protected ConjunctiveRegulation(final Collection<Regulation<C>> subRegulations) {
+    protected ConjunctiveRegulation(final Collection<Regulation> subRegulations) {
         super(subRegulations);
     }
 
     @Override
-    public Mode mode(final Action action, final C context) {
+    public Mode mode(final Action action) {
         return getSubRegulations()
             .stream()
-            .map(r -> r.mode(action, context))
+            .map(r -> r.mode(action))
             .reduce(Mode::and)
             .orElse(PERMITTED);
     }

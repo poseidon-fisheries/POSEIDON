@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.model.market.factory;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.gear.PeriodicUpdateGearStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.ConditionalMarket;
@@ -8,8 +7,6 @@ import uk.ac.ox.oxfish.model.market.NThresholdsMarket;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.function.Predicate;
 
 public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarket> {
 
@@ -28,7 +25,7 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
 
 
     @Override
-    public ConditionalMarket apply(FishState fishState) {
+    public ConditionalMarket apply(final FishState fishState) {
         final NThresholdsMarket nonPremium = nonPremiumMarket.apply(fishState);
         final NThresholdsMarket premium = nonPremiumMarket.apply(fishState);
         final double v = premiumInPercentage.applyAsDouble(fishState.getRandom());
@@ -55,7 +52,7 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
         return new ConditionalMarket(
             nonPremium,
             premium,
-            fisher -> fisher.getTags().contains(tagNeededToAccessToPremium)
+            fisher -> fisher.getTagsList().contains(tagNeededToAccessToPremium)
         );
     }
 
@@ -63,7 +60,7 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
         return premiumFirstBin;
     }
 
-    public void setPremiumFirstBin(boolean premiumFirstBin) {
+    public void setPremiumFirstBin(final boolean premiumFirstBin) {
         this.premiumFirstBin = premiumFirstBin;
     }
 
@@ -71,7 +68,7 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
         return premiumSecondBin;
     }
 
-    public void setPremiumSecondBin(boolean premiumSecondBin) {
+    public void setPremiumSecondBin(final boolean premiumSecondBin) {
         this.premiumSecondBin = premiumSecondBin;
     }
 
@@ -79,7 +76,7 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
         return premiumThirdBin;
     }
 
-    public void setPremiumThirdBin(boolean premiumThirdBin) {
+    public void setPremiumThirdBin(final boolean premiumThirdBin) {
         this.premiumThirdBin = premiumThirdBin;
     }
 
@@ -87,7 +84,7 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
         return premiumInPercentage;
     }
 
-    public void setPremiumInPercentage(DoubleParameter premiumInPercentage) {
+    public void setPremiumInPercentage(final DoubleParameter premiumInPercentage) {
         this.premiumInPercentage = premiumInPercentage;
     }
 
@@ -95,7 +92,7 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
         return nonPremiumMarket;
     }
 
-    public void setNonPremiumMarket(ThreePricesMarketFactory nonPremiumMarket) {
+    public void setNonPremiumMarket(final ThreePricesMarketFactory nonPremiumMarket) {
         this.nonPremiumMarket = nonPremiumMarket;
     }
 
@@ -103,7 +100,7 @@ public class ThreePricesWithPremium implements AlgorithmFactory<ConditionalMarke
         return tagNeededToAccessToPremium;
     }
 
-    public void setTagNeededToAccessToPremium(String tagNeededToAccessToPremium) {
+    public void setTagNeededToAccessToPremium(final String tagNeededToAccessToPremium) {
         this.tagNeededToAccessToPremium = tagNeededToAccessToPremium;
     }
 

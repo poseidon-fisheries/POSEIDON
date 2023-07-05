@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -1094,7 +1095,7 @@ public class Fisher implements Steppable, Startable, Agent {
 
     @Override
     public String toString() {
-        return "Fisher " + fisherID + "; " + String.join(" - ", getTags());
+        return "Fisher " + fisherID + "; " + String.join(" - ", getTagsList());
     }
 
     /**
@@ -1102,8 +1103,13 @@ public class Fisher implements Steppable, Startable, Agent {
      *
      * @return Value for property 'tags'.
      */
-    public List<String> getTags() {
+    public List<String> getTagsList() {
         return tags;
+    }
+
+    @Override
+    public Set<String> getTags() {
+        return ImmutableSet.copyOf(getTagsList());
     }
 
     /**
@@ -1582,7 +1588,7 @@ public class Fisher implements Steppable, Startable, Agent {
      */
     @Override
     public String getId() {
-        return getTags().stream()
+        return getTagsList().stream()
             .findFirst()
             .orElse(String.valueOf(getID()));
     }

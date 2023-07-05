@@ -1,22 +1,20 @@
 package uk.ac.ox.poseidon.regulations.core;
 
 import com.google.common.collect.ImmutableList;
-import uk.ac.ox.poseidon.regulations.api.CompositeRegulation;
 import uk.ac.ox.poseidon.regulations.api.Regulation;
 
 import java.util.Collection;
 
-public abstract class AbstractCompositeRegulation<C> implements CompositeRegulation<C> {
-    private final Collection<Regulation<C>> subRegulations;
+public abstract class AbstractCompositeRegulation implements Regulation {
+    private final Collection<Regulation> subRegulations;
 
     protected AbstractCompositeRegulation(
-        final Collection<Regulation<C>> subRegulations
+        final Collection<Regulation> subRegulations
     ) {
         this.subRegulations = ImmutableList.copyOf(subRegulations);
     }
 
-    @Override
-    public Collection<Regulation<C>> getSubRegulations() {
+    protected Collection<Regulation> getSubRegulations() {
         return subRegulations;
     }
 

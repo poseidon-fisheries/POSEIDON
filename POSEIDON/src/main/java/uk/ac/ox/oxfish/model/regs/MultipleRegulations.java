@@ -65,14 +65,14 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
     private QuotaPerSpecieRegulation delegateHack = null;
 
     public MultipleRegulations(
-        Multimap<String, AlgorithmFactory<? extends Regulation>> factoriesByTag
+        final Multimap<String, AlgorithmFactory<? extends Regulation>> factoriesByTag
     ) {
         Preconditions.checkArgument(!factoriesByTag.isEmpty(), "empty factories!");
         factoriesByTag.forEach(this.factoriesByTag::put);
     }
 
     public MultipleRegulations(
-        Map<String, ? extends List<AlgorithmFactory<? extends Regulation>>> factoriesByTag
+        final Map<String, ? extends List<AlgorithmFactory<? extends Regulation>>> factoriesByTag
     ) {
         Preconditions.checkArgument(!factoriesByTag.isEmpty(), "empty factories!");
         factoriesByTag.forEach(this.factoriesByTag::putAll);
@@ -82,7 +82,7 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
         return factoriesByTag.asMap();
     }
 
-    public void addFactory(String tag, AlgorithmFactory<? extends Regulation> factory) {
+    public void addFactory(final String tag, final AlgorithmFactory<? extends Regulation> factory) {
         this.factoriesByTag.put(tag, factory);
     }
 
@@ -103,7 +103,7 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) {
+    public void start(final FishState model, final Fisher fisher) {
         //you shouldn't have started already
         Preconditions.checkArgument(!started, "Started already!");
         assignRegulations(model, fisher);
@@ -111,7 +111,7 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
         started = true;
     }
 
-    private void assignRegulations(FishState model, Fisher fisher) {
+    private void assignRegulations(final FishState model, final Fisher fisher) {
         checkState(regulations.isEmpty(), "Regulations already assigned!");
         checkState(!factoriesByTag.isEmpty(), "No factories to instantiate!");
         tagSet(fisher).stream()
@@ -127,8 +127,8 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
     /**
      * Returns the set of tags owned by the fisher with TAG_FOR_ALL added so we can use this to check if a regulation applies
      */
-    private Set<String> tagSet(Fisher fisher) {
-        return ImmutableSet.<String>builder().addAll(fisher.getTags()).add(TAG_FOR_ALL).build();
+    private Set<String> tagSet(final Fisher fisher) {
+        return ImmutableSet.<String>builder().addAll(fisher.getTagsList()).add(TAG_FOR_ALL).build();
     }
 
     /**
@@ -136,7 +136,7 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
      * This is only useful if the fisher's tag have changed and it should thus get another set of regulations.
      * WARNING: this will call the start method again on child regulations, which might not always be appropriate.
      */
-    public void reassignRegulations(FishState model, Fisher fisher) {
+    public void reassignRegulations(final FishState model, final Fisher fisher) {
         regulations.clear();
         assignRegulations(model, fisher);
     }
@@ -172,11 +172,11 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
      */
     @Override
     public void reactToFishing(
-        SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-        int hoursSpentFishing, FishState model, int timeStep
+        final SeaTile where, final Fisher who, final Catch fishCaught, final Catch fishRetained,
+        final int hoursSpentFishing, final FishState model, final int timeStep
     ) {
         assert started;
-        for (Regulation regulation : regulations)
+        for (final Regulation regulation : regulations)
             regulation.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
     }
 
@@ -190,15 +190,15 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
      */
     @Override
     public void reactToSale(
-        Species species,
-        Fisher seller,
-        double biomass,
-        double revenue,
-        FishState model,
-        int timeStep
+        final Species species,
+        final Fisher seller,
+        final double biomass,
+        final double revenue,
+        final FishState model,
+        final int timeStep
     ) {
         assert started;
-        for (Regulation regulation : regulations)
+        for (final Regulation regulation : regulations)
             regulation.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 
@@ -212,10 +212,10 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
      */
     @Override
     public double maximumBiomassSellable(
-        Fisher agent, Species species, FishState model, int timeStep
+        final Fisher agent, final Species species, final FishState model, final int timeStep
     ) {
         double max = Double.MAX_VALUE;
-        for (Regulation regulation : regulations) {
+        for (final Regulation regulation : regulations) {
             max = Math.min(max, regulation.maximumBiomassSellable(agent, species, model, timeStep));
         }
         return max;
@@ -230,9 +230,9 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
      * at sea
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
+    public boolean allowedAtSea(final Fisher fisher, final FishState model, final int timeStep) {
         assert started;
-        for (Regulation regulation : regulations) {
+        for (final Regulation regulation : regulations) {
             if (!regulation.allowedAtSea(fisher, model, timeStep))
                 return false;
         }
@@ -240,16 +240,16 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
     }
 
     @Override
-    public void turnOff(Fisher fisher) {
+    public void turnOff(final Fisher fisher) {
         factoriesByTag.clear();
-        for (Regulation regulation : regulations)
+        for (final Regulation regulation : regulations)
             regulation.turnOff(fisher);
         regulations.clear();
     }
 
     @Override
-    public double getQuotaRemaining(int specieIndex) {
-        QuotaPerSpecieRegulation quotaDelegate = getQuotaDelegate();
+    public double getQuotaRemaining(final int specieIndex) {
+        final QuotaPerSpecieRegulation quotaDelegate = getQuotaDelegate();
         if (quotaDelegate != null)
             return quotaDelegate.getQuotaRemaining(specieIndex);
         else
@@ -277,11 +277,11 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
     }
 
     @Override
-    public void setQuotaRemaining(int specieIndex, double newQuotaValue) {
+    public void setQuotaRemaining(final int specieIndex, final double newQuotaValue) {
         getQuotaDelegate().setQuotaRemaining(specieIndex, newQuotaValue);
     }
 
-    public boolean containsRegulation(Regulation regulation) {
+    public boolean containsRegulation(final Regulation regulation) {
         return regulations.contains(regulation);
     }
 }

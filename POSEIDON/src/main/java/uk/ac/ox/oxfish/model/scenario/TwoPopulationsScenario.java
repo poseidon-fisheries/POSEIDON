@@ -80,7 +80,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.function.ToDoubleFunction;
 import java.util.logging.Logger;
 
 /**
@@ -392,18 +391,18 @@ public class TwoPopulationsScenario implements Scenario {
         largeFishersFactory.getAdditionalSetups().add(predictorSetup);
         //add tags
         smallFisherFactory.getAdditionalSetups().add(fisher -> {
-            fisher.getTags().add("small");
-            fisher.getTags().add("yellow");
-            fisher.getTags().add("canoe");
+            fisher.getTagsList().add("small");
+            fisher.getTagsList().add("yellow");
+            fisher.getTagsList().add("canoe");
             //add hourly cost
             fisher.getAdditionalTripCosts().add(
                 new HourlyCost(hourlyTravellingCostSmall.applyAsDouble(model.getRandom()))
             );
         });
         largeFishersFactory.getAdditionalSetups().add(fisher -> {
-            fisher.getTags().add("large");
-            fisher.getTags().add("ship");
-            fisher.getTags().add("red");
+            fisher.getTagsList().add("large");
+            fisher.getTagsList().add("ship");
+            fisher.getTagsList().add("red");
             fisher.getAdditionalTripCosts().add(
                 new HourlyCost(hourlyTravellingCostLarge.applyAsDouble(model.getRandom()))
             );
@@ -426,8 +425,9 @@ public class TwoPopulationsScenario implements Scenario {
 
         //don't let large boats befriend small boats
         if (!allowTwoPopulationFriendships) {
-            networkBuilder.addPredicate((NetworkPredicate) (from, to) -> (from.getTags().contains("small") && to.getTags().contains("small")) ||
-                (from.getTags().contains("large") && to.getTags().contains("large")));
+            networkBuilder.addPredicate((NetworkPredicate) (from, to) -> (from.getTagsList()
+                .contains("small") && to.getTagsList().contains("small")) ||
+                (from.getTagsList().contains("large") && to.getTagsList().contains("large")));
         }
 
         if (!allowFriendshipsBetweenPorts) {
@@ -438,14 +438,14 @@ public class TwoPopulationsScenario implements Scenario {
         model.getYearlyDataSet().registerGatherer("Small Fishers Total Income",
             fishState ->
                 fishState.getFishers().stream().
-                    filter(fisher -> fisher.getTags().contains("small")).
+                    filter(fisher -> fisher.getTagsList().contains("small")).
                     mapToDouble(value -> value.getLatestYearlyObservation(
                         FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN
         );
 
         model.getYearlyDataSet().registerGatherer("Large Fishers Total Income",
             fishState -> fishState.getFishers().stream().
-                filter(fisher -> !fisher.getTags().contains("small")).
+                filter(fisher -> !fisher.getTagsList().contains("small")).
                 mapToDouble(value -> value.getLatestYearlyObservation(
                     FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN
         );
@@ -455,7 +455,7 @@ public class TwoPopulationsScenario implements Scenario {
             model.getYearlyDataSet()
                 .registerGatherer("Small Fishers " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
                     fishState -> fishState.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains("small")).
+                        filter(fisher -> fisher.getTagsList().contains("small")).
                         mapToDouble(value -> value.getLatestYearlyObservation(
                             species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN
                 );
@@ -463,7 +463,7 @@ public class TwoPopulationsScenario implements Scenario {
             model.getYearlyDataSet()
                 .registerGatherer("Large Fishers " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
                     fishState -> fishState.getFishers().stream().
-                        filter(fisher -> !fisher.getTags().contains("small")).
+                        filter(fisher -> !fisher.getTagsList().contains("small")).
                         mapToDouble(value -> value.getLatestYearlyObservation(
                             species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN
                 );
@@ -475,7 +475,7 @@ public class TwoPopulationsScenario implements Scenario {
         final DataColumn smallEffort
             = model.getDailyDataSet().registerGatherer("Small Fishers Total Effort",
             (Gatherer<FishState>) ignored -> model.getFishers().stream().
-                filter(fisher -> fisher.getTags().contains(
+                filter(fisher -> fisher.getTagsList().contains(
                     "small")).
                 mapToDouble(
                     value -> value.getDailyCounter().getColumn(
@@ -487,7 +487,7 @@ public class TwoPopulationsScenario implements Scenario {
         final DataColumn largeEffort
             = model.getDailyDataSet().registerGatherer("Large Fishers Total Effort",
             (Gatherer<FishState>) ignored -> model.getFishers().stream().
-                filter(fisher -> fisher.getTags().contains(
+                filter(fisher -> fisher.getTagsList().contains(
                     "large")).
                 mapToDouble(
                     value -> value.getDailyCounter().getColumn(

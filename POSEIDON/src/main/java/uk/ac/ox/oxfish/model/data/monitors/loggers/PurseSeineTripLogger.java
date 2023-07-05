@@ -38,7 +38,7 @@ public class PurseSeineTripLogger
         final Port port = fisher.getHomePort();
         final Coordinate portCoordinates = fishState.getMap().getCoordinates(port.getLocation());
         addRow(
-            fisher.getTags().get(0), // ves_no
+            fisher.getTagsList().get(0), // ves_no
             record.getTripId(), // trip_id
             event, // event
             fishState.getDate(), // date

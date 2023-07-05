@@ -6,9 +6,9 @@ import uk.ac.ox.poseidon.regulations.api.Regulation;
 
 import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
-public class EverythingPermittedRegulationFactory implements AlgorithmFactory<Regulation<Object>> {
+public class EverythingPermitted implements AlgorithmFactory<Regulation> {
     @Override
-    public Regulation<Object> apply(final FishState fishState) {
+    public Regulation apply(final FishState fishState) {
         return PERMITTED;
     }
 }

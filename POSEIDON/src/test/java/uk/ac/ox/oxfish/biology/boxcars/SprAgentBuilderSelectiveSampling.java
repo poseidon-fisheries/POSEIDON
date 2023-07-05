@@ -52,9 +52,9 @@ public class SprAgentBuilderSelectiveSampling {
         int lames = 0;
         for (final Fisher fisher : agent.monitorObservedFishers()) {
             //we shouldn't sample lames
-            if (fisher.getTags().contains("lame"))
+            if (fisher.getTagsList().contains("lame"))
                 lames++;
-            if (fisher.getTags().contains("cool"))
+            if (fisher.getTagsList().contains("cool"))
                 cools++;
 
 
@@ -76,9 +76,9 @@ public class SprAgentBuilderSelectiveSampling {
         lames = 0;
         for (final Fisher fisher : agent.monitorObservedFishers()) {
             //we shouldn't sample lames
-            if (fisher.getTags().contains("lame"))
+            if (fisher.getTagsList().contains("lame"))
                 lames++;
-            if (fisher.getTags().contains("cool"))
+            if (fisher.getTagsList().contains("cool"))
                 cools++;
 
 

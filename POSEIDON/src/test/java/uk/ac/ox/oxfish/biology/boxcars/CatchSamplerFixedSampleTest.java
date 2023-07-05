@@ -16,21 +16,21 @@ public class CatchSamplerFixedSampleTest {
     public void makeSureTheRightPopulationIsSampled() {
 
         //I can tell what is sampled because a tag is added!
-        FlexibleScenario scenario = new FlexibleScenario();
+        final FlexibleScenario scenario = new FlexibleScenario();
         scenario.getFisherDefinitions().clear();
 
-        FisherDefinition fisherDefinition = new FisherDefinition();
+        final FisherDefinition fisherDefinition = new FisherDefinition();
         fisherDefinition.getInitialFishersPerPort().put("Port 0", 50);
         fisherDefinition.setTags("lame");
         scenario.getFisherDefinitions().add(fisherDefinition);
 
-        FisherDefinition fisherDefinition2 = new FisherDefinition();
+        final FisherDefinition fisherDefinition2 = new FisherDefinition();
         fisherDefinition2.getInitialFishersPerPort().put("Port 0", 50);
         fisherDefinition2.setTags("cool");
         scenario.getFisherDefinitions().add(fisherDefinition2);
 
 
-        SPRAgentBuilderSelectiveSampling spr = new SPRAgentBuilderSelectiveSampling();
+        final SPRAgentBuilderSelectiveSampling spr = new SPRAgentBuilderSelectiveSampling();
         spr.setSurveyTag("surveyed");
         spr.setProbabilityOfSamplingEachTag(new LinkedHashMap<>());
         spr.getProbabilityOfSamplingEachTag().put("lame", 0d);
@@ -39,18 +39,18 @@ public class CatchSamplerFixedSampleTest {
         scenario.getPlugins().add(spr);
 
 
-        FishState state = new FishState();
+        final FishState state = new FishState();
         state.setScenario(scenario);
 
         state.start();
         int numberOfBoatsSampled = 0;
-        for (Fisher fisher : state.getFishers()) {
+        for (final Fisher fisher : state.getFishers()) {
             //we shouldn't sample lames
-            if (fisher.getTags().contains("lame") &&
-                fisher.getTags().contains("surveyed Species 0"))
-                Assert.assertTrue(false);
-            if (fisher.getTags().contains("cool") &&
-                fisher.getTags().contains("surveyed Species 0"))
+            if (fisher.getTagsList().contains("lame") &&
+                fisher.getTagsList().contains("surveyed Species 0"))
+                Assert.fail();
+            if (fisher.getTagsList().contains("cool") &&
+                fisher.getTagsList().contains("surveyed Species 0"))
                 numberOfBoatsSampled++;
 
 

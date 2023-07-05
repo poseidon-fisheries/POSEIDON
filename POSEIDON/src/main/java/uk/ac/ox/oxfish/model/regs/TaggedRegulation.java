@@ -24,7 +24,7 @@ public class TaggedRegulation extends ConditionalRegulation {
 
     @Override
     boolean appliesTo(final Fisher fisher, final int timeStep) {
-        return fisher.getTags().stream().anyMatch(tags::contains);
+        return fisher.getTagsList().stream().anyMatch(tags::contains);
     }
 
     @Override

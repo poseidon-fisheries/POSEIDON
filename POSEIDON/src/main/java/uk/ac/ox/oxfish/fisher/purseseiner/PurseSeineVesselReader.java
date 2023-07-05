@@ -93,8 +93,8 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
         final ImmutableList<String> periods = ImmutableList.of("closure A", "closure B");
         final String tag = "closure " + closure;
         checkArgument(periods.contains(tag));
-        fisher.getTags().removeIf(periods::contains);
-        fisher.getTags().add(tag);
+        fisher.getTagsList().removeIf(periods::contains);
+        fisher.getTagsList().add(tag);
     }
 
     @Override
@@ -133,19 +133,19 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
                 ));
                 final String boatId = record.getString("ves_no");
                 final Fisher fisher = fisherFactory.buildFisher(fishState);
-                fisher.getTags().add(boatId);
+                fisher.getTagsList().add(boatId);
                 setFixedRestTime(
                     fisher.getDepartingStrategy(),
                     record.getDouble("mean_time_at_port_in_hours")
                 );
                 if (record.getBoolean("has_del_license")) {
-                    fisher.getTags().add("has_del_license");
+                    fisher.getTagsList().add("has_del_license");
                 }
                 if (record.getMetaData().containsColumn("closure")) {
                     chooseClosurePeriod(fisher, record.getString("closure"));
                 }
                 if (record.getMetaData().containsColumn("flag")) {
-                    fisher.getTags().add(record.getString("flag"));
+                    fisher.getTagsList().add(record.getString("flag"));
                 }
                 // TODO: setMaxTravelTime(fisher, record.getDouble
                 //  ("max_trip_duration_in_hours"));

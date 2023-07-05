@@ -38,7 +38,7 @@ public class TwoPopulationsScenarioTest {
     @Test
     public void nonseparateRegs() throws Exception {
 
-        TwoPopulationsScenario scenario = new TwoPopulationsScenario();
+        final TwoPopulationsScenario scenario = new TwoPopulationsScenario();
         //quick
         scenario.setLargeFishers(1);
         scenario.setSmallFishers(1);
@@ -46,11 +46,11 @@ public class TwoPopulationsScenarioTest {
         scenario.setRegulationLarge(new TACMonoFactory());
 
         scenario.setSeparateRegulations(false); //force everybody to use small boats regulations
-        FishState state = new FishState();
+        final FishState state = new FishState();
         state.setScenario(scenario);
         state.start();
         //they are all anarchy!
-        for (Fisher fisher : state.getFishers())
+        for (final Fisher fisher : state.getFishers())
             assertTrue(fisher.getRegulation() instanceof Anarchy);
 
     }
@@ -59,7 +59,7 @@ public class TwoPopulationsScenarioTest {
     @Test
     public void separateRegs() throws Exception {
 
-        TwoPopulationsScenario scenario = new TwoPopulationsScenario();
+        final TwoPopulationsScenario scenario = new TwoPopulationsScenario();
         //quick
         scenario.setLargeFishers(1);
         scenario.setSmallFishers(1);
@@ -67,13 +67,13 @@ public class TwoPopulationsScenarioTest {
         scenario.setRegulationLarge(new TACMonoFactory());
 
         scenario.setSeparateRegulations(true); //force everybody to use small boats regulations
-        FishState state = new FishState();
+        final FishState state = new FishState();
         state.setScenario(scenario);
         state.start();
         //they are all anarchy!
         int nonAnarchy = 0;
-        for (Fisher fisher : state.getFishers()) {
-            if (fisher.getTags().contains("small"))
+        for (final Fisher fisher : state.getFishers()) {
+            if (fisher.getTagsList().contains("small"))
                 assertTrue(fisher.getRegulation() instanceof Anarchy);
             else {
                 nonAnarchy++;

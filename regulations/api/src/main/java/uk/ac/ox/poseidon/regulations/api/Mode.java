@@ -4,7 +4,7 @@ import uk.ac.ox.poseidon.agents.api.Action;
 
 import static java.util.Objects.requireNonNull;
 
-public enum Mode implements Regulation<Object> {
+public enum Mode implements Regulation {
 
     PERMITTED, FORBIDDEN, MANDATORY;
 
@@ -43,7 +43,7 @@ public enum Mode implements Regulation<Object> {
     }
 
     @Override
-    public Mode mode(final Action action, final Object context) {
+    public Mode mode(final Action action) {
         return this;
     }
 }

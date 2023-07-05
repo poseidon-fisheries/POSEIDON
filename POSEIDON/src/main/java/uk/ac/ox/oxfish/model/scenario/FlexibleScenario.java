@@ -13,7 +13,6 @@ import uk.ac.ox.oxfish.fisher.erotetic.RememberedProfitsExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SNALSARutilities;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
@@ -41,10 +40,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -231,12 +226,12 @@ public class FlexibleScenario implements Scenario {
                 },
                 fisher -> {
                     //add population tag
-                    fisher.getTags().add("population" + populationNumber);
+                    fisher.getTagsList().add("population" + populationNumber);
 
 
                     //do not over-write given color tags!
                     if (!BoatColors.hasColorTag(fisher))
-                        fisher.getTags().add(
+                        fisher.getTagsList().add(
                             portColorTags.get(fisher.getHomePort())
                         );
                 }
@@ -295,7 +290,7 @@ public class FlexibleScenario implements Scenario {
                 state.getYearlyDataSet().registerGatherer(
                     species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME + " of " + tag,
                     fishState -> fishState.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(tag)).
+                        filter(fisher -> fisher.getTagsList().contains(tag)).
                         mapToDouble(value -> value.getLatestYearlyObservation(
                             species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN
                 );
@@ -303,7 +298,7 @@ public class FlexibleScenario implements Scenario {
             state.getYearlyDataSet().registerGatherer("Total Landings of " + tag,
                 fishState ->
                     fishState.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(tag)).
+                        filter(fisher -> fisher.getTagsList().contains(tag)).
                         mapToDouble(value -> {
 
                             double sum = 0;
@@ -317,7 +312,7 @@ public class FlexibleScenario implements Scenario {
             state.getYearlyDataSet().registerGatherer("Average Earnings of " + tag,
                 fishState ->
                     fishState.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(tag)).
+                        filter(fisher -> fisher.getTagsList().contains(tag)).
                         mapToDouble(value -> value.getLatestYearlyObservation(
                             FisherYearlyTimeSeries.EARNINGS)).average().orElse(Double.NaN), Double.NaN
             );
@@ -325,7 +320,7 @@ public class FlexibleScenario implements Scenario {
             state.getYearlyDataSet().registerGatherer("Total Earnings of " + tag,
                 fishState ->
                     fishState.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(tag)).
+                        filter(fisher -> fisher.getTagsList().contains(tag)).
                         mapToDouble(value -> value.getLatestYearlyObservation(
                             FisherYearlyTimeSeries.EARNINGS)).sum(), Double.NaN
             );
@@ -333,7 +328,7 @@ public class FlexibleScenario implements Scenario {
             state.getYearlyDataSet().registerGatherer("Average Variable Costs of " + tag,
                 fishState ->
                     fishState.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(tag)).
+                        filter(fisher -> fisher.getTagsList().contains(tag)).
                         mapToDouble(value -> value.getLatestYearlyObservation(
                             FisherYearlyTimeSeries.VARIABLE_COSTS)).average().orElse(Double.NaN), Double.NaN
             );
@@ -341,7 +336,7 @@ public class FlexibleScenario implements Scenario {
             state.getYearlyDataSet().registerGatherer("Total Variable Costs of " + tag,
                 fishState ->
                     fishState.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(tag)).
+                        filter(fisher -> fisher.getTagsList().contains(tag)).
                         mapToDouble(value -> value.getLatestYearlyObservation(
                             FisherYearlyTimeSeries.VARIABLE_COSTS)).sum(), Double.NaN
             );
@@ -350,7 +345,7 @@ public class FlexibleScenario implements Scenario {
             state.getYearlyDataSet().registerGatherer("Actual Average Variable Costs of " + tag,
                 (Gatherer<FishState>) observed -> observed.getFishers().stream().
                     filter(fisher -> fisher.hasBeenActiveThisYear() &&
-                        fisher.getTags().contains(tag)).
+                        fisher.getTagsList().contains(tag)).
                     mapToDouble(value -> value.getLatestYearlyObservation(
                         FisherYearlyTimeSeries.VARIABLE_COSTS)).
                     filter(Double::isFinite).average().
@@ -360,7 +355,7 @@ public class FlexibleScenario implements Scenario {
             state.getYearlyDataSet().registerGatherer("Average Distance From Port of " + tag,
                 fishState ->
                     fishState.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(tag)).
+                        filter(fisher -> fisher.getTagsList().contains(tag)).
                         mapToDouble(value -> value.getLatestYearlyObservation(
                             FisherYearlyTimeSeries.FISHING_DISTANCE)).
                         filter(Double::isFinite).average().
@@ -370,7 +365,7 @@ public class FlexibleScenario implements Scenario {
             state.getYearlyDataSet().registerGatherer("Actual Average Distance From Port of " + tag,
                 (Gatherer<FishState>) observed -> observed.getFishers().stream().
                     filter(fisher -> fisher.hasBeenActiveThisYear() &&
-                        fisher.getTags().contains(tag)).
+                        fisher.getTagsList().contains(tag)).
                     mapToDouble(value -> value.getLatestYearlyObservation(
                         FisherYearlyTimeSeries.FISHING_DISTANCE)).
                     filter(Double::isFinite).average().
@@ -381,7 +376,7 @@ public class FlexibleScenario implements Scenario {
             state.getYearlyDataSet().registerGatherer("Average Number of Trips of " + tag,
                 fishState ->
                     fishState.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(tag)).
+                        filter(fisher -> fisher.getTagsList().contains(tag)).
                         mapToDouble(value -> value.getLatestYearlyObservation(
                             FisherYearlyTimeSeries.TRIPS)).average().
                         orElse(Double.NaN), 0
@@ -391,7 +386,7 @@ public class FlexibleScenario implements Scenario {
             state.getYearlyDataSet().registerGatherer("Average Number of Hours Out of " + tag,
                 fishState ->
                     fishState.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(tag)).
+                        filter(fisher -> fisher.getTagsList().contains(tag)).
                         mapToDouble(value -> value.getLatestYearlyObservation(
                             FisherYearlyTimeSeries.HOURS_OUT)).average().
                         orElse(Double.NaN), 0
@@ -402,7 +397,7 @@ public class FlexibleScenario implements Scenario {
                 "Total Hours Out of " + tag,
                 fishState ->
                     fishState.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(tag)).
+                        filter(fisher -> fisher.getTagsList().contains(tag)).
                         mapToDouble(value -> value.getLatestYearlyObservation(
                             FisherYearlyTimeSeries.HOURS_OUT)).sum(),
                 0
@@ -413,7 +408,7 @@ public class FlexibleScenario implements Scenario {
                 (Gatherer<FishState>) observed -> {
 
                     final List<Fisher> taggedFishers = observed.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(tag)).collect(Collectors.toList());
+                        filter(fisher -> fisher.getTagsList().contains(tag)).collect(Collectors.toList());
 
                     //skip boats that made no trips
                     final double hoursOut = taggedFishers.stream().mapToDouble(
@@ -433,7 +428,7 @@ public class FlexibleScenario implements Scenario {
                 fishState ->
                     (double) fishState.getFishers().stream().
                         filter(fisher ->
-                            fisher.getTags().contains(tag)).count(),
+                            fisher.getTagsList().contains(tag)).count(),
                 Double.NaN
             );
 
@@ -443,7 +438,7 @@ public class FlexibleScenario implements Scenario {
                     (double) fishState.getFishers().stream().
                         filter(fisher -> fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS) > 0).
                         filter(fisher ->
-                            fisher.getTags().contains(tag)).count(),
+                            fisher.getTagsList().contains(tag)).count(),
                 Double.NaN
             );
 
@@ -451,7 +446,7 @@ public class FlexibleScenario implements Scenario {
             state.getYearlyDataSet().registerGatherer("Average Cash-Flow of " + tag,
                 (Gatherer<FishState>) observed -> {
                     final List<Fisher> fishers = observed.getFishers().stream().
-                        filter(fisher -> fisher.getTags().contains(tag)).collect(Collectors.toList());
+                        filter(fisher -> fisher.getTagsList().contains(tag)).collect(Collectors.toList());
                     return fishers.stream().
                         mapToDouble(
                             value -> value.getLatestYearlyObservation(
@@ -465,7 +460,7 @@ public class FlexibleScenario implements Scenario {
                 (Gatherer<FishState>) observed -> {
                     final List<Fisher> fishers = observed.getFishers().stream().
                         filter(fisher -> fisher.hasBeenActiveThisYear() &&
-                            fisher.getTags().contains(tag)).collect(Collectors.toList());
+                            fisher.getTagsList().contains(tag)).collect(Collectors.toList());
                     return fishers.stream().
                         mapToDouble(
                             value -> value.getLatestYearlyObservation(

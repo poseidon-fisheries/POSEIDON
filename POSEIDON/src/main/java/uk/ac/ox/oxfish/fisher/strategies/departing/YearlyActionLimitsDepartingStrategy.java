@@ -45,7 +45,7 @@ public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
         final int year = fisher.grabState().getDate().getYear();
         final FadManager fadManager = getFadManager(fisher);
         final PurseSeinerActionContext actionContext = fadManager.getActionContext();
-        return anyYearlyActionsRemaining(fisher, year, fadManager.getRegulations(), actionContext);
+        return anyYearlyActionsRemaining(fisher, year, fadManager.getRegulation(), actionContext);
     }
 
     private static boolean anyYearlyActionsRemaining(

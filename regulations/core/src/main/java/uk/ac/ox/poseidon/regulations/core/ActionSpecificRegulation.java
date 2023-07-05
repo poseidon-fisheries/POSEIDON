@@ -7,7 +7,7 @@ import uk.ac.ox.poseidon.regulations.api.Regulation;
 import java.util.Collection;
 import java.util.Set;
 
-public class ActionSpecificRegulation<C> extends ConditionnalRegulation<C> {
+public class ActionSpecificRegulation<C> extends ConditionalRegulation<C> {
 
     private final Set<String> actionCodes;
 

@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.model.network.NetworkPredicate;
 
 import java.util.LinkedList;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,9 +38,9 @@ public class MustShareTagTest {
     @Test
     public void mustShare() {
 
-        MustShareTag mustShare = new MustShareTag();
+        final MustShareTag mustShare = new MustShareTag();
         mustShare.setMustShareOneOfThese("A,B");
-        NetworkPredicate predicate = mustShare.apply(mock(FishState.class));
+        final NetworkPredicate predicate = mustShare.apply(mock(FishState.class));
 
         /*
          *  nothing ---> "A" is okay
@@ -49,47 +50,43 @@ public class MustShareTagTest {
          *  "B" ---> "A" is not okay
          *  "B" ---> nothing is not okay
          */
-        Fisher fisher1 = mock(Fisher.class);
-        Fisher fisher2 = mock(Fisher.class);
+        final Fisher fisher1 = mock(Fisher.class);
+        final Fisher fisher2 = mock(Fisher.class);
 
         //nothing ---> "A" is okay
-        when(fisher1.getTags()).thenReturn(new LinkedList<>());
-        when(fisher2.getTags()).thenReturn(Lists.newArrayList("A"));
+        when(fisher1.getTagsList()).thenReturn(new LinkedList<>());
+        when(fisher2.getTagsList()).thenReturn(Lists.newArrayList("A"));
         assertTrue(
             predicate.test(fisher1, fisher2)
         );
 
         //nothing ---> nothing is okay
-        when(fisher1.getTags()).thenReturn(new LinkedList<>());
-        when(fisher2.getTags()).thenReturn(new LinkedList<>());
+        when(fisher1.getTagsList()).thenReturn(new LinkedList<>());
+        when(fisher2.getTagsList()).thenReturn(new LinkedList<>());
         assertTrue(
             predicate.test(fisher1, fisher2)
         );
 
         //"A" ----> "A" is okay
-        when(fisher1.getTags()).thenReturn(Lists.newArrayList("A"));
-        when(fisher2.getTags()).thenReturn(Lists.newArrayList("A"));
+        when(fisher1.getTagsList()).thenReturn(Lists.newArrayList("A"));
+        when(fisher2.getTagsList()).thenReturn(Lists.newArrayList("A"));
         assertTrue(
             predicate.test(fisher1, fisher2)
         );
 
         //"A","B" ---> "A" is okay
-        when(fisher1.getTags()).thenReturn(Lists.newArrayList("A"));
-        when(fisher2.getTags()).thenReturn(Lists.newArrayList("A", "B"));
+        when(fisher1.getTagsList()).thenReturn(Lists.newArrayList("A"));
+        when(fisher2.getTagsList()).thenReturn(Lists.newArrayList("A", "B"));
         assertTrue(
             predicate.test(fisher1, fisher2)
         );
         //  "B" ---> "A" is not okay
-        when(fisher1.getTags()).thenReturn(Lists.newArrayList("B"));
-        when(fisher2.getTags()).thenReturn(Lists.newArrayList("A"));
-        assertTrue(
-            !predicate.test(fisher1, fisher2)
-        );
+        when(fisher1.getTagsList()).thenReturn(Lists.newArrayList("B"));
+        when(fisher2.getTagsList()).thenReturn(Lists.newArrayList("A"));
+        assertFalse(predicate.test(fisher1, fisher2));
         //  "B" ---> nothing is not okay
-        when(fisher1.getTags()).thenReturn(Lists.newArrayList("B"));
-        when(fisher2.getTags()).thenReturn(Lists.newArrayList());
-        assertTrue(
-            !predicate.test(fisher1, fisher2)
-        );
+        when(fisher1.getTagsList()).thenReturn(Lists.newArrayList("B"));
+        when(fisher2.getTagsList()).thenReturn(Lists.newArrayList());
+        assertFalse(predicate.test(fisher1, fisher2));
     }
 }

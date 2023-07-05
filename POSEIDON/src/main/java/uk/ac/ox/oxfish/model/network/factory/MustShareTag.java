@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.model.network.factory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.network.NetworkPredicate;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -53,7 +52,7 @@ public class MustShareTag implements AlgorithmFactory<NetworkPredicate> {
      * @return the function result
      */
     @Override
-    public NetworkPredicate apply(FishState state) {
+    public NetworkPredicate apply(final FishState state) {
 
 
         final List<String> tags = Splitter.on(",").splitToList(mustShareOneOfThese);
@@ -63,7 +62,7 @@ public class MustShareTag implements AlgorithmFactory<NetworkPredicate> {
         return (from, to) -> {
 
             //empty is easy
-            if (from.getTags().isEmpty())
+            if (from.getTagsList().isEmpty())
                 return true;
 
 
@@ -71,10 +70,10 @@ public class MustShareTag implements AlgorithmFactory<NetworkPredicate> {
 
 
             // go through all the tags
-            for (String tag : tags) {
+            for (final String tag : tags) {
                 //if there is a match you are done
-                if (from.getTags().contains(tag))
-                    if (to.getTags().contains(tag)) {
+                if (from.getTagsList().contains(tag))
+                    if (to.getTagsList().contains(tag)) {
                         return true;
                     } else {
                         //otherwise remember there was a mismatch
@@ -84,10 +83,7 @@ public class MustShareTag implements AlgorithmFactory<NetworkPredicate> {
 
             }
             //if there was a mismatch and no matches, you are done!
-            if (atLeastOneMismatch)
-                return false;
-            else
-                return true;
+            return !atLeastOneMismatch;
 
         };
     }
@@ -107,7 +103,7 @@ public class MustShareTag implements AlgorithmFactory<NetworkPredicate> {
      *
      * @param mustShareOneOfThese Value to set for property 'mustShareOneOfThese'.
      */
-    public void setMustShareOneOfThese(String mustShareOneOfThese) {
+    public void setMustShareOneOfThese(final String mustShareOneOfThese) {
         this.mustShareOneOfThese = mustShareOneOfThese;
     }
 }

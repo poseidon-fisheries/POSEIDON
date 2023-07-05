@@ -15,6 +15,6 @@ public class DelLicenseRegulation implements ActionSpecificRegulation {
 
     @Override
     public boolean isForbidden(final Class<? extends PurseSeinerAction> action, final Fisher fisher) {
-        return !fisher.getTags().contains("has_del_license");
+        return !fisher.getTagsList().contains("has_del_license");
     }
 }

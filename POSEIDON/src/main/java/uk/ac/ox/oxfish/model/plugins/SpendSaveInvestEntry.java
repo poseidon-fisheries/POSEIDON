@@ -78,7 +78,7 @@ public class SpendSaveInvestEntry implements EntryPlugin {
         int boatsToAdd = 0;
         // count the fisher as active if it has been on at least a trip in the past 365 days!
         for (final Fisher fisher : model.getFishers()) {
-            if (fisher.getTags().contains(populationName) && fisher.hasBeenActiveThisYear()) {
+            if (fisher.getTagsList().contains(populationName) && fisher.hasBeenActiveThisYear()) {
                 //spend your daily trip
                 fisher.spendExogenously(yearlyExpenses);
                 //if you have collected enough money, invest it in a new boat

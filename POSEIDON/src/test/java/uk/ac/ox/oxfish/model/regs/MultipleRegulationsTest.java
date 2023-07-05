@@ -51,14 +51,14 @@ public class MultipleRegulationsTest {
     @Test
     public void readFromYaml() throws Exception {
 
-        FishYAML yaml = new FishYAML();
-        TwoPopulationsScenario scenario = yaml.loadAs(
+        final FishYAML yaml = new FishYAML();
+        final TwoPopulationsScenario scenario = yaml.loadAs(
             new FileReader(
                 Paths.get("inputs", "tests", "multiregulations.yaml").toFile()
             ),
             TwoPopulationsScenario.class
         );
-        FishState state = new FishState();
+        final FishState state = new FishState();
         state.setScenario(scenario);
 
         //there is a law that applies to both and one that only applies to large fish
@@ -66,15 +66,15 @@ public class MultipleRegulationsTest {
         assertEquals(state.getFishers().size(), 2);
         int small = 0;
         int large = 0;
-        for (Fisher fisher : state.getFishers()) {
-            if (fisher.getTags().contains("small")) {
+        for (final Fisher fisher : state.getFishers()) {
+            if (fisher.getTagsList().contains("small")) {
                 assertEquals(((MultipleRegulations) fisher.getRegulation()).getRegulations().size(), 1);
                 assertTrue(((MultipleRegulations) fisher.getRegulation()).getRegulations()
                     .get(0) instanceof MonoQuotaRegulation);
                 small++;
             } else {
                 assertEquals(((MultipleRegulations) fisher.getRegulation()).getRegulations().size(), 2);
-                for (Regulation regulation : ((MultipleRegulations) fisher.getRegulation()).getRegulations()) {
+                for (final Regulation regulation : ((MultipleRegulations) fisher.getRegulation()).getRegulations()) {
                     assertTrue(regulation instanceof MonoQuotaRegulation || regulation instanceof ProtectedAreasOnly);
                     System.out.println(regulation.getClass().getSimpleName());
                 }
@@ -91,11 +91,11 @@ public class MultipleRegulationsTest {
     @Test
     public void simpleChecks() throws Exception {
 
-        TemporaryProtectedArea mpa = mock(TemporaryProtectedArea.class);
-        FishingSeason season = mock(FishingSeason.class);
-        QuotaPerSpecieRegulation quota = mock(QuotaPerSpecieRegulation.class);
+        final TemporaryProtectedArea mpa = mock(TemporaryProtectedArea.class);
+        final FishingSeason season = mock(FishingSeason.class);
+        final QuotaPerSpecieRegulation quota = mock(QuotaPerSpecieRegulation.class);
 
-        MultipleRegulations regs = new MultipleRegulations(
+        final MultipleRegulations regs = new MultipleRegulations(
             ImmutableMap.of(
                 TAG_FOR_ALL,
                 ImmutableList.of(fishState -> mpa, fishState -> season, fishState -> quota)
@@ -134,16 +134,16 @@ public class MultipleRegulationsTest {
 
 
         //check that calls get propagated
-        SeaTile tile = mock(SeaTile.class);
-        Fisher who = mock(Fisher.class);
-        Catch haul = mock(Catch.class);
-        FishState state = mock(FishState.class);
+        final SeaTile tile = mock(SeaTile.class);
+        final Fisher who = mock(Fisher.class);
+        final Catch haul = mock(Catch.class);
+        final FishState state = mock(FishState.class);
         regs.reactToFishing(tile, who, haul, haul, 10, state, 0);
         verify(mpa).reactToFishing(tile, who, haul, haul, 10, state, 0);
         verify(season).reactToFishing(tile, who, haul, haul, 10, state, 0);
         verify(quota).reactToFishing(tile, who, haul, haul, 10, state, 0);
         //react to sale
-        Species species = mock(Species.class);
+        final Species species = mock(Species.class);
         regs.reactToSale(species, who, 100d, 100d, state, 0);
         verify(mpa).reactToSale(species, who, 100d, 100d, state, 0);
         verify(season).reactToSale(species, who, 100d, 100d, state, 0);

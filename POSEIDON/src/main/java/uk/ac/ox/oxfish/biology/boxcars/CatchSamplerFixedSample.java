@@ -113,7 +113,7 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
 
             //how many are you already monitoring?
             final long currentlyContained = observedFishers.stream().filter(
-                fisher -> fisher.getTags().contains(tagToSample.getKey())
+                fisher -> fisher.getTagsList().contains(tagToSample.getKey())
             ).count();
             //how many do you need to add to the sample?
             final long shortfall = Math.max(
@@ -131,7 +131,7 @@ public class CatchSamplerFixedSample implements CatchAtLengthSampler, Steppable 
                     ).
                     //pick only the right tag
                         filter(
-                        fisher -> fisher.getTags().contains(tagToSample.getKey())
+                        fisher -> fisher.getTagsList().contains(tagToSample.getKey())
                     ).
                     //shuffle them
                         sorted(new RandomComparator<>(model.getRandom())).

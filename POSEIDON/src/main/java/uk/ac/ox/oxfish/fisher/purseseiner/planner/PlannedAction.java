@@ -30,7 +30,7 @@ public interface PlannedAction {
     ) {
         return fisher.isAllowedAtSea() &&
             // TODO: get a proper action context
-            fadManager.getRegulations().isPermitted(action, null) &&
+            fadManager.getRegulation().isPermitted(action, null) &&
             //fad setting ought not to be banned
             !fadManager.getActionSpecificRegulations().isForbidden(action.getClass(), fisher) &&
             //we should be allowed to fish here
@@ -492,7 +492,7 @@ public interface PlannedAction {
                 localBiologyClass
             );
         }
-        
+
         @Override
         protected AbstractSetAction createSet(
             final B potentialCatch,

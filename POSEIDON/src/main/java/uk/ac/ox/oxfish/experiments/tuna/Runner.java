@@ -278,7 +278,7 @@ public final class Runner<S extends Scenario> {
             fishState.getFishers().stream()
                 .map(fisher -> new TidyFisherYearlyData(
                     fisher.getYearlyData(),
-                    fisher.getTags().get(0)
+                    fisher.getTagsList().get(0)
                 ))
                 .collect(toImmutableList())
         );
@@ -298,7 +298,7 @@ public final class Runner<S extends Scenario> {
             fishState.getFishers().stream()
                 .map(fisher -> new TidyFisherDailyData(
                     fisher.getDailyData(),
-                    fisher.getTags().get(0)
+                    fisher.getTagsList().get(0)
                 ))
                 .collect(toImmutableList())
         );

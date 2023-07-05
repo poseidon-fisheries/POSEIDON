@@ -64,7 +64,7 @@ public class FadManager {
             DolphinSetAction.class,
             NonAssociatedSetAction.class
         );
-    private final Regulation<? super PurseSeinerActionContext> regulation;
+    private final Regulation regulation;
     private final FadMap fadMap;
     private final Observers observers = new Observers();
     private final YearlyActionCounter yearlyActionCounter;
@@ -78,7 +78,7 @@ public class FadManager {
     private int numFadsInStock;
 
     public FadManager(
-        final Regulation<? super PurseSeinerActionContext> regulation,
+        final Regulation regulation,
         final FadMap fadMap,
         final FadInitializer<?, ?> fadInitializer,
         final YearlyActionCounter yearlyActionCounter,
@@ -107,7 +107,7 @@ public class FadManager {
      */
     @SuppressWarnings("rawtypes")
     public FadManager(
-        final Regulation<? super PurseSeinerActionContext> regulation,
+        final Regulation regulation,
         final FadMap fadMap,
         final FadInitializer<?, ?> fadInitializer,
         final YearlyActionCounter yearlyActionCounter,
@@ -191,7 +191,7 @@ public class FadManager {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
     }
 
-    public Regulation<? super PurseSeinerActionContext> getRegulations() {
+    public Regulation getRegulation() {
         return regulation;
     }
 

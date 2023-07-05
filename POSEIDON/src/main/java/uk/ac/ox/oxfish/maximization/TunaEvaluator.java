@@ -196,7 +196,7 @@ public class TunaEvaluator implements Runnable {
             final AbundanceFadAttractionEventObserver observer =
                 new AbundanceFadAttractionEventObserver(fishState, speciesCodes);
             fishState.getFishers().stream()
-                .filter(fisher -> boatsToTrack.contains(fisher.getTags().get(0)))
+                .filter(fisher -> boatsToTrack.contains(fisher.getTagsList().get(0)))
                 .map(FadManager::getFadManager)
                 .forEach(fadManager ->
                     fadManager.registerObserver(AbundanceFadAttractionEvent.class, observer)

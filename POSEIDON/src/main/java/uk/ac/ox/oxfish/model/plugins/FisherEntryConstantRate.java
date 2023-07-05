@@ -50,7 +50,11 @@ public class FisherEntryConstantRate implements EntryPlugin {
     }
 
 
-    public FisherEntryConstantRate(final double growthRateInPercentage, final String populationName, final int doNotGrowBeforeThisYear) {
+    public FisherEntryConstantRate(
+        final double growthRateInPercentage,
+        final String populationName,
+        final int doNotGrowBeforeThisYear
+    ) {
         this.growthRateInPercentage = growthRateInPercentage;
         this.populationName = populationName;
         this.doNotGrowBeforeThisYear = doNotGrowBeforeThisYear;
@@ -98,7 +102,7 @@ public class FisherEntryConstantRate implements EntryPlugin {
         double currentActiveFishers = 0;
         // count the fisher as active if it has been on at least a trip in the past 365 days!
         for (final Fisher fisher : model.getFishers()) {
-            if (fisher.getTags().contains(populationName) && fisher.hasBeenActiveThisYear())
+            if (fisher.getTagsList().contains(populationName) && fisher.hasBeenActiveThisYear())
                 currentActiveFishers++;
 
 
