@@ -30,7 +30,7 @@ public interface PlannedAction {
     ) {
         return fisher.isAllowedAtSea() &&
             // TODO: get a proper action context
-            fadManager.getRegulation().isPermitted(action, null) &&
+            fadManager.getRegulation().isPermitted(action) &&
             //fad setting ought not to be banned
             !fadManager.getActionSpecificRegulations().isForbidden(action.getClass(), fisher) &&
             //we should be allowed to fish here

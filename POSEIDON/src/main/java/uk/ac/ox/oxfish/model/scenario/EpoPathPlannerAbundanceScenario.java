@@ -20,7 +20,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
 import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
 import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
-import uk.ac.ox.oxfish.regulations.factories.EverythingPermitted;
+import uk.ac.ox.oxfish.regulations.factories.*;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -40,7 +40,29 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
             getInputFolder(),
             getSpeciesCodesSupplier(),
             new AbundancePurseSeineGearFactory(
-                new EverythingPermitted(),
+                new ConjunctiveRegulation(
+                    new ForbiddenIf(
+                        new AllOf(
+                            new ActionCodeIs("DEL"),
+                            new Not(new AgentHasTag("has_del_license"))
+                        )
+                    ),
+                    new ForbiddenIf(
+                        new AllOf(
+                            new ActionCodeIs("DPL"),
+                            new AnyOf(
+                                new AllOf(
+                                    new AgentHasTag("class 6A"),
+                                    new Not(new BelowLimit(300, new ActiveFadsCounter()))
+                                ),
+                                new AllOf(
+                                    new AgentHasTag("class 6B"),
+                                    new Not(new BelowLimit(450, new ActiveFadsCounter()))
+                                )
+                            )
+                        )
+                    )
+                ),
                 new SelectivityAbundanceFadInitializerFactory(
                     // see https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1545974455
                     // for Weibull parameter values, obtained by fitting the distributions to observer data

@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.regulations.factories;
 
+import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.agents.api.Action;
@@ -15,16 +16,24 @@ public class AnyOf implements AlgorithmFactory<Predicate<Action>> {
     public AnyOf() {
     }
 
-    public AnyOf(final Collection<AlgorithmFactory<Predicate<Action>>> conditions) {
-        this.conditions = conditions;
+    @SafeVarargs
+    @SuppressWarnings("varargs")
+    public AnyOf(final AlgorithmFactory<Predicate<Action>>... conditions) {
+        this(ImmutableList.copyOf(conditions));
+    }
+
+    public AnyOf(final Collection<? extends AlgorithmFactory<Predicate<Action>>> conditions) {
+        this.conditions = ImmutableList.copyOf(conditions);
     }
 
     public Collection<AlgorithmFactory<Predicate<Action>>> getConditions() {
         return conditions;
     }
 
-    public void setConditions(final Collection<AlgorithmFactory<Predicate<Action>>> conditions) {
-        this.conditions = conditions;
+    public void setConditions(
+        final Collection<? extends AlgorithmFactory<Predicate<Action>>> conditions
+    ) {
+        this.conditions = ImmutableList.copyOf(conditions);
     }
 
     @Override

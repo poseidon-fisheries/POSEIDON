@@ -27,12 +27,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.poseidon.agents.api.Agent;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounts;
 import uk.ac.ox.poseidon.regulations.api.Regulation;
-import uk.ac.ox.poseidon.regulations.core.YearlyActionCountLimit;
 
-import java.util.List;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction.ALL_ACTION_CODES;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
@@ -51,25 +46,26 @@ public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
     private static boolean anyYearlyActionsRemaining(
         final Agent fisher,
         final int year,
-        final Regulation<? super PurseSeinerActionContext> regulation,
+        final Regulation regulation,
         final YearlyActionCounts actionContext
     ) {
-        final List<YearlyActionCountLimit> yearlyActionCountLimits =
-            regulation
-                .asStream()
-                .filter(r -> r instanceof YearlyActionCountLimit)
-                .map(r -> (YearlyActionCountLimit) r)
-                .collect(toImmutableList());
-        return ALL_ACTION_CODES
-            .stream()
-            .mapToInt(actionCode ->
-                yearlyActionCountLimits
-                    .stream()
-                    .mapToInt(r -> r.getRemainingActions(year, fisher, actionCode, actionContext))
-                    .min()
-                    .orElse(Integer.MAX_VALUE)
-            )
-            .anyMatch(remaining -> remaining > 0);
+        throw new RuntimeException("Needs to be remimplemented for new regulations.");
+//        final List<YearlyActionCountLimit> yearlyActionCountLimits =
+//            regulation
+//                .asStream()
+//                .filter(r -> r instanceof YearlyActionCountLimit)
+//                .map(r -> (YearlyActionCountLimit) r)
+//                .collect(toImmutableList());
+//        return ALL_ACTION_CODES
+//            .stream()
+//            .mapToInt(actionCode ->
+//                yearlyActionCountLimits
+//                    .stream()
+//                    .mapToInt(r -> r.getRemainingActions(year, fisher, actionCode, actionContext))
+//                    .min()
+//                    .orElse(Integer.MAX_VALUE)
+//            )
+//            .anyMatch(remaining -> remaining > 0);
     }
 
 }

@@ -20,7 +20,6 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.AbundancePurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.PurseSeinerActionContext;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
@@ -30,7 +29,7 @@ import uk.ac.ox.poseidon.regulations.api.Regulation;
 public class AbundancePurseSeineGearFactory extends PurseSeineGearFactory {
 
     public AbundancePurseSeineGearFactory(
-        final AlgorithmFactory<? extends Regulation<? super PurseSeinerActionContext>> regulationsFactory,
+        final AlgorithmFactory<? extends Regulation> regulationsFactory,
         final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory,
         final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory
     ) {

@@ -155,7 +155,7 @@ public class PurseSeinerFleetFactory
 
     public List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
         addMonitors(fishState);
-        return new PurseSeineVesselReader(
+        return new EpoPurseSeineVesselReader(
             getVesselsFile().get(),
             targetYear,
             makeFisherFactory(fishState),

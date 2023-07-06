@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 public class AllOf implements Predicate<Action> {
 
     private final Set<Predicate<Action>> predicates;
-
+    
     public AllOf(final Collection<Predicate<Action>> predicates) {
         this.predicates = ImmutableSet.copyOf(predicates);
     }

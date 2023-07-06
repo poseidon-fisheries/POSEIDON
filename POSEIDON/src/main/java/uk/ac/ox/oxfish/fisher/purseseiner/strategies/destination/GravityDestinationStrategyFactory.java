@@ -100,7 +100,6 @@ public class GravityDestinationStrategyFactory
             )
             .orElseThrow(() -> new IllegalStateException(
                 "No max trip duration known for " + fisher));
-
     }
 
     public int getTargetYear() {

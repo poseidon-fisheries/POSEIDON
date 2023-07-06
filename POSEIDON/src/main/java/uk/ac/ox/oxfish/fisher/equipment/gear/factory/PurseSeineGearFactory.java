@@ -11,7 +11,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.caches.LocationFisherValuesByActionCac
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.PurseSeinerActionContext;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
@@ -77,13 +76,13 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     private InputPath locationValuesFile;
     private AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory;
     private AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory;
-    private AlgorithmFactory<? extends Regulation<? super PurseSeinerActionContext>> regulationsFactory;
+    private AlgorithmFactory<? extends Regulation> regulationsFactory;
 
     public PurseSeineGearFactory() {
     }
 
     public PurseSeineGearFactory(
-        final AlgorithmFactory<? extends Regulation<? super PurseSeinerActionContext>> regulationsFactory,
+        final AlgorithmFactory<? extends Regulation> regulationsFactory,
         final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory,
         final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory
     ) {
@@ -92,11 +91,11 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         this.fishValueCalculatorFactory = fishValueCalculatorFactory;
     }
 
-    public AlgorithmFactory<? extends Regulation<? super PurseSeinerActionContext>> getRegulationsFactory() {
+    public AlgorithmFactory<? extends Regulation> getRegulationsFactory() {
         return regulationsFactory;
     }
 
-    public void setRegulationsFactory(final AlgorithmFactory<Regulation<? super PurseSeinerActionContext>> regulationsFactory) {
+    public void setRegulationsFactory(final AlgorithmFactory<? extends Regulation> regulationsFactory) {
         this.regulationsFactory = regulationsFactory;
     }
 

@@ -69,7 +69,7 @@ public abstract class PurseSeinerAction
         final Optional<FadManager> fadManager =
             Optional.of(getFadManager(getFisher()));
         final boolean forbiddenByRegulations = fadManager
-            .map(fm -> fm.getRegulation().isForbidden(this, fm.getActionContext()))
+            .map(fm -> fm.getRegulation().isForbidden(this))
             .orElse(false);
         final boolean forbiddenByActionSpecificRegulations =
             fadManager

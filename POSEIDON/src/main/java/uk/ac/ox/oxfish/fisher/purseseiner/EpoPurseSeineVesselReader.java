@@ -53,7 +53,7 @@ import static tech.units.indriya.unit.Units.*;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
+public class EpoPurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
 
     private final Path vesselsFilePath;
     private final int targetYear;
@@ -61,7 +61,7 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
     private final Map<String, Port> portsByName;
     private final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.MAX_VALUE);
 
-    public PurseSeineVesselReader(
+    EpoPurseSeineVesselReader(
         final Path vesselsFilePath,
         final int targetYear,
         final FisherFactory fisherFactory,
@@ -95,6 +95,17 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
         checkArgument(periods.contains(tag));
         fisher.getTagsList().removeIf(periods::contains);
         fisher.getTagsList().add(tag);
+    }
+
+    private static String capacityClass(final Fisher fisher) {
+        final long t = Math.round(fisher.getMaximumHold() / 1000);
+        if (t < 46) return "class 1";
+        else if (t <= 91) return "class 2";
+        else if (t <= 181) return "class 3";
+        else if (t <= 272) return "class 4";
+        else if (t <= 363) return "class 5";
+        else if (fisher.getHold().getVolumeIn(CUBIC_METRE) < 1200) return "class 6A";
+        else return "class 6B";
     }
 
     @Override
@@ -134,6 +145,7 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
                 final String boatId = record.getString("ves_no");
                 final Fisher fisher = fisherFactory.buildFisher(fishState);
                 fisher.getTagsList().add(boatId);
+                fisher.getTagsList().add(capacityClass(fisher));
                 setFixedRestTime(
                     fisher.getDepartingStrategy(),
                     record.getDouble("mean_time_at_port_in_hours")
@@ -153,5 +165,4 @@ public class PurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
             })
             .collect(toImmutableList());
     }
-
 }

@@ -7,19 +7,19 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 
 import static java.time.Month.JULY;
-import static uk.ac.ox.oxfish.fisher.purseseiner.PurseSeineVesselReader.chooseClosurePeriod;
+import static uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeineVesselReader.chooseClosurePeriod;
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.dayOfYear;
 
 public class IattcClosurePeriodRandomizer implements AdditionalStartable {
 
     private final double proportionOfBoatsInClosureA;
 
-    public IattcClosurePeriodRandomizer(double proportionOfBoatsInClosureA) {
+    public IattcClosurePeriodRandomizer(final double proportionOfBoatsInClosureA) {
         this.proportionOfBoatsInClosureA = proportionOfBoatsInClosureA;
     }
 
     @Override
-    public void start(FishState fishState) {
+    public void start(final FishState fishState) {
 
         // Every year, on July 15th, purse seine vessels must choose
         // which temporal closure period they will observe.

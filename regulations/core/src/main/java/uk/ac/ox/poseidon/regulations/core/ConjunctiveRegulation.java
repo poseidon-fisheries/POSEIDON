@@ -10,7 +10,7 @@ import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
 public class ConjunctiveRegulation extends AbstractCompositeRegulation {
 
-    protected ConjunctiveRegulation(final Collection<Regulation> subRegulations) {
+    public ConjunctiveRegulation(final Collection<Regulation> subRegulations) {
         super(subRegulations);
     }
 

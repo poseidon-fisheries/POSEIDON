@@ -5,21 +5,21 @@ import uk.ac.ox.poseidon.agents.api.Action;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
-public class AboveLimit implements Predicate<Action> {
+public class BelowLimit implements Predicate<Action> {
 
     private final int limit;
-    private final ToIntFunction<? super Action> extractCount;
+    private final ToIntFunction<? super Action> counter;
 
-    public AboveLimit(
+    public BelowLimit(
         final int limit,
-        final ToIntFunction<? super Action> extractCount
+        final ToIntFunction<? super Action> counter
     ) {
         this.limit = limit;
-        this.extractCount = extractCount;
+        this.counter = counter;
     }
 
     @Override
     public boolean test(final Action action) {
-        return extractCount.applyAsInt(action) > limit;
+        return counter.applyAsInt(action) < limit;
     }
 }
