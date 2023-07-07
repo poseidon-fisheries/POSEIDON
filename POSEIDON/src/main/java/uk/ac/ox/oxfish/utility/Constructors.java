@@ -6,8 +6,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
+import static java.util.Arrays.stream;
+import static java.util.Locale.ENGLISH;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.throwingMerger;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
@@ -63,5 +68,28 @@ public class Constructors {
                 throw new RuntimeException(e);
             }
         };
+    }
+
+    /**
+     * Utility method to add the simple name of a class to a NAMES map
+     * The name is split by letter case, the first word is left capitalized,
+     * following words are lower-cased, and they're joined by spaces.
+     * This might not work if any fancy capitalization is involved so
+     * manual naming is still required in some cases.
+     */
+    public static void putName(
+        final Map<? super Class<? extends AlgorithmFactory<?>>, ? super String> names,
+        final Class<? extends AlgorithmFactory<?>> classObject
+    ) {
+        final String[] words = splitByCharacterTypeCamelCase(classObject.getSimpleName());
+        names.put(
+            classObject,
+            Stream
+                .concat(
+                    Stream.of(words[0]),
+                    stream(words).skip(1).map(word -> word.toLowerCase(ENGLISH))
+                )
+                .collect(joining(" "))
+        );
     }
 }

@@ -8,15 +8,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static uk.ac.ox.oxfish.utility.Constructors.putName;
+
 public class RegulationFactories {
 
     public static final Map<String, Supplier<AlgorithmFactory<? extends Regulation>>> CONSTRUCTORS;
     public static final Map<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
-        NAMES.put(ConjunctiveRegulation.class, "Conjunctive regulation");
-        NAMES.put(EverythingPermitted.class, "Everything permitted");
-        NAMES.put(ForbiddenIf.class, "Forbidden if");
+        putName(NAMES, ConjunctiveRegulation.class);
+        putName(NAMES, EverythingPermitted.class);
+        putName(NAMES, ForbiddenIf.class);
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
