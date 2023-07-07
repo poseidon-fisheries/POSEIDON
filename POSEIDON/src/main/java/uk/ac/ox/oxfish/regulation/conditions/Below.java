@@ -7,15 +7,15 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 import uk.ac.ox.poseidon.regulations.api.Quantity;
 
-public class BelowLimit implements AlgorithmFactory<Condition> {
+public class Below implements AlgorithmFactory<Condition> {
 
     private AlgorithmFactory<? extends Quantity> quantity;
     private DoubleParameter limit;
 
-    public BelowLimit() {
+    public Below() {
     }
 
-    public BelowLimit(
+    public Below(
         final AlgorithmFactory<? extends Quantity> quantity,
         final double limit
     ) {
@@ -23,7 +23,7 @@ public class BelowLimit implements AlgorithmFactory<Condition> {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public BelowLimit(
+    public Below(
         final AlgorithmFactory<? extends Quantity> quantity, final DoubleParameter limit
     ) {
         this.limit = limit;
@@ -48,7 +48,7 @@ public class BelowLimit implements AlgorithmFactory<Condition> {
 
     @Override
     public Condition apply(final FishState fishState) {
-        return new uk.ac.ox.poseidon.regulations.core.conditions.BelowLimit(
+        return new uk.ac.ox.poseidon.regulations.core.conditions.Below(
             limit.applyAsDouble(fishState.getRandom()),
             quantity.apply(fishState)
         );

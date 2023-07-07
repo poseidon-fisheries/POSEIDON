@@ -4,12 +4,12 @@ import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 import uk.ac.ox.poseidon.regulations.api.Quantity;
 
-public class BelowLimit implements Condition {
+public class Below implements Condition {
 
     private final double limit;
     private final Quantity quantity;
 
-    public BelowLimit(
+    public Below(
         final double limit,
         final Quantity quantity
     ) {

@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.PurseSeinerActionContext;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.poseidon.agents.api.Agent;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounts;
@@ -39,8 +38,7 @@ public class YearlyActionLimitsDepartingStrategy implements DepartingStrategy {
     public boolean shouldFisherLeavePort(final Fisher fisher, final FishState model, final MersenneTwisterFast random) {
         final int year = fisher.grabState().getDate().getYear();
         final FadManager fadManager = getFadManager(fisher);
-        final PurseSeinerActionContext actionContext = fadManager.getActionContext();
-        return anyYearlyActionsRemaining(fisher, year, fadManager.getRegulation(), actionContext);
+        return anyYearlyActionsRemaining(fisher, year, fadManager.getRegulation(), fadManager.getYearlyActionCounter());
     }
 
     private static boolean anyYearlyActionsRemaining(

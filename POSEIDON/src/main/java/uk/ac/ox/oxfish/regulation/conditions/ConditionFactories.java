@@ -20,7 +20,7 @@ public class ConditionFactories {
         putName(NAMES, AgentHasTag.class);
         putName(NAMES, AllOf.class);
         putName(NAMES, AnyOf.class);
-        putName(NAMES, BelowLimit.class);
+        putName(NAMES, Below.class);
         putName(NAMES, Not.class);
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }

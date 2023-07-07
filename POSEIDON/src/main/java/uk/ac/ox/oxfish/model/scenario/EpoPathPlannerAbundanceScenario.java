@@ -24,6 +24,8 @@ import uk.ac.ox.oxfish.regulation.ConjunctiveRegulation;
 import uk.ac.ox.oxfish.regulation.ForbiddenIf;
 import uk.ac.ox.oxfish.regulation.conditions.*;
 import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
+import uk.ac.ox.oxfish.regulation.quantities.SumOf;
+import uk.ac.ox.oxfish.regulation.quantities.YearlyActionCount;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -56,11 +58,28 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                             new AnyOf(
                                 new AllOf(
                                     new AgentHasTag("class 6A"),
-                                    new Not(new BelowLimit(new NumberOfActiveFads(), 300))
+                                    new Not(new Below(new NumberOfActiveFads(), 300))
                                 ),
                                 new AllOf(
                                     new AgentHasTag("class 6B"),
-                                    new Not(new BelowLimit(new NumberOfActiveFads(), 450))
+                                    new Not(new Below(new NumberOfActiveFads(), 450))
+                                )
+                            )
+                        )
+                    ),
+                    new ForbiddenIf(
+                        new AllOf(
+                            new AnyOf(
+                                new ActionCodeIs("FAD"),
+                                new ActionCodeIs("OFS")
+                            ),
+                            new Not(
+                                new Below(
+                                    new SumOf(
+                                        new YearlyActionCount("FAD"),
+                                        new YearlyActionCount("OFS")
+                                    ),
+                                    999999
                                 )
                             )
                         )

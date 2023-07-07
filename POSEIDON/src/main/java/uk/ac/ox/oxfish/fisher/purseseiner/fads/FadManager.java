@@ -191,6 +191,10 @@ public class FadManager {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
     }
 
+    public YearlyActionCounter getYearlyActionCounter() {
+        return yearlyActionCounter;
+    }
+
     public Regulation getRegulation() {
         return regulation;
     }
@@ -342,7 +346,4 @@ public class FadManager {
         numFadsInStock++;
     }
 
-    public PurseSeinerActionContext getActionContext() {
-        return new PurseSeinerActionContext(yearlyActionCounter);
-    }
 }
