@@ -23,7 +23,7 @@ import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
 import uk.ac.ox.oxfish.regulation.ConjunctiveRegulation;
 import uk.ac.ox.oxfish.regulation.ForbiddenIf;
 import uk.ac.ox.oxfish.regulation.conditions.*;
-import uk.ac.ox.oxfish.regulation.counters.NumberOfActiveFads;
+import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 

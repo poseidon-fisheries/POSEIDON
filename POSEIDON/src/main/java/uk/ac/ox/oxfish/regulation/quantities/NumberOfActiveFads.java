@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.regulation.counters;
+package uk.ac.ox.oxfish.regulation.quantities;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;

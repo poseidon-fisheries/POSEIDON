@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.regulation.counters;
+package uk.ac.ox.oxfish.regulation.quantities;
 
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
