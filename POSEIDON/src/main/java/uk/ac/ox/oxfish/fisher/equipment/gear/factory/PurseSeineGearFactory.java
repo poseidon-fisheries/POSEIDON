@@ -76,27 +76,27 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     private InputPath locationValuesFile;
     private AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory;
     private AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory;
-    private AlgorithmFactory<? extends Regulation> regulationsFactory;
+    private AlgorithmFactory<? extends Regulation> regulations;
 
     public PurseSeineGearFactory() {
     }
 
     public PurseSeineGearFactory(
-        final AlgorithmFactory<? extends Regulation> regulationsFactory,
+        final AlgorithmFactory<? extends Regulation> regulations,
         final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory,
         final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory
     ) {
-        this.regulationsFactory = regulationsFactory;
+        this.regulations = regulations;
         this.fadInitializerFactory = fadInitializerFactory;
         this.fishValueCalculatorFactory = fishValueCalculatorFactory;
     }
 
-    public AlgorithmFactory<? extends Regulation> getRegulationsFactory() {
-        return regulationsFactory;
+    public AlgorithmFactory<? extends Regulation> getRegulations() {
+        return regulations;
     }
 
-    public void setRegulationsFactory(final AlgorithmFactory<? extends Regulation> regulationsFactory) {
-        this.regulationsFactory = regulationsFactory;
+    public void setRegulations(final AlgorithmFactory<? extends Regulation> regulations) {
+        this.regulations = regulations;
     }
 
     public AlgorithmFactory<? extends FishValueCalculator> getFishValueCalculatorFactory() {
@@ -176,7 +176,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         final MersenneTwisterFast rng = fishState.getRandom();
         final GlobalBiology globalBiology = fishState.getBiology();
         return new FadManager(
-            regulationsFactory.apply(fishState),
+            regulations.apply(fishState),
             fishState.getFadMap(),
             fadInitializerFactory.apply(fishState),
             MultisetYearlyActionCounter.create(),
