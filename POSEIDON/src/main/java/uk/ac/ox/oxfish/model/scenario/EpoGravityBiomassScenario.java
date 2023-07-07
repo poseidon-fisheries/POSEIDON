@@ -34,7 +34,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.geography.fads.CompressedBiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.regulations.factories.EverythingPermitted;
+import uk.ac.ox.oxfish.regulation.EverythingPermitted;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 
 import java.util.List;

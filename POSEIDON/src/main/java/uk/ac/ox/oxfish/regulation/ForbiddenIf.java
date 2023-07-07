@@ -1,32 +1,30 @@
-package uk.ac.ox.oxfish.regulations.factories;
+package uk.ac.ox.oxfish.regulation;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.regulations.api.Regulation;
 import uk.ac.ox.poseidon.regulations.core.ConditionalRegulation;
-
-import java.util.function.Predicate;
+import uk.ac.ox.poseidon.regulations.core.conditions.Condition;
 
 import static uk.ac.ox.poseidon.regulations.api.Mode.FORBIDDEN;
 import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
 public class ForbiddenIf implements AlgorithmFactory<Regulation> {
-    private AlgorithmFactory<Predicate<Action>> condition;
+    private AlgorithmFactory<Condition> condition;
 
     @SuppressWarnings("unused")
     public ForbiddenIf() {
     }
 
-    public ForbiddenIf(final AlgorithmFactory<Predicate<Action>> condition) {
+    public ForbiddenIf(final AlgorithmFactory<Condition> condition) {
         this.condition = condition;
     }
 
-    public AlgorithmFactory<Predicate<Action>> getCondition() {
+    public AlgorithmFactory<Condition> getCondition() {
         return condition;
     }
 
-    public void setCondition(final AlgorithmFactory<Predicate<Action>> condition) {
+    public void setCondition(final AlgorithmFactory<Condition> condition) {
         this.condition = condition;
     }
 

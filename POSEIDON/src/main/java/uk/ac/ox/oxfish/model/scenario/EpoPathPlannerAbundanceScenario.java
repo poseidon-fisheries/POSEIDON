@@ -20,7 +20,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
 import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
 import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
-import uk.ac.ox.oxfish.regulations.factories.*;
+import uk.ac.ox.oxfish.regulation.ConjunctiveRegulation;
+import uk.ac.ox.oxfish.regulation.ForbiddenIf;
+import uk.ac.ox.oxfish.regulation.conditions.*;
+import uk.ac.ox.oxfish.regulation.counters.NumberOfActiveFads;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -53,11 +56,11 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                             new AnyOf(
                                 new AllOf(
                                     new AgentHasTag("class 6A"),
-                                    new Not(new BelowLimit(300, new ActiveFadsCounter()))
+                                    new Not(new BelowLimit(new NumberOfActiveFads(), 300))
                                 ),
                                 new AllOf(
                                     new AgentHasTag("class 6B"),
-                                    new Not(new BelowLimit(450, new ActiveFadsCounter()))
+                                    new Not(new BelowLimit(new NumberOfActiveFads(), 450))
                                 )
                             )
                         )

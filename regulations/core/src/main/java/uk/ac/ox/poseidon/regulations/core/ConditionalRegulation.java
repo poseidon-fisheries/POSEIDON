@@ -3,17 +3,16 @@ package uk.ac.ox.poseidon.regulations.core;
 import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.regulations.api.Mode;
 import uk.ac.ox.poseidon.regulations.api.Regulation;
-
-import java.util.function.Predicate;
+import uk.ac.ox.poseidon.regulations.core.conditions.Condition;
 
 public class ConditionalRegulation implements Regulation {
 
-    private final Predicate<? super Action> condition;
+    private final Condition condition;
     private final Regulation regulationIfTrue;
     private final Regulation regulationIfFalse;
 
     public ConditionalRegulation(
-        final Predicate<? super Action> condition,
+        final Condition condition,
         final Regulation regulationIfTrue,
         final Regulation regulationIfFalse
     ) {

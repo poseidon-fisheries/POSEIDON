@@ -2,15 +2,13 @@ package uk.ac.ox.poseidon.regulations.core.conditions;
 
 import uk.ac.ox.poseidon.agents.api.Action;
 
-import java.util.function.Predicate;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class Not implements Predicate<Action> {
+public class Not implements Condition {
 
-    private final Predicate<? super Action> condition;
+    private final Condition condition;
 
-    public Not(final Predicate<? super Action> condition) {
+    public Not(final Condition condition) {
         this.condition = checkNotNull(condition);
     }
 

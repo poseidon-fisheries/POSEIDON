@@ -5,18 +5,17 @@ import uk.ac.ox.poseidon.agents.api.Action;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.function.Predicate;
 
-public class AnyOf implements Predicate<Action> {
+public class AnyOf implements Condition {
 
-    private final Set<Predicate<Action>> predicates;
+    private final Set<Condition> conditions;
 
-    public AnyOf(final Collection<Predicate<Action>> predicates) {
-        this.predicates = ImmutableSet.copyOf(predicates);
+    public AnyOf(final Collection<Condition> conditions) {
+        this.conditions = ImmutableSet.copyOf(conditions);
     }
 
     @Override
     public boolean test(final Action action) {
-        return predicates.stream().anyMatch(predicate -> predicate.test(action));
+        return conditions.stream().anyMatch(predicate -> predicate.test(action));
     }
 }

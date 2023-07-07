@@ -87,10 +87,14 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.PermitAllocationPolicies;
 import uk.ac.ox.oxfish.model.regs.factory.Regulations;
 import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulations;
+import uk.ac.ox.oxfish.regulation.RegulationFactories;
+import uk.ac.ox.oxfish.regulation.conditions.ConditionFactories;
+import uk.ac.ox.oxfish.regulation.counters.QuantityFactories;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.Probabilities;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditAlgorithms;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
+import uk.ac.ox.poseidon.regulations.core.conditions.Condition;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -219,6 +223,15 @@ public class AlgorithmFactories {
             ActionSpecificRegulations.CONSTRUCTORS
         );
         NAMES_MAP.put(ActionSpecificRegulations.class, ActionSpecificRegulations.NAMES);
+
+        CONSTRUCTOR_MAP.put(Condition.class, ConditionFactories.CONSTRUCTORS);
+        NAMES_MAP.put(Condition.class, ConditionFactories.NAMES);
+
+        CONSTRUCTOR_MAP.put(uk.ac.ox.poseidon.regulations.api.Regulation.class, RegulationFactories.CONSTRUCTORS);
+        NAMES_MAP.put(uk.ac.ox.poseidon.regulations.api.Regulation.class, RegulationFactories.NAMES);
+
+        CONSTRUCTOR_MAP.put(uk.ac.ox.poseidon.regulations.api.Quantity.class, QuantityFactories.CONSTRUCTORS);
+        NAMES_MAP.put(uk.ac.ox.poseidon.regulations.api.Quantity.class, QuantityFactories.NAMES);
 
         CONSTRUCTOR_MAP.put(
             DiscretizedOwnFadPlanningModule.class,

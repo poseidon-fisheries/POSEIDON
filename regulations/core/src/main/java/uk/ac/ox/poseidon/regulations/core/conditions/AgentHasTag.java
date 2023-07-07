@@ -2,9 +2,7 @@ package uk.ac.ox.poseidon.regulations.core.conditions;
 
 import uk.ac.ox.poseidon.agents.api.Action;
 
-import java.util.function.Predicate;
-
-public class AgentHasTag implements Predicate<Action> {
+public class AgentHasTag implements Condition {
     private final String tag;
 
     public AgentHasTag(final String tag) {

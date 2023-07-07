@@ -1,13 +1,11 @@
-package uk.ac.ox.oxfish.regulations.factories;
+package uk.ac.ox.oxfish.regulation.conditions;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.StringParameter;
-import uk.ac.ox.poseidon.agents.api.Action;
+import uk.ac.ox.poseidon.regulations.core.conditions.Condition;
 
-import java.util.function.Predicate;
-
-public class AgentHasTag implements AlgorithmFactory<Predicate<Action>> {
+public class AgentHasTag implements AlgorithmFactory<Condition> {
     private StringParameter tag;
 
     public AgentHasTag() {
@@ -30,7 +28,7 @@ public class AgentHasTag implements AlgorithmFactory<Predicate<Action>> {
     }
 
     @Override
-    public Predicate<Action> apply(final FishState fishState) {
+    public Condition apply(final FishState fishState) {
         return new uk.ac.ox.poseidon.regulations.core.conditions.AgentHasTag(tag.getValue());
     }
 }

@@ -1,20 +1,18 @@
-package uk.ac.ox.oxfish.regulations.factories;
+package uk.ac.ox.oxfish.regulation.counters;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.poseidon.agents.api.Action;
-
-import java.util.function.ToIntFunction;
+import uk.ac.ox.poseidon.regulations.api.Quantity;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
 
-public class ActiveFadsCounter implements AlgorithmFactory<ToIntFunction<Action>> {
+public class NumberOfActiveFads implements AlgorithmFactory<Quantity> {
 
-    private static final ToIntFunction<Action> numberOfActiveFads = action -> {
+    private static final Quantity NUMBER_OF_ACTIVE_FADS = action -> {
         checkArgument(action instanceof PurseSeinerAction);
         final Fisher fisher = ((PurseSeinerAction) action).getFisher();
         return maybeGetFadManager(fisher)
@@ -22,11 +20,11 @@ public class ActiveFadsCounter implements AlgorithmFactory<ToIntFunction<Action>
             .orElse(0);
     };
 
-    public ActiveFadsCounter() {
+    public NumberOfActiveFads() {
     }
 
     @Override
-    public ToIntFunction<Action> apply(final FishState fishState) {
-        return numberOfActiveFads;
+    public Quantity apply(final FishState fishState) {
+        return NUMBER_OF_ACTIVE_FADS;
     }
 }
