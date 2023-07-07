@@ -1,6 +1,7 @@
 package uk.ac.ox.poseidon.regulations.core.conditions;
 
 import uk.ac.ox.poseidon.agents.api.Action;
+import uk.ac.ox.poseidon.regulations.api.Condition;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

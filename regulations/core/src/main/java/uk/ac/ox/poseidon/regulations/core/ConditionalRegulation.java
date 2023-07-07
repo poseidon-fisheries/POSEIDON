@@ -1,9 +1,9 @@
 package uk.ac.ox.poseidon.regulations.core;
 
 import uk.ac.ox.poseidon.agents.api.Action;
+import uk.ac.ox.poseidon.regulations.api.Condition;
 import uk.ac.ox.poseidon.regulations.api.Mode;
 import uk.ac.ox.poseidon.regulations.api.Regulation;
-import uk.ac.ox.poseidon.regulations.core.conditions.Condition;
 
 public class ConditionalRegulation implements Regulation {
 

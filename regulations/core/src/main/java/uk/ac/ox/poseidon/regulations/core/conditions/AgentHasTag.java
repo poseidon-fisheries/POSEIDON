@@ -1,6 +1,7 @@
 package uk.ac.ox.poseidon.regulations.core.conditions;
 
 import uk.ac.ox.poseidon.agents.api.Action;
+import uk.ac.ox.poseidon.regulations.api.Condition;
 
 public class AgentHasTag implements Condition {
     private final String tag;

@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.regulation.conditions;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.StringParameter;
-import uk.ac.ox.poseidon.regulations.core.conditions.Condition;
+import uk.ac.ox.poseidon.regulations.api.Condition;
 
 public class AgentHasTag implements AlgorithmFactory<Condition> {
     private StringParameter tag;

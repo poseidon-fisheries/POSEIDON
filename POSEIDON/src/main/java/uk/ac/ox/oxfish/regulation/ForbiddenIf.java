@@ -2,9 +2,9 @@ package uk.ac.ox.oxfish.regulation;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.regulations.api.Condition;
 import uk.ac.ox.poseidon.regulations.api.Regulation;
 import uk.ac.ox.poseidon.regulations.core.ConditionalRegulation;
-import uk.ac.ox.poseidon.regulations.core.conditions.Condition;
 
 import static uk.ac.ox.poseidon.regulations.api.Mode.FORBIDDEN;
 import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;

@@ -1,4 +1,4 @@
-package uk.ac.ox.poseidon.regulations.core.conditions;
+package uk.ac.ox.poseidon.regulations.api;
 
 import uk.ac.ox.poseidon.agents.api.Action;
 

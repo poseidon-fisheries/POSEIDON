@@ -1,6 +1,7 @@
 package uk.ac.ox.poseidon.regulations.core.conditions;
 
 import uk.ac.ox.poseidon.agents.api.Action;
+import uk.ac.ox.poseidon.regulations.api.Condition;
 import uk.ac.ox.poseidon.regulations.api.Quantity;
 
 public class BelowLimit implements Condition {

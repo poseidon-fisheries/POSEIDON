@@ -2,6 +2,7 @@ package uk.ac.ox.poseidon.regulations.core.conditions;
 
 import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.poseidon.agents.api.Action;
+import uk.ac.ox.poseidon.regulations.api.Condition;
 
 import java.util.Collection;
 import java.util.Set;
