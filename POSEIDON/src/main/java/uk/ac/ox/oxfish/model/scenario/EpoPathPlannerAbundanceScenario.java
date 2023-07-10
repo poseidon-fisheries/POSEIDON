@@ -93,8 +93,8 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                             new AgentHasTag("closure A"),
                             new ActionCodeIs("DPL"),
                             new BetweenYearlyDates(
-                                JULY.getValue(), 14,
-                                OCTOBER.getValue(), 28
+                                JULY, 14,
+                                OCTOBER, 28
                             )
                         )
                     ),
@@ -102,8 +102,8 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                         new AllOf(
                             new AgentHasTag("closure A"),
                             new BetweenYearlyDates(
-                                JULY.getValue(), 29,
-                                OCTOBER.getValue(), 8
+                                JULY, 29,
+                                OCTOBER, 8
                             )
                         )
                     ),
@@ -113,8 +113,8 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                             new AgentHasTag("closure B"),
                             new ActionCodeIs("DPL"),
                             new BetweenYearlyDates(
-                                OCTOBER.getValue(), 25,
-                                NOVEMBER.getValue(), 8
+                                OCTOBER, 25,
+                                NOVEMBER, 8
                             )
                         )
                     ),
@@ -122,16 +122,16 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                         new AllOf(
                             new AgentHasTag("closure B"),
                             new BetweenYearlyDates(
-                                NOVEMBER.getValue(), 9,
-                                JANUARY.getValue(), 19
+                                NOVEMBER, 9,
+                                JANUARY, 19
                             )
                         )
                     ),
                     new ForbiddenIf(
                         new AllOf(
                             new BetweenYearlyDates(
-                                OCTOBER.getValue(), 9,
-                                NOVEMBER.getValue(), 8
+                                OCTOBER, 9,
+                                NOVEMBER, 8
                             ),
                             new InRectangularArea(
                                 4.0, -110.0, -3.0, -96.0

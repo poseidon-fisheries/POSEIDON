@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 
+import java.time.Month;
 import java.time.MonthDay;
 
 public class BetweenYearlyDates implements AlgorithmFactory<Condition> {
@@ -15,6 +16,20 @@ public class BetweenYearlyDates implements AlgorithmFactory<Condition> {
     private IntegerParameter endDay;
 
     public BetweenYearlyDates() {
+    }
+
+    public BetweenYearlyDates(
+        final Month startMonth,
+        final int startDay,
+        final Month endMonth,
+        final int endDay
+    ) {
+        this(
+            startMonth.getValue(),
+            startDay,
+            endMonth.getValue(),
+            endDay
+        );
     }
 
     public BetweenYearlyDates(
