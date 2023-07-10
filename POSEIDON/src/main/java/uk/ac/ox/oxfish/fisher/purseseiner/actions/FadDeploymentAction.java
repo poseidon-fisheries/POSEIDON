@@ -35,10 +35,6 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class FadDeploymentAction extends PurseSeinerAction implements FadRelatedAction {
 
-    // TODO: this should ideally be configurable, but we'll need to implement
-    //       temporary regulation at the action specific level for that.
-    private static final int BUFFER_PERIOD_BEFORE_CLOSURE = 15;
-
     private Fad fad;
 
     public FadDeploymentAction(final Fisher fisher) {
@@ -93,16 +89,7 @@ public class FadDeploymentAction extends PurseSeinerAction implements FadRelated
             return false;
         }
     }
-
-    /**
-     * Deploying a FAD is allowed if we can fish and if there is no closure kicking in within the buffer period.
-     */
-    @Override
-    public boolean checkIfPermitted() {
-        return super.checkIfPermitted() &&
-            !isNoFishingAtStep(getFisher().getRegulation(), getStep() + BUFFER_PERIOD_BEFORE_CLOSURE);
-    }
-
+    
     @Override
     public Fad getFad() {
         return fad;

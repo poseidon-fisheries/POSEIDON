@@ -30,8 +30,6 @@ public interface PlannedAction {
     ) {
         return fisher.isAllowedAtSea() &&
             fadManager.getRegulation().isPermitted(action) &&
-            //fad setting ought not to be banned
-            !fadManager.getActionSpecificRegulations().isForbidden(action.getClass(), fisher) &&
             //we should be allowed to fish here
             fisher.isAllowedToFishHere(location, fisher.grabState());
     }
@@ -98,8 +96,8 @@ public interface PlannedAction {
         public boolean isAllowedNow(final Fisher fisher) {
             return fisher.isAllowedAtSea() &&
                 !FadManager.getFadManager(fisher)
-                    .getActionSpecificRegulations()
-                    .isForbidden(FadDeploymentAction.class, fisher);
+                    .getRegulation()
+                    .isForbidden(new FadDeploymentAction(fisher));
         }
 
         @Override

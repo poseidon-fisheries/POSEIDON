@@ -35,8 +35,6 @@ import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.observers.Observers;
-import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
 import uk.ac.ox.poseidon.common.api.Observer;
 import uk.ac.ox.poseidon.regulations.api.Regulation;
@@ -73,7 +71,6 @@ public class FadManager {
     private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
     private final FadInitializer<?, ?> fadInitializer;
     private final FishValueCalculator fishValueCalculator;
-    private ActiveActionRegulations actionSpecificRegulations;
     private Fisher fisher;
     private int numFadsInStock;
 
@@ -95,7 +92,6 @@ public class FadManager {
             ImmutableSet.of(),
             ImmutableSet.of(),
             Optional.empty(),
-            new ActiveActionRegulations(),
             fishValueCalculator
         );
     }
@@ -117,7 +113,6 @@ public class FadManager {
         final Iterable<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers,
         final Iterable<Observer<DolphinSetAction>> dolphinSetObservers,
         final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor,
-        final ActiveActionRegulations actionSpecificRegulations,
         final FishValueCalculator fishValueCalculator
     ) {
         this.regulation = regulation;
@@ -125,7 +120,6 @@ public class FadManager {
         this.fadInitializer = fadInitializer;
         this.yearlyActionCounter = yearlyActionCounter;
         this.biomassLostMonitor = biomassLostMonitor;
-        this.actionSpecificRegulations = actionSpecificRegulations;
         this.fishValueCalculator = fishValueCalculator;
 
         if (yearlyActionCounter != null) {
@@ -166,7 +160,6 @@ public class FadManager {
             BiomassLostEvent.class,
             observer
         ));
-        setActionSpecificRegulations(actionSpecificRegulations);
     }
 
     public <T> void registerObserver(
@@ -299,44 +292,13 @@ public class FadManager {
      * how many active fads  can the owner of this manager still drop?
      */
     public int getHowManyActiveFadsCanWeStillDeploy() {
-        if (fisher == null)
-            return Integer.MAX_VALUE;
-        else {
-            return getActionSpecificRegulations().getActiveFadLimits().map(
-                activeFadLimits1 -> activeFadLimits1.getLimit(fisher)
-            ).orElse(Integer.MAX_VALUE);
-        }
-    }
-
-    public ActiveActionRegulations getActionSpecificRegulations() {
-        return actionSpecificRegulations;
-    }
-
-    public void setActionSpecificRegulations(
-        final Stream<ActionSpecificRegulation> actionSpecificRegulations
-    ) {
-        setActionSpecificRegulations(new ActiveActionRegulations(actionSpecificRegulations));
-    }
-
-    private void setActionSpecificRegulations(
-        final ActiveActionRegulations actionSpecificRegulations
-    ) {
-        observers.unregister(this.actionSpecificRegulations);
-        this.actionSpecificRegulations = actionSpecificRegulations;
-        POSSIBLE_ACTIONS.forEach(actionClass -> registerObserver(
-            actionClass,
-            actionSpecificRegulations
-        ));
+        // TODO: reimplement with new regulation system
+        throw new RuntimeException("Needs to be reimplemented with new regulation system.");
     }
 
     public int getNumberOfRemainingYearlyActions(final Class<? extends PurseSeinerAction> purseSeinerAction) {
-
-        //this should include set limits since those are also yearlyActionLimits
-
-        return getActionSpecificRegulations().getYearlyActionLimitRegulations().
-            get(purseSeinerAction).stream().
-            mapToInt(reg -> reg.getNumRemainingActions(fisher)).min().orElse(Integer.MAX_VALUE);
-
+        // TODO: reimplement with new regulation system
+        throw new RuntimeException("Needs to be reimplemented with new regulation system.");
     }
 
     /**

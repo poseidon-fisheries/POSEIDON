@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -27,11 +26,13 @@ public class GlobalDeploymentAttractionModulator implements GlobalAttractionModu
     }
 
     private static double getPctActiveFads(final Fisher fisher) {
-        final FadManager fadManager = FadManager.getFadManager(fisher);
-        return fadManager
-            .getActionSpecificRegulations()
-            .getActiveFadLimits()
-            .map(reg -> (double) fadManager.getNumDeployedFads() / reg.getLimit(fisher))
-            .orElse(0.0);
+        // TODO: Needs to be reimplemented for new regulation system.
+        throw new RuntimeException("Needs to be reimplemented for new regulation system.");
+//        final FadManager fadManager = FadManager.getFadManager(fisher);
+//        return fadManager
+//            .getActionSpecificRegulations()
+//            .getActiveFadLimits()
+//            .map(reg -> (double) fadManager.getNumDeployedFads() / reg.getLimit(fisher))
+//            .orElse(0.0);
     }
 }

@@ -37,7 +37,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -92,7 +91,6 @@ public class MakeFadSetTest {
         when(model.getFadMap().getFadTile(any())).thenReturn(Optional.of(seaTile));
         when(fadMap.getFadTile(fad)).thenReturn(Optional.of(seaTile));
         when(fadManager.getFadMap()).thenReturn(fadMap);
-        when(fadManager.getActionSpecificRegulations()).thenReturn(new ActiveActionRegulations());
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);
         when(fisher.grabState()).thenReturn(model);
         when(fisher.grabRandomizer()).thenReturn(random);

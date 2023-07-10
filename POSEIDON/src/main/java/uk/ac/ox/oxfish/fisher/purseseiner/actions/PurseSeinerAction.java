@@ -72,12 +72,7 @@ public abstract class PurseSeinerAction
         final boolean forbiddenByRegulations = fadManager
             .map(fm -> fm.getRegulation().isForbidden(this))
             .orElse(false);
-        final boolean forbiddenByActionSpecificRegulations =
-            fadManager
-                .map(FadManager::getActionSpecificRegulations)
-                .map(reg -> reg.isForbidden(this.getClass(), getFisher()))
-                .orElse(false);
-        return !(forbiddenByRegulations || forbiddenByActionSpecificRegulations);
+        return !forbiddenByRegulations;
     }
 
     public Fisher getFisher() {

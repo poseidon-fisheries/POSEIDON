@@ -20,8 +20,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
 import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
 import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
-import uk.ac.ox.oxfish.regulation.ConjunctiveRegulation;
 import uk.ac.ox.oxfish.regulation.ForbiddenIf;
+import uk.ac.ox.oxfish.regulation.NamedRegulations;
 import uk.ac.ox.oxfish.regulation.conditions.*;
 import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
 import uk.ac.ox.oxfish.regulation.quantities.SumOf;
@@ -47,94 +47,97 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
             getInputFolder(),
             getSpeciesCodesSupplier(),
             new AbundancePurseSeineGearFactory(
-                new ConjunctiveRegulation(
-                    new ForbiddenIf(
-                        new AllOf(
-                            new ActionCodeIs("DEL"),
-                            new Not(new AgentHasTag("has_del_license"))
-                        )
-                    ),
-                    new ForbiddenIf(
-                        new AllOf(
-                            new ActionCodeIs("DPL"),
+                new NamedRegulations(
+                    ImmutableMap.of(
+                        "DEL licence", new ForbiddenIf(
+                            new AllOf(
+                                new ActionCodeIs("DEL"),
+                                new Not(new AgentHasTag("has_del_license"))
+                            )
+                        ),
+                        "Active-FAD limits", new ForbiddenIf(
+                            new AllOf(
+                                new ActionCodeIs("DPL"),
+                                new AnyOf(
+                                    new AllOf(
+                                        new AgentHasTag("class 6A"),
+                                        new Not(new Below(new NumberOfActiveFads(), 300))
+                                    ),
+                                    new AllOf(
+                                        new AgentHasTag("class 6B"),
+                                        new Not(new Below(new NumberOfActiveFads(), 450))
+                                    )
+                                )
+                            )
+                        ),
+                        // Yearly set limits, set to 99999 as a placeholder
+                        "Object-set limits", new ForbiddenIf(
+                            new AllOf(
+                                new AnyOf(
+                                    new ActionCodeIs("FAD"),
+                                    new ActionCodeIs("OFS")
+                                ),
+                                new Not(
+                                    new Below(
+                                        new SumOf(
+                                            new YearlyActionCount("FAD"),
+                                            new YearlyActionCount("OFS")
+                                        ),
+                                        999999
+                                    )
+                                )
+                            )
+                        ),
+                        // Forbid deployments 15 days before closure
+                        "Closure A", new ForbiddenIf(
                             new AnyOf(
                                 new AllOf(
-                                    new AgentHasTag("class 6A"),
-                                    new Not(new Below(new NumberOfActiveFads(), 300))
+                                    // Forbid deployments 15 days before closure
+                                    new AgentHasTag("closure A"),
+                                    new ActionCodeIs("DPL"),
+                                    new BetweenYearlyDates(
+                                        JULY, 14,
+                                        OCTOBER, 28
+                                    )
                                 ),
                                 new AllOf(
-                                    new AgentHasTag("class 6B"),
-                                    new Not(new Below(new NumberOfActiveFads(), 450))
+                                    new AgentHasTag("closure A"),
+                                    new BetweenYearlyDates(
+                                        JULY, 29,
+                                        OCTOBER, 8
+                                    )
                                 )
                             )
-                        )
-                    ),
-                    // Yearly set limits, set to 99999 as a placeholder
-                    new ForbiddenIf(
-                        new AllOf(
+                        ),
+                        "Closure B", new ForbiddenIf(
                             new AnyOf(
-                                new ActionCodeIs("FAD"),
-                                new ActionCodeIs("OFS")
-                            ),
-                            new Not(
-                                new Below(
-                                    new SumOf(
-                                        new YearlyActionCount("FAD"),
-                                        new YearlyActionCount("OFS")
-                                    ),
-                                    999999
+                                // Forbid deployments 15 days before closure
+                                new AllOf(
+                                    new AgentHasTag("closure B"),
+                                    new ActionCodeIs("DPL"),
+                                    new BetweenYearlyDates(
+                                        OCTOBER, 25,
+                                        NOVEMBER, 8
+                                    )
+                                ),
+                                new AllOf(
+                                    new AgentHasTag("closure B"),
+                                    new BetweenYearlyDates(
+                                        NOVEMBER, 9,
+                                        JANUARY, 19
+                                    )
                                 )
                             )
-                        )
-                    ),
-                    // Forbid deployments 15 days before closure
-                    new ForbiddenIf(
-                        new AllOf(
-                            new AgentHasTag("closure A"),
-                            new ActionCodeIs("DPL"),
-                            new BetweenYearlyDates(
-                                JULY, 14,
-                                OCTOBER, 28
-                            )
-                        )
-                    ),
-                    new ForbiddenIf(
-                        new AllOf(
-                            new AgentHasTag("closure A"),
-                            new BetweenYearlyDates(
-                                JULY, 29,
-                                OCTOBER, 8
-                            )
-                        )
-                    ),
-                    // Forbid deployments 15 days before closure
-                    new ForbiddenIf(
-                        new AllOf(
-                            new AgentHasTag("closure B"),
-                            new ActionCodeIs("DPL"),
-                            new BetweenYearlyDates(
-                                OCTOBER, 25,
-                                NOVEMBER, 8
-                            )
-                        )
-                    ),
-                    new ForbiddenIf(
-                        new AllOf(
-                            new AgentHasTag("closure B"),
-                            new BetweenYearlyDates(
-                                NOVEMBER, 9,
-                                JANUARY, 19
-                            )
-                        )
-                    ),
-                    new ForbiddenIf(
-                        new AllOf(
-                            new BetweenYearlyDates(
-                                OCTOBER, 9,
-                                NOVEMBER, 8
-                            ),
-                            new InRectangularArea(
-                                4.0, -110.0, -3.0, -96.0
+                        ),
+                        "El Corralito", new ForbiddenIf(
+                            new AllOf(
+                                new BetweenYearlyDates(
+                                    OCTOBER, 9,
+                                    NOVEMBER, 8
+                                ),
+                                new InRectangularArea(
+                                    4.0, -110.0, -3.0, -96.0
+                                )
                             )
                         )
                     )

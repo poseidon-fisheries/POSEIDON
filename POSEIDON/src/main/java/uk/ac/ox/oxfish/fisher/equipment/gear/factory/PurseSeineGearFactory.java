@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -16,10 +15,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
-import uk.ac.ox.oxfish.model.regs.fads.ActionSpecificRegulation;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveFadLimitsFactory;
-import uk.ac.ox.oxfish.model.regs.fads.DelLicenseRegulationFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -30,12 +25,10 @@ import uk.ac.ox.poseidon.regulations.api.Regulation;
 
 import javax.measure.quantity.Mass;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.stream.Collectors.toList;
 
 @SuppressWarnings("unused")
 public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
@@ -69,8 +62,6 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     private final CacheByFishState<Set<Observer<DolphinSetAction>>> dolphinSetObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(dolphinSetObservers));
     private GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
-    private List<AlgorithmFactory<? extends ActionSpecificRegulation>> actionSpecificRegulations =
-        ImmutableList.of(new ActiveFadLimitsFactory(), new DelLicenseRegulationFactory());
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private InputPath locationValuesFile;
@@ -139,22 +130,6 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         this.biomassLostMonitor = biomassLostMonitor;
     }
 
-    @SuppressWarnings("unused")
-    public List<
-        AlgorithmFactory<? extends ActionSpecificRegulation>
-        > getActionSpecificRegulations() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return actionSpecificRegulations;
-    }
-
-    public void setActionSpecificRegulations(
-        final List<AlgorithmFactory<?
-            extends ActionSpecificRegulation>> actionSpecificRegulations
-    ) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.actionSpecificRegulations = actionSpecificRegulations;
-    }
-
     @SuppressWarnings({"unused", "WeakerAccess"})
     public DoubleParameter getSuccessfulSetProbability() {
         return successfulSetProbability;
@@ -167,12 +142,6 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
 
     FadManager makeFadManager(final FishState fishState) {
         checkNotNull(fadInitializerFactory);
-        final ActiveActionRegulations actionSpecificRegulations = new ActiveActionRegulations(
-            this.actionSpecificRegulations.stream()
-                .map(factory -> factory.apply(fishState))
-                .collect(toList())
-        );
-
         final MersenneTwisterFast rng = fishState.getRandom();
         final GlobalBiology globalBiology = fishState.getBiology();
         return new FadManager(
@@ -186,7 +155,6 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
             nonAssociatedSetObserversCache.get(fishState),
             dolphinSetObserversCache.get(fishState),
             Optional.of(biomassLostMonitor),
-            actionSpecificRegulations,
             fishValueCalculatorFactory.apply(fishState)
         );
     }

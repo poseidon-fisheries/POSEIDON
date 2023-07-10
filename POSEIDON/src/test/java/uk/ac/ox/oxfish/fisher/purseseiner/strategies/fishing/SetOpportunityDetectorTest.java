@@ -36,7 +36,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -67,8 +66,6 @@ public class SetOpportunityDetectorTest {
         final FishState fishState = mock(FishState.class);
         final BiomassAggregatingFad ownFad = mock(BiomassAggregatingFad.class);
         final BiomassAggregatingFad otherFad = mock(BiomassAggregatingFad.class);
-        final ActiveActionRegulations actionSpecificRegulations =
-            mock(ActiveActionRegulations.class);
         final Regulation regulation = mock(Regulation.class);
         final SeaTile seaTile = mock(SeaTile.class);
         when(fishState.getStep()).thenReturn(0);
@@ -82,8 +79,6 @@ public class SetOpportunityDetectorTest {
         when(ownFad.getOwner()).thenReturn(fadManager);
         when(otherFad.getOwner()).thenReturn(mock(FadManager.class));
         when(fadManager.fadsAt(any())).thenAnswer(__ -> new Bag(new Object[]{ownFad, otherFad}));
-        when(fadManager.getActionSpecificRegulations()).thenReturn(actionSpecificRegulations);
-        when(actionSpecificRegulations.isForbidden(any(), any())).thenReturn(false);
         when(fisher.getRegulation()).thenReturn(regulation);
         when(regulation.canFishHere(any(), any(), any())).thenReturn(true);
 

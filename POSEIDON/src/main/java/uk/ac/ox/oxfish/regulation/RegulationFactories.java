@@ -16,7 +16,7 @@ public class RegulationFactories {
     public static final Map<Class<? extends AlgorithmFactory<?>>, String> NAMES = new LinkedHashMap<>();
 
     static {
-        putName(NAMES, ConjunctiveRegulation.class);
+        putName(NAMES, NamedRegulations.class);
         putName(NAMES, EverythingPermitted.class);
         putName(NAMES, ForbiddenIf.class);
         CONSTRUCTORS = Constructors.fromNames(NAMES);

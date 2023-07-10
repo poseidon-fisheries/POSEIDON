@@ -23,13 +23,11 @@ package uk.ac.ox.oxfish.model.data.collectors;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
-import uk.ac.ox.oxfish.model.regs.fads.ActiveActionRegulations;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Collection;
@@ -38,7 +36,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
 
 /**
  * the data gatherer for a fisher that steps every year. It gathers:
@@ -191,18 +188,6 @@ public class FisherYearlyTimeSeries extends TimeSeries<Fisher> {
             );
 
         }
-
-        registerGatherer(
-            ACTIVE_FADS_LIMIT_COLUMN_NAME,
-            fisher ->
-                maybeGetFadManager(fisher)
-                    .map(FadManager::getActionSpecificRegulations)
-                    .flatMap(ActiveActionRegulations::getActiveFadLimits)
-                    .map(activeFadLimits -> activeFadLimits.getLimit(fisher))
-                    .orElse(Integer.MAX_VALUE)
-                    .doubleValue(),
-            0
-        );
 
         registerGatherer(
             NumberOfActiveFadsGatherer.COLUMN_NAME,
