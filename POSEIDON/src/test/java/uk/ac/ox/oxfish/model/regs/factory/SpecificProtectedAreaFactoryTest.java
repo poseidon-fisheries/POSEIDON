@@ -5,7 +5,7 @@ import com.google.common.primitives.Booleans;
 import com.vividsolutions.jts.geom.Coordinate;
 import junit.framework.TestCase;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.ConjunctiveRegulations;
+import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
 
@@ -26,12 +26,13 @@ public class SpecificProtectedAreaFactoryTest extends TestCase {
     final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
 
     public void testEveryEEZHasTilesInArea() {
-        final Set<SpecificProtectedArea> areas = fishState.getFishers().stream().flatMap(fisher ->
-            ((ConjunctiveRegulations) fisher.getRegulation()).getRegulations()
-                .stream()
-                .filter(reg -> reg instanceof SpecificProtectedArea)
-                .map(reg -> (SpecificProtectedArea) reg)
-        ).collect(toSet());
+        final Set<SpecificProtectedArea> areas =
+            fishState.getFishers().stream().flatMap(fisher ->
+                ((MultipleRegulations) fisher.getRegulation()).getRegulations()
+                    .stream()
+                    .filter(SpecificProtectedArea.class::isInstance)
+                    .map(SpecificProtectedArea.class::cast)
+            ).collect(toSet());
 
         final ImmutableList<SpecificProtectedArea> areasWithNoTiles =
             areas.stream()
