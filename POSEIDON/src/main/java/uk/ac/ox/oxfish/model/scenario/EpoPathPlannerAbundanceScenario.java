@@ -126,6 +126,17 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                                 JANUARY.getValue(), 19
                             )
                         )
+                    ),
+                    new ForbiddenIf(
+                        new AllOf(
+                            new BetweenYearlyDates(
+                                OCTOBER.getValue(), 9,
+                                NOVEMBER.getValue(), 8
+                            ),
+                            new InRectangularArea(
+                                4.0, -110.0, -3.0, -96.0
+                            )
+                        )
                     )
                 ),
                 new SelectivityAbundanceFadInitializerFactory(
