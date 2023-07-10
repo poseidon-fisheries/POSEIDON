@@ -13,6 +13,9 @@ public class InRectangularArea implements Condition {
 
     @Override
     public boolean test(final Action action) {
-        return envelope.contains(action.getCoordinate());
+        return action
+            .getCoordinate()
+            .map(envelope::contains)
+            .orElse(false);
     }
 }

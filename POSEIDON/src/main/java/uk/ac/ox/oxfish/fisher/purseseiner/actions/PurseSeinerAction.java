@@ -113,8 +113,10 @@ public abstract class PurseSeinerAction
     }
 
     @Override
-    public Coordinate getCoordinate() {
-        return fisher.grabState().getMap().getCoordinates(location);
+    public Optional<Coordinate> getCoordinate() {
+        return Optional
+            .ofNullable(location)
+            .map(fisher.grabState().getMap()::getCoordinates);
     }
 
     public int getStep() {
