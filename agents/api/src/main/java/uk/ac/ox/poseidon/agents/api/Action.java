@@ -1,5 +1,7 @@
 package uk.ac.ox.poseidon.agents.api;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 import java.time.LocalDateTime;
 
 public interface Action {
@@ -7,7 +9,7 @@ public interface Action {
 
     LocalDateTime getDateTime();
 
-    //Coordinate getCoordinate();
+    Coordinate getCoordinate();
 
     String getCode();
 }

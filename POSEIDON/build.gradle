@@ -38,17 +38,19 @@ sourceSets {
 //here we add all the dependencies notice that mason and geomason are not on maven so we need to add them separately
 dependencies {
 
-    api(project(":common:api"))
+    implementation(project(":common:api"))
     implementation(project(":agents:core"))
     implementation(project(":regulations:core"))
 
     //mason libraries. They aren't on maven so we have to lug their jars around
     api fileTree(dir: 'libs/mason', include: '*.jar')
-    api fileTree(dir: 'libs/geomason', include: '*.jar')
+    implementation fileTree(dir: 'libs/geomason', include: '*.jar')
+
+    // JTS Topology Suite, a geomason dependency
+    implementation("com.vividsolutions:jts:1.13")
 
     //fx collections; needed for sanity
     implementation fileTree(dir: 'libs/fxbase/', include: '*.jar')
-
 
     // CSV helpers
     // DO NOT use opencsv for new code, as we want to phase it out.

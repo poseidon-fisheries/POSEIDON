@@ -20,6 +20,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import com.google.common.collect.ImmutableSet;
+import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
@@ -109,6 +110,11 @@ public abstract class PurseSeinerAction
 
     public void setTime(final LocalTime time) {
         this.time = time;
+    }
+
+    @Override
+    public Coordinate getCoordinate() {
+        return fisher.grabState().getMap().getCoordinates(location);
     }
 
     public int getStep() {
