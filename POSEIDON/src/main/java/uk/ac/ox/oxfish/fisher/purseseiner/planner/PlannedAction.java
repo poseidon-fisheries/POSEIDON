@@ -29,7 +29,6 @@ public interface PlannedAction {
         final PurseSeinerAction action
     ) {
         return fisher.isAllowedAtSea() &&
-            // TODO: get a proper action context
             fadManager.getRegulation().isPermitted(action) &&
             //fad setting ought not to be banned
             !fadManager.getActionSpecificRegulations().isForbidden(action.getClass(), fisher) &&

@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.regulation.conditions;
+package uk.ac.ox.poseidon.regulations.core;
 
 import junit.framework.TestCase;
 

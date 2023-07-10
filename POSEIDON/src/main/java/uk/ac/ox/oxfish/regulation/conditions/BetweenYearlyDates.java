@@ -1,45 +1,83 @@
 package uk.ac.ox.oxfish.regulation.conditions;
 
-import uk.ac.ox.poseidon.agents.api.Action;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 
 import java.time.MonthDay;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+public class BetweenYearlyDates implements AlgorithmFactory<Condition> {
 
-public class BetweenYearlyDates implements Condition {
+    private IntegerParameter startMonth;
+    private IntegerParameter startDay;
+    private IntegerParameter endMonth;
+    private IntegerParameter endDay;
 
-    private final MonthDay start;
-    private final MonthDay end;
-    private final boolean yearSpanning;
-
-    public BetweenYearlyDates(final MonthDay start, final MonthDay end) {
-        this.start = checkNotNull(start);
-        this.end = checkNotNull(end);
-        this.yearSpanning = end.isBefore(start);
+    public BetweenYearlyDates() {
     }
 
-    public MonthDay getStart() {
-        return start;
+    public BetweenYearlyDates(
+        final int startMonth,
+        final int startDay,
+        final int endMonth,
+        final int endDay
+    ) {
+        this.startMonth = new IntegerParameter(startMonth);
+        this.startDay = new IntegerParameter(startDay);
+        this.endMonth = new IntegerParameter(endMonth);
+        this.endDay = new IntegerParameter(endDay);
     }
 
-    public MonthDay getEnd() {
-        return end;
+    public BetweenYearlyDates(
+        final IntegerParameter startMonth,
+        final IntegerParameter startDay,
+        final IntegerParameter endMonth,
+        final IntegerParameter endDay
+    ) {
+        this.startMonth = startMonth;
+        this.startDay = startDay;
+        this.endMonth = endMonth;
+        this.endDay = endDay;
     }
 
-    public boolean isYearSpanning() {
-        return yearSpanning;
+    public IntegerParameter getStartMonth() {
+        return startMonth;
+    }
+
+    public void setStartMonth(final IntegerParameter startMonth) {
+        this.startMonth = startMonth;
+    }
+
+    public IntegerParameter getStartDay() {
+        return startDay;
+    }
+
+    public void setStartDay(final IntegerParameter startDay) {
+        this.startDay = startDay;
+    }
+
+    public IntegerParameter getEndMonth() {
+        return endMonth;
+    }
+
+    public void setEndMonth(final IntegerParameter endMonth) {
+        this.endMonth = endMonth;
+    }
+
+    public IntegerParameter getEndDay() {
+        return endDay;
+    }
+
+    public void setEndDay(final IntegerParameter endDay) {
+        this.endDay = endDay;
     }
 
     @Override
-    public boolean test(final Action action) {
-        return test(MonthDay.from(action.getDateTime()));
-    }
-
-    boolean test(final MonthDay monthDay) {
-        final boolean outsideRange = yearSpanning
-            ? monthDay.isAfter(end) && monthDay.isBefore(start)
-            : monthDay.isBefore(start) || monthDay.isAfter(end);
-        return !outsideRange;
+    public Condition apply(final FishState fishState) {
+        return new uk.ac.ox.poseidon.regulations.core.BetweenYearlyDates(
+            MonthDay.of(startMonth.getValue(), startDay.getValue()),
+            MonthDay.of(endMonth.getValue(), endDay.getValue())
+        );
     }
 }

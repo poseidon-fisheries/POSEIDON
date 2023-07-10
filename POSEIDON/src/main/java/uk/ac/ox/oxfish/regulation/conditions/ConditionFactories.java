@@ -21,6 +21,7 @@ public class ConditionFactories {
         putName(NAMES, AllOf.class);
         putName(NAMES, AnyOf.class);
         putName(NAMES, Below.class);
+        putName(NAMES, BetweenYearlyDates.class);
         putName(NAMES, Not.class);
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }

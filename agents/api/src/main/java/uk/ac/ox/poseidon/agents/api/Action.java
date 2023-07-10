@@ -7,5 +7,7 @@ public interface Action {
 
     LocalDateTime getDateTime();
 
+    //Coordinate getCoordinate();
+
     String getCode();
 }

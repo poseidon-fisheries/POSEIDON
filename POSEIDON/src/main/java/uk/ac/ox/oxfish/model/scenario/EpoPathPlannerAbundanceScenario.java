@@ -31,6 +31,8 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.List;
 
+import static java.time.Month.*;
+
 public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
 
     private AbundanceFiltersFactory abundanceFiltersFactory =
@@ -67,6 +69,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                             )
                         )
                     ),
+                    // Yearly set limits, set to 99999 as a placeholder
                     new ForbiddenIf(
                         new AllOf(
                             new AnyOf(
@@ -81,6 +84,46 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                                     ),
                                     999999
                                 )
+                            )
+                        )
+                    ),
+                    // Forbid deployments 15 days before closure
+                    new ForbiddenIf(
+                        new AllOf(
+                            new AgentHasTag("closure A"),
+                            new ActionCodeIs("DPL"),
+                            new BetweenYearlyDates(
+                                JULY.getValue(), 14,
+                                OCTOBER.getValue(), 28
+                            )
+                        )
+                    ),
+                    new ForbiddenIf(
+                        new AllOf(
+                            new AgentHasTag("closure A"),
+                            new BetweenYearlyDates(
+                                JULY.getValue(), 29,
+                                OCTOBER.getValue(), 8
+                            )
+                        )
+                    ),
+                    // Forbid deployments 15 days before closure
+                    new ForbiddenIf(
+                        new AllOf(
+                            new AgentHasTag("closure B"),
+                            new ActionCodeIs("DPL"),
+                            new BetweenYearlyDates(
+                                OCTOBER.getValue(), 25,
+                                NOVEMBER.getValue(), 8
+                            )
+                        )
+                    ),
+                    new ForbiddenIf(
+                        new AllOf(
+                            new AgentHasTag("closure B"),
+                            new BetweenYearlyDates(
+                                NOVEMBER.getValue(), 9,
+                                JANUARY.getValue(), 19
                             )
                         )
                     )
