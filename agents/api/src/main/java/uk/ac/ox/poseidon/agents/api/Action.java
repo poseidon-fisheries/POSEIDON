@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface Action {
     Agent getAgent();
 
-    LocalDateTime getDateTime();
+    Optional<LocalDateTime> getDateTime();
 
     Optional<Coordinate> getCoordinate();
 

@@ -20,8 +20,8 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing;
 
 import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.DepartIfAnyActionPermitted;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedRestTimeDepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.YearlyActionLimitsDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -35,7 +35,7 @@ public class PurseSeinerDepartingStrategyFactory
 
     }
 
-    public PurseSeinerDepartingStrategyFactory(boolean destinationBased) {
+    public PurseSeinerDepartingStrategyFactory(final boolean destinationBased) {
         this.destinationBased = destinationBased;
     }
 
@@ -45,14 +45,14 @@ public class PurseSeinerDepartingStrategyFactory
             return new CompositeDepartingStrategy(
                 new FixedRestTimeDepartingStrategy(0),
                 // rest times assigned in TunaScenario.populateModel
-                new YearlyActionLimitsDepartingStrategy(),
+                new DepartIfAnyActionPermitted(),
                 new DestinationBasedDepartingStrategy()
             );
         else {
             return new CompositeDepartingStrategy(
                 new FixedRestTimeDepartingStrategy(0),
                 // rest times assigned in TunaScenario.populateModel
-                new YearlyActionLimitsDepartingStrategy()
+                new DepartIfAnyActionPermitted()
             );
         }
     }
@@ -61,7 +61,7 @@ public class PurseSeinerDepartingStrategyFactory
         return destinationBased;
     }
 
-    public void setDestinationBased(boolean destinationBased) {
+    public void setDestinationBased(final boolean destinationBased) {
         this.destinationBased = destinationBased;
     }
 }

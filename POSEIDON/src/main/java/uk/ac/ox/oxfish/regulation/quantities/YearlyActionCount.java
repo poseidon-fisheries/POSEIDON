@@ -39,7 +39,7 @@ public class YearlyActionCount implements AlgorithmFactory<Quantity> {
             final Fisher fisher = (Fisher) action.getAgent();
             return maybeGetFadManager(fisher)
                 .map(fm -> fm.getYearlyActionCounter().getCount(
-                    action.getDateTime().getYear(),
+                    fisher.grabState().getCalendarYear(),
                     action.getAgent(),
                     actionCode.getValue()
                 ))

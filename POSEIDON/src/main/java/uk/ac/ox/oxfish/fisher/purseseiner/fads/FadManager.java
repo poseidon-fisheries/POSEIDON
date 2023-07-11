@@ -184,10 +184,6 @@ public class FadManager {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
     }
 
-    public YearlyActionCounter getYearlyActionCounter() {
-        return yearlyActionCounter;
-    }
-
     public Regulation getRegulation() {
         return regulation;
     }
@@ -211,7 +207,6 @@ public class FadManager {
     public Set<Fad> getDeployedFads() {
         return Collections.unmodifiableSet(deployedFads);
     }
-
 
     public Fisher getFisher() {
         return fisher;
@@ -293,7 +288,16 @@ public class FadManager {
      */
     public int getHowManyActiveFadsCanWeStillDeploy() {
         // TODO: reimplement with new regulation system
+        // General strategy:
+        // - generate a dummy action counter
+        // - create dummy deployment actions that refer to that counter (for regulation check)
+        // - increment the dummy action counter
+        // - loop until not permitted anymore or we reach an arbitrary number
         throw new RuntimeException("Needs to be reimplemented with new regulation system.");
+    }
+
+    public YearlyActionCounter getYearlyActionCounter() {
+        return yearlyActionCounter;
     }
 
     public int getNumberOfRemainingYearlyActions(final Class<? extends PurseSeinerAction> purseSeinerAction) {

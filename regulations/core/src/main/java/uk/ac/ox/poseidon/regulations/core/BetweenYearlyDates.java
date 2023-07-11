@@ -33,7 +33,10 @@ public class BetweenYearlyDates implements Condition {
 
     @Override
     public boolean test(final Action action) {
-        return test(MonthDay.from(action.getDateTime()));
+        return action.getDateTime()
+            .map(MonthDay::from)
+            .map(this::test)
+            .orElse(false);
     }
 
     boolean test(final MonthDay monthDay) {

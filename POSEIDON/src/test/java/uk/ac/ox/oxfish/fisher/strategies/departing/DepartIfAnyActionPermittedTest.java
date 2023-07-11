@@ -21,7 +21,7 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import org.junit.Test;
 
-public class YearlyActionLimitsDepartingStrategyTest {
+public class DepartIfAnyActionPermittedTest {
 
     @SuppressWarnings({"unchecked", "rawtypes", "OptionalGetWithoutIsPresent"})
     @Test

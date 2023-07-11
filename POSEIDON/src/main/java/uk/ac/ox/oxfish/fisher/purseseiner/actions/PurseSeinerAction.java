@@ -85,8 +85,10 @@ public abstract class PurseSeinerAction
     }
 
     @Override
-    public LocalDateTime getDateTime() {
-        return LocalDateTime.of(getDate(), getTime().orElse(LocalTime.MIN));
+    public Optional<LocalDateTime> getDateTime() {
+        return Optional
+            .ofNullable(getDate())
+            .map(date -> LocalDateTime.of(date, getTime().orElse(LocalTime.MIN)));
     }
 
     public LocalDate getDate() {
