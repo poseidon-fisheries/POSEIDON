@@ -1,11 +1,12 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
+
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.FAD;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule {
 
@@ -87,7 +88,7 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
     @Override
     public void start(final FishState model, final Fisher fisher) {
         optionsGenerator.startOrReset(
-            FadManager.getFadManager(fisher),
+            getFadManager(fisher),
             model.getRandom(),
             model.getMap()
         );
@@ -109,14 +110,7 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
      */
     @Override
     public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
-
-        return
-            Math.min(
-                FadManager.getFadManager(fisher).getNumberOfRemainingYearlyActions(FadSetAction.class),
-                MAX_OWN_FAD_SETS
-            );
-
-
+        return getFadManager(fisher).numberOfPermissibleActions(FAD, MAX_OWN_FAD_SETS);
     }
 
 }

@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.FAD;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class FadSetAction extends AbstractFadSetAction {
@@ -43,6 +44,6 @@ public class FadSetAction extends AbstractFadSetAction {
 
     @Override
     public String getCode() {
-        return "FAD";
+        return FAD.name();
     }
 }

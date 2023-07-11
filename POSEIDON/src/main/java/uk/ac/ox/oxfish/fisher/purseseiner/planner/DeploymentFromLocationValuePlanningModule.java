@@ -22,11 +22,13 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadDeploymentAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
+
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 /**
  * simply uses DeploymentPlannedActionGenerator to draw a new DPL spot, and returns it as an action
@@ -73,17 +75,7 @@ public class DeploymentFromLocationValuePlanningModule
      */
     @Override
     public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
-        //you are limited by
-        // (1) the amount of fads in your boat
-        // (2) the amount of deploy actions you are still allowed to make this year
-        // (3) the number of active FAD sets this year
-        final FadManager fadManager = FadManager.getFadManager(fisher);
-        return Math.min(
-            Math.min(
-                fadManager.getNumFadsInStock(),
-                fadManager.getHowManyActiveFadsCanWeStillDeploy()
-            ),
-            fadManager.getNumberOfRemainingYearlyActions(FadDeploymentAction.class)
-        );
+        final FadManager fadManager = getFadManager(fisher);
+        return fadManager.numberOfPermissibleActions(DPL, fadManager.getNumFadsInStock());
     }
 }

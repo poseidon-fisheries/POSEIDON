@@ -21,11 +21,11 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.poseidon.agents.core.BasicAction;
 import uk.ac.ox.poseidon.regulations.api.Regulation;
 
-import static uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction.ALL_ACTION_CODES;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class DepartIfAnyActionPermitted implements DepartingStrategy {
@@ -36,8 +36,7 @@ public class DepartIfAnyActionPermitted implements DepartingStrategy {
     @Override
     public boolean shouldFisherLeavePort(final Fisher fisher, final FishState model, final MersenneTwisterFast random) {
         final Regulation regulation = getFadManager(fisher).getRegulation();
-        return ALL_ACTION_CODES
-            .stream()
+        return ActionClass.CODES.stream()
             .map(code -> new BasicAction(code, fisher))
             .anyMatch(regulation::isPermitted);
     }

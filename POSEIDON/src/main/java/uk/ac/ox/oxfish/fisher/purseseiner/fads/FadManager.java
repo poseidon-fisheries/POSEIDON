@@ -35,20 +35,26 @@ import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.observers.Observers;
+import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
+import uk.ac.ox.oxfish.regulation.quantities.YearlyActionCount;
+import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
+import uk.ac.ox.poseidon.agents.core.BasicAction;
 import uk.ac.ox.poseidon.common.api.Observer;
 import uk.ac.ox.poseidon.regulations.api.Regulation;
 
 import javax.measure.quantity.Mass;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Preconditions.*;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
 import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.maybeGetPurseSeineGear;
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 
@@ -192,18 +198,6 @@ public class FadManager {
         return fishValueCalculator;
     }
 
-    public int getNumFadsInStock() {
-        return numFadsInStock;
-    }
-
-    public void setNumFadsInStock(final int numFadsInStock) {
-        this.numFadsInStock = numFadsInStock;
-    }
-
-    public int getNumDeployedFads() {
-        return deployedFads.size();
-    }
-
     public Set<Fad> getDeployedFads() {
         return Collections.unmodifiableSet(deployedFads);
     }
@@ -283,26 +277,42 @@ public class FadManager {
         return fadMap;
     }
 
-    /**
-     * how many active fads  can the owner of this manager still drop?
-     */
-    public int getHowManyActiveFadsCanWeStillDeploy() {
-        // TODO: reimplement with new regulation system
-        // General strategy:
-        // - generate a dummy action counter
-        // - create dummy deployment actions that refer to that counter (for regulation check)
-        // - increment the dummy action counter
-        // - loop until not permitted anymore or we reach an arbitrary number
-        throw new RuntimeException("Needs to be reimplemented with new regulation system.");
+    public int numberOfPermissibleActions(final ActionClass actionClass, final int limit) {
+        checkNotNull(actionClass);
+        checkArgument(limit >= 0);
+
+        final YearlyActionCounter dummyYearlyActionCounter = getYearlyActionCounter().copy();
+        final AtomicLong dummyNumberOfActiveFads = new AtomicLong(getNumberOfActiveFads());
+
+        final Action dummyAction = new DummyAction(
+            actionClass.name(),
+            fisher,
+            dummyYearlyActionCounter,
+            dummyNumberOfActiveFads
+        );
+        int i = 0;
+        while (i < limit && regulation.isPermitted(dummyAction)) {
+            i++;
+            dummyYearlyActionCounter.observe(dummyAction);
+            if (actionClass == DPL) dummyNumberOfActiveFads.incrementAndGet();
+        }
+        return i;
     }
 
     public YearlyActionCounter getYearlyActionCounter() {
         return yearlyActionCounter;
     }
 
-    public int getNumberOfRemainingYearlyActions(final Class<? extends PurseSeinerAction> purseSeinerAction) {
-        // TODO: reimplement with new regulation system
-        throw new RuntimeException("Needs to be reimplemented with new regulation system.");
+    public int getNumberOfActiveFads() {
+        return deployedFads.size();
+    }
+
+    public int getNumFadsInStock() {
+        return numFadsInStock;
+    }
+
+    public void setNumFadsInStock(final int numFadsInStock) {
+        this.numFadsInStock = numFadsInStock;
     }
 
     /**
@@ -310,6 +320,35 @@ public class FadManager {
      */
     public void putFadBackInStock() {
         numFadsInStock++;
+    }
+
+    class DummyAction extends BasicAction implements YearlyActionCount.Getter, NumberOfActiveFads.Getter {
+        private final YearlyActionCounter yearlyActionCounter;
+        private final AtomicLong numberOfActiveFads;
+
+        public DummyAction(
+            final String code,
+            final Fisher fisher,
+            final YearlyActionCounter yearlyActionCounter,
+            final AtomicLong numberOfActiveFads
+        ) {
+            super(code, fisher, fisher.grabState().getDate().atStartOfDay(), null);
+            this.yearlyActionCounter = yearlyActionCounter;
+            this.numberOfActiveFads = numberOfActiveFads;
+        }
+
+        @Override
+        public long getNumberOfActiveFads() {
+            return numberOfActiveFads.get();
+        }
+
+        @Override
+        public long getYearlyActionCount(final String actionCode) {
+            return getDateTime()
+                .map(LocalDateTime::getYear)
+                .map(year -> yearlyActionCounter.getCount(year, fisher, actionCode))
+                .orElse(0L);
+        }
     }
 
 }

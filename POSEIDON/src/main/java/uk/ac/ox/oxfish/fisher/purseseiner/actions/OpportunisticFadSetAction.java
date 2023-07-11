@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.OFS;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class OpportunisticFadSetAction extends AbstractFadSetAction {
@@ -43,6 +44,6 @@ public class OpportunisticFadSetAction extends AbstractFadSetAction {
 
     @Override
     public String getCode() {
-        return "OFS";
+        return OFS.name();
     }
 }

@@ -79,7 +79,7 @@ public class FadManagerTest extends TestCase {
         final BiomassAggregatingFad fad1 = (BiomassAggregatingFad) fadManager.deployFadInCenterOfTile(seaTile, rng);
 
         assertEquals(9, fadManager.getNumFadsInStock());
-        assertEquals(1, fadManager.getNumDeployedFads());
+        assertEquals(1, fadManager.getNumberOfActiveFads());
 
         // try a successful set
         when(rng.nextDouble()).thenReturn(1.0);
@@ -89,7 +89,7 @@ public class FadManagerTest extends TestCase {
 
         final BiomassAggregatingFad fad2 = (BiomassAggregatingFad) fadManager.deployFadInCenterOfTile(seaTile, rng);
         assertEquals(9, fadManager.getNumFadsInStock());
-        assertEquals(2, fadManager.getNumDeployedFads());
+        assertEquals(2, fadManager.getNumberOfActiveFads());
 
         // try with a failed set
         when(rng.nextDouble()).thenReturn(1.0);

@@ -31,6 +31,7 @@ import uk.ac.ox.oxfish.model.regs.TaggedRegulation;
 
 import java.util.stream.Stream;
 
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class FadDeploymentAction extends PurseSeinerAction implements FadRelatedAction {
@@ -89,7 +90,7 @@ public class FadDeploymentAction extends PurseSeinerAction implements FadRelated
             return false;
         }
     }
-    
+
     @Override
     public Fad getFad() {
         return fad;
@@ -97,6 +98,6 @@ public class FadDeploymentAction extends PurseSeinerAction implements FadRelated
 
     @Override
     public String getCode() {
-        return "DPL";
+        return DPL.name();
     }
 }

@@ -1,8 +1,14 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 
+import java.util.Arrays;
 import java.util.function.DoubleUnaryOperator;
+
+import static java.lang.Math.exp;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class GlobalSetAttractionModulator implements GlobalAttractionModulator {
 
@@ -23,38 +29,30 @@ public class GlobalSetAttractionModulator implements GlobalAttractionModulator {
             pctHoldAvailableModulationFunction.applyAsDouble(
                 1 - fisher.getHold().getPercentageFilled());
         final double modulatedPctSetsRemaining =
-            pctSetsRemainingModulationFunction.applyAsDouble(pctSetsRemaining(fisher));
+            pctSetsRemainingModulationFunction.applyAsDouble(mapSetsRemainingToZeroOneInterval(fisher));
         return modulatedPctHoldAvailable * modulatedPctSetsRemaining;
     }
 
-    private static double pctSetsRemaining(final Fisher fisher) {
-        throw new RuntimeException("Need to be reimplemented with new regulations.");
-//        final FadManager fadManager = getFadManager(fisher);
-//        final PurseSeinerActionContext actionContext = fadManager.getActionContext();
-//        final ImmutableSet<YearlyActionCountLimit> yearlyActionCountLimits =
-//            fadManager
-//                .getRegulation()
-//                .asStream()
-//                .filter(reg -> reg instanceof YearlyActionCountLimit)
-//                .map(reg -> (YearlyActionCountLimit) reg)
-//                .collect(toImmutableSet());
-//
-//        // Take the highest percentage for every applicable limit for
-//        // every action code and return the maximum of all of those.
-//        return SET_ACTION_CODES
-//            .stream()
-//            .flatMapToDouble(actionCode -> {
-//                final int count =
-//                    actionContext.getCount(fisher.grabState().getCalendarYear(), fisher, actionCode);
-//                return yearlyActionCountLimits
-//                    .stream()
-//                    .flatMapToDouble(reg ->
-//                        reg.getApplicableLimits(actionCode).mapToDouble(Map.Entry::getValue)
-//                    )
-//                    .map(limit -> count / limit);
-//            })
-//            .max()
-//            .orElse(1.0);
+    private static double mapSetsRemainingToZeroOneInterval(final Fisher fisher) {
+
+        // The current implementation for this is fairly arbitrary, but I think
+        // it could serve as a good base for modulation functions if we decide
+        // to revisit the gravity algorithm.
+        final FadManager fadManager = getFadManager(fisher);
+        final double k = 0.01;
+        final double x0 = -2.0;
+        final double L = (1 + exp(k * x0)) / exp(k * x0);
+        return Arrays
+            .stream(ActionClass.values())
+            .filter(actionClass -> actionClass != ActionClass.DPL)
+            .mapToInt(actionClass ->
+                fadManager.numberOfPermissibleActions(actionClass, 1000)
+            )
+            .mapToDouble(x ->
+                L / (1 + exp(-k * (x - x0))) - L / (1 + exp(k * x0))
+            )
+            .max()
+            .orElse(0);
     }
 
 }

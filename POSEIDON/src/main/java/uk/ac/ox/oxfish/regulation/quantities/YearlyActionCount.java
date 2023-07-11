@@ -1,13 +1,11 @@
 package uk.ac.ox.oxfish.regulation.quantities;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.StringParameter;
 import uk.ac.ox.poseidon.regulations.api.Quantity;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
 
 public class YearlyActionCount implements AlgorithmFactory<Quantity> {
 
@@ -34,18 +32,14 @@ public class YearlyActionCount implements AlgorithmFactory<Quantity> {
 
     @Override
     public Quantity apply(final FishState fishState) {
+        final String actionCodeValue = actionCode.getValue();
         return action -> {
-            checkArgument(action.getAgent() instanceof Fisher);
-            final Fisher fisher = (Fisher) action.getAgent();
-            return maybeGetFadManager(fisher)
-                .map(fm -> fm.getYearlyActionCounter().getCount(
-                    fisher.grabState().getCalendarYear(),
-                    action.getAgent(),
-                    actionCode.getValue()
-                ))
-                .orElseThrow(() -> new RuntimeException(
-                    "FAD manager not found for agent " + fisher
-                ));
+            checkArgument(action instanceof NumberOfActiveFads.Getter);
+            return ((Getter) action).getYearlyActionCount(actionCodeValue);
         };
+    }
+
+    public interface Getter {
+        long getYearlyActionCount(String actionCode);
     }
 }

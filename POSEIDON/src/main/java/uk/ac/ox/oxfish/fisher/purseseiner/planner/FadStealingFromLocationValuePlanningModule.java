@@ -3,11 +3,12 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.OpportunisticFadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.OpportunisticFadSetLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
+
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.OFS;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 @SuppressWarnings("rawtypes")
 public class FadStealingFromLocationValuePlanningModule<B extends LocalBiology>
@@ -43,12 +44,6 @@ public class FadStealingFromLocationValuePlanningModule<B extends LocalBiology>
 
     @Override
     public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
-        return
-            Math.min(
-                FadManager.getFadManager(fisher).
-                    getNumberOfRemainingYearlyActions(
-                        OpportunisticFadSetAction.class),
-                1000
-            );
+        return getFadManager(fisher).numberOfPermissibleActions(OFS, 1000);
     }
 }

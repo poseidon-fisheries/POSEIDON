@@ -23,6 +23,8 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 
 import java.util.Collection;
 
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DEL;
+
 public class DolphinSetAction<B extends LocalBiology> extends SchoolSetAction<B> {
 
     public DolphinSetAction(
@@ -37,6 +39,6 @@ public class DolphinSetAction<B extends LocalBiology> extends SchoolSetAction<B>
 
     @Override
     public String getCode() {
-        return "DEL";
+        return DEL.name();
     }
 }

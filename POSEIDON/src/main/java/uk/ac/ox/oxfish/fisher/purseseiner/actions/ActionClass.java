@@ -3,8 +3,10 @@ package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.function.Function.identity;
 
 /**
@@ -23,6 +25,11 @@ public enum ActionClass {
     NOA(NonAssociatedSetAction.class),
     OFS(OpportunisticFadSetAction.class),
     DPL(FadDeploymentAction.class);
+
+    public static final Set<String> CODES =
+        Arrays.stream(values())
+            .map(ActionClass::name)
+            .collect(toImmutableSet());
 
     public static final Map<Class<? extends PurseSeinerAction>, ActionClass> classMap =
         Arrays.stream(values()).collect(toImmutableMap(

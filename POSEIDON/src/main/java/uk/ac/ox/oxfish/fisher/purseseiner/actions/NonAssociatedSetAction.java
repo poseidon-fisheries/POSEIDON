@@ -23,6 +23,8 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 
 import java.util.Collection;
 
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.NOA;
+
 public class NonAssociatedSetAction<B extends LocalBiology> extends SchoolSetAction<B> {
 
     public NonAssociatedSetAction(
@@ -37,6 +39,6 @@ public class NonAssociatedSetAction<B extends LocalBiology> extends SchoolSetAct
 
     @Override
     public String getCode() {
-        return "NOA";
+        return NOA.name();
     }
 }

@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import com.google.common.collect.ImmutableSet;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
@@ -27,23 +26,24 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
+import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
+import uk.ac.ox.oxfish.regulation.quantities.YearlyActionCount;
 import uk.ac.ox.poseidon.agents.api.Agent;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
-import java.util.Set;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
 
 public abstract class PurseSeinerAction
-    implements Action, Locatable, uk.ac.ox.poseidon.agents.api.Action {
+    implements Action, Locatable,
+    NumberOfActiveFads.Getter,
+    YearlyActionCount.Getter,
+    uk.ac.ox.poseidon.agents.api.Action {
 
-    public static final Set<String> SET_ACTION_CODES =
-        ImmutableSet.of("FAD", "OFS", "NOA", "DEL");
-    public static final Set<String> ALL_ACTION_CODES =
-        ImmutableSet.<String>builder().addAll(SET_ACTION_CODES).add("DPL").build();
     private final Fisher fisher;
     private final SeaTile location;
     private final int step;
@@ -142,4 +142,25 @@ public abstract class PurseSeinerAction
     public Class<? extends PurseSeinerAction> getClassForWeighting() {
         return this.getClass();
     }
+
+    @Override
+    public long getNumberOfActiveFads() {
+        return maybeGetFadManager(fisher)
+            .map(FadManager::getNumberOfActiveFads)
+            .orElse(0);
+    }
+
+    @Override
+    public long getYearlyActionCount(final String actionCode) {
+        return maybeGetFadManager(fisher)
+            .map(fm -> fm.getYearlyActionCounter().getCount(
+                fisher.grabState().getCalendarYear(),
+                fisher,
+                actionCode
+            ))
+            .orElseThrow(() -> new RuntimeException(
+                "FAD manager not found for agent " + fisher
+            ));
+    }
+
 }

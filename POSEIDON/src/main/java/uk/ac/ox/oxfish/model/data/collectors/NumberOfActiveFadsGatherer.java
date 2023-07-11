@@ -13,7 +13,7 @@ public class NumberOfActiveFadsGatherer implements Gatherer<Fisher> {
     @Override
     public Double apply(final Fisher fisher) {
         return maybeGetFadManager(fisher)
-            .map(FadManager::getNumDeployedFads)
+            .map(FadManager::getNumberOfActiveFads)
             .orElse(0)
             .doubleValue();
     }
