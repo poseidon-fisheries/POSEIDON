@@ -322,7 +322,7 @@ public class FadManager {
         numFadsInStock++;
     }
 
-    class DummyAction extends BasicAction implements YearlyActionCount.Getter, NumberOfActiveFads.Getter {
+    static class DummyAction extends BasicAction implements YearlyActionCount.Getter, NumberOfActiveFads.Getter {
         private final YearlyActionCounter yearlyActionCounter;
         private final AtomicLong numberOfActiveFads;
 

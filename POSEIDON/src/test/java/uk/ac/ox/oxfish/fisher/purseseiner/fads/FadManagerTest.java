@@ -31,9 +31,21 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.regulation.ForbiddenIf;
+import uk.ac.ox.oxfish.regulation.conditions.ActionCodeIs;
+import uk.ac.ox.oxfish.regulation.conditions.AllOf;
+import uk.ac.ox.oxfish.regulation.conditions.Below;
+import uk.ac.ox.oxfish.regulation.conditions.Not;
+import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
+import uk.ac.ox.poseidon.agents.api.Action;
+import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
+import uk.ac.ox.poseidon.agents.core.AtomicLongMapYearlyActionCounter;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
 import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
 public class FadManagerTest extends TestCase {
@@ -71,7 +83,7 @@ public class FadManagerTest extends TestCase {
         when(fisher.grabState()).thenReturn(fishState);
         when(fisher.getGear()).thenReturn(purseSeineGear);
         when(fisher.grabRandomizer()).thenReturn(rng);
-        when(fisher.getRegulation()).thenReturn(anarchy);
+        when(fisher.getRegulation()).thenReturn(new Anarchy());
         when(fisher.getLocation()).thenReturn(seaTile);
 
         fadManager.setFisher(fisher);
@@ -97,5 +109,27 @@ public class FadManagerTest extends TestCase {
             .act(fishState, fadManager.getFisher(), anarchy, 24);
         assertEquals(10, fadManager.getNumFadsInStock());
 
+    }
+
+    public void testNumberOfRemainingActions() {
+        final uk.ac.ox.poseidon.regulations.api.Regulation regulation =
+            new ForbiddenIf(
+                new AllOf(
+                    new ActionCodeIs(DPL.name()),
+                    new Not(new Below(new NumberOfActiveFads(), 30))
+                )
+            ).apply(null);
+
+        final YearlyActionCounter yearlyActionCounter = AtomicLongMapYearlyActionCounter.create();
+        final AtomicLong numberOfActiveFads = new AtomicLong(5);
+        final Fisher fisher = mock(Fisher.class);
+        final Action action = new FadManager.DummyAction(
+            DPL.name(),
+            fisher,
+            yearlyActionCounter,
+            numberOfActiveFads
+        );
+
+        yearlyActionCounter
     }
 }
