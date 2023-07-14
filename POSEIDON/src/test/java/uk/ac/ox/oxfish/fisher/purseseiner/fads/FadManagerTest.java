@@ -32,22 +32,22 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.regulation.ForbiddenIf;
-import uk.ac.ox.oxfish.regulation.conditions.ActionCodeIs;
-import uk.ac.ox.oxfish.regulation.conditions.AllOf;
-import uk.ac.ox.oxfish.regulation.conditions.Below;
-import uk.ac.ox.oxfish.regulation.conditions.Not;
+import uk.ac.ox.oxfish.regulation.conditions.*;
 import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
-import uk.ac.ox.poseidon.agents.api.Action;
+import uk.ac.ox.oxfish.regulation.quantities.YearlyActionCount;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
 import uk.ac.ox.poseidon.agents.core.AtomicLongMapYearlyActionCounter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.IntConsumer;
 
 import static java.util.stream.IntStream.range;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.numberOfPermissibleActions;
 import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
 public class FadManagerTest extends TestCase {
@@ -117,40 +117,60 @@ public class FadManagerTest extends TestCase {
         final FishState fishState = mock(FishState.class);
         final MersenneTwisterFast rng = mock(MersenneTwisterFast.class);
         when(fishState.getRandom()).thenReturn(rng);
-        final uk.ac.ox.poseidon.regulations.api.Regulation regulation =
-            new ForbiddenIf(
-                new AllOf(
-                    new ActionCodeIs(DPL.name()),
-                    new Not(new Below(new NumberOfActiveFads(), 30))
-                )
-            ).apply(null);
+        when(fishState.getDate()).thenReturn(LocalDate.now());
+        final Fisher fisher = mock(Fisher.class);
+        when(fisher.grabState()).thenReturn(fishState);
+
+        final AllOf fadLimit = new AllOf(
+            new ActionCodeIs(DPL.name()),
+            new Not(new Below(new NumberOfActiveFads(), 30))
+        );
+        final AllOf actionLimit = new AllOf(
+            new ActionCodeIs(DPL.name()),
+            new Not(new Below(new YearlyActionCount(DPL.name()), 20))
+        );
 
         final YearlyActionCounter yearlyActionCounter = AtomicLongMapYearlyActionCounter.create();
         final AtomicLong numberOfActiveFads = new AtomicLong(5);
-        final Fisher fisher = mock(Fisher.class);
 
-        final Action action = new FadManager.DummyAction(
-            DPL.name(),
-            fisher,
-            LocalDateTime.now(),
-            yearlyActionCounter,
-            numberOfActiveFads
+        final IntConsumer deploy = i -> {
+            yearlyActionCounter.observe(new FadManager.DummyAction(
+                DPL.name(),
+                fisher,
+                LocalDateTime.now(),
+                yearlyActionCounter,
+                numberOfActiveFads
+            ));
+            numberOfActiveFads.incrementAndGet();
+        };
+
+        range(0, 10).forEach(deploy);
+
+        assertEquals(
+            15,
+            numberOfPermissibleActions(
+                fisher,
+                new ForbiddenIf(fadLimit).apply(fishState),
+                yearlyActionCounter,
+                numberOfActiveFads.get(),
+                DPL,
+                50
+            )
         );
-        range(0, 10).forEach(__ ->
-            yearlyActionCounter.observe(action)
+
+        range(0, 5).forEach(deploy);
+
+        assertEquals(
+            5,
+            numberOfPermissibleActions(
+                fisher,
+                new ForbiddenIf(new AnyOf(fadLimit, actionLimit)).apply(fishState),
+                yearlyActionCounter,
+                numberOfActiveFads.get(),
+                DPL,
+                50
+            )
         );
-
-        final FadManager fadManager = mock(FadManager.class);
-        when(fadManager.getFisher()).thenReturn(fisher);
-        when(fadManager.getRegulation()).thenReturn(regulation);
-        when(fadManager.getYearlyActionCounter()).thenReturn(yearlyActionCounter);
-        when(fadManager.getNumberOfActiveFads()).thenReturn((int) numberOfActiveFads.get());
-
-        // TODO
-//        assertEquals(
-//            15,
-//            fadManager.numberOfPermissibleActions(DPL, 50)
-//        );
 
     }
 }

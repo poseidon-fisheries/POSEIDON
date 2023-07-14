@@ -40,7 +40,7 @@ public class AtomicLongMapActionCounter implements ActionCounter {
     public ActionCounter copy() {
         return new AtomicLongMapActionCounter(
             counts.entrySet().stream().collect(toMap(
-                Map.Entry::getValue,
+                Map.Entry::getKey,
                 entry -> AtomicLongMap.create(entry.getValue().asMap())
             ))
         );
