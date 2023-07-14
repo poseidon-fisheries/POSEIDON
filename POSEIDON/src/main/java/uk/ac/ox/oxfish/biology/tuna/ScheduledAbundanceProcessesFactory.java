@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.biology.tuna;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.model.FishState;
@@ -33,7 +32,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -61,14 +59,12 @@ public class ScheduledAbundanceProcessesFactory
     }
 
     public ScheduledAbundanceProcessesFactory(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final Collection<String> biologicalProcessesDates,
         final InputPath mortalityFile
     ) {
         this.biologicalProcessesDates = ImmutableList.copyOf(biologicalProcessesDates);
         this.abundanceMortalityProcessFactory =
             new AbundanceMortalityProcessFromFileFactory(
-                speciesCodesSupplier,
                 mortalityFile,
                 ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
             );

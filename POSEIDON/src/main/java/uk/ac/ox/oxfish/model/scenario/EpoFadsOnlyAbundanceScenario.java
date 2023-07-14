@@ -41,7 +41,6 @@ public class EpoFadsOnlyAbundanceScenario extends EpoAbundanceScenario {
                 new AbundanceFiltersFromFileFactory(
                     getInputFolder().path("abundance", "selectivity.csv")
                 ),
-                getSpeciesCodesSupplier(),
                 "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
             )
         );

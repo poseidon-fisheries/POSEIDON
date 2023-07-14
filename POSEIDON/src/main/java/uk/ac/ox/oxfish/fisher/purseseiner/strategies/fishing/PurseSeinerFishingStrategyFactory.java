@@ -26,7 +26,6 @@ import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.ActionWeightsCache;
@@ -80,7 +79,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
 
     private int targetYear;
     private SetDurationSamplersFactory setDurationSamplersFactory;
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
     private InputPath actionWeightsFile;
     private CatchSamplersFactory<B> catchSamplersFactory;
     private InputPath setCompositionWeightsFile;
@@ -122,7 +120,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
     PurseSeinerFishingStrategyFactory(
         final int targetYear,
         final Class<B> biologyClass,
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputPath actionWeightsFile,
         final CatchSamplersFactory<B> catchSamplersFactory,
         final SetDurationSamplersFactory setDurationSamplersFactory,
@@ -130,7 +127,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
         final InputPath setCompositionWeightsFile
     ) {
         this(targetYear, biologyClass);
-        this.speciesCodesSupplier = speciesCodesSupplier;
         this.actionWeightsFile = actionWeightsFile;
         this.catchSamplersFactory = catchSamplersFactory;
         this.setDurationSamplersFactory = setDurationSamplersFactory;
@@ -185,16 +181,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
     @SuppressWarnings("unused")
     public void setSetDurationSamplersFactory(final SetDurationSamplersFactory setDurationSamplersFactory) {
         this.setDurationSamplersFactory = setDurationSamplersFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
-        return speciesCodesSupplier;
-    }
-
-    @SuppressWarnings("unused")
-    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")
@@ -606,17 +592,11 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
         final FishState fishState,
         final Collection<Record> records
     ) {
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         return
             records.stream().collect(toImmutableMap(
-                r -> {
-                    final String speciesCode = r.getString("species_code").toUpperCase();
-                    final String speciesName = speciesCodes.getSpeciesName(speciesCode);
-                    return fishState.getBiology().getSpeciesByCaseInsensitiveName(speciesName);
-                },
+                r -> fishState.getBiology().getSpeciesByCode(r.getString("species_code").toUpperCase()),
                 r -> r.getDouble("weight")
             ));
-
     }
 
     @SuppressWarnings("unused")

@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.purseseiner;
 
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
@@ -12,8 +11,6 @@ import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasFromFolderFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.util.function.Supplier;
-
 public class EpoPurseSeinerFleetFactory extends PurseSeinerFleetFactory {
     @SuppressWarnings("unused")
     public EpoPurseSeinerFleetFactory() {
@@ -22,7 +19,6 @@ public class EpoPurseSeinerFleetFactory extends PurseSeinerFleetFactory {
     public EpoPurseSeinerFleetFactory(
         final int targetYear,
         final InputPath inputFolder,
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final PurseSeineGearFactory purseSeineGearFactory,
         final AlgorithmFactory<? extends DestinationStrategy> destinationStrategyFactory,
         final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory
@@ -43,8 +39,7 @@ public class EpoPurseSeinerFleetFactory extends PurseSeinerFleetFactory {
             ),
             new PurseSeinerDepartingStrategyFactory(),
             new YearlyMarketMapFromPriceFileFactory(
-                inputFolder.path("prices.csv"),
-                speciesCodesSupplier
+                inputFolder.path("prices.csv")
             ),
             new FromSimpleFilePortInitializer(
                 targetYear,

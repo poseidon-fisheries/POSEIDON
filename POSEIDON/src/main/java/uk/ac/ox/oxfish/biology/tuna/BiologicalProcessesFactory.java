@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.biology.tuna;
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -15,7 +14,6 @@ import java.util.List;
 
 public abstract class BiologicalProcessesFactory<B extends LocalBiology> {
     private InputPath inputFolder;
-    private SpeciesCodesFromFileFactory speciesCodesSupplier;
     private BiologyInitializerFactory<B> biologyInitializerFactory;
     private ReallocatorFactory<B, Reallocator<B>> reallocatorFactory;
     private RestorerFactory<B> restorerFactory;
@@ -23,14 +21,12 @@ public abstract class BiologicalProcessesFactory<B extends LocalBiology> {
 
     public BiologicalProcessesFactory(
         final InputPath inputFolder,
-        final SpeciesCodesFromFileFactory speciesCodesSupplier,
         final BiologyInitializerFactory<B> biologyInitializerFactory,
         final ReallocatorFactory<B, Reallocator<B>> reallocatorFactory,
         final RestorerFactory<B> restorerFactory,
         final ScheduledBiologicalProcessesFactory<B> scheduledProcessesFactory
     ) {
         this.inputFolder = inputFolder;
-        this.speciesCodesSupplier = speciesCodesSupplier;
         this.biologyInitializerFactory = biologyInitializerFactory;
         this.reallocatorFactory = reallocatorFactory;
         this.restorerFactory = restorerFactory;
@@ -63,14 +59,6 @@ public abstract class BiologicalProcessesFactory<B extends LocalBiology> {
 
     public void setInputFolder(final InputPath inputFolder) {
         this.inputFolder = inputFolder;
-    }
-
-    public SpeciesCodesFromFileFactory getSpeciesCodesSupplier() {
-        return speciesCodesSupplier;
-    }
-
-    public void setSpeciesCodesSupplier(final SpeciesCodesFromFileFactory speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     public Processes initProcesses(final NauticalMap nauticalMap, final FishState fishState) {

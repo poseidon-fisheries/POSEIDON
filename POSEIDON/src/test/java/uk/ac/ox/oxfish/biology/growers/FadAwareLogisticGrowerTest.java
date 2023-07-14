@@ -39,7 +39,6 @@ public class FadAwareLogisticGrowerTest {
         scenario.useDummyData();
         scenario.getPurseSeinerFleetFactory().setMarketMapFactory(
             new MarketMapFromPriceFileFactory(
-                scenario.getSpeciesCodesSupplier(),
                 scenario.getInputFolder().path("prices.csv"),
                 scenario.getTargetYear()
             )

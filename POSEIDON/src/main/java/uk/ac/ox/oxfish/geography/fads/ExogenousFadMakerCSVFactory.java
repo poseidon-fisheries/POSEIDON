@@ -19,7 +19,7 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
     private InputPath deploymentsFile; // = "./inputs/tests/fad_dummy_deploy.csv";
 
     private AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory =
-        new CompressedBiomassFadInitializerFactory(null);
+        new CompressedBiomassFadInitializerFactory();
 
     /**
      * Empty constructor for YAML initialization

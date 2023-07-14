@@ -1,13 +1,11 @@
 package uk.ac.ox.oxfish.model.market;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
@@ -16,14 +14,11 @@ public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap
 
     private InputPath priceFile;
     private int targetYear;
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
 
     public MarketMapFromPriceFileFactory(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputPath priceFile,
         final int targetYear
     ) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
         this.priceFile = priceFile;
         this.targetYear = targetYear;
     }
@@ -33,14 +28,6 @@ public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap
      */
     @SuppressWarnings("unused")
     public MarketMapFromPriceFileFactory() {
-    }
-
-    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
-        return speciesCodesSupplier;
-    }
-
-    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")
@@ -75,10 +62,8 @@ public class MarketMapFromPriceFileFactory implements AlgorithmFactory<MarketMap
             ));
         final GlobalBiology globalBiology = fishState.getBiology();
         final MarketMap marketMap = new MarketMap(globalBiology);
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         globalBiology.getSpecies().forEach(species -> {
-            final String speciesCode = speciesCodes.getSpeciesCode(species.getName());
-            marketMap.addMarket(species, new FixedPriceMarket(prices.get(speciesCode)));
+            marketMap.addMarket(species, new FixedPriceMarket(prices.get(species.getCode())));
         });
         return marketMap;
     }

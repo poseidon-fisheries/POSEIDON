@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiomassProcessesFactory;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
 
@@ -9,7 +10,9 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology> {
         setBiologicalProcessesFactory(
             new BiomassProcessesFactory(
                 getInputFolder().path("biomass"),
-                getSpeciesCodesSupplier(),
+                new SpeciesCodesFromFileFactory(
+                    getInputFolder().path("species_codes.csv")
+                ),
                 getTargetYear()
             )
         );

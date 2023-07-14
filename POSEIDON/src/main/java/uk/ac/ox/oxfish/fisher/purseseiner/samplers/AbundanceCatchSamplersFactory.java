@@ -19,14 +19,12 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import java.util.Collection;
-import java.util.function.Supplier;
 
 public class AbundanceCatchSamplersFactory extends CatchSamplersFactory<AbundanceLocalBiology> {
 
@@ -36,11 +34,10 @@ public class AbundanceCatchSamplersFactory extends CatchSamplersFactory<Abundanc
     }
 
     public AbundanceCatchSamplersFactory(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final AbundanceFiltersFactory abundanceFiltersFactory,
         final InputPath catchSamplesFile
     ) {
-        super(speciesCodesSupplier, catchSamplesFile);
+        super(catchSamplesFile);
         this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 

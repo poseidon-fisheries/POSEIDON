@@ -44,7 +44,6 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
         new EpoPurseSeinerFleetFactory(
             getTargetYear(),
             getInputFolder(),
-            getSpeciesCodesSupplier(),
             new AbundancePurseSeineGearFactory(
                 new NamedRegulations(
                     ImmutableMap.of(
@@ -201,7 +200,6 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                 ),
                 new ValuePerSetPlanningModuleFactory(),
                 new AbundanceCatchSamplersFactory(
-                    getSpeciesCodesSupplier(),
                     getAbundanceFiltersFactory(),
                     getInputFolder().path("set_samples.csv")
                 ),

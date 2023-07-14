@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.model.data.monitors.loggers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFadAttractionEvent;
 import uk.ac.ox.oxfish.model.FishState;
@@ -15,7 +14,6 @@ public class AbundanceFadAttractionEventObserver
     implements Observer<AbundanceFadAttractionEvent> {
 
     private final FishState fishState;
-    private final SpeciesCodes speciesCodes;
     private final ClearableLogger eventLogger = new ClearableLogger(
         true, "fad_id", "event_id", "date", "lon", "lat"
     );
@@ -25,11 +23,9 @@ public class AbundanceFadAttractionEventObserver
     private final ClearableLogger fadAbundanceLogger = new ClearableLogger(true, abundanceHeaders);
 
     public AbundanceFadAttractionEventObserver(
-        final FishState fishState,
-        final SpeciesCodes speciesCodes
+        final FishState fishState
     ) {
         this.fishState = fishState;
-        this.speciesCodes = speciesCodes;
     }
 
     public ClearableLogger getTileAbundanceLogger() {
@@ -59,7 +55,7 @@ public class AbundanceFadAttractionEventObserver
                 abundance.forEachIndex((sub, bin) ->
                     logger.addRow(
                         event.getId(),
-                        speciesCodes.getSpeciesCode(species.getName()),
+                        species.getCode(),
                         sub,
                         bin,
                         abundance.getAbundance(sub, bin)

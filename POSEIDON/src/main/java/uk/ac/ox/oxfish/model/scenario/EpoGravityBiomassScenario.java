@@ -48,11 +48,9 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
         new EpoPurseSeinerFleetFactory(
             getTargetYear(),
             getInputFolder(),
-            getSpeciesCodesSupplier(),
             new BiomassPurseSeineGearFactory(
                 new EverythingPermitted(),
                 new CompressedBiomassFadInitializerFactory(
-                    getSpeciesCodesSupplier(),
                     // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
                     ImmutableMap.of(
                         "Bigeye tuna", 0.7697766896339598,
@@ -98,10 +96,8 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
             ),
             new PurseSeinerBiomassFishingStrategyFactory(
                 getTargetYear(),
-                getSpeciesCodesSupplier(),
                 getInputFolder().path("action_weights.csv"),
                 new BiomassCatchSamplersFactory(
-                    getSpeciesCodesSupplier(),
                     getInputFolder().path("set_samples.csv")
                 ),
                 new SetDurationSamplersFactory(getInputFolder().path("set_durations.csv")),

@@ -19,7 +19,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbundanceCatchMaker;
@@ -33,7 +32,6 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 
 public class PurseSeinerAbundanceFishingStrategyFactory
@@ -47,7 +45,6 @@ public class PurseSeinerAbundanceFishingStrategyFactory
 
     public PurseSeinerAbundanceFishingStrategyFactory(
         final int targetYear,
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputPath actionWeightsFile,
         final AbundanceCatchSamplersFactory catchSamplersFactory,
         final SetDurationSamplersFactory setDurationSamplersFactory,
@@ -57,7 +54,6 @@ public class PurseSeinerAbundanceFishingStrategyFactory
         super(
             targetYear,
             AbundanceLocalBiology.class,
-            speciesCodesSupplier,
             actionWeightsFile,
             catchSamplersFactory,
             setDurationSamplersFactory,

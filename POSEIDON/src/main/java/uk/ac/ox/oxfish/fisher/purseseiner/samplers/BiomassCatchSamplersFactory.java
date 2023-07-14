@@ -20,13 +20,11 @@ package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import java.util.Collection;
-import java.util.function.Supplier;
 
 public class BiomassCatchSamplersFactory extends CatchSamplersFactory<BiomassLocalBiology> {
 
@@ -35,10 +33,9 @@ public class BiomassCatchSamplersFactory extends CatchSamplersFactory<BiomassLoc
     }
 
     public BiomassCatchSamplersFactory(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputPath catchSamplesFile
     ) {
-        super(speciesCodesSupplier, catchSamplesFile);
+        super(catchSamplesFile);
     }
 
     @Override

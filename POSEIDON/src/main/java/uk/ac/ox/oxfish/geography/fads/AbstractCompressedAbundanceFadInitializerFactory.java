@@ -1,16 +1,11 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.model.FishState;
-
-import java.util.function.Supplier;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractCompressedAbundanceFadInitializerFactory
     extends CompressedExponentialFadInitializerFactory<AbundanceLocalBiology, AbundanceAggregatingFad> {
@@ -19,10 +14,9 @@ public abstract class AbstractCompressedAbundanceFadInitializerFactory
 
     AbstractCompressedAbundanceFadInitializerFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory,
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final String... speciesNames
     ) {
-        super(speciesCodesSupplier, speciesNames);
+        super(speciesNames);
         this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
@@ -42,7 +36,6 @@ public abstract class AbstractCompressedAbundanceFadInitializerFactory
 
     @Override
     public FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> apply(final FishState fishState) {
-        checkNotNull(getSpeciesCodesSupplier());
         final MersenneTwisterFast rng = fishState.getRandom();
 
         return new AbundanceAggregatingFadInitializer(

@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AggregatingFad;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -32,7 +31,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
@@ -52,16 +50,12 @@ public abstract class CompressedExponentialFadInitializerFactory<
     private Map<String, DoubleParameter> attractableBiomassCoefficients = new HashMap<>();
     private Map<String, DoubleParameter> biomassInteractionsCoefficients = new HashMap<>();
     private Map<String, DoubleParameter> growthRates = new HashMap<>();
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
-
 
     CompressedExponentialFadInitializerFactory(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final String... speciesNames
     ) {
         // By setting all coefficients to zero, we'll get a 0.5 probability of attraction
         this(
-            speciesCodesSupplier,
             makeZeros(speciesNames),
             makeZeros(speciesNames),
             makeZeros(speciesNames),
@@ -70,13 +64,11 @@ public abstract class CompressedExponentialFadInitializerFactory<
     }
 
     CompressedExponentialFadInitializerFactory(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final Map<String, Double> compressionExponents,
         final Map<String, Double> attractableBiomassCoefficients,
         final Map<String, Double> biomassInteractionsCoefficients,
         final Map<String, Double> growthRates
     ) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
         setCompressionExponents(wrapParameters(compressionExponents));
         setAttractableBiomassCoefficients(wrapParameters(attractableBiomassCoefficients));
         setBiomassInteractionsCoefficients(wrapParameters(biomassInteractionsCoefficients));
@@ -99,28 +91,6 @@ public abstract class CompressedExponentialFadInitializerFactory<
     }
 
     CompressedExponentialFadInitializerFactory() {
-
-        // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
-        setAttractableBiomassCoefficients(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(0.7697766896339598),
-            "Yellowfin tuna", new FixedDoubleParameter(1.1292389959739901),
-            "Skipjack tuna", new FixedDoubleParameter(0.0)
-        ));
-        setBiomassInteractionsCoefficients(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(1.0184011081061861),
-            "Yellowfin tuna", new FixedDoubleParameter(0.0),
-            "Skipjack tuna", new FixedDoubleParameter(0.7138646301498129)
-        ));
-        setCompressionExponents(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(9.557509707646096),
-            "Yellowfin tuna", new FixedDoubleParameter(10.419783885948643),
-            "Skipjack tuna", new FixedDoubleParameter(9.492481930328207)
-        ));
-        setGrowthRates(ImmutableMap.of(
-            "Bigeye tuna", new FixedDoubleParameter(0.688914118975473),
-            "Yellowfin tuna", new FixedDoubleParameter(0.30133562299610883),
-            "Skipjack tuna", new FixedDoubleParameter(1.25)
-        ));
     }
 
     static double[] processParameterMap(
@@ -207,14 +177,6 @@ public abstract class CompressedExponentialFadInitializerFactory<
     public void setGrowthRates(final Map<String, DoubleParameter> growthRates) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.growthRates = growthRates;
-    }
-
-    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
-        return speciesCodesSupplier;
-    }
-
-    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
 }

@@ -25,7 +25,6 @@ import ec.util.MersenneTwisterFast;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -37,7 +36,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
@@ -51,7 +49,6 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public abstract class CatchSamplersFactory<B extends LocalBiology>
     implements AlgorithmFactory<Map<Class<? extends AbstractSetAction>, CatchSampler<B>>> {
 
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
     private InputPath catchSamplesFile;
     private boolean yearlyReset = false;
 
@@ -59,21 +56,9 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
     }
 
     public CatchSamplersFactory(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputPath catchSamplesFile
     ) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
         this.catchSamplesFile = catchSamplesFile;
-    }
-
-    @SuppressWarnings("unused")
-    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
-        return speciesCodesSupplier;
-    }
-
-    @SuppressWarnings("unused")
-    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")
@@ -114,13 +99,12 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
         final GlobalBiology globalBiology
     ) {
         final String[] columnNames = record.getMetaData().headers();
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         return Arrays.stream(columnNames)
             .filter(columnName -> !"set_type".equals(columnName))
             .flatMap(columnName -> stream(
                 Optional
-                    .of(speciesCodes.getSpeciesName(columnName.toUpperCase()))
-                    .map(globalBiology::getSpeciesByCaseInsensitiveName)
+                    .of(columnName.toUpperCase())
+                    .map(globalBiology::getSpeciesByCode)
                     .map(species -> entry(
                             species.getIndex(),
                             record.getDouble(columnName) * 1000 // convert tonnes to kg

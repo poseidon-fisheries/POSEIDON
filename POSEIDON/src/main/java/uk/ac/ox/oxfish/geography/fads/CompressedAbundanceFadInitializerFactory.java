@@ -19,13 +19,11 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 public class CompressedAbundanceFadInitializerFactory
     extends AbstractCompressedAbundanceFadInitializerFactory {
@@ -39,10 +37,9 @@ public class CompressedAbundanceFadInitializerFactory
 
     public CompressedAbundanceFadInitializerFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory,
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final String... speciesNames
     ) {
-        super(abundanceFiltersFactory, speciesCodesSupplier, speciesNames);
+        super(abundanceFiltersFactory, speciesNames);
     }
 
     protected DoubleSupplier buildCapacityGenerator(

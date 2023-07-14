@@ -20,7 +20,6 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
@@ -28,7 +27,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Comparator.comparingInt;
@@ -40,7 +38,6 @@ public class AbundanceMortalityProcessFromFileFactory
 
     private InputPath mortalityFile;
     private List<String> sources;
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
     private final CacheByFishState<Map<Species, Map<String, List<List<Double>>>>> cache =
         new CacheByFishState<>(this::load);
 
@@ -49,21 +46,11 @@ public class AbundanceMortalityProcessFromFileFactory
     }
 
     public AbundanceMortalityProcessFromFileFactory(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputPath mortalityFile,
         final Iterable<String> sources
     ) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
         this.mortalityFile = checkNotNull(mortalityFile);
         this.sources = ImmutableList.copyOf(sources);
-    }
-
-    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
-        return speciesCodesSupplier;
-    }
-
-    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")
@@ -94,12 +81,10 @@ public class AbundanceMortalityProcessFromFileFactory
     private Map<Species, Map<String, List<List<Double>>>> load(final FishState fishState) {
         checkNotNull(sources);
         checkNotNull(mortalityFile);
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         return recordStream(mortalityFile.get())
             .filter(r -> sources.contains(r.getString("source")))
             .collect(groupingBy(
-                r -> speciesCodes.getSpeciesFromCode(
-                    fishState.getBiology(),
+                r -> fishState.getBiology().getSpeciesByCode(
                     r.getString("species_code")
                 ),
                 groupingBy(

@@ -24,7 +24,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
 import uk.ac.ox.oxfish.environment.EnvironmentalMapFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -74,10 +73,6 @@ public abstract class EpoScenario<B extends LocalBiology>
     );
     private int targetYear = 2017;
     private InputPath inputFolder = InputPath.of("inputs", "epo_inputs");
-    public SpeciesCodesFromFileFactory speciesCodesSupplier =
-        new SpeciesCodesFromFileFactory(
-            inputFolder.path("species_codes.csv")
-        );
     private final InputPath testInputFolder = inputFolder.path("tests");
     private BiologicalProcessesFactory<B> biologicalProcessesFactory;
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
@@ -139,14 +134,6 @@ public abstract class EpoScenario<B extends LocalBiology>
     @SuppressWarnings("unused")
     public void setCurrentPatternMapSupplier(final CurrentPatternMapSupplier currentPatternMapSupplier) {
         this.currentPatternMapSupplier = currentPatternMapSupplier;
-    }
-
-    public SpeciesCodesFromFileFactory getSpeciesCodesSupplier() {
-        return speciesCodesSupplier;
-    }
-
-    public void setSpeciesCodesSupplier(final SpeciesCodesFromFileFactory speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")

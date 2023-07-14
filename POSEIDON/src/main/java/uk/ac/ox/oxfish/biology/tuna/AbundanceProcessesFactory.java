@@ -26,7 +26,6 @@ public class AbundanceProcessesFactory
     ) {
         super(
             inputFolder,
-            speciesCodesSupplier,
             new AbundanceInitializerFactory(
                 inputFolder.path("bins.csv"),
                 speciesCodesSupplier
@@ -39,7 +38,6 @@ public class AbundanceProcessesFactory
                 ImmutableMap.of(0, 365)
             ),
             new ScheduledAbundanceProcessesFactory(
-                speciesCodesSupplier,
                 ImmutableList.of("01-01", "04-01", "07-01", "10-01"),
                 inputFolder.path("mortality.csv")
             )

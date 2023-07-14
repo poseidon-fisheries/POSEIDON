@@ -25,7 +25,6 @@ public class BiomassProcessesFactory extends BiologicalProcessesFactory<BiomassL
     ) {
         super(
             inputFolder,
-            speciesCodesSupplier,
             new BiomassInitializerFactory(
                 speciesCodesSupplier,
                 inputFolder.path("schaefer_params.csv")

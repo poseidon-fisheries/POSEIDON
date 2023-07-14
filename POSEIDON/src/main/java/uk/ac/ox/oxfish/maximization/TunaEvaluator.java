@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.maximization;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFadAttractionEvent;
@@ -191,10 +190,8 @@ public class TunaEvaluator implements Runnable {
     private void registerFadAttractionEventProviders() {
         runner.setAfterStartConsumer(state -> {
             final FishState fishState = state.getModel();
-            final EpoScenario<?> scenario = (EpoScenario<?>) state.getScenario();
-            final SpeciesCodes speciesCodes = scenario.getSpeciesCodesSupplier().get();
             final AbundanceFadAttractionEventObserver observer =
-                new AbundanceFadAttractionEventObserver(fishState, speciesCodes);
+                new AbundanceFadAttractionEventObserver(fishState);
             fishState.getFishers().stream()
                 .filter(fisher -> boatsToTrack.contains(fisher.getTagsList().get(0)))
                 .map(FadManager::getFadManager)

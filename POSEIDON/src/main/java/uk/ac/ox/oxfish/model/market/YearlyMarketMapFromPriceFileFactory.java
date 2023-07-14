@@ -2,13 +2,11 @@ package uk.ac.ox.oxfish.model.market;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.*;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
@@ -17,14 +15,11 @@ public class YearlyMarketMapFromPriceFileFactory
     implements AlgorithmFactory<MarketMap> {
 
     private InputPath priceFile;
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
 
     public YearlyMarketMapFromPriceFileFactory(
-        final InputPath priceFile,
-        final Supplier<SpeciesCodes> speciesCodesSupplier
+        final InputPath priceFile
     ) {
         this.priceFile = priceFile;
-        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     /**
@@ -32,14 +27,6 @@ public class YearlyMarketMapFromPriceFileFactory
      */
     @SuppressWarnings("unused")
     public YearlyMarketMapFromPriceFileFactory() {
-    }
-
-    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
-        return speciesCodesSupplier;
-    }
-
-    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")
@@ -55,11 +42,10 @@ public class YearlyMarketMapFromPriceFileFactory
     @Override
     public MarketMap apply(final FishState fishState) {
         final GlobalBiology globalBiology = fishState.getBiology();
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         final Map<Species, FixedYearlyPricesBiomassMarket> prices =
             recordStream(priceFile.get()).collect(
                 groupingBy(
-                    r -> globalBiology.getSpeciesByCaseInsensitiveName(speciesCodes.getSpeciesName(r.getString("species"))),
+                    r -> globalBiology.getSpeciesByCode(r.getString("species")),
                     collectingAndThen(toMap(
                         r -> r.getInt("year"),
                         r -> r.getDouble("price") / 1000.0  // convert price / tonne to price / kg

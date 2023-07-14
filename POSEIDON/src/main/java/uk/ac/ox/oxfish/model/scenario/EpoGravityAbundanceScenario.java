@@ -53,12 +53,10 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
         new EpoPurseSeinerFleetFactory(
             getTargetYear(),
             getInputFolder(),
-            getSpeciesCodesSupplier(),
             new AbundancePurseSeineGearFactory(
                 new EverythingPermitted(),
                 new LinearAbundanceFadInitializerFactory(
                     getAbundanceFiltersFactory(),
-                    getSpeciesCodesSupplier(),
                     "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
                 ),
                 new UnreliableFishValueCalculatorFactory(new LogNormalErrorOperatorFactory(
@@ -84,10 +82,8 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
             ),
             new PurseSeinerAbundanceFishingStrategyFactory(
                 getTargetYear(),
-                getSpeciesCodesSupplier(),
                 getInputFolder().path("action_weights.csv"),
                 new AbundanceCatchSamplersFactory(
-                    getSpeciesCodesSupplier(),
                     getAbundanceFiltersFactory(),
                     getInputFolder().path("set_samples.csv")
                 ),
