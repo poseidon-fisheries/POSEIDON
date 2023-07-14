@@ -76,6 +76,9 @@ public class DeploymentFromLocationValuePlanningModule
     @Override
     public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
         final FadManager fadManager = getFadManager(fisher);
-        return fadManager.numberOfPermissibleActions(DPL, fadManager.getNumFadsInStock());
+        return fadManager.numberOfPermissibleActions(
+            DPL,
+            fadManager.getNumFadsInStock()
+        );
     }
 }

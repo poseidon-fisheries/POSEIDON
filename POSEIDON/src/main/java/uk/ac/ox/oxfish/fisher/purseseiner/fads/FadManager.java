@@ -38,6 +38,7 @@ import uk.ac.ox.oxfish.model.data.monitors.observers.Observers;
 import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
 import uk.ac.ox.oxfish.regulation.quantities.YearlyActionCount;
 import uk.ac.ox.poseidon.agents.api.Action;
+import uk.ac.ox.poseidon.agents.api.Agent;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
 import uk.ac.ox.poseidon.agents.core.BasicAction;
 import uk.ac.ox.poseidon.common.api.Observer;
@@ -190,8 +191,67 @@ public class FadManager {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
     }
 
+    public int numberOfPermissibleActions(
+        final ActionClass actionClass,
+        final int limit
+    ) {
+        return numberOfPermissibleActions(
+            getFisher(),
+            getRegulation(),
+            getYearlyActionCounter(),
+            getNumberOfActiveFads(),
+            actionClass,
+            limit
+        );
+    }
+
+    public static int numberOfPermissibleActions(
+        final Fisher fisher,
+        final Regulation regulation,
+        final YearlyActionCounter yearlyActionCounter,
+        final long numberOfActiveFads,
+        final ActionClass actionClass,
+        final int limit
+    ) {
+        checkNotNull(actionClass);
+        checkArgument(limit >= 0);
+
+        final YearlyActionCounter dummyYearlyActionCounter = yearlyActionCounter.copy();
+        final AtomicLong dummyNumberOfActiveFads = new AtomicLong(numberOfActiveFads);
+
+        final Action dummyAction = new DummyAction(
+            actionClass.name(),
+            fisher,
+            dummyYearlyActionCounter,
+            dummyNumberOfActiveFads
+        );
+        int i = 0;
+        while (i < limit && regulation.isPermitted(dummyAction)) {
+            i++;
+            dummyYearlyActionCounter.observe(dummyAction);
+            if (actionClass == DPL) dummyNumberOfActiveFads.incrementAndGet();
+        }
+        return i;
+    }
+
+    public Fisher getFisher() {
+        return fisher;
+    }
+
     public Regulation getRegulation() {
         return regulation;
+    }
+
+    public YearlyActionCounter getYearlyActionCounter() {
+        return yearlyActionCounter;
+    }
+
+    public int getNumberOfActiveFads() {
+        return deployedFads.size();
+    }
+
+    public void setFisher(final Fisher fisher) {
+        this.fisher = fisher;
     }
 
     public FishValueCalculator getFishValueCalculator() {
@@ -200,14 +260,6 @@ public class FadManager {
 
     public Set<Fad> getDeployedFads() {
         return Collections.unmodifiableSet(deployedFads);
-    }
-
-    public Fisher getFisher() {
-        return fisher;
-    }
-
-    public void setFisher(final Fisher fisher) {
-        this.fisher = fisher;
     }
 
     public Stream<Fad> getFadsAt(final SeaTile location) {
@@ -277,36 +329,6 @@ public class FadManager {
         return fadMap;
     }
 
-    public int numberOfPermissibleActions(final ActionClass actionClass, final int limit) {
-        checkNotNull(actionClass);
-        checkArgument(limit >= 0);
-
-        final YearlyActionCounter dummyYearlyActionCounter = getYearlyActionCounter().copy();
-        final AtomicLong dummyNumberOfActiveFads = new AtomicLong(getNumberOfActiveFads());
-
-        final Action dummyAction = new DummyAction(
-            actionClass.name(),
-            fisher,
-            dummyYearlyActionCounter,
-            dummyNumberOfActiveFads
-        );
-        int i = 0;
-        while (i < limit && regulation.isPermitted(dummyAction)) {
-            i++;
-            dummyYearlyActionCounter.observe(dummyAction);
-            if (actionClass == DPL) dummyNumberOfActiveFads.incrementAndGet();
-        }
-        return i;
-    }
-
-    public YearlyActionCounter getYearlyActionCounter() {
-        return yearlyActionCounter;
-    }
-
-    public int getNumberOfActiveFads() {
-        return deployedFads.size();
-    }
-
     public int getNumFadsInStock() {
         return numFadsInStock;
     }
@@ -332,7 +354,23 @@ public class FadManager {
             final YearlyActionCounter yearlyActionCounter,
             final AtomicLong numberOfActiveFads
         ) {
-            super(code, fisher, fisher.grabState().getDate().atStartOfDay(), null);
+            this(
+                code,
+                fisher,
+                fisher.grabState().getDate().atStartOfDay(),
+                yearlyActionCounter,
+                numberOfActiveFads
+            );
+        }
+
+        public DummyAction(
+            final String code,
+            final Agent agent,
+            final LocalDateTime dateTime,
+            final YearlyActionCounter yearlyActionCounter,
+            final AtomicLong numberOfActiveFads
+        ) {
+            super(code, agent, dateTime, null);
             this.yearlyActionCounter = yearlyActionCounter;
             this.numberOfActiveFads = numberOfActiveFads;
         }
@@ -346,7 +384,7 @@ public class FadManager {
         public long getYearlyActionCount(final String actionCode) {
             return getDateTime()
                 .map(LocalDateTime::getYear)
-                .map(year -> yearlyActionCounter.getCount(year, fisher, actionCode))
+                .map(year -> yearlyActionCounter.getCount(year, getAgent(), actionCode))
                 .orElse(0L);
         }
     }

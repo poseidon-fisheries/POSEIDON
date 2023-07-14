@@ -55,7 +55,9 @@ public class NonAssociatedSetFromLocationValuePlanningModule<B extends LocalBiol
 
     @Override
     public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
-        return getFadManager(fisher).numberOfPermissibleActions(NOA, 1000);
+        return getFadManager(fisher).numberOfPermissibleActions(
+            NOA, 1000
+        );
     }
 
 }

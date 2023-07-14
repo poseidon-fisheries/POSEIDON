@@ -110,7 +110,9 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
      */
     @Override
     public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
-        return getFadManager(fisher).numberOfPermissibleActions(FAD, MAX_OWN_FAD_SETS);
+        return getFadManager(fisher).numberOfPermissibleActions(
+            FAD, MAX_OWN_FAD_SETS
+        );
     }
 
 }

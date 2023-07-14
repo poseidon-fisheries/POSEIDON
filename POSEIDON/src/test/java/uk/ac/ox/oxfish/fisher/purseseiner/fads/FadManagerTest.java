@@ -41,8 +41,10 @@ import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
 import uk.ac.ox.poseidon.agents.core.AtomicLongMapYearlyActionCounter;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static java.util.stream.IntStream.range;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
@@ -112,6 +114,9 @@ public class FadManagerTest extends TestCase {
     }
 
     public void testNumberOfRemainingActions() {
+        final FishState fishState = mock(FishState.class);
+        final MersenneTwisterFast rng = mock(MersenneTwisterFast.class);
+        when(fishState.getRandom()).thenReturn(rng);
         final uk.ac.ox.poseidon.regulations.api.Regulation regulation =
             new ForbiddenIf(
                 new AllOf(
@@ -123,13 +128,29 @@ public class FadManagerTest extends TestCase {
         final YearlyActionCounter yearlyActionCounter = AtomicLongMapYearlyActionCounter.create();
         final AtomicLong numberOfActiveFads = new AtomicLong(5);
         final Fisher fisher = mock(Fisher.class);
+
         final Action action = new FadManager.DummyAction(
             DPL.name(),
             fisher,
+            LocalDateTime.now(),
             yearlyActionCounter,
             numberOfActiveFads
         );
+        range(0, 10).forEach(__ ->
+            yearlyActionCounter.observe(action)
+        );
 
-        yearlyActionCounter
+        final FadManager fadManager = mock(FadManager.class);
+        when(fadManager.getFisher()).thenReturn(fisher);
+        when(fadManager.getRegulation()).thenReturn(regulation);
+        when(fadManager.getYearlyActionCounter()).thenReturn(yearlyActionCounter);
+        when(fadManager.getNumberOfActiveFads()).thenReturn((int) numberOfActiveFads.get());
+
+        // TODO
+//        assertEquals(
+//            15,
+//            fadManager.numberOfPermissibleActions(DPL, 50)
+//        );
+
     }
 }
