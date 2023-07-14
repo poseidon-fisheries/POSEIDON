@@ -40,9 +40,9 @@ public class BiomassResetterFactory implements AlgorithmFactory<BiomassLocationR
      * @return the function result
      */
     @Override
-    public BiomassLocationResetter apply(FishState fishState) {
+    public BiomassLocationResetter apply(final FishState fishState) {
         return new BiomassLocationResetter(
-            fishState.getBiology().getSpecie(speciesName),
+            fishState.getBiology().getSpeciesByCaseInsensitiveName(speciesName),
             () -> algorithmFactory.apply(fishState)
 
         );
@@ -62,7 +62,7 @@ public class BiomassResetterFactory implements AlgorithmFactory<BiomassLocationR
      *
      * @param speciesName Value to set for property 'speciesName'.
      */
-    public void setSpeciesName(String speciesName) {
+    public void setSpeciesName(final String speciesName) {
         this.speciesName = speciesName;
     }
 
@@ -81,7 +81,7 @@ public class BiomassResetterFactory implements AlgorithmFactory<BiomassLocationR
      * @param algorithmFactory Value to set for property 'algorithmFactory'.
      */
     public void setAlgorithmFactory(
-        AlgorithmFactory<? extends BiomassAllocator> algorithmFactory
+        final AlgorithmFactory<? extends BiomassAllocator> algorithmFactory
     ) {
         this.algorithmFactory = algorithmFactory;
     }

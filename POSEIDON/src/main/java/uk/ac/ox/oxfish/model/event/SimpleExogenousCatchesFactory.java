@@ -42,12 +42,12 @@ public class SimpleExogenousCatchesFactory implements AlgorithmFactory<MixedExog
      * @return the function result
      */
     @Override
-    public MixedExogenousCatches apply(FishState fishState) {
+    public MixedExogenousCatches apply(final FishState fishState) {
 
-        LinkedHashMap<Species, Double> landings = new LinkedHashMap<>();
-        for (Map.Entry<String, Number> input : yearlyBiomassToExtract.entrySet()) {
+        final LinkedHashMap<Species, Double> landings = new LinkedHashMap<>();
+        for (final Map.Entry<String, Number> input : yearlyBiomassToExtract.entrySet()) {
             landings.put(
-                fishState.getBiology().getSpecie(input.getKey()),
+                fishState.getBiology().getSpeciesByCaseInsensitiveName(input.getKey()),
                 input.getValue().doubleValue()
             );
         }
@@ -71,7 +71,7 @@ public class SimpleExogenousCatchesFactory implements AlgorithmFactory<MixedExog
      *
      * @param yearlyBiomassToExtract Value to set for property 'yearlyBiomassToExtract'.
      */
-    public void setYearlyBiomassToExtract(HashMap<String, Number> yearlyBiomassToExtract) {
+    public void setYearlyBiomassToExtract(final HashMap<String, Number> yearlyBiomassToExtract) {
 
 
         this.yearlyBiomassToExtract = yearlyBiomassToExtract;

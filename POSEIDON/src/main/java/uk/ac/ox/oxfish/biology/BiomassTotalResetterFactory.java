@@ -43,9 +43,9 @@ public class BiomassTotalResetterFactory implements AlgorithmFactory<BiomassTota
      * @return the function result
      */
     @Override
-    public BiomassTotalResetter apply(FishState fishState) {
+    public BiomassTotalResetter apply(final FishState fishState) {
         return new BiomassTotalResetter(
-            fishState.getBiology().getSpecie(speciesName),
+            fishState.getBiology().getSpeciesByCaseInsensitiveName(speciesName),
             () -> allocator.apply(fishState),
             yearlyBiomass
 
@@ -66,7 +66,7 @@ public class BiomassTotalResetterFactory implements AlgorithmFactory<BiomassTota
      *
      * @param speciesName Value to set for property 'speciesName'.
      */
-    public void setSpeciesName(String speciesName) {
+    public void setSpeciesName(final String speciesName) {
         this.speciesName = speciesName;
     }
 
@@ -85,7 +85,7 @@ public class BiomassTotalResetterFactory implements AlgorithmFactory<BiomassTota
      * @param allocator Value to set for property 'allocator'.
      */
     public void setAllocator(
-        AlgorithmFactory<? extends BiomassAllocator> allocator
+        final AlgorithmFactory<? extends BiomassAllocator> allocator
     ) {
         this.allocator = allocator;
     }
@@ -104,7 +104,7 @@ public class BiomassTotalResetterFactory implements AlgorithmFactory<BiomassTota
      *
      * @param yearlyBiomass Value to set for property 'yearlyBiomass'.
      */
-    public void setYearlyBiomass(DoubleParameter yearlyBiomass) {
+    public void setYearlyBiomass(final DoubleParameter yearlyBiomass) {
         this.yearlyBiomass = yearlyBiomass;
     }
 }

@@ -130,7 +130,7 @@ public abstract class CompressedExponentialFadInitializerFactory<
     ) {
         final double[] a = new double[globalBiology.getSize()];
         map.forEach((speciesName, parameter) -> {
-            final int index = globalBiology.getSpecie(speciesName).getIndex();
+            final int index = globalBiology.getSpeciesByCaseInsensitiveName(speciesName).getIndex();
             a[index] = parameter.applyAsDouble(rng);
         });
         return a;

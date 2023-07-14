@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 import com.google.common.collect.ImmutableList;
 import com.univocity.parsers.common.record.Record;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
@@ -31,7 +30,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -42,15 +40,12 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public class AbundanceFiltersFromFileFactory implements AbundanceFiltersFactory {
 
     private InputPath selectivityFile;
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
 
     @SuppressWarnings("unused")
     public AbundanceFiltersFromFileFactory(
-        final InputPath selectivityFile,
-        final Supplier<SpeciesCodes> speciesCodesSupplier
+        final InputPath selectivityFile
     ) {
         this.selectivityFile = selectivityFile;
-        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     /**
@@ -70,25 +65,15 @@ public class AbundanceFiltersFromFileFactory implements AbundanceFiltersFactory 
         this.selectivityFile = selectivityFile;
     }
 
-    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
-        return speciesCodesSupplier;
-    }
-
-    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
-    }
-
     @Override
     public Map<Class<? extends AbstractSetAction>, Map<Species, NonMutatingArrayFilter>> apply(
         final FishState fishState
     ) {
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         return recordStream(selectivityFile.get())
             .collect(groupingBy(
                 r -> getSetActionClass(r.getString("set_type")),
                 groupingBy(
-                    r -> speciesCodes.getSpeciesFromCode(
-                        fishState.getBiology(),
+                    r -> fishState.getBiology().getSpeciesByCode(
                         r.getString("species_code")
                     )
                 )

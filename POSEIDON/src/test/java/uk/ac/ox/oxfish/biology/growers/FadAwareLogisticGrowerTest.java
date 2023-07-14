@@ -60,7 +60,7 @@ public class FadAwareLogisticGrowerTest {
         }
         state.schedule.step(state);
 
-        final Species yft = state.getBiology().getSpecie("Yellowfin tuna");
+        final Species yft = state.getBiology().getSpeciesByCaseInsensitiveName("Yellowfin tuna");
         assertEquals(889195.40, state.getTotalBiomass(yft) / 1000.0, 10.0);
 
 

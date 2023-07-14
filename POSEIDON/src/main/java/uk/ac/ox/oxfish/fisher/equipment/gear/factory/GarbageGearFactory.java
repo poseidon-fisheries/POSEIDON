@@ -56,7 +56,7 @@ public class GarbageGearFactory implements AlgorithmFactory<GarbageGearDecorator
     @Override
     public GarbageGearDecorator apply(final FishState state) {
 
-        final Species garbageSpecies = state.getBiology().getSpecie(garbageSpeciesName);
+        final Species garbageSpecies = state.getBiology().getSpeciesByCaseInsensitiveName(garbageSpeciesName);
         Preconditions.checkArgument(
             garbageSpecies != null && garbageSpecies.isImaginary(),
             "The garbage species must be exist and be'imaginary'"

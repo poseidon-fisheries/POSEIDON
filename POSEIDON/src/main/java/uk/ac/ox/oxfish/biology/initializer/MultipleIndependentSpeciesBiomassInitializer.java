@@ -112,7 +112,7 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
             initializer.processMap(biology, map, random, model);
             movements.add(
                 entry(
-                    biology.getSpecie(initializer.getSpeciesName()),
+                    biology.getSpeciesByCaseInsensitiveName(initializer.getSpeciesName()),
                     initializer.getMovementRule()
                 )
             );

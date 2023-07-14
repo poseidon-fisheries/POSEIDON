@@ -64,7 +64,7 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
 
 
             ),
-            fishState.getBiology().getSpecie(speciesName),
+            fishState.getBiology().getSpeciesByCaseInsensitiveName(speciesName),
 
             computeDailyFishingMortality
         );

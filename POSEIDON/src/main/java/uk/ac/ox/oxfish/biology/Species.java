@@ -38,7 +38,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 public class Species {
 
     private final String name;
-
+    private final String code;
     /**
      * a collection of parameters about the fish including its size and such
      */
@@ -58,32 +58,36 @@ public class Species {
      *
      * @param name the name of the specie
      */
-    public Species(String name) {
-        this(name, StockAssessmentCaliforniaMeristics.FAKE_MERISTICS, false);
-
+    public Species(final String name) {
+        this(name, name, StockAssessmentCaliforniaMeristics.FAKE_MERISTICS, false);
     }
 
-    public Species(String name, Meristics meristics, boolean imaginary) {
+    public Species(final String name, final String code, final Meristics meristics, final boolean imaginary) {
         this.name = name;
+        this.code = code;
         this.meristics = meristics;
         this.imaginary = imaginary;
     }
 
-    public Species(String name, Meristics meristics) {
-        this(name, meristics, false);
-
+    public Species(final String name, final Meristics meristics, final boolean imaginary) {
+        this(name, name, meristics, imaginary);
     }
 
-    public Species(String name, MeristicsInput input) {
+    public Species(final String name, final Meristics meristics) {
+        this(name, name, meristics, false);
+    }
+
+    public Species(final String name, final MeristicsInput input) {
         this.name = name;
+        this.code = name;
         this.meristics = new StockAssessmentCaliforniaMeristics(input);
         this.imaginary = false;
     }
 
     /**
-     * Converts a map of Species to any type to an list of that type, ordered by species index.
+     * Converts a map of Species to any type to a list of that type, ordered by species index.
      */
-    public static <T> List<T> mapToList(final Map<Species, T> map) {
+    public static <T> List<T> mapToList(final Map<? extends Species, ? extends T> map) {
         return map
             .entrySet()
             .stream()
@@ -96,11 +100,15 @@ public class Species {
         return index;
     }
 
+    public String getCode() {
+        return code;
+    }
+
     public String getName() {
         return name;
     }
 
-    public void resetIndexTo(int index) {
+    public void resetIndexTo(final int index) {
         this.index = index;
     }
 
@@ -118,11 +126,11 @@ public class Species {
         return meristics;
     }
 
-    public double getLength(int subdivision, int bin) {
+    public double getLength(final int subdivision, final int bin) {
         return meristics.getLength(subdivision, bin);
     }
 
-    public double getWeight(int subdivision, int bin) {
+    public double getWeight(final int subdivision, final int bin) {
         return meristics.getWeight(subdivision, bin);
     }
 
@@ -165,7 +173,7 @@ public class Species {
      * @param subdivision the subdivision we are study (male/female is different for example)
      * @return the length of the fish
      */
-    public double getLengthAtAge(int ageInYears, int subdivision) {
+    public double getLengthAtAge(final int ageInYears, final int subdivision) {
         return meristics.getLengthAtAge(ageInYears, subdivision);
     }
 

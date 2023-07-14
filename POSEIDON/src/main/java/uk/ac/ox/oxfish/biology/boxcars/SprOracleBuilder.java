@@ -45,7 +45,7 @@ public class SprOracleBuilder implements AlgorithmFactory<SprOracle> {
     @Override
     public SprOracle apply(final FishState fishState) {
         return new SprOracle(
-            fishState.getBiology().getSpecie(speciesName),
+            fishState.getBiology().getSpeciesByCaseInsensitiveName(speciesName),
             lengthAtMaturity.applyAsDouble(fishState.getRandom()),
             dayOfMeasurement,
             virginSSB.applyAsDouble(fishState.getRandom())

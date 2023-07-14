@@ -59,7 +59,7 @@ public class YearlyMarketMapFromPriceFileFactory
         final Map<Species, FixedYearlyPricesBiomassMarket> prices =
             recordStream(priceFile.get()).collect(
                 groupingBy(
-                    r -> globalBiology.getSpecie(speciesCodes.getSpeciesName(r.getString("species"))),
+                    r -> globalBiology.getSpeciesByCaseInsensitiveName(speciesCodes.getSpeciesName(r.getString("species"))),
                     collectingAndThen(toMap(
                         r -> r.getInt("year"),
                         r -> r.getDouble("price") / 1000.0  // convert price / tonne to price / kg

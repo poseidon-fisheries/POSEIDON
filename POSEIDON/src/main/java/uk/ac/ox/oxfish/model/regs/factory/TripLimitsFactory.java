@@ -61,7 +61,7 @@ public class TripLimitsFactory implements AlgorithmFactory<MultiQuotaRegulation>
 
         //create array
         for (final Map.Entry<String, Double> limit : limits.entrySet()) {
-            quotas[state.getBiology().getSpecie(limit.getKey()).getIndex()]
+            quotas[state.getBiology().getSpeciesByCaseInsensitiveName(limit.getKey()).getIndex()]
                 =
                 limit.getValue();
 

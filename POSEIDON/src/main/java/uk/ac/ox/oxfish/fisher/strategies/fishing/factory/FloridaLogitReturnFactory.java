@@ -82,14 +82,14 @@ public class FloridaLogitReturnFactory implements AlgorithmFactory<DailyReturnDe
                                     //price red grouper
                                     entry(
                                         new FishPriceExtractor(
-                                            state.getBiology().getSpecie("RedGrouper")
+                                            state.getBiology().getSpeciesByCaseInsensitiveName("RedGrouper")
                                         ),
                                         priceRedGrouper.applyAsDouble(state.getRandom())
                                     ),
                                     //price gag grouper
                                     entry(
                                         new FishPriceExtractor(
-                                            state.getBiology().getSpecie("GagGrouper")
+                                            state.getBiology().getSpeciesByCaseInsensitiveName("GagGrouper")
                                         ),
                                         priceGagGrouper.applyAsDouble(state.getRandom())
                                     ),

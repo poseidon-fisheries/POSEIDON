@@ -46,8 +46,7 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
 
     private AbundanceFiltersFactory abundanceFiltersFactory =
         new AbundanceFiltersFromFileFactory(
-            getInputFolder().path("abundance", "selectivity.csv"),
-            getSpeciesCodesSupplier()
+            getInputFolder().path("abundance", "selectivity.csv")
         );
 
     private PurseSeinerFleetFactory purseSeinerFleetFactory =

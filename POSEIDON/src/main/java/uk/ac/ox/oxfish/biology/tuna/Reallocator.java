@@ -119,7 +119,7 @@ public abstract class Reallocator<B extends LocalBiology> implements BiologicalP
         }
 
         public Species getSpecies(final GlobalBiology biology) {
-            return biology.getSpecie(speciesName);
+            return biology.getSpeciesByCaseInsensitiveName(speciesName);
         }
 
         @Override

@@ -62,9 +62,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.function.Predicate;
 import java.util.function.ToDoubleBiFunction;
-import java.util.function.ToDoubleFunction;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
@@ -309,7 +307,7 @@ public class FishState extends SimState {
      * @return an unmodifiable list of all the species available
      */
     public Species getSpecies(final String speciesName) {
-        return biology.getSpecie(speciesName);
+        return biology.getSpeciesByCaseInsensitiveName(speciesName);
     }
 
     public GeomGridField getRasterBathymetry() {

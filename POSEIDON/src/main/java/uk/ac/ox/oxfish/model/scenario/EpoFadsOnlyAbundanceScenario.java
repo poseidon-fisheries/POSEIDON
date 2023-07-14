@@ -39,8 +39,7 @@ public class EpoFadsOnlyAbundanceScenario extends EpoAbundanceScenario {
             getInputFolder().path("calibration", "fad_deployments.csv"),
             new CompressedAbundanceFadInitializerFactory(
                 new AbundanceFiltersFromFileFactory(
-                    getInputFolder().path("abundance", "selectivity.csv"),
-                    getSpeciesCodesSupplier()
+                    getInputFolder().path("abundance", "selectivity.csv")
                 ),
                 getSpeciesCodesSupplier(),
                 "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"

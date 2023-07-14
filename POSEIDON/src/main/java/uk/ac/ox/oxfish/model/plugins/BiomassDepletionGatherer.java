@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.model.plugins;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
@@ -32,7 +31,6 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.ToDoubleFunction;
 
 /**
  * creates depletion and MSY data collectors by mere division
@@ -51,7 +49,7 @@ public class BiomassDepletionGatherer implements AdditionalStartable {
     private final HashMap<String, Double> msy;
 
 
-    public BiomassDepletionGatherer(HashMap<String, Double> msy) {
+    public BiomassDepletionGatherer(final HashMap<String, Double> msy) {
         this.msy = msy;
     }
 
@@ -62,15 +60,15 @@ public class BiomassDepletionGatherer implements AdditionalStartable {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
-        for (Species species : model.getBiology().getSpecies()) {
+    public void start(final FishState model) {
+        for (final Species species : model.getBiology().getSpecies()) {
 
             model.getYearlyDataSet().registerGatherer(
                 DEPLETION_COLUMN_NAME + " " + species.getName(),
                 (Gatherer<FishState>) state -> {
 
-                    double bt = state.getTotalBiomass(species);
-                    double k = state.getMap().getAllSeaTilesExcludingLandAsList().stream().mapToDouble(
+                    final double bt = state.getTotalBiomass(species);
+                    final double k = state.getMap().getAllSeaTilesExcludingLandAsList().stream().mapToDouble(
                         value -> {
                             if (!value.isFishingEvenPossibleHere())
                                 return 0d;
@@ -87,15 +85,15 @@ public class BiomassDepletionGatherer implements AdditionalStartable {
 
         }
 
-        for (Map.Entry<String, Double> msyEntry : msy.entrySet()) {
+        for (final Map.Entry<String, Double> msyEntry : msy.entrySet()) {
 
-            Species species = model.getBiology().getSpecie(msyEntry.getKey());
+            final Species species = model.getBiology().getSpeciesByCaseInsensitiveName(msyEntry.getKey());
             Preconditions.checkState(species != null);
             model.getYearlyDataSet().registerGatherer(
                 MSY + " " + species.getName(),
                 (Gatherer<FishState>) state -> {
 
-                    Double landings = FishStateUtilities.generateYearlySum(
+                    final Double landings = FishStateUtilities.generateYearlySum(
                         state.getDailyDataSet().getColumn(
                             species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME
                         )).apply(

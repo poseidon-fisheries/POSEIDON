@@ -161,7 +161,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer {
         final NauticalMap map
     ) {
         //we are going to work on a single species!
-        final Species species = biology.getSpecie(speciesName);
+        final Species species = biology.getSpeciesByCaseInsensitiveName(speciesName);
 
         if (!initialDistribution.isStarted()) {
             habitabilityDistribution.start(map, random);
@@ -226,7 +226,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer {
         final GlobalBiology biology, final NauticalMap map, final MersenneTwisterFast random, final FishState model
     ) {
         //we are going to work on a single species!
-        final Species species = biology.getSpecie(speciesName);
+        final Species species = biology.getSpeciesByCaseInsensitiveName(speciesName);
 
 
         //generate correct numbers of starting biomass!

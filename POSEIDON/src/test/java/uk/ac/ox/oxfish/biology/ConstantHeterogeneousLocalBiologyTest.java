@@ -33,7 +33,8 @@ public class ConstantHeterogeneousLocalBiologyTest {
     @Test
     public void testManySpeciesBiology() throws Exception {
 
-        final ConstantHeterogeneousLocalBiology bio = new ConstantHeterogeneousLocalBiology(100, 200, 300);
+        final ConstantHeterogeneousLocalBiology bio =
+            new ConstantHeterogeneousLocalBiology(100, 200, 300);
         final Species species = mock(Species.class);
         when(species.getIndex()).thenReturn(0);
         assertEquals(100, bio.getBiomass(species), .001);

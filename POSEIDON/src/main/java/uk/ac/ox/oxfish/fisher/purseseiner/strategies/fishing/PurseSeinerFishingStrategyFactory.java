@@ -612,7 +612,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
                 r -> {
                     final String speciesCode = r.getString("species_code").toUpperCase();
                     final String speciesName = speciesCodes.getSpeciesName(speciesCode);
-                    return fishState.getBiology().getSpecie(speciesName);
+                    return fishState.getBiology().getSpeciesByCaseInsensitiveName(speciesName);
                 },
                 r -> r.getDouble("weight")
             ));

@@ -76,14 +76,14 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
         for (final Entry<String, HomogeneousGearFactory>
             entry : getGears().entrySet()) {
             gearsPerSpecies.put(
-                state.getBiology().getSpecie(entry.getKey()),
+                state.getBiology().getSpeciesByCaseInsensitiveName(entry.getKey()),
                 entry.getValue().apply(state)
             );
         }
 
         Preconditions.checkState(
             gears.size() == state.getSpecies().size() ||
-                (gears.size() + 1 == state.getSpecies().size() && state.getBiology().getSpecie(
+                (gears.size() + 1 == state.getSpecies().size() && state.getBiology().getSpeciesByCaseInsensitiveName(
                     MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME) != null)
             ,
             "Not all species have a gear assigned");

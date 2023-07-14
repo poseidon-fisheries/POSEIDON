@@ -90,7 +90,7 @@ public class SPRAgentBuilderSelectiveSampling implements CatchAtLengthFactory {
 
         return new SPRAgent(
             surveyTag,
-            fishState.getBiology().getSpecie(speciesName),
+            fishState.getBiology().getSpeciesByCaseInsensitiveName(speciesName),
             fisher -> {
                 for (final Map.Entry<String, Double> tagProbability : probabilityOfSamplingEachTag.entrySet()) {
                     if (fisher.getTagsList()

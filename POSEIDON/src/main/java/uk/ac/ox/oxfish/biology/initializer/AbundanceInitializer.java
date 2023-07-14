@@ -46,6 +46,8 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 public class AbundanceInitializer implements BiologyInitializer {
 
     private final Map<String, List<Bin>> binsPerSpecies;
+
+    private final SpeciesCodes speciesCodes;
     private final Reallocator<AbundanceLocalBiology> abundanceReallocator;
     private final Map<String, WeightGroups> weightGroupsPerSpecies;
 
@@ -55,6 +57,7 @@ public class AbundanceInitializer implements BiologyInitializer {
         final Map<String, WeightGroups> weightGroupsPerSpecies,
         final Reallocator<AbundanceLocalBiology> abundanceReallocator
     ) {
+        this.speciesCodes = speciesCodes;
         this.binsPerSpecies = binsPerSpecies.entrySet().stream()
             .collect(toImmutableMap(
                 entry -> speciesCodes.getSpeciesName(entry.getKey()),
@@ -93,7 +96,7 @@ public class AbundanceInitializer implements BiologyInitializer {
                 binsPerSpecies.entrySet()
                     .stream()
                     .collect(toImmutableMap(
-                        entry -> globalBiology.getSpecie(entry.getKey()),
+                        entry -> globalBiology.getSpeciesByCaseInsensitiveName(entry.getKey()),
                         entry -> binsToAbundanceMatrix(entry.getValue())
                     ))
             );
@@ -130,7 +133,12 @@ public class AbundanceInitializer implements BiologyInitializer {
                     bins.stream().mapToDouble(bin -> bin.maturity).toArray(),
                     weightGroupsPerSpecies.get(speciesName)
                 );
-                return new Species(speciesName, tunaMeristics);
+                return new Species(
+                    speciesName,
+                    speciesCodes.getSpeciesCode(speciesName),
+                    tunaMeristics,
+                    false
+                );
             })
             .toArray(Species[]::new);
         return new GlobalBiology(species);

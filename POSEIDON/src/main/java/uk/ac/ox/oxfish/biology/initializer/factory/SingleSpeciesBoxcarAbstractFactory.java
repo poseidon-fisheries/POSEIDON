@@ -133,7 +133,7 @@ public abstract class SingleSpeciesBoxcarAbstractFactory implements AlgorithmFac
             public void start(final FishState model) {
                 model.getYearlyDataSet().registerGatherer("Bt/K " + speciesName,
                     (Gatherer<FishState>) state1 -> state1.getTotalBiomass(state1.getBiology()
-                        .getSpecie(speciesName)) / carryingCapacity, Double.NaN
+                        .getSpeciesByCaseInsensitiveName(speciesName)) / carryingCapacity, Double.NaN
                 );
             }
 

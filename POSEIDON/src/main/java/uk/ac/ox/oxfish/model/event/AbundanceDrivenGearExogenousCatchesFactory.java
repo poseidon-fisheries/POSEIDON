@@ -50,10 +50,10 @@ public class AbundanceDrivenGearExogenousCatchesFactory implements
      * @return the function result
      */
     @Override
-    public AbundanceDrivenGearExogenousCatches apply(FishState fishState) {
+    public AbundanceDrivenGearExogenousCatches apply(final FishState fishState) {
 
-        LinkedHashMap<Species, Double> landings = new LinkedHashMap<>();
-        LinkedHashMap<Species, HomogeneousAbundanceGear> gear = new LinkedHashMap<>();
+        final LinkedHashMap<Species, Double> landings = new LinkedHashMap<>();
+        final LinkedHashMap<Species, HomogeneousAbundanceGear> gear = new LinkedHashMap<>();
         Preconditions.checkArgument(
             gears.size() == yearlyBiomassToExtract.size(),
             " mismatch between gear map and landing map for exogenous landings"
@@ -64,7 +64,7 @@ public class AbundanceDrivenGearExogenousCatchesFactory implements
         );
 
         for (int i = 0; i < species.size(); i++) {
-            Species species = fishState.getBiology().getSpecie(this.species.get(i));
+            final Species species = fishState.getBiology().getSpeciesByCaseInsensitiveName(this.species.get(i));
             landings.put(
                 species,
                 yearlyBiomassToExtract.get(i).doubleValue()
@@ -98,7 +98,7 @@ public class AbundanceDrivenGearExogenousCatchesFactory implements
      *
      * @param species Value to set for property 'species'.
      */
-    public void setSpecies(List<String> species) {
+    public void setSpecies(final List<String> species) {
         this.species = species;
     }
 
@@ -116,16 +116,16 @@ public class AbundanceDrivenGearExogenousCatchesFactory implements
      *
      * @param givenGears Value to set for property 'gears'.
      */
-    public void setGears(List<? extends HomogeneousGearFactory> givenGears) {
-        List<HomogeneousGearFactory> real = new LinkedList<>();
+    public void setGears(final List<? extends HomogeneousGearFactory> givenGears) {
+        final List<HomogeneousGearFactory> real = new LinkedList<>();
 
-        FishYAML yaml = new FishYAML();
+        final FishYAML yaml = new FishYAML();
 
         //force it to go through YAML
         for (int i = 0; i < givenGears.size(); i++) {
-            Object homogeneousGearFactory = givenGears.get(i);
+            final Object homogeneousGearFactory = givenGears.get(i);
 
-            HomogeneousGearFactory recast = yaml.loadAs(
+            final HomogeneousGearFactory recast = yaml.loadAs(
                 yaml.dump(homogeneousGearFactory),
                 HomogeneousGearFactory.class
             );
@@ -151,7 +151,7 @@ public class AbundanceDrivenGearExogenousCatchesFactory implements
      *
      * @param yearlyBiomassToExtract Value to set for property 'yearlyBiomassToExtract'.
      */
-    public void setYearlyBiomassToExtract(List<Number> yearlyBiomassToExtract) {
+    public void setYearlyBiomassToExtract(final List<Number> yearlyBiomassToExtract) {
         this.yearlyBiomassToExtract = yearlyBiomassToExtract;
     }
 }

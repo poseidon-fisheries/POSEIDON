@@ -42,24 +42,24 @@ public class FloridaLogitReturnFactoryTest {
     @Test
     public void logitReturnsRightProbability() throws Exception {
         //scaled $/kg
-        FloridaLogitReturnFactory handlinerFishingStrategy = new FloridaLogitReturnFactory();
+        final FloridaLogitReturnFactory handlinerFishingStrategy = new FloridaLogitReturnFactory();
         handlinerFishingStrategy.setIntercept(new FixedDoubleParameter(-3.47701));
         handlinerFishingStrategy.setPriceRedGrouper(new FixedDoubleParameter(0.92395));
         handlinerFishingStrategy.setPriceGagGrouper(new FixedDoubleParameter(-0.65122));
         handlinerFishingStrategy.setRatioCatchToFishHold(new FixedDoubleParameter(4.37828));
         handlinerFishingStrategy.setWeekendDummy(new FixedDoubleParameter(-0.24437));
 
-        FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
-        Species gag = mock(Species.class);
-        when((state.getBiology().getSpecie("GagGrouper"))).thenReturn(gag);
-        Species red = mock(Species.class);
-        when((state.getBiology().getSpecie("RedGrouper"))).thenReturn(red);
-        DailyReturnDecorator strategy = handlinerFishingStrategy.apply(state);
-        LogitReturnStrategy logit = (LogitReturnStrategy) ((MaximumDaysDecorator) strategy.accessDecorated()).accessDecorated();
+        final FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final Species gag = mock(Species.class);
+        when((state.getBiology().getSpeciesByCaseInsensitiveName("GagGrouper"))).thenReturn(gag);
+        final Species red = mock(Species.class);
+        when((state.getBiology().getSpeciesByCaseInsensitiveName("RedGrouper"))).thenReturn(red);
+        final DailyReturnDecorator strategy = handlinerFishingStrategy.apply(state);
+        final LogitReturnStrategy logit = (LogitReturnStrategy) ((MaximumDaysDecorator) strategy.accessDecorated()).accessDecorated();
 
 
-        SeaTile tile = mock(SeaTile.class);
-        Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        final SeaTile tile = mock(SeaTile.class);
+        final Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
 
         when(fisher.getHomePort().getMarginalPrice(gag, fisher)).thenReturn(10d);
         when(fisher.getHomePort().getMarginalPrice(red, fisher)).thenReturn(3d);
@@ -67,7 +67,7 @@ public class FloridaLogitReturnFactoryTest {
         when(fisher.getMaximumHold()).thenReturn(200d);
 
 
-        double probability = logit.getShouldIReturnClassifier().getProbability(
+        final double probability = logit.getShouldIReturnClassifier().getProbability(
             fisher,
             30 * 24, //not a weekend!
             state,

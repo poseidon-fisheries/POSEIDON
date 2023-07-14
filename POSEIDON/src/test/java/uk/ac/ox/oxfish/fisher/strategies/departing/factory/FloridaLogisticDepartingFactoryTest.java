@@ -40,7 +40,7 @@ public class FloridaLogisticDepartingFactoryTest {
 
     @Test
     public void nullables() throws Exception {
-        FloridaLogisticDepartingFactory longlinerDepartingStrategy = new FloridaLogisticDepartingFactory();
+        final FloridaLogisticDepartingFactory longlinerDepartingStrategy = new FloridaLogisticDepartingFactory();
         longlinerDepartingStrategy.setIntercept(new FixedDoubleParameter(-2.959116));
         longlinerDepartingStrategy.setSpring(new FixedDoubleParameter(0.770212));
         longlinerDepartingStrategy.setSummer(new FixedDoubleParameter(0.933939));
@@ -51,7 +51,7 @@ public class FloridaLogisticDepartingFactoryTest {
         longlinerDepartingStrategy.setPriceRedGrouper(new NullParameter());
         longlinerDepartingStrategy.setPriceGagGrouper(new NullParameter());
 
-        FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
         DailyLogisticDepartingStrategy strategy = longlinerDepartingStrategy.apply(state);
 
         assertEquals(strategy.getClassifier().getSize(), 6);
@@ -76,7 +76,7 @@ public class FloridaLogisticDepartingFactoryTest {
     @Test
     public void numbersAreCorrect() throws Exception {
 
-        FloridaLogisticDepartingFactory longlinerDepartingStrategy = new FloridaLogisticDepartingFactory();
+        final FloridaLogisticDepartingFactory longlinerDepartingStrategy = new FloridaLogisticDepartingFactory();
         longlinerDepartingStrategy.setIntercept(new FixedDoubleParameter(-2.075184));
         longlinerDepartingStrategy.setSpring(new FixedDoubleParameter(0.725026));
         longlinerDepartingStrategy.setSummer(new FixedDoubleParameter(0.624472));
@@ -88,12 +88,12 @@ public class FloridaLogisticDepartingFactoryTest {
         longlinerDepartingStrategy.setPriceGagGrouper(new FixedDoubleParameter(0.649616 / 2.20462262));
 
 
-        FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
-        Species gag = mock(Species.class);
-        when((state.getBiology().getSpecie("GagGrouper"))).thenReturn(gag);
-        DailyLogisticDepartingStrategy strategy = longlinerDepartingStrategy.apply(state);
+        final FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
+        final Species gag = mock(Species.class);
+        when((state.getBiology().getSpeciesByCaseInsensitiveName("GagGrouper"))).thenReturn(gag);
+        final DailyLogisticDepartingStrategy strategy = longlinerDepartingStrategy.apply(state);
 
-        Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        final Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
         when(fisher.getHomePort().getGasPricePerLiter()).thenReturn(2d);
         double probability = strategy.getClassifier().getProbability(
             fisher,

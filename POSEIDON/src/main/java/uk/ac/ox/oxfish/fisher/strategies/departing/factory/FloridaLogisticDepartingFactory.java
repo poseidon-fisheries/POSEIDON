@@ -88,11 +88,17 @@ public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLo
 
         coefficient = priceRedGrouper.applyAsDouble(state.getRandom());
         if (Double.isFinite(coefficient))
-            betas.put(new FishPriceExtractor(state.getBiology().getSpecie("RedGrouper")), coefficient);
+            betas.put(
+                new FishPriceExtractor(state.getBiology().getSpeciesByCaseInsensitiveName("RedGrouper")),
+                coefficient
+            );
 
         coefficient = priceGagGrouper.applyAsDouble(state.getRandom());
         if (Double.isFinite(coefficient))
-            betas.put(new FishPriceExtractor(state.getBiology().getSpecie("GagGrouper")), coefficient);
+            betas.put(
+                new FishPriceExtractor(state.getBiology().getSpeciesByCaseInsensitiveName("GagGrouper")),
+                coefficient
+            );
 
 
         return new DailyLogisticDepartingStrategy(

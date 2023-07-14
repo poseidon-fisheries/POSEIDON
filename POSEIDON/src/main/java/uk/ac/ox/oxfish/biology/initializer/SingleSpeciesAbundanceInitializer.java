@@ -42,7 +42,6 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.ToDoubleFunction;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 
@@ -108,20 +107,20 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer {
     /**
      * weights to each location
      */
-    private Map<SeaTile, Double> initialWeights = new HashMap<>();
+    private final Map<SeaTile, Double> initialWeights = new HashMap<>();
 
     public SingleSpeciesAbundanceInitializer(
-        String speciesName,
-        InitialAbundance initialAbundance,
-        BiomassAllocator intialAbundanceAllocator,
-        AgingProcess aging,
-        Meristics meristics,
-        double scaling,
-        RecruitmentProcess recruitmentProcess,
-        AbundanceDiffuser diffuser,
-        BiomassAllocator recruitmentAllocator,
-        BiomassAllocator habitabilityAllocator,
-        NaturalMortalityProcess mortality, boolean daily, boolean rounding
+        final String speciesName,
+        final InitialAbundance initialAbundance,
+        final BiomassAllocator intialAbundanceAllocator,
+        final AgingProcess aging,
+        final Meristics meristics,
+        final double scaling,
+        final RecruitmentProcess recruitmentProcess,
+        final AbundanceDiffuser diffuser,
+        final BiomassAllocator recruitmentAllocator,
+        final BiomassAllocator habitabilityAllocator,
+        final NaturalMortalityProcess mortality, final boolean daily, final boolean rounding
     ) {
         this.initialAbundance = initialAbundance;
         this.intialAbundanceAllocator = intialAbundanceAllocator;
@@ -148,11 +147,11 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer {
      * @param state
      */
     public SingleSpeciesAbundanceInitializer(
-        Path biologicalDirectory, String speciesName, double scaling, FishState state
+        final Path biologicalDirectory, final String speciesName, final double scaling, final FishState state
     ) {
         initialAbundance = new InitialAbundanceFromFileFactory(
             biologicalDirectory.resolve("count.csv")).apply(state);
-        StockAssessmentCaliforniaMeristics
+        final StockAssessmentCaliforniaMeristics
             cali = new MeristicsFileFactory(
             biologicalDirectory.resolve("meristics.yaml")
         ).apply(state);
@@ -194,15 +193,15 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer {
      */
     @Override
     public LocalBiology generateLocal(
-        GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-        int mapWidthInCells, NauticalMap map
+        final GlobalBiology biology, final SeaTile seaTile, final MersenneTwisterFast random, final int mapHeightInCells,
+        final int mapWidthInCells, final NauticalMap map
     ) {
 
 
         if (seaTile.isLand())
             return new EmptyLocalBiology();
         //weight we want to allocate to this area
-        double weight = intialAbundanceAllocator.allocate(
+        final double weight = intialAbundanceAllocator.allocate(
             seaTile,
             map,
             random
@@ -215,7 +214,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer {
         ) <= 0))
             return new EmptyLocalBiology();
         else {
-            AbundanceLocalBiology local = new AbundanceLocalBiology(biology);
+            final AbundanceLocalBiology local = new AbundanceLocalBiology(biology);
             initialWeights.put(seaTile, weight);
             return local;
         }
@@ -233,18 +232,18 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer {
      */
     @Override
     public void processMap(
-        GlobalBiology biology,
-        NauticalMap map,
-        MersenneTwisterFast random,
-        FishState model
+        final GlobalBiology biology,
+        final NauticalMap map,
+        final MersenneTwisterFast random,
+        final FishState model
     ) {
 
 
-        Species species = biology.getSpecie(speciesName);
+        final Species species = biology.getSpeciesByCaseInsensitiveName(speciesName);
 
         //read in the total number of fish
         initialAbundance.initialize(species);
-        double[][] totalCount = initialAbundance.getInitialAbundance();
+        final double[][] totalCount = initialAbundance.getInitialAbundance();
         assert totalCount.length == species.getNumberOfSubdivisions();
         Preconditions.checkArgument(
             totalCount[0].length == species.getNumberOfBins(),
@@ -255,7 +254,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer {
         //now the count is complete, let's distribute these fish uniformly throughout the seatiles
 
 
-        double sum = initialWeights.values().stream().mapToDouble(
+        final double sum = initialWeights.values().stream().mapToDouble(
             value -> value
         ).sum();
 
@@ -289,15 +288,15 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer {
          * this used to be collected when generating, but with other initializers it might not
          * be the case that what you generated was used; to be super-safe then we generate this year
          */
-        for (SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
+        for (final SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
             if (!initialWeights.containsKey(tile))
                 continue;
-            double ratio = initialWeights.get(tile) / sum;
+            final double ratio = initialWeights.get(tile) / sum;
 
             //cast is justified because we put it in ourselves!
             assert tile.getBiology() instanceof AbundanceLocalBiology;
             processes.add((AbundanceLocalBiology) tile.getBiology(), tile);
-            StructuredAbundance abundance = tile.getBiology().getAbundance(species);
+            final StructuredAbundance abundance = tile.getBiology().getAbundance(species);
             for (int bin = 0; bin < abundance.getBins(); bin++)
 
                 for (int subdivision = 0; subdivision < abundance.getSubdivisions(); subdivision++) {
@@ -323,10 +322,10 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer {
      */
     @Override
     public GlobalBiology generateGlobal(
-        MersenneTwisterFast random, FishState modelBeingInitialized
+        final MersenneTwisterFast random, final FishState modelBeingInitialized
     ) {
 
-        Species species = new Species(speciesName, meristics);
+        final Species species = new Species(speciesName, meristics);
         return new GlobalBiology(species);
 
     }

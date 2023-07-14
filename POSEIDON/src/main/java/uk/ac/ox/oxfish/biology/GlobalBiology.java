@@ -20,10 +20,16 @@
 
 package uk.ac.ox.oxfish.biology;
 
-import java.util.Arrays;
+import com.google.common.collect.ImmutableList;
+
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import static com.google.common.base.Suppliers.memoize;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 
 /**
  * The biology object containing general model-wise information like what species are modeled
@@ -34,18 +40,34 @@ public class GlobalBiology {
     /**
      * an unmodifiable list of species.
      */
-    private final Species species[];
+    private final Species[] species;
 
+    private final Supplier<Map<String, Species>> speciesByName;
+    private final Supplier<Map<String, Species>> speciesByCode;
 
-    private final List<Species> unmodifiableView;
+    private final List<Species> speciesList;
 
-    public GlobalBiology(Species... species) {
-
+    public GlobalBiology(final Species... species) {
 
         this.species = species;
         for (int i = 0; i < species.length; i++) //now assign a number to each
             species[i].resetIndexTo(i);
-        unmodifiableView = Collections.unmodifiableList(Arrays.asList(species));
+
+        speciesList = ImmutableList.copyOf(species);
+
+        // Memoizing the name and code maps allows us to
+        // build test biologies with mock species that
+        // have no names or code
+        speciesByName = memoize(() ->
+            speciesList
+                .stream()
+                .collect(toImmutableMap(Species::getName, identity()))
+        );
+        speciesByCode = memoize(() ->
+            speciesList
+                .stream()
+                .collect(toImmutableMap(Species::getCode, identity()))
+        );
     }
 
 
@@ -54,8 +76,8 @@ public class GlobalBiology {
      *
      * @param numberOfSpecies the number of species
      */
-    public static GlobalBiology genericListOfSpecies(int numberOfSpecies) {
-        Species[] generics = new Species[numberOfSpecies];
+    public static GlobalBiology genericListOfSpecies(final int numberOfSpecies) {
+        final Species[] generics = new Species[numberOfSpecies];
         for (int i = 0; i < numberOfSpecies; i++)
             generics[i] = new Species("Species " + i);
         return new GlobalBiology(generics);
@@ -66,28 +88,31 @@ public class GlobalBiology {
         return new GlobalBiology(species);
     }
 
-    public static GlobalBiology listOfSpeciesWithNames(String... names) {
-        Species[] generics = new Species[names.length];
-        for (int i = 0; i < names.length; i++)
-            generics[i] = new Species(names[i]);
-        return new GlobalBiology(generics);
-    }
-
     /**
      * @return an unmodifiable list of all the species available
      */
     public List<Species> getSpecies() {
-        return unmodifiableView;
+        return speciesList;
     }
 
-    public Species getSpecie(int order) {
+    public Species getSpecie(final int order) {
         return species[order];
     }
 
-    public Species getSpecie(String name) {
-        return unmodifiableView.stream().
-            filter(s -> s.getName().trim().equalsIgnoreCase(name.trim())).
-            findFirst().orElseGet(() -> null);
+    public Species getSpeciesByCaseInsensitiveName(final String name) {
+        return speciesList
+            .stream()
+            .filter(s -> s.getName().trim().equalsIgnoreCase(name.trim()))
+            .findFirst()
+            .orElse(null);
+    }
+
+    public Species getSpeciesByName(final String speciesName) {
+        return speciesByName.get().get(speciesName);
+    }
+
+    public Species getSpeciesByCode(final String speciesCode) {
+        return speciesByCode.get().get(speciesCode);
     }
 
     public int getSize() {

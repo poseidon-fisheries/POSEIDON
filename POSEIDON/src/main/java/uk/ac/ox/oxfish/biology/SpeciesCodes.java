@@ -28,7 +28,7 @@ public class SpeciesCodes {
     }
 
     public Species getSpeciesFromCode(final GlobalBiology globalBiology, final String speciesCode) {
-        return globalBiology.getSpecie(getSpeciesName(speciesCode));
+        return globalBiology.getSpeciesByCaseInsensitiveName(getSpeciesName(speciesCode));
     }
 
     public String getSpeciesName(final String speciesCode) {

@@ -120,7 +120,7 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
             .flatMap(columnName -> stream(
                 Optional
                     .of(speciesCodes.getSpeciesName(columnName.toUpperCase()))
-                    .map(globalBiology::getSpecie)
+                    .map(globalBiology::getSpeciesByCaseInsensitiveName)
                     .map(species -> entry(
                             species.getIndex(),
                             record.getDouble(columnName) * 1000 // convert tonnes to kg
