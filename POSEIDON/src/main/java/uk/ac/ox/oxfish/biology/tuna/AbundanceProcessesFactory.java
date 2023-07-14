@@ -46,7 +46,6 @@ public class AbundanceProcessesFactory
         );
         this.recruitmentProcessesFactory =
             new RecruitmentProcessesFactory(
-                speciesCodesSupplier,
                 inputFolder.path("recruitment_parameters.csv")
             );
         this.weightGroupsFactory =

@@ -20,7 +20,6 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentBySpawningBiomass;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
@@ -30,7 +29,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -45,7 +43,6 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public class RecruitmentProcessesFactory
     implements AlgorithmFactory<Map<Species, ? extends RecruitmentProcess>> {
 
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
     private GlobalBiology globalBiology;
     private InputPath recruitmentParametersFile;
 
@@ -56,19 +53,9 @@ public class RecruitmentProcessesFactory
     }
 
     public RecruitmentProcessesFactory(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final InputPath recruitmentParametersFile
     ) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
         this.recruitmentParametersFile = checkNotNull(recruitmentParametersFile);
-    }
-
-    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
-        return speciesCodesSupplier;
-    }
-
-    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     public void setGlobalBiology(final GlobalBiology globalBiology) {
@@ -88,11 +75,9 @@ public class RecruitmentProcessesFactory
     @Override
     public Map<Species, ? extends RecruitmentProcess> apply(final FishState fishState) {
         checkNotNull(globalBiology);
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         return recordStream(recruitmentParametersFile.get())
             .map(record -> {
-                final Species species = speciesCodes.getSpeciesFromCode(
-                    globalBiology,
+                final Species species = globalBiology.getSpeciesByCode(
                     record.getString("species_code")
                 );
                 final float r0 = record.getFloat("R0");
