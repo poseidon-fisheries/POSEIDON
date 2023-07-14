@@ -19,7 +19,6 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
@@ -29,7 +28,6 @@ import uk.ac.ox.oxfish.model.scenario.InputPath;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
@@ -53,10 +51,9 @@ public class AbundanceReallocatorFactory
 
     public AbundanceReallocatorFactory(
         final InputPath biomassDistributionsFilePath,
-        final int period,
-        final Supplier<SpeciesCodes> speciesCodesSupplier
+        final int period
     ) {
-        super(biomassDistributionsFilePath, period, speciesCodesSupplier);
+        super(biomassDistributionsFilePath, period);
     }
 
     @Override
@@ -65,7 +62,6 @@ public class AbundanceReallocatorFactory
 
         final AllocationGrids<SmallLargeAllocationGridsSupplier.Key> grids =
             new SmallLargeAllocationGridsSupplier(
-                getSpeciesCodesSupplier(),
                 getBiomassDistributionsFile().get(),
                 getMapExtent(),
                 365

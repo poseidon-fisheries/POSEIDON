@@ -19,7 +19,6 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import junit.framework.TestCase;
-import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
@@ -41,10 +40,7 @@ public class ScheduledBiomassProcessesFactoryTest extends TestCase {
 
         final BiomassReallocatorFactory biomassReallocatorFactory = new BiomassReallocatorFactory(
             inputFolder.path("biomass", "biomass_distributions.csv"),
-            365,
-            new SpeciesCodesFromFileFactory(
-                inputFolder.path("species_codes.csv")
-            )
+            365
         );
 
         final Path depthFile = Paths.get("inputs", "epo_inputs", "depth.csv");

@@ -20,9 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import com.google.common.collect.ImmutableMap;
 import com.univocity.parsers.common.record.Record;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.geography.MapExtent;
 
 import java.nio.file.Path;
@@ -52,7 +50,6 @@ public class SimpleAllocationGridsSupplier extends AbstractAllocationGridsSuppli
         final String keyName
     ) {
         super(
-            () -> new SpeciesCodes(ImmutableMap.of()), // dummy species code supplier
             gridsFilePath,
             mapExtent,
             period,
@@ -62,7 +59,7 @@ public class SimpleAllocationGridsSupplier extends AbstractAllocationGridsSuppli
     }
 
     @Override
-    String extractKeyFromRecord(final SpeciesCodes speciesCodes, final Record record) {
+    String extractKeyFromRecord(final Record record) {
         return keyName;
     }
 }

@@ -5,7 +5,6 @@ import org.junit.Test;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.Key;
@@ -16,7 +15,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -34,11 +32,7 @@ public class AbundanceReallocatorTest {
         when(meristics.getNumberOfSubdivisions()).thenReturn(2);
         when(meristics.getNumberOfBins()).thenReturn(2);
 
-        final Species species1 = new Species("Piano Tuna", meristics);
-
-        final Map<String, String> sCodes = new HashMap<>();
-        sCodes.put("SP1", species1.getName());
-        final Supplier<SpeciesCodes> speciesCodesSupplier = () -> new SpeciesCodes(sCodes);
+        final Species species1 = new Species("Piano Tuna", "SP1", meristics, false);
 
         final BiFunction<Species, Integer, SizeGroup> binToSizeGroup =
             (species, bin) -> bin == 0 ? SMALL : LARGE;
@@ -54,7 +48,6 @@ public class AbundanceReallocatorTest {
         );
 
         final AllocationGrids<Key> allocationGrids = new SmallLargeAllocationGridsSupplier(
-            speciesCodesSupplier,
             Paths.get("inputs", "epo_inputs", "tests", "mock_grids.csv"),
             nauticalMap.getMapExtent(),
             365

@@ -100,7 +100,7 @@ public class AbundanceReallocator
             identity(),
             species -> range(0, species.getNumberOfBins())
                 .mapToObj(bin -> allocationGrids.get(new Key(
-                    species.getName(),
+                    species.getCode(),
                     binToSizeGroup.apply(species, bin)
                 )))
                 .toArray(DoubleGrid2D[]::new)

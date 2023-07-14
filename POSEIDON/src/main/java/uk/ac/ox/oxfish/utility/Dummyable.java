@@ -7,7 +7,7 @@ import java.util.Arrays;
 public interface Dummyable {
     static void maybeUseDummyData(final InputPath dummyDataFolder, final Object... potentialDummyables) {
         Arrays.stream(potentialDummyables)
-            .filter(factory -> factory instanceof Dummyable)
+            .filter(Dummyable.class::isInstance)
             .forEach(factory -> ((Dummyable) factory).useDummyData(dummyDataFolder));
     }
 

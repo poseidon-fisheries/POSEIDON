@@ -19,7 +19,6 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import com.univocity.parsers.common.record.Record;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.geography.MapExtent;
 
 import java.nio.file.Path;
@@ -27,7 +26,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
@@ -44,23 +42,21 @@ public class SmallLargeAllocationGridsSupplier
 
     @SuppressWarnings("SameParameterValue")
     SmallLargeAllocationGridsSupplier(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final Path gridsFilePath,
         final MapExtent mapExtent,
         final int period
     ) {
-        super(speciesCodesSupplier, gridsFilePath, mapExtent, period, true);
+        super(gridsFilePath, mapExtent, period, true);
     }
 
     @Override
     Key extractKeyFromRecord(
-        final SpeciesCodes speciesCodes,
         final Record record
     ) {
         final String groupCode = record.getString("group");
         final String speciesCode = record.getString("species_code");
         return new Key(
-            speciesCodes.getSpeciesName(speciesCode),
+            speciesCode,
             Optional.ofNullable(groups.get(groupCode))
                 .orElseThrow(() -> new IllegalStateException("Unknown group code: " + groupCode))
         );
@@ -85,8 +81,8 @@ public class SmallLargeAllocationGridsSupplier
 
         private final SizeGroup sizeGroup;
 
-        Key(final String speciesName, final SizeGroup sizeGroup) {
-            super(speciesName);
+        Key(final String speciesCode, final SizeGroup sizeGroup) {
+            super(speciesCode);
             this.sizeGroup = sizeGroup;
         }
 

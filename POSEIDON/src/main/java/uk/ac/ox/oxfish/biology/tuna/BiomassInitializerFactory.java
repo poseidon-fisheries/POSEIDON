@@ -97,7 +97,7 @@ public class BiomassInitializerFactory
                 .entrySet()
                 .stream()
                 .collect(toImmutableMap(
-                    entry -> entry.getKey().getSpeciesName(),
+                    entry -> entry.getKey().getSpeciesCode(),
                     entry -> new GridAllocator(entry.getValue())
                 ));
 
@@ -119,7 +119,8 @@ public class BiomassInitializerFactory
     ) {
         return recordStream(schaeferParamsFile.get())
             .map(r -> {
-                final String speciesName = speciesCodes.getSpeciesName(r.getString("species_code"));
+                final String speciesCode = r.getString("species_code");
+                final String speciesName = speciesCodes.getSpeciesName(speciesCode);
                 final Double logisticGrowthRate = r.getDouble("logistic_growth_rate");
                 final Quantity<Mass> carryingCapacity =
                     getQuantity(r.getDouble("carrying_capacity_in_tonnes"), TONNE);
@@ -127,11 +128,12 @@ public class BiomassInitializerFactory
                     getQuantity(r.getDouble("total_biomass_in_tonnes"), TONNE);
                 return new SingleSpeciesBiomassInitializer(
                     new ConstantInitialBiomass(asDouble(totalBiomass, KILOGRAM)),
-                    initialAllocators.get(speciesName),
+                    initialAllocators.get(speciesCode),
                     new ConstantInitialBiomass(asDouble(carryingCapacity, KILOGRAM)),
                     new ConstantBiomassAllocator(Double.MAX_VALUE),
                     new NoMovement(),
                     speciesName,
+                    speciesCode,
                     new FadAwareLogisticGrowerInitializer(asDouble(carryingCapacity, KILOGRAM),
                         logisticGrowthRate, true
                     ),

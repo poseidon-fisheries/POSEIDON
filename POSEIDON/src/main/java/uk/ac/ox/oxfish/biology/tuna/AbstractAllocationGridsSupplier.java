@@ -23,10 +23,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.univocity.parsers.common.record.Record;
 import sim.field.grid.DoubleGrid2D;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.geography.MapExtent;
 
-import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -47,8 +45,6 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 abstract class AbstractAllocationGridsSupplier<K>
     implements Supplier<AllocationGrids<K>> {
 
-    @Nullable
-    private final Supplier<SpeciesCodes> speciesCodesSupplier;
     private final Path gridsFilePath;
     private final MapExtent mapExtent;
     private final int period;
@@ -59,13 +55,11 @@ abstract class AbstractAllocationGridsSupplier<K>
         CacheBuilder.newBuilder().build(CacheLoader.from(__ -> readGridsFromFile()));
 
     AbstractAllocationGridsSupplier(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final Path gridsFilePath,
         final MapExtent mapExtent,
         final int period,
         final boolean toNormalize
     ) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
         this.gridsFilePath = gridsFilePath;
         this.mapExtent = mapExtent;
         this.period = period;
@@ -100,12 +94,11 @@ abstract class AbstractAllocationGridsSupplier<K>
         checkNotNull(this.gridsFilePath);
         checkNotNull(this.mapExtent);
 
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
         final Map<LocalDate, Map<K, List<Record>>> recordsByDateAndKey =
             recordStream(gridsFilePath)
                 .collect(groupingBy(
                     r -> LocalDate.parse(r.getString("date")),
-                    groupingBy(record -> extractKeyFromRecord(speciesCodes, record))
+                    groupingBy(this::extractKeyFromRecord)
                 ));
 
         final LocalDate startDate = recordsByDateAndKey
@@ -132,7 +125,7 @@ abstract class AbstractAllocationGridsSupplier<K>
         );
     }
 
-    abstract K extractKeyFromRecord(SpeciesCodes speciesCodes, Record record);
+    abstract K extractKeyFromRecord(Record record);
 
     private static DoubleGrid2D makeGrid(
         final MapExtent mapExtent,

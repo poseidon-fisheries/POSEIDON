@@ -19,18 +19,14 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-
-import java.util.function.Supplier;
 
 abstract class ReallocatorFactory<B extends LocalBiology, T extends Reallocator<B>>
     implements AlgorithmFactory<T> {
 
     private MapExtent mapExtent;
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
     private InputPath biomassDistributionsFile;
     private Integer period;
 
@@ -42,20 +38,10 @@ abstract class ReallocatorFactory<B extends LocalBiology, T extends Reallocator<
 
     public ReallocatorFactory(
         final InputPath biomassDistributionsFile,
-        final Integer period,
-        final Supplier<SpeciesCodes> speciesCodesSupplier
+        final Integer period
     ) {
         this.biomassDistributionsFile = biomassDistributionsFile;
         this.period = period;
-        this.speciesCodesSupplier = speciesCodesSupplier;
-    }
-
-    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
-        return speciesCodesSupplier;
-    }
-
-    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
     public Integer getPeriod() {

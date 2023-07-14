@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics.FAKE_MERISTICS;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class SingleSpeciesBiomassInitializer implements BiologyInitializer {
@@ -64,6 +65,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer {
 
     final private String speciesName;
 
+    private final String speciesCode;
     final private LogisticGrowerInitializer grower;
 
 
@@ -90,27 +92,6 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer {
     private AllocatorManager habitabilityDistribution;
     private int numberOfHabitableCells = 0;
 
-    public SingleSpeciesBiomassInitializer(
-        final InitialBiomass initialTotalBiomass,
-        final BiomassAllocator initialAllocator, final InitialBiomass totalCapacity,
-        final BiomassAllocator carryingCapacityAllocator, final BiomassMovementRule movementRule,
-        final String speciesName,
-        final LogisticGrowerInitializer grower,
-        final boolean normalizeAllocators, final boolean unfishable
-    ) {
-        this.initialTotalBiomass = initialTotalBiomass;
-        this.initialAllocator = initialAllocator;
-        this.totalCapacity = totalCapacity;
-        this.carryingCapacityAllocator = carryingCapacityAllocator;
-        this.movementRule = movementRule;
-
-        this.speciesName = speciesName;
-        this.grower = grower;
-        this.normalizeAllocators = normalizeAllocators;
-        this.unfishable = unfishable;
-    }
-
-
     /**
      * this constructor assumes that the biomassAllocators will not be normalized and their output
      * provides the raw amount of biomass available/carrying capacity
@@ -126,19 +107,46 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer {
         final BiomassAllocator carryingCapacityAllocator,
         final BiomassMovementRule movementRule,
         final String speciesName,
-        final LogisticGrowerInitializer grower, final boolean unfishable
+        final LogisticGrowerInitializer grower,
+        final boolean unfishable
     ) {
-        this.unfishable = unfishable;
-        this.initialTotalBiomass = new ConstantInitialBiomass(1);
-        this.totalCapacity = new ConstantInitialBiomass(1);
+        this(
+            new ConstantInitialBiomass(1),
+            initialAllocator,
+            new ConstantInitialBiomass(1),
+            carryingCapacityAllocator,
+            movementRule,
+            speciesName,
+            speciesName,
+            grower,
+            false,
+            unfishable
+        );
+    }
 
 
+    public SingleSpeciesBiomassInitializer(
+        final InitialBiomass initialTotalBiomass,
+        final BiomassAllocator initialAllocator,
+        final InitialBiomass totalCapacity,
+        final BiomassAllocator carryingCapacityAllocator,
+        final BiomassMovementRule movementRule,
+        final String speciesName,
+        final String speciesCode,
+        final LogisticGrowerInitializer grower,
+        final boolean normalizeAllocators,
+        final boolean unfishable
+    ) {
+        this.initialTotalBiomass = initialTotalBiomass;
         this.initialAllocator = initialAllocator;
+        this.totalCapacity = totalCapacity;
         this.carryingCapacityAllocator = carryingCapacityAllocator;
         this.movementRule = movementRule;
         this.speciesName = speciesName;
+        this.speciesCode = speciesCode;
         this.grower = grower;
-        this.normalizeAllocators = false;
+        this.normalizeAllocators = normalizeAllocators;
+        this.unfishable = unfishable;
     }
 
     /**
@@ -346,9 +354,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer {
     public GlobalBiology generateGlobal(
         final MersenneTwisterFast random, final FishState modelBeingInitialized
     ) {
-
-
-        final Species species = new Species(speciesName);
+        final Species species = new Species(speciesName, speciesCode, FAKE_MERISTICS, false);
         final GlobalBiology independentGlobalBiology = new GlobalBiology(species);
         //create maps of where the fish is
         initialDistribution = new AllocatorManager(

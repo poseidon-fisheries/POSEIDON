@@ -93,19 +93,18 @@ public class SingleSpeciesBiomassNormalizedFactory implements AlgorithmFactory<S
 
         final Double actualCarryingCapacity = carryingCapacity.applyAsDouble(state.getRandom());
         return new SingleSpeciesBiomassInitializer(
-            new ConstantInitialBiomass(Double.NaN)
-            ,
+            new ConstantInitialBiomass(Double.NaN),
             initialBiomassAllocator.apply(state),
             biomassSuppliedPerCell ? new PerCellInitialBiomass(actualCarryingCapacity) :
                 new ConstantInitialBiomass(actualCarryingCapacity),
             initialCapacityAllocator.apply(state),
             movementRate > 0 & movementLimit > 0 ?
                 new SmoothMovementRule(
-
                     percentageLimitOnDailyMovement.applyAsDouble(state.getRandom()),
                     differentialPercentageToMove.applyAsDouble(state.getRandom())
                 ) :
                 new NoMovement(),
+            speciesName,
             speciesName,
             grower.apply(state),
             true,

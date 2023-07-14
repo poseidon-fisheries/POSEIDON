@@ -32,8 +32,7 @@ public class BiomassProcessesFactory extends BiologicalProcessesFactory<BiomassL
             ),
             new BiomassReallocatorFactory(
                 inputFolder.path("biomass_distributions.csv"),
-                365,
-                speciesCodesSupplier
+                365
             ),
             new BiomassRestorerFactory(),
             new ScheduledBiomassProcessesFactory()

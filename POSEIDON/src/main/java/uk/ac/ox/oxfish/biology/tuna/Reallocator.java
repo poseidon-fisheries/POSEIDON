@@ -108,18 +108,18 @@ public abstract class Reallocator<B extends LocalBiology> implements BiologicalP
 
     static class SpeciesKey {
 
-        private final String speciesName;
+        private final String speciesCode;
 
-        SpeciesKey(final String speciesName) {
-            this.speciesName = speciesName;
+        SpeciesKey(final String speciesCode) {
+            this.speciesCode = speciesCode;
         }
 
-        public String getSpeciesName() {
-            return speciesName;
+        public String getSpeciesCode() {
+            return speciesCode;
         }
 
         public Species getSpecies(final GlobalBiology biology) {
-            return biology.getSpeciesByCaseInsensitiveName(speciesName);
+            return biology.getSpeciesByCode(speciesCode);
         }
 
         @Override
@@ -127,12 +127,12 @@ public abstract class Reallocator<B extends LocalBiology> implements BiologicalP
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             final SpeciesKey that = (SpeciesKey) o;
-            return speciesName.equals(that.speciesName);
+            return speciesCode.equals(that.speciesCode);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(speciesName);
+            return Objects.hash(speciesCode);
         }
     }
 

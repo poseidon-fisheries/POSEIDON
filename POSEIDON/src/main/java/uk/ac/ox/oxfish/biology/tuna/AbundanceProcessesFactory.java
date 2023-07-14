@@ -33,8 +33,7 @@ public class AbundanceProcessesFactory
             ),
             new AbundanceReallocatorFactory(
                 inputFolder.path("grids.csv"),
-                365,
-                speciesCodesSupplier
+                365
             ),
             new AbundanceRestorerFactory(
                 ImmutableMap.of(0, 365)

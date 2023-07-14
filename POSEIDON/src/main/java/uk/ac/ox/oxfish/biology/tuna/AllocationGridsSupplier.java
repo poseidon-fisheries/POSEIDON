@@ -19,32 +19,28 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import com.univocity.parsers.common.record.Record;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.tuna.Reallocator.SpeciesKey;
 import uk.ac.ox.oxfish.geography.MapExtent;
 
 import java.nio.file.Path;
-import java.util.function.Supplier;
 
 class AllocationGridsSupplier
     extends AbstractAllocationGridsSupplier<SpeciesKey> {
 
     AllocationGridsSupplier(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
         final Path gridsFilePath,
         final MapExtent mapExtent,
         final int period
     ) {
-        super(speciesCodesSupplier, gridsFilePath, mapExtent, period, true);
+        super(gridsFilePath, mapExtent, period, true);
     }
 
     @Override
     SpeciesKey extractKeyFromRecord(
-        final SpeciesCodes speciesCodes,
         final Record record
     ) {
         return new SpeciesKey(
-            speciesCodes.getSpeciesName(record.getString("species_code"))
+            record.getString("species_code")
         );
     }
 
