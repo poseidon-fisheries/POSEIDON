@@ -44,7 +44,9 @@ public class EpoGravityBiomassScenarioTest {
         );
 
         final Regulation regulation = new FishingSeason(true, 100);
-        scenario.getAdditionalStartables().add(state -> model -> {
+        scenario.getAdditionalStartables().put(
+            "Catches checker",
+            state -> model -> {
                 model.getFishers().forEach(fisher -> fisher.setRegulation(regulation));
                 state.scheduleEveryYear(simState -> {
                     final FishStateYearlyTimeSeries yearlyDataSet =

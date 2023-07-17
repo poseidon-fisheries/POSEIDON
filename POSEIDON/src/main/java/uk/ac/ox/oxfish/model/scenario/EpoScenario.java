@@ -50,9 +50,9 @@ import uk.ac.ox.oxfish.utility.parameters.StringParameter;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Map;
 
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
@@ -74,6 +74,17 @@ public abstract class EpoScenario<B extends LocalBiology>
     private int targetYear = 2017;
     private InputPath inputFolder = InputPath.of("inputs", "epo_inputs");
     private final InputPath testInputFolder = inputFolder.path("tests");
+    private Map<String, AlgorithmFactory<? extends Startable>> additionalStartables =
+        new HashMap<>(ImmutableMap.of(
+            "FAD zapper", new FadZapperFactory(
+                new FixedDoubleParameter(300),
+                new IntegerParameter(20)
+            ),
+            "Shear map", new EnvironmentalMapFactory(
+                new StringParameter("Shear"),
+                getInputFolder().path("currents", "shear.csv")
+            )
+        ));
     private BiologicalProcessesFactory<B> biologicalProcessesFactory;
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
         inputFolder,
@@ -84,17 +95,6 @@ public abstract class EpoScenario<B extends LocalBiology>
         )
     );
     private FadMapFactory fadMapFactory;
-    private List<AlgorithmFactory<? extends Startable>> additionalStartables =
-        Stream.of(
-            new FadZapperFactory(
-                new FixedDoubleParameter(300),
-                new IntegerParameter(20)
-            ),
-            new EnvironmentalMapFactory(
-                new StringParameter("Shear"),
-                getInputFolder().path("currents", "shear.csv")
-            )
-        ).collect(Collectors.toList());
     private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
         new FromFileMapInitializerFactory(
             getInputFolder().path("depth.csv"),
@@ -152,7 +152,7 @@ public abstract class EpoScenario<B extends LocalBiology>
         fishState.setFadMap(fadMap);
         fishState.registerStartable(fadMap);
 
-        additionalStartables.stream()
+        additionalStartables.values().stream()
             .map(additionalStartable -> additionalStartable.apply(fishState))
             .forEach(fishState::registerStartable);
 
@@ -186,16 +186,6 @@ public abstract class EpoScenario<B extends LocalBiology>
         return LocalDate.of(targetYear - 1, 1, 1);
     }
 
-    @SuppressWarnings("unused")
-    public List<AlgorithmFactory<? extends Startable>> getAdditionalStartables() {
-        return additionalStartables;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAdditionalStartables(final List<AlgorithmFactory<? extends Startable>> additionalStartables) {
-        this.additionalStartables = additionalStartables;
-    }
-
     @Override
     public ScenarioEssentials start(final FishState fishState) {
         System.out.println("Starting model...");
@@ -207,7 +197,9 @@ public abstract class EpoScenario<B extends LocalBiology>
 
         final BiologicalProcessesFactory.Processes biologicalProcesses =
             biologicalProcessesFactory.initProcesses(nauticalMap, fishState);
-        biologicalProcesses.startableFactories.forEach(getAdditionalStartables()::add);
+        biologicalProcesses.startableFactories.forEach(bpf ->
+            getAdditionalStartables().put(bpf.toString(), bpf)
+        );
         final GlobalBiology globalBiology = biologicalProcesses.globalBiology;
 
         nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));
@@ -219,6 +211,14 @@ public abstract class EpoScenario<B extends LocalBiology>
 
     public AlgorithmFactory<? extends MapInitializer> getMapInitializerFactory() {
         return mapInitializerFactory;
+    }
+
+    public Map<String, AlgorithmFactory<? extends Startable>> getAdditionalStartables() {
+        return additionalStartables;
+    }
+
+    public void setAdditionalStartables(final Map<String, AlgorithmFactory<? extends Startable>> additionalStartables) {
+        this.additionalStartables = additionalStartables;
     }
 
     @SuppressWarnings("unused")
