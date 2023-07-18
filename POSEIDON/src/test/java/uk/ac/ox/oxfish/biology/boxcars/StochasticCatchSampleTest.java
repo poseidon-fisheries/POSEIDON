@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
 import com.beust.jcommander.internal.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
 import uk.ac.ox.oxfish.fisher.Fisher;

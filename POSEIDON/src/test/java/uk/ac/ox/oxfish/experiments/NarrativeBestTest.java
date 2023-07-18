@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.experiments;
 
 import org.jfree.util.Log;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;

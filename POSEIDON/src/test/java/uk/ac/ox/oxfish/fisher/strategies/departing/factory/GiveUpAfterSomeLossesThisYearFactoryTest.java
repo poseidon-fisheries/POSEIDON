@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.GiveUpAfterSomeLossesThisYearDecorator;
 import uk.ac.ox.oxfish.model.FishState;

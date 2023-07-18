@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.geography;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;

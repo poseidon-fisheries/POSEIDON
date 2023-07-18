@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import com.beust.jcommander.internal.Lists;
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
@@ -31,7 +31,6 @@ import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightLogisticFactor
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.List;

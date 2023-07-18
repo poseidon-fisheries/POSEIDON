@@ -1,8 +1,7 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 import static org.junit.Assert.assertEquals;

@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.biology.weather.initializer;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;

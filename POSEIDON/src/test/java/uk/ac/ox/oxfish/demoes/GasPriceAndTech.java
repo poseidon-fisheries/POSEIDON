@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.demoes;
 
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static uk.ac.ox.oxfish.experiments.BestGearWins.efficiencyImitation;
 

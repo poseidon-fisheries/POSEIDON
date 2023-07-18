@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by carrknight on 12/6/16.

@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.demoes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.experiments.MarketFirstDemo;
 import uk.ac.ox.oxfish.fisher.Fisher;

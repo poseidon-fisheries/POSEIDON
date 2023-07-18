@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.maximization.generic.CommaMapOptimizationParameter;

@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;

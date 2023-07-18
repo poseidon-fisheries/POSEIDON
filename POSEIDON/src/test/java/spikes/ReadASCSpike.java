@@ -21,6 +21,7 @@
 package spikes;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.grid.DoubleGrid2D;
 import sim.io.geo.ArcInfoASCGridImporter;
@@ -35,7 +36,7 @@ import java.net.URL;
 public class ReadASCSpike {
 
 
-    @org.junit.Test
+    @Test
     public void canRead() throws Exception {
 
 

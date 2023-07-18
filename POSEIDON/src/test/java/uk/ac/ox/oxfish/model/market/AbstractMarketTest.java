@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.model.market;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.Species;

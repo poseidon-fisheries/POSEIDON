@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.demoes;
 
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishOnceFactory;

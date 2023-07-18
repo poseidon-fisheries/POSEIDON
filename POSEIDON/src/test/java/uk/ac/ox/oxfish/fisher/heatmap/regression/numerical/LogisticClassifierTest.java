@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import org.jfree.util.Log;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 

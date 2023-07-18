@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;

@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.biology.initializer.factory;
 
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.boxcars.BoxCarSimulator;
 import uk.ac.ox.oxfish.biology.boxcars.FixedBoxcarAging;
 import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;

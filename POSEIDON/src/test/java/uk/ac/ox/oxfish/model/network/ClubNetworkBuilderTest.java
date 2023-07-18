@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.model.network;
 
 import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;

@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.geography.fads;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassAggregatingFad;

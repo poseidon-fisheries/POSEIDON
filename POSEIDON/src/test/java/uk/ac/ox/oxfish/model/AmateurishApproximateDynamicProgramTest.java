@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.model;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.utility.dynapro.AmateurishApproximateDynamicProgram;
 
 import java.util.Map;

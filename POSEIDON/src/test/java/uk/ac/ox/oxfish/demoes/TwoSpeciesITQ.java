@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.WellMixedBiologyFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;

@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.biology;
 
 import com.beust.jcommander.internal.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower;
 import uk.ac.ox.oxfish.model.FishState;
 

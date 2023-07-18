@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import com.beust.jcommander.internal.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FullSeasonalRetiredDecoratorFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.MaxHoursPerYearDepartingFactory;

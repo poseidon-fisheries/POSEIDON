@@ -20,15 +20,12 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.Fisher;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeWithHeadStartFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
-
-import java.util.function.ToDoubleFunction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;

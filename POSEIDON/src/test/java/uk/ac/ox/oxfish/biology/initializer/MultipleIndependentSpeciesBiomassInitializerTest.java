@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
 import com.beust.jcommander.internal.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import uk.ac.ox.oxfish.biology.BiomassDiffuserContainer;

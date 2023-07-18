@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.biology;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.mockito.Mockito.*;

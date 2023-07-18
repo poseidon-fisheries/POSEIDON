@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.geography;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.geography.pathfinding.Pathfinder;
 

@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import ec.util.MersenneTwisterFast;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.complicated.factory.MeristicsFileFactory;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.model.FishState;

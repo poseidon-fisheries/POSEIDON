@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.HillClimberAcquisitionFunction;

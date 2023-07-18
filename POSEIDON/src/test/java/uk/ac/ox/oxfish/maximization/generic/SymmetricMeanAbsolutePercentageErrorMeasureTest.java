@@ -19,7 +19,7 @@
 
 package uk.ac.ox.oxfish.maximization.generic;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 import static uk.ac.ox.oxfish.maximization.generic.SymmetricMeanAbsolutePercentageErrorMeasure.INSTANCE;

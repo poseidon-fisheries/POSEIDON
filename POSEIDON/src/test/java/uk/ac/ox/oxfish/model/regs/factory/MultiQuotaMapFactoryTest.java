@@ -21,8 +21,8 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
@@ -53,7 +53,7 @@ public class MultiQuotaMapFactoryTest {
     private FishState state;
     private MultiQuotaMapFactory factory;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         Logger.getGlobal().setLevel(Level.INFO);
         factory = new MultiQuotaMapFactory();

@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertTrue;
 

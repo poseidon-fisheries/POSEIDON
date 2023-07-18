@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
 import org.jfree.util.Log;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionGearFactory;
@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborTransduc
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.tripbased.ProfitFunctionRegression;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.ProfitFunction;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;

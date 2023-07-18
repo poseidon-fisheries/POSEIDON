@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;

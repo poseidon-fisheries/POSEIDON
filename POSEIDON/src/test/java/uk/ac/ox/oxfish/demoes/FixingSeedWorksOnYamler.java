@@ -20,8 +20,8 @@
 
 package uk.ac.ox.oxfish.demoes;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.YamlMain;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -58,7 +58,7 @@ public class FixingSeedWorksOnYamler {
         FishStateUtilities.deleteRecursively(Paths.get("output", "replicate2").toFile());
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
 
         final File[] filesInOutputFolder = Paths.get("output").toFile().listFiles();

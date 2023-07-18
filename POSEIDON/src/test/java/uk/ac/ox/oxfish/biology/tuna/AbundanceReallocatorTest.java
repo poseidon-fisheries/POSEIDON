@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableSortedMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;

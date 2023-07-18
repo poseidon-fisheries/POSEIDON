@@ -20,7 +20,7 @@
 
 package spikes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by carrknight on 2/22/16.

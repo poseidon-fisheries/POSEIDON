@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
 import uk.ac.ox.oxfish.model.FishState;

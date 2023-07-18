@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.engine.Schedule;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.*;

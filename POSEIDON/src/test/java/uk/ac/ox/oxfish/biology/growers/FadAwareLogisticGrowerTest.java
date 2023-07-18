@@ -19,7 +19,7 @@
 
 package uk.ac.ox.oxfish.biology.growers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.tuna.BiomassProcessesFactory;
 import uk.ac.ox.oxfish.model.FishState;

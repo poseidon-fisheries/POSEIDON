@@ -19,7 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.FixedProportionGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;

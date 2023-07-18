@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborTransductionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;

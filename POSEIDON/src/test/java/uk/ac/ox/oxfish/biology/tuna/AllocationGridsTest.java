@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.Key;
 import uk.ac.ox.oxfish.geography.NauticalMap;

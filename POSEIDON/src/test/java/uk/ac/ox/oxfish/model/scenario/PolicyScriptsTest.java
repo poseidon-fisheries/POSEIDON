@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionGearFactory;
 import uk.ac.ox.oxfish.model.FishState;

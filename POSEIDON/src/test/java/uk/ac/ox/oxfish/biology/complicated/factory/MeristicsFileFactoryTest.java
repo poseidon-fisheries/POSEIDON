@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.model.FishState;
 

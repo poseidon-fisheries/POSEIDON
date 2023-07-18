@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.model.data.collectors;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CounterSpeedTest {
 

@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.OscillatingWeatherFactory;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.WindThresholdFactory;
 import uk.ac.ox.oxfish.model.FishState;

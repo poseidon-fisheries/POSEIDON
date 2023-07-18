@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;

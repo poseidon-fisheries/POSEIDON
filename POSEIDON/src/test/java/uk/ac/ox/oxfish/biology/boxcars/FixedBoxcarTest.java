@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.VariableProportionAging;
 import uk.ac.ox.oxfish.biology.complicated.factory.FixedRecruitmentFactory;

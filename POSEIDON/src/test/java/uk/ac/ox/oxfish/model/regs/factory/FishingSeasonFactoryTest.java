@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;

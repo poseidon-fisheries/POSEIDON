@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression.basis;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridYExtractor;

@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
 import com.beust.jcommander.internal.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
 

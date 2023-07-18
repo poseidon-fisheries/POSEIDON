@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.model.data.collectors;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;

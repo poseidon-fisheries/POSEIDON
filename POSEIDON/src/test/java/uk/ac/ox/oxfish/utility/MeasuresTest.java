@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.utility;
 
 import org.jfree.util.Log;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;

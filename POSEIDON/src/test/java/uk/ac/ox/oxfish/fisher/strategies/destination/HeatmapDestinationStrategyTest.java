@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;

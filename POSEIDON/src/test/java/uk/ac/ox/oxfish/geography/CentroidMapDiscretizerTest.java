@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.geography;
 
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.geography.discretization.CentroidMapDiscretizer;
 import uk.ac.ox.oxfish.geography.discretization.CentroidMapFileFactory;

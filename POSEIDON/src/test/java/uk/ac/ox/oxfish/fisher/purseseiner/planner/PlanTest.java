@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 

@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.model;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;

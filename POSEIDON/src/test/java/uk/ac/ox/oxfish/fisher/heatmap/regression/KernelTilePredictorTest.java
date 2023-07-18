@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridYExtractor;

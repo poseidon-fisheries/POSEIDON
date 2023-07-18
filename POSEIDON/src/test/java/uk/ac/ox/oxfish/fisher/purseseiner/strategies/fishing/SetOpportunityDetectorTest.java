@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.util.Bag;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;

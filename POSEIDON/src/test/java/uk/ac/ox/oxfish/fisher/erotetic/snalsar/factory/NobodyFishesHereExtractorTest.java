@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.NobodyFishesHereExtractor;
 import uk.ac.ox.oxfish.geography.SeaTile;

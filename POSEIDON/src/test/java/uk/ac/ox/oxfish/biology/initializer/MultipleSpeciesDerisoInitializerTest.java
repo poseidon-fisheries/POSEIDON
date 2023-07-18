@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
 import org.jfree.util.Log;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -36,7 +36,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
-import java.util.function.ToDoubleFunction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

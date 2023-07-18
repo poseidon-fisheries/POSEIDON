@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.SpaceOnlyKernelRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;

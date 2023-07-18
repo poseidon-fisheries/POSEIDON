@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.ConstantLocalBiology;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;

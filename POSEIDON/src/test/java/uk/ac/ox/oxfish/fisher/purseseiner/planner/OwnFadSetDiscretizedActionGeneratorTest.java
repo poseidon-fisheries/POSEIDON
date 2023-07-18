@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -42,7 +42,6 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
-import uk.ac.ox.poseidon.regulations.api.Regulation;
 
 import java.util.List;
 import java.util.Map.Entry;

@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.erotetic.snalsar;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;

@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.biology.initializer.factory;
 import ec.util.MersenneTwisterFast;
 import org.jfree.util.Log;
 import org.jfree.util.LogTarget;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;

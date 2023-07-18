@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;

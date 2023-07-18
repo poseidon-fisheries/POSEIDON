@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.geography.currents;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.util.Double2D;
 import sim.util.Int2D;
 

@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 
 import static org.junit.Assert.assertEquals;

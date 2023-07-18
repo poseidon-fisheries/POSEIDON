@@ -21,8 +21,7 @@
 package uk.ac.ox.oxfish.model;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Test;
-import sim.engine.SimState;
+import org.junit.jupiter.api.Test;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;

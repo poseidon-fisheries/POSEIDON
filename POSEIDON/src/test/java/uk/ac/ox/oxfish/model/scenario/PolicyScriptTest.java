@@ -21,8 +21,8 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import org.jfree.util.Log;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.FixedProportionGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionGearFactory;
@@ -46,7 +46,7 @@ public class PolicyScriptTest {
 
     private FishState state;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setFishers(5);

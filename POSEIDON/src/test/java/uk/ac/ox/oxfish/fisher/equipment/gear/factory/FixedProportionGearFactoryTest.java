@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.equipment.gear.FixedProportionGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;

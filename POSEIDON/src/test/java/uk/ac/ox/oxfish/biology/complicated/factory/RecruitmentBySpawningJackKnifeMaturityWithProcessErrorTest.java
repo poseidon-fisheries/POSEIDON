@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.DoubleSummaryStatistics;

@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.model.data;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 public class MovingSumTest {

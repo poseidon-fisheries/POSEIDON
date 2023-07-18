@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.geography.sampling;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.nio.file.Path;

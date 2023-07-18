@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.factory.TargetSpeciesObjectiveFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;

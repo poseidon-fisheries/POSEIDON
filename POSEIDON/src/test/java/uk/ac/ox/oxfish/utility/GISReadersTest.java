@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.utility;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.grid.DoubleGrid2D;
 

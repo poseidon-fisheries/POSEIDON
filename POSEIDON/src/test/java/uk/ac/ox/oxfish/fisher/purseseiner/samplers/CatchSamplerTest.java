@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.ImmutableDoubleArray;
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 
 import java.util.Map;

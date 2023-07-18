@@ -21,12 +21,11 @@
 package uk.ac.ox.oxfish.fisher.erotetic;
 
 import org.jfree.util.Log;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +41,7 @@ public class ThresholdAnswerTest {
     private LinkedList<Double> options;
     private FeatureExtractors<Double> extractor;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         options = new LinkedList<>();
         options.add(1d);

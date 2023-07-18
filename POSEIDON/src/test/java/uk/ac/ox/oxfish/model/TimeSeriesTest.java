@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 

@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.model.market.itq;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscarding;

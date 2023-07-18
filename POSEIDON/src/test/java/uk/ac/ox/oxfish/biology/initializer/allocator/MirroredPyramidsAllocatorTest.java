@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.biology.initializer.allocator;
 import com.beust.jcommander.internal.Lists;
 import ec.util.MersenneTwisterFast;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;

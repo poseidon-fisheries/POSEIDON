@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.model.event;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.CommonLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.WellMixedBiologyFactory;
@@ -30,7 +30,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
 import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedHashMap;

@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.strategies.departing.WeatherLogisticDepartingStrategy;

@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.demoes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.RockyLogisticFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HabitatAwareGearFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;

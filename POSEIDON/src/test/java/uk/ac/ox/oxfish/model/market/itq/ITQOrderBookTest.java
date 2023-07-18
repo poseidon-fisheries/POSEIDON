@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.model.market.itq;
 
 import ec.util.MersenneTwisterFast;
 import org.jfree.util.Log;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;

@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.utility;
 
 import com.beust.jcommander.internal.Lists;
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;

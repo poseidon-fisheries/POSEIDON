@@ -19,8 +19,8 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.equipment;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -48,7 +48,7 @@ public class PurseSeineGearTest {
 
     private PurseSeineGear purseSeineGear;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final FishState fishState = mock(FishState.class);
         when(fishState.getBiology()).thenReturn(new GlobalBiology());

@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.bayes.Belief;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.bayes.ParticleFilter;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;

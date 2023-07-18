@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.selfanalysis.profit;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripListener;

@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.maximization.generic;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 
