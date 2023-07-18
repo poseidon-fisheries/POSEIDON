@@ -1,13 +1,14 @@
 package uk.ac.ox.oxfish.parameters;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class CalibrationGeneratorTest extends TestCase {
+public class CalibrationGeneratorTest {
 
+    @Test
     public void testGenerateCalibration() {
         final Path calibrationFolder = Paths.get("inputs", "epo_inputs", "calibration");
         new CalibrationGenerator().generateCalibration(

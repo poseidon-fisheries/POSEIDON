@@ -6,7 +6,8 @@ import com.google.common.collect.ObjectArrays;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import com.vividsolutions.jts.geom.Coordinate;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
@@ -21,10 +22,11 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.Collectors.*;
 import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
 
-public class EpoScenarioCustomRegionalDivisionTest extends TestCase {
+public class EpoScenarioCustomRegionalDivisionTest {
 
     final RegionalDivision division = EpoScenario.REGIONAL_DIVISION;
 
+    @Test
     public void testLocationsInDivision() {
 
         final ImmutableMap<Coordinate, String> testPoints =
@@ -40,7 +42,7 @@ public class EpoScenarioCustomRegionalDivisionTest extends TestCase {
                 .build();
 
         testPoints.forEach(((coordinate, regionName) ->
-            assertEquals(coordinate.toString(), regionName, division.getRegion(coordinate).getName())
+            Assert.assertEquals(coordinate.toString(), regionName, division.getRegion(coordinate).getName())
         ));
 
     }
@@ -49,6 +51,7 @@ public class EpoScenarioCustomRegionalDivisionTest extends TestCase {
      * The goal of this method is to write the regional boundaries to a file more than it is to test
      * the TicTacToeRegionalDivision per se...
      */
+    @Test
     public void testWriteRegionalBoundaries() {
         final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
         final NauticalMap map = fishState.getMap();

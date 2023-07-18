@@ -19,7 +19,8 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableList;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -43,8 +44,9 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
-public class BiomassReallocatorTest extends TestCase {
+public class BiomassReallocatorTest {
 
+    @Test
     public void test() {
         final ImmutableList<DoubleGrid2D> grids = Stream
             .of(
@@ -67,7 +69,7 @@ public class BiomassReallocatorTest extends TestCase {
         );
 
         final List<Double> initialBiomasses = getBiomasses(globalBiology, nauticalMap);
-        assertEquals(ImmutableList.of(9.0, 9.0), initialBiomasses);
+        Assert.assertEquals(ImmutableList.of(9.0, 9.0), initialBiomasses);
 
         final BiomassReallocator biomassReallocator = new BiomassReallocator(
             AllocationGrids.from(
@@ -96,10 +98,7 @@ public class BiomassReallocatorTest extends TestCase {
             biomassAggregator.apply(fishState.getBiology(), biomassExtractor.apply(fishState))
         );
 
-        assertEquals(
-            ImmutableList.of(9.0, 9.0),
-            getBiomasses(globalBiology, nauticalMap)
-        );
+        Assert.assertEquals(ImmutableList.of(9.0, 9.0), getBiomasses(globalBiology, nauticalMap));
 
         assertArrayEquals(
             new double[][]{{3, 3, 3}, {0, 0, 0}, {0, 0, 0}},

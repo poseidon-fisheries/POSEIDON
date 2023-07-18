@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
@@ -43,7 +44,7 @@ public class NauticalMapTest {
     public void readTilesDepthCorrectly() {
 
 
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(
+        final NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(
             new StraightLinePathfinder(),
             "test.asc",
             "fakempa.shp"
@@ -77,7 +78,7 @@ public class NauticalMapTest {
 
         //test2.asc is like test.asc but it should be so that lower-left corner center grid is exactly lat0,long0 and
         //grid size is 1
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(
+        final NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(
             new StraightLinePathfinder(),
             "test2.asc",
             "fakempa.shp"
@@ -95,7 +96,7 @@ public class NauticalMapTest {
     public void readMPAsCorrectly() {
 
 
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(
+        final NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(
             new StraightLinePathfinder(),
             "test.asc",
             "fakempa.shp"
@@ -117,11 +118,14 @@ public class NauticalMapTest {
 
 
         //read the 5by5 asc
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(new StraightLinePathfinder(), "5by5.asc");
+        final NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(
+            new StraightLinePathfinder(),
+            "5by5.asc"
+        );
         //it has 3 sea columns and then 2 columns of land
         //I can put a port for each coastal land port
         for (int row = 0; row < 5; row++) {
-            Port port = new Port("Port 0", map.getSeaTile(3, row), mock(MarketMap.class), 0);
+            final Port port = new Port("Port 0", map.getSeaTile(3, row), mock(MarketMap.class), 0);
             map.addPort(port);
             map.getPorts().contains(port);
             assertEquals(map.getPortMap().getObjectLocation(port).x, 3);
@@ -134,34 +138,45 @@ public class NauticalMapTest {
 
     }
 
-    @Test(expected = IllegalArgumentException.class)
     public void addPortsOnSeaIsWrong() {
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(new StraightLinePathfinder(), "5by5.asc");
-        map.addPort(new Port(
-            "Port 0",
-            map.getSeaTile(2, 0),
-            mock(MarketMap.class),
-            0
-        )); //throws exception since the seatile is underwater
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            final NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(
+                new StraightLinePathfinder(),
+                "5by5.asc"
+            );
+            map.addPort(new Port(
+                "Port 0",
+                map.getSeaTile(2, 0),
+                mock(MarketMap.class),
+                0
+            )); //throws exception since the seatile is underwater
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
     public void addPortsAwayFromSeaIsWrong() {
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(new StraightLinePathfinder(), "5by5.asc");
-        map.addPort(new Port(
-            "Port 0",
-            map.getSeaTile(4, 0),
-            mock(MarketMap.class),
-            0
-        )); //it's on land but there is no sea around.
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            final NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(
+                new StraightLinePathfinder(),
+                "5by5.asc"
+            );
+            map.addPort(new Port(
+                "Port 0",
+                map.getSeaTile(4, 0),
+                mock(MarketMap.class),
+                0
+            )); //it's on land but there is no sea around.
+        });
     }
 
 
     @Test
     public void towCountCorrect() throws Exception {
 
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(new StraightLinePathfinder(), "5by5.asc");
-        FishState state = new FishState(0l);
+        final NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(
+            new StraightLinePathfinder(),
+            "5by5.asc"
+        );
+        final FishState state = new FishState(0L);
         map.recordFishing(map.getSeaTile(2, 2));
         map.recordFishing(map.getSeaTile(2, 2));
         map.recordFishing(map.getSeaTile(2, 3));

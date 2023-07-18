@@ -18,7 +18,8 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
@@ -32,8 +33,9 @@ import java.util.Arrays;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
-public class ScheduledBiomassProcessesFactoryTest extends TestCase {
+public class ScheduledBiomassProcessesFactoryTest {
 
+    @Test
     public void testBuildBiomassGrids() {
 
         final InputPath inputFolder = InputPath.of("inputs", "epo_inputs");
@@ -52,17 +54,13 @@ public class ScheduledBiomassProcessesFactoryTest extends TestCase {
             biomassReallocatorFactory.apply(mock(FishState.class));
         final AllocationGrids<?> allocationGrids =
             biomassReallocator.getAllocationGrids();
-        assertEquals(12, allocationGrids.size());
+        Assert.assertEquals(12, allocationGrids.size());
         allocationGrids.values().forEach(gridsPerSpecies -> {
-            assertEquals(3, gridsPerSpecies.size());
+            Assert.assertEquals(3, gridsPerSpecies.size());
             gridsPerSpecies.values().forEach(grid -> {
-                assertEquals(100, grid.getHeight());
-                assertEquals(101, grid.getWidth());
-                assertEquals(
-                    1.0,
-                    Arrays.stream(grid.field).flatMapToDouble(Arrays::stream).sum(),
-                    EPSILON
-                );
+                Assert.assertEquals(100, grid.getHeight());
+                Assert.assertEquals(101, grid.getWidth());
+                Assert.assertEquals(1.0, Arrays.stream(grid.field).flatMapToDouble(Arrays::stream).sum(), EPSILON);
             });
         });
     }

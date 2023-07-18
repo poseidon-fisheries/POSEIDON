@@ -18,11 +18,12 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 
-public class FadsOnlyEpoGravityAbundanceScenarioTest extends TestCase {
+public class FadsOnlyEpoGravityAbundanceScenarioTest {
 
+    @Test
     public void testRunTwoYearsWithoutCrashing() {
         final EpoFadsOnlyAbundanceScenario scenario = new EpoFadsOnlyAbundanceScenario();
         scenario.useDummyData();

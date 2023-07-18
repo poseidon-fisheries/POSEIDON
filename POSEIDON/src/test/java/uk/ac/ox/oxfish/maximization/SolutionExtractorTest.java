@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.maximization;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -8,11 +9,12 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertArrayEquals;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
-public class SolutionExtractorTest extends TestCase {
+public class SolutionExtractorTest {
 
     private final Path logFilePath = Paths.get("inputs", "tests", "calibration_log.md");
     private final SolutionExtractor solutionExtractor = new SolutionExtractor(logFilePath);
 
+    @Test
     public void testBestSolution() {
         assertArrayEquals(
             new double[]{
@@ -25,7 +27,8 @@ public class SolutionExtractorTest extends TestCase {
         );
     }
 
+    @Test
     public void testAllSolutions() {
-        assertEquals(80, solutionExtractor.allSolutions().size());
+        Assert.assertEquals(80, solutionExtractor.allSolutions().size());
     }
 }

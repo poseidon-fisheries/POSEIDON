@@ -1,14 +1,15 @@
 package uk.ac.ox.oxfish.model.scenario;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.*;
 import java.nio.file.Paths;
 
-public class EpoScenarioTest extends TestCase {
+public class EpoScenarioTest {
 
+    @Test
     public void testSaveAndLoadEpoGravityAbundanceScenario() {
         saveAndLoadYaml(EpoGravityAbundanceScenario.class);
     }
@@ -40,18 +41,22 @@ public class EpoScenarioTest extends TestCase {
         }
     }
 
+    @Test
     public void testSaveAndLoadEpoGravityBiomassScenario() {
         saveAndLoadYaml(EpoGravityBiomassScenario.class);
     }
 
+    @Test
     public void testSaveAndLoadEpoFadsOnlyAbundanceScenario() {
         saveAndLoadYaml(EpoFadsOnlyAbundanceScenario.class);
     }
 
+    @Test
     public void testSaveAndLoadEpoAbundanceScenario() {
         saveAndLoadYaml(EpoAbundanceScenario.class);
     }
 
+    @Test
     public void testSaveAndLoadEpoPathPlannerAbundanceScenario() {
         saveAndLoadYaml(EpoPathPlannerAbundanceScenario.class);
     }

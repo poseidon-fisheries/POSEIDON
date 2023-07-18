@@ -1,12 +1,13 @@
 package uk.ac.ox.oxfish.maximization;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import static org.apache.commons.math3.util.Precision.EPSILON;
 import static org.junit.Assert.assertArrayEquals;
 
-public class OneAtATimeSensitivityTest extends TestCase {
+public class OneAtATimeSensitivityTest {
 
+    @Test
     public void testValueRange() {
         assertArrayEquals(
             new double[]{0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100},

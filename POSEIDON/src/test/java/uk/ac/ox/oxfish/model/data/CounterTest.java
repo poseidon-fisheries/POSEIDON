@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.model.data;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
@@ -35,7 +36,7 @@ public class CounterTest {
     @Test
     public void countAndReset() throws Exception {
 
-        Counter counter = new Counter(IntervalPolicy.EVERY_DAY);
+        final Counter counter = new Counter(IntervalPolicy.EVERY_DAY);
         counter.start(mock(FishState.class));
         counter.addColumn("Variable1");
         counter.addColumn("Variable2");
@@ -54,20 +55,21 @@ public class CounterTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
     public void registerTwiceTheSameColumn() {
-        Counter counter = new Counter(IntervalPolicy.EVERY_DAY);
-        counter.start(mock(FishState.class));
-        counter.addColumn("Variable1");
-        counter.addColumn("Variable1");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            final Counter counter = new Counter(IntervalPolicy.EVERY_DAY);
+            counter.start(mock(FishState.class));
+            counter.addColumn("Variable1");
+            counter.addColumn("Variable1");
+        });
     }
 
-    @Test(expected = NullPointerException.class)
     public void addWithoutRegistering() {
-        Counter counter = new Counter(IntervalPolicy.EVERY_DAY);
-        counter.start(mock(FishState.class));
-        counter.count("Variable1", 100);
-        counter.getColumn("Variable1");
-
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            final Counter counter = new Counter(IntervalPolicy.EVERY_DAY);
+            counter.start(mock(FishState.class));
+            counter.count("Variable1", 100);
+            counter.getColumn("Variable1");
+        });
     }
 }

@@ -1,18 +1,20 @@
 package uk.ac.ox.oxfish.maximization;
 
 import com.beust.jcommander.JCommander;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
-public class TwoPunchCalibrationTest extends TestCase {
+public class TwoPunchCalibrationTest {
 
+    @Test
     public void testArgsParsing() {
         final TwoPunchCalibration twoPunchCalibration = new TwoPunchCalibration();
         JCommander.newBuilder()
             .addObject(twoPunchCalibration)
             .build()
             .parse("-p 32 -g 100 -l 200".split("\\s+"));
-        assertEquals(32, twoPunchCalibration.getParallelThreads());
-        assertEquals(100, twoPunchCalibration.getMaxGlobalCalls());
-        assertEquals(200, twoPunchCalibration.getMaxLocalCalls());
+        Assert.assertEquals(32, twoPunchCalibration.getParallelThreads());
+        Assert.assertEquals(100, twoPunchCalibration.getMaxGlobalCalls());
+        Assert.assertEquals(200, twoPunchCalibration.getMaxLocalCalls());
     }
 }

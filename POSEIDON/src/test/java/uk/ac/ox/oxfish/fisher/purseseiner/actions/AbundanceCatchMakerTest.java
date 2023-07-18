@@ -19,7 +19,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import com.google.common.collect.ImmutableMap;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -31,8 +31,9 @@ import java.util.Map.Entry;
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertArrayEquals;
 
-public class AbundanceCatchMakerTest extends TestCase {
+public class AbundanceCatchMakerTest {
 
+    @Test
     public void testApply() {
 
         final Species twoBinner = new Species(

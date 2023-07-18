@@ -18,8 +18,8 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import junit.framework.TestCase;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -28,12 +28,13 @@ import java.util.Map.Entry;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
-public class BiomassCatchMakerTest extends TestCase {
+public class BiomassCatchMakerTest {
 
     private final GlobalBiology globalBiology = GlobalBiology.genericListOfSpecies(2);
 
     private final CatchMaker<BiomassLocalBiology> catchMaker = new BiomassCatchMaker(globalBiology);
 
+    @Test
     public void testApply() {
         final Entry<Catch, BiomassLocalBiology> caughtAndUncaught =
             catchMaker.apply(

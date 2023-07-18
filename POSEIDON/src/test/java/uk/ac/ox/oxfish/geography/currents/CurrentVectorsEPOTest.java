@@ -1,7 +1,8 @@
 package uk.ac.ox.oxfish.geography.currents;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
@@ -14,7 +15,8 @@ import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO.ZERO_VECTOR;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
-public class CurrentVectorsEPOTest extends TestCase {
+public class CurrentVectorsEPOTest {
+    @Test
     public void testEpoScenarioHasNoDeadCells() {
         final FishState fishState = new FishState();
         fishState.setScenario(new EpoGravityAbundanceScenario());
@@ -36,6 +38,6 @@ public class CurrentVectorsEPOTest extends TestCase {
                     .filter(step -> currentVectors.getVector(step, seaTile.getGridLocation()).equals(ZERO_VECTOR))
                     .mapToObj(step -> entry(nauticalMap.getCoordinates(seaTile), step))
             ).collect(toImmutableList());
-        assertTrue(currentlessCells.isEmpty());
+        Assert.assertTrue(currentlessCells.isEmpty());
     }
 }

@@ -20,7 +20,8 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Sets;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceRestorer;
@@ -38,8 +39,9 @@ import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
 
 
-public class EpoGravityAbundanceScenarioTest extends TestCase {
+public class EpoGravityAbundanceScenarioTest {
 
+    @Test
     public void testRunOneYearWithoutCrashing() {
         final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
         do {
@@ -53,6 +55,7 @@ public class EpoGravityAbundanceScenarioTest extends TestCase {
      * Otherwise, even if the grid's values sum up to 1.0, some biomass will be lost during the
      * reallocation process.
      */
+    @Test
     public void testAllNonZeroGridCellsMapRightBiologySeaTiles() {
 
         final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
@@ -81,23 +84,21 @@ public class EpoGravityAbundanceScenarioTest extends TestCase {
 
         final ImmutableSortedMap<Integer, ? extends Map<?, DoubleGrid2D>> grids =
             reallocator.getAllocationGrids().getGrids();
-        assertTrue(
-            grids.entrySet().stream().allMatch(entry1 ->
-                entry1.getValue().entrySet().stream().allMatch(entry2 -> {
-                    final DoubleGrid2D grid = entry2.getValue();
-                    final Set<Int2D> nonZeroGridCells =
-                        range(0, grid.field.length).boxed()
-                            .flatMap(x ->
-                                range(0, grid.field[x].length)
-                                    .filter(y -> grid.get(x, y) > 0)
-                                    .boxed()
-                                    .map(y -> new Int2D(x, y))
-                            )
-                            .collect(toImmutableSet());
-                    return Sets.difference(nonZeroGridCells, rightBiologySeaTiles).isEmpty();
-                })
-            )
-        );
+        Assert.assertTrue(grids.entrySet().stream().allMatch(entry1 ->
+            entry1.getValue().entrySet().stream().allMatch(entry2 -> {
+                final DoubleGrid2D grid = entry2.getValue();
+                final Set<Int2D> nonZeroGridCells =
+                    range(0, grid.field.length).boxed()
+                        .flatMap(x ->
+                            range(0, grid.field[x].length)
+                                .filter(y -> grid.get(x, y) > 0)
+                                .boxed()
+                                .map(y -> new Int2D(x, y))
+                        )
+                        .collect(toImmutableSet());
+                return Sets.difference(nonZeroGridCells, rightBiologySeaTiles).isEmpty();
+            })
+        ));
     }
 
 }

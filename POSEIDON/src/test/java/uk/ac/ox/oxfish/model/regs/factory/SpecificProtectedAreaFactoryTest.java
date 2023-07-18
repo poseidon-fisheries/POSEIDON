@@ -3,7 +3,8 @@ package uk.ac.ox.oxfish.model.regs.factory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Booleans;
 import com.vividsolutions.jts.geom.Coordinate;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
@@ -21,10 +22,11 @@ import static java.util.stream.Collectors.*;
 import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public class SpecificProtectedAreaFactoryTest extends TestCase {
+public class SpecificProtectedAreaFactoryTest {
 
     final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
 
+    @Test
     public void testEveryEEZHasTilesInArea() {
         final Set<SpecificProtectedArea> areas =
             fishState.getFishers().stream().flatMap(fisher ->
@@ -44,9 +46,10 @@ public class SpecificProtectedAreaFactoryTest extends TestCase {
                 )
                 .collect(toImmutableList());
 
-        assertEquals(ImmutableList.of(), areasWithNoTiles);
+        Assert.assertEquals(ImmutableList.of(), areasWithNoTiles);
     }
 
+    @Test
     public void testEEZPoints() {
 
         final Map<String, List<TestPoint>> testPoints =
@@ -86,7 +89,7 @@ public class SpecificProtectedAreaFactoryTest extends TestCase {
                 )
                 .collect(toImmutableList());
 
-        assertEquals(ImmutableList.of(), failures);
+        Assert.assertEquals(ImmutableList.of(), failures);
 
     }
 

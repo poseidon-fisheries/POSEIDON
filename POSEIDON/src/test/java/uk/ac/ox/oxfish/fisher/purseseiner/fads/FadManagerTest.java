@@ -19,7 +19,8 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import ec.util.MersenneTwisterFast;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -50,8 +51,9 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.numberOfPermissibleActions;
 import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
-public class FadManagerTest extends TestCase {
+public class FadManagerTest {
 
+    @Test
     public void testFadsGoBackInStockAfterSet() {
 
         final FadInitializer<BiomassLocalBiology, BiomassAggregatingFad> fadInitializer =
@@ -92,27 +94,28 @@ public class FadManagerTest extends TestCase {
         fadManager.setNumFadsInStock(10);
         final BiomassAggregatingFad fad1 = (BiomassAggregatingFad) fadManager.deployFadInCenterOfTile(seaTile, rng);
 
-        assertEquals(9, fadManager.getNumFadsInStock());
-        assertEquals(1, fadManager.getNumberOfActiveFads());
+        Assert.assertEquals(9, fadManager.getNumFadsInStock());
+        Assert.assertEquals(1, fadManager.getNumberOfActiveFads());
 
         // try a successful set
         when(rng.nextDouble()).thenReturn(1.0);
         new FadSetAction(fad1, fisher, 1.0)
             .act(fishState, fadManager.getFisher(), anarchy, 24);
-        assertEquals(10, fadManager.getNumFadsInStock());
+        Assert.assertEquals(10, fadManager.getNumFadsInStock());
 
         final BiomassAggregatingFad fad2 = (BiomassAggregatingFad) fadManager.deployFadInCenterOfTile(seaTile, rng);
-        assertEquals(9, fadManager.getNumFadsInStock());
-        assertEquals(2, fadManager.getNumberOfActiveFads());
+        Assert.assertEquals(9, fadManager.getNumFadsInStock());
+        Assert.assertEquals(2, fadManager.getNumberOfActiveFads());
 
         // try with a failed set
         when(rng.nextDouble()).thenReturn(1.0);
         new FadSetAction(fad2, fisher, 1.0)
             .act(fishState, fadManager.getFisher(), anarchy, 24);
-        assertEquals(10, fadManager.getNumFadsInStock());
+        Assert.assertEquals(10, fadManager.getNumFadsInStock());
 
     }
 
+    @Test
     public void testNumberOfRemainingActions() {
         final FishState fishState = mock(FishState.class);
         final MersenneTwisterFast rng = mock(MersenneTwisterFast.class);
@@ -146,31 +149,25 @@ public class FadManagerTest extends TestCase {
 
         range(0, 10).forEach(deploy);
 
-        assertEquals(
-            15,
-            numberOfPermissibleActions(
-                fisher,
-                new ForbiddenIf(fadLimit).apply(fishState),
-                yearlyActionCounter,
-                numberOfActiveFads.get(),
-                DPL,
-                50
-            )
-        );
+        Assert.assertEquals(15, numberOfPermissibleActions(
+            fisher,
+            new ForbiddenIf(fadLimit).apply(fishState),
+            yearlyActionCounter,
+            numberOfActiveFads.get(),
+            DPL,
+            50
+        ));
 
         range(0, 5).forEach(deploy);
 
-        assertEquals(
-            5,
-            numberOfPermissibleActions(
-                fisher,
-                new ForbiddenIf(new AnyOf(fadLimit, actionLimit)).apply(fishState),
-                yearlyActionCounter,
-                numberOfActiveFads.get(),
-                DPL,
-                50
-            )
-        );
+        Assert.assertEquals(5, numberOfPermissibleActions(
+            fisher,
+            new ForbiddenIf(new AnyOf(fadLimit, actionLimit)).apply(fishState),
+            yearlyActionCounter,
+            numberOfActiveFads.get(),
+            DPL,
+            50
+        ));
 
     }
 }

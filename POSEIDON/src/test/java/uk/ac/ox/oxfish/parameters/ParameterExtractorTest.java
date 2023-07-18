@@ -1,13 +1,14 @@
 package uk.ac.ox.oxfish.parameters;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
 import uk.ac.ox.oxfish.utility.parameters.Parameter;
 
 import java.util.stream.Stream;
 
-public class ParameterExtractorTest extends TestCase {
+public class ParameterExtractorTest {
 
+    @Test
     public void testGetParameters() {
         final Stream<ParameterExtractor<Parameter>.Parameter> parameters =
             new ParameterExtractor<>(Parameter.class)
