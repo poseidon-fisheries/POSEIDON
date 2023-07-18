@@ -81,8 +81,10 @@ dependencies {
     implementation group: 'de.openea', name: 'eva2', version: '2.2.0'
 
     //testing:
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
     testImplementation 'org.junit.vintage:junit-vintage-engine:5.9.3'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    
     testImplementation 'org.mockito:mockito-core:4.3.1'
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.7'
 
@@ -99,11 +101,18 @@ processTestResources.doFirst {
     duplicatesStrategy = "include"
 }
 
-//this makes tests multi-threaded when called from gradle. Useful!
 test {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
     minHeapSize = "1024m"
     maxHeapSize = "4G" // GitHub actions was crashing on 6GB, let's see if 4GB fixes it...
+    //this makes tests multi-threaded when called from gradle. Useful!
     maxParallelForks = Math.min(Runtime.runtime.availableProcessors(), 8)
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
 }
 
 tasks.withType(Test) {
@@ -112,13 +121,6 @@ tasks.withType(Test) {
 
         // Optionally do:
         showStackTraces = true
-    }
-}
-
-test {
-    useJUnit()
-    testLogging {
-        events "passed", "skipped", "failed"
     }
 }
 
