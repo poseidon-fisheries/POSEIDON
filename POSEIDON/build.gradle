@@ -113,19 +113,10 @@ tasks.named('test', Test) {
     useJUnitPlatform()
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     testLogging {
         exceptionFormat = 'full'
-
-        // Optionally do:
         showStackTraces = true
-    }
-}
-
-if (hasProperty('buildScan')) {
-    buildScan {
-        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-        termsOfServiceAgree = 'yes'
     }
 }
 
