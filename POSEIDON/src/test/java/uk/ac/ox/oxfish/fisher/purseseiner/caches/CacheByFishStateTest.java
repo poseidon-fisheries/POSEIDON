@@ -19,12 +19,12 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.caches;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class CacheByFishStateTest {
@@ -40,9 +40,9 @@ public class CacheByFishStateTest {
         final FishState fishStateA = mock(FishState.class);
         final FishState fishStateB = mock(FishState.class);
 
-        assertEquals((Integer) 1, cache.get(fishStateA));
-        assertEquals((Integer) 2, cache.get(fishStateB));
-        assertEquals((Integer) 1, cache.get(fishStateA));
+        Assertions.assertEquals((Integer) 1, cache.get(fishStateA));
+        Assertions.assertEquals((Integer) 2, cache.get(fishStateB));
+        Assertions.assertEquals((Integer) 1, cache.get(fishStateA));
     }
 
 }

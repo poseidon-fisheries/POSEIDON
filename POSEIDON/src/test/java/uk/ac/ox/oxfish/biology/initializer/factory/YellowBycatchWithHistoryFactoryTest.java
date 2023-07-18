@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
 import com.google.common.collect.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -29,8 +30,6 @@ import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 3/17/17.
@@ -42,7 +41,7 @@ public class YellowBycatchWithHistoryFactoryTest {
     public void virgin() throws Exception {
 
         //numbers numbers numbers
-        YellowBycatchWithHistoryFactory factory = new YellowBycatchWithHistoryFactory();
+        final YellowBycatchWithHistoryFactory factory = new YellowBycatchWithHistoryFactory();
         factory.setHistoricalTargetBiomass(Lists.newArrayList(527154d, 527154d, 527154d, 527154d, 527154d, 527154d));
         factory.setTargetRho(new FixedDoubleParameter(1.03));
         factory.setTargetNaturalSurvivalRate(new FixedDoubleParameter(0.92311));
@@ -57,22 +56,22 @@ public class YellowBycatchWithHistoryFactoryTest {
         factory.setHistoricalBycatchBiomass(null);
 
 
-        PrototypeScenario scenario = new PrototypeScenario();
+        final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setBiologyInitializer(factory);
         scenario.setFishers(0);
-        SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
+        final SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
         mapInitializer.setHeight(new FixedDoubleParameter(4));
         mapInitializer.setWidth(new FixedDoubleParameter(4));
         mapInitializer.setMaxLandWidth(new FixedDoubleParameter(1));
         scenario.setMapInitializer(mapInitializer);
 
-        FishState state = new FishState();
+        final FishState state = new FishState();
         state.setScenario(scenario);
         state.start();
         while (state.getYear() <= 3) {
             state.schedule.step(state);
         }
-        assertEquals(state.getTotalBiomass(state.getSpecies().get(0)), 527154d, .001);
+        Assertions.assertEquals(state.getTotalBiomass(state.getSpecies().get(0)), 527154d, .001);
 
     }
 
@@ -80,7 +79,7 @@ public class YellowBycatchWithHistoryFactoryTest {
     public void virginByNull() throws Exception {
 
         //numbers numbers numbers
-        YellowBycatchWithHistoryFactory factory = new YellowBycatchWithHistoryFactory();
+        final YellowBycatchWithHistoryFactory factory = new YellowBycatchWithHistoryFactory();
         factory.setHistoricalTargetBiomass(null);
         factory.setTargetRho(new FixedDoubleParameter(1.03));
         factory.setTargetNaturalSurvivalRate(new FixedDoubleParameter(0.92311));
@@ -95,22 +94,22 @@ public class YellowBycatchWithHistoryFactoryTest {
         factory.setHistoricalBycatchBiomass(null);
 
 
-        PrototypeScenario scenario = new PrototypeScenario();
+        final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setBiologyInitializer(factory);
         scenario.setFishers(0);
-        SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
+        final SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
         mapInitializer.setHeight(new FixedDoubleParameter(4));
         mapInitializer.setWidth(new FixedDoubleParameter(4));
         mapInitializer.setMaxLandWidth(new FixedDoubleParameter(1));
         scenario.setMapInitializer(mapInitializer);
 
-        FishState state = new FishState();
+        final FishState state = new FishState();
         state.setScenario(scenario);
         state.start();
         while (state.getYear() <= 3) {
             state.schedule.step(state);
         }
-        assertEquals(state.getTotalBiomass(state.getSpecies().get(0)), 527154d, .001);
+        Assertions.assertEquals(state.getTotalBiomass(state.getSpecies().get(0)), 527154d, .001);
 
     }
 
@@ -119,7 +118,7 @@ public class YellowBycatchWithHistoryFactoryTest {
     public void onePercentFishingMortality() throws Exception {
 
         //numbers numbers numbers
-        YellowBycatchWithHistoryFactory factory = new YellowBycatchWithHistoryFactory();
+        final YellowBycatchWithHistoryFactory factory = new YellowBycatchWithHistoryFactory();
         factory.setHistoricalTargetBiomass(null);
         factory.setTargetRho(new FixedDoubleParameter(1.03));
         factory.setTargetNaturalSurvivalRate(new FixedDoubleParameter(0.92311));
@@ -134,33 +133,33 @@ public class YellowBycatchWithHistoryFactoryTest {
         factory.setHistoricalBycatchBiomass(null);
 
 
-        PrototypeScenario scenario = new PrototypeScenario();
+        final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setBiologyInitializer(factory);
         scenario.setFishers(0);
-        SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
+        final SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
         mapInitializer.setHeight(new FixedDoubleParameter(4));
         mapInitializer.setWidth(new FixedDoubleParameter(4));
         mapInitializer.setMaxLandWidth(new FixedDoubleParameter(1));
         scenario.setMapInitializer(mapInitializer);
 
-        FishState state = new FishState();
+        final FishState state = new FishState();
         state.setScenario(scenario);
         state.start();
-        Species target = state.getSpecies().get(0);
+        final Species target = state.getSpecies().get(0);
 
         while (state.getYear() <= 3) {
             state.schedule.step(state);
 
             if (state.getDayOfTheYear() == 100) { // at day 100 kill off one % of all the target
                 System.out.println(state.getTotalBiomass(target));
-                for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
+                for (final SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
                     tile.reactToThisAmountOfBiomassBeingFished(
                         new Catch(target, tile.getBiomass(target) * .01, state.getBiology()),
                         null, state.getBiology()
                     );
             }
         }
-        assertEquals(state.getTotalBiomass(target), 509166.4d, .1);
+        Assertions.assertEquals(state.getTotalBiomass(target), 509166.4d, .1);
 
     }
 
@@ -169,7 +168,7 @@ public class YellowBycatchWithHistoryFactoryTest {
     public void startatyear12() throws Exception {
 
         //numbers numbers numbers
-        YellowBycatchWithHistoryFactory factory = new YellowBycatchWithHistoryFactory();
+        final YellowBycatchWithHistoryFactory factory = new YellowBycatchWithHistoryFactory();
         factory.setHistoricalTargetBiomass(Lists.newArrayList(
             505317.4,
             501682.3,
@@ -192,33 +191,33 @@ public class YellowBycatchWithHistoryFactoryTest {
         factory.setHistoricalBycatchBiomass(null);
 
 
-        PrototypeScenario scenario = new PrototypeScenario();
+        final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setBiologyInitializer(factory);
         scenario.setFishers(0);
-        SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
+        final SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
         mapInitializer.setHeight(new FixedDoubleParameter(4));
         mapInitializer.setWidth(new FixedDoubleParameter(4));
         mapInitializer.setMaxLandWidth(new FixedDoubleParameter(1));
         scenario.setMapInitializer(mapInitializer);
 
-        FishState state = new FishState();
+        final FishState state = new FishState();
         state.setScenario(scenario);
         state.start();
-        Species target = state.getSpecies().get(0);
+        final Species target = state.getSpecies().get(0);
 
         while (state.getYear() <= 3) {
             state.schedule.step(state);
 
             if (state.getDayOfTheYear() == 100) { // at day 100 kill off one % of all the target
                 System.out.println(state.getTotalBiomass(target));
-                for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
+                for (final SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
                     tile.reactToThisAmountOfBiomassBeingFished(
                         new Catch(target, tile.getBiomass(target) * .01, state.getBiology()),
                         null, state.getBiology()
                     );
             }
         }
-        assertEquals(state.getTotalBiomass(target), 478923.5d, .1);
+        Assertions.assertEquals(state.getTotalBiomass(target), 478923.5d, .1);
 
     }
 

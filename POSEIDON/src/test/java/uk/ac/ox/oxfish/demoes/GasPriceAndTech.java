@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static uk.ac.ox.oxfish.experiments.BestGearWins.efficiencyImitation;
@@ -37,7 +37,7 @@ public class GasPriceAndTech {
             System.out.println(averageTech);
         }
 
-        Assert.assertTrue(averageTech / 3d < 5);
+        Assertions.assertTrue(averageTech / 3d < 5);
 
 
     }
@@ -49,7 +49,7 @@ public class GasPriceAndTech {
             averageTech += efficiencyImitation(0, 20, "Independent Logistic", System.currentTimeMillis()).getLatest();
 
 
-        Assert.assertTrue(averageTech / 3d > 5);
+        Assertions.assertTrue(averageTech / 3d > 5);
 
 
     }

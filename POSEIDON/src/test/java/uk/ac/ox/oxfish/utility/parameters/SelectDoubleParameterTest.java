@@ -21,9 +21,8 @@
 package uk.ac.ox.oxfish.utility.parameters;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertEquals;
 
 
 public class SelectDoubleParameterTest {
@@ -85,8 +84,8 @@ public class SelectDoubleParameterTest {
 
 
         final SelectDoubleParameter parameter = new SelectDoubleParameter("5 6");
-        assertEquals(parameter.getPossibleValues()[0], 5, .0001);
-        assertEquals(parameter.getPossibleValues()[1], 6, .0001);
+        Assertions.assertEquals(parameter.getPossibleValues()[0], 5, .0001);
+        Assertions.assertEquals(parameter.getPossibleValues()[1], 6, .0001);
         parameter.setValueString("1 2 3");
         //make sure they are all selected!
         int first = 0;

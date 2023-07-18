@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -28,8 +29,6 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -73,12 +72,12 @@ public class FromLeftToRightMixedInitializerTest {
         );
 
 
-        assertTrue(left.getBiomass(species1) > middle.getBiomass(species1));
-        assertTrue(middle.getBiomass(species1) > right.getBiomass(species1));
-        assertTrue(left.getBiomass(species2) > middle.getBiomass(species2));
-        assertTrue(middle.getBiomass(species2) > right.getBiomass(species2));
-        assertEquals(left.getBiomass(species1) / left.getBiomass(species2), .5, .001);
-        assertEquals(middle.getBiomass(species1) / middle.getBiomass(species2), .5, .001);
+        Assertions.assertTrue(left.getBiomass(species1) > middle.getBiomass(species1));
+        Assertions.assertTrue(middle.getBiomass(species1) > right.getBiomass(species1));
+        Assertions.assertTrue(left.getBiomass(species2) > middle.getBiomass(species2));
+        Assertions.assertTrue(middle.getBiomass(species2) > right.getBiomass(species2));
+        Assertions.assertEquals(left.getBiomass(species1) / left.getBiomass(species2), .5, .001);
+        Assertions.assertEquals(middle.getBiomass(species1) / middle.getBiomass(species2), .5, .001);
     }
 }
 

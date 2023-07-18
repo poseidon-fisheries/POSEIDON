@@ -20,11 +20,11 @@
 
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,11 +47,11 @@ public class TargetSpeciesTripObjectiveTest {
         Species species = mock(Species.class);
         when(species.getIndex()).thenReturn(0);
         TargetSpeciesTripObjective obj = new TargetSpeciesTripObjective(species, false);
-        assertEquals(obj.extractUtilityFromTrip(null, record, null), (20 - 50d) / 10d, .001d);
+        Assertions.assertEquals(obj.extractUtilityFromTrip(null, record, null), (20 - 50d) / 10d, .001d);
 
         when(species.getIndex()).thenReturn(1);
         obj = new TargetSpeciesTripObjective(species, true);
-        assertEquals(obj.extractUtilityFromTrip(null, record, null), (200 - 50 - 50) / 10d, .001d);
+        Assertions.assertEquals(obj.extractUtilityFromTrip(null, record, null), (200 - 50 - 50) / 10d, .001d);
 
 
     }

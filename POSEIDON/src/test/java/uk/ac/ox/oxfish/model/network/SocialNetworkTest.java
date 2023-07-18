@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.model.network;
 import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -32,8 +33,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -61,22 +60,22 @@ public class SocialNetworkTest {
         SocialNetwork network = new SocialNetwork(networkPopulator);
 
         network.populate(state);
-        assertTrue(!network.getAllNeighbors(zero).contains(one));
-        assertTrue(!network.getDirectedNeighbors(zero).contains(one));
-        assertTrue(!network.getAllNeighbors(one).contains(zero));
-        assertTrue(!network.getDirectedNeighbors(zero).contains(zero));
+        Assertions.assertTrue(!network.getAllNeighbors(zero).contains(one));
+        Assertions.assertTrue(!network.getDirectedNeighbors(zero).contains(one));
+        Assertions.assertTrue(!network.getAllNeighbors(one).contains(zero));
+        Assertions.assertTrue(!network.getDirectedNeighbors(zero).contains(zero));
         network.addRandomFriend(zero, fishers, state.getRandom());
 
         //by necessity it must have connected to one
-        assertTrue(network.getAllNeighbors(zero).contains(one));
-        assertTrue(network.getDirectedNeighbors(zero).contains(one));
-        assertTrue(network.getAllNeighbors(one).contains(zero));
-        assertTrue(!network.getDirectedNeighbors(one).contains(zero));
+        Assertions.assertTrue(network.getAllNeighbors(zero).contains(one));
+        Assertions.assertTrue(network.getDirectedNeighbors(zero).contains(one));
+        Assertions.assertTrue(network.getAllNeighbors(one).contains(zero));
+        Assertions.assertTrue(!network.getDirectedNeighbors(one).contains(zero));
 
-        assertEquals(network.getBackingnetwork().getSuccessorCount(zero), 1);
-        assertEquals(network.getBackingnetwork().getSuccessorCount(one), 0);
-        assertEquals(network.getBackingnetwork().getPredecessorCount(zero), 0);
-        assertEquals(network.getBackingnetwork().getPredecessorCount(one), 1);
+        Assertions.assertEquals(network.getBackingnetwork().getSuccessorCount(zero), 1);
+        Assertions.assertEquals(network.getBackingnetwork().getSuccessorCount(one), 0);
+        Assertions.assertEquals(network.getBackingnetwork().getPredecessorCount(zero), 0);
+        Assertions.assertEquals(network.getBackingnetwork().getPredecessorCount(one), 1);
     }
 
 
@@ -101,23 +100,23 @@ public class SocialNetworkTest {
         SocialNetwork network = new SocialNetwork(networkPopulator);
 
         network.populate(state);
-        assertTrue(!network.getAllNeighbors(zero).contains(one));
-        assertTrue(!network.getDirectedNeighbors(zero).contains(one));
-        assertTrue(!network.getAllNeighbors(one).contains(zero));
-        assertTrue(!network.getDirectedNeighbors(zero).contains(zero));
+        Assertions.assertTrue(!network.getAllNeighbors(zero).contains(one));
+        Assertions.assertTrue(!network.getDirectedNeighbors(zero).contains(one));
+        Assertions.assertTrue(!network.getAllNeighbors(one).contains(zero));
+        Assertions.assertTrue(!network.getDirectedNeighbors(zero).contains(zero));
         network.addRandomConnection(zero, fishers, state.getRandom());
 
         //by necessity it must have connected to one
-        assertTrue(network.getAllNeighbors(zero).contains(one));
-        assertTrue(!network.getDirectedNeighbors(zero).contains(one));
-        assertTrue(network.getAllNeighbors(one).contains(zero));
-        assertTrue(network.getDirectedNeighbors(one).contains(zero));
+        Assertions.assertTrue(network.getAllNeighbors(zero).contains(one));
+        Assertions.assertTrue(!network.getDirectedNeighbors(zero).contains(one));
+        Assertions.assertTrue(network.getAllNeighbors(one).contains(zero));
+        Assertions.assertTrue(network.getDirectedNeighbors(one).contains(zero));
 
 
-        assertEquals(network.getBackingnetwork().getSuccessorCount(zero), 0);
-        assertEquals(network.getBackingnetwork().getSuccessorCount(one), 1);
-        assertEquals(network.getBackingnetwork().getPredecessorCount(zero), 1);
-        assertEquals(network.getBackingnetwork().getPredecessorCount(one), 0);
+        Assertions.assertEquals(network.getBackingnetwork().getSuccessorCount(zero), 0);
+        Assertions.assertEquals(network.getBackingnetwork().getSuccessorCount(one), 1);
+        Assertions.assertEquals(network.getBackingnetwork().getPredecessorCount(zero), 1);
+        Assertions.assertEquals(network.getBackingnetwork().getPredecessorCount(one), 0);
 
     }
 
@@ -192,32 +191,32 @@ public class SocialNetworkTest {
 
         //check to make sure the population is correct
         Collection<Fisher> neighbors = network.getAllNeighbors(zero);
-        assertEquals(neighbors.size(), 1);
+        Assertions.assertEquals(neighbors.size(), 1);
         neighbors.contains(one);
         //it's directed so the other way works as well
         neighbors = network.getDirectedNeighbors(zero);
-        assertEquals(neighbors.size(), 1);
+        Assertions.assertEquals(neighbors.size(), 1);
         neighbors.contains(one);
 
         //1 instead has a friend only if you count it indirectly
         neighbors = network.getAllNeighbors(one);
-        assertEquals(neighbors.size(), 1);
+        Assertions.assertEquals(neighbors.size(), 1);
         neighbors.contains(zero);
         neighbors = network.getDirectedNeighbors(one);
-        assertEquals(neighbors.size(), 0);
+        Assertions.assertEquals(neighbors.size(), 0);
 
 
         //if I force a replacement it must connect 0 with 2
         Fisher newFriend = network.replaceFriend(zero, one, false, new MersenneTwisterFast(), fishers);
-        assertEquals(newFriend, two);
+        Assertions.assertEquals(newFriend, two);
         neighbors = network.getDirectedNeighbors(zero);
-        assertEquals(neighbors.size(), 1);
+        Assertions.assertEquals(neighbors.size(), 1);
         neighbors.contains(two);
         //if I do it again, it will revert back to 1
         newFriend = network.replaceFriend(zero, two, false, new MersenneTwisterFast(), fishers);
-        assertEquals(newFriend, one);
+        Assertions.assertEquals(newFriend, one);
         neighbors = network.getDirectedNeighbors(zero);
-        assertEquals(neighbors.size(), 1);
+        Assertions.assertEquals(neighbors.size(), 1);
         neighbors.contains(one);
 
     }

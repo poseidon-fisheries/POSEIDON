@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.regs;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
@@ -40,7 +41,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 
@@ -62,8 +62,8 @@ public class RegulationTest {
         ActionResult act = port.act(mock(FishState.class), fisher, regulation, 1);
 
         //must be still at port!
-        assertTrue(act.getNextState() instanceof AtPort);
-        assertFalse(act.isActAgainThisTurn());
+        Assertions.assertTrue(act.getNextState() instanceof AtPort);
+        Assertions.assertFalse(act.isActAgainThisTurn());
         //in fact it should have never even checked if I wanted to leave port
         verify(fisher, never()).shouldFisherLeavePort(any());
 
@@ -98,12 +98,12 @@ public class RegulationTest {
 
         when(regs.allowedAtSea(fisher, model)).thenReturn(true);
         fisher.updateDestination(model, mock(Action.class));
-        assertEquals(fisher.getDestination(), destinationTile);
+        Assertions.assertEquals(fisher.getDestination(), destinationTile);
 
         //if i don't allow it though it will return to home
         when(regs.allowedAtSea(fisher, model)).thenReturn(false);
         fisher.updateDestination(model, mock(Action.class));
-        assertEquals(fisher.getDestination(), portTile);
+        Assertions.assertEquals(fisher.getDestination(), portTile);
 
 
     }

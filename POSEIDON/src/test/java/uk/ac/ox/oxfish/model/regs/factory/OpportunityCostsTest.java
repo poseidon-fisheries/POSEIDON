@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -30,8 +31,6 @@ import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.regs.SpecificQuotaRegulation;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 9/24/15.
@@ -101,7 +100,7 @@ public class OpportunityCostsTest {
 
 
         System.out.println(unprotected / (protectedSpecie + unprotected));
-        assertTrue(unprotected / (protectedSpecie + unprotected) > .9); //90% of all the fishing ought to be from
+        Assertions.assertTrue(unprotected / (protectedSpecie + unprotected) > .9); //90% of all the fishing ought to be from
         //the non-ITQ specie
 
     }
@@ -167,7 +166,7 @@ public class OpportunityCostsTest {
 
 
         System.out.println(unprotected / (protectedSpecie + unprotected));
-        assertTrue(unprotected / (protectedSpecie + unprotected) > .9); //90% of all the fishing ought to be from
+        Assertions.assertTrue(unprotected / (protectedSpecie + unprotected) > .9); //90% of all the fishing ought to be from
         //the non-ITQ specie
 
     }

@@ -21,12 +21,12 @@
 package uk.ac.ox.oxfish.geography.habitat.rectangles;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -49,10 +49,10 @@ public class RandomRockyRectanglesTest {
         );
 
         final RockyRectangle[] rockyRectangles = maker.buildRectangles(state.getRandom(), state.getMap());
-        assertEquals(rockyRectangles.length, 3);
+        Assertions.assertEquals(rockyRectangles.length, 3);
         for (final RockyRectangle rectangle : rockyRectangles) {
-            assertEquals(rectangle.getHeight(), 2);
-            assertEquals(rectangle.getWidth(), 2);
+            Assertions.assertEquals(rectangle.getHeight(), 2);
+            Assertions.assertEquals(rectangle.getWidth(), 2);
         }
 
     }

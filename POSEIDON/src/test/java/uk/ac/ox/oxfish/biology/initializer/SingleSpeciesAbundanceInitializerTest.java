@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -36,8 +37,6 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -81,11 +80,10 @@ public class SingleSpeciesAbundanceInitializerTest {
             for (int y = 0; y < map.getWidth(); y++) {
                 if (x == 0 && y == 0)
                     continue;
-                assertEquals(
+                Assertions.assertEquals(
                     map.getSeaTile(x, y).getBiomass(biology.getSpecie(0)),
                     map.getSeaTile(0, 0).getBiomass(biology.getSpecie(0)),
                     .01
-
                 );
             }
 
@@ -97,9 +95,8 @@ public class SingleSpeciesAbundanceInitializerTest {
             for (int y = 0; y < map.getWidth(); y++) {
                 if (x == 0 && y == 0)
                     continue;
-                assertTrue(map.getSeaTile(x, y).getBiomass(biology.getSpecie(0)) <
-                    map.getSeaTile(0, 0).getBiomass(biology.getSpecie(0))
-                );
+                Assertions.assertTrue(map.getSeaTile(x, y).getBiomass(biology.getSpecie(0)) <
+                    map.getSeaTile(0, 0).getBiomass(biology.getSpecie(0)));
             }
     }
 
@@ -125,10 +122,10 @@ public class SingleSpeciesAbundanceInitializerTest {
         //create biology object
         final GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
         //check that name and meristics are correct
-        assertEquals(1, biology.getSpecies().size());
+        Assertions.assertEquals(1, biology.getSpecies().size());
         final Species fakeSpecies = biology.getSpecie(0);
-        assertEquals("fake", fakeSpecies.getName());
-        assertEquals(3, fakeSpecies.getNumberOfBins() - 1);
+        Assertions.assertEquals("fake", fakeSpecies.getName());
+        Assertions.assertEquals(3, fakeSpecies.getNumberOfBins() - 1);
 
 
         //put biology in there
@@ -141,30 +138,42 @@ public class SingleSpeciesAbundanceInitializerTest {
         }
         //by default the abundance initializer splits total count uniformly
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
-        assertEquals(
+        Assertions.assertEquals(
             200,
             map.getSeaTile(0, 0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],
             .0001
         );
-        assertEquals(
+        Assertions.assertEquals(
             200,
             map.getSeaTile(1, 1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],
             .0001
         );
-        assertEquals(
+        Assertions.assertEquals(
             200,
             map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],
             .0001
         );
-        assertEquals(250, map.getSeaTile(0, 0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0], .0001);
-        assertEquals(250, map.getSeaTile(1, 1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0], .0001);
-        assertEquals(250, map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0], .0001);
-        assertEquals(
+        Assertions.assertEquals(
+            250,
+            map.getSeaTile(0, 0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],
+            .0001
+        );
+        Assertions.assertEquals(
+            250,
+            map.getSeaTile(1, 1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],
+            .0001
+        );
+        Assertions.assertEquals(
+            250,
+            map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],
+            .0001
+        );
+        Assertions.assertEquals(
             325,
             map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],
             .0001
         );
-        assertEquals(
+        Assertions.assertEquals(
             325,
             map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],
             .0001

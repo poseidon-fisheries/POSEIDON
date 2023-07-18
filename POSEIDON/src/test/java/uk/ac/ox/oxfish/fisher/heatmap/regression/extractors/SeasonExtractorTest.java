@@ -21,13 +21,13 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.extractors;
 
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Season;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,70 +54,46 @@ public class SeasonExtractorTest {
 
 
         //day 40 is winter, not spring
-        assertEquals(
-            winter.extract(
-                mock(SeaTile.class),
-                40 * 24d,
-                mock(Fisher.class),
-                mock(FishState.class)
-            ),
-            1d,
-            .001
-        );
-        assertEquals(
-            spring.extract(
-                mock(SeaTile.class),
-                40 * 24d,
-                mock(Fisher.class),
-                model
-            ),
-            0d,
-            .001
-        );
+        Assertions.assertEquals(winter.extract(
+            mock(SeaTile.class),
+            40 * 24d,
+            mock(Fisher.class),
+            mock(FishState.class)
+        ), 1d, .001);
+        Assertions.assertEquals(spring.extract(
+            mock(SeaTile.class),
+            40 * 24d,
+            mock(Fisher.class),
+            model
+        ), 0d, .001);
         //same is true 365 days later!
-        assertEquals(
-            winter.extract(
-                mock(SeaTile.class),
-                (40 + 365) * 24d,
-                mock(Fisher.class),
-                model
-            ),
-            1d,
-            .001
-        );
-        assertEquals(
-            spring.extract(
-                mock(SeaTile.class),
-                (40 + 365) * 24d,
-                mock(Fisher.class),
-                model
-            ),
-            0d,
-            .001
-        );
+        Assertions.assertEquals(winter.extract(
+            mock(SeaTile.class),
+            (40 + 365) * 24d,
+            mock(Fisher.class),
+            model
+        ), 1d, .001);
+        Assertions.assertEquals(spring.extract(
+            mock(SeaTile.class),
+            (40 + 365) * 24d,
+            mock(Fisher.class),
+            model
+        ), 0d, .001);
 
 
         //day 90 is spring though
-        assertEquals(
-            winter.extract(
-                mock(SeaTile.class),
-                90 * 24d,
-                mock(Fisher.class),
-                model
-            ),
-            0d,
-            .001
-        );
-        assertEquals(
-            spring.extract(
-                mock(SeaTile.class),
-                90 * 24d,
-                mock(Fisher.class),
-                model
-            ),
-            1d,
-            .001
-        );
+        Assertions.assertEquals(winter.extract(
+            mock(SeaTile.class),
+            90 * 24d,
+            mock(Fisher.class),
+            model
+        ), 0d, .001);
+        Assertions.assertEquals(spring.extract(
+            mock(SeaTile.class),
+            90 * 24d,
+            mock(Fisher.class),
+            model
+        ), 1d, .001);
 
 
     }

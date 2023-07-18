@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.discarding;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -31,8 +32,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -71,9 +70,9 @@ public class DiscardAllUnsellableTest {
         );
 
         //assertEquals(retained,caught); not true because the objects are different!
-        assertEquals(retained.getTotalWeight(), caught.getTotalWeight(), .001);
-        assertEquals(retained.getWeightCaught(0), caught.getWeightCaught(0), .001);
-        assertEquals(retained.getWeightCaught(1), caught.getWeightCaught(1), .001);
+        Assertions.assertEquals(retained.getTotalWeight(), caught.getTotalWeight(), .001);
+        Assertions.assertEquals(retained.getWeightCaught(0), caught.getWeightCaught(0), .001);
+        Assertions.assertEquals(retained.getWeightCaught(1), caught.getWeightCaught(1), .001);
 
     }
 
@@ -102,10 +101,10 @@ public class DiscardAllUnsellableTest {
             new MersenneTwisterFast()
         );
 
-        assertNotEquals(retained, caught);
-        assertEquals(retained.getWeightCaught(0), 50d, .001);
-        assertEquals(retained.getWeightCaught(1), 0d, .001);
-        assertEquals(caught.getWeightCaught(0), 100d, .001);
+        Assertions.assertNotEquals(retained, caught);
+        Assertions.assertEquals(retained.getWeightCaught(0), 50d, .001);
+        Assertions.assertEquals(retained.getWeightCaught(1), 0d, .001);
+        Assertions.assertEquals(caught.getWeightCaught(0), 100d, .001);
 
     }
 

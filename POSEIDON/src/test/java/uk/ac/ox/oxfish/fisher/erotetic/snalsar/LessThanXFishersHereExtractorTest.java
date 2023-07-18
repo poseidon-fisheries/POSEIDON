@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.erotetic.snalsar;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -30,7 +31,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -69,9 +69,9 @@ public class LessThanXFishersHereExtractorTest {
             mock(Fisher.class)
         );
 
-        assertTrue(safetyReport.get(empty) > 0);
-        assertTrue(safetyReport.get(halfFull) > 0);
-        assertTrue(safetyReport.get(full) <= 0);
+        Assertions.assertTrue(safetyReport.get(empty) > 0);
+        Assertions.assertTrue(safetyReport.get(halfFull) > 0);
+        Assertions.assertTrue(safetyReport.get(full) <= 0);
 
 
     }

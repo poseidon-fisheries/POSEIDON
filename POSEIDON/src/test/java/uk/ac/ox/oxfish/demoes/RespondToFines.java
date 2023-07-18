@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 import org.jfree.util.Log;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.biology.initializer.factory.HalfBycatchFactory;
@@ -77,8 +77,8 @@ public class RespondToFines {
         Log.info("all spots ---- lower spots");
         Log.info(allHotspots + " --- " + lowerHotSpots);
         Log.info("percentage fished on the bottom : " + lowerHotSpots / allHotspots);
-        Assert.assertTrue(allHotspots * .05 >= lowerHotSpots);
-        Assert.assertTrue(allHotspots > 0);
+        Assertions.assertTrue(allHotspots * .05 >= lowerHotSpots);
+        Assertions.assertTrue(allHotspots > 0);
     }
 
 }

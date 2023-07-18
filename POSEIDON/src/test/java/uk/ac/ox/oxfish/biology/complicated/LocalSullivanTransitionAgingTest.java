@@ -20,13 +20,13 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.boxcars.SullivanTransitionProbability;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -70,17 +70,17 @@ public class LocalSullivanTransitionAgingTest {
         when(mock.getDay()).thenReturn(1); //does not step on odd days
         aging.start(species);
         aging.ageLocally(bio, species, mock, false, 1);
-        assertEquals(bio.getAbundance(species).asMatrix()[0][9], 1000d, .0001);
+        Assertions.assertEquals(bio.getAbundance(species).asMatrix()[0][9], 1000d, .0001);
         //again!
         when(mock.getDay()).thenReturn(2); //does not step on odd days
         aging.ageLocally(bio, species, mock, false, 1);
         //now there ought to be only 12% or so of the fish in that bin!
-        assertEquals(bio.getAbundance(species).asMatrix()[0][9], 130.91, .01);
+        Assertions.assertEquals(bio.getAbundance(species).asMatrix()[0][9], 130.91, .01);
 
         when(mock.getDay()).thenReturn(4); //does not step on odd days
         aging.ageLocally(bio, species, mock, false, 1);
         //now there ought to be only 12% or so of the fish in that bin!
-        assertEquals(bio.getAbundance(species).asMatrix()[0][9], 17.14, .01);
+        Assertions.assertEquals(bio.getAbundance(species).asMatrix()[0][9], 17.14, .01);
 
 
     }

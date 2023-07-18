@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
@@ -92,7 +92,7 @@ public class KernelTilePredictorTest {
             ),
             null, mock(FishState.class)
         );
-        Assert.assertEquals(predictor.getCurrentPrediction(), 100, 5);
+        Assertions.assertEquals(predictor.getCurrentPrediction(), 100, 5);
     }
 
     @Test
@@ -162,6 +162,6 @@ public class KernelTilePredictorTest {
 
         System.out.println(forgetting.getCurrentPrediction());
         System.out.println(notForgetting.getCurrentPrediction());
-        Assert.assertTrue(forgetting.getCurrentPrediction() > notForgetting.getCurrentPrediction());
+        Assertions.assertTrue(forgetting.getCurrentPrediction() > notForgetting.getCurrentPrediction());
     }
 }

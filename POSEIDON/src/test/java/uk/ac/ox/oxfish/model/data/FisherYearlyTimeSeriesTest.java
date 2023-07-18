@@ -20,13 +20,13 @@
 
 package uk.ac.ox.oxfish.model.data;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,12 +49,12 @@ public class FisherYearlyTimeSeriesTest {
         yearlyGatherer.step(mock(FishState.class));
         when(fisher.getBankBalance()).thenReturn(3d);
         yearlyGatherer.step(mock(FishState.class));
-        assertEquals(1d, yearlyGatherer.getColumn("CASH").get(0), .0001);
-        assertEquals(2d, yearlyGatherer.getColumn("CASH").get(1), .0001);
-        assertEquals(3d, yearlyGatherer.getColumn("CASH").get(2), .0001);
-        assertEquals(1d, yearlyGatherer.getColumn("NET_CASH_FLOW").get(0), .0001);
-        assertEquals(1d, yearlyGatherer.getColumn("NET_CASH_FLOW").get(1), .0001);
-        assertEquals(1d, yearlyGatherer.getColumn("NET_CASH_FLOW").get(2), .0001);
+        Assertions.assertEquals(1d, yearlyGatherer.getColumn("CASH").get(0), .0001);
+        Assertions.assertEquals(2d, yearlyGatherer.getColumn("CASH").get(1), .0001);
+        Assertions.assertEquals(3d, yearlyGatherer.getColumn("CASH").get(2), .0001);
+        Assertions.assertEquals(1d, yearlyGatherer.getColumn("NET_CASH_FLOW").get(0), .0001);
+        Assertions.assertEquals(1d, yearlyGatherer.getColumn("NET_CASH_FLOW").get(1), .0001);
+        Assertions.assertEquals(1d, yearlyGatherer.getColumn("NET_CASH_FLOW").get(2), .0001);
 
 
     }

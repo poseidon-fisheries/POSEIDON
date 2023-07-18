@@ -20,10 +20,8 @@
 
 package uk.ac.ox.oxfish.model.data;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 public class MovingAverageTest {
@@ -71,14 +69,14 @@ public class MovingAverageTest {
         for (int i = 0; i < 19; i++) {
             ma.addObservation(i + 1f);
             System.out.println(i + ", " + ma.getSmoothedObservation());
-            assertEquals(expected[index], ma.getSmoothedObservation(), .001f);
+            Assertions.assertEquals(expected[index], ma.getSmoothedObservation(), .001f);
             index++;
 
         }
 
         for (int i = 18; i > 0; i--) {
             ma.addObservation((float) i);
-            assertEquals(expected[index], ma.getSmoothedObservation(), .001f);
+            Assertions.assertEquals(expected[index], ma.getSmoothedObservation(), .001f);
             index++;
 
         }
@@ -90,11 +88,11 @@ public class MovingAverageTest {
     @Test
     public void isReadyTest() {
         MovingAverage<Float> ma = new MovingAverage<>(20);
-        assertTrue(!ma.isReady());
-        assertTrue(Double.isNaN(ma.getSmoothedObservation()));
+        Assertions.assertTrue(!ma.isReady());
+        Assertions.assertTrue(Double.isNaN(ma.getSmoothedObservation()));
         ma.addObservation(1f);
-        assertTrue(ma.isReady());
-        assertTrue(!Double.isNaN(ma.getSmoothedObservation()));
+        Assertions.assertTrue(ma.isReady());
+        Assertions.assertTrue(!Double.isNaN(ma.getSmoothedObservation()));
     }
 
 }

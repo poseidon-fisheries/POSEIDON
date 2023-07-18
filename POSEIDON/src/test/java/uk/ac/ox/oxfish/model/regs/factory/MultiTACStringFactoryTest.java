@@ -20,15 +20,13 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.HalfBycatchFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 public class MultiTACStringFactoryTest {
@@ -51,8 +49,8 @@ public class MultiTACStringFactoryTest {
         state.start();
         Fisher fisher = state.getFishers().get(0);
         MultiQuotaRegulation regs = (MultiQuotaRegulation) fisher.getRegulation();
-        assertTrue(Double.isInfinite(regs.getQuotaRemaining(0)));
-        assertEquals(regs.getQuotaRemaining(1), 123d, .0001);
+        Assertions.assertTrue(Double.isInfinite(regs.getQuotaRemaining(0)));
+        Assertions.assertEquals(regs.getQuotaRemaining(1), 123d, .0001);
 
 
     }
@@ -74,8 +72,8 @@ public class MultiTACStringFactoryTest {
         state.start();
         Fisher fisher = state.getFishers().get(0);
         MultiQuotaRegulation regs = (MultiQuotaRegulation) fisher.getRegulation();
-        assertEquals(regs.getQuotaRemaining(0), 1d, .0001);
-        assertEquals(regs.getQuotaRemaining(1), 1d, .0001);
+        Assertions.assertEquals(regs.getQuotaRemaining(0), 1d, .0001);
+        Assertions.assertEquals(regs.getQuotaRemaining(1), 1d, .0001);
 
 
     }

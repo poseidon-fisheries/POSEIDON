@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripLogger;
@@ -56,7 +56,7 @@ public class CutoffPerTripObjectiveTest {
         when(fisher.getLastFinishedTrip()).thenReturn(logger.getLastFinishedTrip());
 
         HourlyProfitInTripObjective tripFunction = new HourlyProfitInTripObjective();
-        Assert.assertEquals(tripFunction.computeCurrentFitness(fisher, fisher), 10d, .001);
+        Assertions.assertEquals(tripFunction.computeCurrentFitness(fisher, fisher), 10d, .001);
 
 
         CutoffPerTripObjectiveFactory factory = new CutoffPerTripObjectiveFactory();
@@ -64,11 +64,11 @@ public class CutoffPerTripObjectiveTest {
         factory.getLowThreshold().setValue(new FixedDoubleParameter(5d));
         factory.getLowThreshold().setActive(true);
         CutoffPerTripObjective objective = factory.apply(mock(FishState.class));
-        Assert.assertEquals(objective.computeCurrentFitness(fisher, fisher), 10d, .001);
+        Assertions.assertEquals(objective.computeCurrentFitness(fisher, fisher), 10d, .001);
         factory.getHighThreshold().setValue(new FixedDoubleParameter(7d));
         factory.getHighThreshold().setActive(true);
         objective = factory.apply(mock(FishState.class));
-        Assert.assertEquals(objective.computeCurrentFitness(fisher, fisher), 7d, .001);
+        Assertions.assertEquals(objective.computeCurrentFitness(fisher, fisher), 7d, .001);
 
     }
 

@@ -20,6 +20,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
@@ -29,7 +30,6 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
@@ -65,32 +65,32 @@ public class FadTest {
         when(rng.nextDouble()).thenReturn(1.0);
         fad.maybeReleaseFish(globalBiology.getSpecies(), tileBiology, rng);
         // check that the FAD is still full and the tile biology is still empty
-        assertEquals(Arrays.stream(fad.getBiomass()).sum(), fad.getCarryingCapacity().getTotal(), 0.0);
-        assertTrue(tileBiology.isEmpty());
+        Assertions.assertEquals(Arrays.stream(fad.getBiomass()).sum(), fad.getCarryingCapacity().getTotal(), 0.0);
+        Assertions.assertTrue(tileBiology.isEmpty());
 
         // release the FAD's fish into the tile biology
         when(rng.nextDouble()).thenReturn(0.0);
         fad.maybeReleaseFish(globalBiology.getSpecies(), tileBiology, rng);
         // Check that the FAD is now empty and the tile has received the fish
-        assertTrue(fadBiology.isEmpty());
-        assertEquals(tileBiology.getTotalBiomass(), fad.getCarryingCapacity().getTotal(), 0);
+        Assertions.assertTrue(fadBiology.isEmpty());
+        Assertions.assertEquals(tileBiology.getTotalBiomass(), fad.getCarryingCapacity().getTotal(), 0);
 
         // Refill the FAD and release another batch of FAD fish into the tile biology
         fillBiomassFad(fad);
         fad.maybeReleaseFish(globalBiology.getSpecies(), tileBiology, rng);
 
         // Check that the FAD is now empty and the tile is now at full carrying capacity
-        assertTrue(fadBiology.isEmpty());
-        assertTrue(tileBiology.isFull());
+        Assertions.assertTrue(fadBiology.isEmpty());
+        Assertions.assertTrue(tileBiology.isFull());
 
         // Fill the FAD one last time and release the fish to nowhere
         fillBiomassFad(fad);
         when(rng.nextDouble()).thenReturn(1.0);
         fad.maybeReleaseFish(globalBiology.getSpecies(), rng);
-        assertFalse(fadBiology.isEmpty());
+        Assertions.assertFalse(fadBiology.isEmpty());
         when(rng.nextDouble()).thenReturn(0.0);
         fad.maybeReleaseFish(globalBiology.getSpecies(), rng);
-        assertTrue(fadBiology.isEmpty());
+        Assertions.assertTrue(fadBiology.isEmpty());
 
     }
 
@@ -107,12 +107,12 @@ public class FadTest {
             new Int2D(),
             new GlobalCarryingCapacity(1.5)
         );
-        assertNull(fad.getStepOfFirstAttraction());
-        assertNull(fad.getStepsBeforeFirstAttraction());
+        Assertions.assertNull(fad.getStepOfFirstAttraction());
+        Assertions.assertNull(fad.getStepsBeforeFirstAttraction());
         final BiomassLocalBiology cellBiology = makeBiology(globalBiology, Double.POSITIVE_INFINITY);
         globalBiology.getSpecies().forEach(s -> cellBiology.setCurrentBiomass(s, 1));
         fad.aggregateFish(cellBiology, globalBiology, 20);
-        assertEquals(Integer.valueOf(20), fad.getStepOfFirstAttraction());
-        assertEquals(Integer.valueOf(10), fad.getStepsBeforeFirstAttraction());
+        Assertions.assertEquals(Integer.valueOf(20), fad.getStepOfFirstAttraction());
+        Assertions.assertEquals(Integer.valueOf(10), fad.getStepsBeforeFirstAttraction());
     }
 }

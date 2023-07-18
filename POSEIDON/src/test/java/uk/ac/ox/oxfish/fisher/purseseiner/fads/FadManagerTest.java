@@ -19,7 +19,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -94,24 +94,24 @@ public class FadManagerTest {
         fadManager.setNumFadsInStock(10);
         final BiomassAggregatingFad fad1 = (BiomassAggregatingFad) fadManager.deployFadInCenterOfTile(seaTile, rng);
 
-        Assert.assertEquals(9, fadManager.getNumFadsInStock());
-        Assert.assertEquals(1, fadManager.getNumberOfActiveFads());
+        Assertions.assertEquals(9, fadManager.getNumFadsInStock());
+        Assertions.assertEquals(1, fadManager.getNumberOfActiveFads());
 
         // try a successful set
         when(rng.nextDouble()).thenReturn(1.0);
         new FadSetAction(fad1, fisher, 1.0)
             .act(fishState, fadManager.getFisher(), anarchy, 24);
-        Assert.assertEquals(10, fadManager.getNumFadsInStock());
+        Assertions.assertEquals(10, fadManager.getNumFadsInStock());
 
         final BiomassAggregatingFad fad2 = (BiomassAggregatingFad) fadManager.deployFadInCenterOfTile(seaTile, rng);
-        Assert.assertEquals(9, fadManager.getNumFadsInStock());
-        Assert.assertEquals(2, fadManager.getNumberOfActiveFads());
+        Assertions.assertEquals(9, fadManager.getNumFadsInStock());
+        Assertions.assertEquals(2, fadManager.getNumberOfActiveFads());
 
         // try with a failed set
         when(rng.nextDouble()).thenReturn(1.0);
         new FadSetAction(fad2, fisher, 1.0)
             .act(fishState, fadManager.getFisher(), anarchy, 24);
-        Assert.assertEquals(10, fadManager.getNumFadsInStock());
+        Assertions.assertEquals(10, fadManager.getNumFadsInStock());
 
     }
 
@@ -149,7 +149,7 @@ public class FadManagerTest {
 
         range(0, 10).forEach(deploy);
 
-        Assert.assertEquals(15, numberOfPermissibleActions(
+        Assertions.assertEquals(15, numberOfPermissibleActions(
             fisher,
             new ForbiddenIf(fadLimit).apply(fishState),
             yearlyActionCounter,
@@ -160,7 +160,7 @@ public class FadManagerTest {
 
         range(0, 5).forEach(deploy);
 
-        Assert.assertEquals(5, numberOfPermissibleActions(
+        Assertions.assertEquals(5, numberOfPermissibleActions(
             fisher,
             new ForbiddenIf(new AnyOf(fadLimit, actionLimit)).apply(fishState),
             yearlyActionCounter,

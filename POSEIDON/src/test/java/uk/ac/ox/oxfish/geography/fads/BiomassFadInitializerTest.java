@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -17,7 +18,6 @@ import uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
@@ -64,7 +64,7 @@ public class BiomassFadInitializerTest {
         final MersenneTwisterFast rng = new MersenneTwisterFast();
         final BiomassAggregatingFad fad = fadInitializer.makeFad(fadManager, null, seaTile, rng);
         for (final Species species : globalBiology.getSpecies()) {
-            assertEquals(fad.getBiology().getBiomass(species), 0, 0);
+            Assertions.assertEquals(fad.getBiology().getBiomass(species), 0, 0);
         }
     }
 

@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.market.gas;
 
 import com.beust.jcommander.internal.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
@@ -31,8 +32,6 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.nio.file.Paths;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 7/18/17.
@@ -65,29 +64,29 @@ public class TimeSeriesGasPriceMakerTest {
 
         Port port = state.getPorts().get(0);
         //if asked, the initial price is 0
-        assertEquals(maker.supplyInitialPrice(port.getLocation(), port.getName()), 0d, .001);
+        Assertions.assertEquals(maker.supplyInitialPrice(port.getLocation(), port.getName()), 0d, .001);
 
         maker.start(port, state);
         state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(), 1d, .001);
+        Assertions.assertEquals(port.getGasPricePerLiter(), 1d, .001);
 
         state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(), 2d, .001);
+        Assertions.assertEquals(port.getGasPricePerLiter(), 2d, .001);
 
         state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(), 3d, .001);
+        Assertions.assertEquals(port.getGasPricePerLiter(), 3d, .001);
 
         state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(), 4d, .001);
+        Assertions.assertEquals(port.getGasPricePerLiter(), 4d, .001);
 
         //and from now on it is stuck at 4
         state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(), 4d, .001);
+        Assertions.assertEquals(port.getGasPricePerLiter(), 4d, .001);
         state.schedule.step(state);
         state.schedule.step(state);
         state.schedule.step(state);
         state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(), 4d, .001);
+        Assertions.assertEquals(port.getGasPricePerLiter(), 4d, .001);
 
 
     }
@@ -119,30 +118,30 @@ public class TimeSeriesGasPriceMakerTest {
 
         Port port = state.getPorts().get(0);
         //if asked, the initial price is 0
-        assertEquals(maker.supplyInitialPrice(port.getLocation(), port.getName()), 1.677d, .001);
+        Assertions.assertEquals(maker.supplyInitialPrice(port.getLocation(), port.getName()), 1.677d, .001);
 
         maker.start(port, state);
 
         for (int i = 0; i < 365; i++)
             state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(), 1.561d, .001);
+        Assertions.assertEquals(port.getGasPricePerLiter(), 1.561d, .001);
 
         for (int i = 0; i < 365; i++)
             state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(), 1.878d, .001);
+        Assertions.assertEquals(port.getGasPricePerLiter(), 1.878d, .001);
 
         for (int i = 0; i < 365; i++)
             state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(), 2.166d, .001);
+        Assertions.assertEquals(port.getGasPricePerLiter(), 2.166d, .001);
 
         for (int i = 0; i < 365; i++)
             state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(), 2.517d, .001);
+        Assertions.assertEquals(port.getGasPricePerLiter(), 2.517d, .001);
 
 
         for (int i = 0; i < 365; i++)
             state.schedule.step(state);
-        assertEquals(port.getGasPricePerLiter(), 2.855d, .001);
+        Assertions.assertEquals(port.getGasPricePerLiter(), 2.855d, .001);
 
 
     }

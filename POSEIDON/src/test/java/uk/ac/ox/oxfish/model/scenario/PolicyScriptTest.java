@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -36,8 +37,6 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 
 @SuppressWarnings("rawtypes")
@@ -59,10 +58,10 @@ public class PolicyScriptTest {
         state.start();
         state.schedule.step(state);
 
-        assertEquals(5, state.getFishers().size());
+        Assertions.assertEquals(5, state.getFishers().size());
         for (final Fisher fisher : state.getFishers()) {
-            assertEquals(1, ((FixedProportionGear) fisher.getGear()).getProportionFished(), .0001);
-            assertEquals(AnarchyFactory.getSingleton(), fisher.getRegulation());
+            Assertions.assertEquals(1, ((FixedProportionGear) fisher.getGear()).getProportionFished(), .0001);
+            Assertions.assertEquals(AnarchyFactory.getSingleton(), fisher.getRegulation());
 
         }
 
@@ -76,10 +75,10 @@ public class PolicyScriptTest {
         final PolicyScript script = new PolicyScript();
         script.apply(state);
 
-        assertEquals(5, state.getFishers().size());
+        Assertions.assertEquals(5, state.getFishers().size());
         for (final Fisher fisher : state.getFishers()) {
-            assertEquals(1, ((FixedProportionGear) fisher.getGear()).getProportionFished(), .0001);
-            assertEquals(AnarchyFactory.getSingleton(), fisher.getRegulation());
+            Assertions.assertEquals(1, ((FixedProportionGear) fisher.getGear()).getProportionFished(), .0001);
+            Assertions.assertEquals(AnarchyFactory.getSingleton(), fisher.getRegulation());
         }
     }
 
@@ -95,11 +94,11 @@ public class PolicyScriptTest {
         script.setRegulation(regulation);
         script.apply(state);
 
-        assertEquals(5, state.getFishers().size());
+        Assertions.assertEquals(5, state.getFishers().size());
         for (final Fisher fisher : state.getFishers()) {
-            assertEquals(1, ((FixedProportionGear) fisher.getGear()).getProportionFished(), .0001);
-            assertTrue(fisher.getRegulation() instanceof MonoQuotaRegulation);
-            assertEquals(5000d, ((MonoQuotaRegulation) fisher.getRegulation()).getYearlyQuota(), .0001);
+            Assertions.assertEquals(1, ((FixedProportionGear) fisher.getGear()).getProportionFished(), .0001);
+            Assertions.assertTrue(fisher.getRegulation() instanceof MonoQuotaRegulation);
+            Assertions.assertEquals(5000d, ((MonoQuotaRegulation) fisher.getRegulation()).getYearlyQuota(), .0001);
         }
     }
 
@@ -115,10 +114,10 @@ public class PolicyScriptTest {
         script.setGear(gear);
         script.apply(state);
 
-        assertEquals(5, state.getFishers().size());
+        Assertions.assertEquals(5, state.getFishers().size());
         for (final Fisher fisher : state.getFishers()) {
-            assertEquals(0, ((FixedProportionGear) fisher.getGear()).getProportionFished(), .0001);
-            assertEquals(AnarchyFactory.getSingleton(), fisher.getRegulation());
+            Assertions.assertEquals(0, ((FixedProportionGear) fisher.getGear()).getProportionFished(), .0001);
+            Assertions.assertEquals(AnarchyFactory.getSingleton(), fisher.getRegulation());
 
         }
     }
@@ -136,10 +135,10 @@ public class PolicyScriptTest {
         script.setChangeInNumberOfFishers(10);
         script.apply(state);
 
-        assertEquals(15, state.getFishers().size());
+        Assertions.assertEquals(15, state.getFishers().size());
         for (final Fisher fisher : state.getFishers()) {
-            assertEquals(0, ((FixedProportionGear) fisher.getGear()).getProportionFished(), .0001);
-            assertEquals(AnarchyFactory.getSingleton(), fisher.getRegulation());
+            Assertions.assertEquals(0, ((FixedProportionGear) fisher.getGear()).getProportionFished(), .0001);
+            Assertions.assertEquals(AnarchyFactory.getSingleton(), fisher.getRegulation());
 
         }
     }
@@ -157,9 +156,9 @@ public class PolicyScriptTest {
         final String representedPolicy = yaml.dump(script);
         System.out.println(representedPolicy);
         final PolicyScript read = yaml.loadAs(representedPolicy, PolicyScript.class);
-        assertNull(read.getRegulation());
-        assertTrue(read.getGear() instanceof FixedProportionGearFactory);
-        assertNull(read.getChangeInNumberOfFishers());
+        Assertions.assertNull(read.getRegulation());
+        Assertions.assertTrue(read.getGear() instanceof FixedProportionGearFactory);
+        Assertions.assertNull(read.getChangeInNumberOfFishers());
 
 
         final HashMap<Integer, PolicyScript> scripts = new HashMap<>();
@@ -180,9 +179,9 @@ public class PolicyScriptTest {
             //turn value into string and read it back forcing it as a policy script
             readBack.put(entry.getKey(), yaml.loadAs(yaml.dump(entry.getValue()), PolicyScript.class));
 
-        assertEquals(2, readBack.size());
-        assertEquals(100, (int) readBack.get(15).getChangeInNumberOfFishers());
-        assertTrue(readBack.get(10).getGear() instanceof FixedProportionGearFactory);
+        Assertions.assertEquals(2, readBack.size());
+        Assertions.assertEquals(100, (int) readBack.get(15).getChangeInNumberOfFishers());
+        Assertions.assertTrue(readBack.get(10).getGear() instanceof FixedProportionGearFactory);
 
     }
 }

@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
@@ -40,9 +41,6 @@ import java.util.function.UnaryOperator;
 import java.util.stream.DoubleStream;
 
 import static java.lang.Double.MAX_VALUE;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
@@ -58,17 +56,17 @@ public class SchoolSetOpportunityGeneratorTest {
     @Test
     public void test() {
         final double expected = 0.6321205588285577;
-        assertEquals(expected, getP(1, 1, 0, 0).getKey(), EPSILON);
-        assertEquals(expected, getP(0, 0, 1, 1).getKey(), EPSILON);
-        assertEquals(expected, getP(1, 0, 1, 1).getKey(), EPSILON);
-        assertEquals(expected, getP(1, 1, 1, 0).getKey(), EPSILON);
-        assertEquals(expected, getP(2, 1, 0, 1).getKey(), EPSILON);
-        assertEquals(expected, getP(0, 1, 2, 1).getKey(), EPSILON);
-        assertTrue(expected > getP(0, 1, 0, 1).getKey());
-        assertTrue(expected < getP(2, 1, 2, 1).getKey());
+        Assertions.assertEquals(expected, getP(1, 1, 0, 0).getKey(), EPSILON);
+        Assertions.assertEquals(expected, getP(0, 0, 1, 1).getKey(), EPSILON);
+        Assertions.assertEquals(expected, getP(1, 0, 1, 1).getKey(), EPSILON);
+        Assertions.assertEquals(expected, getP(1, 1, 1, 0).getKey(), EPSILON);
+        Assertions.assertEquals(expected, getP(2, 1, 0, 1).getKey(), EPSILON);
+        Assertions.assertEquals(expected, getP(0, 1, 2, 1).getKey(), EPSILON);
+        Assertions.assertTrue(expected > getP(0, 1, 0, 1).getKey());
+        Assertions.assertTrue(expected < getP(2, 1, 2, 1).getKey());
 
-        assertTrue(getP(MAX_VALUE, 1, MAX_VALUE, 1).getValue().isPresent());
-        assertFalse(getP(0, 1, 0, 1).getValue().isPresent());
+        Assertions.assertTrue(getP(MAX_VALUE, 1, MAX_VALUE, 1).getValue().isPresent());
+        Assertions.assertFalse(getP(0, 1, 0, 1).getValue().isPresent());
 
     }
 

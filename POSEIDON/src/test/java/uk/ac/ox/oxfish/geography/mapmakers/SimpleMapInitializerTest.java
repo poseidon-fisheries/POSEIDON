@@ -1,11 +1,10 @@
 package uk.ac.ox.oxfish.geography.mapmakers;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static org.junit.Assert.assertTrue;
 
 public class SimpleMapInitializerTest {
 
@@ -30,12 +29,8 @@ public class SimpleMapInitializerTest {
 
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++) {
-                assertTrue(
-                    state.getMap().getSeaTile(i, j).getAltitude() <= -100
-                );
-                assertTrue(
-                    state.getMap().getSeaTile(i, j).getAltitude() >= -1000
-                );
+                Assertions.assertTrue(state.getMap().getSeaTile(i, j).getAltitude() <= -100);
+                Assertions.assertTrue(state.getMap().getSeaTile(i, j).getAltitude() >= -1000);
             }
     }
 }

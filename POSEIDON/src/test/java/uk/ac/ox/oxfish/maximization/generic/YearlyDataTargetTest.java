@@ -1,12 +1,12 @@
 package uk.ac.ox.oxfish.maximization.generic;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class YearlyDataTargetTest {
@@ -31,7 +31,7 @@ public class YearlyDataTargetTest {
 
         when(model.getYearlyDataSet().getColumn("fakeData")).thenReturn(fakeData);
 
-        assertEquals(target.computeError(model), 0, .0001);
+        Assertions.assertEquals(target.computeError(model), 0, .0001);
 
     }
 
@@ -55,11 +55,11 @@ public class YearlyDataTargetTest {
 
         when(model.getYearlyDataSet().getColumn("fakeData")).thenReturn(fakeData);
 
-        assertEquals(target.computeError(model), .1, .0001);
+        Assertions.assertEquals(target.computeError(model), .1, .0001);
 
         //if you decrease coefficient of variation, you will weigh your error more!
         target.setCoefficientOfVariation(.1);
-        assertEquals(target.computeError(model), 1, .0001);
+        Assertions.assertEquals(target.computeError(model), 1, .0001);
 
 
     }
@@ -99,14 +99,14 @@ public class YearlyDataTargetTest {
 
         when(model.getYearlyDataSet().getColumn("fakeData")).thenReturn(fakeData);
 
-        assertEquals(target.computeError(model), 324228 / 15d, .0001);
+        Assertions.assertEquals(target.computeError(model), 324228 / 15d, .0001);
 
         //if you decrease coefficient of variation, you will weigh your error more!
         target.setCoefficientOfVariation(Double.NaN);
-        assertEquals(target.computeError(model), 324228 / 15d, .0001);
+        Assertions.assertEquals(target.computeError(model), 324228 / 15d, .0001);
 
         target.setCoefficientOfVariation(0);
-        assertEquals(target.computeError(model), 324228 / 15d, .0001);
+        Assertions.assertEquals(target.computeError(model), 324228 / 15d, .0001);
 
     }
 
@@ -145,14 +145,14 @@ public class YearlyDataTargetTest {
 
         when(model.getYearlyDataSet().getColumn("fakeData")).thenReturn(fakeData);
 
-        assertEquals(target.computeError(model), 105123795984d / 15d, .0001);
+        Assertions.assertEquals(target.computeError(model), 105123795984d / 15d, .0001);
 
         //if you decrease coefficient of variation, you will weigh your error more!
         target.setCoefficientOfVariation(Double.NaN);
-        assertEquals(target.computeError(model), 105123795984d / 15d, .0001);
+        Assertions.assertEquals(target.computeError(model), 105123795984d / 15d, .0001);
 
         target.setCoefficientOfVariation(0);
-        assertEquals(target.computeError(model), 105123795984d / 15d, .0001);
+        Assertions.assertEquals(target.computeError(model), 105123795984d / 15d, .0001);
 
     }
 }

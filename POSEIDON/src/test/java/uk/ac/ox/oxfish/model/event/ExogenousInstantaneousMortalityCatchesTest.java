@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model.event;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.engine.SimState;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
@@ -41,9 +41,10 @@ public class ExogenousInstantaneousMortalityCatchesTest {
 
         for (int i = 0; i < 363; i++) {
             state.schedule.step(state);
-            Assert.assertEquals(
+            Assertions.assertEquals(
                 state.getMap().getSeaTile(2, 2).getBiomass(state.getSpecies("Species 0")),
-                1000, .0001
+                1000,
+                .0001
             );
         }
 
@@ -51,10 +52,9 @@ public class ExogenousInstantaneousMortalityCatchesTest {
             state.schedule.step(state);
 
         }
-        Assert.assertEquals(
-            state.getMap().getSeaTile(2, 2).getBiomass(state.getSpecies("Species 0")),
-            606.5307, .0001
-        );
+        Assertions.assertEquals(state.getMap().getSeaTile(2, 2).getBiomass(state.getSpecies("Species 0")),
+            606.5307,
+            .0001);
 
 
     }
@@ -104,17 +104,11 @@ public class ExogenousInstantaneousMortalityCatchesTest {
 
 
         state.schedule.step(state);
-        Assert.assertEquals(
-            state.getMap().getSeaTile(2, 2).getBiomass(state.getSpecies("Red Fish")),
-            2266886, 1
-        );
+        Assertions.assertEquals(state.getMap().getSeaTile(2, 2).getBiomass(state.getSpecies("Red Fish")), 2266886, 1);
 
         //    catches.start(state);
         catches.step(state);
-        Assert.assertEquals(
-            state.getMap().getSeaTile(2, 2).getBiomass(state.getSpecies("Red Fish")),
-            1374936, 1
-        );
+        Assertions.assertEquals(state.getMap().getSeaTile(2, 2).getBiomass(state.getSpecies("Red Fish")), 1374936, 1);
 
 
     }

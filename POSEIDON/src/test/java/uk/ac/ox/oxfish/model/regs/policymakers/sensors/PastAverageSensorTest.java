@@ -1,10 +1,10 @@
 package uk.ac.ox.oxfish.model.regs.policymakers.sensors;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class PastAverageSensorTest {
@@ -34,16 +34,12 @@ public class PastAverageSensorTest {
                 "indicator",
                 2
             );
-        assertEquals(target.scan(state),
-            0.975, .0001d
-        );
+        Assertions.assertEquals(target.scan(state), 0.975, .0001d);
 
         //make sure it updates
         indicatorColumn.add(1d);
         indicatorColumn.add(2d);
-        assertEquals(target.scan(state),
-            1.5d, .0001d
-        );
+        Assertions.assertEquals(target.scan(state), 1.5d, .0001d);
 
     }
 }

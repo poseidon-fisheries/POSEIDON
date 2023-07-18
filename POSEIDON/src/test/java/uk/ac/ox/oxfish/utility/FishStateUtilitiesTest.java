@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.utility;
 
 import com.beust.jcommander.internal.Lists;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -39,8 +40,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -69,15 +68,15 @@ public class FishStateUtilitiesTest {
         column.add(1d);
         column.add(2d);
 
-        assertEquals(1.5, FishStateUtilities.getAverage(column, 2), .0001);
+        Assertions.assertEquals(1.5, FishStateUtilities.getAverage(column, 2), .0001);
     }
 
     @Test
     public void logistic() throws Exception {
 
 
-        assertEquals(0.9933071491, FishStateUtilities.logisticProbability(1, 10, 1, .5), .0001);
-        assertEquals(0.119202922, FishStateUtilities.logisticProbability(1, 20, .9, 1), .0001);
+        Assertions.assertEquals(0.9933071491, FishStateUtilities.logisticProbability(1, 10, 1, .5), .0001);
+        Assertions.assertEquals(0.119202922, FishStateUtilities.logisticProbability(1, 20, .9, 1), .0001);
 
     }
 
@@ -86,14 +85,14 @@ public class FishStateUtilitiesTest {
 
         //osmose low-right corner
         Point2D.Double latlong = FishStateUtilities.utmToLatLong("17 N", 584600.702, 2791787.489);
-        assertEquals(25.24, latlong.getX(), .01);
-        assertEquals(-80.16, latlong.getY(), .01);
+        Assertions.assertEquals(25.24, latlong.getX(), .01);
+        Assertions.assertEquals(-80.16, latlong.getY(), .01);
         System.out.println(latlong);
 
         //osmose up-left corner
         latlong = FishStateUtilities.utmToLatLong("17 N", -73291.664, 3445097.299);
-        assertEquals(31, latlong.getX(), .01);
-        assertEquals(-87, latlong.getY(), .01);
+        Assertions.assertEquals(31, latlong.getX(), .01);
+        Assertions.assertEquals(-87, latlong.getY(), .01);
 
         System.out.println(latlong);
 
@@ -144,14 +143,13 @@ public class FishStateUtilitiesTest {
 
         final String table = FishStateUtilities.printTablePerPort(model, "lame", 0);
         System.out.println(table);
-        assertTrue(table.equals("Shanghai,Seattle\n" +
+        Assertions.assertTrue(table.equals("Shanghai,Seattle\n" +
             "1500.0,150.0\n" +
             "1500.0,150.0\n") ||
             table.equals(
                 "Seattle,Shanghai\n" +
                     "150.0,1500.0\n" +
-                    "150.0,1500.0\n")
-        );
+                    "150.0,1500.0\n"));
 
 
     }
@@ -192,7 +190,7 @@ public class FishStateUtilitiesTest {
                 true,
                 100
             );
-            assertEquals(tile, tile4);
+            Assertions.assertEquals(tile, tile4);
         }
     }
 
@@ -219,15 +217,11 @@ public class FishStateUtilitiesTest {
             10702457.01
 
         );
-        assertEquals(
-            0,
-            FishStateUtilities.timeSeriesDistance(
-                input,
-                input, 1,
-                false
-            ),
-            0.0001
-        );
+        Assertions.assertEquals(0, FishStateUtilities.timeSeriesDistance(
+            input,
+            input, 1,
+            false
+        ), 0.0001);
 
         //transform into data column
         final DataColumn data = new DataColumn("lame");
@@ -235,26 +229,18 @@ public class FishStateUtilitiesTest {
             data.add(observation);
         }
 
-        assertEquals(
-            0,
-            FishStateUtilities.timeSeriesDistance(
-                data,
-                Paths.get("inputs", "tests", "landings.csv"), 1
-            ),
-            0.0001
-        );
+        Assertions.assertEquals(0, FishStateUtilities.timeSeriesDistance(
+            data,
+            Paths.get("inputs", "tests", "landings.csv"), 1
+        ), 0.0001);
 
 
         //computed this distance with R
         //169961501
-        assertEquals(
-            169961500.94,
-            FishStateUtilities.timeSeriesDistance(
-                data,
-                Paths.get("inputs", "tests", "landings2.csv"), 1
-            ),
-            0.01
-        );
+        Assertions.assertEquals(169961500.94, FishStateUtilities.timeSeriesDistance(
+            data,
+            Paths.get("inputs", "tests", "landings2.csv"), 1
+        ), 0.01);
 
     }
 
@@ -264,7 +250,7 @@ public class FishStateUtilitiesTest {
         final double[] observations = new double[]{100, 200, 300};
         final double[] weight = new double[]{1, 1, 10};
         final double average = FishStateUtilities.getWeightedAverage(observations, weight);
-        assertEquals(275, average, .0001);
+        Assertions.assertEquals(275, average, .0001);
 
     }
 

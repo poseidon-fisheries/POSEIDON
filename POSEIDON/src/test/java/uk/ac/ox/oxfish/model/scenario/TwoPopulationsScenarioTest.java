@@ -20,14 +20,13 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.TACMonoFactory;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by carrknight on 4/3/17.
@@ -51,7 +50,7 @@ public class TwoPopulationsScenarioTest {
         state.start();
         //they are all anarchy!
         for (final Fisher fisher : state.getFishers())
-            assertTrue(fisher.getRegulation() instanceof Anarchy);
+            Assertions.assertTrue(fisher.getRegulation() instanceof Anarchy);
 
     }
 
@@ -74,14 +73,14 @@ public class TwoPopulationsScenarioTest {
         int nonAnarchy = 0;
         for (final Fisher fisher : state.getFishers()) {
             if (fisher.getTagsList().contains("small"))
-                assertTrue(fisher.getRegulation() instanceof Anarchy);
+                Assertions.assertTrue(fisher.getRegulation() instanceof Anarchy);
             else {
                 nonAnarchy++;
-                assertFalse(fisher.getRegulation() instanceof Anarchy);
+                Assertions.assertFalse(fisher.getRegulation() instanceof Anarchy);
             }
         }
         //make sure you are counting them!
-        assertEquals(nonAnarchy, 1);
+        Assertions.assertEquals(nonAnarchy, 1);
 
     }
 }

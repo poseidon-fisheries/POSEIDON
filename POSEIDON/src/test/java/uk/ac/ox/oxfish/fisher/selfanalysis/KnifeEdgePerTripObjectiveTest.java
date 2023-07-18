@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripLogger;
@@ -56,14 +56,14 @@ public class KnifeEdgePerTripObjectiveTest {
         when(fisher.getLastFinishedTrip()).thenReturn(logger.getLastFinishedTrip());
 
         HourlyProfitInTripObjective tripFunction = new HourlyProfitInTripObjective();
-        Assert.assertEquals(tripFunction.computeCurrentFitness(fisher, fisher), 10d, .001);
+        Assertions.assertEquals(tripFunction.computeCurrentFitness(fisher, fisher), 10d, .001);
 
 
         KnifeEdgePerTripFactory factory = new KnifeEdgePerTripFactory();
         factory.setOpportunityCosts(true);
         factory.setThreshold(new FixedDoubleParameter(5d));
         KnifeEdgePerTripObjective objective = factory.apply(mock(FishState.class));
-        Assert.assertEquals(objective.computeCurrentFitness(fisher, fisher), 1d, .001);
+        Assertions.assertEquals(objective.computeCurrentFitness(fisher, fisher), 1d, .001);
     }
 
 }

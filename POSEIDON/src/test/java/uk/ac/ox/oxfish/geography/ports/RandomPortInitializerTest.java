@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.geography.ports;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -31,8 +32,6 @@ import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 
 import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -60,12 +59,12 @@ public class RandomPortInitializerTest {
             mock(FishState.class),
             new FixedGasPrice(5)
         );
-        assertEquals(map.getPorts().size(), 4);
-        assertTrue(map.getSeaTile(3, 0).isPortHere());
-        assertTrue(map.getSeaTile(3, 1).isPortHere());
-        assertTrue(map.getSeaTile(3, 2).isPortHere());
-        assertTrue(map.getSeaTile(3, 3).isPortHere());
-        assertEquals(map.getPorts().get(0).getGasPricePerLiter(), 5d, .00001d);
+        Assertions.assertEquals(map.getPorts().size(), 4);
+        Assertions.assertTrue(map.getSeaTile(3, 0).isPortHere());
+        Assertions.assertTrue(map.getSeaTile(3, 1).isPortHere());
+        Assertions.assertTrue(map.getSeaTile(3, 2).isPortHere());
+        Assertions.assertTrue(map.getSeaTile(3, 3).isPortHere());
+        Assertions.assertEquals(map.getPorts().get(0).getGasPricePerLiter(), 5d, .00001d);
 
     }
 

@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.biology.complicated;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
@@ -51,8 +52,6 @@ import java.util.TreeMap;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.*;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
@@ -124,18 +123,10 @@ public class BiomassResetterTest {
             for (int y = 0; y < 4; y++) {
 
                 if (x == 0 && y == 1) {
-                    assertEquals(
-                        fishState.getMap().getSeaTile(x, y).getBiomass(species),
-                        600d,
-                        .0001d
-                    );
+                    Assertions.assertEquals(fishState.getMap().getSeaTile(x, y).getBiomass(species), 600d, .0001d);
 
                 } else {
-                    assertEquals(
-                        fishState.getMap().getSeaTile(x, y).getBiomass(species),
-                        0d,
-                        .0001d
-                    );
+                    Assertions.assertEquals(fishState.getMap().getSeaTile(x, y).getBiomass(species), 0d, .0001d);
                 }
 
             }
@@ -241,14 +232,14 @@ public class BiomassResetterTest {
             totalBiomasses(globalBiology, fadBiologies);
 
         // Check that FADs have attracted the right biomass
-        species.forEach(s -> assertEquals(
+        species.forEach(s -> Assertions.assertEquals(
             initialSeaTileBiomasses.get(s) * fadAttractionRate,
             initialFadBiomasses.get(s),
             EPSILON
         ));
 
         // Check that the tile biomasses have changed
-        assertNotEquals(totalBiomasses(globalBiology, seaTileBiologies), initialSeaTileBiomasses);
+        Assertions.assertNotEquals(totalBiomasses(globalBiology, seaTileBiologies), initialSeaTileBiomasses);
 
         // Wipe the cell biomasses
         species.forEach(s ->
@@ -263,16 +254,14 @@ public class BiomassResetterTest {
         // Check that the FAD biomasses are unaffected
         final ImmutableMap<Species, Double> finalFadBiomasses =
             totalBiomasses(globalBiology, fadBiologies);
-        assertEquals(finalFadBiomasses, initialFadBiomasses);
+        Assertions.assertEquals(finalFadBiomasses, initialFadBiomasses);
 
         // Check that the sum of current tile and FAD biomasses is equal to the initial biomass
         final ImmutableMap<Species, Double> finalSeaTileBiomasses =
             totalBiomasses(globalBiology, seaTileBiologies);
-        species.forEach(s -> assertEquals(
-            finalFadBiomasses.get(s) + finalSeaTileBiomasses.get(s),
+        species.forEach(s -> Assertions.assertEquals(finalFadBiomasses.get(s) + finalSeaTileBiomasses.get(s),
             initialSeaTileBiomasses.get(s),
-            EPSILON
-        ));
+            EPSILON));
 
     }
 

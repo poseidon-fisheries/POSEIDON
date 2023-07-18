@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -33,7 +34,6 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.*;
 
@@ -55,8 +55,8 @@ public class GarbageGearDecoratorTest {
         final Gear gear = new GarbageGearDecorator(second, 1.5, new OneSpecieGear(first, .5), true);
         final Catch fishCaught = gear.fish(mock(Fisher.class), where, where, 1, biology);
 
-        assertEquals(fishCaught.getWeightCaught(first), 0, .001);
-        assertEquals(fishCaught.getWeightCaught(second), 0, .001);
+        Assertions.assertEquals(fishCaught.getWeightCaught(first), 0, .001);
+        Assertions.assertEquals(fishCaught.getWeightCaught(second), 0, .001);
 
     }
 
@@ -75,8 +75,8 @@ public class GarbageGearDecoratorTest {
         final Gear gear = new GarbageGearDecorator(second, 2, new OneSpecieGear(first, .5), true);
         final Catch fishCaught = gear.fish(mock(Fisher.class), where, where, 1, biology);
 
-        assertEquals(fishCaught.getWeightCaught(first), 50, .001);
-        assertEquals(fishCaught.getWeightCaught(second), 100, .001);
+        Assertions.assertEquals(fishCaught.getWeightCaught(first), 50, .001);
+        Assertions.assertEquals(fishCaught.getWeightCaught(second), 100, .001);
         //gear itself never calls biology reacts
         verify(local, never()).reactToThisAmountOfBiomassBeingFished(any(), any(), any());
 
@@ -98,8 +98,8 @@ public class GarbageGearDecoratorTest {
         final Gear gear = new GarbageGearDecorator(second, 2, new OneSpecieGear(first, .5), true);
         final double[] fishCaught = gear.expectedHourlyCatch(mock(Fisher.class), where, 1, biology);
 
-        assertEquals(fishCaught[0], 50, .001);
-        assertEquals(fishCaught[1], 100.0, .001);
+        Assertions.assertEquals(fishCaught[0], 50, .001);
+        Assertions.assertEquals(fishCaught[1], 100.0, .001);
         //gear itself never calls biology reacts
         verify(local, never()).reactToThisAmountOfBiomassBeingFished(any(), any(), any());
 
@@ -145,9 +145,9 @@ public class GarbageGearDecoratorTest {
         final SeaTile mock = mock(SeaTile.class, RETURNS_DEEP_STUBS);
         when(mock.getBiology().getBiomass(any())).thenReturn(1d);
         final Catch caught = gear.fish(mock(Fisher.class), mock, mock, 1, biology);
-        assertEquals(caught.getWeightCaught(0), 19.880139, .001);
-        assertEquals(caught.getWeightCaught(1), 9, .001); //meristics round!
-        assertEquals(caught.getTotalWeight(), 9 + 19.880139, .001);
+        Assertions.assertEquals(caught.getWeightCaught(0), 19.880139, .001);
+        Assertions.assertEquals(caught.getWeightCaught(1), 9, .001); //meristics round!
+        Assertions.assertEquals(caught.getTotalWeight(), 9 + 19.880139, .001);
 
 
     }

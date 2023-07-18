@@ -20,14 +20,13 @@
 
 package uk.ac.ox.oxfish.model.market.itq;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 
@@ -43,25 +42,25 @@ public class PenaltyBoxTest {
 
         final PenaltyBox box = new PenaltyBox(10);
         box.registerTrader(one);
-        assertTrue(box.has(one));
-        assertFalse(box.has(two));
+        Assertions.assertTrue(box.has(one));
+        Assertions.assertFalse(box.has(two));
 
         //step it 5 times
         for (int i = 0; i < 5; i++)
             box.step(mock(FishState.class));
-        assertTrue(box.has(one));
-        assertFalse(box.has(two));
+        Assertions.assertTrue(box.has(one));
+        Assertions.assertFalse(box.has(two));
 
         //add two to the list
         box.registerTrader(two);
-        assertTrue(box.has(one));
-        assertTrue(box.has(two));
+        Assertions.assertTrue(box.has(one));
+        Assertions.assertTrue(box.has(two));
 
         //step it 5 times
         for (int i = 0; i < 5; i++)
             box.step(mock(FishState.class));
         //one should be out, two should be in
-        assertFalse(box.has(one));
-        assertTrue(box.has(two));
+        Assertions.assertFalse(box.has(one));
+        Assertions.assertTrue(box.has(two));
     }
 }

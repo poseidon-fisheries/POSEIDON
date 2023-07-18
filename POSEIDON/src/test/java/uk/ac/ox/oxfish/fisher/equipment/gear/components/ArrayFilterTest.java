@@ -20,11 +20,11 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -46,10 +46,10 @@ public class ArrayFilterTest {
         );
 
 
-        assertEquals(filtered[FishStateUtilities.FEMALE][0], 100, .001d);
-        assertEquals(filtered[FishStateUtilities.FEMALE][1], 200, .001d);
-        assertEquals(filtered[FishStateUtilities.MALE][0], 50, .001d);
-        assertEquals(filtered[FishStateUtilities.MALE][1], 30, .001d);
+        Assertions.assertEquals(filtered[FishStateUtilities.FEMALE][0], 100, .001d);
+        Assertions.assertEquals(filtered[FishStateUtilities.FEMALE][1], 200, .001d);
+        Assertions.assertEquals(filtered[FishStateUtilities.MALE][0], 50, .001d);
+        Assertions.assertEquals(filtered[FishStateUtilities.MALE][1], 30, .001d);
 
 
     }

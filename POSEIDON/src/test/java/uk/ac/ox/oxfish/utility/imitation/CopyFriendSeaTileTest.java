@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.utility.imitation;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
@@ -31,8 +32,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -59,7 +58,7 @@ public class CopyFriendSeaTileTest {
         ).getKey();
 
 
-        assertEquals(chosen, newT);
+        Assertions.assertEquals(chosen, newT);
 
         //you have a friend but he has no fitness
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(Double.NaN);
@@ -69,7 +68,7 @@ public class CopyFriendSeaTileTest {
             fisher -> friendT
         ).getKey();
 
-        assertEquals(chosen, newT);
+        Assertions.assertEquals(chosen, newT);
 
         //you have a friend with fitness but no seatile
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(0d);
@@ -79,7 +78,7 @@ public class CopyFriendSeaTileTest {
             fisher -> null
         ).getKey();
 
-        assertEquals(chosen, newT);
+        Assertions.assertEquals(chosen, newT);
 
         //you have a normal friend but he has low fitness
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(0d);
@@ -89,7 +88,7 @@ public class CopyFriendSeaTileTest {
             fisher -> friendT
         ).getKey();
 
-        assertEquals(chosen, newT);
+        Assertions.assertEquals(chosen, newT);
 
     }
 
@@ -118,8 +117,8 @@ public class CopyFriendSeaTileTest {
             fisher -> friendT
         );
         final SeaTile chosen = imitation.getKey();
-        assertNull(imitation.getValue()); // we didn't imitate anyone
-        assertEquals(chosen, newT);
+        Assertions.assertNull(imitation.getValue()); // we didn't imitate anyone
+        Assertions.assertEquals(chosen, newT);
 
         //best fitness is friend
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(100d);
@@ -131,8 +130,8 @@ public class CopyFriendSeaTileTest {
                 friend),
             friendFunction, fisher -> friendT
         );
-        assertEquals(imitation.getKey(), friendT);
-        assertEquals(imitation.getValue(), friend); // we imitated our friend
+        Assertions.assertEquals(imitation.getKey(), friendT);
+        Assertions.assertEquals(imitation.getValue(), friend); // we imitated our friend
 
         //friends lose ties
         when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(10d);
@@ -143,8 +142,8 @@ public class CopyFriendSeaTileTest {
                 mock(Fisher.class)),
             friendFunction, fisher -> friendT
         );
-        assertEquals(imitation.getKey(), newT);
-        assertNull(imitation.getValue()); // we didn't imitate anyone
+        Assertions.assertEquals(imitation.getKey(), newT);
+        Assertions.assertNull(imitation.getValue()); // we didn't imitate anyone
 
     }
 }

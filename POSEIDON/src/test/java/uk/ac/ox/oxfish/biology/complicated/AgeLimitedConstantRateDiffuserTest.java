@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -34,7 +35,6 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,15 +49,15 @@ public class AgeLimitedConstantRateDiffuserTest {
 
         //there is only one species of fish, with 3 age structures
 
-        Meristics meristics = new FromListMeristics(
+        final Meristics meristics = new FromListMeristics(
             new double[]{10d, 20d, 30d}, 2);
-        Species species = new Species("only", meristics);
-        GlobalBiology biology = new GlobalBiology(species);
+        final Species species = new Species("only", meristics);
+        final GlobalBiology biology = new GlobalBiology(species);
 
 
         //we will move from full to empty at 50%
-        SeaTile full = new SeaTile(0, 0, -1, new TileHabitat(0d));
-        AbundanceLocalBiology fullBio = new AbundanceLocalBiology(biology);
+        final SeaTile full = new SeaTile(0, 0, -1, new TileHabitat(0d));
+        final AbundanceLocalBiology fullBio = new AbundanceLocalBiology(biology);
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0] = 1000;
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][1] = 500;
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][2] = 0;
@@ -67,15 +67,15 @@ public class AgeLimitedConstantRateDiffuserTest {
         full.setBiology(fullBio);
 
 
-        SeaTile empty = new SeaTile(0, 1, -1, new TileHabitat(0d));
-        AbundanceLocalBiology emptyBio = new AbundanceLocalBiology(biology);
+        final SeaTile empty = new SeaTile(0, 1, -1, new TileHabitat(0d));
+        final AbundanceLocalBiology emptyBio = new AbundanceLocalBiology(biology);
         empty.setBiology(emptyBio);
 
-        HashMap<SeaTile, AbundanceLocalBiology> tiles = new HashMap<>();
+        final HashMap<SeaTile, AbundanceLocalBiology> tiles = new HashMap<>();
         tiles.put(full, fullBio);
         tiles.put(empty, emptyBio);
 
-        AgeLimitedConstantRateDiffuser diffuser = new AgeLimitedConstantRateDiffuser(
+        final AgeLimitedConstantRateDiffuser diffuser = new AgeLimitedConstantRateDiffuser(
             1,
             .5,
             1, 2
@@ -83,8 +83,8 @@ public class AgeLimitedConstantRateDiffuserTest {
         );
 
         //set up the two tiles as neighbors
-        NauticalMap map = mock(NauticalMap.class);
-        FishState state = mock(FishState.class);
+        final NauticalMap map = mock(NauticalMap.class);
+        final FishState state = mock(FishState.class);
         when(state.getMap()).thenReturn(map);
         when(map.getMooreNeighbors(full, 1)).thenReturn(new Bag(Lists.newArrayList(empty)));
         when(map.getMooreNeighbors(empty, 1)).thenReturn(new Bag(Lists.newArrayList(full)));
@@ -93,19 +93,27 @@ public class AgeLimitedConstantRateDiffuserTest {
 
         diffuser.step(species, tiles, state);
 
-        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
+        Assertions.assertArrayEquals(
+            fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
             new double[]{1000, 250, 0},
-            .001);
-        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
+            .001
+        );
+        Assertions.assertArrayEquals(
+            fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
             new double[]{0, 0, 5},
-            .001);
+            .001
+        );
 
-        assertArrayEquals(emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
+        Assertions.assertArrayEquals(
+            emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
             new double[]{0, 250, 0},
-            .001);
-        assertArrayEquals(emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
+            .001
+        );
+        Assertions.assertArrayEquals(
+            emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
             new double[]{0, 0, 5},
-            .001);
+            .001
+        );
 
     }
 
@@ -114,15 +122,15 @@ public class AgeLimitedConstantRateDiffuserTest {
     public void movesTwice() throws Exception {
 
         //there is only one species of fish, with 3 age structures
-        Meristics meristics = new FromListMeristics(
+        final Meristics meristics = new FromListMeristics(
             new double[]{10d, 20d, 30d}, 2);
-        Species species = new Species("only", meristics);
-        GlobalBiology biology = new GlobalBiology(species);
+        final Species species = new Species("only", meristics);
+        final GlobalBiology biology = new GlobalBiology(species);
 
 
         //we will move from full to empty at 10%
-        SeaTile full = new SeaTile(0, 0, -1, new TileHabitat(0d));
-        AbundanceLocalBiology fullBio = new AbundanceLocalBiology(biology);
+        final SeaTile full = new SeaTile(0, 0, -1, new TileHabitat(0d));
+        final AbundanceLocalBiology fullBio = new AbundanceLocalBiology(biology);
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0] = 1000;
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][1] = 500;
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][2] = 0;
@@ -132,15 +140,15 @@ public class AgeLimitedConstantRateDiffuserTest {
         full.setBiology(fullBio);
 
 
-        SeaTile empty = new SeaTile(0, 1, -1, new TileHabitat(0d));
-        AbundanceLocalBiology emptyBio = new AbundanceLocalBiology(biology);
+        final SeaTile empty = new SeaTile(0, 1, -1, new TileHabitat(0d));
+        final AbundanceLocalBiology emptyBio = new AbundanceLocalBiology(biology);
         empty.setBiology(emptyBio);
 
-        HashMap<SeaTile, AbundanceLocalBiology> tiles = new HashMap<>();
+        final HashMap<SeaTile, AbundanceLocalBiology> tiles = new HashMap<>();
         tiles.put(full, fullBio);
         tiles.put(empty, emptyBio);
 
-        AgeLimitedConstantRateDiffuser diffuser = new AgeLimitedConstantRateDiffuser(
+        final AgeLimitedConstantRateDiffuser diffuser = new AgeLimitedConstantRateDiffuser(
             1,
             .1,
             0, 1
@@ -148,8 +156,8 @@ public class AgeLimitedConstantRateDiffuserTest {
         );
 
         //set up the two tiles as neighbors
-        NauticalMap map = mock(NauticalMap.class);
-        FishState state = mock(FishState.class);
+        final NauticalMap map = mock(NauticalMap.class);
+        final FishState state = mock(FishState.class);
         when(state.getMap()).thenReturn(map);
         when(map.getMooreNeighbors(full, 1)).thenReturn(new Bag(Lists.newArrayList(empty)));
         when(map.getMooreNeighbors(empty, 1)).thenReturn(new Bag(Lists.newArrayList(full)));
@@ -158,35 +166,49 @@ public class AgeLimitedConstantRateDiffuserTest {
 
         diffuser.step(species, tiles, state);
 
-        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
+        Assertions.assertArrayEquals(
+            fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
             new double[]{900, 450, 0},
-            .001);
-        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
+            .001
+        );
+        Assertions.assertArrayEquals(
+            fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
             new double[]{0, 0, 10},
-            .001);
+            .001
+        );
 
-        assertArrayEquals(emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
+        Assertions.assertArrayEquals(
+            emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
             new double[]{100, 50, 0},
-            .001);
-        assertArrayEquals(
+            .001
+        );
+        Assertions.assertArrayEquals(
             emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
             new double[]{0, 0, 0},
             .001
         );
         diffuser.step(species, tiles, state);
-        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
+        Assertions.assertArrayEquals(
+            fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
             new double[]{820, 410, 0},
-            .001);
-        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
+            .001
+        );
+        Assertions.assertArrayEquals(
+            fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
             new double[]{0, 0, 10},
-            .001);
+            .001
+        );
 
-        assertArrayEquals(emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
+        Assertions.assertArrayEquals(
+            emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
             new double[]{180, 90, 0},
-            .001);
-        assertArrayEquals(emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
+            .001
+        );
+        Assertions.assertArrayEquals(
+            emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
             new double[]{0, 0, 0},
-            .001);
+            .001
+        );
     }
 
 }

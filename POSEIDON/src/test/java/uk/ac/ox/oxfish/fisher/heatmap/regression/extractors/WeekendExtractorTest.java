@@ -20,10 +20,10 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression.extractors;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,16 +42,16 @@ public class WeekendExtractorTest {
         when(model.getHoursPerStep()).thenReturn(12d);
         WeekendExtractor extractor = new WeekendExtractor();
         //no:
-        assertEquals(extractor.extract(null, 12d, null, model), 0, .0001);
-        assertEquals(extractor.extract(null, 12d + 24, null, model), 0, .0001);
-        assertEquals(extractor.extract(null, 12d + 24 * 2, null, model), 0, .0001);
-        assertEquals(extractor.extract(null, 12d + 24 * 3, null, model), 0, .0001);
-        assertEquals(extractor.extract(null, 12d + 24 * 4, null, model), 0, .0001);
+        Assertions.assertEquals(extractor.extract(null, 12d, null, model), 0, .0001);
+        Assertions.assertEquals(extractor.extract(null, 12d + 24, null, model), 0, .0001);
+        Assertions.assertEquals(extractor.extract(null, 12d + 24 * 2, null, model), 0, .0001);
+        Assertions.assertEquals(extractor.extract(null, 12d + 24 * 3, null, model), 0, .0001);
+        Assertions.assertEquals(extractor.extract(null, 12d + 24 * 4, null, model), 0, .0001);
 
 
         //yes:
-        assertEquals(extractor.extract(null, 12d + 24 * 5, null, model), 1, .0001);
-        assertEquals(extractor.extract(null, 12d + 24 * 6, null, model), 1, .0001);
+        Assertions.assertEquals(extractor.extract(null, 12d + 24 * 5, null, model), 1, .0001);
+        Assertions.assertEquals(extractor.extract(null, 12d + 24 * 6, null, model), 1, .0001);
 
     }
 }

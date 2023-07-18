@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.model.data;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
@@ -51,7 +51,7 @@ public class FishStateYearlyTimeSeriesTest {
         when(iterator.hasNext()).thenReturn(true);
         when(iterator.next()).thenReturn(5d);
         final Double sum = summer.apply(mock(FishState.class));
-        Assert.assertEquals(sum, 365 * 5, .001);
+        Assertions.assertEquals(sum, 365 * 5, .001);
 
 
     }

@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.fishing;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
@@ -28,8 +29,6 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.TowLimitFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,23 +49,17 @@ public class TowLimitFishingStrategyTest {
         when(record.getEffort()).thenReturn(1);
         Fisher fisher = mock(Fisher.class);
         when(fisher.getMaximumHold()).thenReturn(100d);
-        assertTrue(
-            strategy.shouldFish(fisher, new MersenneTwisterFast(),
-                mock(FishState.class), record
-            )
-        );
+        Assertions.assertTrue(strategy.shouldFish(fisher, new MersenneTwisterFast(),
+            mock(FishState.class), record
+        ));
         when(record.getEffort()).thenReturn(100);
-        assertTrue(
-            strategy.shouldFish(fisher, new MersenneTwisterFast(),
-                mock(FishState.class), record
-            )
-        );
+        Assertions.assertTrue(strategy.shouldFish(fisher, new MersenneTwisterFast(),
+            mock(FishState.class), record
+        ));
 
         when(record.getEffort()).thenReturn(101);
-        assertFalse(
-            strategy.shouldFish(fisher, new MersenneTwisterFast(),
-                mock(FishState.class), record
-            )
-        );
+        Assertions.assertFalse(strategy.shouldFish(fisher, new MersenneTwisterFast(),
+            mock(FishState.class), record
+        ));
     }
 }

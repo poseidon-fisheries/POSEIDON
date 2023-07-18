@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.engine.Schedule;
 import sim.util.Double2D;
@@ -17,8 +18,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
@@ -91,29 +90,29 @@ public class FadMapTest {
         final SeaTile startTile = nauticalMap.getSeaTile(2, 1);
         final BiomassAggregatingFad fad = (BiomassAggregatingFad) fadManager.deployFadInCenterOfTile(startTile, rng);
         fillBiomassFad(fad);
-        assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
+        Assertions.assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
         final VariableBiomassBasedBiology startTileBiology =
             (VariableBiomassBasedBiology) startTile.getBiology();
-        assertEquals(Arrays.stream(fad.getBiomass()).sum(), fad.getCarryingCapacity().getTotal(), 0.0);
-        assertTrue(startTileBiology.isEmpty());
+        Assertions.assertEquals(Arrays.stream(fad.getBiomass()).sum(), fad.getCarryingCapacity().getTotal(), 0.0);
+        Assertions.assertTrue(startTileBiology.isEmpty());
 
         // If we step once, the FAD should still be in its starting tile
         // and the biologies should not have changed
         when(fishState.getStep()).thenReturn(1);
         fadMap.step(fishState);
-        assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
-        assertEquals(Arrays.stream(fad.getBiomass()).sum(), fad.getCarryingCapacity().getTotal(), 0.0);
-        assertTrue(startTileBiology.isEmpty());
+        Assertions.assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
+        Assertions.assertEquals(Arrays.stream(fad.getBiomass()).sum(), fad.getCarryingCapacity().getTotal(), 0.0);
+        Assertions.assertTrue(startTileBiology.isEmpty());
 
         // Let it drift to the island
         when(fishState.getStep()).thenReturn(2);
         fadMap.step(fishState);
 
         // The FAD should have been removed from the map
-        assertEquals(Optional.empty(), fadMap.getFadTile(fad));
+        Assertions.assertEquals(Optional.empty(), fadMap.getFadTile(fad));
         // And the fish should be released in the starting cell
-        assertTrue(fad.getBiology().isEmpty());
-        assertTrue(startTileBiology.isFull());
+        Assertions.assertTrue(fad.getBiology().isEmpty());
+        Assertions.assertTrue(startTileBiology.isFull());
     }
 
 }

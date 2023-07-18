@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.equipment;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
@@ -37,7 +38,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear.getPurseSeineGear;
@@ -63,24 +64,20 @@ public class PurseSeineGearTest {
     public void testGetPurseSeineGear() {
         final Fisher fisher = mock(Fisher.class);
         when(fisher.getGear()).thenReturn(mock(Gear.class));
-        assertEquals(Optional.empty(), maybeGetPurseSeineGear(fisher));
+        Assertions.assertEquals(Optional.empty(), maybeGetPurseSeineGear(fisher));
         assertThrows(IllegalArgumentException.class, () -> getPurseSeineGear(fisher));
         when(fisher.getGear()).thenReturn(purseSeineGear);
-        assertEquals(Optional.of(purseSeineGear), maybeGetPurseSeineGear(fisher));
-        assertEquals(purseSeineGear, getPurseSeineGear(fisher));
+        Assertions.assertEquals(Optional.of(purseSeineGear), maybeGetPurseSeineGear(fisher));
+        Assertions.assertEquals(purseSeineGear, getPurseSeineGear(fisher));
     }
 
     @Test
     public void testGetFuelConsumptionPerHourOfFishing() {
-        assertEquals(
-            0.0,
-            purseSeineGear.getFuelConsumptionPerHourOfFishing(
-                mock(Fisher.class),
-                mock(Boat.class),
-                mock(SeaTile.class)
-            ),
-            EPSILON
-        );
+        Assertions.assertEquals(0.0, purseSeineGear.getFuelConsumptionPerHourOfFishing(
+            mock(Fisher.class),
+            mock(Boat.class),
+            mock(SeaTile.class)
+        ), EPSILON);
     }
 
     @Test
@@ -103,8 +100,8 @@ public class PurseSeineGearTest {
             0,
             globalBiology
         );
-        assertEquals(1.0, fishCaught1.getWeightCaught(0), EPSILON);
-        assertEquals(1.0, fishCaught1.getWeightCaught(1), EPSILON);
+        Assertions.assertEquals(1.0, fishCaught1.getWeightCaught(0), EPSILON);
+        Assertions.assertEquals(1.0, fishCaught1.getWeightCaught(1), EPSILON);
 
         when(hold.getMaximumLoad()).thenReturn(1.0);
         final Catch fishCaught2 = purseSeineGear.fish(
@@ -114,8 +111,8 @@ public class PurseSeineGearTest {
             0,
             globalBiology
         );
-        assertEquals(0.5, fishCaught2.getWeightCaught(0), EPSILON);
-        assertEquals(0.5, fishCaught2.getWeightCaught(1), EPSILON);
+        Assertions.assertEquals(0.5, fishCaught2.getWeightCaught(0), EPSILON);
+        Assertions.assertEquals(0.5, fishCaught2.getWeightCaught(1), EPSILON);
 
     }
 
@@ -128,20 +125,20 @@ public class PurseSeineGearTest {
 
     @Test
     public void isSame() {
-        assertTrue(purseSeineGear.isSame(purseSeineGear));
-        assertFalse(purseSeineGear.isSame(null));
-        assertFalse(purseSeineGear.isSame(new FixedProportionGear(0)));
-        assertTrue(purseSeineGear.isSame(purseSeineGear.makeCopy()));
+        Assertions.assertTrue(purseSeineGear.isSame(purseSeineGear));
+        Assertions.assertFalse(purseSeineGear.isSame(null));
+        Assertions.assertFalse(purseSeineGear.isSame(new FixedProportionGear(0)));
+        Assertions.assertTrue(purseSeineGear.isSame(purseSeineGear.makeCopy()));
     }
 
     @Test
     public void testVisits() {
-        assertEquals(Optional.empty(), purseSeineGear.getLastVisit(new Int2D(0, 0)));
+        Assertions.assertEquals(Optional.empty(), purseSeineGear.getLastVisit(new Int2D(0, 0)));
         purseSeineGear.recordVisit(new Int2D(0, 0), 0);
-        assertEquals(Optional.of(0), purseSeineGear.getLastVisit(new Int2D(0, 0)));
-        assertEquals(Optional.empty(), purseSeineGear.getLastVisit(new Int2D(1, 1)));
+        Assertions.assertEquals(Optional.of(0), purseSeineGear.getLastVisit(new Int2D(0, 0)));
+        Assertions.assertEquals(Optional.empty(), purseSeineGear.getLastVisit(new Int2D(1, 1)));
         purseSeineGear.recordVisit(new Int2D(0, 0), 1);
-        assertEquals(Optional.of(1), purseSeineGear.getLastVisit(new Int2D(0, 0)));
+        Assertions.assertEquals(Optional.of(1), purseSeineGear.getLastVisit(new Int2D(0, 0)));
     }
 
 }

@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.utility.adaptation.maximization;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -30,7 +31,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -75,12 +75,20 @@ public class GravitationalSearchAdaptationTest {
                     fisher13 -> true,
                     new CoordinateTransformer<double[]>() {
                         @Override
-                        public double[] toCoordinates(final double[] variable, final Fisher fisher, final FishState model) {
+                        public double[] toCoordinates(
+                            final double[] variable,
+                            final Fisher fisher,
+                            final FishState model
+                        ) {
                             return variable;
                         }
 
                         @Override
-                        public double[] fromCoordinates(final double[] variable, final Fisher fisher, final FishState model) {
+                        public double[] fromCoordinates(
+                            final double[] variable,
+                            final Fisher fisher,
+                            final FishState model
+                        ) {
                             return variable;
                         }
                     },
@@ -121,9 +129,9 @@ public class GravitationalSearchAdaptationTest {
             two.accept(coordinate[1]);
             three.accept(coordinate[2]);
         }
-        assertEquals(one.getAverage(), 10, 10);
-        assertEquals(two.getAverage(), 20, 10);
-        assertEquals(three.getAverage(), 30, 10);
+        Assertions.assertEquals(one.getAverage(), 10, 10);
+        Assertions.assertEquals(two.getAverage(), 20, 10);
+        Assertions.assertEquals(three.getAverage(), 30, 10);
 
 
     }

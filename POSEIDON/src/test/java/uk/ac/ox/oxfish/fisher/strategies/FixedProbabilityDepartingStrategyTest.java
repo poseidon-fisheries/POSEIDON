@@ -21,12 +21,12 @@
 package uk.ac.ox.oxfish.fisher.strategies;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,7 +41,7 @@ public class FixedProbabilityDepartingStrategyTest {
 
 
         for (int i = 0; i < 50; i++) {
-            assertTrue(always.shouldFisherLeavePort(
+            Assertions.assertTrue(always.shouldFisherLeavePort(
                 mock(Fisher.class),
                 mock(FishState.class),
                 new MersenneTwisterFast()
@@ -55,7 +55,7 @@ public class FixedProbabilityDepartingStrategyTest {
 
         final FixedProbabilityDepartingStrategy never = new FixedProbabilityDepartingStrategy(0, false);
         for (int i = 0; i < 50; i++)
-            assertFalse(never.shouldFisherLeavePort(
+            Assertions.assertFalse(never.shouldFisherLeavePort(
                 mock(Fisher.class),
                 mock(FishState.class),
                 new MersenneTwisterFast()
@@ -72,8 +72,8 @@ public class FixedProbabilityDepartingStrategyTest {
         for (int i = 0; i < 50; i++)
             if (sometimes.shouldFisherLeavePort(mock(Fisher.class), mock(FishState.class), new MersenneTwisterFast()))
                 departures++;
-        assertTrue(departures < 50);
-        assertTrue(departures > 0);
+        Assertions.assertTrue(departures < 50);
+        Assertions.assertTrue(departures > 0);
 
 
     }
@@ -91,8 +91,8 @@ public class FixedProbabilityDepartingStrategyTest {
             if (daily.shouldFisherLeavePort(mock(Fisher.class), model, new MersenneTwisterFast()))
                 departures++;
         }
-        assertEquals(1, departures);
+        Assertions.assertEquals(1, departures);
         when(model.getDay()).thenReturn(2);
-        assertTrue(daily.shouldFisherLeavePort(mock(Fisher.class), model, new MersenneTwisterFast()));
+        Assertions.assertTrue(daily.shouldFisherLeavePort(mock(Fisher.class), model, new MersenneTwisterFast()));
     }
 }

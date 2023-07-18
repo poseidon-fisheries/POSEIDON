@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model;
 
 import com.google.common.collect.ImmutableList;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -35,7 +36,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -88,15 +88,11 @@ public class FishStateDailyTimeSeriesTest {
         //and after all that set up, see if it aggregates correctly
         dataSet.start(state, state);
         dataSet.step(state);
-        assertEquals(
-            -300d,
+        Assertions.assertEquals(-300d,
             dataSet.getLatestObservation(species + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
-            .0001d
-        );
-        assertEquals(
-            300d,
+            .0001d);
+        Assertions.assertEquals(300d,
             dataSet.getLatestObservation(species + " " + AbstractMarket.EARNINGS_COLUMN_NAME),
-            .0001d
-        );
+            .0001d);
     }
 }

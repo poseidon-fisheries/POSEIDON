@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.utility.adaptation;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -32,7 +33,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 
@@ -81,7 +81,7 @@ public class ExplorationOrImitationMovementTest {
         verify(algorithm, never()).randomize(any(), any(), anyDouble(), any());
         verify(algorithm, never()).exploit(any(), any(), anyDouble(), any());
         //should have copied a friend
-        assertTrue(newObjective[0].equals(locations.get(friend1)) ||
+        Assertions.assertTrue(newObjective[0].equals(locations.get(friend1)) ||
             newObjective[0].equals(locations.get(friend2)));
 
 
@@ -133,7 +133,7 @@ public class ExplorationOrImitationMovementTest {
         verify(algorithm, never()).randomize(any(), any(), anyDouble(), any());
         verify(algorithm, times(1)).imitate(any(), any(), anyDouble(), any(), anyCollection(), any(), any());
         //should have stayed on its own
-        assertNull(newObjective[0]);
+        Assertions.assertNull(newObjective[0]);
     }
 
 
@@ -180,7 +180,7 @@ public class ExplorationOrImitationMovementTest {
         verify(algorithm, never()).exploit(any(), any(), anyDouble(), any());
         verify(algorithm, never()).imitate(any(), any(), anyDouble(), any(), anyCollection(), any(), any());
         //should have randomized
-        assertEquals(newObjective[0], randomized);
+        Assertions.assertEquals(newObjective[0], randomized);
 
     }
 }

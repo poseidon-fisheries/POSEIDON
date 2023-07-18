@@ -19,6 +19,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -29,7 +30,6 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import java.util.Map.Entry;
 
 import static java.util.Objects.requireNonNull;
-import static org.junit.Assert.assertArrayEquals;
 
 public class AbundanceCatchMakerTest {
 
@@ -66,14 +66,10 @@ public class AbundanceCatchMakerTest {
             catchMaker.apply(emptyAvailableBiology, desiredBiology);
 
         globalBiology.getSpecies().forEach(species -> {
-            assertArrayEquals(
-                emptyAvailableBiology.getAbundance(species).asMatrix(),
-                requireNonNull(emptyCatch.getKey().getAbundance(species)).asMatrix()
-            );
-            assertArrayEquals(
-                desiredBiology.getAbundance(species).asMatrix(),
-                emptyCatch.getValue().getAbundance(species).asMatrix()
-            );
+            Assertions.assertArrayEquals(emptyAvailableBiology.getAbundance(species).asMatrix(),
+                requireNonNull(emptyCatch.getKey().getAbundance(species)).asMatrix());
+            Assertions.assertArrayEquals(desiredBiology.getAbundance(species).asMatrix(),
+                emptyCatch.getValue().getAbundance(species).asMatrix());
         });
 
         final AbundanceLocalBiology availableBiology =
@@ -92,23 +88,18 @@ public class AbundanceCatchMakerTest {
             catchMaker.apply(availableBiology, desiredBiology);
 
         globalBiology.getSpecies().forEach(species -> {
-            assertArrayEquals(
-                availableBiology.getAbundance(species).asMatrix(),
-                requireNonNull(betterCatch.getKey().getAbundance(species)).asMatrix()
-            );
-            assertArrayEquals(
-                new AbundanceLocalBiology(ImmutableMap.of(
-                    twoBinner, new double[][]{
-                        new double[]{0, 1},
-                        new double[]{10, 11}
-                    },
-                    threeBinner, new double[][]{
-                        new double[]{100, 101, 102},
-                        new double[]{110, 111, 112}
-                    }
-                )).getAbundance(species).asMatrix(),
-                betterCatch.getValue().getAbundance(species).asMatrix()
-            );
+            Assertions.assertArrayEquals(availableBiology.getAbundance(species).asMatrix(),
+                requireNonNull(betterCatch.getKey().getAbundance(species)).asMatrix());
+            Assertions.assertArrayEquals(new AbundanceLocalBiology(ImmutableMap.of(
+                twoBinner, new double[][]{
+                    new double[]{0, 1},
+                    new double[]{10, 11}
+                },
+                threeBinner, new double[][]{
+                    new double[]{100, 101, 102},
+                    new double[]{110, 111, 112}
+                }
+            )).getAbundance(species).asMatrix(), betterCatch.getValue().getAbundance(species).asMatrix());
         });
 
     }

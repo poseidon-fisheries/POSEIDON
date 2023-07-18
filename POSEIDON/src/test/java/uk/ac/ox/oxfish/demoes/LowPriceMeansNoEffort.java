@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.demoes;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.experiments.EffortThrottling;
 import uk.ac.ox.oxfish.model.FishState;
@@ -50,7 +50,7 @@ public class LowPriceMeansNoEffort {
         );
 
         //probability should be very low!
-        Assert.assertTrue(state.getDailyDataSet().getLatestObservation("Probability to leave port") < .001);
+        Assertions.assertTrue(state.getDailyDataSet().getLatestObservation("Probability to leave port") < .001);
 
     }
 }

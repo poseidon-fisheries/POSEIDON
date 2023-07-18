@@ -20,12 +20,12 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class VariableProportionAgingTest {
@@ -51,13 +51,13 @@ public class VariableProportionAgingTest {
         aging.ageLocally(bio, species, mock(FishState.class), false, 365);
 
 
-        assertEquals(bio.getAbundance(species).asMatrix()[0][0], 800d, .001);
-        assertEquals(bio.getAbundance(species).asMatrix()[0][1], 300d, .001);
+        Assertions.assertEquals(bio.getAbundance(species).asMatrix()[0][0], 800d, .001);
+        Assertions.assertEquals(bio.getAbundance(species).asMatrix()[0][1], 300d, .001);
 
         aging.ageLocally(bio, species, mock(FishState.class), false, 1);
         //0.000547945
-        assertEquals(bio.getAbundance(species).asMatrix()[0][0], 799.561644, .001);
-        assertEquals(bio.getAbundance(species).asMatrix()[0][1], 300.438356, .001);
+        Assertions.assertEquals(bio.getAbundance(species).asMatrix()[0][0], 799.561644, .001);
+        Assertions.assertEquals(bio.getAbundance(species).asMatrix()[0][1], 300.438356, .001);
 
     }
 }

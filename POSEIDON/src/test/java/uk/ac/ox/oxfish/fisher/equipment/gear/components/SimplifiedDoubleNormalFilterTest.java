@@ -1,10 +1,9 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
-
-import static org.junit.Assert.assertEquals;
 
 public class SimplifiedDoubleNormalFilterTest {
 
@@ -31,10 +30,10 @@ public class SimplifiedDoubleNormalFilterTest {
 
         final double[][] selex = filter.computeSelectivity(species);
 
-        assertEquals(selex[0][30], 1.0, .001);
-        assertEquals(selex[0][20], 6.250000e-02, .001);
-        assertEquals(selex[0][40], 0.5, .001);
-        assertEquals(selex[0][50], 6.250000e-02, .001);
+        Assertions.assertEquals(selex[0][30], 1.0, .001);
+        Assertions.assertEquals(selex[0][20], 6.250000e-02, .001);
+        Assertions.assertEquals(selex[0][40], 0.5, .001);
+        Assertions.assertEquals(selex[0][50], 6.250000e-02, .001);
 
     }
 }

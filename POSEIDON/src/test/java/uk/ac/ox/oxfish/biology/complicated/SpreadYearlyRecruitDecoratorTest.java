@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.complicated.factory.MeristicsFileFactory;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
@@ -60,7 +60,7 @@ public class SpreadYearlyRecruitDecoratorTest {
         double recruits = recruitment.recruit(process.getSpecies(), meristics,
             new StructuredAbundance(male, female), 0, 365
         );
-        Assert.assertEquals(416140d, recruits, 1d);
+        Assertions.assertEquals(416140d, recruits, 1d);
 
 
         //DECORATION
@@ -71,37 +71,21 @@ public class SpreadYearlyRecruitDecoratorTest {
             recruitment, new MersenneTwisterFast()
         );
 
-        Assert.assertEquals(0d,
-            decorator.recruit(process.getSpecies(), meristics,
-                new StructuredAbundance(male, female), 0, 1
-            )
+        Assertions.assertEquals(0d, decorator.recruit(process.getSpecies(), meristics,
+            new StructuredAbundance(male, female), 0, 1
+        ), 1d);
 
-            , 1d
-        );
+        Assertions.assertEquals(0d, decorator.recruit(process.getSpecies(), meristics,
+            new StructuredAbundance(male, female), 364, 1
+        ), 1d);
 
-        Assert.assertEquals(0d,
-            decorator.recruit(process.getSpecies(), meristics,
-                new StructuredAbundance(male, female), 364, 1
-            )
+        Assertions.assertEquals(416140d * 0.3d, decorator.recruit(process.getSpecies(), meristics,
+            new StructuredAbundance(male, female), 100, 1
+        ), 1d);
 
-            , 1d
-        );
-
-        Assert.assertEquals(416140d * 0.3d,
-            decorator.recruit(process.getSpecies(), meristics,
-                new StructuredAbundance(male, female), 100, 1
-            )
-
-            , 1d
-        );
-
-        Assert.assertEquals(416140d * 0.7d,
-            decorator.recruit(process.getSpecies(), meristics,
-                new StructuredAbundance(male, female), 200, 1
-            )
-
-            , 1d
-        );
+        Assertions.assertEquals(416140d * 0.7d, decorator.recruit(process.getSpecies(), meristics,
+            new StructuredAbundance(male, female), 200, 1
+        ), 1d);
 
     }
 

@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
@@ -29,8 +30,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -56,15 +55,15 @@ public class RandomCatchabilityTrawlFactoryFromStringTest {
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
         RandomCatchabilityTrawl gear = factory.apply(state);
-        assertEquals(gear.getCatchabilityMeanPerSpecie()[0], 1, .001);
-        assertEquals(gear.getCatchabilityMeanPerSpecie()[1], 0, .001);
-        assertEquals(gear.getCatchabilityMeanPerSpecie()[2], 0, .001);
-        assertEquals(gear.getCatchabilityMeanPerSpecie()[3], 1, .001);
+        Assertions.assertEquals(gear.getCatchabilityMeanPerSpecie()[0], 1, .001);
+        Assertions.assertEquals(gear.getCatchabilityMeanPerSpecie()[1], 0, .001);
+        Assertions.assertEquals(gear.getCatchabilityMeanPerSpecie()[2], 0, .001);
+        Assertions.assertEquals(gear.getCatchabilityMeanPerSpecie()[3], 1, .001);
 
-        assertEquals(gear.getCatchabilityDeviationPerSpecie()[0], 1, .001);
-        assertEquals(gear.getCatchabilityDeviationPerSpecie()[1], 0, .001);
-        assertEquals(gear.getCatchabilityDeviationPerSpecie()[2], 1, .001);
-        assertEquals(gear.getCatchabilityDeviationPerSpecie()[3], 0, .001);
+        Assertions.assertEquals(gear.getCatchabilityDeviationPerSpecie()[0], 1, .001);
+        Assertions.assertEquals(gear.getCatchabilityDeviationPerSpecie()[1], 0, .001);
+        Assertions.assertEquals(gear.getCatchabilityDeviationPerSpecie()[2], 1, .001);
+        Assertions.assertEquals(gear.getCatchabilityDeviationPerSpecie()[3], 0, .001);
 
 
     }
@@ -81,7 +80,7 @@ public class RandomCatchabilityTrawlFactoryFromStringTest {
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
         RandomCatchabilityTrawl gear = factory.apply(state);
-        assertTrue(gear.getCatchabilityMeanPerSpecie()[0] >= 1);
-        assertTrue(gear.getCatchabilityMeanPerSpecie()[0] <= 2);
+        Assertions.assertTrue(gear.getCatchabilityMeanPerSpecie()[0] >= 1);
+        Assertions.assertTrue(gear.getCatchabilityMeanPerSpecie()[0] <= 2);
     }
 }

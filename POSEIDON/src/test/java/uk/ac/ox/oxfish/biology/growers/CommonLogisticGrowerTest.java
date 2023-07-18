@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.biology.growers;
 
 import com.google.common.collect.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
@@ -10,8 +11,6 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.ArrayList;
-
-import static org.junit.Assert.assertEquals;
 
 public class CommonLogisticGrowerTest {
 
@@ -43,21 +42,13 @@ public class CommonLogisticGrowerTest {
         model.setScenario(scenario);
         model.start();
 
-        assertEquals(
-            7500,
-            model.getTotalBiomass(model.getBiology().getSpecie(0)),
-            .001
-        );
+        Assertions.assertEquals(7500, model.getTotalBiomass(model.getBiology().getSpecie(0)), .001);
 
         for (int i = 0; i < 370; i++)
             model.schedule.step(model);
 
 
-        assertEquals(
-            8118.75,
-            model.getTotalBiomass(model.getBiology().getSpecie(0)),
-            .001
-        );
+        Assertions.assertEquals(8118.75, model.getTotalBiomass(model.getBiology().getSpecie(0)), .001);
     }
 
     @Test
@@ -74,8 +65,8 @@ public class CommonLogisticGrowerTest {
             1
         );
 
-        assertEquals(150, first.getCurrentBiomass()[0], .0001);
-        assertEquals(150, second.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(150, first.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(150, second.getCurrentBiomass()[0], .0001);
 
 
     }
@@ -94,8 +85,8 @@ public class CommonLogisticGrowerTest {
             1
         );
 
-        assertEquals(200, first.getCurrentBiomass()[0], .0001);
-        assertEquals(200, second.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(200, first.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(200, second.getCurrentBiomass()[0], .0001);
 
 
     }
@@ -115,8 +106,8 @@ public class CommonLogisticGrowerTest {
             1
         );
 
-        assertEquals(200, first.getCurrentBiomass()[0], .0001);
-        assertEquals(200, second.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(200, first.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(200, second.getCurrentBiomass()[0], .0001);
 
 
     }
@@ -135,8 +126,8 @@ public class CommonLogisticGrowerTest {
             1
         );
 
-        assertEquals(100 * (200d / 300), first.getCurrentBiomass()[0], .0001);
-        assertEquals(100 + 100d * (100d / 300), second.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(100 * (200d / 300), first.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(100 + 100d * (100d / 300), second.getCurrentBiomass()[0], .0001);
 
 
     }
@@ -155,8 +146,8 @@ public class CommonLogisticGrowerTest {
             1
         );
 
-        assertEquals(250d * (200d / 300), first.getCurrentBiomass()[0], .0001);
-        assertEquals(100 + 250d * (100d / 300), second.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(250d * (200d / 300), first.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(100 + 250d * (100d / 300), second.getCurrentBiomass()[0], .0001);
 
 
     }
@@ -176,8 +167,8 @@ public class CommonLogisticGrowerTest {
         );
 
         //fill this up first!
-        assertEquals(200, first.getCurrentBiomass()[0], .0001);
-        assertEquals(150, second.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(200, first.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(150, second.getCurrentBiomass()[0], .0001);
 
 
     }

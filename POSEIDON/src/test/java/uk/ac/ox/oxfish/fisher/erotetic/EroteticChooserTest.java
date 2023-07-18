@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.erotetic;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -30,7 +31,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
@@ -63,13 +63,10 @@ public class EroteticChooserTest {
         //priority to one, one should be choosen
         chooser.add(fakeFilterOne);
         chooser.add(fakeFilterTwo);
-        assertEquals(
-            one,
-            chooser.answer(toChoose,
-                mock(FeatureExtractors.class),
-                mock(FishState.class), mock(Fisher.class)
-            )
-        );
+        Assertions.assertEquals(one, chooser.answer(toChoose,
+            mock(FeatureExtractors.class),
+            mock(FishState.class), mock(Fisher.class)
+        ));
 
 
         //if I put priority to two, two should be chosen
@@ -77,13 +74,10 @@ public class EroteticChooserTest {
         //priority to one, one should be choosen
         chooser.add(fakeFilterTwo);
         chooser.add(fakeFilterOne);
-        assertEquals(
-            two,
-            chooser.answer(toChoose,
-                mock(FeatureExtractors.class),
-                mock(FishState.class), mock(Fisher.class)
-            )
-        );
+        Assertions.assertEquals(two, chooser.answer(toChoose,
+            mock(FeatureExtractors.class),
+            mock(FishState.class), mock(Fisher.class)
+        ));
 
 
     }
@@ -123,13 +117,10 @@ public class EroteticChooserTest {
         //priority to one, one should be choosen
         chooser.add(fakeFilterOne);
         chooser.add(fakeFilterOne);
-        assertEquals(
-            three,
-            chooser.answer(toChoose,
-                mock(FeatureExtractors.class),
-                mock(FishState.class), mock(Fisher.class)
-            )
-        );
+        Assertions.assertEquals(three, chooser.answer(toChoose,
+            mock(FeatureExtractors.class),
+            mock(FishState.class), mock(Fisher.class)
+        ));
 
 
     }

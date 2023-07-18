@@ -1,11 +1,11 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
 import com.beust.jcommander.internal.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class LBSPREffortPolicyTest {
@@ -37,13 +37,13 @@ public class LBSPREffortPolicyTest {
         policy.step(red);
         policy.step(red);
         policy.step(red);
-        assertTrue(lastReturn[0] < 1d);
+        Assertions.assertTrue(lastReturn[0] < 1d);
         double minimum = lastReturn[0];
         //spr is too high!
         when(red.getLatestYearlyObservation("lala")).thenReturn(.9);
         policy.step(red);
 
-        assertTrue(lastReturn[0] > minimum);
+        Assertions.assertTrue(lastReturn[0] > minimum);
 
 
     }
@@ -78,7 +78,7 @@ public class LBSPREffortPolicyTest {
         policy.step(red);
         policy.step(red);
         verify(entryPlugin, times(3)).setEntryPaused(true);
-        assertTrue(lastReturn[0] < 1d);
+        Assertions.assertTrue(lastReturn[0] < 1d);
         double minimum = lastReturn[0];
         //push it above 1
         for (int i = 0; i < 100; i++) {
@@ -92,7 +92,7 @@ public class LBSPREffortPolicyTest {
         verify(entryPlugin, times(1)).setEntryPaused(false);
 
 
-        assertTrue(lastReturn[0] > minimum);
+        Assertions.assertTrue(lastReturn[0] > minimum);
 
 
     }

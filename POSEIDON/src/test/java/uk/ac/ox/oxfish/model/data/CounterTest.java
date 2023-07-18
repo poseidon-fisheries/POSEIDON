@@ -26,7 +26,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
@@ -41,17 +40,17 @@ public class CounterTest {
         counter.addColumn("Variable1");
         counter.addColumn("Variable2");
         //start empty
-        assertEquals(0, counter.getColumn("Variable1"), .0001);
-        assertEquals(0, counter.getColumn("Variable2"), .0001);
+        Assertions.assertEquals(0, counter.getColumn("Variable1"), .0001);
+        Assertions.assertEquals(0, counter.getColumn("Variable2"), .0001);
         //add
         counter.count("Variable1", 100);
         counter.count("Variable1", 1);
-        assertEquals(101, counter.getColumn("Variable1"), .0001);
-        assertEquals(0, counter.getColumn("Variable2"), .0001);
+        Assertions.assertEquals(101, counter.getColumn("Variable1"), .0001);
+        Assertions.assertEquals(0, counter.getColumn("Variable2"), .0001);
         //reset
         counter.step(mock(FishState.class));
-        assertEquals(0, counter.getColumn("Variable1"), .0001);
-        assertEquals(0, counter.getColumn("Variable2"), .0001);
+        Assertions.assertEquals(0, counter.getColumn("Variable1"), .0001);
+        Assertions.assertEquals(0, counter.getColumn("Variable2"), .0001);
     }
 
 

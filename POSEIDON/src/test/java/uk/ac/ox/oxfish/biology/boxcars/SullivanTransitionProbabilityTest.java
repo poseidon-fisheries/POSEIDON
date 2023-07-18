@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class SullivanTransitionProbabilityTest {
@@ -40,23 +40,11 @@ public class SullivanTransitionProbabilityTest {
         //todo scaling ought to apply to beta too?
 
 
-        Assert.assertEquals(
-            probability.getTransitionMatrix()[0][4],
-            0.06278263,
-            .0001
-        );
+        Assertions.assertEquals(probability.getTransitionMatrix()[0][4], 0.06278263, .0001);
 
-        Assert.assertEquals(
-            probability.getTransitionMatrix()[6][9],
-            0.1770288,
-            .0001
-        );
+        Assertions.assertEquals(probability.getTransitionMatrix()[6][9], 0.1770288, .0001);
 
-        Assert.assertEquals(
-            probability.getTransitionMatrix()[9][9],
-            0.1309123,
-            .0001
-        );
+        Assertions.assertEquals(probability.getTransitionMatrix()[9][9], 0.1309123, .0001);
 
 
     }

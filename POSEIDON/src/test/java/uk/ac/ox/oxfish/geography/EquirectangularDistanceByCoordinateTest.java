@@ -21,9 +21,9 @@
 package uk.ac.ox.oxfish.geography;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,7 +54,7 @@ public class EquirectangularDistanceByCoordinateTest {
         final EquirectangularDistanceByCoordinate distance = new EquirectangularDistanceByCoordinate();
         final double distanceInKm = distance.distance(firstPoint, secondPoint, map);
         System.out.println("distance is " + distanceInKm);
-        assertEquals(distanceInKm, 427.1, .1);
+        Assertions.assertEquals(distanceInKm, 427.1, .1);
     }
 
     @Test
@@ -77,7 +77,7 @@ public class EquirectangularDistanceByCoordinateTest {
         final EquirectangularDistanceByCoordinate distance = new EquirectangularDistanceByCoordinate();
         final double distanceInKm = distance.distance(firstPoint, secondPoint, map);
         System.out.println("distance is " + distanceInKm);
-        assertEquals(distanceInKm, 41.7, .1);
+        Assertions.assertEquals(distanceInKm, 41.7, .1);
 
     }
 }

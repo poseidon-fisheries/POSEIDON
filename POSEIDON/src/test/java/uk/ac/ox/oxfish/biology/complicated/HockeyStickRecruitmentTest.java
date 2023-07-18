@@ -1,9 +1,8 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
-
-import static org.junit.Assert.assertEquals;
 
 public class HockeyStickRecruitmentTest {
 
@@ -31,7 +30,7 @@ public class HockeyStickRecruitmentTest {
         StructuredAbundance abundance = new StructuredAbundance(new double[]{10000, 100, 150});
 
         //full recruitment!
-        assertEquals(
+        Assertions.assertEquals(
             recruitment.computeYearlyRecruitment(species, species.getMeristics(), abundance),
             1000,
             .0001
@@ -63,7 +62,7 @@ public class HockeyStickRecruitmentTest {
         StructuredAbundance abundance = new StructuredAbundance(new double[]{10000, 25, 25});
 
         //half recruitment! (10% depletion)
-        assertEquals(
+        Assertions.assertEquals(
             recruitment.computeYearlyRecruitment(species, species.getMeristics(), abundance),
             500,
             .0001

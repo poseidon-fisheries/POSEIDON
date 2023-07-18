@@ -1,9 +1,9 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -24,12 +24,12 @@ public class LogisticSimpleFilterTest {
             15.0948823, 0.5391899
         );
         double[][] selectivity = filter.computeSelectivity(species);
-        assertEquals(selectivity.length, 1);
+        Assertions.assertEquals(selectivity.length, 1);
         //1/(1+exp(15.0948823-0.5391899*(c(25,40,100))))
         // 0.1658769 0.9984574 1.0000000
-        assertEquals(selectivity[0][0], 0.1658769, .001);
-        assertEquals(selectivity[0][1], 0.9984574, .001);
-        assertEquals(selectivity[0][2], 1, .001);
+        Assertions.assertEquals(selectivity[0][0], 0.1658769, .001);
+        Assertions.assertEquals(selectivity[0][1], 0.9984574, .001);
+        Assertions.assertEquals(selectivity[0][2], 1, .001);
 
     }
 }

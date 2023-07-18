@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.geography;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
@@ -29,7 +30,6 @@ import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -54,12 +54,12 @@ public class SquaresMapDiscretizerTest {
 
         final MapDiscretization discretization = new MapDiscretization(factory.apply(mock(FishState.class)));
         discretization.discretize(chart);
-        assertEquals(discretization.getNumberOfGroups(), 12);
+        Assertions.assertEquals(discretization.getNumberOfGroups(), 12);
 
-        assertTrue(discretization.isValid(0));
-        assertFalse(discretization.isValid(11));
+        Assertions.assertTrue(discretization.isValid(0));
+        Assertions.assertFalse(discretization.isValid(11));
 
-        assertTrue(discretization.getGroup(5).contains(chart.getSeaTile(2, 2)));
+        Assertions.assertTrue(discretization.getGroup(5).contains(chart.getSeaTile(2, 2)));
 
 
     }
@@ -79,7 +79,7 @@ public class SquaresMapDiscretizerTest {
         factory.setVerticalSplits(new FixedDoubleParameter(2));
         final MapDiscretization discretization = new MapDiscretization(factory.apply(mock(FishState.class)));
         discretization.discretize(chart);
-        assertEquals(discretization.getNumberOfGroups(), 9);
+        Assertions.assertEquals(discretization.getNumberOfGroups(), 9);
 
 
     }

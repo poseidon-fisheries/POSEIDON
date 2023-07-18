@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.experiments;
 
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -31,8 +32,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * These tests are here to make sure that the yaml files of the narrative example
@@ -65,7 +64,7 @@ public class NarrativeBestTest {
 
         Log.info("final biomass : " + finalBiomass + " which is  " + (finalBiomass / initialBiomass) + "% of the initial value; we are targeting 5% or lower");
         System.out.println("final biomass : " + finalBiomass + " which is  " + (finalBiomass / initialBiomass) + "% of the initial value; we are targeting 5% or lower");
-        assertTrue(finalBiomass < initialBiomass * .05);
+        Assertions.assertTrue(finalBiomass < initialBiomass * .05);
 
     }
 
@@ -106,9 +105,9 @@ public class NarrativeBestTest {
         }
         System.out.println(profits);
         //itq beats tac
-        assertTrue(profits.get("itq_best.yaml") > profits.get("tac_best.yaml"));
+        Assertions.assertTrue(profits.get("itq_best.yaml") > profits.get("tac_best.yaml"));
         //itq+ beats itq
-        assertTrue(profits.get("itqplus_best.yaml") > profits.get("itq_best.yaml") * 1.5);
+        Assertions.assertTrue(profits.get("itqplus_best.yaml") > profits.get("itq_best.yaml") * 1.5);
 
         final long end = System.currentTimeMillis();
         System.out.println((end - start) / 1000);

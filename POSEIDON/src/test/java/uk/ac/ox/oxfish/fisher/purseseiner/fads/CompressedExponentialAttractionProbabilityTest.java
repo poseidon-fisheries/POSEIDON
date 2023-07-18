@@ -18,7 +18,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 
@@ -37,15 +37,15 @@ public class CompressedExponentialAttractionProbabilityTest {
             );
 
         final double delta = 0.001;
-        Assert.assertEquals(0, f.apply(species, 0, 0), delta);
-        Assert.assertEquals(0, f.apply(species, 0, 0), delta);
-        Assert.assertEquals(0.221, f.apply(species, 500, 0), delta);
-        Assert.assertEquals(0.632, f.apply(species, 1000, 0), delta);
-        Assert.assertEquals(0, f.apply(species, 0, 150), delta);
-        Assert.assertEquals(0.790, f.apply(species, 500, 150), delta);
-        Assert.assertEquals(0.998, f.apply(species, 1000, 150), delta);
-        Assert.assertEquals(0, f.apply(species, 0, 300), delta);
-        Assert.assertEquals(0.982, f.apply(species, 500, 300), delta);
-        Assert.assertEquals(1.00, f.apply(species, 1000, 300), delta);
+        Assertions.assertEquals(0, f.apply(species, 0, 0), delta);
+        Assertions.assertEquals(0, f.apply(species, 0, 0), delta);
+        Assertions.assertEquals(0.221, f.apply(species, 500, 0), delta);
+        Assertions.assertEquals(0.632, f.apply(species, 1000, 0), delta);
+        Assertions.assertEquals(0, f.apply(species, 0, 150), delta);
+        Assertions.assertEquals(0.790, f.apply(species, 500, 150), delta);
+        Assertions.assertEquals(0.998, f.apply(species, 1000, 150), delta);
+        Assertions.assertEquals(0, f.apply(species, 0, 300), delta);
+        Assertions.assertEquals(0.982, f.apply(species, 500, 300), delta);
+        Assertions.assertEquals(1.00, f.apply(species, 1000, 300), delta);
     }
 }

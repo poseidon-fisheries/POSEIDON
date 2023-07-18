@@ -20,12 +20,11 @@
 
 package uk.ac.ox.oxfish.utility;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 import java.util.LinkedList;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 11/30/16.
@@ -42,8 +41,8 @@ public class CsvColumnsToListsTest {
         );
 
         final LinkedList<Double>[] columns = tester.readColumns();
-        assertEquals(columns[0].get(0), -1, .0001);
-        assertEquals(columns[1].get(0), 0, .0001);
+        Assertions.assertEquals(columns[0].get(0), -1, .0001);
+        Assertions.assertEquals(columns[1].get(0), 0, .0001);
 
     }
 }

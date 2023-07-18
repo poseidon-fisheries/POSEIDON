@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.maximization;
 
 import com.beust.jcommander.JCommander;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class TwoPunchCalibrationTest {
@@ -13,8 +13,8 @@ public class TwoPunchCalibrationTest {
             .addObject(twoPunchCalibration)
             .build()
             .parse("-p 32 -g 100 -l 200".split("\\s+"));
-        Assert.assertEquals(32, twoPunchCalibration.getParallelThreads());
-        Assert.assertEquals(100, twoPunchCalibration.getMaxGlobalCalls());
-        Assert.assertEquals(200, twoPunchCalibration.getMaxLocalCalls());
+        Assertions.assertEquals(32, twoPunchCalibration.getParallelThreads());
+        Assertions.assertEquals(100, twoPunchCalibration.getMaxGlobalCalls());
+        Assertions.assertEquals(200, twoPunchCalibration.getMaxLocalCalls());
     }
 }

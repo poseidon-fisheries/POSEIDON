@@ -21,11 +21,11 @@
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,7 +39,7 @@ public class DepthAllocatorDecoratorTest {
     public void depthAllocator() throws Exception {
 
 
-        DepthAllocatorDecorator allocator = new DepthAllocatorDecorator(
+        final DepthAllocatorDecorator allocator = new DepthAllocatorDecorator(
 
             105, 300,
             new BoundedAllocatorDecorator(0, 0, 5, 10, true,
@@ -48,7 +48,7 @@ public class DepthAllocatorDecoratorTest {
         );
 
 
-        SeaTile tile = mock(SeaTile.class);
+        final SeaTile tile = mock(SeaTile.class);
         when(tile.getGridX()).thenReturn(0);
         when(tile.getGridY()).thenReturn(0);
 
@@ -58,7 +58,7 @@ public class DepthAllocatorDecoratorTest {
             mock(NauticalMap.class),
             new MersenneTwisterFast()
         );
-        assertEquals(0d, allocate, .001);
+        Assertions.assertEquals(0d, allocate, .001);
 
 
         when(tile.getAltitude()).thenReturn(-105d);
@@ -67,7 +67,7 @@ public class DepthAllocatorDecoratorTest {
             mock(NauticalMap.class),
             new MersenneTwisterFast()
         );
-        assertEquals(1d, allocate, .001);
+        Assertions.assertEquals(1d, allocate, .001);
 
 
         when(tile.getAltitude()).thenReturn(-500d);
@@ -76,7 +76,7 @@ public class DepthAllocatorDecoratorTest {
             mock(NauticalMap.class),
             new MersenneTwisterFast()
         );
-        assertEquals(0d, allocate, .001);
+        Assertions.assertEquals(0d, allocate, .001);
 
         when(tile.getAltitude()).thenReturn(-300d);
         allocate = allocator.allocate(
@@ -84,7 +84,7 @@ public class DepthAllocatorDecoratorTest {
             mock(NauticalMap.class),
             new MersenneTwisterFast()
         );
-        assertEquals(1d, allocate, .001);
+        Assertions.assertEquals(1d, allocate, .001);
 
         when(tile.getGridY()).thenReturn(10);
         allocate = allocator.allocate(
@@ -92,7 +92,7 @@ public class DepthAllocatorDecoratorTest {
             mock(NauticalMap.class),
             new MersenneTwisterFast()
         );
-        assertEquals(1d, allocate, .001);
+        Assertions.assertEquals(1d, allocate, .001);
 
 
         when(tile.getGridY()).thenReturn(11);
@@ -101,7 +101,7 @@ public class DepthAllocatorDecoratorTest {
             mock(NauticalMap.class),
             new MersenneTwisterFast()
         );
-        assertEquals(0d, allocate, .001);
+        Assertions.assertEquals(0d, allocate, .001);
 
     }
 }

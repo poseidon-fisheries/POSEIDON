@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.regs;
 
 import com.beust.jcommander.internal.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -28,7 +29,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,27 +50,27 @@ public class WeakMultiQuotaRegulationTest {
         one.resetIndexTo(1);
 
 
-        assertTrue(regs.allowedAtSea(fisher, model));
-        assertEquals(1, regs.getQuotaRemaining(0), .0001);
-        assertEquals(2, regs.getQuotaRemaining(1), .0001);
+        Assertions.assertTrue(regs.allowedAtSea(fisher, model));
+        Assertions.assertEquals(1, regs.getQuotaRemaining(0), .0001);
+        Assertions.assertEquals(2, regs.getQuotaRemaining(1), .0001);
 
 
         SeaTile tile = mock(SeaTile.class);
         when(tile.isProtected()).thenReturn(false);
-        assertTrue(regs.canFishHere(fisher, tile, model));
+        Assertions.assertTrue(regs.canFishHere(fisher, tile, model));
 
         when(tile.isProtected()).thenReturn(true);
-        assertFalse(regs.canFishHere(fisher, tile, model));
+        Assertions.assertFalse(regs.canFishHere(fisher, tile, model));
 
         //if it's not protected and you are out of quota but you can still fish because one of the two species is still
         //available to be fished
         when(tile.isProtected()).thenReturn(false);
         regs.setQuotaRemaining(0, -FishStateUtilities.EPSILON);
-        assertTrue(regs.canFishHere(fisher, tile, model));
+        Assertions.assertTrue(regs.canFishHere(fisher, tile, model));
         //what about after the other quota is also off? now you shouldn't be able to fish
         regs.setQuotaRemaining(1, -FishStateUtilities.EPSILON);
-        assertFalse(regs.canFishHere(fisher, tile, model));
-        assertFalse(regs.allowedAtSea(fisher, model));
+        Assertions.assertFalse(regs.canFishHere(fisher, tile, model));
+        Assertions.assertFalse(regs.allowedAtSea(fisher, model));
 
 
     }
@@ -94,19 +94,19 @@ public class WeakMultiQuotaRegulationTest {
             new double[]{1d, 2d, Double.POSITIVE_INFINITY},
             model
         );
-        assertTrue(regs.allowedAtSea(fisher, model));
-        assertEquals(1, regs.getQuotaRemaining(0), .0001);
-        assertEquals(2, regs.getQuotaRemaining(1), .0001);
-        assertEquals(Double.POSITIVE_INFINITY, regs.getQuotaRemaining(2), .0001);
+        Assertions.assertTrue(regs.allowedAtSea(fisher, model));
+        Assertions.assertEquals(1, regs.getQuotaRemaining(0), .0001);
+        Assertions.assertEquals(2, regs.getQuotaRemaining(1), .0001);
+        Assertions.assertEquals(Double.POSITIVE_INFINITY, regs.getQuotaRemaining(2), .0001);
         regs.reactToSale(two, fisher, 100, 123141, model); //sell 100 of the infinite quota
 
-        assertEquals(1, regs.getQuotaRemaining(0), .0001);
-        assertEquals(2, regs.getQuotaRemaining(1), .0001);
-        assertEquals(Double.POSITIVE_INFINITY, regs.getQuotaRemaining(2), .0001);
+        Assertions.assertEquals(1, regs.getQuotaRemaining(0), .0001);
+        Assertions.assertEquals(2, regs.getQuotaRemaining(1), .0001);
+        Assertions.assertEquals(Double.POSITIVE_INFINITY, regs.getQuotaRemaining(2), .0001);
         regs.step(model);
-        assertEquals(1, regs.getQuotaRemaining(0), .0001);
-        assertEquals(2, regs.getQuotaRemaining(1), .0001);
-        assertEquals(Double.POSITIVE_INFINITY, regs.getQuotaRemaining(2), .0001);
+        Assertions.assertEquals(1, regs.getQuotaRemaining(0), .0001);
+        Assertions.assertEquals(2, regs.getQuotaRemaining(1), .0001);
+        Assertions.assertEquals(Double.POSITIVE_INFINITY, regs.getQuotaRemaining(2), .0001);
     }
 
     @Test
@@ -123,45 +123,45 @@ public class WeakMultiQuotaRegulationTest {
 
         WeakMultiQuotaRegulation regs = new WeakMultiQuotaRegulation(new double[]{1d, 2d}, model);
 
-        assertTrue(regs.allowedAtSea(fisher, model));
-        assertEquals(1, regs.getQuotaRemaining(0), FishStateUtilities.EPSILON);
-        assertEquals(2, regs.getQuotaRemaining(1), FishStateUtilities.EPSILON);
+        Assertions.assertTrue(regs.allowedAtSea(fisher, model));
+        Assertions.assertEquals(1, regs.getQuotaRemaining(0), FishStateUtilities.EPSILON);
+        Assertions.assertEquals(2, regs.getQuotaRemaining(1), FishStateUtilities.EPSILON);
 
-        assertEquals(1, regs.maximumBiomassSellable(fisher, zero, model), FishStateUtilities.EPSILON);
-        assertEquals(2, regs.maximumBiomassSellable(fisher, one, model), FishStateUtilities.EPSILON);
+        Assertions.assertEquals(1, regs.maximumBiomassSellable(fisher, zero, model), FishStateUtilities.EPSILON);
+        Assertions.assertEquals(2, regs.maximumBiomassSellable(fisher, one, model), FishStateUtilities.EPSILON);
 
         //sell one unit of specie 1
         regs.reactToSale(one, fisher, 1, 123141, model);
 
-        assertTrue(regs.allowedAtSea(fisher, model));
-        assertEquals(1, regs.getQuotaRemaining(0), FishStateUtilities.EPSILON);
-        assertEquals(1, regs.getQuotaRemaining(1), FishStateUtilities.EPSILON);
+        Assertions.assertTrue(regs.allowedAtSea(fisher, model));
+        Assertions.assertEquals(1, regs.getQuotaRemaining(0), FishStateUtilities.EPSILON);
+        Assertions.assertEquals(1, regs.getQuotaRemaining(1), FishStateUtilities.EPSILON);
 
-        assertEquals(1, regs.maximumBiomassSellable(fisher, zero, model), FishStateUtilities.EPSILON);
-        assertEquals(1, regs.maximumBiomassSellable(fisher, one, model), FishStateUtilities.EPSILON);
+        Assertions.assertEquals(1, regs.maximumBiomassSellable(fisher, zero, model), FishStateUtilities.EPSILON);
+        Assertions.assertEquals(1, regs.maximumBiomassSellable(fisher, one, model), FishStateUtilities.EPSILON);
 
 
         //sell another, you are still allowed to fish because there is still species 1
         regs.reactToSale(one, fisher, 1 + FishStateUtilities.EPSILON / 2, 123141, model);
 
-        assertTrue(regs.allowedAtSea(fisher, model));
-        assertEquals(1, regs.getQuotaRemaining(0), FishStateUtilities.EPSILON);
-        assertEquals(0, regs.getQuotaRemaining(1), FishStateUtilities.EPSILON);
+        Assertions.assertTrue(regs.allowedAtSea(fisher, model));
+        Assertions.assertEquals(1, regs.getQuotaRemaining(0), FishStateUtilities.EPSILON);
+        Assertions.assertEquals(0, regs.getQuotaRemaining(1), FishStateUtilities.EPSILON);
         //now you shouldn't be allowed anymore!
         regs.reactToSale(zero, fisher, 1 + FishStateUtilities.EPSILON / 2, 123141, model);
-        assertFalse(regs.allowedAtSea(fisher, model));
-        assertEquals(0, regs.getQuotaRemaining(0), FishStateUtilities.EPSILON);
-        assertEquals(0, regs.getQuotaRemaining(1), FishStateUtilities.EPSILON);
+        Assertions.assertFalse(regs.allowedAtSea(fisher, model));
+        Assertions.assertEquals(0, regs.getQuotaRemaining(0), FishStateUtilities.EPSILON);
+        Assertions.assertEquals(0, regs.getQuotaRemaining(1), FishStateUtilities.EPSILON);
 
         //reset after step
         regs.step(model);
 
-        assertTrue(regs.allowedAtSea(fisher, model));
-        assertEquals(1, regs.getQuotaRemaining(0), FishStateUtilities.EPSILON);
-        assertEquals(2, regs.getQuotaRemaining(1), FishStateUtilities.EPSILON);
+        Assertions.assertTrue(regs.allowedAtSea(fisher, model));
+        Assertions.assertEquals(1, regs.getQuotaRemaining(0), FishStateUtilities.EPSILON);
+        Assertions.assertEquals(2, regs.getQuotaRemaining(1), FishStateUtilities.EPSILON);
 
-        assertEquals(1, regs.maximumBiomassSellable(fisher, zero, model), FishStateUtilities.EPSILON);
-        assertEquals(2, regs.maximumBiomassSellable(fisher, one, model), FishStateUtilities.EPSILON);
+        Assertions.assertEquals(1, regs.maximumBiomassSellable(fisher, zero, model), FishStateUtilities.EPSILON);
+        Assertions.assertEquals(2, regs.maximumBiomassSellable(fisher, one, model), FishStateUtilities.EPSILON);
 
 
     }

@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
 import uk.ac.ox.oxfish.model.FishState;
@@ -44,9 +44,9 @@ public class EquallySpacedBertalanffyFactoryTest {
         GrowthBinByList species = factory.apply(mock(FishState.class));
 
         //numbers come from fixedBoxcar.R
-        Assert.assertEquals(species.getLength(0, 0), 10.0, .0001);
-        Assert.assertEquals(species.getLength(0, 5), 15.2020202020202, .0001);
-        Assert.assertEquals(species.getLength(0, 99), 113, .0001);
+        Assertions.assertEquals(species.getLength(0, 0), 10.0, .0001);
+        Assertions.assertEquals(species.getLength(0, 5), 15.2020202020202, .0001);
+        Assertions.assertEquals(species.getLength(0, 99), 113, .0001);
 
 
     }

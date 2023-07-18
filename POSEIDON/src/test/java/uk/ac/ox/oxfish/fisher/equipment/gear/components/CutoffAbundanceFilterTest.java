@@ -20,12 +20,11 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 3/11/16.
@@ -48,12 +47,12 @@ public class CutoffAbundanceFilterTest {
         );
         CutoffAbundanceFilter filter = new CutoffAbundanceFilter(10, false, true);
         double[][] selectivity = filter.getProbabilityMatrix(species);
-        assertEquals(selectivity[FishStateUtilities.MALE][3], 1, .001);
-        assertEquals(selectivity[FishStateUtilities.FEMALE][20], 0, .001);
+        Assertions.assertEquals(selectivity[FishStateUtilities.MALE][3], 1, .001);
+        Assertions.assertEquals(selectivity[FishStateUtilities.FEMALE][20], 0, .001);
         filter = new CutoffAbundanceFilter(10, true, true);
         selectivity = filter.getProbabilityMatrix(species);
-        assertEquals(selectivity[FishStateUtilities.MALE][3], 0, .001);
-        assertEquals(selectivity[FishStateUtilities.FEMALE][20], 1, .001);
+        Assertions.assertEquals(selectivity[FishStateUtilities.MALE][3], 0, .001);
+        Assertions.assertEquals(selectivity[FishStateUtilities.FEMALE][20], 1, .001);
 
     }
 
@@ -77,9 +76,9 @@ public class CutoffAbundanceFilterTest {
         abundance[FishStateUtilities.MALE] = male;
         abundance[FishStateUtilities.FEMALE] = female;
         double[][] filtered = filter.filter(species, abundance);
-        assertEquals(filtered[FishStateUtilities.MALE][5], 100, .001);
-        assertEquals(filtered[FishStateUtilities.MALE][0], 0, .001);
-        assertEquals(filtered[FishStateUtilities.FEMALE][5], 0, .0001);
+        Assertions.assertEquals(filtered[FishStateUtilities.MALE][5], 100, .001);
+        Assertions.assertEquals(filtered[FishStateUtilities.MALE][0], 0, .001);
+        Assertions.assertEquals(filtered[FishStateUtilities.FEMALE][5], 0, .0001);
 
 
     }

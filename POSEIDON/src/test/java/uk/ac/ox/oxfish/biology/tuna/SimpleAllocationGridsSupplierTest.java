@@ -21,14 +21,13 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
 
 import java.nio.file.Paths;
-
-import static org.junit.Assert.assertEquals;
 
 public class SimpleAllocationGridsSupplierTest {
 
@@ -50,8 +49,8 @@ public class SimpleAllocationGridsSupplierTest {
         final AllocationGrids<String> lame = supplier.get();
         final SeaTile seaTile = model.getMap().getSeaTile(new Coordinate(-142, 40));
         double chlorophyll = lame.atOrBeforeStep(1).get("Chlorophyll").get(seaTile.getGridX(), seaTile.getGridY());
-        assertEquals(chlorophyll, 0.258503, .0001);
+        Assertions.assertEquals(chlorophyll, 0.258503, .0001);
         chlorophyll = lame.atOrBeforeStep(360).get("Chlorophyll").get(seaTile.getGridX(), seaTile.getGridY());
-        assertEquals(chlorophyll, 0.136956, .0001);
+        Assertions.assertEquals(chlorophyll, 0.136956, .0001);
     }
 }

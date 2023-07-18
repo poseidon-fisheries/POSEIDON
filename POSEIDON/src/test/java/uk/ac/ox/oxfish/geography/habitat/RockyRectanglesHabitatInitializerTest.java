@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.geography.habitat;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -53,8 +53,8 @@ public class RockyRectanglesHabitatInitializerTest {
             for (final SeaTile tile : map.getAllSeaTilesAsList())
                 if (tile.getHabitat().getHardPercentage() > .99d)
                     count++;
-            Assert.assertTrue(count > 0);
-            Assert.assertTrue(count <= 9);
+            Assertions.assertTrue(count > 0);
+            Assertions.assertTrue(count <= 9);
         }
 
     }

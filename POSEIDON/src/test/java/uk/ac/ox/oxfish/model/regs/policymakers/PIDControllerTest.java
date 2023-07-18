@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
 import org.jfree.util.Log;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
@@ -58,7 +58,7 @@ public class PIDControllerTest {
             tank[0] += inflow[0] - outflow;
 
         }
-        Assert.assertEquals(tank[0], 10d, .001);
+        Assertions.assertEquals(tank[0], 10d, .001);
 
     }
 }

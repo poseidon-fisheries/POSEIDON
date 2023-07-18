@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.IntFunction;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
@@ -56,7 +56,7 @@ public class ExtractorTest {
 
         List<LocalBiology> localBiologyList = extractor.apply(fishState);
 
-        assertEquals(localBiologyList.size(), 9);
-        assertEquals(localBiologyList.get(0).getAbundance(species1).asMatrix()[0][0], 10, .01);
+        Assertions.assertEquals(localBiologyList.size(), 9);
+        Assertions.assertEquals(localBiologyList.get(0).getAbundance(species1).asMatrix()[0][0], 10, .01);
     }
 }

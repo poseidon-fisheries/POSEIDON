@@ -21,12 +21,11 @@
 package uk.ac.ox.oxfish.utility.bandit;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.data.ExponentialMovingAverage;
 import uk.ac.ox.oxfish.model.data.IterativeAverage;
 import uk.ac.ox.oxfish.model.data.MovingAverage;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 11/9/16.
@@ -50,7 +49,7 @@ public class EpsilonGreedyBanditAlgorithmTest {
 
         //now you should be playing most
         bandit.setExplorationProbability(0);
-        assertEquals(9, bandit.chooseArm(random));
+        Assertions.assertEquals(9, bandit.chooseArm(random));
 
     }
 
@@ -71,7 +70,7 @@ public class EpsilonGreedyBanditAlgorithmTest {
 
         //now you should be playing most
         bandit.setExplorationProbability(0);
-        assertEquals(9, bandit.chooseArm(random));
+        Assertions.assertEquals(9, bandit.chooseArm(random));
 
     }
 
@@ -92,7 +91,7 @@ public class EpsilonGreedyBanditAlgorithmTest {
 
         //now you should be playing most
         bandit.setExplorationProbability(0);
-        assertEquals(9, bandit.chooseArm(random));
+        Assertions.assertEquals(9, bandit.chooseArm(random));
 
     }
 }

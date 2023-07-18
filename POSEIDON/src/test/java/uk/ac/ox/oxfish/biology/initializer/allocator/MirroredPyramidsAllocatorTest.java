@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.biology.initializer.allocator;
 
 import com.beust.jcommander.internal.Lists;
 import ec.util.MersenneTwisterFast;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -18,19 +18,19 @@ public class MirroredPyramidsAllocatorTest {
     @Test
     public void pyramids() {
 
-        PyramidsAllocator allocator = new PyramidsAllocator(
+        final PyramidsAllocator allocator = new PyramidsAllocator(
             .2, 2, 1000, Lists.newArrayList(new int[]{2, 2})
         );
 
 
-        SeaTile middle = new SeaTile(2, 2, -100, new TileHabitat(0));
-        SeaTile oneOff = new SeaTile(3, 2, -100, new TileHabitat(0));
-        SeaTile twoOff = new SeaTile(4, 2, -100, new TileHabitat(0));
-        SeaTile threeOff = new SeaTile(5, 2, -100, new TileHabitat(0));
-        SeaTile diagonal = new SeaTile(3, 3, -100, new TileHabitat(0));
+        final SeaTile middle = new SeaTile(2, 2, -100, new TileHabitat(0));
+        final SeaTile oneOff = new SeaTile(3, 2, -100, new TileHabitat(0));
+        final SeaTile twoOff = new SeaTile(4, 2, -100, new TileHabitat(0));
+        final SeaTile threeOff = new SeaTile(5, 2, -100, new TileHabitat(0));
+        final SeaTile diagonal = new SeaTile(3, 3, -100, new TileHabitat(0));
 
         //map to fool allocator
-        NauticalMap map = mock(NauticalMap.class);
+        final NauticalMap map = mock(NauticalMap.class);
         final SeaTile fakeReturn = mock(SeaTile.class);
         when(fakeReturn.isWater()).thenReturn(true);
         when(map.getSeaTile(anyInt(), anyInt())).thenReturn(fakeReturn);
@@ -39,39 +39,19 @@ public class MirroredPyramidsAllocatorTest {
         final MersenneTwisterFast random = new MersenneTwisterFast();
 
         //peak is 10000
-        Assert.assertEquals(
-            1000,
-            allocator.allocate(
-                middle,
-                map,
-                random
-            ),
-            .001
-        );
+        Assertions.assertEquals(1000, allocator.allocate(
+            middle,
+            map,
+            random
+        ), .001);
         //one off: 20% left
-        Assert.assertEquals(
-            200,
-            allocator.allocate(oneOff, map, random),
-            .001
-        );
+        Assertions.assertEquals(200, allocator.allocate(oneOff, map, random), .001);
 
         //maxSpread is 2 which means there is nothing to fish elsewhere
-        Assert.assertEquals(
-            0,
-            allocator.allocate(twoOff, map, random),
-            .001
-        );
-        Assert.assertEquals(
-            0,
-            allocator.allocate(threeOff, map, random),
-            .001
-        );
+        Assertions.assertEquals(0, allocator.allocate(twoOff, map, random), .001);
+        Assertions.assertEquals(0, allocator.allocate(threeOff, map, random), .001);
         //diagonal is still only 1 off (square base pyramid)
-        Assert.assertEquals(
-            200,
-            allocator.allocate(diagonal, map, random),
-            .001
-        );
+        Assertions.assertEquals(200, allocator.allocate(diagonal, map, random), .001);
 
 
     }
@@ -80,7 +60,7 @@ public class MirroredPyramidsAllocatorTest {
     @Test
     public void antiPyramid() {
 
-        BiomassAllocator allocator = new MirroredPyramidsAllocator(
+        final BiomassAllocator allocator = new MirroredPyramidsAllocator(
             new PyramidsAllocator(
                 .2, 2, 1000, Lists.newArrayList(new int[]{2, 2})
             ),
@@ -88,14 +68,14 @@ public class MirroredPyramidsAllocatorTest {
         );
 
 
-        SeaTile middle = new SeaTile(2, 2, -100, new TileHabitat(0));
-        SeaTile oneOff = new SeaTile(3, 2, -100, new TileHabitat(0));
-        SeaTile twoOff = new SeaTile(4, 2, -100, new TileHabitat(0));
-        SeaTile threeOff = new SeaTile(5, 2, -100, new TileHabitat(0));
-        SeaTile diagonal = new SeaTile(3, 3, -100, new TileHabitat(0));
+        final SeaTile middle = new SeaTile(2, 2, -100, new TileHabitat(0));
+        final SeaTile oneOff = new SeaTile(3, 2, -100, new TileHabitat(0));
+        final SeaTile twoOff = new SeaTile(4, 2, -100, new TileHabitat(0));
+        final SeaTile threeOff = new SeaTile(5, 2, -100, new TileHabitat(0));
+        final SeaTile diagonal = new SeaTile(3, 3, -100, new TileHabitat(0));
 
         //map to fool allocator
-        NauticalMap map = mock(NauticalMap.class);
+        final NauticalMap map = mock(NauticalMap.class);
         final SeaTile fakeReturn = mock(SeaTile.class);
         when(fakeReturn.isWater()).thenReturn(true);
         when(map.getSeaTile(anyInt(), anyInt())).thenReturn(fakeReturn);
@@ -104,39 +84,19 @@ public class MirroredPyramidsAllocatorTest {
         final MersenneTwisterFast random = new MersenneTwisterFast();
 
         //peak is 0 now
-        Assert.assertEquals(
-            0,
-            allocator.allocate(
-                middle,
-                map,
-                random
-            ),
-            .001
-        );
+        Assertions.assertEquals(0, allocator.allocate(
+            middle,
+            map,
+            random
+        ), .001);
         //one off: 20% left- reversi
-        Assert.assertEquals(
-            .8,
-            allocator.allocate(oneOff, map, random),
-            .001
-        );
+        Assertions.assertEquals(.8, allocator.allocate(oneOff, map, random), .001);
 
         //maxSpread is 2 which means there the fish is elsewhere
-        Assert.assertEquals(
-            1,
-            allocator.allocate(twoOff, map, random),
-            .001
-        );
-        Assert.assertEquals(
-            1,
-            allocator.allocate(threeOff, map, random),
-            .001
-        );
+        Assertions.assertEquals(1, allocator.allocate(twoOff, map, random), .001);
+        Assertions.assertEquals(1, allocator.allocate(threeOff, map, random), .001);
         //diagonal is still only 1 off (square base pyramid)
-        Assert.assertEquals(
-            .8,
-            allocator.allocate(diagonal, map, random),
-            .001
-        );
+        Assertions.assertEquals(.8, allocator.allocate(diagonal, map, random), .001);
 
 
     }

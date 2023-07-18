@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -101,16 +101,16 @@ public class DrawThenCheapestInsertionPlannerTest {
         System.out.println(plan);
         List<PlannedAction> plannedActions = plan.lookAtPlan();
         //should have ordered it right
-        Assert.assertEquals(plannedActions.get(1).getLocation().getGridX(), 1);
-        Assert.assertEquals(plannedActions.get(1).getLocation().getGridY(), 1);
-        Assert.assertEquals(plannedActions.get(2).getLocation().getGridX(), 1);
-        Assert.assertEquals(plannedActions.get(2).getLocation().getGridY(), 1);
-        Assert.assertEquals(plannedActions.get(3).getLocation().getGridX(), 2);
-        Assert.assertEquals(plannedActions.get(3).getLocation().getGridY(), 2);
-        Assert.assertEquals(plannedActions.get(4).getLocation().getGridX(), 5);
-        Assert.assertEquals(plannedActions.get(4).getLocation().getGridY(), 0);
-        Assert.assertEquals(plannedActions.get(5).getLocation().getGridX(), 0);
-        Assert.assertEquals(plannedActions.get(5).getLocation().getGridY(), 0);
+        Assertions.assertEquals(plannedActions.get(1).getLocation().getGridX(), 1);
+        Assertions.assertEquals(plannedActions.get(1).getLocation().getGridY(), 1);
+        Assertions.assertEquals(plannedActions.get(2).getLocation().getGridX(), 1);
+        Assertions.assertEquals(plannedActions.get(2).getLocation().getGridY(), 1);
+        Assertions.assertEquals(plannedActions.get(3).getLocation().getGridX(), 2);
+        Assertions.assertEquals(plannedActions.get(3).getLocation().getGridY(), 2);
+        Assertions.assertEquals(plannedActions.get(4).getLocation().getGridX(), 5);
+        Assertions.assertEquals(plannedActions.get(4).getLocation().getGridY(), 0);
+        Assertions.assertEquals(plannedActions.get(5).getLocation().getGridX(), 0);
+        Assertions.assertEquals(plannedActions.get(5).getLocation().getGridY(), 0);
 
     }
 
@@ -198,17 +198,17 @@ public class DrawThenCheapestInsertionPlannerTest {
         }
         System.out.println(numberOfDPLAfterReplan);
         System.out.println(otherActionsAfterReplan);
-        Assert.assertEquals(numberOfDPLAfterReplan, numberOfDPLBeforeReplan);
+        Assertions.assertEquals(numberOfDPLAfterReplan, numberOfDPLBeforeReplan);
         //you should also go to 10,10 before doing those DPLs
         List<PlannedAction> plannedActions = plan.lookAtPlan();
-        Assert.assertEquals(plannedActions.get(2).getLocation().getGridX(), 10);
-        Assert.assertEquals(plannedActions.get(2).getLocation().getGridY(), 10);
+        Assertions.assertEquals(plannedActions.get(2).getLocation().getGridX(), 10);
+        Assertions.assertEquals(plannedActions.get(2).getLocation().getGridY(), 10);
         System.out.println(plan);
 
         //because we teleported you at 5,5 and consumed only 5 hours (rather than the 10 it takes)
         //and because you can only take FSH and not DPL; you should have increased the amount of FSH actions
         //in the replan
-        Assert.assertTrue(otherActionsAfterReplan > otherActions);
+        Assertions.assertTrue(otherActionsAfterReplan > otherActions);
         //in fact it should increase by precisely 5 times (but rounding may screw this up)
     }
 

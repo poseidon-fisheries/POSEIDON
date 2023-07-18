@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -36,7 +37,6 @@ import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
@@ -92,8 +92,8 @@ public class TwoSpeciesBoxInitializerTest {
                 mock(NauticalMap.class)
             );
 
-        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(0)), 0, .0001);
-        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(1)), 100, .0001);
+        Assertions.assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(0)), 0, .0001);
+        Assertions.assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(1)), 100, .0001);
 
         //at 5,5 also no species 0
         final VariableBiomassBasedBiology fivefive = (VariableBiomassBasedBiology)
@@ -106,8 +106,8 @@ public class TwoSpeciesBoxInitializerTest {
                 mock(NauticalMap.class)
 
             );
-        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(0)), 0, .0001);
-        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(1)), 100, .0001);
+        Assertions.assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(0)), 0, .0001);
+        Assertions.assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(1)), 100, .0001);
 
 
         //at 10,10 there is no species 1
@@ -121,8 +121,8 @@ public class TwoSpeciesBoxInitializerTest {
                 mock(NauticalMap.class)
 
             );
-        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(0)), 100, .0001);
-        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(1)), 0, .0001);
+        Assertions.assertEquals(tenten.getCarryingCapacity(biology.getSpecie(0)), 100, .0001);
+        Assertions.assertEquals(tenten.getCarryingCapacity(biology.getSpecie(1)), 0, .0001);
     }
 
     @Test
@@ -167,8 +167,8 @@ public class TwoSpeciesBoxInitializerTest {
                 mock(NauticalMap.class)
             );
 
-        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(0)), 0, .0001);
-        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(1)), 100, .0001);
+        Assertions.assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(0)), 0, .0001);
+        Assertions.assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(1)), 100, .0001);
 
         //at 5,5 also no species 0
         final VariableBiomassBasedBiology fivefive = (VariableBiomassBasedBiology)
@@ -181,8 +181,8 @@ public class TwoSpeciesBoxInitializerTest {
                 mock(NauticalMap.class)
 
             );
-        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(0)), 0, .0001);
-        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(1)), 100, .0001);
+        Assertions.assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(0)), 0, .0001);
+        Assertions.assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(1)), 100, .0001);
 
 
         //at 10,10 there is no species 1
@@ -196,8 +196,8 @@ public class TwoSpeciesBoxInitializerTest {
                 mock(NauticalMap.class)
 
             );
-        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(0)), 100, .0001);
-        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(1)), 0, .0001);
+        Assertions.assertEquals(tenten.getCarryingCapacity(biology.getSpecie(0)), 100, .0001);
+        Assertions.assertEquals(tenten.getCarryingCapacity(biology.getSpecie(1)), 0, .0001);
 
     }
 }

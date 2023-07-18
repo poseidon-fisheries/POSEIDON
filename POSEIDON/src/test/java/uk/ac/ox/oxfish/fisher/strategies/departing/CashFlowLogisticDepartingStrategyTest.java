@@ -21,11 +21,11 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -67,8 +67,8 @@ public class CashFlowLogisticDepartingStrategyTest {
         double departingRate = hoursDeparted / (10000 * 24d);
 
         System.out.println(departingRate);
-        assertTrue(departingRate > .20);
-        assertTrue(departingRate < .30);
+        Assertions.assertTrue(departingRate > .20);
+        Assertions.assertTrue(departingRate < .30);
 
 
     }

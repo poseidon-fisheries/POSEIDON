@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -28,8 +29,6 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.WeatherLogisticDepartingStrat
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -61,7 +60,7 @@ public class WeatherLogisticDepartingStrategyTest {
         int hoursDeparted = 0;
 
         //given the setup the harshness value ought to be 0.8 and the probability ought to be .88
-        assertEquals(.8, strategy.computeX(fisher, model), .001);
+        Assertions.assertEquals(.8, strategy.computeX(fisher, model), .001);
 
         for (int day = 0; day < 10000; day++) {
             strategy.step(model);
@@ -77,8 +76,8 @@ public class WeatherLogisticDepartingStrategyTest {
         double departingRate = hoursDeparted / (10000 * 24d);
 
         System.out.println(departingRate);
-        assertTrue(departingRate > .85);
-        assertTrue(departingRate < .90);
+        Assertions.assertTrue(departingRate > .85);
+        Assertions.assertTrue(departingRate < .90);
 
     }
 }

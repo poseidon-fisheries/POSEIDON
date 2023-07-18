@@ -20,11 +20,10 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
-
-import static org.junit.Assert.assertEquals;
 
 public class MeristicsInputTest {
 
@@ -62,18 +61,18 @@ public class MeristicsInputTest {
         );
 
         StockAssessmentCaliforniaMeristics yellowEye = new StockAssessmentCaliforniaMeristics(meristicsInput);
-        assertEquals(yellowEye.getLength(FishStateUtilities.FEMALE, 5), 26.4837518217, .001);
-        assertEquals(yellowEye.getLength(FishStateUtilities.MALE, 5), 26.8991271545, .001);
+        Assertions.assertEquals(yellowEye.getLength(FishStateUtilities.FEMALE, 5), 26.4837518217, .001);
+        Assertions.assertEquals(yellowEye.getLength(FishStateUtilities.MALE, 5), 26.8991271545, .001);
 
-        assertEquals(yellowEye.getWeight(FishStateUtilities.FEMALE, 5), 0.3167667645, .001);
-        assertEquals(yellowEye.getWeight(FishStateUtilities.MALE, 5), 0.365220907, .001);
+        Assertions.assertEquals(yellowEye.getWeight(FishStateUtilities.FEMALE, 5), 0.3167667645, .001);
+        Assertions.assertEquals(yellowEye.getWeight(FishStateUtilities.MALE, 5), 0.365220907, .001);
 
-        assertEquals(yellowEye.getMaturity()[5], 0.0046166415, .0001);
-        assertEquals(yellowEye.getRelativeFecundity()[5], 47344.590014727, .001);
-        assertEquals(yellowEye.getPhi().get(5), 173.6635925757, .001);
+        Assertions.assertEquals(yellowEye.getMaturity()[5], 0.0046166415, .0001);
+        Assertions.assertEquals(yellowEye.getRelativeFecundity()[5], 47344.590014727, .001);
+        Assertions.assertEquals(yellowEye.getPhi().get(5), 173.6635925757, .001);
 
-        assertEquals(yellowEye.getCumulativeSurvivalFemale().get(5), 0.7945336025, .001);
-        assertEquals(yellowEye.getCumulativePhi(), 8043057.98636817, .01);
+        Assertions.assertEquals(yellowEye.getCumulativeSurvivalFemale().get(5), 0.7945336025, .001);
+        Assertions.assertEquals(yellowEye.getCumulativePhi(), 8043057.98636817, .01);
 
     }
 

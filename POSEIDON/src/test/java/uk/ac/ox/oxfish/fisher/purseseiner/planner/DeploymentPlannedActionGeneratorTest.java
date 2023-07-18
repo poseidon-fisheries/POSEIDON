@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -10,7 +11,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationVa
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
@@ -62,7 +62,7 @@ public class DeploymentPlannedActionGeneratorTest {
         }
         System.out.println(timesWeDeployAt22);
         System.out.println(timesWeDeployAt11);
-        assertTrue(timesWeDeployAt22 > timesWeDeployAt11);
+        Assertions.assertTrue(timesWeDeployAt22 > timesWeDeployAt11);
 
     }
 }

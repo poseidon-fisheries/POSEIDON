@@ -22,13 +22,13 @@ package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.ImmutableDoubleArray;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 
 import java.util.Map;
 
 import static com.google.common.primitives.ImmutableDoubleArray.of;
-import static org.junit.Assert.assertEquals;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class CatchSamplerTest {
@@ -55,7 +55,7 @@ public class CatchSamplerTest {
                 final ImmutableDoubleArray expectedCatch = entry.getValue();
                 final BiomassLocalBiology localBiology =
                     new BiomassLocalBiology(entry.getKey().toArray());
-                assertEquals(expectedCatch, catchSampler.next(localBiology));
+                Assertions.assertEquals(expectedCatch, catchSampler.next(localBiology));
             });
 
     }

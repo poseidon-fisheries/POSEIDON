@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.model.market;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -50,18 +50,18 @@ public class CongestedMarketTest {
         TradeInfo tradeInfo = market.sellFish(hold, mock(Fisher.class), new Anarchy(), mock(FishState.class),
             species
         );
-        Assert.assertEquals(tradeInfo.getMoneyExchanged(), 100, .001);
+        Assertions.assertEquals(tradeInfo.getMoneyExchanged(), 100, .001);
         //sell 90, again the price ought to be steady at 10
         when(hold.getWeightOfCatchInHold(any())).thenReturn(90d);
         tradeInfo = market.sellFish(hold, mock(Fisher.class), new Anarchy(), mock(FishState.class), species);
-        Assert.assertEquals(tradeInfo.getMoneyExchanged(), 900, .001);
+        Assertions.assertEquals(tradeInfo.getMoneyExchanged(), 900, .001);
 
         //now do it once more, this time it pays less
         when(hold.getWeightOfCatchInHold(any())).thenReturn(100d);
 
         tradeInfo = market.sellFish(hold, mock(Fisher.class), new Anarchy(), mock(FishState.class), species);
-        Assert.assertEquals(tradeInfo.getMoneyExchanged(), 900, .001);
-        Assert.assertEquals(market.getMarginalPrice(), 9, .0001d);
+        Assertions.assertEquals(tradeInfo.getMoneyExchanged(), 900, .001);
+        Assertions.assertEquals(market.getMarginalPrice(), 9, .0001d);
 
 
     }
@@ -75,22 +75,22 @@ public class CongestedMarketTest {
         market.start(mock(FishState.class));
 
         //decongested
-        Assert.assertEquals(market.getMarginalPrice(), 10, .0001d);
+        Assertions.assertEquals(market.getMarginalPrice(), 10, .0001d);
 
         Hold hold = mock(Hold.class);
         when(hold.getWeightOfCatchInHold(any())).thenReturn(200d);
         market.sellFish(hold, mock(Fisher.class), new Anarchy(), mock(FishState.class), species);
 
         //congested
-        Assert.assertEquals(market.getMarginalPrice(), 9, .0001d);
+        Assertions.assertEquals(market.getMarginalPrice(), 9, .0001d);
 
         //drops by 150 each step
         market.step(mock(FishState.class));
         //decongested
-        Assert.assertEquals(market.getMarginalPrice(), 10, .0001d);
+        Assertions.assertEquals(market.getMarginalPrice(), 10, .0001d);
         //recongested
         market.sellFish(hold, mock(Fisher.class), new Anarchy(), mock(FishState.class), species);
-        Assert.assertEquals(market.getMarginalPrice(), 8.5, .0001d);
+        Assertions.assertEquals(market.getMarginalPrice(), 8.5, .0001d);
 
 
     }

@@ -20,14 +20,13 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborTransductionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NearestNeighborTransduction;
 import uk.ac.ox.oxfish.model.FishState;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 7/5/16.
@@ -45,12 +44,12 @@ public class NearestNeighborTransductionTest {
             null
         );
         regression.addObservation(new GeographicalObservation<>(state.getMap().getSeaTile(0, 0), 0, 1d), null, null);
-        assertEquals(regression.predict(state.getMap().getSeaTile(0, 0), 0, null, null), 1d, .001);
-        assertEquals(regression.predict(state.getMap().getSeaTile(1, 0), 0, null, null), 1d, .001);
-        assertEquals(regression.predict(state.getMap().getSeaTile(0, 1), 0, null, null), 1d, .001);
-        assertEquals(regression.predict(state.getMap().getSeaTile(3, 3), 0, null, null), 1d, .001);
-        assertEquals(regression.predict(state.getMap().getSeaTile(6, 6), 0, null, null), 100d, .001);
-        assertEquals(regression.predict(state.getMap().getSeaTile(30, 30), 0, null, null), 100d, .001);
+        Assertions.assertEquals(regression.predict(state.getMap().getSeaTile(0, 0), 0, null, null), 1d, .001);
+        Assertions.assertEquals(regression.predict(state.getMap().getSeaTile(1, 0), 0, null, null), 1d, .001);
+        Assertions.assertEquals(regression.predict(state.getMap().getSeaTile(0, 1), 0, null, null), 1d, .001);
+        Assertions.assertEquals(regression.predict(state.getMap().getSeaTile(3, 3), 0, null, null), 1d, .001);
+        Assertions.assertEquals(regression.predict(state.getMap().getSeaTile(6, 6), 0, null, null), 100d, .001);
+        Assertions.assertEquals(regression.predict(state.getMap().getSeaTile(30, 30), 0, null, null), 100d, .001);
 
 
     }

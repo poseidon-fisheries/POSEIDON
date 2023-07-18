@@ -20,13 +20,13 @@
 
 package uk.ac.ox.oxfish.maximization.generic;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class FixedDataLastStepTargetTest {
@@ -49,7 +49,7 @@ public class FixedDataLastStepTargetTest {
 
         when(model.getYearlyDataSet().getColumn("fakeData")).thenReturn(fakeData);
 
-        assertEquals(target.computeError(model), 10702357.01, .0001);
+        Assertions.assertEquals(target.computeError(model), 10702357.01, .0001);
 
     }
 
@@ -71,7 +71,7 @@ public class FixedDataLastStepTargetTest {
 
         when(model.getYearlyDataSet().getColumn("fakeData")).thenReturn(fakeData);
 
-        assertEquals(target.computeError(model), 100, .0001);
+        Assertions.assertEquals(target.computeError(model), 100, .0001);
 
     }
 }

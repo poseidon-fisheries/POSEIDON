@@ -22,14 +22,13 @@ package uk.ac.ox.oxfish.model.regs;
 
 import com.beust.jcommander.internal.Lists;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -59,7 +58,7 @@ public class MaxHoldSizeRandomAllocationPolicyTest {
 
         for (int i = 0; i < 100; i++) {
             List<Fisher> allowed = policy.computeWhichFishersAreAllowed(fishers, state);
-            assertEquals(allowed.size(), 2);
+            Assertions.assertEquals(allowed.size(), 2);
         }
 
 
@@ -90,8 +89,8 @@ public class MaxHoldSizeRandomAllocationPolicyTest {
 
         for (int i = 0; i < 100; i++) {
             List<Fisher> allowed = policy.computeWhichFishersAreAllowed(fishers, state);
-            assertEquals(allowed.size(), 3);
-            assertTrue(!allowed.contains(one));
+            Assertions.assertEquals(allowed.size(), 3);
+            Assertions.assertTrue(!allowed.contains(one));
         }
 
 

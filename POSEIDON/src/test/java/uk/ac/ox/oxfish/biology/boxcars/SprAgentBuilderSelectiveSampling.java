@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
@@ -64,8 +64,8 @@ public class SprAgentBuilderSelectiveSampling {
         //force the first fisher to quit
         firstMonitored.setDepartingStrategy(new FixedProbabilityDepartingStrategy(0, true));
 
-        Assert.assertEquals(lames, 5);
-        Assert.assertEquals(cools, 10);
+        Assertions.assertEquals(lames, 5);
+        Assertions.assertEquals(cools, 10);
 
         //run for a year
         for (int i = 0; i < 400; i++)
@@ -83,22 +83,22 @@ public class SprAgentBuilderSelectiveSampling {
 
 
         }
-        Assert.assertEquals(lames, 5);
-        Assert.assertEquals(cools, 10);
+        Assertions.assertEquals(lames, 5);
+        Assertions.assertEquals(cools, 10);
 
         //second fisher hasn't quit: should still be in
-        Assert.assertTrue(agent.monitorObservedFishers().contains(secondMonitored));
+        Assertions.assertTrue(agent.monitorObservedFishers().contains(secondMonitored));
         //first fisher was active ON THE FIRST DAY: should still be in!
-        Assert.assertTrue(agent.monitorObservedFishers().contains(firstMonitored));
+        Assertions.assertTrue(agent.monitorObservedFishers().contains(firstMonitored));
 
         //run it one more year
         for (int i = 0; i < 365; i++)
             state.schedule.step(state);
 
         //second fisher hasn't quit: should still be in
-        Assert.assertTrue(agent.monitorObservedFishers().contains(secondMonitored));
+        Assertions.assertTrue(agent.monitorObservedFishers().contains(secondMonitored));
         //first fisher wasn't active: should be out!
-        Assert.assertFalse(agent.monitorObservedFishers().contains(firstMonitored));
+        Assertions.assertFalse(agent.monitorObservedFishers().contains(firstMonitored));
 
     }
 

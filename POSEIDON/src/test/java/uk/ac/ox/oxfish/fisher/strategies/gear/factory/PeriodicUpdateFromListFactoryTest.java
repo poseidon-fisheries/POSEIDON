@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.gear.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionGearFactory;
@@ -28,9 +29,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 6/14/16.
@@ -57,13 +55,13 @@ public class PeriodicUpdateFromListFactoryTest {
         final FishYAML yamler = new FishYAML();
         final AlgorithmFactory<? extends GearStrategy> gearStrategy = yamler.loadAs(toRead, AlgorithmFactory.class);
 
-        assertEquals(gearStrategy.getClass(), PeriodicUpdateFromListFactory.class);
+        Assertions.assertEquals(gearStrategy.getClass(), PeriodicUpdateFromListFactory.class);
         final PeriodicUpdateFromListFactory casted = (PeriodicUpdateFromListFactory) gearStrategy;
-        assertEquals(2, casted.getAvailableGears().size());
+        Assertions.assertEquals(2, casted.getAvailableGears().size());
         for (final AlgorithmFactory<? extends Gear> gearFactory : casted.getAvailableGears()) {
-            assertEquals(gearFactory.getClass(), FixedProportionGearFactory.class);
+            Assertions.assertEquals(gearFactory.getClass(), FixedProportionGearFactory.class);
             final DoubleParameter catchabilityPerHour = ((FixedProportionGearFactory) gearFactory).getCatchabilityPerHour();
-            assertTrue(((FixedDoubleParameter) catchabilityPerHour).getValue() == 0.01 ||
+            Assertions.assertTrue(((FixedDoubleParameter) catchabilityPerHour).getValue() == 0.01 ||
                 ((FixedDoubleParameter) catchabilityPerHour).getValue() == 0.02);
         }
 

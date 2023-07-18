@@ -20,11 +20,11 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
@@ -40,8 +40,8 @@ public class PlanTest {
             map.getSeaTile(0, 0),
             map.getSeaTile(0, 0)
         );
-        assertEquals(0, plan.getGridXCentroid(), .0001);
-        assertEquals(0, plan.getGridYCentroid(), .0001);
+        Assertions.assertEquals(0, plan.getGridXCentroid(), .0001);
+        Assertions.assertEquals(0, plan.getGridYCentroid(), .0001);
 
         plan.insertAction(
             new PlannedAction.Deploy(map.getSeaTile(1, 1)),
@@ -53,18 +53,18 @@ public class PlanTest {
             1, 0.1
 
         );
-        assertEquals(plan.getGridXCentroid(), 0.5, .0001);
-        assertEquals(plan.getGridYCentroid(), 1, .0001);
+        Assertions.assertEquals(plan.getGridXCentroid(), 0.5, .0001);
+        Assertions.assertEquals(plan.getGridYCentroid(), 1, .0001);
 
         PlannedAction nextAction = plan.pollNextAction();
-        assertEquals(nextAction.getLocation().getGridX(), 0);
-        assertEquals(nextAction.getLocation().getGridY(), 0);
+        Assertions.assertEquals(nextAction.getLocation().getGridX(), 0);
+        Assertions.assertEquals(nextAction.getLocation().getGridY(), 0);
         nextAction = plan.pollNextAction();
-        assertEquals(nextAction.getLocation().getGridX(), 1);
-        assertEquals(nextAction.getLocation().getGridY(), 3);
+        Assertions.assertEquals(nextAction.getLocation().getGridX(), 1);
+        Assertions.assertEquals(nextAction.getLocation().getGridY(), 3);
 
-        assertEquals(plan.getGridXCentroid(), 0.5, .0001);
-        assertEquals(plan.getGridYCentroid(), 0.5, .0001);
+        Assertions.assertEquals(plan.getGridXCentroid(), 0.5, .0001);
+        Assertions.assertEquals(plan.getGridYCentroid(), 0.5, .0001);
 
     }
 }

@@ -18,7 +18,7 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializer;
@@ -54,13 +54,13 @@ public class ScheduledBiomassProcessesFactoryTest {
             biomassReallocatorFactory.apply(mock(FishState.class));
         final AllocationGrids<?> allocationGrids =
             biomassReallocator.getAllocationGrids();
-        Assert.assertEquals(12, allocationGrids.size());
+        Assertions.assertEquals(12, allocationGrids.size());
         allocationGrids.values().forEach(gridsPerSpecies -> {
-            Assert.assertEquals(3, gridsPerSpecies.size());
+            Assertions.assertEquals(3, gridsPerSpecies.size());
             gridsPerSpecies.values().forEach(grid -> {
-                Assert.assertEquals(100, grid.getHeight());
-                Assert.assertEquals(101, grid.getWidth());
-                Assert.assertEquals(1.0, Arrays.stream(grid.field).flatMapToDouble(Arrays::stream).sum(), EPSILON);
+                Assertions.assertEquals(100, grid.getHeight());
+                Assertions.assertEquals(101, grid.getWidth());
+                Assertions.assertEquals(1.0, Arrays.stream(grid.field).flatMapToDouble(Arrays::stream).sum(), EPSILON);
             });
         });
     }

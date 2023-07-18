@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.demoes;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
@@ -29,8 +30,6 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.logging.Logger;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 12/15/15.
@@ -71,7 +70,7 @@ public class TooLateToRemoveFishers {
         }
         Double biomass = state.getLatestYearlyObservation("Biomass Species 0");
         Logger.getGlobal().info("The actual remaining biomass is: " + biomass);
-        assertTrue(biomass < 1000000);
+        Assertions.assertTrue(biomass < 1000000);
 
         //for the next 5 years remove the fishers
         while (state.getYear() < 23) {
@@ -88,7 +87,7 @@ public class TooLateToRemoveFishers {
         Logger.getGlobal().info("I am assuming that the biomass is below 10% the virgin level of 10million");
         biomass = state.getLatestYearlyObservation("Biomass Species 0");
         Logger.getGlobal().info("The actual remaining biomass is: " + biomass);
-        assertTrue(biomass < 1000000);
+        Assertions.assertTrue(biomass < 1000000);
     }
 
 }

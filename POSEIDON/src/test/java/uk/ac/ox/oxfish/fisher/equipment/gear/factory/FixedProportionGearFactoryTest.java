@@ -21,12 +21,12 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.equipment.gear.FixedProportionGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +48,7 @@ public class FixedProportionGearFactoryTest {
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
         FixedProportionGear gear = fixedProportionGearFactory.apply(state);
-        assertEquals(gear.getProportionFished(), .5, .001);
+        Assertions.assertEquals(gear.getProportionFished(), .5, .001);
 
 
     }

@@ -21,9 +21,8 @@
 package uk.ac.ox.oxfish.utility.parameters;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertEquals;
 
 
 public class FixedDoubleParameterTest {
@@ -32,9 +31,9 @@ public class FixedDoubleParameterTest {
     public void returnsCorrectly() {
 
         final FixedDoubleParameter parameter = new FixedDoubleParameter(100);
-        assertEquals(parameter.applyAsDouble(new MersenneTwisterFast()), 100, .0001);
+        Assertions.assertEquals(parameter.applyAsDouble(new MersenneTwisterFast()), 100, .0001);
         parameter.setValue(-1);
-        assertEquals(parameter.applyAsDouble(new MersenneTwisterFast()), -1, .0001);
+        Assertions.assertEquals(parameter.applyAsDouble(new MersenneTwisterFast()), -1, .0001);
 
 
     }

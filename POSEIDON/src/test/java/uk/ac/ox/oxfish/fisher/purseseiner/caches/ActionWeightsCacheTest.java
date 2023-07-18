@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.caches;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FisherMocker;
@@ -26,7 +27,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.FisherMocker;
 import java.nio.file.Path;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.utils.TempFileMaker.makeTempFile;
 
@@ -53,16 +53,16 @@ public class ActionWeightsCacheTest {
         final Path path2 = makeTempFile(headers);
         final List<Fisher> fishers = new FisherMocker().mockFishers(3);
 
-        assertEquals(0.1, cache.get(path1, 2017, fishers.get(0), DEL.getActionClass()));
-        assertEquals(0.2, cache.get(path1, 2017, fishers.get(0), FAD.getActionClass()));
-        assertEquals(0.3, cache.get(path1, 2017, fishers.get(0), NOA.getActionClass()));
-        assertEquals(0.4, cache.get(path1, 2017, fishers.get(0), OFS.getActionClass()));
-        assertEquals(0.5, cache.get(path1, 2017, fishers.get(1), DEL.getActionClass()));
-        assertEquals(0.6, cache.get(path1, 2017, fishers.get(1), FAD.getActionClass()));
-        assertEquals(0.7, cache.get(path1, 2017, fishers.get(1), NOA.getActionClass()));
-        assertEquals(0.8, cache.get(path1, 2017, fishers.get(1), OFS.getActionClass()));
-        assertEquals(0.0, cache.get(path1, 2017, fishers.get(2), OFS.getActionClass()));
-        assertEquals(0.0, cache.get(path2, 2017, fishers.get(1), OFS.getActionClass()));
+        Assertions.assertEquals(0.1, cache.get(path1, 2017, fishers.get(0), DEL.getActionClass()));
+        Assertions.assertEquals(0.2, cache.get(path1, 2017, fishers.get(0), FAD.getActionClass()));
+        Assertions.assertEquals(0.3, cache.get(path1, 2017, fishers.get(0), NOA.getActionClass()));
+        Assertions.assertEquals(0.4, cache.get(path1, 2017, fishers.get(0), OFS.getActionClass()));
+        Assertions.assertEquals(0.5, cache.get(path1, 2017, fishers.get(1), DEL.getActionClass()));
+        Assertions.assertEquals(0.6, cache.get(path1, 2017, fishers.get(1), FAD.getActionClass()));
+        Assertions.assertEquals(0.7, cache.get(path1, 2017, fishers.get(1), NOA.getActionClass()));
+        Assertions.assertEquals(0.8, cache.get(path1, 2017, fishers.get(1), OFS.getActionClass()));
+        Assertions.assertEquals(0.0, cache.get(path1, 2017, fishers.get(2), OFS.getActionClass()));
+        Assertions.assertEquals(0.0, cache.get(path2, 2017, fishers.get(1), OFS.getActionClass()));
 
     }
 

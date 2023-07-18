@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -12,7 +13,6 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class AbundanceLinearIntervalAttractorTest {
@@ -55,22 +55,16 @@ public class AbundanceLinearIntervalAttractorTest {
 
         //each day you want to attract 80kg!
         attractor.step(state);
-        assertEquals(attractor.getDailyAttractionStep().getTotalWeight(),
-            80.0, .0001
-        );
+        Assertions.assertEquals(attractor.getDailyAttractionStep().getTotalWeight(), 80.0, .0001);
 
-        assertEquals(attractor.getDailyAttractionStep()
+        Assertions.assertEquals(attractor.getDailyAttractionStep()
                 .getObjectBeingWeighted()
                 .getAbundance(species)
-                .getAbundance(0, 0),
-            80 * 10d / 12d, .0001
-        );
-        assertEquals(attractor.getDailyAttractionStep()
+                .getAbundance(0, 0), 80 * 10d / 12d, .0001);
+        Assertions.assertEquals(attractor.getDailyAttractionStep()
                 .getObjectBeingWeighted()
                 .getAbundance(species)
-                .getAbundance(0, 1),
-            80d / 12d, .0001
-        );
+                .getAbundance(0, 1), 80d / 12d, .0001);
 
     }
 
@@ -112,22 +106,16 @@ public class AbundanceLinearIntervalAttractorTest {
 
         //each day you want to attract 80kg!
         attractor.step(state);
-        assertEquals(attractor.getDailyAttractionStep().getTotalWeight(),
-            80.0, .0001
-        );
+        Assertions.assertEquals(attractor.getDailyAttractionStep().getTotalWeight(), 80.0, .0001);
 
-        assertEquals(attractor.getDailyAttractionStep()
+        Assertions.assertEquals(attractor.getDailyAttractionStep()
                 .getObjectBeingWeighted()
                 .getAbundance(species)
-                .getAbundance(0, 0),
-            80 * 10d / 12d, .0001
-        );
-        assertEquals(attractor.getDailyAttractionStep()
+                .getAbundance(0, 0), 80 * 10d / 12d, .0001);
+        Assertions.assertEquals(attractor.getDailyAttractionStep()
                 .getObjectBeingWeighted()
                 .getAbundance(species)
-                .getAbundance(0, 1),
-            80d / 12d, .0001
-        );
+                .getAbundance(0, 1), 80d / 12d, .0001);
 
         //too early!
         final AbundanceAggregatingFad fad = mock(AbundanceAggregatingFad.class);
@@ -146,9 +134,7 @@ public class AbundanceLinearIntervalAttractorTest {
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(3);
 
-        assertNull(
-            attractor.attractImplementation(localBiology, fad)
-        );
+        Assertions.assertNull(attractor.attractImplementation(localBiology, fad));
 
         //too full
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{999999});
@@ -163,9 +149,7 @@ public class AbundanceLinearIntervalAttractorTest {
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(99999999);
 
-        assertNull(
-            attractor.attractImplementation(localBiology, fad)
-        );
+        Assertions.assertNull(attractor.attractImplementation(localBiology, fad));
 
         //empty local biology
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{0});
@@ -180,9 +164,7 @@ public class AbundanceLinearIntervalAttractorTest {
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(99999999);
 
-        assertNull(
-            attractor.attractImplementation(localBiology, fad)
-        );
+        Assertions.assertNull(attractor.attractImplementation(localBiology, fad));
 
         //valid
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{0});
@@ -198,8 +180,6 @@ public class AbundanceLinearIntervalAttractorTest {
         when(fad.isActive()).thenReturn(true);
         when(state.getDay()).thenReturn(99999999);
 
-        assertNotNull(
-            attractor.attractImplementation(localBiology, fad)
-        );
+        Assertions.assertNotNull(attractor.attractImplementation(localBiology, fad));
     }
 }

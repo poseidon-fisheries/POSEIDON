@@ -20,6 +20,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import com.google.common.collect.ImmutableSet;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -27,7 +28,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 
 import static java.util.stream.IntStream.range;
-import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
@@ -45,13 +45,10 @@ public class PortLocationValuesTest {
         when(seaTile.getGridLocation()).thenReturn(portLocation);
         final PortLocationValues portLocationValues = new PortLocationValues();
         portLocationValues.start(null, fisher);
-        assertEquals(
-            portLocationValues.getValues(),
-            ImmutableSet.of(entry(portLocation, 1.0))
-        );
-        assertEquals(1.0, portLocationValues.getValueAt(portLocation));
+        Assertions.assertEquals(portLocationValues.getValues(), ImmutableSet.of(entry(portLocation, 1.0)));
+        Assertions.assertEquals(1.0, portLocationValues.getValueAt(portLocation), 0.0);
         range(1, 9).forEach(i ->
-            assertEquals(0.0, portLocationValues.getValueAt(new Int2D(i, i)))
+            Assertions.assertEquals(0.0, portLocationValues.getValueAt(new Int2D(i, i)), 0.0)
         );
     }
 

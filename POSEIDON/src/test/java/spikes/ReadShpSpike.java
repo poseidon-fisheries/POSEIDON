@@ -22,7 +22,7 @@ package spikes;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
@@ -46,7 +46,7 @@ public class ReadShpSpike {
 
 
         //should read all the features!
-        Assert.assertEquals(1, vectorField.getGeometries().size());
+        Assertions.assertEquals(1, vectorField.getGeometries().size());
 
     }
 
@@ -96,7 +96,7 @@ public class ReadShpSpike {
             final int y = grid.toYCoord(centroid.getY());
             final double depth = ((DoubleGrid2D) grid.getGrid()).get(x, y);
             System.out.println(depth);
-            Assert.assertEquals(1333, depth, .01);
+            Assertions.assertEquals(1333, depth, .01);
         }
 
 

@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.biology.initializer.factory;
 
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.boxcars.BoxCarSimulator;
 import uk.ac.ox.oxfish.biology.boxcars.FixedBoxcarAging;
@@ -13,7 +14,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,46 +28,46 @@ public class SingleSpeciesIrregularBoxcarFactoryTest {
 
 
         //check that the length and weights match the regular ones
-        SingleSpeciesRegularBoxcarFactory control = new SingleSpeciesRegularBoxcarFactory();
+        final SingleSpeciesRegularBoxcarFactory control = new SingleSpeciesRegularBoxcarFactory();
         control.setCmPerBin(5);
         final SingleSpeciesAbundanceInitializer equalSpaced = control.apply(mock);
 
-        SingleSpeciesIrregularBoxcarFactory factory = new SingleSpeciesIrregularBoxcarFactory();
+        final SingleSpeciesIrregularBoxcarFactory factory = new SingleSpeciesIrregularBoxcarFactory();
 
         factory.setBinnedLengthsInCm(Lists.newArrayList(12.5d, 57.5d, 102.5d));
         final SingleSpeciesAbundanceInitializer unequalSpaced = factory.apply(mock);
 
         //same lengths/same weights
         //12.5 cm
-        assertEquals(
+        Assertions.assertEquals(
             equalSpaced.getMeristics().getLength(0, 2),
             unequalSpaced.getMeristics().getLength(0, 0),
             .0001
         );
-        assertEquals(
+        Assertions.assertEquals(
             equalSpaced.getMeristics().getWeight(0, 2),
             unequalSpaced.getMeristics().getWeight(0, 0),
             .0001
         );
         //57.5
-        assertEquals(
+        Assertions.assertEquals(
             equalSpaced.getMeristics().getLength(0, 11),
             unequalSpaced.getMeristics().getLength(0, 1),
             .0001
         );
-        assertEquals(
+        Assertions.assertEquals(
             equalSpaced.getMeristics().getWeight(0, 11),
             unequalSpaced.getMeristics().getWeight(0, 1),
             .0001
         );
 
         //102.5
-        assertEquals(
+        Assertions.assertEquals(
             equalSpaced.getMeristics().getLength(0, 20),
             unequalSpaced.getMeristics().getLength(0, 2),
             .0001
         );
-        assertEquals(
+        Assertions.assertEquals(
             equalSpaced.getMeristics().getWeight(0, 20),
             unequalSpaced.getMeristics().getWeight(0, 2),
             .0001
@@ -80,7 +81,7 @@ public class SingleSpeciesIrregularBoxcarFactoryTest {
         when(mock.getRandom()).thenReturn(new MersenneTwisterFast());
 
 
-        SingleSpeciesIrregularBoxcarFactory factory = new SingleSpeciesIrregularBoxcarFactory();
+        final SingleSpeciesIrregularBoxcarFactory factory = new SingleSpeciesIrregularBoxcarFactory();
 
         factory.setBinnedLengthsInCm(Lists.newArrayList(12.5d, 57.5d, 102.5d));
         factory.setInitialBtOverK(new FixedDoubleParameter(1d));
@@ -91,7 +92,7 @@ public class SingleSpeciesIrregularBoxcarFactoryTest {
         final SingleSpeciesAbundanceInitializer noise = factory.apply(mock);
 
         //the initial abundance ought to be the same (since that's carrying capacity!)
-        assertArrayEquals(
+        Assertions.assertArrayEquals(
             ((RepeatingInitialAbundance) noNoise.getInitialAbundance()).peekCohort(),
             ((RepeatingInitialAbundance) noise.getInitialAbundance()).peekCohort(),
             1
@@ -105,7 +106,7 @@ public class SingleSpeciesIrregularBoxcarFactoryTest {
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
 
-        SingleSpeciesIrregularBoxcarFactory factory = new SingleSpeciesIrregularBoxcarFactory();
+        final SingleSpeciesIrregularBoxcarFactory factory = new SingleSpeciesIrregularBoxcarFactory();
 
         factory.setBinnedLengthsInCm(Lists.newArrayList(12.5d, 57.5d, 102.5d));
         factory.setInitialBtOverK(new FixedDoubleParameter(.5d));
@@ -135,11 +136,11 @@ public class SingleSpeciesIrregularBoxcarFactoryTest {
                 meristicsInstance,
                 initializer.getMortality()
             );
-            double newWeight = FishStateUtilities.weigh(
+            final double newWeight = FishStateUtilities.weigh(
                 simulator.virginCondition(state, 20),
                 meristicsInstance
             );
-            assertEquals(totalWeightNoNoise, newWeight, .0001);
+            Assertions.assertEquals(totalWeightNoNoise, newWeight, .0001);
         }
 
         //but if it is with noise, completely different numbers will get simulated... that's noise for you.
@@ -155,7 +156,7 @@ public class SingleSpeciesIrregularBoxcarFactoryTest {
                 meristicsInstance,
                 initializer.getMortality()
             );
-            double newWeight = FishStateUtilities.weigh(
+            final double newWeight = FishStateUtilities.weigh(
                 simulator.virginCondition(state, 20),
                 meristicsInstance
             );

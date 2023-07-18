@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
@@ -50,7 +50,6 @@ import java.util.Set;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.IntStream.range;
-import static junit.framework.TestCase.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -123,33 +122,33 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         final List<Entry<ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
         System.out.println(initialOptions);
         //you should have only given me two fads: one in the upper-left quadrant and one in the lower-right quadrant
-        Assert.assertEquals(0, (int) initialOptions.get(0).getValue());
-        Assert.assertEquals(3, (int) initialOptions.get(1).getValue());
+        Assertions.assertEquals(0, (int) initialOptions.get(0).getValue());
+        Assertions.assertEquals(3, (int) initialOptions.get(1).getValue());
 
         Entry<ValuedFad, Integer> firstGuess = initialOptions.get(0);
         Entry<ValuedFad, Integer> secondGuess = initialOptions.get(1);
 
         //you should have only chosen the best!
-        assertEquals(firstGuess.getKey().getValue(), 1.0);
-        assertEquals(secondGuess.getKey().getValue(), 2.0);
+        Assertions.assertEquals(firstGuess.getKey().getValue(), 1.0);
+        Assertions.assertEquals(secondGuess.getKey().getValue(), 2.0);
 
         //if I pick one option, next time I choose it shouldn't be present anymore
         final PlannedAction.FadSet plannedFadSet = generator.chooseFad(0);
-        assertEquals(plannedFadSet.getLocation(), firstGuess.getKey().getKey().getLocation());
+        Assertions.assertEquals(plannedFadSet.getLocation(), firstGuess.getKey().getKey().getLocation());
 
         final List<Entry<ValuedFad, Integer>> newOptions = generator.generateBestFadOpportunities();
         firstGuess = newOptions.get(0);
         secondGuess = newOptions.get(1);
 
         //the 1$ fad should have gone
-        assertEquals(firstGuess.getKey().getValue(), 0.0);
-        assertEquals(secondGuess.getKey().getValue(), 2.0);
+        Assertions.assertEquals(firstGuess.getKey().getValue().doubleValue(), 0.0);
+        Assertions.assertEquals(secondGuess.getKey().getValue().doubleValue(), 2.0);
 
         //if you empty a queue, the group won't appear again
         generator.chooseFad(0);
         final List<Entry<ValuedFad, Integer>> finalOptions = generator.generateBestFadOpportunities();
-        assertEquals(finalOptions.size(), 1);
-        Assert.assertEquals(3, (int) finalOptions.get(0).getValue());
+        Assertions.assertEquals(finalOptions.size(), 1);
+        Assertions.assertEquals(3, (int) finalOptions.get(0).getValue());
 
     }
 
@@ -207,8 +206,8 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
 
         generator.startOrReset(fadManager, new MersenneTwisterFast(), mock(NauticalMap.class));
         final List<Entry<ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
-        assertEquals(initialOptions.size(), 1);
-        Assert.assertEquals(3, (int) initialOptions.get(0).getValue());
+        Assertions.assertEquals(initialOptions.size(), 1);
+        Assertions.assertEquals(3, (int) initialOptions.get(0).getValue());
     }
 
 
@@ -277,7 +276,7 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         generator.startOrReset(fadManager, new MersenneTwisterFast(), map);
         final List<Entry<ValuedFad, Integer>> initialOptions =
             generator.generateBestFadOpportunities();
-        assertEquals(1, initialOptions.size());
-        Assert.assertEquals(3, (int) initialOptions.get(0).getValue());
+        Assertions.assertEquals(1, initialOptions.size());
+        Assertions.assertEquals(3, (int) initialOptions.get(0).getValue());
     }
 }

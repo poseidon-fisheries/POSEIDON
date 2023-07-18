@@ -20,11 +20,11 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression.extractors;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,12 +45,12 @@ public class GroupInterceptExtractorTest {
 
         SeaTile tile = mock(SeaTile.class);
         when(discretization.getGroup(tile)).thenReturn(2);
-        assertEquals(extractor.extract(
+        Assertions.assertEquals(extractor.extract(
             tile, 0, null, null
         ), 30, .001);
 
         when(discretization.getGroup(tile)).thenReturn(0);
-        assertEquals(extractor.extract(
+        Assertions.assertEquals(extractor.extract(
             tile, 0, null, null
         ), 10, .001);
     }

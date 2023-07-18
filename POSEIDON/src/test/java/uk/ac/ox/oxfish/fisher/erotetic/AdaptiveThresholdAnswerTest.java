@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.erotetic;
 
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -30,7 +31,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
@@ -93,7 +93,7 @@ public class AdaptiveThresholdAnswerTest {
             mock(Fisher.class)
 
         );
-        assertEquals(selected.size(), 3);
+        Assertions.assertEquals(selected.size(), 3);
 
         when(adaptorAnswer.get(any())).thenReturn(1d);
         selected = filter.answer(
@@ -102,7 +102,7 @@ public class AdaptiveThresholdAnswerTest {
             mock(FishState.class),
             mock(Fisher.class)
         );
-        assertEquals(selected.size(), 3);
+        Assertions.assertEquals(selected.size(), 3);
 
         when(adaptorAnswer.get(any())).thenReturn(2d);
         selected = filter.answer(
@@ -111,7 +111,7 @@ public class AdaptiveThresholdAnswerTest {
             mock(FishState.class),
             mock(Fisher.class)
         );
-        assertEquals(selected.size(), 2);
+        Assertions.assertEquals(selected.size(), 2);
 
         when(adaptorAnswer.get(any())).thenReturn(3d);
         selected = filter.answer(
@@ -120,6 +120,6 @@ public class AdaptiveThresholdAnswerTest {
             mock(FishState.class),
             mock(Fisher.class)
         );
-        assertEquals(selected.size(), 1);
+        Assertions.assertEquals(selected.size(), 1);
     }
 }

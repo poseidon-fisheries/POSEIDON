@@ -20,7 +20,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Sets;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
@@ -84,7 +84,7 @@ public class EpoGravityAbundanceScenarioTest {
 
         final ImmutableSortedMap<Integer, ? extends Map<?, DoubleGrid2D>> grids =
             reallocator.getAllocationGrids().getGrids();
-        Assert.assertTrue(grids.entrySet().stream().allMatch(entry1 ->
+        Assertions.assertTrue(grids.entrySet().stream().allMatch(entry1 ->
             entry1.getValue().entrySet().stream().allMatch(entry2 -> {
                 final DoubleGrid2D grid = entry2.getValue();
                 final Set<Int2D> nonZeroGridCells =

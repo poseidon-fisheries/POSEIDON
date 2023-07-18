@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -9,9 +10,6 @@ import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 
 public class AbundanceResetterTest {
 
@@ -73,23 +71,13 @@ public class AbundanceResetterTest {
             for (int y = 0; y < 4; y++) {
 
                 if (x == 0 && y == 1) {
-                    assertEquals(
-                        fishState.getMap().getSeaTile(x, y).getBiomass(species),
-                        1200d,
-                        .0001d
-                    );
+                    Assertions.assertEquals(fishState.getMap().getSeaTile(x, y).getBiomass(species), 1200d, .0001d);
 
-                    assertArrayEquals(
-                        new double[]{600, 60},
+                    Assertions.assertArrayEquals(new double[]{600, 60},
                         fishState.getMap().getSeaTile(x, y).getAbundance(species).asMatrix()[0],
-                        .0001
-                    );
+                        .0001);
                 } else {
-                    assertEquals(
-                        fishState.getMap().getSeaTile(x, y).getBiomass(species),
-                        0d,
-                        .0001d
-                    );
+                    Assertions.assertEquals(fishState.getMap().getSeaTile(x, y).getBiomass(species), 0d, .0001d);
                 }
 
             }

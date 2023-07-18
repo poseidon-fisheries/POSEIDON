@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
@@ -27,7 +28,6 @@ import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class SPRTest {
@@ -74,7 +74,7 @@ public class SPRTest {
         );
 
 
-        assertEquals(0.08894, spr, .0001);
+        Assertions.assertEquals(0.08894, spr, .0001);
 
     }
 
@@ -121,7 +121,7 @@ public class SPRTest {
 
 
         System.out.println(spr);
-        assertEquals(0.02996616, spr, .01);
+        Assertions.assertEquals(0.02996616, spr, .01);
 
     }
 }

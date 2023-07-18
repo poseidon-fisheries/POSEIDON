@@ -20,13 +20,12 @@
 
 package uk.ac.ox.oxfish.model.plugins;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static org.junit.Assert.assertEquals;
 
 public class FisherEntryConstantRateTest {
 
@@ -54,7 +53,7 @@ public class FisherEntryConstantRateTest {
         //year 0: 10
         //year 1: 15
         //year 2: 22.5 rounded to 23
-        assertEquals(state.getFishers().size(), 23);
+        Assertions.assertEquals(state.getFishers().size(), 23);
 
         //now force all but 10 people to stay home; the active fishers left are 10 which means that the increase is going to be 5 fishers
         for (int i = 10; i < state.getFishers().size(); i++) {
@@ -63,7 +62,7 @@ public class FisherEntryConstantRateTest {
         }
         while (state.getYear() < 3)
             state.schedule.step(state);
-        assertEquals(state.getFishers().size(), 28);
+        Assertions.assertEquals(state.getFishers().size(), 28);
 
     }
 }

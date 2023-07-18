@@ -20,10 +20,10 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class FixedRecruitmentProcessTest {
@@ -33,29 +33,21 @@ public class FixedRecruitmentProcessTest {
     public void fixedRecruits() throws Exception {
 
         FixedRecruitmentProcess fixedRecruitmentProcess = new FixedRecruitmentProcess(365);
-        assertEquals(
-            fixedRecruitmentProcess.recruit(
-                mock(Species.class),
-                mock(Meristics.class),
-                mock(StructuredAbundance.class),
-                12,
-                365
-            ),
-            365d,
-            0.001
-        );
+        Assertions.assertEquals(fixedRecruitmentProcess.recruit(
+            mock(Species.class),
+            mock(Meristics.class),
+            mock(StructuredAbundance.class),
+            12,
+            365
+        ), 365d, 0.001);
 
-        assertEquals(
-            fixedRecruitmentProcess.recruit(
-                mock(Species.class),
-                mock(Meristics.class),
-                mock(StructuredAbundance.class),
-                12,
-                1
-            ),
-            1d,
-            0.001
-        );
+        Assertions.assertEquals(fixedRecruitmentProcess.recruit(
+            mock(Species.class),
+            mock(Meristics.class),
+            mock(StructuredAbundance.class),
+            12,
+            1
+        ), 1d, 0.001);
 
 
     }

@@ -20,12 +20,11 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 3/21/16.
@@ -50,7 +49,7 @@ public class DoubleNormalFilterTest {
 
         double[][] selectivity = filter.computeSelectivity(species);
 
-        assertEquals(0.0026758814, selectivity[0][2], .00001);
+        Assertions.assertEquals(0.0026758814, selectivity[0][2], .00001);
 
 //
     }
@@ -74,7 +73,7 @@ public class DoubleNormalFilterTest {
 
         double[][] selectivity = filter.computeSelectivity(species);
 
-        assertEquals(0.798, selectivity[FishStateUtilities.FEMALE][9], .01);
+        Assertions.assertEquals(0.798, selectivity[FishStateUtilities.FEMALE][9], .01);
     }
 
 
@@ -102,6 +101,6 @@ public class DoubleNormalFilterTest {
 
         double[][] selectivity = filter.computeSelectivity(species);
 
-        assertEquals(0.434, selectivity[FishStateUtilities.MALE][13], .001);
+        Assertions.assertEquals(0.434, selectivity[FishStateUtilities.MALE][13], .001);
     }
 }

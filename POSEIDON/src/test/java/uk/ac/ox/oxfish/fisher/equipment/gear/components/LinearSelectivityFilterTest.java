@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.boxcars.EquallySpacedBertalanffyFactory;
@@ -28,7 +29,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class LinearSelectivityFilterTest {
@@ -64,8 +64,8 @@ public class LinearSelectivityFilterTest {
 
         System.out.println(Arrays.toString(mortality[0]));
 
-        assertEquals(0, mortality[0][0], .0001);
-        assertEquals(0.84956384, mortality[0][mortality[0].length - 1], .0001);
+        Assertions.assertEquals(0, mortality[0][0], .0001);
+        Assertions.assertEquals(0.84956384, mortality[0][mortality[0].length - 1], .0001);
 
 
     }

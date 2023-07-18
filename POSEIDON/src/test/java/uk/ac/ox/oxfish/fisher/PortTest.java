@@ -26,8 +26,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,20 +45,20 @@ public class PortTest {
         when(two.getLocation()).thenReturn(location);
 
         //initially neither fisher is at port
-        assertFalse(port.isDocked(one));
-        assertFalse(port.isDocked(two));
+        Assertions.assertFalse(port.isDocked(one));
+        Assertions.assertFalse(port.isDocked(two));
         //one enters the port
         port.dock(one);
-        assertTrue(port.isDocked(one));
-        assertFalse(port.isDocked(two));
+        Assertions.assertTrue(port.isDocked(one));
+        Assertions.assertFalse(port.isDocked(two));
         //two enters port
         port.dock(two);
-        assertTrue(port.isDocked(one));
-        assertTrue(port.isDocked(two));
+        Assertions.assertTrue(port.isDocked(one));
+        Assertions.assertTrue(port.isDocked(two));
         //two exits port
         port.depart(two);
-        assertTrue(port.isDocked(one));
-        assertFalse(port.isDocked(two));
+        Assertions.assertTrue(port.isDocked(one));
+        Assertions.assertFalse(port.isDocked(two));
     }
 
     public void wrongLocationThrowsException() {

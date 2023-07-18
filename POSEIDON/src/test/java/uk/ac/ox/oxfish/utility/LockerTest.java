@@ -20,9 +20,8 @@
 
 package uk.ac.ox.oxfish.utility;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 11/15/16.
@@ -37,11 +36,11 @@ public class LockerTest {
 
         final Locker<String, String> locker = new Locker<>();
         String item = locker.presentKey("key", () -> "old_item");
-        assertEquals(item, "old_item");
+        Assertions.assertEquals(item, "old_item");
         item = locker.presentKey("key", () -> "other_item");
-        assertEquals(item, "old_item");
+        Assertions.assertEquals(item, "old_item");
         item = locker.presentKey("new_key", () -> "new_item");
-        assertEquals(item, "new_item");
+        Assertions.assertEquals(item, "new_item");
 
 
     }

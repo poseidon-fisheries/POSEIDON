@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
@@ -17,8 +17,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -51,7 +49,7 @@ public class ExogenousFadMakerTest {
         factory.setBiomassOnly(true);
         final FadMap actualMap = factory.apply(state);
         state.registerStartable(actualMap);
-        assertTrue(actualMap.isStarted()); //make sure the FADMap has started
+        Assertions.assertTrue(actualMap.isStarted()); //make sure the FADMap has started
         //and now let's add the exogenous fad maker: it is going to try and put a fad at day 3!
         final FadInitializer<BiomassLocalBiology, BiomassAggregatingFad> fakeFadInitializer = mock(FadInitializer.class);
         //mason primitives are accessed by "setlocation"
@@ -81,9 +79,9 @@ public class ExogenousFadMakerTest {
         state.schedule.step(state);
         //you should have deployed 2 fads, both at 0,4
         verify(fakeFadInitializer, times(2)).makeFad(any(), any(), any(), any());
-        assertEquals(state.getFadMap().fadsAt(state.getMap().getSeaTile(0, 4)).size(), 2);
-        assertEquals(state.getFadMap().getDriftingObjectsMap().getField().allObjects.size(), 2);
-        assertEquals(state.getFadMap().fadsAt(state.getMap().getSeaTile(1, 1)).size(), 0);
+        Assertions.assertEquals(state.getFadMap().fadsAt(state.getMap().getSeaTile(0, 4)).size(), 2);
+        Assertions.assertEquals(state.getFadMap().getDriftingObjectsMap().getField().allObjects.size(), 2);
+        Assertions.assertEquals(state.getFadMap().fadsAt(state.getMap().getSeaTile(1, 1)).size(), 0);
     }
 
     @Test
@@ -112,16 +110,13 @@ public class ExogenousFadMakerTest {
             state.schedule.step(state);
         System.out.println(state.getDay());
         //there ought to be 12 fads at play
-        Assert.assertEquals(
-            state.getFadMap().allFads().count(),
-            12
-        );
+        Assertions.assertEquals(state.getFadMap().allFads().count(), 12);
         //the first we dropped was at 5,5 coordinates, which translates to 5,44 in seatile grids (right there at the edge, really)
         //it moved left and up for 13 steps (from day 2 to 14, considering it steps the very same day it is dropped)
         // so it should be at 18,
-        assertEquals(1, state.getFadMap().fadsAt(state.getMap().getSeaTile(18, 31)).size());
+        Assertions.assertEquals(1, state.getFadMap().fadsAt(state.getMap().getSeaTile(18, 31)).size());
         //there should be at least one FAD out there that has attracted some biomass (probability of attraction is 63% per step per FAD)
-        assertTrue(state.getFadMap()
+        Assertions.assertTrue(state.getFadMap()
             .allFads()
             .mapToDouble(value -> value.getBiology()
                 .getBiomass(state.getSpecies("Species 0")))

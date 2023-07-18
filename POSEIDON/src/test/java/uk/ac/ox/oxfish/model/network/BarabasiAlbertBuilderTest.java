@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.model.network;
 import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.Graph;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -30,7 +31,6 @@ import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,9 +54,9 @@ public class BarabasiAlbertBuilderTest {
 
         final Graph<Fisher, FriendshipEdge> graph = builder.apply(fake);
 
-        assertEquals(123, graph.getVertexCount());
+        Assertions.assertEquals(123, graph.getVertexCount());
         //the first 3 elements generate no edge.
-        assertEquals(120 * 3, graph.getEdgeCount());
+        Assertions.assertEquals(120 * 3, graph.getEdgeCount());
 
 
     }
@@ -81,14 +81,14 @@ public class BarabasiAlbertBuilderTest {
         final DirectedGraph<Fisher, FriendshipEdge> graph = builder.apply(fake);
 
 
-        assertEquals(120 * 3, graph.getEdgeCount());
+        Assertions.assertEquals(120 * 3, graph.getEdgeCount());
 
 
         builder.addFisher(mock(Fisher.class), graph, fake);
         builder.addFisher(mock(Fisher.class), graph, fake);
         Fisher last = mock(Fisher.class);
         builder.addFisher(last, graph, fake);
-        assertEquals(123 * 3, graph.getEdgeCount());
+        Assertions.assertEquals(123 * 3, graph.getEdgeCount());
 
         builder.removeFisher(last, graph, fake);
 

@@ -20,13 +20,13 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -44,8 +44,8 @@ public class ListMeristicFactoryTest {
         //factory.setMaturityPerBin("1,2,3,4,5,6");
         FromListMeristics meristics = factory.apply(mock(FishState.class));
 
-        assertEquals(meristics.getMaxAge(), 5);
-        assertEquals(meristics.getWeight(FishStateUtilities.MALE, 2), 3, .001);
+        Assertions.assertEquals(meristics.getMaxAge(), 5);
+        Assertions.assertEquals(meristics.getWeight(FishStateUtilities.MALE, 2), 3, .001);
 
 
     }

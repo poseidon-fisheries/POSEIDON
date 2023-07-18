@@ -21,12 +21,11 @@
 package uk.ac.ox.oxfish.utility.bandit;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.data.ExponentialMovingAverage;
 import uk.ac.ox.oxfish.model.data.IterativeAverage;
 import uk.ac.ox.oxfish.model.data.MovingAverage;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 11/10/16.
@@ -49,7 +48,7 @@ public class UCB1BanditAlgorithmTest {
 
         //now you should be playing most
         System.out.println(bandit.getNumberOfObservations(9));
-        assertTrue(bandit.getNumberOfObservations(9) > 5000);
+        Assertions.assertTrue(bandit.getNumberOfObservations(9) > 5000);
 
     }
 
@@ -70,7 +69,7 @@ public class UCB1BanditAlgorithmTest {
 
         //now you should be playing most
         System.out.println(bandit.getNumberOfObservations(9));
-        assertTrue(bandit.getNumberOfObservations(9) > 4000);
+        Assertions.assertTrue(bandit.getNumberOfObservations(9) > 4000);
 
     }
 
@@ -90,7 +89,7 @@ public class UCB1BanditAlgorithmTest {
 
         //now you should be playing most
         System.out.println(bandit.getNumberOfObservations(9));
-        assertTrue(bandit.getNumberOfObservations(9) > 5000);
+        Assertions.assertTrue(bandit.getNumberOfObservations(9) > 5000);
 
     }
 

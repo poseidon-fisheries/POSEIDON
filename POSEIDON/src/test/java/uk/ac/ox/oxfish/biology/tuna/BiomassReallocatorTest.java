@@ -19,7 +19,7 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
@@ -38,7 +38,6 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.lang.Double.POSITIVE_INFINITY;
 import static java.util.function.Function.identity;
 import static java.util.stream.IntStream.range;
-import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
@@ -69,7 +68,7 @@ public class BiomassReallocatorTest {
         );
 
         final List<Double> initialBiomasses = getBiomasses(globalBiology, nauticalMap);
-        Assert.assertEquals(ImmutableList.of(9.0, 9.0), initialBiomasses);
+        Assertions.assertEquals(ImmutableList.of(9.0, 9.0), initialBiomasses);
 
         final BiomassReallocator biomassReallocator = new BiomassReallocator(
             AllocationGrids.from(
@@ -98,17 +97,13 @@ public class BiomassReallocatorTest {
             biomassAggregator.apply(fishState.getBiology(), biomassExtractor.apply(fishState))
         );
 
-        Assert.assertEquals(ImmutableList.of(9.0, 9.0), getBiomasses(globalBiology, nauticalMap));
+        Assertions.assertEquals(ImmutableList.of(9.0, 9.0), getBiomasses(globalBiology, nauticalMap));
 
-        assertArrayEquals(
-            new double[][]{{3, 3, 3}, {0, 0, 0}, {0, 0, 0}},
-            getBiomassArray(nauticalMap, globalBiology.getSpecie(0))
-        );
+        Assertions.assertArrayEquals(new double[][]{{3, 3, 3}, {0, 0, 0}, {0, 0, 0}},
+            getBiomassArray(nauticalMap, globalBiology.getSpecie(0)));
 
-        assertArrayEquals(
-            new double[][]{{0, 0, 0}, {0, 0, 0}, {3, 3, 3}},
-            getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
-        );
+        Assertions.assertArrayEquals(new double[][]{{0, 0, 0}, {0, 0, 0}, {3, 3, 3}},
+            getBiomassArray(nauticalMap, globalBiology.getSpecie(1)));
 
         biomassReallocator.reallocate(
             1,
@@ -117,15 +112,11 @@ public class BiomassReallocatorTest {
             biomassAggregator.apply(fishState.getBiology(), biomassExtractor.apply(fishState))
         );
 
-        assertArrayEquals(
-            new double[][]{{0, 0, 0}, {3, 3, 3}, {0, 0, 0}},
-            getBiomassArray(nauticalMap, globalBiology.getSpecie(0))
-        );
+        Assertions.assertArrayEquals(new double[][]{{0, 0, 0}, {3, 3, 3}, {0, 0, 0}},
+            getBiomassArray(nauticalMap, globalBiology.getSpecie(0)));
 
-        assertArrayEquals(
-            new double[][]{{0, 0, 0}, {3, 3, 3}, {0, 0, 0}},
-            getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
-        );
+        Assertions.assertArrayEquals(new double[][]{{0, 0, 0}, {3, 3, 3}, {0, 0, 0}},
+            getBiomassArray(nauticalMap, globalBiology.getSpecie(1)));
 
         nauticalMap.getAllSeaTilesAsList().forEach(seaTile -> {
             final double[] biomass =
@@ -142,15 +133,11 @@ public class BiomassReallocatorTest {
             biomassAggregator.apply(fishState.getBiology(), biomassExtractor.apply(fishState))
         );
 
-        assertArrayEquals(
-            new double[][]{{0, 0, 0}, {0, 0, 0}, {6, 6, 6}},
-            getBiomassArray(nauticalMap, globalBiology.getSpecie(0))
-        );
+        Assertions.assertArrayEquals(new double[][]{{0, 0, 0}, {0, 0, 0}, {6, 6, 6}},
+            getBiomassArray(nauticalMap, globalBiology.getSpecie(0)));
 
-        assertArrayEquals(
-            new double[][]{{6, 6, 6}, {0, 0, 0}, {0, 0, 0}},
-            getBiomassArray(nauticalMap, globalBiology.getSpecie(1))
-        );
+        Assertions.assertArrayEquals(new double[][]{{6, 6, 6}, {0, 0, 0}, {0, 0, 0}},
+            getBiomassArray(nauticalMap, globalBiology.getSpecie(1)));
 
     }
 

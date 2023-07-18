@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.model.regs;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -29,8 +30,6 @@ import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -60,17 +59,17 @@ public class PortBasedWaitTimesDecoratorTest {
 
 
         when(fisher.isAtPortAndDocked()).thenReturn(false); //never stop somebody who is already out!
-        assertTrue(decorator.allowedAtSea(fisher, mock(FishState.class)));
+        Assertions.assertTrue(decorator.allowedAtSea(fisher, mock(FishState.class)));
 
         when(fisher.isAtPortAndDocked()).thenReturn(true); //allow somebody who has waited for a long time
         when(fisher.getHomePort()).thenReturn(port);
         when(fisher.getHoursAtPort()).thenReturn(200d);
-        assertTrue(decorator.allowedAtSea(fisher, mock(FishState.class)));
+        Assertions.assertTrue(decorator.allowedAtSea(fisher, mock(FishState.class)));
 
 
         //but do not allow if they haven't waited enough!
         when(fisher.getHoursAtPort()).thenReturn(20d);
-        assertFalse(decorator.allowedAtSea(fisher, mock(FishState.class)));
+        Assertions.assertFalse(decorator.allowedAtSea(fisher, mock(FishState.class)));
 
         //if the decorator says no, then it's no
         Regulation decorated = mock(Regulation.class);
@@ -80,7 +79,7 @@ public class PortBasedWaitTimesDecoratorTest {
             hoursToWaitPerPort
         );
         when(fisher.getHoursAtPort()).thenReturn(200d);
-        assertFalse(decorator.allowedAtSea(fisher, mock(FishState.class)));
+        Assertions.assertFalse(decorator.allowedAtSea(fisher, mock(FishState.class)));
 
 
     }

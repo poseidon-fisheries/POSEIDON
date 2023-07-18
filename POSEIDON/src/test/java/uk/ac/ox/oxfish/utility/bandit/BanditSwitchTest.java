@@ -20,10 +20,8 @@
 
 package uk.ac.ox.oxfish.utility.bandit;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  * Created by carrknight on 12/1/16.
@@ -39,14 +37,14 @@ public class BanditSwitchTest {
             integer -> integer % 2 == 0
         );
 
-        assertEquals(banditSwitch.getGroup(0), 0);
-        assertEquals(banditSwitch.getGroup(1), 2);
-        assertEquals(banditSwitch.getGroup(2), 4);
-        assertEquals((int) banditSwitch.getArm(0), 0);
-        assertEquals((int) banditSwitch.getArm(2), 1);
-        assertEquals((int) banditSwitch.getArm(4), 2);
+        Assertions.assertEquals(banditSwitch.getGroup(0), 0);
+        Assertions.assertEquals(banditSwitch.getGroup(1), 2);
+        Assertions.assertEquals(banditSwitch.getGroup(2), 4);
+        Assertions.assertEquals((int) banditSwitch.getArm(0), 0);
+        Assertions.assertEquals((int) banditSwitch.getArm(2), 1);
+        Assertions.assertEquals((int) banditSwitch.getArm(4), 2);
 
-        assertNull(banditSwitch.getArm(1));
+        Assertions.assertNull(banditSwitch.getArm(1));
 
     }
 }

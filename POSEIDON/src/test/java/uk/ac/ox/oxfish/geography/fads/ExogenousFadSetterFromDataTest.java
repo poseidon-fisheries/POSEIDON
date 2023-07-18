@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.geography.fads;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -21,7 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class ExogenousFadSetterFromDataTest {
@@ -73,12 +72,10 @@ public class ExogenousFadSetterFromDataTest {
 
         //there should have been 2 matches, not out of bounds, and the error ought to be sqrt(2(100-40)^2) since second
         //fad has perfect match!
-        assertEquals(2, setter.getCounter().getColumn("Matches"), 0.0001);
-        assertEquals(0, setter.getCounter().getColumn("Failed Matches"), 0.0001);
-        assertEquals(0, setter.getCounter().getColumn("Out of Bounds"), 0.0001);
-        assertEquals(
-            Math.sqrt(2 * Math.pow(100 - 40, 2))
-            , setter.getCounter().getColumn("Error"), 0.0001);
+        Assertions.assertEquals(2, setter.getCounter().getColumn("Matches"), 0.0001);
+        Assertions.assertEquals(0, setter.getCounter().getColumn("Failed Matches"), 0.0001);
+        Assertions.assertEquals(0, setter.getCounter().getColumn("Out of Bounds"), 0.0001);
+        Assertions.assertEquals(Math.sqrt(2 * Math.pow(100 - 40, 2)), setter.getCounter().getColumn("Error"), 0.0001);
 
     }
 
@@ -131,22 +128,20 @@ public class ExogenousFadSetterFromDataTest {
 
         //there should have been 1 match, not out of bounds, and the error ought to be sqrt(2 (100-40)^2) +
         // the penalty for unmatching
-        assertEquals(1, setter.getCounter().getColumn("Matches"), 0.0001);
-        assertEquals(1, setter.getCounter().getColumn("Failed Matches"), 0.0001);
-        assertEquals(0, setter.getCounter().getColumn("Out of Bounds"), 0.0001);
-        assertEquals(
-            Math.sqrt(2 * Math.pow(100 - 40, 2)) + ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR
-            , setter.getCounter().getColumn("Error"), 0.0001);
+        Assertions.assertEquals(1, setter.getCounter().getColumn("Matches"), 0.0001);
+        Assertions.assertEquals(1, setter.getCounter().getColumn("Failed Matches"), 0.0001);
+        Assertions.assertEquals(0, setter.getCounter().getColumn("Out of Bounds"), 0.0001);
+        Assertions.assertEquals(
+            Math.sqrt(2 * Math.pow(100 - 40, 2)) + ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR,
+            setter.getCounter().getColumn("Error"),
+            0.0001
+        );
 
         System.out.println(setter.printLog());
 
-        assertEquals(
-            "day,x,y,result,error,Species 0,Species 0_simulated,Species 1,Species 1_simulated\n" +
-                "123,0,0,MATCH," + Math.sqrt(2 * Math.pow(100 - 40, 2)) + ",100.0,40.0,100.0,40.0\n" +
-                "123,0,0,FAILED,NaN\n",
-            setter.printLog()
-
-        );
+        Assertions.assertEquals("day,x,y,result,error,Species 0,Species 0_simulated,Species 1,Species 1_simulated\n" +
+            "123,0,0,MATCH," + Math.sqrt(2 * Math.pow(100 - 40, 2)) + ",100.0,40.0,100.0,40.0\n" +
+            "123,0,0,FAILED,NaN\n", setter.printLog());
 
     }
 
@@ -186,12 +181,14 @@ public class ExogenousFadSetterFromDataTest {
 
         //there should have been 0 matches, 2 out of bounds, and the error ought to be
         // the penalty for out of bounds twice
-        assertEquals(0, setter.getCounter().getColumn("Matches"), 0.0001);
-        assertEquals(0, setter.getCounter().getColumn("Failed Matches"), 0.0001);
-        assertEquals(2, setter.getCounter().getColumn("Out of Bounds"), 0.0001);
-        assertEquals(
-            2 * ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR
-            , setter.getCounter().getColumn("Error"), 0.0001);
+        Assertions.assertEquals(0, setter.getCounter().getColumn("Matches"), 0.0001);
+        Assertions.assertEquals(0, setter.getCounter().getColumn("Failed Matches"), 0.0001);
+        Assertions.assertEquals(2, setter.getCounter().getColumn("Out of Bounds"), 0.0001);
+        Assertions.assertEquals(
+            2 * ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR,
+            setter.getCounter().getColumn("Error"),
+            0.0001
+        );
     }
 
     @Test
@@ -202,29 +199,25 @@ public class ExogenousFadSetterFromDataTest {
             2
         );
         //should by now have beached or left the map
-        Assert.assertEquals(
-            state.getFadMap().allFads().collect(Collectors.toList()).size(),
-            0
-        );
+        Assertions.assertEquals(state.getFadMap().allFads().collect(Collectors.toList()).size(), 0);
         //there should have been 2 matches, 1 failed match (day 0) and 1 out of bounds
-        assertEquals(
+        Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Failed Matches"),
             1,
             .001d
         );
-        assertEquals(
+        Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Matches"),
             2,
             .001d
         );
-        assertEquals(
+        Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Out of Bounds"),
             1,
             .001d
         );
-        assertEquals(
+        Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Error"),
-            //1 missing, 1 out of bounds, and twice they should have hit empty
             ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR +
                 2 * Math.sqrt(2 * Math.pow(10, 2)),
             .001d
@@ -272,10 +265,7 @@ public class ExogenousFadSetterFromDataTest {
         while (state.getDay() <= 10)
             state.schedule.step(state);
         //there ought to be 2 fads left (4 dropped, 2 landed!)
-        Assert.assertEquals(
-            state.getFadMap().allFads().count(),
-            expectedFadsRemainingAfter10Steps
-        );
+        Assertions.assertEquals(state.getFadMap().allFads().count(), expectedFadsRemainingAfter10Steps);
 
         //go to the end of the year
         while (state.getDay() <= 366)
@@ -291,29 +281,25 @@ public class ExogenousFadSetterFromDataTest {
             4
         );
         //should by now have beached or left the map
-        Assert.assertEquals(
-            state.getFadMap().allFads().collect(Collectors.toList()).size(),
-            0
-        );
+        Assertions.assertEquals(state.getFadMap().allFads().collect(Collectors.toList()).size(), 0);
         //there should have been 0 matches, 3 failed matches  and 1 out of bounds
-        assertEquals(
+        Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Failed Matches"),
             3,
             .001d
         );
-        assertEquals(
+        Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Matches"),
             0,
             .001d
         );
-        assertEquals(
+        Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Out of Bounds"),
             1,
             .001d
         );
-        assertEquals(
+        Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Error"),
-            //1 missing, 1 out of bounds, and twice they should have hit empty
             3 * ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR,
             .001d
         );
@@ -329,31 +315,27 @@ public class ExogenousFadSetterFromDataTest {
             2
         );
         //should by now have beached or left the map
-        Assert.assertEquals(
-            state.getFadMap().allFads().count(),
-            0
-        );
+        Assertions.assertEquals(state.getFadMap().allFads().count(), 0);
 
 
         //there should have been 2 matches, 1 failed match (day 0) and 1 out of bounds
-        assertEquals(
+        Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Failed Matches"),
             1,
             .001d
         );
-        assertEquals(
+        Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Matches"),
             2,
             .001d
         );
-        assertEquals(
+        Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Out of Bounds"),
             1,
             .001d
         );
-        assertEquals(
+        Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Error"),
-            //1 missing, 1 out of bounds, and twice they should have hit empty
             ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR +
                 2 * Math.sqrt(2 * Math.pow(10, 2)),
             .001d

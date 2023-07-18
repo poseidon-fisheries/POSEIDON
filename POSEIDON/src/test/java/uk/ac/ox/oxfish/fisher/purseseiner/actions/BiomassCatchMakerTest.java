@@ -18,7 +18,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -41,15 +41,7 @@ public class BiomassCatchMakerTest {
                 new BiomassLocalBiology(new double[]{10.0, 10.0}),
                 new BiomassLocalBiology(new double[]{5.0, 15.0})
             );
-        Assert.assertArrayEquals(
-            new double[]{5.0, 10.0},
-            caughtAndUncaught.getKey().getBiomassArray(),
-            EPSILON
-        );
-        Assert.assertArrayEquals(
-            new double[]{0.0, 5.0},
-            caughtAndUncaught.getValue().getCurrentBiomass(),
-            EPSILON
-        );
+        Assertions.assertArrayEquals(new double[]{5.0, 10.0}, caughtAndUncaught.getKey().getBiomassArray(), EPSILON);
+        Assertions.assertArrayEquals(new double[]{0.0, 5.0}, caughtAndUncaught.getValue().getCurrentBiomass(), EPSILON);
     }
 }

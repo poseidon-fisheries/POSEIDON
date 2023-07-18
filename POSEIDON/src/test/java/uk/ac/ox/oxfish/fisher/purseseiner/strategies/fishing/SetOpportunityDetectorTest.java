@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Bag;
 import sim.util.Int2D;
@@ -44,8 +45,6 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.toList;
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -120,20 +119,15 @@ public class SetOpportunityDetectorTest {
 
         // when hold is full there should be no possible action
         when(hold.getPercentageFilled()).thenReturn(1.0);
-        assertFalse(setOpportunityDetector.possibleSetActions().findAny().isPresent());
+        Assertions.assertFalse(setOpportunityDetector.possibleSetActions().findAny().isPresent());
 
         // before we search, we should only detect our own FAD
         when(hold.getPercentageFilled()).thenReturn(0.0);
-        assertEquals(
-            ImmutableList.of(mockActions.get(FAD)),
-            setOpportunityDetector.possibleSetActions().collect(toList())
-        );
+        Assertions.assertEquals(ImmutableList.of(mockActions.get(FAD)),
+            setOpportunityDetector.possibleSetActions().collect(toList()));
 
         setOpportunityDetector.notifyOfSearch();
-        assertEquals(
-            mockActions.values(),
-            setOpportunityDetector.possibleSetActions().collect(toList())
-        );
+        Assertions.assertEquals(mockActions.values(), setOpportunityDetector.possibleSetActions().collect(toList()));
 
     }
 

@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.NobodyFishesHereExtractor;
@@ -31,7 +32,6 @@ import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -60,10 +60,10 @@ public class NobodyFishesHereExtractorTest {
             model,
             mock(Fisher.class)
         );
-        assertEquals(map.size(), 3);
-        assertEquals(map.get(good), 1, .001);
-        assertEquals(map.get(bad1), -1, .001);
-        assertEquals(map.get(bad2), -1, .001);
+        Assertions.assertEquals(map.size(), 3);
+        Assertions.assertEquals(map.get(good), 1, .001);
+        Assertions.assertEquals(map.get(bad1), -1, .001);
+        Assertions.assertEquals(map.get(bad2), -1, .001);
 
     }
 }

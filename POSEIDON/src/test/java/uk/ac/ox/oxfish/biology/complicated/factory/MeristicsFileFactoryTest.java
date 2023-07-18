@@ -20,13 +20,13 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -44,7 +44,7 @@ public class MeristicsFileFactoryTest {
         StockAssessmentCaliforniaMeristics meristics = factory.apply(mock(FishState.class));
 
 
-        assertEquals(meristics.getMaturitySlope(), -0.13, .001d);
+        Assertions.assertEquals(meristics.getMaturitySlope(), -0.13, .001d);
 
     }
 }

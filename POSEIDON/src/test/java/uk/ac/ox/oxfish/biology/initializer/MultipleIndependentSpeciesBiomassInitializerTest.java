@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
 import com.beust.jcommander.internal.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -35,7 +36,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -72,9 +72,9 @@ public class MultipleIndependentSpeciesBiomassInitializerTest {
 
 
         final GlobalBiology globalBiology = toTest.generateGlobal(model.getRandom(), model);
-        assertEquals(globalBiology.getSize(), 2);
-        assertEquals(globalBiology.getSpecie(0).getName(), "red");
-        assertEquals(globalBiology.getSpecie(1).getName(), "blue");
+        Assertions.assertEquals(globalBiology.getSize(), 2);
+        Assertions.assertEquals(globalBiology.getSpecie(0).getName(), "red");
+        Assertions.assertEquals(globalBiology.getSpecie(1).getName(), "blue");
         Mockito.verify(model.getYearlyCounter(), times(1)).addColumn("red Recruitment");
         Mockito.verify(model.getYearlyCounter(), times(1)).addColumn("blue Recruitment");
 
@@ -87,11 +87,19 @@ public class MultipleIndependentSpeciesBiomassInitializerTest {
         toTest.processMap(globalBiology, map, model.getRandom(), model);
 
         for (final SeaTile tile : map.getAllSeaTilesAsList()) {
-            assertEquals(tile.getBiomass(globalBiology.getSpecie(0)), 100d, .0001);
-            assertEquals(tile.getBiomass(globalBiology.getSpecie(1)), 160d, .0001);
+            Assertions.assertEquals(tile.getBiomass(globalBiology.getSpecie(0)), 100d, .0001);
+            Assertions.assertEquals(tile.getBiomass(globalBiology.getSpecie(1)), 160d, .0001);
 
-            assertEquals(((VariableBiomassBasedBiology) tile.getBiology()).getCarryingCapacity(0), 100d, .0001);
-            assertEquals(((VariableBiomassBasedBiology) tile.getBiology()).getCarryingCapacity(1), 200d, .0001);
+            Assertions.assertEquals(
+                ((VariableBiomassBasedBiology) tile.getBiology()).getCarryingCapacity(0),
+                100d,
+                .0001
+            );
+            Assertions.assertEquals(
+                ((VariableBiomassBasedBiology) tile.getBiology()).getCarryingCapacity(1),
+                200d,
+                .0001
+            );
         }
         //only one movement should have started!
         verify(model, times(1)).scheduleEveryDay(

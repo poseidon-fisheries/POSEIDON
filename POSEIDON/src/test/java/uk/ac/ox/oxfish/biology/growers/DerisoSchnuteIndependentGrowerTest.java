@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.biology.growers;
 
 import com.google.common.collect.Lists;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
@@ -67,7 +67,7 @@ public class DerisoSchnuteIndependentGrowerTest {
             grower.step(mock(FishState.class));
             System.out.println(biology.getCurrentBiomass()[0]);
         }
-        Assert.assertEquals(biology.getCurrentBiomass()[0], 527154d, .001);
+        Assertions.assertEquals(biology.getCurrentBiomass()[0], 527154d, .001);
 
     }
 
@@ -104,7 +104,7 @@ public class DerisoSchnuteIndependentGrowerTest {
             System.out.println(biology.getCurrentBiomass()[0]);
         }
 
-        Assert.assertEquals(297073.2, biology.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(297073.2, biology.getCurrentBiomass()[0], .0001);
     }
 
     @Test
@@ -152,7 +152,7 @@ public class DerisoSchnuteIndependentGrowerTest {
             System.out.println(biology.getCurrentBiomass()[0]);
         }
 
-        Assert.assertEquals(4184.71, biology.getCurrentBiomass()[0], .0001);
+        Assertions.assertEquals(4184.71, biology.getCurrentBiomass()[0], .0001);
     }
 
     /*

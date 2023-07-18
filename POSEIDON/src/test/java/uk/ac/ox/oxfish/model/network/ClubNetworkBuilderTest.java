@@ -22,14 +22,13 @@ package uk.ac.ox.oxfish.model.network;
 
 import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,22 +51,22 @@ public class ClubNetworkBuilderTest {
         builder.setClubSize(new FixedDoubleParameter(3));
         DirectedGraph<Fisher, FriendshipEdge> graph = builder.apply(state);
 
-        assertEquals(graph.outDegree(one), 2);
-        assertEquals(graph.outDegree(two), 2);
-        assertEquals(graph.outDegree(three), 2);
-        assertEquals(graph.outDegree(four), 1);
-        assertEquals(graph.outDegree(five), 1);
+        Assertions.assertEquals(graph.outDegree(one), 2);
+        Assertions.assertEquals(graph.outDegree(two), 2);
+        Assertions.assertEquals(graph.outDegree(three), 2);
+        Assertions.assertEquals(graph.outDegree(four), 1);
+        Assertions.assertEquals(graph.outDegree(five), 1);
 
-        assertTrue(graph.isNeighbor(four, five));
-        assertTrue(graph.isNeighbor(one, two));
-        assertTrue(graph.isNeighbor(three, two));
-        assertTrue(graph.isNeighbor(three, one));
-        assertTrue(graph.isPredecessor(three, one));
-        assertTrue(graph.isSuccessor(three, one));
+        Assertions.assertTrue(graph.isNeighbor(four, five));
+        Assertions.assertTrue(graph.isNeighbor(one, two));
+        Assertions.assertTrue(graph.isNeighbor(three, two));
+        Assertions.assertTrue(graph.isNeighbor(three, one));
+        Assertions.assertTrue(graph.isPredecessor(three, one));
+        Assertions.assertTrue(graph.isSuccessor(three, one));
 
-        assertTrue(!graph.isNeighbor(four, one));
-        assertTrue(!graph.isNeighbor(four, two));
-        assertTrue(!graph.isNeighbor(four, three));
+        Assertions.assertTrue(!graph.isNeighbor(four, one));
+        Assertions.assertTrue(!graph.isNeighbor(four, two));
+        Assertions.assertTrue(!graph.isNeighbor(four, three));
 
 
     }

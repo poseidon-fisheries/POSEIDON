@@ -20,10 +20,10 @@
 
 package uk.ac.ox.oxfish.biology;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,9 +45,9 @@ public class GetterLocalBiologyTest {
         localBiology.start(state);
 
         when(state.getDay()).thenReturn(0);
-        assertEquals(localBiology.getBiomass(species), 10d, .001);
+        Assertions.assertEquals(localBiology.getBiomass(species), 10d, .001);
         when(state.getDay()).thenReturn(10);
-        assertEquals(localBiology.getBiomass(species), 20d, .001);
+        Assertions.assertEquals(localBiology.getBiomass(species), 20d, .001);
 
 
     }

@@ -20,13 +20,13 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NearestNeighborRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,12 +49,12 @@ public class NearestNeighborRegressionTest {
         when(zero.getGridY()).thenReturn(0);
         regression.addObservation(new GeographicalObservation<>(tenten, 0, 100d), null, mock(FishState.class));
         regression.addObservation(new GeographicalObservation<>(zero, 0, 1d), null, mock(FishState.class));
-        assertEquals(regression.predict(0, 0, 0), 1, .001);
-        assertEquals(regression.predict(1, 0, 0), 1, .001);
-        assertEquals(regression.predict(0, 1, 0), 1, .001);
-        assertEquals(regression.predict(3, 3, 0), 1, .001);
-        assertEquals(regression.predict(6, 6, 0), 100, .001);
-        assertEquals(regression.predict(30, 30, 0), 100, .001);
+        Assertions.assertEquals(regression.predict(0, 0, 0), 1, .001);
+        Assertions.assertEquals(regression.predict(1, 0, 0), 1, .001);
+        Assertions.assertEquals(regression.predict(0, 1, 0), 1, .001);
+        Assertions.assertEquals(regression.predict(3, 3, 0), 1, .001);
+        Assertions.assertEquals(regression.predict(6, 6, 0), 100, .001);
+        Assertions.assertEquals(regression.predict(30, 30, 0), 100, .001);
 
 
     }

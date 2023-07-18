@@ -20,10 +20,10 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 
-import static org.junit.Assert.assertEquals;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
@@ -34,7 +34,7 @@ public class BiomassLostEventTest {
         final Species species = genericListOfSpecies(1).getSpecie(0);
         final BiomassLostEvent biomassLostEvent =
             new BiomassLostEvent(ImmutableMap.of(species, 1.0));
-        assertEquals(1.0, biomassLostEvent.getBiomassLost().get(species), EPSILON);
+        Assertions.assertEquals(1.0, biomassLostEvent.getBiomassLost().get(species), EPSILON);
     }
 
 }

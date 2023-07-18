@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -10,7 +11,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -33,11 +33,11 @@ public class MaxThroughputDecoratorTest {
         MaxThroughputDecorator gear = new MaxThroughputDecorator(delegate, 50);
         SeaTile tile = mock(SeaTile.class);
         Catch haul = gear.fish(fisher, tile, tile, 100, mock(GlobalBiology.class));
-        assertEquals(haul.getTotalWeight(), 50d, .001);
-        assertEquals(haul.getWeightCaught(0), 35d, .001);
-        assertEquals(haul.getWeightCaught(1), 15d, .001);
+        Assertions.assertEquals(haul.getTotalWeight(), 50d, .001);
+        Assertions.assertEquals(haul.getWeightCaught(0), 35d, .001);
+        Assertions.assertEquals(haul.getWeightCaught(1), 15d, .001);
 
-        assertFalse(haul.hasAbundanceInformation());
+        Assertions.assertFalse(haul.hasAbundanceInformation());
 
     }
 
@@ -72,10 +72,10 @@ public class MaxThroughputDecoratorTest {
         );
         SeaTile tile = mock(SeaTile.class);
         Catch haul = gear.fish(fisher, tile, tile, 100, bio);
-        assertTrue(haul.hasAbundanceInformation());
-        assertEquals(haul.getTotalWeight(), 200d, .001);
-        assertEquals(haul.getWeightCaught(0), 120d, .001);
-        assertEquals(haul.getWeightCaught(1), 80d, .001);
+        Assertions.assertTrue(haul.hasAbundanceInformation());
+        Assertions.assertEquals(haul.getTotalWeight(), 200d, .001);
+        Assertions.assertEquals(haul.getWeightCaught(0), 120d, .001);
+        Assertions.assertEquals(haul.getWeightCaught(1), 80d, .001);
 
     }
 

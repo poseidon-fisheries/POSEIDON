@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology.weather.initializer;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -28,7 +29,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.*;
 import static uk.ac.ox.oxfish.fisher.actions.MovingTest.generateSimple4x4Map;
 
 
@@ -50,7 +50,7 @@ public class ConstantWeatherInitializerTest {
         //shouldn't have any local weather
         for (int x = 0; x < 4; x++)
             for (int y = 0; y < 4; y++)
-                assertNull(map.getSeaTile(x, y).grabLocalWeather());
+                Assertions.assertNull(map.getSeaTile(x, y).grabLocalWeather());
 
 
         initializer.processMap(state.getMap(), new MersenneTwisterFast(), state);
@@ -59,10 +59,10 @@ public class ConstantWeatherInitializerTest {
         for (int x = 0; x < 4; x++)
             for (int y = 0; y < 4; y++) {
                 SeaTile tile = map.getSeaTile(x, y);
-                assertTrue(tile.grabLocalWeather() instanceof ConstantWeather);
-                assertEquals(tile.getTemperatureInCelsius(), 100, .001);
-                assertEquals(tile.getWindSpeedInKph(), 100, .001);
-                assertEquals(tile.getWindDirection(), 360, .001); //bounded!
+                Assertions.assertTrue(tile.grabLocalWeather() instanceof ConstantWeather);
+                Assertions.assertEquals(tile.getTemperatureInCelsius(), 100, .001);
+                Assertions.assertEquals(tile.getWindSpeedInKph(), 100, .001);
+                Assertions.assertEquals(tile.getWindDirection(), 360, .001); //bounded!
             }
     }
 }

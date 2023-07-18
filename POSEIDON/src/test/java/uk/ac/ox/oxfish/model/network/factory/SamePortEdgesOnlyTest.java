@@ -20,14 +20,13 @@
 
 package uk.ac.ox.oxfish.model.network.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.network.NetworkPredicate;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,13 +47,13 @@ public class SamePortEdgesOnlyTest {
 
         when(fisher1.getHomePort()).thenReturn(port1);
         when(fisher2.getHomePort()).thenReturn(port2);
-        assertFalse(predicate.test(fisher1, fisher2));
-        assertFalse(predicate.test(fisher2, fisher1));
+        Assertions.assertFalse(predicate.test(fisher1, fisher2));
+        Assertions.assertFalse(predicate.test(fisher2, fisher1));
 
 
         when(fisher1.getHomePort()).thenReturn(port1);
         when(fisher2.getHomePort()).thenReturn(port1);
-        assertTrue(predicate.test(fisher1, fisher2));
-        assertTrue(predicate.test(fisher2, fisher1));
+        Assertions.assertTrue(predicate.test(fisher1, fisher2));
+        Assertions.assertTrue(predicate.test(fisher2, fisher1));
     }
 }

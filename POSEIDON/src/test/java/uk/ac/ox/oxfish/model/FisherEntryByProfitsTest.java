@@ -20,10 +20,10 @@
 
 package uk.ac.ox.oxfish.model;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.plugins.FisherEntryByProfits;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class FisherEntryByProfitsTest {
@@ -39,21 +39,21 @@ public class FisherEntryByProfitsTest {
         //10% returns
         int fishers = profits.newEntrants(100, 1000);
         //should be 10 fishers
-        assertEquals(fishers, 10);
+        Assertions.assertEquals(fishers, 10);
 
 
         //0.1% returns: rounded away, no fishers
         fishers = profits.newEntrants(100, 1000000);
-        assertEquals(fishers, 0);
+        Assertions.assertEquals(fishers, 0);
 
         //negative returns, no fishers
         fishers = profits.newEntrants(-100, 1000000);
-        assertEquals(fishers, 0);
+        Assertions.assertEquals(fishers, 0);
 
 
         //NaN returns, no fishers
         fishers = profits.newEntrants(Double.NaN, 1000000);
-        assertEquals(fishers, 0);
+        Assertions.assertEquals(fishers, 0);
 
 
     }
@@ -70,7 +70,7 @@ public class FisherEntryByProfitsTest {
         //10% returns
         int fishers = profits.newEntrants(100, 1000);
         //There should be no new entrants because now you aren't even covering the profits you should cover
-        assertEquals(fishers, 0);
+        Assertions.assertEquals(fishers, 0);
 
 
     }

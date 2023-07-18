@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -26,7 +27,6 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
-import static org.junit.Assert.assertEquals;
 import static uk.ac.ox.oxfish.biology.GlobalBiology.genericListOfSpecies;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
@@ -42,15 +42,11 @@ public class FishValueCalculatorTest {
         final FishValueCalculator fishValueCalculator = new ReliableFishValueCalculator(biology);
 
 
-        assertEquals(
-            5.0,
-            fishValueCalculator.valueOf(
-                new BiomassLocalBiology(new double[]{1, 2}, new double[]{2, 2}),
-                marketMap.getPrices()
-            ),
-            EPSILON
-        );
-        assertEquals(
+        Assertions.assertEquals(5.0, fishValueCalculator.valueOf(
+            new BiomassLocalBiology(new double[]{1, 2}, new double[]{2, 2}),
+            marketMap.getPrices()
+        ), EPSILON);
+        Assertions.assertEquals(
             11.0,
             fishValueCalculator.valueOf(new Catch(new double[]{3, 4}), marketMap.getPrices()),
             EPSILON

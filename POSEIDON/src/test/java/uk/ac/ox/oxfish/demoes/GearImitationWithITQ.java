@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
@@ -40,8 +40,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
-
-import static org.junit.Assert.assertTrue;
 
 
 public class GearImitationWithITQ {
@@ -182,9 +180,9 @@ public class GearImitationWithITQ {
         red = state.getYearlyDataSet().getLatestObservation("Red Catchability");
         System.out.println("Red catchability: " + red + " --- Blue Catchability: " + blue);
 
-        assertTrue(red > .01);
-        assertTrue(blue < .01);
-        assertTrue(red > blue + .005);
+        Assertions.assertTrue(red > .01);
+        Assertions.assertTrue(blue < .01);
+        Assertions.assertTrue(red > blue + .005);
 
         //by year 20 the quotas are very well used!
         lateRedLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(0) + " " +
@@ -202,12 +200,11 @@ public class GearImitationWithITQ {
                 lateBlueLandings / totalBlueQuotas);
 
         //much better efficiency by the end of the simulation
-        Assert.assertTrue(lateBlueLandings > .75 * totalBlueQuotas);
+        Assertions.assertTrue(lateBlueLandings > .75 * totalBlueQuotas);
         if (checkRed) {
             final double totalRedQuotas = 4500 * 100;
 
-            Assert.assertTrue(
-                lateRedLandings > .7 * totalRedQuotas); //this is actually almost always above 90% after 20 years
+            Assertions.assertTrue(lateRedLandings > .7 * totalRedQuotas); //this is actually almost always above 90% after 20 years
         }
 
         return state;

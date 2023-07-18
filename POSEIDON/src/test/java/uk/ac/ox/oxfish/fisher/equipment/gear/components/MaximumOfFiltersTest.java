@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
@@ -37,8 +37,8 @@ public class MaximumOfFiltersTest {
         }
 
         final double[][] filtered = filters.filter(species, abundance);
-        Assert.assertArrayEquals(filtered[0], new double[]{0.5, 0.5, 0.5}, .001);
-        Assert.assertArrayEquals(filtered[1], new double[]{1, 1, 1}, .001);
+        Assertions.assertArrayEquals(filtered[0], new double[]{0.5, 0.5, 0.5}, .001);
+        Assertions.assertArrayEquals(filtered[1], new double[]{1, 1, 1}, .001);
 
     }
 }

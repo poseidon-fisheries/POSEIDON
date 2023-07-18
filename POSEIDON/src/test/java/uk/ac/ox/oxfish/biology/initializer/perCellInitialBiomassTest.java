@@ -20,11 +20,11 @@
 
 package uk.ac.ox.oxfish.biology.initializer;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class perCellInitialBiomassTest {
@@ -34,13 +34,11 @@ public class perCellInitialBiomassTest {
     public void multiply() {
 
         final PerCellInitialBiomass bio = new PerCellInitialBiomass(100);
-        assertEquals(bio.getInitialBiomass(
-                mock(NauticalMap.class),
-                mock(Species.class),
-                10
-            ),
-            1000, .0001
-        );
+        Assertions.assertEquals(bio.getInitialBiomass(
+            mock(NauticalMap.class),
+            mock(Species.class),
+            10
+        ), 1000, .0001);
 
 
     }

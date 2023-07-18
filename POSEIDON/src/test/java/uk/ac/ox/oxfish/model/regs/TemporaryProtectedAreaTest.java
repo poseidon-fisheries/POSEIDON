@@ -20,13 +20,12 @@
 
 package uk.ac.ox.oxfish.model.regs;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,17 +48,17 @@ public class TemporaryProtectedAreaTest {
         TemporaryProtectedArea reg2 = new TemporaryProtectedArea(10, 30);
         TemporaryProtectedArea reg3 = new TemporaryProtectedArea(150, 300);
 
-        assertFalse(reg1.canFishHere(
+        Assertions.assertFalse(reg1.canFishHere(
             mock(Fisher.class),
             tile,
             state
         ));
-        assertTrue(reg2.canFishHere(
+        Assertions.assertTrue(reg2.canFishHere(
             mock(Fisher.class),
             tile,
             state
         ));
-        assertTrue(reg3.canFishHere(
+        Assertions.assertTrue(reg3.canFishHere(
             mock(Fisher.class),
             tile,
             state

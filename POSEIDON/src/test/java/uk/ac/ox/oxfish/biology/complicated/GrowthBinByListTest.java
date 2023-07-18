@@ -20,9 +20,8 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class GrowthBinByListTest {
 
@@ -35,13 +34,13 @@ public class GrowthBinByListTest {
         GrowthBinByList list = new GrowthBinByList(1, new double[]{1, 2, 3},
             new double[]{1, 2, 3}
         );
-        assertEquals(list.getLengthAtAge(1, 1), 2.0, .0001);
+        Assertions.assertEquals(list.getLengthAtAge(1, 1), 2.0, .0001);
 
         list = new GrowthBinByList(1, new double[]{1, 2, 3},
             new double[]{1, 2, 3},
             new double[]{0, 10}
         );
-        assertEquals(list.getLengthAtAge(1, 1), 10.0, .0001);
+        Assertions.assertEquals(list.getLengthAtAge(1, 1), 10.0, .0001);
 
     }
 }

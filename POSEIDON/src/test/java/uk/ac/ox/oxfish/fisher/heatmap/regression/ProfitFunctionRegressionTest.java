@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -35,8 +36,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 7/21/16.
@@ -86,9 +85,7 @@ public class ProfitFunctionRegressionTest {
             state.schedule.step(state);
         //if I predict the catches it ought to be exactly the same as what I get at 20,20
         double predictedCatchesPerHour = regression.apply(state.getMap().getSeaTile(20, 20))[0];
-        assertEquals(predictedCatchesPerHour,
-            target.getBiomass(state.getSpecies().get(0)) * .01, .001
-        );
+        Assertions.assertEquals(predictedCatchesPerHour, target.getBiomass(state.getSpecies().get(0)) * .01, .001);
 
     }
 }

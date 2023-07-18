@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
@@ -29,7 +30,6 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegressio
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -66,12 +66,12 @@ public class HillClimberAcquisitionFunctionTest {
 
 
         SeaTile pick = acquisitionFunction.pick(state.getMap(), regression, state, null, null);
-        assertEquals(pick.getGridX(), 25);
-        assertEquals(pick.getGridY(), 25);
+        Assertions.assertEquals(pick.getGridX(), 25);
+        Assertions.assertEquals(pick.getGridY(), 25);
 
         pick = acquisitionFunction2.pick(state.getMap(), regression, state, null, null);
-        assertEquals(pick.getGridX(), 25);
-        assertEquals(pick.getGridY(), 25);
+        Assertions.assertEquals(pick.getGridX(), 25);
+        Assertions.assertEquals(pick.getGridY(), 25);
 
 
     }

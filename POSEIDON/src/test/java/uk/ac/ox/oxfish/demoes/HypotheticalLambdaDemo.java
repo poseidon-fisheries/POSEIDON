@@ -20,14 +20,13 @@
 
 package uk.ac.ox.oxfish.demoes;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-
-import static org.junit.Assert.assertTrue;
 
 
 public class HypotheticalLambdaDemo {
@@ -106,7 +105,7 @@ public class HypotheticalLambdaDemo {
 
         //lambda estimated is higher than 3
         System.out.println("mid year lambda: " + averageLambda);
-        assertTrue(averageLambda > 3);
+        Assertions.assertTrue(averageLambda > 3);
 
         while (state.getDayOfTheYear() != 360)
             state.schedule.step(state);
@@ -116,7 +115,7 @@ public class HypotheticalLambdaDemo {
         averageLambda = state.getFishers().stream().mapToDouble(
             value -> value.getDailyData().getLatestObservation("Reservation Lambda Owning 1000 quotas")).sum() / 100;
         System.out.println("end year lambda: " + averageLambda);
-        assertTrue(averageLambda < 1);
+        Assertions.assertTrue(averageLambda < 1);
 
 
     }

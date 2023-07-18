@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -48,11 +48,11 @@ public class FlexibleScenarioTest {
         FishState state = new FishState();
         state.setScenario(flexibleScenario);
         state.start();
-        Assert.assertTrue(state.getTotalBiomass(state.getSpecies().get(0)) > 100000);
+        Assertions.assertTrue(state.getTotalBiomass(state.getSpecies().get(0)) > 100000);
         while (state.getYear() <= 10)
             state.schedule.step(state);
 
-        Assert.assertTrue(state.getTotalBiomass(state.getSpecies().get(0)) < 10);
+        Assertions.assertTrue(state.getTotalBiomass(state.getSpecies().get(0)) < 10);
 
 
     }

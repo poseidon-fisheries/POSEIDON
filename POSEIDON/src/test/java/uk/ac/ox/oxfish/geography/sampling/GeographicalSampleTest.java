@@ -20,12 +20,11 @@
 
 package uk.ac.ox.oxfish.geography.sampling;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.nio.file.Path;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 2/25/16.
@@ -36,15 +35,18 @@ public class GeographicalSampleTest {
     public void sampledMap() throws Exception {
 
         final Path resourcesDirectory = new File("src/test/resources").toPath();
-        final GeographicalSample sample = new GeographicalSample(resourcesDirectory.resolve("sampled_map_test.txt"), true);
-        assertEquals(sample.getMinFirstCoordinate(), 298500, .1);
-        assertEquals(sample.getMaxFirstCoordinate(), 355500, .1);
-        assertEquals(sample.getMinSecondCoordinate(), 5345500, .1);
-        assertEquals(sample.getMaxSecondCoordinate(), 5351500, .1);
+        final GeographicalSample sample = new GeographicalSample(
+            resourcesDirectory.resolve("sampled_map_test.txt"),
+            true
+        );
+        Assertions.assertEquals(sample.getMinFirstCoordinate(), 298500, .1);
+        Assertions.assertEquals(sample.getMaxFirstCoordinate(), 355500, .1);
+        Assertions.assertEquals(sample.getMinSecondCoordinate(), 5345500, .1);
+        Assertions.assertEquals(sample.getMaxSecondCoordinate(), 5351500, .1);
 
         //it should read in the way it is inserted
-        assertEquals(sample.getFirstCoordinate().get(0), 353500, .001);
-        assertEquals(sample.getSecondCoordinate().get(0), 5351500, .001);
-        assertEquals(sample.getObservations().get(0), 0.0130458027124405, .001);
+        Assertions.assertEquals(sample.getFirstCoordinate().get(0), 353500, .001);
+        Assertions.assertEquals(sample.getSecondCoordinate().get(0), 5351500, .001);
+        Assertions.assertEquals(sample.getObservations().get(0), 0.0130458027124405, .001);
     }
 }

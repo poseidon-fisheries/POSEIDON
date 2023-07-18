@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.model.regs;
 
 import com.google.common.collect.Lists;
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
@@ -37,7 +38,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -71,7 +71,7 @@ public class ITQCostManagerTest {
             if (cost instanceof ITQCostManager)
                 count++;
 
-        assertEquals(count, 1);
+        Assertions.assertEquals(count, 1);
     }
 
     private FishState initialize(final String regulationName) {
@@ -118,7 +118,7 @@ public class ITQCostManagerTest {
 
         TripRecord record = mock(TripRecord.class);
         when(record.getSoldCatch()).thenReturn(new double[]{5, 3});
-        assertEquals(35, costManager.cost(mock(Fisher.class), model, record, -1, 1), .001);
+        Assertions.assertEquals(35, costManager.cost(mock(Fisher.class), model, record, -1, 1), .001);
 
     }
 }

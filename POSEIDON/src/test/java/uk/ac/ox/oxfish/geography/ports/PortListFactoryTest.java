@@ -20,13 +20,13 @@
 
 package uk.ac.ox.oxfish.geography.ports;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -48,14 +48,11 @@ public class PortListFactoryTest {
         final String dump = yaml.dump(factory);
         System.out.println(dump);
 
-        assertEquals(
-            dump.trim(),
-            "List of Ports:\n" +
-                "  ports:\n" +
-                "    Washington: 0.0,0.0\n" +
-                "    Italy: 5.0,2.0\n" +
-                "  usingGridCoordinates: true"
-        );
+        Assertions.assertEquals(dump.trim(), "List of Ports:\n" +
+            "  ports:\n" +
+            "    Washington: 0.0,0.0\n" +
+            "    Italy: 5.0,2.0\n" +
+            "  usingGridCoordinates: true");
 
     }
 
@@ -79,11 +76,11 @@ public class PortListFactoryTest {
         );
 
 
-        assertEquals(factory.getPorts().size(), 2);
+        Assertions.assertEquals(factory.getPorts().size(), 2);
         final PortListInitializer initializer = factory.apply(mock(FishState.class));
 
-        assertEquals((int) initializer.getPorts().get("Washington").x, 0);
-        assertEquals((int) initializer.getPorts().get("Italy").x, 7);
+        Assertions.assertEquals((int) initializer.getPorts().get("Washington").x, 0);
+        Assertions.assertEquals((int) initializer.getPorts().get("Italy").x, 7);
 
     }
 }

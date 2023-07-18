@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.geography.currents;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -38,6 +38,6 @@ public class CurrentVectorsEPOTest {
                     .filter(step -> currentVectors.getVector(step, seaTile.getGridLocation()).equals(ZERO_VECTOR))
                     .mapToObj(step -> entry(nauticalMap.getCoordinates(seaTile), step))
             ).collect(toImmutableList());
-        Assert.assertTrue(currentlessCells.isEmpty());
+        Assertions.assertTrue(currentlessCells.isEmpty());
     }
 }

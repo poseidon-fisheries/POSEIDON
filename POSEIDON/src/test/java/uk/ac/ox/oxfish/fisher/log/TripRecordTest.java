@@ -20,10 +20,10 @@
 
 package uk.ac.ox.oxfish.fisher.log;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.ports.Port;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
@@ -35,7 +35,7 @@ public class TripRecordTest {
         record.recordCosts(100);
         record.recordEarnings(0, 1, 200);
         record.completeTrip(10, mock(Port.class));
-        assertEquals(record.getProfitPerHour(false), 10, .001d);
+        Assertions.assertEquals(record.getProfitPerHour(false), 10, .001d);
     }
 
 
@@ -48,8 +48,8 @@ public class TripRecordTest {
         record.recordOpportunityCosts(50);
         record.recordEarnings(0, 1, 200);
         record.completeTrip(10, mock(Port.class));
-        assertEquals(record.getProfitPerHour(false), 10, .001d);
-        assertEquals(record.getProfitPerHour(true), 5, .001d);
+        Assertions.assertEquals(record.getProfitPerHour(false), 10, .001d);
+        Assertions.assertEquals(record.getProfitPerHour(true), 5, .001d);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class TripRecordTest {
         record.recordEarnings(0, 1, 200);
         record.recordEarnings(1, 1, 100);
         record.completeTrip(10, mock(Port.class));
-        assertEquals(record.getTotalTripProfit(), 200, .001);
+        Assertions.assertEquals(record.getTotalTripProfit(), 200, .001);
 
     }
 }

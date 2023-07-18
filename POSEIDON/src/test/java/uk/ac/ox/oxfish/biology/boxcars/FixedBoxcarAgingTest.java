@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -30,8 +31,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -103,11 +102,7 @@ public class FixedBoxcarAgingTest {
         System.out.println(Arrays.toString(yearlyGraduatingRates));
 
 
-        assertArrayEquals(
-            aging.getYearlyProportionGraduating(0),
-            yearlyGraduatingRates,
-            .001f
-        );
+        Assertions.assertArrayEquals(aging.getYearlyProportionGraduating(0), yearlyGraduatingRates, .001f);
 
 
         AbundanceLocalBiology biology = mock(AbundanceLocalBiology.class);
@@ -130,18 +125,14 @@ public class FixedBoxcarAgingTest {
             );
         System.out.println(Arrays.toString(abundance.asMatrix()[0]));
 
-        assertArrayEquals(
-            abundance.asMatrix()[0],
-            newDistribution,
-            .001f
-        );
+        Assertions.assertArrayEquals(abundance.asMatrix()[0], newDistribution, .001f);
 
 
         //no element should have been lost!
         double sum = 0;
         for (double element : abundance.asMatrix()[0])
             sum += element;
-        assertEquals(sum, 100, .001);
+        Assertions.assertEquals(sum, 100, .001);
 
     }
 }

@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.discarding;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -33,7 +34,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -75,15 +75,15 @@ public class DiscardUnderagedTest {
             new MersenneTwisterFast()
         );
 
-        assertArrayEquals(new double[]{0, 10, 1},
-            newCatch.getAbundance(firstSpecies).asMatrix()[FishStateUtilities.MALE], .001
-        );
-        assertArrayEquals(new double[]{0, 0, 0},
-            newCatch.getAbundance(firstSpecies).asMatrix()[FishStateUtilities.FEMALE], .001
-        );
-        assertArrayEquals(new double[]{0, 0},
-            newCatch.getAbundance(secondSpecies).asMatrix()[FishStateUtilities.FEMALE], .001
-        );
+        Assertions.assertArrayEquals(new double[]{0, 10, 1},
+            newCatch.getAbundance(firstSpecies).asMatrix()[FishStateUtilities.MALE],
+            .001);
+        Assertions.assertArrayEquals(new double[]{0, 0, 0},
+            newCatch.getAbundance(firstSpecies).asMatrix()[FishStateUtilities.FEMALE],
+            .001);
+        Assertions.assertArrayEquals(new double[]{0, 0},
+            newCatch.getAbundance(secondSpecies).asMatrix()[FishStateUtilities.FEMALE],
+            .001);
 
     }
 }

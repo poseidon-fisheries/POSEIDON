@@ -21,11 +21,11 @@
 package uk.ac.ox.oxfish.biology;
 
 import com.beust.jcommander.internal.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 
@@ -54,9 +54,9 @@ public class LogisticGrowthTest {
             new IndependentLogisticBiomassGrower(.5, species2);
         grower2.getBiologies().add(bio);
 
-        assertEquals(100, bio.getBiomass(species0), .1);
-        assertEquals(200, bio.getBiomass(species1), .1);
-        assertEquals(0, bio.getBiomass(species2), .1);
+        Assertions.assertEquals(100, bio.getBiomass(species0), .1);
+        Assertions.assertEquals(200, bio.getBiomass(species1), .1);
+        Assertions.assertEquals(0, bio.getBiomass(species2), .1);
 
         //grow it
         final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
@@ -65,18 +65,18 @@ public class LogisticGrowthTest {
         grower1.step(model);
         grower2.step(model);
 
-        assertEquals(100, bio.getBiomass(species0), .1); //didn't grow because it is at capacity
-        assertEquals(250, bio.getBiomass(species1), .1); //grew by 50%
-        assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow
+        Assertions.assertEquals(100, bio.getBiomass(species0), .1); //didn't grow because it is at capacity
+        Assertions.assertEquals(250, bio.getBiomass(species1), .1); //grew by 50%
+        Assertions.assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow
 
         bio.setCurrentBiomass(species1, 399.88);
         //grow it again
         grower0.step(model);
         grower1.step(model);
         grower2.step(model);
-        assertEquals(100, bio.getBiomass(species0), .1); //didn't grow because it is at capacity
-        assertEquals(400, bio.getBiomass(species1), .1); //grew until capacity
-        assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow
+        Assertions.assertEquals(100, bio.getBiomass(species0), .1); //didn't grow because it is at capacity
+        Assertions.assertEquals(400, bio.getBiomass(species1), .1); //grew until capacity
+        Assertions.assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow
     }
 
 
@@ -98,25 +98,25 @@ public class LogisticGrowthTest {
             new IndependentLogisticBiomassGrower(.5, species1);
         grower.getBiologies().add(bio);
 
-        assertEquals(80d, bio.getBiomass(species0), .1);
-        assertEquals(200, bio.getBiomass(species1), .1);
-        assertEquals(0, bio.getBiomass(species2), .1);
+        Assertions.assertEquals(80d, bio.getBiomass(species0), .1);
+        Assertions.assertEquals(200, bio.getBiomass(species1), .1);
+        Assertions.assertEquals(0, bio.getBiomass(species2), .1);
 
         //grow it
         final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getSpecies()).thenReturn(Lists.newArrayList(species0, species1, species2));
         grower.step(model);
 
-        assertEquals(80, bio.getBiomass(species0), .1); //didn't grow because the grower focuses on species1
-        assertEquals(250, bio.getBiomass(species1), .1); //grew by 50%
-        assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow
+        Assertions.assertEquals(80, bio.getBiomass(species0), .1); //didn't grow because the grower focuses on species1
+        Assertions.assertEquals(250, bio.getBiomass(species1), .1); //grew by 50%
+        Assertions.assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow
 
         bio.setCurrentBiomass(species1, 399.88);
         //grow it again
         grower.step(model);
-        assertEquals(80, bio.getBiomass(species0), .1); //didn't grow because the grower focuses on species1
-        assertEquals(400, bio.getBiomass(species1), .1); //grew until capacity
-        assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow
+        Assertions.assertEquals(80, bio.getBiomass(species0), .1); //didn't grow because the grower focuses on species1
+        Assertions.assertEquals(400, bio.getBiomass(species1), .1); //grew until capacity
+        Assertions.assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow
     }
 
 }

@@ -20,13 +20,13 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.SpaceOnlyKernelRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -69,7 +69,7 @@ public class SpaceOnlyKernelRegressionTest {
 
         //ought to be an increasing function
         for (int x = -10; x < 10; x++) {
-            assertTrue(regression.predict(x, 0, 0d) > regression.predict(x - 1, 0, 0d));
+            Assertions.assertTrue(regression.predict(x, 0, 0d) > regression.predict(x - 1, 0, 0d));
         }
 
     }
@@ -107,7 +107,7 @@ public class SpaceOnlyKernelRegressionTest {
 
         //ought to be an increasing function
         for (int x = -10; x < 10; x++) {
-            assertTrue(regression.predict(x, x, 0d) > regression.predict(x - 1, x - 1, 0d));
+            Assertions.assertTrue(regression.predict(x, x, 0d) > regression.predict(x - 1, x - 1, 0d));
         }
 
     }

@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
@@ -29,7 +30,6 @@ import uk.ac.ox.oxfish.model.data.collectors.FisherDailyCounter;
 import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
@@ -102,10 +102,10 @@ public class SPRAgentTest {
         agent.start(model);
         agent.step(model);
         double spr = agent.computeSPR();
-        assertEquals(0.08894, spr, .0001);
+        Assertions.assertEquals(0.08894, spr, .0001);
 
-        assertEquals(agent.computeMaturityRatio(), .995, .001);
-        assertEquals(agent.computeLoptRatio(), .245, .001);
-        assertEquals(agent.computeMeanLength(), 59.924, .001);
+        Assertions.assertEquals(agent.computeMaturityRatio(), .995, .001);
+        Assertions.assertEquals(agent.computeLoptRatio(), .245, .001);
+        Assertions.assertEquals(agent.computeMeanLength(), 59.924, .001);
     }
 }

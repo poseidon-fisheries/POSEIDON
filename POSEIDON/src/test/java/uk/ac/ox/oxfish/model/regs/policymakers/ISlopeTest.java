@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
@@ -45,10 +45,6 @@ public class ISlopeTest {
         double islopeTac = slope.scan(state);
         System.out.println(islopeTac);
 
-        Assert.assertEquals(
-            1129.152,
-            islopeTac,
-            .001
-        );
+        Assertions.assertEquals(1129.152, islopeTac, .001);
     }
 }

@@ -1,9 +1,9 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
@@ -34,18 +34,10 @@ public class LoptEffortPolicyTest {
         policy.start(red);
         //mean length caught is 50
         policy.step(red);
-        assertEquals(
-            lastReturn[0],
-            0.675,
-            .0001
-        );
+        Assertions.assertEquals(lastReturn[0], 0.675, .0001);
         policy.step(red);
         //now mean length is 70
-        assertEquals(
-            lastReturn[0],
-            0.765 * 0.675,
-            .0001
-        );
+        Assertions.assertEquals(lastReturn[0], 0.765 * 0.675, .0001);
         policy.step(red);
 
         //mean length caught is 150
@@ -56,12 +48,7 @@ public class LoptEffortPolicyTest {
 
         for (int i = 0; i < 100; i++)
             policy.step(red);
-        assertEquals(
-            lastReturn[0],
-            //forces it to be 1, even though it should be higher
-            1,
-            .0001
-        );
+        Assertions.assertEquals(lastReturn[0], 1, .0001);
 
 
     }

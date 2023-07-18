@@ -19,11 +19,10 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.observers;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.Assert.assertEquals;
 
 public class ObserversTest {
 
@@ -38,9 +37,9 @@ public class ObserversTest {
         observers.register(B.class, (B __) -> count.incrementAndGet());
         observers.register(O.class, (O __) -> count.incrementAndGet());
         a.act();
-        assertEquals(2, count.get());
+        Assertions.assertEquals(2, count.get());
         b.act();
-        assertEquals(3, count.get());
+        Assertions.assertEquals(3, count.get());
     }
 
     private static class O {

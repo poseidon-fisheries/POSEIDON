@@ -20,13 +20,12 @@
 
 package uk.ac.ox.oxfish.model.regs;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -47,21 +46,21 @@ public class FishingSeasonTest {
         //right season, not protected===> can fish
         when(model.getDayOfTheYear(anyInt())).thenReturn(50);
         when(tile.isProtected()).thenReturn(false);
-        assertTrue(season.canFishHere(fisher, tile, model));
+        Assertions.assertTrue(season.canFishHere(fisher, tile, model));
 
         //off season ===> can't fish
         when(model.getDayOfTheYear(anyInt())).thenReturn(150);
         when(tile.isProtected()).thenReturn(false);
-        assertTrue(season.canFishHere(fisher, tile, model));// not an MPA problem
-        assertFalse(season.allowedAtSea(fisher, model));
+        Assertions.assertTrue(season.canFishHere(fisher, tile, model));// not an MPA problem
+        Assertions.assertFalse(season.allowedAtSea(fisher, model));
 
         //on season, protected ===> can't fish
         when(model.getDayOfTheYear(anyInt())).thenReturn(50);
         when(tile.isProtected()).thenReturn(true);
-        assertFalse(season.canFishHere(fisher, tile, model));
+        Assertions.assertFalse(season.canFishHere(fisher, tile, model));
         //turnOff caring about mpas
         season = new FishingSeason(false, 100);
-        assertTrue(season.canFishHere(fisher, tile, model));
+        Assertions.assertTrue(season.canFishHere(fisher, tile, model));
 
     }
 }

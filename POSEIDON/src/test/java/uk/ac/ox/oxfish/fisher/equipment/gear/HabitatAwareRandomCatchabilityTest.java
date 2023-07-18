@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -61,9 +61,9 @@ public class HabitatAwareRandomCatchabilityTest {
         //gear does not kill off the fish
         verify(tile, never()).reactToThisAmountOfBiomassBeingFished(any(), any(), any());
 
-        Assert.assertEquals(20, fishCaught.getWeightCaught(species), .01);
+        Assertions.assertEquals(20, fishCaught.getWeightCaught(species), .01);
         when(tile.getRockyPercentage()).thenReturn(0d);
-        Assert.assertEquals(10, gear.fish(fisher, tile, tile, 1, biology).getWeightCaught(species), .01);
+        Assertions.assertEquals(10, gear.fish(fisher, tile, tile, 1, biology).getWeightCaught(species), .01);
 
 
     }
@@ -92,7 +92,7 @@ public class HabitatAwareRandomCatchabilityTest {
         when(fisher.grabRandomizer()).thenReturn(new MersenneTwisterFast());
         double[] fishCaught = gear.expectedHourlyCatch(fisher, tile, 1, biology);
         verify(tile, never()).reactToThisAmountOfBiomassBeingFished(any(), any(), any());
-        Assert.assertEquals(20, fishCaught[0], .01);
+        Assertions.assertEquals(20, fishCaught[0], .01);
     }
 
 }

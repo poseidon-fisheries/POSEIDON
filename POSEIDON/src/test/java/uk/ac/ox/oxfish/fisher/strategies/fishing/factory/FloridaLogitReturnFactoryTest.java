@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.fishing.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -30,7 +31,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -75,7 +75,7 @@ public class FloridaLogitReturnFactoryTest {
         );
         System.out.println(probability);
         //grabbed from wolfram alpha
-        assertEquals(0.006507830733273149, probability, .001);
+        Assertions.assertEquals(0.006507830733273149, probability, .001);
 
 
     }

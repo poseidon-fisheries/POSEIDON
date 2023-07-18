@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -17,7 +18,6 @@ import java.util.List;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
@@ -72,26 +72,10 @@ public class AbundanceMortalityProcessTest {
         final List<AbundanceLocalBiology> biologiesAfterMortality =
             ImmutableList.copyOf(mortalityProcess.process(mock(FishState.class), localBiologies));
 
-        assertEquals(
-            7.5,
-            biologiesAfterMortality.get(0).getAbundance(species1).asMatrix()[0][0],
-            0
-        );
-        assertEquals(
-            6.5,
-            biologiesAfterMortality.get(1).getAbundance(species1).asMatrix()[0][1],
-            0
-        );
-        assertEquals(
-            5,
-            biologiesAfterMortality.get(2).getAbundance(species1).asMatrix()[1][0],
-            0
-        );
-        assertEquals(
-            2.5,
-            biologiesAfterMortality.get(3).getAbundance(species1).asMatrix()[1][1],
-            0
-        );
+        Assertions.assertEquals(7.5, biologiesAfterMortality.get(0).getAbundance(species1).asMatrix()[0][0], 0);
+        Assertions.assertEquals(6.5, biologiesAfterMortality.get(1).getAbundance(species1).asMatrix()[0][1], 0);
+        Assertions.assertEquals(5, biologiesAfterMortality.get(2).getAbundance(species1).asMatrix()[1][0], 0);
+        Assertions.assertEquals(2.5, biologiesAfterMortality.get(3).getAbundance(species1).asMatrix()[1][1], 0);
     }
 
 }

@@ -20,9 +20,8 @@
 
 package uk.ac.ox.oxfish.model.data;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class IterativeAgerageBackAndForthTest {
 
@@ -35,11 +34,11 @@ public class IterativeAgerageBackAndForthTest {
         averager.addObservationfromDouble(2);
         averager.addObservationfromDouble(3);
         averager.addObservationfromDouble(4);
-        assertEquals(2.5, averager.getSmoothedObservation(), .0001);
+        Assertions.assertEquals(2.5, averager.getSmoothedObservation(), .0001);
         averager.removeObservation(4);
-        assertEquals(2, averager.getSmoothedObservation(), .0001);
+        Assertions.assertEquals(2, averager.getSmoothedObservation(), .0001);
         averager.removeObservation(1);
-        assertEquals(2.5, averager.getSmoothedObservation(), .0001);
+        Assertions.assertEquals(2.5, averager.getSmoothedObservation(), .0001);
 
 
     }

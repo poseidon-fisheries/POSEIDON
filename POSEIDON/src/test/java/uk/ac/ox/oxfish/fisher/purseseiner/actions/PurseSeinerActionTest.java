@@ -20,13 +20,13 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 import uk.ac.ox.oxfish.model.data.monitors.regions.TicTacToeRegionalDivision;
 
-import static org.junit.Assert.assertEquals;
 import static uk.ac.ox.oxfish.fisher.actions.MovingTest.generateSimple50x50Map;
 
 public class PurseSeinerActionTest {
@@ -51,7 +51,7 @@ public class PurseSeinerActionTest {
             .put(map.getSeaTile(17, map.getHeight() - 1), "South")
             .put(map.getSeaTile(map.getWidth() - 1, map.getHeight() - 1), "Southeast")
             .build()
-            .forEach((seaTile, region) -> assertEquals(
+            .forEach((seaTile, region) -> Assertions.assertEquals(
                 region,
                 regionalDivision.getRegion(seaTile.getGridLocation()).getName()
             ));

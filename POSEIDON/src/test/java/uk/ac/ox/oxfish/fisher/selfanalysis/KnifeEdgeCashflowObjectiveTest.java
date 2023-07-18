@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.factory.KnifeEdgeCashflowFactory;
@@ -27,7 +28,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -64,9 +64,9 @@ public class KnifeEdgeCashflowObjectiveTest {
 
         }
         //cash should now be 6, 6 days ago it was 6
-        assertEquals(6, objective.computeCurrentFitness(fisher, fisher), .0001);
-        assertEquals(1, knifeEdge.computeCurrentFitness(fisher, fisher), .0001);
-        assertEquals(-1, knifeEdge2.computeCurrentFitness(fisher, fisher), .0001);
+        Assertions.assertEquals(6, objective.computeCurrentFitness(fisher, fisher), .0001);
+        Assertions.assertEquals(1, knifeEdge.computeCurrentFitness(fisher, fisher), .0001);
+        Assertions.assertEquals(-1, knifeEdge2.computeCurrentFitness(fisher, fisher), .0001);
 
         //let's add some garbage
         for (int i = 0; i < 6; i++) {
@@ -74,9 +74,9 @@ public class KnifeEdgeCashflowObjectiveTest {
             data.step(mock(FishState.class));
         }
         //now it should be -99
-        assertEquals(-99, objective.computeCurrentFitness(fisher, fisher), .0001);
-        assertEquals(-1, knifeEdge.computeCurrentFitness(fisher, fisher), .0001);
-        assertEquals(-1, knifeEdge2.computeCurrentFitness(fisher, fisher), .0001);
+        Assertions.assertEquals(-99, objective.computeCurrentFitness(fisher, fisher), .0001);
+        Assertions.assertEquals(-1, knifeEdge.computeCurrentFitness(fisher, fisher), .0001);
+        Assertions.assertEquals(-1, knifeEdge2.computeCurrentFitness(fisher, fisher), .0001);
 
     }
 

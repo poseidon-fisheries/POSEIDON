@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.YamlMain;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -29,8 +30,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 3/16/16.
@@ -45,14 +44,14 @@ public class FixingSeedWorksOnYamler {
         final Path secondInputPath = Paths.get("inputs", "tests", "replicate2.yaml");
         final String firstInput = String.join("\n", Files.readAllLines(firstInputPath));
         final String secondInput = String.join("\n", Files.readAllLines(secondInputPath));
-        assertEquals(firstInput, secondInput);
+        Assertions.assertEquals(firstInput, secondInput);
 
         YamlMain.main(new String[]{firstInputPath.toString(), "--seed", "567", "--years", "3"});
         YamlMain.main(new String[]{secondInputPath.toString(), "--seed", "567", "--years", "3"});
 
         final String firstOutput = String.join("\n", Files.readAllLines(Paths.get("output/replicate/result.yaml")));
         final String secondOutput = String.join("\n", Files.readAllLines(Paths.get("output/replicate2/result.yaml")));
-        assertEquals(firstOutput, secondOutput);
+        Assertions.assertEquals(firstOutput, secondOutput);
 
         FishStateUtilities.deleteRecursively(Paths.get("output", "replicate").toFile());
         FishStateUtilities.deleteRecursively(Paths.get("output", "replicate2").toFile());

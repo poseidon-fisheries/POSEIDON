@@ -20,12 +20,11 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import static org.junit.Assert.assertEquals;
 
 
 public class FixedProportionFilterTest {
@@ -54,8 +53,8 @@ public class FixedProportionFilterTest {
         abundance[FishStateUtilities.MALE] = male;
         abundance[FishStateUtilities.FEMALE] = female;
         double[][] filtered = filter.filter(species, abundance);
-        assertEquals(filtered[FishStateUtilities.MALE][20], 20, .0001);
-        assertEquals(filtered[FishStateUtilities.MALE][21], 0, .001);
+        Assertions.assertEquals(filtered[FishStateUtilities.MALE][20], 20, .0001);
+        Assertions.assertEquals(filtered[FishStateUtilities.MALE][21], 0, .001);
 
         abundance = new double[2][];
         abundance[FishStateUtilities.MALE] = male;
@@ -63,7 +62,7 @@ public class FixedProportionFilterTest {
         abundance[FishStateUtilities.FEMALE] = female;
         filter = new FixedProportionFilter(1, true);
         filtered = filter.filter(species, abundance);
-        assertEquals(filtered[FishStateUtilities.MALE][20], 100, .001);
-        assertEquals(filtered[FishStateUtilities.MALE][21], 0, .001);
+        Assertions.assertEquals(filtered[FishStateUtilities.MALE][20], 100, .001);
+        Assertions.assertEquals(filtered[FishStateUtilities.MALE][21], 0, .001);
     }
 }

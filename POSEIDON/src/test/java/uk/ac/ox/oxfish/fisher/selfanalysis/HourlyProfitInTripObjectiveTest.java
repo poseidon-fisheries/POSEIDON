@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripLogger;
@@ -53,6 +53,6 @@ public class HourlyProfitInTripObjectiveTest {
         when(fisher.getLastFinishedTrip()).thenReturn(logger.getLastFinishedTrip());
 
         HourlyProfitInTripObjective tripFunction = new HourlyProfitInTripObjective();
-        Assert.assertEquals(tripFunction.computeCurrentFitness(fisher, fisher), 10d, .001);
+        Assertions.assertEquals(tripFunction.computeCurrentFitness(fisher, fisher), 10d, .001);
     }
 }

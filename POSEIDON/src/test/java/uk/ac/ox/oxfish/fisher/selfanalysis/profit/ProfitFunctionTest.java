@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.selfanalysis.profit;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
@@ -28,9 +29,6 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.LameTripSimulator;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 8/16/16.
@@ -73,12 +71,12 @@ public class ProfitFunctionTest {
                     return;
                 }
                 tripsRecorded[0] = tripsRecorded[0] + 1;
-                assertEquals(simulated.getDistanceTravelled(), record.getDistanceTravelled(), .001d);
-                assertEquals(record.getEffort() + record.getDistanceTravelled() / fisher1.getBoat()
+                Assertions.assertEquals(simulated.getDistanceTravelled(), record.getDistanceTravelled(), .001d);
+                Assertions.assertEquals(record.getEffort() + record.getDistanceTravelled() / fisher1.getBoat()
                     .getSpeedInKph() - record.getDurationInHours(), 0, .1d);
-                assertEquals(simulated.getEffort(), record.getEffort(), .001d);
-                assertEquals(simulated.getLitersOfGasConsumed(), record.getLitersOfGasConsumed(), .001d);
-                assertEquals(simulated.getDurationInHours(), record.getDurationInHours(), .1);
+                Assertions.assertEquals(simulated.getEffort(), record.getEffort(), .001d);
+                Assertions.assertEquals(simulated.getLitersOfGasConsumed(), record.getLitersOfGasConsumed(), .001d);
+                Assertions.assertEquals(simulated.getDurationInHours(), record.getDurationInHours(), .1);
                 double hourlyProfits = function.hourlyProfitFromHypotheticalTripHere(
                     fisher1, record.getMostFishedTileInTrip(),
                     state,
@@ -87,7 +85,7 @@ public class ProfitFunctionTest {
 
 
                 );
-                assertEquals(hourlyProfits, record.getProfitPerHour(true), .1);
+                Assertions.assertEquals(hourlyProfits, record.getProfitPerHour(true), .1);
 
             }
         );
@@ -95,7 +93,7 @@ public class ProfitFunctionTest {
         for (int i = 0; i < 10000; i++)
             state.schedule.step(state);
 
-        assertTrue(tripsRecorded[0] > 0);
+        Assertions.assertTrue(tripsRecorded[0] > 0);
 
     }
 

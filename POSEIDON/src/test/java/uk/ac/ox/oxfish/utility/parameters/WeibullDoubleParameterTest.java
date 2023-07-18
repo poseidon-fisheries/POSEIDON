@@ -21,12 +21,10 @@
 package uk.ac.ox.oxfish.utility.parameters;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.DoubleSummaryStatistics;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class WeibullDoubleParameterTest {
 
@@ -40,10 +38,10 @@ public class WeibullDoubleParameterTest {
         for (int samples = 0; samples < 10000; samples++) {
             stats.accept(weibull.applyAsDouble(rng));
         }
-        assertTrue(stats.getAverage() > .45);
-        assertTrue(stats.getAverage() < .55);
-        assertTrue(stats.getMin() > .45);
-        assertTrue(stats.getMax() < .55);
+        Assertions.assertTrue(stats.getAverage() > .45);
+        Assertions.assertTrue(stats.getAverage() < .55);
+        Assertions.assertTrue(stats.getMin() > .45);
+        Assertions.assertTrue(stats.getMax() < .55);
 
 
     }
@@ -57,8 +55,8 @@ public class WeibullDoubleParameterTest {
         for (int samples = 0; samples < 10000; samples++) {
             stats.accept(weibull.applyAsDouble(rng));
         }
-        assertTrue(stats.getAverage() > 18000);
-        assertTrue(stats.getAverage() < 22000);
+        Assertions.assertTrue(stats.getAverage() > 18000);
+        Assertions.assertTrue(stats.getAverage() < 22000);
 
 
     }
@@ -80,7 +78,7 @@ public class WeibullDoubleParameterTest {
         for (int samples = 0; samples < 10000; samples++) {
             stats.accept(weibull.applyAsDouble(rng));
         }
-        assertEquals(firstAverage, stats.getAverage(), .0001);
+        Assertions.assertEquals(firstAverage, stats.getAverage(), .0001);
 
 
     }

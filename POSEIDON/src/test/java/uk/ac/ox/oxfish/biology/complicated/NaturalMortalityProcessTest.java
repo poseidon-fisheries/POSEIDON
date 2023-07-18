@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
@@ -27,7 +28,6 @@ import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,13 +50,13 @@ public class NaturalMortalityProcessTest {
         NaturalMortalityProcess mortality = new ExponentialMortalityProcess(.1, .2);
         mortality.cull(meristics, true, new StructuredAbundance(male, female), 365);
         //this numbers I obtained in R
-        assertEquals(male[0], 9048, .001);
-        assertEquals(male[1], 9048, .001);
-        assertEquals(male[2], 9048, .001);
+        Assertions.assertEquals(male[0], 9048, .001);
+        Assertions.assertEquals(male[1], 9048, .001);
+        Assertions.assertEquals(male[2], 9048, .001);
 
-        assertEquals(female[0], 4093, 1);
-        assertEquals(female[1], 3275, 1);
-        assertEquals(female[2], 2456, 1);
+        Assertions.assertEquals(female[0], 4093, 1);
+        Assertions.assertEquals(female[1], 3275, 1);
+        Assertions.assertEquals(female[2], 2456, 1);
 
 
     }
@@ -84,7 +84,7 @@ public class NaturalMortalityProcessTest {
         process.cull(species.getMeristics(), true, new StructuredAbundance(male, female), 365);
 
         for (int i = 0; i < male.length; i++)
-            assertEquals(male[i], 9370, .001); //always round down now
+            Assertions.assertEquals(male[i], 9370, .001); //always round down now
         System.out.println(Arrays.toString(male));
 
     }

@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.boxcars.EquallySpacedBertalanffyFactory;
@@ -86,7 +86,7 @@ public class RecruitmentBySpawningBiomassTest {
             new StructuredAbundance(male, female), 0, 365
         );
         System.out.println(recruits);
-        Assert.assertEquals(416140d, recruits, 1d);
+        Assertions.assertEquals(416140d, recruits, 1d);
 
     }
 
@@ -107,7 +107,7 @@ public class RecruitmentBySpawningBiomassTest {
         factory.setCmPerBin(5.0);
         GrowthBinByList meristics = factory.apply(state);
         for (int i = 0; i < 25; i++)
-            Assert.assertEquals(2.5 + i * 5d, meristics.getLength(0, i), .001);
+            Assertions.assertEquals(2.5 + i * 5d, meristics.getLength(0, i), .001);
         //create 25 bins, each of 5 cm
 
 
@@ -117,10 +117,10 @@ public class RecruitmentBySpawningBiomassTest {
         double[] maturities = recruit.getMaturity().apply(new Species("test", meristics));
 
         for (int i = 0; i <= 9; i++)
-            Assert.assertEquals(maturities[i], 0, .001);
+            Assertions.assertEquals(maturities[i], 0, .001);
 
         for (int i = 10; i < 25; i++)
-            Assert.assertEquals(maturities[i], 1, .001);
+            Assertions.assertEquals(maturities[i], 1, .001);
 
 
     }

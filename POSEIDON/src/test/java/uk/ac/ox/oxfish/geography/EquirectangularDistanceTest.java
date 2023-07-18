@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.geography;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,11 +37,11 @@ public class EquirectangularDistanceTest {
         final EquirectangularDistance distance = new EquirectangularDistance(0.0, 1.0);
 
         //distance between 0,0 and 3,3 ought to be 471.8 kilometers
-        Assert.assertEquals(distance.distance(0, 0, 3, 3), 471.8, .1);
+        Assertions.assertEquals(distance.distance(0, 0, 3, 3), 471.8, .1);
         //same if I flip
-        Assert.assertEquals(distance.distance(3, 3, 0, 0), 471.8, .1);
+        Assertions.assertEquals(distance.distance(3, 3, 0, 0), 471.8, .1);
         //distance to itself is 0
-        Assert.assertEquals(distance.distance(0, 0, 0, 0), 0, .1);
+        Assertions.assertEquals(distance.distance(0, 0, 0, 0), 0, .1);
 
 
     }

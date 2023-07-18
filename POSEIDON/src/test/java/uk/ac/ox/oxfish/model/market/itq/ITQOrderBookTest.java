@@ -22,13 +22,12 @@ package uk.ac.ox.oxfish.model.market.itq;
 
 import ec.util.MersenneTwisterFast;
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 
@@ -65,30 +64,30 @@ public class ITQOrderBookTest {
 
         orderBook.step(state);
         //they should have exchanged quotas!
-        assertEquals(buyerReg.getQuotaRemaining(0), 200, .0001);
-        assertEquals(sellerReg.getQuotaRemaining(0), 0, .0001);
-        assertEquals(orderBook.getDailyMatches(), 1, .0001);
-        assertEquals(orderBook.getDailyAveragePrice(), 11, .0001);
-        assertEquals(orderBook.getDailyQuotasExchanged(), 100, .0001);
+        Assertions.assertEquals(buyerReg.getQuotaRemaining(0), 200, .0001);
+        Assertions.assertEquals(sellerReg.getQuotaRemaining(0), 0, .0001);
+        Assertions.assertEquals(orderBook.getDailyMatches(), 1, .0001);
+        Assertions.assertEquals(orderBook.getDailyAveragePrice(), 11, .0001);
+        Assertions.assertEquals(orderBook.getDailyQuotasExchanged(), 100, .0001);
         //they should have traded  (assuming they use seller quote)
         verify(buyer).spendExogenously(11 * 100);
         verify(seller).earn(11 * 100);
 
-        assertTrue(orderBook.inPenaltyBox(buyer));
-        assertTrue(!orderBook.inPenaltyBox(seller));
+        Assertions.assertTrue(orderBook.inPenaltyBox(buyer));
+        Assertions.assertTrue(!orderBook.inPenaltyBox(seller));
 
         //now check that the buyer isn't placing a sale quote because of the penalty box
         sellerReg.step(state);
-        assertEquals(sellerReg.getQuotaRemaining(0), 100, .0001);
+        Assertions.assertEquals(sellerReg.getQuotaRemaining(0), 100, .0001);
         buyerReg.step(state);
-        assertEquals(buyerReg.getQuotaRemaining(0), 100, .0001);
+        Assertions.assertEquals(buyerReg.getQuotaRemaining(0), 100, .0001);
         //reverse the prices so that buyer would like to sell now
         when(buyerGenerator.computeLambda()).thenReturn(10d);
         when(sellerGenerator.computeLambda()).thenReturn(10d);
         orderBook.step(state);
         //they shouldn't have traded
-        assertEquals(buyerReg.getQuotaRemaining(0), 100, .0001);
-        assertEquals(sellerReg.getQuotaRemaining(0), 100, .0001);
+        Assertions.assertEquals(buyerReg.getQuotaRemaining(0), 100, .0001);
+        Assertions.assertEquals(sellerReg.getQuotaRemaining(0), 100, .0001);
 
 
     }
@@ -124,17 +123,17 @@ public class ITQOrderBookTest {
 
         orderBook.step(state);
         //no trading
-        assertEquals(buyerReg.getQuotaRemaining(0), 100, .0001);
-        assertEquals(sellerReg.getQuotaRemaining(0), 100, .0001);
+        Assertions.assertEquals(buyerReg.getQuotaRemaining(0), 100, .0001);
+        Assertions.assertEquals(sellerReg.getQuotaRemaining(0), 100, .0001);
         //no money exchange
         verify(buyer, never()).spendExogenously(anyDouble());
         verify(buyer, never()).earn(anyDouble());
         verify(seller, never()).spendExogenously(anyDouble());
         verify(seller, never()).earn(anyDouble());
         //no trading recorded
-        assertEquals(orderBook.getDailyMatches(), 0, .0001);
-        assertEquals(orderBook.getDailyAveragePrice(), Double.NaN, .0001);
-        assertEquals(orderBook.getDailyQuotasExchanged(), 0, .0001);
+        Assertions.assertEquals(orderBook.getDailyMatches(), 0, .0001);
+        Assertions.assertEquals(orderBook.getDailyAveragePrice(), Double.NaN, .0001);
+        Assertions.assertEquals(orderBook.getDailyQuotasExchanged(), 0, .0001);
 
 
     }
@@ -170,17 +169,17 @@ public class ITQOrderBookTest {
 
         orderBook.step(state);
         //no trading
-        assertEquals(buyerReg.getQuotaRemaining(0), 100, .0001);
-        assertEquals(sellerReg.getQuotaRemaining(0), 50, .0001);
+        Assertions.assertEquals(buyerReg.getQuotaRemaining(0), 100, .0001);
+        Assertions.assertEquals(sellerReg.getQuotaRemaining(0), 50, .0001);
         //no money exchange
         verify(buyer, never()).spendExogenously(anyDouble());
         verify(buyer, never()).earn(anyDouble());
         verify(seller, never()).spendExogenously(anyDouble());
         verify(seller, never()).earn(anyDouble());
         //no trading recorded
-        assertEquals(orderBook.getDailyMatches(), 0, .0001);
-        assertEquals(orderBook.getDailyAveragePrice(), Double.NaN, .0001);
-        assertEquals(orderBook.getDailyQuotasExchanged(), 0, .0001);
+        Assertions.assertEquals(orderBook.getDailyMatches(), 0, .0001);
+        Assertions.assertEquals(orderBook.getDailyAveragePrice(), Double.NaN, .0001);
+        Assertions.assertEquals(orderBook.getDailyQuotasExchanged(), 0, .0001);
 
 
     }
@@ -212,19 +211,15 @@ public class ITQOrderBookTest {
 
         orderBook.step(state);
         //some bought, some sold
-        assertEquals(regs[4].getQuotaRemaining(0), 200, .0001);
-        assertEquals(regs[3].getQuotaRemaining(0), 200, .0001);
-        assertEquals(regs[2].getQuotaRemaining(0), 100, .0001);
-        assertEquals(regs[1].getQuotaRemaining(0), 0, .0001);
-        assertEquals(regs[0].getQuotaRemaining(0), 0, .0001);
+        Assertions.assertEquals(regs[4].getQuotaRemaining(0), 200, .0001);
+        Assertions.assertEquals(regs[3].getQuotaRemaining(0), 200, .0001);
+        Assertions.assertEquals(regs[2].getQuotaRemaining(0), 100, .0001);
+        Assertions.assertEquals(regs[1].getQuotaRemaining(0), 0, .0001);
+        Assertions.assertEquals(regs[0].getQuotaRemaining(0), 0, .0001);
 
-        assertEquals(orderBook.getDailyMatches(), 2, .0001);
-        assertEquals(
-            orderBook.getDailyAveragePrice(),
-            (100.01 + 200.01) / 2,
-            .0001
-        ); //with no markup there is a default 0.01 increase in prices so that bids and sells don't cross
-        assertEquals(orderBook.getDailyQuotasExchanged(), 200, .0001);
+        Assertions.assertEquals(orderBook.getDailyMatches(), 2, .0001);
+        Assertions.assertEquals(orderBook.getDailyAveragePrice(), (100.01 + 200.01) / 2, .0001); //with no markup there is a default 0.01 increase in prices so that bids and sells don't cross
+        Assertions.assertEquals(orderBook.getDailyQuotasExchanged(), 200, .0001);
 
 
     }
@@ -262,32 +257,32 @@ public class ITQOrderBookTest {
 
         orderBook.step(state);
         //they should have traded only once!
-        assertEquals(buyerReg.getQuotaRemaining(0), 600, .0001);
-        assertEquals(sellerReg.getQuotaRemaining(0), 400, .0001);
-        assertEquals(orderBook.getDailyMatches(), 1, .0001);
-        assertEquals(orderBook.getDailyAveragePrice(), 11, .0001);
-        assertEquals(orderBook.getDailyQuotasExchanged(), 100, .0001);
+        Assertions.assertEquals(buyerReg.getQuotaRemaining(0), 600, .0001);
+        Assertions.assertEquals(sellerReg.getQuotaRemaining(0), 400, .0001);
+        Assertions.assertEquals(orderBook.getDailyMatches(), 1, .0001);
+        Assertions.assertEquals(orderBook.getDailyAveragePrice(), 11, .0001);
+        Assertions.assertEquals(orderBook.getDailyQuotasExchanged(), 100, .0001);
         //should have asked about the buyer twice though
         verify(buyerGenerator, times(2)).computeLambda();
         //they should have traded  (assuming they use seller quote)
         verify(buyer).spendExogenously(11 * 100);
         verify(seller).earn(11 * 100);
 
-        assertTrue(orderBook.inPenaltyBox(buyer));
-        assertTrue(!orderBook.inPenaltyBox(seller));
+        Assertions.assertTrue(orderBook.inPenaltyBox(buyer));
+        Assertions.assertTrue(!orderBook.inPenaltyBox(seller));
 
         //even if I step it now there isn't any trade occurring because the penalty box is there
         sellerReg.step(state);
-        assertEquals(sellerReg.getQuotaRemaining(0), 500, .0001);
+        Assertions.assertEquals(sellerReg.getQuotaRemaining(0), 500, .0001);
         buyerReg.step(state);
-        assertEquals(buyerReg.getQuotaRemaining(0), 500, .0001);
+        Assertions.assertEquals(buyerReg.getQuotaRemaining(0), 500, .0001);
         //reverse the prices so that buyer would like to sell now
         when(buyerGenerator.computeLambda()).thenReturn(10d);
         when(sellerGenerator.computeLambda()).thenReturn(10d);
         orderBook.step(state);
         //they shouldn't have traded
-        assertEquals(buyerReg.getQuotaRemaining(0), 500, .0001);
-        assertEquals(sellerReg.getQuotaRemaining(0), 500, .0001);
+        Assertions.assertEquals(buyerReg.getQuotaRemaining(0), 500, .0001);
+        Assertions.assertEquals(sellerReg.getQuotaRemaining(0), 500, .0001);
 
 
     }

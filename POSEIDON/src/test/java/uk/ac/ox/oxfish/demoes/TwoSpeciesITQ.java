@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.WellMixedBiologyFactory;
 import uk.ac.ox.oxfish.model.FishState;
@@ -34,8 +35,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Iterator;
 import java.util.List;
-
-import static org.junit.Assert.assertTrue;
 
 public class TwoSpeciesITQ {
 
@@ -94,11 +93,11 @@ public class TwoSpeciesITQ {
         //reds don't use a lot of biomass: less than 50% of allocated red quota is landed
         Double redLandings = state.getYearlyDataSet().getColumn(
             state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME).getLatest();
-        assertTrue(4500 * scenario.getFishers() * .5 > redLandings);
+        Assertions.assertTrue(4500 * scenario.getFishers() * .5 > redLandings);
         //at least 95% of the blue quota was consumed instead
         Double blueLandings = state.getYearlyDataSet().getColumn(
             state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME).getLatest();
-        assertTrue(500 * scenario.getFishers() * .95 < blueLandings);
+        Assertions.assertTrue(500 * scenario.getFishers() * .95 < blueLandings);
         System.out.println(redLandings + " ---- "
             + blueLandings);
         System.out.println(redLandings / (4500 * scenario.getFishers()) + " ---- "
@@ -114,8 +113,8 @@ public class TwoSpeciesITQ {
             if (Double.isFinite(current) && current > highestRed)
                 highestRed = current;
         }
-        assertTrue(highestRed >= 0);
-        assertTrue(highestRed + " ----- ", highestRed < 7);
+        Assertions.assertTrue(highestRed >= 0);
+        Assertions.assertTrue(highestRed < 7, highestRed + " ----- ");
 
         //blue quotas are pricey!
         double highestBlue = 0;
@@ -129,7 +128,7 @@ public class TwoSpeciesITQ {
         System.out.println(highestRed + " ----- " + highestBlue);
 
         //more than the sale price of red!
-        assertTrue(highestRed + " ----- " + highestBlue, highestBlue > 10);
+        Assertions.assertTrue(highestBlue > 10, highestRed + " ----- " + highestBlue);
 
         System.out.println("============================================");
     }

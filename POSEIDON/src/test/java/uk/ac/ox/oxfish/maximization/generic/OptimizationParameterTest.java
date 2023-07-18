@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.maximization.generic;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.growers.CommonLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
@@ -33,8 +34,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static org.junit.Assert.assertEquals;
-
 public class OptimizationParameterTest {
 
 
@@ -47,9 +46,7 @@ public class OptimizationParameterTest {
         scenario.setBiologyInitializer(biologyInitializer);
 
 
-        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(),
-            100, .0001
-        );
+        Assertions.assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(), 100, .0001);
 
         OptimizationParameter.navigateAndSet(
             scenario,
@@ -58,9 +55,7 @@ public class OptimizationParameterTest {
         );
 
 
-        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(),
-            200, .0001
-        );
+        Assertions.assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(), 200, .0001);
     }
 
     @Test
@@ -69,9 +64,7 @@ public class OptimizationParameterTest {
         scenario.setFishers(150);
 
 
-        assertEquals(scenario.getFishers(),
-            150, .0001
-        );
+        Assertions.assertEquals(scenario.getFishers(), 150, .0001);
 
         OptimizationParameter.navigateAndSet(
             scenario,
@@ -80,9 +73,7 @@ public class OptimizationParameterTest {
         );
 
 
-        assertEquals(scenario.getFishers(),
-            10, .0001
-        );
+        Assertions.assertEquals(scenario.getFishers(), 10, .0001);
     }
 
     @Test
@@ -100,11 +91,15 @@ public class OptimizationParameterTest {
         second.setGrower(new CommonLogisticGrowerFactory(.567));
 
 
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
-            .567, .0001
+        Assertions.assertEquals(
+            ((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
+            .567,
+            .0001
         );
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getValue(),
-            .567, .0001
+        Assertions.assertEquals(
+            ((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getValue(),
+            .567,
+            .0001
         );
 
         OptimizationParameter.navigateAndSet(
@@ -114,11 +109,15 @@ public class OptimizationParameterTest {
         );
 
 
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
-            .567, .0001
+        Assertions.assertEquals(
+            ((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
+            .567,
+            .0001
         );
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getValue(),
-            10, .0001
+        Assertions.assertEquals(
+            ((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getValue(),
+            10,
+            .0001
         );
     }
 
@@ -169,24 +168,16 @@ public class OptimizationParameterTest {
         scenario.setGear(limiting);
 
 
-        assertEquals(
-            ((FixedDoubleParameter) gears.gears.get("Pristipomoides multidens")
-                .getAverageCatchability()).getValue(),
-            .01,
-            .0001
-        );
+        Assertions.assertEquals(((FixedDoubleParameter) gears.gears.get("Pristipomoides multidens")
+            .getAverageCatchability()).getValue(), .01, .0001);
         //change catchability of multidens!
         OptimizationParameter.navigateAndSet(
             scenario,
             "gear.delegate.gears~Pristipomoides multidens.averageCatchability",
             new FixedDoubleParameter(22)
         );
-        assertEquals(
-            ((FixedDoubleParameter) gears.gears.get("Pristipomoides multidens")
-                .getAverageCatchability()).getValue(),
-            22,
-            .0001
-        );
+        Assertions.assertEquals(((FixedDoubleParameter) gears.gears.get("Pristipomoides multidens")
+            .getAverageCatchability()).getValue(), 22, .0001);
 
 
     }

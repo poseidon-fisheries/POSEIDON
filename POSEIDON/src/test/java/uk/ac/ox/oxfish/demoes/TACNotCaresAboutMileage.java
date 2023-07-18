@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.demoes;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.experiments.MarketFirstDemo;
@@ -32,8 +33,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.nio.file.Paths;
-
-import static org.junit.Assert.assertTrue;
 
 
 public class TACNotCaresAboutMileage {
@@ -70,8 +69,8 @@ public class TACNotCaresAboutMileage {
         final double correlation = FishStateUtilities.computeCorrelation(mileage, catches);
         System.out.println("the correlation between mileage and TAC is: " + correlation);
         System.out.println("Ideally it should be, in absolute value, less than .3");
-        assertTrue(correlation < .3);
-        assertTrue(correlation > -.3);
+        Assertions.assertTrue(correlation < .3);
+        Assertions.assertTrue(correlation > -.3);
 
 
     }

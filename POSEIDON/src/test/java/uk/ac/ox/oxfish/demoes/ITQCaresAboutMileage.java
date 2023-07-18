@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.demoes;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.experiments.MarketFirstDemo;
@@ -34,9 +35,6 @@ import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.util.Iterator;
 import java.util.stream.DoubleStream;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 public class ITQCaresAboutMileage {
@@ -73,7 +71,7 @@ public class ITQCaresAboutMileage {
         System.out.println("Correlation: " +
             Double.toString(FishStateUtilities.computeCorrelation(mileage, catches)));
         //efficiency is 100%
-        assertEquals(400000.0, DoubleStream.of(catches).sum(), .1);
+        Assertions.assertEquals(400000.0, DoubleStream.of(catches).sum(), .1);
 
 
         //make sure the same number of landings is recorded in the market
@@ -86,9 +84,9 @@ public class ITQCaresAboutMileage {
             landedCatches += doubleIterator.next();
         }
         //sum up the last 365 days of observations
-        assertEquals(400000, landedCatches, .1);
+        Assertions.assertEquals(400000, landedCatches, .1);
 
-        assertTrue(FishStateUtilities.computeCorrelation(mileage, catches) < -.45);
+        Assertions.assertTrue(FishStateUtilities.computeCorrelation(mileage, catches) < -.45);
 
 
     }

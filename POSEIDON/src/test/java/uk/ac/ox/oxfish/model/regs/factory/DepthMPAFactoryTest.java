@@ -20,13 +20,12 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 6/28/17.
@@ -45,7 +44,7 @@ public class DepthMPAFactoryTest {
         factory.setMinDepth(new FixedDoubleParameter(0));
         factory.apply(state);
         for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
-            assertTrue(tile.isProtected());
+            Assertions.assertTrue(tile.isProtected());
 
 
     }
@@ -61,7 +60,7 @@ public class DepthMPAFactoryTest {
         factory.setMinDepth(new FixedDoubleParameter(101));
         factory.apply(state);
         for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
-            assertTrue(!tile.isProtected());
+            Assertions.assertTrue(!tile.isProtected());
 
 
     }
@@ -77,7 +76,7 @@ public class DepthMPAFactoryTest {
         factory.setMinDepth(new FixedDoubleParameter(0));
         factory.apply(state);
         for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
-            assertTrue(!tile.isProtected());
+            Assertions.assertTrue(!tile.isProtected());
 
 
     }

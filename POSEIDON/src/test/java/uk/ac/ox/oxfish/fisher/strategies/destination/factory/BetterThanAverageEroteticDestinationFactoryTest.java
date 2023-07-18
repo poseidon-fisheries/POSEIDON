@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.IndependentLogisticFactory;
@@ -29,8 +30,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 5/2/16.
@@ -49,7 +48,7 @@ public class BetterThanAverageEroteticDestinationFactoryTest {
             if (steps > steps2)
                 timesItWasTrue++;
         }
-        assertTrue(timesItWasTrue > 1);
+        Assertions.assertTrue(timesItWasTrue > 1);
 
     }
 

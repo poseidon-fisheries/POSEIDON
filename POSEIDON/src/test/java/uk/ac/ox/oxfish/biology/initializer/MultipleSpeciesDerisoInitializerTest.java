@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -37,8 +38,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -61,10 +60,10 @@ public class MultipleSpeciesDerisoInitializerTest {
         //create biology object
         final GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
         //check that name and meristics are correct
-        assertEquals(1, biology.getSpecies().size());
+        Assertions.assertEquals(1, biology.getSpecies().size());
         final Species fakeSpecies = biology.getSpecie(0);
-        assertEquals("fake", fakeSpecies.getName());
-        assertEquals(0, fakeSpecies.getNumberOfBins() - 1);
+        Assertions.assertEquals("fake", fakeSpecies.getName());
+        Assertions.assertEquals(0, fakeSpecies.getNumberOfBins() - 1);
 
 
         //create a 4x4 map of the world.
@@ -85,24 +84,27 @@ public class MultipleSpeciesDerisoInitializerTest {
         );
         //empirical biomass is 300, but I am scaling it
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
-        assertEquals(18.75 * 2d, map.getSeaTile(0, 0).getBiomass(fakeSpecies), .001d);
-        assertEquals(18.75 * 2d, map.getSeaTile(1, 1).getBiomass(fakeSpecies), .001d);
-        assertEquals(18.75 * 2d, map.getSeaTile(2, 3).getBiomass(fakeSpecies), .001d);
+        Assertions.assertEquals(18.75 * 2d, map.getSeaTile(0, 0).getBiomass(fakeSpecies), .001d);
+        Assertions.assertEquals(18.75 * 2d, map.getSeaTile(1, 1).getBiomass(fakeSpecies), .001d);
+        Assertions.assertEquals(18.75 * 2d, map.getSeaTile(2, 3).getBiomass(fakeSpecies), .001d);
 
 
         final DerisoSchnuteCommonGrower grower = initializer.getNaturalProcesses().get(fakeSpecies);
-        assertEquals(grower.getBiologies().size(), 16);
-        assertEquals(grower.getSpeciesIndex(), 0);
-        assertEquals(
+        Assertions.assertEquals(grower.getBiologies().size(), 16);
+        Assertions.assertEquals(grower.getSpeciesIndex(), 0);
+        Assertions.assertEquals(
             grower.getEmpiricalYearlyBiomasses().get(grower.getEmpiricalYearlyBiomasses().size() - 1),
             600d,
             .0001d
         );
 
-        final double virginBiomass = map.getAllSeaTilesAsList().stream().mapToDouble(value -> ((VariableBiomassBasedBiology) value.getBiology()).getCarryingCapacity(fakeSpecies)).sum();
+        final double virginBiomass = map.getAllSeaTilesAsList()
+            .stream()
+            .mapToDouble(value -> ((VariableBiomassBasedBiology) value.getBiology()).getCarryingCapacity(fakeSpecies))
+            .sum();
 
         //biomass should also have been scaled!
-        assertEquals(virginBiomass, 4000d, .0001d);
+        Assertions.assertEquals(virginBiomass, 4000d, .0001d);
 
 
     }
@@ -123,10 +125,10 @@ public class MultipleSpeciesDerisoInitializerTest {
         //create biology object
         final GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
         //check that name and meristics are correct
-        assertEquals(1, biology.getSpecies().size());
+        Assertions.assertEquals(1, biology.getSpecies().size());
         final Species fakeSpecies = biology.getSpecie(0);
-        assertEquals("fake", fakeSpecies.getName());
-        assertEquals(0, fakeSpecies.getNumberOfBins() - 1);
+        Assertions.assertEquals("fake", fakeSpecies.getName());
+        Assertions.assertEquals(0, fakeSpecies.getNumberOfBins() - 1);
 
 
         //create a 4x4 map of the world.
@@ -150,9 +152,9 @@ public class MultipleSpeciesDerisoInitializerTest {
             }
         );
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
-        assertTrue(map.getSeaTile(0, 0).getBiology() instanceof EmptyLocalBiology);
-        assertEquals(300, map.getSeaTile(1, 1).getBiomass(fakeSpecies), .001d);
-        assertTrue(map.getSeaTile(2, 3).getBiology() instanceof EmptyLocalBiology);
+        Assertions.assertTrue(map.getSeaTile(0, 0).getBiology() instanceof EmptyLocalBiology);
+        Assertions.assertEquals(300, map.getSeaTile(1, 1).getBiomass(fakeSpecies), .001d);
+        Assertions.assertTrue(map.getSeaTile(2, 3).getBiology() instanceof EmptyLocalBiology);
 
     }
 

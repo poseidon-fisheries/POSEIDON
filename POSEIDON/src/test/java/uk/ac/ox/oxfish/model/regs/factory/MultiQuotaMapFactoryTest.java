@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -39,8 +40,6 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
@@ -87,15 +86,15 @@ public class MultiQuotaMapFactoryTest {
         final MultiQuotaRegulation apply = factory.apply(state);
         Logger.getGlobal().info("the test read the following string: " + factory.getConvertedInitialQuotas());
 
-        assertEquals(apply.getQuotaRemaining(0), 1000d, .001);
-        assertEquals(apply.getQuotaRemaining(2), 10d, .001);
+        Assertions.assertEquals(apply.getQuotaRemaining(0), 1000d, .001);
+        Assertions.assertEquals(apply.getQuotaRemaining(2), 10d, .001);
         //i am going to force the itq scaler to start
         final ITQScaler scaler = new ITQScaler(apply);
         scaler.start(state);
-        assertEquals(apply.getQuotaRemaining(0), 10, .001);
-        assertEquals(apply.getQuotaRemaining(2), 0.1, .001);
-        assertEquals(apply.getYearlyQuota()[0], 10, .001);
-        assertEquals(apply.getYearlyQuota()[2], 0.1, .001);
+        Assertions.assertEquals(apply.getQuotaRemaining(0), 10, .001);
+        Assertions.assertEquals(apply.getQuotaRemaining(2), 0.1, .001);
+        Assertions.assertEquals(apply.getYearlyQuota()[0], 10, .001);
+        Assertions.assertEquals(apply.getYearlyQuota()[2], 0.1, .001);
 
     }
 
@@ -113,15 +112,15 @@ public class MultiQuotaMapFactoryTest {
         Logger.getGlobal().info("the test read the following string: " + factory.getConvertedInitialQuotas());
         verify(state).registerStartable(any(ITQScaler.class));
 
-        assertEquals(apply.getQuotaRemaining(0), 1000d, .001);
-        assertEquals(apply.getQuotaRemaining(2), 10d, .001);
+        Assertions.assertEquals(apply.getQuotaRemaining(0), 1000d, .001);
+        Assertions.assertEquals(apply.getQuotaRemaining(2), 10d, .001);
         //i am going to force the itq scaler to start
         final ITQScaler scaler = new ITQScaler(apply);
         scaler.start(state);
-        assertEquals(apply.getQuotaRemaining(0), 10, .001);
-        assertEquals(apply.getQuotaRemaining(2), 0.1, .001);
-        assertEquals(apply.getYearlyQuota()[0], 10, .001);
-        assertEquals(apply.getYearlyQuota()[2], 0.1, .001);
+        Assertions.assertEquals(apply.getQuotaRemaining(0), 10, .001);
+        Assertions.assertEquals(apply.getQuotaRemaining(2), 0.1, .001);
+        Assertions.assertEquals(apply.getYearlyQuota()[0], 10, .001);
+        Assertions.assertEquals(apply.getYearlyQuota()[2], 0.1, .001);
 
     }
 
@@ -138,12 +137,12 @@ public class MultiQuotaMapFactoryTest {
         verify(state, never()).registerStartable(any(ITQScaler.class));
 
         Logger.getGlobal().info("the test read the following string: " + factory.getConvertedInitialQuotas());
-        assertEquals(1000d, apply.getYearlyQuota()[0], .0001);
-        assertEquals(10d, apply.getYearlyQuota()[2], .0001);
-        assertTrue(Double.isInfinite(apply.getYearlyQuota()[1]));
-        assertEquals(1000d, apply.getQuotaRemaining(0), .0001);
-        assertEquals(10d, apply.getQuotaRemaining(2), .0001);
-        assertTrue(Double.isInfinite(apply.getYearlyQuota()[1]));
+        Assertions.assertEquals(1000d, apply.getYearlyQuota()[0], .0001);
+        Assertions.assertEquals(10d, apply.getYearlyQuota()[2], .0001);
+        Assertions.assertTrue(Double.isInfinite(apply.getYearlyQuota()[1]));
+        Assertions.assertEquals(1000d, apply.getQuotaRemaining(0), .0001);
+        Assertions.assertEquals(10d, apply.getQuotaRemaining(2), .0001);
+        Assertions.assertTrue(Double.isInfinite(apply.getYearlyQuota()[1]));
 
 
     }
@@ -171,13 +170,13 @@ public class MultiQuotaMapFactoryTest {
         model.start();
         model.schedule.step(model);
         Fisher fisher = model.getFishers().get(0);
-        assertEquals(fisher.getRegulation().maximumBiomassSellable(
+        Assertions.assertEquals(fisher.getRegulation().maximumBiomassSellable(
             fisher,
             model.getSpecies().get(0),
             model
         ), 50.0, FishStateUtilities.EPSILON);
         fisher = model.getFishers().get(1);
-        assertEquals(fisher.getRegulation().maximumBiomassSellable(
+        Assertions.assertEquals(fisher.getRegulation().maximumBiomassSellable(
             fisher,
             model.getSpecies().get(0),
             model
@@ -212,13 +211,13 @@ public class MultiQuotaMapFactoryTest {
         model.start();
         model.schedule.step(model);
         Fisher fisher = model.getFishers().get(0);
-        assertEquals(fisher.getRegulation().maximumBiomassSellable(
+        Assertions.assertEquals(fisher.getRegulation().maximumBiomassSellable(
             fisher,
             model.getSpecies().get(0),
             model
         ), 50.0, FishStateUtilities.EPSILON);
         fisher = model.getFishers().get(1);
-        assertEquals(fisher.getRegulation().maximumBiomassSellable(
+        Assertions.assertEquals(fisher.getRegulation().maximumBiomassSellable(
             fisher,
             model.getSpecies().get(0),
             model

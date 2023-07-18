@@ -1,9 +1,7 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertTrue;
 
 public class SurplusProductionStockAssessmentTest {
 
@@ -25,32 +23,12 @@ public class SurplusProductionStockAssessmentTest {
                 observedLandings
             );
 
-        Assert.assertEquals(
-            surplus.getCarryingCapacity(),
-            11987685,
-            .0001
-        );
-        Assert.assertEquals(
-            surplus.getLogisticGrowth(),
-            0.4033695,
-            .0001
-        );
-        Assert.assertEquals(
-            surplus.getCatchability(),
-            9.701158e-08,
-            .0001
-        );
+        Assertions.assertEquals(surplus.getCarryingCapacity(), 11987685, .0001);
+        Assertions.assertEquals(surplus.getLogisticGrowth(), 0.4033695, .0001);
+        Assertions.assertEquals(surplus.getCatchability(), 9.701158e-08, .0001);
 
-        Assert.assertEquals(
-            surplus.getDepletion()[observedLandings.length - 1],
-            0.8733650,
-            .0001
-        );
-        Assert.assertEquals(
-            surplus.getCpue()[observedLandings.length - 1],
-            1.0145001,
-            .0001
-        );
+        Assertions.assertEquals(surplus.getDepletion()[observedLandings.length - 1], 0.8733650, .0001);
+        Assertions.assertEquals(surplus.getCpue()[observedLandings.length - 1], 1.0145001, .0001);
 
     }
 
@@ -86,7 +64,7 @@ public class SurplusProductionStockAssessmentTest {
         for (int year = 0; year < simulatedCPUE.length; year++) {
 
             if (simulatedCPUE[year] < 0) //negative CPUE is unacceptable: we are somewhere shit
-                assertTrue(false);
+                Assertions.assertTrue(false);
             sumDistance += Math.pow(
                 simulatedCPUE[year] - observedCPUE[year]
                 , 2);
@@ -94,7 +72,7 @@ public class SurplusProductionStockAssessmentTest {
         }
         System.out.println("SP error: " + sumDistance);
         System.out.println(assessment);
-        Assert.assertTrue(sumDistance < .2);
+        Assertions.assertTrue(sumDistance < .2);
 
 
     }

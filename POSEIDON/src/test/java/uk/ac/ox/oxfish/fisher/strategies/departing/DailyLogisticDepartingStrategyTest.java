@@ -22,12 +22,12 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import ec.util.MersenneTwisterFast;
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticClassifier;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -54,26 +54,26 @@ public class DailyLogisticDepartingStrategyTest {
         when(fisher.getHoursAtPort()).thenReturn(0d);
 
         //always true
-        assertTrue(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
-        assertTrue(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
-        assertTrue(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
-        assertTrue(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
+        Assertions.assertTrue(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
+        Assertions.assertTrue(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
+        Assertions.assertTrue(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
+        Assertions.assertTrue(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
 
         //if the classifier fails once
         when(classifier.test(any(), any(), any(), any())).thenReturn(false);
-        assertFalse(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
+        Assertions.assertFalse(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
         //then it will return automatically false without asking the classifier
         when(classifier.test(any(), any(), any(), any())).thenReturn(true);
-        assertFalse(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
-        assertEquals(1, strategy.getDaysToWait());
+        Assertions.assertFalse(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
+        Assertions.assertEquals(1, strategy.getDaysToWait());
 
 
         //until enough time passes
         when(fisher.getHoursAtPort()).thenReturn(23d);
-        assertFalse(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
+        Assertions.assertFalse(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
         when(fisher.getHoursAtPort()).thenReturn(24d);
-        assertTrue(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
-        assertEquals(0, strategy.getDaysToWait());
+        Assertions.assertTrue(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
+        Assertions.assertEquals(0, strategy.getDaysToWait());
 
 
     }

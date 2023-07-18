@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.fishing;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -30,8 +31,6 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishOnceFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 
@@ -46,14 +45,12 @@ public class FishOnceStrategyTest {
 
 
         //should be true: you haven't fished before
-        assertTrue(
-            strategy.shouldFish(
-                mock(Fisher.class),
-                new MersenneTwisterFast(),
-                mock(FishState.class),
-                record
-            )
-        );
+        Assertions.assertTrue(strategy.shouldFish(
+            mock(Fisher.class),
+            new MersenneTwisterFast(),
+            mock(FishState.class),
+            record
+        ));
 
         //record a single fish
         record.recordFishing(new FishingRecord(
@@ -63,13 +60,11 @@ public class FishOnceStrategyTest {
         ));
 
         //should be false: you have fished at least once~!
-        assertFalse(
-            strategy.shouldFish(
-                mock(Fisher.class),
-                new MersenneTwisterFast(),
-                mock(FishState.class),
-                record
-            )
-        );
+        Assertions.assertFalse(strategy.shouldFish(
+            mock(Fisher.class),
+            new MersenneTwisterFast(),
+            mock(FishState.class),
+            record
+        ));
     }
 }

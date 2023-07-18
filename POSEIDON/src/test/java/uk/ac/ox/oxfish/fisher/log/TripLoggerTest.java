@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.log;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -27,7 +28,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 
@@ -42,13 +42,13 @@ public class TripLoggerTest {
         logger.start(mock(FishState.class));
         logger.setNumberOfSpecies(1);
 
-        assertNull(logger.getCurrentTrip());
-        assertEquals(logger.getFinishedTrips().size(), 0);
+        Assertions.assertNull(logger.getCurrentTrip());
+        Assertions.assertEquals(logger.getFinishedTrips().size(), 0);
         //create a new trip, now there is a current trip, but it's not in the history
         final Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
         logger.newTrip(0, 0, fisher);
-        assertNotNull(logger.getCurrentTrip());
-        assertEquals(logger.getFinishedTrips().size(), 0);
+        Assertions.assertNotNull(logger.getCurrentTrip());
+        Assertions.assertEquals(logger.getFinishedTrips().size(), 0);
 
         logger.recordFishing(new FishingRecord(
             1,
@@ -59,11 +59,11 @@ public class TripLoggerTest {
         logger.recordCosts(200);
         logger.finishTrip(10, mock(Port.class), fisher);
         //even though it's over, it is still there as current trip
-        assertTrue(logger.getCurrentTrip().isCompleted());
-        assertEquals(logger.getCurrentTrip().getProfitPerHour(false), -10, .001);
-        assertEquals(logger.getCurrentTrip().getProfitPerSpecie(0, false), -100, .001);
-        assertEquals(logger.getCurrentTrip().getUnitProfitPerSpecie(0), -1, .001);
-        assertEquals(logger.getFinishedTrips().size(), 1);
+        Assertions.assertTrue(logger.getCurrentTrip().isCompleted());
+        Assertions.assertEquals(logger.getCurrentTrip().getProfitPerHour(false), -10, .001);
+        Assertions.assertEquals(logger.getCurrentTrip().getProfitPerSpecie(0, false), -100, .001);
+        Assertions.assertEquals(logger.getCurrentTrip().getUnitProfitPerSpecie(0), -1, .001);
+        Assertions.assertEquals(logger.getFinishedTrips().size(), 1);
 
 
     }

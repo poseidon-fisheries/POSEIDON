@@ -21,12 +21,12 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,24 +39,24 @@ public class ProportionalAgingAndRecruitmentProcessTest {
     @Test
     public void halfAge() throws Exception {
 
-        Species species = mock(Species.class);
+        final Species species = mock(Species.class);
         when(species.getNumberOfBins()).thenReturn(3);
-        double[] male = {10, 20, 30};
-        double[] female = {100, 200, 300};
-        StructuredAbundance abundance = new StructuredAbundance(male, female);
+        final double[] male = {10, 20, 30};
+        final double[] female = {100, 200, 300};
+        final StructuredAbundance abundance = new StructuredAbundance(male, female);
 
-        ProportionalAgingProcess process = new ProportionalAgingProcess(new FixedDoubleParameter(0.5d));
+        final ProportionalAgingProcess process = new ProportionalAgingProcess(new FixedDoubleParameter(0.5d));
 
-        AbundanceLocalBiology bio = mock(AbundanceLocalBiology.class);
+        final AbundanceLocalBiology bio = mock(AbundanceLocalBiology.class);
         when(bio.getAbundance(species)).thenReturn(abundance);
 
 
-        FishState model = mock(FishState.class);
+        final FishState model = mock(FishState.class);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         process.ageLocally(bio, species, model, true, 365);
 
-        assertArrayEquals(male, new double[]{5, 15, 25}, .001);
-        assertArrayEquals(female, new double[]{50, 150, 250}, .001);
+        Assertions.assertArrayEquals(male, new double[]{5, 15, 25}, .001);
+        Assertions.assertArrayEquals(female, new double[]{50, 150, 250}, .001);
 
     }
 

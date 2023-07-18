@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.log;
 
 import com.google.common.collect.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -30,7 +31,6 @@ import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.util.LinkedList;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -98,16 +98,16 @@ public class TripLaggedExtractorTest {
         when(model.getDay()).thenReturn(600);
 
         //before starting, everything should be 0
-        assertEquals(extractor.extract(tile1, Double.NaN, fakeFisher, model), 0d, .0001);
-        assertEquals(extractor.extract(tile2, Double.NaN, fakeFisher, model), 0d, .0001);
-        assertEquals(extractor.extract(tile3, Double.NaN, fakeFisher, model), 0d, .0001);
+        Assertions.assertEquals(extractor.extract(tile1, Double.NaN, fakeFisher, model), 0d, .0001);
+        Assertions.assertEquals(extractor.extract(tile2, Double.NaN, fakeFisher, model), 0d, .0001);
+        Assertions.assertEquals(extractor.extract(tile3, Double.NaN, fakeFisher, model), 0d, .0001);
 
         extractor.start(model);
         extractor.step(model);
 
-        assertEquals(extractor.extract(tile1, Double.NaN, fakeFisher, model), 55d, .0001);
-        assertEquals(extractor.extract(tile2, Double.NaN, fakeFisher, model), 10d, .0001);
-        assertEquals(extractor.extract(tile3, Double.NaN, fakeFisher, model), 0d, .0001);
+        Assertions.assertEquals(extractor.extract(tile1, Double.NaN, fakeFisher, model), 55d, .0001);
+        Assertions.assertEquals(extractor.extract(tile2, Double.NaN, fakeFisher, model), 10d, .0001);
+        Assertions.assertEquals(extractor.extract(tile3, Double.NaN, fakeFisher, model), 0d, .0001);
 
     }
 
@@ -190,12 +190,12 @@ public class TripLaggedExtractorTest {
         fleetwideExtractor.step(model);
 
 
-        assertEquals(extractorFisher1.extract(tile1, Double.NaN, null, model), 55d, .0001);
-        assertEquals(extractorFisher1.extract(tile2, Double.NaN, null, model), 0d, .0001);
-        assertEquals(extractorFisher1.extract(tile3, Double.NaN, null, model), 0d, .0001);
-        assertEquals(fleetwideExtractor.extract(tile1, Double.NaN, null, model), 55d, .0001);
-        assertEquals(fleetwideExtractor.extract(tile2, Double.NaN, null, model), 10d, .0001);
-        assertEquals(fleetwideExtractor.extract(tile3, Double.NaN, null, model), 0d, .0001);
+        Assertions.assertEquals(extractorFisher1.extract(tile1, Double.NaN, null, model), 55d, .0001);
+        Assertions.assertEquals(extractorFisher1.extract(tile2, Double.NaN, null, model), 0d, .0001);
+        Assertions.assertEquals(extractorFisher1.extract(tile3, Double.NaN, null, model), 0d, .0001);
+        Assertions.assertEquals(fleetwideExtractor.extract(tile1, Double.NaN, null, model), 55d, .0001);
+        Assertions.assertEquals(fleetwideExtractor.extract(tile2, Double.NaN, null, model), 10d, .0001);
+        Assertions.assertEquals(fleetwideExtractor.extract(tile3, Double.NaN, null, model), 0d, .0001);
 
     }
 }

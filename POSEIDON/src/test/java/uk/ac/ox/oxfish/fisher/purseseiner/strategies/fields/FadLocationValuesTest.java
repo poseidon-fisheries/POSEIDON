@@ -20,6 +20,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import com.google.common.collect.ImmutableSet;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
@@ -42,7 +43,6 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.IntStream.range;
-import static junit.framework.TestCase.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -103,17 +103,14 @@ public class FadLocationValuesTest {
         final FadLocationValues fadLocationValues = new FadLocationValues();
         fadLocationValues.start(null, fisher);
 
-        assertEquals(2.0, fadLocationValues.getValueAt(new Int2D(0, 0)));
-        assertEquals(1.0, fadLocationValues.getValueAt(new Int2D(1, 1)));
-        assertEquals(0.0, fadLocationValues.getValueAt(new Int2D(2, 2)));
+        Assertions.assertEquals(2.0, fadLocationValues.getValueAt(new Int2D(0, 0)), 0.0);
+        Assertions.assertEquals(1.0, fadLocationValues.getValueAt(new Int2D(1, 1)), 0.0);
+        Assertions.assertEquals(0.0, fadLocationValues.getValueAt(new Int2D(2, 2)), 0.0);
 
-        assertEquals(
-            ImmutableSet.of(
-                entry(new Int2D(0, 0), 2.0),
-                entry(new Int2D(1, 1), 1.0)
-            ),
-            fadLocationValues.getValues()
-        );
+        Assertions.assertEquals(ImmutableSet.of(
+            entry(new Int2D(0, 0), 2.0),
+            entry(new Int2D(1, 1), 1.0)
+        ), fadLocationValues.getValues());
 
     }
 

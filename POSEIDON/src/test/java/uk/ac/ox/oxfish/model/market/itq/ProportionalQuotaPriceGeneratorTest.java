@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.model.market.itq;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -74,14 +74,14 @@ public class ProportionalQuotaPriceGeneratorTest {
             fisher1 -> 123d
         );
         quota.start(state, fisher);
-        Assert.assertEquals(1.25d, quota.computeLambda(), .001d);
+        Assertions.assertEquals(1.25d, quota.computeLambda(), .001d);
 
 
         //now set the proportion to 1:3 (specie 0 is a choke specie)
         when(fisher.predictDailyCatches(1)).thenReturn(300d);
         //this increases the value of this quota, all things constant
         // .5 * ( 1 + 3*(2 -.5)) = 2
-        Assert.assertEquals(2.75d, quota.computeLambda(), .001d);
+        Assertions.assertEquals(2.75d, quota.computeLambda(), .001d);
 
 
     }

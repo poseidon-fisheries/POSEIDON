@@ -1,9 +1,9 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class DecoratorGearPairTest {
@@ -14,8 +14,8 @@ public class DecoratorGearPairTest {
 
         FixedProportionGear single = new FixedProportionGear(.1);
         DecoratorGearPair returned = DecoratorGearPair.getActualGear(single);
-        assertEquals(returned.getDeepestDecorator(), null);
-        assertEquals(returned.getDecorated(), single);
+        Assertions.assertEquals(returned.getDeepestDecorator(), null);
+        Assertions.assertEquals(returned.getDecorated(), single);
 
     }
 
@@ -30,8 +30,8 @@ public class DecoratorGearPairTest {
             true
         );
         DecoratorGearPair returned = DecoratorGearPair.getActualGear(decorator);
-        assertEquals(returned.getDeepestDecorator(), decorator);
-        assertEquals(returned.getDecorated(), delegate);
+        Assertions.assertEquals(returned.getDeepestDecorator(), decorator);
+        Assertions.assertEquals(returned.getDecorated(), delegate);
 
     }
 
@@ -52,15 +52,15 @@ public class DecoratorGearPairTest {
             true
         );
         DecoratorGearPair returned = DecoratorGearPair.getActualGear(decorator2);
-        assertEquals(returned.getDeepestDecorator(), decorator);
-        assertEquals(returned.getDecorated(), delegate);
+        Assertions.assertEquals(returned.getDeepestDecorator(), decorator);
+        Assertions.assertEquals(returned.getDecorated(), delegate);
 
         //and I can change the tree leaf without affecting the tree structure
         Gear mock = mock(Gear.class);
         returned.getDeepestDecorator().setDelegate(mock);
         returned = DecoratorGearPair.getActualGear(decorator2);
-        assertEquals(returned.getDeepestDecorator(), decorator);
-        assertEquals(returned.getDecorated(), mock);
+        Assertions.assertEquals(returned.getDeepestDecorator(), decorator);
+        Assertions.assertEquals(returned.getDecorated(), mock);
 
     }
 }

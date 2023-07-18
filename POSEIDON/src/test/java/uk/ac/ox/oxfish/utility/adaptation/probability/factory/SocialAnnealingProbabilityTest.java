@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.utility.adaptation.probability.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
@@ -28,7 +29,6 @@ import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.utility.adaptation.probability.ThresholdExplorationProbability;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -63,27 +63,27 @@ public class SocialAnnealingProbabilityTest {
         annealing.reactToFinishedTrip(record, mock(Fisher.class, RETURNS_DEEP_STUBS));
         annealing2.reactToFinishedTrip(record, mock(Fisher.class, RETURNS_DEEP_STUBS));
         annealing05.reactToFinishedTrip(record, mock(Fisher.class, RETURNS_DEEP_STUBS));
-        assertEquals(1d, annealing.getExplorationProbability(), .001);
-        assertEquals(1d, annealing2.getExplorationProbability(), .001);
-        assertEquals(0d, annealing05.getExplorationProbability(), .001);
+        Assertions.assertEquals(1d, annealing.getExplorationProbability(), .001);
+        Assertions.assertEquals(1d, annealing2.getExplorationProbability(), .001);
+        Assertions.assertEquals(0d, annealing05.getExplorationProbability(), .001);
 
         //very low profits: everybody explores
         when(record.getProfitPerHour(true)).thenReturn(2d);
         annealing.reactToFinishedTrip(record, mock(Fisher.class, RETURNS_DEEP_STUBS));
         annealing2.reactToFinishedTrip(record, mock(Fisher.class, RETURNS_DEEP_STUBS));
         annealing05.reactToFinishedTrip(record, mock(Fisher.class, RETURNS_DEEP_STUBS));
-        assertEquals(1d, annealing.getExplorationProbability(), .001);
-        assertEquals(1d, annealing2.getExplorationProbability(), .001);
-        assertEquals(1d, annealing05.getExplorationProbability(), .001);
+        Assertions.assertEquals(1d, annealing.getExplorationProbability(), .001);
+        Assertions.assertEquals(1d, annealing2.getExplorationProbability(), .001);
+        Assertions.assertEquals(1d, annealing05.getExplorationProbability(), .001);
 
         //very high profits, nobody explores
         when(record.getProfitPerHour(true)).thenReturn(21d);
         annealing.reactToFinishedTrip(record, mock(Fisher.class, RETURNS_DEEP_STUBS));
         annealing2.reactToFinishedTrip(record, mock(Fisher.class, RETURNS_DEEP_STUBS));
         annealing05.reactToFinishedTrip(record, mock(Fisher.class, RETURNS_DEEP_STUBS));
-        assertEquals(0d, annealing.getExplorationProbability(), .001);
-        assertEquals(0d, annealing2.getExplorationProbability(), .001);
-        assertEquals(0d, annealing05.getExplorationProbability(), .001);
+        Assertions.assertEquals(0d, annealing.getExplorationProbability(), .001);
+        Assertions.assertEquals(0d, annealing2.getExplorationProbability(), .001);
+        Assertions.assertEquals(0d, annealing05.getExplorationProbability(), .001);
 
 
     }

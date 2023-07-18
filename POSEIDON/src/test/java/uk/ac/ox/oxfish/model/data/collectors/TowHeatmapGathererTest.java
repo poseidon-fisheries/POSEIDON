@@ -20,12 +20,12 @@
 
 package uk.ac.ox.oxfish.model.data.collectors;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -78,12 +78,12 @@ public class TowHeatmapGathererTest {
         gatherer.step(state);
         gatherer.step(state);
 
-        assertEquals(0, gatherer.getTowHeatmap()[0][0], .0001);
-        assertEquals(0, gatherer.getTowHeatmap()[1][1], .0001);
-        assertEquals(0, gatherer.getTowHeatmap()[2][2], .0001);
-        assertEquals(0, gatherer.getTowHeatmap()[0][49], .0001);
-        assertEquals(400, gatherer.getTowHeatmap()[1][48], .0001);
-        assertEquals(400, gatherer.getTowHeatmap()[2][47], .0001);
+        Assertions.assertEquals(0, gatherer.getTowHeatmap()[0][0], .0001);
+        Assertions.assertEquals(0, gatherer.getTowHeatmap()[1][1], .0001);
+        Assertions.assertEquals(0, gatherer.getTowHeatmap()[2][2], .0001);
+        Assertions.assertEquals(0, gatherer.getTowHeatmap()[0][49], .0001);
+        Assertions.assertEquals(400, gatherer.getTowHeatmap()[1][48], .0001);
+        Assertions.assertEquals(400, gatherer.getTowHeatmap()[2][47], .0001);
 
     }
 }

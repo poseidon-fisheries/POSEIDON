@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.geography;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.grid.ObjectGrid2D;
@@ -29,8 +29,8 @@ public class MapExtentTest {
 
         for (int x = -5; x <= 5; x++) {
             for (int y = -5; y <= 5; y++) {
-                Assert.assertEquals(geomGridField.toXCoord(x), mapExtent.toGridX(x));
-                Assert.assertEquals(geomGridField.toYCoord(y), mapExtent.toGridY(y));
+                Assertions.assertEquals(geomGridField.toXCoord(x), mapExtent.toGridX(x));
+                Assertions.assertEquals(geomGridField.toYCoord(y), mapExtent.toGridY(y));
             }
         }
 
@@ -51,7 +51,11 @@ public class MapExtentTest {
 
         coordinates.forEach(coordinate -> {
             final Double2D xy = mapExtent.coordinateToXY(coordinate);
-            Assert.assertEquals(coordinate.toString(), coordinate, mapExtent.getCoordinates((int) xy.x, (int) xy.y));
+            Assertions.assertEquals(
+                coordinate,
+                mapExtent.getCoordinates((int) xy.x, (int) xy.y),
+                coordinate.toString()
+            );
         });
     }
 }

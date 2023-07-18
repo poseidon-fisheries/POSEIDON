@@ -20,10 +20,9 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
-
-import static org.junit.Assert.assertEquals;
 
 public class OneBinInitialAbundanceTest {
 
@@ -38,12 +37,12 @@ public class OneBinInitialAbundanceTest {
         initialAbundance.initialize(longspine);
 
         double[][] abundance = initialAbundance.getInitialAbundance();
-        assertEquals(abundance.length, 2); //male and female
-        assertEquals(abundance[0].length, 81); //80 years old fish
-        assertEquals(abundance[0][0], 0d, .0001);
-        assertEquals(abundance[1][1], 0d, .0001);
-        assertEquals(abundance[0][1], 100d, .0001);
-        assertEquals(abundance[0][2], 0d, .0001);
+        Assertions.assertEquals(abundance.length, 2); //male and female
+        Assertions.assertEquals(abundance[0].length, 81); //80 years old fish
+        Assertions.assertEquals(abundance[0][0], 0d, .0001);
+        Assertions.assertEquals(abundance[1][1], 0d, .0001);
+        Assertions.assertEquals(abundance[0][1], 100d, .0001);
+        Assertions.assertEquals(abundance[0][2], 0d, .0001);
 
     }
 
@@ -57,12 +56,12 @@ public class OneBinInitialAbundanceTest {
         initialAbundance.initialize(longspine);
 
         double[][] abundance = initialAbundance.getInitialAbundance();
-        assertEquals(abundance.length, 2); //male and female
-        assertEquals(abundance[0].length, 81); //80 years old fish
-        assertEquals(abundance[0][0], 0d, .0001);
-        assertEquals(abundance[1][1], 100d, .0001);
-        assertEquals(abundance[0][1], 100d, .0001);
-        assertEquals(abundance[0][2], 0d, .0001);
+        Assertions.assertEquals(abundance.length, 2); //male and female
+        Assertions.assertEquals(abundance[0].length, 81); //80 years old fish
+        Assertions.assertEquals(abundance[0][0], 0d, .0001);
+        Assertions.assertEquals(abundance[1][1], 100d, .0001);
+        Assertions.assertEquals(abundance[0][1], 100d, .0001);
+        Assertions.assertEquals(abundance[0][2], 0d, .0001);
 
     }
 }

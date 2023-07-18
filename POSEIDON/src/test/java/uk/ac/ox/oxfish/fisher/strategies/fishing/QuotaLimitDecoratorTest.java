@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.fishing;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -33,8 +34,6 @@ import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,7 +53,7 @@ public class QuotaLimitDecoratorTest {
         QuotaLimitDecorator decorator = new QuotaLimitDecorator(stub);
 
         //short-circuit to false if the decorated stub always returns false!
-        assertFalse(decorator.shouldFish(mock(Fisher.class), new MersenneTwisterFast(),
+        Assertions.assertFalse(decorator.shouldFish(mock(Fisher.class), new MersenneTwisterFast(),
             mock(FishState.class), mock(TripRecord.class)
         ));
 
@@ -86,7 +85,7 @@ public class QuotaLimitDecoratorTest {
         FishingStrategy stub = mock(FishingStrategy.class);
         when(stub.shouldFish(any(), any(), any(), any())).thenReturn(true);
         QuotaLimitDecorator decorator = new QuotaLimitDecorator(stub);
-        assertTrue(decorator.shouldFish(fisher, new MersenneTwisterFast(),
+        Assertions.assertTrue(decorator.shouldFish(fisher, new MersenneTwisterFast(),
             model, mock(TripRecord.class)
         ));
 
@@ -120,25 +119,25 @@ public class QuotaLimitDecoratorTest {
 
         //there is nothing in the hold so the decorator should return true
         QuotaLimitDecorator decorator = new QuotaLimitDecorator(stub);
-        assertTrue(decorator.shouldFish(fisher, new MersenneTwisterFast(),
+        Assertions.assertTrue(decorator.shouldFish(fisher, new MersenneTwisterFast(),
             model, mock(TripRecord.class)
         ));
 
         //load up a bit more but still not enough
         hold.load(new Catch(new double[]{50, 50})); //getting full
-        assertTrue(decorator.shouldFish(fisher, new MersenneTwisterFast(),
+        Assertions.assertTrue(decorator.shouldFish(fisher, new MersenneTwisterFast(),
             model, mock(TripRecord.class)
         ));
 
         //even still, but having exactly the right amount doesn't stop you from fishing
         hold.load(new Catch(new double[]{50, 0})); //getting full
-        assertTrue(decorator.shouldFish(fisher, new MersenneTwisterFast(),
+        Assertions.assertTrue(decorator.shouldFish(fisher, new MersenneTwisterFast(),
             model, mock(TripRecord.class)
         ));
 
         //but overflowing in one category does make you want to go back!
         hold.load(new Catch(new double[]{50, 0})); //getting full
-        assertFalse(decorator.shouldFish(fisher, new MersenneTwisterFast(),
+        Assertions.assertFalse(decorator.shouldFish(fisher, new MersenneTwisterFast(),
             model, mock(TripRecord.class)
         ));
     }

@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -30,7 +31,6 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
@@ -49,7 +49,8 @@ public class WellMixedBiologyInitializerTest {
 
 
         final SeaTile tile = mock(SeaTile.class);
-        final VariableBiomassBasedBiology biology = (VariableBiomassBasedBiology) initializer.generateLocal(mock(GlobalBiology.class),
+        final VariableBiomassBasedBiology biology = (VariableBiomassBasedBiology) initializer.generateLocal(mock(
+                GlobalBiology.class),
             tile,
             new MersenneTwisterFast(), 50,
             50,
@@ -63,8 +64,8 @@ public class WellMixedBiologyInitializerTest {
         one.resetIndexTo(1);
 
 
-        assertEquals(biology.getCarryingCapacity(zero), 60, .001);
-        assertEquals(biology.getCarryingCapacity(one), 20, .001);
+        Assertions.assertEquals(biology.getCarryingCapacity(zero), 60, .001);
+        Assertions.assertEquals(biology.getCarryingCapacity(one), 20, .001);
 
     }
 }

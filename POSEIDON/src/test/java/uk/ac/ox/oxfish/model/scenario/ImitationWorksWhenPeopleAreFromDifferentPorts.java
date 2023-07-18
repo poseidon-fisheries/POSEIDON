@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.LinearGetterBiologyFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -35,9 +36,6 @@ import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.DoubleSummaryStatistics;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 7/3/17.
@@ -97,8 +95,8 @@ public class ImitationWorksWhenPeopleAreFromDifferentPorts {
             else
                 port2++;
         }
-        assertTrue(port1 > 0);
-        assertTrue(port2 > 0);
+        Assertions.assertTrue(port1 > 0);
+        Assertions.assertTrue(port2 > 0);
 
         //make sure people have friends in opposite ports
         int crossFriendships = 0;
@@ -108,7 +106,7 @@ public class ImitationWorksWhenPeopleAreFromDifferentPorts {
                     crossFriendships++;
 
 
-        assertTrue(crossFriendships > 0);
+        Assertions.assertTrue(crossFriendships > 0);
 
 
         //step for 100 days
@@ -147,9 +145,9 @@ public class ImitationWorksWhenPeopleAreFromDifferentPorts {
         System.out.println(y1);
         System.out.println(y2);
 
-        assertEquals(x1, 39, 2);
-        assertEquals(x2, 39, 2);
-        assertEquals(y1, 0, 2);
-        assertEquals(y2, 49, 2);
+        Assertions.assertEquals(x1, 39, 2);
+        Assertions.assertEquals(x2, 39, 2);
+        Assertions.assertEquals(y1, 0, 2);
+        Assertions.assertEquals(y2, 49, 2);
     }
 }

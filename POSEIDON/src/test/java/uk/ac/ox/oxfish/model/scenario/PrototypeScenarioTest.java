@@ -20,15 +20,13 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeWithHeadStartFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 11/18/15.
@@ -56,10 +54,10 @@ public class PrototypeScenarioTest {
         FishYAML yaml = new FishYAML();
         PrototypeScenario scenario = yaml.loadAs(override, PrototypeScenario.class);
 
-        assertEquals(scenario.getStartingMPAs().size(), 2);
+        Assertions.assertEquals(scenario.getStartingMPAs().size(), 2);
         //the order can be flipped
-        assertEquals(scenario.getStartingMPAs().get(0).getHeight(), 5, 1);
-        assertEquals(scenario.getStartingMPAs().get(1).getHeight(), 5, 1);
+        Assertions.assertEquals(scenario.getStartingMPAs().get(0).getHeight(), 5, 1);
+        Assertions.assertEquals(scenario.getStartingMPAs().get(1).getHeight(), 5, 1);
 
 
     }
@@ -79,8 +77,8 @@ public class PrototypeScenarioTest {
         state.start();
         Port port = state.getMap().getPorts().iterator().next();
 
-        assertEquals(port.getLocation().getGridX(), 40);
-        assertEquals(port.getLocation().getGridY(), 25);
+        Assertions.assertEquals(port.getLocation().getGridX(), 40);
+        Assertions.assertEquals(port.getLocation().getGridY(), 25);
 
 
     }
@@ -101,8 +99,8 @@ public class PrototypeScenarioTest {
         state.start();
         Port port = state.getMap().getPorts().iterator().next();
 
-        assertEquals(port.getLocation().getGridX(), 40);
-        assertEquals(port.getLocation().getGridY(), 20);
+        Assertions.assertEquals(port.getLocation().getGridX(), 40);
+        Assertions.assertEquals(port.getLocation().getGridY(), 20);
 
 
     }
@@ -146,7 +144,7 @@ public class PrototypeScenarioTest {
 
         System.out.println(distanceWithHeadStart);
         System.out.println(distanceWithoutHeadStart);
-        assertTrue(distanceWithHeadStart < distanceWithoutHeadStart);
+        Assertions.assertTrue(distanceWithHeadStart < distanceWithoutHeadStart);
     }
 
 
@@ -183,9 +181,9 @@ public class PrototypeScenarioTest {
         double landings2 = state.getDailyDataSet().getColumn("Species 0 Landings").stream().reduce(
             (aDouble, aDouble2) -> aDouble + aDouble2).get();
 
-        assertEquals(landings, landings2, .0001);
+        Assertions.assertEquals(landings, landings2, .0001);
         System.out.println(random);
-        assertEquals(random, state.getRandom().nextLong());
+        Assertions.assertEquals(random, state.getRandom().nextLong());
 
     }
 }

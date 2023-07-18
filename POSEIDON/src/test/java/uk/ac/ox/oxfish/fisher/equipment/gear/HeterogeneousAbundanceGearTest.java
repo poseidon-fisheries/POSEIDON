@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -29,7 +30,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
@@ -89,8 +89,8 @@ public class HeterogeneousAbundanceGearTest {
         final SeaTile mock = mock(SeaTile.class, RETURNS_DEEP_STUBS);
         when(mock.getBiology().getBiomass(any())).thenReturn(1d);
         final Catch caught = gear.fish(mock(Fisher.class), mock, mock, 1, biology);
-        assertEquals(caught.getWeightCaught(0), 19.880139, .001);
-        assertEquals(caught.getWeightCaught(1), 19.880139 * 2, .001);
+        Assertions.assertEquals(caught.getWeightCaught(0), 19.880139, .001);
+        Assertions.assertEquals(caught.getWeightCaught(1), 19.880139 * 2, .001);
 
 
     }

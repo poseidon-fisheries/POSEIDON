@@ -21,9 +21,8 @@
 package uk.ac.ox.oxfish.utility.parameters;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertTrue;
 
 
 public class UniformDoubleParameterTest {
@@ -36,8 +35,8 @@ public class UniformDoubleParameterTest {
         final MersenneTwisterFast random = new MersenneTwisterFast();
         for (int i = 0; i < 1000; i++) {
             final double value = parameter.applyAsDouble(random);
-            assertTrue(value <= 4);
-            assertTrue(value >= 2);
+            Assertions.assertTrue(value <= 4);
+            Assertions.assertTrue(value >= 2);
         }
 
     }

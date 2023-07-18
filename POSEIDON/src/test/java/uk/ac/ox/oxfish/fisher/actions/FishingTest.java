@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.actions;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -43,7 +44,6 @@ import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class FishingTest {
@@ -114,20 +114,20 @@ public class FishingTest {
         );
         fisher.start(fishState);
         fisher.step(fishState);
-        assertEquals(0, fisher.getTotalWeightOfCatchInHold(), .001);
+        Assertions.assertEquals(0, fisher.getTotalWeightOfCatchInHold(), .001);
 
 
         //should have fished 50 pounds
         fisher.step(fishState);
-        assertEquals(50.0, fisher.getTotalWeightOfCatchInHold(), .001);
+        Assertions.assertEquals(50.0, fisher.getTotalWeightOfCatchInHold(), .001);
 
         //step again and it will fish 50 more!
         fisher.step(fishState);
-        assertEquals(100.0, fisher.getTotalWeightOfCatchInHold(), .001);
+        Assertions.assertEquals(100.0, fisher.getTotalWeightOfCatchInHold(), .001);
 
         //fish again does nothing because it's full
         fisher.step(fishState);
-        assertEquals(100.0, fisher.getTotalWeightOfCatchInHold(), .001);
+        Assertions.assertEquals(100.0, fisher.getTotalWeightOfCatchInHold(), .001);
         verify(gear, times(3)).fish(any(), any(), any(), anyInt(), any());
 
 

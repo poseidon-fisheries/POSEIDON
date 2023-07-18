@@ -20,14 +20,13 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 3/21/17.
@@ -57,7 +56,7 @@ public class SablefishGearFactoryTest {
         //filtered and rounded if there are 10000 males in this cell, all aged 1, only 9 will actually be caught
         double[][] abundance = new double[2][sablefish.getMaxAge() + 1];
         abundance[FishStateUtilities.MALE][1] = 10000;
-        assertEquals(gear.filter(species, abundance)[FishStateUtilities.MALE][1], 9, .001);
+        Assertions.assertEquals(gear.filter(species, abundance)[FishStateUtilities.MALE][1], 9, .001);
 
 
     }

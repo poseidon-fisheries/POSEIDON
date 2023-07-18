@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
 import com.beust.jcommander.internal.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesAbundanceFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
@@ -10,8 +11,6 @@ import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
-
-import static org.junit.Assert.assertEquals;
 
 public class MeraAgeStructure {
 
@@ -133,10 +132,6 @@ public class MeraAgeStructure {
         }
 
         //carrying capacity ought to be about equal
-        assertEquals(
-            state.getTotalBiomass(state.getSpecies("MERA Test")) / 1000d,
-            219599420 / 1000d,
-            5 //off by about 5 tons, because even 200 years is not enough to reach the asymptote
-        );
+        Assertions.assertEquals(state.getTotalBiomass(state.getSpecies("MERA Test")) / 1000d, 219599420 / 1000d, 5);
     }
 }

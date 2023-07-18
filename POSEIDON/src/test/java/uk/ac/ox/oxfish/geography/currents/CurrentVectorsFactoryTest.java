@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.geography.currents;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.geography.MapExtent;
@@ -26,7 +26,7 @@ public class CurrentVectorsFactoryTest {
         final double oneMeterPerSecondAtEquatorInDegreesPerDay =
             metrePerSecondToXyPerDaysVector(new Double2D(1, 0), new Coordinate(0, 0), mapExtent).length();
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
             SECONDS_PER_DAY / ((EARTH_CIRCUMFERENCE / 360) * 1000),
             oneMeterPerSecondAtEquatorInDegreesPerDay,
             EPSILON

@@ -20,14 +20,13 @@
 
 package uk.ac.ox.oxfish.biology;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightLogisticPlusClimateChangeFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 4/11/17.
@@ -61,8 +60,8 @@ public class CarryingCapacityDiffuserTest {
             state.schedule.step(state);
 
         final Species species = state.getBiology().getSpecies().get(0);
-        assertEquals(state.getMap().getSeaTile(0, 0).getBiomass(species), 0d, 1);
-        assertEquals(state.getMap().getSeaTile(2, 3).getBiomass(species), 9000d, 1);
+        Assertions.assertEquals(state.getMap().getSeaTile(0, 0).getBiomass(species), 0d, 1);
+        Assertions.assertEquals(state.getMap().getSeaTile(2, 3).getBiomass(species), 9000d, 1);
 
 
     }

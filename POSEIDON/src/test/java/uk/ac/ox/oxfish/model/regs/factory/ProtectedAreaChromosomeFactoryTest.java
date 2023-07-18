@@ -20,14 +20,12 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 10/25/16.
@@ -55,11 +53,11 @@ public class ProtectedAreaChromosomeFactoryTest {
         state.setScenario(scenario);
         state.start();
 
-        assertFalse(state.getMap().getSeaTile(0, 0).isProtected());
-        assertFalse(state.getMap().getSeaTile(1, 0).isProtected());
-        assertTrue(state.getMap().getSeaTile(2, 0).isProtected());
-        assertFalse(state.getMap().getSeaTile(3, 0).isProtected());
-        assertFalse(state.getMap().getSeaTile(0, 1).isProtected());
-        assertTrue(state.getMap().getSeaTile(1, 1).isProtected());
+        Assertions.assertFalse(state.getMap().getSeaTile(0, 0).isProtected());
+        Assertions.assertFalse(state.getMap().getSeaTile(1, 0).isProtected());
+        Assertions.assertTrue(state.getMap().getSeaTile(2, 0).isProtected());
+        Assertions.assertFalse(state.getMap().getSeaTile(3, 0).isProtected());
+        Assertions.assertFalse(state.getMap().getSeaTile(0, 1).isProtected());
+        Assertions.assertTrue(state.getMap().getSeaTile(1, 1).isProtected());
     }
 }

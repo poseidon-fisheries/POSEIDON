@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.maximization.generic;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
@@ -30,10 +30,10 @@ public class IntervalTargetTest {
             model
         );
 
-        Assert.assertFalse(test[0]);
-        Assert.assertFalse(test[1]);
-        Assert.assertFalse(test[2]);
-        Assert.assertTrue(test[3]);
+        Assertions.assertFalse(test[0]);
+        Assertions.assertFalse(test[1]);
+        Assertions.assertFalse(test[2]);
+        Assertions.assertTrue(test[3]);
 
 
     }
@@ -59,10 +59,10 @@ public class IntervalTargetTest {
             model
         );
 
-        Assert.assertFalse(test[0]);
-        Assert.assertTrue(test[1]);
-        Assert.assertFalse(test[2]);
-        Assert.assertFalse(test[3]);
+        Assertions.assertFalse(test[0]);
+        Assertions.assertTrue(test[1]);
+        Assertions.assertFalse(test[2]);
+        Assertions.assertFalse(test[3]);
 
 
     }

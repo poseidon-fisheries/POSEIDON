@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import com.beust.jcommander.internal.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FullSeasonalRetiredDecoratorFactory;
@@ -29,7 +30,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class FullSeasonalRetiredDecoratorTest {
@@ -54,46 +54,46 @@ public class FullSeasonalRetiredDecoratorTest {
         verify(fisher, times(1)).getAdditionalVariables();
 
         //
-        assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
         //you are making more than target; you won't change
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
         //you are making more than minimum; you won't change
         when(fisher.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(20d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
 
 
         //switch to retired
         when(fisher.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(2d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
         //between minimum and target; you stay seasonal
         when(fisher.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(20d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
         //back above target: you go back full time!
         when(fisher.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(200d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
 
 
         //you can retire if you do badly often
         when(fisher.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(2d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
 
 
         //at which point you are stuck in retired forever without friends!
         when(fisher.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(9999d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
 
 
         verify(fisher, times(11)).getAdditionalVariables();
@@ -120,62 +120,62 @@ public class FullSeasonalRetiredDecoratorTest {
         verify(fisher, times(1)).getAdditionalVariables();
 
         //
-        assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
         //you are making more than target; you won't change
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
         //you are making more than minimum; you won't change
         when(fisher.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(20d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
 
 
         //switch to retired after 3
         when(fisher.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(2d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
         //between minimum and target; you stay seasonal
         when(fisher.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(20d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
         //back above target: you go back full time!
         when(fisher.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(200d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
 
 
         //you can retire if you do badly often
         when(fisher.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(2d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.FULLTIME);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
 
 
         //at which point you are stuck in retired forever without friends!
         when(fisher.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(9999d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
 
 
     }
@@ -206,19 +206,19 @@ public class FullSeasonalRetiredDecoratorTest {
         when(friend1.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(2d);
         when(friend2.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(-2d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
 
         //both make more than minimumIncome; still not good enough!
         when(friend1.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(20d);
         when(friend2.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(32d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
 
         //but if one makes more than target; you come back
         when(friend1.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(-20d);
         when(friend2.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(320d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.SEASONAL);
 
         verify(fisher, times(3)).getAdditionalVariables();
 
@@ -234,7 +234,7 @@ public class FullSeasonalRetiredDecoratorTest {
         FullSeasonalRetiredDecoratorFactory factory = new FullSeasonalRetiredDecoratorFactory();
         factory.setCanReturnFromRetirement(false);
         final FullSeasonalRetiredDecorator apply = factory.apply(new FishState());
-        assertFalse(apply.isCanReturnFromRetirement());
+        Assertions.assertFalse(apply.isCanReturnFromRetirement());
 
         FullSeasonalRetiredDecorator decorator = new FullSeasonalRetiredDecorator(
             EffortStatus.RETIRED, 100, 10, 0,
@@ -255,19 +255,19 @@ public class FullSeasonalRetiredDecoratorTest {
         when(friend1.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(2d);
         when(friend2.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(-2d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
 
         //both make more than minimumIncome; still not good enough!
         when(friend1.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(20d);
         when(friend2.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(32d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
 
         //but if one makes more than target; you come back
         when(friend1.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(-20d);
         when(friend2.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(320d);
         decorator.updateEffortLevel(fisher, model);
-        assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
+        Assertions.assertEquals(decorator.getStatus(), EffortStatus.RETIRED);
 
         verify(fisher, times(3)).getAdditionalVariables();
 
@@ -293,7 +293,7 @@ public class FullSeasonalRetiredDecoratorTest {
             state.schedule.step(state);
 
 
-        assertTrue(state.getYearlyDataSet().getColumn("Average Number of Trips").get(0) >
+        Assertions.assertTrue(state.getYearlyDataSet().getColumn("Average Number of Trips").get(0) >
             10 *
                 state.getYearlyDataSet().getColumn("Average Number of Trips").get(1));
 

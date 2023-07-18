@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
@@ -40,8 +41,6 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -98,8 +97,8 @@ public class RandomThenBackToPortDestinationStrategyTest {
             SeaTile destination = strategy.chooseDestination(fisher,
                 random, model, action
             );
-            assertEquals(destination.getGridX(), 0);
-            assertTrue(destination.isWater());
+            Assertions.assertEquals(destination.getGridX(), 0);
+            Assertions.assertTrue(destination.isWater());
         }
 
 
@@ -156,9 +155,9 @@ public class RandomThenBackToPortDestinationStrategyTest {
             SeaTile destination = strategy.chooseDestination(fisher,
                 random, model, null
             );
-            assertEquals(destination.getGridX(), 0);
-            assertEquals(destination.getGridY(), 0);
-            assertEquals(destination, fisher.getDestination());
+            Assertions.assertEquals(destination.getGridX(), 0);
+            Assertions.assertEquals(destination.getGridY(), 0);
+            Assertions.assertEquals(destination, fisher.getDestination());
         }
 
 
@@ -192,9 +191,9 @@ public class RandomThenBackToPortDestinationStrategyTest {
             SeaTile destination = strategy.chooseDestination(fisher,
                 random, model, null
             );
-            assertEquals(destination.getGridX(), 1);
-            assertEquals(destination.getGridY(), 1);
-            assertEquals(destination, port.getLocation());
+            Assertions.assertEquals(destination.getGridX(), 1);
+            Assertions.assertEquals(destination.getGridY(), 1);
+            Assertions.assertEquals(destination, port.getLocation());
         }
 
 

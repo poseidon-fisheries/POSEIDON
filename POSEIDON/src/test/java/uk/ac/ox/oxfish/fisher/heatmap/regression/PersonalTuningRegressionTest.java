@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
@@ -29,7 +30,6 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
@@ -100,8 +100,8 @@ public class PersonalTuningRegressionTest {
             System.out.println(Arrays.toString(regression.getParametersAsArray()));
         }
         //the approach gets really slow so you might not have reached it
-        assertEquals(regression.getParametersAsArray()[0], -2, .1);
-        assertEquals(regression.getParametersAsArray()[1], 10, .5);
+        Assertions.assertEquals(regression.getParametersAsArray()[0], -2, .1);
+        Assertions.assertEquals(regression.getParametersAsArray()[1], 10, .5);
 
     }
 }

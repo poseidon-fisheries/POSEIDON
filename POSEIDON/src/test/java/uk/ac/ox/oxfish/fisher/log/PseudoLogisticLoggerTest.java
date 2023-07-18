@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.log;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
@@ -32,7 +33,6 @@ import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizer;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -84,18 +84,18 @@ public class PseudoLogisticLoggerTest {
 
         System.out.print(log.getData().toString());
         String[] csv = log.getData().toString().trim().split("\n");
-        assertEquals(csv.length, 16); //it comes in long format
+        Assertions.assertEquals(csv.length, 16); //it comes in long format
         //0,1 is actually group 4 (square goes vertical first)
         for (int row = 0; row < 16; row++) {
             if (row == 4)
-                assertTrue(csv[row].contains("yes"));
+                Assertions.assertTrue(csv[row].contains("yes"));
             else
-                assertFalse(csv[row].contains("yes"));
+                Assertions.assertFalse(csv[row].contains("yes"));
 
         }
         //check that rows are correct
         //id,trip#,year,day,arm,chosen,x,y,time
-        assertTrue("0,0,123,456,6,no,2.0,1.0,0.0".equals(csv[6]));
+        Assertions.assertTrue("0,0,123,456,6,no,2.0,1.0,0.0".equals(csv[6]));
 
 
         //add one more observation
@@ -108,17 +108,17 @@ public class PseudoLogisticLoggerTest {
         System.out.println("***************************************");
         System.out.print(log.getData().toString());
         csv = log.getData().toString().trim().split("\n");
-        assertEquals(csv.length, 32); //it comes in long format
+        Assertions.assertEquals(csv.length, 32); //it comes in long format
         //0,1 is actually group 4 (square goes vertical first)
         for (int row = 16; row < 32; row++) {
             if (row == 16)
-                assertTrue(csv[row].contains("yes"));
+                Assertions.assertTrue(csv[row].contains("yes"));
             else
-                assertFalse(csv[row].contains("yes"));
+                Assertions.assertFalse(csv[row].contains("yes"));
 
         }
         //check that rows are correct
         //id,trip#,year,day,arm,chosen,x,y,time
-        assertTrue("0,1,123,456,0,yes,0.0,0.0,100.0".equals(csv[16]));
+        Assertions.assertTrue("0,1,123,456,0,yes,0.0,0.0,100.0".equals(csv[16]));
     }
 }

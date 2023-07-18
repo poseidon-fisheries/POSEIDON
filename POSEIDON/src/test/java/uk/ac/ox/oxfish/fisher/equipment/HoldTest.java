@@ -20,13 +20,13 @@
 
 package uk.ac.ox.oxfish.fisher.equipment;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
@@ -48,15 +48,15 @@ public class HoldTest {
 
 
         hold.load(new Catch(second, 50.0, bio));
-        assertEquals(50, hold.getTotalWeightOfCatchInHold(), .001);
+        Assertions.assertEquals(50, hold.getTotalWeightOfCatchInHold(), .001);
 
         hold.load(new Catch(first, 10.0, bio));
-        assertEquals(60, hold.getTotalWeightOfCatchInHold(), .001);
+        Assertions.assertEquals(60, hold.getTotalWeightOfCatchInHold(), .001);
 
         hold.load(new Catch(first, 1.0, bio));
-        assertEquals(61, hold.getTotalWeightOfCatchInHold(), .001);
+        Assertions.assertEquals(61, hold.getTotalWeightOfCatchInHold(), .001);
 
-        assertEquals(hold.getPercentageFilled(), .61, .001);
+        Assertions.assertEquals(hold.getPercentageFilled(), .61, .001);
 
 
     }
@@ -71,14 +71,14 @@ public class HoldTest {
 
 
         hold.load(new Catch(first, 100.0, bio));
-        assertEquals(100, hold.getTotalWeightOfCatchInHold(), .001);
+        Assertions.assertEquals(100, hold.getTotalWeightOfCatchInHold(), .001);
 
         hold.load(new Catch(second, 300.0, bio));
-        assertEquals(100, hold.getTotalWeightOfCatchInHold(), .001);
+        Assertions.assertEquals(100, hold.getTotalWeightOfCatchInHold(), .001);
 
         //has thrown stuff overboard
-        assertEquals(25, hold.getWeightOfCatchInHold(first), .001);
-        assertEquals(75, hold.getWeightOfCatchInHold(second), .001);
+        Assertions.assertEquals(25, hold.getWeightOfCatchInHold(first), .001);
+        Assertions.assertEquals(75, hold.getWeightOfCatchInHold(second), .001);
 
 
     }
@@ -94,16 +94,16 @@ public class HoldTest {
 
         hold.load(new Catch(first, 25.0, bio));
         hold.load(new Catch(second, 35.0, bio));
-        assertEquals(60, hold.getTotalWeightOfCatchInHold(), .001);
+        Assertions.assertEquals(60, hold.getTotalWeightOfCatchInHold(), .001);
 
         Catch caught = hold.unload();
         //should have emptied the hold
-        assertEquals(0, hold.getTotalWeightOfCatchInHold(), .001);
-        assertEquals(25.0, caught.getWeightCaught(first), .001);
+        Assertions.assertEquals(0, hold.getTotalWeightOfCatchInHold(), .001);
+        Assertions.assertEquals(25.0, caught.getWeightCaught(first), .001);
         //should not fuck up if I fill the hold again
         hold.load(new Catch(first, 15.0, bio));
-        assertEquals(25.0, caught.getWeightCaught(first), .001);
-        assertEquals(15, hold.getTotalWeightOfCatchInHold(), .001);
+        Assertions.assertEquals(25.0, caught.getWeightCaught(first), .001);
+        Assertions.assertEquals(15, hold.getTotalWeightOfCatchInHold(), .001);
 
 
     }
@@ -148,19 +148,13 @@ public class HoldTest {
             )
         );
 
-        assertEquals(hold.getTotalWeightOfCatchInHold(),
-            10 * 10 + 10 * 50d, .001d
-        );
-        assertEquals(hold.getWeightOfCatchInHold(firstSpecies),
-            600d, 0001d
-        );
-        assertEquals(hold.getWeightOfCatchInHold(secondSpecies),
-            0d, 0001d
-        );
+        Assertions.assertEquals(hold.getTotalWeightOfCatchInHold(), 10 * 10 + 10 * 50d, .001d);
+        Assertions.assertEquals(hold.getWeightOfCatchInHold(firstSpecies), 600d, 0001d);
+        Assertions.assertEquals(hold.getWeightOfCatchInHold(secondSpecies), 0d, 0001d);
 
-        assertEquals(hold.getWeightOfBin(firstSpecies, 0), 100d, .001d);
-        assertEquals(hold.getWeightOfBin(firstSpecies, 1), 500d, .001d);
-        assertEquals(hold.getWeightOfBin(firstSpecies, 2), 0d, .001d);
+        Assertions.assertEquals(hold.getWeightOfBin(firstSpecies, 0), 100d, .001d);
+        Assertions.assertEquals(hold.getWeightOfBin(firstSpecies, 1), 500d, .001d);
+        Assertions.assertEquals(hold.getWeightOfBin(firstSpecies, 2), 0d, .001d);
         //catch the other species, too
         hold.load(
             new Catch(
@@ -171,19 +165,13 @@ public class HoldTest {
 
             )
         );
-        assertEquals(hold.getTotalWeightOfCatchInHold(),
-            800, .001d
-        );
-        assertEquals(hold.getWeightOfCatchInHold(firstSpecies),
-            600d, 0001d
-        );
-        assertEquals(hold.getWeightOfCatchInHold(secondSpecies),
-            200d, 0001d
-        );
+        Assertions.assertEquals(hold.getTotalWeightOfCatchInHold(), 800, .001d);
+        Assertions.assertEquals(hold.getWeightOfCatchInHold(firstSpecies), 600d, 0001d);
+        Assertions.assertEquals(hold.getWeightOfCatchInHold(secondSpecies), 200d, 0001d);
 
-        assertEquals(hold.getWeightOfBin(firstSpecies, 0), 100d, .001d);
-        assertEquals(hold.getWeightOfBin(firstSpecies, 1), 500d, .001d);
-        assertEquals(hold.getWeightOfBin(firstSpecies, 2), 0d, .001d);
+        Assertions.assertEquals(hold.getWeightOfBin(firstSpecies, 0), 100d, .001d);
+        Assertions.assertEquals(hold.getWeightOfBin(firstSpecies, 1), 500d, .001d);
+        Assertions.assertEquals(hold.getWeightOfBin(firstSpecies, 2), 0d, .001d);
 
         //so far so good, now we overload and we should throw away 50% of each
 
@@ -199,22 +187,16 @@ public class HoldTest {
         );
         //you had 2000kg, you can only hold 1000kg
         //you had 600-1400 now you ought to have 300-700
-        assertEquals(hold.getTotalWeightOfCatchInHold(),
-            1000, .001d
-        );
-        assertEquals(hold.getWeightOfCatchInHold(firstSpecies),
-            300d, 0001d
-        );
-        assertEquals(hold.getWeightOfCatchInHold(secondSpecies),
-            700d, 0001d
-        );
+        Assertions.assertEquals(hold.getTotalWeightOfCatchInHold(), 1000, .001d);
+        Assertions.assertEquals(hold.getWeightOfCatchInHold(firstSpecies), 300d, 0001d);
+        Assertions.assertEquals(hold.getWeightOfCatchInHold(secondSpecies), 700d, 0001d);
 
 
-        assertEquals(hold.getWeightOfBin(firstSpecies, 0), 50d, .001d);
-        assertEquals(hold.getWeightOfBin(firstSpecies, 1), 250d, .001d);
-        assertEquals(hold.getWeightOfBin(firstSpecies, 2), 0d, .001d);
-        assertEquals(hold.getWeightOfBin(secondSpecies, 0), 0d, .001d);
-        assertEquals(hold.getWeightOfBin(secondSpecies, 1), 700d, .001d);
+        Assertions.assertEquals(hold.getWeightOfBin(firstSpecies, 0), 50d, .001d);
+        Assertions.assertEquals(hold.getWeightOfBin(firstSpecies, 1), 250d, .001d);
+        Assertions.assertEquals(hold.getWeightOfBin(firstSpecies, 2), 0d, .001d);
+        Assertions.assertEquals(hold.getWeightOfBin(secondSpecies, 0), 0d, .001d);
+        Assertions.assertEquals(hold.getWeightOfBin(secondSpecies, 1), 700d, .001d);
 
     }
 }

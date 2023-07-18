@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 
@@ -48,7 +48,7 @@ public class LogisticRecruitmentProcessTest {
         );
 
         //recruits ought to be weighin a total of 50kg, so that there ought to be 50 of them
-        Assert.assertEquals((int) recruit, 50);
+        Assertions.assertEquals((int) recruit, 50);
 
 
     }
@@ -66,7 +66,7 @@ public class LogisticRecruitmentProcessTest {
         );
 
         //recruits ought to be weighin a total of 1kg, so that there ought to be 1 of them
-        Assert.assertEquals((int) recruit, 1);
+        Assertions.assertEquals((int) recruit, 1);
 
 
     }
@@ -84,7 +84,7 @@ public class LogisticRecruitmentProcessTest {
                 new double[]{0, 0, 0}, new double[]{0, 0, 0}), 0, 365
         );
 
-        Assert.assertEquals((int) recruit, 0);
+        Assertions.assertEquals((int) recruit, 0);
 
 
     }

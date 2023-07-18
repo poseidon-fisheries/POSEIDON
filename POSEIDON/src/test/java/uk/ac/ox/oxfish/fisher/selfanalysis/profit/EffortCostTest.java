@@ -1,12 +1,11 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis.profit;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,7 +26,7 @@ public class EffortCostTest {
             100
         );
 
-        Assert.assertEquals(effortCost, 60, .001);
+        Assertions.assertEquals(effortCost, 60, .001);
 
     }
 
@@ -35,7 +34,7 @@ public class EffortCostTest {
     public void additionalCostCorrect() {
 
         EffortCost cost = new EffortCost(10);
-        assertEquals(20, cost.expectedAdditionalCosts(
+        Assertions.assertEquals(20, cost.expectedAdditionalCosts(
             mock(Fisher.class),
             999,
             2,

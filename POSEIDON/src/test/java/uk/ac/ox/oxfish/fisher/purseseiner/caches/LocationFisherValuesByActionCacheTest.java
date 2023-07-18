@@ -20,6 +20,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.caches;
 
 import com.google.common.collect.ImmutableSet;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -31,8 +32,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
@@ -68,28 +67,19 @@ public class LocationFisherValuesByActionCacheTest {
 
         final Map<Int2D, Double> locationValuesOFS0 =
             cache.getLocationValues(path, 2017, fishers.get(0), OFS.getActionClass());
-        assertEquals(
-            ImmutableSet.of(10.0, 20.0),
-            ImmutableSet.copyOf(locationValuesOFS0.values())
-        );
+        Assertions.assertEquals(ImmutableSet.of(10.0, 20.0), ImmutableSet.copyOf(locationValuesOFS0.values()));
 
         final Map<Int2D, Double> locationValuesDPL0 =
             cache.getLocationValues(path, 2017, fishers.get(0), DPL.getActionClass());
-        assertTrue(locationValuesDPL0.isEmpty());
+        Assertions.assertTrue(locationValuesDPL0.isEmpty());
 
         final Map<Int2D, Double> locationValuesOFS1 =
             cache.getLocationValues(path, 2017, fishers.get(1), OFS.getActionClass());
-        assertEquals(
-            ImmutableSet.of(30.0, 20.0),
-            ImmutableSet.copyOf(locationValuesOFS1.values())
-        );
+        Assertions.assertEquals(ImmutableSet.of(30.0, 20.0), ImmutableSet.copyOf(locationValuesOFS1.values()));
 
         final Map<Int2D, Double> locationValuesDPL1 =
             cache.getLocationValues(path, 2017, fishers.get(1), DPL.getActionClass());
-        assertEquals(
-            ImmutableSet.of(10.0),
-            ImmutableSet.copyOf(locationValuesDPL1.values())
-        );
+        Assertions.assertEquals(ImmutableSet.of(10.0), ImmutableSet.copyOf(locationValuesDPL1.values()));
 
     }
 

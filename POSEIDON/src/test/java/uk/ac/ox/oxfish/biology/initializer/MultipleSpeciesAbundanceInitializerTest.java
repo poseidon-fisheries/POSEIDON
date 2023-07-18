@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -36,8 +37,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 
@@ -59,10 +58,10 @@ public class MultipleSpeciesAbundanceInitializerTest {
         //create biology object
         final GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
         //check that name and meristics are correct
-        assertEquals(1, biology.getSpecies().size());
+        Assertions.assertEquals(1, biology.getSpecies().size());
         final Species fakeSpecies = biology.getSpecie(0);
-        assertEquals("fake", fakeSpecies.getName());
-        assertEquals(3, fakeSpecies.getNumberOfBins() - 1);
+        Assertions.assertEquals("fake", fakeSpecies.getName());
+        Assertions.assertEquals(3, fakeSpecies.getNumberOfBins() - 1);
 
 
         //create a 4x4 map of the world.
@@ -80,30 +79,42 @@ public class MultipleSpeciesAbundanceInitializerTest {
             seaTile -> 1d / 16d
         );
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
-        assertEquals(
+        Assertions.assertEquals(
             200,
             map.getSeaTile(0, 0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],
             .001
         );
-        assertEquals(
+        Assertions.assertEquals(
             200,
             map.getSeaTile(1, 1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],
             .001
         );
-        assertEquals(
+        Assertions.assertEquals(
             200,
             map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],
             .001
         );
-        assertEquals(250, map.getSeaTile(0, 0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0], .001);
-        assertEquals(250, map.getSeaTile(1, 1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0], .001);
-        assertEquals(250, map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0], .001);
-        assertEquals(
+        Assertions.assertEquals(
+            250,
+            map.getSeaTile(0, 0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],
+            .001
+        );
+        Assertions.assertEquals(
+            250,
+            map.getSeaTile(1, 1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],
+            .001
+        );
+        Assertions.assertEquals(
+            250,
+            map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],
+            .001
+        );
+        Assertions.assertEquals(
             325,
             map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],
             .001
         );
-        assertEquals(
+        Assertions.assertEquals(
             325,
             map.getSeaTile(2, 3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],
             .001
@@ -138,10 +149,10 @@ public class MultipleSpeciesAbundanceInitializerTest {
         //create biology object
         final GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
         //check that name and meristics are correct
-        assertEquals(1, biology.getSpecies().size());
+        Assertions.assertEquals(1, biology.getSpecies().size());
         final Species fakeSpecies = biology.getSpecie(0);
-        assertEquals("fake", fakeSpecies.getName());
-        assertEquals(3, fakeSpecies.getNumberOfBins() - 1);
+        Assertions.assertEquals("fake", fakeSpecies.getName());
+        Assertions.assertEquals(3, fakeSpecies.getNumberOfBins() - 1);
 
 
         //create a 4x4 map of the world.
@@ -164,14 +175,14 @@ public class MultipleSpeciesAbundanceInitializerTest {
             }
         );
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
-        assertTrue(map.getSeaTile(0, 0).getBiology() instanceof EmptyLocalBiology);
-        assertEquals(
+        Assertions.assertTrue(map.getSeaTile(0, 0).getBiology() instanceof EmptyLocalBiology);
+        Assertions.assertEquals(
             1600 * 2,
             map.getSeaTile(1, 1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],
             .001
         );
-        assertTrue(map.getSeaTile(2, 3).getBiology() instanceof EmptyLocalBiology);
-        assertEquals(
+        Assertions.assertTrue(map.getSeaTile(2, 3).getBiology() instanceof EmptyLocalBiology);
+        Assertions.assertEquals(
             2000 * 2,
             map.getSeaTile(1, 1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],
             .001

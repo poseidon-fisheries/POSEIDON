@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.model.regs;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -27,8 +28,6 @@ import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -48,10 +47,10 @@ public class MaxHoursOutRegulationTest {
         Fisher fisher = mock(Fisher.class);
         when(fisher.getHoursAtSeaThisYear()).thenReturn(20d);
 
-        assertTrue(hoursOut.allowedAtSea(fisher, model));
+        Assertions.assertTrue(hoursOut.allowedAtSea(fisher, model));
 
         when(fisher.getHoursAtSeaThisYear()).thenReturn(120d);
-        assertFalse(hoursOut.allowedAtSea(fisher, model));
+        Assertions.assertFalse(hoursOut.allowedAtSea(fisher, model));
 
     }
 
@@ -72,7 +71,7 @@ public class MaxHoursOutRegulationTest {
         when(fisher.getHoursAtSeaThisYear()).thenReturn(20d);
 
 
-        assertFalse(hoursOut.allowedAtSea(fisher, model));
+        Assertions.assertFalse(hoursOut.allowedAtSea(fisher, model));
 
     }
 }

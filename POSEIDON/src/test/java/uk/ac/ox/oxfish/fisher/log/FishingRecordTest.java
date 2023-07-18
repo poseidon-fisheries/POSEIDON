@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.log;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -28,8 +29,6 @@ import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class FishingRecordTest {
@@ -59,7 +58,7 @@ public class FishingRecordTest {
 
 
         FishingRecord sum = FishingRecord.sumRecords(FishingRecord.sumRecords(record1, record2), record3);
-        assertArrayEquals(sum.getFishCaught().getBiomassArray(), new double[]{210, 420}, .001);
+        Assertions.assertArrayEquals(sum.getFishCaught().getBiomassArray(), new double[]{210, 420}, .001);
 
     }
 
@@ -110,7 +109,7 @@ public class FishingRecordTest {
             )
         );
         FishingRecord sum = FishingRecord.sumRecords(FishingRecord.sumRecords(record1, record2), record3);
-        assertEquals(sum.getFishCaught().getAbundance(0).getAbundance(0, 1), 10, .001);
-        assertEquals(sum.getFishCaught().getAbundance(1).getAbundance(0, 1), 4, .001);
+        Assertions.assertEquals(sum.getFishCaught().getAbundance(0).getAbundance(0, 1), 10, .001);
+        Assertions.assertEquals(sum.getFishCaught().getAbundance(1).getAbundance(0, 1), 4, .001);
     }
 }

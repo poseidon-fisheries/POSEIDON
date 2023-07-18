@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.geography;
 
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.geography.discretization.CentroidMapDiscretizer;
@@ -31,7 +32,6 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -55,8 +55,8 @@ public class CentroidMapDiscretizerTest {
     private FishState buildState() {
         final FishState state = MovingTest.generateSimple4x4Map();
         state.getMap().recomputeTilesMPA();
-        assertEquals(new Coordinate(0.125, .875, 0), state.getMap().getCoordinates(0, 0));
-        assertEquals(new Coordinate(.875, 0.125, 0), state.getMap().getCoordinates(3, 3));
+        Assertions.assertEquals(new Coordinate(0.125, .875, 0), state.getMap().getCoordinates(0, 0));
+        Assertions.assertEquals(new Coordinate(.875, 0.125, 0), state.getMap().getCoordinates(3, 3));
         return state;
     }
 
@@ -66,11 +66,11 @@ public class CentroidMapDiscretizerTest {
         final Integer tileZeroZeroGroup
     ) {
         discretization.discretize(state.getMap());
-        assertEquals(tileZeroZeroGroup, discretization.getGroup(state.getMap().getSeaTile(0, 0)));
-        assertEquals(0, (int) discretization.getGroup(state.getMap().getSeaTile(1, 1)));
-        assertEquals(0, (int) discretization.getGroup(state.getMap().getSeaTile(0, 1)));
-        assertEquals(1, (int) discretization.getGroup(state.getMap().getSeaTile(2, 2)));
-        assertEquals(1, (int) discretization.getGroup(state.getMap().getSeaTile(3, 3)));
+        Assertions.assertEquals(tileZeroZeroGroup, discretization.getGroup(state.getMap().getSeaTile(0, 0)));
+        Assertions.assertEquals(0, (int) discretization.getGroup(state.getMap().getSeaTile(1, 1)));
+        Assertions.assertEquals(0, (int) discretization.getGroup(state.getMap().getSeaTile(0, 1)));
+        Assertions.assertEquals(1, (int) discretization.getGroup(state.getMap().getSeaTile(2, 2)));
+        Assertions.assertEquals(1, (int) discretization.getGroup(state.getMap().getSeaTile(3, 3)));
     }
 
     //same as above, but builds the map from factory

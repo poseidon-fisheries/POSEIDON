@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -44,7 +45,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.IntStream.range;
 import static java.util.stream.IntStream.rangeClosed;
-import static junit.framework.TestCase.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -94,42 +94,30 @@ public class SetLocationValuesTest {
 
         locationValues.forEach(values -> {
             values.start(fishState, fisher);
-            assertEquals(
-                initialValues.entrySet(),
-                values.getValues()
-            );
-            range(0, 3).forEach(i -> assertEquals((double) i, values.getValueAt(i, i)));
-            assertEquals(0.0, values.getValueAt(3, 3));
+            Assertions.assertEquals(initialValues.entrySet(), values.getValues());
+            range(0, 3).forEach(i -> Assertions.assertEquals(i, values.getValueAt(i, i), 0.0));
+            Assertions.assertEquals(0.0, values.getValueAt(3, 3), 0.0);
         });
 
         locationValues.forEach(values -> values.step(fishState));
 
         // Test the different decay rates
-        assertEquals(
-            ImmutableSet.of( // decay rate: 0
-                entry(new Int2D(0, 0), 0.0),
-                entry(new Int2D(1, 1), 1.0),
-                entry(new Int2D(2, 2), 2.0)
-            ),
-            locationValues.get(0).getValues()
-        );
+        Assertions.assertEquals(ImmutableSet.of( // decay rate: 0
+            entry(new Int2D(0, 0), 0.0),
+            entry(new Int2D(1, 1), 1.0),
+            entry(new Int2D(2, 2), 2.0)
+        ), locationValues.get(0).getValues());
         rangeClosed(1, 2).forEach(i ->
-            assertEquals(
-                ImmutableSet.of( // decay rate: 0.5
-                    entry(new Int2D(0, 0), 0.0),
-                    entry(new Int2D(1, 1), 0.5),
-                    entry(new Int2D(2, 2), 1.0)
-                ),
-                locationValues.get(i).getValues()
-            ));
-        assertEquals(
-            ImmutableSet.of( // decay rate: 1.0
+            Assertions.assertEquals(ImmutableSet.of( // decay rate: 0.5
                 entry(new Int2D(0, 0), 0.0),
-                entry(new Int2D(1, 1), 0.0),
-                entry(new Int2D(2, 2), 0.0)
-            ),
-            locationValues.get(3).getValues()
-        );
+                entry(new Int2D(1, 1), 0.5),
+                entry(new Int2D(2, 2), 1.0)
+            ), locationValues.get(i).getValues()));
+        Assertions.assertEquals(ImmutableSet.of( // decay rate: 1.0
+            entry(new Int2D(0, 0), 0.0),
+            entry(new Int2D(1, 1), 0.0),
+            entry(new Int2D(2, 2), 0.0)
+        ), locationValues.get(3).getValues());
 
         final Catch caught = new Catch(specie, 1000, globalBiology);
 
@@ -142,13 +130,13 @@ public class SetLocationValuesTest {
         });
 
         delValues.observe(biomassDolphinSetAction);
-        assertEquals(1000.0, delValues.getValueAt(3, 3));
+        Assertions.assertEquals(1000.0, delValues.getValueAt(3, 3), 0.0);
 
         final Fad fad = mock(BiomassAggregatingFad.class);
         when(fadSetAction.getFad()).thenReturn(fad);
         when(fad.getLocationDeployed()).thenReturn(new Int2D(3, 3));
         dplValues.observe(fadSetAction);
-        assertEquals(1000.0, dplValues.getValueAt(3, 3));
+        Assertions.assertEquals(1000.0, dplValues.getValueAt(3, 3), 0.0);
 
     }
 

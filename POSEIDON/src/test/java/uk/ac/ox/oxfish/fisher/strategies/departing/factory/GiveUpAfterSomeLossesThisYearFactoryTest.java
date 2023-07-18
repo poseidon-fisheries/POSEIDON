@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.GiveUpAfterSomeLossesThisYearDecorator;
@@ -7,9 +8,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class GiveUpAfterSomeLossesThisYearFactoryTest {
 
@@ -33,7 +31,7 @@ public class GiveUpAfterSomeLossesThisYearFactoryTest {
         for (int i = 0; i < 150; i++)
             state.schedule.step(state);
 
-        assertTrue(state.getLatestDailyObservation("Fishers at Sea") > 0);
+        Assertions.assertTrue(state.getLatestDailyObservation("Fishers at Sea") > 0);
 
 
     }
@@ -62,12 +60,12 @@ public class GiveUpAfterSomeLossesThisYearFactoryTest {
         for (int i = 0; i < 150; i++)
             state.schedule.step(state);
 
-        assertEquals(state.getLatestDailyObservation("Fishers at Sea"), 0, .0001);
+        Assertions.assertEquals(state.getLatestDailyObservation("Fishers at Sea"), 0, .0001);
         //rests at the beginning of the year
         while (state.getYear() < 1)
             state.schedule.step(state);
         state.schedule.step(state);
-        assertTrue(state.getLatestDailyObservation("Fishers at Sea") > 0);
+        Assertions.assertTrue(state.getLatestDailyObservation("Fishers at Sea") > 0);
 
 
     }
@@ -104,7 +102,7 @@ public class GiveUpAfterSomeLossesThisYearFactoryTest {
         }
         // assertEquals(state.getLatestDailyObservation("Fishers at Sea"), 0,.0001);
 
-        assertTrue(state.getLatestDailyObservation("Fishers at Sea") > 0);
+        Assertions.assertTrue(state.getLatestDailyObservation("Fishers at Sea") > 0);
 
 
     }

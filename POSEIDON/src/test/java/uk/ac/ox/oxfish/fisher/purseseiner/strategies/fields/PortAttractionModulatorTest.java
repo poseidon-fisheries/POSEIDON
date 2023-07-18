@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
@@ -26,7 +27,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinat
 import uk.ac.ox.oxfish.utility.operators.LogisticFunction;
 
 import static java.lang.Double.MAX_VALUE;
-import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,13 +52,13 @@ public class PortAttractionModulatorTest {
 
         when(fisher.getHoursAtSea()).thenReturn(0.0);
         when(hold.getPercentageFilled()).thenReturn(0.0);
-        assertEquals(0.0, modulator.modulate(fisher));
+        Assertions.assertEquals(0.0, modulator.modulate(fisher), 0.0);
 
         when(fisher.getHoursAtSea()).thenReturn(0.5);
-        assertEquals(0.5, modulator.modulate(fisher));
+        Assertions.assertEquals(0.5, modulator.modulate(fisher), 0.0);
 
         when(hold.getPercentageFilled()).thenReturn(1.0);
-        assertEquals(1.0, modulator.modulate(fisher));
+        Assertions.assertEquals(1.0, modulator.modulate(fisher), 0.0);
 
     }
 

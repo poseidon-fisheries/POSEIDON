@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.biology;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
@@ -50,13 +50,13 @@ public class SingleSpeciesLogisticDelayGrowthBiologyTest {
         for (int i = 0; i < 10; i++)
             biology.step(mock(FishState.class));
 
-        Assert.assertEquals(1020, biology.getBiomass(aaa), .0001);
+        Assertions.assertEquals(1020, biology.getBiomass(aaa), .0001);
 
         //another 10 years and you hit the max
         for (int i = 0; i < 10; i++)
             biology.step(mock(FishState.class));
 
-        Assert.assertEquals(1032, biology.getBiomass(aaa), .0001);
+        Assertions.assertEquals(1032, biology.getBiomass(aaa), .0001);
 
 
     }
@@ -75,20 +75,20 @@ public class SingleSpeciesLogisticDelayGrowthBiologyTest {
             3
 
         );
-        Assert.assertEquals(1000, biology.getBiomass(aaa), .0001);
+        Assertions.assertEquals(1000, biology.getBiomass(aaa), .0001);
         final GlobalBiology global = mock(GlobalBiology.class);
         when(global.getSize()).thenReturn(1);
         biology.reactToThisAmountOfBiomassBeingFished(new Catch(aaa, 200, global),
             null, global
         );
-        Assert.assertEquals(800, biology.getBiomass(aaa), .0001);
+        Assertions.assertEquals(800, biology.getBiomass(aaa), .0001);
 
 
         //step it for 10 years
         for (int i = 0; i < 10; i++)
             biology.step(mock(FishState.class));
 
-        Assert.assertEquals(829.8954875892, biology.getBiomass(aaa), .001);
+        Assertions.assertEquals(829.8954875892, biology.getBiomass(aaa), .001);
 
 
     }

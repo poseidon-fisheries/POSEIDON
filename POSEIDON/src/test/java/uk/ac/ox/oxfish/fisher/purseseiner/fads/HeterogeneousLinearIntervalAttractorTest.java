@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -34,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class HeterogeneousLinearIntervalAttractorTest {
@@ -109,16 +109,14 @@ public class HeterogeneousLinearIntervalAttractorTest {
 
 
         final WeightedObject<AbundanceLocalBiology> attracted = attractor.attractImplementation(localBiology, fad);
-        assertEquals(attracted.getTotalWeight(),
-            80.0, .0001
-        );
+        Assertions.assertEquals(attracted.getTotalWeight(), 80.0, .0001);
 
-        assertEquals(attracted.getObjectBeingWeighted().getAbundance(species).getAbundance(0, 0),
-            80 * 10d / 12d, .0001
-        );
-        assertEquals(attracted.getObjectBeingWeighted().getAbundance(species).getAbundance(0, 1),
-            80d / 12d, .0001
-        );
+        Assertions.assertEquals(attracted.getObjectBeingWeighted().getAbundance(species).getAbundance(0, 0),
+            80 * 10d / 12d,
+            .0001);
+        Assertions.assertEquals(attracted.getObjectBeingWeighted().getAbundance(species).getAbundance(0, 1),
+            80d / 12d,
+            .0001);
 
     }
 
@@ -213,28 +211,30 @@ public class HeterogeneousLinearIntervalAttractorTest {
 
 
         final WeightedObject<AbundanceLocalBiology> attracted = attractor.attractImplementation(localBiology, fad);
-        assertEquals(attracted.getTotalWeight(),
-            120, .0001
-        );
+        Assertions.assertEquals(attracted.getTotalWeight(), 120, .0001);
 
-        assertEquals(attracted.getObjectBeingWeighted().getAbundance(allSpecies.get(0)).getAbundance(0, 0),
-            0, .0001
+        Assertions.assertEquals(
+            attracted.getObjectBeingWeighted().getAbundance(allSpecies.get(0)).getAbundance(0, 0),
+            0,
+            .0001
         );
-        assertEquals(attracted.getObjectBeingWeighted().getAbundance(allSpecies.get(0)).getAbundance(0, 1),
-            0, .0001
+        Assertions.assertEquals(
+            attracted.getObjectBeingWeighted().getAbundance(allSpecies.get(0)).getAbundance(0, 1),
+            0,
+            .0001
         );
-        assertEquals(attracted.getObjectBeingWeighted().getAbundance(allSpecies.get(1)).getAbundance(0, 0),
-            80 * 10d / 12d, .0001
-        );
-        assertEquals(attracted.getObjectBeingWeighted().getAbundance(allSpecies.get(1)).getAbundance(0, 1),
-            80d / 12d, .0001
-        );
-        assertEquals(attracted.getObjectBeingWeighted().getAbundance(allSpecies.get(2)).getAbundance(0, 0),
-            40 * 10d / 12d, .0001
-        );
-        assertEquals(attracted.getObjectBeingWeighted().getAbundance(allSpecies.get(2)).getAbundance(0, 1),
-            40d / 12d, .0001
-        );
+        Assertions.assertEquals(attracted.getObjectBeingWeighted().getAbundance(allSpecies.get(1)).getAbundance(0, 0),
+            80 * 10d / 12d,
+            .0001);
+        Assertions.assertEquals(attracted.getObjectBeingWeighted().getAbundance(allSpecies.get(1)).getAbundance(0, 1),
+            80d / 12d,
+            .0001);
+        Assertions.assertEquals(attracted.getObjectBeingWeighted().getAbundance(allSpecies.get(2)).getAbundance(0, 0),
+            40 * 10d / 12d,
+            .0001);
+        Assertions.assertEquals(attracted.getObjectBeingWeighted().getAbundance(allSpecies.get(2)).getAbundance(0, 1),
+            40d / 12d,
+            .0001);
 
     }
 
@@ -294,9 +294,7 @@ public class HeterogeneousLinearIntervalAttractorTest {
         when(state.getDay()).thenReturn(3);
         when(fad.isActive()).thenReturn(true);
 
-        assertNull(
-            attractor.attractImplementation(localBiology, fad)
-        );
+        Assertions.assertNull(attractor.attractImplementation(localBiology, fad));
 
         //too full
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{999999});
@@ -311,9 +309,7 @@ public class HeterogeneousLinearIntervalAttractorTest {
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(99999999);
 
-        assertNull(
-            attractor.attractImplementation(localBiology, fad)
-        );
+        Assertions.assertNull(attractor.attractImplementation(localBiology, fad));
 
         //empty local biology
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{0});
@@ -328,9 +324,7 @@ public class HeterogeneousLinearIntervalAttractorTest {
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(99999999);
 
-        assertNull(
-            attractor.attractImplementation(localBiology, fad)
-        );
+        Assertions.assertNull(attractor.attractImplementation(localBiology, fad));
 
         //valid
         when(fadBiology.getCurrentBiomass()).thenReturn(new double[]{0});
@@ -345,9 +339,7 @@ public class HeterogeneousLinearIntervalAttractorTest {
         when(fad.getStepDeployed()).thenReturn(1);
         when(state.getDay()).thenReturn(99999999);
 
-        assertNotNull(
-            attractor.attractImplementation(localBiology, fad)
-        );
+        Assertions.assertNotNull(attractor.attractImplementation(localBiology, fad));
     }
 
 

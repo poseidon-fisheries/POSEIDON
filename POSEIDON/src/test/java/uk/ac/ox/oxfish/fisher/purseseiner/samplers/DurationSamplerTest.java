@@ -20,12 +20,12 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.DoubleSupplier;
 
 import static java.lang.Math.E;
-import static junit.framework.TestCase.assertEquals;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class DurationSamplerTest {
@@ -39,11 +39,7 @@ public class DurationSamplerTest {
             Double.MIN_VALUE
         );
 
-        assertEquals(
-            E,
-            durationSampler.getAsDouble(),
-            EPSILON
-        );
+        Assertions.assertEquals(E, durationSampler.getAsDouble(), EPSILON);
     }
 
 }

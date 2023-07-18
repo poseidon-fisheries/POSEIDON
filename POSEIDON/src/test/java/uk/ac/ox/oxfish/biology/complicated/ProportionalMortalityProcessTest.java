@@ -20,9 +20,9 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,11 +48,7 @@ public class ProportionalMortalityProcessTest {
         );
 
 
-        assertArrayEquals(
-            abundance.asMatrix()[0],
-            new double[]{90, 9, .9},
-            .001d
-        );
+        Assertions.assertArrayEquals(abundance.asMatrix()[0], new double[]{90, 9, .9}, .001d);
     }
 
 
@@ -82,10 +78,6 @@ public class ProportionalMortalityProcessTest {
         }
 
 
-        assertArrayEquals(
-            abundance.asMatrix()[0],
-            new double[]{50, 5, .5},
-            .001d
-        );
+        Assertions.assertArrayEquals(abundance.asMatrix()[0], new double[]{50, 5, .5}, .001d);
     }
 }

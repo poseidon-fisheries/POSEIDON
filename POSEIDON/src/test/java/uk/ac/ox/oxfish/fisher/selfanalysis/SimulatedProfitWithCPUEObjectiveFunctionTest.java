@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.FixedProportionGear;
@@ -10,8 +11,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class SimulatedProfitWithCPUEObjectiveFunctionTest {
@@ -30,8 +29,8 @@ public class SimulatedProfitWithCPUEObjectiveFunctionTest {
 
         ObjectiveFunction<Fisher> function = new SimulatedProfitWithCPUEObjectiveFunction(10);
         //no trip, it should be NaN
-        assertTrue(Double.isNaN(function.computeCurrentFitness(observer, observed)));
-        assertTrue(Double.isNaN(function.computeCurrentFitness(observer, observer)));
+        Assertions.assertTrue(Double.isNaN(function.computeCurrentFitness(observer, observed)));
+        Assertions.assertTrue(Double.isNaN(function.computeCurrentFitness(observer, observer)));
 
 
     }
@@ -62,7 +61,7 @@ public class SimulatedProfitWithCPUEObjectiveFunctionTest {
             simulation
         );
         //the trip "profits" will be just .1 + .1
-        assertEquals(.2, (function).computeCurrentFitness(observer, observed), .001);
+        Assertions.assertEquals(.2, (function).computeCurrentFitness(observer, observed), .001);
 
     }
 
@@ -95,7 +94,7 @@ public class SimulatedProfitWithCPUEObjectiveFunctionTest {
             simulation
         );
         //the trip "profits" will be just .2 + .2 (basically it's doubled by the fact that the fisher1 is more efficient)
-        assertEquals(.4, (function).computeCurrentFitness(observer, observed), .001);
+        Assertions.assertEquals(.4, (function).computeCurrentFitness(observer, observed), .001);
 
     }
 

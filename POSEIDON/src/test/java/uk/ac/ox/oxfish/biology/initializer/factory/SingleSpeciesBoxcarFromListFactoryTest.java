@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.biology.initializer.factory;
 import ec.util.MersenneTwisterFast;
 import org.jfree.util.Log;
 import org.jfree.util.LogTarget;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
@@ -32,12 +33,8 @@ public class SingleSpeciesBoxcarFromListFactoryTest {
             getInitialAbundance().getInitialAbundance()));
 
 
-        assertArrayEquals(
-            equalSpaced.
-                getInitialAbundance().getInitialAbundance()[0],
-            populationArray,
-            .1
-        );
+        Assertions.assertArrayEquals(equalSpaced.
+            getInitialAbundance().getInitialAbundance()[0], populationArray, .1);
     }
 
     private SingleSpeciesAbundanceInitializer buildPopulation(final double[] populationArray) {
@@ -67,14 +64,14 @@ public class SingleSpeciesBoxcarFromListFactoryTest {
 
         final double[] populationArray = new double[2];
         assertThrows(
-            "bins do not reach even half of L_infinity. The biology is inconsistent!",
             IllegalArgumentException.class,
-            () -> buildPopulation(populationArray)
+            () -> buildPopulation(populationArray),
+            "bins do not reach even half of L_infinity. The biology is inconsistent!"
         );
 
         final ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
         verify(logTarget).log(anyInt(), captor.capture());
-        assertTrue(captor.getAllValues().contains(
+        Assertions.assertTrue(captor.getAllValues().contains(
             "The number of bins provided given their width won't reach l-infinity..."
         ));
 

@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model.market;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -43,19 +43,19 @@ public class ConditionalMarketTest {
         TradeInfo tradeInfo = market.sellFish(hold, mock(Fisher.class), new Anarchy(), mock(FishState.class),
             species
         );
-        Assert.assertEquals(tradeInfo.getMoneyExchanged(), 10, .001);
+        Assertions.assertEquals(tradeInfo.getMoneyExchanged(), 10, .001);
 
         tradeInfo = market.sellFish(hold, one, new Anarchy(), mock(FishState.class),
             species
         );
-        Assert.assertEquals(tradeInfo.getMoneyExchanged(), 10, .001);
+        Assertions.assertEquals(tradeInfo.getMoneyExchanged(), 10, .001);
 
         //but fisher two has access to better market
 
         tradeInfo = market.sellFish(hold, two, new Anarchy(), mock(FishState.class),
             species
         );
-        Assert.assertEquals(tradeInfo.getMoneyExchanged(), 20, .001);
+        Assertions.assertEquals(tradeInfo.getMoneyExchanged(), 20, .001);
 
 
     }

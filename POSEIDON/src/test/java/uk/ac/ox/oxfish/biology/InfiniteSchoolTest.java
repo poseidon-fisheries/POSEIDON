@@ -20,11 +20,11 @@
 
 package uk.ac.ox.oxfish.biology;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.*;
 import static uk.ac.ox.oxfish.fisher.actions.MovingTest.generateSimple4x4Map;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
@@ -40,30 +40,30 @@ public class InfiniteSchoolTest {
         final NauticalMap map = state.getMap();
 
         final InfiniteSchool school = new InfiniteSchool(1, 1, 1, 0, 100, null, entry(0, 0), entry(3, 3));
-        assertTrue(school.contains(map.getSeaTile(1, 1)));
-        assertFalse(school.contains(map.getSeaTile(0, 0)));
-        assertFalse(school.contains(map.getSeaTile(2, 2)));
-        assertFalse(school.contains(map.getSeaTile(1, 2)));
-        assertFalse(school.contains(map.getSeaTile(2, 1)));
-        assertFalse(school.contains(map.getSeaTile(1, 0)));
-        assertFalse(school.contains(map.getSeaTile(0, 1)));
+        Assertions.assertTrue(school.contains(map.getSeaTile(1, 1)));
+        Assertions.assertFalse(school.contains(map.getSeaTile(0, 0)));
+        Assertions.assertFalse(school.contains(map.getSeaTile(2, 2)));
+        Assertions.assertFalse(school.contains(map.getSeaTile(1, 2)));
+        Assertions.assertFalse(school.contains(map.getSeaTile(2, 1)));
+        Assertions.assertFalse(school.contains(map.getSeaTile(1, 0)));
+        Assertions.assertFalse(school.contains(map.getSeaTile(0, 1)));
 
 
         school.step(state);
-        assertEquals(school.getPositionX(), 0);
-        assertEquals(school.getPositionY(), 0);
+        Assertions.assertEquals(school.getPositionX(), 0);
+        Assertions.assertEquals(school.getPositionY(), 0);
         school.step(state);
-        assertEquals(school.getPositionX(), 1);
-        assertEquals(school.getPositionY(), 1);
+        Assertions.assertEquals(school.getPositionX(), 1);
+        Assertions.assertEquals(school.getPositionY(), 1);
         school.step(state);
-        assertEquals(school.getPositionX(), 2);
-        assertEquals(school.getPositionY(), 2);
+        Assertions.assertEquals(school.getPositionX(), 2);
+        Assertions.assertEquals(school.getPositionY(), 2);
         school.step(state);
-        assertEquals(school.getPositionX(), 3);
-        assertEquals(school.getPositionY(), 3);
+        Assertions.assertEquals(school.getPositionX(), 3);
+        Assertions.assertEquals(school.getPositionY(), 3);
         school.step(state);
-        assertEquals(school.getPositionX(), 2);
-        assertEquals(school.getPositionY(), 2);
+        Assertions.assertEquals(school.getPositionX(), 2);
+        Assertions.assertEquals(school.getPositionY(), 2);
     }
 
 
@@ -76,15 +76,15 @@ public class InfiniteSchoolTest {
 
         //diameter 1
         final InfiniteSchool school = new InfiniteSchool(1, 1, 1, 1, 100, null, entry(0, 0), entry(3, 3));
-        assertTrue(school.contains(map.getSeaTile(1, 1)));
+        Assertions.assertTrue(school.contains(map.getSeaTile(1, 1)));
         //doesn't contain the diagonal neighbors
-        assertFalse(school.contains(map.getSeaTile(0, 0)));
-        assertFalse(school.contains(map.getSeaTile(2, 2)));
+        Assertions.assertFalse(school.contains(map.getSeaTile(0, 0)));
+        Assertions.assertFalse(school.contains(map.getSeaTile(2, 2)));
         //but contains the side ones
-        assertTrue(school.contains(map.getSeaTile(1, 2)));
-        assertTrue(school.contains(map.getSeaTile(2, 1)));
-        assertTrue(school.contains(map.getSeaTile(1, 0)));
-        assertTrue(school.contains(map.getSeaTile(0, 1)));
+        Assertions.assertTrue(school.contains(map.getSeaTile(1, 2)));
+        Assertions.assertTrue(school.contains(map.getSeaTile(2, 1)));
+        Assertions.assertTrue(school.contains(map.getSeaTile(1, 0)));
+        Assertions.assertTrue(school.contains(map.getSeaTile(0, 1)));
 
 
     }
@@ -102,18 +102,18 @@ public class InfiniteSchoolTest {
 
 
         school.step(state);
-        assertEquals(school.getPositionX(), 1);
-        assertEquals(school.getPositionY(), 1);
+        Assertions.assertEquals(school.getPositionX(), 1);
+        Assertions.assertEquals(school.getPositionY(), 1);
         school.step(state);
-        assertEquals(school.getPositionX(), 0);
-        assertEquals(school.getPositionY(), 0);
+        Assertions.assertEquals(school.getPositionX(), 0);
+        Assertions.assertEquals(school.getPositionY(), 0);
         school.step(state);
-        assertEquals(school.getPositionX(), 0);
-        assertEquals(school.getPositionY(), 0);
+        Assertions.assertEquals(school.getPositionX(), 0);
+        Assertions.assertEquals(school.getPositionY(), 0);
         school.step(state);
 
-        assertEquals(school.getPositionX(), 1);
-        assertEquals(school.getPositionY(), 1);
+        Assertions.assertEquals(school.getPositionX(), 1);
+        Assertions.assertEquals(school.getPositionY(), 1);
 
     }
 }

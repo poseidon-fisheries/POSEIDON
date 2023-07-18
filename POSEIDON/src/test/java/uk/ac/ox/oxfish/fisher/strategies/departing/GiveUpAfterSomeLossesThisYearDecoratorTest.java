@@ -1,11 +1,11 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,16 +36,16 @@ public class GiveUpAfterSomeLossesThisYearDecoratorTest {
             goodTrip,
             fake
         );
-        assertEquals(decorator.getBadTrips(), 0);
-        assertEquals(decorator.isGivenUp(), false);
+        Assertions.assertEquals(decorator.getBadTrips(), 0);
+        Assertions.assertEquals(decorator.isGivenUp(), false);
 
         for (int i = 0; i < 2; i++) {
             decorator.reactToFinishedTrip(
                 badTrip,
                 fake
             );
-            assertEquals(decorator.getBadTrips(), i + 1);
-            assertEquals(decorator.isGivenUp(), false);
+            Assertions.assertEquals(decorator.getBadTrips(), i + 1);
+            Assertions.assertEquals(decorator.isGivenUp(), false);
         }
 
         decorator.reset();
@@ -55,15 +55,15 @@ public class GiveUpAfterSomeLossesThisYearDecoratorTest {
                 badTrip,
                 fake
             );
-            assertEquals(decorator.getBadTrips(), i + 1);
-            assertEquals(decorator.isGivenUp(), false);
+            Assertions.assertEquals(decorator.getBadTrips(), i + 1);
+            Assertions.assertEquals(decorator.isGivenUp(), false);
         }
         decorator.reactToFinishedTrip(
             badTrip,
             fake
         );
-        assertEquals(decorator.getBadTrips(), 3);
-        assertEquals(decorator.isGivenUp(), true);
+        Assertions.assertEquals(decorator.getBadTrips(), 3);
+        Assertions.assertEquals(decorator.isGivenUp(), true);
 
 
     }

@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
 import com.google.common.collect.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.ports.Port;
@@ -28,7 +29,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -64,28 +64,28 @@ public class SingleSpeciesBiomassTaxmanTest {
         //there is biomass of 101, no tax should be imposed
         when(model.getTotalBiomass(species)).thenReturn(101d);
         taxman.step(model);
-        assertEquals(30, marketMap1.getMarket(species).getMarginalPrice(), .0001);
-        assertEquals(10, marketMap2.getMarket(species).getMarginalPrice(), .0001);
+        Assertions.assertEquals(30, marketMap1.getMarket(species).getMarginalPrice(), .0001);
+        Assertions.assertEquals(10, marketMap2.getMarket(species).getMarginalPrice(), .0001);
         //there is biomass of 99, tax should be imposed!
         when(model.getTotalBiomass(species)).thenReturn(99d);
         taxman.step(model);
-        assertEquals(25, marketMap1.getMarket(species).getMarginalPrice(), .0001);
-        assertEquals(5, marketMap2.getMarket(species).getMarginalPrice(), .0001);
+        Assertions.assertEquals(25, marketMap1.getMarket(species).getMarginalPrice(), .0001);
+        Assertions.assertEquals(5, marketMap2.getMarket(species).getMarginalPrice(), .0001);
         //biomass drops to 98, the tax remains
         when(model.getTotalBiomass(species)).thenReturn(98d);
         taxman.step(model);
-        assertEquals(25, marketMap1.getMarket(species).getMarginalPrice(), .0001);
-        assertEquals(5, marketMap2.getMarket(species).getMarginalPrice(), .0001);
+        Assertions.assertEquals(25, marketMap1.getMarket(species).getMarginalPrice(), .0001);
+        Assertions.assertEquals(5, marketMap2.getMarket(species).getMarginalPrice(), .0001);
         //biomass goes back to 101, tax is taken away
         when(model.getTotalBiomass(species)).thenReturn(101d);
         taxman.step(model);
-        assertEquals(30, marketMap1.getMarket(species).getMarginalPrice(), .0001);
-        assertEquals(10, marketMap2.getMarket(species).getMarginalPrice(), .0001);
+        Assertions.assertEquals(30, marketMap1.getMarket(species).getMarginalPrice(), .0001);
+        Assertions.assertEquals(10, marketMap2.getMarket(species).getMarginalPrice(), .0001);
         //biomass goes to 102, no tax
         when(model.getTotalBiomass(species)).thenReturn(102d);
         taxman.step(model);
-        assertEquals(30, marketMap1.getMarket(species).getMarginalPrice(), .0001);
-        assertEquals(10, marketMap2.getMarket(species).getMarginalPrice(), .0001);
+        Assertions.assertEquals(30, marketMap1.getMarket(species).getMarginalPrice(), .0001);
+        Assertions.assertEquals(10, marketMap2.getMarket(species).getMarginalPrice(), .0001);
 
     }
 }

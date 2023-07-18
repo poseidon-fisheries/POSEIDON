@@ -21,9 +21,8 @@
 package uk.ac.ox.oxfish.utility;
 
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 12/2/16.
@@ -36,12 +35,12 @@ public class SeasonTest {
 
         Log.info("Tests that seasons are assigned correctly given the day number");
 
-        assertEquals(Season.WINTER, Season.season(1));
-        assertEquals(Season.WINTER, Season.season(40));
-        assertEquals(Season.WINTER, Season.season(360));
-        assertEquals(Season.SPRING, Season.season(90));
-        assertEquals(Season.FALL, Season.season(280));
-        assertEquals(Season.SUMMER, Season.season(190));
+        Assertions.assertEquals(Season.WINTER, Season.season(1));
+        Assertions.assertEquals(Season.WINTER, Season.season(40));
+        Assertions.assertEquals(Season.WINTER, Season.season(360));
+        Assertions.assertEquals(Season.SPRING, Season.season(90));
+        Assertions.assertEquals(Season.FALL, Season.season(280));
+        Assertions.assertEquals(Season.SUMMER, Season.season(190));
 
 
     }

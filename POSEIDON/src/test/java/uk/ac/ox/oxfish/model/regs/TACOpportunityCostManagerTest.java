@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.model.regs;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
@@ -30,7 +31,6 @@ import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 
@@ -74,7 +74,7 @@ public class TACOpportunityCostManagerTest {
 
 
         //so now it should have learned that there is 1 unit of catch a day on average
-        assertEquals(1d, manager.predictedHourlyCatches(0), .0001);
+        Assertions.assertEquals(1d, manager.predictedHourlyCatches(0), .0001);
 
         //now tell him that this dude has caught 10 fish in 20 hours
         TripRecord newRecord = mock(TripRecord.class);

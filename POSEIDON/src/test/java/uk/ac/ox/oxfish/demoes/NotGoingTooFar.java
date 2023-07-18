@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
@@ -83,7 +83,7 @@ public class NotGoingTooFar {
         }
 
         System.out.println(bestTows + " ---- " + worstTows + " ---- " + limitX);
-        Assert.assertTrue(bestTows > 9 * worstTows);
+        Assertions.assertTrue(bestTows > 9 * worstTows);
 
 
     }

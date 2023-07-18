@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.erotetic;
 
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -30,8 +31,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 
@@ -75,7 +74,7 @@ public class ThresholdAnswerTest {
             mock(Fisher.class)
         );
 
-        assertTrue(selected == null || selected.isEmpty());
+        Assertions.assertTrue(selected == null || selected.isEmpty());
 
     }
 
@@ -99,7 +98,7 @@ public class ThresholdAnswerTest {
             mock(Fisher.class)
         );
 
-        assertTrue(selected == null || selected.isEmpty());
+        Assertions.assertTrue(selected == null || selected.isEmpty());
 
     }
 
@@ -124,7 +123,7 @@ public class ThresholdAnswerTest {
 
         );
 
-        assertEquals(selected.size(), 3);
+        Assertions.assertEquals(selected.size(), 3);
 
     }
 
@@ -147,7 +146,7 @@ public class ThresholdAnswerTest {
             mock(Fisher.class)
         );
 
-        assertEquals(selected.size(), 1);
+        Assertions.assertEquals(selected.size(), 1);
 
     }
 }

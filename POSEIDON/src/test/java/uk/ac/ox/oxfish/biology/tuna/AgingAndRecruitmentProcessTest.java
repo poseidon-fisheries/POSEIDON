@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -12,7 +13,6 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
@@ -84,10 +84,8 @@ public class AgingAndRecruitmentProcessTest {
 //        dumbiomass = localBio.getBiomass(species1);
         //        }
 
-        assertEquals(localBio.getAbundance(species1).getAbundance(0, 0), 786573.430
-            , 0.01);
-        assertEquals(localBio.getAbundance(species1).getAbundance(0, 1), 10000
-            , 0.01);
+        Assertions.assertEquals(localBio.getAbundance(species1).getAbundance(0, 0), 786573.430, 0.01);
+        Assertions.assertEquals(localBio.getAbundance(species1).getAbundance(0, 1), 10000, 0.01);
 
     }
 }

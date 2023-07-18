@@ -20,12 +20,11 @@
 
 package uk.ac.ox.oxfish.model.market.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 8/31/16.
@@ -53,8 +52,8 @@ public class ArrayFixedPriceMarketTest {
             state.getSpecies().get(0)).getMarginalPrice();
         double secondPrice = state.getPorts().iterator().next().getDefaultMarketMap().getMarket(
             state.getSpecies().get(1)).getMarginalPrice();
-        assertEquals(firstPrice, 20, .0001);
-        assertEquals(secondPrice, -10, .0001);
+        Assertions.assertEquals(firstPrice, 20, .0001);
+        Assertions.assertEquals(secondPrice, -10, .0001);
 
 
     }

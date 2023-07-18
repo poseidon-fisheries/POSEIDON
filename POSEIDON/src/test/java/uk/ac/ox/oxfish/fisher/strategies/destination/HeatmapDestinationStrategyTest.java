@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
@@ -32,8 +33,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.probability.FixedProbability;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -181,20 +180,14 @@ public class HeatmapDestinationStrategyTest {
 
 
         final SeaTile optimal = mock(SeaTile.class);
-        assertNotEquals(
-            strategy.getFavoriteSpot(),
-            optimal
-        );
+        Assertions.assertNotEquals(strategy.getFavoriteSpot(), optimal);
         when(optimal.isWater()).thenReturn(true);
         when(optimizer.pick(any(), any(), any(), any(), any())).thenReturn(optimal);
         strategy.reactToFinishedTrip(
             mock(TripRecord.class, RETURNS_DEEP_STUBS),
             mock(Fisher.class, RETURNS_DEEP_STUBS)
         );
-        assertEquals(
-            strategy.getFavoriteSpot(),
-            optimal
-        );
+        Assertions.assertEquals(strategy.getFavoriteSpot(), optimal);
 
 
     }

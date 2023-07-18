@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripObjective;
@@ -38,8 +39,6 @@ import uk.ac.ox.oxfish.utility.bandit.EpsilonGreedyBanditAlgorithm;
 
 import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -83,7 +82,7 @@ public class BanditDestinationStrategyTest {
         }
 
         ((EpsilonGreedyBanditAlgorithm) strategy.getAlgorithm()).setExplorationProbability(0);
-        assertEquals(2, strategy.getAlgorithm().chooseArm(randomizer));
+        Assertions.assertEquals(2, strategy.getAlgorithm().chooseArm(randomizer));
     }
 
 
@@ -126,6 +125,6 @@ public class BanditDestinationStrategyTest {
         System.out.println(FishStateUtilities.deepToStringArray(chosen, ",", "\n"));
         for (int x = 0; x < 3; x++)
             for (int y = 0; y < 3; y++)
-                assertTrue(chosen[x][y] > 50);
+                Assertions.assertTrue(chosen[x][y] > 50);
     }
 }

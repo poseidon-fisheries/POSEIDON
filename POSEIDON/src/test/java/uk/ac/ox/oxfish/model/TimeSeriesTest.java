@@ -20,11 +20,11 @@
 
 package uk.ac.ox.oxfish.model;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
@@ -47,25 +47,25 @@ public class TimeSeriesTest {
         gatherer.step(state);
         gatherer.step(state);
 
-        assertEquals(gatherer.numberOfObservations(), 2);
-        assertEquals(gatherer.getColumn("column1").get(0), 12345, .0001);
-        assertEquals(gatherer.getColumn("column1").get(1), 12345, .0001);
-        assertEquals(gatherer.getColumn("column2").get(0), 1, .0001);
-        assertEquals(gatherer.getColumn("column2").get(1), 1, .0001);
+        Assertions.assertEquals(gatherer.numberOfObservations(), 2);
+        Assertions.assertEquals(gatherer.getColumn("column1").get(0), 12345, .0001);
+        Assertions.assertEquals(gatherer.getColumn("column1").get(1), 12345, .0001);
+        Assertions.assertEquals(gatherer.getColumn("column2").get(0), 1, .0001);
+        Assertions.assertEquals(gatherer.getColumn("column2").get(1), 1, .0001);
 
         gatherer.registerGatherer("column3", s -> Double.valueOf(s.substring(1, 2)), -1);
         //      assertEquals(gatherer.getNumberOfColumns(), 3);
         //old stuff hasn't changed, hopefully
-        assertEquals(gatherer.numberOfObservations(), 2);
-        assertEquals(gatherer.getColumn("column2").get(0), 1, .0001);
-        assertEquals(gatherer.getColumn("column2").get(1), 1, .0001);
+        Assertions.assertEquals(gatherer.numberOfObservations(), 2);
+        Assertions.assertEquals(gatherer.getColumn("column2").get(0), 1, .0001);
+        Assertions.assertEquals(gatherer.getColumn("column2").get(1), 1, .0001);
         //new stuff is filled with default
-        assertEquals(gatherer.getColumn("column3").get(0), -1, .0001);
-        assertEquals(gatherer.getColumn("column3").get(1), -1, .0001);
+        Assertions.assertEquals(gatherer.getColumn("column3").get(0), -1, .0001);
+        Assertions.assertEquals(gatherer.getColumn("column3").get(1), -1, .0001);
 
         //and it collects
         gatherer.step(state);
-        assertEquals(gatherer.numberOfObservations(), 3);
-        assertEquals(gatherer.getColumn("column3").get(2), 2, .0001);
+        Assertions.assertEquals(gatherer.numberOfObservations(), 3);
+        Assertions.assertEquals(gatherer.getColumn("column3").get(2), 2, .0001);
     }
 }

@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractors;
@@ -46,8 +46,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -95,13 +93,13 @@ public class SNALSARDestinationStrategyTest {
             if (strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
-                assertEquals(strategy.getFavoriteSpot(), (option2));
+                Assertions.assertEquals(strategy.getFavoriteSpot(), (option2));
                 timesOption2WasChosen++;
             }
 
         }
-        assertTrue(timesOption1WasChosen > 10);
-        assertTrue(timesOption2WasChosen > 10);
+        Assertions.assertTrue(timesOption1WasChosen > 10);
+        Assertions.assertTrue(timesOption2WasChosen > 10);
 
     }
 
@@ -193,13 +191,13 @@ public class SNALSARDestinationStrategyTest {
             if (strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
-                assertEquals(strategy.getFavoriteSpot(), (option2));
+                Assertions.assertEquals(strategy.getFavoriteSpot(), (option2));
                 timesOption2WasChosen++;
             }
 
         }
-        assertEquals(100, timesOption1WasChosen);
-        assertEquals(0, timesOption2WasChosen);
+        Assertions.assertEquals(100, timesOption1WasChosen);
+        Assertions.assertEquals(0, timesOption2WasChosen);
 
     }
 
@@ -253,13 +251,13 @@ public class SNALSARDestinationStrategyTest {
             if (strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
-                assertEquals(strategy.getFavoriteSpot(), (option2));
+                Assertions.assertEquals(strategy.getFavoriteSpot(), (option2));
                 timesOption2WasChosen++;
             }
 
         }
-        assertEquals(0, timesOption1WasChosen);
-        assertEquals(100, timesOption2WasChosen);
+        Assertions.assertEquals(0, timesOption1WasChosen);
+        Assertions.assertEquals(100, timesOption2WasChosen);
 
     }
 
@@ -301,13 +299,13 @@ public class SNALSARDestinationStrategyTest {
             if (strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
-                assertEquals(strategy.getFavoriteSpot(), (option2));
+                Assertions.assertEquals(strategy.getFavoriteSpot(), (option2));
                 timesOption2WasChosen++;
             }
 
         }
-        assertEquals(0, timesOption1WasChosen);
-        assertEquals(100, timesOption2WasChosen);
+        Assertions.assertEquals(0, timesOption1WasChosen);
+        Assertions.assertEquals(100, timesOption2WasChosen);
 
     }
 
@@ -351,7 +349,7 @@ public class SNALSARDestinationStrategyTest {
                     cheaters += state.getMap().getDailyTrawlsMap().get(0, y);
 
         }
-        assertEquals(0, cheaters, .001);
+        Assertions.assertEquals(0, cheaters, .001);
 
 
         //after 1 year they are all (> 50%) cheating
@@ -368,7 +366,7 @@ public class SNALSARDestinationStrategyTest {
             total += Arrays.stream(state.getMap().getDailyTrawlsMap().toArray()).sum();
 
         }
-        assertTrue(cheaters / total > .5);
+        Assertions.assertTrue(cheaters / total > .5);
 
     }
 
@@ -428,7 +426,7 @@ public class SNALSARDestinationStrategyTest {
         }
 
         System.out.println("North vs South : " + towsNorth / ((double) towsNorth + towsSouth));
-        Assert.assertTrue(towsNorth / ((double) towsNorth + towsSouth) > .6);
+        Assertions.assertTrue(towsNorth / ((double) towsNorth + towsSouth) > .6);
 
 
     }

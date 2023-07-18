@@ -1,13 +1,12 @@
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.DoubleSummaryStatistics;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,7 +29,7 @@ public class RecruitmentBySpawningJackKnifeMaturityWithProcessErrorTest {
         //pre-year it will return always 0
         when(mocked.getYear()).thenReturn(3);
         for (int attempts = 0; attempts < 10; attempts++) {
-            assertEquals(maker.get(), 0.0, .0001);
+            Assertions.assertEquals(maker.get(), 0.0, .0001);
         }
 
         when(mocked.getYear()).thenReturn(10);
@@ -41,8 +40,8 @@ public class RecruitmentBySpawningJackKnifeMaturityWithProcessErrorTest {
         final double averageObserved = collectorOfSamples.getAverage();
         System.out.println(averageObserved);
         //this is a bit tricky, but according to R it's unlikely to go past these values...
-        assertTrue(averageObserved >= 0.99);
-        assertTrue(averageObserved <= 1.01);
+        Assertions.assertTrue(averageObserved >= 0.99);
+        Assertions.assertTrue(averageObserved <= 1.01);
 
     }
 }

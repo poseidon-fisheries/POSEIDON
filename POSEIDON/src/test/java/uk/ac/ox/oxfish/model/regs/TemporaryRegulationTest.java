@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.regs;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -9,7 +10,6 @@ import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -32,7 +32,7 @@ public class TemporaryRegulationTest {
         final TemporaryRegulation temporaryRegulation =
             new TemporaryRegulation(new NoFishing(), startDay, endDay);
         cases.forEach((day, expected) ->
-            assertEquals("on day " + day, expected, temporaryRegulation.appliesOn(day))
+            Assertions.assertEquals(expected, temporaryRegulation.appliesOn(day), "on day " + day)
         );
     }
 
@@ -76,7 +76,7 @@ public class TemporaryRegulationTest {
             new TemporaryRegulation(protectedAreasOnly, 150, 300), true
         ).forEach((reg, expected) -> {
             reg.start(state, fisher);
-            assertEquals(reg.canFishHere(fisher, tile, state), expected);
+            Assertions.assertEquals(reg.canFishHere(fisher, tile, state), expected);
         });
     }
 
@@ -103,16 +103,16 @@ public class TemporaryRegulationTest {
         final Fisher fisher = mock(Fisher.class);
         when(fisher.grabState()).thenReturn(state);
         when(state.getDayOfTheYear(anyInt())).thenReturn(10);
-        assertTrue(regulation.allowedAtSea(fisher, state));
+        Assertions.assertTrue(regulation.allowedAtSea(fisher, state));
 
         //day 150: not allowed at sea
         when(state.getDayOfTheYear(anyInt())).thenReturn(150);
-        assertFalse(regulation.allowedAtSea(fisher, state));
+        Assertions.assertFalse(regulation.allowedAtSea(fisher, state));
 
 
         //day 250: allowed at sea
         when(state.getDayOfTheYear(anyInt())).thenReturn(250);
-        assertTrue(regulation.allowedAtSea(fisher, state));
+        Assertions.assertTrue(regulation.allowedAtSea(fisher, state));
 
     }
 }

@@ -6,7 +6,7 @@ import com.google.common.collect.ObjectArrays;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
 import com.vividsolutions.jts.geom.Coordinate;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -42,7 +42,7 @@ public class EpoScenarioCustomRegionalDivisionTest {
                 .build();
 
         testPoints.forEach(((coordinate, regionName) ->
-            Assert.assertEquals(coordinate.toString(), regionName, division.getRegion(coordinate).getName())
+            Assertions.assertEquals(regionName, division.getRegion(coordinate).getName(), coordinate.toString())
         ));
 
     }

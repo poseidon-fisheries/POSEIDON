@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.demoes;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.RockyLogisticFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HabitatAwareGearFactory;
@@ -30,8 +31,6 @@ import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * A lot of fishing occurs at the border much like an MPA
@@ -91,7 +90,7 @@ public class FishTheRockyLineDemo {
 
         );
 
-        assertTrue(state.getDailyDataSet().getColumn(
+        Assertions.assertTrue(state.getDailyDataSet().getColumn(
             RockyRectanglesHabitatInitializer.BORDER_FISHING_INTENSITY).getLatest()
             > 35); //on average more than 35% of all tows happened in rocky areas
     }

@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
@@ -28,8 +29,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static org.junit.Assert.assertTrue;
 
 
 public class PerTripImitativeDestinationFactoryTest {
@@ -44,7 +43,7 @@ public class PerTripImitativeDestinationFactoryTest {
 
         int protectedTargets = protectedTargetsHit(false);
 
-        assertTrue(protectedTargets > 0);
+        Assertions.assertTrue(protectedTargets > 0);
         System.out.println(protectedTargets);
 
 
@@ -88,7 +87,7 @@ public class PerTripImitativeDestinationFactoryTest {
 
         int protectedTargets = protectedTargetsHit(true);
 
-        assertTrue(protectedTargets == 0);
+        Assertions.assertTrue(protectedTargets == 0);
         System.out.println(protectedTargets);
 
 

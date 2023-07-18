@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.model.data.monitors.regions;
 
 import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static uk.ac.ox.oxfish.model.scenario.EpoScenario.DEFAULT_MAP_EXTENT;
@@ -35,7 +35,7 @@ public class TwoByTwoRegionalDivisionTest {
                 .build();
 
         testPoints.forEach(((coordinate, regionName) ->
-            Assert.assertEquals(coordinate.toString(), regionName, division.getRegion(coordinate).getName())
+            Assertions.assertEquals(regionName, division.getRegion(coordinate).getName(), coordinate.toString())
         ));
 
     }

@@ -20,10 +20,10 @@
 
 package uk.ac.ox.oxfish.utility.adaptation.probability;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
@@ -34,24 +34,24 @@ public class DailyDecreasingProbabilityTest {
     public void decreasesCorrectly() throws Exception {
 
         final DailyDecreasingProbability probability = new DailyDecreasingProbability(1, 1, .5, .1);
-        assertEquals(probability.getExplorationProbability(), 1, .0001);
-        assertEquals(probability.getImitationProbability(), 1, .0001);
+        Assertions.assertEquals(probability.getExplorationProbability(), 1, .0001);
+        Assertions.assertEquals(probability.getImitationProbability(), 1, .0001);
 
         probability.step(mock(FishState.class));
-        assertEquals(probability.getExplorationProbability(), .5, .0001);
-        assertEquals(probability.getImitationProbability(), 1, .0001);
+        Assertions.assertEquals(probability.getExplorationProbability(), .5, .0001);
+        Assertions.assertEquals(probability.getImitationProbability(), 1, .0001);
 
         probability.step(mock(FishState.class));
-        assertEquals(probability.getExplorationProbability(), .25, .0001);
-        assertEquals(probability.getImitationProbability(), 1, .0001);
+        Assertions.assertEquals(probability.getExplorationProbability(), .25, .0001);
+        Assertions.assertEquals(probability.getImitationProbability(), 1, .0001);
 
         probability.step(mock(FishState.class));
-        assertEquals(probability.getExplorationProbability(), .125, .0001);
-        assertEquals(probability.getImitationProbability(), 1, .0001);
+        Assertions.assertEquals(probability.getExplorationProbability(), .125, .0001);
+        Assertions.assertEquals(probability.getImitationProbability(), 1, .0001);
 
         //threshold is bounding now
         probability.step(mock(FishState.class));
-        assertEquals(probability.getExplorationProbability(), .1, .0001);
-        assertEquals(probability.getImitationProbability(), 1, .0001);
+        Assertions.assertEquals(probability.getExplorationProbability(), .1, .0001);
+        Assertions.assertEquals(probability.getImitationProbability(), 1, .0001);
     }
 }

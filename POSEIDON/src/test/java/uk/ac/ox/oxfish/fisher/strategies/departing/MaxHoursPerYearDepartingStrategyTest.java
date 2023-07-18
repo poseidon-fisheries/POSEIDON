@@ -21,12 +21,11 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,10 +41,10 @@ public class MaxHoursPerYearDepartingStrategyTest {
         MaxHoursPerYearDepartingStrategy strategy = new MaxHoursPerYearDepartingStrategy(100);
         when(fisher.getHoursAtSeaThisYear()).thenReturn(50d);
 
-        assertTrue(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
+        Assertions.assertTrue(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
 
         when(fisher.getHoursAtSeaThisYear()).thenReturn(150d);
-        assertFalse(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
+        Assertions.assertFalse(strategy.shouldFisherLeavePort(fisher, mock(FishState.class), new MersenneTwisterFast()));
 
 
     }

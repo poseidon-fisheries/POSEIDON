@@ -21,12 +21,11 @@
 package uk.ac.ox.oxfish.fisher.log;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +47,7 @@ public class LocationMemoriesTest {
         //remember something
         SeaTile spot = mock(SeaTile.class);
         memories.memorize("Remember me?", spot);
-        assertEquals("Remember me?", memories.getMemory(spot));
+        Assertions.assertEquals("Remember me?", memories.getMemory(spot));
 
         //step it 9 times
         FishState mock = mock(FishState.class);
@@ -57,12 +56,12 @@ public class LocationMemoriesTest {
             memories.step(mock);
 
         //should still be there!
-        assertEquals("Remember me?", memories.getMemory(spot));
+        Assertions.assertEquals("Remember me?", memories.getMemory(spot));
         //10th time
         memories.step(mock);
 
         //now forgotten
-        assertNull(memories.getMemory(spot));
+        Assertions.assertNull(memories.getMemory(spot));
 
     }
 
@@ -79,7 +78,7 @@ public class LocationMemoriesTest {
         //remember something
         SeaTile spot = mock(SeaTile.class);
         memories.memorize("Remember me?", spot);
-        assertEquals("Remember me?", memories.getMemory(spot));
+        Assertions.assertEquals("Remember me?", memories.getMemory(spot));
 
         //step it 9 times
         FishState mock = mock(FishState.class);
@@ -89,12 +88,12 @@ public class LocationMemoriesTest {
             memories.step(mock);
 
         //should still be there!
-        assertEquals("Remember me?", memories.getMemory(spot));
+        Assertions.assertEquals("Remember me?", memories.getMemory(spot));
         //10th time
         memories.step(mock);
 
         //NOT forgetten
-        assertEquals("Remember me?", memories.getMemory(spot));
+        Assertions.assertEquals("Remember me?", memories.getMemory(spot));
 
     }
 

@@ -30,7 +30,6 @@ import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -52,23 +51,23 @@ public class NauticalMapTest {
         //open the test grid and the test mpas
 
         //now, the grid ought to be simple: the altitude increases for each element from the row
-        assertEquals(map.getRasterBathymetry().getGridWidth(), 72);
-        assertEquals(map.getRasterBathymetry().getGridHeight(), 36);
-        assertEquals(map.getSeaTile(0, 0).getAltitude(), 1, .0001);
-        assertEquals(map.getSeaTile(1, 0).getAltitude(), 2, .0001);
-        assertEquals(map.getSeaTile(71, 35).getAltitude(), 2592, .0001);
+        Assertions.assertEquals(map.getRasterBathymetry().getGridWidth(), 72);
+        Assertions.assertEquals(map.getRasterBathymetry().getGridHeight(), 36);
+        Assertions.assertEquals(map.getSeaTile(0, 0).getAltitude(), 1, .0001);
+        Assertions.assertEquals(map.getSeaTile(1, 0).getAltitude(), 2, .0001);
+        Assertions.assertEquals(map.getSeaTile(71, 35).getAltitude(), 2592, .0001);
 
 
         Coordinate coordinates = map.getCoordinates(71, 35);
         SeaTile tile = map.getSeaTile(coordinates);
-        assertEquals(71, tile.getGridX());
-        assertEquals(35, tile.getGridY());
+        Assertions.assertEquals(71, tile.getGridX());
+        Assertions.assertEquals(35, tile.getGridY());
 
 
         coordinates = map.getCoordinates(12, 13);
         tile = map.getSeaTile(coordinates);
-        assertEquals(12, tile.getGridX());
-        assertEquals(13, tile.getGridY());
+        Assertions.assertEquals(12, tile.getGridX());
+        Assertions.assertEquals(13, tile.getGridY());
 
     }
 
@@ -87,7 +86,7 @@ public class NauticalMapTest {
 
         //now, the grid ought to be simple: the altitude increases for each element from the row
         //here I assumed the distance is computed by the EquirectangularDistance object. Could change
-        assertEquals(map.distance(0, 0, 3, 3), 471.8, .1);
+        Assertions.assertEquals(map.distance(0, 0, 3, 3), 471.8, .1);
 
 
     }
@@ -103,11 +102,11 @@ public class NauticalMapTest {
         );
 
         //there is only one big square MPA in the middle. So at the borders we ought not to be protected
-        assertFalse(map.getSeaTile(0, 0).isProtected());
-        assertFalse(map.getSeaTile(1, 0).isProtected());
-        assertFalse(map.getSeaTile(71, 35).isProtected());
+        Assertions.assertFalse(map.getSeaTile(0, 0).isProtected());
+        Assertions.assertFalse(map.getSeaTile(1, 0).isProtected());
+        Assertions.assertFalse(map.getSeaTile(71, 35).isProtected());
         //but right in the middle we are
-        assertTrue(map.getSeaTile(35, 17).isProtected());
+        Assertions.assertTrue(map.getSeaTile(35, 17).isProtected());
 
 
     }
@@ -128,13 +127,13 @@ public class NauticalMapTest {
             final Port port = new Port("Port 0", map.getSeaTile(3, row), mock(MarketMap.class), 0);
             map.addPort(port);
             map.getPorts().contains(port);
-            assertEquals(map.getPortMap().getObjectLocation(port).x, 3);
-            assertEquals(map.getPortMap().getObjectLocation(port).y, row);
-            assertEquals(map.getPortMap().getObjectsAtLocation(3, row).size(), 1);
-            assertEquals(map.getPortMap().getObjectsAtLocation(3, row).get(0), port);
+            Assertions.assertEquals(map.getPortMap().getObjectLocation(port).x, 3);
+            Assertions.assertEquals(map.getPortMap().getObjectLocation(port).y, row);
+            Assertions.assertEquals(map.getPortMap().getObjectsAtLocation(3, row).size(), 1);
+            Assertions.assertEquals(map.getPortMap().getObjectsAtLocation(3, row).get(0), port);
         }
         //no exceptions thrown
-        assertEquals(5, map.getPorts().size());
+        Assertions.assertEquals(5, map.getPorts().size());
 
     }
 
@@ -181,10 +180,10 @@ public class NauticalMapTest {
         map.recordFishing(map.getSeaTile(2, 2));
         map.recordFishing(map.getSeaTile(2, 3));
 
-        assertEquals(map.getDailyTrawlsMap().get(2, 2), 2);
-        assertEquals(map.getDailyTrawlsMap().get(2, 2), 2);
-        assertEquals(map.getDailyTrawlsMap().get(2, 3), 1);
-        assertEquals(map.getDailyTrawlsMap().get(3, 3), 0);
+        Assertions.assertEquals(map.getDailyTrawlsMap().get(2, 2), 2);
+        Assertions.assertEquals(map.getDailyTrawlsMap().get(2, 2), 2);
+        Assertions.assertEquals(map.getDailyTrawlsMap().get(2, 3), 1);
+        Assertions.assertEquals(map.getDailyTrawlsMap().get(3, 3), 0);
 
 
     }

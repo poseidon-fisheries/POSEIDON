@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -11,8 +12,6 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -55,9 +54,9 @@ public class PenalizedGearTest {
         PenalizedGear gear = new PenalizedGear(.1, delegate);
         SeaTile tile = mock(SeaTile.class);
         Catch haul = gear.fish(fisher, tile, tile, 100, bio);
-        assertTrue(haul.hasAbundanceInformation());
-        assertEquals(haul.getTotalWeight(), 450, .001);
-        assertEquals(haul.getWeightCaught(firstSpecies), 270, .001);
+        Assertions.assertTrue(haul.hasAbundanceInformation());
+        Assertions.assertEquals(haul.getTotalWeight(), 450, .001);
+        Assertions.assertEquals(haul.getWeightCaught(firstSpecies), 270, .001);
 //        assertEquals(haul.getWeightCaught(0),120d,.001);
 //        assertEquals(haul.getWeightCaught(1),80d,.001);
     }

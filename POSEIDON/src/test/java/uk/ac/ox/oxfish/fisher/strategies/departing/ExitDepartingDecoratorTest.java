@@ -21,14 +21,13 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -51,7 +50,7 @@ public class ExitDepartingDecoratorTest {
 
         ExitDepartingDecorator decorator = new ExitDepartingDecorator(strategy, 2);
         //at the start it delegate
-        assertTrue(decorator.shouldFisherLeavePort(
+        Assertions.assertTrue(decorator.shouldFisherLeavePort(
             fisher,
             mock(FishState.class),
             new MersenneTwisterFast()
@@ -62,7 +61,7 @@ public class ExitDepartingDecoratorTest {
         earningsData.add(0d);
         costData.add(1d);
         decorator.checkIfQuit(fisher);
-        assertTrue(decorator.shouldFisherLeavePort(
+        Assertions.assertTrue(decorator.shouldFisherLeavePort(
             fisher,
             mock(FishState.class),
             new MersenneTwisterFast()
@@ -72,7 +71,7 @@ public class ExitDepartingDecoratorTest {
         earningsData.add(3d);
         costData.add(1d);
         decorator.checkIfQuit(fisher);
-        assertTrue(decorator.shouldFisherLeavePort(
+        Assertions.assertTrue(decorator.shouldFisherLeavePort(
             fisher,
             mock(FishState.class),
             new MersenneTwisterFast()
@@ -82,7 +81,7 @@ public class ExitDepartingDecoratorTest {
         earningsData.add(0d);
         costData.add(1d);
         decorator.checkIfQuit(fisher);
-        assertTrue(decorator.shouldFisherLeavePort(
+        Assertions.assertTrue(decorator.shouldFisherLeavePort(
             fisher,
             mock(FishState.class),
             new MersenneTwisterFast()
@@ -92,7 +91,7 @@ public class ExitDepartingDecoratorTest {
         earningsData.add(0d);
         costData.add(1d);
         decorator.checkIfQuit(fisher);
-        assertFalse(decorator.shouldFisherLeavePort(
+        Assertions.assertFalse(decorator.shouldFisherLeavePort(
             fisher,
             mock(FishState.class),
             new MersenneTwisterFast()
@@ -101,7 +100,7 @@ public class ExitDepartingDecoratorTest {
         //does not matter what happens next
         earningsData.add(300d);
         costData.add(1d);
-        assertFalse(decorator.shouldFisherLeavePort(
+        Assertions.assertFalse(decorator.shouldFisherLeavePort(
             fisher,
             mock(FishState.class),
             new MersenneTwisterFast()

@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.geography.ports;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -31,7 +32,6 @@ import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 
 import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -62,15 +62,15 @@ public class TwoPortsInitializerTest {
         ports.buildPorts(map, new MersenneTwisterFast(), mock(Function.class), mock(FishState.class),
             new FixedGasPrice(3)
         );
-        assertEquals(map.getPorts().size(), 2);
+        Assertions.assertEquals(map.getPorts().size(), 2);
         for (final Port port : map.getPorts()) {
-            assertEquals(port.getGasPricePerLiter(), 3, .0001d);
-            assertEquals(port.getLocation().getGridX(), 3);
+            Assertions.assertEquals(port.getGasPricePerLiter(), 3, .0001d);
+            Assertions.assertEquals(port.getLocation().getGridX(), 3);
             if (port.getName().equals("North"))
-                assertEquals(port.getLocation().getGridY(), 1);
+                Assertions.assertEquals(port.getLocation().getGridY(), 1);
             else {
-                assertEquals(port.getLocation().getGridY(), 2);
-                assertEquals("South", port.getName());
+                Assertions.assertEquals(port.getLocation().getGridY(), 2);
+                Assertions.assertEquals("South", port.getName());
 
             }
         }

@@ -21,14 +21,13 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.logging.Logger;
-
-import static org.junit.Assert.*;
 
 
 public class RetentionAbundanceFilterTest {
@@ -41,11 +40,11 @@ public class RetentionAbundanceFilterTest {
         final AbundanceFilter second = new RetentionAbundanceFilter(true, 10, 10, 10, true);
         final AbundanceFilter third = new RetentionAbundanceFilter(true, 10, 10, 100, true);
 
-        assertNotSame(first, second);
-        assertNotSame(first, third);
+        Assertions.assertNotSame(first, second);
+        Assertions.assertNotSame(first, third);
 
-        assertEquals(first, second);
-        assertNotEquals(first, third);
+        Assertions.assertEquals(first, second);
+        Assertions.assertNotEquals(first, third);
 
     }
 
@@ -65,8 +64,8 @@ public class RetentionAbundanceFilterTest {
         );
         final RetentionAbundanceFilter filter = new RetentionAbundanceFilter(false, 21.8035, 1.7773, 0.992661, true);
         final double[][] probability = filter.getProbabilityMatrix(species);
-        assertEquals(probability[FishStateUtilities.MALE][5], 0.004970534, .0001);
-        assertEquals(probability[FishStateUtilities.FEMALE][20], 0.8571669724, .001);
+        Assertions.assertEquals(probability[FishStateUtilities.MALE][5], 0.004970534, .0001);
+        Assertions.assertEquals(probability[FishStateUtilities.FEMALE][20], 0.8571669724, .001);
 
     }
 
@@ -91,9 +90,9 @@ public class RetentionAbundanceFilterTest {
         abundance[FishStateUtilities.MALE] = male;
         abundance[FishStateUtilities.FEMALE] = female;
         final double[][] filtered = filter.filter(species, abundance);
-        assertEquals(filtered[FishStateUtilities.MALE][20], 86, .001);
-        assertEquals(filtered[FishStateUtilities.MALE][0], 0, .001);
-        assertEquals(filtered[FishStateUtilities.FEMALE][20], 0, .001);
+        Assertions.assertEquals(filtered[FishStateUtilities.MALE][20], 86, .001);
+        Assertions.assertEquals(filtered[FishStateUtilities.MALE][0], 0, .001);
+        Assertions.assertEquals(filtered[FishStateUtilities.FEMALE][20], 0, .001);
 
 
     }
@@ -139,7 +138,7 @@ public class RetentionAbundanceFilterTest {
         Logger.getGlobal()
             .info("After running a 1000 times the logistic filter, I expect the memoization time: " + durationSecond + ", to " +
                 "be less than the non-memoization time: " + durationFirst);
-        assertTrue(durationFirst > durationSecond);
+        Assertions.assertTrue(durationFirst > durationSecond);
 
 
     }

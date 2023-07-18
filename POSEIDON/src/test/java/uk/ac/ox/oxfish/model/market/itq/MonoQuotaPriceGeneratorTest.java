@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.market.itq;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -32,7 +33,6 @@ import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 
@@ -77,18 +77,18 @@ public class MonoQuotaPriceGeneratorTest {
 
         when(fisher.probabilitySumDailyCatchesBelow(3, 100, 1)).thenReturn(.5);
         //.5*10
-        assertEquals(5, gen.computeLambda(), .0001);
+        Assertions.assertEquals(5, gen.computeLambda(), .0001);
 
         //change quotas
         regulation.setQuotaRemaining(0, 200);
         when(fisher.probabilitySumDailyCatchesBelow(3, 200, 1)).thenReturn(0d);
-        assertEquals(10, gen.computeLambda(), .0001);
+        Assertions.assertEquals(10, gen.computeLambda(), .0001);
 
 
         when(model.getDayOfTheYear()).thenReturn(363);
         when(fisher.probabilitySumDailyCatchesBelow(3, 200, 2)).thenReturn(.5d);
 
-        assertEquals(5, gen.computeLambda(), .0001);
+        Assertions.assertEquals(5, gen.computeLambda(), .0001);
 
 
     }
@@ -115,7 +115,7 @@ public class MonoQuotaPriceGeneratorTest {
         // .5 * (10+10*2) = 15
         when(fisher.getDepartingStrategy().
             predictedDaysLeftFishingThisYear(any(), any(), any())).thenReturn(365 - 363);
-        assertEquals(15d, gen.computeLambda(), .001d);
+        Assertions.assertEquals(15d, gen.computeLambda(), .001d);
 
     }
 }

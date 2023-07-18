@@ -20,12 +20,12 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.ErrorTrackingRegression;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.mock;
@@ -56,8 +56,8 @@ public class ErrorTrackingRegressionTest {
         double sum = 0;
         for (final double errors : test.getErrors())
             sum += errors;
-        assertEquals(4 + 9 + 16, sum, .001);
-        assertEquals(test.getLatestError(), 16, .001d);
+        Assertions.assertEquals(4 + 9 + 16, sum, .001);
+        Assertions.assertEquals(test.getLatestError(), 16, .001d);
 
     }
 }

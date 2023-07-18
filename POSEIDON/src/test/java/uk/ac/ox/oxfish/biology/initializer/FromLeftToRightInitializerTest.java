@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -28,7 +29,6 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 
@@ -82,7 +82,7 @@ public class FromLeftToRightInitializerTest {
         );
 
 
-        assertTrue(left.getBiomass(species) > middle.getBiomass(species));
-        assertTrue(middle.getBiomass(species) > right.getBiomass(species));
+        Assertions.assertTrue(left.getBiomass(species) > middle.getBiomass(species));
+        Assertions.assertTrue(middle.getBiomass(species) > right.getBiomass(species));
     }
 }

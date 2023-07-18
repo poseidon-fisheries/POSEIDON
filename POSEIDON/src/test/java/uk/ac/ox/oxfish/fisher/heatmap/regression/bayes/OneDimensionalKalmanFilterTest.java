@@ -21,10 +21,8 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.bayes;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 8/2/16.
@@ -38,8 +36,8 @@ public class OneDimensionalKalmanFilterTest {
             1, 1, 50 * 50, 0, 1
         );
         //we start at N(0,50^2)
-        assertEquals(kalmanFilter.getStandardDeviation(), 50, .0001);
-        assertEquals(kalmanFilter.getStateEstimate(), 0, .0001);
+        Assertions.assertEquals(kalmanFilter.getStandardDeviation(), 50, .0001);
+        Assertions.assertEquals(kalmanFilter.getStateEstimate(), 0, .0001);
 
         //if I keep observing 30 then my state estimate should move to there and my standard deviation drop
         for (int i = 0; i < 10; i++) {
@@ -49,8 +47,8 @@ public class OneDimensionalKalmanFilterTest {
                 kalmanFilter.getStandardDeviation());
         }
 
-        assertTrue(kalmanFilter.getStandardDeviation() < 1);
-        assertEquals(kalmanFilter.getStateEstimate(), 30, 1);
+        Assertions.assertTrue(kalmanFilter.getStandardDeviation() < 1);
+        Assertions.assertEquals(kalmanFilter.getStateEstimate(), 30, 1);
 
         //if I keep elapsing time the mean stays constant but the uncertainty grows
         for (int i = 0; i < 100; i++) {
@@ -59,8 +57,8 @@ public class OneDimensionalKalmanFilterTest {
                 " ==== " +
                 kalmanFilter.getStandardDeviation());
         }
-        assertTrue(kalmanFilter.getStandardDeviation() > 5);
-        assertEquals(kalmanFilter.getStateEstimate(), 30, 1);
+        Assertions.assertTrue(kalmanFilter.getStandardDeviation() > 5);
+        Assertions.assertEquals(kalmanFilter.getStateEstimate(), 30, 1);
 
 
     }

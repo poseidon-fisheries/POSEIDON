@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
@@ -36,8 +37,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -68,11 +67,11 @@ public class GeographicallyWeightedRegressionTest {
         );
 
         List<String> data = Files.readAllLines(Paths.get("inputs", "tests", "w_regression.csv"));
-        assertEquals(data.size(), 100);
+        Assertions.assertEquals(data.size(), 100);
 
         for (String line : data) {
             String[] split = line.split(",");
-            assertEquals(split.length, 3);
+            Assertions.assertEquals(split.length, 3);
             double x = Double.parseDouble(split[0]);
             double y = Double.parseDouble(split[1]);
             when(distance.distance(any(), any(), any())).thenReturn(
@@ -83,8 +82,8 @@ public class GeographicallyWeightedRegressionTest {
             );
         }
         System.out.println(Arrays.toString(regression.getBeta(tile)));
-        assertEquals(1.423, regression.getBeta(tile)[0], .1); //some imprecision here, but more or less correct
-        assertEquals(9.996, regression.getBeta(tile)[1], .01);
+        Assertions.assertEquals(1.423, regression.getBeta(tile)[0], .1); //some imprecision here, but more or less correct
+        Assertions.assertEquals(9.996, regression.getBeta(tile)[1], .01);
 
 
     }
@@ -108,9 +107,9 @@ public class GeographicallyWeightedRegressionTest {
             new MersenneTwisterFast()
         );
 
-        assertArrayEquals(regression.getParametersAsArray(), new double[]{.23, 10}, .001);
+        Assertions.assertArrayEquals(regression.getParametersAsArray(), new double[]{.23, 10}, .001);
         regression.setParameters(new double[]{.56, 5});
-        assertArrayEquals(regression.getParametersAsArray(), new double[]{.56, 5}, .001);
+        Assertions.assertArrayEquals(regression.getParametersAsArray(), new double[]{.56, 5}, .001);
 
 
     }

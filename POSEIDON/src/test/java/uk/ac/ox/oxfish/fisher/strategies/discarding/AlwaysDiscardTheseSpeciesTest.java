@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.discarding;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -32,8 +32,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -58,14 +56,14 @@ public class AlwaysDiscardTheseSpeciesTest {
             null
         );
 
-        assertEquals(original.getTotalWeight(), 300.0, .0001);
-        assertEquals(postDiscard.getTotalWeight(), 100.0, .0001);
+        Assertions.assertEquals(original.getTotalWeight(), 300.0, .0001);
+        Assertions.assertEquals(postDiscard.getTotalWeight(), 100.0, .0001);
 
-        assertEquals(original.getWeightCaught(0), 100.0, .0001);
-        assertEquals(postDiscard.getWeightCaught(0), 100.0, .0001);
+        Assertions.assertEquals(original.getWeightCaught(0), 100.0, .0001);
+        Assertions.assertEquals(postDiscard.getWeightCaught(0), 100.0, .0001);
 
-        assertEquals(original.getWeightCaught(1), 100.0, .0001);
-        assertEquals(postDiscard.getWeightCaught(1), 0, .0001);
+        Assertions.assertEquals(original.getWeightCaught(1), 100.0, .0001);
+        Assertions.assertEquals(postDiscard.getWeightCaught(1), 0, .0001);
 
 
     }
@@ -101,11 +99,11 @@ public class AlwaysDiscardTheseSpeciesTest {
             model,
             new MersenneTwisterFast()
         );
-        Assert.assertEquals(end.getWeightCaught(secondSpecies), 0, .0001);
-        assertTrue(end.getWeightCaught(firstSpecies) > 0);
-        assertEquals(end.getAbundance(firstSpecies).asMatrix()
+        Assertions.assertEquals(end.getWeightCaught(secondSpecies), 0, .0001);
+        Assertions.assertTrue(end.getWeightCaught(firstSpecies) > 0);
+        Assertions.assertEquals(end.getAbundance(firstSpecies).asMatrix()
             [FishStateUtilities.MALE][1], 100, .001);
-        assertEquals(end.getAbundance(firstSpecies).asMatrix()
+        Assertions.assertEquals(end.getAbundance(firstSpecies).asMatrix()
             [FishStateUtilities.FEMALE][1], 20, .001);
 
 

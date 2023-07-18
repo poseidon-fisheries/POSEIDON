@@ -21,11 +21,11 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import org.jfree.util.Log;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
@@ -59,15 +59,19 @@ public class LogisticClassifierTest {
         //if xb=0 the probability is 1/2
         when(fisher.getID()).thenReturn(0);
         when(state.getDayOfTheYear()).thenReturn(0);
-        assertEquals(classifier.getProbability(fisher, state.getHoursSinceStart(), state, null), .5, .0001);
+        Assertions.assertEquals(classifier.getProbability(fisher, state.getHoursSinceStart(), state, null), .5, .0001);
         //if xb=-1 the probability is lower
         when(fisher.getID()).thenReturn(1);
         when(state.getDayOfTheYear()).thenReturn(1);
-        assertEquals(classifier.getProbability(fisher, state.getHoursSinceStart(), state, null), 0.2689414, .0001);
+        Assertions.assertEquals(classifier.getProbability(fisher, state.getHoursSinceStart(), state, null),
+            0.2689414,
+            .0001);
         //if xb=1 the probability is higher
         when(fisher.getID()).thenReturn(3);
         when(state.getDayOfTheYear()).thenReturn(1);
-        assertEquals(classifier.getProbability(fisher, state.getHoursSinceStart(), state, null), 0.73105, .0001);
+        Assertions.assertEquals(classifier.getProbability(fisher, state.getHoursSinceStart(), state, null),
+            0.73105,
+            .0001);
 
 
     }

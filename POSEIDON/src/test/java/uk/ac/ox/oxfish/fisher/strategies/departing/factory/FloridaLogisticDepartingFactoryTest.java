@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -29,7 +30,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NullParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -54,7 +54,7 @@ public class FloridaLogisticDepartingFactoryTest {
         final FishState state = mock(FishState.class, RETURNS_DEEP_STUBS);
         DailyLogisticDepartingStrategy strategy = longlinerDepartingStrategy.apply(state);
 
-        assertEquals(strategy.getClassifier().getSize(), 6);
+        Assertions.assertEquals(strategy.getClassifier().getSize(), 6);
 
 
         longlinerDepartingStrategy.setIntercept(new FixedDoubleParameter(-2.075184));
@@ -69,7 +69,7 @@ public class FloridaLogisticDepartingFactoryTest {
 
 
         strategy = longlinerDepartingStrategy.apply(state);
-        assertEquals(strategy.getClassifier().getSize(), 9);
+        Assertions.assertEquals(strategy.getClassifier().getSize(), 9);
     }
 
 
@@ -103,7 +103,7 @@ public class FloridaLogisticDepartingFactoryTest {
         );
         System.out.println("probability: " + probability);
 
-        assertEquals(0.0015140371942369245d, probability, .001);
+        Assertions.assertEquals(0.0015140371942369245d, probability, .001);
         when(fisher.getHomePort().getMarginalPrice(gag, fisher)).thenReturn(10d);
         probability = strategy.getClassifier().getProbability(
             fisher,
@@ -112,6 +112,6 @@ public class FloridaLogisticDepartingFactoryTest {
             mock(SeaTile.class)
         );
         System.out.println("probability: " + probability);
-        assertEquals(0.0280627, probability, .001);
+        Assertions.assertEquals(0.0280627, probability, .001);
     }
 }

@@ -20,12 +20,12 @@
 
 package uk.ac.ox.oxfish.model.data;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -62,7 +62,7 @@ public class DiscretizationHistogrammerTest {
         when(record.getMostFishedTileInTrip()).thenReturn(tile3);
         histogrammer.reactToFinishedTrip(record, null);
 
-        assertEquals("3,2,0,0", histogrammer.composeFileContents());
+        Assertions.assertEquals("3,2,0,0", histogrammer.composeFileContents());
 
     }
 }

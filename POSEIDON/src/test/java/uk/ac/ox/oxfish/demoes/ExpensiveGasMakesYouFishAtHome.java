@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
@@ -28,8 +29,6 @@ import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static org.junit.Assert.assertTrue;
 
 public class ExpensiveGasMakesYouFishAtHome {
 
@@ -82,7 +81,7 @@ public class ExpensiveGasMakesYouFishAtHome {
 
         System.out.println(averageX + " --- " + newAverage);
 
-        assertTrue(1.5 * averageX < newAverage); //before the price rise the distance from port was at least 50% more!
+        Assertions.assertTrue(1.5 * averageX < newAverage); //before the price rise the distance from port was at least 50% more!
 
     }
 }

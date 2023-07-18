@@ -21,12 +21,12 @@
 package uk.ac.ox.oxfish.utility.adaptation;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
@@ -47,15 +47,15 @@ public class HillClimbingMovementTest {
             (state, random1, fisher, current1) -> newTile
         );
 
-        assertEquals(newTile, algo.randomize(random, mock(Fisher.class), 0, current));
+        Assertions.assertEquals(newTile, algo.randomize(random, mock(Fisher.class), 0, current));
 
         //current better than old? stay!
-        assertEquals(current, algo.judgeRandomization(random,
+        Assertions.assertEquals(current, algo.judgeRandomization(random,
             mock(Fisher.class), 0, 100, old, current
         ));
 
         //if old is better than new, go back to new
-        assertEquals(old, algo.judgeRandomization(random,
+        Assertions.assertEquals(old, algo.judgeRandomization(random,
             mock(Fisher.class), 100, 0, old, current
         ));
 

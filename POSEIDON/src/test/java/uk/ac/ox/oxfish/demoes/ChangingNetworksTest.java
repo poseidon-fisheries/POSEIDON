@@ -34,7 +34,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Collection;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class ChangingNetworksTest {
@@ -46,16 +46,16 @@ public class ChangingNetworksTest {
     //however we made imitation smarter which in turn made this segregation effect not happening
     //because now I just ahead of time stop
     public void networksRemainSegregated() throws Exception {
-        FishState state = new FishState(System.currentTimeMillis());
-        PrototypeScenario scenario = new PrototypeScenario();
+        final FishState state = new FishState(System.currentTimeMillis());
+        final PrototypeScenario scenario = new PrototypeScenario();
         state.setScenario(scenario);
 
-        PerTripImitativeDestinationFactory imitation = new PerTripImitativeDestinationFactory();
+        final PerTripImitativeDestinationFactory imitation = new PerTripImitativeDestinationFactory();
         imitation.setDropInUtilityNeededForUnfriend(new FixedDoubleParameter(0.027688));
         imitation.setIgnoreEdgeDirection(false);
         imitation.setAlwaysCopyBest(false);
         scenario.setDestinationStrategy(imitation);
-        EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
+        final EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
         networkBuilder.setDegree(new FixedDoubleParameter(1));
         scenario.setNetworkBuilder(networkBuilder);
 
@@ -65,10 +65,10 @@ public class ChangingNetworksTest {
             fishState -> {
                 double sameGearConnections = 0;
                 double connections = 0;
-                for (Fisher fisher : fishState.getFishers()) {
-                    Collection<Fisher> friends = fisher.getDirectedFriends();
+                for (final Fisher fisher : fishState.getFishers()) {
+                    final Collection<Fisher> friends = fisher.getDirectedFriends();
                     connections += friends.size();
-                    for (Fisher friend : friends) {
+                    for (final Fisher friend : friends) {
                         if (friend.getID() < 50 && fisher.getID() < 50) {
                             sameGearConnections++;
                         } else if (friend.getID() >= 50 && fisher.getID() >= 50) {
@@ -83,16 +83,16 @@ public class ChangingNetworksTest {
         );
 
 
-        OneSpecieGearFactory option1 = new OneSpecieGearFactory();
+        final OneSpecieGearFactory option1 = new OneSpecieGearFactory();
         option1.setSpecieTargetIndex(0);
-        OneSpecieGearFactory option2 = new OneSpecieGearFactory();
+        final OneSpecieGearFactory option2 = new OneSpecieGearFactory();
         option2.setSpecieTargetIndex(1);
 
         scenario.setGear(new AlgorithmFactory<Gear>() {
             int counter;
 
             @Override
-            public Gear apply(FishState fishState) {
+            public Gear apply(final FishState fishState) {
                 counter++;
                 if (counter <= 50)
                     return option1.apply(fishState);
@@ -103,7 +103,7 @@ public class ChangingNetworksTest {
 
 
         scenario.setBiologyInitializer(new SplitInitializerFactory());
-        SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
+        final SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
         scenario.setMapInitializer(mapInitializer);
 
         state.start();

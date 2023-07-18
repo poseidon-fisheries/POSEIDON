@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionGearFactory;
@@ -116,15 +116,15 @@ public class PolicyScriptsTest {
             "          individualQuota: '5000.0'\n";
         final FishYAML yamler = new FishYAML();
         final PolicyScripts scripts = yamler.loadAs(yaml, PolicyScripts.class);
-        Assert.assertEquals(scripts.getScripts().size(), 2);
+        Assertions.assertEquals(scripts.getScripts().size(), 2);
         final PolicyScript firstYearPolicyScript = scripts.getScripts().get(1);
         final PolicyScript secondYearPolicyScript = scripts.getScripts().get(10);
-        Assert.assertNull(firstYearPolicyScript.getFishingStrategy());
-        Assert.assertNull(secondYearPolicyScript.getFishingStrategy());
-        Assert.assertTrue(firstYearPolicyScript.getGear() instanceof FixedProportionGearFactory);
-        Assert.assertEquals(
-            ((FixedDoubleParameter) ((FixedProportionGearFactory) firstYearPolicyScript.getGear()).getCatchabilityPerHour()).getValue()
-            , .06, .0001);
+        Assertions.assertNull(firstYearPolicyScript.getFishingStrategy());
+        Assertions.assertNull(secondYearPolicyScript.getFishingStrategy());
+        Assertions.assertTrue(firstYearPolicyScript.getGear() instanceof FixedProportionGearFactory);
+        Assertions.assertEquals(((FixedDoubleParameter) ((FixedProportionGearFactory) firstYearPolicyScript.getGear()).getCatchabilityPerHour()).getValue(),
+            .06,
+            .0001);
 
 
     }
@@ -144,11 +144,11 @@ public class PolicyScriptsTest {
             "  weatherStrategy: null";
         final FishYAML yamler = new FishYAML();
         final PolicyScript script = yamler.loadAs(yaml, PolicyScript.class);
-        Assert.assertNull(script.getFishingStrategy());
-        Assert.assertTrue(script.getGear() instanceof FixedProportionGearFactory);
-        Assert.assertEquals(
-            ((FixedDoubleParameter) ((FixedProportionGearFactory) script.getGear()).getCatchabilityPerHour()).getValue()
-            , .06, .0001);
+        Assertions.assertNull(script.getFishingStrategy());
+        Assertions.assertTrue(script.getGear() instanceof FixedProportionGearFactory);
+        Assertions.assertEquals(((FixedDoubleParameter) ((FixedProportionGearFactory) script.getGear()).getCatchabilityPerHour()).getValue(),
+            .06,
+            .0001);
 
 
     }

@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.model.network;
 
 import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -31,8 +32,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -58,23 +57,23 @@ public class EquidegreeBuilderTest {
         builder.setDegree(new FixedDoubleParameter(2));
         DirectedGraph<Fisher, FriendshipEdge> graph = builder.apply(state);
 
-        assertEquals(graph.outDegree(one), 2);
-        assertEquals(graph.outDegree(two), 2);
-        assertEquals(graph.outDegree(three), 2);
+        Assertions.assertEquals(graph.outDegree(one), 2);
+        Assertions.assertEquals(graph.outDegree(two), 2);
+        Assertions.assertEquals(graph.outDegree(three), 2);
 
         builder.setDegree(new FixedDoubleParameter(1));
         graph = builder.apply(state);
-        assertEquals(graph.outDegree(one), 1);
-        assertEquals(graph.outDegree(two), 1);
-        assertEquals(graph.outDegree(three), 1);
+        Assertions.assertEquals(graph.outDegree(one), 1);
+        Assertions.assertEquals(graph.outDegree(two), 1);
+        Assertions.assertEquals(graph.outDegree(three), 1);
 
 
         Fisher fourth = mock(Fisher.class);
         builder.addFisher(fourth, graph, state);
-        assertEquals(graph.outDegree(one), 1);
-        assertEquals(graph.outDegree(two), 1);
-        assertEquals(graph.outDegree(three), 1);
-        assertEquals(graph.outDegree(fourth), 1);
+        Assertions.assertEquals(graph.outDegree(one), 1);
+        Assertions.assertEquals(graph.outDegree(two), 1);
+        Assertions.assertEquals(graph.outDegree(three), 1);
+        Assertions.assertEquals(graph.outDegree(fourth), 1);
         builder.removeFisher(one, graph, state);
 
 
@@ -99,23 +98,23 @@ public class EquidegreeBuilderTest {
         builder.setEqualOutDegree(false);
         DirectedGraph<Fisher, FriendshipEdge> graph = builder.apply(state);
 
-        assertEquals(graph.inDegree(one), 2);
-        assertEquals(graph.inDegree(two), 2);
-        assertEquals(graph.inDegree(three), 2);
+        Assertions.assertEquals(graph.inDegree(one), 2);
+        Assertions.assertEquals(graph.inDegree(two), 2);
+        Assertions.assertEquals(graph.inDegree(three), 2);
 
         builder.setDegree(new FixedDoubleParameter(1));
         graph = builder.apply(state);
-        assertEquals(graph.inDegree(one), 1);
-        assertEquals(graph.inDegree(two), 1);
-        assertEquals(graph.inDegree(three), 1);
+        Assertions.assertEquals(graph.inDegree(one), 1);
+        Assertions.assertEquals(graph.inDegree(two), 1);
+        Assertions.assertEquals(graph.inDegree(three), 1);
 
 
         Fisher fourth = mock(Fisher.class);
         builder.addFisher(fourth, graph, state);
-        assertEquals(graph.inDegree(one), 1);
-        assertEquals(graph.inDegree(two), 1);
-        assertEquals(graph.inDegree(three), 1);
-        assertEquals(graph.inDegree(fourth), 1);
+        Assertions.assertEquals(graph.inDegree(one), 1);
+        Assertions.assertEquals(graph.inDegree(two), 1);
+        Assertions.assertEquals(graph.inDegree(three), 1);
+        Assertions.assertEquals(graph.inDegree(fourth), 1);
         builder.removeFisher(one, graph, state);
 
     }
@@ -146,13 +145,13 @@ public class EquidegreeBuilderTest {
         //build many many graphs
         for (int i = 0; i < 100; i++) {
             DirectedGraph<Fisher, FriendshipEdge> graph = builder.apply(state);
-            assertEquals(graph.outDegree(one), 1);
-            assertFalse(graph.isSuccessor(one, three));
+            Assertions.assertEquals(graph.outDegree(one), 1);
+            Assertions.assertFalse(graph.isSuccessor(one, three));
 
             Fisher fourth = mock(Fisher.class);
             builder.addPredicate((from, to) -> !(from == fourth && to == one));
             builder.addFisher(fourth, graph, state);
-            assertFalse(graph.isSuccessor(fourth, one));
+            Assertions.assertFalse(graph.isSuccessor(fourth, one));
 
         }
 

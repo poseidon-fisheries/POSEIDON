@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression.extractors;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -28,7 +29,6 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.LinkedList;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -65,38 +65,32 @@ public class PeriodHabitContinuousExtractorTest {
         FishState model = mock(FishState.class);
         when(model.getDay()).thenReturn(60);
 
-        assertEquals(1,
-            extractor.extract(
-                mock(SeaTile.class),
-                -1,
-                fisher,
-                model
-            ), .0001
-        );
+        Assertions.assertEquals(1, extractor.extract(
+            mock(SeaTile.class),
+            -1,
+            fisher,
+            model
+        ), .0001);
 
         //at day 200, though, there ought to be no visit
         when(model.getDay()).thenReturn(200);
-        assertEquals(0,
-            extractor.extract(
-                mock(SeaTile.class),
-                -1,
-                fisher,
-                model
-            ), .0001
-        );
+        Assertions.assertEquals(0, extractor.extract(
+            mock(SeaTile.class),
+            -1,
+            fisher,
+            model
+        ), .0001);
 
         //if I enlarge the period to 196 days we ought to see 3 visits (all except the one at day 1)
         extractor = new PeriodHabitContinuousExtractor(
             discretization,
             196
         );
-        assertEquals(3,
-            extractor.extract(
-                mock(SeaTile.class),
-                -1,
-                fisher,
-                model
-            ), .0001
-        );
+        Assertions.assertEquals(3, extractor.extract(
+            mock(SeaTile.class),
+            -1,
+            fisher,
+            model
+        ), .0001);
     }
 }

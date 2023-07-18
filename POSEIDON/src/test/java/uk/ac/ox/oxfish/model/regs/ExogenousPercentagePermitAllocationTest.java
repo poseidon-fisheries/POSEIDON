@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.regs;
 
 import com.beust.jcommander.internal.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -8,8 +9,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,21 +35,21 @@ public class ExogenousPercentagePermitAllocationTest {
         ExogenousPercentagePermitAllocation allocation = new ExogenousPercentagePermitAllocation(effortWanted);
 
         when(state.getYear()).thenReturn(0);
-        assertEquals(allocation.computeWhichFishersAreAllowed(fishers, state).size(), 2);
+        Assertions.assertEquals(allocation.computeWhichFishersAreAllowed(fishers, state).size(), 2);
 
         when(state.getYear()).thenReturn(1);
-        assertEquals(allocation.computeWhichFishersAreAllowed(fishers, state).size(), 3);
+        Assertions.assertEquals(allocation.computeWhichFishersAreAllowed(fishers, state).size(), 3);
 
         when(state.getYear()).thenReturn(2);
-        assertEquals(allocation.computeWhichFishersAreAllowed(fishers, state).size(), 4);
+        Assertions.assertEquals(allocation.computeWhichFishersAreAllowed(fishers, state).size(), 4);
 
         when(state.getYear()).thenReturn(100);
-        assertEquals(allocation.computeWhichFishersAreAllowed(fishers, state).size(), 4);
+        Assertions.assertEquals(allocation.computeWhichFishersAreAllowed(fishers, state).size(), 4);
 
 
         final List<Fisher> lastReturn = allocation.computeWhichFishersAreAllowed(fishers, state);
         for (Fisher fisher : lastReturn) {
-            assertTrue(fisher.getID() <= 3);
+            Assertions.assertTrue(fisher.getID() <= 3);
         }
     }
 }

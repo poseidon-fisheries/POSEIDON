@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -34,7 +35,6 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -129,27 +129,19 @@ public class WeightedAbundanceDiffuserTest {
 
 
         //ought to rearrange so that 2/3 of biomass is in "there"
-        assertArrayEquals(
-            fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
+        Assertions.assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
             new double[]{334, 334, 0},
-            .001
-        );
-        assertArrayEquals(
-            fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
+            .001);
+        Assertions.assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
             new double[]{0, 0, 33},
-            .001
-        );
+            .001);
 
-        assertArrayEquals(
-            bioThere.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
+        Assertions.assertArrayEquals(bioThere.getAbundance(species).asMatrix()[FishStateUtilities.MALE],
             new double[]{666, 666, 0},
-            .001
-        );
-        assertArrayEquals(
-            bioThere.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
+            .001);
+        Assertions.assertArrayEquals(bioThere.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],
             new double[]{0, 0, 67},
-            .001
-        );
+            .001);
 
     }
 

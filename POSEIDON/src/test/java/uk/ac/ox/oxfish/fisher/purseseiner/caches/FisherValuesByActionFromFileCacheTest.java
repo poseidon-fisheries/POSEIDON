@@ -20,6 +20,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.caches;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
@@ -33,7 +34,6 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
-import static junit.framework.TestCase.assertEquals;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.*;
 import static uk.ac.ox.oxfish.utility.FishStateUtilitiesTest.writeTempFile;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
@@ -89,10 +89,7 @@ public class FisherValuesByActionFromFileCacheTest {
     }
 
     private void check(final String result, final int fisherId, final ActionClass actionClass, final Path path) {
-        assertEquals(
-            result,
-            cache.get(path, 2017, fishers.get(fisherId), actionClass.getActionClass())
-        );
+        Assertions.assertEquals(result, cache.get(path, 2017, fishers.get(fisherId), actionClass.getActionClass()));
     }
 
 }

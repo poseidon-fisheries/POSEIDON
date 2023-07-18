@@ -19,13 +19,13 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunction;
 
 import java.util.function.DoubleUnaryOperator;
 
 import static java.lang.Double.MAX_VALUE;
-import static org.junit.Assert.assertEquals;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class LogisticFunctionTest {
@@ -33,9 +33,9 @@ public class LogisticFunctionTest {
     @Test
     public void test() {
         final DoubleUnaryOperator f = new LogisticFunction(0, 1);
-        assertEquals(0.0, f.applyAsDouble(-MAX_VALUE), EPSILON);
-        assertEquals(0.5, f.applyAsDouble(0), EPSILON);
-        assertEquals(1.0, f.applyAsDouble(MAX_VALUE), EPSILON);
+        Assertions.assertEquals(0.0, f.applyAsDouble(-MAX_VALUE), EPSILON);
+        Assertions.assertEquals(0.5, f.applyAsDouble(0), EPSILON);
+        Assertions.assertEquals(1.0, f.applyAsDouble(MAX_VALUE), EPSILON);
     }
 
 }

@@ -20,6 +20,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
@@ -41,8 +42,6 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
@@ -101,15 +100,15 @@ public class MakeFadSetTest {
         when(regulation.canFishHere(any(), any(), any())).thenReturn(true);
 
         // Before the set, FAD biology should be full and tile biology should be empty
-        assertEquals(Arrays.stream(fad.getBiomass()).sum(), fad.getCarryingCapacity().getTotal(), 0.0);
-        assertTrue(tileBiology.isEmpty());
+        Assertions.assertEquals(Arrays.stream(fad.getBiomass()).sum(), fad.getCarryingCapacity().getTotal(), 0.0);
+        Assertions.assertTrue(tileBiology.isEmpty());
 
         // After a successful set, FAD biology should be empty and tile biology should also be empty
         final PurseSeinerAction fadSetAction = new FadSetAction(fad, fisher, 1);
         when(random.nextDouble()).thenReturn(1.0);
         fadSetAction.act(model, fisher, regulation, fadSetAction.getDuration());
-        assertTrue(fadBiology.isEmpty());
-        assertTrue(tileBiology.isEmpty());
+        Assertions.assertTrue(fadBiology.isEmpty());
+        Assertions.assertTrue(tileBiology.isEmpty());
 
         // Now we refill the FAD biology and make an unsuccessful set
         fillBiomassFad(fad);
@@ -117,8 +116,8 @@ public class MakeFadSetTest {
         fadSetAction.act(model, fisher, regulation, fadSetAction.getDuration());
 
         // After that, the FAD biology should be empty and the tile biology should be full
-        assertTrue(fadBiology.isEmpty());
-        assertTrue(tileBiology.isFull());
+        Assertions.assertTrue(fadBiology.isEmpty());
+        Assertions.assertTrue(tileBiology.isFull());
     }
 
 }

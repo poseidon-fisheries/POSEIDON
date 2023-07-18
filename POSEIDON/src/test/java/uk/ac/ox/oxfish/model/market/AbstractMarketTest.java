@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.model.market;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -30,7 +31,6 @@ import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -61,7 +61,7 @@ public class AbstractMarketTest {
 
 
         market.start(model);
-        assertEquals(2, steppables.size());
+        Assertions.assertEquals(2, steppables.size());
         market.recordTrade(new TradeInfo(100, test, 100));
         market.recordTrade(new TradeInfo(10, test, 200));
         steppables.get(1).step(model);
@@ -70,12 +70,12 @@ public class AbstractMarketTest {
         final DataColumn landings = market.getData().getColumn(AbstractMarket.LANDINGS_COLUMN_NAME);
         final DataColumn earnings = market.getData().getColumn(AbstractMarket.EARNINGS_COLUMN_NAME);
 
-        assertEquals(110, landings.get(0), .0001);
-        assertEquals(300, earnings.get(0), .0001);
+        Assertions.assertEquals(110, landings.get(0), .0001);
+        Assertions.assertEquals(300, earnings.get(0), .0001);
 
         steppables.get(1).step(model);
         steppables.get(0).step(model);
-        assertEquals(0, landings.get(1), .0001);
-        assertEquals(0, earnings.get(1), .0001);
+        Assertions.assertEquals(0, landings.get(1), .0001);
+        Assertions.assertEquals(0, earnings.get(1), .0001);
     }
 }

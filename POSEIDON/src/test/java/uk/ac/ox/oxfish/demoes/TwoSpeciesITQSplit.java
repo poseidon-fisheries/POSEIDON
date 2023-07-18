@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
@@ -80,7 +80,7 @@ public class TwoSpeciesITQSplit {
         }
 
         System.out.println("North vs South : " + towsNorth / ((double) towsNorth + towsSouth));
-        Assert.assertTrue(towsNorth / ((double) towsNorth + towsSouth) > .6);
+        Assertions.assertTrue(towsNorth / ((double) towsNorth + towsSouth) > .6);
 
 
     }
@@ -151,10 +151,10 @@ public class TwoSpeciesITQSplit {
         System.out.println("Early Landings: " + earlyRedLandings + " --- " + earlyBlueLandings);
         //blue start as a choke species
         double totalBlueQuotas = 500 * 100;
-        Assert.assertTrue(earlyBlueLandings > .8 * totalBlueQuotas);
+        Assertions.assertTrue(earlyBlueLandings > .8 * totalBlueQuotas);
         //red is underutilized
         double totalRedQuotas = 4500 * 100;
-        Assert.assertTrue(earlyRedLandings < .5 * totalRedQuotas);
+        Assertions.assertTrue(earlyRedLandings < .5 * totalRedQuotas);
 
 
         while (state.getYear() < 5) {
@@ -170,7 +170,7 @@ public class TwoSpeciesITQSplit {
         }
 
         System.out.println("North vs South : " + towsNorth / ((double) towsNorth + towsSouth));
-        Assert.assertTrue(towsNorth / ((double) towsNorth + towsSouth) > .6);
+        Assertions.assertTrue(towsNorth / ((double) towsNorth + towsSouth) > .6);
 
         //by year 10 the quotas are very well used!
         double lateRedLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(0) + " " +
@@ -182,7 +182,7 @@ public class TwoSpeciesITQSplit {
             "Late Quota Efficiency: " + lateRedLandings / totalRedQuotas + " --- " + lateBlueLandings / totalBlueQuotas);
 
         //geographical choice with "fixed" biology works very strongly
-        Assert.assertTrue(lateRedLandings > .6 * totalRedQuotas);
+        Assertions.assertTrue(lateRedLandings > .6 * totalRedQuotas);
     }
 
 

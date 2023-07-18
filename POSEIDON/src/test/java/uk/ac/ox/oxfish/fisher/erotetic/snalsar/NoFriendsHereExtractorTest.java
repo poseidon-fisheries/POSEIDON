@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.fisher.erotetic.snalsar;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
@@ -67,9 +67,9 @@ public class NoFriendsHereExtractorTest {
             chooser
         );
 
-        Assert.assertEquals(featureMap.size(), 2);
-        Assert.assertEquals(featureMap.get(empty), 1, .0001);
-        Assert.assertEquals(featureMap.get(full), -1, .0001);
+        Assertions.assertEquals(featureMap.size(), 2);
+        Assertions.assertEquals(featureMap.get(empty), 1, .0001);
+        Assertions.assertEquals(featureMap.get(full), -1, .0001);
 
 
     }

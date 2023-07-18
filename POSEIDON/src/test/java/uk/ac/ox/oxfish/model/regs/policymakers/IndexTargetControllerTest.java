@@ -1,10 +1,10 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class IndexTargetControllerTest {
@@ -19,7 +19,7 @@ public class IndexTargetControllerTest {
             (Sensor<FishState, Double>) system -> 200d,
             (subject, policy, model) -> {
                 testsRan[0]++;
-                assertEquals(policy, 0.5d, .0001);
+                Assertions.assertEquals(policy, 0.5d, .0001);
             },
             365,
             1d,
@@ -28,7 +28,7 @@ public class IndexTargetControllerTest {
         controller.start(mock(FishState.class));
         controller.step(mock(FishState.class));
 
-        assertEquals(testsRan[0], 1);
+        Assertions.assertEquals(testsRan[0], 1);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class IndexTargetControllerTest {
             (Sensor<FishState, Double>) system -> 200d,
             (subject, policy, model) -> {
                 testsRan[0]++;
-                assertEquals(policy, 0.8d, .0001);
+                Assertions.assertEquals(policy, 0.8d, .0001);
             },
             365,
             .2d,
@@ -51,7 +51,7 @@ public class IndexTargetControllerTest {
         controller.start(mock(FishState.class));
         controller.step(mock(FishState.class));
 
-        assertEquals(testsRan[0], 1);
+        Assertions.assertEquals(testsRan[0], 1);
     }
 
 
@@ -66,7 +66,7 @@ public class IndexTargetControllerTest {
             (Sensor<FishState, Double>) system -> 200d,
             (subject, policy, model) -> {
                 testsRan[0]++;
-                assertEquals(policy, 1d, .0001);
+                Assertions.assertEquals(policy, 1d, .0001);
             },
             365,
             .2d,
@@ -75,7 +75,7 @@ public class IndexTargetControllerTest {
         controller.start(mock(FishState.class));
         controller.step(mock(FishState.class));
 
-        assertEquals(testsRan[0], 1);
+        Assertions.assertEquals(testsRan[0], 1);
     }
 
     @Test
@@ -89,7 +89,7 @@ public class IndexTargetControllerTest {
             (Sensor<FishState, Double>) system -> 200d,
             (subject, policy, model) -> {
                 testsRan[0]++;
-                assertEquals(policy, 0d, .0001);
+                Assertions.assertEquals(policy, 0d, .0001);
             },
             365,
             1d,
@@ -98,7 +98,7 @@ public class IndexTargetControllerTest {
         controller.start(mock(FishState.class));
         controller.step(mock(FishState.class));
 
-        assertEquals(testsRan[0], 1);
+        Assertions.assertEquals(testsRan[0], 1);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class IndexTargetControllerTest {
             (Sensor<FishState, Double>) system -> 200d,
             (subject, policy, model) -> {
                 testsRan[0]++;
-                assertEquals(policy, 1d, .0001);
+                Assertions.assertEquals(policy, 1d, .0001);
             },
             365,
             1d,
@@ -119,7 +119,7 @@ public class IndexTargetControllerTest {
         controller.start(mock(FishState.class));
         controller.step(mock(FishState.class));
 
-        assertEquals(testsRan[0], 1);
+        Assertions.assertEquals(testsRan[0], 1);
     }
 
 

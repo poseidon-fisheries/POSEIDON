@@ -1,11 +1,11 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.UnchangingPastSensor;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class UnchangingPastSensorTest {
@@ -33,16 +33,12 @@ public class UnchangingPastSensorTest {
             new UnchangingPastSensor("indicator",
                 1.5, 3
             );
-        assertEquals(target.scan(state),
-            1.4, .0001d
-        );
+        Assertions.assertEquals(target.scan(state), 1.4, .0001d);
 
 
         //make sure it doesn't update
         indicatorColumn.add(1d);
         indicatorColumn.add(2d);
-        assertEquals(target.scan(state),
-            1.4, .0001d
-        );
+        Assertions.assertEquals(target.scan(state), 1.4, .0001d);
     }
 }

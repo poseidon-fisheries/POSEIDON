@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
@@ -67,7 +67,7 @@ public class EpoBiologyOnlyScenarioTest {
                 prevAbund = fishState.getTotalAbundance(BET);
 
                 //System.out.println("new recruits: "+(totalAbundance[0][0]+totalAbundance[1][0]));
-                Assert.assertEquals(expectedBiomass[check], fishState.getTotalBiomass(BET), 1000000);
+                Assertions.assertEquals(expectedBiomass[check], fishState.getTotalBiomass(BET), 1000000);
                 check++;
             }
             fishState.schedule.step(fishState);

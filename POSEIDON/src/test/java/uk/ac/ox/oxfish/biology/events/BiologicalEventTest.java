@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.events;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -28,7 +29,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -66,7 +66,7 @@ public class BiologicalEventTest {
         event.step(state);
 
         //only one row trigger, and it only triggers twice
-        assertEquals(counter.get(), 8);
+        Assertions.assertEquals(counter.get(), 8);
 
 
     }

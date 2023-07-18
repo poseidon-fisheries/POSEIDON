@@ -21,13 +21,11 @@
 package uk.ac.ox.oxfish.model;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.utility.dynapro.AmateurishApproximateDynamicProgram;
 
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 10/12/16.
@@ -95,12 +93,12 @@ public class AmateurishApproximateDynamicProgramTest {
 
         System.out.println(program);
         //you should be able to make at least the easy decisions:
-        assertEquals(0, (int) program.chooseBestAction(1, .2, .2).getKey());
-        assertEquals(1, (int) program.chooseBestAction(.3, .5, .5).getKey());
+        Assertions.assertEquals(0, (int) program.chooseBestAction(1, .2, .2).getKey());
+        Assertions.assertEquals(1, (int) program.chooseBestAction(.3, .5, .5).getKey());
 
         //and the signs ought to be right
-        assertTrue(program.getLinearParameters()[0][0] > 0);
-        assertTrue(program.getLinearParameters()[1][0] < 0);
+        Assertions.assertTrue(program.getLinearParameters()[0][0] > 0);
+        Assertions.assertTrue(program.getLinearParameters()[1][0] < 0);
 
 
     }

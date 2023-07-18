@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.ConstantLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -9,7 +10,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class DelayGearDecoratorTest {
@@ -36,7 +36,7 @@ public class DelayGearDecoratorTest {
             );
             //should not have called the original proportion gear at all
             verify(delegate, never()).fish(any(), any(), any(), anyInt(), any());
-            assertEquals(catchMade.getTotalWeight(), 0, .001);
+            Assertions.assertEquals(catchMade.getTotalWeight(), 0, .001);
         }
 
         //10th hour it should catch!
@@ -50,7 +50,7 @@ public class DelayGearDecoratorTest {
         //should not have called the original proportion gear at all
         verify(delegate, times(1)).fish(any(), any(), any(), anyInt(), any());
         //should have caught 500kg!
-        assertEquals(catchMade.getTotalWeight(), 500, .001);
+        Assertions.assertEquals(catchMade.getTotalWeight(), 500, .001);
     }
 
     @Test

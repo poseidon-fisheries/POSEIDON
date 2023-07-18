@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
 import com.beust.jcommander.internal.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
@@ -10,7 +11,6 @@ import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class StochasticCatchSampleTest {
@@ -49,24 +49,24 @@ public class StochasticCatchSampleTest {
         sampler.start(model);
         sampler.observeDaily();
         double[][] sampledAbundance = sampler.getAbundance();
-        assertEquals(sampledAbundance[0][0], 10, .01);
-        assertEquals(sampledAbundance[0][1], 5, .01);
+        Assertions.assertEquals(sampledAbundance[0][0], 10, .01);
+        Assertions.assertEquals(sampledAbundance[0][1], 5, .01);
 
         //doesn't reset automatically
         sampler.observeDaily();
         sampledAbundance = sampler.getAbundance();
-        assertEquals(sampledAbundance[0][0], 20, .01);
-        assertEquals(sampledAbundance[0][1], 10, .01);
+        Assertions.assertEquals(sampledAbundance[0][0], 20, .01);
+        Assertions.assertEquals(sampledAbundance[0][1], 10, .01);
 
         //feed it the wrong weight and you get the wrong count
         sampledAbundance = sampler.getAbundance(integerIntegerPair -> 1d);
-        assertEquals(sampledAbundance[0][0], 20, .01);
-        assertEquals(sampledAbundance[0][1], 20, .01);
+        Assertions.assertEquals(sampledAbundance[0][0], 20, .01);
+        Assertions.assertEquals(sampledAbundance[0][1], 20, .01);
 
         //reset works
         sampler.resetCatchObservations();
         sampledAbundance = sampler.getAbundance();
-        assertEquals(sampledAbundance[0][0], 0, .01);
-        assertEquals(sampledAbundance[0][1], 0, .01);
+        Assertions.assertEquals(sampledAbundance[0][0], 0, .01);
+        Assertions.assertEquals(sampledAbundance[0][1], 0, .01);
     }
 }

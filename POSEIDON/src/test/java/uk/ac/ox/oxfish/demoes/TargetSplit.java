@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.demoes;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.factory.TargetSpeciesObjectiveFactory;
@@ -92,7 +92,7 @@ public class TargetSplit {
 
         Logger.getGlobal()
             .info("North vs South : " + towsNorth / ((double) towsNorth + towsSouth) + " I expect it to be at least 70%");
-        Assert.assertTrue(towsNorth / ((double) towsNorth + towsSouth) > .7);
+        Assertions.assertTrue(towsNorth / ((double) towsNorth + towsSouth) > .7);
 
     }
 }

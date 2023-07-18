@@ -20,13 +20,12 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import static org.junit.Assert.assertEquals;
 
 
 public class AbundanceLocalBiologyTest {
@@ -71,13 +70,9 @@ public class AbundanceLocalBiologyTest {
         local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][5] = 200;
         local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][6] = 100;
 
-        assertEquals(
-            local.getBiomass(longspine),
-            100 * 0.019880139 +
-                200 * 0.019880139 +
-                100 * 0.0300262838,
-            .001
-        );
+        Assertions.assertEquals(local.getBiomass(longspine), 100 * 0.019880139 +
+            200 * 0.019880139 +
+            100 * 0.0300262838, .001);
 
 
     }
@@ -104,10 +99,10 @@ public class AbundanceLocalBiologyTest {
             null, biology
         );
 
-        assertEquals(local.getAbundance(longspine).asMatrix()[FishStateUtilities.FEMALE][5], 100, .001);
-        assertEquals(local.getAbundance(longspine).asMatrix()[FishStateUtilities.FEMALE][6], 0, .001);
-        assertEquals(local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][5], 200, .001);
-        assertEquals(local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][6], 50, .001);
+        Assertions.assertEquals(local.getAbundance(longspine).asMatrix()[FishStateUtilities.FEMALE][5], 100, .001);
+        Assertions.assertEquals(local.getAbundance(longspine).asMatrix()[FishStateUtilities.FEMALE][6], 0, .001);
+        Assertions.assertEquals(local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][5], 200, .001);
+        Assertions.assertEquals(local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][6], 50, .001);
 
     }
 

@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.demoes;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -84,7 +84,7 @@ public class FishTheLineDemo {
                     onTheLine += hotspot;
                 //also hotspot should be 0 in the MPA itself
                 if (x >= topLeftX && x <= topLeftX + mpaWidth && y >= topLeftY && y <= topLeftY + height)
-                    Assert.assertEquals(0, hotspot, .0001);
+                    Assertions.assertEquals(0, hotspot, .0001);
             }
 
         }
@@ -92,8 +92,8 @@ public class FishTheLineDemo {
         //on the line fishing make up at least 40% of all recent fishing (since exploration is pretty aggressive anyway)
         System.out.println(allHotspots + " --- " + onTheLine);
         System.out.println("percentage fished on the line : " + onTheLine / allHotspots);
-        Assert.assertTrue(allHotspots * .40 <= onTheLine);
-        Assert.assertTrue(onTheLine > 0);
+        Assertions.assertTrue(allHotspots * .40 <= onTheLine);
+        Assertions.assertTrue(onTheLine > 0);
 
 
     }

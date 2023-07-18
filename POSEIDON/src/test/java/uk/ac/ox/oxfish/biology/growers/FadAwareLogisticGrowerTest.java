@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.biology.growers;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.tuna.BiomassProcessesFactory;
@@ -27,8 +28,6 @@ import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
-
-import static org.junit.Assert.assertEquals;
 
 public class FadAwareLogisticGrowerTest {
 
@@ -60,7 +59,7 @@ public class FadAwareLogisticGrowerTest {
         state.schedule.step(state);
 
         final Species yft = state.getBiology().getSpeciesByCaseInsensitiveName("Yellowfin tuna");
-        assertEquals(889195.40, state.getTotalBiomass(yft) / 1000.0, 10.0);
+        Assertions.assertEquals(889195.40, state.getTotalBiomass(yft) / 1000.0, 10.0);
 
 
     }

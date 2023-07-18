@@ -20,10 +20,8 @@
 
 package uk.ac.ox.oxfish.fisher.equipment;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 public class EngineTest {
@@ -35,8 +33,8 @@ public class EngineTest {
         final Engine inefficient = new Engine(100, 100, 1);
         final Engine efficient = new Engine(100, 50, 1);
 
-        assertTrue(efficient.getGasConsumptionPerKm(1) < inefficient.getGasConsumptionPerKm(1));
-        assertEquals(efficient.getGasConsumptionPerKm(1), 50, .0001);
+        Assertions.assertTrue(efficient.getGasConsumptionPerKm(1) < inefficient.getGasConsumptionPerKm(1));
+        Assertions.assertEquals(efficient.getGasConsumptionPerKm(1), 50, .0001);
 
     }
 
@@ -46,10 +44,10 @@ public class EngineTest {
         FuelTank tank = new FuelTank(1000);
         tank.consume(100);
         tank.consume(25);
-        assertEquals(tank.getLitersOfFuelInTank(), 875, .0001);
-        assertEquals(tank.refill(), 125, .0001);
-        assertEquals(tank.getLitersOfFuelInTank(), 1000, .0001);
-        assertEquals(tank.getFuelCapacityInLiters(), 1000, .0001);
+        Assertions.assertEquals(tank.getLitersOfFuelInTank(), 875, .0001);
+        Assertions.assertEquals(tank.refill(), 125, .0001);
+        Assertions.assertEquals(tank.getLitersOfFuelInTank(), 1000, .0001);
+        Assertions.assertEquals(tank.getFuelCapacityInLiters(), 1000, .0001);
 
     }
 }

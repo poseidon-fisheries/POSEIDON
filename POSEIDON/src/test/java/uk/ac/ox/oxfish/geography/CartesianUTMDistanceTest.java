@@ -21,11 +21,11 @@
 package uk.ac.ox.oxfish.geography;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,7 +51,7 @@ public class CartesianUTMDistanceTest {
         Logger.getGlobal()
             .info(
                 "the distance between Morro Bay and San Francisco is about 300km, the distance calculator thinks it is " + km);
-        assertEquals(km, 300, 10);
+        Assertions.assertEquals(km, 300, 10);
 
         //Los Angeles: Easting: 695337, Northing: 3915757.7
         //San Diego: 486713.98.7, 3616444.50
@@ -66,7 +66,7 @@ public class CartesianUTMDistanceTest {
         Logger.getGlobal()
             .info("the distance between Los Angeles and San Diego is about 180km, the distance calculator thinks it is " +
                 km);
-        assertEquals(km, 180, 10);
+        Assertions.assertEquals(km, 180, 10);
 
     }
 }

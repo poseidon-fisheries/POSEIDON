@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -27,7 +28,6 @@ import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import static org.junit.Assert.assertTrue;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class EpoGravityBiomassScenarioTest {
@@ -58,9 +58,9 @@ public class EpoGravityBiomassScenarioTest {
                     System.out.printf("Catches:    %.2f%n", catches);
                     System.out.printf("Landings:   %.2f%n", landings);
                     System.out.printf("Difference: %.2f%n", Math.abs(catches - landings));
-                    assertTrue(catches > 1000);
-                    assertTrue(landings > 1000);
-                    assertTrue(Math.abs(catches - landings) < EPSILON);
+                    Assertions.assertTrue(catches > 1000);
+                    Assertions.assertTrue(landings > 1000);
+                    Assertions.assertTrue(Math.abs(catches - landings) < EPSILON);
                 }, StepOrder.AFTER_DATA);
             }
         );

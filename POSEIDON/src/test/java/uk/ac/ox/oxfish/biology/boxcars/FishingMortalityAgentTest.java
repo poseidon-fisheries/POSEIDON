@@ -20,13 +20,12 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.FormulaAbundanceFilter;
-
-import static org.junit.Assert.assertEquals;
 
 public class FishingMortalityAgentTest {
 
@@ -82,7 +81,7 @@ public class FishingMortalityAgentTest {
             catches,
             abundance
         );
-        assertEquals(0.8754687, mortality, .001);
+        Assertions.assertEquals(0.8754687, mortality, .001);
 
 
     }

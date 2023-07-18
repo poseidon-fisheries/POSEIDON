@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.maximization.generic;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.growers.CommonLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
@@ -29,8 +30,6 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.lang.reflect.InvocationTargetException;
-
-import static org.junit.Assert.assertEquals;
 
 public class SimpleOptimizationParameterTest {
 
@@ -44,9 +43,7 @@ public class SimpleOptimizationParameterTest {
         scenario.setBiologyInitializer(biologyInitializer);
 
 
-        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(),
-            100, .0001
-        );
+        Assertions.assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(), 100, .0001);
 
         final SimpleOptimizationParameter parameter = new SimpleOptimizationParameter(
             "biologyInitializer.exponent",
@@ -59,9 +56,7 @@ public class SimpleOptimizationParameterTest {
         );
 
 
-        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(),
-            200, .0001
-        );
+        Assertions.assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(), 200, .0001);
     }
 
     @Test
@@ -70,9 +65,7 @@ public class SimpleOptimizationParameterTest {
         scenario.setSpeedInKmh(new FixedDoubleParameter(150));
 
 
-        assertEquals(((FixedDoubleParameter) scenario.getSpeedInKmh()).getValue(),
-            150, .0001
-        );
+        Assertions.assertEquals(((FixedDoubleParameter) scenario.getSpeedInKmh()).getValue(), 150, .0001);
 
         final SimpleOptimizationParameter parameter = new SimpleOptimizationParameter(
             "speedInKmh",
@@ -84,9 +77,7 @@ public class SimpleOptimizationParameterTest {
             new double[]{0}
         );
 
-        assertEquals(((FixedDoubleParameter) scenario.getSpeedInKmh()).getValue(),
-            10, .0001
-        );
+        Assertions.assertEquals(((FixedDoubleParameter) scenario.getSpeedInKmh()).getValue(), 10, .0001);
     }
 
     @Test
@@ -104,11 +95,15 @@ public class SimpleOptimizationParameterTest {
         second.setGrower(new CommonLogisticGrowerFactory(.567));
 
 
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
-            .567, .0001
+        Assertions.assertEquals(
+            ((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
+            .567,
+            .0001
         );
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getValue(),
-            .567, .0001
+        Assertions.assertEquals(
+            ((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getValue(),
+            .567,
+            .0001
         );
 
 
@@ -129,11 +124,15 @@ public class SimpleOptimizationParameterTest {
         );
 
 
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
-            .567, .0001
+        Assertions.assertEquals(
+            ((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
+            .567,
+            .0001
         );
-        assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getValue(),
-            10, .0001
+        Assertions.assertEquals(
+            ((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getValue(),
+            10,
+            .0001
         );
     }
 

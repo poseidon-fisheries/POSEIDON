@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.model.regs.factory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Booleans;
 import com.vividsolutions.jts.geom.Coordinate;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
@@ -46,7 +46,7 @@ public class SpecificProtectedAreaFactoryTest {
                 )
                 .collect(toImmutableList());
 
-        Assert.assertEquals(ImmutableList.of(), areasWithNoTiles);
+        Assertions.assertEquals(ImmutableList.of(), areasWithNoTiles);
     }
 
     @Test
@@ -89,7 +89,7 @@ public class SpecificProtectedAreaFactoryTest {
                 )
                 .collect(toImmutableList());
 
-        Assert.assertEquals(ImmutableList.of(), failures);
+        Assertions.assertEquals(ImmutableList.of(), failures);
 
     }
 

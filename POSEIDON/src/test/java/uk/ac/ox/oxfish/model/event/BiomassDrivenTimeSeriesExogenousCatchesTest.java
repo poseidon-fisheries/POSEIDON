@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.model.event;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.CommonLogisticGrowerFactory;
@@ -35,8 +35,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Queue;
-
-import static org.junit.Assert.assertEquals;
 
 public class BiomassDrivenTimeSeriesExogenousCatchesTest {
 
@@ -102,30 +100,20 @@ public class BiomassDrivenTimeSeriesExogenousCatchesTest {
             state.schedule.step(state);
 
         System.out.println(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0"));
-        Assert.assertEquals(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0").get(0),
-            10d, .001
-        );
-        Assert.assertEquals(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0").get(1),
-            20d, .001
-        );
-        Assert.assertEquals(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0").get(2),
-            30d, .001
-        );
-        Assert.assertEquals(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0").get(3),
-            30d, .001
-        );
+        Assertions.assertEquals(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0").get(0), 10d, .001);
+        Assertions.assertEquals(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0").get(1), 20d, .001);
+        Assertions.assertEquals(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0").get(2), 30d, .001);
+        Assertions.assertEquals(state.getYearlyDataSet().getColumn("Exogenous catches of Species 0").get(3), 30d, .001);
 
         //no other landings must have occurred!
         for (int i = 0; i < 4; i++)
-            Assert.assertEquals(state.getYearlyDataSet().getColumn("Species 0 Landings").get(i),
-                0, .001
-            );
+            Assertions.assertEquals(state.getYearlyDataSet().getColumn("Species 0 Landings").get(i), 0, .001);
 
 
         System.out.println(state.getYearlyDataSet().getColumn("Biomass Species 0"));
         System.out.println(state.getYearlyDataSet().getColumn("Species 0 Landings"));
 
-        assertEquals(
+        Assertions.assertEquals(
             state.getTotalBiomass(state.getSpecies().get(0)),
             initialBiomassFirst - 10 - 20 - 30 - 30,
             .0001
@@ -133,11 +121,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesTest {
         System.out.println(state.getTotalBiomass(state.getSpecies().get(0)));
         System.out.println(initialBiomassFirst);
 
-        assertEquals(
-            state.getTotalBiomass(state.getSpecies().get(1)),
-            initialBiomassSecond - 1 - 2,
-            .0001
-        );
+        Assertions.assertEquals(state.getTotalBiomass(state.getSpecies().get(1)), initialBiomassSecond - 1 - 2, .0001);
 
 
     }

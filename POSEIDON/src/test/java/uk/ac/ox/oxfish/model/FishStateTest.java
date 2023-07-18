@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -38,8 +39,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.model.StepOrder.*;
 
@@ -96,26 +95,26 @@ public class FishStateTest {
         state.schedule.step(state);
         state.schedule.step(state);
 
-        assertEquals(4, state.getFishers().size());
-        assertTrue(state.canCreateMoreFishers());
+        Assertions.assertEquals(4, state.getFishers().size());
+        Assertions.assertTrue(state.canCreateMoreFishers());
         state.createFisher(FishState.DEFAULT_POPULATION_NAME);
         state.createFisher(FishState.DEFAULT_POPULATION_NAME);
         state.createFisher(FishState.DEFAULT_POPULATION_NAME);
         state.schedule.step(state);
-        assertEquals(7, state.getFishers().size());
+        Assertions.assertEquals(7, state.getFishers().size());
         state.schedule.step(state);
-        assertEquals(7, state.getFishers().size());
+        Assertions.assertEquals(7, state.getFishers().size());
         state.killRandomFisher();
         state.killRandomFisher();
-        assertEquals(5, state.getFishers().size());
+        Assertions.assertEquals(5, state.getFishers().size());
         state.schedule.step(state);
-        assertEquals(5, state.getFishers().size());
+        Assertions.assertEquals(5, state.getFishers().size());
 
         Logger.getGlobal().info("Testing that new fishers collect data just like the old ones");
         final Fisher newguy = state.createFisher(FishState.DEFAULT_POPULATION_NAME);
         for (int i = 0; i < 10; i++)
             state.schedule.step(state);
-        assertEquals(10, newguy.getDailyData().numberOfObservations());
+        Assertions.assertEquals(10, newguy.getDailyData().numberOfObservations());
 
 
     }
@@ -131,11 +130,11 @@ public class FishStateTest {
         state.start();
         while (state.getDay() < 366)
             state.schedule.step(state);
-        assertEquals(2, state.getDayOfTheYear());
-        assertEquals(1, state.getYear());
-        assertEquals(366, state.getDay(), .001d);
+        Assertions.assertEquals(2, state.getDayOfTheYear());
+        Assertions.assertEquals(1, state.getYear());
+        Assertions.assertEquals(366, state.getDay(), .001d);
         //midnight is the previous day, so that the first valid step for day 366 will be at 12pm
-        assertEquals(8784 + 12, state.getHoursSinceStart(), 0.0001d);
+        Assertions.assertEquals(8784 + 12, state.getHoursSinceStart(), 0.0001d);
     }
 
     @Test
@@ -159,18 +158,18 @@ public class FishStateTest {
         for (int day = 0; day < 350; day++) {
             state.schedule.step(state);
         }
-        assertEquals(stepCounter[0], 1);
-        assertEquals(stepCounter[1], 0);
+        Assertions.assertEquals(stepCounter[0], 1);
+        Assertions.assertEquals(stepCounter[1], 0);
         for (int day = 0; day < 350; day++) {
             state.schedule.step(state);
         }
-        assertEquals(stepCounter[0], 1);
-        assertEquals(stepCounter[1], 1);
+        Assertions.assertEquals(stepCounter[0], 1);
+        Assertions.assertEquals(stepCounter[1], 1);
         for (int day = 0; day < 350; day++) {
             state.schedule.step(state);
         }
-        assertEquals(stepCounter[0], 2);
-        assertEquals(stepCounter[1], 1);
+        Assertions.assertEquals(stepCounter[0], 2);
+        Assertions.assertEquals(stepCounter[1], 1);
     }
 
     @Test
@@ -211,11 +210,11 @@ public class FishStateTest {
         fishState.scheduleOnce(
             simState1 -> {
                 final FishState fs1 = (FishState) simState1;
-                assertEquals(fs1.getScenario().getStartDate(), fs1.getDate());
+                Assertions.assertEquals(fs1.getScenario().getStartDate(), fs1.getDate());
                 fishState.scheduleOnceInXDays(
                     simState2 -> {
                         final FishState fs2 = (FishState) simState2;
-                        assertEquals(fs2.getScenario().getStartDate().plusDays(daysFromNow), fs2.getDate());
+                        Assertions.assertEquals(fs2.getScenario().getStartDate().plusDays(daysFromNow), fs2.getDate());
                     },
                     DAWN,
                     daysFromNow

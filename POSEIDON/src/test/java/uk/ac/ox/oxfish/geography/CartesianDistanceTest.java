@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.geography;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.geography.pathfinding.Pathfinder;
@@ -30,8 +31,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import static com.google.common.collect.Iterables.get;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 
 public class CartesianDistanceTest {
 
@@ -40,11 +39,11 @@ public class CartesianDistanceTest {
 
         CartesianDistance distance = new CartesianDistance(1);
 
-        assertEquals(distance.distance(0, 0, 1, 1), Math.sqrt(2), .001);
+        Assertions.assertEquals(distance.distance(0, 0, 1, 1), Math.sqrt(2), .001);
 
         distance = new CartesianDistance(2);
 
-        assertEquals(distance.distance(0, 2, 0, 0), 4, .001);
+        Assertions.assertEquals(distance.distance(0, 2, 0, 0), 4, .001);
 
     }
 
@@ -66,11 +65,11 @@ public class CartesianDistanceTest {
             // First value of cumulative distance should always be zero
             final Deque<SeaTile> route = pathfinder.getRoute(map, startTile, endTile);
             final List<Entry<SeaTile, Double>> cumDist = distance.cumulativeDistanceAlongRouteInKm(route, map);
-            assertEquals(0.0, get(cumDist, 0).getValue(), 0.01);
+            Assertions.assertEquals(0.0, get(cumDist, 0).getValue(), 0.01);
         }
     }
 
     private <T> void checkSecondValueOfEntries(final Collection<Entry<T, Double>> pairs, final double... values) {
-        assertArrayEquals(values, pairs.stream().mapToDouble(Entry::getValue).toArray(), 0.01);
+        Assertions.assertArrayEquals(values, pairs.stream().mapToDouble(Entry::getValue).toArray(), 0.01);
     }
 }

@@ -21,13 +21,11 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.bayes.Belief;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.bayes.ParticleFilter;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 8/1/16.
@@ -43,7 +41,7 @@ public class ParticleFilterTest {
 
         Belief<Double> belief = particleFilter.getBelief();
 
-        assertEquals(Belief.getSummaryStatistics(belief)[0], .5, .2);
+        Assertions.assertEquals(Belief.getSummaryStatistics(belief)[0], .5, .2);
         double earlyDeviation = Belief.getSummaryStatistics(belief)[1];
 
         for (int i = 0; i < 100; i++) {
@@ -53,17 +51,17 @@ public class ParticleFilterTest {
             System.out.println(Belief.getSummaryStatistics(particleFilter.getBelief())[0]);
         }
 
-        assertEquals(.8, Belief.getSummaryStatistics(particleFilter.getBelief())[0], .1);
+        Assertions.assertEquals(.8, Belief.getSummaryStatistics(particleFilter.getBelief())[0], .1);
         double midDeviation = Belief.getSummaryStatistics(particleFilter.getBelief())[1];
-        assertTrue(midDeviation < earlyDeviation);
+        Assertions.assertTrue(midDeviation < earlyDeviation);
 
         for (int i = 0; i < 100; i++) {
             particleFilter.drift(random);
             System.out.println(Belief.getSummaryStatistics(particleFilter.getBelief())[0]);
         }
-        assertEquals(Belief.getSummaryStatistics(particleFilter.getBelief())[0], .5, .2);
+        Assertions.assertEquals(Belief.getSummaryStatistics(particleFilter.getBelief())[0], .5, .2);
         double lateDeviation = Belief.getSummaryStatistics(particleFilter.getBelief())[1];
-        assertTrue(lateDeviation > midDeviation);
+        Assertions.assertTrue(lateDeviation > midDeviation);
 
     }
 }

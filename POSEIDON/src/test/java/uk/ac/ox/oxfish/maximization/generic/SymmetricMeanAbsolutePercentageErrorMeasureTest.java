@@ -19,9 +19,9 @@
 
 package uk.ac.ox.oxfish.maximization.generic;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
 import static uk.ac.ox.oxfish.maximization.generic.SymmetricMeanAbsolutePercentageErrorMeasure.INSTANCE;
 
 public class SymmetricMeanAbsolutePercentageErrorMeasureTest {
@@ -30,10 +30,10 @@ public class SymmetricMeanAbsolutePercentageErrorMeasureTest {
     public void test() {
 
         // At = 100 and Ft = 110 give SMAPE = 4.76%
-        assertEquals(4.76, INSTANCE.applyAsDouble(100, 110), 0.005);
+        Assertions.assertEquals(4.76, INSTANCE.applyAsDouble(100, 110), 0.005);
 
         // At = 100 and Ft = 90 give SMAPE = 5.26%.
-        assertEquals(5.26, INSTANCE.applyAsDouble(100, 90), 0.005);
+        Assertions.assertEquals(5.26, INSTANCE.applyAsDouble(100, 90), 0.005);
 
     }
 

@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -31,7 +32,6 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.components.FixedProportionFilter;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
@@ -61,17 +61,17 @@ public class HomogeneousAbundanceGearTest {
 
 
         Catch fish = gear.fish(mock(Fisher.class), tile, tile, 1, biology);
-        assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
+        Assertions.assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
             new double[]{0}, new double[]{25}, species.getMeristics()), .001);
 
-        assertEquals(fish.getAbundance(0).asMatrix()[FEMALE][0], 25, .001);
+        Assertions.assertEquals(fish.getAbundance(0).asMatrix()[FEMALE][0], 25, .001);
 
         //it shouldn't break if I run it again!
         fish = gear.fish(mock(Fisher.class), tile, tile, 1, biology);
-        assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
+        Assertions.assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
             new double[]{0}, new double[]{25}, species.getMeristics()), .001);
 
-        assertEquals(fish.getAbundance(0).asMatrix()[FEMALE][0], 25, .001);
+        Assertions.assertEquals(fish.getAbundance(0).asMatrix()[FEMALE][0], 25, .001);
 
 
     }
@@ -97,7 +97,7 @@ public class HomogeneousAbundanceGearTest {
 
         Catch fish = gear.fish(mock(Fisher.class), tile, tile, 1, biology);
 
-        assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
+        Assertions.assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
             new double[]{0}, new double[]{50}, species.getMeristics()), .001);
 
 
@@ -124,7 +124,7 @@ public class HomogeneousAbundanceGearTest {
 
         double fish[] = gear.expectedHourlyCatch(mock(Fisher.class), tile, 1, biology);
 
-        assertEquals(fish[0], FishStateUtilities.weigh(new double[]{0},
+        Assertions.assertEquals(fish[0], FishStateUtilities.weigh(new double[]{0},
             new double[]{50}, species.getMeristics()
         ), .001);
 
@@ -152,9 +152,9 @@ public class HomogeneousAbundanceGearTest {
         Catch fish = gear.fish(mock(Fisher.class), tile, tile, 2, biology);
 
         //you are going to catch 50 on the first hour and 50 in the other second (this is because seatile is mocked and doesn't kill off biology)
-        assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
+        Assertions.assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
             new double[]{0}, new double[]{50 + 50}, species.getMeristics()), .001);
-        assertEquals(fish.getAbundance(0).asMatrix()[FEMALE][0], 100, .0001);
+        Assertions.assertEquals(fish.getAbundance(0).asMatrix()[FEMALE][0], 100, .0001);
 
 
     }

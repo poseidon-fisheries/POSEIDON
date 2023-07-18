@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.actions;
 
 import com.vividsolutions.jts.geom.Envelope;
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
@@ -60,8 +61,6 @@ import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 
 import java.util.Queue;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 
@@ -161,19 +160,19 @@ public class MovingTest {
         );
         fisher.start(mock(FishState.class));
         //starts at port!
-        assertEquals(fishState.getMap().getSeaTile(1, 1), fisher.getLocation());
+        Assertions.assertEquals(fishState.getMap().getSeaTile(1, 1), fisher.getLocation());
 
         fisher.step(fishState);
         //still at port
-        assertEquals(fishState.getMap().getSeaTile(1, 1), fisher.getLocation());
+        Assertions.assertEquals(fishState.getMap().getSeaTile(1, 1), fisher.getLocation());
 
         //one more step, still at port!
         fisher.step(fishState);
-        assertEquals(fishState.getMap().getSeaTile(1, 1), fisher.getLocation());
+        Assertions.assertEquals(fishState.getMap().getSeaTile(1, 1), fisher.getLocation());
 
         //final step, gooone!
         fisher.step(fishState);
-        assertEquals(fishState.getMap().getSeaTile(0, 1), fisher.getLocation());
+        Assertions.assertEquals(fishState.getMap().getSeaTile(0, 1), fisher.getLocation());
 
 
     }
@@ -183,7 +182,7 @@ public class MovingTest {
         final FishState simple = generateSimple4x4Map();
         final NauticalMap map = simple.getMap();
         final Queue<SeaTile> route = map.getRoute(map.getSeaTile(2, 2), map.getSeaTile(2, 2));
-        assertEquals(1, route.size());
+        Assertions.assertEquals(1, route.size());
     }
 
     //all sea tiles!
@@ -217,8 +216,8 @@ public class MovingTest {
 
         final ActionResult result = move.act(simple, fisher, new Anarchy(), 24);
         verify(fisher, never()).move(any(), any(), any(), anyDouble()); //never moved
-        assertTrue(result.isActAgainThisTurn()); //think he has arrived
-        assertTrue(result.getNextState() instanceof Arriving);
+        Assertions.assertTrue(result.isActAgainThisTurn()); //think he has arrived
+        Assertions.assertTrue(result.getNextState() instanceof Arriving);
 
 
     }
@@ -234,8 +233,8 @@ public class MovingTest {
         //should move and spend 20 hours doing so
         fisher.undock();
         move.act(simple, fisher, new Anarchy(), 24);
-        assertEquals(fisher.getHoursTravelledToday(), 20, .001);
-        assertEquals(fisher.getLocation(), map.getSeaTile(2, 0));
+        Assertions.assertEquals(fisher.getHoursTravelledToday(), 20, .001);
+        Assertions.assertEquals(fisher.getLocation(), map.getSeaTile(2, 0));
 
     }
 
@@ -276,8 +275,8 @@ public class MovingTest {
 
         //should move and spend 20 hours doing so
         move.act(simple, fisher, new Anarchy(), 24);
-        assertEquals(fisher.getHoursTravelledToday(), 20, .001);
-        assertEquals(fisher.getLocation(), map.getSeaTile(1, 0));
+        Assertions.assertEquals(fisher.getHoursTravelledToday(), 20, .001);
+        Assertions.assertEquals(fisher.getLocation(), map.getSeaTile(1, 0));
 
     }
 
@@ -289,9 +288,9 @@ public class MovingTest {
         final Queue<SeaTile> route = map.getRoute(map.getSeaTile(0, 2), map.getSeaTile(2, 2));
         route.poll(); //ignore start
 
-        assertEquals(route.size(), 2);
-        assertEquals(route.poll(), map.getSeaTile(1, 2));
-        assertEquals(route.poll(), map.getSeaTile(2, 2));
+        Assertions.assertEquals(route.size(), 2);
+        Assertions.assertEquals(route.poll(), map.getSeaTile(1, 2));
+        Assertions.assertEquals(route.poll(), map.getSeaTile(2, 2));
     }
 
     @Test
@@ -302,9 +301,9 @@ public class MovingTest {
         final Queue<SeaTile> route = map.getRoute(map.getSeaTile(2, 0), map.getSeaTile(2, 2));
         route.poll(); //ignore start
 
-        assertEquals(route.size(), 2);
-        assertEquals(route.poll(), map.getSeaTile(2, 1));
-        assertEquals(route.poll(), map.getSeaTile(2, 2));
+        Assertions.assertEquals(route.size(), 2);
+        Assertions.assertEquals(route.poll(), map.getSeaTile(2, 1));
+        Assertions.assertEquals(route.poll(), map.getSeaTile(2, 2));
 
 
     }
@@ -317,9 +316,9 @@ public class MovingTest {
         final Queue<SeaTile> route = map.getRoute(map.getSeaTile(0, 0), map.getSeaTile(2, 2));
         route.poll(); //ignore start
 
-        assertEquals(route.size(), 2);
-        assertEquals(route.poll(), map.getSeaTile(1, 1));
-        assertEquals(route.poll(), map.getSeaTile(2, 2));
+        Assertions.assertEquals(route.size(), 2);
+        Assertions.assertEquals(route.poll(), map.getSeaTile(1, 1));
+        Assertions.assertEquals(route.poll(), map.getSeaTile(2, 2));
 
 
     }
@@ -330,10 +329,10 @@ public class MovingTest {
         final NauticalMap map = simple.getMap();
         final Queue<SeaTile> route = map.getRoute(map.getSeaTile(0, 0), map.getSeaTile(2, 3));
         route.poll(); //ignore start
-        assertEquals(route.size(), 3);
-        assertEquals(route.poll(), map.getSeaTile(1, 1));
-        assertEquals(route.poll(), map.getSeaTile(2, 2));
-        assertEquals(route.poll(), map.getSeaTile(2, 3));
+        Assertions.assertEquals(route.size(), 3);
+        Assertions.assertEquals(route.poll(), map.getSeaTile(1, 1));
+        Assertions.assertEquals(route.poll(), map.getSeaTile(2, 2));
+        Assertions.assertEquals(route.poll(), map.getSeaTile(2, 3));
     }
 
 }

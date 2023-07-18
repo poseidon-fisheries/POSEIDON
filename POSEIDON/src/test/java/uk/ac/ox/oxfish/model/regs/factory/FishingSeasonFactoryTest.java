@@ -20,13 +20,11 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 
 public class FishingSeasonFactoryTest {
@@ -42,9 +40,9 @@ public class FishingSeasonFactoryTest {
         factory.setRespectMPA(false);
         for (int i = 0; i < 100; i++) {
             final FishingSeason season = factory.apply(state);
-            assertTrue(season.getDaysOpened() >= 50);
-            assertTrue(season.getDaysOpened() <= 150);
-            assertFalse(season.isRespectMPAs());
+            Assertions.assertTrue(season.getDaysOpened() >= 50);
+            Assertions.assertTrue(season.getDaysOpened() <= 150);
+            Assertions.assertFalse(season.isRespectMPAs());
         }
 
 

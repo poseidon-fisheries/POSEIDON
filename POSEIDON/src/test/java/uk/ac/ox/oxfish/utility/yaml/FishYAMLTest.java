@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.utility.yaml;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
@@ -40,8 +40,6 @@ import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 
 public class FishYAMLTest {
@@ -114,20 +112,20 @@ public class FishYAMLTest {
         final FishYAML yaml = new FishYAML();
         final Object loaded = yaml.loadAs(scenarioFile, Scenario.class);
         //read prototype scenario correctly
-        Assert.assertTrue(loaded instanceof PrototypeScenario);
+        Assertions.assertTrue(loaded instanceof PrototypeScenario);
         final PrototypeScenario scenario = (PrototypeScenario) loaded;
         //read initializer correctly
-        Assert.assertTrue(scenario.getBiologyInitializer() instanceof DiffusingLogisticFactory);
+        Assertions.assertTrue(scenario.getBiologyInitializer() instanceof DiffusingLogisticFactory);
         final DiffusingLogisticFactory factory = (DiffusingLogisticFactory) scenario.getBiologyInitializer();
         //reads double parameters correctly
-        Assert.assertTrue(factory.getCarryingCapacity() instanceof FixedDoubleParameter);
-        Assert.assertEquals(((FixedDoubleParameter) factory.getCarryingCapacity()).getValue(), 14.0, .001);
+        Assertions.assertTrue(factory.getCarryingCapacity() instanceof FixedDoubleParameter);
+        Assertions.assertEquals(((FixedDoubleParameter) factory.getCarryingCapacity()).getValue(), 14.0, .001);
         //reads normal doubles correctly
         final double[] possibleValues = ((SelectDoubleParameter) factory.getPercentageLimitOnDailyMovement()).getPossibleValues();
-        Assert.assertEquals(possibleValues[0], .2, .0001);
-        Assert.assertEquals(possibleValues[1], .5, .0001);
+        Assertions.assertEquals(possibleValues[0], .2, .0001);
+        Assertions.assertEquals(possibleValues[1], .5, .0001);
         //reads anarchy factory just as well (it's a scalar algorithmFactory which is tricky)
-        Assert.assertTrue(scenario.getRegulation() instanceof AnarchyFactory);
+        Assertions.assertTrue(scenario.getRegulation() instanceof AnarchyFactory);
 
     }
 
@@ -144,15 +142,19 @@ public class FishYAMLTest {
         System.out.println(dumped);
 
         //test pretty printing
-        Assert.assertTrue(dumped.contains("percentageLimitOnDailyMovement: uniform 0.0 10.0"));
-        Assert.assertTrue(dumped.contains("carryingCapacity: normal 10000.0 10.0"));
+        Assertions.assertTrue(dumped.contains("percentageLimitOnDailyMovement: uniform 0.0 10.0"));
+        Assertions.assertTrue(dumped.contains("carryingCapacity: normal 10000.0 10.0"));
 
         //now read it back! (notice that I need to do "loadAs" because when writing prettily the factory gets written
         //as a map; that's not an issue in scenarios because the constructor knows where factories ought to be but when
         //the factory is written without any warning that it's going to be an AlgorithmFactory then things go badly
         final DiffusingLogisticFactory factory2 = yaml.loadAs(dumped, DiffusingLogisticFactory.class);
-        assertEquals(((NormalDoubleParameter) factory2.getCarryingCapacity()).getMean(), 10000, .001);
-        assertEquals(((NormalDoubleParameter) factory2.getCarryingCapacity()).getStandardDeviation(), 10, .001);
+        Assertions.assertEquals(((NormalDoubleParameter) factory2.getCarryingCapacity()).getMean(), 10000, .001);
+        Assertions.assertEquals(
+            ((NormalDoubleParameter) factory2.getCarryingCapacity()).getStandardDeviation(),
+            10,
+            .001
+        );
 
     }
 
@@ -166,12 +168,12 @@ public class FishYAMLTest {
         final String dumped = yaml.dump(scenario);
         //load back! Notice that because it's made "pretty" I still have to call loadAs
         final Scenario scenario2 = yaml.loadAs(dumped, Scenario.class);
-        Assert.assertTrue(scenario2 instanceof PrototypeScenario);
+        Assertions.assertTrue(scenario2 instanceof PrototypeScenario);
 
         //make sure it remembers that the regulations have changed
-        Assert.assertTrue(((PrototypeScenario) scenario2).getRegulation() instanceof ProtectedAreasOnlyFactory);
+        Assertions.assertTrue(((PrototypeScenario) scenario2).getRegulation() instanceof ProtectedAreasOnlyFactory);
         //make sure three recursions in this is still correct.
-        Assert.assertEquals(
+        Assertions.assertEquals(
             ((FixedDoubleParameter) ((DiffusingLogisticFactory) ((PrototypeScenario) scenario2).getBiologyInitializer()).getDifferentialPercentageToMove()).getValue(),
             .9,
             .0001
@@ -180,7 +182,7 @@ public class FishYAMLTest {
 
         //final test, if I redump you, it'll be exactly like before
         final String dump2 = yaml.dump(scenario2);
-        Assert.assertEquals(dumped, dump2);
+        Assertions.assertEquals(dumped, dump2);
     }
 
 

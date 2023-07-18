@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
@@ -51,10 +51,7 @@ public class ITargetTest {
             5, 5 * 2
         );
 
-        Assert.assertEquals(target.scan(state),
-            661.2503
-            , .0001
-        );
+        Assertions.assertEquals(target.scan(state), 661.2503, .0001);
 
     }
 }

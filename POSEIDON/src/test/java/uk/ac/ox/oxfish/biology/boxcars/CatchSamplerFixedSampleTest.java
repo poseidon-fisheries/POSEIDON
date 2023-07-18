@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -48,7 +48,7 @@ public class CatchSamplerFixedSampleTest {
             //we shouldn't sample lames
             if (fisher.getTagsList().contains("lame") &&
                 fisher.getTagsList().contains("surveyed Species 0"))
-                Assert.fail();
+                Assertions.fail();
             if (fisher.getTagsList().contains("cool") &&
                 fisher.getTagsList().contains("surveyed Species 0"))
                 numberOfBoatsSampled++;
@@ -56,8 +56,8 @@ public class CatchSamplerFixedSampleTest {
 
         }
 
-        Assert.assertTrue(numberOfBoatsSampled > 5);
-        Assert.assertTrue(numberOfBoatsSampled < 45);
+        Assertions.assertTrue(numberOfBoatsSampled > 5);
+        Assertions.assertTrue(numberOfBoatsSampled < 45);
 
 
     }

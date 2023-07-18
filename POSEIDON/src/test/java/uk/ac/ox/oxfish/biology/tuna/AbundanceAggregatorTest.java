@@ -20,7 +20,7 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -77,21 +77,21 @@ public class AbundanceAggregatorTest {
 
         // Note that the biomasses and the abundance numbers should be equal since we're using
         // fake meristics where the weight of one fish is 1.0.
-        Assert.assertEquals(111, outputBiology.getAbundance(species.get(0)).getAbundance(0, 0), EPSILON);
-        Assert.assertEquals(111, outputBiology.getBiomass(species.get(0)), EPSILON);
-        Assert.assertEquals(222, outputBiology.getAbundance(species.get(1)).getAbundance(0, 0), EPSILON);
-        Assert.assertEquals(222, outputBiology.getBiomass(species.get(1)), EPSILON);
+        Assertions.assertEquals(111, outputBiology.getAbundance(species.get(0)).getAbundance(0, 0), EPSILON);
+        Assertions.assertEquals(111, outputBiology.getBiomass(species.get(0)), EPSILON);
+        Assertions.assertEquals(222, outputBiology.getAbundance(species.get(1)).getAbundance(0, 0), EPSILON);
+        Assertions.assertEquals(222, outputBiology.getBiomass(species.get(1)), EPSILON);
 
         // Check that the original abundances haven't been changed
         range(0, inputBiologies.size()).forEach(b ->
             range(0, species.size()).forEach(s -> {
                 final double expected = Math.pow(10, b) * (s + 1);
-                Assert.assertEquals(
+                Assertions.assertEquals(
                     expected,
                     inputBiologies.get(b).getAbundance(species.get(s)).getAbundance(0, 0),
                     EPSILON
                 );
-                Assert.assertEquals(expected, inputBiologies.get(b).getBiomass(species.get(s)), EPSILON);
+                Assertions.assertEquals(expected, inputBiologies.get(b).getBiomass(species.get(s)), EPSILON);
             })
         );
     }
@@ -151,7 +151,7 @@ public class AbundanceAggregatorTest {
         final Map<Species, Double> actual
     ) {
         expected.forEach((species, biomass) ->
-            Assert.assertEquals(biomass, actual.get(species), EPSILON)
+            Assertions.assertEquals(biomass, actual.get(species), EPSILON)
         );
     }
 

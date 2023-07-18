@@ -21,14 +21,13 @@
 package uk.ac.ox.oxfish.biology.weather.initializer.factory;
 
 import ec.util.MersenneTwisterFast;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.weather.initializer.CSVWeatherInitializer;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Paths;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 11/29/16.
@@ -51,20 +50,21 @@ public class TimeSeriesWeatherFactoryTest {
         CSVWeatherInitializer weather = factory.apply(mock);
         weather.processMap(mock.getMap(), new MersenneTwisterFast(), mock);
 
-        assertEquals(mock.getMap().getSeaTile(0, 0).getWindSpeedInKph(), 1, .0001);
+        Assertions.assertEquals(mock.getMap().getSeaTile(0, 0).getWindSpeedInKph(), 1, .0001);
         weather.getActuator().step(mock);
-        assertEquals(mock.getMap().getSeaTile(1, 1).getWindSpeedInKph(), 2, .0001);
+        Assertions.assertEquals(mock.getMap().getSeaTile(1, 1).getWindSpeedInKph(), 2, .0001);
 
 
         //notice that all tiles share the same weather object
-        assertEquals(mock.getMap().getSeaTile(0, 0).getWindSpeedInKph()
-            , mock.getMap().getSeaTile(1, 1).getWindSpeedInKph(), .001d);
+        Assertions.assertEquals(mock.getMap().getSeaTile(0, 0).getWindSpeedInKph(),
+            mock.getMap().getSeaTile(1, 1).getWindSpeedInKph(),
+            .001d);
 
         weather.getActuator().step(mock);
-        assertEquals(mock.getMap().getSeaTile(2, 2).getWindSpeedInKph(), 3, .0001);
+        Assertions.assertEquals(mock.getMap().getSeaTile(2, 2).getWindSpeedInKph(), 3, .0001);
 
         weather.getActuator().step(mock);
-        assertEquals(mock.getMap().getSeaTile(3, 3).getWindSpeedInKph(), 1, .0001);
+        Assertions.assertEquals(mock.getMap().getSeaTile(3, 3).getWindSpeedInKph(), 1, .0001);
 
 
     }

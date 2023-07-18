@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.model.regs;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -28,8 +29,6 @@ import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,19 +47,19 @@ public class OffSwitchDecoratorTest {
         MaxHoursOutRegulation hoursOut = factory.apply(model);
         Fisher fisher = mock(Fisher.class);
         when(fisher.getHoursAtSeaThisYear()).thenReturn(20d);
-        assertTrue(hoursOut.allowedAtSea(fisher, model));
+        Assertions.assertTrue(hoursOut.allowedAtSea(fisher, model));
 
         OffSwitchDecorator decorator = new OffSwitchDecorator(hoursOut, true);
-        assertFalse(decorator.allowedAtSea(fisher, model));
+        Assertions.assertFalse(decorator.allowedAtSea(fisher, model));
         decorator.setTurnedOff(false);
-        assertTrue(decorator.allowedAtSea(fisher, model));
+        Assertions.assertTrue(decorator.allowedAtSea(fisher, model));
 
 
         when(fisher.getHoursAtSeaThisYear()).thenReturn(120d);
-        assertFalse(hoursOut.allowedAtSea(fisher, model));
-        assertFalse(decorator.allowedAtSea(fisher, model));
+        Assertions.assertFalse(hoursOut.allowedAtSea(fisher, model));
+        Assertions.assertFalse(decorator.allowedAtSea(fisher, model));
         decorator.setTurnedOff(true);
-        assertFalse(decorator.allowedAtSea(fisher, model));
+        Assertions.assertFalse(decorator.allowedAtSea(fisher, model));
 
     }
 
@@ -77,30 +76,30 @@ public class OffSwitchDecoratorTest {
         TemporaryProtectedArea reg2 = new TemporaryProtectedArea(10, 30);
         TemporaryProtectedArea reg3 = new TemporaryProtectedArea(150, 300);
 
-        assertFalse(reg1.canFishHere(
+        Assertions.assertFalse(reg1.canFishHere(
             mock(Fisher.class),
             tile,
             state
         ));
-        assertTrue(reg2.canFishHere(
+        Assertions.assertTrue(reg2.canFishHere(
             mock(Fisher.class),
             tile,
             state
         ));
-        assertTrue(reg3.canFishHere(
+        Assertions.assertTrue(reg3.canFishHere(
             mock(Fisher.class),
             tile,
             state
         ));
 
         OffSwitchDecorator decorator = new OffSwitchDecorator(reg2, true);
-        assertFalse(decorator.canFishHere(
+        Assertions.assertFalse(decorator.canFishHere(
             mock(Fisher.class),
             tile,
             state
         ));
         decorator.setTurnedOff(false);
-        assertTrue(decorator.canFishHere(
+        Assertions.assertTrue(decorator.canFishHere(
             mock(Fisher.class),
             tile,
             state

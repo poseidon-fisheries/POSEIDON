@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.heatmap.regression.basis;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
@@ -29,7 +30,6 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservati
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -55,7 +55,7 @@ public class RBFNetworkRegressionTest {
             100
         );
 
-        assertEquals(regression.getNetwork().size(), 27);
+        Assertions.assertEquals(regression.getNetwork().size(), 27);
 
     }
 
@@ -92,7 +92,7 @@ public class RBFNetworkRegressionTest {
             System.out.println(regression.predict(tile, 0, mock(Fisher.class), mock(FishState.class)));
         }
 
-        assertEquals(54, regression.predict(tile, 0, mock(Fisher.class), mock(FishState.class)), .01);
+        Assertions.assertEquals(54, regression.predict(tile, 0, mock(Fisher.class), mock(FishState.class)), .01);
 
     }
 }
