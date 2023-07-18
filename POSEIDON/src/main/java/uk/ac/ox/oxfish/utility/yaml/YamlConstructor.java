@@ -21,8 +21,10 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.inspector.TrustedTagInspector;
 import org.yaml.snakeyaml.nodes.*;
 import uk.ac.ox.oxfish.model.scenario.PolicyScript;
 import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
@@ -46,8 +48,16 @@ import java.util.Objects;
  */
 public class YamlConstructor extends Constructor {
 
+    private static final LoaderOptions LOADER_OPTIONS = new LoaderOptions();
+
+    static {
+        // Allow using global tags
+        LOADER_OPTIONS.setTagInspector(new TrustedTagInspector());
+    }
 
     YamlConstructor() {
+
+        super(LOADER_OPTIONS);
 
         //intercept the scalar nodes to see if they are actually Factories or DoubleParameters
         this.yamlClassConstructors.put(

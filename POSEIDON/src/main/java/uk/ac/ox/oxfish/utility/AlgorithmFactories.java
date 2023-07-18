@@ -46,6 +46,7 @@ import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.TimeScalarFunction;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.TimeScalarFunctions;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.DiscretizedOwnFadPlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.FadPlanningFactories;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFilterFactories;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.fisher.selfanalysis.factory.ObjectiveFunctions;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
@@ -216,7 +217,7 @@ public class AlgorithmFactories {
 
         CONSTRUCTOR_MAP.put(NetworkPredicate.class, NetworkPredicates.CONSTRUCTORS);
         NAMES_MAP.put(NetworkPredicate.class, NetworkPredicates.NAMES);
-        
+
         CONSTRUCTOR_MAP.put(Condition.class, ConditionFactories.CONSTRUCTORS);
         NAMES_MAP.put(Condition.class, ConditionFactories.NAMES);
 
@@ -234,6 +235,9 @@ public class AlgorithmFactories {
             DiscretizedOwnFadPlanningModule.class,
             FadPlanningFactories.NAMES
         );
+
+        CONSTRUCTOR_MAP.put(AbundanceFilterFactories.class, AbundanceFilterFactories.CONSTRUCTORS);
+        NAMES_MAP.put(AbundanceFilterFactories.class, AbundanceFilterFactories.NAMES);
     }
 
 

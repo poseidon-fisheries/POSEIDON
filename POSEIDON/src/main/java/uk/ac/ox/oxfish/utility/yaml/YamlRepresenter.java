@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -55,6 +56,8 @@ import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 class YamlRepresenter extends Representer {
 
     YamlRepresenter() {
+
+        super(new DumperOptions());
 
         //go through all the double parameters and make them print as a single line "pretty" format
 

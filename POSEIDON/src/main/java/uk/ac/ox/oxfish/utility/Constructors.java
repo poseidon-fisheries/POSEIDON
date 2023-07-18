@@ -81,7 +81,12 @@ public class Constructors {
         final Map<? super Class<? extends AlgorithmFactory<?>>, ? super String> names,
         final Class<? extends AlgorithmFactory<?>> classObject
     ) {
-        final String[] words = splitByCharacterTypeCamelCase(classObject.getSimpleName());
+        final String[] words =
+            splitByCharacterTypeCamelCase(
+                classObject
+                    .getSimpleName()
+                    .replaceAll("Factory", "")
+            );
         names.put(
             classObject,
             Stream

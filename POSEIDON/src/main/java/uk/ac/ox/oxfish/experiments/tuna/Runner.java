@@ -107,7 +107,7 @@ public final class Runner<S extends Scenario> {
 
     private static <S extends Scenario> Supplier<S> makeScenarioSupplier(
         final Path scenarioPath,
-        final Class<? extends S> scenarioClass
+        final Class<S> scenarioClass
     ) {
         return () -> {
             try (final FileReader fileReader = new FileReader(scenarioPath.toFile())) {

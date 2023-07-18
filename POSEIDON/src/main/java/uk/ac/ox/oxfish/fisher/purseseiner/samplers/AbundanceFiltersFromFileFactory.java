@@ -20,15 +20,12 @@ package uk.ac.ox.oxfish.fisher.purseseiner.samplers;
 
 import com.google.common.collect.ImmutableList;
 import com.univocity.parsers.common.record.Record;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -66,31 +63,33 @@ public class AbundanceFiltersFromFileFactory implements AbundanceFiltersFactory 
     }
 
     @Override
-    public Map<Class<? extends AbstractSetAction>, Map<Species, NonMutatingArrayFilter>> apply(
+    public AbundanceFilters apply(
         final FishState fishState
     ) {
-        return recordStream(selectivityFile.get())
-            .collect(groupingBy(
-                r -> getSetActionClass(r.getString("set_type")),
-                groupingBy(
-                    r -> fishState.getBiology().getSpeciesByCode(
-                        r.getString("species_code")
+        return new ForwardingAbundanceFilters(
+            recordStream(selectivityFile.get())
+                .collect(groupingBy(
+                    r -> getSetActionClass(r.getString("set_type")),
+                    groupingBy(
+                        r -> fishState.getBiology().getSpeciesByCode(
+                            r.getString("species_code")
+                        )
                     )
-                )
-            ))
-            .entrySet()
-            .stream()
-            .collect(toImmutableMap(
-                Entry::getKey,
-                entry1 -> entry1
-                    .getValue()
-                    .entrySet()
-                    .stream()
-                    .collect(toImmutableMap(
-                        Entry::getKey,
-                        entry2 -> makeFilter(entry2.getValue())
-                    ))
-            ));
+                ))
+                .entrySet()
+                .stream()
+                .collect(toImmutableMap(
+                    Entry::getKey,
+                    entry1 -> entry1
+                        .getValue()
+                        .entrySet()
+                        .stream()
+                        .collect(toImmutableMap(
+                            Entry::getKey,
+                            entry2 -> makeFilter(entry2.getValue())
+                        ))
+                ))
+        );
     }
 
     private static NonMutatingArrayFilter makeFilter(final Collection<Record> records) {

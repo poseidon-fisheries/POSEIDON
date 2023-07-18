@@ -7,10 +7,8 @@ import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotAbundanceResetterFact
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
 import uk.ac.ox.oxfish.biology.tuna.BiomassRestorerFactory;
 import uk.ac.ox.oxfish.biology.tuna.ScheduledBiomassProcessesFactory;
-import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
-import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
-import uk.ac.ox.oxfish.geography.fads.FadDemoFactory;
-import uk.ac.ox.oxfish.geography.fads.FadTemperatureHazardFactory;
+import uk.ac.ox.oxfish.environment.EnvironmentalMapFactory;
+import uk.ac.ox.oxfish.geography.fads.*;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.data.collectors.AdditionalFishStateDailyCollectorsFactory;
 import uk.ac.ox.oxfish.model.data.collectors.HerfindalndexCollectorFactory;
@@ -27,6 +25,8 @@ import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
+
+import static uk.ac.ox.oxfish.utility.Constructors.putName;
 
 public class AdditionalStartables {
 
@@ -79,7 +79,8 @@ public class AdditionalStartables {
         NAMES.put(IattcClosurePeriodRandomizerFactory.class, "IATTC Closure Period Randomizer");
         NAMES.put(FadTemperatureHazardFactory.class, "Fad Temperature Hazard");
 
-        NAMES.put(AdditionalMapFactory.class, "Environmental Map");
+        NAMES.put(FadZapperFactory.class, "FAD zapper");
+        putName(NAMES, EnvironmentalMapFactory.class);
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
