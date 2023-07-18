@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.geography.discretization;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.CsvColumnsToLists;
@@ -29,7 +28,6 @@ import uk.ac.ox.oxfish.utility.CsvColumnsToLists;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.function.Predicate;
 
 /**
  * Creates centroid maps from files

@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;

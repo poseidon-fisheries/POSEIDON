@@ -33,7 +33,6 @@ import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
@@ -65,7 +64,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;

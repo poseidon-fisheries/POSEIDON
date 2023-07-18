@@ -29,8 +29,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.DefaultBeamHillClimbing;
 
-import java.util.function.Predicate;
-
 /**
  * A strategy that every year iteratively tries a new sea-patch to fish on. It uses net cash-flow as a fitness value
  * to decide whether the new sea-patch is better than the one before

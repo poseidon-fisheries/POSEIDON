@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.biology.weather.initializer;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
 import uk.ac.ox.oxfish.geography.NauticalMap;

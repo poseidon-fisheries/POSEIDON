@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model.network.factory;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.network.NetworkPredicate;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;

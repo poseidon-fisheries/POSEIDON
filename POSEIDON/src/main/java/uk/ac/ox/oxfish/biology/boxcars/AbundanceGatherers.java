@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.Species;

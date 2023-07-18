@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.utility.TimeSeriesActuator;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Created by carrknight on 7/18/17.

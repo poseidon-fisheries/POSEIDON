@@ -24,14 +24,11 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.probability.FixedProbability;
-
-import java.util.function.Predicate;
 
 /**
  * Created by carrknight on 2/14/17.

@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.log.initializers;
 
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.AdditionalStartable;

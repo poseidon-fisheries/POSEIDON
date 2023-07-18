@@ -27,7 +27,6 @@ import uk.ac.ox.oxfish.utility.CsvColumnToList;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Function;
 
 /**
  * Created by carrknight on 7/18/17.

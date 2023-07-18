@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.experiments;
 
 import com.google.common.collect.Lists;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;

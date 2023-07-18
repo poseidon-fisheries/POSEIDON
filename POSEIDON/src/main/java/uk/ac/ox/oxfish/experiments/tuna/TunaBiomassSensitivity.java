@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.experiments.tuna;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.heatmaps.BiomassHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProviderToOutputPluginAdaptor;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;

@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.*;
 import uk.ac.ox.oxfish.biology.complicated.factory.InitialAbundanceFromFileFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;

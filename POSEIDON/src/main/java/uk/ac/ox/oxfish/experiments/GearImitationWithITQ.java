@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.experiments;
 
 
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.initializer.factory.WellMixedBiologyFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
@@ -36,7 +35,6 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 

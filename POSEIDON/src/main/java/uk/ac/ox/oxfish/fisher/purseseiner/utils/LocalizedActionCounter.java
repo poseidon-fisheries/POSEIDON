@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractFadSetAction;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;

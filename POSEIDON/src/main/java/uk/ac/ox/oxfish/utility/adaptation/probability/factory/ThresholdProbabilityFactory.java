@@ -26,8 +26,6 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.ThresholdExplorationProbab
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.function.Function;
-
 /**
  * Created by carrknight on 1/29/17.
  */

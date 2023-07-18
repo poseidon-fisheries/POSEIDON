@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;

@@ -25,7 +25,6 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
-import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 /**

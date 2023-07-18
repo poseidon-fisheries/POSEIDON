@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.ReliableFishValueCalculator;
 

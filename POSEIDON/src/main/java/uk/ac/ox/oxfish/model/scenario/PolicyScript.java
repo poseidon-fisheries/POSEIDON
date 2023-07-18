@@ -37,8 +37,6 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
-import java.util.function.Consumer;
-
 /**
  * A bunch of factories to apply to a model, usually to change its policies or something similar
  * Created by carrknight on 5/3/16.

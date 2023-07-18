@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
 import com.google.common.base.Preconditions;
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.boxcars.SPRAgent;
 import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilder;

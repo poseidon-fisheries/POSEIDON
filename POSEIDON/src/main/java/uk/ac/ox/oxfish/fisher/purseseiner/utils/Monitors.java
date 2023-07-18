@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.fisher.purseseiner.utils;
 
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.model.FishState;
@@ -34,7 +33,6 @@ import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import javax.measure.quantity.Dimensionless;
 import javax.measure.quantity.Mass;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 

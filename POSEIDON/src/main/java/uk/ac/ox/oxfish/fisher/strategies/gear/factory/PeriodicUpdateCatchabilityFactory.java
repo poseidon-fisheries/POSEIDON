@@ -21,14 +21,11 @@
 package uk.ac.ox.oxfish.fisher.strategies.gear.factory;
 
 import com.google.common.base.Preconditions;
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.strategies.gear.PeriodicUpdateGearStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;

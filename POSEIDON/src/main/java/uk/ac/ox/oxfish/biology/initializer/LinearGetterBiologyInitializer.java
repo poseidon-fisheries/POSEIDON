@@ -26,8 +26,6 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.function.Function;
-
 /**
  * Each seatile has biomass driven by a linear function: <br>
  * intercept + x + y + x*t + y*t + rocky + rocky*x + rocky*y + rocky*t
