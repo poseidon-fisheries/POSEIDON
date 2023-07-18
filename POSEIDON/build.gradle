@@ -83,11 +83,11 @@ dependencies {
     //testing:
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'org.mockito:mockito-core:4.3.1'
+    testImplementation 'org.mockito:mockito-core:4.11.0'
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.7'
 
     //guava. Useful for PreConditions and sometimes specialized collections
-    implementation "com.google.guava:guava:31.1-jre"
+    implementation "com.google.guava:guava:32.1.1-jre"
 
     // Reference implementation of JSR-385 for units of measure
     implementation 'si.uom:si-quantity:2.1'
