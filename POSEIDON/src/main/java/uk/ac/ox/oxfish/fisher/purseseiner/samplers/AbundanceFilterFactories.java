@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static uk.ac.ox.oxfish.utility.Constructors.putName;
+
 public class AbundanceFilterFactories {
 
     public static final Map<String, Supplier<AlgorithmFactory<? extends AbundanceFilters>>>
@@ -19,7 +21,7 @@ public class AbundanceFilterFactories {
         // TODO: our custom YAML loader breaks when assigning an anchor to a
         // a named algorithm factory, so we disable this for abundance filters,
         // but this will need to be fixed at some point.
-        //putName(NAMES, AbundanceFiltersFromFileFactory.class);
+        putName(NAMES, AbundanceFiltersFromFileFactory.class);
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 

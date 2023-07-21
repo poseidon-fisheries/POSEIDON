@@ -25,9 +25,10 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.inspector.TrustedTagInspector;
-import org.yaml.snakeyaml.nodes.*;
-import uk.ac.ox.oxfish.model.scenario.PolicyScript;
-import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeId;
+import org.yaml.snakeyaml.nodes.ScalarNode;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
@@ -36,7 +37,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
 
 /**
  * Constructor useful to implement YAML objects back into the Fishstate. I modify it so that it does the following things:
@@ -91,6 +91,7 @@ public class YamlConstructor extends Constructor {
             @Override
             public Object construct(final Node node) {
 
+                final MappingNode mappingNode = (MappingNode) node;
                 if (AlgorithmFactory.class.isAssignableFrom(node.getType())) {
                     //try super constructor first, most of the time it works
                     try {
@@ -99,16 +100,16 @@ public class YamlConstructor extends Constructor {
                         //the original construct failed, hopefully this means it's an algorithm factory
                         //written as a map, so get its name and look it up
                         final AlgorithmFactory<?> toReturn = AlgorithmFactories.constructorLookup(
-                            ((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue());
+                            ((ScalarNode) mappingNode.getValue().get(0).getKeyNode()).getValue());
                         //now take all the elements of the submap, we are going to place them by setter
                         //todo might have to flatten here!
-                        ((MappingNode) node).setValue(
-                            ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
+                        mappingNode.setValue(
+                            ((MappingNode) mappingNode.getValue().get(0).getValueNode()).getValue());
                         assert toReturn != null;
                         //need to set the node to the correct return or the reflection magic of snakeYAML wouldn't work
                         node.setType(toReturn.getClass());
                         //use beans to set all the properties correctly
-                        constructJavaBean2ndStep((MappingNode) node, toReturn);
+                        constructJavaBean2ndStep(mappingNode, toReturn);
                         //done!
                         return toReturn;
                     }
@@ -123,63 +124,27 @@ public class YamlConstructor extends Constructor {
 
                         //grab first element, ought to be the name of the scenario
                         final Scenario scenario =
-                            Scenarios.SCENARIOS.get(((ScalarNode) ((MappingNode) node).getValue()
-                                .get(0)
-                                .getKeyNode()).getValue()).get();
+                            Scenarios.SCENARIOS.get(
+                                ((ScalarNode) mappingNode
+                                    .getValue()
+                                    .get(0)
+                                    .getKeyNode()
+                                ).getValue()
+                            ).get();
 
                         //now we can deal with filling it through beans
                         //first allocate subnodes correctly
-                        ((MappingNode) node).setValue(
-                            ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
+                        mappingNode.setValue(
+                            ((MappingNode) mappingNode
+                                .getValue()
+                                .get(0)
+                                .getValueNode()
+                            ).getValue()
+                        );
                         //set type correctly
                         node.setType(scenario.getClass());
-                        constructJavaBean2ndStep((MappingNode) node, scenario);
+                        constructJavaBean2ndStep(mappingNode, scenario);
                         return scenario;
-
-
-                    }
-                }
-
-                if (((MappingNode) node).getValue().size() > 0) {
-                    //again for policy scripts
-                    if (PolicyScript.class.isAssignableFrom(node.getType()) ||
-                        Objects.equals(
-                            ((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue(),
-                            "PolicyScript"
-                        )) {
-
-                        final PolicyScript script = new PolicyScript();
-
-
-                        //now we can deal with filling it through beans
-                        //first allocate subnodes correctly
-                        ((MappingNode) node).setValue(
-                            ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
-                        //set type correctly
-                        node.setType(PolicyScript.class);
-                        constructJavaBean2ndStep((MappingNode) node, script);
-                        return script;
-
-
-                    }
-
-
-                    if (PolicyScripts.class.isAssignableFrom(node.getType())) {
-
-                        //now we can deal with filling it through beans
-                        //first allocate subnodes correctly
-
-                        //set type correctly
-
-                        node.setType(PolicyScripts.class);
-                        for (final NodeTuple partialScript : ((MappingNode) ((MappingNode) node).getValue().get(
-                            0).getValueNode()).getValue()) {
-                            partialScript.getKeyNode().setType(Integer.class);
-                            partialScript.getValueNode().setType(PolicyScript.class);
-                        }
-                        final PolicyScripts script = new PolicyScripts();
-                        constructJavaBean2ndStep((MappingNode) node, script);
-                        return script;
 
 
                     }

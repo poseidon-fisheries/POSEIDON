@@ -41,7 +41,6 @@ import uk.ac.ox.oxfish.model.data.OutputPlugin;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.TowHeatmapGatherer;
-import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -53,7 +52,6 @@ import java.lang.reflect.Array;
 import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.*;
 import java.util.Map.Entry;
@@ -1113,19 +1111,6 @@ public class FishStateUtilities {
             logger.info("adding additional data");
             model.attachAdditionalGatherers();
         }
-
-        //if you have a policy script, then follow it
-        if (policyScript != null && !policyScript.isEmpty()) {
-            final String policyScriptString = new String(Files.readAllBytes(Paths.get(policyScript)));
-            final PolicyScripts scripts = yaml.loadAs(policyScriptString, PolicyScripts.class);
-            model.registerStartable(scripts);
-            Files.write(
-                outputFolder.resolve("policy_script.yaml"),
-                yaml.dump(scripts.getScripts()).getBytes()
-            );
-        }
-
-        //     System.out.println("random " + model.random.nextDouble());
 
         mainloop:
         while (model.getYear() < yearsToRun) {

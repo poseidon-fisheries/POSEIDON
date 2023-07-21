@@ -29,8 +29,6 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
-import uk.ac.ox.oxfish.model.scenario.PolicyScript;
-import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
@@ -169,39 +167,6 @@ class YamlRepresenter extends Representer {
                 return node;
             });
         }
-
-        //do it for the policy script too
-        //this is easier in the sense that you don't need factories and the like
-        //just plain PolicyScript
-
-        this.addClassTag(PolicyScript.class, Tag.MAP);
-        this.representers.put(
-            PolicyScript.class,
-            data -> {
-                final Node node;
-                //prepare the node
-                final Set<Property> properties;
-                properties = getProperties(PolicyScript.class);
-                if (properties.size() == 0) {
-                    node = outer.representData(data);
-                } else {
-                    final List<NodeTuple> value = new ArrayList<>(
-                        properties.size());
-                    final Tag tag = Tag.MAP;
-                    node = new MappingNode(tag, value, BLOCK);
-
-                    value.add(new NodeTuple(
-                        outer.representData("PolicyScript"),
-                        representJavaBean(properties, data)
-                    ));
-                }
-                node.setType(PolicyScript.class);
-                return node;
-            }
-        );
-
-        this.addClassTag(PolicyScripts.class, Tag.MAP);
-
 
         //get all the scenarios
         final Iterable<Supplier<Scenario>> scenarios = new LinkedList<>(Scenarios.SCENARIOS.values());
