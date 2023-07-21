@@ -97,10 +97,10 @@ import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * Just a way to link a class to its constructor map Created by carrknight on 5/29/15.
@@ -112,7 +112,7 @@ public class AlgorithmFactories {
     //join terrorist organizations
     public static final Map<Class<?>, Map<String, ? extends Supplier<? extends AlgorithmFactory<?>>>>
         CONSTRUCTOR_MAP = new HashMap<>();
-    public static final Map<Class<?>, Map<Class<? extends AlgorithmFactory<?>>, String>> NAMES_MAP =
+    private static final Map<Class<?>, Map<Class<? extends AlgorithmFactory<?>>, String>> NAMES_MAP =
         new HashMap<>();
 
     static {
@@ -245,44 +245,48 @@ public class AlgorithmFactories {
      * look up for any algorithm factory with a specific name, returning the first it finds
      *
      * @param name the name
-     * @return the factory or null if there isn't any!
+     * @return the factory; or throws an exception if there isn't any!
      */
     public static AlgorithmFactory<?> constructorLookup(final String name) {
-        for (final Map<String, ? extends Supplier<? extends AlgorithmFactory<?>>> map : CONSTRUCTOR_MAP.values()) {
-            final Supplier<? extends AlgorithmFactory<?>> supplier = map.get(name);
-            if (supplier != null) {
-                return supplier.get();
-            }
-        }
-        System.err.println("failed to find constructor named: " + name);
-        return null;
+        return getFirstValueForKey(CONSTRUCTOR_MAP, name)
+            .orElseThrow(() ->
+                new RuntimeException("failed to find constructor named: " + name)
+            )
+            .get();
+    }
+
+    private static <V> Optional<? extends V> getFirstValueForKey(
+        final Map<?, ? extends Map<?, ? extends V>> mapOfMaps,
+        final Object key
+    ) {
+        return mapOfMaps
+            .values()
+            .stream()
+            .filter(map -> map.containsKey(key))
+            .map(map -> map.get(key))
+            .findFirst();
     }
 
     /**
      * look up the name of the algorithm factory that has this class
      *
-     * @param factory the name
-     * @return the factory or null if there isn't any!
+     * @param factoryClass the class for which to find the name
+     * @return the factory or throws an exception if there isn't any!
      */
-    public static String nameLookup(final Class<?> factory) {
-        for (final Map<Class<? extends AlgorithmFactory<?>>, String> map : NAMES_MAP.values()) {
-            final String name = map.get(factory);
-            if (name != null) {
-                return name;
-            }
-        }
-        System.err.println("failed to find constructor: " + factory);
-        return null;
+    public static String nameLookup(final Class<?> factoryClass) {
+        return getFirstValueForKey(NAMES_MAP, factoryClass)
+            .orElseThrow(() ->
+                new RuntimeException("failed to find factory name for class " + factoryClass)
+            );
     }
 
     /**
-     * returns a list with all the factories available in the constructor Maps
+     * returns a stream with all the factories available in the constructor Maps
      */
-    public static List<Class<? extends AlgorithmFactory<?>>> getAllAlgorithmFactories() {
-        final List<Class<? extends AlgorithmFactory<?>>> classes = new LinkedList<>();
-        for (final Map<Class<? extends AlgorithmFactory<?>>, String> names : NAMES_MAP.values()) {
-            classes.addAll(names.keySet());
-        }
-        return classes;
+    public static Stream<Class<? extends AlgorithmFactory<?>>> getAllAlgorithmFactories() {
+        return NAMES_MAP
+            .entrySet()
+            .stream()
+            .flatMap(entry -> entry.getValue().keySet().stream());
     }
 }

@@ -135,7 +135,7 @@ class YamlRepresenter extends Representer {
         //get all the algorithm factories including the super-class
         @SuppressWarnings("rawtypes") final List<Class<? extends AlgorithmFactory>> allAlgorithmFactories =
             Stream.concat(
-                AlgorithmFactories.getAllAlgorithmFactories().stream(),
+                AlgorithmFactories.getAllAlgorithmFactories(),
                 Stream.of(AlgorithmFactory.class)
             ).collect(toList());
         //for each class create a representer that shows it as a map
