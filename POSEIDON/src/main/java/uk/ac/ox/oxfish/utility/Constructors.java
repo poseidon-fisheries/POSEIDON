@@ -81,20 +81,21 @@ public class Constructors {
         final Map<? super Class<? extends AlgorithmFactory<?>>, ? super String> names,
         final Class<? extends AlgorithmFactory<?>> classObject
     ) {
+        names.put(classObject, makeFactoryName(classObject));
+    }
+
+    public static String makeFactoryName(final Class<? extends AlgorithmFactory<?>> classObject) {
         final String[] words =
             splitByCharacterTypeCamelCase(
                 classObject
                     .getSimpleName()
                     .replaceAll("Factory", "")
             );
-        names.put(
-            classObject,
-            Stream
-                .concat(
-                    Stream.of(words[0]),
-                    stream(words).skip(1).map(word -> word.toLowerCase(ENGLISH))
-                )
-                .collect(joining(" "))
-        );
+        return Stream
+            .concat(
+                Stream.of(words[0]),
+                stream(words).skip(1).map(word -> word.toLowerCase(ENGLISH))
+            )
+            .collect(joining(" "));
     }
 }

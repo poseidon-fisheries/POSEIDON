@@ -85,7 +85,7 @@ public abstract class EpoScenario<B extends LocalBiology>
                 getInputFolder().path("currents", "shear.csv")
             )
         ));
-    private BiologicalProcessesFactory<B> biologicalProcessesFactory;
+    private BiologicalProcessesFactory<B> biologicalProcesses;
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
         inputFolder,
         ImmutableMap.of(
@@ -114,12 +114,12 @@ public abstract class EpoScenario<B extends LocalBiology>
         this.targetYear = targetYear;
     }
 
-    public BiologicalProcessesFactory<B> getBiologicalProcessesFactory() {
-        return biologicalProcessesFactory;
+    public BiologicalProcessesFactory<B> getBiologicalProcesses() {
+        return biologicalProcesses;
     }
 
-    public void setBiologicalProcessesFactory(final BiologicalProcessesFactory<B> biologicalProcessesFactory) {
-        this.biologicalProcessesFactory = biologicalProcessesFactory;
+    public void setBiologicalProcesses(final BiologicalProcessesFactory<B> biologicalProcesses) {
+        this.biologicalProcesses = biologicalProcesses;
     }
 
     public InputPath testFolder() {
@@ -196,7 +196,7 @@ public abstract class EpoScenario<B extends LocalBiology>
                 .makeMap(fishState.random, null, fishState);
 
         final BiologicalProcessesFactory.Processes biologicalProcesses =
-            biologicalProcessesFactory.initProcesses(nauticalMap, fishState);
+            this.biologicalProcesses.initProcesses(nauticalMap, fishState);
         biologicalProcesses.startableFactories.forEach(bpf ->
             getAdditionalStartables().put(bpf.toString(), bpf)
         );

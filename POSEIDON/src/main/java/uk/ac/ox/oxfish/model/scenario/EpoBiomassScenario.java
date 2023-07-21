@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.geography.fads.BiomassFadMapFactory;
 
 public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology> {
     public EpoBiomassScenario() {
-        setBiologicalProcessesFactory(
+        setBiologicalProcesses(
             new BiomassProcessesFactory(
                 getInputFolder().path("biomass"),
                 new SpeciesCodesFromFileFactory(

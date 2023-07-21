@@ -18,7 +18,7 @@ public class EpoBiologyOnlyScenarioTest {
 
 
         ((AbundanceMortalityProcessFromFileFactory)
-            ((ScheduledAbundanceProcessesFactory) scenario.getBiologicalProcessesFactory()
+            ((ScheduledAbundanceProcessesFactory) scenario.getBiologicalProcesses()
                 .getScheduledProcessesFactory())
                 .getAbundanceMortalityProcessFactory())
             .setMortalityFile(scenario.testFolder().path("mortality_BP.csv"));

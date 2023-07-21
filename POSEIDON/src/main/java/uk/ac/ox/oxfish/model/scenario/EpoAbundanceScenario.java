@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology> {
 
     public EpoAbundanceScenario() {
-        setBiologicalProcessesFactory(
+        setBiologicalProcesses(
             new AbundanceProcessesFactory(
                 getInputFolder().path("abundance"),
                 new SpeciesCodesFromFileFactory(

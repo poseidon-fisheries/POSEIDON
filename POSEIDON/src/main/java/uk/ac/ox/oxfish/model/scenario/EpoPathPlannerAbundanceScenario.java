@@ -35,7 +35,7 @@ import static java.time.Month.*;
 
 public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
 
-    private AbundanceFiltersFactory abundanceFiltersFactory =
+    private AbundanceFiltersFactory abundanceFilters =
         new AbundanceFiltersFromFileFactory(
             getInputFolder().path("abundance", "selectivity.csv")
         );
@@ -163,7 +163,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                             1, 1.5, 0, 2, 1
                         )
                     ),
-                    getAbundanceFiltersFactory(),
+                    getAbundanceFilters(),
                     ImmutableMap.of(
                         "Bigeye tuna", new CalibratedParameter(0.03, 0.25, 0, 1, 0.16),
                         "Skipjack tuna", new CalibratedParameter(0.005, 0.25, 0, 1, 0.075),
@@ -200,7 +200,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                 ),
                 new ValuePerSetPlanningModuleFactory(),
                 new AbundanceCatchSamplersFactory(
-                    getAbundanceFiltersFactory(),
+                    getAbundanceFilters(),
                     getInputFolder().path("set_samples.csv")
                 ),
                 getInputFolder().path("action_weights.csv"),
@@ -218,12 +218,12 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
         this.purseSeinerFleetFactory = purseSeinerFleetFactory;
     }
 
-    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
-        return abundanceFiltersFactory;
+    public AbundanceFiltersFactory getAbundanceFilters() {
+        return abundanceFilters;
     }
 
-    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
-        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    public void setAbundanceFilters(final AbundanceFiltersFactory abundanceFilters) {
+        this.abundanceFilters = abundanceFilters;
     }
 
     @Override
