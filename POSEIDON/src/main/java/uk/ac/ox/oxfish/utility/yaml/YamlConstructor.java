@@ -25,18 +25,18 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.inspector.TrustedTagInspector;
-import org.yaml.snakeyaml.nodes.MappingNode;
-import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.nodes.NodeId;
-import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.*;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Function;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static uk.ac.ox.oxfish.model.scenario.Scenarios.SCENARIOS;
 
 /**
  * Constructor useful to implement YAML objects back into the Fishstate. I modify it so that it does the following things:
@@ -63,94 +63,67 @@ public class YamlConstructor extends Constructor {
         this.yamlClassConstructors.put(
             NodeId.scalar, new Constructor.ConstructScalar() {
                 @Override
-                public Object construct(final Node nnode) {
+                public Object construct(final Node node) {
                     //if the field you are trying to fill is a double parameter
-                    if (nnode.getType().equals(DoubleParameter.class))
+                    if (node.getType().equals(DoubleParameter.class))
                         //then a simple scalar must be a fixed double parameter. Build it
-                        return doubleParameterSplit((ScalarNode) nnode);
+                        return doubleParameterSplit((ScalarNode) node);
                     //if it's a path type we write and read it as string rather than with the ugly !! notation
-                    if (nnode.getType().equals(Path.class))
-                        return Paths.get(((ScalarNode) nnode).getValue());
+                    if (node.getType().equals(Path.class))
+                        return Paths.get(((ScalarNode) node).getValue());
                     //it's also possible that the scalar is an algorithm factory without any settable field
                     //this is rare since factories are represented as maps, but this might be one of the simple
                     //ones like AnarchyFactory
-                    if (AlgorithmFactory.class.isAssignableFrom(nnode.getType()))
-                        return AlgorithmFactories.constructorLookup(constructScalar((ScalarNode) nnode));
+                    if (AlgorithmFactory.class.isAssignableFrom(node.getType()))
+                        return AlgorithmFactories.constructorLookup(constructScalar((ScalarNode) node));
                         //otherwise I guess it's really a normal scalar!
                     else
                         // other FixedParameter subclasses will be handled here, as
                         // SnakeYAML is able to identify the one-argument constructor
                         // needed to build the right objects
-                        return super.construct(nnode);
+                        return super.construct(node);
                 }
             });
 
         //intercept maps as well, some of them could be factories
         this.yamlClassConstructors.put(NodeId.mapping, new Constructor.ConstructMapping() {
-
             @Override
             public Object construct(final Node node) {
-
-                final MappingNode mappingNode = (MappingNode) node;
-                if (AlgorithmFactory.class.isAssignableFrom(node.getType())) {
-                    //try super constructor first, most of the time it works
-                    try {
-                        return super.construct(node);
-                    } catch (final YAMLException e) {
-                        //the original construct failed, hopefully this means it's an algorithm factory
-                        //written as a map, so get its name and look it up
-                        final AlgorithmFactory<?> toReturn = AlgorithmFactories.constructorLookup(
-                            ((ScalarNode) mappingNode.getValue().get(0).getKeyNode()).getValue());
-                        //now take all the elements of the submap, we are going to place them by setter
-                        //todo might have to flatten here!
-                        mappingNode.setValue(
-                            ((MappingNode) mappingNode.getValue().get(0).getValueNode()).getValue());
-                        assert toReturn != null;
-                        //need to set the node to the correct return or the reflection magic of snakeYAML wouldn't work
-                        node.setType(toReturn.getClass());
-                        //use beans to set all the properties correctly
-                        constructJavaBean2ndStep(mappingNode, toReturn);
-                        //done!
-                        return toReturn;
+                try {
+                    // First try to construct the object normally
+                    return super.construct(node);
+                } catch (final YAMLException e) {
+                    // If it fails, it might be a factory or a scenario that has been
+                    // written as a map for readability, so try to construct it that way
+                    final NodeTuple nodeTuple = ((MappingNode) node).getValue().get(0);
+                    if (AlgorithmFactory.class.isAssignableFrom(node.getType())) {
+                        return constructNamedObject(nodeTuple, AlgorithmFactories::constructorLookup);
+                    } else if (Scenario.class.isAssignableFrom(node.getType())) {
+                        return constructNamedObject(nodeTuple, name -> SCENARIOS.get(name).get());
+                    } else {
+                        // If it's neither an algorithm factory nor a scenario, propagate the exception
+                        throw e;
                     }
                 }
-                //try a similar approach for scenarios
-                if (Scenario.class.isAssignableFrom(node.getType())) {
-                    try {
-                        //might have been written correctly as it is!
-                        return super.construct(node);
-                    } catch (final YAMLException e) {
-                        //this either means it's badly written somehow or more likely it's written in a "prettyfied" style
+            }
 
-                        //grab first element, ought to be the name of the scenario
-                        final Scenario scenario =
-                            Scenarios.SCENARIOS.get(
-                                ((ScalarNode) mappingNode
-                                    .getValue()
-                                    .get(0)
-                                    .getKeyNode()
-                                ).getValue()
-                            ).get();
-
-                        //now we can deal with filling it through beans
-                        //first allocate subnodes correctly
-                        mappingNode.setValue(
-                            ((MappingNode) mappingNode
-                                .getValue()
-                                .get(0)
-                                .getValueNode()
-                            ).getValue()
-                        );
-                        //set type correctly
-                        node.setType(scenario.getClass());
-                        constructJavaBean2ndStep(mappingNode, scenario);
-                        return scenario;
-
-
-                    }
-                }
-
-                return super.construct(node);
+            private Object constructNamedObject(
+                final NodeTuple nodeTuple,
+                final Function<? super String, Object> constructor
+            ) {
+                //the original construct failed, hopefully this means it's an algorithm factory
+                //written as a map, so get its name and look it up
+                final String name = ((ScalarNode) nodeTuple.getKeyNode()).getValue();
+                final Object object = checkNotNull(constructor.apply(name));
+                // The top level mapping node is only there to identify the right
+                // factory. The actual construction is done using the value node.
+                final MappingNode valueNode = (MappingNode) nodeTuple.getValueNode();
+                //need to set the node to the correct return or the reflection magic of snakeYAML wouldn't work
+                valueNode.setType(object.getClass());
+                //use beans to set all the properties correctly
+                constructJavaBean2ndStep(valueNode, object);
+                //done!
+                return object;
             }
         });
     }
@@ -164,10 +137,13 @@ public class YamlConstructor extends Constructor {
     public static Coordinate convertToCoordinate(final String val) {
         final String[] split = val.replaceAll("x:", "").replaceAll("y:", "").split(",");
         return new Coordinate(
-            Double.parseDouble(split[0].trim().replaceAll("'", "").replaceAll("\"", "")),
-            Double.parseDouble(split[1].trim().replaceAll("'", "").replaceAll("\"", ""))
+            parseCoordinateString(split[0]),
+            parseCoordinateString(split[1])
         );
     }
 
+    private static double parseCoordinateString(final String coordinateString) {
+        return Double.parseDouble(coordinateString.trim().replaceAll("'", "").replaceAll("\"", ""));
+    }
 
 }
