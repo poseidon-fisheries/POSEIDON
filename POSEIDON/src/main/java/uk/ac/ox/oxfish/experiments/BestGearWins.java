@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.experiments;
 
-import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
+import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
@@ -28,6 +28,8 @@ import uk.ac.ox.oxfish.fisher.strategies.gear.factory.PeriodicUpdateFromListFact
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactories;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -43,17 +45,22 @@ import java.nio.file.Paths;
  */
 public class BestGearWins {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException {
 
 
         Path root = Paths.get("runs", "ltr");
 
         root.toFile().mkdirs();
         for (int i = 0; i < 100; i++) {
-            DataColumn column = efficiencyImitation(.05, 20, "From Left To Right Fixed", System.currentTimeMillis());
-            File file = root.resolve("pricey" + i + ".csv").toFile();
-            FileWriter writer = new FileWriter(file);
-            for (Double aColumn : column) {
+            final DataColumn column = efficiencyImitation(
+                .05,
+                20,
+                "From Left To Right Fixed",
+                System.currentTimeMillis()
+            );
+            final File file = root.resolve("pricey" + i + ".csv").toFile();
+            final FileWriter writer = new FileWriter(file);
+            for (final Double aColumn : column) {
                 writer.write(aColumn.toString());
                 writer.write("\n");
             }
@@ -61,10 +68,15 @@ public class BestGearWins {
             writer.close();
         }
         for (int i = 0; i < 100; i++) {
-            DataColumn column = efficiencyImitation(0, 20, "From Left To Right Fixed", System.currentTimeMillis());
-            File file = root.resolve("free" + i + ".csv").toFile();
-            FileWriter writer = new FileWriter(file);
-            for (Double aColumn : column) {
+            final DataColumn column = efficiencyImitation(
+                0,
+                20,
+                "From Left To Right Fixed",
+                System.currentTimeMillis()
+            );
+            final File file = root.resolve("free" + i + ".csv").toFile();
+            final FileWriter writer = new FileWriter(file);
+            for (final Double aColumn : column) {
                 writer.write(aColumn.toString());
                 writer.write("\n");
             }
@@ -76,10 +88,10 @@ public class BestGearWins {
         root = Paths.get("runs", "logistic");
         root.toFile().mkdirs();
         for (int i = 0; i < 100; i++) {
-            DataColumn column = efficiencyImitation(.05, 20, "Independent Logistic", System.currentTimeMillis());
-            File file = root.resolve("pricey" + i + ".csv").toFile();
-            FileWriter writer = new FileWriter(file);
-            for (Double aColumn : column) {
+            final DataColumn column = efficiencyImitation(.05, 20, "Independent Logistic", System.currentTimeMillis());
+            final File file = root.resolve("pricey" + i + ".csv").toFile();
+            final FileWriter writer = new FileWriter(file);
+            for (final Double aColumn : column) {
                 writer.write(aColumn.toString());
                 writer.write("\n");
             }
@@ -87,10 +99,10 @@ public class BestGearWins {
             writer.close();
         }
         for (int i = 0; i < 100; i++) {
-            DataColumn column = efficiencyImitation(0, 20, "Independent Logistic", System.currentTimeMillis());
-            File file = root.resolve("free" + i + ".csv").toFile();
-            FileWriter writer = new FileWriter(file);
-            for (Double aColumn : column) {
+            final DataColumn column = efficiencyImitation(0, 20, "Independent Logistic", System.currentTimeMillis());
+            final File file = root.resolve("free" + i + ".csv").toFile();
+            final FileWriter writer = new FileWriter(file);
+            for (final Double aColumn : column) {
                 writer.write(aColumn.toString());
                 writer.write("\n");
             }
@@ -101,10 +113,10 @@ public class BestGearWins {
         root = Paths.get("runs", "marginal");
         root.toFile().mkdirs();
         for (int i = 0; i < 100; i++) {
-            DataColumn column = efficiencyImitation(.2, 20, "Independent Logistic", System.currentTimeMillis());
-            File file = root.resolve("pricey" + i + ".csv").toFile();
-            FileWriter writer = new FileWriter(file);
-            for (Double aColumn : column) {
+            final DataColumn column = efficiencyImitation(.2, 20, "Independent Logistic", System.currentTimeMillis());
+            final File file = root.resolve("pricey" + i + ".csv").toFile();
+            final FileWriter writer = new FileWriter(file);
+            for (final Double aColumn : column) {
                 writer.write(aColumn.toString());
                 writer.write("\n");
             }
@@ -112,10 +124,10 @@ public class BestGearWins {
             writer.close();
         }
         for (int i = 0; i < 100; i++) {
-            DataColumn column = efficiencyImitation(.01, 20, "Independent Logistic", System.currentTimeMillis());
-            File file = root.resolve("free" + i + ".csv").toFile();
-            FileWriter writer = new FileWriter(file);
-            for (Double aColumn : column) {
+            final DataColumn column = efficiencyImitation(.01, 20, "Independent Logistic", System.currentTimeMillis());
+            final File file = root.resolve("free" + i + ".csv").toFile();
+            final FileWriter writer = new FileWriter(file);
+            for (final Double aColumn : column) {
                 writer.write(aColumn.toString());
                 writer.write("\n");
             }
@@ -126,20 +138,28 @@ public class BestGearWins {
 
     }
 
+    @SuppressWarnings("unchecked")
     public static DataColumn efficiencyImitation(
-        final double gasPrice, final int simulationYears,
-        final String biologyInitializer, final long seed
+        final double gasPrice,
+        final int simulationYears,
+        final String biologyInitializer,
+        final long seed
     ) {
 
         //without fuel cost:
-        PrototypeScenario scenario = new PrototypeScenario();
-        scenario.setBiologyInitializer(BiologyInitializers.CONSTRUCTORS.get(biologyInitializer).get());
+        final PrototypeScenario scenario = new PrototypeScenario();
+        scenario.setBiologyInitializer(
+            (AlgorithmFactory<? extends BiologyInitializer>) AlgorithmFactories.CONSTRUCTOR_MAP
+                .get(BiologyInitializer.class)
+                .get(biologyInitializer)
+                .get()
+        );
         scenario.setFishers(100);
         scenario.setGasPricePerLiter(new FixedDoubleParameter(gasPrice));
         RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
         gear.setGasPerHourFished(new FixedDoubleParameter(10));
         scenario.setGear(gear);
-        PeriodicUpdateFromListFactory gearStrategy = new PeriodicUpdateFromListFactory();
+        final PeriodicUpdateFromListFactory gearStrategy = new PeriodicUpdateFromListFactory();
         gearStrategy.setProbability(new FixedProbabilityFactory(.05, .25));
         gearStrategy.setYearly(false);
         for (int i = 0; i < 20; i++) {
@@ -149,17 +169,17 @@ public class BestGearWins {
         }
         scenario.setGearStrategy(gearStrategy);
         //start everything
-        FishState state = new FishState(seed);
+        final FishState state = new FishState(seed);
         state.setScenario(scenario);
         state.start();
 
         state.getDailyDataSet().registerGatherer("Thrawling Fuel Consumption", model -> {
-            double size = state.getFishers().size();
+            final double size = state.getFishers().size();
             if (size == 0)
                 return Double.NaN;
             else {
                 double total = 0;
-                for (Fisher fisher1 : state.getFishers())
+                for (final Fisher fisher1 : state.getFishers())
                     total += ((RandomCatchabilityTrawl) fisher1.getGear()).getGasPerHourFished();
                 return total / size;
             }
@@ -170,12 +190,12 @@ public class BestGearWins {
             final int finalI = i;
             state.getDailyDataSet().registerGatherer("Trawling Efficiency for Species " + i,
                 model -> {
-                    double size = state.getFishers().size();
+                    final double size = state.getFishers().size();
                     if (size == 0)
                         return Double.NaN;
                     else {
                         double total = 0;
-                        for (Fisher fisher1 : state.getFishers())
+                        for (final Fisher fisher1 : state.getFishers())
                             total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[finalI];
                         return total / size;
                     }
@@ -185,7 +205,7 @@ public class BestGearWins {
 
         //pre-lspiRun average efficiency
         double average = 0;
-        for (Fisher fisher : state.getFishers()) {
+        for (final Fisher fisher : state.getFishers()) {
             average += ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished();
         }
         average /= 100;
@@ -197,7 +217,7 @@ public class BestGearWins {
         state.schedule.step(state);
         //average now? Ought to be more or less the same
         average = 0;
-        for (Fisher fisher : state.getFishers()) {
+        for (final Fisher fisher : state.getFishers()) {
             average += ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished();
         }
         average /= 100;

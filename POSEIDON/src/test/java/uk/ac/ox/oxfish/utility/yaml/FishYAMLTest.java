@@ -27,11 +27,12 @@ import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.maximization.generic.CommaMapOptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
-import uk.ac.ox.oxfish.model.regs.factory.Regulations;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.SelectDoubleParameter;
@@ -158,12 +159,18 @@ public class FishYAMLTest {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void writePrettilyAllSortsOfScenarios() {
         final PrototypeScenario scenario = new PrototypeScenario();
         ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setDifferentialPercentageToMove(new FixedDoubleParameter(
             .9));
-        scenario.setRegulation(Regulations.CONSTRUCTORS.get("MPA Only").get());
+        scenario.setRegulation(
+            AlgorithmFactories
+                .getConstructors(Regulation.class)
+                .get("MPA Only")
+                .get()
+        );
         final FishYAML yaml = new FishYAML();
         final String dumped = yaml.dump(scenario);
         //load back! Notice that because it's made "pretty" I still have to call loadAs

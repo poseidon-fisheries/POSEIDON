@@ -22,6 +22,8 @@ package uk.ac.ox.oxfish.utility;
 
 import com.google.common.collect.ImmutableMap;
 import edu.uci.ics.jung.graph.DirectedGraph;
+import uk.ac.ox.oxfish.biology.BiomassResetterFactory;
+import uk.ac.ox.oxfish.biology.BiomassTotalResetterFactory;
 import uk.ac.ox.oxfish.biology.boxcars.*;
 import uk.ac.ox.oxfish.biology.complicated.*;
 import uk.ac.ox.oxfish.biology.complicated.factory.*;
@@ -29,13 +31,20 @@ import uk.ac.ox.oxfish.biology.growers.CommonLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.growers.FadAwareLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
+import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
-import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
 import uk.ac.ox.oxfish.biology.initializer.allocator.*;
+import uk.ac.ox.oxfish.biology.initializer.factory.*;
+import uk.ac.ox.oxfish.biology.tuna.BiomassInitializerFactory;
+import uk.ac.ox.oxfish.biology.tuna.BiomassRestorerFactory;
+import uk.ac.ox.oxfish.biology.tuna.ScheduledBiomassProcessesFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
-import uk.ac.ox.oxfish.biology.weather.initializer.factory.WeatherInitializers;
+import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
+import uk.ac.ox.oxfish.biology.weather.initializer.factory.OscillatingWeatherFactory;
+import uk.ac.ox.oxfish.biology.weather.initializer.factory.TimeSeriesWeatherFactory;
+import uk.ac.ox.oxfish.environment.EnvironmentalMapFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.Gears;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.*;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.*;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
@@ -50,34 +59,48 @@ import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.TimeScalarFunction;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.ExponentialTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.InverseTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.SigmoidalTimeScalarFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.GenerateRandomPlansStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.PlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFilters;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
-import uk.ac.ox.oxfish.fisher.selfanalysis.factory.ObjectiveFunctions;
-import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
+import uk.ac.ox.oxfish.fisher.selfanalysis.factory.*;
+import uk.ac.ox.oxfish.fisher.strategies.departing.AdaptiveProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.*;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.DestinationStrategies;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.*;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.*;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishingStrategies;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.*;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.gear.factory.GearStrategies;
+import uk.ac.ox.oxfish.fisher.strategies.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.weather.factory.WeatherStrategies;
+import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
+import uk.ac.ox.oxfish.fisher.strategies.weather.factory.WindThresholdFactory;
 import uk.ac.ox.oxfish.geography.discretization.CentroidMapFileFactory;
 import uk.ac.ox.oxfish.geography.discretization.IdentityDiscretizerFactory;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
+import uk.ac.ox.oxfish.geography.fads.*;
+import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
-import uk.ac.ox.oxfish.geography.habitat.HabitatInitializers;
-import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
-import uk.ac.ox.oxfish.geography.mapmakers.MapInitializers;
+import uk.ac.ox.oxfish.geography.habitat.RockyPyramidsFactory;
+import uk.ac.ox.oxfish.geography.habitat.rectangles.OneRockyRectangleFactory;
+import uk.ac.ox.oxfish.geography.habitat.rectangles.RockyRectanglesHabitatFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.*;
 import uk.ac.ox.oxfish.geography.ports.*;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.data.Averager;
+import uk.ac.ox.oxfish.model.data.collectors.AdditionalFishStateDailyCollectorsFactory;
+import uk.ac.ox.oxfish.model.data.collectors.HerfindalndexCollectorFactory;
+import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
 import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.model.data.factory.IterativeAverageFactory;
 import uk.ac.ox.oxfish.model.data.factory.MovingAverageFactory;
@@ -86,21 +109,22 @@ import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.event.ExogenousInstantaneousMortalityCatchesFactory;
 import uk.ac.ox.oxfish.model.event.SimpleExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.market.Market;
-import uk.ac.ox.oxfish.model.market.factory.Markets;
+import uk.ac.ox.oxfish.model.market.factory.*;
 import uk.ac.ox.oxfish.model.market.gas.CsvTimeSeriesGasFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasFactory;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
-import uk.ac.ox.oxfish.model.network.NetworkBuilders;
-import uk.ac.ox.oxfish.model.network.NetworkPredicate;
+import uk.ac.ox.oxfish.model.network.*;
 import uk.ac.ox.oxfish.model.network.factory.MustShareTag;
 import uk.ac.ox.oxfish.model.network.factory.SamePortEdgesOnly;
-import uk.ac.ox.oxfish.model.plugins.AdditionalStartables;
-import uk.ac.ox.oxfish.model.regs.ExogenousPercentagePermitFactory;
-import uk.ac.ox.oxfish.model.regs.PermitAllocationPolicy;
-import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.factory.AllowAllAllocationPolicyFactory;
-import uk.ac.ox.oxfish.model.regs.factory.MaxHoldSizeRandomAllocationPolicyFactory;
-import uk.ac.ox.oxfish.model.regs.factory.Regulations;
+import uk.ac.ox.oxfish.model.plugins.*;
+import uk.ac.ox.oxfish.model.regs.*;
+import uk.ac.ox.oxfish.model.regs.factory.*;
+import uk.ac.ox.oxfish.model.regs.policymakers.*;
+import uk.ac.ox.oxfish.model.regs.policymakers.factory.ISlopeToTACControllerFactory;
+import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITEControllerFactory;
+import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITargetTACFactory;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SimpleFishSamplerFactory;
+import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.regulation.EverythingPermitted;
 import uk.ac.ox.oxfish.regulation.ForbiddenIf;
 import uk.ac.ox.oxfish.regulation.NamedRegulations;
@@ -109,7 +133,7 @@ import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
 import uk.ac.ox.oxfish.regulation.quantities.SumOf;
 import uk.ac.ox.oxfish.regulation.quantities.YearlyActionCount;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
-import uk.ac.ox.oxfish.utility.adaptation.probability.Probabilities;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.*;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
 import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
 import uk.ac.ox.poseidon.regulations.api.Condition;
@@ -126,51 +150,309 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 /**
  * Just a way to link a class to its constructor map Created by carrknight on 5/29/15.
  */
+@SuppressWarnings({"unchecked", "RedundantSuppression"})
 public class AlgorithmFactories {
 
     public static final Map<Class<?>, Map<String, ? extends Supplier<? extends AlgorithmFactory<?>>>>
         CONSTRUCTOR_MAP = new HashMap<>();
+
     private static final Map<Class<?>, Map<Class<? extends AlgorithmFactory<?>>, String>> NAMES_MAP =
         new HashMap<>();
 
     static {
 
-        CONSTRUCTOR_MAP.put(AdditionalStartable.class, AdditionalStartables.CONSTRUCTORS);
-        NAMES_MAP.put(AdditionalStartable.class, AdditionalStartables.NAMES);
-
-
-        CONSTRUCTOR_MAP.put(DepartingStrategy.class, DepartingStrategies.CONSTRUCTORS);
-        NAMES_MAP.put(DepartingStrategy.class, DepartingStrategies.NAMES);
-        CONSTRUCTOR_MAP.put(DestinationStrategy.class, DestinationStrategies.CONSTRUCTORS);
-        NAMES_MAP.put(DestinationStrategy.class, DestinationStrategies.NAMES);
-        CONSTRUCTOR_MAP.put(FishingStrategy.class, FishingStrategies.CONSTRUCTORS);
-        NAMES_MAP.put(FishingStrategy.class, FishingStrategies.NAMES);
-        CONSTRUCTOR_MAP.put(Regulation.class, Regulations.CONSTRUCTORS);
-        NAMES_MAP.put(Regulation.class, Regulations.NAMES);
-        CONSTRUCTOR_MAP.put(BiologyInitializer.class, BiologyInitializers.CONSTRUCTORS);
-        NAMES_MAP.put(BiologyInitializer.class, BiologyInitializers.NAMES);
-        CONSTRUCTOR_MAP.put(DirectedGraph.class, NetworkBuilders.CONSTRUCTORS);
-        NAMES_MAP.put(DirectedGraph.class, NetworkBuilders.NAMES);
-        CONSTRUCTOR_MAP.put(Market.class, Markets.CONSTRUCTORS);
-        NAMES_MAP.put(Market.class, Markets.NAMES);
-        CONSTRUCTOR_MAP.put(AdaptationProbability.class, Probabilities.CONSTRUCTORS);
-        NAMES_MAP.put(AdaptationProbability.class, Probabilities.NAMES);
-        CONSTRUCTOR_MAP.put(WeatherInitializer.class, WeatherInitializers.CONSTRUCTORS);
-        NAMES_MAP.put(WeatherInitializer.class, WeatherInitializers.NAMES);
-        CONSTRUCTOR_MAP.put(WeatherEmergencyStrategy.class, WeatherStrategies.CONSTRUCTORS);
-        NAMES_MAP.put(WeatherEmergencyStrategy.class, WeatherStrategies.NAMES);
-        CONSTRUCTOR_MAP.put(HabitatInitializer.class, HabitatInitializers.CONSTRUCTORS);
-        NAMES_MAP.put(HabitatInitializer.class, HabitatInitializers.NAMES);
-        CONSTRUCTOR_MAP.put(Gear.class, Gears.CONSTRUCTORS);
-        NAMES_MAP.put(Gear.class, Gears.NAMES);
-        CONSTRUCTOR_MAP.put(MapInitializer.class, MapInitializers.CONSTRUCTORS);
-        NAMES_MAP.put(MapInitializer.class, MapInitializers.NAMES);
-        CONSTRUCTOR_MAP.put(ObjectiveFunction.class, ObjectiveFunctions.CONSTRUCTORS);
-        NAMES_MAP.put(ObjectiveFunction.class, ObjectiveFunctions.NAMES);
-        CONSTRUCTOR_MAP.put(GearStrategy.class, GearStrategies.CONSTRUCTORS);
-        NAMES_MAP.put(GearStrategy.class, GearStrategies.NAMES);
-        
         Stream.of(
+            new Factories<>(
+                AdditionalStartable.class,
+                ImmutableMap.ofEntries(
+                    entry(TowAndAltitudePluginFactory.class, "Tow Heatmapper"),
+                    entry(BiomassResetterFactory.class, "Biomass Location Resetter"),
+                    entry(BiomassTotalResetterFactory.class, "Biomass Total Resetter"),
+                    entry(SnapshotAbundanceResetterFactory.class, "Abundance Snapshot Resetter"),
+                    entry(SnapshotBiomassResetterFactory.class, "Biomass Snapshot Resetter"),
+                    entry(AbundanceGathererBuilder.class, "Abundance Gatherers"),
+                    entry(SPRAgentBuilder.class, "SPR Agent"),
+                    entry(SPRAgentBuilderSelectiveSampling.class, "SPR Selective Agent"),
+                    entry(SPRAgentBuilderFixedSample.class, "SPR Fixed Sample Agent"),
+                    entry(SprOracleBuilder.class, "SPR Oracle"),
+                    entry(FishingMortalityAgentFactory.class, "Fishing Mortality Agent"),
+                    entry(FisherEntryByProfitFactory.class, "Fish Entry By Profit"),
+                    entry(FisherEntryConstantRateFactory.class, "Fish Entry Constant Rate"),
+                    entry(SpendSaveInvestEntryFactory.class, "Spend Save Invest Entry"),
+                    entry(FullSeasonalRetiredDataCollectorsFactory.class, "Full-time Seasonal Retired Data Collectors"),
+                    entry(BiomassDepletionGathererFactory.class, "Biomass Depletion Data Collectors"),
+                    entry(TowLongLoggerFactory.class, "Tow Long Logger"),
+                    entry(OnOffSwitchAllocatorFactory.class, "Effort Regulator"),
+                    entry(AdditionalFishStateDailyCollectorsFactory.class, "Additional Daily Collectors"),
+                    entry(CatchAtBinFactory.class, "Catch at bin Collectors"),
+                    entry(HerfindalndexCollectorFactory.class, "Herfindal Index"),
+                    entry(ISlopeToTACControllerFactory.class, "ISlope-TAC Controller"),
+                    entry(LastCatchToTACController.class, "Last catch as TAC Controller"),
+                    entry(PIDControllerIndicatorTarget.class, "PID-TAC Controller"),
+                    entry(LBSPREffortPolicyFactory.class, "LBSPR Effort Controller"),
+                    entry(LBSPRffortPolicyAdaptingFactory.class, "LBSPR Effort Adaptive Controller"),
+                    entry(ITEControllerFactory.class, "ITEControllerFactory"),
+                    entry(LoptEffortPolicyFactory.class, "Lopt Effort Controller"),
+                    entry(ITargetTACFactory.class, "Itarget Controller"),
+                    entry(SurplusProductionDepletionFormulaController.class, "Schaefer Assessment Formula Controller"),
+                    entry(SimpleFishSamplerFactory.class, "Simple Fisher Sampler"),
+                    entry(ScheduledBiomassProcessesFactory.class, "Scheduled Biomass Processes"),
+                    entry(BiomassRestorerFactory.class, "Biomass Restorer"),
+                    entry(ExogenousFadMakerCSVFactory.class, "Exogenous Fad Maker CSV"),
+                    entry(FadDemoFactory.class, "Fad Demo"),
+                    entry(ExogenousFadSetterCSVFactory.class, "Exogenous Fad Setter CSV"),
+                    entry(IattcClosurePeriodRandomizerFactory.class, "IATTC Closure Period Randomizer"),
+                    entry(FadTemperatureHazardFactory.class, "Fad Temperature Hazard"),
+                    entry(FadZapperFactory.class, "FAD zapper")
+                ),
+                EnvironmentalMapFactory.class
+            ),
+            new Factories<>(
+                DepartingStrategy.class,
+                ImmutableMap.ofEntries(
+                    entry(FixedProbabilityDepartingFactory.class, "Fixed Probability Departing"),
+                    entry(AdaptiveProbabilityDepartingFactory.class, "Adaptive Probability Departing"),
+                    entry(FixedRestTimeDepartingFactory.class, "Fixed Rest"),
+                    entry(DoubleLogisticDepartingFactory.class, "Double Logistic"),
+                    entry(MonthlyDepartingFactory.class, "Monthly Departing"),
+                    entry(MaxHoursPerYearDepartingFactory.class, "Max Hours Per Year"),
+                    entry(MaxHoursOutWithRestingTimeDepartingStrategy.class, "Max Hours Per Year Plus Resting Time"),
+                    entry(LonglineFloridaLogisticDepartingFactory.class, "WFS Longline"),
+                    entry(FloridaLogisticDepartingFactory.class, "WFS Handline"),
+                    entry(ExitDecoratorFactory.class, "Exit Decorator"),
+                    entry(FullSeasonalRetiredDecoratorFactory.class, "Full-time Seasonal Retired Decorator"),
+                    entry(PurseSeinerDepartingStrategyFactory.class, "Purse Seiner Departing Strategy")
+                )
+            ),
+            new Factories<>(
+                DestinationStrategy.class,
+                ImmutableMap.ofEntries(
+                    entry(RandomFavoriteDestinationFactory.class, "Random Favorite"),
+                    entry(FixedFavoriteDestinationFactory.class, "Fixed Favorite"),
+                    entry(RandomThenBackToPortFactory.class, "Always Random"),
+                    entry(YearlyIterativeDestinationFactory.class, "Yearly HillClimber"),
+                    entry(PerTripIterativeDestinationFactory.class, "Per Trip Iterative"),
+                    entry(PerTripImitativeDestinationFactory.class, "Imitator-Explorator"),
+                    entry(PerTripImitativeWithHeadStartFactory.class, "Imitator-Explorator with Head Start"),
+                    entry(PerTripParticleSwarmFactory.class, "PSO"),
+                    entry(ThresholdEroteticDestinationFactory.class, "Threshold Erotetic"),
+                    entry(BetterThanAverageEroteticDestinationFactory.class, "Better Than Average Erotetic"),
+                    entry(SNALSARDestinationFactory.class, "SNALSAR"),
+                    entry(HeatmapDestinationFactory.class, "Heatmap Based"),
+                    entry(PlanningHeatmapDestinationFactory.class, "Heatmap Planning"),
+                    entry(GravitationalSearchDestinationFactory.class, "GSA"),
+                    entry(BanditDestinationFactory.class, "Discretized Bandit"),
+                    entry(ClampedDestinationFactory.class, "Clamped to Data"),
+                    entry(PerfectDestinationFactory.class, "Perfect Knowledge"),
+                    entry(GeneralizedCognitiveStrategyFactory.class, "Generalized Cognitive Strategy"),
+                    entry(GravityDestinationStrategyFactory.class, "Gravity Destination Strategy"),
+                    entry(GenerateRandomPlansStrategyFactory.class, "Random Fishing Plans Strategy")
+                )
+            ),
+            new Factories<>(
+                FishingStrategy.class,
+                ImmutableMap.of(
+                    FishOnceFactory.class, "Fish Once",
+                    TowLimitFactory.class, "Tow Limit",
+                    QuotaLimitDecoratorFactory.class, "Quota Bound",
+                    FishUntilFullFactory.class, "Fish Until Full",
+                    MaximumStepsFactory.class, "Until Full With Day Limit",
+                    FloridaLogitReturnFactory.class, "WFS Logit Return",
+                    MaximumDaysAYearFactory.class, "Maximum Days a Year Decorator",
+                    PurseSeinerBiomassFishingStrategyFactory.class, "Purse Seiner Biomass Fishing Strategy",
+                    DefaultToDestinationStrategyFishingStrategyFactory.class, "Default to Destination Strategy",
+                    PurseSeinerAbundanceFishingStrategyFactory.class, "Purse Seiner Abundance Fishing Strategy"
+                )
+            ),
+            new Factories<>(
+                Regulation.class,
+                ImmutableMap.ofEntries(
+                    entry(AnarchyFactory.class, "Anarchy"),
+                    entry(FishingSeasonFactory.class, "Fishing Season"),
+                    entry(ProtectedAreasOnlyFactory.class, "MPA Only"),
+                    entry(SpecificProtectedAreaFromShapeFileFactory.class, "Specific MPA from Shape File"),
+                    entry(SpecificProtectedAreaFromCoordinatesFactory.class, "Specific MPA from Coordinates"),
+                    entry(ProtectedAreaChromosomeFactory.class, "MPA Chromosome"),
+                    entry(FinedProtectedAreasFactory.class, "MPA with fine"),
+                    entry(DepthMPAFactory.class, "MPA by depth"),
+                    entry(TACMonoFactory.class, "Mono-TAC"),
+                    entry(IQMonoFactory.class, "Mono-IQ"),
+                    entry(ITQMonoFactory.class, "Mono-ITQ"),
+                    entry(MultiITQFactory.class, "Multi-ITQ"),
+                    entry(MultiITQStringFactory.class, "Multi-ITQ by List"),
+                    entry(ITQSpecificFactory.class, "Partial-ITQ"),
+                    entry(TACMultiFactory.class, "Multi-TAC"),
+                    entry(MultiTACStringFactory.class, "Multi-TAC by List"),
+                    entry(KitchenSinkFactory.class, "Kitchen Sink"),
+                    entry(MultiQuotaMapFactory.class, "Multi-Quotas from Map"),
+                    entry(ThresholdSingleSpeciesTaxation.class, "Single Species Threshold Taxation"),
+                    entry(SingleSpeciesPIDTaxationOnLandingsFactory.class, "Single Species PID Taxation"),
+                    entry(TemporaryProtectedAreasFactory.class, "Temporary MPA"),
+                    entry(TemporaryRegulationFactory.class, "Temporary Regulation"),
+                    entry(TaggedRegulationFactory.class, "Tagged Regulation"),
+                    entry(MultipleRegulationsFactory.class, "Multiple Regulations"),
+                    entry(ConjunctiveRegulationsFactory.class, "Conjunctive Regulations"),
+                    entry(WeakMultiTACStringFactory.class, "Weak Multi-TAC by List"),
+                    entry(PortBasedWaitTimesFactory.class, "Port Based Wait Times"),
+                    entry(MaxHoursOutFactory.class, "Max Hours Out"),
+                    entry(TriggerRegulationFactory.class, "Trigger Regulation"),
+                    entry(OffSwitchFactory.class, "Off Switch Decorator"),
+                    entry(NoFishingFactory.class, "No Fishing"),
+                    entry(ProtectedAreasFromFolderFactory.class, "Protected Areas from Folder")
+                )
+            ),
+            new Factories<>(
+                BiologyInitializer.class,
+                ImmutableMap.ofEntries(
+                    entry(IndependentLogisticFactory.class, "Independent Logistic"),
+                    entry(DiffusingLogisticFactory.class, "Diffusing Logistic"),
+                    entry(RockyLogisticFactory.class, "Habitat-Aware Diffusing Logistic"),
+                    entry(TwoSpeciesRockyLogisticFactory.class, "Habitat-Aware 2 Species"),
+                    entry(FromLeftToRightFactory.class, "From Left To Right Fixed"),
+                    entry(FromLeftToRightLogisticFactory.class, "From Left To Right Logistic"),
+                    entry(
+                        FromLeftToRightLogisticPlusClimateChangeFactory.class,
+                        "From Left To Right Logistic with Climate Change"
+                    ),
+                    entry(FromLeftToRightMixedFactory.class, "From Left To Right Well-Mixed"),
+                    entry(RandomConstantBiologyFactory.class, "Random Smoothed and Fixed"),
+                    entry(HalfBycatchFactory.class, "Half Bycatch"),
+                    entry(SplitInitializerFactory.class, "Split in Half"),
+                    entry(WellMixedBiologyFactory.class, "Well-Mixed"),
+                    entry(TwoSpeciesBoxFactory.class, "Two Species Box"),
+                    entry(SingleSpeciesBiomassFactory.class, "Single Species Biomass"),
+                    entry(SingleSpeciesBiomassNormalizedFactory.class, "Single Species Biomass Normalized"),
+                    entry(SingleSpeciesAbundanceFromDirectoryFactory.class, "Single Species Abundance From Directory"),
+                    entry(SingleSpeciesAbundanceFactory.class, "Single Species Abundance"),
+                    entry(MultipleIndependentSpeciesBiomassFactory.class, "Multiple Species Biomass"),
+                    entry(MultipleIndependentSpeciesAbundanceFactory.class, "Multiple Species Abundance"),
+                    entry(OneSpeciesSchoolFactory.class, "One Species School"),
+                    entry(YellowBycatchFactory.class, "Yellow Bycatch Factory"),
+                    entry(YellowBycatchWithHistoryFactory.class, "Yellow Bycatch Factory with History"),
+                    entry(LinearGetterBiologyFactory.class, "Linear Getter Biology"),
+                    entry(SingleSpeciesRegularBoxcarFactory.class, "Boxcar Biology"),
+                    entry(SingleSpeciesBoxcarFromListFactory.class, "Boxcar Biology from List"),
+                    entry(SingleSpeciesIrregularBoxcarFactory.class, "Irregular Boxcar Biology"),
+                    entry(SingleSpeciesBoxcarPulseRecruitmentFactory.class, "Boxcar Biology with pulses"),
+                    entry(BiomassInitializerFactory.class, "Biomass Initializer Factory"),
+                    entry(AbundanceInitializerFactory.class, "Abundance Initializer Factory")
+                )
+            ),
+            new Factories<>(
+                DirectedGraph.class,
+                ImmutableMap.of(
+                    EmptyNetworkBuilder.class, "No Network",
+                    BarabasiAlbertBuilder.class, "Barabasi-Albert",
+                    EquidegreeBuilder.class, "Equal Out Degree",
+                    ClubNetworkBuilder.class, "Same Size Clubs"
+                )
+            ),
+            new Factories<>(
+                Market.class,
+                ImmutableMap.of(
+                    FixedPriceMarketFactory.class, "Fixed Price Market",
+                    AbundanceAwareFixedPriceMarketFactory.class, "Abundance Aware Fixed Price Market",
+                    ArrayFixedPriceMarket.class, "Fixed Price Market Array",
+                    CongestedMarketFactory.class, "Congested Market",
+                    MACongestedMarketFactory.class, "Moving Average Congested Market",
+                    ThreePricesMarketFactory.class, "Three Prices Market",
+                    NPricesMarketFactory.class, "Many Prices Market",
+                    SpeciesMarketMappedFactory.class, "Multiple Three Prices Markets",
+                    ThreePricesWithPremium.class, "Three Prices Market with premium",
+                    WeightLimitMarketFactory.class, "Weight Limit Market"
+                )
+            ),
+            new Factories<>(
+                AdaptationProbability.class,
+                ImmutableMap.of(
+                    FixedProbabilityFactory.class, "Fixed Probability",
+                    DailyDecreasingProbabilityFactory.class, "Daily Decreasing Probability",
+                    ExplorationPenaltyProbabilityFactory.class, "Adaptive Probability",
+                    SocialAnnealingProbabilityFactory.class, "Social Annealing Probability",
+                    ThresholdProbabilityFactory.class, "Profit Threshold Probability"
+                )
+            ),
+            new Factories<>(
+                WeatherInitializer.class,
+                ImmutableMap.of(
+                    ConstantWeatherFactory.class, "Constant Weather",
+                    OscillatingWeatherFactory.class, "Oscillating Weather",
+                    TimeSeriesWeatherFactory.class, "CSV Fixed Weather"
+                )
+            ),
+            new Factories<>(
+                WeatherEmergencyStrategy.class,
+                ImmutableMap.of(
+                    IgnoreWeatherFactory.class, "Ignore Weather",
+                    WindThresholdFactory.class, "Sail up to Threshold"
+                )
+            ),
+            new Factories<>(
+                HabitatInitializer.class,
+                ImmutableMap.of(
+                    AllSandyHabitatFactory.class, "All Sand",
+                    RockyRectanglesHabitatFactory.class, "Rocky Rectangles",
+                    OneRockyRectangleFactory.class, "One Rocky Rectangle",
+                    RockyPyramidsFactory.class, "Rocky Pyramids"
+                )
+            ),
+            new Factories<>(
+                Gear.class,
+                ImmutableMap.ofEntries(
+                    entry(FixedProportionGearFactory.class, "Fixed Proportion"),
+                    entry(OneSpecieGearFactory.class, "One Species Gear"),
+                    entry(RandomCatchabilityTrawlFactory.class, "Random Catchability"),
+                    entry(RandomTrawlStringFactory.class, "Random Catchability By List"),
+                    entry(HabitatAwareGearFactory.class, "Habitat Aware Gear"),
+                    entry(ThresholdGearFactory.class, "Threshold Gear Factory"),
+                    entry(LogisticSelectivityGearFactory.class, "Logistic Selectivity Gear"),
+                    entry(SimpleLogisticGearFactory.class, "Simple Logistic Selectivity Gear"),
+                    entry(SelectivityFromListGearFactory.class, "Selectivity from List Gear"),
+                    entry(SimpleDomeShapedGearFactory.class, "Simple Dome Shaped Selectivity Gear"),
+                    entry(DoubleNormalGearFactory.class, "Double Normal Selectivity Gear"),
+                    entry(SablefishGearFactory.class, "Sablefish Trawl Selectivity Gear"),
+                    entry(HeterogeneousGearFactory.class, "Heterogeneous Selectivity Gear"),
+                    entry(FixedProportionHomogeneousGearFactory.class, "Abundance Fixed Proportion Gear"),
+                    entry(GarbageGearFactory.class, "Garbage Gear"),
+                    entry(HoldLimitingDecoratorFactory.class, "Hold Upper Limit"),
+                    entry(DelayGearDecoratorFactory.class, "Hour Delay Gear"),
+                    entry(MaxThroughputDecoratorFactory.class, "Max Throughput Limit"),
+                    entry(BiomassPurseSeineGearFactory.class, "Biomass Purse Seine Gear")
+                )
+            ),
+            new Factories<>(
+                MapInitializer.class,
+                ImmutableMap.of(
+                    SimpleMapInitializerFactory.class, "Simple Map",
+                    TwoSidedMapFactory.class, "Two Sided Map",
+                    MapWithFarOffPortsInitializerFactory.class, "Map with far-off ports",
+                    FromFileMapInitializerFactory.class, "From File Map",
+                    FromFileMapInitializerWithOverridesFactory.class, "From File Map With Overrides"
+                )
+            ),
+            new Factories<>(
+                ObjectiveFunction.class,
+                ImmutableMap.of(
+                    CashFlowObjectiveFactory.class, "Cash Flow Objective",
+                    HourlyProfitObjectiveFactory.class, "Hourly Profit Objective",
+                    TargetSpeciesObjectiveFactory.class, "Target Species Hourly Profit",
+                    KnifeEdgePerTripFactory.class, "Hourly Knife-Edge Objective",
+                    CutoffPerTripObjectiveFactory.class, "Hourly Cutoff Objective",
+                    KnifeEdgeCashflowFactory.class, "Cash Flow Knife-Edge Objective",
+                    SimulatedProfitCPUEObjectiveFactory.class, "Simulated Profit Objective"
+                )
+            ),
+            new Factories<>(
+                GearStrategy.class,
+                ImmutableMap.of(
+                    FixedGearStrategyFactory.class, "Never Change Gear",
+                    PeriodicUpdateFromListFactory.class, "Periodic Gear Update from List",
+                    PeriodicUpdateMileageFactory.class, "Periodic Gear Update Mileage",
+                    PeriodicUpdateCatchabilityFactory.class, "Periodic Gear Update Catchability",
+                    PeriodicUpdateSelectivityFactory.class, "Periodic Gear Update Selectivity",
+                    FadRefillGearStrategyFactory.class, "FAD Refill"
+                )
+            ),
             new Factories<>(
                 ProfitThresholdExtractor.class,
                 ImmutableMap.of(
@@ -498,5 +780,9 @@ public class AlgorithmFactories {
             .entrySet()
             .stream()
             .flatMap(entry -> entry.getValue().keySet().stream());
+    }
+
+    public static <T> Map<String, Supplier<AlgorithmFactory<? extends T>>> getConstructors(final Class<T> classObject) {
+        return (Map<String, Supplier<AlgorithmFactory<? extends T>>>) CONSTRUCTOR_MAP.get(classObject);
     }
 }
