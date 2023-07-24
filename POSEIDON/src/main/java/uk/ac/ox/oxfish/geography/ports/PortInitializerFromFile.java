@@ -11,7 +11,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -29,16 +28,12 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public class FromSimpleFilePortInitializer implements PortInitializer {
+public class PortInitializerFromFile implements PortInitializer {
 
-    private int targetYear;
-    private InputPath portFile;
+    private final int targetYear;
+    private final Path portFile;
 
-    @SuppressWarnings("unused")
-    public FromSimpleFilePortInitializer() {
-    }
-
-    public FromSimpleFilePortInitializer(final int targetYear, final InputPath portFile) {
+    public PortInitializerFromFile(final int targetYear, final Path portFile) {
         this.targetYear = targetYear;
         this.portFile = portFile;
     }
@@ -57,18 +52,8 @@ public class FromSimpleFilePortInitializer implements PortInitializer {
     }
 
     @SuppressWarnings("unused")
-    public void setTargetYear(final int targetYear) {
-        this.targetYear = targetYear;
-    }
-
-    @SuppressWarnings("unused")
-    public InputPath getPortFile() {
+    public Path getPortFile() {
         return portFile;
-    }
-
-    @SuppressWarnings("unused")
-    public void setPortFile(final InputPath portFile) {
-        this.portFile = portFile;
     }
 
     /**
@@ -85,7 +70,7 @@ public class FromSimpleFilePortInitializer implements PortInitializer {
         final GasPriceMaker gasPriceMaker
     ) {
 
-        final Map<String, Coordinate> portCoordinates = readPortCoordinatesFromFile(portFile.get(), targetYear);
+        final Map<String, Coordinate> portCoordinates = readPortCoordinatesFromFile(portFile, targetYear);
         final Map<String, SeaTile> initialPortTiles = portCoordinatesToTiles(map, portCoordinates);
         final Map<String, SeaTile> adjustedPortTiles = adjustPortTiles(map, portCoordinates, initialPortTiles);
         final Map<String, SeaTile> separatedPortTiles = separatePortTiles(map, portCoordinates, adjustedPortTiles);
@@ -118,7 +103,7 @@ public class FromSimpleFilePortInitializer implements PortInitializer {
 
     private Map<String, SeaTile> portCoordinatesToTiles(
         final NauticalMap map,
-        final Map<String, Coordinate> portCoordinates
+        final Map<String, ? extends Coordinate> portCoordinates
     ) {
         return portCoordinates.entrySet().stream().collect(toImmutableMap(
             Entry::getKey,
@@ -130,8 +115,8 @@ public class FromSimpleFilePortInitializer implements PortInitializer {
 
     private Map<String, SeaTile> adjustPortTiles(
         final NauticalMap map,
-        final Map<String, Coordinate> portCoordinates,
-        final Map<String, SeaTile> portTiles
+        final Map<String, ? extends Coordinate> portCoordinates,
+        final Map<String, ? extends SeaTile> portTiles
     ) {
         return portTiles
             .entrySet()
@@ -157,7 +142,7 @@ public class FromSimpleFilePortInitializer implements PortInitializer {
 
     private Map<String, SeaTile> separatePortTiles(
         final NauticalMap map,
-        final Map<String, Coordinate> portCoordinates,
+        final Map<String, ? extends Coordinate> portCoordinates,
         final Map<String, SeaTile> portTiles
     ) {
         final ImmutableList<Entry<SeaTile, Collection<String>>> tilesWithManyPorts = getTilesWithManyPorts(portTiles);
@@ -198,11 +183,10 @@ public class FromSimpleFilePortInitializer implements PortInitializer {
             .collect(toImmutableList());
     }
 
-    @SuppressWarnings("UnstableApiUsage")
-    Map<String, SeaTile> separatePorts(
+    private Map<String, SeaTile> separatePorts(
         final NauticalMap map,
         final SeaTile initialTile,
-        final Map<String, Coordinate> portCoordinates
+        final Map<String, ? extends Coordinate> portCoordinates
     ) {
         final Set<SeaTile> coastalTiles =
             Stream.concat(Stream.of(initialTile), neighbors(initialTile, map))

@@ -59,6 +59,7 @@ import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.TimeScalarFunction;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.ExponentialTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.InverseTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.SigmoidalTimeScalarFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.GenerateRandomPlansStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.PlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.*;
@@ -111,6 +112,8 @@ import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.event.ExogenousInstantaneousMortalityCatchesFactory;
 import uk.ac.ox.oxfish.model.event.SimpleExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.market.factory.*;
 import uk.ac.ox.oxfish.model.market.gas.CsvTimeSeriesGasFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasFactory;
@@ -162,7 +165,6 @@ public class AlgorithmFactories {
         new HashMap<>();
 
     static {
-
         addFactories(new Factories<>(
             AdditionalStartable.class,
             ImmutableMap.ofEntries(
@@ -206,7 +208,9 @@ public class AlgorithmFactories {
                 entry(FadTemperatureHazardFactory.class, "Fad Temperature Hazard"),
                 entry(FadZapperFactory.class, "FAD zapper")
             ),
-            EnvironmentalMapFactory.class
+            EnvironmentalMapFactory.class,
+            TemperatureMapFactory.class,
+            FrontalIndexMapFactory.class
         ));
         addFactories(new Factories<>(
             DepartingStrategy.class,
@@ -247,7 +251,8 @@ public class AlgorithmFactories {
                 entry(PerfectDestinationFactory.class, "Perfect Knowledge"),
                 entry(GeneralizedCognitiveStrategyFactory.class, "Generalized Cognitive Strategy"),
                 entry(GravityDestinationStrategyFactory.class, "Gravity Destination Strategy"),
-                entry(GenerateRandomPlansStrategyFactory.class, "Random Fishing Plans Strategy")
+                entry(GenerateRandomPlansStrategyFactory.class, "Random Fishing Plans Strategy"),
+                entry(EPOPlannedStrategyFlexibleFactory.class, "EPO planned strategy")
             )
         ));
         addFactories(new Factories<>(
@@ -362,6 +367,10 @@ public class AlgorithmFactories {
                 ThreePricesWithPremium.class, "Three Prices Market with premium",
                 WeightLimitMarketFactory.class, "Weight Limit Market"
             )
+        ));
+        addFactories(new Factories<>(
+            MarketMap.class,
+            YearlyMarketMapFromPriceFileFactory.class
         ));
         addFactories(new Factories<>(
             AdaptationProbability.class,
@@ -535,7 +544,8 @@ public class AlgorithmFactories {
                 OnePortFactory.class, "One Port",
                 TwoPortsFactory.class, "Two Ports",
                 PortListFactory.class, "List of Ports"
-            )
+            ),
+            PortInitializerFromFileFactory.class
         ));
         addFactories(new Factories<>(
             MapDiscretizer.class,
@@ -750,6 +760,23 @@ public class AlgorithmFactories {
             BiologicalProcesses.class,
             AbundanceProcessesFactory.class,
             BiomassProcessesFactory.class
+        ));
+        addFactories(new Factories<>(
+            ScheduledBiologicalProcesses.class,
+            ScheduledAbundanceProcessesFactory.class,
+            ScheduledBiomassProcessesFactory.class
+        ));
+        addFactories(new Factories<>(
+            AbundanceMortalityProcess.class,
+            AbundanceMortalityProcessFromFileFactory.class
+        ));
+        addFactories(new Factories<>(
+            FadMap.class,
+            ImmutableMap.of(
+                AbundanceFadMapFactory.class, "Abundance FAD map",
+                BiomassFadMapFactory.class, "Biomass FAD map",
+                BiasedFadMapFactory.class, "Biased FAD map factory"
+            )
         ));
     }
 

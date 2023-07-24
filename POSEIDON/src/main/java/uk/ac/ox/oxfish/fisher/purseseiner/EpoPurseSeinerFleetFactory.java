@@ -5,7 +5,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepart
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
-import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
+import uk.ac.ox.oxfish.geography.ports.PortInitializerFromFileFactory;
 import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasFromFolderFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
@@ -41,7 +41,7 @@ public class EpoPurseSeinerFleetFactory extends PurseSeinerFleetFactory {
             new YearlyMarketMapFromPriceFileFactory(
                 inputFolder.path("prices.csv")
             ),
-            new FromSimpleFilePortInitializer(
+            new PortInitializerFromFileFactory(
                 targetYear,
                 inputFolder.path("ports.csv")
             )

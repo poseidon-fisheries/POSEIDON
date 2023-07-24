@@ -53,7 +53,7 @@ public class PurseSeinerFleetFactory
     private AlgorithmFactory<? extends GearStrategy> gearStrategy;
     private AlgorithmFactory<? extends Regulation> regulationsFactory;
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
-    private PortInitializer portInitializer;
+    private AlgorithmFactory<? extends PortInitializer> portInitializer;
 
     public PurseSeinerFleetFactory(
         final InputPath vesselsFile,
@@ -65,7 +65,7 @@ public class PurseSeinerFleetFactory
         final AlgorithmFactory<? extends Regulation> regulationsFactory,
         final AlgorithmFactory<? extends DepartingStrategy> departingStrategy,
         final AlgorithmFactory<? extends MarketMap> marketMapFactory,
-        final PortInitializer portInitializer
+        final AlgorithmFactory<? extends PortInitializer> portInitializer
     ) {
         this.vesselsFile = vesselsFile;
         this.costsFile = costsFile;
@@ -82,11 +82,11 @@ public class PurseSeinerFleetFactory
     public PurseSeinerFleetFactory() {
     }
 
-    public PortInitializer getPortInitializer() {
+    public AlgorithmFactory<? extends PortInitializer> getPortInitializer() {
         return portInitializer;
     }
 
-    public void setPortInitializer(final PortInitializer portInitializer) {
+    public void setPortInitializer(final AlgorithmFactory<? extends PortInitializer> portInitializer) {
         this.portInitializer = portInitializer;
     }
 
@@ -235,7 +235,7 @@ public class PurseSeinerFleetFactory
 
     List<Port> buildPorts(final FishState fishState) {
         final MarketMap marketMap = getMarketMapFactory().apply(fishState);
-        portInitializer.buildPorts(
+        portInitializer.apply(fishState).buildPorts(
             fishState.getMap(),
             fishState.random,
             seaTile -> marketMap,

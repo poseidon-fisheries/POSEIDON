@@ -49,7 +49,7 @@ import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
  *
  * @param <B> The type of local biology to operate upon.
  */
-class ScheduledBiologicalProcesses<B extends LocalBiology>
+public class ScheduledBiologicalProcesses<B extends LocalBiology>
     implements Steppable, AdditionalStartable {
 
     private static final long serialVersionUID = -5467692646048931777L;
