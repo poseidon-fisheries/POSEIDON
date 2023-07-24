@@ -45,7 +45,7 @@ import static uk.ac.ox.oxfish.model.StepOrder.POLICY_UPDATE;
  *
  * @param <B> the type of local biology to work with.
  */
-abstract class Restorer<B extends LocalBiology>
+public abstract class Restorer<B extends LocalBiology>
     implements AdditionalStartable {
 
     private final Map<Integer, Integer> schedule;

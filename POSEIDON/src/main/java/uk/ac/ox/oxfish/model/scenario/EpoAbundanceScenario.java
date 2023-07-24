@@ -34,7 +34,8 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology> {
                 getInputFolder().path("abundance"),
                 new SpeciesCodesFromFileFactory(
                     getInputFolder().path("species_codes.csv")
-                )
+                ),
+                DEFAULT_MAP_EXTENT_FACTORY
             )
         );
         setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));

@@ -27,12 +27,12 @@ import uk.ac.ox.oxfish.biology.tuna.WeightGroups;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -48,14 +48,15 @@ public class AbundanceInitializerFactory
         new CacheByFile<>(AbundanceInitializerFactory::binsPerSpecies);
 
     private InputPath binsFile;
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
+    private AlgorithmFactory<SpeciesCodes> speciesCodes;
     private Map<String, WeightGroups> weightGroupsPerSpecies;
+
     public AbundanceInitializerFactory(
         final InputPath binsFile,
-        final Supplier<SpeciesCodes> speciesCodesSupplier
+        final AlgorithmFactory<SpeciesCodes> speciesCodes
     ) {
         this.binsFile = binsFile;
-        this.speciesCodesSupplier = speciesCodesSupplier;
+        this.speciesCodes = speciesCodes;
     }
 
     /**
@@ -93,12 +94,12 @@ public class AbundanceInitializerFactory
             ));
     }
 
-    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
-        return speciesCodesSupplier;
+    public AlgorithmFactory<SpeciesCodes> getSpeciesCodes() {
+        return speciesCodes;
     }
 
-    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
-        this.speciesCodesSupplier = speciesCodesSupplier;
+    public void setSpeciesCodes(final AlgorithmFactory<SpeciesCodes> speciesCodes) {
+        this.speciesCodes = speciesCodes;
     }
 
     /**
@@ -124,7 +125,7 @@ public class AbundanceInitializerFactory
         checkNotNull(getReallocator(), "need to call setAbundanceReallocator() before using");
         checkNotNull(weightGroupsPerSpecies, "need to call setWeightGroupsPerSpecies() before using");
         return new AbundanceInitializer(
-            speciesCodesSupplier.get(),
+            speciesCodes.apply(fishState),
             binsCache.apply(this.binsFile.get()),
             weightGroupsPerSpecies,
             getReallocator()

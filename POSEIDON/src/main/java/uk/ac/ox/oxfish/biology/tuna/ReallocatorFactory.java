@@ -22,13 +22,24 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 abstract class ReallocatorFactory<B extends LocalBiology, T extends Reallocator<B>>
     implements AlgorithmFactory<T> {
 
-    private MapExtent mapExtent;
     private InputPath biomassDistributionsFile;
-    private Integer period;
+    private IntegerParameter period;
+    private AlgorithmFactory<MapExtent> mapExtent;
+
+    public ReallocatorFactory(
+        final InputPath biomassDistributionsFile,
+        final IntegerParameter period,
+        final AlgorithmFactory<MapExtent> mapExtent
+    ) {
+        this.biomassDistributionsFile = biomassDistributionsFile;
+        this.period = period;
+        this.mapExtent = mapExtent;
+    }
 
     /**
      * Empty constructor to make instantiable from YAML.
@@ -36,28 +47,19 @@ abstract class ReallocatorFactory<B extends LocalBiology, T extends Reallocator<
     public ReallocatorFactory() {
     }
 
-    public ReallocatorFactory(
-        final InputPath biomassDistributionsFile,
-        final Integer period
-    ) {
-        this.biomassDistributionsFile = biomassDistributionsFile;
-        this.period = period;
-    }
-
-    public Integer getPeriod() {
+    public IntegerParameter getPeriod() {
         return period;
     }
 
-    @SuppressWarnings("unused")
-    public void setPeriod(final Integer period) {
+    public void setPeriod(final IntegerParameter period) {
         this.period = period;
     }
 
-    public MapExtent getMapExtent() {
+    public AlgorithmFactory<MapExtent> getMapExtent() {
         return mapExtent;
     }
 
-    public void setMapExtent(final MapExtent mapExtent) {
+    public void setMapExtent(final AlgorithmFactory<MapExtent> mapExtent) {
         this.mapExtent = mapExtent;
     }
 

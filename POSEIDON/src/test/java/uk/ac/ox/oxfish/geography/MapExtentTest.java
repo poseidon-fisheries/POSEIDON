@@ -38,7 +38,7 @@ public class MapExtentTest {
 
     @Test
     public void testCoordToXyAndBack() {
-        final MapExtent mapExtent = EpoScenario.DEFAULT_MAP_EXTENT;
+        final MapExtent mapExtent = EpoScenario.DEFAULT_MAP_EXTENT_FACTORY.get();
         final Envelope envelope = mapExtent.getEnvelope();
         final List<Coordinate> coordinates =
             range((int) envelope.getMinX(), (int) envelope.getMaxX() - 1)

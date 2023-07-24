@@ -9,6 +9,9 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.DEFAULT_MAP_EXTENT_FACTORY;
 
 public class BiomassProcessesFactory extends BiologicalProcessesFactory<BiomassLocalBiology> {
     private BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory;
@@ -31,7 +34,8 @@ public class BiomassProcessesFactory extends BiologicalProcessesFactory<BiomassL
             ),
             new BiomassReallocatorFactory(
                 inputFolder.path("biomass_distributions.csv"),
-                365
+                new IntegerParameter(365),
+                DEFAULT_MAP_EXTENT_FACTORY
             ),
             new BiomassRestorerFactory(),
             new ScheduledBiomassProcessesFactory()

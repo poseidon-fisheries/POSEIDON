@@ -5,14 +5,14 @@ import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static uk.ac.ox.oxfish.model.scenario.EpoScenario.DEFAULT_MAP_EXTENT;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.DEFAULT_MAP_EXTENT_FACTORY;
 
 public class TwoByTwoRegionalDivisionTest {
 
     @Test
     public void testLocationsInDivision() {
         final TwoByTwoRegionalDivision division =
-            new TwoByTwoRegionalDivision(new Coordinate(-140.5, 0.5), DEFAULT_MAP_EXTENT);
+            new TwoByTwoRegionalDivision(new Coordinate(-140.5, 0.5), DEFAULT_MAP_EXTENT_FACTORY.get());
 
         final ImmutableMap<Coordinate, String> testPoints =
             new ImmutableMap.Builder<Coordinate, String>()

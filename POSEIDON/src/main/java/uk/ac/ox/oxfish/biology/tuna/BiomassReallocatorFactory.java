@@ -20,8 +20,11 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.Reallocator.SpeciesKey;
+import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -41,9 +44,10 @@ public class BiomassReallocatorFactory
 
     public BiomassReallocatorFactory(
         final InputPath biomassDistributionsFilePath,
-        final int period
+        final IntegerParameter period,
+        final AlgorithmFactory<MapExtent> mapExtent
     ) {
-        super(biomassDistributionsFilePath, period);
+        super(biomassDistributionsFilePath, period, mapExtent);
     }
 
     @Override
@@ -52,8 +56,8 @@ public class BiomassReallocatorFactory
         final AllocationGrids<SpeciesKey> grids =
             new AllocationGridsSupplier(
                 getBiomassDistributionsFile().get(),
-                getMapExtent(),
-                getPeriod()
+                getMapExtent().apply(fishState),
+                getPeriod().getValue()
             ).get();
         return new BiomassReallocator(grids);
     }

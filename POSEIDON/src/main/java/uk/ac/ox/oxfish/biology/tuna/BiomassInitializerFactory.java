@@ -27,12 +27,12 @@ import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -49,7 +49,7 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public class BiomassInitializerFactory
     extends BiologyInitializerFactory<BiomassLocalBiology> {
 
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
+    private AlgorithmFactory<SpeciesCodes> speciesCodesSupplier;
     private InputPath schaeferParamsFile;
 
     @SuppressWarnings("unused")
@@ -57,7 +57,7 @@ public class BiomassInitializerFactory
     }
 
     public BiomassInitializerFactory(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final AlgorithmFactory<SpeciesCodes> speciesCodesSupplier,
         final InputPath schaeferParamsFile
     ) {
         this.speciesCodesSupplier = speciesCodesSupplier;
@@ -74,12 +74,12 @@ public class BiomassInitializerFactory
     }
 
     @SuppressWarnings("unused")
-    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+    public AlgorithmFactory<SpeciesCodes> getSpeciesCodesSupplier() {
         return speciesCodesSupplier;
     }
 
     @SuppressWarnings("unused")
-    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+    public void setSpeciesCodesSupplier(final AlgorithmFactory<SpeciesCodes> speciesCodesSupplier) {
         this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
@@ -102,7 +102,7 @@ public class BiomassInitializerFactory
                 ));
 
         final List<SingleSpeciesBiomassInitializer> biomassInitializers =
-            makeBiomassInitializers(initialAllocators, speciesCodesSupplier.get());
+            makeBiomassInitializers(initialAllocators, speciesCodesSupplier.apply(fishState));
 
         return new BiomassInitializer(biomassInitializers);
     }

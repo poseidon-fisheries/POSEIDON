@@ -1,7 +1,9 @@
 package uk.ac.ox.oxfish.biology;
 
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;
@@ -16,7 +18,7 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
  *  <li>{@code species_name}</li>
  * </ul>
  */
-public class SpeciesCodesFromFileFactory implements Supplier<SpeciesCodes> {
+public class SpeciesCodesFromFileFactory implements AlgorithmFactory<SpeciesCodes>, Supplier<SpeciesCodes> {
 
     private static final CacheByFile<SpeciesCodes> cache =
         new CacheByFile<>(SpeciesCodesFromFileFactory::getSpeciesCodes);
@@ -49,6 +51,11 @@ public class SpeciesCodesFromFileFactory implements Supplier<SpeciesCodes> {
     @SuppressWarnings("unused")
     public void setSpeciesCodeFile(final InputPath speciesCodeFile) {
         this.speciesCodeFile = speciesCodeFile;
+    }
+
+    @Override
+    public SpeciesCodes apply(final FishState fishState) {
+        return get();
     }
 
     @Override

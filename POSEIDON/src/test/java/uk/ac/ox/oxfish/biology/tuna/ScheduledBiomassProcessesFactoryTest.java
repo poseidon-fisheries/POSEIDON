@@ -25,12 +25,14 @@ import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static org.mockito.Mockito.mock;
+import static uk.ac.ox.oxfish.model.scenario.EpoScenario.DEFAULT_MAP_EXTENT_FACTORY;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class ScheduledBiomassProcessesFactoryTest {
@@ -42,14 +44,14 @@ public class ScheduledBiomassProcessesFactoryTest {
 
         final BiomassReallocatorFactory biomassReallocatorFactory = new BiomassReallocatorFactory(
             inputFolder.path("biomass", "biomass_distributions.csv"),
-            365
+            new IntegerParameter(365),
+            DEFAULT_MAP_EXTENT_FACTORY
         );
 
         final Path depthFile = Paths.get("inputs", "epo_inputs", "depth.csv");
         final MapInitializer mapInitializer =
             new FromFileMapInitializer(depthFile, 101, 0.5, true, true);
         final NauticalMap nauticalMap = mapInitializer.makeMap(null, null, null);
-        biomassReallocatorFactory.setMapExtent(nauticalMap.getMapExtent());
         final BiomassReallocator biomassReallocator =
             biomassReallocatorFactory.apply(mock(FishState.class));
         final AllocationGrids<?> allocationGrids =

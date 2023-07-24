@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import java.util.*;
-import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toCollection;
 import static si.uom.NonSI.TONNE;
@@ -23,7 +22,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
 
     private int startingYear = 2000;
     private InputPath catchesFile; // = Paths.get("inputs", "tuna", "exogenous_catches.csv");
-    private Supplier<SpeciesCodes> speciesCodesSupplier;
+    private AlgorithmFactory<SpeciesCodes> speciesCodesSupplier;
     private boolean fadMortality = false;
 
     @SuppressWarnings("unused")
@@ -31,7 +30,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
     }
 
     public BiomassDrivenTimeSeriesExogenousCatchesFactory(
-        final Supplier<SpeciesCodes> speciesCodesSupplier,
+        final AlgorithmFactory<SpeciesCodes> speciesCodesSupplier,
         final InputPath catchesFile,
         final int startingYear,
         final boolean fadMortalityIncluded
@@ -43,11 +42,11 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
     }
 
     @SuppressWarnings("unused")
-    public Supplier<SpeciesCodes> getSpeciesCodesSupplier() {
+    public AlgorithmFactory<SpeciesCodes> getSpeciesCodesSupplier() {
         return speciesCodesSupplier;
     }
 
-    public void setSpeciesCodesSupplier(final Supplier<SpeciesCodes> speciesCodesSupplier) {
+    public void setSpeciesCodesSupplier(final AlgorithmFactory<SpeciesCodes> speciesCodesSupplier) {
         this.speciesCodesSupplier = speciesCodesSupplier;
     }
 
@@ -79,7 +78,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
     @Override
     public BiomassDrivenTimeSeriesExogenousCatches apply(final FishState fishState) {
         final Map<Species, SortedMap<Integer, Quantity<Mass>>> catchesBySpecies = new HashMap<>();
-        final SpeciesCodes speciesCodes = speciesCodesSupplier.get();
+        final SpeciesCodes speciesCodes = speciesCodesSupplier.apply(fishState);
         recordStream(catchesFile.get()).forEach(record -> {
             final Integer year = record.getInt("year");
             if (year >= startingYear) {

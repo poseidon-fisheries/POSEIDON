@@ -2,12 +2,15 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
+import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
+import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.util.stream.Stream;
 
@@ -22,7 +25,8 @@ public class AbundanceProcessesFactory
 
     public AbundanceProcessesFactory(
         final InputPath inputFolder,
-        final SpeciesCodesFromFileFactory speciesCodesSupplier
+        final AlgorithmFactory<SpeciesCodes> speciesCodesSupplier,
+        final AlgorithmFactory<MapExtent> mapExtent
     ) {
         super(
             inputFolder,
@@ -32,7 +36,8 @@ public class AbundanceProcessesFactory
             ),
             new AbundanceReallocatorFactory(
                 inputFolder.path("grids.csv"),
-                365
+                new IntegerParameter(365),
+                mapExtent
             ),
             new AbundanceRestorerFactory(
                 ImmutableMap.of(0, 365)
@@ -65,11 +70,11 @@ public class AbundanceProcessesFactory
 
     @Override
     public Processes initProcesses(final NauticalMap nauticalMap, final FishState fishState) {
-        ((AbundanceInitializerFactory) getBiologyInitializerFactory())
+        ((AbundanceInitializerFactory) getBiologyInitializer())
             .assignWeightGroupsPerSpecies(weightGroupsFactory.apply(fishState));
         final Processes processes = super.initProcesses(nauticalMap, fishState);
         recruitmentProcessesFactory.setGlobalBiology(processes.globalBiology);
-        ((ScheduledAbundanceProcessesFactory) getScheduledProcessesFactory())
+        ((ScheduledAbundanceProcessesFactory) getScheduledProcesses())
             .setRecruitmentProcesses(recruitmentProcessesFactory.apply(fishState));
         return processes;
     }

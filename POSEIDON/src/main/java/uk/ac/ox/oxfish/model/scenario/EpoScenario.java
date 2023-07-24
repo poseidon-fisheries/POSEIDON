@@ -21,13 +21,12 @@ package uk.ac.ox.oxfish.model.scenario;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
 import uk.ac.ox.oxfish.environment.EnvironmentalMapFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.oxfish.geography.MapExtentFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -60,10 +59,13 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 public abstract class EpoScenario<B extends LocalBiology>
     implements TestableScenario {
 
-    public static final MapExtent DEFAULT_MAP_EXTENT =
-        MapExtent.from(101, 100, new Envelope(-171, -70, -50, 50));
+    public static final MapExtentFactory DEFAULT_MAP_EXTENT_FACTORY =
+        new MapExtentFactory(
+            101, 100, -171, -70, -50, 50
+        );
+
     public static final RegionalDivision REGIONAL_DIVISION = new CustomRegionalDivision(
-        DEFAULT_MAP_EXTENT,
+        DEFAULT_MAP_EXTENT_FACTORY.get(),
         ImmutableMap.of(
             "West", entry(new Coordinate(-170.5, 49.5), new Coordinate(-140.5, -49.5)),
             "North", entry(new Coordinate(-139.5, 50), new Coordinate(-90.5, 0.5)),
@@ -194,6 +196,7 @@ public abstract class EpoScenario<B extends LocalBiology>
             getMapInitializerFactory()
                 .apply(fishState)
                 .makeMap(fishState.random, null, fishState);
+
 
         final BiologicalProcessesFactory.Processes biologicalProcesses =
             this.biologicalProcesses.initProcesses(nauticalMap, fishState);
