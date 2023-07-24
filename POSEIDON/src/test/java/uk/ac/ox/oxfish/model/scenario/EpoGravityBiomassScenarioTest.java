@@ -36,7 +36,7 @@ public class EpoGravityBiomassScenarioTest {
 
         final EpoGravityBiomassScenario scenario = new EpoGravityBiomassScenario();
         scenario.useDummyData();
-        scenario.getPurseSeinerFleetFactory().setMarketMapFactory(
+        scenario.getPurseSeinerFleetFactory().setMarketMap(
             new MarketMapFromPriceFileFactory(
                 scenario.getInputFolder().path("prices.csv"),
                 scenario.getTargetYear()

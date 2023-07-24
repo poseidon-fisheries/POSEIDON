@@ -19,8 +19,8 @@ import static java.util.function.Function.identity;
 public class AbundanceProcessesFactory
     extends BiologicalProcessesFactory<AbundanceLocalBiology> {
 
-    private RecruitmentProcessesFactory recruitmentProcessesFactory;
-    private WeightGroupsFactory weightGroupsFactory;
+    private RecruitmentProcessesFactory recruitmentProcesses;
+    private WeightGroupsFactory weightGroups;
 
     @SuppressWarnings("unused")
     public AbundanceProcessesFactory() {
@@ -33,11 +33,11 @@ public class AbundanceProcessesFactory
         final ScheduledBiologicalProcessesFactory<AbundanceLocalBiology> scheduledProcesses
     ) {
         super(inputFolder, biologyInitializer, restorer, scheduledProcesses);
-        this.recruitmentProcessesFactory =
+        this.recruitmentProcesses =
             new RecruitmentProcessesFactory(
                 inputFolder.path("recruitment_parameters.csv")
             );
-        this.weightGroupsFactory =
+        this.weightGroups =
             new WeightGroupsFactory(
                 Stream.of("Bigeye tuna", "Skipjack tuna", "Yellowfin tuna").collect(
                     toImmutableMap(identity(), __ -> ImmutableList.of("small", "medium", "large"))
@@ -83,27 +83,27 @@ public class AbundanceProcessesFactory
     @Override
     public BiologicalProcesses apply(final FishState fishState) {
         ((AbundanceInitializerFactory) getBiologyInitializer())
-            .assignWeightGroupsPerSpecies(weightGroupsFactory.apply(fishState));
+            .assignWeightGroupsPerSpecies(weightGroups.apply(fishState));
         final BiologicalProcesses biologicalProcesses = super.apply(fishState);
-        recruitmentProcessesFactory.setGlobalBiology(biologicalProcesses.getGlobalBiology());
+        recruitmentProcesses.setGlobalBiology(biologicalProcesses.getGlobalBiology());
         ((ScheduledAbundanceProcessesFactory) getScheduledProcesses())
-            .setRecruitmentProcesses(recruitmentProcessesFactory.apply(fishState));
+            .setRecruitmentProcesses(recruitmentProcesses.apply(fishState));
         return biologicalProcesses;
     }
 
-    public WeightGroupsFactory getWeightGroupsFactory() {
-        return weightGroupsFactory;
+    public WeightGroupsFactory getWeightGroups() {
+        return weightGroups;
     }
 
-    public void setWeightGroupsFactory(final WeightGroupsFactory weightGroupsFactory) {
-        this.weightGroupsFactory = weightGroupsFactory;
+    public void setWeightGroups(final WeightGroupsFactory weightGroups) {
+        this.weightGroups = weightGroups;
     }
 
-    public RecruitmentProcessesFactory getRecruitmentProcessesFactory() {
-        return recruitmentProcessesFactory;
+    public RecruitmentProcessesFactory getRecruitmentProcesses() {
+        return recruitmentProcesses;
     }
 
-    public void setRecruitmentProcessesFactory(final RecruitmentProcessesFactory recruitmentProcessesFactory) {
-        this.recruitmentProcessesFactory = recruitmentProcessesFactory;
+    public void setRecruitmentProcesses(final RecruitmentProcessesFactory recruitmentProcesses) {
+        this.recruitmentProcesses = recruitmentProcesses;
     }
 }

@@ -48,7 +48,7 @@ public class ScheduledAbundanceProcessesFactory
     private List<String> biologicalProcessesDates;
     private Map<Species, ? extends RecruitmentProcess> recruitmentProcesses;
 
-    private AlgorithmFactory<AbundanceMortalityProcess> abundanceMortalityProcessFactory;
+    private AlgorithmFactory<AbundanceMortalityProcess> abundanceMortalityProcess;
 
     /**
      * Empty constructor to allow YAML instantiation.
@@ -64,7 +64,7 @@ public class ScheduledAbundanceProcessesFactory
     ) {
         super(reallocator);
         this.biologicalProcessesDates = ImmutableList.copyOf(biologicalProcessesDates);
-        this.abundanceMortalityProcessFactory =
+        this.abundanceMortalityProcess =
             new AbundanceMortalityProcessFromFileFactory(
                 mortalityFile,
                 ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
@@ -72,12 +72,12 @@ public class ScheduledAbundanceProcessesFactory
     }
 
     @SuppressWarnings("unused")
-    public AlgorithmFactory<AbundanceMortalityProcess> getAbundanceMortalityProcessFactory() {
-        return abundanceMortalityProcessFactory;
+    public AlgorithmFactory<AbundanceMortalityProcess> getAbundanceMortalityProcess() {
+        return abundanceMortalityProcess;
     }
 
-    public void setAbundanceMortalityProcessFactory(final AlgorithmFactory<AbundanceMortalityProcess> abundanceMortalityProcessFactory) {
-        this.abundanceMortalityProcessFactory = abundanceMortalityProcessFactory;
+    public void setAbundanceMortalityProcess(final AlgorithmFactory<AbundanceMortalityProcess> abundanceMortalityProcess) {
+        this.abundanceMortalityProcess = abundanceMortalityProcess;
     }
 
     @SuppressWarnings("unused")
@@ -139,7 +139,7 @@ public class ScheduledAbundanceProcessesFactory
         final List<BiologicalProcess<AbundanceLocalBiology>> allProcesses =
             ImmutableList.of(
                 new AbundanceExtractorProcess(true, true),
-                abundanceMortalityProcessFactory.apply(fishState),
+                abundanceMortalityProcess.apply(fishState),
                 new AbundanceLostRecoveryProcess(),
                 new AbundanceAggregatorProcess(),
                 new AgingAndRecruitmentProcess(recruitmentProcesses),

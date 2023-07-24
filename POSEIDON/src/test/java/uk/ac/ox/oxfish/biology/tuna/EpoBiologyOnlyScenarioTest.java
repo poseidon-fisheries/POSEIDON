@@ -20,11 +20,11 @@ public class EpoBiologyOnlyScenarioTest {
         ((AbundanceMortalityProcessFromFileFactory)
             ((ScheduledAbundanceProcessesFactory) scenario.getBiologicalProcesses()
                 .getScheduledProcesses())
-                .getAbundanceMortalityProcessFactory())
+                .getAbundanceMortalityProcess())
             .setMortalityFile(scenario.testFolder().path("mortality_BP.csv"));
         final FishState fishState = new FishState();
         fishState.setScenario(scenario);
-        scenario.getFadMapFactory().setCurrentPatternMapSupplier(CurrentPatternMapSupplier.EMPTY);
+        scenario.getFadMap().setCurrentPatternMapSupplier(CurrentPatternMapSupplier.EMPTY);
 
         final double[] partialF = {0.132763, 0.00484204, 3.12056E-05, 0.0296353, 0.00197554, 0.00632267, 0.00559769, 0.0555887, 0.00258933};
 

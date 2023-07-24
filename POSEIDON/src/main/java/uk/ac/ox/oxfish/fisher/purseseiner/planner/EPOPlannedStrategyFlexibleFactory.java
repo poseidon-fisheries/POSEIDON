@@ -29,7 +29,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     /**
      * object used to draw catches for DEL and NOA
      */
-    private CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory;
+    private CatchSamplersFactory<? extends LocalBiology> catchSamplers;
     /**
      * probability of any of these actions taking place next in a plan
      */
@@ -96,14 +96,14 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         final int targetYear,
         final LocationValuesFactory locationValuesFactory,
         final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModuleFactory,
-        final CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory,
+        final CatchSamplersFactory<? extends LocalBiology> catchSamplers,
         final InputPath actionWeightsFile,
         final InputPath maxTripDurationFile
     ) {
         this.targetYear = targetYear;
         this.locationValuesFactory = locationValuesFactory;
         this.fadModuleFactory = fadModuleFactory;
-        this.catchSamplersFactory = catchSamplersFactory;
+        this.catchSamplers = catchSamplers;
         this.actionWeightsFile = actionWeightsFile;
         this.maxTripDurationFile = maxTripDurationFile;
     }
@@ -154,8 +154,8 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
 
         final PlannedStrategyProxy proxy = new PlannedStrategyProxy(
             uniqueCatchSamplerForEachStrategy.getValue()
-                ? catchSamplersFactory.apply(state)
-                : catchSamplerLocker.presentKey(state, () -> catchSamplersFactory.apply(state))
+                ? catchSamplers.apply(state)
+                : catchSamplerLocker.presentKey(state, () -> catchSamplers.apply(state))
             ,
             PurseSeinerFishingStrategyFactory.loadActionWeights(targetYear, actionWeightsFile.get()),
             GravityDestinationStrategyFactory.loadMaxTripDuration(targetYear, maxTripDurationFile.get()),
@@ -180,12 +180,12 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         return proxy;
     }
 
-    public CatchSamplersFactory<? extends LocalBiology> getCatchSamplersFactory() {
-        return catchSamplersFactory;
+    public CatchSamplersFactory<? extends LocalBiology> getCatchSamplers() {
+        return catchSamplers;
     }
 
-    public void setCatchSamplersFactory(final CatchSamplersFactory<? extends LocalBiology> catchSamplersFactory) {
-        this.catchSamplersFactory = catchSamplersFactory;
+    public void setCatchSamplers(final CatchSamplersFactory<? extends LocalBiology> catchSamplers) {
+        this.catchSamplers = catchSamplers;
     }
 
 

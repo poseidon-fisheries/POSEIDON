@@ -36,7 +36,7 @@ public class FadAwareLogisticGrowerTest {
 
         final EpoGravityBiomassScenario scenario = new EpoGravityBiomassScenario();
         scenario.useDummyData();
-        scenario.getPurseSeinerFleetFactory().setMarketMapFactory(
+        scenario.getPurseSeinerFleetFactory().setMarketMap(
             new MarketMapFromPriceFileFactory(
                 scenario.getInputFolder().path("prices.csv"),
                 scenario.getTargetYear()
@@ -47,7 +47,7 @@ public class FadAwareLogisticGrowerTest {
             .setCatchesFile(
                 InputPath.of("inputs", "tests", "exogenous_catches.csv")
             );
-        scenario.getPurseSeinerFleetFactory().setRegulationsFactory(new NoFishingFactory());
+        scenario.getPurseSeinerFleetFactory().setRegulations(new NoFishingFactory());
 
         final FishState state = new FishState();
         state.setScenario(scenario);

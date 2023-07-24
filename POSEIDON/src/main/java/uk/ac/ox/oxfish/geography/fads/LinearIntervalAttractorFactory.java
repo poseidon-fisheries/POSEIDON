@@ -62,7 +62,7 @@ public class LinearIntervalAttractorFactory
             (int) getDaysInWaterBeforeAttraction().applyAsDouble(fishState.getRandom()),
             (int) daysItTakesToFillUp.applyAsDouble(fishState.getRandom()),
             minAbundanceThreshold.applyAsDouble(fishState.getRandom()),
-            getAbundanceFiltersFactory().apply(fishState).get(FadSetAction.class),
+            getAbundanceFilters().apply(fishState).get(FadSetAction.class),
             fishState
         );
         Optional

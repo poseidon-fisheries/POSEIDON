@@ -65,8 +65,8 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
     private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
     private InputPath locationValuesFile;
-    private AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory;
-    private AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory;
+    private AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializer;
+    private AlgorithmFactory<? extends FishValueCalculator> fishValueCalculator;
     private AlgorithmFactory<? extends Regulation> regulations;
 
     public PurseSeineGearFactory() {
@@ -74,12 +74,12 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
 
     public PurseSeineGearFactory(
         final AlgorithmFactory<? extends Regulation> regulations,
-        final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory,
-        final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory
+        final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializer,
+        final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculator
     ) {
         this.regulations = regulations;
-        this.fadInitializerFactory = fadInitializerFactory;
-        this.fishValueCalculatorFactory = fishValueCalculatorFactory;
+        this.fadInitializer = fadInitializer;
+        this.fishValueCalculator = fishValueCalculator;
     }
 
     public AlgorithmFactory<? extends Regulation> getRegulations() {
@@ -90,12 +90,12 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         this.regulations = regulations;
     }
 
-    public AlgorithmFactory<? extends FishValueCalculator> getFishValueCalculatorFactory() {
-        return fishValueCalculatorFactory;
+    public AlgorithmFactory<? extends FishValueCalculator> getFishValueCalculator() {
+        return fishValueCalculator;
     }
 
-    public void setFishValueCalculatorFactory(final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory) {
-        this.fishValueCalculatorFactory = fishValueCalculatorFactory;
+    public void setFishValueCalculator(final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculator) {
+        this.fishValueCalculator = fishValueCalculator;
     }
 
     public void setLocationValuesFile(final InputPath locationValuesFile) {
@@ -110,12 +110,12 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         this.maxAllowableShear = maxAllowableShear;
     }
 
-    public AlgorithmFactory<? extends FadInitializer<?, ?>> getFadInitializerFactory() {
-        return fadInitializerFactory;
+    public AlgorithmFactory<? extends FadInitializer<?, ?>> getFadInitializer() {
+        return fadInitializer;
     }
 
-    public void setFadInitializerFactory(final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory) {
-        this.fadInitializerFactory = fadInitializerFactory;
+    public void setFadInitializer(final AlgorithmFactory<FadInitializer<?, ?>> fadInitializer) {
+        this.fadInitializer = fadInitializer;
     }
 
     @SuppressWarnings("unused")
@@ -141,13 +141,13 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     }
 
     FadManager makeFadManager(final FishState fishState) {
-        checkNotNull(fadInitializerFactory);
+        checkNotNull(fadInitializer);
         final MersenneTwisterFast rng = fishState.getRandom();
         final GlobalBiology globalBiology = fishState.getBiology();
         return new FadManager(
             regulations.apply(fishState),
             fishState.getFadMap(),
-            fadInitializerFactory.apply(fishState),
+            fadInitializer.apply(fishState),
             AtomicLongMapYearlyActionCounter.create(),
             fadDeploymentObserversCache.get(fishState),
             allSetsObserversCache.get(fishState),
@@ -155,7 +155,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
             nonAssociatedSetObserversCache.get(fishState),
             dolphinSetObserversCache.get(fishState),
             Optional.of(biomassLostMonitor),
-            fishValueCalculatorFactory.apply(fishState)
+            fishValueCalculator.apply(fishState)
         );
     }
 

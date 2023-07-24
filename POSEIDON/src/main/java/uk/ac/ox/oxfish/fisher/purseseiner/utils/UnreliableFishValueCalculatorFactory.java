@@ -5,29 +5,29 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.function.DoubleUnaryOperator;
 
-public class UnreliableFishValueCalculatorFactory implements AlgorithmFactory<UnreliableFishValueCalculator> {
-    private AlgorithmFactory<? extends DoubleUnaryOperator> errorOperatorFactory;
+public class UnreliableFishValueCalculatorFactory implements AlgorithmFactory<FishValueCalculator> {
+    private AlgorithmFactory<? extends DoubleUnaryOperator> errorOperator;
 
-    public UnreliableFishValueCalculatorFactory(final AlgorithmFactory<? extends DoubleUnaryOperator> errorOperatorFactory) {
-        this.errorOperatorFactory = errorOperatorFactory;
+    public UnreliableFishValueCalculatorFactory(final AlgorithmFactory<? extends DoubleUnaryOperator> errorOperator) {
+        this.errorOperator = errorOperator;
     }
 
     public UnreliableFishValueCalculatorFactory() {
     }
 
-    public AlgorithmFactory<? extends DoubleUnaryOperator> getErrorOperatorFactory() {
-        return errorOperatorFactory;
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getErrorOperator() {
+        return errorOperator;
     }
 
-    public void setErrorOperatorFactory(final AlgorithmFactory<? extends DoubleUnaryOperator> errorOperatorFactory) {
-        this.errorOperatorFactory = errorOperatorFactory;
+    public void setErrorOperator(final AlgorithmFactory<? extends DoubleUnaryOperator> errorOperator) {
+        this.errorOperator = errorOperator;
     }
 
     @Override
     public UnreliableFishValueCalculator apply(final FishState fishState) {
         return new UnreliableFishValueCalculator(
             fishState.getBiology(),
-            errorOperatorFactory.apply(fishState)
+            errorOperator.apply(fishState)
         );
     }
 }

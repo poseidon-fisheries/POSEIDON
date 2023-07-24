@@ -97,8 +97,8 @@ public abstract class EpoScenario<B extends LocalBiology>
             Y2018, Paths.get("currents", "currents_2018.csv")
         )
     );
-    private FadMapFactory fadMapFactory;
-    private AlgorithmFactory<? extends MapInitializer> mapInitializerFactory =
+    private FadMapFactory fadMap;
+    private AlgorithmFactory<? extends MapInitializer> mapInitializer =
         new FromFileMapInitializerFactory(
             getInputFolder().path("depth.csv"),
             101,
@@ -151,7 +151,7 @@ public abstract class EpoScenario<B extends LocalBiology>
 
     @Override
     public ScenarioPopulation populateModel(final FishState fishState) {
-        final FadMap fadMap = getFadMapFactory().apply(fishState);
+        final FadMap fadMap = getFadMap().apply(fishState);
         fishState.setFadMap(fadMap);
         fishState.registerStartable(fadMap);
 
@@ -166,22 +166,22 @@ public abstract class EpoScenario<B extends LocalBiology>
         );
     }
 
-    public FadMapFactory getFadMapFactory() {
-        return this.fadMapFactory;
+    public FadMapFactory getFadMap() {
+        return this.fadMap;
     }
 
     List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
         return ImmutableList.of();
     }
 
-    public void setFadMapFactory(final FadMapFactory fadMapFactory) {
-        this.fadMapFactory = fadMapFactory;
+    public void setFadMap(final FadMapFactory fadMap) {
+        this.fadMap = fadMap;
     }
 
     @SuppressWarnings("unused")
     @Override
     public void useDummyData() {
-        getFadMapFactory().setCurrentPatternMapSupplier(CurrentPatternMapSupplier.EMPTY);
+        getFadMap().setCurrentPatternMapSupplier(CurrentPatternMapSupplier.EMPTY);
     }
 
     @Override
@@ -194,7 +194,7 @@ public abstract class EpoScenario<B extends LocalBiology>
         System.out.println("Starting model...");
 
         final NauticalMap nauticalMap =
-            getMapInitializerFactory()
+            getMapInitializer()
                 .apply(fishState)
                 .makeMap(fishState.random, null, fishState);
 
@@ -222,8 +222,8 @@ public abstract class EpoScenario<B extends LocalBiology>
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }
 
-    public AlgorithmFactory<? extends MapInitializer> getMapInitializerFactory() {
-        return mapInitializerFactory;
+    public AlgorithmFactory<? extends MapInitializer> getMapInitializer() {
+        return mapInitializer;
     }
 
     public Map<String, AlgorithmFactory<? extends Startable>> getAdditionalStartables() {
@@ -235,7 +235,7 @@ public abstract class EpoScenario<B extends LocalBiology>
     }
 
     @SuppressWarnings("unused")
-    public void setMapInitializerFactory(final AlgorithmFactory<? extends MapInitializer> mapInitializerFactory) {
-        this.mapInitializerFactory = mapInitializerFactory;
+    public void setMapInitializer(final AlgorithmFactory<? extends MapInitializer> mapInitializer) {
+        this.mapInitializer = mapInitializer;
     }
 }

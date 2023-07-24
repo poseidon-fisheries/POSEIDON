@@ -46,36 +46,36 @@ public class PurseSeinerFleetFactory
     implements Dummyable {
     private InputPath vesselsFile;
     private InputPath costsFile;
-    private AlgorithmFactory<? extends MarketMap> marketMapFactory;
-    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategyFactory;
-    private AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory;
-    private PurseSeineGearFactory purseSeineGearFactory;
+    private AlgorithmFactory<? extends MarketMap> marketMap;
+    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy;
+    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy;
+    private PurseSeineGearFactory purseSeineGear;
     private AlgorithmFactory<? extends GearStrategy> gearStrategy;
-    private AlgorithmFactory<? extends Regulation> regulationsFactory;
+    private AlgorithmFactory<? extends Regulation> regulations;
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
     private AlgorithmFactory<? extends PortInitializer> portInitializer;
 
     public PurseSeinerFleetFactory(
         final InputPath vesselsFile,
         final InputPath costsFile,
-        final PurseSeineGearFactory purseSeineGearFactory,
+        final PurseSeineGearFactory purseSeineGear,
         final AlgorithmFactory<? extends GearStrategy> gearStrategy,
-        final AlgorithmFactory<? extends DestinationStrategy> destinationStrategyFactory,
-        final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory,
-        final AlgorithmFactory<? extends Regulation> regulationsFactory,
+        final AlgorithmFactory<? extends DestinationStrategy> destinationStrategy,
+        final AlgorithmFactory<? extends FishingStrategy> fishingStrategy,
+        final AlgorithmFactory<? extends Regulation> regulations,
         final AlgorithmFactory<? extends DepartingStrategy> departingStrategy,
-        final AlgorithmFactory<? extends MarketMap> marketMapFactory,
+        final AlgorithmFactory<? extends MarketMap> marketMap,
         final AlgorithmFactory<? extends PortInitializer> portInitializer
     ) {
         this.vesselsFile = vesselsFile;
         this.costsFile = costsFile;
-        this.purseSeineGearFactory = purseSeineGearFactory;
+        this.purseSeineGear = purseSeineGear;
         this.gearStrategy = gearStrategy;
-        this.destinationStrategyFactory = destinationStrategyFactory;
-        this.fishingStrategyFactory = fishingStrategyFactory;
-        this.regulationsFactory = regulationsFactory;
+        this.destinationStrategy = destinationStrategy;
+        this.fishingStrategy = fishingStrategy;
+        this.regulations = regulations;
         this.departingStrategy = departingStrategy;
-        this.marketMapFactory = marketMapFactory;
+        this.marketMap = marketMap;
         this.portInitializer = portInitializer;
     }
 
@@ -98,20 +98,20 @@ public class PurseSeinerFleetFactory
         this.costsFile = costsFile;
     }
 
-    public AlgorithmFactory<? extends DestinationStrategy> getDestinationStrategyFactory() {
-        return destinationStrategyFactory;
+    public AlgorithmFactory<? extends DestinationStrategy> getDestinationStrategy() {
+        return destinationStrategy;
     }
 
-    public void setDestinationStrategyFactory(final AlgorithmFactory<? extends DestinationStrategy> destinationStrategyFactory) {
-        this.destinationStrategyFactory = destinationStrategyFactory;
+    public void setDestinationStrategy(final AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
+        this.destinationStrategy = destinationStrategy;
     }
 
-    public AlgorithmFactory<? extends FishingStrategy> getFishingStrategyFactory() {
-        return fishingStrategyFactory;
+    public AlgorithmFactory<? extends FishingStrategy> getFishingStrategy() {
+        return fishingStrategy;
     }
 
-    public void setFishingStrategyFactory(final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory) {
-        this.fishingStrategyFactory = fishingStrategyFactory;
+    public void setFishingStrategy(final AlgorithmFactory<? extends FishingStrategy> fishingStrategy) {
+        this.fishingStrategy = fishingStrategy;
     }
 
     public AlgorithmFactory<? extends GearStrategy> getGearStrategy() {
@@ -122,12 +122,12 @@ public class PurseSeinerFleetFactory
         this.gearStrategy = gearStrategy;
     }
 
-    public AlgorithmFactory<? extends Regulation> getRegulationsFactory() {
-        return regulationsFactory;
+    public AlgorithmFactory<? extends Regulation> getRegulations() {
+        return regulations;
     }
 
-    public void setRegulationsFactory(final AlgorithmFactory<? extends Regulation> regulationsFactory) {
-        this.regulationsFactory = regulationsFactory;
+    public void setRegulations(final AlgorithmFactory<? extends Regulation> regulations) {
+        this.regulations = regulations;
     }
 
     public AlgorithmFactory<? extends DepartingStrategy> getDepartingStrategy() {
@@ -144,11 +144,11 @@ public class PurseSeinerFleetFactory
         vesselsFile = dummyDataFolder.path("dummy_boats.csv");
         maybeUseDummyData(
             dummyDataFolder,
-            purseSeineGearFactory,
+            purseSeineGear,
             gearStrategy,
-            destinationStrategyFactory,
-            fishingStrategyFactory,
-            regulationsFactory,
+            destinationStrategy,
+            fishingStrategy,
+            regulations,
             departingStrategy
         );
     }
@@ -166,7 +166,7 @@ public class PurseSeinerFleetFactory
     private void addMonitors(final FishState fishState) {
         final Monitors monitors = new Monitors(fishState);
         monitors.getMonitors().forEach(fishState::registerStartable);
-        getPurseSeineGearFactory().addMonitors(monitors);
+        getPurseSeineGear().addMonitors(monitors);
     }
 
     public InputPath getVesselsFile() {
@@ -181,16 +181,16 @@ public class PurseSeinerFleetFactory
         final FisherFactory fisherFactory =
             new FisherFactory(
                 null,
-                regulationsFactory,
+                regulations,
                 departingStrategy,
-                destinationStrategyFactory,
-                fishingStrategyFactory,
+                destinationStrategy,
+                fishingStrategy,
                 new NoDiscardingFactory(),
                 gearStrategy,
                 new IgnoreWeatherFactory(),
                 null,
                 null,
-                purseSeineGearFactory,
+                purseSeineGear,
                 0
             );
 
@@ -234,7 +234,7 @@ public class PurseSeinerFleetFactory
     }
 
     List<Port> buildPorts(final FishState fishState) {
-        final MarketMap marketMap = getMarketMapFactory().apply(fishState);
+        final MarketMap marketMap = getMarketMap().apply(fishState);
         portInitializer.apply(fishState).buildPorts(
             fishState.getMap(),
             fishState.random,
@@ -245,12 +245,12 @@ public class PurseSeinerFleetFactory
         return fishState.getMap().getPorts();
     }
 
-    public PurseSeineGearFactory getPurseSeineGearFactory() {
-        return purseSeineGearFactory;
+    public PurseSeineGearFactory getPurseSeineGear() {
+        return purseSeineGear;
     }
 
-    public void setPurseSeineGearFactory(final PurseSeineGearFactory purseSeineGearFactory) {
-        this.purseSeineGearFactory = purseSeineGearFactory;
+    public void setPurseSeineGear(final PurseSeineGearFactory purseSeineGear) {
+        this.purseSeineGear = purseSeineGear;
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -272,11 +272,11 @@ public class PurseSeinerFleetFactory
         };
     }
 
-    public AlgorithmFactory<? extends MarketMap> getMarketMapFactory() {
-        return marketMapFactory;
+    public AlgorithmFactory<? extends MarketMap> getMarketMap() {
+        return marketMap;
     }
 
-    public void setMarketMapFactory(final AlgorithmFactory<? extends MarketMap> marketMapFactory) {
-        this.marketMapFactory = marketMapFactory;
+    public void setMarketMap(final AlgorithmFactory<? extends MarketMap> marketMap) {
+        this.marketMap = marketMap;
     }
 }

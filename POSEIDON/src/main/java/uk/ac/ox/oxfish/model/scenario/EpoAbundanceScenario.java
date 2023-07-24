@@ -38,7 +38,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology> {
                 DEFAULT_MAP_EXTENT_FACTORY
             )
         );
-        setFadMapFactory(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
+        setFadMap(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));
     }
 
 }

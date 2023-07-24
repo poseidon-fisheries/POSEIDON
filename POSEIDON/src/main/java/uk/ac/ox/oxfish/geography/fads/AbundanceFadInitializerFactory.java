@@ -12,14 +12,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class AbundanceFadInitializerFactory
     extends FadInitializerFactory<AbundanceLocalBiology, AbundanceAggregatingFad> {
 
-    private AbundanceFiltersFactory abundanceFiltersFactory;
+    private AbundanceFiltersFactory abundanceFilters;
 
     public AbundanceFadInitializerFactory(
         final CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory,
         final Map<String, DoubleParameter> catchabilities,
         final DoubleParameter daysInWaterBeforeAttraction,
         final DoubleParameter fishReleaseProbabilityInPercent,
-        final AbundanceFiltersFactory abundanceFiltersFactory
+        final AbundanceFiltersFactory abundanceFilters
     ) {
         super(
             carryingCapacityInitializerFactory,
@@ -27,29 +27,29 @@ public abstract class AbundanceFadInitializerFactory
             daysInWaterBeforeAttraction,
             fishReleaseProbabilityInPercent
         );
-        this.abundanceFiltersFactory = checkNotNull(abundanceFiltersFactory);
+        this.abundanceFilters = checkNotNull(abundanceFilters);
     }
 
     protected AbundanceFadInitializerFactory(
         final CarryingCapacityInitializerFactory<?> carryingCapacitiesFactory,
         final Map<String, DoubleParameter> catchabilities,
-        final AbundanceFiltersFactory abundanceFiltersFactory
+        final AbundanceFiltersFactory abundanceFilters
     ) {
         super(carryingCapacitiesFactory, catchabilities);
-        this.abundanceFiltersFactory = checkNotNull(abundanceFiltersFactory);
+        this.abundanceFilters = checkNotNull(abundanceFilters);
     }
 
     public AbundanceFadInitializerFactory() {
 
     }
 
-    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
-        return abundanceFiltersFactory;
+    public AbundanceFiltersFactory getAbundanceFilters() {
+        return abundanceFilters;
     }
 
-    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
+    public void setAbundanceFilters(final AbundanceFiltersFactory abundanceFilters) {
         invalidateCache();
-        this.abundanceFiltersFactory = checkNotNull(abundanceFiltersFactory);
+        this.abundanceFilters = checkNotNull(abundanceFilters);
     }
 
 }

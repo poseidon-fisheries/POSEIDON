@@ -59,6 +59,10 @@ import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.TimeScalarFunction;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.ExponentialTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.InverseTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.SigmoidalTimeScalarFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.CarryingCapacityInitializer;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.MaximumPerSpeciesCarryingCapacitiesFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.SelectivityAbundanceFadInitializerFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullPerSpeciesCarryingCapacitiesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.GenerateRandomPlansStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.PlanningModule;
@@ -70,6 +74,10 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinat
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.ReliableFishValueCalculatorFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.fisher.selfanalysis.factory.*;
 import uk.ac.ox.oxfish.fisher.strategies.departing.AdaptiveProbabilityDepartingFactory;
@@ -147,6 +155,7 @@ import uk.ac.ox.poseidon.regulations.api.Quantity;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -777,6 +786,28 @@ public class AlgorithmFactories {
                 BiomassFadMapFactory.class, "Biomass FAD map",
                 BiasedFadMapFactory.class, "Biased FAD map factory"
             )
+        ));
+        addFactories(new Factories<>(
+            FadInitializer.class,
+            ImmutableMap.of(
+                SelectivityAbundanceFadInitializerFactory.class, "Selectivity abundance FAD",
+                LinearIntervalAttractorFactory.class, "Linear attractor abundance FAD",
+                BiomassFadInitializerFactory.class, "Biomass FAD"
+            )
+        ));
+        addFactories(new Factories<>(
+            CarryingCapacityInitializer.class,
+            MaximumPerSpeciesCarryingCapacitiesFactory.class,
+            WeibullPerSpeciesCarryingCapacitiesFactory.class
+        ));
+        addFactories(new Factories<>(
+            FishValueCalculator.class,
+            UnreliableFishValueCalculatorFactory.class,
+            ReliableFishValueCalculatorFactory.class
+        ));
+        addFactories(new Factories<>(
+            DoubleUnaryOperator.class,
+            LogNormalErrorOperatorFactory.class
         ));
     }
 

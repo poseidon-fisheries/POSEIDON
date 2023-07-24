@@ -40,7 +40,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
             getInputFolder().path("abundance", "selectivity.csv")
         );
 
-    private PurseSeinerFleetFactory purseSeinerFleetFactory =
+    private PurseSeinerFleetFactory purseSeinerFleet =
         new EpoPurseSeinerFleetFactory(
             getTargetYear(),
             getInputFolder(),
@@ -209,13 +209,13 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
             new DefaultToDestinationStrategyFishingStrategyFactory()
         );
 
-    public PurseSeinerFleetFactory getPurseSeinerFleetFactory() {
-        return purseSeinerFleetFactory;
+    public PurseSeinerFleetFactory getPurseSeinerFleet() {
+        return purseSeinerFleet;
     }
 
     @SuppressWarnings("unused")
-    public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory purseSeinerFleetFactory) {
-        this.purseSeinerFleetFactory = purseSeinerFleetFactory;
+    public void setPurseSeinerFleet(final PurseSeinerFleetFactory purseSeinerFleet) {
+        this.purseSeinerFleet = purseSeinerFleet;
     }
 
     public AbundanceFiltersFactory getAbundanceFilters() {
@@ -229,12 +229,12 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
     @Override
     public void useDummyData() {
         super.useDummyData();
-        purseSeinerFleetFactory.useDummyData(testFolder());
+        purseSeinerFleet.useDummyData(testFolder());
     }
 
     @Override
     List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
-        return purseSeinerFleetFactory.makeFishers(fishState, targetYear);
+        return purseSeinerFleet.makeFishers(fishState, targetYear);
     }
 
 }
