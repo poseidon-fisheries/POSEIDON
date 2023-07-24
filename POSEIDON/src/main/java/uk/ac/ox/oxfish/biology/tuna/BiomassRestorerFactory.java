@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.biology.tuna;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Map;
 
@@ -28,7 +29,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BiomassRestorerFactory extends RestorerFactory<BiomassLocalBiology> {
 
-    private ImmutableMap<Integer, Integer> schedule = ImmutableMap.of(0, 364);
+    private ImmutableMap<Integer, Integer> schedule;
+
+    public BiomassRestorerFactory() {
+    }
+
+    public BiomassRestorerFactory(
+        final AlgorithmFactory<Reallocator<BiomassLocalBiology>> reallocator,
+        final ImmutableMap<Integer, Integer> schedule
+    ) {
+        super(reallocator);
+        this.schedule = schedule;
+    }
 
     @SuppressWarnings("unused")
     public Map<Integer, Integer> getSchedule() {
@@ -49,7 +61,7 @@ public class BiomassRestorerFactory extends RestorerFactory<BiomassLocalBiology>
             "setReallocator must be called before using."
         );
         return new BiomassRestorer(
-            getReallocator(),
+            getReallocator().apply(fishState),
             new BiomassAggregator(),
             schedule
         );

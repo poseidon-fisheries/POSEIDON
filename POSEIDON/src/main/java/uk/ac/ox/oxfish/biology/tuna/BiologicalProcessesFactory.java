@@ -1,34 +1,27 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.util.List;
-
-public abstract class BiologicalProcessesFactory<B extends LocalBiology> {
+public abstract class BiologicalProcessesFactory<B extends LocalBiology>
+    implements AlgorithmFactory<BiologicalProcesses> {
     private InputPath inputFolder;
     private BiologyInitializerFactory<B> biologyInitializer;
-    private ReallocatorFactory<B, Reallocator<B>> reallocator;
     private RestorerFactory<B> restorer;
     private ScheduledBiologicalProcessesFactory<B> scheduledProcesses;
 
     public BiologicalProcessesFactory(
         final InputPath inputFolder,
         final BiologyInitializerFactory<B> biologyInitializer,
-        final ReallocatorFactory<B, Reallocator<B>> reallocator,
         final RestorerFactory<B> restorer,
         final ScheduledBiologicalProcessesFactory<B> scheduledProcesses
     ) {
         this.inputFolder = inputFolder;
         this.biologyInitializer = biologyInitializer;
-        this.reallocator = reallocator;
         this.restorer = restorer;
         this.scheduledProcesses = scheduledProcesses;
     }
@@ -61,15 +54,10 @@ public abstract class BiologicalProcessesFactory<B extends LocalBiology> {
         this.inputFolder = inputFolder;
     }
 
-    public Processes initProcesses(final NauticalMap nauticalMap, final FishState fishState) {
-
-        final Reallocator<B> reallocator = this.reallocator.apply(fishState);
-        scheduledProcesses.setReallocator(reallocator);
-        restorer.setReallocator(reallocator);
-        biologyInitializer.setReallocator(reallocator);
-
+    @Override
+    public BiologicalProcesses apply(final FishState fishState) {
         final BiologyInitializer biologyInitializer = getBiologyInitializer().apply(fishState);
-        return new Processes(
+        return new BiologicalProcesses(
             biologyInitializer,
             biologyInitializer.generateGlobal(fishState.getRandom(), fishState),
             ImmutableList.of(
@@ -85,29 +73,5 @@ public abstract class BiologicalProcessesFactory<B extends LocalBiology> {
 
     public void setBiologyInitializer(final BiologyInitializerFactory<B> biologyInitializer) {
         this.biologyInitializer = biologyInitializer;
-    }
-
-    public ReallocatorFactory<B, Reallocator<B>> getReallocator() {
-        return reallocator;
-    }
-
-    public void setReallocator(final ReallocatorFactory<B, Reallocator<B>> reallocator) {
-        this.reallocator = reallocator;
-    }
-
-    public static class Processes {
-        public final BiologyInitializer biologyInitializer;
-        public final GlobalBiology globalBiology;
-        public final List<AlgorithmFactory<? extends Startable>> startableFactories;
-
-        public Processes(
-            final BiologyInitializer biologyInitializer,
-            final GlobalBiology globalBiology,
-            final List<AlgorithmFactory<? extends Startable>> startableFactories
-        ) {
-            this.biologyInitializer = biologyInitializer;
-            this.globalBiology = globalBiology;
-            this.startableFactories = startableFactories;
-        }
     }
 }

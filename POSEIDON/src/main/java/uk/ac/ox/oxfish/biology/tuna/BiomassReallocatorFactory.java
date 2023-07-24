@@ -19,14 +19,12 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.tuna.Reallocator.SpeciesKey;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This will create a {@link BiomassReallocator}. It will use allocation grids based on the biomass
@@ -34,6 +32,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class BiomassReallocatorFactory
     extends ReallocatorFactory<BiomassLocalBiology, Reallocator<BiomassLocalBiology>> {
+
+    private final CacheByFishState<BiomassReallocator> cache = new CacheByFishState<>(fishState -> {
+        final AllocationGrids<Reallocator.SpeciesKey> grids =
+            new AllocationGridsSupplier(
+                getBiomassDistributionsFile().get(),
+                getMapExtent().apply(fishState),
+                getPeriod().getValue()
+            ).get();
+        return new BiomassReallocator(grids);
+    });
 
     /**
      * Empty constructor needed for YAML.
@@ -52,13 +60,6 @@ public class BiomassReallocatorFactory
 
     @Override
     public BiomassReallocator apply(final FishState fishState) {
-        checkNotNull(getMapExtent(), "Need to call setMapExtent() before using");
-        final AllocationGrids<SpeciesKey> grids =
-            new AllocationGridsSupplier(
-                getBiomassDistributionsFile().get(),
-                getMapExtent().apply(fishState),
-                getPeriod().getValue()
-            ).get();
-        return new BiomassReallocator(grids);
+        return cache.get(fishState);
     }
 }

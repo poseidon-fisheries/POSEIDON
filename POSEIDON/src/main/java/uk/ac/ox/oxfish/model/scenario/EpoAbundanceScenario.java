@@ -30,7 +30,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology> {
 
     public EpoAbundanceScenario() {
         setBiologicalProcesses(
-            new AbundanceProcessesFactory(
+            AbundanceProcessesFactory.create(
                 getInputFolder().path("abundance"),
                 new SpeciesCodesFromFileFactory(
                     getInputFolder().path("species_codes.csv")

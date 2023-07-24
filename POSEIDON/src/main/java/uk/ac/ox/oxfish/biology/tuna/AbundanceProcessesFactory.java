@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -23,30 +22,17 @@ public class AbundanceProcessesFactory
     private RecruitmentProcessesFactory recruitmentProcessesFactory;
     private WeightGroupsFactory weightGroupsFactory;
 
+    @SuppressWarnings("unused")
+    public AbundanceProcessesFactory() {
+    }
+
     public AbundanceProcessesFactory(
         final InputPath inputFolder,
-        final AlgorithmFactory<SpeciesCodes> speciesCodesSupplier,
-        final AlgorithmFactory<MapExtent> mapExtent
+        final BiologyInitializerFactory<AbundanceLocalBiology> biologyInitializer,
+        final RestorerFactory<AbundanceLocalBiology> restorer,
+        final ScheduledBiologicalProcessesFactory<AbundanceLocalBiology> scheduledProcesses
     ) {
-        super(
-            inputFolder,
-            new AbundanceInitializerFactory(
-                inputFolder.path("bins.csv"),
-                speciesCodesSupplier
-            ),
-            new AbundanceReallocatorFactory(
-                inputFolder.path("grids.csv"),
-                new IntegerParameter(365),
-                mapExtent
-            ),
-            new AbundanceRestorerFactory(
-                ImmutableMap.of(0, 365)
-            ),
-            new ScheduledAbundanceProcessesFactory(
-                ImmutableList.of("01-01", "04-01", "07-01", "10-01"),
-                inputFolder.path("mortality.csv")
-            )
-        );
+        super(inputFolder, biologyInitializer, restorer, scheduledProcesses);
         this.recruitmentProcessesFactory =
             new RecruitmentProcessesFactory(
                 inputFolder.path("recruitment_parameters.csv")
@@ -64,19 +50,45 @@ public class AbundanceProcessesFactory
             );
     }
 
-    @SuppressWarnings("unused")
-    public AbundanceProcessesFactory() {
+    public static AbundanceProcessesFactory create(
+        final InputPath inputFolder,
+        final AlgorithmFactory<SpeciesCodes> speciesCodesSupplier,
+        final AlgorithmFactory<MapExtent> mapExtent
+    ) {
+        final AbundanceReallocatorFactory reallocator =
+            new AbundanceReallocatorFactory(
+                inputFolder.path("grids.csv"),
+                new IntegerParameter(365),
+                mapExtent
+            );
+        return new AbundanceProcessesFactory(
+            inputFolder,
+            new AbundanceInitializerFactory(
+                reallocator,
+                inputFolder.path("bins.csv"),
+                speciesCodesSupplier
+            ),
+            new AbundanceRestorerFactory(
+                reallocator,
+                ImmutableMap.of(0, 365)
+            ),
+            new ScheduledAbundanceProcessesFactory(
+                reallocator,
+                ImmutableList.of("01-01", "04-01", "07-01", "10-01"),
+                inputFolder.path("mortality.csv")
+            )
+        );
     }
 
     @Override
-    public Processes initProcesses(final NauticalMap nauticalMap, final FishState fishState) {
+    public BiologicalProcesses apply(final FishState fishState) {
         ((AbundanceInitializerFactory) getBiologyInitializer())
             .assignWeightGroupsPerSpecies(weightGroupsFactory.apply(fishState));
-        final Processes processes = super.initProcesses(nauticalMap, fishState);
-        recruitmentProcessesFactory.setGlobalBiology(processes.globalBiology);
+        final BiologicalProcesses biologicalProcesses = super.apply(fishState);
+        recruitmentProcessesFactory.setGlobalBiology(biologicalProcesses.getGlobalBiology());
         ((ScheduledAbundanceProcessesFactory) getScheduledProcesses())
             .setRecruitmentProcesses(recruitmentProcessesFactory.apply(fishState));
-        return processes;
+        return biologicalProcesses;
     }
 
     public WeightGroupsFactory getWeightGroupsFactory() {

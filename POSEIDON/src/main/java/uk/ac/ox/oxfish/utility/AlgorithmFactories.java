@@ -746,6 +746,11 @@ public class AlgorithmFactories {
             MapExtent.class,
             MapExtentFactory.class
         ));
+        addFactories(new Factories<>(
+            BiologicalProcesses.class,
+            AbundanceProcessesFactory.class,
+            BiomassProcessesFactory.class
+        ));
     }
 
     private static void addFactories(final Factories<?> factories) {

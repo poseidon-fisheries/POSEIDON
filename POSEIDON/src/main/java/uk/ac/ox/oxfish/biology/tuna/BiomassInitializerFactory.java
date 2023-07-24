@@ -57,12 +57,15 @@ public class BiomassInitializerFactory
     }
 
     public BiomassInitializerFactory(
+        final AlgorithmFactory<Reallocator<BiomassLocalBiology>> reallocator,
         final AlgorithmFactory<SpeciesCodes> speciesCodesSupplier,
         final InputPath schaeferParamsFile
     ) {
+        super(reallocator);
         this.speciesCodesSupplier = speciesCodesSupplier;
         this.schaeferParamsFile = schaeferParamsFile;
     }
+
 
     public InputPath getSchaeferParamsFile() {
         return schaeferParamsFile;
@@ -90,7 +93,7 @@ public class BiomassInitializerFactory
             "setReallocator must be called before using."
         );
         final Map<String, GridAllocator> initialAllocators =
-            getReallocator()
+            getReallocator().apply(fishState)
                 .getAllocationGrids()
                 .getGrids()
                 .get(0)

@@ -21,11 +21,11 @@ package uk.ac.ox.oxfish.biology.tuna;
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Collection;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
@@ -37,13 +37,17 @@ import static java.util.function.Function.identity;
 public class ScheduledBiomassProcessesFactory
     extends ScheduledBiologicalProcessesFactory<BiomassLocalBiology> {
 
+    public ScheduledBiomassProcessesFactory() {
+    }
+
+    public ScheduledBiomassProcessesFactory(final AlgorithmFactory<Reallocator<BiomassLocalBiology>> reallocator) {
+        super(reallocator);
+    }
+
     @Override
     public ScheduledBiologicalProcesses<BiomassLocalBiology> apply(final FishState fishState) {
 
-        checkNotNull(
-            getReallocator(),
-            "setReallocator must be called before using."
-        );
+        final Reallocator<BiomassLocalBiology> reallocator = getReallocator().apply(fishState);
 
         // The biomass scheduled processes are pretty straightforward:
         // we aggregate the biomass from the ocean (not the FADs) and
@@ -51,11 +55,10 @@ public class ScheduledBiomassProcessesFactory
         final Collection<BiologicalProcess<BiomassLocalBiology>> biologicalProcesses =
             ImmutableList.of(
                 new BiomassExtractor(false, true),
-                getReallocator()
+                reallocator
             );
 
-        final AllocationGrids<?> grids =
-            getReallocator().getAllocationGrids();
+        final AllocationGrids<?> grids = reallocator.getAllocationGrids();
 
         final Map<Integer, Collection<BiologicalProcess<BiomassLocalBiology>>> schedule =
             grids.getGrids()

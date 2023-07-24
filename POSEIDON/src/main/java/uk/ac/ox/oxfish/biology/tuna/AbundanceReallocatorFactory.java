@@ -22,6 +22,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
@@ -32,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.LARGE;
 import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.SizeGroup.SMALL;
 
@@ -44,6 +44,27 @@ import static uk.ac.ox.oxfish.biology.tuna.SmallLargeAllocationGridsSupplier.Siz
  */
 public class AbundanceReallocatorFactory
     extends ReallocatorFactory<AbundanceLocalBiology, Reallocator<AbundanceLocalBiology>> {
+
+    private final CacheByFishState<AbundanceReallocator> cache =
+        new CacheByFishState<>(fishState -> {
+            final AllocationGrids<SmallLargeAllocationGridsSupplier.Key> grids =
+                new SmallLargeAllocationGridsSupplier(
+                    getBiomassDistributionsFile().get(),
+                    getMapExtent().apply(fishState),
+                    365
+                ).get();
+
+            final BiFunction<Species, Integer, SizeGroup> binToSizeGroup =
+                (species, bin) -> {
+                    final TunaMeristics meristics = (TunaMeristics) species.getMeristics();
+                    final List<Map<String, List<Integer>>> weightBins = meristics.getWeightBins();
+                    final Map<String, List<Integer>> stringListMap = weightBins.get(0);
+                    final List<Integer> large = stringListMap.get("large");
+                    final int firstLargeBin = large.get(0);
+                    return bin >= firstLargeBin ? LARGE : SMALL;
+                };
+            return new AbundanceReallocator(grids, binToSizeGroup);
+        });
 
     /**
      * Empty constructor needed for YAML.
@@ -62,25 +83,6 @@ public class AbundanceReallocatorFactory
 
     @Override
     public AbundanceReallocator apply(final FishState fishState) {
-        checkNotNull(getMapExtent(), "Need to call setMapExtent() before using");
-
-        final AllocationGrids<SmallLargeAllocationGridsSupplier.Key> grids =
-            new SmallLargeAllocationGridsSupplier(
-                getBiomassDistributionsFile().get(),
-                getMapExtent().apply(fishState),
-                365
-            ).get();
-
-        final BiFunction<Species, Integer, SizeGroup> binToSizeGroup =
-            (species, bin) -> {
-                final TunaMeristics meristics = (TunaMeristics) species.getMeristics();
-                final List<Map<String, List<Integer>>> weightBins = meristics.getWeightBins();
-                final Map<String, List<Integer>> stringListMap = weightBins.get(0);
-                final List<Integer> large = stringListMap.get("large");
-                final int firstLargeBin = large.get(0);
-                return bin >= firstLargeBin ? LARGE : SMALL;
-            };
-
-        return new AbundanceReallocator(grids, binToSizeGroup);
+        return cache.get(fishState);
     }
 }

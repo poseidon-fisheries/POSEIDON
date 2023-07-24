@@ -6,13 +6,20 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public abstract class RestorerFactory<B extends LocalBiology>
     implements AlgorithmFactory<Restorer<B>> {
 
-    private Reallocator<B> reallocator;
+    private AlgorithmFactory<Reallocator<B>> reallocator;
 
-    public Reallocator<B> getReallocator() {
+    public RestorerFactory() {
+    }
+
+    public RestorerFactory(final AlgorithmFactory<Reallocator<B>> reallocator) {
+        this.reallocator = reallocator;
+    }
+
+    public AlgorithmFactory<Reallocator<B>> getReallocator() {
         return reallocator;
     }
 
-    public void setReallocator(final Reallocator<B> reallocator) {
+    public void setReallocator(final AlgorithmFactory<Reallocator<B>> reallocator) {
         this.reallocator = reallocator;
     }
 }

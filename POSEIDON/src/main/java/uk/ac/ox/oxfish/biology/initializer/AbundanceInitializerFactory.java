@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializer.Bin;
 import uk.ac.ox.oxfish.biology.tuna.BiologyInitializerFactory;
+import uk.ac.ox.oxfish.biology.tuna.Reallocator;
 import uk.ac.ox.oxfish.biology.tuna.WeightGroups;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -52,9 +53,10 @@ public class AbundanceInitializerFactory
     private Map<String, WeightGroups> weightGroupsPerSpecies;
 
     public AbundanceInitializerFactory(
-        final InputPath binsFile,
+        final AlgorithmFactory<Reallocator<AbundanceLocalBiology>> reallocator, final InputPath binsFile,
         final AlgorithmFactory<SpeciesCodes> speciesCodes
     ) {
+        super(reallocator);
         this.binsFile = binsFile;
         this.speciesCodes = speciesCodes;
     }
@@ -128,7 +130,7 @@ public class AbundanceInitializerFactory
             speciesCodes.apply(fishState),
             binsCache.apply(this.binsFile.get()),
             weightGroupsPerSpecies,
-            getReallocator()
+            getReallocator().apply(fishState)
         );
     }
 

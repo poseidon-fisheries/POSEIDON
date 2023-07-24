@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.tuna.BiologicalProcesses;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
 import uk.ac.ox.oxfish.environment.EnvironmentalMapFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -197,17 +198,26 @@ public abstract class EpoScenario<B extends LocalBiology>
                 .apply(fishState)
                 .makeMap(fishState.random, null, fishState);
 
+        final BiologicalProcesses biologicalProcesses =
+            this.biologicalProcesses.apply(fishState);
 
-        final BiologicalProcessesFactory.Processes biologicalProcesses =
-            this.biologicalProcesses.initProcesses(nauticalMap, fishState);
-        biologicalProcesses.startableFactories.forEach(bpf ->
+        final GlobalBiology globalBiology =
+            biologicalProcesses.getGlobalBiology();
+
+        biologicalProcesses.getStartableFactories().forEach(bpf ->
             getAdditionalStartables().put(bpf.toString(), bpf)
         );
-        final GlobalBiology globalBiology = biologicalProcesses.globalBiology;
-
-        nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));
-        nauticalMap.initializeBiology(biologicalProcesses.biologyInitializer, fishState.random, globalBiology);
-        biologicalProcesses.biologyInitializer.processMap(globalBiology, nauticalMap, fishState.random, fishState);
+        nauticalMap.setPathfinder(
+            new AStarFallbackPathfinder(nauticalMap.getDistance())
+        );
+        nauticalMap.initializeBiology(
+            biologicalProcesses.getBiologyInitializer(),
+            fishState.random,
+            globalBiology
+        );
+        biologicalProcesses
+            .getBiologyInitializer()
+            .processMap(globalBiology, nauticalMap, fishState.random, fishState);
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
     }

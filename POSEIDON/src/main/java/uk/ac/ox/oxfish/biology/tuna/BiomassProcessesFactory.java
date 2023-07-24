@@ -1,9 +1,9 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
@@ -16,56 +16,59 @@ import static uk.ac.ox.oxfish.model.scenario.EpoScenario.DEFAULT_MAP_EXTENT_FACT
 public class BiomassProcessesFactory extends BiologicalProcessesFactory<BiomassLocalBiology> {
     private BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory;
 
-    @SuppressWarnings("unused")
     public BiomassProcessesFactory() {
-        super();
     }
 
     public BiomassProcessesFactory(
         final InputPath inputFolder,
+        final BiologyInitializerFactory<BiomassLocalBiology> biologyInitializer,
+        final RestorerFactory<BiomassLocalBiology> restorer,
+        final ScheduledBiologicalProcessesFactory<BiomassLocalBiology> scheduledProcesses,
+        final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory
+    ) {
+        super(inputFolder, biologyInitializer, restorer, scheduledProcesses);
+        this.exogenousCatchesFactory = exogenousCatchesFactory;
+    }
+
+    public static BiomassProcessesFactory create(
+        final InputPath inputFolder,
         final SpeciesCodesFromFileFactory speciesCodesSupplier,
         final int targetYear
     ) {
-        super(
+        final BiomassReallocatorFactory reallocator = new BiomassReallocatorFactory(
+            inputFolder.path("biomass_distributions.csv"),
+            new IntegerParameter(365),
+            DEFAULT_MAP_EXTENT_FACTORY
+        );
+        return new BiomassProcessesFactory(
             inputFolder,
             new BiomassInitializerFactory(
+                reallocator,
                 speciesCodesSupplier,
                 inputFolder.path("schaefer_params.csv")
             ),
-            new BiomassReallocatorFactory(
-                inputFolder.path("biomass_distributions.csv"),
-                new IntegerParameter(365),
-                DEFAULT_MAP_EXTENT_FACTORY
+            new BiomassRestorerFactory(
+                reallocator,
+                ImmutableMap.of(0, 364)
             ),
-            new BiomassRestorerFactory(),
-            new ScheduledBiomassProcessesFactory()
-        );
-        this.exogenousCatchesFactory =
+            new ScheduledBiomassProcessesFactory(reallocator),
             new BiomassDrivenTimeSeriesExogenousCatchesFactory(
                 speciesCodesSupplier,
                 inputFolder.path("exogenous_catches.csv"),
                 targetYear,
                 true
-            );
+            )
+        );
     }
 
-    /**
-     * @param nauticalMap The nautical map, which must be passed separately from the FishState, because at the time
-     *                    this is called, the FishState's map has not been set.
-     * @param fishState   The model.
-     * @return The biology initializer and a list of startables.
-     */
     @Override
-    public Processes initProcesses(
-        final NauticalMap nauticalMap,
-        final FishState fishState
-    ) {
-        final Processes processes = super.initProcesses(nauticalMap, fishState);
-        return new Processes(
-            processes.biologyInitializer,
-            processes.globalBiology,
+    public BiologicalProcesses apply(final FishState fishState) {
+        final BiologicalProcesses biologicalProcesses = super.apply(fishState);
+        return new BiologicalProcesses(
+            biologicalProcesses.getBiologyInitializer(),
+            biologicalProcesses.getGlobalBiology(),
             ImmutableList.<AlgorithmFactory<? extends Startable>>builder()
-                .addAll(processes.startableFactories)
+                .addAll(biologicalProcesses.getStartableFactories())
                 .add(exogenousCatchesFactory)
                 .build()
         );
