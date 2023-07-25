@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasFromFolderFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 public class EpoPurseSeinerFleetFactory extends PurseSeinerFleetFactory {
     @SuppressWarnings("unused")
@@ -17,13 +18,14 @@ public class EpoPurseSeinerFleetFactory extends PurseSeinerFleetFactory {
     }
 
     public EpoPurseSeinerFleetFactory(
-        final int targetYear,
+        final IntegerParameter targetYear,
         final InputPath inputFolder,
         final PurseSeineGearFactory purseSeineGearFactory,
         final AlgorithmFactory<? extends DestinationStrategy> destinationStrategyFactory,
         final AlgorithmFactory<? extends FishingStrategy> fishingStrategyFactory
     ) {
         super(
+            targetYear,
             inputFolder.path("vessels.csv"),
             inputFolder.path("costs.csv"),
             purseSeineGearFactory,

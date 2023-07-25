@@ -6,42 +6,41 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.PurseSeinerActionClassToDouble;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.operators.LogisticFunctionSupplier;
+import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.function.DoubleUnaryOperator;
-import java.util.function.Supplier;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionField>> {
     private LocationValuesFactory locationValuesFactory;
     private InputPath maxCurrentSpeedsFile;
-    private Supplier<? extends DoubleUnaryOperator>
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctHoldSpaceLeftModulationFunction =
-        new LogisticFunctionSupplier(0.15670573908905225, 5);
-    private Supplier<? extends DoubleUnaryOperator>
+        new LogisticFunctionFactory(0.15670573908905225, 5);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctSetsRemainingModulationFunction =
-        new LogisticFunctionSupplier(EPSILON, 10);
-    private Supplier<? extends DoubleUnaryOperator>
+        new LogisticFunctionFactory(EPSILON, 10);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
         numFadsInStockModulationFunction =
-        new LogisticFunctionSupplier(465.76938287575837, 5);
-    private Supplier<? extends DoubleUnaryOperator>
+        new LogisticFunctionFactory(465.76938287575837, 5);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
         fadDeploymentPctActiveFadsLimitModulationFunction =
-        new LogisticFunctionSupplier(0.817463635675281, 5);
-    private Supplier<? extends DoubleUnaryOperator>
+        new LogisticFunctionFactory(0.817463635675281, 5);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
         pctTravelTimeLeftModulationFunction =
-        new LogisticFunctionSupplier(0.10183241937374361, 5);
-    private Supplier<? extends DoubleUnaryOperator>
+        new LogisticFunctionFactory(0.10183241937374361, 5);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
         opportunisticFadSetTimeSinceLastVisitModulationFunction =
-        new LogisticFunctionSupplier(73.32224086132372, 5);
-    private Supplier<? extends DoubleUnaryOperator>
+        new LogisticFunctionFactory(73.32224086132372, 5);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
         nonAssociatedSetTimeSinceLastVisitModulationFunction =
-        new LogisticFunctionSupplier(51.91162666081563, 5);
-    private Supplier<? extends DoubleUnaryOperator>
+        new LogisticFunctionFactory(51.91162666081563, 5);
+    private AlgorithmFactory<? extends DoubleUnaryOperator>
         dolphinSetTimeSinceLastVisitModulationFunction =
-        new LogisticFunctionSupplier(72.28852668100924, 5);
+        new LogisticFunctionFactory(72.28852668100924, 5);
     private double actionDistanceExponent = 10;
     private double destinationDistanceExponent = 2;
 
@@ -64,67 +63,67 @@ public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionF
         this.locationValuesFactory = locationValuesFactory;
     }
 
-    public Supplier<? extends DoubleUnaryOperator> getPctHoldSpaceLeftModulationFunction() {
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getPctHoldSpaceLeftModulationFunction() {
         return pctHoldSpaceLeftModulationFunction;
     }
 
-    public void setPctHoldSpaceLeftModulationFunction(final Supplier<? extends DoubleUnaryOperator> pctHoldSpaceLeftModulationFunction) {
+    public void setPctHoldSpaceLeftModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> pctHoldSpaceLeftModulationFunction) {
         this.pctHoldSpaceLeftModulationFunction = pctHoldSpaceLeftModulationFunction;
     }
 
-    public Supplier<? extends DoubleUnaryOperator> getPctSetsRemainingModulationFunction() {
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getPctSetsRemainingModulationFunction() {
         return pctSetsRemainingModulationFunction;
     }
 
-    public void setPctSetsRemainingModulationFunction(final Supplier<? extends DoubleUnaryOperator> pctSetsRemainingModulationFunction) {
+    public void setPctSetsRemainingModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> pctSetsRemainingModulationFunction) {
         this.pctSetsRemainingModulationFunction = pctSetsRemainingModulationFunction;
     }
 
-    public Supplier<? extends DoubleUnaryOperator> getNumFadsInStockModulationFunction() {
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getNumFadsInStockModulationFunction() {
         return numFadsInStockModulationFunction;
     }
 
-    public void setNumFadsInStockModulationFunction(final Supplier<? extends DoubleUnaryOperator> numFadsInStockModulationFunction) {
+    public void setNumFadsInStockModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> numFadsInStockModulationFunction) {
         this.numFadsInStockModulationFunction = numFadsInStockModulationFunction;
     }
 
-    public Supplier<? extends DoubleUnaryOperator> getFadDeploymentPctActiveFadsLimitModulationFunction() {
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getFadDeploymentPctActiveFadsLimitModulationFunction() {
         return fadDeploymentPctActiveFadsLimitModulationFunction;
     }
 
-    public void setFadDeploymentPctActiveFadsLimitModulationFunction(final Supplier<? extends DoubleUnaryOperator> fadDeploymentPctActiveFadsLimitModulationFunction) {
+    public void setFadDeploymentPctActiveFadsLimitModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> fadDeploymentPctActiveFadsLimitModulationFunction) {
         this.fadDeploymentPctActiveFadsLimitModulationFunction = fadDeploymentPctActiveFadsLimitModulationFunction;
     }
 
-    public Supplier<? extends DoubleUnaryOperator> getPctTravelTimeLeftModulationFunction() {
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getPctTravelTimeLeftModulationFunction() {
         return pctTravelTimeLeftModulationFunction;
     }
 
-    public void setPctTravelTimeLeftModulationFunction(final Supplier<? extends DoubleUnaryOperator> pctTravelTimeLeftModulationFunction) {
+    public void setPctTravelTimeLeftModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> pctTravelTimeLeftModulationFunction) {
         this.pctTravelTimeLeftModulationFunction = pctTravelTimeLeftModulationFunction;
     }
 
-    public Supplier<? extends DoubleUnaryOperator> getOpportunisticFadSetTimeSinceLastVisitModulationFunction() {
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getOpportunisticFadSetTimeSinceLastVisitModulationFunction() {
         return opportunisticFadSetTimeSinceLastVisitModulationFunction;
     }
 
-    public void setOpportunisticFadSetTimeSinceLastVisitModulationFunction(final Supplier<? extends DoubleUnaryOperator> opportunisticFadSetTimeSinceLastVisitModulationFunction) {
+    public void setOpportunisticFadSetTimeSinceLastVisitModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> opportunisticFadSetTimeSinceLastVisitModulationFunction) {
         this.opportunisticFadSetTimeSinceLastVisitModulationFunction = opportunisticFadSetTimeSinceLastVisitModulationFunction;
     }
 
-    public Supplier<? extends DoubleUnaryOperator> getNonAssociatedSetTimeSinceLastVisitModulationFunction() {
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getNonAssociatedSetTimeSinceLastVisitModulationFunction() {
         return nonAssociatedSetTimeSinceLastVisitModulationFunction;
     }
 
-    public void setNonAssociatedSetTimeSinceLastVisitModulationFunction(final Supplier<? extends DoubleUnaryOperator> nonAssociatedSetTimeSinceLastVisitModulationFunction) {
+    public void setNonAssociatedSetTimeSinceLastVisitModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> nonAssociatedSetTimeSinceLastVisitModulationFunction) {
         this.nonAssociatedSetTimeSinceLastVisitModulationFunction = nonAssociatedSetTimeSinceLastVisitModulationFunction;
     }
 
-    public Supplier<? extends DoubleUnaryOperator> getDolphinSetTimeSinceLastVisitModulationFunction() {
+    public AlgorithmFactory<? extends DoubleUnaryOperator> getDolphinSetTimeSinceLastVisitModulationFunction() {
         return dolphinSetTimeSinceLastVisitModulationFunction;
     }
 
-    public void setDolphinSetTimeSinceLastVisitModulationFunction(final Supplier<? extends DoubleUnaryOperator> dolphinSetTimeSinceLastVisitModulationFunction) {
+    public void setDolphinSetTimeSinceLastVisitModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> dolphinSetTimeSinceLastVisitModulationFunction) {
         this.dolphinSetTimeSinceLastVisitModulationFunction = dolphinSetTimeSinceLastVisitModulationFunction;
     }
 
@@ -155,8 +154,8 @@ public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionF
 
         final GlobalSetAttractionModulator globalSetAttractionModulator =
             new GlobalSetAttractionModulator(
-                pctHoldSpaceLeftModulationFunction.get(),
-                pctSetsRemainingModulationFunction.get()
+                pctHoldSpaceLeftModulationFunction.apply(fishState),
+                pctSetsRemainingModulationFunction.apply(fishState)
             );
 
         return ImmutableSet.<AttractionField>builder()
@@ -174,7 +173,7 @@ public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionF
                 new ActionAttractionField(
                     locationValues.get(OpportunisticFadSetAction.class),
                     new LocalSetAttractionModulator(
-                        opportunisticFadSetTimeSinceLastVisitModulationFunction.get(),
+                        opportunisticFadSetTimeSinceLastVisitModulationFunction.apply(fishState),
                         maxCurrentSpeed.applyAsDouble(OpportunisticFadSetAction.class)
                     ),
                     globalSetAttractionModulator,
@@ -187,7 +186,7 @@ public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionF
                 new ActionAttractionField(
                     locationValues.get(NonAssociatedSetAction.class),
                     new LocalSetAttractionModulator(
-                        nonAssociatedSetTimeSinceLastVisitModulationFunction.get(),
+                        nonAssociatedSetTimeSinceLastVisitModulationFunction.apply(fishState),
                         maxCurrentSpeed.applyAsDouble(NonAssociatedSetAction.class)
                     ),
                     globalSetAttractionModulator,
@@ -200,7 +199,7 @@ public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionF
                 new ActionAttractionField(
                     locationValues.get(DolphinSetAction.class),
                     new LocalSetAttractionModulator(
-                        dolphinSetTimeSinceLastVisitModulationFunction.get(),
+                        dolphinSetTimeSinceLastVisitModulationFunction.apply(fishState),
                         maxCurrentSpeed.applyAsDouble(DolphinSetAction.class)
                     ),
                     globalSetAttractionModulator,
@@ -214,8 +213,8 @@ public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionF
                     locationValues.get(FadDeploymentAction.class),
                     LocalCanFishThereAttractionModulator.INSTANCE,
                     new GlobalDeploymentAttractionModulator(
-                        fadDeploymentPctActiveFadsLimitModulationFunction.get(),
-                        numFadsInStockModulationFunction.get()
+                        fadDeploymentPctActiveFadsLimitModulationFunction.apply(fishState),
+                        numFadsInStockModulationFunction.apply(fishState)
                     ),
                     FadDeploymentAction.class,
                     actionDistanceExponent,
@@ -225,8 +224,8 @@ public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionF
             .add(
                 new PortAttractionField(
                     new PortAttractionModulator(
-                        pctHoldSpaceLeftModulationFunction.get(),
-                        pctTravelTimeLeftModulationFunction.get()
+                        pctHoldSpaceLeftModulationFunction.apply(fishState),
+                        pctTravelTimeLeftModulationFunction.apply(fishState)
                     ),
                     actionDistanceExponent,
                     destinationDistanceExponent

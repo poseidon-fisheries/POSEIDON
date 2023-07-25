@@ -33,7 +33,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
@@ -47,14 +46,16 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public abstract class CatchSamplersFactory<B extends LocalBiology>
-    implements AlgorithmFactory<Map<Class<? extends AbstractSetAction>, CatchSampler<B>>> {
+    implements AlgorithmFactory<CatchSamplers<B>> {
 
     private InputPath catchSamplesFile;
     private boolean yearlyReset = false;
 
+    @SuppressWarnings("WeakerAccess")
     public CatchSamplersFactory() {
     }
 
+    @SuppressWarnings("WeakerAccess")
     public CatchSamplersFactory(
         final InputPath catchSamplesFile
     ) {
@@ -72,25 +73,32 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
     }
 
     @Override
-    public Map<Class<? extends AbstractSetAction>, CatchSampler<B>> apply(final FishState fishState) {
+    public CatchSamplers<B> apply(final FishState fishState) {
         final MersenneTwisterFast rng = checkNotNull(fishState).getRandom();
-        return recordStream(catchSamplesFile.get())
-            .collect(toImmutableListMultimap(
-                r -> getSetActionClass(r.getString("set_type")),
-                r -> getBiomasses(r, fishState.getBiology())
-            ))
-            .asMap()
-            .entrySet()
-            .stream()
-            .collect(toImmutableMap(
-                Entry::getKey,
-                entry -> {
-                    final CatchSampler<B> instance = makeCatchSampler(fishState, entry.getKey(), entry.getValue(), rng);
-                    if (yearlyReset)
-                        fishState.scheduleEveryYear((Steppable) simState -> instance.reset(), StepOrder.DAWN);
-                    return instance;
-                }
-            ));
+        return new CatchSamplers<>(
+            recordStream(catchSamplesFile.get())
+                .collect(toImmutableListMultimap(
+                    r -> getSetActionClass(r.getString("set_type")),
+                    r -> getBiomasses(r, fishState.getBiology())
+                ))
+                .asMap()
+                .entrySet()
+                .stream()
+                .collect(toImmutableMap(
+                    Entry::getKey,
+                    entry -> {
+                        final CatchSampler<B> instance = makeCatchSampler(
+                            fishState,
+                            entry.getKey(),
+                            entry.getValue(),
+                            rng
+                        );
+                        if (yearlyReset)
+                            fishState.scheduleEveryYear((Steppable) simState -> instance.reset(), StepOrder.DAWN);
+                        return instance;
+                    }
+                ))
+        );
     }
 
     @SuppressWarnings("UnstableApiUsage")

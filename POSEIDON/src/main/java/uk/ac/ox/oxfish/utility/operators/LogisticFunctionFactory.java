@@ -18,11 +18,15 @@
 
 package uk.ac.ox.oxfish.utility.operators;
 
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Supplier;
 
 import static java.lang.Math.min;
 
-public class LogisticFunctionSupplier implements Supplier<LogisticFunction> {
+public class LogisticFunctionFactory implements Supplier<DoubleUnaryOperator>, AlgorithmFactory<DoubleUnaryOperator> {
 
     private double midpoint = 0.5;
     private double steepness = 1.0;
@@ -30,11 +34,11 @@ public class LogisticFunctionSupplier implements Supplier<LogisticFunction> {
     private double maximumSteepness = 1E6; // to avoid infinite steepness when (relativeSteepness && midpoint == 0)
     private boolean relativeSteepness = true;
 
-    public LogisticFunctionSupplier(final double midpoint, final double steepness) {
+    public LogisticFunctionFactory(final double midpoint, final double steepness) {
         this(midpoint, steepness, 1.0, true);
     }
 
-    public LogisticFunctionSupplier(
+    public LogisticFunctionFactory(
         final double midpoint,
         final double steepness,
         final double maximum,
@@ -47,7 +51,7 @@ public class LogisticFunctionSupplier implements Supplier<LogisticFunction> {
     }
 
     @SuppressWarnings("unused")
-    public LogisticFunctionSupplier() {
+    public LogisticFunctionFactory() {
     }
 
     @SuppressWarnings("unused")
@@ -94,6 +98,11 @@ public class LogisticFunctionSupplier implements Supplier<LogisticFunction> {
 
     public void setMaximum(final double maximum) {
         this.maximum = maximum;
+    }
+
+    @Override
+    public DoubleUnaryOperator apply(final FishState fishState) {
+        return get();
     }
 
     @Override

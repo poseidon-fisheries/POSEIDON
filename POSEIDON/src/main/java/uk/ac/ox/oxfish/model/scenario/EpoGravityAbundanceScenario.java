@@ -18,7 +18,6 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
@@ -33,11 +32,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanc
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.geography.fads.LinearAbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.regulation.EverythingPermitted;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
-
-import java.util.List;
 
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
@@ -110,11 +106,6 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
 
     public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
         this.abundanceFiltersFactory = abundanceFiltersFactory;
-    }
-
-    @Override
-    List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
-        return purseSeinerFleetFactory.makeFishers(fishState, targetYear);
     }
 
     @Override

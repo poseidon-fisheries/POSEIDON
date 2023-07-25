@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplers;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.*;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
@@ -41,17 +41,16 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
     /**
      * object used to draw catches for DEL and NOA
      */
-    private final Map<Class<? extends AbstractSetAction>,
-        ? extends CatchSampler<? extends LocalBiology>> catchSamplers;
+    private final CatchSamplers<? extends LocalBiology> catchSamplers;
     /**
      * probability of any of these actions taking place next in a plan
      */
-    private final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>>
+    private final Function<? super Fisher, ? extends Map<Class<? extends PurseSeinerAction>, Double>>
         attractionWeightsPerFisher;
     /**
      * function that returns max travel time
      */
-    private final ToDoubleFunction<Fisher> maxTravelTimeLoader;
+    private final ToDoubleFunction<? super Fisher> maxTravelTimeLoader;
     /**
      * hours wasted after each DEL set
      */
@@ -112,17 +111,16 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      */
     private final int delSetsRangeInSeatiles;
 
-    private final Map<Class<? extends PurseSeinerAction>, LocationValues> locationValues;
+    private final Map<Class<? extends PurseSeinerAction>, ? extends LocationValues> locationValues;
 
     private final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadPlanningModule;
     private PlannedStrategy delegate;
 
 
     public PlannedStrategyProxy(
-        final Map<Class<? extends AbstractSetAction>,
-            ? extends CatchSampler<? extends LocalBiology>> catchSamplers,
-        final Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> attractionWeightsPerFisher,
-        final ToDoubleFunction<Fisher> maxTravelTimeLoader,
+        final CatchSamplers<? extends LocalBiology> catchSamplers,
+        final Function<? super Fisher, ? extends Map<Class<? extends PurseSeinerAction>, Double>> attractionWeightsPerFisher,
+        final ToDoubleFunction<? super Fisher> maxTravelTimeLoader,
         final double additionalHourlyDelayDolphinSets,
         final double additionalHourlyDelayDeployment,
         final double additionalHourlyDelayNonAssociatedSets,
@@ -138,7 +136,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         final int noaSetsRangeInSeatiles,
         final int delSetsRangeInSeatiles,
         final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadPlanningModule,
-        final Map<Class<? extends PurseSeinerAction>, LocationValues> locationValues
+        final Map<Class<? extends PurseSeinerAction>, ? extends LocationValues> locationValues
     ) {
         this.catchSamplers = catchSamplers;
         this.attractionWeightsPerFisher = attractionWeightsPerFisher;
@@ -295,7 +293,6 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                         minimumValueOpportunisticFadSets
                     )
                 );
-            } else {
             }
 
         }

@@ -28,27 +28,27 @@ import java.util.Collection;
 
 public class AbundanceCatchSamplersFactory extends CatchSamplersFactory<AbundanceLocalBiology> {
 
-    private AbundanceFiltersFactory abundanceFiltersFactory;
+    private AbundanceFiltersFactory abundanceFilters;
 
     public AbundanceCatchSamplersFactory() {
     }
 
     public AbundanceCatchSamplersFactory(
-        final AbundanceFiltersFactory abundanceFiltersFactory,
+        final AbundanceFiltersFactory abundanceFilters,
         final InputPath catchSamplesFile
     ) {
         super(catchSamplesFile);
-        this.abundanceFiltersFactory = abundanceFiltersFactory;
+        this.abundanceFilters = abundanceFilters;
     }
 
     @SuppressWarnings("unused")
-    public AbundanceFiltersFactory getAbundanceFiltersFactory() {
-        return abundanceFiltersFactory;
+    public AbundanceFiltersFactory getAbundanceFilters() {
+        return abundanceFilters;
     }
 
     @SuppressWarnings("unused")
-    public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
-        this.abundanceFiltersFactory = abundanceFiltersFactory;
+    public void setAbundanceFilters(final AbundanceFiltersFactory abundanceFilters) {
+        this.abundanceFilters = abundanceFilters;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class AbundanceCatchSamplersFactory extends CatchSamplersFactory<Abundanc
         final Collection<Collection<Double>> sample,
         final MersenneTwisterFast rng
     ) {
-        return new AbundanceCatchSampler(sample, rng, abundanceFiltersFactory.apply(fishState).get(actionClass));
+        return new AbundanceCatchSampler(sample, rng, abundanceFilters.apply(fishState).get(actionClass));
     }
 
 }

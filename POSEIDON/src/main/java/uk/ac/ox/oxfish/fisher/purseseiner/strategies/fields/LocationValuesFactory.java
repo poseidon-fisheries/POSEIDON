@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class LocationValuesFactory
     private DoubleParameter decayRateOfNonAssociatedSetLocationValues;
     private DoubleParameter decayRateOfDolphinSetLocationValues;
     private DoubleParameter decayRateOfDeploymentLocationValues;
-    private int targetYear;
+    private IntegerParameter targetYear;
 
     public LocationValuesFactory(
         final InputPath locationValuesFile,
@@ -30,7 +31,7 @@ public class LocationValuesFactory
         final DoubleParameter decayRateOfNonAssociatedSetLocationValues,
         final DoubleParameter decayRateOfDolphinSetLocationValues,
         final DoubleParameter decayRateOfDeploymentLocationValues,
-        final int targetYear
+        final IntegerParameter targetYear
     ) {
         this.locationValuesFile = locationValuesFile;
         this.decayRateOfOpportunisticFadSetLocationValues = decayRateOfOpportunisticFadSetLocationValues;
@@ -43,11 +44,11 @@ public class LocationValuesFactory
     public LocationValuesFactory() {
     }
 
-    public int getTargetYear() {
+    public IntegerParameter getTargetYear() {
         return targetYear;
     }
 
-    public void setTargetYear(final int targetYear) {
+    public void setTargetYear(final IntegerParameter targetYear) {
         this.targetYear = targetYear;
     }
 
@@ -105,7 +106,7 @@ public class LocationValuesFactory
     ) {
         return locationValuesCache.getLocationValues(
             locationValuesFile.get(),
-            targetYear,
+            targetYear.getValue(),
             fisher,
             actionClass
         );

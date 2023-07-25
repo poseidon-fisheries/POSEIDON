@@ -33,7 +33,7 @@ public class BiomassProcessesFactory extends BiologicalProcessesFactory<BiomassL
     public static BiomassProcessesFactory create(
         final InputPath inputFolder,
         final SpeciesCodesFromFileFactory speciesCodesSupplier,
-        final int targetYear
+        final IntegerParameter targetYear
     ) {
         final BiomassReallocatorFactory reallocator = new BiomassReallocatorFactory(
             inputFolder.path("biomass_distributions.csv"),

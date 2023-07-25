@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrate
 
     private final CacheByFile<Map<Integer, ImmutableMap<String, Integer>>> cache = new CacheByFile<>(this::readValues);
     private InputPath maxFadDeploymentsFile;
-    private int targetYear;
+    private IntegerParameter targetYear;
 
     private double fadCost = 1000;
 
@@ -45,18 +46,18 @@ public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrate
     public FadRefillGearStrategyFactory() {
     }
 
-    public FadRefillGearStrategyFactory(final int targetYear, final InputPath maxFadDeploymentsFile) {
+    public FadRefillGearStrategyFactory(final IntegerParameter targetYear, final InputPath maxFadDeploymentsFile) {
         this.targetYear = targetYear;
         this.maxFadDeploymentsFile = maxFadDeploymentsFile;
     }
 
     @SuppressWarnings("unused")
-    public int getTargetYear() {
+    public IntegerParameter getTargetYear() {
         return targetYear;
     }
 
     @SuppressWarnings("unused")
-    public void setTargetYear(final int targetYear) {
+    public void setTargetYear(final IntegerParameter targetYear) {
         this.targetYear = targetYear;
     }
 
@@ -95,7 +96,7 @@ public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrate
     @Override
     public GearStrategy apply(final FishState fishState) {
         return new FadRefillGearStrategy(
-            cache.apply(maxFadDeploymentsFile.get()).get(targetYear),
+            cache.apply(maxFadDeploymentsFile.get()).get(targetYear.getValue()),
             fadCost
         );
     }

@@ -1,8 +1,8 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplers;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesFactory;
@@ -11,25 +11,19 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
-import uk.ac.ox.oxfish.utility.parameters.BooleanParameter;
-import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.Map;
+import uk.ac.ox.oxfish.utility.parameters.*;
 
 public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<PlannedStrategyProxy>, Dummyable {
 
-    @SuppressWarnings("deprecation")
-    private final uk.ac.ox.oxfish.utility.Locker<
-        FishState,
-        Map<Class<? extends AbstractSetAction>, ? extends CatchSampler<? extends LocalBiology>>
-        > catchSamplerLocker = new uk.ac.ox.oxfish.utility.Locker<>();
-    private int targetYear;
+    private IntegerParameter targetYear;
     /**
      * object used to draw catches for DEL and NOA
      */
     private CatchSamplersFactory<? extends LocalBiology> catchSamplers;
+
+    private final CacheByFishState<CatchSamplers<? extends LocalBiology>> catchSamplersCache =
+        new CacheByFishState<>(fishState -> catchSamplers.apply(fishState));
+
     /**
      * probability of any of these actions taking place next in a plan
      */
@@ -86,23 +80,23 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     private DoubleParameter delSetsRangeInSeatiles =
         new CalibratedParameter(0, 5, 0, 5, 3);
     private BooleanParameter uniqueCatchSamplerForEachStrategy = new BooleanParameter(false);
-    private AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModuleFactory;
+    private AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule;
     private LocationValuesFactory locationValuesFactory;
 
     public EPOPlannedStrategyFlexibleFactory() {
     }
 
     public EPOPlannedStrategyFlexibleFactory(
-        final int targetYear,
+        final IntegerParameter targetYear,
         final LocationValuesFactory locationValuesFactory,
-        final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModuleFactory,
+        final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule,
         final CatchSamplersFactory<? extends LocalBiology> catchSamplers,
         final InputPath actionWeightsFile,
         final InputPath maxTripDurationFile
     ) {
         this.targetYear = targetYear;
         this.locationValuesFactory = locationValuesFactory;
-        this.fadModuleFactory = fadModuleFactory;
+        this.fadModule = fadModule;
         this.catchSamplers = catchSamplers;
         this.actionWeightsFile = actionWeightsFile;
         this.maxTripDurationFile = maxTripDurationFile;
@@ -124,11 +118,11 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.purgeIllegalActionsImmediately = purgeIllegalActionsImmediately;
     }
 
-    public int getTargetYear() {
+    public IntegerParameter getTargetYear() {
         return targetYear;
     }
 
-    public void setTargetYear(final int targetYear) {
+    public void setTargetYear(final IntegerParameter targetYear) {
         this.targetYear = targetYear;
     }
 
@@ -155,10 +149,9 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         final PlannedStrategyProxy proxy = new PlannedStrategyProxy(
             uniqueCatchSamplerForEachStrategy.getValue()
                 ? catchSamplers.apply(state)
-                : catchSamplerLocker.presentKey(state, () -> catchSamplers.apply(state))
-            ,
-            PurseSeinerFishingStrategyFactory.loadActionWeights(targetYear, actionWeightsFile.get()),
-            GravityDestinationStrategyFactory.loadMaxTripDuration(targetYear, maxTripDurationFile.get()),
+                : catchSamplersCache.get(state),
+            PurseSeinerFishingStrategyFactory.loadActionWeights(targetYear.getValue(), actionWeightsFile.get()),
+            GravityDestinationStrategyFactory.loadMaxTripDuration(targetYear.getValue(), maxTripDurationFile.get()),
             additionalHourlyDelayDolphinSets.applyAsDouble(state.getRandom()),
             additionalHourlyDelayDeployment.applyAsDouble(state.getRandom()),
             additionalHourlyDelayNonAssociatedSets.applyAsDouble(state.getRandom()),
@@ -173,7 +166,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             purgeIllegalActionsImmediately.getValue(),
             (int) noaSetsRangeInSeatiles.applyAsDouble(state.getRandom()),
             (int) delSetsRangeInSeatiles.applyAsDouble(state.getRandom()),
-            fadModuleFactory,
+            fadModule,
             locationValuesFactory.apply(state)
         );
 
@@ -294,12 +287,12 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.uniqueCatchSamplerForEachStrategy = uniqueCatchSamplerForEachStrategy;
     }
 
-    public AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> getFadModuleFactory() {
-        return fadModuleFactory;
+    public AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> getFadModule() {
+        return fadModule;
     }
 
-    public void setFadModuleFactory(final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModuleFactory) {
-        this.fadModuleFactory = fadModuleFactory;
+    public void setFadModule(final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule) {
+        this.fadModule = fadModule;
     }
 
     public LocationValuesFactory getLocationValuesSupplier() {

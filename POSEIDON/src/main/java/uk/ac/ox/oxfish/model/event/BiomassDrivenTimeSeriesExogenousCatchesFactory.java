@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -20,7 +21,7 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public class BiomassDrivenTimeSeriesExogenousCatchesFactory
     implements AlgorithmFactory<BiomassDrivenTimeSeriesExogenousCatches> {
 
-    private int startingYear = 2000;
+    private IntegerParameter startingYear;
     private InputPath catchesFile; // = Paths.get("inputs", "tuna", "exogenous_catches.csv");
     private AlgorithmFactory<SpeciesCodes> speciesCodesSupplier;
     private boolean fadMortality = false;
@@ -32,7 +33,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
     public BiomassDrivenTimeSeriesExogenousCatchesFactory(
         final AlgorithmFactory<SpeciesCodes> speciesCodesSupplier,
         final InputPath catchesFile,
-        final int startingYear,
+        final IntegerParameter startingYear,
         final boolean fadMortalityIncluded
     ) {
         this.speciesCodesSupplier = speciesCodesSupplier;
@@ -51,12 +52,12 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
     }
 
     @SuppressWarnings("unused")
-    public int getStartingYear() {
+    public IntegerParameter getStartingYear() {
         return startingYear;
     }
 
     @SuppressWarnings("unused")
-    public void setStartingYear(final int startingYear) {
+    public void setStartingYear(final IntegerParameter startingYear) {
         this.startingYear = startingYear;
     }
 
@@ -81,7 +82,7 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
         final SpeciesCodes speciesCodes = speciesCodesSupplier.apply(fishState);
         recordStream(catchesFile.get()).forEach(record -> {
             final Integer year = record.getInt("year");
-            if (year >= startingYear) {
+            if (year >= startingYear.getValue()) {
                 final String speciesName = speciesCodes.getSpeciesName(record.getString("species_code"));
                 final Species species = fishState.getSpecies(speciesName);
                 catchesBySpecies

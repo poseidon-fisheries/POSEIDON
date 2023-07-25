@@ -1,10 +1,8 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableMap;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.SelectivityAbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullPerSpeciesCarryingCapacitiesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
@@ -16,7 +14,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesFactor
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
 import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
 import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
@@ -26,10 +23,10 @@ import uk.ac.ox.oxfish.regulation.conditions.*;
 import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
 import uk.ac.ox.oxfish.regulation.quantities.SumOf;
 import uk.ac.ox.oxfish.regulation.quantities.YearlyActionCount;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Dummyable;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.List;
 
 import static java.time.Month.*;
 
@@ -40,7 +37,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
             getInputFolder().path("abundance", "selectivity.csv")
         );
 
-    private PurseSeinerFleetFactory purseSeinerFleet =
+    private AlgorithmFactory<ScenarioPopulation> purseSeinerFleet =
         new EpoPurseSeinerFleetFactory(
             getTargetYear(),
             getInputFolder(),
@@ -209,12 +206,12 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
             new DefaultToDestinationStrategyFishingStrategyFactory()
         );
 
-    public PurseSeinerFleetFactory getPurseSeinerFleet() {
+    public AlgorithmFactory<ScenarioPopulation> getPurseSeinerFleet() {
         return purseSeinerFleet;
     }
 
     @SuppressWarnings("unused")
-    public void setPurseSeinerFleet(final PurseSeinerFleetFactory purseSeinerFleet) {
+    public void setPurseSeinerFleet(final AlgorithmFactory<ScenarioPopulation> purseSeinerFleet) {
         this.purseSeinerFleet = purseSeinerFleet;
     }
 
@@ -229,12 +226,8 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
     @Override
     public void useDummyData() {
         super.useDummyData();
-        purseSeinerFleet.useDummyData(testFolder());
-    }
-
-    @Override
-    List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
-        return purseSeinerFleet.makeFishers(fishState, targetYear);
+        if (purseSeinerFleet instanceof Dummyable)
+            ((Dummyable) purseSeinerFleet).useDummyData(testFolder());
     }
 
 }

@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import tech.units.indriya.ComparableQuantity;
@@ -22,11 +23,15 @@ import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
+import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
+import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import javax.measure.quantity.Mass;
 import java.util.List;
@@ -43,7 +48,7 @@ import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class PurseSeinerFleetFactory
-    implements Dummyable {
+    implements Dummyable, AlgorithmFactory<ScenarioPopulation> {
     private InputPath vesselsFile;
     private InputPath costsFile;
     private AlgorithmFactory<? extends MarketMap> marketMap;
@@ -54,8 +59,10 @@ public class PurseSeinerFleetFactory
     private AlgorithmFactory<? extends Regulation> regulations;
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
     private AlgorithmFactory<? extends PortInitializer> portInitializer;
+    private IntegerParameter targetYear;
 
     public PurseSeinerFleetFactory(
+        final IntegerParameter targetYear,
         final InputPath vesselsFile,
         final InputPath costsFile,
         final PurseSeineGearFactory purseSeineGear,
@@ -67,6 +74,7 @@ public class PurseSeinerFleetFactory
         final AlgorithmFactory<? extends MarketMap> marketMap,
         final AlgorithmFactory<? extends PortInitializer> portInitializer
     ) {
+        this.targetYear = targetYear;
         this.vesselsFile = vesselsFile;
         this.costsFile = costsFile;
         this.purseSeineGear = purseSeineGear;
@@ -80,6 +88,14 @@ public class PurseSeinerFleetFactory
     }
 
     public PurseSeinerFleetFactory() {
+    }
+
+    public IntegerParameter getTargetYear() {
+        return targetYear;
+    }
+
+    public void setTargetYear(final IntegerParameter targetYear) {
+        this.targetYear = targetYear;
     }
 
     public AlgorithmFactory<? extends PortInitializer> getPortInitializer() {
@@ -150,6 +166,15 @@ public class PurseSeinerFleetFactory
             fishingStrategy,
             regulations,
             departingStrategy
+        );
+    }
+
+    @Override
+    public ScenarioPopulation apply(final FishState fishState) {
+        return new ScenarioPopulation(
+            makeFishers(fishState, targetYear.getValue()),
+            new SocialNetwork(new EmptyNetworkBuilder()),
+            ImmutableMap.of() // no entry in the fishery so no need to pass factory here
         );
     }
 
@@ -233,7 +258,7 @@ public class PurseSeinerFleetFactory
         return fisherFactory;
     }
 
-    List<Port> buildPorts(final FishState fishState) {
+    private List<Port> buildPorts(final FishState fishState) {
         final MarketMap marketMap = getMarketMap().apply(fishState);
         portInitializer.apply(fishState).buildPorts(
             fishState.getMap(),
@@ -253,7 +278,6 @@ public class PurseSeinerFleetFactory
         this.purseSeineGear = purseSeineGear;
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     private Consumer<Fisher> addHourlyCosts() {
         final RangeMap<ComparableQuantity<Mass>, HourlyCost> hourlyCostsPerCarryingCapacity =
             recordStream(costsFile.get()).collect(toImmutableRangeMap(

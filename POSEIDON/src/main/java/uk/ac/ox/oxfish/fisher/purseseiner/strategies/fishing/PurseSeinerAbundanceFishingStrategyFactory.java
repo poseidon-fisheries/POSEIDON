@@ -27,8 +27,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
-import java.time.LocalDate;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
@@ -40,11 +40,11 @@ public class PurseSeinerAbundanceFishingStrategyFactory
     private boolean ageBasedSetDecisions = false;
 
     public PurseSeinerAbundanceFishingStrategyFactory() {
-        super(LocalDate.now().getYear(), AbundanceLocalBiology.class);
+        super(AbundanceLocalBiology.class);
     }
 
     public PurseSeinerAbundanceFishingStrategyFactory(
-        final int targetYear,
+        final IntegerParameter targetYear,
         final InputPath actionWeightsFile,
         final AbundanceCatchSamplersFactory catchSamplersFactory,
         final SetDurationSamplersFactory setDurationSamplersFactory,

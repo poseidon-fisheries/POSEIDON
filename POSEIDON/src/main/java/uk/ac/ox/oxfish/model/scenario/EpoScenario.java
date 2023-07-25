@@ -18,7 +18,6 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -26,7 +25,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcesses;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
 import uk.ac.ox.oxfish.environment.EnvironmentalMapFactory;
-import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.EmptyFleet;
 import uk.ac.ox.oxfish.geography.MapExtentFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
@@ -40,8 +39,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.monitors.regions.CustomRegionalDivision;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
-import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
-import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
@@ -51,7 +48,6 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
@@ -74,7 +70,7 @@ public abstract class EpoScenario<B extends LocalBiology>
             "East", entry(new Coordinate(-89.5, 49.5), new Coordinate(-70.5, -49.5))
         )
     );
-    private int targetYear = 2017;
+    private IntegerParameter targetYear = new IntegerParameter(2017);
     private InputPath inputFolder = InputPath.of("inputs", "epo_inputs");
     private final InputPath testInputFolder = inputFolder.path("tests");
     private Map<String, AlgorithmFactory<? extends Startable>> additionalStartables =
@@ -104,16 +100,25 @@ public abstract class EpoScenario<B extends LocalBiology>
             101,
             0.5
         );
+    private AlgorithmFactory<ScenarioPopulation> fleet = new EmptyFleet();
 
     public static int dayOfYear(final int year, final Month month, final int dayOfMonth) {
         return LocalDate.of(year, month, dayOfMonth).getDayOfYear();
     }
 
-    public int getTargetYear() {
+    public AlgorithmFactory<ScenarioPopulation> getFleet() {
+        return fleet;
+    }
+
+    public void setFleet(final AlgorithmFactory<ScenarioPopulation> fleet) {
+        this.fleet = fleet;
+    }
+
+    public IntegerParameter getTargetYear() {
         return targetYear;
     }
 
-    public void setTargetYear(final int targetYear) {
+    public void setTargetYear(final IntegerParameter targetYear) {
         this.targetYear = targetYear;
     }
 
@@ -159,19 +164,11 @@ public abstract class EpoScenario<B extends LocalBiology>
             .map(additionalStartable -> additionalStartable.apply(fishState))
             .forEach(fishState::registerStartable);
 
-        return new ScenarioPopulation(
-            makeFishers(fishState, targetYear),
-            new SocialNetwork(new EmptyNetworkBuilder()),
-            ImmutableMap.of() // no entry in the fishery so no need to pass factory here
-        );
+        return fleet.apply(fishState);
     }
 
     public FadMapFactory getFadMap() {
         return this.fadMap;
-    }
-
-    List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
-        return ImmutableList.of();
     }
 
     public void setFadMap(final FadMapFactory fadMap) {
@@ -186,7 +183,7 @@ public abstract class EpoScenario<B extends LocalBiology>
 
     @Override
     public LocalDate getStartDate() {
-        return LocalDate.of(targetYear - 1, 1, 1);
+        return LocalDate.of(targetYear.getValue() - 1, 1, 1);
     }
 
     @Override

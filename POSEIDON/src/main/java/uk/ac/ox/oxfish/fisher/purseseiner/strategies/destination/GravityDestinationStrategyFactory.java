@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -64,13 +65,13 @@ public class GravityDestinationStrategyFactory
     //  be made configurable.
     private final Predicate<SeaTile> isValidDestination =
         seaTile -> !(seaTile.getGridX() > 72 && seaTile.getBiology() instanceof EmptyLocalBiology);
-    private int targetYear;
+    private IntegerParameter targetYear;
     private AttractionFieldsFactory attractionFieldsFactory;
     private InputPath actionWeightsFile;
     private InputPath maxTripDurationFile;
 
     public GravityDestinationStrategyFactory(
-        final int targetYear,
+        final IntegerParameter targetYear,
         final InputPath actionWeightsFile,
         final InputPath maxTripDurationFile,
         final AttractionFieldsFactory attractionFieldsFactory
@@ -85,7 +86,7 @@ public class GravityDestinationStrategyFactory
     }
 
     public ToDoubleFunction<Fisher> loadMaxTripDuration(final Path maxTripDurationFile) {
-        return loadMaxTripDuration(targetYear, maxTripDurationFile);
+        return loadMaxTripDuration(targetYear.getValue(), maxTripDurationFile);
     }
 
     public static ToDoubleFunction<Fisher> loadMaxTripDuration(
@@ -102,11 +103,11 @@ public class GravityDestinationStrategyFactory
                 "No max trip duration known for " + fisher));
     }
 
-    public int getTargetYear() {
+    public IntegerParameter getTargetYear() {
         return targetYear;
     }
 
-    public void setTargetYear(final int targetYear) {
+    public void setTargetYear(final IntegerParameter targetYear) {
         this.targetYear = targetYear;
     }
 
@@ -146,7 +147,7 @@ public class GravityDestinationStrategyFactory
             identity(),
             field -> ActionWeightsCache.INSTANCE.get(
                 actionWeightsFile.get(),
-                targetYear,
+                targetYear.getValue(),
                 fisher,
                 field.getActionClass()
             )
@@ -157,7 +158,7 @@ public class GravityDestinationStrategyFactory
         return maxTripDurationCache
             .get(
                 maxTripDurationFile.get(),
-                targetYear,
+                targetYear.getValue(),
                 fisher
             )
             .orElseThrow(() -> new IllegalStateException(

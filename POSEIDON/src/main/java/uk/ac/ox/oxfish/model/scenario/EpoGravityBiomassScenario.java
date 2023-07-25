@@ -20,7 +20,6 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableMap;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
@@ -33,11 +32,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassF
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.geography.fads.CompressedBiomassFadInitializerFactory;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.regulation.EverythingPermitted;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
-
-import java.util.List;
 
 /**
  * The biomass-based IATTC tuna simulation scenario.
@@ -113,11 +109,6 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
     @SuppressWarnings("unused")
     public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory purseSeinerFleetFactory) {
         this.purseSeinerFleetFactory = purseSeinerFleetFactory;
-    }
-
-    @Override
-    List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
-        return purseSeinerFleetFactory.makeFishers(fishState, targetYear);
     }
 
     @Override

@@ -59,6 +59,8 @@ import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.TimeScalarFunction;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.ExponentialTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.InverseTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.SigmoidalTimeScalarFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.EmptyFleet;
+import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.CarryingCapacityInitializer;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.MaximumPerSpeciesCarryingCapacitiesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.SelectivityAbundanceFadInitializerFactory;
@@ -67,8 +69,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFact
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.GenerateRandomPlansStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.PlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFilters;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
@@ -138,6 +139,7 @@ import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITEControllerFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITargetTACFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SimpleFishSamplerFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
+import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
 import uk.ac.ox.oxfish.regulation.EverythingPermitted;
 import uk.ac.ox.oxfish.regulation.ForbiddenIf;
 import uk.ac.ox.oxfish.regulation.NamedRegulations;
@@ -149,6 +151,7 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.*;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
 import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
+import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 import uk.ac.ox.poseidon.regulations.api.Quantity;
 
@@ -435,9 +438,10 @@ public class AlgorithmFactories {
                 entry(GarbageGearFactory.class, "Garbage Gear"),
                 entry(HoldLimitingDecoratorFactory.class, "Hold Upper Limit"),
                 entry(DelayGearDecoratorFactory.class, "Hour Delay Gear"),
-                entry(MaxThroughputDecoratorFactory.class, "Max Throughput Limit"),
-                entry(BiomassPurseSeineGearFactory.class, "Biomass Purse Seine Gear")
-            )
+                entry(MaxThroughputDecoratorFactory.class, "Max Throughput Limit")
+            ),
+            BiomassPurseSeineGearFactory.class,
+            AbundancePurseSeineGearFactory.class
         ));
         addFactories(new Factories<>(
             MapInitializer.class,
@@ -792,7 +796,9 @@ public class AlgorithmFactories {
             ImmutableMap.of(
                 SelectivityAbundanceFadInitializerFactory.class, "Selectivity abundance FAD",
                 LinearIntervalAttractorFactory.class, "Linear attractor abundance FAD",
-                BiomassFadInitializerFactory.class, "Biomass FAD"
+                BiomassFadInitializerFactory.class, "Biomass FAD",
+                CompressedBiomassFadInitializerFactory.class, "Compressed biomass FAD",
+                CompressedAbundanceFadInitializerFactory.class, "Compressed abundance FAD"
             )
         ));
         addFactories(new Factories<>(
@@ -807,7 +813,20 @@ public class AlgorithmFactories {
         ));
         addFactories(new Factories<>(
             DoubleUnaryOperator.class,
-            LogNormalErrorOperatorFactory.class
+            LogNormalErrorOperatorFactory.class,
+            LogisticFunctionFactory.class
+        ));
+        addFactories(new Factories<>(
+            CatchSamplers.class,
+            AbundanceCatchSamplersFactory.class,
+            BiomassCatchSamplersFactory.class
+        ));
+        addFactories(new Factories<>(
+            ScenarioPopulation.class,
+            ImmutableMap.of(
+                EpoPurseSeinerFleetFactory.class, "EPO purse-seiner fleet"
+            ),
+            EmptyFleet.class
         ));
     }
 
