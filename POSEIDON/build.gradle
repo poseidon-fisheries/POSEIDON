@@ -81,9 +81,6 @@ dependencies {
     implementation group: 'de.openea', name: 'eva2', version: '2.2.0'
 
     //testing:
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'org.mockito:mockito-core:4.11.0'
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.7'
 
     //guava. Useful for PreConditions and sometimes specialized collections
@@ -97,20 +94,6 @@ dependencies {
 processTestResources.doFirst {
     // explicitly allow overriding files when copying resources
     duplicatesStrategy = "include"
-}
-
-test {
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-    minHeapSize = "1024m"
-    maxHeapSize = "4G" // GitHub actions was crashing on 6GB, let's see if 4GB fixes it...
-    //this makes tests multi-threaded when called from gradle. Useful!
-    maxParallelForks = Math.min(Runtime.runtime.availableProcessors(), 8)
-}
-
-tasks.named('test', Test) {
-    useJUnitPlatform()
 }
 
 tasks.withType(Test).configureEach {

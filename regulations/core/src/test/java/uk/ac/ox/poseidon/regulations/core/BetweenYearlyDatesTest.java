@@ -8,10 +8,10 @@ import static java.time.Month.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BetweenYearlyDatesTest {
+class BetweenYearlyDatesTest {
 
     @Test
-    public void testWhenNotYearSpanning() {
+    void whenNotYearSpanning() {
         final BetweenYearlyDates betweenYearlyDates =
             new BetweenYearlyDates(
                 MonthDay.of(OCTOBER, 1),
@@ -27,7 +27,7 @@ public class BetweenYearlyDatesTest {
     }
 
     @Test
-    public void testWhenYearSpanning() {
+    void whenYearSpanning() {
         final BetweenYearlyDates betweenYearlyDates =
             new BetweenYearlyDates(
                 MonthDay.of(DECEMBER, 15),
