@@ -20,9 +20,8 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
+import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcesses;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -46,7 +45,7 @@ public class ScheduledAbundanceProcessesFactory
     extends ScheduledBiologicalProcessesFactory<AbundanceLocalBiology> {
 
     private List<String> biologicalProcessesDates;
-    private Map<Species, ? extends RecruitmentProcess> recruitmentProcesses;
+    private AlgorithmFactory<RecruitmentProcesses> recruitmentProcesses;
 
     private AlgorithmFactory<AbundanceMortalityProcess> abundanceMortalityProcess;
 
@@ -58,11 +57,13 @@ public class ScheduledAbundanceProcessesFactory
     }
 
     public ScheduledAbundanceProcessesFactory(
+        final AlgorithmFactory<RecruitmentProcesses> recruitmentProcesses,
         final AlgorithmFactory<Reallocator<AbundanceLocalBiology>> reallocator,
         final Collection<String> biologicalProcessesDates,
         final InputPath mortalityFile
     ) {
         super(reallocator);
+        this.recruitmentProcesses = recruitmentProcesses;
         this.biologicalProcessesDates = ImmutableList.copyOf(biologicalProcessesDates);
         this.abundanceMortalityProcess =
             new AbundanceMortalityProcessFromFileFactory(
@@ -81,13 +82,13 @@ public class ScheduledAbundanceProcessesFactory
     }
 
     @SuppressWarnings("unused")
-    public Map<Species, ? extends RecruitmentProcess> getRecruitmentProcesses() {
+    public AlgorithmFactory<RecruitmentProcesses> getRecruitmentProcesses() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         return recruitmentProcesses;
     }
 
     public void setRecruitmentProcesses(
-        final Map<Species, ? extends RecruitmentProcess> recruitmentProcesses
+        final AlgorithmFactory<RecruitmentProcesses> recruitmentProcesses
     ) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.recruitmentProcesses = recruitmentProcesses;
@@ -142,7 +143,7 @@ public class ScheduledAbundanceProcessesFactory
                 abundanceMortalityProcess.apply(fishState),
                 new AbundanceLostRecoveryProcess(),
                 new AbundanceAggregatorProcess(),
-                new AgingAndRecruitmentProcess(recruitmentProcesses),
+                new AgingAndRecruitmentProcess(recruitmentProcesses.apply(fishState)),
                 new FadAbundanceExcluderProcess(),
                 reallocator
             );

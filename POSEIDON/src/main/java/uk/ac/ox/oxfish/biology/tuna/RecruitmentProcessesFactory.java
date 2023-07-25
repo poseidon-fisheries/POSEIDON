@@ -18,16 +18,16 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentBySpawningBiomass;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
+import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcesses;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
+import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-import java.util.Map;
 import java.util.Map.Entry;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,10 +41,33 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
  * ScheduledAbundanceProcessesFactory}. It will read the parameters from the provided CSV file.
  */
 public class RecruitmentProcessesFactory
-    implements AlgorithmFactory<Map<Species, ? extends RecruitmentProcess>> {
+    implements AlgorithmFactory<RecruitmentProcesses> {
 
-    private GlobalBiology globalBiology;
     private InputPath recruitmentParametersFile;
+    private final CacheByFishState<RecruitmentProcesses> cache =
+        new CacheByFishState<>(fishState -> {
+            checkNotNull(fishState.getBiology());
+            return new RecruitmentProcesses(
+                recordStream(recruitmentParametersFile.get())
+                    .map(record -> {
+                        final Species species = fishState.getBiology().getSpeciesByCode(
+                            record.getString("species_code")
+                        );
+                        final float r0 = record.getFloat("R0");
+                        return entry(species, new RecruitmentBySpawningBiomass(
+                            Math.round(r0),
+                            record.getDouble("h_steepness"),
+                            record.getDouble("virgin_ssb") / r0,
+                            false,
+                            ((TunaMeristics) species.getMeristics()).getMaturity().toArray(),
+                            null,
+                            FEMALE,
+                            false
+                        ));
+                    })
+                    .collect(toImmutableMap(Entry::getKey, Entry::getValue))
+            );
+        });
 
     /**
      * Empty constructor for YAML construction
@@ -58,10 +81,6 @@ public class RecruitmentProcessesFactory
         this.recruitmentParametersFile = checkNotNull(recruitmentParametersFile);
     }
 
-    public void setGlobalBiology(final GlobalBiology globalBiology) {
-        this.globalBiology = globalBiology;
-    }
-
     @SuppressWarnings("unused")
     public InputPath getRecruitmentParametersFile() {
         return recruitmentParametersFile;
@@ -73,26 +92,7 @@ public class RecruitmentProcessesFactory
     }
 
     @Override
-    public Map<Species, ? extends RecruitmentProcess> apply(final FishState fishState) {
-        checkNotNull(globalBiology);
-        return recordStream(recruitmentParametersFile.get())
-            .map(record -> {
-                final Species species = globalBiology.getSpeciesByCode(
-                    record.getString("species_code")
-                );
-                final float r0 = record.getFloat("R0");
-                //noinspection UnstableApiUsage
-                return entry(species, new RecruitmentBySpawningBiomass(
-                    Math.round(r0),
-                    record.getDouble("h_steepness"),
-                    record.getDouble("virgin_ssb") / r0,
-                    false,
-                    ((TunaMeristics) species.getMeristics()).getMaturity().toArray(),
-                    null,
-                    FEMALE,
-                    false
-                ));
-            })
-            .collect(toImmutableMap(Entry::getKey, Entry::getValue));
+    public RecruitmentProcesses apply(final FishState fishState) {
+        return cache.get(fishState);
     }
 }

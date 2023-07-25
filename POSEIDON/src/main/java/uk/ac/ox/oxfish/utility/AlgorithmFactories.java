@@ -828,6 +828,10 @@ public class AlgorithmFactories {
             ),
             EmptyFleet.class
         ));
+        addFactories(new Factories<>(
+            RecruitmentProcesses.class,
+            RecruitmentProcessesFactory.class
+        ));
     }
 
     private static void addFactories(final Factories<?> factories) {

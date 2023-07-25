@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.model.scenario;
 import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
+import uk.ac.ox.oxfish.biology.tuna.RecruitmentProcessesFactory;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 
 /**
@@ -29,13 +30,17 @@ import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology> {
 
     public EpoAbundanceScenario() {
+        final InputPath abundanceInputFolder = getInputFolder().path("abundance");
         setBiologicalProcesses(
             AbundanceProcessesFactory.create(
-                getInputFolder().path("abundance"),
+                abundanceInputFolder,
                 new SpeciesCodesFromFileFactory(
                     getInputFolder().path("species_codes.csv")
                 ),
-                DEFAULT_MAP_EXTENT_FACTORY
+                DEFAULT_MAP_EXTENT_FACTORY,
+                new RecruitmentProcessesFactory(
+                    abundanceInputFolder.path("recruitment_parameters.csv")
+                )
             )
         );
         setFadMap(new AbundanceFadMapFactory(getCurrentPatternMapSupplier()));

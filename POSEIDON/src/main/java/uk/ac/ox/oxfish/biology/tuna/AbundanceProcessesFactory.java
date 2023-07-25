@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcesses;
 import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
 import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.FishState;
@@ -19,7 +20,6 @@ import static java.util.function.Function.identity;
 public class AbundanceProcessesFactory
     extends BiologicalProcessesFactory<AbundanceLocalBiology> {
 
-    private RecruitmentProcessesFactory recruitmentProcesses;
     private WeightGroupsFactory weightGroups;
 
     @SuppressWarnings("unused")
@@ -33,10 +33,6 @@ public class AbundanceProcessesFactory
         final ScheduledBiologicalProcessesFactory<AbundanceLocalBiology> scheduledProcesses
     ) {
         super(inputFolder, biologyInitializer, restorer, scheduledProcesses);
-        this.recruitmentProcesses =
-            new RecruitmentProcessesFactory(
-                inputFolder.path("recruitment_parameters.csv")
-            );
         this.weightGroups =
             new WeightGroupsFactory(
                 Stream.of("Bigeye tuna", "Skipjack tuna", "Yellowfin tuna").collect(
@@ -53,7 +49,8 @@ public class AbundanceProcessesFactory
     public static AbundanceProcessesFactory create(
         final InputPath inputFolder,
         final AlgorithmFactory<SpeciesCodes> speciesCodesSupplier,
-        final AlgorithmFactory<MapExtent> mapExtent
+        final AlgorithmFactory<MapExtent> mapExtent,
+        final AlgorithmFactory<RecruitmentProcesses> recruitmentProcesses
     ) {
         final AbundanceReallocatorFactory reallocator =
             new AbundanceReallocatorFactory(
@@ -73,6 +70,7 @@ public class AbundanceProcessesFactory
                 ImmutableMap.of(0, 365)
             ),
             new ScheduledAbundanceProcessesFactory(
+                recruitmentProcesses,
                 reallocator,
                 ImmutableList.of("01-01", "04-01", "07-01", "10-01"),
                 inputFolder.path("mortality.csv")
@@ -84,11 +82,7 @@ public class AbundanceProcessesFactory
     public BiologicalProcesses apply(final FishState fishState) {
         ((AbundanceInitializerFactory) getBiologyInitializer())
             .assignWeightGroupsPerSpecies(weightGroups.apply(fishState));
-        final BiologicalProcesses biologicalProcesses = super.apply(fishState);
-        recruitmentProcesses.setGlobalBiology(biologicalProcesses.getGlobalBiology());
-        ((ScheduledAbundanceProcessesFactory) getScheduledProcesses())
-            .setRecruitmentProcesses(recruitmentProcesses.apply(fishState));
-        return biologicalProcesses;
+        return super.apply(fishState);
     }
 
     public WeightGroupsFactory getWeightGroups() {
@@ -99,11 +93,4 @@ public class AbundanceProcessesFactory
         this.weightGroups = weightGroups;
     }
 
-    public RecruitmentProcessesFactory getRecruitmentProcesses() {
-        return recruitmentProcesses;
-    }
-
-    public void setRecruitmentProcesses(final RecruitmentProcessesFactory recruitmentProcesses) {
-        this.recruitmentProcesses = recruitmentProcesses;
-    }
 }
