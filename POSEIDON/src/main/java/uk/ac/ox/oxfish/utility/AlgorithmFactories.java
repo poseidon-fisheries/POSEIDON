@@ -689,7 +689,8 @@ public class AlgorithmFactories {
             Below.class,
             BetweenYearlyDates.class,
             InRectangularArea.class,
-            Not.class
+            Not.class,
+            NotBelow.class
         ));
         addFactories(new Factories<>(
             uk.ac.ox.poseidon.regulations.api.Regulation.class,

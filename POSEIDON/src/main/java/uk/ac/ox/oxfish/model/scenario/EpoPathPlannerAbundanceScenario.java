@@ -55,11 +55,11 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                                     new AnyOf(
                                         new AllOf(
                                             new AgentHasTag("class 6A"),
-                                            new Not(new Below(new NumberOfActiveFads(), 300))
+                                            new NotBelow(new NumberOfActiveFads(), 300)
                                         ),
                                         new AllOf(
                                             new AgentHasTag("class 6B"),
-                                            new Not(new Below(new NumberOfActiveFads(), 450))
+                                            new NotBelow(new NumberOfActiveFads(), 450)
                                         )
                                     )
                                 )
@@ -71,14 +71,12 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                                         new ActionCodeIs("FAD"),
                                         new ActionCodeIs("OFS")
                                     ),
-                                    new Not(
-                                        new Below(
-                                            new SumOf(
-                                                new YearlyActionCount("FAD"),
-                                                new YearlyActionCount("OFS")
-                                            ),
-                                            999999
-                                        )
+                                    new NotBelow(
+                                        new SumOf(
+                                            new YearlyActionCount("FAD"),
+                                            new YearlyActionCount("OFS")
+                                        ),
+                                        999999
                                     )
                                 )
                             ),
