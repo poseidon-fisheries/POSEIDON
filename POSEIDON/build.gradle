@@ -44,7 +44,7 @@ dependencies {
 
     //mason libraries. They aren't on maven so we have to lug their jars around
     api fileTree(dir: 'libs/mason', include: '*.jar')
-    implementation fileTree(dir: 'libs/geomason', include: '*.jar')
+    api files("$rootDir/libs/geomason/geomason.1.5.jar")
 
     // JTS Topology Suite, a geomason dependency
     implementation("com.vividsolutions:jts:1.13")
