@@ -25,7 +25,7 @@ import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
-import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
@@ -56,7 +56,6 @@ public class PurseSeinerFleetFactory
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategy;
     private PurseSeineGearFactory gear;
     private AlgorithmFactory<? extends GearStrategy> gearStrategy;
-    private AlgorithmFactory<? extends Regulation> regulations;
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
     private AlgorithmFactory<? extends PortInitializer> portInitializer;
     private IntegerParameter targetYear;
@@ -69,7 +68,6 @@ public class PurseSeinerFleetFactory
         final AlgorithmFactory<? extends GearStrategy> gearStrategy,
         final AlgorithmFactory<? extends DestinationStrategy> destinationStrategy,
         final AlgorithmFactory<? extends FishingStrategy> fishingStrategy,
-        final AlgorithmFactory<? extends Regulation> regulations,
         final AlgorithmFactory<? extends DepartingStrategy> departingStrategy,
         final AlgorithmFactory<? extends MarketMap> marketMap,
         final AlgorithmFactory<? extends PortInitializer> portInitializer
@@ -81,7 +79,6 @@ public class PurseSeinerFleetFactory
         this.gearStrategy = gearStrategy;
         this.destinationStrategy = destinationStrategy;
         this.fishingStrategy = fishingStrategy;
-        this.regulations = regulations;
         this.departingStrategy = departingStrategy;
         this.marketMap = marketMap;
         this.portInitializer = portInitializer;
@@ -138,14 +135,6 @@ public class PurseSeinerFleetFactory
         this.gearStrategy = gearStrategy;
     }
 
-    public AlgorithmFactory<? extends Regulation> getRegulations() {
-        return regulations;
-    }
-
-    public void setRegulations(final AlgorithmFactory<? extends Regulation> regulations) {
-        this.regulations = regulations;
-    }
-
     public AlgorithmFactory<? extends DepartingStrategy> getDepartingStrategy() {
         return departingStrategy;
     }
@@ -164,7 +153,6 @@ public class PurseSeinerFleetFactory
             gearStrategy,
             destinationStrategy,
             fishingStrategy,
-            regulations,
             departingStrategy
         );
     }
@@ -206,7 +194,7 @@ public class PurseSeinerFleetFactory
         final FisherFactory fisherFactory =
             new FisherFactory(
                 null,
-                regulations,
+                new AnarchyFactory(),
                 departingStrategy,
                 destinationStrategy,
                 fishingStrategy,
@@ -223,8 +211,8 @@ public class PurseSeinerFleetFactory
             fisher -> ((CompositeDepartingStrategy) fisher.getDepartingStrategy())
                 .getStrategies()
                 .stream()
-                .filter(strategy -> strategy instanceof DestinationBasedDepartingStrategy)
-                .map(strategy -> (DestinationBasedDepartingStrategy) strategy)
+                .filter(DestinationBasedDepartingStrategy.class::isInstance)
+                .map(DestinationBasedDepartingStrategy.class::cast)
                 .forEach(strategy -> strategy.setDestinationStrategy(fisher.getDestinationStrategy())),
             addHourlyCosts(),
             fisher -> ((PurseSeineGear) fisher.getGear()).getFadManager().setFisher(fisher),

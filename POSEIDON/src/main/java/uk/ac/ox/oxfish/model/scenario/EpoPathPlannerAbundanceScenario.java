@@ -17,6 +17,7 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStr
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
 import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
 import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
+import uk.ac.ox.oxfish.regulation.ForbiddenAreasFromShapeFiles;
 import uk.ac.ox.oxfish.regulation.ForbiddenIf;
 import uk.ac.ox.oxfish.regulation.NamedRegulations;
 import uk.ac.ox.oxfish.regulation.conditions.*;
@@ -36,6 +37,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
         );
 
     public EpoPathPlannerAbundanceScenario() {
+        final InputPath regions = getInputFolder().path("regions");
         setFleet(
             new EpoPurseSeinerFleetFactory(
                 getTargetYear(),
@@ -131,6 +133,10 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                                         4.0, -110.0, -3.0, -96.0
                                     )
                                 )
+                            ),
+                            "EEZs", new ForbiddenAreasFromShapeFiles(
+                                regions,
+                                regions.path("region_tags.csv")
                             )
                         )
                     ),
@@ -205,6 +211,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
         );
     }
 
+    @SuppressWarnings("WeakerAccess")
     public AbundanceFiltersFactory getAbundanceFilters() {
         return abundanceFilters;
     }

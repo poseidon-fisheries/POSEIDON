@@ -23,11 +23,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.tuna.BiomassProcessesFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.regulation.EverythingForbidden;
 
 public class FadAwareLogisticGrowerTest {
 
@@ -42,7 +43,9 @@ public class FadAwareLogisticGrowerTest {
             .setCatchesFile(
                 InputPath.of("inputs", "tests", "exogenous_catches.csv")
             );
-        ((PurseSeinerFleetFactory) scenario.getFleet()).setRegulations(new NoFishingFactory());
+
+        final PurseSeinerFleetFactory fleet = (PurseSeinerFleetFactory) scenario.getFleet();
+        fleet.getGear().setRegulations(new EverythingForbidden());
 
         final FishState state = new FishState();
         state.setScenario(scenario);

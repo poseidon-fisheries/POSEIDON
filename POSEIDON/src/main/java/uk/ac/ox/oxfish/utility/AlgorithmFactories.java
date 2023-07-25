@@ -140,9 +140,7 @@ import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITargetTACFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SimpleFishSamplerFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
-import uk.ac.ox.oxfish.regulation.EverythingPermitted;
-import uk.ac.ox.oxfish.regulation.ForbiddenIf;
-import uk.ac.ox.oxfish.regulation.NamedRegulations;
+import uk.ac.ox.oxfish.regulation.*;
 import uk.ac.ox.oxfish.regulation.conditions.*;
 import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
 import uk.ac.ox.oxfish.regulation.quantities.SumOf;
@@ -683,6 +681,7 @@ public class AlgorithmFactories {
         addFactories(new Factories<>(
             Condition.class,
             ActionCodeIs.class,
+            AgentHasAnyOfTags.class,
             AgentHasTag.class,
             AllOf.class,
             AnyOf.class,
@@ -695,8 +694,10 @@ public class AlgorithmFactories {
         addFactories(new Factories<>(
             uk.ac.ox.poseidon.regulations.api.Regulation.class,
             NamedRegulations.class,
+            EverythingForbidden.class,
             EverythingPermitted.class,
-            ForbiddenIf.class
+            ForbiddenIf.class,
+            ForbiddenAreasFromShapeFiles.class
         ));
         addFactories(new Factories<>(
             Quantity.class,
