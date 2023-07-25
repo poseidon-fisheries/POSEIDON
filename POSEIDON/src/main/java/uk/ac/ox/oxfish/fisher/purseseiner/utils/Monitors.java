@@ -277,27 +277,27 @@ public class Monitors {
         );
     }
 
-    public Collection<Monitor<AbstractSetAction, ?, ?>> getAllSetsMonitors() {
+    public Collection<Monitor<AbstractSetAction, ?, ?>> grabAllSetsMonitors() {
         return allSetsMonitors;
     }
 
-    public Collection<Monitor<FadDeploymentAction, ?, ?>> getFadDeploymentMonitors() {
+    public Collection<Monitor<FadDeploymentAction, ?, ?>> grabFadDeploymentMonitors() {
         return fadDeploymentMonitors;
     }
 
-    public Collection<Monitor<AbstractFadSetAction, ?, ?>> getFadSetMonitors() {
+    public Collection<Monitor<AbstractFadSetAction, ?, ?>> grabFadSetMonitors() {
         return fadSetMonitors;
     }
 
-    public Collection<Monitor<NonAssociatedSetAction, ?, ?>> getNonAssociatedSetMonitors() {
+    public Collection<Monitor<NonAssociatedSetAction, ?, ?>> grabNonAssociatedSetMonitors() {
         return nonAssociatedSetMonitors;
     }
 
-    public Collection<Monitor<DolphinSetAction, ?, ?>> getDolphinSetMonitors() {
+    public Collection<Monitor<DolphinSetAction, ?, ?>> grabDolphinSetMonitors() {
         return dolphinSetMonitors;
     }
 
-    public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> getBiomassLostMonitor() {
+    public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> grabBiomassLostMonitor() {
         return biomassLostMonitor;
     }
 

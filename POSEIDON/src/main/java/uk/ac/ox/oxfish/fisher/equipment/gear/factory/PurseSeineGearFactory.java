@@ -119,15 +119,8 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     }
 
     @SuppressWarnings("unused")
-    public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> getBiomassLostMonitor() {
+    public GroupingMonitor<Species, BiomassLostEvent, Double, Mass> grabBiomassLostMonitor() {
         return biomassLostMonitor;
-    }
-
-    public void setBiomassLostMonitor(
-        final GroupingMonitor<Species, BiomassLostEvent, Double,
-            Mass> biomassLostMonitor
-    ) {
-        this.biomassLostMonitor = biomassLostMonitor;
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})
@@ -160,39 +153,58 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     }
 
     public void addMonitors(final Monitors monitors) {
-        getFadDeploymentObservers()
-            .addAll(monitors.getFadDeploymentMonitors());
-        getAllSetsObservers()
-            .addAll(monitors.getAllSetsMonitors());
-        getFadSetObservers()
-            .addAll(monitors.getFadSetMonitors());
-        getNonAssociatedSetObservers()
-            .addAll(monitors.getNonAssociatedSetMonitors());
-        getDolphinSetObservers()
-            .addAll(monitors.getDolphinSetMonitors());
-        setBiomassLostMonitor(monitors.getBiomassLostMonitor());
+        grabFadDeploymentObservers()
+            .addAll(monitors.grabFadDeploymentMonitors());
+        grabAllSetsObservers()
+            .addAll(monitors.grabAllSetsMonitors());
+        grabFadSetObservers()
+            .addAll(monitors.grabFadSetMonitors());
+        grabNonAssociatedSetObservers()
+            .addAll(monitors.grabNonAssociatedSetMonitors());
+        grabDolphinSetObservers()
+            .addAll(monitors.grabDolphinSetMonitors());
+        setBiomassLostMonitor(monitors.grabBiomassLostMonitor());
     }
 
     @SuppressWarnings("unused")
-    public Set<Observer<FadDeploymentAction>> getFadDeploymentObservers() {
+    public Set<Observer<FadDeploymentAction>> grabFadDeploymentObservers() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         return fadDeploymentObservers;
     }
 
-    public Set<Observer<AbstractSetAction>> getAllSetsObservers() {
+    public Set<Observer<AbstractSetAction>> grabAllSetsObservers() {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         return allSetsObservers;
+    }
+
+    @SuppressWarnings({"unused"})
+    public Set<Observer<AbstractFadSetAction>> grabFadSetObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return fadSetObservers;
+    }
+
+    @SuppressWarnings({"unused", "rawtypes"})
+    public Set<Observer<NonAssociatedSetAction>> grabNonAssociatedSetObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return nonAssociatedSetObservers;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public Set<Observer<DolphinSetAction>> grabDolphinSetObservers() {
+        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        return dolphinSetObservers;
+    }
+
+    public void setBiomassLostMonitor(
+        final GroupingMonitor<Species, BiomassLostEvent, Double,
+            Mass> biomassLostMonitor
+    ) {
+        this.biomassLostMonitor = biomassLostMonitor;
     }
 
     public void setAllSetsObservers(final Set<Observer<AbstractSetAction>> allSetsObservers) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.allSetsObservers = allSetsObservers;
-    }
-
-    @SuppressWarnings({"unused"})
-    public Set<Observer<AbstractFadSetAction>> getFadSetObservers() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return fadSetObservers;
     }
 
     @SuppressWarnings("unused")
@@ -201,18 +213,6 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     ) {
         //noinspection AssignmentOrReturnOfFieldWithMutableType
         this.fadSetObservers = fadSetObservers;
-    }
-
-    @SuppressWarnings({"unused", "rawtypes"})
-    public Set<Observer<NonAssociatedSetAction>> getNonAssociatedSetObservers() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return nonAssociatedSetObservers;
-    }
-
-    @SuppressWarnings("rawtypes")
-    public Set<Observer<DolphinSetAction>> getDolphinSetObservers() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return dolphinSetObservers;
     }
 
     public void setDolphinSetObservers(
