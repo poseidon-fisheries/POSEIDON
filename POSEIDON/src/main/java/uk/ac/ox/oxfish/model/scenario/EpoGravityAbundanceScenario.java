@@ -20,7 +20,6 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
@@ -45,59 +44,54 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
             getInputFolder().path("abundance", "selectivity.csv")
         );
 
-    private PurseSeinerFleetFactory purseSeinerFleetFactory =
-        new EpoPurseSeinerFleetFactory(
-            getTargetYear(),
-            getInputFolder(),
-            new AbundancePurseSeineGearFactory(
-                new EverythingPermitted(),
-                new LinearAbundanceFadInitializerFactory(
-                    getAbundanceFiltersFactory(),
-                    "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
-                ),
-                new UnreliableFishValueCalculatorFactory(new LogNormalErrorOperatorFactory(
-                    new CalibratedParameter(-.2, .2, -.4, .4),
-                    new CalibratedParameter(.2, .3, .01, .5)
-                ))
-            ),
-            new GravityDestinationStrategyFactory(
+    public EpoGravityAbundanceScenario() {
+        super();
+        setFleet(
+            new EpoPurseSeinerFleetFactory(
                 getTargetYear(),
-                getInputFolder().path("action_weights.csv"),
-                getInputFolder().path("vessels.csv"),
-                new AttractionFieldsFactory(
-                    new LocationValuesFactory(
-                        getInputFolder().path("location_values.csv"),
-                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
-                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
-                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
-                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
-                        getTargetYear()
+                getInputFolder(),
+                new AbundancePurseSeineGearFactory(
+                    new EverythingPermitted(),
+                    new LinearAbundanceFadInitializerFactory(
+                        getAbundanceFiltersFactory(),
+                        "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
                     ),
-                    getInputFolder().path("max_current_speeds.csv")
+                    new UnreliableFishValueCalculatorFactory(new LogNormalErrorOperatorFactory(
+                        new CalibratedParameter(-.2, .2, -.4, .4),
+                        new CalibratedParameter(.2, .3, .01, .5)
+                    ))
+                ),
+                new GravityDestinationStrategyFactory(
+                    getTargetYear(),
+                    getInputFolder().path("action_weights.csv"),
+                    getInputFolder().path("vessels.csv"),
+                    new AttractionFieldsFactory(
+                        new LocationValuesFactory(
+                            getInputFolder().path("location_values.csv"),
+                            new CalibratedParameter(0, 0.1, 0, 1, 0.01),
+                            new CalibratedParameter(0, 0.1, 0, 1, 0.01),
+                            new CalibratedParameter(0, 0.1, 0, 1, 0.01),
+                            new CalibratedParameter(0, 0.1, 0, 1, 0.01),
+                            getTargetYear()
+                        ),
+                        getInputFolder().path("max_current_speeds.csv")
+                    )
+                ),
+                new PurseSeinerAbundanceFishingStrategyFactory(
+                    getTargetYear(),
+                    getInputFolder().path("action_weights.csv"),
+                    new AbundanceCatchSamplersFactory(
+                        getAbundanceFiltersFactory(),
+                        getInputFolder().path("set_samples.csv")
+                    ),
+                    new SetDurationSamplersFactory(
+                        getInputFolder().path("set_durations.csv")
+                    ),
+                    getInputFolder().path("max_current_speeds.csv"),
+                    getInputFolder().path("set_compositions.csv")
                 )
-            ),
-            new PurseSeinerAbundanceFishingStrategyFactory(
-                getTargetYear(),
-                getInputFolder().path("action_weights.csv"),
-                new AbundanceCatchSamplersFactory(
-                    getAbundanceFiltersFactory(),
-                    getInputFolder().path("set_samples.csv")
-                ),
-                new SetDurationSamplersFactory(
-                    getInputFolder().path("set_durations.csv")
-                ),
-                getInputFolder().path("max_current_speeds.csv"),
-                getInputFolder().path("set_compositions.csv")
             )
         );
-
-    public PurseSeinerFleetFactory getPurseSeinerFleetFactory() {
-        return purseSeinerFleetFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory purseSeinerFleetFactory) {
-        this.purseSeinerFleetFactory = purseSeinerFleetFactory;
     }
 
     public AbundanceFiltersFactory getAbundanceFiltersFactory() {
@@ -106,12 +100,6 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
 
     public void setAbundanceFiltersFactory(final AbundanceFiltersFactory abundanceFiltersFactory) {
         this.abundanceFiltersFactory = abundanceFiltersFactory;
-    }
-
-    @Override
-    public void useDummyData() {
-        super.useDummyData();
-        purseSeinerFleetFactory.useDummyData(testFolder());
     }
 
 }

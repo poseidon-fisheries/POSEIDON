@@ -54,7 +54,7 @@ public class PurseSeinerFleetFactory
     private AlgorithmFactory<? extends MarketMap> marketMap;
     private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy;
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategy;
-    private PurseSeineGearFactory purseSeineGear;
+    private PurseSeineGearFactory gear;
     private AlgorithmFactory<? extends GearStrategy> gearStrategy;
     private AlgorithmFactory<? extends Regulation> regulations;
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
@@ -65,7 +65,7 @@ public class PurseSeinerFleetFactory
         final IntegerParameter targetYear,
         final InputPath vesselsFile,
         final InputPath costsFile,
-        final PurseSeineGearFactory purseSeineGear,
+        final PurseSeineGearFactory gear,
         final AlgorithmFactory<? extends GearStrategy> gearStrategy,
         final AlgorithmFactory<? extends DestinationStrategy> destinationStrategy,
         final AlgorithmFactory<? extends FishingStrategy> fishingStrategy,
@@ -77,7 +77,7 @@ public class PurseSeinerFleetFactory
         this.targetYear = targetYear;
         this.vesselsFile = vesselsFile;
         this.costsFile = costsFile;
-        this.purseSeineGear = purseSeineGear;
+        this.gear = gear;
         this.gearStrategy = gearStrategy;
         this.destinationStrategy = destinationStrategy;
         this.fishingStrategy = fishingStrategy;
@@ -160,7 +160,7 @@ public class PurseSeinerFleetFactory
         vesselsFile = dummyDataFolder.path("dummy_boats.csv");
         maybeUseDummyData(
             dummyDataFolder,
-            purseSeineGear,
+            gear,
             gearStrategy,
             destinationStrategy,
             fishingStrategy,
@@ -191,7 +191,7 @@ public class PurseSeinerFleetFactory
     private void addMonitors(final FishState fishState) {
         final Monitors monitors = new Monitors(fishState);
         monitors.getMonitors().forEach(fishState::registerStartable);
-        getPurseSeineGear().addMonitors(monitors);
+        getGear().addMonitors(monitors);
     }
 
     public InputPath getVesselsFile() {
@@ -215,7 +215,7 @@ public class PurseSeinerFleetFactory
                 new IgnoreWeatherFactory(),
                 null,
                 null,
-                purseSeineGear,
+                gear,
                 0
             );
 
@@ -270,12 +270,12 @@ public class PurseSeinerFleetFactory
         return fishState.getMap().getPorts();
     }
 
-    public PurseSeineGearFactory getPurseSeineGear() {
-        return purseSeineGear;
+    public PurseSeineGearFactory getGear() {
+        return gear;
     }
 
-    public void setPurseSeineGear(final PurseSeineGearFactory purseSeineGear) {
-        this.purseSeineGear = purseSeineGear;
+    public void setGear(final PurseSeineGearFactory gear) {
+        this.gear = gear;
     }
 
     private Consumer<Fisher> addHourlyCosts() {

@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.model.scenario;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
@@ -40,81 +39,69 @@ import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
  */
 public class EpoGravityBiomassScenario extends EpoBiomassScenario {
 
-    private PurseSeinerFleetFactory purseSeinerFleetFactory =
-        new EpoPurseSeinerFleetFactory(
-            getTargetYear(),
-            getInputFolder(),
-            new BiomassPurseSeineGearFactory(
-                new EverythingPermitted(),
-                new CompressedBiomassFadInitializerFactory(
-                    // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
-                    ImmutableMap.of(
-                        "Bigeye tuna", 0.7697766896339598,
-                        "Yellowfin tuna", 1.1292389959739901,
-                        "Skipjack tuna", 0.0
+    public EpoGravityBiomassScenario() {
+        setFleet(
+            new EpoPurseSeinerFleetFactory(
+                getTargetYear(),
+                getInputFolder(),
+                new BiomassPurseSeineGearFactory(
+                    new EverythingPermitted(),
+                    new CompressedBiomassFadInitializerFactory(
+                        // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
+                        ImmutableMap.of(
+                            "Bigeye tuna", 0.7697766896339598,
+                            "Yellowfin tuna", 1.1292389959739901,
+                            "Skipjack tuna", 0.0
+                        ),
+                        ImmutableMap.of(
+                            "Bigeye tuna", 1.0184011081061861,
+                            "Yellowfin tuna", 0.0,
+                            "Skipjack tuna", 0.7138646301498129
+                        ),
+                        ImmutableMap.of(
+                            "Bigeye tuna", 9.557509707646096,
+                            "Yellowfin tuna", 10.419783885948643,
+                            "Skipjack tuna", 9.492481930328207
+                        ),
+                        ImmutableMap.of(
+                            "Bigeye tuna", 0.688914118975473,
+                            "Yellowfin tuna", 0.30133562299610883,
+                            "Skipjack tuna", 1.25
+                        )
                     ),
-                    ImmutableMap.of(
-                        "Bigeye tuna", 1.0184011081061861,
-                        "Yellowfin tuna", 0.0,
-                        "Skipjack tuna", 0.7138646301498129
-                    ),
-                    ImmutableMap.of(
-                        "Bigeye tuna", 9.557509707646096,
-                        "Yellowfin tuna", 10.419783885948643,
-                        "Skipjack tuna", 9.492481930328207
-                    ),
-                    ImmutableMap.of(
-                        "Bigeye tuna", 0.688914118975473,
-                        "Yellowfin tuna", 0.30133562299610883,
-                        "Skipjack tuna", 1.25
+                    new UnreliableFishValueCalculatorFactory(new LogNormalErrorOperatorFactory(
+                        new CalibratedParameter(-.2, .2, -.4, .4),
+                        new CalibratedParameter(.2, .3, .01, .5)
+                    ))
+                ),
+                new GravityDestinationStrategyFactory(
+                    getTargetYear(),
+                    getInputFolder().path("action_weights.csv"),
+                    getInputFolder().path("vessels.csv"),
+                    new AttractionFieldsFactory(
+                        new LocationValuesFactory(
+                            getInputFolder().path("location_values.csv"),
+                            new CalibratedParameter(0, 0.1, 0, 1, 0.01),
+                            new CalibratedParameter(0, 0.1, 0, 1, 0.01),
+                            new CalibratedParameter(0, 0.1, 0, 1, 0.01),
+                            new CalibratedParameter(0, 0.1, 0, 1, 0.01),
+                            getTargetYear()
+                        ),
+                        getInputFolder().path("max_current_speeds.csv")
                     )
                 ),
-                new UnreliableFishValueCalculatorFactory(new LogNormalErrorOperatorFactory(
-                    new CalibratedParameter(-.2, .2, -.4, .4),
-                    new CalibratedParameter(.2, .3, .01, .5)
-                ))
-            ),
-            new GravityDestinationStrategyFactory(
-                getTargetYear(),
-                getInputFolder().path("action_weights.csv"),
-                getInputFolder().path("vessels.csv"),
-                new AttractionFieldsFactory(
-                    new LocationValuesFactory(
-                        getInputFolder().path("location_values.csv"),
-                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
-                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
-                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
-                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
-                        getTargetYear()
+                new PurseSeinerBiomassFishingStrategyFactory(
+                    getTargetYear(),
+                    getInputFolder().path("action_weights.csv"),
+                    new BiomassCatchSamplersFactory(
+                        getInputFolder().path("set_samples.csv")
                     ),
-                    getInputFolder().path("max_current_speeds.csv")
+                    new SetDurationSamplersFactory(getInputFolder().path("set_durations.csv")),
+                    getInputFolder().path("max_current_speeds.csv"),
+                    getInputFolder().path("set_compositions.csv")
                 )
-            ),
-            new PurseSeinerBiomassFishingStrategyFactory(
-                getTargetYear(),
-                getInputFolder().path("action_weights.csv"),
-                new BiomassCatchSamplersFactory(
-                    getInputFolder().path("set_samples.csv")
-                ),
-                new SetDurationSamplersFactory(getInputFolder().path("set_durations.csv")),
-                getInputFolder().path("max_current_speeds.csv"),
-                getInputFolder().path("set_compositions.csv")
             )
         );
-
-    public PurseSeinerFleetFactory getPurseSeinerFleetFactory() {
-        return purseSeinerFleetFactory;
-    }
-
-    @SuppressWarnings("unused")
-    public void setPurseSeinerFleetFactory(final PurseSeinerFleetFactory purseSeinerFleetFactory) {
-        this.purseSeinerFleetFactory = purseSeinerFleetFactory;
-    }
-
-    @Override
-    public void useDummyData() {
-        super.useDummyData();
-        purseSeinerFleetFactory.useDummyData(testFolder());
     }
 
 }

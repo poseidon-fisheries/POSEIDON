@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
-import uk.ac.ox.oxfish.model.market.MarketMapFromPriceFileFactory;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
@@ -36,12 +35,6 @@ public class EpoGravityBiomassScenarioTest {
 
         final EpoGravityBiomassScenario scenario = new EpoGravityBiomassScenario();
         scenario.useDummyData();
-        scenario.getPurseSeinerFleetFactory().setMarketMap(
-            new MarketMapFromPriceFileFactory(
-                scenario.getInputFolder().path("prices.csv"),
-                scenario.getTargetYear()
-            )
-        );
 
         final Regulation regulation = new FishingSeason(true, 100);
         scenario.getAdditionalStartables().put(

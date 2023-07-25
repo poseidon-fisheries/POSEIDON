@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
+import static uk.ac.ox.oxfish.utility.Dummyable.maybeUseDummyData;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public abstract class EpoScenario<B extends LocalBiology>
@@ -60,7 +61,6 @@ public abstract class EpoScenario<B extends LocalBiology>
         new MapExtentFactory(
             101, 100, -171, -70, -50, 50
         );
-
     public static final RegionalDivision REGIONAL_DIVISION = new CustomRegionalDivision(
         DEFAULT_MAP_EXTENT_FACTORY.get(),
         ImmutableMap.of(
@@ -106,14 +106,6 @@ public abstract class EpoScenario<B extends LocalBiology>
         return LocalDate.of(year, month, dayOfMonth).getDayOfYear();
     }
 
-    public AlgorithmFactory<ScenarioPopulation> getFleet() {
-        return fleet;
-    }
-
-    public void setFleet(final AlgorithmFactory<ScenarioPopulation> fleet) {
-        this.fleet = fleet;
-    }
-
     public IntegerParameter getTargetYear() {
         return targetYear;
     }
@@ -128,10 +120,6 @@ public abstract class EpoScenario<B extends LocalBiology>
 
     public void setBiologicalProcesses(final BiologicalProcessesFactory<B> biologicalProcesses) {
         this.biologicalProcesses = biologicalProcesses;
-    }
-
-    public InputPath testFolder() {
-        return testInputFolder;
     }
 
     @SuppressWarnings("unused")
@@ -179,6 +167,19 @@ public abstract class EpoScenario<B extends LocalBiology>
     @Override
     public void useDummyData() {
         getFadMap().setCurrentPatternMapSupplier(CurrentPatternMapSupplier.EMPTY);
+        maybeUseDummyData(testFolder(), getFleet());
+    }
+
+    public InputPath testFolder() {
+        return testInputFolder;
+    }
+
+    public AlgorithmFactory<ScenarioPopulation> getFleet() {
+        return fleet;
+    }
+
+    public void setFleet(final AlgorithmFactory<ScenarioPopulation> fleet) {
+        this.fleet = fleet;
     }
 
     @Override

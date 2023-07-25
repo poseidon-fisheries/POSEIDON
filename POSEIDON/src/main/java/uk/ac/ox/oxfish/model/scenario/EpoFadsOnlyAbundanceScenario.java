@@ -33,7 +33,6 @@ import uk.ac.ox.oxfish.utility.Dummyable;
 public class EpoFadsOnlyAbundanceScenario extends EpoAbundanceScenario {
 
     private boolean fadSettingActive = true;
-
     private AlgorithmFactory<? extends AdditionalStartable> fadMakerFactory =
         new ExogenousFadMakerCSVFactory(
             getInputFolder().path("calibration", "fad_deployments.csv"),
@@ -44,7 +43,6 @@ public class EpoFadsOnlyAbundanceScenario extends EpoAbundanceScenario {
                 "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
             )
         );
-
     private AlgorithmFactory<? extends AdditionalStartable> fadSetterFactory =
         new ExogenousFadSetterCSVFactory(
             getInputFolder().path("calibration", "fad_sets.csv"), true
