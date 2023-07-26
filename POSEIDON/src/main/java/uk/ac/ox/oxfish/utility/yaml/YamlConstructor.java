@@ -24,7 +24,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.inspector.TrustedTagInspector;
 import org.yaml.snakeyaml.nodes.*;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
@@ -49,11 +48,6 @@ import static uk.ac.ox.oxfish.model.scenario.Scenarios.SCENARIOS;
 public class YamlConstructor extends Constructor {
 
     private static final LoaderOptions LOADER_OPTIONS = new LoaderOptions();
-
-    static {
-        // Allow using global tags
-        LOADER_OPTIONS.setTagInspector(new TrustedTagInspector());
-    }
 
     YamlConstructor() {
 
