@@ -15,6 +15,10 @@ public class AllOf implements Condition {
         this.conditions = ImmutableSet.copyOf(conditions);
     }
 
+    public Set<Condition> getConditions() {
+        return conditions;
+    }
+
     @Override
     public boolean test(final Action action) {
         return conditions.stream().allMatch(predicate -> predicate.test(action));

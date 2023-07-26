@@ -43,7 +43,7 @@ public class EpoGravityAbundanceScenarioTest {
 
     @Test
     public void testRunOneYearWithoutCrashing() {
-        final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
+        final FishState fishState = startTestableScenario(EpoPathPlannerAbundanceScenario.class);
         do {
             fishState.schedule.step(fishState);
         } while (fishState.getYear() < 1);

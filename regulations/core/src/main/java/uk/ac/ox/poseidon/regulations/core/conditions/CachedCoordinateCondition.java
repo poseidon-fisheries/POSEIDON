@@ -20,6 +20,6 @@ public abstract class CachedCoordinateCondition implements Condition {
             .orElse(false);
     }
 
-    abstract boolean test(final Coordinate coordinate);
+    abstract public boolean test(final Coordinate coordinate);
 
 }

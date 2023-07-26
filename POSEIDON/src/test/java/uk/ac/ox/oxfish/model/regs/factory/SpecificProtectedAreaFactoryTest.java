@@ -1,20 +1,24 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.primitives.Booleans;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
-import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.regulation.ForbiddenAreasFromShapeFiles;
+import uk.ac.ox.poseidon.regulations.api.Regulation;
+import uk.ac.ox.poseidon.regulations.core.ConditionalRegulation;
+import uk.ac.ox.poseidon.regulations.core.conditions.AllOf;
+import uk.ac.ox.poseidon.regulations.core.conditions.AnyOf;
+import uk.ac.ox.poseidon.regulations.core.conditions.InVectorField;
 
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Iterables.getLast;
@@ -26,27 +30,35 @@ public class SpecificProtectedAreaFactoryTest {
 
     final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
 
+    final InputPath regionsFolder = InputPath.of("inputs", "epo_inputs", "regions");
+    final Regulation regulation =
+        new ForbiddenAreasFromShapeFiles(
+            regionsFolder,
+            regionsFolder.path("region_tags.csv")
+        ).apply(fishState);
+    final List<InVectorField> vectorFields =
+        ((AnyOf) ((ConditionalRegulation) regulation).getCondition())
+            .getConditions()
+            .stream()
+            .map(AllOf.class::cast)
+            .map(AllOf::getConditions)
+            .flatMap(Collection::stream)
+            .filter(InVectorField.class::isInstance)
+            .map(InVectorField.class::cast)
+            .collect(toList());
+    final NauticalMap map = fishState.getMap();
+    final List<Coordinate> coordinates =
+        map.getAllSeaTilesExcludingLandAsList()
+            .stream()
+            .map(map::getCoordinates)
+            .collect(toList());
+
     @Test
     public void testEveryEEZHasTilesInArea() {
-        final Set<SpecificProtectedArea> areas =
-            fishState.getFishers().stream().flatMap(fisher ->
-                ((MultipleRegulations) fisher.getRegulation()).getRegulations()
-                    .stream()
-                    .filter(SpecificProtectedArea.class::isInstance)
-                    .map(SpecificProtectedArea.class::cast)
-            ).collect(toSet());
-
-        final ImmutableList<SpecificProtectedArea> areasWithNoTiles =
-            areas.stream()
-                .filter(reg ->
-                    Arrays.stream(reg.getInAreaArrayClone())
-                        .noneMatch(booleans ->
-                            Booleans.asList(booleans).stream().anyMatch(Boolean::booleanValue)
-                        )
-                )
-                .collect(toImmutableList());
-
-        Assertions.assertEquals(ImmutableList.of(), areasWithNoTiles);
+        vectorFields
+            .forEach(inVectorField ->
+                Assertions.assertTrue(coordinates.stream().anyMatch(inVectorField::test))
+            );
     }
 
     @Test

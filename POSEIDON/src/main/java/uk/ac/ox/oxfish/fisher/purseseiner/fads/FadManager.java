@@ -344,9 +344,34 @@ public class FadManager {
         numFadsInStock++;
     }
 
-    static class DummyAction extends BasicAction implements YearlyActionCount.Getter, NumberOfActiveFads.Getter {
+    public static class DummyAction extends BasicAction implements YearlyActionCount.Getter, NumberOfActiveFads.Getter {
         private final YearlyActionCounter yearlyActionCounter;
         private final AtomicLong numberOfActiveFads;
+
+        public DummyAction(
+            final String code,
+            final Fisher fisher
+        ) {
+            this(
+                code,
+                fisher,
+                fisher.grabState().getDate().atStartOfDay(),
+                getFadManager(fisher).getYearlyActionCounter(),
+                new AtomicLong(getFadManager(fisher).getNumberOfActiveFads())
+            );
+        }
+
+        public DummyAction(
+            final String code,
+            final Agent agent,
+            final LocalDateTime dateTime,
+            final YearlyActionCounter yearlyActionCounter,
+            final AtomicLong numberOfActiveFads
+        ) {
+            super(code, agent, dateTime, null);
+            this.yearlyActionCounter = yearlyActionCounter;
+            this.numberOfActiveFads = numberOfActiveFads;
+        }
 
         public DummyAction(
             final String code,
@@ -361,18 +386,6 @@ public class FadManager {
                 yearlyActionCounter,
                 numberOfActiveFads
             );
-        }
-
-        public DummyAction(
-            final String code,
-            final Agent agent,
-            final LocalDateTime dateTime,
-            final YearlyActionCounter yearlyActionCounter,
-            final AtomicLong numberOfActiveFads
-        ) {
-            super(code, agent, dateTime, null);
-            this.yearlyActionCounter = yearlyActionCounter;
-            this.numberOfActiveFads = numberOfActiveFads;
         }
 
         @Override

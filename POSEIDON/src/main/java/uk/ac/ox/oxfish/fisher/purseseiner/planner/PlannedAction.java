@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.*;
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
+
 /**
  * this represents either the next step in a plan or a potential next step in a plan.
  * It is described by where it should take place, how much it takes in time, and the type of action
@@ -26,7 +29,7 @@ public interface PlannedAction {
         final Fisher fisher,
         final SeaTile location,
         final FadManager fadManager,
-        final PurseSeinerAction action
+        final uk.ac.ox.poseidon.agents.api.Action action
     ) {
         return fisher.isAllowedAtSea() &&
             fadManager.getRegulation().isPermitted(action) &&
@@ -95,7 +98,7 @@ public interface PlannedAction {
         @Override
         public boolean isAllowedNow(final Fisher fisher) {
             return fisher.isAllowedAtSea() &&
-                !FadManager.getFadManager(fisher)
+                !getFadManager(fisher)
                     .getRegulation()
                     .isForbidden(new FadDeploymentAction(fisher));
         }
@@ -123,7 +126,7 @@ public interface PlannedAction {
 
         @Override
         public boolean isAllowedNow(final Fisher fisher) {
-            return isFadSetAllowed(fisher, FadManager.getFadManager(fisher), fadWePlanToSetOn);
+            return isFadSetAllowed(fisher, getFadManager(fisher), fadWePlanToSetOn);
         }
 
         public static boolean isFadSetAllowed(
@@ -197,8 +200,8 @@ public interface PlannedAction {
             return isActionAllowed(
                 fisher,
                 getLocation(),
-                FadManager.getFadManager(fisher),
-                new OpportunisticFadSetAction(null, fisher, 0) // fake action just to check for legality
+                getFadManager(fisher),
+                new FadManager.DummyAction(OFS.name(), fisher) // fake action just to check for legality
             );
         }
 
@@ -366,7 +369,7 @@ public interface PlannedAction {
             return isActionAllowed(
                 fisher,
                 getLocation(),
-                FadManager.getFadManager(fisher),
+                getFadManager(fisher),
                 makeDummyPlannedAction(fisher)
             );
         }
@@ -376,25 +379,7 @@ public interface PlannedAction {
             return position;
         }
 
-        AbstractSetAction makeDummyPlannedAction(final Fisher fisher) {
-            return createSet(
-                null,
-                null,
-                fisher,
-                0,
-                getLocation(),
-                null
-            );
-        }
-
-        abstract protected AbstractSetAction createSet(
-            final B potentialCatch,
-            final List<B> targetBiologies,
-            final Fisher fisher,
-            final double fishingTime,
-            final SeaTile location,
-            final CatchMaker<B> catchMaker
-        );
+        abstract protected uk.ac.ox.poseidon.agents.api.Action makeDummyPlannedAction(final Fisher fisher);
 
         /**
          * list of actions that need to take place for the planned action to take place
@@ -425,6 +410,15 @@ public interface PlannedAction {
         public TargetBiologiesGrabber<B> getTargetBiologiesGrabber() {
             return targetBiologiesGrabber;
         }
+
+        abstract protected AbstractSetAction createSet(
+            final B potentialCatch,
+            final List<B> targetBiologies,
+            final Fisher fisher,
+            final double fishingTime,
+            final SeaTile location,
+            final CatchMaker<B> catchMaker
+        );
 
         @Override
         public String toString() {
@@ -491,6 +485,11 @@ public interface PlannedAction {
         }
 
         @Override
+        protected uk.ac.ox.poseidon.agents.api.Action makeDummyPlannedAction(final Fisher fisher) {
+            return new FadManager.DummyAction(DEL.name(), fisher);
+        }
+
+        @Override
         protected AbstractSetAction createSet(
             final B potentialCatch,
             final List<B> targetBiologies,
@@ -530,6 +529,11 @@ public interface PlannedAction {
                 rangeInSeaTiles,
                 localBiologyClass
             );
+        }
+
+        @Override
+        protected uk.ac.ox.poseidon.agents.api.Action makeDummyPlannedAction(final Fisher fisher) {
+            return new FadManager.DummyAction(NOA.name(), fisher);
         }
 
         @Override

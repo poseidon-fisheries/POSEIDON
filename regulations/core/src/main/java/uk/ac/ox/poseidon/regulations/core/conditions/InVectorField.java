@@ -12,7 +12,7 @@ public class InVectorField extends CachedCoordinateCondition {
     }
 
     @Override
-    boolean test(final Coordinate coordinate) {
+    public boolean test(final Coordinate coordinate) {
         return vectorField.isCovered(coordinate);
     }
 

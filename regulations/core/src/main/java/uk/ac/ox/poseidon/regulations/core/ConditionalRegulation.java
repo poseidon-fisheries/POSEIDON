@@ -21,6 +21,18 @@ public class ConditionalRegulation implements Regulation {
         this.regulationIfFalse = regulationIfFalse;
     }
 
+    public Condition getCondition() {
+        return condition;
+    }
+
+    public Regulation getRegulationIfTrue() {
+        return regulationIfTrue;
+    }
+
+    public Regulation getRegulationIfFalse() {
+        return regulationIfFalse;
+    }
+
     @Override
     public Mode mode(final Action action) {
         final Regulation regulation =

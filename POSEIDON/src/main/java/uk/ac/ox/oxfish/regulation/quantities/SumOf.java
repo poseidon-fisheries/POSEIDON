@@ -7,6 +7,8 @@ import uk.ac.ox.poseidon.regulations.api.Quantity;
 
 import java.util.Collection;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 public class SumOf implements AlgorithmFactory<Quantity> {
 
     private Collection<AlgorithmFactory<Quantity>> quantities;
@@ -36,6 +38,8 @@ public class SumOf implements AlgorithmFactory<Quantity> {
 
     @Override
     public Quantity apply(final FishState fishState) {
-        return null;
+        return new uk.ac.ox.poseidon.regulations.core.quantities.SumOf(
+            quantities.stream().map(q -> q.apply(fishState)).collect(toImmutableList())
+        );
     }
 }
