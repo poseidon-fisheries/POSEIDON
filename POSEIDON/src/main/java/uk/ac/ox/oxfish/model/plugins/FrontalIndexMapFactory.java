@@ -14,18 +14,22 @@ public class FrontalIndexMapFactory extends EnvironmentalMapFactory {
         super(
             "FrontalIndex",
             gridFile,
-            new CalibratedParameter(0, 4, 0, 25, 0),
-            new CalibratedParameter(1, 3, 1, 3, 2)
+            new CalibratedParameter(-2.0, 0, 0, 0, -0.20), //target
+            new CalibratedParameter(1, 3, 0, 5, 2), //penalty
+            new CalibratedParameter(2.0, 3.0, 0, 25.0, 2) //margin
         );
     }
 
     @Override
-    public void setPenalty(final DoubleParameter penalty) {
-        super.setPenalty(penalty);
+    public void setPenalty(final DoubleParameter penalty) {super.setPenalty(penalty);}
+
+    @Override
+    public void setTarget(final DoubleParameter target) {
+        super.setTarget(target);
     }
 
     @Override
-    public void setThreshold(final DoubleParameter threshold) {
-        super.setThreshold(threshold);
+    public void setMargin(final DoubleParameter margin) {
+        super.setMargin(margin);
     }
 }

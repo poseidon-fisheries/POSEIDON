@@ -63,18 +63,32 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      * hours wasted after every NOA
      */
     private final double additionalHourlyDelayNonAssociatedSets;
+
+
+    private final double MINBIAS = 0.0001;
+    private final double MAXBIAS = 0.9999;
+
     /**
      * a multiplier to the data-read action weight for own fad
      */
     private final double ownFadActionWeightBias;
     /**
      * a multiplier to the DPL actions weight (makes it more or less common than what the data may suggest)
+     * removed deployment bias, added bias for del and ofs
      */
     private final double deploymentBias;
     /**
      * a multiplier to the NOA actions weight (makes it more or less common than what the data may suggest)
      */
     private final double nonAssociatedBias;
+    /**
+     * a multiplier to the DEL actions weight (makes it more or less common than what the data may suggest)
+     */
+    private final double dolphinBias;
+    /**
+     * a multiplier to the OFS actions weight (makes it more or less common than what the data may suggest)
+     */
+    private final double opportunisticBias;
     /**
      * $ a fad needs to have accumulated before we even try to target it when stealing in
      * an area
@@ -127,6 +141,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         final double ownFadActionWeightBias,
         final double deploymentBias,
         final double nonAssociatedBias,
+        final double dolphinBias,
+        final double opportunisticBias,
         final double minimumValueOpportunisticFadSets,
         final double hoursWastedOnFailedSearches,
         final double planningHorizonInHours,
@@ -144,9 +160,11 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         this.additionalHourlyDelayDolphinSets = additionalHourlyDelayDolphinSets;
         this.additionalHourlyDelayDeployment = additionalHourlyDelayDeployment;
         this.additionalHourlyDelayNonAssociatedSets = additionalHourlyDelayNonAssociatedSets;
-        this.ownFadActionWeightBias = ownFadActionWeightBias;
-        this.deploymentBias = deploymentBias;
-        this.nonAssociatedBias = nonAssociatedBias;
+        this.ownFadActionWeightBias = Math.max(Math.min(MAXBIAS, ownFadActionWeightBias),MINBIAS);
+        this.deploymentBias = Math.max(Math.min(MAXBIAS, deploymentBias),MINBIAS);
+        this.dolphinBias = Math.max(Math.min(MAXBIAS, dolphinBias),MINBIAS);
+        this.opportunisticBias = Math.max(Math.min(MAXBIAS, opportunisticBias),MINBIAS);
+        this.nonAssociatedBias = Math.max(Math.min(MAXBIAS, nonAssociatedBias),MINBIAS);
         this.minimumValueOpportunisticFadSets = minimumValueOpportunisticFadSets;
         this.hoursWastedOnFailedSearches = hoursWastedOnFailedSearches;
         this.planningHorizonInHours = planningHorizonInHours;
@@ -194,7 +212,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                         "a weight of " + actionWeight.getValue());
                 plannableActionWeights.put(
                     ActionType.DolphinSets,
-                    actionWeight.getValue()
+                    actionWeight.getValue() * dolphinBias/(1-dolphinBias)
                 );
                 planModules.put(
                     ActionType.DolphinSets,
@@ -220,7 +238,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                         "a weight of " + actionWeight.getValue());
                 plannableActionWeights.put(
                     ActionType.DeploymentAction,
-                    actionWeight.getValue() * deploymentBias
+                    actionWeight.getValue() *deploymentBias/(1-deploymentBias)
                 );
                 planModules.put(
                     ActionType.DeploymentAction,
@@ -239,7 +257,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                     (NonAssociatedSetLocationValues) locationValues.get(NonAssociatedSetAction.class);
                 plannableActionWeights.put(
                     ActionType.NonAssociatedSets,
-                    actionWeight.getValue() * nonAssociatedBias
+                    actionWeight.getValue() * nonAssociatedBias/(1-nonAssociatedBias)
                 );
                 planModules.put(
                     ActionType.NonAssociatedSets,
@@ -261,7 +279,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             else if (actionWeight.getKey().equals(FadSetAction.class)) {
                 plannableActionWeights.put(
                     ActionType.SetOwnFadAction,
-                    actionWeight.getValue() * ownFadActionWeightBias
+                    actionWeight.getValue() * ownFadActionWeightBias/(1-ownFadActionWeightBias)
                 );
                 planModules.put(
                     ActionType.SetOwnFadAction,
@@ -280,7 +298,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 }
                 plannableActionWeights.put(
                     ActionType.OpportunisticFadSets,
-                    actionWeight.getValue()
+                    actionWeight.getValue() * opportunisticBias/(1-opportunisticBias)
                 );
                 planModules.put(
                     ActionType.OpportunisticFadSets,

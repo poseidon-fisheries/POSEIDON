@@ -63,14 +63,20 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * a multiplier applied to the action weight of own fad (since it's quite low in the data)
      */
     private DoubleParameter ownFadActionWeightBias =
-        new CalibratedParameter(1, 1000, 22);
+        new CalibratedParameter(0.25, 0.99,0.0, 1.0, 0.9565217);
     /**
      * a multiplier applied to the action weight of DPL
      */
     private DoubleParameter deploymentBias =
-        new CalibratedParameter(1, 1000, 10);
+        new CalibratedParameter(0.25, 0.95, 0.0, 0.9999,0.9090909);
     private DoubleParameter noaBias =
-        new CalibratedParameter(0.2, 2, 0.6);
+        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999, 0.6);
+    private DoubleParameter delBias =
+            new CalibratedParameter(0.25, 0.75, 0.0, 0.9999,  0.5);
+    private DoubleParameter ofsBias =
+            new CalibratedParameter(0.25, 0.75, 0.0, 0.9999,   0.5);
+
+
     private DoubleParameter minimumPercentageOfTripDurationAllowed =
         new CalibratedParameter(0.4, 0.9, 0, 1, 0.7);
     private BooleanParameter noaSetsCanPoachFads = new BooleanParameter(false);
@@ -158,6 +164,8 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             ownFadActionWeightBias.applyAsDouble(state.getRandom()),
             deploymentBias.applyAsDouble(state.getRandom()),
             noaBias.applyAsDouble(state.getRandom()),
+            delBias.applyAsDouble(state.getRandom()),
+            ofsBias.applyAsDouble(state.getRandom()),
             minimumValueOpportunisticFadSets.applyAsDouble(state.getRandom()),
             hoursWastedOnFailedSearches.applyAsDouble(state.getRandom()),
             planningHorizonInHours.applyAsDouble(state.getRandom()),
@@ -270,6 +278,23 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     public void setNoaBias(final DoubleParameter noaBias) {
         this.noaBias = noaBias;
     }
+
+    public DoubleParameter getDelBias() {
+        return delBias;
+    }
+
+    public void setDelBias(final DoubleParameter delBias) {
+        this.delBias = delBias;
+    }
+
+    public DoubleParameter getOfsBias() {
+        return ofsBias;
+    }
+
+    public void setOfsBias(final DoubleParameter ofsBias) {
+        this.ofsBias = ofsBias;
+    }
+
 
     public DoubleParameter getDelSetsRangeInSeatiles() {
         return delSetsRangeInSeatiles;

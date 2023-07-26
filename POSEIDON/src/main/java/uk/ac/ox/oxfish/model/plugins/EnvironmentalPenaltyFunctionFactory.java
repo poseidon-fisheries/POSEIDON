@@ -29,8 +29,9 @@ public class EnvironmentalPenaltyFunctionFactory extends EnvironmentalFunctionFa
         final EnvironmentalMapFactory environmentalMapFactory
     ) {
         final String mapName = environmentalMapFactory.getMapVariableName();
-        final double threshold = environmentalMapFactory.getThreshold().applyAsDouble(fishState.getRandom());
+        final double margin = environmentalMapFactory.getMargin().applyAsDouble(fishState.getRandom());
         final double penalty = environmentalMapFactory.getPenalty().applyAsDouble(fishState.getRandom());
+        final double target = environmentalMapFactory.getTarget().applyAsDouble(fishState.getRandom());
         return seaTile -> {
             final double valueHere =
                 fishState.getMap()
@@ -38,7 +39,7 @@ public class EnvironmentalPenaltyFunctionFactory extends EnvironmentalFunctionFa
                     .get(mapName)
                     .get()
                     .get(seaTile.getGridX(), seaTile.getGridY());
-            return Math.pow(Math.min(1d, valueHere / threshold), penalty);
+            return Math.pow(Math.min(1d, margin / Math.abs(target-valueHere) ), penalty);
         };
     }
 

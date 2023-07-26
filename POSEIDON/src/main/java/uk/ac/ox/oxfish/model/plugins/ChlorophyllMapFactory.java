@@ -14,8 +14,9 @@ public class ChlorophyllMapFactory extends EnvironmentalMapFactory {
         super(
             "Chlorophyll",
             gridFile,
-            new CalibratedParameter(0, 0.15, 0, 0.5, 0.1),
-            new CalibratedParameter(1, 3, 1, 3, 2)
+                new CalibratedParameter(26, 27, 25, 28, 26.5), //target
+                new CalibratedParameter(1, 3, 0, 5, 2), //penalty
+                new CalibratedParameter(1.0, 3.0, 0.5, 5.0, 2.25) //margin
         );
     }
 
@@ -25,7 +26,10 @@ public class ChlorophyllMapFactory extends EnvironmentalMapFactory {
     }
 
     @Override
-    public void setThreshold(final DoubleParameter threshold) {
-        super.setThreshold(threshold);
+    public void setTarget(final DoubleParameter target) {
+        super.setTarget(target);
     }
+
+    @Override
+    public void setMargin(final DoubleParameter margin) {super.setMargin(margin);}
 }

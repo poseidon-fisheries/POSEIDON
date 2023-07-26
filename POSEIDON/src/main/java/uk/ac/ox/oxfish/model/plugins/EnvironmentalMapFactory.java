@@ -6,13 +6,16 @@ import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
+import java.util.function.DoubleBinaryOperator;
+
 public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStartable> {
 
     private final int mapPeriod = 365;
     private String mapVariableName;
     private InputPath gridFile;
-    private DoubleParameter threshold;
+    private DoubleParameter target;
     private DoubleParameter penalty;
+    private DoubleParameter margin;
 
     public EnvironmentalMapFactory() {
     }
@@ -20,21 +23,27 @@ public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStart
     public EnvironmentalMapFactory(
         final String mapVariableName,
         final InputPath gridFile,
-        final DoubleParameter threshold,
-        final DoubleParameter penalty
+        final DoubleParameter target,
+        final DoubleParameter penalty,
+        final DoubleParameter margin
     ) {
         this.mapVariableName = mapVariableName;
         this.gridFile = gridFile;
-        this.threshold = threshold;
+        this.margin = margin;
         this.penalty = penalty;
+        this.target = target;
     }
 
-    public DoubleParameter getThreshold() {
-        return threshold;
+    public DoubleParameter getTarget() { return target;}
+
+    public void setTarget(final DoubleParameter target) {
+        this.target = target;
     }
 
-    public void setThreshold(final DoubleParameter threshold) {
-        this.threshold = threshold;
+    public DoubleParameter getMargin() { return margin;}
+
+    public void setMargin(final DoubleParameter margin) {
+        this.margin = margin;
     }
 
     public DoubleParameter getPenalty() {
@@ -69,4 +78,5 @@ public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStart
     public AdditionalStartable apply(final FishState fishState) {
         return new AdditionalMapFactory(mapVariableName, gridFile, mapPeriod).apply(fishState);
     }
+
 }
