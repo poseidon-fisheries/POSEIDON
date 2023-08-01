@@ -23,4 +23,11 @@ public class AllOf implements Condition {
     public boolean test(final Action action) {
         return conditions.stream().allMatch(predicate -> predicate.test(action));
     }
+
+    @Override
+    public String toString() {
+        return "AllOf{" +
+            "conditions=" + conditions +
+            '}';
+    }
 }

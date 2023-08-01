@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,6 +51,7 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
 
     private InputPath catchSamplesFile;
     private boolean yearlyReset = false;
+    private IntegerParameter targetYear;
 
     @SuppressWarnings("WeakerAccess")
     public CatchSamplersFactory() {
@@ -57,9 +59,19 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
 
     @SuppressWarnings("WeakerAccess")
     public CatchSamplersFactory(
-        final InputPath catchSamplesFile
+        final InputPath catchSamplesFile,
+        final IntegerParameter targetYear
     ) {
         this.catchSamplesFile = catchSamplesFile;
+        this.targetYear = targetYear;
+    }
+
+    public IntegerParameter getTargetYear() {
+        return targetYear;
+    }
+
+    public void setTargetYear(final IntegerParameter targetYear) {
+        this.targetYear = targetYear;
     }
 
     @SuppressWarnings("unused")
@@ -77,6 +89,7 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
         final MersenneTwisterFast rng = checkNotNull(fishState).getRandom();
         return new CatchSamplers<>(
             recordStream(catchSamplesFile.get())
+                .filter(r -> r.getInt("year").equals(targetYear.getValue()))
                 .collect(toImmutableListMultimap(
                     r -> getSetActionClass(r.getString("set_type")),
                     r -> getBiomasses(r, fishState.getBiology())

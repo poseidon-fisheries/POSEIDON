@@ -15,13 +15,19 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public class PurseSeinerActionClassToDouble implements ToDoubleFunction<Class<? extends PurseSeinerAction>> {
     private final Map<Class<? extends PurseSeinerAction>, Double> values;
 
-    public PurseSeinerActionClassToDouble(Map<Class<? extends PurseSeinerAction>, Double> values) {
+    public PurseSeinerActionClassToDouble(final Map<Class<? extends PurseSeinerAction>, Double> values) {
         this.values = ImmutableMap.copyOf(values);
     }
 
-    public static PurseSeinerActionClassToDouble fromFile(Path path, String actionColumn, String valueColumn) {
+    public static PurseSeinerActionClassToDouble fromFile(
+        final Path path,
+        final int year,
+        final String actionColumn,
+        final String valueColumn
+    ) {
         return new PurseSeinerActionClassToDouble(
             recordStream(path)
+                .filter(r -> r.getInt("year") == year)
                 .collect(toImmutableMap(
                     r -> ActionClass.valueOf(r.getString(actionColumn)).getActionClass(),
                     r -> r.getDouble(valueColumn)
@@ -34,7 +40,7 @@ public class PurseSeinerActionClassToDouble implements ToDoubleFunction<Class<? 
         return values.toString();
     }
 
-    public PurseSeinerActionClassToDouble mapValues(DoubleUnaryOperator doubleUnaryOperator) {
+    public PurseSeinerActionClassToDouble mapValues(final DoubleUnaryOperator doubleUnaryOperator) {
         return new PurseSeinerActionClassToDouble(
             values.entrySet().stream()
                 .collect(toImmutableMap(
@@ -45,7 +51,7 @@ public class PurseSeinerActionClassToDouble implements ToDoubleFunction<Class<? 
     }
 
     @Override
-    public double applyAsDouble(Class<? extends PurseSeinerAction> purseSeinerActionClass) {
+    public double applyAsDouble(final Class<? extends PurseSeinerAction> purseSeinerActionClass) {
         return values.get(purseSeinerActionClass);
     }
 

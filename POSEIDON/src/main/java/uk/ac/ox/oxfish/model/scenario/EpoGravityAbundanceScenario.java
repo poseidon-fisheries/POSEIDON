@@ -74,7 +74,8 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
                             new CalibratedParameter(0, 0.1, 0, 1, 0.01),
                             getTargetYear()
                         ),
-                        getInputFolder().path("max_current_speeds.csv")
+                        getInputFolder().path("max_current_speeds.csv"),
+                        getTargetYear()
                     )
                 ),
                 new PurseSeinerAbundanceFishingStrategyFactory(
@@ -82,7 +83,8 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
                     getInputFolder().path("action_weights.csv"),
                     new AbundanceCatchSamplersFactory(
                         getAbundanceFiltersFactory(),
-                        getInputFolder().path("set_samples.csv")
+                        getInputFolder().path("set_samples.csv"),
+                        getTargetYear()
                     ),
                     new SetDurationSamplersFactory(
                         getInputFolder().path("set_durations.csv")

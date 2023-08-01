@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,8 @@ import java.util.function.DoubleUnaryOperator;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionField>> {
+
+    private IntegerParameter targetYear;
     private LocationValuesFactory locationValuesFactory;
     private InputPath maxCurrentSpeedsFile;
     private AlgorithmFactory<? extends DoubleUnaryOperator>
@@ -49,10 +52,20 @@ public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionF
 
     public AttractionFieldsFactory(
         final LocationValuesFactory locationValuesFactory,
-        final InputPath maxCurrentSpeedsFile
+        final InputPath maxCurrentSpeedsFile,
+        final IntegerParameter targetYear
     ) {
         this.locationValuesFactory = locationValuesFactory;
         this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
+        this.targetYear = targetYear;
+    }
+
+    public IntegerParameter getTargetYear() {
+        return targetYear;
+    }
+
+    public void setTargetYear(final IntegerParameter targetYear) {
+        this.targetYear = targetYear;
     }
 
     public LocationValuesFactory getLocationValuesSupplier() {
@@ -149,7 +162,7 @@ public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionF
             locationValuesFactory.apply(fishState);
         final PurseSeinerActionClassToDouble maxCurrentSpeed =
             PurseSeinerActionClassToDouble.fromFile(
-                getMaxCurrentSpeedsFile().get(), "action", "speed"
+                getMaxCurrentSpeedsFile().get(), targetYear.getValue(), "action", "speed"
             );
 
         final GlobalSetAttractionModulator globalSetAttractionModulator =

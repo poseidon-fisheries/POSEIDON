@@ -3,10 +3,7 @@ package uk.ac.ox.oxfish.regulation;
 import com.google.common.io.MoreFiles;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.regulation.conditions.AgentHasAnyOfTags;
-import uk.ac.ox.oxfish.regulation.conditions.AllOf;
-import uk.ac.ox.oxfish.regulation.conditions.AnyOf;
-import uk.ac.ox.oxfish.regulation.conditions.InVectorField;
+import uk.ac.ox.oxfish.regulation.conditions.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 import uk.ac.ox.poseidon.regulations.api.Regulation;
@@ -18,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.io.MoreFiles.getFileExtension;
 import static java.util.stream.Collectors.*;
@@ -32,7 +28,10 @@ public class ForbiddenAreasFromShapeFiles implements AlgorithmFactory<Regulation
     public ForbiddenAreasFromShapeFiles() {
     }
 
-    public ForbiddenAreasFromShapeFiles(final InputPath shapeFilesFolder, final InputPath tagsFile) {
+    public ForbiddenAreasFromShapeFiles(
+        final InputPath shapeFilesFolder,
+        final InputPath tagsFile
+    ) {
         this.shapeFilesFolder = shapeFilesFolder;
         this.tagsFile = tagsFile;
     }
@@ -48,33 +47,45 @@ public class ForbiddenAreasFromShapeFiles implements AlgorithmFactory<Regulation
     @Override
     public Regulation apply(final FishState fishState) {
 
-        final Map<String, AlgorithmFactory<Condition>> factoriesByName =
-            makeFactoriesFromShapeFiles();
+        final Map<String, AlgorithmFactory<Condition>> areaConditionsByName =
+            loadAreaConditionsByName();
 
-        final Map<String, List<String>> tagsByName =
+        final Map<Integer, Map<String, List<String>>> tagsByNameByYear =
             recordStream(getTagsFile().get())
-                .collect(groupingBy(
-                    record -> record.getString("name"),
-                    mapping(
-                        record -> record.getString("tag"),
-                        toList()
+                .collect(
+                    groupingBy(
+                        record -> record.getInt("year"),
+                        groupingBy(
+                            record -> record.getString("name"),
+                            mapping(
+                                record -> record.getString("tag"),
+                                toList()
+                            )
+                        )
                     )
-                ));
+                );
 
         return new ForbiddenIf(
             new AnyOf(
-                factoriesByName.entrySet().stream()
-                    .map(entry -> new AllOf(
-                        new AgentHasAnyOfTags(tagsByName.get(entry.getKey())),
-                        entry.getValue()
-                    ))
-                    .collect(toImmutableList())
+                tagsByNameByYear.entrySet().stream().map(yearAndTagsByName ->
+                    new AllOf(
+                        new InYear(yearAndTagsByName.getKey()),
+                        new AnyOf(
+                            yearAndTagsByName.getValue().entrySet().stream().map(nameAndTags ->
+                                new AllOf(
+                                    new AgentHasAnyOfTags(nameAndTags.getValue()),
+                                    areaConditionsByName.get(nameAndTags.getKey())
+                                )
+                            )
+                        )
+                    )
+                )
             )
         ).apply(fishState);
 
     }
 
-    private Map<String, AlgorithmFactory<Condition>> makeFactoriesFromShapeFiles() {
+    private Map<String, AlgorithmFactory<Condition>> loadAreaConditionsByName() {
         try (final Stream<Path> files = Files.list(shapeFilesFolder.get())) {
             return files
                 .filter(path -> getFileExtension(path).equals("shp"))

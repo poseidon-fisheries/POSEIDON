@@ -49,6 +49,16 @@ public class BasicAction implements Action {
     }
 
     @Override
+    public String toString() {
+        return "BasicAction{" +
+            "code='" + code + '\'' +
+            ", agent=" + agent +
+            ", dateTime=" + dateTime +
+            ", coordinate=" + coordinate +
+            '}';
+    }
+
+    @Override
     public String getCode() {
         return code;
     }

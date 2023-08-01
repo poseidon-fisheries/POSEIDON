@@ -70,7 +70,7 @@ public abstract class EpoScenario<B extends LocalBiology>
             "East", entry(new Coordinate(-89.5, 49.5), new Coordinate(-70.5, -49.5))
         )
     );
-    private IntegerParameter targetYear = new IntegerParameter(2017);
+    private IntegerParameter targetYear = new IntegerParameter(2022);
     private InputPath inputFolder = InputPath.of("inputs", "epo_inputs");
     private final InputPath testInputFolder = inputFolder.path("tests");
     private Map<String, AlgorithmFactory<? extends Startable>> additionalStartables =

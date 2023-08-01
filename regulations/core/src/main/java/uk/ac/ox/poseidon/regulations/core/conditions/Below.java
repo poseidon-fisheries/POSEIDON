@@ -21,4 +21,12 @@ public class Below implements Condition {
     public boolean test(final Action action) {
         return quantity.applyAsDouble(action) < limit;
     }
+
+    @Override
+    public String toString() {
+        return "Below{" +
+            "limit=" + limit +
+            ", quantity=" + quantity +
+            '}';
+    }
 }

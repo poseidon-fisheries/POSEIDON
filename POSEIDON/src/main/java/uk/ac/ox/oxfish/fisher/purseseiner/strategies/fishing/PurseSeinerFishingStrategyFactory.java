@@ -140,12 +140,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
         this.biologyClass = biologyClass;
     }
 
-    public Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> loadActionWeights(
-        final Path attractionWeightsFile
-    ) {
-        return loadActionWeights(targetYear.getValue(), attractionWeightsFile);
-    }
-
     public static Function<Fisher, Map<Class<? extends PurseSeinerAction>, Double>> loadActionWeights(
         final int targetYear,
         final Path attractionWeightsFile
@@ -161,14 +155,6 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
                     actionClass
                 )
             ));
-    }
-
-    public IntegerParameter getTargetYear() {
-        return targetYear;
-    }
-
-    public void setTargetYear(final IntegerParameter targetYear) {
-        this.targetYear = targetYear;
     }
 
     @SuppressWarnings("unused")
@@ -308,6 +294,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
         return actionWeightsFile;
     }
 
+    @SuppressWarnings("unused")
     public void setActionWeightsFile(final InputPath actionWeightsFile) {
         this.actionWeightsFile = actionWeightsFile;
     }
@@ -447,7 +434,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
 
         final FishState fishState = fisher.grabState();
 
-        final ImmutableMap<Class<? extends PurseSeinerAction>, ImmutableMap<Species, Double>>
+        final Map<Class<? extends PurseSeinerAction>, Map<Species, Double>>
             setCompositionWeights = loadSetCompositionWeights(fishState);
 
         final Map<Class<? extends AbstractSetAction>, DurationSampler> durationSamplers =
@@ -551,7 +538,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
     /**
      * Convert the max current speeds in m/s per seconds given in the input file into degrees per day.
      * For the purpose of the conversion, we assume that we're at the equator. This means that the max
-     * speeds we calculate in °/day represent lower speeds in m/s as we move away from the equator, and
+     * speeds we calculate in °/day represent lower speeds in m/s as we move away from the equator,
      * and thus that fishers are slightly less tolerant of strong currents away from the equator but the
      * difference is small enough to ignore and doing thing the right way would massively complicate things.
      */
@@ -559,7 +546,12 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
         final Coordinate coordinate = new Coordinate(0, 0);
         final MapExtent mapExtent = nauticalMap.getMapExtent();
         return PurseSeinerActionClassToDouble
-            .fromFile(maxCurrentSpeedsFile.get(), "action", "speed")
+            .fromFile(
+                maxCurrentSpeedsFile.get(),
+                getTargetYear().getValue(),
+                "action",
+                "speed"
+            )
             .mapValues(speed ->
                 metrePerSecondToXyPerDaysVector(
                     new Double2D(speed, 0),
@@ -569,8 +561,7 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
             );
     }
 
-    private ImmutableMap<Class<? extends PurseSeinerAction>, ImmutableMap<Species, Double>>
-    loadSetCompositionWeights(
+    private Map<Class<? extends PurseSeinerAction>, Map<Species, Double>> loadSetCompositionWeights(
         final FishState fishState
     ) {
         return recordStream(setCompositionWeightsFile.get())
@@ -580,18 +571,28 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
             .stream()
             .collect(toImmutableMap(
                 Map.Entry::getKey,
-                entry -> makeWeightMap(fishState, entry.getValue())
+                entry -> makeWeightMap(fishState, entry.getValue(), getTargetYear().getValue())
             ));
     }
 
     abstract CatchMaker<B> getCatchMaker(GlobalBiology globalBiology);
 
+    public IntegerParameter getTargetYear() {
+        return targetYear;
+    }
+
+    public void setTargetYear(final IntegerParameter targetYear) {
+        this.targetYear = targetYear;
+    }
+
     private ImmutableMap<Species, Double> makeWeightMap(
         final FishState fishState,
-        final Collection<Record> records
+        final Collection<? extends Record> records,
+        final int targetYear
     ) {
-        return
-            records.stream().collect(toImmutableMap(
+        return records.stream()
+            .filter(r -> r.getInt("year") == targetYear)
+            .collect(toImmutableMap(
                 r -> fishState.getBiology().getSpeciesByCode(r.getString("species_code").toUpperCase()),
                 r -> r.getDouble("weight")
             ));

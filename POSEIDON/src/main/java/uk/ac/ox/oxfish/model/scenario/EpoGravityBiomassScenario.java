@@ -87,14 +87,16 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
                             new CalibratedParameter(0, 0.1, 0, 1, 0.01),
                             getTargetYear()
                         ),
-                        getInputFolder().path("max_current_speeds.csv")
+                        getInputFolder().path("max_current_speeds.csv"),
+                        getTargetYear()
                     )
                 ),
                 new PurseSeinerBiomassFishingStrategyFactory(
                     getTargetYear(),
                     getInputFolder().path("action_weights.csv"),
                     new BiomassCatchSamplersFactory(
-                        getInputFolder().path("set_samples.csv")
+                        getInputFolder().path("set_samples.csv"),
+                        getTargetYear()
                     ),
                     new SetDurationSamplersFactory(getInputFolder().path("set_durations.csv")),
                     getInputFolder().path("max_current_speeds.csv"),

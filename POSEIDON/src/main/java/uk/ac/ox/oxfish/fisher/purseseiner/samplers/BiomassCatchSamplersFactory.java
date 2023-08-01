@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.util.Collection;
 
@@ -33,9 +34,10 @@ public class BiomassCatchSamplersFactory extends CatchSamplersFactory<BiomassLoc
     }
 
     public BiomassCatchSamplersFactory(
-        final InputPath catchSamplesFile
+        final InputPath catchSamplesFile,
+        final IntegerParameter targetYear
     ) {
-        super(catchSamplesFile);
+        super(catchSamplesFile, targetYear);
     }
 
     @Override

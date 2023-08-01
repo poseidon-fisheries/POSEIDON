@@ -14,4 +14,11 @@ public class InRectangularArea extends CachedCoordinateCondition {
     public boolean test(final Coordinate coordinate) {
         return envelope.contains(coordinate);
     }
+
+    @Override
+    public String toString() {
+        return "InRectangularArea{" +
+            "envelope=" + envelope +
+            '}';
+    }
 }

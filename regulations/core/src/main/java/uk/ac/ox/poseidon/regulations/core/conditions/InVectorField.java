@@ -16,4 +16,10 @@ public class InVectorField extends CachedCoordinateCondition {
         return vectorField.isCovered(coordinate);
     }
 
+    @Override
+    public String toString() {
+        return "InVectorField{" +
+            "vectorField=" + vectorField +
+            '}';
+    }
 }

@@ -14,4 +14,11 @@ public class AgentHasTag implements Condition {
     public boolean test(final Action action) {
         return action.getAgent().getTags().contains(tag);
     }
+
+    @Override
+    public String toString() {
+        return "AgentHasTag{" +
+            "tag='" + tag + '\'' +
+            '}';
+    }
 }

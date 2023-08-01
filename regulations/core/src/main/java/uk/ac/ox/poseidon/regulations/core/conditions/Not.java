@@ -17,4 +17,11 @@ public class Not implements Condition {
     public boolean test(final Action action) {
         return !condition.test(action);
     }
+
+    @Override
+    public String toString() {
+        return "Not{" +
+            "condition=" + condition +
+            '}';
+    }
 }

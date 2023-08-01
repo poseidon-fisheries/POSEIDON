@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.util.Collection;
 
@@ -35,9 +36,10 @@ public class AbundanceCatchSamplersFactory extends CatchSamplersFactory<Abundanc
 
     public AbundanceCatchSamplersFactory(
         final AbundanceFiltersFactory abundanceFilters,
-        final InputPath catchSamplesFile
+        final InputPath catchSamplesFile,
+        final IntegerParameter targetYear
     ) {
-        super(catchSamplesFile);
+        super(catchSamplesFile, targetYear);
         this.abundanceFilters = abundanceFilters;
     }
 

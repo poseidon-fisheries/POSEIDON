@@ -31,4 +31,5 @@ public class AgentHasTag implements AlgorithmFactory<Condition> {
     public Condition apply(final FishState fishState) {
         return new uk.ac.ox.poseidon.regulations.core.conditions.AgentHasTag(tag.getValue());
     }
+
 }

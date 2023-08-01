@@ -6,7 +6,9 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 
 import java.util.Collection;
+import java.util.stream.Stream;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 public class AllOf implements AlgorithmFactory<Condition> {
@@ -18,12 +20,18 @@ public class AllOf implements AlgorithmFactory<Condition> {
 
     @SafeVarargs
     @SuppressWarnings("varargs")
-    public AllOf(final AlgorithmFactory<Condition>... predicates) {
-        this(ImmutableList.copyOf(predicates));
+    public AllOf(final AlgorithmFactory<Condition>... conditions) {
+        this(ImmutableList.copyOf(conditions));
     }
 
-    public AllOf(final Collection<AlgorithmFactory<Condition>> conditions) {
-        this.conditions = conditions;
+    @SuppressWarnings("WeakerAccess")
+    public AllOf(final Collection<? extends AlgorithmFactory<Condition>> conditions) {
+        this.conditions = ImmutableList.copyOf(conditions);
+    }
+
+    @SuppressWarnings("unused")
+    public AllOf(final Stream<? extends AlgorithmFactory<Condition>> conditions) {
+        this(conditions.collect(toImmutableList()));
     }
 
     public Collection<AlgorithmFactory<Condition>> getConditions() {

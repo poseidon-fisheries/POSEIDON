@@ -96,7 +96,8 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                     new ValuePerSetPlanningModuleFactory(),
                     new AbundanceCatchSamplersFactory(
                         getAbundanceFilters(),
-                        getInputFolder().path("set_samples.csv")
+                        getInputFolder().path("set_samples.csv"),
+                        getTargetYear()
                     ),
                     getInputFolder().path("action_weights.csv"),
                     getInputFolder().path("vessels.csv")

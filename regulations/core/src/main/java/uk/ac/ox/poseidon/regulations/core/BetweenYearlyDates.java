@@ -1,13 +1,11 @@
 package uk.ac.ox.poseidon.regulations.core;
 
-import uk.ac.ox.poseidon.agents.api.Action;
-import uk.ac.ox.poseidon.regulations.api.Condition;
-
+import java.time.LocalDate;
 import java.time.MonthDay;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class BetweenYearlyDates implements Condition {
+public class BetweenYearlyDates extends DateCondition {
 
     private final MonthDay start;
     private final MonthDay end;
@@ -32,11 +30,8 @@ public class BetweenYearlyDates implements Condition {
     }
 
     @Override
-    public boolean test(final Action action) {
-        return action.getDateTime()
-            .map(MonthDay::from)
-            .map(this::test)
-            .orElse(false);
+    boolean test(final LocalDate date) {
+        return test(MonthDay.from(date));
     }
 
     boolean test(final MonthDay monthDay) {

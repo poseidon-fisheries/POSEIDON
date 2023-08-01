@@ -55,4 +55,8 @@ public class FixedDoubleParameter extends FixedParameter<Double> implements Doub
     public FixedDoubleParameter makeCopy() {
         return new FixedDoubleParameter(getValue());
     }
+
+    public double getDoubleValue() {
+        return getValue();
+    }
 }

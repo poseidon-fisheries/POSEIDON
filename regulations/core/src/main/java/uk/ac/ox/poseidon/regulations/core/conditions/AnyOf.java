@@ -23,4 +23,11 @@ public class AnyOf implements Condition {
     public boolean test(final Action action) {
         return conditions.stream().anyMatch(predicate -> predicate.test(action));
     }
+
+    @Override
+    public String toString() {
+        return "AnyOf{" +
+            "conditions=" + conditions +
+            '}';
+    }
 }

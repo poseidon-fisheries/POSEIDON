@@ -16,4 +16,11 @@ public class ActionCodeIs implements Condition {
     public boolean test(final Action action) {
         return actionCode.equals(action.getCode());
     }
+
+    @Override
+    public String toString() {
+        return "ActionCodeIs{" +
+            "actionCode='" + actionCode + '\'' +
+            '}';
+    }
 }
