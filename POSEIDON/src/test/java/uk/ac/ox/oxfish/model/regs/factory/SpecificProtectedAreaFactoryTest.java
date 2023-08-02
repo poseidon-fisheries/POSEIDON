@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.regulation.ForbiddenAreasFromShapeFiles;
+import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.agents.core.BasicAction;
 import uk.ac.ox.poseidon.regulations.api.Regulation;
 import uk.ac.ox.poseidon.regulations.core.ConditionalRegulation;
@@ -77,7 +78,7 @@ class SpecificProtectedAreaFactoryTest {
                         record -> record.getString("flag"),
                         mapping(
                             record -> new TestPoint(
-                                record.getString("eez_name"),
+                                record.getString("name"),
                                 record.getInt("year"),
                                 record.getString("flag"),
                                 record.getBoolean("allowed"),
@@ -92,7 +93,7 @@ class SpecificProtectedAreaFactoryTest {
             testPoints
                 .get(getLast(fisher.getTagsList()))
                 .forEach(testPoint -> {
-                    final BasicAction action = new BasicAction(
+                    final Action action = new BasicAction(
                         "FAD",
                         fisher,
                         LocalDate.of(testPoint.year, 1, 1).atStartOfDay(),
