@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcesses;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
 import uk.ac.ox.oxfish.environment.EnvironmentalMapFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.DefaultEpoRegulations;
 import uk.ac.ox.oxfish.fisher.purseseiner.EmptyFleet;
 import uk.ac.ox.oxfish.geography.MapExtentFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -43,6 +44,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 import uk.ac.ox.oxfish.utility.parameters.StringParameter;
+import uk.ac.ox.poseidon.regulations.api.Regulation;
 
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -84,6 +86,7 @@ public abstract class EpoScenario<B extends LocalBiology>
                 getInputFolder().path("currents", "shear.csv")
             )
         ));
+    private AlgorithmFactory<? extends Regulation> regulations = DefaultEpoRegulations.make(getInputFolder());
     private BiologicalProcessesFactory<B> biologicalProcesses;
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
         inputFolder,
@@ -104,6 +107,14 @@ public abstract class EpoScenario<B extends LocalBiology>
 
     public static int dayOfYear(final int year, final Month month, final int dayOfMonth) {
         return LocalDate.of(year, month, dayOfMonth).getDayOfYear();
+    }
+
+    public AlgorithmFactory<? extends Regulation> getRegulations() {
+        return regulations;
+    }
+
+    public void setRegulations(final AlgorithmFactory<? extends Regulation> regulations) {
+        this.regulations = regulations;
     }
 
     public IntegerParameter getTargetYear() {
@@ -217,7 +228,10 @@ public abstract class EpoScenario<B extends LocalBiology>
             .getBiologyInitializer()
             .processMap(globalBiology, nauticalMap, fishState.random, fishState);
 
-        return new ScenarioEssentials(globalBiology, nauticalMap);
+        return new ScenarioEssentials(
+            globalBiology,
+            nauticalMap
+        );
     }
 
     public AlgorithmFactory<? extends MapInitializer> getMapInitializer() {

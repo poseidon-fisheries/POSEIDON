@@ -28,11 +28,10 @@ public interface PlannedAction {
     static boolean isActionAllowed(
         final Fisher fisher,
         final SeaTile location,
-        final FadManager fadManager,
         final uk.ac.ox.poseidon.agents.api.Action action
     ) {
         return fisher.isAllowedAtSea() &&
-            fadManager.getRegulation().isPermitted(action) &&
+            fisher.grabState().getRegulation().isPermitted(action) &&
             //we should be allowed to fish here
             fisher.isAllowedToFishHere(location, fisher.grabState());
     }
@@ -98,7 +97,7 @@ public interface PlannedAction {
         @Override
         public boolean isAllowedNow(final Fisher fisher) {
             return fisher.isAllowedAtSea() &&
-                !getFadManager(fisher)
+                !fisher.grabState()
                     .getRegulation()
                     .isForbidden(new FadDeploymentAction(fisher));
         }
@@ -138,7 +137,6 @@ public interface PlannedAction {
                 isActionAllowed(
                     fisher,
                     fad.getLocation(),
-                    fadManager,
                     new FadSetAction(fad, fisher, 0) // fake action just to check for legality
                 );
         }
@@ -200,7 +198,6 @@ public interface PlannedAction {
             return isActionAllowed(
                 fisher,
                 getLocation(),
-                getFadManager(fisher),
                 new FadManager.DummyAction(OFS.name(), fisher) // fake action just to check for legality
             );
         }
@@ -369,7 +366,6 @@ public interface PlannedAction {
             return isActionAllowed(
                 fisher,
                 getLocation(),
-                getFadManager(fisher),
                 makeDummyPlannedAction(fisher)
             );
         }

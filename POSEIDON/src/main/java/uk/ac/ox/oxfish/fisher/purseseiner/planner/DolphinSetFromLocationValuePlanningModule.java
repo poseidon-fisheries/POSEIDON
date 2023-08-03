@@ -53,7 +53,8 @@ public class DolphinSetFromLocationValuePlanningModule<B extends LocalBiology>
     @Override
     public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
         return getFadManager(fisher).numberOfPermissibleActions(
-            DEL, 1000
+            DEL, 1000,
+            state.getRegulation()
         );
     }
 }

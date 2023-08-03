@@ -24,16 +24,14 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.poseidon.regulations.api.Regulation;
 
 public class BiomassPurseSeineGearFactory extends PurseSeineGearFactory {
 
     public BiomassPurseSeineGearFactory(
-        final AlgorithmFactory<? extends Regulation> regulationsFactory,
         final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory,
         final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory
     ) {
-        super(regulationsFactory, fadInitializerFactory, fishValueCalculatorFactory);
+        super(fadInitializerFactory, fishValueCalculatorFactory);
     }
 
     public BiomassPurseSeineGearFactory() {

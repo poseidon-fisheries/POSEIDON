@@ -31,7 +31,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanc
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.geography.fads.LinearAbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.regulation.EverythingPermitted;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 
 /**
@@ -51,7 +50,6 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
                 getTargetYear(),
                 getInputFolder(),
                 new AbundancePurseSeineGearFactory(
-                    new EverythingPermitted(),
                     new LinearAbundanceFadInitializerFactory(
                         getAbundanceFiltersFactory(),
                         "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"

@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.DefaultEpoRegulations;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.SelectivityAbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullPerSpeciesCarryingCapacitiesFactory;
@@ -34,7 +33,6 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                 getTargetYear(),
                 getInputFolder(),
                 new AbundancePurseSeineGearFactory(
-                    DefaultEpoRegulations.make(getInputFolder()),
                     new SelectivityAbundanceFadInitializerFactory(
                         // see https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1545974455
                         // for Weibull parameter values, obtained by fitting the distributions to observer data

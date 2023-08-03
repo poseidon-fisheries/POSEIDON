@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.BiomassPurseSeineGearFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.DefaultEpoRegulations;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
@@ -45,7 +44,6 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
                 getTargetYear(),
                 getInputFolder(),
                 new BiomassPurseSeineGearFactory(
-                    DefaultEpoRegulations.make(getInputFolder()),
                     new CompressedBiomassFadInitializerFactory(
                         // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
                         ImmutableMap.of(

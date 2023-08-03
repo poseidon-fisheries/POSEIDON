@@ -9,7 +9,7 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.FAD;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule {
-    
+
     private static final int MAX_OWN_FAD_SETS = 100;
     final protected OwnFadSetDiscretizedActionGenerator optionsGenerator;
     protected double speedInKmPerHours;
@@ -109,9 +109,12 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
      */
     @Override
     public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
-        return getFadManager(fisher).numberOfPermissibleActions(
-            FAD, MAX_OWN_FAD_SETS
-        );
+        return getFadManager(fisher)
+            .numberOfPermissibleActions(
+                FAD,
+                MAX_OWN_FAD_SETS,
+                state.getRegulation()
+            );
     }
 
 }

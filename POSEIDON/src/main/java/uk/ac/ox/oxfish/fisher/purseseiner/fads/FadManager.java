@@ -69,7 +69,6 @@ public class FadManager {
             DolphinSetAction.class,
             NonAssociatedSetAction.class
         );
-    private final Regulation regulation;
     private final FadMap fadMap;
     private final Observers observers = new Observers();
     private final YearlyActionCounter yearlyActionCounter;
@@ -82,14 +81,12 @@ public class FadManager {
     private int numFadsInStock;
 
     public FadManager(
-        final Regulation regulation,
         final FadMap fadMap,
         final FadInitializer<?, ?> fadInitializer,
         final YearlyActionCounter yearlyActionCounter,
         final FishValueCalculator fishValueCalculator
     ) {
         this(
-            regulation,
             fadMap,
             fadInitializer,
             yearlyActionCounter,
@@ -110,7 +107,6 @@ public class FadManager {
      */
     @SuppressWarnings("rawtypes")
     public FadManager(
-        final Regulation regulation,
         final FadMap fadMap,
         final FadInitializer<?, ?> fadInitializer,
         final YearlyActionCounter yearlyActionCounter,
@@ -122,7 +118,6 @@ public class FadManager {
         final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor,
         final FishValueCalculator fishValueCalculator
     ) {
-        this.regulation = regulation;
         this.fadMap = fadMap;
         this.fadInitializer = fadInitializer;
         this.yearlyActionCounter = yearlyActionCounter;
@@ -193,11 +188,12 @@ public class FadManager {
 
     public int numberOfPermissibleActions(
         final ActionClass actionClass,
-        final int limit
+        final int limit,
+        final Regulation regulation
     ) {
         return numberOfPermissibleActions(
             getFisher(),
-            getRegulation(),
+            regulation,
             getYearlyActionCounter(),
             getNumberOfActiveFads(),
             actionClass,
@@ -236,10 +232,6 @@ public class FadManager {
 
     public Fisher getFisher() {
         return fisher;
-    }
-
-    public Regulation getRegulation() {
-        return regulation;
     }
 
     public YearlyActionCounter getYearlyActionCounter() {

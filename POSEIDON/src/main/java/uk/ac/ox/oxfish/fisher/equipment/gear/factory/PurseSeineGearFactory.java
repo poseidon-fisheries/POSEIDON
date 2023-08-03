@@ -21,7 +21,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.poseidon.agents.core.AtomicLongMapYearlyActionCounter;
 import uk.ac.ox.poseidon.common.api.Observer;
-import uk.ac.ox.poseidon.regulations.api.Regulation;
 
 import javax.measure.quantity.Mass;
 import java.util.LinkedHashSet;
@@ -67,27 +66,16 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     private InputPath locationValuesFile;
     private AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializer;
     private AlgorithmFactory<? extends FishValueCalculator> fishValueCalculator;
-    private AlgorithmFactory<? extends Regulation> regulations;
 
     public PurseSeineGearFactory() {
     }
 
     public PurseSeineGearFactory(
-        final AlgorithmFactory<? extends Regulation> regulations,
         final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializer,
         final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculator
     ) {
-        this.regulations = regulations;
         this.fadInitializer = fadInitializer;
         this.fishValueCalculator = fishValueCalculator;
-    }
-
-    public AlgorithmFactory<? extends Regulation> getRegulations() {
-        return regulations;
-    }
-
-    public void setRegulations(final AlgorithmFactory<? extends Regulation> regulations) {
-        this.regulations = regulations;
     }
 
     public AlgorithmFactory<? extends FishValueCalculator> getFishValueCalculator() {
@@ -138,7 +126,6 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         final MersenneTwisterFast rng = fishState.getRandom();
         final GlobalBiology globalBiology = fishState.getBiology();
         return new FadManager(
-            regulations.apply(fishState),
             fishState.getFadMap(),
             fadInitializer.apply(fishState),
             AtomicLongMapYearlyActionCounter.create(),

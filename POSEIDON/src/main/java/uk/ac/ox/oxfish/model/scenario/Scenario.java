@@ -21,6 +21,9 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.regulation.EverythingPermitted;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.regulations.api.Regulation;
 
 import java.time.LocalDate;
 
@@ -46,6 +49,10 @@ public interface Scenario {
      * @return a list of agents
      */
     ScenarioPopulation populateModel(FishState model);
+
+    default AlgorithmFactory<? extends Regulation> getRegulations() {
+        return new EverythingPermitted();
+    }
 
     default LocalDate getStartDate() {
         return LocalDate.now();

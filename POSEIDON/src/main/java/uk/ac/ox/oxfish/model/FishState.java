@@ -56,6 +56,7 @@ import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
 import uk.ac.ox.oxfish.model.scenario.*;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
+import uk.ac.ox.poseidon.regulations.api.Regulation;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -67,6 +68,7 @@ import java.util.function.ToDoubleBiFunction;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
 /**
  * The main model object. Like all the other simstates it holds the reference
@@ -125,6 +127,10 @@ public class FishState extends SimState {
      */
     private GlobalBiology biology;
     /**
+     * The regulations in place while the simulation is running.
+     */
+    private Regulation regulation = PERMITTED;
+    /**
      * the list of agents. Observable so it can be listened to for changes
      */
     private ObservableList<Fisher> fishers;
@@ -174,7 +180,6 @@ public class FishState extends SimState {
 
     }
 
-
     /**
      * create a fishstate model with one step per day
      *
@@ -190,6 +195,10 @@ public class FishState extends SimState {
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
+    }
+
+    public Regulation getRegulation() {
+        return regulation;
     }
 
     public int getStepsPerDay() {
@@ -239,13 +248,9 @@ public class FishState extends SimState {
 
         final ScenarioEssentials initialization = scenario.start(this);
 
-        //read raster bathymetry
-        //  map = NauticalMap.initializeWithDefaultValues();
         map = initialization.getMap();
-        //      map.addCities("cities/cities.shp");
-
         biology = initialization.getBiology();
-
+        regulation = scenario.getRegulations().apply(this);
 
         final ScenarioPopulation scenarioPopulation = scenario.populateModel(this);
         fisherFactory = scenarioPopulation.getFactory();

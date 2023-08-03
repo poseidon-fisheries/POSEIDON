@@ -58,14 +58,14 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.planner.OwnFadSetDiscretizedAct
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
-public class OwnFadSetDiscretizedActionGeneratorTest {
+class OwnFadSetDiscretizedActionGeneratorTest {
 
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
-    public void test() {
+    void test() {
 
         final FishState fishState = mock(FishState.class);
+        when(fishState.getRegulation()).thenReturn(PERMITTED);
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
         final PurseSeineGear gear = mock(PurseSeineGear.class);
@@ -73,7 +73,6 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         when(gear.getFadManager()).thenReturn(mock(FadManager.class));
         when(gear.isSafe(any())).thenReturn(true);
         final FadManager fadManager = gear.getFadManager();
-        when(fadManager.getRegulation()).thenReturn(PERMITTED);
         when(fadManager.getFadMap()).thenReturn(fadMap);
         when(fadManager.getFisher()).thenReturn(fisher);
 
@@ -152,10 +151,10 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
 
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
-    public void filterByValue() {
+    void filterByValue() {
         final FishState fishState = mock(FishState.class);
+        when(fishState.getRegulation()).thenReturn(PERMITTED);
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
         final PurseSeineGear gear = mock(PurseSeineGear.class);
@@ -163,7 +162,6 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
         when(gear.isSafe(any())).thenReturn(true);
         final FadManager fadManager = gear.getFadManager();
         when(fadManager.getFisher()).thenReturn(fisher);
-        when(fadManager.getRegulation()).thenReturn(PERMITTED);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);
@@ -211,10 +209,10 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
     }
 
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
-    public void banLocations() {
+    void banLocations() {
         final FishState fishState = mock(FishState.class);
+        when(fishState.getRegulation()).thenReturn(PERMITTED);
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
         final PurseSeineGear gear =
@@ -225,7 +223,6 @@ public class OwnFadSetDiscretizedActionGeneratorTest {
             );
         final FadManager fadManager = gear.getFadManager();
         when(fadManager.getFisher()).thenReturn(fisher);
-        when(fadManager.getRegulation()).thenReturn(PERMITTED);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);

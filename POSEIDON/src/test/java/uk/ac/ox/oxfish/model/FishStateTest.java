@@ -34,6 +34,7 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
+import uk.ac.ox.oxfish.regulation.EverythingPermitted;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedList;
@@ -53,6 +54,7 @@ public class FishStateTest {
 
         final FishState state = new FishState(1L);
         final Scenario scenario = mock(Scenario.class);
+        when(scenario.getRegulations()).thenAnswer(__ -> new EverythingPermitted());
         final ScenarioEssentials result = mock(ScenarioEssentials.class);
         when(result.getBiology()).thenReturn(mock(GlobalBiology.class));
         when(scenario.start(state)).thenReturn(result);

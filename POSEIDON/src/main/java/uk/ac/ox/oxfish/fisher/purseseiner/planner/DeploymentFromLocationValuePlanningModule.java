@@ -78,7 +78,8 @@ public class DeploymentFromLocationValuePlanningModule
         final FadManager fadManager = getFadManager(fisher);
         return fadManager.numberOfPermissibleActions(
             DPL,
-            fadManager.getNumFadsInStock()
+            fadManager.getNumFadsInStock(),
+            state.getRegulation()
         );
     }
 }

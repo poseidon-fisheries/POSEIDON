@@ -20,7 +20,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
 public class BiomassFadInitializerTest {
 
@@ -45,7 +44,6 @@ public class BiomassFadInitializerTest {
             );
         final FadManager fadManager =
             new FadManager(
-                PERMITTED,
                 fadMap,
                 fadInitializer,
                 null,

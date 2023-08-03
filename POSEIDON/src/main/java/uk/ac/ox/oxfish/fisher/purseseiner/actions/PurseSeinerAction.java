@@ -35,7 +35,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
 
-import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.maybeGetFadManager;
 
 public abstract class PurseSeinerAction
@@ -67,12 +66,7 @@ public abstract class PurseSeinerAction
     }
 
     public boolean checkIfPermitted() {
-        final Optional<FadManager> fadManager =
-            Optional.of(getFadManager(getFisher()));
-        final boolean forbiddenByRegulations = fadManager
-            .map(fm -> fm.getRegulation().isForbidden(this))
-            .orElse(false);
-        return !forbiddenByRegulations;
+        return getFisher().grabState().getRegulation().isPermitted(this);
     }
 
     public Fisher getFisher() {

@@ -30,12 +30,11 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 public class ScenarioEssentials {
 
     private final GlobalBiology biology;
-
     private final NauticalMap map;
 
-
     public ScenarioEssentials(
-        GlobalBiology biology, NauticalMap map
+        final GlobalBiology biology,
+        final NauticalMap map
     ) {
         this.biology = biology;
         this.map = map;
@@ -48,6 +47,5 @@ public class ScenarioEssentials {
     public NauticalMap getMap() {
         return map;
     }
-
 
 }

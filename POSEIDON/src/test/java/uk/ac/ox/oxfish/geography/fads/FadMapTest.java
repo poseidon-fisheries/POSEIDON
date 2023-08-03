@@ -22,7 +22,6 @@ import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
-import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
 public class FadMapTest {
 
@@ -74,7 +73,6 @@ public class FadMapTest {
 
         final FadManager fadManager =
             new FadManager(
-                PERMITTED,
                 fadMap,
                 fadInitializer,
                 null,

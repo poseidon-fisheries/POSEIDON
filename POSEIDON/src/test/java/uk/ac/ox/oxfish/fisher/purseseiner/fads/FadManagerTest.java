@@ -68,7 +68,7 @@ public class FadManagerTest {
         final FadMap fadMap = mock(FadMap.class);
 
         final FadManager fadManager =
-            new FadManager(PERMITTED, fadMap, fadInitializer, null, null);
+            new FadManager(fadMap, fadInitializer, null, null);
 
         final PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);
@@ -78,6 +78,7 @@ public class FadManagerTest {
         when(fishState.getStep()).thenReturn(1);
         when(fishState.getFadMap()).thenReturn(fadMap);
         when(fishState.getBiology()).thenReturn(globalBiology);
+        when(fishState.getRegulation()).thenReturn(PERMITTED);
 
         final MersenneTwisterFast rng = mock(MersenneTwisterFast.class);
 

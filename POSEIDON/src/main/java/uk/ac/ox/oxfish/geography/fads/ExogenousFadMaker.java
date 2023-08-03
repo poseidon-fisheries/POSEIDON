@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
-
 /**
  * this object deploys and sets on FADs but without an associated boat or owner. In other words
  * it is useful to generate exogenous FAD setting other for microsimulation purposes, calibration or
@@ -86,7 +84,6 @@ public class ExogenousFadMaker<B extends LocalBiology, F extends Fad> implements
 
         //create the fad manager
         fadManager = new FadManager(
-            PERMITTED,
             model.getFadMap(),
             fadInitializer,
             null,
