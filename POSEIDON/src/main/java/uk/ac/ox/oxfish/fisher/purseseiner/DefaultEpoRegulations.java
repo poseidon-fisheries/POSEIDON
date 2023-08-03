@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
 import uk.ac.ox.oxfish.regulation.quantities.SumOf;
 import uk.ac.ox.oxfish.regulation.quantities.YearlyActionCount;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.poseidon.regulations.api.Regulation;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import static java.time.Month.*;
 
@@ -19,7 +19,7 @@ public class DefaultEpoRegulations {
     private DefaultEpoRegulations() {
     }
 
-    public static AlgorithmFactory<Regulation> make(final InputPath inputFolder) {
+    public static AlgorithmFactory<Regulations> make(final InputPath inputFolder) {
 
         final InputPath regions = inputFolder.path("regions");
 

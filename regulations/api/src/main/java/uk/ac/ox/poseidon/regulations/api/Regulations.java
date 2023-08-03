@@ -5,7 +5,7 @@ import uk.ac.ox.poseidon.agents.api.Action;
 import static uk.ac.ox.poseidon.regulations.api.Mode.FORBIDDEN;
 import static uk.ac.ox.poseidon.regulations.api.Mode.MANDATORY;
 
-public interface Regulation {
+public interface Regulations {
 
     default boolean isPermitted(final Action action) {
         // the action is permitted of the mode is either

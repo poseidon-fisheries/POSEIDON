@@ -46,7 +46,7 @@ public class GlobalSetAttractionModulator implements GlobalAttractionModulator {
             .stream(ActionClass.values())
             .filter(actionClass -> actionClass != ActionClass.DPL)
             .mapToInt(actionClass ->
-                fadManager.numberOfPermissibleActions(actionClass, 100, fisher.grabState().getRegulation())
+                fadManager.numberOfPermissibleActions(actionClass, 100, fisher.grabState().getRegulations())
             )
             .mapToDouble(x ->
                 L / (1 + exp(-k * (x - x0))) - L / (1 + exp(k * x0))

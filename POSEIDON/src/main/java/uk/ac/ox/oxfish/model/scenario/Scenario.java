@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.model.scenario;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.regulation.EverythingPermitted;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.poseidon.regulations.api.Regulation;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.time.LocalDate;
 
@@ -50,7 +50,7 @@ public interface Scenario {
      */
     ScenarioPopulation populateModel(FishState model);
 
-    default AlgorithmFactory<? extends Regulation> getRegulations() {
+    default AlgorithmFactory<? extends Regulations> getRegulations() {
         return new EverythingPermitted();
     }
 

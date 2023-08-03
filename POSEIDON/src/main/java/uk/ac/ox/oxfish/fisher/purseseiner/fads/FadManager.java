@@ -42,7 +42,7 @@ import uk.ac.ox.poseidon.agents.api.Agent;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
 import uk.ac.ox.poseidon.agents.core.BasicAction;
 import uk.ac.ox.poseidon.common.api.Observer;
-import uk.ac.ox.poseidon.regulations.api.Regulation;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import javax.measure.quantity.Mass;
 import java.time.LocalDateTime;
@@ -189,11 +189,11 @@ public class FadManager {
     public int numberOfPermissibleActions(
         final ActionClass actionClass,
         final int limit,
-        final Regulation regulation
+        final Regulations regulations
     ) {
         return numberOfPermissibleActions(
             getFisher(),
-            regulation,
+            regulations,
             getYearlyActionCounter(),
             getNumberOfActiveFads(),
             actionClass,
@@ -203,7 +203,7 @@ public class FadManager {
 
     public static int numberOfPermissibleActions(
         final Fisher fisher,
-        final Regulation regulation,
+        final Regulations regulations,
         final YearlyActionCounter yearlyActionCounter,
         final long numberOfActiveFads,
         final ActionClass actionClass,
@@ -222,7 +222,7 @@ public class FadManager {
             dummyNumberOfActiveFads
         );
         int i = 0;
-        while (i < limit && regulation.isPermitted(dummyAction)) {
+        while (i < limit && regulations.isPermitted(dummyAction)) {
             i++;
             dummyYearlyActionCounter.observe(dummyAction);
             if (actionClass == DPL) dummyNumberOfActiveFads.incrementAndGet();

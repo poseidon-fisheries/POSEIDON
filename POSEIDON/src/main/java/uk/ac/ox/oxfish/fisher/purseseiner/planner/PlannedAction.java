@@ -31,7 +31,7 @@ public interface PlannedAction {
         final uk.ac.ox.poseidon.agents.api.Action action
     ) {
         return fisher.isAllowedAtSea() &&
-            fisher.grabState().getRegulation().isPermitted(action) &&
+            fisher.grabState().getRegulations().isPermitted(action) &&
             //we should be allowed to fish here
             fisher.isAllowedToFishHere(location, fisher.grabState());
     }
@@ -98,7 +98,7 @@ public interface PlannedAction {
         public boolean isAllowedNow(final Fisher fisher) {
             return fisher.isAllowedAtSea() &&
                 !fisher.grabState()
-                    .getRegulation()
+                    .getRegulations()
                     .isForbidden(new FadDeploymentAction(fisher));
         }
 

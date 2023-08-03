@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.regulation.conditions.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.regulations.api.Condition;
-import uk.ac.ox.poseidon.regulations.api.Regulation;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,7 +20,7 @@ import static com.google.common.io.MoreFiles.getFileExtension;
 import static java.util.stream.Collectors.*;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public class ForbiddenAreasFromShapeFiles implements AlgorithmFactory<Regulation> {
+public class ForbiddenAreasFromShapeFiles implements AlgorithmFactory<Regulations> {
 
     private InputPath shapeFilesFolder;
     private InputPath tagsFile;
@@ -45,7 +45,7 @@ public class ForbiddenAreasFromShapeFiles implements AlgorithmFactory<Regulation
     }
 
     @Override
-    public Regulation apply(final FishState fishState) {
+    public Regulations apply(final FishState fishState) {
 
         final Map<String, AlgorithmFactory<Condition>> areaConditionsByName =
             loadAreaConditionsByName();

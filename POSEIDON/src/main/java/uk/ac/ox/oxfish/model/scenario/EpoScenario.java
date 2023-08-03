@@ -44,7 +44,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 import uk.ac.ox.oxfish.utility.parameters.StringParameter;
-import uk.ac.ox.poseidon.regulations.api.Regulation;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -86,7 +86,7 @@ public abstract class EpoScenario<B extends LocalBiology>
                 getInputFolder().path("currents", "shear.csv")
             )
         ));
-    private AlgorithmFactory<? extends Regulation> regulations = DefaultEpoRegulations.make(getInputFolder());
+    private AlgorithmFactory<? extends Regulations> regulations = DefaultEpoRegulations.make(getInputFolder());
     private BiologicalProcessesFactory<B> biologicalProcesses;
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
         inputFolder,
@@ -109,11 +109,11 @@ public abstract class EpoScenario<B extends LocalBiology>
         return LocalDate.of(year, month, dayOfMonth).getDayOfYear();
     }
 
-    public AlgorithmFactory<? extends Regulation> getRegulations() {
+    public AlgorithmFactory<? extends Regulations> getRegulations() {
         return regulations;
     }
 
-    public void setRegulations(final AlgorithmFactory<? extends Regulation> regulations) {
+    public void setRegulations(final AlgorithmFactory<? extends Regulations> regulations) {
         this.regulations = regulations;
     }
 

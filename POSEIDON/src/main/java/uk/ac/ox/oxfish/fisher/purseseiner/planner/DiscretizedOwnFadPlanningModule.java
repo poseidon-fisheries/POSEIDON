@@ -113,7 +113,7 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
             .numberOfPermissibleActions(
                 FAD,
                 MAX_OWN_FAD_SETS,
-                state.getRegulation()
+                state.getRegulations()
             );
     }
 

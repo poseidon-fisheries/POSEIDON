@@ -66,7 +66,7 @@ public abstract class PurseSeinerAction
     }
 
     public boolean checkIfPermitted() {
-        return getFisher().grabState().getRegulation().isPermitted(this);
+        return getFisher().grabState().getRegulations().isPermitted(this);
     }
 
     public Fisher getFisher() {

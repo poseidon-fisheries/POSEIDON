@@ -10,8 +10,8 @@ import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.regulation.ForbiddenAreasFromShapeFiles;
 import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.agents.core.BasicAction;
-import uk.ac.ox.poseidon.regulations.api.Regulation;
-import uk.ac.ox.poseidon.regulations.core.ConditionalRegulation;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
+import uk.ac.ox.poseidon.regulations.core.ConditionalRegulations;
 import uk.ac.ox.poseidon.regulations.core.conditions.AllOf;
 import uk.ac.ox.poseidon.regulations.core.conditions.AnyOf;
 import uk.ac.ox.poseidon.regulations.core.conditions.InVectorField;
@@ -34,13 +34,13 @@ class SpecificProtectedAreaFactoryTest {
     private final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
 
     private final InputPath regionsFolder = InputPath.of("inputs", "epo_inputs", "regions");
-    private final Regulation regulation =
+    private final Regulations regulations =
         new ForbiddenAreasFromShapeFiles(
             regionsFolder,
             regionsFolder.path("region_tags.csv")
         ).apply(fishState);
     private final List<InVectorField> vectorFields =
-        ((AnyOf) ((ConditionalRegulation) regulation).getCondition())
+        ((AnyOf) ((ConditionalRegulations) regulations).getCondition())
             .getConditions()
             .stream()
             .map(AllOf.class::cast)
@@ -101,7 +101,7 @@ class SpecificProtectedAreaFactoryTest {
                     );
                     assertEquals(
                         testPoint.shouldBeAllowed,
-                        regulation.isPermitted(action),
+                        regulations.isPermitted(action),
                         () -> action + ", " + testPoint
                     );
                 })

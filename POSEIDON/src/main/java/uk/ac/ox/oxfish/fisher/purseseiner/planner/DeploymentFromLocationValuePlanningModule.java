@@ -79,7 +79,7 @@ public class DeploymentFromLocationValuePlanningModule
         return fadManager.numberOfPermissibleActions(
             DPL,
             fadManager.getNumFadsInStock(),
-            state.getRegulation()
+            state.getRegulations()
         );
     }
 }

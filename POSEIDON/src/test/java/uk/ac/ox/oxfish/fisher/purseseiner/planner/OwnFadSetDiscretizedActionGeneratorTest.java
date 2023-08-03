@@ -65,7 +65,7 @@ class OwnFadSetDiscretizedActionGeneratorTest {
     void test() {
 
         final FishState fishState = mock(FishState.class);
-        when(fishState.getRegulation()).thenReturn(PERMITTED);
+        when(fishState.getRegulations()).thenReturn(PERMITTED);
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
         final PurseSeineGear gear = mock(PurseSeineGear.class);
@@ -154,7 +154,7 @@ class OwnFadSetDiscretizedActionGeneratorTest {
     @Test
     void filterByValue() {
         final FishState fishState = mock(FishState.class);
-        when(fishState.getRegulation()).thenReturn(PERMITTED);
+        when(fishState.getRegulations()).thenReturn(PERMITTED);
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
         final PurseSeineGear gear = mock(PurseSeineGear.class);
@@ -212,7 +212,7 @@ class OwnFadSetDiscretizedActionGeneratorTest {
     @Test
     void banLocations() {
         final FishState fishState = mock(FishState.class);
-        when(fishState.getRegulation()).thenReturn(PERMITTED);
+        when(fishState.getRegulations()).thenReturn(PERMITTED);
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
         final PurseSeineGear gear =

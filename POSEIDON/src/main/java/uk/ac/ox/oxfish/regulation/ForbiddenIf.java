@@ -3,13 +3,13 @@ package uk.ac.ox.oxfish.regulation;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.regulations.api.Condition;
-import uk.ac.ox.poseidon.regulations.api.Regulation;
-import uk.ac.ox.poseidon.regulations.core.ConditionalRegulation;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
+import uk.ac.ox.poseidon.regulations.core.ConditionalRegulations;
 
 import static uk.ac.ox.poseidon.regulations.api.Mode.FORBIDDEN;
 import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
-public class ForbiddenIf implements AlgorithmFactory<Regulation> {
+public class ForbiddenIf implements AlgorithmFactory<Regulations> {
     private AlgorithmFactory<Condition> condition;
 
     @SuppressWarnings("unused")
@@ -29,8 +29,8 @@ public class ForbiddenIf implements AlgorithmFactory<Regulation> {
     }
 
     @Override
-    public Regulation apply(final FishState fishState) {
-        return new ConditionalRegulation(
+    public Regulations apply(final FishState fishState) {
+        return new ConditionalRegulations(
             condition.apply(fishState),
             FORBIDDEN,
             PERMITTED

@@ -152,6 +152,7 @@ import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 import uk.ac.ox.poseidon.regulations.api.Quantity;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -692,7 +693,7 @@ public class AlgorithmFactories {
             NotBelow.class
         ));
         addFactories(new Factories<>(
-            uk.ac.ox.poseidon.regulations.api.Regulation.class,
+            Regulations.class,
             NamedRegulations.class,
             EverythingForbidden.class,
             EverythingPermitted.class,

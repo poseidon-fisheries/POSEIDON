@@ -56,7 +56,7 @@ import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
 import uk.ac.ox.oxfish.model.scenario.*;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
-import uk.ac.ox.poseidon.regulations.api.Regulation;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -129,7 +129,7 @@ public class FishState extends SimState {
     /**
      * The regulations in place while the simulation is running.
      */
-    private Regulation regulation = PERMITTED;
+    private Regulations regulations = PERMITTED;
     /**
      * the list of agents. Observable so it can be listened to for changes
      */
@@ -197,8 +197,8 @@ public class FishState extends SimState {
         return bd.doubleValue();
     }
 
-    public Regulation getRegulation() {
-        return regulation;
+    public Regulations getRegulations() {
+        return regulations;
     }
 
     public int getStepsPerDay() {
@@ -250,7 +250,7 @@ public class FishState extends SimState {
 
         map = initialization.getMap();
         biology = initialization.getBiology();
-        regulation = scenario.getRegulations().apply(this);
+        regulations = scenario.getRegulations().apply(this);
 
         final ScenarioPopulation scenarioPopulation = scenario.populateModel(this);
         fisherFactory = scenarioPopulation.getFactory();

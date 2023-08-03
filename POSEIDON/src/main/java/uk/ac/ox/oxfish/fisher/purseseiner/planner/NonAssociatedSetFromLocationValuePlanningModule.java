@@ -57,7 +57,7 @@ public class NonAssociatedSetFromLocationValuePlanningModule<B extends LocalBiol
     public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
         return getFadManager(fisher).numberOfPermissibleActions(
             NOA, 1000,
-            state.getRegulation()
+            state.getRegulations()
         );
     }
 

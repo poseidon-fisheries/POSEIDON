@@ -78,7 +78,7 @@ public class FadManagerTest {
         when(fishState.getStep()).thenReturn(1);
         when(fishState.getFadMap()).thenReturn(fadMap);
         when(fishState.getBiology()).thenReturn(globalBiology);
-        when(fishState.getRegulation()).thenReturn(PERMITTED);
+        when(fishState.getRegulations()).thenReturn(PERMITTED);
 
         final MersenneTwisterFast rng = mock(MersenneTwisterFast.class);
 
