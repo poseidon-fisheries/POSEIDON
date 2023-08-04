@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.regulation.EverythingForbidden;
+import uk.ac.ox.oxfish.regulations.EverythingForbidden;
 
 public class FadAwareLogisticGrowerTest {
 

@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.regulation.ForbiddenAreasFromShapeFiles;
+import uk.ac.ox.oxfish.regulations.ForbiddenAreasFromShapeFiles;
 import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.agents.core.BasicAction;
 import uk.ac.ox.poseidon.regulations.api.Regulations;

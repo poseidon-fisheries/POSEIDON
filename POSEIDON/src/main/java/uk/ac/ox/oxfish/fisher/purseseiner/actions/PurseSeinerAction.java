@@ -26,8 +26,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
-import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
-import uk.ac.ox.oxfish.regulation.quantities.YearlyActionCount;
+import uk.ac.ox.oxfish.regulations.quantities.NumberOfActiveFads;
+import uk.ac.ox.oxfish.regulations.quantities.YearlyActionCount;
 import uk.ac.ox.poseidon.agents.api.Agent;
 
 import java.time.LocalDate;
@@ -145,10 +145,10 @@ public abstract class PurseSeinerAction
     }
 
     @Override
-    public long getYearlyActionCount(final String actionCode) {
+    public long getYearlyActionCount(final int year, final String actionCode) {
         return maybeGetFadManager(fisher)
             .map(fm -> fm.getYearlyActionCounter().getCount(
-                fisher.grabState().getCalendarYear(),
+                year,
                 fisher,
                 actionCode
             ))

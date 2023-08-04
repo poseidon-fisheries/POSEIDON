@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.regulation.quantities;
+package uk.ac.ox.oxfish.regulations.quantities;
 
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.model.FishState;

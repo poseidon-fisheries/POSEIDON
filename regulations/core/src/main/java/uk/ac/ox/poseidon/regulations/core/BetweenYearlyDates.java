@@ -7,18 +7,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BetweenYearlyDates extends DateCondition {
 
-    private final MonthDay start;
+    private final MonthDay beginning;
     private final MonthDay end;
     private final boolean yearSpanning;
 
-    public BetweenYearlyDates(final MonthDay start, final MonthDay end) {
-        this.start = checkNotNull(start);
+    public BetweenYearlyDates(final MonthDay beginning, final MonthDay end) {
+        this.beginning = checkNotNull(beginning);
         this.end = checkNotNull(end);
-        this.yearSpanning = end.isBefore(start);
+        this.yearSpanning = end.isBefore(beginning);
     }
 
-    public MonthDay getStart() {
-        return start;
+    public MonthDay getBeginning() {
+        return beginning;
     }
 
     public MonthDay getEnd() {
@@ -36,8 +36,8 @@ public class BetweenYearlyDates extends DateCondition {
 
     boolean test(final MonthDay monthDay) {
         final boolean outsideRange = yearSpanning
-            ? monthDay.isAfter(end) && monthDay.isBefore(start)
-            : monthDay.isBefore(start) || monthDay.isAfter(end);
+            ? monthDay.isAfter(end) && monthDay.isBefore(beginning)
+            : monthDay.isBefore(beginning) || monthDay.isAfter(end);
         return !outsideRange;
     }
 }

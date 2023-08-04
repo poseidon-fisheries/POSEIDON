@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.regulation.conditions;
+package uk.ac.ox.oxfish.regulations.conditions;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

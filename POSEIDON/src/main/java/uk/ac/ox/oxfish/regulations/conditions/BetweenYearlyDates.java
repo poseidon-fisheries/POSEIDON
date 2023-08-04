@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.regulation.conditions;
+package uk.ac.ox.oxfish.regulations.conditions;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -10,8 +10,8 @@ import java.time.MonthDay;
 
 public class BetweenYearlyDates implements AlgorithmFactory<Condition> {
 
-    private IntegerParameter startMonth;
-    private IntegerParameter startDay;
+    private IntegerParameter beginningMonth;
+    private IntegerParameter beginningDay;
     private IntegerParameter endMonth;
     private IntegerParameter endDay;
 
@@ -19,57 +19,64 @@ public class BetweenYearlyDates implements AlgorithmFactory<Condition> {
     }
 
     public BetweenYearlyDates(
-        final Month startMonth,
-        final int startDay,
+        final MonthDay beginning,
+        final MonthDay end
+    ) {
+        this(beginning.getMonth(), beginning.getDayOfMonth(), end.getMonth(), end.getDayOfMonth());
+    }
+
+    public BetweenYearlyDates(
+        final Month beginningMonth,
+        final int beginningDay,
         final Month endMonth,
         final int endDay
     ) {
         this(
-            startMonth.getValue(),
-            startDay,
+            beginningMonth.getValue(),
+            beginningDay,
             endMonth.getValue(),
             endDay
         );
     }
 
     public BetweenYearlyDates(
-        final int startMonth,
-        final int startDay,
+        final int beginningMonth,
+        final int beginningDay,
         final int endMonth,
         final int endDay
     ) {
-        this.startMonth = new IntegerParameter(startMonth);
-        this.startDay = new IntegerParameter(startDay);
+        this.beginningMonth = new IntegerParameter(beginningMonth);
+        this.beginningDay = new IntegerParameter(beginningDay);
         this.endMonth = new IntegerParameter(endMonth);
         this.endDay = new IntegerParameter(endDay);
     }
 
     public BetweenYearlyDates(
-        final IntegerParameter startMonth,
-        final IntegerParameter startDay,
+        final IntegerParameter beginningMonth,
+        final IntegerParameter beginningDay,
         final IntegerParameter endMonth,
         final IntegerParameter endDay
     ) {
-        this.startMonth = startMonth;
-        this.startDay = startDay;
+        this.beginningMonth = beginningMonth;
+        this.beginningDay = beginningDay;
         this.endMonth = endMonth;
         this.endDay = endDay;
     }
 
-    public IntegerParameter getStartMonth() {
-        return startMonth;
+    public IntegerParameter getBeginningMonth() {
+        return beginningMonth;
     }
 
-    public void setStartMonth(final IntegerParameter startMonth) {
-        this.startMonth = startMonth;
+    public void setBeginningMonth(final IntegerParameter beginningMonth) {
+        this.beginningMonth = beginningMonth;
     }
 
-    public IntegerParameter getStartDay() {
-        return startDay;
+    public IntegerParameter getBeginningDay() {
+        return beginningDay;
     }
 
-    public void setStartDay(final IntegerParameter startDay) {
-        this.startDay = startDay;
+    public void setBeginningDay(final IntegerParameter beginningDay) {
+        this.beginningDay = beginningDay;
     }
 
     public IntegerParameter getEndMonth() {
@@ -91,7 +98,7 @@ public class BetweenYearlyDates implements AlgorithmFactory<Condition> {
     @Override
     public Condition apply(final FishState fishState) {
         return new uk.ac.ox.poseidon.regulations.core.BetweenYearlyDates(
-            MonthDay.of(startMonth.getValue(), startDay.getValue()),
+            MonthDay.of(beginningMonth.getValue(), beginningDay.getValue()),
             MonthDay.of(endMonth.getValue(), endDay.getValue())
         );
     }

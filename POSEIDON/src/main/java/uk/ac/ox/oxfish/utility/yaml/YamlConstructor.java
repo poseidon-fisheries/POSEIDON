@@ -28,10 +28,12 @@ import org.yaml.snakeyaml.nodes.*;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.DateParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -58,6 +60,8 @@ public class YamlConstructor extends Constructor {
             NodeId.scalar, new Constructor.ConstructScalar() {
                 @Override
                 public Object construct(final Node node) {
+                    if (node.getType().equals(DateParameter.class))
+                        return new DateParameter(LocalDate.parse(((ScalarNode) node).getValue()));
                     //if the field you are trying to fill is a double parameter
                     if (node.getType().equals(DoubleParameter.class))
                         //then a simple scalar must be a fixed double parameter. Build it

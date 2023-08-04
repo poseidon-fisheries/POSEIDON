@@ -32,10 +32,10 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.regulation.ForbiddenIf;
-import uk.ac.ox.oxfish.regulation.conditions.*;
-import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
-import uk.ac.ox.oxfish.regulation.quantities.YearlyActionCount;
+import uk.ac.ox.oxfish.regulations.ForbiddenIf;
+import uk.ac.ox.oxfish.regulations.conditions.*;
+import uk.ac.ox.oxfish.regulations.quantities.CurrentYearActionCount;
+import uk.ac.ox.oxfish.regulations.quantities.NumberOfActiveFads;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
 import uk.ac.ox.poseidon.agents.core.AtomicLongMapYearlyActionCounter;
 
@@ -131,7 +131,7 @@ public class FadManagerTest {
         );
         final AllOf actionLimit = new AllOf(
             new ActionCodeIs(DPL.name()),
-            new Not(new Below(new YearlyActionCount(DPL.name()), 20))
+            new Not(new Below(new CurrentYearActionCount(DPL.name()), 20))
         );
 
         final YearlyActionCounter yearlyActionCounter = AtomicLongMapYearlyActionCounter.create();

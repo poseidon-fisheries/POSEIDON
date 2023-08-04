@@ -35,8 +35,8 @@ import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.observers.Observers;
-import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
-import uk.ac.ox.oxfish.regulation.quantities.YearlyActionCount;
+import uk.ac.ox.oxfish.regulations.quantities.NumberOfActiveFads;
+import uk.ac.ox.oxfish.regulations.quantities.YearlyActionCount;
 import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.agents.api.Agent;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
@@ -386,11 +386,8 @@ public class FadManager {
         }
 
         @Override
-        public long getYearlyActionCount(final String actionCode) {
-            return getDateTime()
-                .map(LocalDateTime::getYear)
-                .map(year -> yearlyActionCounter.getCount(year, getAgent(), actionCode))
-                .orElse(0L);
+        public long getYearlyActionCount(final int year, final String actionCode) {
+            return yearlyActionCounter.getCount(year, getAgent(), actionCode);
         }
     }
 

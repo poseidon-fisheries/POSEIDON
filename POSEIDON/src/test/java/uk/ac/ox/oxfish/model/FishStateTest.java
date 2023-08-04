@@ -34,7 +34,7 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
-import uk.ac.ox.oxfish.regulation.EverythingPermitted;
+import uk.ac.ox.oxfish.regulations.EverythingPermitted;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedList;

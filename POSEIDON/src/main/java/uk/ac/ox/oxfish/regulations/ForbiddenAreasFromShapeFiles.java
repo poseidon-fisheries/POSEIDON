@@ -1,9 +1,9 @@
-package uk.ac.ox.oxfish.regulation;
+package uk.ac.ox.oxfish.regulations;
 
 import com.google.common.io.MoreFiles;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.regulation.conditions.*;
+import uk.ac.ox.oxfish.regulations.conditions.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 import uk.ac.ox.poseidon.regulations.api.Regulations;

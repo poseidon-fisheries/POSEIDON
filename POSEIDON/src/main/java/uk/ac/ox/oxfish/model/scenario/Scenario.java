@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.regulation.EverythingPermitted;
+import uk.ac.ox.oxfish.regulations.EverythingPermitted;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
 

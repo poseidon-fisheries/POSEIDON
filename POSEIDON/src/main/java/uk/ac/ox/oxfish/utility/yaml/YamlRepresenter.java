@@ -57,7 +57,11 @@ class YamlRepresenter extends Representer {
 
         super(new DumperOptions());
 
-        //go through all the double parameters and make them print as a single line "pretty" format
+
+        this.multiRepresenters.put(
+            DateParameter.class,
+            data -> representData(((FixedParameter<?>) data).getValue().toString())
+        );
 
         this.multiRepresenters.put(
             FixedParameter.class,
@@ -73,6 +77,8 @@ class YamlRepresenter extends Representer {
             NullParameter.class,
             data -> representData("nullparameter")
         );
+
+        //go through all the double parameters and make them print as a single line "pretty" format
 
         this.representers.put(
             NormalDoubleParameter.class,

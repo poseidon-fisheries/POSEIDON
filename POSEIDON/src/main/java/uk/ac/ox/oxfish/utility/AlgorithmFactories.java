@@ -140,11 +140,9 @@ import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITargetTACFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SimpleFishSamplerFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
-import uk.ac.ox.oxfish.regulation.*;
-import uk.ac.ox.oxfish.regulation.conditions.*;
-import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
-import uk.ac.ox.oxfish.regulation.quantities.SumOf;
-import uk.ac.ox.oxfish.regulation.quantities.YearlyActionCount;
+import uk.ac.ox.oxfish.regulations.*;
+import uk.ac.ox.oxfish.regulations.conditions.*;
+import uk.ac.ox.oxfish.regulations.quantities.*;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.*;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
@@ -681,16 +679,19 @@ public class AlgorithmFactories {
         ));
         addFactories(new Factories<>(
             Condition.class,
+            Above.class,
             ActionCodeIs.class,
             AgentHasAnyOfTags.class,
             AgentHasTag.class,
             AllOf.class,
             AnyOf.class,
             Below.class,
+            BetweenDates.class,
             BetweenYearlyDates.class,
             InRectangularArea.class,
             Not.class,
-            NotBelow.class
+            NotBelow.class,
+            NotAbove.class
         ));
         addFactories(new Factories<>(
             Regulations.class,
@@ -705,8 +706,12 @@ public class AlgorithmFactories {
             ImmutableMap.of(
                 NumberOfActiveFads.class, "Number of active FADs"
             ),
-            SumOf.class,
-            YearlyActionCount.class
+            CurrentYearActionCount.class,
+            LastYearlyFisherValue.class,
+            SecondLastYearlyFisherValue.class,
+            YearlyFisherValue.class,
+            PreviousYearActionCount.class,
+            SumOf.class
         ));
         addFactories(new Factories<>(
             AbundanceFilters.class,

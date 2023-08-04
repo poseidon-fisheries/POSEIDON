@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.regulation.quantities;
+package uk.ac.ox.oxfish.regulations.quantities;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
