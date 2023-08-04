@@ -1,20 +1,28 @@
 package uk.ac.ox.oxfish.fisher.purseseiner;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.regulation.ForbiddenAreasFromShapeFiles;
-import uk.ac.ox.oxfish.regulation.ForbiddenIf;
-import uk.ac.ox.oxfish.regulation.NamedRegulations;
-import uk.ac.ox.oxfish.regulation.conditions.*;
-import uk.ac.ox.oxfish.regulation.quantities.NumberOfActiveFads;
-import uk.ac.ox.oxfish.regulation.quantities.SumOf;
-import uk.ac.ox.oxfish.regulation.quantities.YearlyActionCount;
+import uk.ac.ox.oxfish.regulations.ForbiddenAreasFromShapeFiles;
+import uk.ac.ox.oxfish.regulations.ForbiddenIf;
+import uk.ac.ox.oxfish.regulations.NamedRegulations;
+import uk.ac.ox.oxfish.regulations.conditions.*;
+import uk.ac.ox.oxfish.regulations.quantities.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
+
+import java.time.LocalDate;
+import java.time.MonthDay;
+import java.util.Map;
 
 import static java.time.Month.*;
 
 public class DefaultEpoRegulations {
+
+    private static final MonthDay CLOSURE_A_START = MonthDay.of(JULY, 29);
+    private static final MonthDay CLOSURE_A_END = MonthDay.of(OCTOBER, 8);
+    private static final MonthDay CLOSURE_B_START = MonthDay.of(NOVEMBER, 9);
+    private static final MonthDay CLOSURE_B_END = MonthDay.of(JANUARY, 19);
 
     private DefaultEpoRegulations() {
     }
@@ -22,6 +30,15 @@ public class DefaultEpoRegulations {
     public static AlgorithmFactory<Regulations> make(final InputPath inputFolder) {
 
         final InputPath regions = inputFolder.path("regions");
+
+        final ImmutableSet<Map.Entry<Integer, Integer>> additionalClosureDaysByExcessTonnesOfBet = ImmutableMap.of(
+            1200, 10,
+            1500, 13,
+            1800, 16,
+            2100, 19,
+            2400, 22
+        ).entrySet();
+
 
         return new NamedRegulations(
             ImmutableMap.of(
@@ -55,8 +72,8 @@ public class DefaultEpoRegulations {
                         ),
                         new NotBelow(
                             new SumOf(
-                                new YearlyActionCount("FAD"),
-                                new YearlyActionCount("OFS")
+                                new CurrentYearActionCount("FAD"),
+                                new CurrentYearActionCount("OFS")
                             ),
                             999999
                         )
@@ -70,15 +87,15 @@ public class DefaultEpoRegulations {
                             new AgentHasTag("closure A"),
                             new ActionCodeIs("DPL"),
                             new BetweenYearlyDates(
-                                JULY, 14,
-                                OCTOBER, 28
+                                addDays(CLOSURE_A_START, -15),
+                                addDays(CLOSURE_A_START, -1)
                             )
                         ),
                         new AllOf(
                             new AgentHasTag("closure A"),
                             new BetweenYearlyDates(
-                                JULY, 29,
-                                OCTOBER, 8
+                                CLOSURE_A_START,
+                                CLOSURE_A_END
                             )
                         )
                     )
@@ -90,15 +107,15 @@ public class DefaultEpoRegulations {
                             new AgentHasTag("closure B"),
                             new ActionCodeIs("DPL"),
                             new BetweenYearlyDates(
-                                OCTOBER, 25,
-                                NOVEMBER, 8
+                                addDays(CLOSURE_B_START, -15),
+                                addDays(CLOSURE_B_START, -1)
                             )
                         ),
                         new AllOf(
                             new AgentHasTag("closure B"),
                             new BetweenYearlyDates(
-                                NOVEMBER, 9,
-                                JANUARY, 19
+                                CLOSURE_B_START,
+                                CLOSURE_B_END
                             )
                         )
                     )
@@ -117,8 +134,98 @@ public class DefaultEpoRegulations {
                 "EEZs", new ForbiddenAreasFromShapeFiles(
                     regions,
                     regions.path("region_tags.csv")
+                ),
+                "BET limits", new ForbiddenIf(
+                    new AllOf(
+                        new BetweenDates(
+                            LocalDate.of(2023, JANUARY, 1),
+                            LocalDate.of(2024, DECEMBER, 31)
+                        ),
+                        new AnyOf(
+                            new AllOf(
+                                new AgentHasTag("closure A"),
+                                new AnyOf(
+                                    additionalClosureDaysByExcessTonnesOfBet.stream().map(entry -> {
+                                            final MonthDay newClosureStart = addDays(
+                                                CLOSURE_A_START,
+                                                entry.getValue() * -1L
+                                            );
+                                            return new AllOf(
+                                                new Above(
+                                                    new LastYearlyFisherValue("Bigeye tuna Catches (kg)"),
+                                                    entry.getKey() * 1000 // convert from tonnes to kg
+                                                ),
+                                                new AnyOf(
+                                                    // closure extension
+                                                    new BetweenYearlyDates(
+                                                        newClosureStart,
+                                                        addDays(CLOSURE_A_START, -1)
+                                                    ),
+                                                    // pre-closure DPL ban
+                                                    new AllOf(
+                                                        new ActionCodeIs("DPL"),
+                                                        new BetweenYearlyDates(
+                                                            addDays(newClosureStart, -15),
+                                                            addDays(newClosureStart, -1)
+                                                        )
+                                                    )
+                                                )
+                                            );
+                                        }
+                                    )
+                                )
+                            ),
+                            new AllOf(
+                                new AgentHasTag("closure B"),
+                                new AnyOf(
+                                    additionalClosureDaysByExcessTonnesOfBet.stream().map(entry ->
+                                        // This gets slightly complicated because we need to check for the catches
+                                        // the year before the closure _starts_, and once we get to Jan 1st, that
+                                        // not "last year" anymore, but the year before that, hence those different
+                                        // conditions depending on where we are in the year. March 30 is an arbitrary
+                                        // cutoff for the different checks. At least we do not need to deal with the
+                                        // pre-closure DPL ban, since closure B gets extended at the end.
+                                        new AllOf(
+                                            new AnyOf(
+                                                new AllOf(
+                                                    new BetweenYearlyDates(JANUARY, 1, MARCH, 30),
+                                                    new Above(
+                                                        new SecondLastYearlyFisherValue("Bigeye tuna Catches (kg)"),
+                                                        entry.getKey() * 1000 // convert from tonnes to kg
+                                                    )
+                                                ),
+                                                new AllOf(
+                                                    new BetweenYearlyDates(APRIL, 1, DECEMBER, 31),
+                                                    new Above(
+                                                        new LastYearlyFisherValue("Bigeye tuna Catches (kg)"),
+                                                        entry.getKey() * 1000 // convert from tonnes to kg
+                                                    )
+                                                )
+                                            ),
+                                            new BetweenYearlyDates(
+                                                addDays(CLOSURE_B_END, 1),
+                                                addDays(CLOSURE_B_END, entry.getValue())
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
                 )
             )
         );
     }
+
+    @SuppressWarnings("SameParameterValue")
+    private static MonthDay addDays(
+        final MonthDay monthDay,
+        final long daysToAdd
+    ) {
+        final int REFERENCE_YEAR = 2023;
+        final LocalDate baseDate = monthDay.atYear(REFERENCE_YEAR);
+        final LocalDate newDate = baseDate.plusDays(daysToAdd);
+        return MonthDay.of(newDate.getMonth(), newDate.getDayOfMonth());
+    }
+
 }
