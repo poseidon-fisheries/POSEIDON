@@ -33,3 +33,7 @@ tasks.named<Test>("test") {
 tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.addAll(listOf("-Werror", "-Xlint:all"))
 }
+
+tasks.withType<Copy>().all {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
