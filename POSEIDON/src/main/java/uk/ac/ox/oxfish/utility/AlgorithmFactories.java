@@ -689,6 +689,7 @@ public class AlgorithmFactories {
             BetweenDates.class,
             BetweenYearlyDates.class,
             InRectangularArea.class,
+            InYear.class,
             Not.class,
             NotBelow.class,
             NotAbove.class

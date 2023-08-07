@@ -156,6 +156,11 @@ public class EpoPurseSeineVesselReader implements AlgorithmFactory<List<Fisher>>
                 if (record.getMetaData().containsColumn("closure")) {
                     chooseClosurePeriod(fisher, record.getString("closure"));
                 }
+                if (record.getMetaData().containsColumn("extended_2022_closure") &&
+                    record.getBoolean("extended_2022_closure")
+                ) {
+                    fisher.getTagsList().add(record.getString("extended_2022_closure"));
+                }
                 if (record.getMetaData().containsColumn("flag")) {
                     fisher.getTagsList().add(record.getString("flag"));
                 }

@@ -13,7 +13,7 @@ import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.time.LocalDate;
 import java.time.MonthDay;
-import java.util.Map;
+import java.util.Map.Entry;
 
 import static java.time.Month.*;
 
@@ -31,7 +31,7 @@ public class DefaultEpoRegulations {
 
         final InputPath regions = inputFolder.path("regions");
 
-        final ImmutableSet<Map.Entry<Integer, Integer>> additionalClosureDaysByExcessTonnesOfBet = ImmutableMap.of(
+        final ImmutableSet<Entry<Integer, Integer>> additionalClosureDaysByExcessTonnesOfBet = ImmutableMap.of(
             1200, 10,
             1500, 13,
             1800, 16,
@@ -39,6 +39,12 @@ public class DefaultEpoRegulations {
             2400, 22
         ).entrySet();
 
+        final ImmutableSet<Entry<Integer, ImmutableMap<String, Integer>>> activeFadLimits = ImmutableMap.of(
+            2021, ImmutableMap.of("6A", 300, "6B", 450),
+            2022, ImmutableMap.of("6A", 270, "6B", 400),
+            2023, ImmutableMap.of("6A", 255, "6B", 340),
+            2024, ImmutableMap.of("6A", 210, "6B", 340)
+        ).entrySet();
 
         return new NamedRegulations(
             ImmutableMap.of(
@@ -52,13 +58,18 @@ public class DefaultEpoRegulations {
                     new AllOf(
                         new ActionCodeIs("DPL"),
                         new AnyOf(
-                            new AllOf(
-                                new AgentHasTag("class 6A"),
-                                new NotBelow(new NumberOfActiveFads(), 300)
-                            ),
-                            new AllOf(
-                                new AgentHasTag("class 6B"),
-                                new NotBelow(new NumberOfActiveFads(), 450)
+                            activeFadLimits.stream().map(yearAndLimits ->
+                                new AllOf(
+                                    new InYear(yearAndLimits.getKey()),
+                                    new AnyOf(
+                                        yearAndLimits.getValue().entrySet().stream().map(classAndLimit ->
+                                            new AllOf(
+                                                new AgentHasTag("class " + classAndLimit.getKey()),
+                                                new NotBelow(new NumberOfActiveFads(), classAndLimit.getValue())
+                                            )
+                                        )
+                                    )
+                                )
                             )
                         )
                     )
@@ -135,11 +146,32 @@ public class DefaultEpoRegulations {
                     regions,
                     regions.path("region_tags.csv")
                 ),
+                "Extended 2022 closure", new ForbiddenIf(
+                    new AllOf(
+                        new AgentHasTag("extended_2022_closure"),
+                        new AnyOf(
+                            new AllOf(
+                                new AgentHasTag("closure A"),
+                                new BetweenDates(
+                                    CLOSURE_A_START.atYear(2022).minusDays(8),
+                                    CLOSURE_A_START.atYear(2022).minusDays(1)
+                                )
+                            ),
+                            new AllOf(
+                                new AgentHasTag("closure B"),
+                                new BetweenDates(
+                                    CLOSURE_B_END.atYear(2023).plusDays(1),
+                                    CLOSURE_B_END.atYear(2023).plusDays(8)
+                                )
+                            )
+                        )
+                    )
+                ),
                 "BET limits", new ForbiddenIf(
                     new AllOf(
                         new BetweenDates(
                             LocalDate.of(2023, JANUARY, 1),
-                            LocalDate.of(2024, DECEMBER, 31)
+                            LocalDate.of(2025, DECEMBER, 31)
                         ),
                         new AnyOf(
                             new AllOf(
