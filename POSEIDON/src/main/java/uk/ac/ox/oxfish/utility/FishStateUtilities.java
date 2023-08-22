@@ -1146,19 +1146,19 @@ public class FishStateUtilities {
 
         if (outputFolder != null) {
 
-            FileWriter writer = new FileWriter(outputFolder.resolve("result.yaml").toFile());
-            final ModelResults results = new ModelResults(model);
-            yaml.dump(results, writer);
+            try (final FileWriter writer = new FileWriter(outputFolder.resolve("result.yaml").toFile())) {
+                final ModelResults results = new ModelResults(model);
+                yaml.dump(results, writer);
+            }
 
-            writer = new FileWriter(outputFolder.resolve("seed.txt").toFile());
-            writer.write(Long.toString(seed));
-            writer.close();
+            try (final FileWriter writer = new FileWriter(outputFolder.resolve("seed.txt").toFile())) {
+                writer.write(Long.toString(seed));
+            }
 
             if (gatherer != null) {
-                writer = new FileWriter(outputFolder.resolve("tow_heatmap.txt").toFile());
-                writer.write(FishStateUtilities.gridToCSV(gatherer.getTowHeatmap()));
-                writer.close();
-
+                try (final FileWriter writer = new FileWriter(outputFolder.resolve("tow_heatmap.txt").toFile())) {
+                    writer.write(FishStateUtilities.gridToCSV(gatherer.getTowHeatmap()));
+                }
             }
             writeAdditionalOutputsToFolder(outputFolder, model);
         }
