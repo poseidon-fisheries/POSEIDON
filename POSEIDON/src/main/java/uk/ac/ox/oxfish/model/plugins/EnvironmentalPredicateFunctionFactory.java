@@ -18,9 +18,10 @@ public class EnvironmentalPredicateFunctionFactory extends EnvironmentalFunction
         final EnvironmentalMapFactory environmentalMapFactory
     ) {
         final String mapName = environmentalMapFactory.getMapVariableName();
-        final double threshold = environmentalMapFactory.getThreshold().applyAsDouble(fishState.getRandom());
+        final double target = environmentalMapFactory.getTarget().applyAsDouble(fishState.getRandom());
+        final double margin = environmentalMapFactory.getMargin().applyAsDouble(fishState.getRandom());
         return seaTile ->
-            fishState
+            Math.abs(fishState
                 .getMap()
                 .getAdditionalMaps()
                 .get(mapName)
@@ -28,7 +29,7 @@ public class EnvironmentalPredicateFunctionFactory extends EnvironmentalFunction
                 .get(
                     seaTile.getGridX(),
                     seaTile.getGridY()
-                ) >= threshold;
+                )-target) >= margin;
     }
 
     @Override
