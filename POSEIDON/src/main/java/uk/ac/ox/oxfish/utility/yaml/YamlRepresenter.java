@@ -35,6 +35,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.*;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -119,7 +120,8 @@ class YamlRepresenter extends Representer {
         //do the same for the Path class
         final Represent pathRepresenter = data -> {
             final Path path = (Path) data;
-            return representData(path.toString());
+            // make sure path separators are forward slashes even on Windows
+            return representData(path.toString().replace('/', File.separatorChar));
         };
         this.multiRepresenters.put(
             Path.class,
