@@ -36,7 +36,7 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.planner.OwnFadSetDiscretizedAct
  * that has the highest value/distance_from_path_centroid
  * <p>
  * <p>
- * Feillet, Dominique, Pierre Dejax, and Michel Gendreau. “Traveling Salesman Problems with Profits.” Transportation
+ * Feillet, Dominique, Pierre Dejax, and Michel Gendreau. "Traveling Salesman Problems with Profits." Transportation
  * Science 39, no. 2 (2005): 188–205.
  */
 public class DiscretizedOwnFadCentroidPlanningModule
