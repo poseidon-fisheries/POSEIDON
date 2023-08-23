@@ -46,7 +46,8 @@ public enum CurrentVectorsFactory {
     @SuppressWarnings("SameParameterValue")
     private static TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> makeVectorMaps(
         final MapExtent mapExtent,
-        final Map<CurrentPattern, Path> currentFiles, boolean inputIsMetersPerSecond1
+        final Map<CurrentPattern, ? extends Path> currentFiles,
+        final boolean inputIsMetersPerSecond1
     ) {
         final TreeMap<Integer, EnumMap<CurrentPattern, Map<Int2D, Double2D>>> currentVectors = new TreeMap<>();
         final SparseGrid2D dummyGrid = new SparseGrid2D(mapExtent.getGridWidth(), mapExtent.getGridHeight());
@@ -79,7 +80,7 @@ public enum CurrentVectorsFactory {
         final Record record,
         final Coordinate startCoord,
         final MapExtent mapExtent,
-        boolean inputIsMetersPerSecond1
+        final boolean inputIsMetersPerSecond1
     ) {
         final Double2D input = new Double2D(
             record.getDouble("u"),
@@ -117,7 +118,8 @@ public enum CurrentVectorsFactory {
     /**
      * Takes a vector of offsets in metres and converts it to a vector of longitude/latitude
      * offsets, assuming that we are in the vicinity of {@code coord}. Adapted from
-     * https://stackoverflow.com/a/2839560 and https://stackoverflow.com/a/7478827.
+     * <a href="https://stackoverflow.com/a/2839560">https://stackoverflow.com/a/2839560</a> and
+     * <a href="https://stackoverflow.com/a/7478827">https://stackoverflow.com/a/7478827</a>.
      */
     private static Double2D metresVectorToLonLatVector(final Coordinate coord, final Double u, final Double v) {
         final double r = EquirectangularDistance.EARTH_RADIUS * 1000; // Earth radius in metres
@@ -129,7 +131,7 @@ public enum CurrentVectorsFactory {
     public CurrentVectors getCurrentVectors(
         final MapExtent mapExtent,
         final Map<CurrentPattern, Path> currentFiles,
-        boolean inputIsMetersPerSecond
+        final boolean inputIsMetersPerSecond
     ) {
         return cache.getUnchecked(entry(mapExtent, entry(inputIsMetersPerSecond, currentFiles)));
     }

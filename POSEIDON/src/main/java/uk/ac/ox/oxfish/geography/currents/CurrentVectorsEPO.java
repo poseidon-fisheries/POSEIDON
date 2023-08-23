@@ -41,7 +41,7 @@ public class CurrentVectorsEPO implements CurrentVectors {
     ) {
         this(
             vectorMaps,
-            step -> step < 365 ? Y2016 : (step < 730 ? Y2017 : Y2018),
+            step -> step < 365 ? Y2021 : (step < 730 ? Y2022 : Y2023),
             gridWidth,
             gridHeight,
             stepsPerDay

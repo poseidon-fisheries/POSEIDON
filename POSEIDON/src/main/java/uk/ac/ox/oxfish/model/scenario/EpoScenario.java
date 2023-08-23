@@ -83,7 +83,7 @@ public abstract class EpoScenario<B extends LocalBiology>
             ),
             "Shear map", new EnvironmentalMapFactory(
                 new StringParameter("Shear"),
-                getInputFolder().path("currents", "shear.csv")
+                getInputFolder().path("currents", "shear_2021.csv")
             )
         ));
     private AlgorithmFactory<? extends Regulations> regulations = DefaultEpoRegulations.make(getInputFolder());
@@ -93,7 +93,9 @@ public abstract class EpoScenario<B extends LocalBiology>
         ImmutableMap.of(
             Y2016, Paths.get("currents", "currents_2016.csv"),
             Y2017, Paths.get("currents", "currents_2017.csv"),
-            Y2018, Paths.get("currents", "currents_2018.csv")
+            Y2018, Paths.get("currents", "currents_2018.csv"),
+            Y2021, Paths.get("currents", "currents_2021.csv"),
+            Y2022, Paths.get("currents", "currents_2022.csv")
         )
     );
     private FadMapFactory fadMap;
