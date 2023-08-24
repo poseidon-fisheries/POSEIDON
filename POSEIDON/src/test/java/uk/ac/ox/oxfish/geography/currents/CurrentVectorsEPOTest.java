@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography.currents;
 
+import com.google.common.collect.ImmutableList;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,6 @@ public class CurrentVectorsEPOTest {
                     .filter(step -> currentVectors.getVector(step, seaTile.getGridLocation()).equals(ZERO_VECTOR))
                     .mapToObj(step -> entry(nauticalMap.getCoordinates(seaTile), step))
             ).collect(toImmutableList());
-        Assertions.assertTrue(currentlessCells.isEmpty());
+        Assertions.assertEquals(ImmutableList.of(), currentlessCells);
     }
 }
