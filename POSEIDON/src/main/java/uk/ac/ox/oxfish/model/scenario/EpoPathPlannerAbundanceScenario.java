@@ -65,10 +65,10 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                         new EnvironmentalPenaltyFunctionFactory(
                             ImmutableMap.of(
                                 "Temperature", new TemperatureMapFactory(
-                                    getInputFolder().path("environmental_maps", "temperature.csv")
+                                    getInputFolder().path("environmental_maps", "temperature_2022.csv")
                                 ),
                                 "FrontalIndex", new FrontalIndexMapFactory(
-                                    getInputFolder().path("environmental_maps", "frontal_index.csv")
+                                    getInputFolder().path("environmental_maps", "frontal_index_2022.csv")
                                 )
                             )
                         )
