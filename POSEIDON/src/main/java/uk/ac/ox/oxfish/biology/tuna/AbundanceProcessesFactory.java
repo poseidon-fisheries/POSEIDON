@@ -54,8 +54,8 @@ public class AbundanceProcessesFactory
     ) {
         final AbundanceReallocatorFactory reallocator =
             new AbundanceReallocatorFactory(
-                inputFolder.path("grids.csv"),
-                new IntegerParameter(365),
+                inputFolder.path("species_distribution_maps_2021_to_2023.csv"),
+                new IntegerParameter(365 * 3),
                 mapExtent
             );
         return new AbundanceProcessesFactory(

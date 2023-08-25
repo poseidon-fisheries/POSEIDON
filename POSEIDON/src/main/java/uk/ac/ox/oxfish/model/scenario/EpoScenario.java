@@ -83,7 +83,7 @@ public abstract class EpoScenario<B extends LocalBiology>
             ),
             "Shear map", new EnvironmentalMapFactory(
                 new StringParameter("Shear"),
-                getInputFolder().path("currents", "shear_2021.csv")
+                getInputFolder().path("currents", "shear_2021.csv") // TODO: this should be 2022
             )
         ));
     private AlgorithmFactory<? extends Regulations> regulations = DefaultEpoRegulations.make(getInputFolder());
@@ -96,7 +96,7 @@ public abstract class EpoScenario<B extends LocalBiology>
             Y2018, Paths.get("currents", "currents_2018.csv"),
             Y2021, Paths.get("currents", "currents_2021.csv"),
             Y2022, Paths.get("currents", "currents_2022.csv"),
-            Y2023, Paths.get("currents", "currents_2017.csv")
+            Y2023, Paths.get("currents", "currents_2017.csv") // using 2017 as proxy for 2023
         )
     );
     private FadMapFactory fadMap;
