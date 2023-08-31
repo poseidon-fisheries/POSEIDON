@@ -24,7 +24,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
 
     private AbundanceFiltersFactory abundanceFilters =
         new AbundanceFiltersFromFileFactory(
-            getInputFolder().path("abundance", "selectivity.csv")
+            getInputFolder().path("abundance", "selectivity_2022.csv")
         );
 
     public EpoPathPlannerAbundanceScenario() {

@@ -39,7 +39,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology> {
                 ),
                 DEFAULT_MAP_EXTENT_FACTORY,
                 new RecruitmentProcessesFactory(
-                    abundanceInputFolder.path("recruitment_parameters.csv")
+                    abundanceInputFolder.path("recruitment_parameters_2022.csv")
                 )
             )
         );

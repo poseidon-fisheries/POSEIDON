@@ -62,7 +62,7 @@ public class AbundanceProcessesFactory
             inputFolder,
             new AbundanceInitializerFactory(
                 reallocator,
-                inputFolder.path("bins.csv"),
+                inputFolder.path("bins_2022.csv"),
                 speciesCodesSupplier
             ),
             new AbundanceRestorerFactory(
@@ -73,7 +73,7 @@ public class AbundanceProcessesFactory
                 recruitmentProcesses,
                 reallocator,
                 ImmutableList.of("01-01", "04-01", "07-01", "10-01"),
-                inputFolder.path("mortality.csv")
+                inputFolder.path("mortality_2022.csv")
             )
         );
     }
