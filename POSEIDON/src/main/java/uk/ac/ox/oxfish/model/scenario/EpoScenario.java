@@ -83,7 +83,7 @@ public abstract class EpoScenario<B extends LocalBiology>
             ),
             "Shear map", new EnvironmentalMapFactory(
                 new StringParameter("Shear"),
-                getInputFolder().path("currents", "shear_2021.csv") // TODO: this should be 2022
+                getInputFolder().path("currents", "shear_2022.csv")
             )
         ));
     private AlgorithmFactory<? extends Regulations> regulations = DefaultEpoRegulations.make(getInputFolder());
