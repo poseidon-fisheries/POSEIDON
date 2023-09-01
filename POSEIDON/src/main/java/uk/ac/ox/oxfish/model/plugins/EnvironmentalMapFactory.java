@@ -5,12 +5,11 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-
-import java.util.function.DoubleBinaryOperator;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStartable> {
 
-    private final int mapPeriod = 365;
+    private IntegerParameter mapPeriod;
     private String mapVariableName;
     private InputPath gridFile;
     private DoubleParameter target;
@@ -23,24 +22,30 @@ public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStart
     public EnvironmentalMapFactory(
         final String mapVariableName,
         final InputPath gridFile,
+        final IntegerParameter mapPeriod,
         final DoubleParameter target,
         final DoubleParameter penalty,
         final DoubleParameter margin
     ) {
         this.mapVariableName = mapVariableName;
         this.gridFile = gridFile;
+        this.mapPeriod = mapPeriod;
         this.margin = margin;
         this.penalty = penalty;
         this.target = target;
     }
 
-    public DoubleParameter getTarget() { return target;}
+    public DoubleParameter getTarget() {
+        return target;
+    }
 
     public void setTarget(final DoubleParameter target) {
         this.target = target;
     }
 
-    public DoubleParameter getMargin() { return margin;}
+    public DoubleParameter getMargin() {
+        return margin;
+    }
 
     public void setMargin(final DoubleParameter margin) {
         this.margin = margin;
@@ -70,13 +75,17 @@ public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStart
         this.gridFile = gridFile;
     }
 
-    public int getMapPeriod() {
+    public IntegerParameter getMapPeriod() {
         return mapPeriod;
+    }
+
+    public void setMapPeriod(final IntegerParameter mapPeriod) {
+        this.mapPeriod = mapPeriod;
     }
 
     @Override
     public AdditionalStartable apply(final FishState fishState) {
-        return new AdditionalMapFactory(mapVariableName, gridFile, mapPeriod).apply(fishState);
+        return new AdditionalMapFactory(mapVariableName, gridFile, mapPeriod.getValue()).apply(fishState);
     }
 
 }
