@@ -39,6 +39,10 @@ public class CurrentVectorsEPOTest {
                     .filter(step -> currentVectors.getVector(step, seaTile.getGridLocation()).equals(ZERO_VECTOR))
                     .mapToObj(step -> entry(nauticalMap.getCoordinates(seaTile), step))
             ).collect(toImmutableList());
-        Assertions.assertEquals(ImmutableList.of(), currentlessCells);
+        Assertions.assertEquals(
+            ImmutableList.of(),
+            currentlessCells,
+            () -> "Number of currentless cells: " + currentlessCells.size()
+        );
     }
 }
