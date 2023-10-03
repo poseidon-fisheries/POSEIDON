@@ -4,7 +4,7 @@ import com.google.ortools.Loader;
 import com.google.ortools.linearsolver.*;
 
 public class SupplyChain {
-    MPSolver solver = MPSolver.createSolver("GLOP");
+    MPSolver solver;
     double infinity = java.lang.Double.POSITIVE_INFINITY;
 
     //Inputs
@@ -40,6 +40,7 @@ public class SupplyChain {
     double WCPOCostRaw, WCPOCostLoin, WCPOCostPackaged;
 
 
+
     // Linear Program Variables
     MPVariable[][] portToProcessor;
     MPVariable[][] processorToPackager;
@@ -61,7 +62,6 @@ public class SupplyChain {
 
     //Linear Program Objective
     MPObjective objective;
-
     MPSolver.ResultStatus resultStatus;
 
     public SupplyChain(GenericPort[] ports,
@@ -100,6 +100,10 @@ public class SupplyChain {
     }
 
     public void initializeLP(){
+
+        Loader.loadNativeLibraries();
+        solver  = MPSolver.createSolver("GLOP");
+
         //Create Variables
         portToProcessor = new MPVariable[nPort][nProcessor];
         for(int i=0; i<nPort; i++){
@@ -233,7 +237,6 @@ public class SupplyChain {
                 marketDemandPackage[l].setCoefficient(packagerToMarket[k][l], 1.0);
             }
         }
-
     }
 
     public void setObjective(int index){
@@ -315,6 +318,13 @@ public class SupplyChain {
 
     public void solveLP(){
         MPSolverParameters params = new MPSolverParameters();
+        params.setIntegerParam(MPSolverParameters.IntegerParam.LP_ALGORITHM, MPSolverParameters.LpAlgorithmValues.PRIMAL.swigValue());
+        solver.solve(params);
+        resultStatus = solver.solve();
+    }
+
+    public void solveDual(){
+        MPSolverParameters params = new MPSolverParameters();
         params.setIntegerParam(MPSolverParameters.IntegerParam.LP_ALGORITHM, MPSolverParameters.LpAlgorithmValues.DUAL.swigValue());
         solver.solve(params);
         resultStatus = solver.solve();
@@ -327,6 +337,35 @@ public class SupplyChain {
             return 0.0;
         }
     }
+
+    public void printLandingsDual(){
+        for(int i=0; i<nPort; i++){
+            System.out.println(landingsPerPort[i].dualValue());
+
+        }
+    }
+
+    public double[] getExVesselPrices(int index) {
+        if (resultStatus == MPSolver.ResultStatus.OPTIMAL) {
+            double[] prices = new double[nPort];
+            for(int i=0; i<nPort; i++){
+                prices[i]=-landingsPerPort[i].dualValue();
+            }
+            return prices;
+        } else {
+            return new double[]{};
+        }
+
+    }
+
+    /*
+    public double[] getPortPrices(int index){
+        if (resultStatus == MPSolver.ResultStatus.OPTIMAL) {
+            return ;
+        } else {
+            return new double[]{};
+        }
+    }*/
 
 
 

@@ -1,15 +1,21 @@
 package uk.ac.ox.oxfish.model.market.supplychain;
 
 public class GenericPort {
+    String name;
     double[] landings;
 
 
-    public GenericPort(double[] landings){
+    public GenericPort(String name, double[] landings){
+        this.name = name;
         this.landings = landings;
     }
 
     public double[] getLandings() {
         return landings;
+    }
+
+    public String getName(){
+        return this.name;
     }
 
     public double getLandings(int index) {
