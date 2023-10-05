@@ -95,6 +95,7 @@ public class EpoPurseSeineVesselReader implements AlgorithmFactory<List<Fisher>>
         checkArgument(periods.contains(tag));
         fisher.getTagsList().removeIf(periods::contains);
         fisher.getTagsList().add(tag);
+        fisher.refreshTagSet();
     }
 
     private static String capacityClass(final Fisher fisher) {
@@ -164,6 +165,7 @@ public class EpoPurseSeineVesselReader implements AlgorithmFactory<List<Fisher>>
                 if (record.getMetaData().containsColumn("flag")) {
                     fisher.getTagsList().add(record.getString("flag"));
                 }
+                fisher.refreshTagSet();
                 // TODO: setMaxTravelTime(fisher, record.getDouble
                 //  ("max_trip_duration_in_hours"));
                 return fisher;

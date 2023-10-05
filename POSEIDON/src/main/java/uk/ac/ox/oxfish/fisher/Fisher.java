@@ -118,6 +118,10 @@ public class Fisher implements Steppable, Startable, Agent {
      * collection of adaptation algorithms to fire every 2 months
      */
     private final AdaptationDailyScheduler bimonthlyAdaptation = new AdaptationDailyScheduler(60);
+    /**
+     * collection of adaptation algorithms to fire every 365  days
+     */
+    private final AdaptationDailyScheduler yearlyAdaptation = new AdaptationDailyScheduler(365);
 
 
     /***
@@ -128,9 +132,9 @@ public class Fisher implements Steppable, Startable, Agent {
      *            |_|      |_|
      */
     /**
-     * collection of adaptation algorithms to fire every 365  days
+     * collection of adaptation algorithms to fire every trip
      */
-    private final AdaptationDailyScheduler yearlyAdaptation = new AdaptationDailyScheduler(365);
+    private final AdaptationPerTripScheduler tripAdaptation = new AdaptationPerTripScheduler();
 
     /***
      *      ___ _            _            _
@@ -139,11 +143,13 @@ public class Fisher implements Steppable, Startable, Agent {
      *     |___/\__|_| \__,_|\__\___\__, |_\___/__/
      *                              |___/
      */
-    /**
-     * collection of adaptation algorithms to fire every trip
-     */
-    private final AdaptationPerTripScheduler tripAdaptation = new AdaptationPerTripScheduler();
     private final LinkedList<DockingListener> dockingListeners = new LinkedList<>();
+    /**
+     * An immutable copy of the tags list, which needs to be manually refreshed
+     * by calling {@link #refreshTagSet()} if the tag list changes. Ideally, we'd monitor the
+     * list for changes ourselves, but we can't since we're exposing the mutable list.
+     */
+    private Set<String> tagSet = ImmutableSet.of();
     /**
      * a link to the model. Grabbed when start() is called. It's not used or shared except when a new strategy is plugged in
      * at which point this reference is used to call the strategy's start method
@@ -1109,7 +1115,11 @@ public class Fisher implements Steppable, Startable, Agent {
 
     @Override
     public Set<String> getTags() {
-        return ImmutableSet.copyOf(getTagsList());
+        return tagSet;
+    }
+
+    public void refreshTagSet() {
+        tagSet = ImmutableSet.copyOf(getTagsList());
     }
 
     /**
