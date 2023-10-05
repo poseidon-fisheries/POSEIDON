@@ -91,9 +91,6 @@ public abstract class EpoScenario<B extends LocalBiology>
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
         inputFolder,
         ImmutableMap.of(
-            Y2016, Paths.get("currents", "currents_2016.csv"),
-            Y2017, Paths.get("currents", "currents_2017.csv"),
-            Y2018, Paths.get("currents", "currents_2018.csv"),
             Y2021, Paths.get("currents", "currents_2021.csv"),
             Y2022, Paths.get("currents", "currents_2022.csv"),
             Y2023, Paths.get("currents", "currents_2017.csv") // using 2017 as proxy for 2023
