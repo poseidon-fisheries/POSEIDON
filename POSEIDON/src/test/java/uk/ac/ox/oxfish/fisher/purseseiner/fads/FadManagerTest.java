@@ -19,7 +19,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -38,13 +37,15 @@ import uk.ac.ox.oxfish.regulations.quantities.CurrentYearActionCount;
 import uk.ac.ox.oxfish.regulations.quantities.NumberOfActiveFads;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
 import uk.ac.ox.poseidon.agents.core.AtomicLongMapYearlyActionCounter;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.IntConsumer;
+import java.util.function.ToIntFunction;
 
 import static java.util.stream.IntStream.range;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
@@ -95,37 +96,40 @@ public class FadManagerTest {
         fadManager.setNumFadsInStock(10);
         final BiomassAggregatingFad fad1 = (BiomassAggregatingFad) fadManager.deployFadInCenterOfTile(seaTile, rng);
 
-        Assertions.assertEquals(9, fadManager.getNumFadsInStock());
-        Assertions.assertEquals(1, fadManager.getNumberOfActiveFads());
+        assertEquals(9, fadManager.getNumFadsInStock());
+        assertEquals(1, fadManager.getNumberOfActiveFads());
 
         // try a successful set
         when(rng.nextDouble()).thenReturn(1.0);
         new FadSetAction(fad1, fisher, 1.0)
             .act(fishState, fadManager.getFisher(), anarchy, 24);
-        Assertions.assertEquals(10, fadManager.getNumFadsInStock());
+        assertEquals(10, fadManager.getNumFadsInStock());
 
         final BiomassAggregatingFad fad2 = (BiomassAggregatingFad) fadManager.deployFadInCenterOfTile(seaTile, rng);
-        Assertions.assertEquals(9, fadManager.getNumFadsInStock());
-        Assertions.assertEquals(2, fadManager.getNumberOfActiveFads());
+        assertEquals(9, fadManager.getNumFadsInStock());
+        assertEquals(2, fadManager.getNumberOfActiveFads());
 
         // try with a failed set
         when(rng.nextDouble()).thenReturn(1.0);
         new FadSetAction(fad2, fisher, 1.0)
             .act(fishState, fadManager.getFisher(), anarchy, 24);
-        Assertions.assertEquals(10, fadManager.getNumFadsInStock());
+        assertEquals(10, fadManager.getNumFadsInStock());
 
     }
 
     @Test
     public void testNumberOfRemainingActions() {
+        final LocalDateTime now = LocalDateTime.now();
+        final int year = now.getYear();
         final FishState fishState = mock(FishState.class);
         final MersenneTwisterFast rng = mock(MersenneTwisterFast.class);
         when(fishState.getRandom()).thenReturn(rng);
-        when(fishState.getDate()).thenReturn(LocalDate.now());
+        when(fishState.getDate()).thenReturn(now.toLocalDate());
+        when(fishState.getCalendarYear()).thenReturn(year);
         final Fisher fisher = mock(Fisher.class);
         when(fisher.grabState()).thenReturn(fishState);
 
-        final AllOf fadLimit = new AllOf(
+        final AllOf activeFadsLimit = new AllOf(
             new ActionCodeIs(DPL.name()),
             new Not(new Below(new NumberOfActiveFads(), 30))
         );
@@ -133,42 +137,64 @@ public class FadManagerTest {
             new ActionCodeIs(DPL.name()),
             new Not(new Below(new CurrentYearActionCount(DPL.name()), 20))
         );
+        final Regulations fadLimitOnly = new ForbiddenIf(activeFadsLimit).apply(fishState);
+        final Regulations bothLimits = new ForbiddenIf(new AnyOf(activeFadsLimit, actionLimit)).apply(fishState);
 
         final YearlyActionCounter yearlyActionCounter = AtomicLongMapYearlyActionCounter.create();
         final AtomicLong numberOfActiveFads = new AtomicLong(5);
+
+        final ToIntFunction<Regulations> n = regulations ->
+            numberOfPermissibleActions(
+                fisher,
+                regulations,
+                yearlyActionCounter,
+                numberOfActiveFads.get(),
+                DPL,
+                50
+            );
+
 
         final IntConsumer deploy = i -> {
             yearlyActionCounter.observe(new FadManager.DummyAction(
                 DPL.name(),
                 fisher,
-                LocalDateTime.now(),
+                now,
                 yearlyActionCounter,
                 numberOfActiveFads
             ));
             numberOfActiveFads.incrementAndGet();
         };
 
+        // Since we initially have 5 active FADs and no deployments, we should
+        // be able to deploy 25 more according to the active FADs limit
+        assertEquals(25, n.applyAsInt(fadLimitOnly));
+        // but only 20 if we use the action limit
+        assertEquals(20, n.applyAsInt(bothLimits));
+
+        // Now, deploying 10 FADs
         range(0, 10).forEach(deploy);
+        // should take us to 15 active FADs
+        assertEquals(15, numberOfActiveFads.get());
+        // and 10 deployments,
+        assertEquals(10, yearlyActionCounter.getCount(year, fisher, DPL.name()));
 
-        Assertions.assertEquals(15, numberOfPermissibleActions(
-            fisher,
-            new ForbiddenIf(fadLimit).apply(fishState),
-            yearlyActionCounter,
-            numberOfActiveFads.get(),
-            DPL,
-            50
-        ));
+        // which means we should be able to deploy 10 more
+        // before reaching the limit of 30 active FADs
+        assertEquals(15, n.applyAsInt(fadLimitOnly));
+        // but only 10 more with the action limit
+        assertEquals(10, n.applyAsInt(bothLimits));
 
-        range(0, 5).forEach(deploy);
+        // and then if we deploy 10 more
+        range(0, 10).forEach(deploy);
+        // it should take us to 20 active FADs
+        assertEquals(25, numberOfActiveFads.get());
+        // and 15 deployments,
+        assertEquals(20, yearlyActionCounter.getCount(year, fisher, DPL.name()));
 
-        Assertions.assertEquals(5, numberOfPermissibleActions(
-            fisher,
-            new ForbiddenIf(new AnyOf(fadLimit, actionLimit)).apply(fishState),
-            yearlyActionCounter,
-            numberOfActiveFads.get(),
-            DPL,
-            50
-        ));
+        // which means there is still room for 5 active FADs
+        assertEquals(5, n.applyAsInt(fadLimitOnly));
+        // but we have expended our deployments
+        assertEquals(0, n.applyAsInt(bothLimits));
 
     }
 }

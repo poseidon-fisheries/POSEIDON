@@ -37,9 +37,11 @@ import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.observers.Observers;
 import uk.ac.ox.oxfish.regulations.quantities.NumberOfActiveFads;
 import uk.ac.ox.oxfish.regulations.quantities.YearlyActionCount;
+import uk.ac.ox.oxfish.utility.BinarySearch;
 import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.agents.api.Agent;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
+import uk.ac.ox.poseidon.agents.api.YearlyActionCounts;
 import uk.ac.ox.poseidon.agents.core.BasicAction;
 import uk.ac.ox.poseidon.common.api.Observer;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
@@ -51,6 +53,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -62,18 +65,16 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FadManager {
 
-    private static final List<Class<? extends PurseSeinerAction>> POSSIBLE_ACTIONS =
-        ImmutableList.of(
-            FadDeploymentAction.class,
-            AbstractFadSetAction.class,
-            DolphinSetAction.class,
-            NonAssociatedSetAction.class
-        );
+    private static final List<Class<? extends PurseSeinerAction>> POSSIBLE_ACTIONS = ImmutableList.of(
+        FadDeploymentAction.class,
+        AbstractFadSetAction.class,
+        DolphinSetAction.class,
+        NonAssociatedSetAction.class
+    );
     private final FadMap fadMap;
     private final Observers observers = new Observers();
     private final YearlyActionCounter yearlyActionCounter;
-    private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>>
-        biomassLostMonitor;
+    private final Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor;
     private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
     private final FadInitializer<?, ?> fadInitializer;
     private final FishValueCalculator fishValueCalculator;
@@ -131,15 +132,10 @@ public class FadManager {
                 OpportunisticFadSetAction.class,
                 NonAssociatedSetAction.class,
                 DolphinSetAction.class
-            ).forEach(actionClass ->
-                registerObserver(actionClass, yearlyActionCounter)
-            );
+            ).forEach(actionClass -> registerObserver(actionClass, yearlyActionCounter));
         }
 
-        fadDeploymentObservers.forEach(observer -> registerObserver(
-            FadDeploymentAction.class,
-            observer
-        ));
+        fadDeploymentObservers.forEach(observer -> registerObserver(FadDeploymentAction.class, observer));
         allSetsObservers.forEach(observer -> {
             registerObserver(FadSetAction.class, observer);
             registerObserver(OpportunisticFadSetAction.class, observer);
@@ -150,23 +146,13 @@ public class FadManager {
             registerObserver(FadSetAction.class, observer);
             registerObserver(OpportunisticFadSetAction.class, observer);
         });
-        nonAssociatedSetObservers.forEach(observer -> registerObserver(
-            NonAssociatedSetAction.class,
-            observer
-        ));
-        dolphinSetObservers.forEach(observer -> registerObserver(
-            DolphinSetAction.class,
-            observer
-        ));
-        biomassLostMonitor.ifPresent(observer -> registerObserver(
-            BiomassLostEvent.class,
-            observer
-        ));
+        nonAssociatedSetObservers.forEach(observer -> registerObserver(NonAssociatedSetAction.class, observer));
+        dolphinSetObservers.forEach(observer -> registerObserver(DolphinSetAction.class, observer));
+        biomassLostMonitor.ifPresent(observer -> registerObserver(BiomassLostEvent.class, observer));
     }
 
     public <T> void registerObserver(
-        final Class<T> observedClass,
-        final Observer<? super T> observer
+        final Class<T> observedClass, final Observer<? super T> observer
     ) {
         observers.register(observedClass, observer);
     }
@@ -175,9 +161,8 @@ public class FadManager {
         final Fisher fisher
     ) {
         return maybeGetFadManager(fisher).orElseThrow(() -> new IllegalArgumentException(
-            "PurseSeineGear required to get FadManager instance. Fisher "
-                + fisher + " is using " + fisher.getGear().getClass() + "."
-        ));
+            "PurseSeineGear required to get FadManager instance. Fisher " + fisher + " is using " + fisher.getGear()
+                .getClass() + "."));
     }
 
     public static Optional<FadManager> maybeGetFadManager(
@@ -188,7 +173,7 @@ public class FadManager {
 
     public int numberOfPermissibleActions(
         final ActionClass actionClass,
-        final int limit,
+        final int maximumToCheckFor,
         final Regulations regulations
     ) {
         return numberOfPermissibleActions(
@@ -197,37 +182,59 @@ public class FadManager {
             getYearlyActionCounter(),
             getNumberOfActiveFads(),
             actionClass,
-            limit
+            maximumToCheckFor
         );
     }
 
     public static int numberOfPermissibleActions(
         final Fisher fisher,
         final Regulations regulations,
-        final YearlyActionCounter yearlyActionCounter,
+        final YearlyActionCounts yearlyActionCounter,
         final long numberOfActiveFads,
         final ActionClass actionClass,
-        final int limit
+        final int maximumToCheckFor
     ) {
         checkNotNull(actionClass);
-        checkArgument(limit >= 0);
+        checkArgument(maximumToCheckFor >= 0);
 
-        final YearlyActionCounter dummyYearlyActionCounter = yearlyActionCounter.copy();
-        final AtomicLong dummyNumberOfActiveFads = new AtomicLong(numberOfActiveFads);
+        /*
+          Action counts that delegate to the real counters except for the
+          current year/agent/action class, in which case `addedCount`
+          is added to the real count.
+         */
+        class ActionCountsWithOverride implements YearlyActionCounts {
+            private long addedCount;
 
+            @Override
+            public long getCount(final int year, final Agent agent, final String actionCode) {
+                final long realCount = yearlyActionCounter.getCount(year, agent, actionCode);
+                final boolean isOverride =
+                    year == fisher.grabState().getCalendarYear() &&
+                        agent == fisher &&
+                        actionCode.equals(actionClass.name());
+                return realCount + (isOverride ? addedCount : 0);
+            }
+        }
+
+        final ActionCountsWithOverride dummyActionCounts = new ActionCountsWithOverride();
+        final AtomicLong dummyNumberOfActiveFads = new AtomicLong();
         final Action dummyAction = new DummyAction(
             actionClass.name(),
             fisher,
-            dummyYearlyActionCounter,
+            dummyActionCounts,
             dummyNumberOfActiveFads
         );
-        int i = 0;
-        while (i < limit && regulations.isPermitted(dummyAction)) {
-            i++;
-            dummyYearlyActionCounter.observe(dummyAction);
-            if (actionClass == DPL) dummyNumberOfActiveFads.incrementAndGet();
-        }
-        return i;
+
+        final Predicate<Integer> wouldBePermitted = n -> {
+            // pretend that (n - 1) actions have happened
+            // and that we're about to take the n^th action
+            dummyActionCounts.addedCount = n - 1;
+            dummyNumberOfActiveFads.set(numberOfActiveFads + (actionClass == DPL ? n - 1 : 0));
+            return regulations.isPermitted(dummyAction);
+        };
+
+        return BinarySearch.highestWhere(maximumToCheckFor, wouldBePermitted);
+
     }
 
     public Fisher getFisher() {
@@ -278,12 +285,7 @@ public class FadManager {
     private Fad initFad(final SeaTile tile, final MersenneTwisterFast rng) {
         checkState(numFadsInStock >= 1, "No FADs in stock!");
         numFadsInStock--;
-        final Fad newFad = fadInitializer.makeFad(
-            this,
-            fisher,
-            tile,
-            rng
-        );
+        final Fad newFad = fadInitializer.makeFad(this, fisher, tile, rng);
         deployedFads.add(newFad);
         return newFad;
     }
@@ -307,9 +309,7 @@ public class FadManager {
         this.observers.reactTo(observedClass, observableSupplier);
     }
 
-    public Optional<
-        GroupingMonitor<Species, BiomassLostEvent, Double, Mass>
-        > getBiomassLostMonitor() {
+    public Optional<GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> getBiomassLostMonitor() {
         return biomassLostMonitor;
     }
 
@@ -337,12 +337,11 @@ public class FadManager {
     }
 
     public static class DummyAction extends BasicAction implements YearlyActionCount.Getter, NumberOfActiveFads.Getter {
-        private final YearlyActionCounter yearlyActionCounter;
+        private final YearlyActionCounts yearlyActionCounts;
         private final AtomicLong numberOfActiveFads;
 
         public DummyAction(
-            final String code,
-            final Fisher fisher
+            final String code, final Fisher fisher
         ) {
             this(
                 code,
@@ -357,27 +356,21 @@ public class FadManager {
             final String code,
             final Agent agent,
             final LocalDateTime dateTime,
-            final YearlyActionCounter yearlyActionCounter,
+            final YearlyActionCounts yearlyActionCounts,
             final AtomicLong numberOfActiveFads
         ) {
             super(code, agent, dateTime, null);
-            this.yearlyActionCounter = yearlyActionCounter;
+            this.yearlyActionCounts = yearlyActionCounts;
             this.numberOfActiveFads = numberOfActiveFads;
         }
 
         public DummyAction(
             final String code,
             final Fisher fisher,
-            final YearlyActionCounter yearlyActionCounter,
+            final YearlyActionCounts yearlyActionCounts,
             final AtomicLong numberOfActiveFads
         ) {
-            this(
-                code,
-                fisher,
-                fisher.grabState().getDate().atStartOfDay(),
-                yearlyActionCounter,
-                numberOfActiveFads
-            );
+            this(code, fisher, fisher.grabState().getDate().atStartOfDay(), yearlyActionCounts, numberOfActiveFads);
         }
 
         @Override
@@ -387,7 +380,7 @@ public class FadManager {
 
         @Override
         public long getYearlyActionCount(final int year, final String actionCode) {
-            return yearlyActionCounter.getCount(year, getAgent(), actionCode);
+            return yearlyActionCounts.getCount(year, getAgent(), actionCode);
         }
     }
 

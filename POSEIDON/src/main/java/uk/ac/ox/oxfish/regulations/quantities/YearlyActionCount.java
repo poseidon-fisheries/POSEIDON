@@ -34,7 +34,7 @@ public abstract class YearlyActionCount implements AlgorithmFactory<Quantity> {
     public Quantity apply(final FishState fishState) {
         final String actionCodeValue = actionCode.getValue();
         return action -> {
-            checkArgument(action instanceof NumberOfActiveFads.Getter);
+            checkArgument(action instanceof Getter);
             return ((Getter) action).getYearlyActionCount(getYear(fishState), actionCodeValue);
         };
     }
