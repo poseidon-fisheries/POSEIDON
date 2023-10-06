@@ -89,6 +89,9 @@ dependencies {
     // Reference implementation of JSR-385 for units of measure
     implementation 'si.uom:si-quantity:2.1'
     implementation 'si.uom:si-units:2.1'
+
+    //Google OR tools for solving Linear Programs
+    implementation 'com.google.ortools:ortools-java:9.6.2534'
 }
 
 processTestResources.doFirst {
