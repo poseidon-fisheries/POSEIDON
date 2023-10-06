@@ -14,7 +14,7 @@ public class CalibrationGeneratorTest {
         new CalibrationGenerator().generateCalibration(
             new EpoPathPlannerAbundanceScenario(),
             calibrationFolder,
-            calibrationFolder.resolve("calibration_targets.csv"),
+            calibrationFolder.resolve("priority_calibration_targets.csv"),
             new EpoPathPlannerAbundanceScenario().getTargetYear().getValue(),
             1,
             2
