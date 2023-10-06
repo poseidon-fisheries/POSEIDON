@@ -36,7 +36,7 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
     /**
      * the number of recruits you'd get in a "virgin" state.
      */
-    private final int virginRecruits;
+    private final long virginRecruits;
 
     /**
      * logistic growth parameter
@@ -67,7 +67,7 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
 
 
     public RecruitmentBySpawningBiomass(
-        final int virginRecruits,
+        final long virginRecruits,
         final double steepness,
         final double cumulativePhi, final boolean addRelativeFecundityToSpawningBiomass, final double[] maturity,
         final double[] relativeFecundity, final int femaleSubdivision, final boolean recruitEveryDay
@@ -95,7 +95,7 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
 
 
     public RecruitmentBySpawningBiomass(
-        final int virginRecruits,
+        final long virginRecruits,
         final double steepness,
         final double cumulativePhi, final boolean addRelativeFecundityToSpawningBiomass,
         final Function<Species, double[]> maturity,
@@ -193,7 +193,7 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
      *
      * @return Value for property 'virginRecruits'.
      */
-    public int getVirginRecruits() {
+    public long getVirginRecruits() {
         return virginRecruits;
     }
 
