@@ -55,7 +55,9 @@ public class RecruitmentProcessesFactory
                         );
                         final float r0 = record.getFloat("R0");
                         return entry(species, new RecruitmentBySpawningBiomass(
-                            Math.round(r0),
+                            (long)(r0),
+
+
                             record.getDouble("h_steepness"),
                             record.getDouble("virgin_ssb") / r0,
                             false,
