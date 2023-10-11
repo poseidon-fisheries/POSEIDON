@@ -2,11 +2,11 @@ package uk.ac.ox.oxfish.model.market.supplychain;
 
 public class GenericProcessor {
     String name;
+    String location;
     double[] maxOutput;
 
     //cannery transformation ability
     double[] transformationAbility;
-
     double[] processingCost;
 
     public GenericProcessor(double[] maxOutput,
@@ -17,6 +17,17 @@ public class GenericProcessor {
         this.processingCost = processingCost;
     }
 
+    public GenericProcessor(String name,
+                            String location,
+                            double[] maxOutput,
+                            double[] transformationAbility,
+                            double[] processingCost){
+        this.name = name;
+        this.location = location;
+        this.maxOutput = maxOutput;
+        this.transformationAbility = transformationAbility;
+        this.processingCost = processingCost;
+    }
     public GenericProcessor(String name,
                             double[] maxOutput,
                             double[] transformationAbility,

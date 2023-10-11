@@ -3,7 +3,21 @@ package uk.ac.ox.oxfish.model.market.supplychain;
 import com.google.ortools.Loader;
 import com.google.ortools.linearsolver.*;
 
+import uk.ac.ox.oxfish.biology.Species;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
 public class SupplyChain {
+    List<String> speciesNames = new ArrayList<>();
+    List<String> locationNames = new ArrayList<>();
+
     MPSolver solver;
     double infinity = java.lang.Double.POSITIVE_INFINITY;
 
@@ -368,6 +382,147 @@ public class SupplyChain {
     }*/
 
 
+    public List<GenericPort> readPortsFromCSV(String path){
+        List<GenericPort> ports = new ArrayList<>();
+        Path pathToFile = Paths.get(path);
 
+        try(BufferedReader br = Files.newBufferedReader(pathToFile, StandardCharsets.US_ASCII)){
+            String line = br.readLine(); //First line is a header
+            line = br.readLine();
+            while(line != null){
+                String[] attributes = line.split(",");
+                GenericPort port = createPort(attributes);
+                ports.add(port);
+                line=br.readLine();
+            }
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return ports;
+    }
+
+    public List<GenericProcessor> readFacilitiesFromCSV(String path){
+        List<GenericProcessor> facilities = new ArrayList<>();
+        Path pathToFile = Paths.get(path);
+        try(BufferedReader br = Files.newBufferedReader(pathToFile, StandardCharsets.US_ASCII)){
+            String line = br.readLine(); //First line is a header
+            line = br.readLine();
+            while(line != null){
+                String[] attributes = line.split(",");
+                GenericProcessor facility = createFacility(attributes);
+                facilities.add(facility);
+                line=br.readLine();
+            }
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return facilities;
+
+    }
+
+    public List<GenericMarket> readMarketsFromCSV(String path){
+        List<GenericMarket> markets = new ArrayList<>();
+        Path pathToFile = Paths.get(path);
+        try(BufferedReader br = Files.newBufferedReader(pathToFile, StandardCharsets.US_ASCII)){
+            String line = br.readLine(); //First line is a header
+            line = br.readLine();
+            while(line != null){
+                String[] attributes = line.split(",");
+                GenericMarket market = createMarket(attributes);
+                markets.add(market);
+                line=br.readLine();
+            }
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return markets;
+    }
+
+    public List<TransportCost> readTransportCostsFromCSV(String path){
+        List<TransportCost> costs = new ArrayList<>();
+        Path pathToFile = Paths.get(path);
+        try(BufferedReader br = Files.newBufferedReader(pathToFile, StandardCharsets.US_ASCII)){
+            String line = br.readLine(); //First line is a header
+            line = br.readLine();
+            while(line != null){
+                String[] attributes = line.split(",");
+                TransportCost cost = createTransportCost(attributes);
+                costs.add(cost);
+                line=br.readLine();
+            }
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return costs;
+    }
+
+
+
+
+    private static int getIndex(List<String> list, String token){
+        if(list.indexOf(token) > -1){
+            return (list.indexOf(token));
+        } else {
+            list.add(token);
+            return (list.indexOf(token));
+        }
+    }
+
+    private  GenericPort createPort(String[] data){
+        String name = data[0];
+        String location = data[1];
+        int locationIndex = getIndex(locationNames,location);
+        double[] landings = new double[(data.length-2)/2];
+        //System.out.println(data.length);
+        for(int i=0; i<(data.length-2)/2; i++){
+            int speciesIndex = getIndex(speciesNames, data[i*2+2]);
+           // System.out.println(speciesIndex);
+            landings[speciesIndex] = Double.parseDouble(data[i*2+3]);
+        }
+        return new GenericPort(name, location, landings);
+    }
+
+    private  GenericProcessor createFacility(String[] data){
+        String name = data[0];
+        String location = data[1];
+        int locationIndex = getIndex(locationNames, location);
+        double coldStorage = Double.parseDouble(data[2]);
+        double CTA = Double.parseDouble(data[3]);
+        double maxLoining = Double.parseDouble(data[4]);
+        double maxCanning = Double.parseDouble(data[5]);
+        return new GenericProcessor(name, location, new double[]{maxLoining,maxCanning},new double[]{CTA}, new double[]{41.52, 87.80-41.52} );
+    }
+
+    private TransportCost createTransportCost(String[] data){
+        String origin = data[0];
+        String destination = data[1];
+        double cost = Double.parseDouble(data[2]);
+        return new TransportCost(getIndex(locationNames, origin),
+                getIndex(locationNames, destination),
+                cost);
+        }
+
+
+    private GenericMarket createMarket(String[] data){
+        String name = data[0];
+        String location = data[1];
+        int locationIndex = getIndex(locationNames, location);
+        double canDemand = Double.parseDouble(data[2]);
+        //then
+        //loin demand per species
+        double[] loinDemand = new double[(data.length-3)/2];
+        //System.out.println(data.length);
+        for(int i=0; i<(data.length-3)/2; i++){
+            int speciesIndex = getIndex(speciesNames, data[i*2+3]);
+            // System.out.println(speciesIndex);
+            loinDemand[speciesIndex] = Double.parseDouble(data[i*2+4]);
+        }
+        return new GenericMarket(name, location,loinDemand, new double[]{canDemand} );
+    }
 
 }
+

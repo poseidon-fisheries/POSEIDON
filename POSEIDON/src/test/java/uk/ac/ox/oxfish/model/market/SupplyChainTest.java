@@ -1,14 +1,15 @@
 package uk.ac.ox.oxfish.model.market;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.oxfish.model.market.supplychain.GenericMarket;
-import uk.ac.ox.oxfish.model.market.supplychain.GenericPort;
-import uk.ac.ox.oxfish.model.market.supplychain.GenericProcessor;
-import uk.ac.ox.oxfish.model.market.supplychain.SupplyChain;
+import uk.ac.ox.oxfish.model.market.supplychain.*;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 
 public class SupplyChainTest {
+
+
 
     @Test
     public void testSimpleSupplyChain(){
@@ -61,6 +62,16 @@ public class SupplyChainTest {
                 1.5,
                 2.5,
                 1.1);
+
+        List<GenericPort> testPorts = testSupplyChain.readPortsFromCSV(Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "ports.csv").toAbsolutePath().toString());
+        List<GenericProcessor> testFacilities = testSupplyChain.readFacilitiesFromCSV(Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "facilities.csv").toAbsolutePath().toString());
+        List<GenericMarket> testMarkets = testSupplyChain.readMarketsFromCSV(Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "demands.csv").toAbsolutePath().toString());
+        List<ImportTarriff> importTarriffs;
+        List<TransportCost> transportCosts = testSupplyChain.readTransportCostsFromCSV(Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "transportation_costs.csv").toAbsolutePath().toString());
+
+
+        //breakpoint
+
         testSupplyChain.initializeLP();
         testSupplyChain.establishConstraints(0);
         testSupplyChain.setObjective(0);
