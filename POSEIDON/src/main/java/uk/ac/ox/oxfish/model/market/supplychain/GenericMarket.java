@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.market.supplychain;
 
 public class GenericMarket {
     String name;
+    int locationIndex;
     String location;
     double[] demandLoin;
     double[] demandPackaged;
@@ -19,6 +20,18 @@ public class GenericMarket {
                          double[] demandPackaged){
         this.name = name;
         this.location = location;
+        this.demandLoin = demandLoin;
+        this.demandPackaged = demandPackaged;
+    }
+
+    public GenericMarket(String name,
+                         String location,
+                         int locationIndex,
+                         double[] demandLoin,
+                         double[] demandPackaged){
+        this.name = name;
+        this.location = location;
+        this.locationIndex = locationIndex;
         this.demandLoin = demandLoin;
         this.demandPackaged = demandPackaged;
     }
@@ -42,4 +55,6 @@ public class GenericMarket {
     public String getName(){
         return name;
     }
+
+    public int getLocationIndex(){ return locationIndex;}
 }

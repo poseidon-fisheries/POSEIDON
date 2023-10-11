@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.model.market.supplychain;
 public class GenericPort {
     String name;
     String location;
+    int locationIndex;
     double[] landings;
 
 
@@ -14,6 +15,13 @@ public class GenericPort {
     public GenericPort(String name, String location, double[] landings){
         this.name = name;
         this.location = location;
+        this.landings = landings;
+    }
+
+    public GenericPort(String name, String location, int locationIndex, double[] landings){
+        this.name = name;
+        this.location = location;
+        this.locationIndex = locationIndex;
         this.landings = landings;
     }
 
@@ -37,6 +45,8 @@ public class GenericPort {
     public void updateLandings(int index, double newLandings){
         this.landings[index] = newLandings;
     }
+
+    public int getLocationIndex(){return locationIndex;}
 
 
 }

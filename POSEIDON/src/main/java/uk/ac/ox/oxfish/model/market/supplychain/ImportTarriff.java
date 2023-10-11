@@ -7,4 +7,6 @@ public class ImportTarriff {
     private int origin;
     private int destination;
     private double rate_raw, rate_loin, rate_packaged;
+
+
 }

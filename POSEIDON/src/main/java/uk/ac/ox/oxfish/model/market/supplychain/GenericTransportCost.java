@@ -1,11 +1,11 @@
 package uk.ac.ox.oxfish.model.market.supplychain;
 
-public class TransportCost {
+public class GenericTransportCost {
     int origin;
     int destination;
     double cost;
 
-    public TransportCost(int origin, int destination, double cost){
+    public GenericTransportCost(int origin, int destination, double cost){
         this.origin=origin;
         this.destination=destination;
         this.cost=cost;

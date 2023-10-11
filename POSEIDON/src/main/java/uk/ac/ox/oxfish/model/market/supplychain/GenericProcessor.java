@@ -3,7 +3,9 @@ package uk.ac.ox.oxfish.model.market.supplychain;
 public class GenericProcessor {
     String name;
     String location;
-    double[] maxOutput;
+    int locationIndex;
+    double[] maxOutput;  //index 0: loining capacity
+                        // index 1: canning(packaging) capacity
 
     //cannery transformation ability
     double[] transformationAbility;
@@ -28,6 +30,21 @@ public class GenericProcessor {
         this.transformationAbility = transformationAbility;
         this.processingCost = processingCost;
     }
+
+    public GenericProcessor(String name,
+                            String location,
+                            int locationIndex,
+                            double[] maxOutput,
+                            double[] transformationAbility,
+                            double[] processingCost){
+        this.name = name;
+        this.location = location;
+        this.locationIndex = locationIndex;
+        this.maxOutput = maxOutput;
+        this.transformationAbility = transformationAbility;
+        this.processingCost = processingCost;
+    }
+
     public GenericProcessor(String name,
                             double[] maxOutput,
                             double[] transformationAbility,
@@ -64,5 +81,6 @@ public class GenericProcessor {
     public String getName(){
         return name;
     }
+    public int getLocationIndex(){return locationIndex; }
 
 }
