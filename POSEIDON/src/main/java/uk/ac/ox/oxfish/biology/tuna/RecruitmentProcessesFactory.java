@@ -53,9 +53,9 @@ public class RecruitmentProcessesFactory
                         final Species species = fishState.getBiology().getSpeciesByCode(
                             record.getString("species_code")
                         );
-                        final float r0 = record.getFloat("R0");
+                        final double r0 = record.getDouble("R0");
                         return entry(species, new RecruitmentBySpawningBiomass(
-                            (long)r0,
+                            (long) r0,
                             record.getDouble("h_steepness"),
                             record.getDouble("virgin_ssb") / r0,
                             false,
