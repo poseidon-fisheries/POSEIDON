@@ -48,5 +48,6 @@ public class GenericPort {
 
     public int getLocationIndex(){return locationIndex;}
 
+    public String getLocation(){return location;}
 
 }

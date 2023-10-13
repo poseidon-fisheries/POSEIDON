@@ -65,57 +65,35 @@ public class SupplyChainTest {
                 1.1);
 */
         SupplyChain testSupplyChain = new SupplyChain();
+        testSupplyChain.initializeModel(
+                Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "ports.csv").toAbsolutePath().toString(),
+                Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "facilities.csv").toAbsolutePath().toString(),
+                Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "demands_s1.csv").toAbsolutePath().toString(),
+                Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "transportation_costs.csv").toAbsolutePath().toString(),
+                Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "tariffs.csv").toAbsolutePath().toString(),
+                new double[]{1100, 1500, 2500},
+                new double[]{999999999, (35.2 * 1000000) / (16.4 * 1000) * 1.4 , (2274.0 * 1000000)/(576.4*1000)}
+                );
 
-        List<GenericPort> testPorts = testSupplyChain.readPortsFromCSV(Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "ports.csv").toAbsolutePath().toString());
-        testSupplyChain.setPorts(testPorts);
-        List<GenericProcessor> testFacilities = testSupplyChain.readFacilitiesFromCSV(Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "facilities.csv").toAbsolutePath().toString());
-        testSupplyChain.setFacilities(testFacilities);
-        List<GenericMarket> testMarkets = testSupplyChain.readMarketsFromCSV(Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "demands.csv").toAbsolutePath().toString());
-        testSupplyChain.setMarkets(testMarkets);
-        List<GenericTransportCost> transportCosts = testSupplyChain.readTransportCostsFromCSV(Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "transportation_costs.csv").toAbsolutePath().toString());
-        double[][] transportCostMatrix = new double[testSupplyChain.getnLocations()][testSupplyChain.getnLocations()];
-        for(GenericTransportCost tc : transportCosts){
-            transportCostMatrix[tc.getOrigin()][tc.getDestination()] = tc.getCost();
-        }
-        testSupplyChain.setTransportCosts(transportCostMatrix);
-
-        List<GenericImportTariff> importTarriffs = testSupplyChain.readTariffsFromCSV(Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "tariffs.csv").toAbsolutePath().toString());
-        testSupplyChain.setTariffs(importTarriffs);
-
-        testSupplyChain.setProductCosts(1100,1500,2500);
-        int WCPOindex = testSupplyChain.getLocationIndex("Thailand");
-        double WCPOCostRaw = 1100;
-        double WCPOCostLoin = 1500;
-        double WCPOCostPackaged = 2500;
-        testSupplyChain.initializeWCPO(WCPOindex, WCPOCostRaw, WCPOCostLoin, WCPOCostPackaged);
-
-        //breakpoint
-
-        System.out.println(testSupplyChain.calculateTransportCosts(4,7,1,0));
+        System.out.println("------tests----------");
+        System.out.println("---------------------");
 
         testSupplyChain.initializeLP();
-
-        //breakpoint
-
         testSupplyChain.establishConstraints();
-
         testSupplyChain.setObjective();
-
         testSupplyChain.solveLP();
 
 //        System.out.println(testSupplyChain.getObjectiveValue());
 
-        testSupplyChain.solveDual();
+//        testSupplyChain.printPorts();
+//        testSupplyChain.printFacilities();
+//        testSupplyChain.printMarkets();
 
-
-        //breakpoint
+        System.out.println("SOLUTION NETWORK ---------------------");
+//        System.out.printf(testSupplyChain.generateSolutionNetwork());
+        System.out.println("--------------------------------------");
 
         testSupplyChain.printLandingsDual();
-        System.out.println("Port to Facility Transfers");
-        System.out.println(Arrays.deepToString(testSupplyChain.getPortTransfers(0)));
-
-//        System.out.println("Ex vessel prices");
-//        System.out.println(Arrays.toString(testSupplyChain.getExVesselPrices(0)));
 
     }
 }

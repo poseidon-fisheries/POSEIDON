@@ -83,4 +83,6 @@ public class GenericProcessor {
     }
     public int getLocationIndex(){return locationIndex; }
 
+    public String getLocation() {return location;
+    }
 }

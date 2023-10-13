@@ -55,6 +55,7 @@ public class GenericMarket {
     public String getName(){
         return name;
     }
+    public String getLocation(){return location;}
 
     public int getLocationIndex(){ return locationIndex;}
 }
