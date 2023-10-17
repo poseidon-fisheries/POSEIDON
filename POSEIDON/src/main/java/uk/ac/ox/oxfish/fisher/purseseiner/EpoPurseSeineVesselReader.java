@@ -166,6 +166,8 @@ public class EpoPurseSeineVesselReader implements AlgorithmFactory<List<Fisher>>
                     fisher.getTagsList().add(record.getString("flag"));
                 }
                 fisher.refreshTagSet();
+                // Need to update the gear here to initialize number of FADs in stock
+                fisher.updateGear(fishState.getRandom(), fishState, null);
                 // TODO: setMaxTravelTime(fisher, record.getDouble
                 //  ("max_trip_duration_in_hours"));
                 return fisher;
