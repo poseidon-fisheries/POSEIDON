@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class FadRefillGearStrategy implements GearStrategy {
@@ -49,11 +48,14 @@ public class FadRefillGearStrategy implements GearStrategy {
         final Action currentAction
     ) {
         final FadManager fadManager = getFadManager(fisher);
-        final String boatId = fisher.getId();
-        final int maxFads = checkNotNull(
-            maxFadsPerFisher.get(boatId),
-            "Max number of FADs not found for fisher %s", boatId
-        );
+        // As a temporary measure, hardcode maxFads as the max number of active FADs
+        // that a vessel can possibly have and see if it helps with calibration.
+        final int maxFads = 450;
+//        final String boatId = fisher.getId();
+//        final int maxFads = checkNotNull(
+//            maxFadsPerFisher.get(boatId),
+//            "Max number of FADs not found for fisher %s", boatId
+//        );
         // The very first time this method is called, at the start of the
         // simulation, the current trip isn't initialized yet,so we can't
         // charge the vessels for FADs, but that's fine with us since
