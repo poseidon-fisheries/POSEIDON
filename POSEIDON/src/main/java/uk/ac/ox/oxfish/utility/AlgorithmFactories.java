@@ -712,7 +712,8 @@ public class AlgorithmFactories {
             SecondLastYearlyFisherValue.class,
             YearlyFisherValue.class,
             PreviousYearActionCount.class,
-            SumOf.class
+            SumOf.class,
+            YearlyCounter.class
         ));
         addFactories(new Factories<>(
             AbundanceFilters.class,

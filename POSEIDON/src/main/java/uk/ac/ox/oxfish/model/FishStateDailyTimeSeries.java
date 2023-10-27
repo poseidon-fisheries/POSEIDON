@@ -29,6 +29,7 @@ import uk.ac.ox.oxfish.model.market.Market;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -63,31 +64,33 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
     /**
      * call this to start the observation
      *
-     * @param state    model
-     * @param observed the object to observe
+     * @param state     model
+     * @param fishState the object to observe
      */
     @Override
-    public void start(final FishState state, final FishState observed) {
+    public void start(final FishState state, final FishState fishState) {
 
         //get all the markets for this species
         //now register each
-        observed.getSpecies().forEach(species ->
+        fishState.getSpecies().forEach(species ->
             registerSummaryGatherers(
-                observed.getAllMarketsForThisSpecie(species)
+                fishState.getAllMarketsForThisSpecie(species)
                     .stream()
                     .flatMap(market -> market.getData().getColumns().stream())
                     ::iterator,
-                species.getName() + " %s"
+                species.getName() + " %s",
+                name -> name.equals("Landings"),
+                fishState.getYearlyCounter()
             )
         );
 
         //add a counter for all catches (including discards) by asking each fisher individually
-        for (final Species species : observed.getSpecies()) {
+        for (final Species species : fishState.getSpecies()) {
 
             final String catchesColumn = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
             registerGatherer(
                 catchesColumn,
-                (Gatherer<FishState>) ignored -> observed.getFishers().stream().mapToDouble(
+                (Gatherer<FishState>) ignored -> fishState.getFishers().stream().mapToDouble(
                     value -> value.getDailyCounter().getCatchesPerSpecie(species.getIndex())).sum(),
                 0d,
                 KILOGRAM,
@@ -98,17 +101,17 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         final List<Fisher> fishers = state.getFishers();
 
 
-        registerGatherer("Total Effort", (Gatherer<FishState>) ignored -> observed.getFishers().stream().mapToDouble(
+        registerGatherer("Total Effort", (Gatherer<FishState>) ignored -> fishState.getFishers().stream().mapToDouble(
             value -> value.getDailyCounter().getColumn(FisherYearlyTimeSeries.EFFORT)).sum(), 0d, HOUR, "Effort");
 
 
         registerGatherer(AVERAGE_LAST_TRIP_HOURLY_PROFITS, (Gatherer<FishState>) ignored -> {
 
-            if (fishers.size() == 0)
+            if (fishers.isEmpty())
                 return 0d;
 
             double sum = 0;
-            for (final Fisher fisher : observed.getFishers()) {
+            for (final Fisher fisher : fishState.getFishers()) {
                 final TripRecord lastTrip = fisher.getLastFinishedTrip();
                 if (lastTrip != null) {
                     final double lastProfits = lastTrip.getProfitPerHour(true);
@@ -122,10 +125,15 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         }, 0d);
 
 
-        super.start(state, observed);
+        super.start(state, fishState);
     }
 
-    private void registerSummaryGatherers(final Iterable<? extends DataColumn> allColumns, final String nameTemplate) {
+    private void registerSummaryGatherers(
+        final Iterable<? extends DataColumn> allColumns,
+        final String nameTemplate,
+        final Predicate<? super String> conditionForAddingCounter,
+        final Counter counter
+    ) {
         stream(allColumns)
             .collect(groupingBy(DataColumn::getName))
             .forEach((name, columns) -> {
@@ -139,14 +147,40 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
                     "All columns named '%s' must have same unit.",
                     columns.get(0).getName()
                 );
+                final String title = String.format(nameTemplate, name);
+                final boolean shouldAddCounter = conditionForAddingCounter.test(name);
+                if (shouldAddCounter && !counter.hasColumn(title)) {
+                    counter.addColumn(title);
+                }
+
+                final Gatherer<FishState> basicGatherer = __ ->
+                    columns.stream()
+                        .mapToDouble(DataColumn::getLatest)
+                        .sum();
+
+                final Gatherer<FishState> gatherer = shouldAddCounter
+                    ? gathererWithCounter(basicGatherer, title)
+                    : basicGatherer;
+
                 registerGatherer(
-                    String.format(nameTemplate, name),
-                    __ -> columns.stream().mapToDouble(DataColumn::getLatest).sum(),
+                    title,
+                    gatherer,
                     Double.NaN,
                     columns.get(0).getUnit(),
                     columns.get(0).getYLabel()
                 );
             });
+    }
+
+    private static Gatherer<FishState> gathererWithCounter(
+        final Gatherer<? super FishState> basicGatherer,
+        final String title
+    ) {
+        return fishState -> {
+            final Double value = basicGatherer.apply(fishState);
+            fishState.getYearlyCounter().count(title, value);
+            return value;
+        };
     }
 
 }

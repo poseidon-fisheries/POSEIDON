@@ -23,7 +23,7 @@ public class YamlScenarioRunner {
     @Parameter(names = {"-s", "--seed"})
     private long rngSeed = System.currentTimeMillis();
     @Parameter(names = {"-y", "--years"})
-    private int numYearsToRun = 1;
+    private int numYearsToRun = 2;
     @Parameter(converter = PathConverter.class)
     private Path scenarioPath =
         Paths.get(
