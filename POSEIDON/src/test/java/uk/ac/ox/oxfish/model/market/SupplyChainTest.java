@@ -66,31 +66,48 @@ public class SupplyChainTest {
 */
         SupplyChain testSupplyChain = new SupplyChain();
         testSupplyChain.initializeModel(
+                Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "ports2021.csv").toAbsolutePath().toString(),
+                Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "facilities_2022.csv").toAbsolutePath().toString(),
+                Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "demands2021.csv").toAbsolutePath().toString(),
+                Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "transportation_costs_2022.csv").toAbsolutePath().toString(),
+                Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "tariffs2021.csv").toAbsolutePath().toString(),
+//                new double[]{1500, 3250, 3800},
+//                new double[]{999999999, (35.2 * 1000000) / (16.4 * 1000) * 1.4 , (2274.0 * 1000000)/(576.4*1000)}
+                Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "product_costs2021.csv").toAbsolutePath().toString());
+
+        SupplyChain slice1b = new SupplyChain();
+        slice1b.initializeModel(
                 Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "ports.csv").toAbsolutePath().toString(),
                 Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "facilities.csv").toAbsolutePath().toString(),
                 Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "demands_s1.csv").toAbsolutePath().toString(),
-                Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "transportation_costs.csv").toAbsolutePath().toString(),
+                Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "transportation_costs_s1.csv").toAbsolutePath().toString(),
                 Paths.get("inputs", "epo_inputs", "tests", "supply_chain", "tariffs.csv").toAbsolutePath().toString(),
-                new double[]{1100, 1500, 2500},
-                new double[]{999999999, (35.2 * 1000000) / (16.4 * 1000) * 1.4 , (2274.0 * 1000000)/(576.4*1000)}
-                );
+                new double[]{1000, 1200, 1500},
+                new double[]{999999999, (35.2 * 1000000) / (16.4 * 1000) * 1.4 , (2274.0 * 1000000)/(576.4*1000)});
+/*
+        slice1b.run();
+        slice1b.printConstraints();
+        System.out.println("SOLUTION NETWORK ---------------------");
+        System.out.printf(slice1b.generateSolutionNetwork());
+        System.out.println("--------------------------------------");
+        slice1b.printLandingsDual();
+*/
 
         System.out.println("------tests----------");
+
         System.out.println("---------------------");
 
-        testSupplyChain.initializeLP();
-        testSupplyChain.establishConstraints();
-        testSupplyChain.setObjective();
-        testSupplyChain.solveLP();
+        testSupplyChain.run();
+//        testSupplyChain.printConstraints();
+
 
 //        System.out.println(testSupplyChain.getObjectiveValue());
-
 //        testSupplyChain.printPorts();
 //        testSupplyChain.printFacilities();
 //        testSupplyChain.printMarkets();
 
         System.out.println("SOLUTION NETWORK ---------------------");
-//        System.out.printf(testSupplyChain.generateSolutionNetwork());
+        System.out.printf(testSupplyChain.generateSolutionNetwork());
         System.out.println("--------------------------------------");
 
         testSupplyChain.printLandingsDual();

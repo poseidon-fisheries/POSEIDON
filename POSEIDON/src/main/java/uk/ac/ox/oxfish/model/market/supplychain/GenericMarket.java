@@ -4,7 +4,7 @@ public class GenericMarket {
     String name;
     int locationIndex;
     String location;
-    double[] demandLoin;
+    double[] demandLoin; //Index 3 for exchangeable
     double[] demandPackaged;
 
     public GenericMarket(String name,

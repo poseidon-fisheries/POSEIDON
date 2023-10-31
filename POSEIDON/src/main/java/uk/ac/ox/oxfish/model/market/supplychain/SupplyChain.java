@@ -42,8 +42,8 @@ public class SupplyChain {
     double[][][] productCost;
     boolean wcpoRaw=false, wcpoLoinProcessor=true, wcpoLoinMarket=true, wcpoPackageMarket=true;
     //Raw, localCostLoin, localCostPackaged;
-    double WCPORetailLoin;
-    double WCPORetailPackage;
+//    double WCPORetailLoin;
+//    double WCPORetailPackage;
 
     //Tarriffs
     List<GenericImportTariff> tariffs;
@@ -80,6 +80,23 @@ public class SupplyChain {
                                 String marketsFile,
                                 String transportationCostsFile,
                                 String tariffsFile,
+                                String costsFile){
+        setPorts(readPortsFromCSV(portsFile));
+        setFacilities(readFacilitiesFromCSV(facilitiesFile));
+        setMarkets(readMarketsFromCSV(marketsFile));
+        setTransportCosts(createTransportCostMatrixFromCSV(transportationCostsFile));
+        setTariffs(readTariffsFromCSV(tariffsFile));
+        setProductCosts(readProductCostsFromCSV(costsFile));
+        this.nSpecies = getnSpecies();
+    }
+
+
+
+    public void initializeModel(String portsFile,
+                                String facilitiesFile,
+                                String marketsFile,
+                                String transportationCostsFile,
+                                String tariffsFile,
                                 double[] productCosts,
                                 double[] wcpoCosts){
         setPorts(readPortsFromCSV(portsFile));
@@ -89,6 +106,7 @@ public class SupplyChain {
         setTariffs(readTariffsFromCSV(tariffsFile));
         setProductCosts(productCosts[0],productCosts[1],productCosts[2]);
         initializeWCPO(getLocationIndex("Thailand"), wcpoCosts[0], wcpoCosts[1], wcpoCosts[1], wcpoCosts[2]);
+        this.nSpecies = getnSpecies();
     }
 
     //-----------------------------------------------------------
@@ -171,9 +189,12 @@ public class SupplyChain {
 
         //Actually I think the left hand side should be scaled by CTA
         processorCapacity = new MPConstraint[nProcessor];
+//        System.out.println("nSpecies = "+nSpecies);
+//        System.out.println("nPort = "+nPort);
         for(int j=0; j<nProcessor; j++){
             processorCapacity[j] = solver.makeConstraint(0.0, facilities[j].getMaxOutput(0), "PC"+j);
             for(int s=0; s<nSpecies; s++) {
+//                System.out.println("CTA"+j+" "+s+":"+facilities[j].getTransformationAbility(s));
 //                processorCapacity[j].setCoefficient(WCPOToProcessor[s][j], 1.0);
                 processorCapacity[j].setCoefficient(WCPOToProcessor[s][j], facilities[j].getTransformationAbility(s));
                 for (int i = 0; i < nPort; i++) {
@@ -236,20 +257,45 @@ public class SupplyChain {
         }
 
         //Market Demands - Loins
-        marketDemandLoin = new MPConstraint[nSpecies][nMarkets];
+        marketDemandLoin = new MPConstraint[nSpecies+1][nMarkets];
+        // The "various species" demand is met exactly.
+        //for species "NA", WlMl + sum_j RMjl = DLl
+
+        // The individual species demand can be exceeded by exports
         //WlMl + sum_j RMjl = DLl
-        for(int s=0; s<nSpecies; s++){
+
+        for(int s=0; s<nSpecies+1; s++){
+//            System.out.println("s="+s);
             for(int l=0; l< nMarkets; l++){
-                marketDemandLoin[s][l] = solver.makeConstraint(markets[l].getDemandLoin(s),
-                        markets[l].getDemandLoin(s),
-                        "MDL"+s+"_"+l);
-                marketDemandLoin[s][l].setCoefficient(WCPOToMarketLoin[s][l], 1.0);
-                for(int j=0; j<nProcessor; j++){
-                    marketDemandLoin[s][l].setCoefficient(processorToMarket[s][j][l], 1.0);
+                if(s == getIndex(speciesNames, "NA")){
+                    double totalDemand = 0;
+                    for(int s1=0; s1<nSpecies+1; s1++){
+                        totalDemand += markets[l].getDemandLoin(s1);
+                    }
+                    marketDemandLoin[s][l] = solver.makeConstraint(totalDemand,
+                            totalDemand,
+                            "MDL"+s+"_"+l);
+                    for(int s1 = 0; s1<nSpecies; s1++){
+                        if(s1 != getIndex(speciesNames, "NA")){
+                            marketDemandLoin[s][l].setCoefficient(WCPOToMarketLoin[s1][l], 1.0);
+                            for(int j=0; j<nProcessor; j++){
+                                marketDemandLoin[s][l].setCoefficient(processorToMarket[s1][j][l], 1.0);
+                            }
+                        }
+                    }
+                }  else {
+                    marketDemandLoin[s][l] = solver.makeConstraint(markets[l].getDemandLoin(s),
+                            MPSolver.infinity(),
+                            "MDL"+s+"_"+l);
+                    marketDemandLoin[s][l].setCoefficient(WCPOToMarketLoin[s][l], 1.0);
+                    for(int j=0; j<nProcessor; j++){
+                        marketDemandLoin[s][l].setCoefficient(processorToMarket[s][j][l], 1.0);
+                    }
                 }
-//                System.out.println(stringifyConstraint(marketDemandLoin[s][l]));
             }
         }
+
+
 
         //Market Demands - Packaged
         marketDemandPackage = new MPConstraint[nMarkets];
@@ -314,7 +360,7 @@ public class SupplyChain {
                 for(int j=0; j<nProcessor; j++){
                     objective.setCoefficient(processorToMarket[s][j][l], getCostsProcessor2Market(s,j,l));
                 }
-                objective.setCoefficient(WCPOToMarketLoin[s][l], getCostsWCPO2Market(s, LOIN, l) + WCPORetailLoin);
+                objective.setCoefficient(WCPOToMarketLoin[s][l], getCostsWCPO2Market(s, LOIN, l) + productCost[WCPOindex][s][1]);
             }
         }
 
@@ -326,7 +372,7 @@ public class SupplyChain {
             for(int k=0; k<nPackager; k++){
                 objective.setCoefficient(packagerToMarket[k][l], getCostsPackager2Market(k,l));
             }
-            objective.setCoefficient(WCPOToMarketPackaged[l], getCostsWCPO2Market(0, PACKAGE, l)+WCPORetailPackage);
+            objective.setCoefficient(WCPOToMarketPackaged[l], getCostsWCPO2Market(0, PACKAGE, l)+productCost[WCPOindex][getIndex(speciesNames,"SKJ")][2]);
         }
 
         objective.setMinimization();
@@ -430,11 +476,17 @@ public class SupplyChain {
 
     //Actually Prints Shadow Prices
     public void printLandingsDual(){
+        String spHeader = "";
         for(int s=0; s<nSpecies; s++){
-            for(int i=0; i<nPort; i++){
-                System.out.println("Species "+s+", "+ports[i].getLocation()+": "+ - Math.round(landingsPerPort[s][i].dualValue()*100)/100.0 );
-
+            spHeader +=","+speciesNames.get(s);
+        }
+        System.out.println("Port"+spHeader);
+        for(int i=0; i<nPort; i++){
+            String prices="";
+            for(int s=0; s<nSpecies; s++){
+                prices +=","+ (- Math.round(landingsPerPort[s][i].dualValue()*100)/100.0);
             }
+            System.out.println(ports[i].getLocation()+prices);
         }
     }
 
@@ -475,8 +527,8 @@ public class SupplyChain {
         double tc = transportCostMatrix[originIndex][destIndex];
         double tariff = getTariffRate(originIndex, destIndex, s, product);
         double cost_per_tonne = 0;
-        if(product==1) cost_per_tonne=WCPORetailLoin;
-        if(product==2) cost_per_tonne=WCPORetailPackage;
+        if(product==1) cost_per_tonne=productCost[WCPOindex][s][1];
+        if(product==2) cost_per_tonne=productCost[WCPOindex][getIndex(speciesNames,"SKJ")][2];
         return tc*1000+cost_per_tonne*tariff;
     }
 
@@ -670,7 +722,10 @@ public class SupplyChain {
         return (locationNames.size());
     }
     public int getnSpecies(){
-        return (speciesNames.size());
+        if(speciesNames.contains("NA"))
+            return(speciesNames.size()-1);
+        else
+            return (speciesNames.size());
     }
     public double getTariffRate(int origin, int destination, int species, int product) {
         if(product==RAW) {
@@ -853,10 +908,16 @@ public class SupplyChain {
         String location = data[1];
         int locationIndex = getIndex(locationNames, location);
         double coldStorage = Double.parseDouble(data[2]);
-        double CTA = Double.parseDouble(data[3]);
-        double maxLoining = Double.parseDouble(data[4]);
-        double maxCanning = Double.parseDouble(data[5]);
-        return new GenericProcessor(name, location, locationIndex, new double[]{maxLoining,maxCanning},new double[]{CTA}, new double[]{41.52, 87.80-41.52} );
+        double maxLoining = Double.parseDouble(data[3]);
+        double maxCanning = Double.parseDouble(data[4]);
+        double[] CTA = new double[nSpecies];
+        for(int i=0; i<Math.min(nSpecies,(data.length - 5) / 2);i++){
+            int s = getIndex(speciesNames, data[5+i*2]);
+            CTA[s]=Double.parseDouble(data[5+i*2+1]);
+        }
+
+
+        return new GenericProcessor(name, location, locationIndex, new double[]{maxLoining,maxCanning},CTA, new double[]{41.52, 87.80-41.52} );
     }
 
     private GenericTransportCost createTransportCost(String[] data){
@@ -908,16 +969,21 @@ public class SupplyChain {
     public void setPorts(List<GenericPort> ports){
         this.ports = new GenericPort[ports.size()];
         this.ports = ports.toArray(this.ports);
+        this.nPort = this.ports.length;
     }
 
     public void setFacilities(List<GenericProcessor> facilities){
         this.facilities = new GenericProcessor[facilities.size()];
         this.facilities = facilities.toArray(this.facilities);
+        this.nProcessor = this.facilities.length;
+        this.nPackager = this.facilities.length;
+
     }
 
     public void setMarkets(List<GenericMarket> markets){
         this.markets = new GenericMarket[markets.size()];
         this.markets = markets.toArray(this.markets);
+        this.nMarkets = this.markets.length;
     }
 
     public void setTransportCosts(double[][] transportCostMatrix) {
@@ -931,8 +997,6 @@ public class SupplyChain {
             this.productCost[WCPOindex][s][LOIN]=wcpoCostLoin;
             this.productCost[WCPOindex][s][PACKAGE]=wcpoRetailPackage;
         }
-        this.WCPORetailLoin = wcpoRetailLoin;
-        this.WCPORetailPackage=wcpoRetailPackage;
     }
 
     public void setTariffs(List<GenericImportTariff> tariffs){
@@ -950,6 +1014,55 @@ public class SupplyChain {
         }
     }
 
+    public void setProductCosts(double[][][] costs){
+        //First index is wcpo vs local
+        //second index is species
+        //third index is product
+
+//        System.out.println("nSpecies = "+getnSpecies());
+
+        this.productCost = new double[getnLocations()][getnSpecies()][3];
+        this.WCPOindex = getLocationIndex("Thailand");
+        for(int l=0; l<getnLocations(); l++){
+            int source=(l==WCPOindex?0:1);
+            for(int s=0; s<nSpecies; s++){
+                this.productCost[l][s][RAW]=costs[source][s][RAW];
+                this.productCost[l][s][LOIN]=costs[source][s][LOIN];
+                this.productCost[l][s][PACKAGE]=costs[source][s][PACKAGE];
+            }
+        }
+//        setProductCosts(productCosts[0],productCosts[1],productCosts[2]);
+//        initializeWCPO(getLocationIndex("Thailand"), wcpoCosts[0], wcpoCosts[1], wcpoCosts[1], wcpoCosts[2]);
+        enableWCPOImports();
+    }
+
+    private double[][][] readProductCostsFromCSV(String path) {
+        double[][][] costs = new double[2][nSpecies][3];
+        Path pathToFile = Paths.get(path);
+        try(BufferedReader br = Files.newBufferedReader(pathToFile, StandardCharsets.US_ASCII)){
+            String line = br.readLine(); //First line is a header
+            line = br.readLine();
+            while(line != null){
+                String[] attributes = line.split(",");
+
+                int source = (attributes[0].equals("WCPO")?0:1);
+                int species = getIndex(speciesNames,attributes[1]);
+                for(int j=2; j<attributes.length;j++){
+                    double cost = 9999999999.0;
+                    if(!attributes[j].equals("na")) cost = Double.parseDouble(attributes[j]);
+                    costs[source][species][j-2] = cost;
+                }
+                line=br.readLine();
+            }
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return costs;
+    }
+
+
+
     public void enableWCPOImports(){
         wcpoRaw=true;
         wcpoLoinProcessor=true;
@@ -957,5 +1070,17 @@ public class SupplyChain {
         wcpoPackageMarket=true;
     }
 
+    public void printConstraints() {
+        for(MPConstraint constraint : solver.constraints()){
+            System.out.println(stringifyConstraint(constraint));
+        }
+    }
+
+    public void run() {
+        this.initializeLP();
+        this.establishConstraints();
+        this.setObjective();
+        this.solveLP();
+    }
 }
 
