@@ -7,7 +7,9 @@ import uk.ac.ox.oxfish.regulations.ForbiddenAreasFromShapeFiles;
 import uk.ac.ox.oxfish.regulations.ForbiddenIf;
 import uk.ac.ox.oxfish.regulations.NamedRegulations;
 import uk.ac.ox.oxfish.regulations.conditions.*;
-import uk.ac.ox.oxfish.regulations.quantities.*;
+import uk.ac.ox.oxfish.regulations.quantities.LastYearlyFisherValue;
+import uk.ac.ox.oxfish.regulations.quantities.NumberOfActiveFads;
+import uk.ac.ox.oxfish.regulations.quantities.SecondLastYearlyFisherValue;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
 
@@ -71,22 +73,6 @@ public class DefaultEpoRegulations {
                                     )
                                 )
                             )
-                        )
-                    )
-                ),
-                // Yearly set limits, set to 99999 as a placeholder
-                "Object-set limits", new ForbiddenIf(
-                    new AllOf(
-                        new AnyOf(
-                            new ActionCodeIs("FAD"),
-                            new ActionCodeIs("OFS")
-                        ),
-                        new NotBelow(
-                            new SumOf(
-                                new CurrentYearActionCount("FAD"),
-                                new CurrentYearActionCount("OFS")
-                            ),
-                            999999
                         )
                     )
                 ),
