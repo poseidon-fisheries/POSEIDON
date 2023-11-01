@@ -1,11 +1,13 @@
 package uk.ac.ox.oxfish.regulations;
 
+import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
 import uk.ac.ox.poseidon.regulations.core.ConjunctiveRegulations;
 
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
@@ -16,15 +18,8 @@ public class NamedRegulations implements AlgorithmFactory<Regulations> {
         this.regulations = regulations;
     }
 
+    @SuppressWarnings("unused")
     public NamedRegulations() {
-    }
-
-    public Map<String, AlgorithmFactory<Regulations>> getRegulations() {
-        return regulations;
-    }
-
-    public void setRegulations(final Map<String, AlgorithmFactory<Regulations>> regulations) {
-        this.regulations = regulations;
     }
 
     @Override
@@ -34,5 +29,25 @@ public class NamedRegulations implements AlgorithmFactory<Regulations> {
                 .map(regulation -> regulation.apply(fishState))
                 .collect(toImmutableSet())
         );
+    }
+
+    public void modify(
+        final String regulationName,
+        final UnaryOperator<AlgorithmFactory<Regulations>> operator
+    ) {
+        setRegulations(
+            ImmutableMap.<String, AlgorithmFactory<Regulations>>builder()
+                .putAll(getRegulations())
+                .put(regulationName, operator.apply(getRegulations().get(regulationName)))
+                .buildKeepingLast()
+        );
+    }
+
+    public Map<String, AlgorithmFactory<Regulations>> getRegulations() {
+        return regulations;
+    }
+
+    public void setRegulations(final Map<String, AlgorithmFactory<Regulations>> regulations) {
+        this.regulations = regulations;
     }
 }

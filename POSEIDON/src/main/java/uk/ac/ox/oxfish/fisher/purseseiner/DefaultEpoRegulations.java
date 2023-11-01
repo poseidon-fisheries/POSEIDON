@@ -15,12 +15,26 @@ import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.time.LocalDate;
 import java.time.MonthDay;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import static java.time.Month.*;
 
 public class DefaultEpoRegulations {
 
+    public static final Map<Integer, Map<String, Integer>> ACTIVE_FAD_LIMITS = ImmutableMap.of(
+        2021, ImmutableMap.of("6A", 300, "6B", 450),
+        2022, ImmutableMap.of("6A", 270, "6B", 400),
+        2023, ImmutableMap.of("6A", 255, "6B", 340),
+        2024, ImmutableMap.of("6A", 210, "6B", 340)
+    );
+    private static final ImmutableSet<Entry<Integer, Integer>> ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET = ImmutableMap.of(
+        1200, 10,
+        1500, 13,
+        1800, 16,
+        2100, 19,
+        2400, 22
+    ).entrySet();
     private static final MonthDay CLOSURE_A_START = MonthDay.of(JULY, 29);
     private static final MonthDay CLOSURE_A_END = MonthDay.of(OCTOBER, 8);
     private static final MonthDay CLOSURE_B_START = MonthDay.of(NOVEMBER, 9);
@@ -33,21 +47,6 @@ public class DefaultEpoRegulations {
 
         final InputPath regions = inputFolder.path("regions");
 
-        final ImmutableSet<Entry<Integer, Integer>> additionalClosureDaysByExcessTonnesOfBet = ImmutableMap.of(
-            1200, 10,
-            1500, 13,
-            1800, 16,
-            2100, 19,
-            2400, 22
-        ).entrySet();
-
-        final ImmutableSet<Entry<Integer, ImmutableMap<String, Integer>>> activeFadLimits = ImmutableMap.of(
-            2021, ImmutableMap.of("6A", 300, "6B", 450),
-            2022, ImmutableMap.of("6A", 270, "6B", 400),
-            2023, ImmutableMap.of("6A", 255, "6B", 340),
-            2024, ImmutableMap.of("6A", 210, "6B", 340)
-        ).entrySet();
-
         return new NamedRegulations(
             ImmutableMap.of(
                 "DEL licence", new ForbiddenIf(
@@ -56,26 +55,7 @@ public class DefaultEpoRegulations {
                         new Not(new AgentHasTag("has_del_license"))
                     )
                 ),
-                "Active-FAD limits", new ForbiddenIf(
-                    new AllOf(
-                        new ActionCodeIs("DPL"),
-                        new AnyOf(
-                            activeFadLimits.stream().map(yearAndLimits ->
-                                new AllOf(
-                                    new InYear(yearAndLimits.getKey()),
-                                    new AnyOf(
-                                        yearAndLimits.getValue().entrySet().stream().map(classAndLimit ->
-                                            new AllOf(
-                                                new AgentHasTag("class " + classAndLimit.getKey()),
-                                                new NotBelow(new NumberOfActiveFads(), classAndLimit.getValue())
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                ),
+                "Active-FAD limits", makeActiveFadLimits(ACTIVE_FAD_LIMITS),
                 // Forbid deployments 15 days before closure
                 "Closure A", new ForbiddenIf(
                     new AnyOf(
@@ -163,7 +143,7 @@ public class DefaultEpoRegulations {
                             new AllOf(
                                 new AgentHasTag("closure A"),
                                 new AnyOf(
-                                    additionalClosureDaysByExcessTonnesOfBet.stream().map(entry -> {
+                                    ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET.stream().map(entry -> {
                                             final MonthDay newClosureStart = addDays(
                                                 CLOSURE_A_START,
                                                 entry.getValue() * -1L
@@ -196,7 +176,7 @@ public class DefaultEpoRegulations {
                             new AllOf(
                                 new AgentHasTag("closure B"),
                                 new AnyOf(
-                                    additionalClosureDaysByExcessTonnesOfBet.stream().map(entry ->
+                                    ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET.stream().map(entry ->
                                         // This gets slightly complicated because we need to check for the catches
                                         // the year before the closure _starts_, and once we get to Jan 1st, that
                                         // not "last year" anymore, but the year before that, hence those different
@@ -225,6 +205,34 @@ public class DefaultEpoRegulations {
                                                 addDays(CLOSURE_B_END, entry.getValue())
                                             )
                                         )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+    }
+
+    /**
+     * TODO: this should be its own factory class
+     */
+    public static ForbiddenIf makeActiveFadLimits(
+        final Map<Integer, ? extends Map<String, Integer>> activeFadLimits
+    ) {
+        return new ForbiddenIf(
+            new AllOf(
+                new ActionCodeIs("DPL"),
+                new AnyOf(
+                    activeFadLimits.entrySet().stream().map(yearAndLimits ->
+                        new AllOf(
+                            new InYear(yearAndLimits.getKey()),
+                            new AnyOf(
+                                yearAndLimits.getValue().entrySet().stream().map(classAndLimit ->
+                                    new AllOf(
+                                        new AgentHasTag("class " + classAndLimit.getKey()),
+                                        new NotBelow(new NumberOfActiveFads(), classAndLimit.getValue())
                                     )
                                 )
                             )
