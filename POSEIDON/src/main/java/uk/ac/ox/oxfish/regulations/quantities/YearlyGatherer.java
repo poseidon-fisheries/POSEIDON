@@ -14,6 +14,10 @@ public class YearlyGatherer implements AlgorithmFactory<Quantity> {
     public YearlyGatherer() {
     }
 
+    public YearlyGatherer(final String name) {
+        this.name = new StringParameter(name);
+    }
+
     public YearlyGatherer(final StringParameter name) {
         this.name = name;
     }

@@ -8,20 +8,19 @@ import uk.ac.ox.oxfish.regulations.NamedRegulations;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static uk.ac.ox.oxfish.fisher.purseseiner.DefaultEpoRegulations.ACTIVE_FAD_LIMITS;
 import static uk.ac.ox.oxfish.fisher.purseseiner.DefaultEpoRegulations.makeActiveFadLimits;
 
-public class ActiveFadLimitsPolicies implements Supplier<List<Policy<EpoScenario<?>>>> {
+public class ActiveFadLimitsPolicies implements PolicySupplier {
 
     private final int referenceYear;
     private final int yearToModify;
     private final List<Double> proportionsOfCurrentLimits;
 
-    public ActiveFadLimitsPolicies(
+    ActiveFadLimitsPolicies(
         final int referenceYear,
         final int yearToModify,
         final List<Double> proportionsOfCurrentLimits

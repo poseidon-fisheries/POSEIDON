@@ -14,6 +14,10 @@ public class YearlyCounter implements AlgorithmFactory<Quantity> {
     public YearlyCounter() {
     }
 
+    public YearlyCounter(final String name) {
+        this.name = new StringParameter(name);
+    }
+
     public YearlyCounter(final StringParameter name) {
         this.name = name;
     }
