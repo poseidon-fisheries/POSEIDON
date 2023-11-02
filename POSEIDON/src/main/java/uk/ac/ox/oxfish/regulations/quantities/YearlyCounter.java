@@ -10,6 +10,22 @@ public class YearlyCounter implements AlgorithmFactory<Quantity> {
 
     private StringParameter name;
 
+    @SuppressWarnings("unused")
+    public YearlyCounter() {
+    }
+
+    public YearlyCounter(final StringParameter name) {
+        this.name = name;
+    }
+
+    public StringParameter getName() {
+        return name;
+    }
+
+    public void setName(final StringParameter name) {
+        this.name = name;
+    }
+
     @Override
     public Quantity apply(final FishState fishState) {
         return action ->
