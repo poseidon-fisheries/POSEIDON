@@ -1,6 +1,5 @@
 package uk.ac.ox.poseidon.epo;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
@@ -30,14 +29,6 @@ public class ActiveFadLimitsPolicies implements Supplier<List<Policy<EpoScenario
         this.referenceYear = referenceYear;
         this.yearToModify = yearToModify;
         this.proportionsOfCurrentLimits = proportionsOfCurrentLimits;
-    }
-
-    public static void main(final String[] args) {
-        System.out.println(new ActiveFadLimitsPolicies(
-            2022,
-            2023,
-            ImmutableList.of(1.0, 0.75, 0.50, 0.25, 0.10, 0.0)
-        ).get());
     }
 
     @Override
