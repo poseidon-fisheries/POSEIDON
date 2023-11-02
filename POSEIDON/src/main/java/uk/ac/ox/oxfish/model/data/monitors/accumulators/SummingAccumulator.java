@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.model.data.monitors.accumulators;
 
 public class SummingAccumulator<V extends Number> implements Accumulator<V> {
 
+    private static final long serialVersionUID = -2947987958295391850L;
     private double sum;
 
     @Override
@@ -34,7 +35,7 @@ public class SummingAccumulator<V extends Number> implements Accumulator<V> {
     }
 
     @Override
-    public void accumulate(V value) {
+    public void accumulate(final V value) {
         this.sum = this.sum + value.doubleValue();
     }
 

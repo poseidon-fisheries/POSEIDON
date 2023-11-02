@@ -6,15 +6,15 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.StringParameter;
 import uk.ac.ox.poseidon.regulations.api.Quantity;
 
-public class YearlyCounter implements AlgorithmFactory<Quantity> {
+public class YearlyGatherer implements AlgorithmFactory<Quantity> {
 
     private StringParameter name;
 
     @SuppressWarnings("unused")
-    public YearlyCounter() {
+    public YearlyGatherer() {
     }
 
-    public YearlyCounter(final StringParameter name) {
+    public YearlyGatherer(final StringParameter name) {
         this.name = name;
     }
 
@@ -27,15 +27,18 @@ public class YearlyCounter implements AlgorithmFactory<Quantity> {
     }
 
     @Override
-    public Quantity apply(final FishState fishState) {
+    public Quantity apply(final FishState ignored) {
         // store name in local variable because we don't
         // want to close over the mutable StringParameter
-        final String columnName = name.getValue();
-        return action ->
-            ((Fisher) action.getAgent())
-                .grabState()
-                .getYearlyCounter()
-                .getColumn(columnName);
+        final String gathererName = name.getValue();
+        return action -> {
+            final FishState fishState =
+                ((Fisher) action.getAgent()).grabState();
+            return fishState
+                .getYearlyDataSet()
+                .getGatherer(gathererName)
+                .apply(fishState);
+        };
     }
 
 }

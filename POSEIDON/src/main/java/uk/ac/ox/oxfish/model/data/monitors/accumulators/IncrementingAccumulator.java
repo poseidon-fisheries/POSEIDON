@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.model.data.monitors.accumulators;
 
 public class IncrementingAccumulator<V> implements Accumulator<V> {
 
+    private static final long serialVersionUID = 6370068331086803528L;
     private int count = 0;
 
     @Override
@@ -28,7 +29,7 @@ public class IncrementingAccumulator<V> implements Accumulator<V> {
         return "Number of %s";
     }
 
-    public void accumulate(V ignored) {
+    public void accumulate(final V ignored) {
         this.count++;
     }
 

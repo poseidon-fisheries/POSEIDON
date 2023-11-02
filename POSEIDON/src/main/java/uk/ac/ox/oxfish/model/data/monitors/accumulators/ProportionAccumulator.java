@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.model.data.IterativeAverage;
  */
 public class ProportionAccumulator implements Accumulator<Boolean> {
 
+    private static final long serialVersionUID = 270496675129037470L;
     private final Averager<Double> averager = new IterativeAverage<>();
 
     @Override

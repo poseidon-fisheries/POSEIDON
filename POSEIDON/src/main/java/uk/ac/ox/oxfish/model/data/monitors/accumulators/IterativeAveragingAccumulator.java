@@ -24,6 +24,7 @@ import uk.ac.ox.oxfish.model.data.IterativeAverage;
 
 public class IterativeAveragingAccumulator<V extends Number> extends AbstractAveragingAccumulator<V> {
 
+    private static final long serialVersionUID = -4397544237806260395L;
     private final Averager<V> averager = new IterativeAverage<>();
 
     @Override

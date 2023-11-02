@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.model.data.Averager;
 
 public abstract class AbstractAveragingAccumulator<V extends Number> implements Accumulator<V> {
 
+    private static final long serialVersionUID = 8405148290266756019L;
     private final boolean ignoreNulls;
 
     AbstractAveragingAccumulator() {

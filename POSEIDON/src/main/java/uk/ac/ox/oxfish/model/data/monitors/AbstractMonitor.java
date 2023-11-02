@@ -83,7 +83,7 @@ abstract public class AbstractMonitor<O, V, Q extends Quantity<Q>> implements Mo
         if (baseName != null) // a null baseName indicates we don't want to register the accumulator
             timeSeries.registerGatherer(
                 accumulator.makeName(baseName),
-                __ -> accumulator.get(),
+                accumulator,
                 0.0,
                 unit,
                 yLabel

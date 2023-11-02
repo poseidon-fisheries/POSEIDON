@@ -206,6 +206,17 @@ public class TimeSeries<T> implements Steppable {
         return current.getColumn();
     }
 
+    /**
+     * get the gatherer associated with a specific column
+     */
+    public Gatherer<T> getGatherer(final String name) {
+        final ColumnGatherer<T> current = data.get(name);
+        if (current == null) {
+            return null;
+        }
+        return current.getGatherer();
+    }
+
     public Collection<DataColumn> getColumns() {
 
         final ArrayList<DataColumn> columns = new ArrayList<>(data.size());
