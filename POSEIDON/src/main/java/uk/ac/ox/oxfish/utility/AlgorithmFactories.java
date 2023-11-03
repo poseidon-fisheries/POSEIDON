@@ -71,6 +71,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.planner.PlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ActiveFadLimits;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.Closure;
+import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ClosureExtensionAfter;
+import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ClosureExtensionBefore;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
@@ -690,6 +692,8 @@ public class AlgorithmFactories {
             Below.class,
             BetweenDates.class,
             BetweenYearlyDates.class,
+            ClosureExtensionAfter.class,
+            ClosureExtensionBefore.class,
             InRectangularArea.class,
             InYear.class,
             Not.class,

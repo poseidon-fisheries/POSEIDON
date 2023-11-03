@@ -46,6 +46,8 @@ public class DefaultEpoRegulations {
 
         final InputPath regions = inputFolder.path("regions");
 
+        final Closure closureA = new Closure("closure A", CLOSURE_A_START, CLOSURE_A_END, 15);
+        final Closure closureB = new Closure("closure B", CLOSURE_B_START, CLOSURE_B_END, 15);
         return new NamedRegulations(
             ImmutableMap.of(
                 "DEL licence", new ForbiddenIf(
@@ -55,8 +57,8 @@ public class DefaultEpoRegulations {
                     )
                 ),
                 "Active-FAD limits", new ActiveFadLimits(ACTIVE_FAD_LIMITS),
-                "Closure A", new Closure(CLOSURE_A_START, CLOSURE_A_END, 15),
-                "Closure B", new Closure(CLOSURE_B_START, CLOSURE_B_END, 15),
+                "Closure A", closureA,
+                "Closure B", closureB,
                 "El Corralito", new ForbiddenIf(
                     new AllOf(
                         new BetweenYearlyDates(
@@ -74,22 +76,11 @@ public class DefaultEpoRegulations {
                 ),
                 "Extended 2022 closure", new ForbiddenIf(
                     new AllOf(
+                        new InYear(2022),
                         new AgentHasTag("extended_2022_closure"),
                         new AnyOf(
-                            new AllOf(
-                                new AgentHasTag("closure A"),
-                                new BetweenDates(
-                                    CLOSURE_A_START.atYear(2022).minusDays(8),
-                                    CLOSURE_A_START.atYear(2022).minusDays(1)
-                                )
-                            ),
-                            new AllOf(
-                                new AgentHasTag("closure B"),
-                                new BetweenDates(
-                                    CLOSURE_B_END.atYear(2023).plusDays(1),
-                                    CLOSURE_B_END.atYear(2023).plusDays(8)
-                                )
-                            )
+                            new ClosureExtensionBefore(closureA, 8),
+                            new ClosureExtensionAfter(closureB, 8)
                         )
                     )
                 ),
