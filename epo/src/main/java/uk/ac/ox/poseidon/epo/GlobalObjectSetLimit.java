@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.regulations.ForbiddenIf;
 import uk.ac.ox.oxfish.regulations.NamedRegulations;
 import uk.ac.ox.oxfish.regulations.conditions.*;
 import uk.ac.ox.oxfish.regulations.quantities.YearlyGatherer;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.List;
 
@@ -14,14 +13,14 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 
 public class GlobalObjectSetLimit implements PolicySupplier {
 
-    private final List<Integer> years;
+    private final List<Integer> yearsActive;
     private final List<Integer> limits;
 
     public GlobalObjectSetLimit(
-        final List<Integer> years,
+        final List<Integer> yearsActive,
         final List<Integer> limits
     ) {
-        this.years = years;
+        this.yearsActive = yearsActive;
         this.limits = limits;
     }
 
@@ -32,16 +31,14 @@ public class GlobalObjectSetLimit implements PolicySupplier {
             .stream()
             .map(limit ->
                 new Policy<EpoScenario<?>>(
-                    "Global limit of %d object sets",
+                    String.format("Global limit of %d object sets", limit),
                     scenario ->
                         ((NamedRegulations) scenario.getRegulations())
                             .modify(
                                 "Global object-set limits",
                                 ignored -> new ForbiddenIf(
                                     new AllOf(
-                                        new AnyOf(
-                                            years.stream().map(InYear::new).toArray(AlgorithmFactory[]::new)
-                                        ),
+                                        new AnyOf(yearsActive.stream().map(InYear::new)),
                                         new AnyOf(
                                             new ActionCodeIs("FAD"),
                                             new ActionCodeIs("OFS")

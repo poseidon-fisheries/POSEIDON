@@ -34,8 +34,12 @@ public class PolicyRuns {
                 ),
                 "fad_limits", new ActiveFadLimitsPolicies(
                     2022,
-                    2023,
+                    2023, // TODO: reframe that in terms of applicable years
                     proportions
+                ),
+                "extended_closures", new ExtendedClosurePolicies(
+                    applicableYears,
+                    ImmutableList.of(5, 15, 30)
                 )
             )
             .entrySet()

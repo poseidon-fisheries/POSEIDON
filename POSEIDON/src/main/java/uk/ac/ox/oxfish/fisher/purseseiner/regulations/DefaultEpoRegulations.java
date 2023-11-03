@@ -12,6 +12,7 @@ import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.time.LocalDate;
 import java.time.MonthDay;
+import java.util.List;
 import java.util.Map;
 
 import static java.time.Month.*;
@@ -40,11 +41,10 @@ public class DefaultEpoRegulations {
     }
 
     public static AlgorithmFactory<Regulations> make(final InputPath inputFolder) {
-
         final InputPath regions = inputFolder.path("regions");
-
-        final Closure closureA = new Closure("closure A", CLOSURE_A_START, CLOSURE_A_END, 15);
-        final Closure closureB = new Closure("closure B", CLOSURE_B_START, CLOSURE_B_END, 15);
+        final List<Integer> yearsActive = ImmutableList.of(2021, 2022, 2023);
+        final Closure closureA = new Closure(yearsActive, "closure A", CLOSURE_A_START, CLOSURE_A_END, 15);
+        final Closure closureB = new Closure(yearsActive, "closure B", CLOSURE_B_START, CLOSURE_B_END, 15);
         return new NamedRegulations(
             ImmutableMap.of(
                 "DEL licence", new ForbiddenIf(

@@ -8,11 +8,13 @@ import uk.ac.ox.oxfish.utility.parameters.StringParameter;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.time.MonthDay;
+import java.util.List;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.regulations.DefaultEpoRegulations.addDays;
 import static uk.ac.ox.oxfish.regulations.conditions.False.FALSE;
 
-public class Closure implements RegulationFactory {
+public class Closure implements RegulationFactory, YearsActive {
+    private List<Integer> yearsActive;
     private StringParameter agentTag;
     private IntegerParameter beginningDay;
     private IntegerParameter beginningMonth;
@@ -26,12 +28,14 @@ public class Closure implements RegulationFactory {
 
     @SuppressWarnings({"WeakerAccess", "unused"})
     public Closure(
+        final List<Integer> yearsActive,
         final String agentTag,
         final MonthDay beginning,
         final MonthDay end,
         final int daysToForbidDeploymentsBefore
     ) {
         this(
+            yearsActive,
             new StringParameter(agentTag),
             new IntegerParameter(beginning.getDayOfMonth()),
             new IntegerParameter(beginning.getMonthValue()),
@@ -43,6 +47,7 @@ public class Closure implements RegulationFactory {
 
     @SuppressWarnings("WeakerAccess")
     public Closure(
+        final List<Integer> yearsActive,
         final StringParameter agentTag,
         final IntegerParameter beginningDay,
         final IntegerParameter beginningMonth,
@@ -51,6 +56,7 @@ public class Closure implements RegulationFactory {
         final IntegerParameter daysToForbidDeploymentsBefore
     ) {
         this.agentTag = agentTag;
+        this.yearsActive = yearsActive;
         this.beginningDay = beginningDay;
         this.beginningMonth = beginningMonth;
         this.endDay = endDay;
@@ -58,6 +64,17 @@ public class Closure implements RegulationFactory {
         this.daysToForbidDeploymentsBefore = daysToForbidDeploymentsBefore;
     }
 
+    @SuppressWarnings("unused")
+    public List<Integer> getYearsActive() {
+        return yearsActive;
+    }
+
+    @SuppressWarnings("unused")
+    public void setYearsActive(final List<Integer> yearsActive) {
+        this.yearsActive = yearsActive;
+    }
+
+    @SuppressWarnings("WeakerAccess")
     public StringParameter getAgentTag() {
         return agentTag;
     }
@@ -67,7 +84,7 @@ public class Closure implements RegulationFactory {
         this.agentTag = agentTag;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("WeakerAccess")
     public IntegerParameter getDaysToForbidDeploymentsBefore() {
         return daysToForbidDeploymentsBefore;
     }
@@ -82,7 +99,7 @@ public class Closure implements RegulationFactory {
         return beginningDay;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("WeakerAccess")
     public void setBeginningDay(final IntegerParameter beginningDay) {
         this.beginningDay = beginningDay;
     }
@@ -92,7 +109,7 @@ public class Closure implements RegulationFactory {
         return beginningMonth;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("WeakerAccess")
     public void setBeginningMonth(final IntegerParameter beginningMonth) {
         this.beginningMonth = beginningMonth;
     }
@@ -102,7 +119,7 @@ public class Closure implements RegulationFactory {
         return endDay;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("WeakerAccess")
     public void setEndDay(final IntegerParameter endDay) {
         this.endDay = endDay;
     }
@@ -112,7 +129,7 @@ public class Closure implements RegulationFactory {
         return endMonth;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("WeakerAccess")
     public void setEndMonth(final IntegerParameter endMonth) {
         this.endMonth = endMonth;
     }
@@ -123,6 +140,7 @@ public class Closure implements RegulationFactory {
         return new ForbiddenIf(
             new AllOf(
                 new AgentHasTag(agentTag.getValue()),
+                new AnyOf(yearsActive.stream().map(InYear::new)),
                 new AnyOf(
                     daysToForbidDeploymentsBefore.getIntValue() >= 1
                         ? forbidDeploymentsBefore(beginning, daysToForbidDeploymentsBefore.getIntValue())
@@ -153,5 +171,15 @@ public class Closure implements RegulationFactory {
 
     private static MonthDay makeMonthDay(final IntegerParameter month, final IntegerParameter day) {
         return MonthDay.of(month.getIntValue(), day.getIntValue());
+    }
+
+    public void setEnd(final MonthDay monthDay) {
+        setEndMonth(new IntegerParameter(monthDay.getMonthValue()));
+        setEndDay(new IntegerParameter(monthDay.getDayOfMonth()));
+    }
+
+    public void setBeginning(final MonthDay monthDay) {
+        setBeginningMonth(new IntegerParameter(monthDay.getMonthValue()));
+        setBeginningDay(new IntegerParameter(monthDay.getDayOfMonth()));
     }
 }

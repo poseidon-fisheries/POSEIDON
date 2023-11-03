@@ -12,7 +12,7 @@ import java.util.Map;
 
 import static java.time.Month.*;
 
-public class IndividualBetLimits implements RegulationFactory {
+public class IndividualBetLimits implements RegulationFactory, YearsActive {
 
     private Closure closureA;
     private Closure closureB;
