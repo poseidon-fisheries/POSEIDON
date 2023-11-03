@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
@@ -23,10 +24,12 @@ public class PolicyRuns {
             "calibrated_scenario.yaml"
         ));
         final Path baseOutputFolder = baseFolder.resolve(Paths.get("policy_runs"));
+        final List<Integer> applicableYears = ImmutableList.of(2023);
         final ImmutableList<Double> proportions = ImmutableList.of(1.0, 0.75, 0.50, 0.25, 0.10, 0.0);
         ImmutableMap.of(
                 "global_object_set_limits", new GlobalObjectSetLimit(
-                    // 8729 FAD + 4003 OFS in 2022
+                    applicableYears,
+                    // 8729 FAD + 4003 OFS in 2022:
                     proportions.stream().map(p -> (int) (p * (8729 + 4003))).collect(toList())
                 ),
                 "fad_limits", new ActiveFadLimitsPolicies(
