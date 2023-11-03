@@ -11,8 +11,8 @@ import java.util.Map.Entry;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static uk.ac.ox.oxfish.fisher.purseseiner.DefaultEpoRegulations.ACTIVE_FAD_LIMITS;
-import static uk.ac.ox.oxfish.fisher.purseseiner.DefaultEpoRegulations.makeActiveFadLimits;
+import static uk.ac.ox.oxfish.fisher.purseseiner.regulations.DefaultEpoRegulations.ACTIVE_FAD_LIMITS;
+import static uk.ac.ox.oxfish.fisher.purseseiner.regulations.DefaultEpoRegulations.makeActiveFadLimits;
 
 public class ActiveFadLimitsPolicies implements PolicySupplier {
 

@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.purseseiner;
+package uk.ac.ox.oxfish.fisher.purseseiner.regulations;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
