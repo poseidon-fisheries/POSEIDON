@@ -8,7 +8,6 @@ import uk.ac.ox.oxfish.regulations.ForbiddenIf;
 import uk.ac.ox.oxfish.regulations.NamedRegulations;
 import uk.ac.ox.oxfish.regulations.conditions.*;
 import uk.ac.ox.oxfish.regulations.quantities.LastYearlyFisherValue;
-import uk.ac.ox.oxfish.regulations.quantities.NumberOfActiveFads;
 import uk.ac.ox.oxfish.regulations.quantities.SecondLastYearlyFisherValue;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
@@ -55,7 +54,7 @@ public class DefaultEpoRegulations {
                         new Not(new AgentHasTag("has_del_license"))
                     )
                 ),
-                "Active-FAD limits", makeActiveFadLimits(ACTIVE_FAD_LIMITS),
+                "Active-FAD limits", new ActiveFadLimits(ACTIVE_FAD_LIMITS),
                 // Forbid deployments 15 days before closure
                 "Closure A", new ForbiddenIf(
                     new AnyOf(
@@ -205,34 +204,6 @@ public class DefaultEpoRegulations {
                                                 addDays(CLOSURE_B_END, entry.getValue())
                                             )
                                         )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-            )
-        );
-    }
-
-    /**
-     * TODO: this should be its own factory class
-     */
-    public static ForbiddenIf makeActiveFadLimits(
-        final Map<Integer, ? extends Map<String, Integer>> activeFadLimits
-    ) {
-        return new ForbiddenIf(
-            new AllOf(
-                new ActionCodeIs("DPL"),
-                new AnyOf(
-                    activeFadLimits.entrySet().stream().map(yearAndLimits ->
-                        new AllOf(
-                            new InYear(yearAndLimits.getKey()),
-                            new AnyOf(
-                                yearAndLimits.getValue().entrySet().stream().map(classAndLimit ->
-                                    new AllOf(
-                                        new AgentHasTag("class " + classAndLimit.getKey()),
-                                        new NotBelow(new NumberOfActiveFads(), classAndLimit.getValue())
                                     )
                                 )
                             )

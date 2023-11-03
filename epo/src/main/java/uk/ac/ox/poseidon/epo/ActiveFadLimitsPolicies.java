@@ -2,6 +2,7 @@ package uk.ac.ox.poseidon.epo;
 
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
+import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ActiveFadLimits;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.regulations.NamedRegulations;
 
@@ -12,7 +13,6 @@ import java.util.Map.Entry;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static uk.ac.ox.oxfish.fisher.purseseiner.regulations.DefaultEpoRegulations.ACTIVE_FAD_LIMITS;
-import static uk.ac.ox.oxfish.fisher.purseseiner.regulations.DefaultEpoRegulations.makeActiveFadLimits;
 
 public class ActiveFadLimitsPolicies implements PolicySupplier {
 
@@ -43,7 +43,7 @@ public class ActiveFadLimitsPolicies implements PolicySupplier {
                     scenario ->
                         ((NamedRegulations) scenario.getRegulations()).modify(
                             "Active-FAD limits",
-                            ignored -> makeActiveFadLimits(
+                            ignored -> new ActiveFadLimits(
                                 ImmutableMap.<Integer, Map<String, Integer>>builder()
                                     .putAll(ACTIVE_FAD_LIMITS)
                                     .put(
