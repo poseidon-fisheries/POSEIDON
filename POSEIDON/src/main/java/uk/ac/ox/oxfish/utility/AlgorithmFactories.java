@@ -70,6 +70,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.planner.GenerateRandomPlansStrategyFac
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.PlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ActiveFadLimits;
+import uk.ac.ox.oxfish.fisher.purseseiner.regulations.Closure;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
@@ -693,7 +694,9 @@ public class AlgorithmFactories {
             InYear.class,
             Not.class,
             NotBelow.class,
-            NotAbove.class
+            NotAbove.class,
+            True.class,
+            False.class
         ));
         addFactories(new Factories<>(
             Regulations.class,
@@ -701,6 +704,7 @@ public class AlgorithmFactories {
                 ActiveFadLimits.class, "Active-FAD limits"
             ),
             NamedRegulations.class,
+            Closure.class,
             EverythingForbidden.class,
             EverythingPermitted.class,
             ForbiddenIf.class,

@@ -55,47 +55,8 @@ public class DefaultEpoRegulations {
                     )
                 ),
                 "Active-FAD limits", new ActiveFadLimits(ACTIVE_FAD_LIMITS),
-                // Forbid deployments 15 days before closure
-                "Closure A", new ForbiddenIf(
-                    new AnyOf(
-                        new AllOf(
-                            // Forbid deployments 15 days before closure
-                            new AgentHasTag("closure A"),
-                            new ActionCodeIs("DPL"),
-                            new BetweenYearlyDates(
-                                addDays(CLOSURE_A_START, -15),
-                                addDays(CLOSURE_A_START, -1)
-                            )
-                        ),
-                        new AllOf(
-                            new AgentHasTag("closure A"),
-                            new BetweenYearlyDates(
-                                CLOSURE_A_START,
-                                CLOSURE_A_END
-                            )
-                        )
-                    )
-                ),
-                "Closure B", new ForbiddenIf(
-                    new AnyOf(
-                        // Forbid deployments 15 days before closure
-                        new AllOf(
-                            new AgentHasTag("closure B"),
-                            new ActionCodeIs("DPL"),
-                            new BetweenYearlyDates(
-                                addDays(CLOSURE_B_START, -15),
-                                addDays(CLOSURE_B_START, -1)
-                            )
-                        ),
-                        new AllOf(
-                            new AgentHasTag("closure B"),
-                            new BetweenYearlyDates(
-                                CLOSURE_B_START,
-                                CLOSURE_B_END
-                            )
-                        )
-                    )
-                ),
+                "Closure A", new Closure(CLOSURE_A_START, CLOSURE_A_END, 15),
+                "Closure B", new Closure(CLOSURE_B_START, CLOSURE_B_END, 15),
                 "El Corralito", new ForbiddenIf(
                     new AllOf(
                         new BetweenYearlyDates(
@@ -215,7 +176,7 @@ public class DefaultEpoRegulations {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private static MonthDay addDays(
+    public static MonthDay addDays(
         final MonthDay monthDay,
         final long daysToAdd
     ) {
