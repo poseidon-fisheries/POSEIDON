@@ -1,21 +1,18 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.regulations;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.regulations.ForbiddenAreasFromShapeFiles;
 import uk.ac.ox.oxfish.regulations.ForbiddenIf;
 import uk.ac.ox.oxfish.regulations.NamedRegulations;
 import uk.ac.ox.oxfish.regulations.conditions.*;
-import uk.ac.ox.oxfish.regulations.quantities.LastYearlyFisherValue;
-import uk.ac.ox.oxfish.regulations.quantities.SecondLastYearlyFisherValue;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import static java.time.Month.*;
 
@@ -27,13 +24,13 @@ public class DefaultEpoRegulations {
         2023, ImmutableMap.of("6A", 255, "6B", 340),
         2024, ImmutableMap.of("6A", 210, "6B", 340)
     );
-    private static final ImmutableSet<Entry<Integer, Integer>> ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET = ImmutableMap.of(
+    private static final Map<Integer, Integer> ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET = ImmutableMap.of(
         1200, 10,
         1500, 13,
         1800, 16,
         2100, 19,
         2400, 22
-    ).entrySet();
+    );
     private static final MonthDay CLOSURE_A_START = MonthDay.of(JULY, 29);
     private static final MonthDay CLOSURE_A_END = MonthDay.of(OCTOBER, 8);
     private static final MonthDay CLOSURE_B_START = MonthDay.of(NOVEMBER, 9);
@@ -84,83 +81,11 @@ public class DefaultEpoRegulations {
                         )
                     )
                 ),
-                "BET limits", new ForbiddenIf(
-                    new AllOf(
-                        new BetweenDates(
-                            LocalDate.of(2023, JANUARY, 1),
-                            LocalDate.of(2025, DECEMBER, 31)
-                        ),
-                        new AnyOf(
-                            new AllOf(
-                                new AgentHasTag("closure A"),
-                                new AnyOf(
-                                    ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET.stream().map(entry -> {
-                                            final MonthDay newClosureStart = addDays(
-                                                CLOSURE_A_START,
-                                                entry.getValue() * -1L
-                                            );
-                                            return new AllOf(
-                                                new Above(
-                                                    new LastYearlyFisherValue("Bigeye tuna Catches (kg)"),
-                                                    entry.getKey() * 1000 // convert from tonnes to kg
-                                                ),
-                                                new AnyOf(
-                                                    // closure extension
-                                                    new BetweenYearlyDates(
-                                                        newClosureStart,
-                                                        addDays(CLOSURE_A_START, -1)
-                                                    ),
-                                                    // pre-closure DPL ban
-                                                    new AllOf(
-                                                        new ActionCodeIs("DPL"),
-                                                        new BetweenYearlyDates(
-                                                            addDays(newClosureStart, -15),
-                                                            addDays(newClosureStart, -1)
-                                                        )
-                                                    )
-                                                )
-                                            );
-                                        }
-                                    )
-                                )
-                            ),
-                            new AllOf(
-                                new AgentHasTag("closure B"),
-                                new AnyOf(
-                                    ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET.stream().map(entry ->
-                                        // This gets slightly complicated because we need to check for the catches
-                                        // the year before the closure _starts_, and once we get to Jan 1st, that
-                                        // not "last year" anymore, but the year before that, hence those different
-                                        // conditions depending on where we are in the year. March 30 is an arbitrary
-                                        // cutoff for the different checks. At least we do not need to deal with the
-                                        // pre-closure DPL ban, since closure B gets extended at the end.
-                                        new AllOf(
-                                            new AnyOf(
-                                                new AllOf(
-                                                    new BetweenYearlyDates(JANUARY, 1, MARCH, 30),
-                                                    new Above(
-                                                        new SecondLastYearlyFisherValue("Bigeye tuna Catches (kg)"),
-                                                        entry.getKey() * 1000 // convert from tonnes to kg
-                                                    )
-                                                ),
-                                                new AllOf(
-                                                    new BetweenYearlyDates(APRIL, 1, DECEMBER, 31),
-                                                    new Above(
-                                                        new LastYearlyFisherValue("Bigeye tuna Catches (kg)"),
-                                                        entry.getKey() * 1000 // convert from tonnes to kg
-                                                    )
-                                                )
-                                            ),
-                                            new BetweenYearlyDates(
-                                                addDays(CLOSURE_B_END, 1),
-                                                addDays(CLOSURE_B_END, entry.getValue())
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
+                "BET limits", new IndividualBetLimits(
+                    closureA,
+                    closureB,
+                    ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET,
+                    ImmutableList.of(2023, 2024, 2025)
                 )
             )
         );

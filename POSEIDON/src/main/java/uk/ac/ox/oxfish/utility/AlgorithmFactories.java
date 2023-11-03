@@ -69,10 +69,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFact
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.GenerateRandomPlansStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.PlanningModule;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ActiveFadLimits;
-import uk.ac.ox.oxfish.fisher.purseseiner.regulations.Closure;
-import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ClosureExtensionAfter;
-import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ClosureExtensionBefore;
+import uk.ac.ox.oxfish.fisher.purseseiner.regulations.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
@@ -705,7 +702,8 @@ public class AlgorithmFactories {
         addFactories(new Factories<>(
             Regulations.class,
             ImmutableMap.of(
-                ActiveFadLimits.class, "Active-FAD limits"
+                ActiveFadLimits.class, "Active-FAD limits",
+                IndividualBetLimits.class, "Individual BET limits"
             ),
             NamedRegulations.class,
             Closure.class,
