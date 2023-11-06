@@ -13,7 +13,7 @@ import java.util.List;
 import static uk.ac.ox.oxfish.fisher.purseseiner.regulations.DefaultEpoRegulations.addDays;
 import static uk.ac.ox.oxfish.regulations.conditions.False.FALSE;
 
-public class Closure implements RegulationFactory, YearsActive {
+public class TemporalClosure implements RegulationFactory, YearsActive {
     private List<Integer> yearsActive;
     private StringParameter agentTag;
     private IntegerParameter beginningDay;
@@ -23,11 +23,11 @@ public class Closure implements RegulationFactory, YearsActive {
     private IntegerParameter daysToForbidDeploymentsBefore;
 
     @SuppressWarnings("unused")
-    public Closure() {
+    public TemporalClosure() {
     }
 
     @SuppressWarnings({"WeakerAccess", "unused"})
-    public Closure(
+    public TemporalClosure(
         final List<Integer> yearsActive,
         final String agentTag,
         final MonthDay beginning,
@@ -46,7 +46,7 @@ public class Closure implements RegulationFactory, YearsActive {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public Closure(
+    public TemporalClosure(
         final List<Integer> yearsActive,
         final StringParameter agentTag,
         final IntegerParameter beginningDay,

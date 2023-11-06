@@ -1,8 +1,8 @@
 package uk.ac.ox.poseidon.epo;
 
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
-import uk.ac.ox.oxfish.fisher.purseseiner.regulations.Closure;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.IndividualBetLimits;
+import uk.ac.ox.oxfish.fisher.purseseiner.regulations.TemporalClosure;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.regulations.NamedRegulations;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -32,18 +32,18 @@ public class ExtendedClosurePolicies extends PolicySupplier {
                 scenario -> {
                     final NamedRegulations namedRegulations = (NamedRegulations) scenario.getRegulations();
                     final Map<String, AlgorithmFactory<Regulations>> regulationMap = namedRegulations.getRegulations();
-                    final Closure closureA = (Closure) regulationMap.get("Closure A");
-                    final Closure closureB = (Closure) regulationMap.get("Closure B");
+                    final TemporalClosure closureA = (TemporalClosure) regulationMap.get("Closure A");
+                    final TemporalClosure closureB = (TemporalClosure) regulationMap.get("Closure B");
                     final IndividualBetLimits betLimits = (IndividualBetLimits) regulationMap.get("BET limits");
                     Stream.of(closureA, closureB, betLimits).forEach(this::deactivateForYearsActive);
-                    final Closure newClosureA = new Closure(
+                    final TemporalClosure newClosureA = new TemporalClosure(
                         getYearsActive(),
                         closureA.getAgentTag().getValue(),
                         addDays(closureA.beginning(), -days),
                         closureA.end(),
                         closureA.getDaysToForbidDeploymentsBefore().getIntValue()
                     );
-                    final Closure newClosureB = new Closure(
+                    final TemporalClosure newClosureB = new TemporalClosure(
                         getYearsActive(),
                         closureA.getAgentTag().getValue(),
                         closureA.beginning(),

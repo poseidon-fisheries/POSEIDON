@@ -2,38 +2,32 @@ package uk.ac.ox.oxfish.fisher.purseseiner.regulations;
 
 import uk.ac.ox.oxfish.regulations.conditions.AgentHasTag;
 import uk.ac.ox.oxfish.regulations.conditions.AllOf;
-import uk.ac.ox.oxfish.regulations.conditions.AnyOf;
 import uk.ac.ox.oxfish.regulations.conditions.BetweenYearlyDates;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 
-import java.time.MonthDay;
-
 import static com.google.common.base.Preconditions.checkArgument;
-import static uk.ac.ox.oxfish.fisher.purseseiner.regulations.Closure.forbidDeploymentsBefore;
 import static uk.ac.ox.oxfish.fisher.purseseiner.regulations.DefaultEpoRegulations.addDays;
-import static uk.ac.ox.oxfish.regulations.conditions.False.FALSE;
 
-public class ClosureExtensionBefore implements ConditionFactory {
-    private Closure originalClosure;
+public class TemporalClosureExtensionAfter implements ConditionFactory {
+    private TemporalClosure originalClosure;
     private IntegerParameter numberOfDaysToExtend;
 
     @SuppressWarnings("unused")
-    public ClosureExtensionBefore() {
+    public TemporalClosureExtensionAfter() {
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public ClosureExtensionBefore(
-        final Closure originalClosure,
+    public TemporalClosureExtensionAfter(
+        final TemporalClosure originalClosure,
         final int numberOfDaysToExtend
     ) {
         this(originalClosure, new IntegerParameter(numberOfDaysToExtend));
     }
 
     @SuppressWarnings("WeakerAccess")
-    public ClosureExtensionBefore(
-        final Closure originalClosure,
+    public TemporalClosureExtensionAfter(
+        final TemporalClosure originalClosure,
         final IntegerParameter numberOfDaysToExtend
     ) {
         checkArgument(numberOfDaysToExtend.getIntValue() >= 1);
@@ -42,12 +36,12 @@ public class ClosureExtensionBefore implements ConditionFactory {
     }
 
     @SuppressWarnings("unused")
-    public Closure getOriginalClosure() {
+    public TemporalClosure getOriginalClosure() {
         return originalClosure;
     }
 
     @SuppressWarnings("unused")
-    public void setOriginalClosure(final Closure originalClosure) {
+    public void setOriginalClosure(final TemporalClosure originalClosure) {
         this.originalClosure = originalClosure;
     }
 
@@ -64,18 +58,11 @@ public class ClosureExtensionBefore implements ConditionFactory {
 
     @Override
     public AlgorithmFactory<Condition> get() {
-        final MonthDay newBeginning = addDays(originalClosure.beginning(), -numberOfDaysToExtend.getIntValue());
-        final int daysOfForbiddenDeployments = originalClosure.getDaysToForbidDeploymentsBefore().getIntValue();
         return new AllOf(
             new AgentHasTag(originalClosure.getAgentTag().getValue()),
-            new AnyOf(
-                daysOfForbiddenDeployments >= 1
-                    ? forbidDeploymentsBefore(newBeginning, daysOfForbiddenDeployments)
-                    : FALSE,
-                new BetweenYearlyDates(
-                    newBeginning,
-                    addDays(originalClosure.beginning(), -1)
-                )
+            new BetweenYearlyDates(
+                addDays(originalClosure.end(), 1),
+                addDays(originalClosure.end(), numberOfDaysToExtend.getIntValue())
             )
         );
     }

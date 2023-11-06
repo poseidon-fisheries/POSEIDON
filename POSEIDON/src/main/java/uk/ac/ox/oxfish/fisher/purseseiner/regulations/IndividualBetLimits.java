@@ -14,8 +14,8 @@ import static java.time.Month.*;
 
 public class IndividualBetLimits implements RegulationFactory, YearsActive {
 
-    private Closure closureA;
-    private Closure closureB;
+    private TemporalClosure closureA;
+    private TemporalClosure closureB;
     private Map<Integer, Integer> additionalClosureDaysByExcessTonnesOfBet;
     private List<Integer> yearsActive;
 
@@ -25,8 +25,8 @@ public class IndividualBetLimits implements RegulationFactory, YearsActive {
 
     @SuppressWarnings("WeakerAccess")
     public IndividualBetLimits(
-        final Closure closureA,
-        final Closure closureB,
+        final TemporalClosure closureA,
+        final TemporalClosure closureB,
         final Map<Integer, Integer> additionalClosureDaysByExcessTonnesOfBet,
         final List<Integer> yearsActive
     ) {
@@ -47,22 +47,22 @@ public class IndividualBetLimits implements RegulationFactory, YearsActive {
     }
 
     @SuppressWarnings("unused")
-    public Closure getClosureA() {
+    public TemporalClosure getClosureA() {
         return closureA;
     }
 
     @SuppressWarnings("unused")
-    public void setClosureA(final Closure closureA) {
+    public void setClosureA(final TemporalClosure closureA) {
         this.closureA = closureA;
     }
 
     @SuppressWarnings("unused")
-    public Closure getClosureB() {
+    public TemporalClosure getClosureB() {
         return closureB;
     }
 
     @SuppressWarnings("unused")
-    public void setClosureB(final Closure closureB) {
+    public void setClosureB(final TemporalClosure closureB) {
         this.closureB = closureB;
     }
 
@@ -93,7 +93,7 @@ public class IndividualBetLimits implements RegulationFactory, YearsActive {
                                         new LastYearlyFisherValue("Bigeye tuna Catches (kg)"),
                                         entry.getKey() * 1000 // convert from tonnes to kg
                                     ),
-                                    new ClosureExtensionBefore(
+                                    new TemporalClosureExtensionBefore(
                                         closureA,
                                         entry.getValue()
                                     )
@@ -128,7 +128,7 @@ public class IndividualBetLimits implements RegulationFactory, YearsActive {
                                             )
                                         )
                                     ),
-                                    new ClosureExtensionAfter(closureB, entry.getValue())
+                                    new TemporalClosureExtensionAfter(closureB, entry.getValue())
                                 )
                             )
                         )

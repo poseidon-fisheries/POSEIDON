@@ -43,8 +43,20 @@ public class DefaultEpoRegulations {
     public static AlgorithmFactory<Regulations> make(final InputPath inputFolder) {
         final InputPath regions = inputFolder.path("regions");
         final List<Integer> yearsActive = ImmutableList.of(2021, 2022, 2023);
-        final Closure closureA = new Closure(yearsActive, "closure A", CLOSURE_A_START, CLOSURE_A_END, 15);
-        final Closure closureB = new Closure(yearsActive, "closure B", CLOSURE_B_START, CLOSURE_B_END, 15);
+        final TemporalClosure closureA = new TemporalClosure(
+            yearsActive,
+            "closure A",
+            CLOSURE_A_START,
+            CLOSURE_A_END,
+            15
+        );
+        final TemporalClosure closureB = new TemporalClosure(
+            yearsActive,
+            "closure B",
+            CLOSURE_B_START,
+            CLOSURE_B_END,
+            15
+        );
         return new NamedRegulations(
             ImmutableMap.of(
                 "DEL licence", new ForbiddenIf(
@@ -76,8 +88,8 @@ public class DefaultEpoRegulations {
                         new InYear(2022),
                         new AgentHasTag("extended_2022_closure"),
                         new AnyOf(
-                            new ClosureExtensionBefore(closureA, 8),
-                            new ClosureExtensionAfter(closureB, 8)
+                            new TemporalClosureExtensionBefore(closureA, 8),
+                            new TemporalClosureExtensionAfter(closureB, 8)
                         )
                     )
                 ),
