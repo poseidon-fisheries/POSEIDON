@@ -25,7 +25,7 @@ public class PolicyRuns {
         ));
         final Path baseOutputFolder = baseFolder.resolve(Paths.get("policy_runs"));
         final List<Integer> yearsActive = ImmutableList.of(2023);
-        final ImmutableList<Double> proportions = ImmutableList.of(1.0, 0.75, 0.50, 0.25, 0.10, 0.0);
+        final ImmutableList<Double> proportions = ImmutableList.of(0.75, 0.50, 0.25, 0.10, 0.0);
         ImmutableMap.of(
                 "global_object_set_limits", new GlobalObjectSetLimit(
                     yearsActive,
@@ -59,7 +59,7 @@ public class PolicyRuns {
                 final Path outputFolder = baseOutputFolder.resolve(entry.getKey());
                 final Runner<EpoPathPlannerAbundanceScenario> runner =
                     new Runner<>(EpoPathPlannerAbundanceScenario.class, baseScenario, outputFolder)
-                        .setPolicies(entry.getValue().get())
+                        .setPolicies(entry.getValue().getWithDefault())
                         .setParallel(true)
                         .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
                         .requestFisherYearlyData()

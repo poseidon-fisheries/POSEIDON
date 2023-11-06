@@ -1,5 +1,6 @@
 package uk.ac.ox.poseidon.epo;
 
+import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.YearsActive;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
@@ -12,6 +13,13 @@ import java.util.function.Supplier;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 abstract class PolicySupplier implements Supplier<List<Policy<EpoScenario<?>>>> {
+
+    static final Policy<EpoScenario<?>> CURRENT_REGULATIONS = new Policy<>(
+        "Current regulations",
+        scenario -> {
+        }
+    );
+
     private final List<Integer> yearsActive;
 
     PolicySupplier(final List<Integer> yearsActive) {
@@ -33,5 +41,12 @@ abstract class PolicySupplier implements Supplier<List<Policy<EpoScenario<?>>>> 
                 .filter(year -> !yearsActive.contains(year))
                 .collect(toImmutableList())
         );
+    }
+
+    List<Policy<EpoScenario<?>>> getWithDefault() {
+        return ImmutableList.<Policy<EpoScenario<?>>>builder()
+            .add(CURRENT_REGULATIONS)
+            .addAll(get())
+            .build();
     }
 }
