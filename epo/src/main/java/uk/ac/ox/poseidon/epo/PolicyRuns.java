@@ -33,8 +33,8 @@ public class PolicyRuns {
                     proportions.stream().map(p -> (int) (p * (8729 + 4003))).collect(toList())
                 ),
                 "fad_limits", new ActiveFadLimitsPolicies(
+                    applicableYears,
                     2022,
-                    2023, // TODO: reframe that in terms of applicable years
                     proportions
                 ),
                 "extended_closures", new ExtendedClosurePolicies(

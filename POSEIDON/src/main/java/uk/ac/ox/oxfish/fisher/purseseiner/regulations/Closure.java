@@ -136,7 +136,7 @@ public class Closure implements RegulationFactory, YearsActive {
 
     @Override
     public AlgorithmFactory<Regulations> get() {
-        final MonthDay beginning = getBeginning();
+        final MonthDay beginning = beginning();
         return new ForbiddenIf(
             new AllOf(
                 new AgentHasTag(agentTag.getValue()),
@@ -145,13 +145,13 @@ public class Closure implements RegulationFactory, YearsActive {
                     daysToForbidDeploymentsBefore.getIntValue() >= 1
                         ? forbidDeploymentsBefore(beginning, daysToForbidDeploymentsBefore.getIntValue())
                         : FALSE,
-                    new BetweenYearlyDates(beginning, getEnd())
+                    new BetweenYearlyDates(beginning, end())
                 )
             )
         );
     }
 
-    public MonthDay getBeginning() {
+    public MonthDay beginning() {
         return makeMonthDay(beginningMonth, beginningDay);
     }
 
@@ -165,7 +165,7 @@ public class Closure implements RegulationFactory, YearsActive {
         );
     }
 
-    public MonthDay getEnd() {
+    public MonthDay end() {
         return makeMonthDay(endMonth, endDay);
     }
 

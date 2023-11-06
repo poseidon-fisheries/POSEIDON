@@ -14,19 +14,18 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static uk.ac.ox.oxfish.fisher.purseseiner.regulations.DefaultEpoRegulations.ACTIVE_FAD_LIMITS;
 
-public class ActiveFadLimitsPolicies implements PolicySupplier {
+public class ActiveFadLimitsPolicies extends PolicySupplier {
 
     private final int referenceYear;
-    private final int yearToModify;
     private final List<Double> proportionsOfCurrentLimits;
 
     ActiveFadLimitsPolicies(
+        final List<Integer> yearsActive,
         final int referenceYear,
-        final int yearToModify,
         final List<Double> proportionsOfCurrentLimits
     ) {
+        super(yearsActive);
         this.referenceYear = referenceYear;
-        this.yearToModify = yearToModify;
         this.proportionsOfCurrentLimits = proportionsOfCurrentLimits;
     }
 
@@ -43,22 +42,21 @@ public class ActiveFadLimitsPolicies implements PolicySupplier {
                     scenario ->
                         ((NamedRegulations) scenario.getRegulations()).modify(
                             "Active-FAD limits",
-                            ignored -> new ActiveFadLimits(
-                                ImmutableMap.<Integer, Map<String, Integer>>builder()
-                                    .putAll(ACTIVE_FAD_LIMITS)
-                                    .put(
-                                        yearToModify,
-                                        ACTIVE_FAD_LIMITS
-                                            .get(referenceYear)
-                                            .entrySet()
-                                            .stream()
-                                            .collect(toImmutableMap(
-                                                Entry::getKey,
-                                                entry -> (int) (entry.getValue() * proportion)
-                                            ))
-                                    )
-                                    .buildKeepingLast()
-                            )
+                            ignored -> {
+                                final ImmutableMap<String, Integer> newLimits = ACTIVE_FAD_LIMITS
+                                    .get(referenceYear)
+                                    .entrySet()
+                                    .stream()
+                                    .collect(toImmutableMap(
+                                        Entry::getKey,
+                                        entry -> (int) (entry.getValue() * proportion)
+                                    ));
+                                final ImmutableMap.Builder<Integer, Map<String, Integer>> builder =
+                                    ImmutableMap.<Integer, Map<String, Integer>>builder()
+                                        .putAll(ACTIVE_FAD_LIMITS);
+                                getYearsActive().forEach(year -> builder.put(year, newLimits));
+                                return new ActiveFadLimits(builder.buildKeepingLast());
+                            }
                         )
                 )
             )

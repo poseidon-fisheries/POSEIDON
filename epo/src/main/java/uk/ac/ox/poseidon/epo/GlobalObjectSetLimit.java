@@ -4,27 +4,28 @@ import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.regulations.ForbiddenIf;
 import uk.ac.ox.oxfish.regulations.NamedRegulations;
-import uk.ac.ox.oxfish.regulations.conditions.*;
+import uk.ac.ox.oxfish.regulations.conditions.ActionCodeIs;
+import uk.ac.ox.oxfish.regulations.conditions.AllOf;
+import uk.ac.ox.oxfish.regulations.conditions.AnyOf;
+import uk.ac.ox.oxfish.regulations.conditions.NotBelow;
 import uk.ac.ox.oxfish.regulations.quantities.YearlyGatherer;
 
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-public class GlobalObjectSetLimit implements PolicySupplier {
+public class GlobalObjectSetLimit extends PolicySupplier {
 
-    private final List<Integer> yearsActive;
     private final List<Integer> limits;
 
     public GlobalObjectSetLimit(
         final List<Integer> yearsActive,
         final List<Integer> limits
     ) {
-        this.yearsActive = yearsActive;
+        super(yearsActive);
         this.limits = limits;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Policy<EpoScenario<?>>> get() {
         return limits
@@ -38,7 +39,7 @@ public class GlobalObjectSetLimit implements PolicySupplier {
                                 "Global object-set limits",
                                 ignored -> new ForbiddenIf(
                                     new AllOf(
-                                        new AnyOf(yearsActive.stream().map(InYear::new)),
+                                        yearsActiveCondition(),
                                         new AnyOf(
                                             new ActionCodeIs("FAD"),
                                             new ActionCodeIs("OFS")
@@ -54,4 +55,5 @@ public class GlobalObjectSetLimit implements PolicySupplier {
             )
             .collect(toImmutableList());
     }
+
 }

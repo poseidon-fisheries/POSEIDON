@@ -3,7 +3,6 @@ package uk.ac.ox.poseidon.epo;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.Closure;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.IndividualBetLimits;
-import uk.ac.ox.oxfish.fisher.purseseiner.regulations.YearsActive;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.regulations.NamedRegulations;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -16,14 +15,12 @@ import java.util.stream.Stream;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static uk.ac.ox.oxfish.fisher.purseseiner.regulations.DefaultEpoRegulations.addDays;
 
-public class ExtendedClosurePolicies implements PolicySupplier {
-
-    private final List<Integer> yearsActive;
+public class ExtendedClosurePolicies extends PolicySupplier {
 
     private final List<Integer> daysToExtend;
 
-    public ExtendedClosurePolicies(final List<Integer> yearsActive, final List<Integer> daysToExtend) {
-        this.yearsActive = yearsActive;
+    ExtendedClosurePolicies(final List<Integer> yearsActive, final List<Integer> daysToExtend) {
+        super(yearsActive);
         this.daysToExtend = daysToExtend;
     }
 
@@ -40,17 +37,17 @@ public class ExtendedClosurePolicies implements PolicySupplier {
                     final IndividualBetLimits betLimits = (IndividualBetLimits) regulationMap.get("BET limits");
                     Stream.of(closureA, closureB, betLimits).forEach(this::deactivateForYearsActive);
                     final Closure newClosureA = new Closure(
-                        yearsActive,
+                        getYearsActive(),
                         closureA.getAgentTag().getValue(),
-                        addDays(closureA.getBeginning(), -days),
-                        closureA.getEnd(),
+                        addDays(closureA.beginning(), -days),
+                        closureA.end(),
                         closureA.getDaysToForbidDeploymentsBefore().getIntValue()
                     );
                     final Closure newClosureB = new Closure(
-                        yearsActive,
+                        getYearsActive(),
                         closureA.getAgentTag().getValue(),
-                        closureA.getBeginning(),
-                        addDays(closureB.getEnd(), days),
+                        closureA.beginning(),
+                        addDays(closureB.end(), days),
                         closureA.getDaysToForbidDeploymentsBefore().getIntValue()
                     );
                     namedRegulations.modify("New closure A", __ -> newClosureA);
@@ -61,21 +58,12 @@ public class ExtendedClosurePolicies implements PolicySupplier {
                             newClosureA,
                             newClosureB,
                             betLimits.getAdditionalClosureDaysByExcessTonnesOfBet(),
-                            yearsActive
+                            getYearsActive()
                         )
                     );
                 }
             )
         ).collect(toImmutableList());
-    }
-
-    private void deactivateForYearsActive(final YearsActive regulation) {
-        regulation.setYearsActive(
-            regulation.getYearsActive()
-                .stream()
-                .filter(year -> !yearsActive.contains(year))
-                .collect(toImmutableList())
-        );
     }
 
 }

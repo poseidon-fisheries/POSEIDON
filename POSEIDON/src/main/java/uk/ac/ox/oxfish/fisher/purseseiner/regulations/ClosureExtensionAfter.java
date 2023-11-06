@@ -61,8 +61,8 @@ public class ClosureExtensionAfter implements ConditionFactory {
         return new AllOf(
             new AgentHasTag(originalClosure.getAgentTag().getValue()),
             new BetweenYearlyDates(
-                addDays(originalClosure.getEnd(), 1),
-                addDays(originalClosure.getEnd(), numberOfDaysToExtend.getIntValue())
+                addDays(originalClosure.end(), 1),
+                addDays(originalClosure.end(), numberOfDaysToExtend.getIntValue())
             )
         );
     }

@@ -64,7 +64,7 @@ public class ClosureExtensionBefore implements ConditionFactory {
 
     @Override
     public AlgorithmFactory<Condition> get() {
-        final MonthDay newBeginning = addDays(originalClosure.getBeginning(), -numberOfDaysToExtend.getIntValue());
+        final MonthDay newBeginning = addDays(originalClosure.beginning(), -numberOfDaysToExtend.getIntValue());
         final int daysOfForbiddenDeployments = originalClosure.getDaysToForbidDeploymentsBefore().getIntValue();
         return new AllOf(
             new AgentHasTag(originalClosure.getAgentTag().getValue()),
@@ -74,7 +74,7 @@ public class ClosureExtensionBefore implements ConditionFactory {
                     : FALSE,
                 new BetweenYearlyDates(
                     newBeginning,
-                    addDays(originalClosure.getBeginning(), -1)
+                    addDays(originalClosure.beginning(), -1)
                 )
             )
         );
