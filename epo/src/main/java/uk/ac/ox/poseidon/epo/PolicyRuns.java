@@ -24,21 +24,26 @@ public class PolicyRuns {
             "calibrated_scenario.yaml"
         ));
         final Path baseOutputFolder = baseFolder.resolve(Paths.get("policy_runs"));
-        final List<Integer> applicableYears = ImmutableList.of(2023);
+        final List<Integer> yearsActive = ImmutableList.of(2023);
         final ImmutableList<Double> proportions = ImmutableList.of(1.0, 0.75, 0.50, 0.25, 0.10, 0.0);
         ImmutableMap.of(
                 "global_object_set_limits", new GlobalObjectSetLimit(
-                    applicableYears,
+                    yearsActive,
                     // 8729 FAD + 4003 OFS in 2022:
                     proportions.stream().map(p -> (int) (p * (8729 + 4003))).collect(toList())
                 ),
                 "fad_limits", new ActiveFadLimitsPolicies(
-                    applicableYears,
+                    yearsActive,
                     2022,
                     proportions
                 ),
                 "extended_closures", new ExtendedClosurePolicies(
-                    applicableYears,
+                    yearsActive,
+                    ImmutableList.of(5, 15, 30)
+                ),
+                "el_corralito", new ExtendedElCorralitoPolicy(
+                    yearsActive,
+                    -5, 5, -120,
                     ImmutableList.of(5, 15, 30)
                 )
             )

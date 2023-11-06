@@ -50,11 +50,11 @@ public class ExtendedClosurePolicies extends PolicySupplier {
                         addDays(closureB.end(), days),
                         closureA.getDaysToForbidDeploymentsBefore().getIntValue()
                     );
-                    namedRegulations.modify("New closure A", __ -> newClosureA);
-                    namedRegulations.modify("New closure B", __ -> newClosureB);
+                    namedRegulations.modify("New closure A", () -> newClosureA);
+                    namedRegulations.modify("New closure B", () -> newClosureB);
                     namedRegulations.modify(
                         "New BET limits",
-                        __ -> new IndividualBetLimits(
+                        () -> new IndividualBetLimits(
                             newClosureA,
                             newClosureB,
                             betLimits.getAdditionalClosureDaysByExcessTonnesOfBet(),

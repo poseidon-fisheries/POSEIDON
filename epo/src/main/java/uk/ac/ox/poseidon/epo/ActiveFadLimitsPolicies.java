@@ -42,7 +42,7 @@ public class ActiveFadLimitsPolicies extends PolicySupplier {
                     scenario ->
                         ((NamedRegulations) scenario.getRegulations()).modify(
                             "Active-FAD limits",
-                            ignored -> {
+                            () -> {
                                 final ImmutableMap<String, Integer> newLimits = ACTIVE_FAD_LIMITS
                                     .get(referenceYear)
                                     .entrySet()

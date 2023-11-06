@@ -37,7 +37,7 @@ public class GlobalObjectSetLimit extends PolicySupplier {
                         ((NamedRegulations) scenario.getRegulations())
                             .modify(
                                 "Global object-set limits",
-                                ignored -> new ForbiddenIf(
+                                () -> new ForbiddenIf(
                                     new AllOf(
                                         yearsActiveCondition(),
                                         new AnyOf(

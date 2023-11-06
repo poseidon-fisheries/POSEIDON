@@ -25,6 +25,11 @@ public class DefaultEpoRegulations {
         2023, ImmutableMap.of("6A", 255, "6B", 340),
         2024, ImmutableMap.of("6A", 210, "6B", 340)
     );
+    public static final MonthDay EL_CORRALITO_BEGINNING = MonthDay.of(OCTOBER, 9);
+    public static final MonthDay EL_CORRALITO_END = MonthDay.of(NOVEMBER, 8);
+    public static final InRectangularArea EL_CORRALITO_AREA = new InRectangularArea(
+        4.0, -110.0, -3.0, -96.0
+    );
     private static final Map<Integer, Integer> ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET = ImmutableMap.of(
         1200, 10,
         1500, 13,
@@ -71,12 +76,10 @@ public class DefaultEpoRegulations {
                 "El Corralito", new ForbiddenIf(
                     new AllOf(
                         new BetweenYearlyDates(
-                            OCTOBER, 9,
-                            NOVEMBER, 8
+                            EL_CORRALITO_BEGINNING,
+                            EL_CORRALITO_END
                         ),
-                        new InRectangularArea(
-                            4.0, -110.0, -3.0, -96.0
-                        )
+                        EL_CORRALITO_AREA
                     )
                 ),
                 "EEZs", new ForbiddenAreasFromShapeFiles(

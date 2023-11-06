@@ -7,7 +7,7 @@ import uk.ac.ox.poseidon.regulations.api.Regulations;
 import uk.ac.ox.poseidon.regulations.core.ConjunctiveRegulations;
 
 import java.util.Map;
-import java.util.function.UnaryOperator;
+import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
@@ -33,12 +33,12 @@ public class NamedRegulations implements AlgorithmFactory<Regulations> {
 
     public void modify(
         final String regulationName,
-        final UnaryOperator<AlgorithmFactory<Regulations>> operator
+        final Supplier<? extends AlgorithmFactory<Regulations>> supplier
     ) {
         setRegulations(
             ImmutableMap.<String, AlgorithmFactory<Regulations>>builder()
                 .putAll(getRegulations())
-                .put(regulationName, operator.apply(getRegulations().get(regulationName)))
+                .put(regulationName, supplier.get())
                 .buildKeepingLast()
         );
     }
