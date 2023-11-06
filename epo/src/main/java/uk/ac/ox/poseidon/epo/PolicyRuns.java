@@ -45,6 +45,11 @@ public class PolicyRuns {
                     yearsActive,
                     -5, 5, -120,
                     ImmutableList.of(5, 15, 30)
+                ),
+                "western_closure", new WesternClosure(
+                    yearsActive,
+                    -120,
+                    ImmutableList.of(5, 15, 30)
                 )
             )
             .entrySet()
@@ -57,13 +62,10 @@ public class PolicyRuns {
                         .setPolicies(entry.getValue().get())
                         .setParallel(true)
                         .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
-                        .requestFisherYearlyData();
-                if (!entry.getKey().equals("fad_limits_fine")) {
-                    runner
+                        .requestFisherYearlyData()
                         .requestFisherDailyData()
                         .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
                         .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
-                }
                 runner.run(3, 1);
             });
     }
