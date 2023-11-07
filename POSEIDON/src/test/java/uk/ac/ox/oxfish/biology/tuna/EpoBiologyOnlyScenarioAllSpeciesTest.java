@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
@@ -28,11 +29,6 @@ public class EpoBiologyOnlyScenarioAllSpeciesTest {
     public void testRunBiologyOnlyScenario() {
         final EpoAbundanceScenario scenario = new EpoAbundanceScenario();
 
-        ((AbundanceMortalityProcessFromFileFactory)
-                ((ScheduledAbundanceProcessesFactory) scenario.getBiologicalProcesses()
-                        .getScheduledProcesses())
-                        .getAbundanceMortalityProcess())
-                .setMortalityFile(scenario.testFolder().path("mortality_BP.csv"));
         final FishState fishState = new FishState();
         fishState.setScenario(scenario);
         scenario.getFadMap().setCurrentPatternMapSupplier(CurrentPatternMapSupplier.EMPTY);
@@ -45,44 +41,47 @@ public class EpoBiologyOnlyScenarioAllSpeciesTest {
         final Species yft = fishState.getSpecies("Yellowfin tuna");
         final Species skj = fishState.getSpecies("Skipjack tuna");
 
+
         System.out.println("breakpoint");
 
         Map<Integer, Map<String, Double>> expectedBiomass = recordStream(biologyTestFile)
                 .collect(Collectors.groupingBy(record -> record.getInt("day"),
                         Collectors.toMap(record -> record.getString("species"), record -> record.getDouble("biomass"))));
 
-        double[][] prevAbund = fishState.getTotalAbundance(bet);
-        final double[][] deaths = fishState.getTotalAbundance(bet);
+        Map<Species, double[][]> speciesAbundances =
+                ImmutableMap.of(
+                        bet, fishState.getTotalAbundance(bet),
+                        yft, fishState.getTotalAbundance(yft),
+                        skj, fishState.getTotalAbundance(skj));
+
+        Map<Species, double[][]> speciesDeaths =
+                ImmutableMap.of(
+                        bet, fishState.getTotalAbundance(bet),
+                        yft, fishState.getTotalAbundance(yft),
+                        skj, fishState.getTotalAbundance(skj));
 
         System.out.println("File found, start stepping model");
 
         do {
             System.out.println(fishState.getStep());
             if (expectedBiomass.containsKey(fishState.getStep())) {
-                    System.out.println(fishState.getStep() + " " + fishState.getTotalBiomass(bet) / 1000);
-                    final double[][] totalAbundance = fishState.getTotalAbundance(bet);
-                    for (int i = 0; i < totalAbundance.length; i++) {
-                        for (int j = 0; j < totalAbundance[0].length - 1; j++) {
-                            deaths[i][j] = prevAbund[i][j] - totalAbundance[i][j + 1];
-                        }
-                    }
+                speciesAbundances.forEach( (s, abundance) -> {
+                    System.out.println(fishState.getStep() + " " + fishState.getTotalBiomass(s) / 1000);
                     System.out.println("Bigeye estimated");
-
-                    prevAbund = fishState.getTotalAbundance(bet);
-
-                    Assertions.assertEquals(expectedBiomass.get(fishState.getStep()).get("BET"), fishState.getTotalBiomass(bet), 1000000);
-
-
-                    System.out.println(fishState.getStep() + " " + fishState.getTotalBiomass(yft) / 1000);
+                    Assertions.assertEquals(expectedBiomass.get(fishState.getStep()).get(s.getCode()), fishState.getTotalBiomass(s), 1000000);
+                });
+                   }
+                    /*System.out.println(fishState.getStep() + " " + fishState.getTotalBiomass(yft) / 1000);
                     final double[][] totalAbundanceYFT = fishState.getTotalAbundance(yft);
                     for (int i = 0; i < totalAbundanceYFT.length; i++) {
                         for (int j = 0; j < totalAbundanceYFT[0].length - 1; j++) {
-                            deaths[i][j] = prevAbund[i][j] - totalAbundanceYFT[i][j + 1];
+
+                            deaths[i][j] = prevAbundYFT[i][j] - totalAbundanceYFT[i][j + 1];
                         }
                     }
                     System.out.println("Yellowfin estimated");
 
-                    prevAbund = fishState.getTotalAbundance(yft);
+                    prevAbundYFT = fishState.getTotalAbundance(yft);
 
                     Assertions.assertEquals(expectedBiomass.get(fishState.getStep()).get("YFT"), fishState.getTotalBiomass(yft), 1000000);
 
@@ -91,16 +90,14 @@ public class EpoBiologyOnlyScenarioAllSpeciesTest {
                     final double[][] totalAbundanceSKJ = fishState.getTotalAbundance(skj);
                     for (int i = 0; i < totalAbundanceSKJ.length; i++) {
                         for (int j = 0; j < totalAbundanceSKJ[0].length - 1; j++) {
-                            deaths[i][j] = prevAbund[i][j] - totalAbundanceSKJ[i][j + 1];
+                            deaths[i][j] = prevAbundSKJ[i][j] - totalAbundanceSKJ[i][j + 1];
                         }
                     }
                     System.out.println("Skipjack estimated");
 
-                    prevAbund = fishState.getTotalAbundance(skj);
+                    prevAbundSKJ = fishState.getTotalAbundance(skj);
 
-                    Assertions.assertEquals(expectedBiomass.get(fishState.getStep()).get("SKJ"), fishState.getTotalBiomass(skj), 1000000);
-
-                }
+                    Assertions.assertEquals(expectedBiomass.get(fishState.getStep()).get("SKJ"), fishState.getTotalBiomass(skj), 1000000);*/
             fishState.schedule.step(fishState);
         } while (fishState.getYear() < 1);
     }
