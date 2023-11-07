@@ -3,6 +3,7 @@ package uk.ac.ox.poseidon.epo;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.IndividualBetLimits;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.TemporalClosure;
+import uk.ac.ox.oxfish.fisher.purseseiner.regulations.YearsActive;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.regulations.NamedRegulations;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -28,14 +29,14 @@ public class ExtendedClosurePolicies extends PolicySupplier {
     public List<Policy<EpoScenario<?>>> get() {
         return daysToExtend.stream().map(days ->
             new Policy<EpoScenario<?>>(
-                String.format("Closures extended by %d days", days),
+                String.format("Closures extended by %02d days", days),
                 scenario -> {
                     final NamedRegulations namedRegulations = (NamedRegulations) scenario.getRegulations();
                     final Map<String, AlgorithmFactory<Regulations>> regulationMap = namedRegulations.getRegulations();
                     final TemporalClosure closureA = (TemporalClosure) regulationMap.get("Closure A");
                     final TemporalClosure closureB = (TemporalClosure) regulationMap.get("Closure B");
                     final IndividualBetLimits betLimits = (IndividualBetLimits) regulationMap.get("BET limits");
-                    Stream.of(closureA, closureB, betLimits).forEach(this::deactivateForYearsActive);
+                    Stream.<YearsActive>of(closureA, closureB, betLimits).forEach(this::deactivateForYearsActive);
                     final TemporalClosure newClosureA = new TemporalClosure(
                         getYearsActive(),
                         closureA.getAgentTag().getValue(),

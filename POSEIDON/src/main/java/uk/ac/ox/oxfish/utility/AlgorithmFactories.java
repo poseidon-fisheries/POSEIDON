@@ -721,6 +721,7 @@ public class AlgorithmFactories {
             LastYearlyFisherValue.class,
             SecondLastYearlyFisherValue.class,
             YearlyFisherValue.class,
+            YearlyGatherer.class,
             PreviousYearActionCount.class,
             SumOf.class,
             YearlyCounter.class

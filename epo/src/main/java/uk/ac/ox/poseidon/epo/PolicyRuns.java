@@ -2,16 +2,24 @@ package uk.ac.ox.poseidon.epo;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.maximization.YearlyResultsRowProvider;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.toList;
 
 public class PolicyRuns {
@@ -26,7 +34,7 @@ public class PolicyRuns {
         final Path baseOutputFolder = baseFolder.resolve(Paths.get("policy_runs"));
         final List<Integer> yearsActive = ImmutableList.of(2023);
         final ImmutableList<Double> proportions = ImmutableList.of(0.75, 0.50, 0.25, 0.10, 0.0);
-        ImmutableMap.of(
+        ImmutableMap<String, List<Policy<EpoScenario<?>>>> policies = ImmutableMap.of(
                 "global_object_set_limits", new GlobalObjectSetLimit(
                     yearsActive,
                     // 8729 FAD + 4003 OFS in 2022:
@@ -54,19 +62,37 @@ public class PolicyRuns {
             )
             .entrySet()
             .stream()
+            .collect(toImmutableMap(
+                Entry::getKey,
+                entry -> entry.getValue().getWithDefault()
+            ));
+
+        int numberOfRunsPerPolicy = 1;
+        int numberOfPolicies = policies.values().stream().mapToInt(List::size).sum();
+        System.out.printf(
+            "About to run %d policies %d times (%d total runs)\n",
+            numberOfPolicies,
+            numberOfRunsPerPolicy,
+            numberOfPolicies * numberOfRunsPerPolicy
+        );
+
+        policies
+            .entrySet()
+            .stream()
             .parallel()
             .forEach(entry -> {
                 final Path outputFolder = baseOutputFolder.resolve(entry.getKey());
                 final Runner<EpoPathPlannerAbundanceScenario> runner =
                     new Runner<>(EpoPathPlannerAbundanceScenario.class, baseScenario, outputFolder)
-                        .setPolicies(entry.getValue().getWithDefault())
+                        .setPolicies(entry.getValue())
                         .setParallel(true)
+                        .setWriteScenarioToFile(true)
                         .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
                         .requestFisherYearlyData()
                         .requestFisherDailyData()
                         .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
                         .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
-                runner.run(3, 1);
+                runner.run(3, numberOfRunsPerPolicy);
             });
     }
 }

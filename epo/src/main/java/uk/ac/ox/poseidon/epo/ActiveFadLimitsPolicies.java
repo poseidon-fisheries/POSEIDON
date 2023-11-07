@@ -36,7 +36,7 @@ public class ActiveFadLimitsPolicies extends PolicySupplier {
             .map(proportion ->
                 new Policy<EpoScenario<?>>(
                     String.format(
-                        "%d%% of regular active FAD limits",
+                        "%02d%% of regular active FAD limits",
                         (int) (proportion * 100)
                     ),
                     scenario ->

@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.regulations.conditions.ActionCodeIs;
 import uk.ac.ox.oxfish.regulations.conditions.AllOf;
 import uk.ac.ox.oxfish.regulations.conditions.AnyOf;
 import uk.ac.ox.oxfish.regulations.conditions.NotBelow;
+import uk.ac.ox.oxfish.regulations.quantities.SumOf;
 import uk.ac.ox.oxfish.regulations.quantities.YearlyGatherer;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class GlobalObjectSetLimit extends PolicySupplier {
             .stream()
             .map(limit ->
                 new Policy<EpoScenario<?>>(
-                    String.format("Global limit of %d object sets", limit),
+                    String.format("Global limit of %04d object sets", limit),
                     scenario ->
                         ((NamedRegulations) scenario.getRegulations())
                             .modify(
@@ -45,7 +46,7 @@ public class GlobalObjectSetLimit extends PolicySupplier {
                                             new ActionCodeIs("OFS")
                                         ),
                                         new NotBelow(
-                                            new YearlyGatherer("Number of FAD sets"),
+                                            new YearlyGatherer("Number of FAD sets"), // this includes both FAD and OFS sets
                                             limit
                                         )
                                     )

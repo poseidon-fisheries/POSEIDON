@@ -31,7 +31,7 @@ public class WesternClosure extends PolicySupplier {
         return numberOfExtraDays.stream().map(extraDays ->
             new Policy<EpoScenario<?>>(
                 String.format(
-                    "Closure west of %f, from %d days before to %d days after El Corralito",
+                    "Closure west of %.0f, from %02d days before to %02d days after El Corralito",
                     eastLongitude,
                     extraDays,
                     extraDays

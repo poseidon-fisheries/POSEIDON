@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.data.monitors.*;
@@ -219,7 +220,7 @@ public class Monitors {
                     IterativeAveragingAccumulator::new,
                     DAY,
                     "Days",
-                    fad -> fad.getStepsBeforeFirstAttraction()
+                    Fad::getStepsBeforeFirstAttraction
                 )
             )
         );
@@ -249,7 +250,6 @@ public class Monitors {
         final String baseName,
         final Supplier<Accumulator<Double>> accumulatorSupplier
     ) {
-        //noinspection unchecked
         return perSpeciesPerRegionMonitor(
             baseName,
             EVERY_YEAR,

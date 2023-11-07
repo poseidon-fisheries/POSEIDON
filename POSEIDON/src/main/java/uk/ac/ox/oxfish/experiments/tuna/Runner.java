@@ -36,6 +36,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -61,6 +62,7 @@ public final class Runner<S extends Scenario> {
     private static final String FISHER_DAILY_DATA_FILENAME = "fisher_daily_data.csv";
     private static final String RUNS_FILENAME = "runs.csv";
     private static final String POLICIES_FILENAME = "policies.csv";
+    private static final String SCENARIOS_FOLDER = "scenarios";
 
     private final Map<Path, AtomicBoolean> overwriteFiles = new HashMap<>();
 
@@ -70,6 +72,7 @@ public final class Runner<S extends Scenario> {
         rowProviderFactories =
         HashMultimap.create();
     private boolean parallel = true;
+    private boolean writeScenarioToFile = false;
     private CsvWriterSettings csvWriterSettings = new CsvWriterSettings();
     private Collection<Policy<? super S>> policies = ImmutableList.of(Policy.DEFAULT);
     private Consumer<? super State> beforeStartConsumer = __ -> {
@@ -89,6 +92,7 @@ public final class Runner<S extends Scenario> {
         this.outputPath = outputPath;
     }
 
+    @SuppressWarnings("unused")
     public Runner(
         final Class<S> scenarioClass,
         final Path scenarioPath
@@ -167,6 +171,17 @@ public final class Runner<S extends Scenario> {
         return this;
     }
 
+    @SuppressWarnings("unused")
+    public boolean isWriteScenarioToFile() {
+        return writeScenarioToFile;
+    }
+
+    @SuppressWarnings("unused")
+    public Runner<S> setWriteScenarioToFile(boolean writeScenarioToFile) {
+        this.writeScenarioToFile = writeScenarioToFile;
+        return this;
+    }
+
     @SuppressWarnings("SameParameterValue")
     public void run(final int numYearsToRun) {
         run(numYearsToRun, 1);
@@ -188,6 +203,7 @@ public final class Runner<S extends Scenario> {
                 final int runNumber = runCounter.getAndIncrement();
                 System.out.printf("=== Starting run %d / %s ===\n", runNumber, numRuns);
                 final State state = startRun(policy, runNumber, numRuns, numYearsToRun);
+                if (writeScenarioToFile) writeScenarioToFile(state);
                 beforeStartConsumer.accept(state);
                 state.model.start();
                 afterStartConsumer.accept(state);
@@ -304,7 +320,7 @@ public final class Runner<S extends Scenario> {
         );
     }
 
-    @SuppressWarnings("WeakerAccess")
+    @SuppressWarnings({"WeakerAccess", "unused"})
     public Runner<S> requestYearlyData() {
         return registerRowProvider(YEARLY_DATA_FILENAME, fishState ->
             new TidyYearlyData(fishState.getYearlyDataSet())
@@ -325,6 +341,19 @@ public final class Runner<S extends Scenario> {
     public Runner<S> setPolicies(final Iterable<? extends Policy<? super S>> policies) {
         this.policies = ImmutableList.copyOf(policies);
         return this;
+    }
+
+    private void writeScenarioToFile(State runnerState) {
+        try {
+            Path scenariosFolder = outputPath.resolve(SCENARIOS_FOLDER);
+            Files.createDirectories(scenariosFolder);
+            Path scenarioFile = scenariosFolder.resolve(
+                runnerState.getPolicy().getName().replaceAll("[^a-zA-Z0-9-_.]", "_") + ".yaml"
+            );
+            new FishYAML().dump(runnerState.getScenario(), new FileWriter(scenarioFile.toFile()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public class State implements RowProvider {
