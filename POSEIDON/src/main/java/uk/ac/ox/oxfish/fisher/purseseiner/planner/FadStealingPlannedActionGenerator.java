@@ -20,17 +20,22 @@ public class FadStealingPlannedActionGenerator<B extends LocalBiology> extends
 
     private final double minimumFadValueToSteal;
 
-    public FadStealingPlannedActionGenerator(
+    private final double probabilityOfFindingOtherFads;
+
+    FadStealingPlannedActionGenerator(
         final OpportunisticFadSetLocationValues originalLocationValues,
-        final NauticalMap map, final MersenneTwisterFast random,
+        final NauticalMap map,
+        final MersenneTwisterFast random,
         final double hoursItTakesToSet,
         final double hoursWastedIfNoFadAround,
-        final double minimumFadValueToSteal
+        final double minimumFadValueToSteal,
+        final double probabilityOfFindingOtherFads
     ) {
         super(originalLocationValues, map, random);
         this.hoursItTakesToSet = hoursItTakesToSet;
         this.hoursWastedIfNoFadAround = hoursWastedIfNoFadAround;
         this.minimumFadValueToSteal = minimumFadValueToSteal;
+        this.probabilityOfFindingOtherFads = probabilityOfFindingOtherFads;
     }
 
     @Override
@@ -39,7 +44,8 @@ public class FadStealingPlannedActionGenerator<B extends LocalBiology> extends
             drawNewLocation(),
             hoursItTakesToSet,
             hoursWastedIfNoFadAround,
-            minimumFadValueToSteal
+            minimumFadValueToSteal,
+            probabilityOfFindingOtherFads
         );
     }
 }

@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplers;
@@ -48,7 +49,12 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * $ a stolen fad needs to have accumulated before we even try to target it
      */
     private DoubleParameter minimumValueOpportunisticFadSets =
-        new FixedDoubleParameter(18135.37); // based on 10t of SKJ at 2017 price
+        new FixedDoubleParameter(0); // fixing at zero to disable for now; was 18135.37 (based on 10t of SKJ at 2017 price)
+    /**
+     * To probability of finding another vessel's FAD when you search for some.
+     */
+    private DoubleParameter probabilityOfFindingOtherFads =
+        new CalibratedParameter(0, 1, 0, 1);
     /**
      * if you tried to steal and failed, how many hours does it take for you to fish this out
      */
@@ -63,20 +69,18 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * a multiplier applied to the action weight of own fad (since it's quite low in the data)
      */
     private DoubleParameter ownFadActionWeightBias =
-        new CalibratedParameter(0.25, 0.99,0.0, 1.0, 0.9565217);
+        new CalibratedParameter(0.25, 0.99, 0.0, 1.0, 0.9565217);
     /**
      * a multiplier applied to the action weight of DPL
      */
     private DoubleParameter deploymentBias =
-        new CalibratedParameter(0.25, 0.95, 0.0, 0.9999,0.9090909);
+        new CalibratedParameter(0.25, 0.95, 0.0, 0.9999, 0.9090909);
     private DoubleParameter noaBias =
         new CalibratedParameter(0.25, 0.75, 0.0, 0.9999, 0.6);
     private DoubleParameter delBias =
-            new CalibratedParameter(0.25, 0.75, 0.0, 0.9999,  0.5);
+        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999, 0.5);
     private DoubleParameter ofsBias =
-            new CalibratedParameter(0.25, 0.75, 0.0, 0.9999,   0.5);
-
-
+        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999, 0.5);
     private DoubleParameter minimumPercentageOfTripDurationAllowed =
         new CalibratedParameter(0.4, 0.9, 0, 1, 0.7);
     private BooleanParameter noaSetsCanPoachFads = new BooleanParameter(false);
@@ -106,6 +110,14 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.catchSamplers = catchSamplers;
         this.actionWeightsFile = actionWeightsFile;
         this.maxTripDurationFile = maxTripDurationFile;
+    }
+
+    public DoubleParameter getProbabilityOfFindingOtherFads() {
+        return probabilityOfFindingOtherFads;
+    }
+
+    public void setProbabilityOfFindingOtherFads(final DoubleParameter probabilityOfFindingOtherFads) {
+        this.probabilityOfFindingOtherFads = probabilityOfFindingOtherFads;
     }
 
     public BooleanParameter getNoaSetsCanPoachFads() {
@@ -152,28 +164,30 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     public PlannedStrategyProxy apply(final FishState state) {
 
 
+        final MersenneTwisterFast rng = state.getRandom();
         final PlannedStrategyProxy proxy = new PlannedStrategyProxy(
             uniqueCatchSamplerForEachStrategy.getValue()
                 ? catchSamplers.apply(state)
                 : catchSamplersCache.get(state),
             PurseSeinerFishingStrategyFactory.loadActionWeights(targetYear.getValue(), actionWeightsFile.get()),
             GravityDestinationStrategyFactory.loadMaxTripDuration(targetYear.getValue(), maxTripDurationFile.get()),
-            additionalHourlyDelayDolphinSets.applyAsDouble(state.getRandom()),
-            additionalHourlyDelayDeployment.applyAsDouble(state.getRandom()),
-            additionalHourlyDelayNonAssociatedSets.applyAsDouble(state.getRandom()),
-            ownFadActionWeightBias.applyAsDouble(state.getRandom()),
-            deploymentBias.applyAsDouble(state.getRandom()),
-            noaBias.applyAsDouble(state.getRandom()),
-            delBias.applyAsDouble(state.getRandom()),
-            ofsBias.applyAsDouble(state.getRandom()),
-            minimumValueOpportunisticFadSets.applyAsDouble(state.getRandom()),
-            hoursWastedOnFailedSearches.applyAsDouble(state.getRandom()),
-            planningHorizonInHours.applyAsDouble(state.getRandom()),
-            minimumPercentageOfTripDurationAllowed.applyAsDouble(state.getRandom()),
+            additionalHourlyDelayDolphinSets.applyAsDouble(rng),
+            additionalHourlyDelayDeployment.applyAsDouble(rng),
+            additionalHourlyDelayNonAssociatedSets.applyAsDouble(rng),
+            ownFadActionWeightBias.applyAsDouble(rng),
+            deploymentBias.applyAsDouble(rng),
+            noaBias.applyAsDouble(rng),
+            delBias.applyAsDouble(rng),
+            ofsBias.applyAsDouble(rng),
+            minimumValueOpportunisticFadSets.applyAsDouble(rng),
+            probabilityOfFindingOtherFads.applyAsDouble(rng),
+            hoursWastedOnFailedSearches.applyAsDouble(rng),
+            planningHorizonInHours.applyAsDouble(rng),
+            minimumPercentageOfTripDurationAllowed.applyAsDouble(rng),
             noaSetsCanPoachFads.getValue(),
             purgeIllegalActionsImmediately.getValue(),
-            (int) noaSetsRangeInSeatiles.applyAsDouble(state.getRandom()),
-            (int) delSetsRangeInSeatiles.applyAsDouble(state.getRandom()),
+            (int) noaSetsRangeInSeatiles.applyAsDouble(rng),
+            (int) delSetsRangeInSeatiles.applyAsDouble(rng),
             fadModule,
             locationValuesFactory.apply(state)
         );

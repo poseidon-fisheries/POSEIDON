@@ -175,16 +175,20 @@ public interface PlannedAction {
 
         final private double minimumFadValueToSteal;
 
+        final private double probabilityOfFindingOtherFads;
+
         public OpportunisticFadSet(
             final SeaTile whereAreWeGoingToSearchForFads,
             final double hoursItTakesToSet,
             final double hoursWastedIfNoFadAround,
-            final double minimumFadValueToSteal
+            final double minimumFadValueToSteal,
+            final double probabilityOfFindingOtherFads
         ) {
             this.whereAreWeGoingToSearchForFads = whereAreWeGoingToSearchForFads;
             this.hoursItTakesToSet = hoursItTakesToSet;
             this.hoursWastedIfNoFadAround = hoursWastedIfNoFadAround;
             this.minimumFadValueToSteal = minimumFadValueToSteal;
+            this.probabilityOfFindingOtherFads = probabilityOfFindingOtherFads;
         }
 
         @Override
@@ -214,7 +218,8 @@ public interface PlannedAction {
                 new FadSearchAction(
                     hoursWastedIfNoFadAround,
                     hoursItTakesToSet,
-                    minimumFadValueToSteal
+                    minimumFadValueToSteal,
+                    probabilityOfFindingOtherFads
                 )
             };
         }

@@ -10,17 +10,17 @@ import uk.ac.ox.oxfish.model.FishState;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.OFS;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
-@SuppressWarnings("rawtypes")
 public class FadStealingFromLocationValuePlanningModule<B extends LocalBiology>
     extends LocationValuePlanningModule<B> {
 
-    public FadStealingFromLocationValuePlanningModule(
+    FadStealingFromLocationValuePlanningModule(
         final OpportunisticFadSetLocationValues locationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
         final double hoursItTakesToSet,
         final double hoursWastedIfNoFadAround,
-        final double minimumFadValueToSteal
+        final double minimumFadValueToSteal,
+        final double probabilityOfFindingOtherFads
     ) {
         this(
             locationValues,
@@ -30,12 +30,13 @@ public class FadStealingFromLocationValuePlanningModule<B extends LocalBiology>
                 random,
                 hoursItTakesToSet,
                 hoursWastedIfNoFadAround,
-                minimumFadValueToSteal
+                minimumFadValueToSteal,
+                probabilityOfFindingOtherFads
             )
         );
     }
 
-    public FadStealingFromLocationValuePlanningModule(
+    private FadStealingFromLocationValuePlanningModule(
         final OpportunisticFadSetLocationValues locationValues,
         final FadStealingPlannedActionGenerator<B> generator
     ) {

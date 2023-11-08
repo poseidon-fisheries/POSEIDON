@@ -38,6 +38,8 @@ import java.util.function.ToDoubleFunction;
 @SuppressWarnings("unchecked")
 public class PlannedStrategyProxy implements FishingStrategy, DestinationStrategy {
 
+    private static final double MIN_BIAS = 0.0001;
+    private static final double MAX_BIAS = 0.9999;
     /**
      * object used to draw catches for DEL and NOA
      */
@@ -63,11 +65,6 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      * hours wasted after every NOA
      */
     private final double additionalHourlyDelayNonAssociatedSets;
-
-
-    private final double MINBIAS = 0.0001;
-    private final double MAXBIAS = 0.9999;
-
     /**
      * a multiplier to the data-read action weight for own fad
      */
@@ -94,6 +91,12 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      * an area
      */
     private final double minimumValueOpportunisticFadSets;
+
+    /**
+     * To probability of finding another vessel's FAD when you search for some.
+     */
+    private final double probabilityOfFindingOtherFads;
+
     /**
      * if you tried to steal and failed, how many hours does it take for you to fish this out
      */
@@ -144,6 +147,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         final double dolphinBias,
         final double opportunisticBias,
         final double minimumValueOpportunisticFadSets,
+        final double probabilityOfFindingOtherFads,
         final double hoursWastedOnFailedSearches,
         final double planningHorizonInHours,
         final double minimumPercentageOfTripDurationAllowed,
@@ -160,12 +164,13 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         this.additionalHourlyDelayDolphinSets = additionalHourlyDelayDolphinSets;
         this.additionalHourlyDelayDeployment = additionalHourlyDelayDeployment;
         this.additionalHourlyDelayNonAssociatedSets = additionalHourlyDelayNonAssociatedSets;
-        this.ownFadActionWeightBias = Math.max(Math.min(MAXBIAS, ownFadActionWeightBias),MINBIAS);
-        this.deploymentBias = Math.max(Math.min(MAXBIAS, deploymentBias),MINBIAS);
-        this.dolphinBias = Math.max(Math.min(MAXBIAS, dolphinBias),MINBIAS);
-        this.opportunisticBias = Math.max(Math.min(MAXBIAS, opportunisticBias),MINBIAS);
-        this.nonAssociatedBias = Math.max(Math.min(MAXBIAS, nonAssociatedBias),MINBIAS);
+        this.ownFadActionWeightBias = Math.max(Math.min(MAX_BIAS, ownFadActionWeightBias), MIN_BIAS);
+        this.deploymentBias = Math.max(Math.min(MAX_BIAS, deploymentBias), MIN_BIAS);
+        this.dolphinBias = Math.max(Math.min(MAX_BIAS, dolphinBias), MIN_BIAS);
+        this.opportunisticBias = Math.max(Math.min(MAX_BIAS, opportunisticBias), MIN_BIAS);
+        this.nonAssociatedBias = Math.max(Math.min(MAX_BIAS, nonAssociatedBias), MIN_BIAS);
         this.minimumValueOpportunisticFadSets = minimumValueOpportunisticFadSets;
+        this.probabilityOfFindingOtherFads = probabilityOfFindingOtherFads;
         this.hoursWastedOnFailedSearches = hoursWastedOnFailedSearches;
         this.planningHorizonInHours = planningHorizonInHours;
         this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
@@ -207,12 +212,12 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 //add
                 final DolphinSetLocationValues locations =
                     (DolphinSetLocationValues) locationValues.get(DolphinSetAction.class);
-                if (locations.getValues().size() == 0)
+                if (locations.getValues().isEmpty())
                     System.out.println(fisher + " failed to create DEL location values, in spite of having" +
                         "a weight of " + actionWeight.getValue());
                 plannableActionWeights.put(
                     ActionType.DolphinSets,
-                    actionWeight.getValue() * dolphinBias/(1-dolphinBias)
+                    actionWeight.getValue() * dolphinBias / (1 - dolphinBias)
                 );
                 planModules.put(
                     ActionType.DolphinSets,
@@ -233,12 +238,12 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
 
                 final DeploymentLocationValues locations =
                     (DeploymentLocationValues) locationValues.get(FadDeploymentAction.class);
-                if (locations.getValues().size() == 0)
+                if (locations.getValues().isEmpty())
                     System.out.println(fisher + " failed to create DPL location values, in spite of having" +
                         "a weight of " + actionWeight.getValue());
                 plannableActionWeights.put(
                     ActionType.DeploymentAction,
-                    actionWeight.getValue() *deploymentBias/(1-deploymentBias)
+                    actionWeight.getValue() * deploymentBias / (1 - deploymentBias)
                 );
                 planModules.put(
                     ActionType.DeploymentAction,
@@ -257,7 +262,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                     (NonAssociatedSetLocationValues) locationValues.get(NonAssociatedSetAction.class);
                 plannableActionWeights.put(
                     ActionType.NonAssociatedSets,
-                    actionWeight.getValue() * nonAssociatedBias/(1-nonAssociatedBias)
+                    actionWeight.getValue() * nonAssociatedBias / (1 - nonAssociatedBias)
                 );
                 planModules.put(
                     ActionType.NonAssociatedSets,
@@ -279,7 +284,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             else if (actionWeight.getKey().equals(FadSetAction.class)) {
                 plannableActionWeights.put(
                     ActionType.SetOwnFadAction,
-                    actionWeight.getValue() * ownFadActionWeightBias/(1-ownFadActionWeightBias)
+                    actionWeight.getValue() * ownFadActionWeightBias / (1 - ownFadActionWeightBias)
                 );
                 planModules.put(
                     ActionType.SetOwnFadAction,
@@ -291,14 +296,14 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 //add
                 final OpportunisticFadSetLocationValues locations =
                     (OpportunisticFadSetLocationValues) locationValues.get(OpportunisticFadSetAction.class);
-                if (locations.getValues().size() == 0) {
+                if (locations.getValues().isEmpty()) {
                     System.out.println(fisher + " failed to create OFS location values, in spite of having" +
                         "a weight of " + actionWeight.getValue());
                     continue;
                 }
                 plannableActionWeights.put(
                     ActionType.OpportunisticFadSets,
-                    actionWeight.getValue() * opportunisticBias/(1-opportunisticBias)
+                    actionWeight.getValue() * opportunisticBias / (1 - opportunisticBias)
                 );
                 planModules.put(
                     ActionType.OpportunisticFadSets,
@@ -308,7 +313,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                         model.getRandom(),
                         2.779,
                         hoursWastedOnFailedSearches,
-                        minimumValueOpportunisticFadSets
+                        minimumValueOpportunisticFadSets,
+                        probabilityOfFindingOtherFads
                     )
                 );
             }
