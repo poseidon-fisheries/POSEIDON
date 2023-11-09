@@ -249,24 +249,14 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
      * @return
      */
     private boolean isAnyActionEvenPossible() {
-        for (final Map.Entry<ActionType, Double> actionTypeAndProbability : plannableActionWeights.entrySet()) {
-
-            //can this action type be drawn?
-            if (actionTypeAndProbability.getValue() > 0) {
-                //if it is drawn is it allowed? (it is also possible that this has never been started, so let's assume it is valid)
-                final MutableInt allowedActions = stillAllowedActionsInPlan.get(actionTypeAndProbability.getKey());
-
-                if (allowedActions == null || allowedActions.intValue() > 0)
-                    return true;
-            } else {
-                assert actionTypeAndProbability.getValue() == 0;
-
-            }
-
-
-        }
-        return false;
-
+        return plannableActionWeights
+            .entrySet()
+            .stream()
+            // can this action type be drawn?
+            .filter(entry -> entry.getValue() > 0)
+            // if it is drawn is it allowed? (it is also possible that this has never been started, so let's assume it is valid)
+            .map(entry -> stillAllowedActionsInPlan.get(entry.getKey()))
+            .anyMatch(allowedActions -> allowedActions == null || allowedActions.intValue() > 0);
     }
 
     @Override
