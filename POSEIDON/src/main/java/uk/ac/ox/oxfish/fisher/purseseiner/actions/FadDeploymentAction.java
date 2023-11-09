@@ -25,11 +25,7 @@ import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.ConjunctiveRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.TaggedRegulation;
-
-import java.util.stream.Stream;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
@@ -61,36 +57,7 @@ public class FadDeploymentAction extends PurseSeinerAction implements FadRelated
         fadManager.reactTo(this);
         return new ActionResult(new Arriving(), Math.max(0, hoursLeft - getDuration()));
     }
-
-    /**
-     * This little piece of ugliness is my "solution" to the problem of disallowing FAD deployments 15 days before
-     * the start of a temporary closure. It recursively digs down the regulation hierarchy to see if a regulation
-     * tagged "closure A" or "closure B" will be active at the specified step.
-     * <p>
-     * The proper way to do this would be to have a system of temporary action-specific regulations (just like
-     * we have of old-school regulations) and use that to disallow deployments before closures.
-     */
-    private boolean isNoFishingAtStep(final Regulation regulation, final int step) {
-        if (regulation instanceof ConjunctiveRegulations) {
-            return ((ConjunctiveRegulations) regulation)
-                .getRegulations()
-                .stream()
-                .anyMatch(r -> isNoFishingAtStep(r, step));
-        } else if (regulation instanceof TaggedRegulation) {
-            final boolean isClosure =
-                Stream.of("closure A", "closure B")
-                    .anyMatch(((TaggedRegulation) regulation).getTags()::contains);
-            return isClosure && !regulation.canFishHere(
-                getFisher(),
-                getFisher().getLocation(),
-                getFisher().grabState(),
-                step
-            );
-        } else {
-            return false;
-        }
-    }
-
+    
     @Override
     public Fad getFad() {
         return fad;
