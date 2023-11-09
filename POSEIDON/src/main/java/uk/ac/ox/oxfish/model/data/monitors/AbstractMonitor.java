@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.model.data.monitors;
 
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
@@ -34,7 +35,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static uk.ac.ox.oxfish.model.StepOrder.DATA_RESET;
 
-abstract public class AbstractMonitor<O, V, Q extends Quantity<Q>> implements Monitor<O, V, Q> {
+abstract public class AbstractMonitor<O, V, Q extends Quantity<Q>> implements Monitor<O, V, Q>, Gatherer<FishState> {
+
+    private static final long serialVersionUID = 7844804465386740854L;
 
     private final IntervalPolicy resetInterval;
     private final String baseName;
@@ -79,11 +82,16 @@ abstract public class AbstractMonitor<O, V, Q extends Quantity<Q>> implements Mo
     }
 
     @Override
+    public Double apply(FishState fishState) {
+        return accumulator.get();
+    }
+
+    @Override
     public void registerWith(final TimeSeries<FishState> timeSeries) {
         if (baseName != null) // a null baseName indicates we don't want to register the accumulator
             timeSeries.registerGatherer(
                 accumulator.makeName(baseName),
-                accumulator,
+                this,
                 0.0,
                 unit,
                 yLabel

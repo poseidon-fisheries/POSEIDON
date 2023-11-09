@@ -44,6 +44,7 @@ import static java.util.function.UnaryOperator.identity;
 
 public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMonitor<O, V, Q> {
 
+    private static final long serialVersionUID = -520256027446952684L;
     private final Map<G, Monitor<O, V, Q>> subMonitors;
     private final Function<? super O, Collection<G>> groupsExtractor;
 

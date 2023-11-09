@@ -31,6 +31,7 @@ import static java.util.Collections.singletonList;
 
 public class BasicMonitor<O, V, Q extends Quantity<Q>> extends AbstractMonitor<O, V, Q> {
 
+    private static final long serialVersionUID = -7516952997092729146L;
     private final Function<? super O, V> valueExtractor;
 
     public BasicMonitor(

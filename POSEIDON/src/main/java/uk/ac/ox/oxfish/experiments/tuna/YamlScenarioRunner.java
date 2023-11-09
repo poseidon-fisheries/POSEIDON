@@ -1,3 +1,21 @@
+/*
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (C) 2023 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.ox.oxfish.experiments.tuna;
 
 import com.beust.jcommander.JCommander;
@@ -20,19 +38,22 @@ import java.nio.file.Paths;
  */
 public class YamlScenarioRunner {
 
+    private static final Path TUNA_REPO_FOLDER = Paths.get(
+        System.getProperty("user.home"),
+        "workspace", "tuna"
+    );
     @Parameter(names = {"-s", "--seed"})
     private long rngSeed = System.currentTimeMillis();
     @Parameter(names = {"-y", "--years"})
-    private int numYearsToRun = 2;
+    private int numYearsToRun = 3;
     @Parameter(converter = PathConverter.class)
     private Path scenarioPath =
-        Paths.get(
-            System.getProperty("user.home"),
-            "workspace", "tuna",
-            "np", "calibrations",
-            "2023-09-04", "cenv0729", "2023-09-15_14.48.13_local",
-            "calibrated_scenario.yaml"
-        );
+        TUNA_REPO_FOLDER.resolve(Paths.get(
+            "np", "policy_runs", "fad_limits", "scenarios", "00__of_regular_active_FAD_limits.yaml"
+//            "np", "calibrations",
+//            "2023-09-04", "cenv0729", "2023-09-15_14.48.13_local",
+//            "calibrated_scenario.yaml"
+        ));
 
     public static void main(final String[] args) throws IOException {
         final YamlScenarioRunner yamlScenarioRunner = new YamlScenarioRunner();

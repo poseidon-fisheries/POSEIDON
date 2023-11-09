@@ -19,11 +19,7 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.accumulators;
 
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.Gatherer;
-
-@SuppressWarnings({"serial", "RedundantSuppression"}) // see: https://bugs.openjdk.org/browse/JDK-8191637
-public interface Accumulator<V> extends Gatherer<FishState> {
+public interface Accumulator<V> {
 
     default String makeName(final String baseName) {
         return String.format(getNameFormat(), baseName);
@@ -32,11 +28,6 @@ public interface Accumulator<V> extends Gatherer<FishState> {
     String getNameFormat();
 
     void accumulate(V value);
-
-    @Override
-    default Double apply(final FishState fishState) {
-        return get();
-    }
 
     double get();
 }
