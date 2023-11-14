@@ -317,6 +317,11 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
         //if the planning module cannot propose more actions, ignore them for this plan
         if (plannedAction == null || (doNotWaitToPurgeIllegalActions && !plannedAction.isAllowedNow(fisher))) {
+            // If there is an attempt to add an illegal action to the plan, we don't allow any more actions of
+            // that type to be added. We're leaving that bit of code in for now, but we're questioning whether
+            // it's necessary. It caused problem when attempts to add FAD sets in, e.g., EEZs; preventing further
+            // FAD sets to be added. We fixed that by filtering out illegal FAD sets "upstream" (in the
+            // OwnFadSetDiscretizedActionGenerator) but we should be careful with this -- NP 2023-11-14.
             stillAllowedActionsInPlan.get(nextActionType).setValue(0);
             //try planning more
             return planRecursively(currentPlan, hoursLeftInBudget, model, fisher);

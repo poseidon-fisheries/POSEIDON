@@ -43,10 +43,10 @@ public class OwnFadSetDiscretizedActionGenerator {
     private PriorityQueue<ValuedFad>[] rankedFads;
     /**
      * when this is set to true, the generator will immediately remove all fads that are currently not
-     * allowed to be caught. This is set to false because the standard procedure is to wait till the action
-     * comes up in the plan before checking its validity.
+     * allowed to be caught. This is needs to be true, otherwise DrawThenCheapestInsertionPlanner will
+     * prevent further FAD sets to be added to the plan if we try to add a set on an illegal FAD.
      */
-    private boolean filterOutCurrentlyInvalidFads = false;
+    private boolean filterOutCurrentlyInvalidFads = true;
 
     //todo add minimum soaktime
 
