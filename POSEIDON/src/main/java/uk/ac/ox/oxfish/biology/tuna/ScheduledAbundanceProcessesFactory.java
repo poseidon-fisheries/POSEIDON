@@ -140,11 +140,18 @@ public class ScheduledAbundanceProcessesFactory
         final List<BiologicalProcess<AbundanceLocalBiology>> allProcesses =
             ImmutableList.of(
                 new AbundanceExtractorProcess(true, true),
+                new AbundanceReporterProcess("pre_mortality"),
                 abundanceMortalityProcess.apply(fishState),
+                    new AbundanceReporterProcess("post_mortality"),
                 new AbundanceLostRecoveryProcess(),
+                    new AbundanceReporterProcess("post_abundance_lost"),
                 new AbundanceAggregatorProcess(),
+                    new AbundanceReporterProcess("post_abundance_aggregator"),
                 new AgingAndRecruitmentProcess(recruitmentProcesses.apply(fishState)),
+                    new AbundanceReporterProcess("post_aging_recruitment"),
                 new FadAbundanceExcluderProcess(),
+                    new AbundanceReporterProcess("post_FAD_excluder"),
+                new FADAbundanceReporterProcess("FAD_Abundance"),
                 reallocator
             );
 
