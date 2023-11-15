@@ -14,7 +14,7 @@ public abstract class AbstractCompositeRegulations implements Regulations {
         this.subRegulations = ImmutableList.copyOf(subRegulations);
     }
 
-    protected Collection<Regulations> getSubRegulations() {
+    public Collection<Regulations> getSubRegulations() {
         return subRegulations;
     }
 

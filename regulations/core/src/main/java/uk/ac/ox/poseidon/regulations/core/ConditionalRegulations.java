@@ -5,7 +5,7 @@ import uk.ac.ox.poseidon.regulations.api.Condition;
 import uk.ac.ox.poseidon.regulations.api.Mode;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
 
-public class ConditionalRegulations implements Regulations {
+public class ConditionalRegulations implements uk.ac.ox.poseidon.regulations.api.ConditionalRegulations {
 
     private final Condition condition;
     private final Regulations regulationsIfTrue;
@@ -21,14 +21,17 @@ public class ConditionalRegulations implements Regulations {
         this.regulationsIfFalse = regulationsIfFalse;
     }
 
+    @Override
     public Condition getCondition() {
         return condition;
     }
 
+    @Override
     public Regulations getRegulationIfTrue() {
         return regulationsIfTrue;
     }
 
+    @Override
     public Regulations getRegulationIfFalse() {
         return regulationsIfFalse;
     }

@@ -10,8 +10,8 @@ import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.regulations.ForbiddenAreasFromShapeFiles;
 import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.agents.core.BasicAction;
+import uk.ac.ox.poseidon.regulations.api.ConditionalRegulations;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
-import uk.ac.ox.poseidon.regulations.core.ConditionalRegulations;
 import uk.ac.ox.poseidon.regulations.core.conditions.AllOf;
 import uk.ac.ox.poseidon.regulations.core.conditions.AnyOf;
 import uk.ac.ox.poseidon.regulations.core.conditions.InVectorField;
@@ -41,10 +41,10 @@ class SpecificProtectedAreaFactoryTest {
         ).apply(fishState);
     private final List<InVectorField> vectorFields =
         ((AnyOf) ((ConditionalRegulations) regulations).getCondition())
-            .getConditions()
+            .getSubConditions()
             .stream()
             .map(AllOf.class::cast)
-            .map(AllOf::getConditions)
+            .map(AllOf::getSubConditions)
             .flatMap(Collection::stream)
             .filter(InVectorField.class::isInstance)
             .map(InVectorField.class::cast)

@@ -3,25 +3,21 @@ package uk.ac.ox.poseidon.regulations.core.conditions;
 import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+public class Not extends MonadicConditionalOperator {
 
-public class Not implements Condition {
-
-    private final Condition condition;
-
-    public Not(final Condition condition) {
-        this.condition = checkNotNull(condition);
+    public Not(Condition operand) {
+        super(operand);
     }
 
     @Override
     public boolean test(final Action action) {
-        return !condition.test(action);
+        return !getSubCondition().test(action);
     }
 
     @Override
     public String toString() {
         return "Not{" +
-            "condition=" + condition +
+            "condition=" + getSubCondition() +
             '}';
     }
 }

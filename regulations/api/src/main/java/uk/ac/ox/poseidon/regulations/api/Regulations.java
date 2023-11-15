@@ -2,6 +2,9 @@ package uk.ac.ox.poseidon.regulations.api;
 
 import uk.ac.ox.poseidon.agents.api.Action;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import static uk.ac.ox.poseidon.regulations.api.Mode.FORBIDDEN;
 import static uk.ac.ox.poseidon.regulations.api.Mode.MANDATORY;
 
@@ -21,6 +24,10 @@ public interface Regulations {
 
     default boolean isMandatory(final Action action) {
         return mode(action) == MANDATORY;
+    }
+
+    default Collection<Regulations> getSubRegulations() {
+        return Collections.emptyList();
     }
 
 }
