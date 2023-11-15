@@ -2,6 +2,8 @@ package uk.ac.ox.poseidon.epo;
 
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
+import uk.ac.ox.oxfish.regulations.ForbiddenIf;
+import uk.ac.ox.oxfish.regulations.NamedRegulations;
 import uk.ac.ox.oxfish.regulations.conditions.AnyOf;
 import uk.ac.ox.oxfish.regulations.conditions.BetweenYearlyDates;
 import uk.ac.ox.oxfish.regulations.conditions.InRectangularArea;
@@ -36,20 +38,27 @@ public class WesternClosure extends PolicySupplier {
                     extraDays,
                     extraDays
                 ),
-                epoScenario ->
-                    new AnyOf(
-                        yearsActiveCondition(),
-                        new BetweenYearlyDates(
-                            addDays(EL_CORRALITO_BEGINNING, -extraDays),
-                            addDays(EL_CORRALITO_END, extraDays)
-                        ),
-                        new InRectangularArea(
-                            50,
-                            -150,
-                            -50,
-                            eastLongitude
+                epoScenario -> {
+                    final NamedRegulations namedRegulations = (NamedRegulations) epoScenario.getRegulations();
+                    namedRegulations.modify(
+                        "El Corralito",
+                        () -> new ForbiddenIf(
+                            new AnyOf(
+                                yearsActiveCondition(),
+                                new BetweenYearlyDates(
+                                    addDays(EL_CORRALITO_BEGINNING, -extraDays),
+                                    addDays(EL_CORRALITO_END, extraDays)
+                                ),
+                                new InRectangularArea(
+                                    50,
+                                    -150,
+                                    -50,
+                                    eastLongitude
+                                )
+                            )
                         )
-                    )
+                    );
+                }
             )
         ).collect(toImmutableList());
     }
