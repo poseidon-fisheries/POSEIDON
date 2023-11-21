@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.regulations.conditions;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.model.FishState;
@@ -48,14 +47,10 @@ public class InRectangularArea implements AlgorithmFactory<Condition> {
         final MersenneTwisterFast rng = fishState.getRandom();
         return new uk.ac.ox.poseidon.regulations.core.conditions.InRectangularArea(
             new Envelope(
-                new Coordinate(
-                    getWestLongitude().applyAsDouble(rng),
-                    getNorthLatitude().applyAsDouble(rng)
-                ),
-                new Coordinate(
-                    getEastLongitude().applyAsDouble(rng),
-                    getSouthLatitude().applyAsDouble(rng)
-                )
+                getWestLongitude().applyAsDouble(rng),
+                getEastLongitude().applyAsDouble(rng),
+                getSouthLatitude().applyAsDouble(rng),
+                getNorthLatitude().applyAsDouble(rng)
             )
         );
     }
@@ -64,20 +59,20 @@ public class InRectangularArea implements AlgorithmFactory<Condition> {
         return westLongitude;
     }
 
-    public DoubleParameter getNorthLatitude() {
-        return northLatitude;
-    }
-
-    public void setNorthLatitude(final DoubleParameter northLatitude) {
-        this.northLatitude = northLatitude;
-    }
-
     public DoubleParameter getEastLongitude() {
         return eastLongitude;
     }
 
     public DoubleParameter getSouthLatitude() {
         return southLatitude;
+    }
+
+    public DoubleParameter getNorthLatitude() {
+        return northLatitude;
+    }
+
+    public void setNorthLatitude(final DoubleParameter northLatitude) {
+        this.northLatitude = northLatitude;
     }
 
     public void setSouthLatitude(final DoubleParameter southLatitude) {

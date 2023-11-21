@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.regulations.ForbiddenIf;
 import uk.ac.ox.oxfish.regulations.NamedRegulations;
-import uk.ac.ox.oxfish.regulations.conditions.AnyOf;
+import uk.ac.ox.oxfish.regulations.conditions.AllOf;
 import uk.ac.ox.oxfish.regulations.conditions.BetweenYearlyDates;
 import uk.ac.ox.oxfish.regulations.conditions.InRectangularArea;
 
@@ -33,17 +33,16 @@ public class WesternClosure extends PolicySupplier {
         return numberOfExtraDays.stream().map(extraDays ->
             new Policy<EpoScenario<?>>(
                 String.format(
-                    "Closure west of %.0f, from %02d days before to %02d days after El Corralito",
+                    "West of %.0f, %02d days before/after El Corralito",
                     eastLongitude,
-                    extraDays,
                     extraDays
                 ),
                 epoScenario -> {
                     final NamedRegulations namedRegulations = (NamedRegulations) epoScenario.getRegulations();
                     namedRegulations.modify(
-                        "El Corralito",
+                        "Western closure",
                         () -> new ForbiddenIf(
-                            new AnyOf(
+                            new AllOf(
                                 yearsActiveCondition(),
                                 new BetweenYearlyDates(
                                     addDays(EL_CORRALITO_BEGINNING, -extraDays),

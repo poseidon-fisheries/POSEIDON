@@ -37,7 +37,7 @@ public class ExtendedElCorralitoPolicy extends PolicySupplier {
     public List<Policy<EpoScenario<?>>> get() {
         return numberOfExtraDays.stream().map(extraDays ->
             new Policy<EpoScenario<?>>(
-                String.format("El Corralito extended spatially and by %02d days before and after", extraDays),
+                String.format("Larger El Corralito + %02d days before/after", extraDays),
                 scenario -> {
                     final NamedRegulations namedRegulations = (NamedRegulations) scenario.getRegulations();
                     namedRegulations.modify(

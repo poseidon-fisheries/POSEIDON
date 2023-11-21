@@ -9,14 +9,10 @@ import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -28,13 +24,13 @@ public class PolicyRuns {
         final Path baseFolder = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
         final Path baseScenario = baseFolder.resolve(Paths.get(
             "calibrations",
-            "2023-10-23/cenv0729/2023-10-25_04.14.17_local",
+            "2023-11-14/cenv0729/2023-11-16_13.34.46_local",
             "calibrated_scenario.yaml"
         ));
         final Path baseOutputFolder = baseFolder.resolve(Paths.get("policy_runs"));
         final List<Integer> yearsActive = ImmutableList.of(2023);
         final ImmutableList<Double> proportions = ImmutableList.of(0.75, 0.50, 0.25, 0.10, 0.0);
-        ImmutableMap<String, List<Policy<EpoScenario<?>>>> policies = ImmutableMap.of(
+        final ImmutableMap<String, List<Policy<EpoScenario<?>>>> policies = ImmutableMap.of(
                 "global_object_set_limits", new GlobalObjectSetLimit(
                     yearsActive,
                     // 8729 FAD + 4003 OFS in 2022:
@@ -67,8 +63,8 @@ public class PolicyRuns {
                 entry -> entry.getValue().getWithDefault()
             ));
 
-        int numberOfRunsPerPolicy = 1;
-        int numberOfPolicies = policies.values().stream().mapToInt(List::size).sum();
+        final int numberOfRunsPerPolicy = 5;
+        final int numberOfPolicies = policies.values().stream().mapToInt(List::size).sum();
         System.out.printf(
             "About to run %d policies %d times (%d total runs)\n",
             numberOfPolicies,
@@ -87,9 +83,10 @@ public class PolicyRuns {
                         .setPolicies(entry.getValue())
                         .setParallel(true)
                         .setWriteScenarioToFile(true)
-                        .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
                         .requestFisherYearlyData()
                         .requestFisherDailyData()
+                        .registerRowProvider("spatial_closures.csv", RectangularAreaExtractor::new)
+                        .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
                         .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
                         .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
                 runner.run(3, numberOfRunsPerPolicy);
