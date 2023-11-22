@@ -38,19 +38,19 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                         // for Weibull parameter values, obtained by fitting the distributions to observer data
                         new WeibullPerSpeciesCarryingCapacitiesFactory(
                             ImmutableMap.of(
-                                "Bigeye tuna", new FixedDoubleParameter(0.6346391),
-                                "Skipjack tuna", new FixedDoubleParameter(0.7705004),
-                                "Yellowfin tuna", new FixedDoubleParameter(0.7026296)
+                                "Bigeye tuna", new FixedDoubleParameter(0.8171673593681151),
+                                "Skipjack tuna", new FixedDoubleParameter(0.7853352630396406),
+                                "Yellowfin tuna", new FixedDoubleParameter(0.7433541177856742)
                             ),
                             ImmutableMap.of(
-                                "Bigeye tuna", new FixedDoubleParameter(8.9333883),
-                                "Skipjack tuna", new FixedDoubleParameter(18.4077481),
-                                "Yellowfin tuna", new FixedDoubleParameter(5.7959415)
+                                "Bigeye tuna", new FixedDoubleParameter(6.963430732400244),
+                                "Skipjack tuna", new FixedDoubleParameter(17.604745764579597),
+                                "Yellowfin tuna", new FixedDoubleParameter(6.220187515020116)
                             ),
                             ImmutableMap.of(
-                                "Bigeye tuna", new FixedDoubleParameter(.4879391),
-                                "Skipjack tuna", new FixedDoubleParameter(.0949),
-                                "Yellowfin tuna", new FixedDoubleParameter(.2552899)
+                                "Bigeye tuna", new FixedDoubleParameter(0.6160218635237851),
+                                "Skipjack tuna", new FixedDoubleParameter(0.07626612007857204),
+                                "Yellowfin tuna", new FixedDoubleParameter(0.19660090528653174)
                             ),
                             new CalibratedParameter(
                                 1, 1.5, 0, 2, 1
