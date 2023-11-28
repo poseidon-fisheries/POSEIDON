@@ -1,16 +1,13 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.univocity.parsers.common.record.Record;
-import uk.ac.ox.oxfish.fisher.erotetic.EroteticAnswer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.parameters.*;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.*;
