@@ -37,12 +37,13 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                     new SelectivityAbundanceFadInitializerFactory(
                         // see https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1545974455
                         // for Weibull parameter values, obtained by fitting the distributions to observer data
-                                    new WeibullPerSpeciesCarryingCapacitiesFromFileFactory(getInputFolder().path("fad_carrying_capacity_parameters.csv"),
-                                            getTargetYear(),
-                                            new CalibratedParameter(
-                                            1, 1.5, 0, 2, 1
-                                            )
-                                    ),
+                        new WeibullPerSpeciesCarryingCapacitiesFromFileFactory(
+                            getInputFolder().path("fad_carrying_capacity_parameters.csv"),
+                            getTargetYear(),
+                            new CalibratedParameter(
+                                1, 1.5, 0, 2, 1
+                            )
+                        ),
                         getAbundanceFilters(),
                         ImmutableMap.of(
                             "Bigeye tuna", new CalibratedParameter(0.03, 0.25, 0, 1, 0.16),

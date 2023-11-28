@@ -3,26 +3,28 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 import com.univocity.parsers.common.record.Record;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.utility.parameters.*;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.*;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
-        implements uk.ac.ox.oxfish.geography.fads.CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> {
+    implements uk.ac.ox.oxfish.geography.fads.CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> {
 
     private DoubleParameter scalingFactor;
     private IntegerParameter targetYear;
-    private InputPath fadCarryingCapacityFile;
+    private final InputPath fadCarryingCapacityFile;
 
     public WeibullPerSpeciesCarryingCapacitiesFromFileFactory(
-            final InputPath fadCarryingCapacityFile,
-            final IntegerParameter targetYear,
-            final DoubleParameter scalingFactor
+        final InputPath fadCarryingCapacityFile,
+        final IntegerParameter targetYear,
+        final DoubleParameter scalingFactor
     ) {
         this.fadCarryingCapacityFile = fadCarryingCapacityFile;
         this.targetYear = targetYear;
@@ -33,30 +35,35 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
     public CarryingCapacityInitializer<PerSpeciesCarryingCapacity> apply(FishState fishState) {
 
         List<Record> recordList = recordStream(fadCarryingCapacityFile.get()).filter(record -> record.getInt("year") == targetYear.getIntValue())
-                .collect(toImmutableList());
+            .collect(toImmutableList());
 
         Map<String, DoubleParameter> yearShapeParameters = recordList.stream()
-                .collect(Collectors.toMap(
-                        record -> record.getString("species_code"),
-                        record -> new FixedDoubleParameter(record.getDouble("weibull_shape"))
-                        )
-                );
+            .collect(Collectors.toMap(
+                    record -> record.getString("species_code"),
+                    record -> new FixedDoubleParameter(record.getDouble("weibull_shape"))
+                )
+            );
 
         Map<String, DoubleParameter> yearScaleParameters = recordList.stream()
-                .collect(Collectors.toMap(
-                        record -> record.getString("species_code"),
-                        record -> new FixedDoubleParameter(record.getDouble("weibull_scale"))
-                        )
-                );
+            .collect(Collectors.toMap(
+                    record -> record.getString("species_code"),
+                    record -> new FixedDoubleParameter(record.getDouble("weibull_scale"))
+                )
+            );
 
         Map<String, DoubleParameter> yearProportionOfZeros = recordList.stream()
-                .collect(Collectors.toMap(
-                        record -> record.getString("species_code"),
-                        record -> new FixedDoubleParameter(record.getDouble("probability_of_zeros"))
-                        )
-                );
+            .collect(Collectors.toMap(
+                    record -> record.getString("species_code"),
+                    record -> new FixedDoubleParameter(record.getDouble("probability_of_zeros"))
+                )
+            );
 
-        new WeibullPerSpeciesCarryingCapacitiesFactory(yearShapeParameters, yearScaleParameters, yearProportionOfZeros, scalingFactor);
+        new WeibullPerSpeciesCarryingCapacitiesFactory(
+            yearShapeParameters,
+            yearScaleParameters,
+            yearProportionOfZeros,
+            scalingFactor
+        );
         return null;
     }
 
@@ -76,7 +83,6 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
     public void setScalingFactor(final DoubleParameter scalingFactor) {
         this.scalingFactor = scalingFactor;
     }
-
 
 
 }
