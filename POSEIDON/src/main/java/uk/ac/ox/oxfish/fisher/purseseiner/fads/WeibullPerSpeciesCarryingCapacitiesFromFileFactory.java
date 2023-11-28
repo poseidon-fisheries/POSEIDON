@@ -19,7 +19,7 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
 
     private DoubleParameter scalingFactor;
     private IntegerParameter targetYear;
-    private final InputPath fadCarryingCapacityFile;
+    private InputPath fadCarryingCapacityFile;
 
     public WeibullPerSpeciesCarryingCapacitiesFromFileFactory(
         final InputPath fadCarryingCapacityFile,
@@ -58,13 +58,20 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
                 )
             );
 
-        new WeibullPerSpeciesCarryingCapacitiesFactory(
+        return new WeibullPerSpeciesCarryingCapacitiesFactory(
             yearShapeParameters,
             yearScaleParameters,
             yearProportionOfZeros,
             scalingFactor
-        );
-        return null;
+        ).apply(fishState);
+    }
+
+    public DoubleParameter getScalingFactor() {
+        return scalingFactor;
+    }
+
+    public void setScalingFactor(final DoubleParameter scalingFactor) {
+        this.scalingFactor = scalingFactor;
     }
 
     public IntegerParameter getTargetYear() {
@@ -75,14 +82,12 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
         this.targetYear = targetYear;
     }
 
-
-    public DoubleParameter getScalingFactor() {
-        return scalingFactor;
+    public InputPath getFadCarryingCapacityFile() {
+        return fadCarryingCapacityFile;
     }
 
-    public void setScalingFactor(final DoubleParameter scalingFactor) {
-        this.scalingFactor = scalingFactor;
+    public void setFadCarryingCapacityFile(final InputPath fadCarryingCapacityFile) {
+        this.fadCarryingCapacityFile = fadCarryingCapacityFile;
     }
-
 
 }
