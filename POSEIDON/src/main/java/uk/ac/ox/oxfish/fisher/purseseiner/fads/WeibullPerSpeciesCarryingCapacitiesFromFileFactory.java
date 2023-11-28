@@ -1,28 +1,33 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import com.univocity.parsers.common.record.Record;
+import uk.ac.ox.oxfish.fisher.erotetic.EroteticAnswer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.parameters.*;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.*;
 
 public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
         implements uk.ac.ox.oxfish.geography.fads.CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> {
 
     private DoubleParameter scalingFactor;
     private IntegerParameter targetYear;
-    private InputPath fadCarryingCapacityParameters;
+    private InputPath fadCarryingCapacityFile;
 
     public WeibullPerSpeciesCarryingCapacitiesFromFileFactory(
-            final InputPath fadCarryingCapacityParameters,
+            final InputPath fadCarryingCapacityFile,
             final IntegerParameter targetYear,
             final DoubleParameter scalingFactor
     ) {
-        this.fadCarryingCapacityParameters = fadCarryingCapacityParameters;
+        this.fadCarryingCapacityFile = fadCarryingCapacityFile;
         this.targetYear = targetYear;
         this.scalingFactor = scalingFactor;
     }
@@ -30,25 +35,31 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
     @Override
     public CarryingCapacityInitializer<PerSpeciesCarryingCapacity> apply(FishState fishState) {
 
-        Map<Integer, Map<String, DoubleParameter>> yearShapeParameters = recordStream((Path) fadCarryingCapacityParameters)
-                .collect(Collectors.groupingBy(record -> record.getInt("year"),
-                        Collectors.toMap(record -> record.getString("species_code"), record -> new FixedDoubleParameter(record.getDouble("weibull_shape")))));
+        List<Record> recordList = recordStream(fadCarryingCapacityFile.get()).filter(record -> record.getInt("year") == targetYear.getIntValue())
+                .collect(toImmutableList());
 
-        final Map<String, DoubleParameter> shapeParameters = yearShapeParameters.get(targetYear);
+        Map<String, DoubleParameter> yearShapeParameters = recordList.stream()
+                .collect(Collectors.toMap(
+                        record -> record.getString("species_code"),
+                        record -> new FixedDoubleParameter(record.getDouble("weibull_shape"))
+                        )
+                );
 
-        Map<Integer, Map<String, DoubleParameter>> yearScaleParameters = recordStream((Path) fadCarryingCapacityParameters)
-                .collect(Collectors.groupingBy(record -> record.getInt("year"),
-                        Collectors.toMap(record -> record.getString("species_code"), record -> new FixedDoubleParameter(record.getDouble("weibull_scale")))));
+        Map<String, DoubleParameter> yearScaleParameters = recordList.stream()
+                .collect(Collectors.toMap(
+                        record -> record.getString("species_code"),
+                        record -> new FixedDoubleParameter(record.getDouble("weibull_scale"))
+                        )
+                );
 
-        final Map<String, DoubleParameter> scaleParameters = yearScaleParameters.get(targetYear);
+        Map<String, DoubleParameter> yearProportionOfZeros = recordList.stream()
+                .collect(Collectors.toMap(
+                        record -> record.getString("species_code"),
+                        record -> new FixedDoubleParameter(record.getDouble("probability_of_zeros"))
+                        )
+                );
 
-        Map<Integer, Map<String, DoubleParameter>> yearProportionOfZeros = recordStream((Path) fadCarryingCapacityParameters)
-                .collect(Collectors.groupingBy(record -> record.getInt("year"),
-                        Collectors.toMap(record -> record.getString("species_code"), record -> new FixedDoubleParameter(record.getDouble("weibull_scale")))));
-
-        final Map<String, DoubleParameter> proportionOfZeros = yearProportionOfZeros.get(targetYear);
-
-        new WeibullPerSpeciesCarryingCapacitiesFactory(shapeParameters, scaleParameters, proportionOfZeros, scalingFactor);
+        new WeibullPerSpeciesCarryingCapacitiesFactory(yearShapeParameters, yearScaleParameters, yearProportionOfZeros, scalingFactor);
         return null;
     }
 
