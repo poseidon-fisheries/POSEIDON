@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
@@ -38,6 +39,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy.EVERY_YEAR;
 
 
 @SuppressWarnings("unchecked")
@@ -50,6 +52,7 @@ public class FishStateDailyTimeSeriesTest {
 
         final FishState state = mock(FishState.class);
         when(state.getFishers()).thenReturn(ObservableList.observableList(new ArrayList<>()));
+        when(state.getYearlyCounter()).thenReturn(new Counter(EVERY_YEAR));
         final NauticalMap map = mock(NauticalMap.class);
         when(map.getAllSeaTilesAsList()).thenReturn(new LinkedList<>());
         when(state.getMap()).thenReturn(map);
@@ -88,11 +91,15 @@ public class FishStateDailyTimeSeriesTest {
         //and after all that set up, see if it aggregates correctly
         dataSet.start(state, state);
         dataSet.step(state);
-        Assertions.assertEquals(-300d,
+        Assertions.assertEquals(
+            -300d,
             dataSet.getLatestObservation(species + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
-            .0001d);
-        Assertions.assertEquals(300d,
+            .0001d
+        );
+        Assertions.assertEquals(
+            300d,
             dataSet.getLatestObservation(species + " " + AbstractMarket.EARNINGS_COLUMN_NAME),
-            .0001d);
+            .0001d
+        );
     }
 }
