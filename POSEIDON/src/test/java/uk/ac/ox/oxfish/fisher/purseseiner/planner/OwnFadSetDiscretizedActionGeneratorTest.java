@@ -76,6 +76,8 @@ class OwnFadSetDiscretizedActionGeneratorTest {
         when(fadManager.getFadMap()).thenReturn(fadMap);
         when(fadManager.getFisher()).thenReturn(fisher);
 
+        when(fisher.isAllowedAtSea()).thenReturn(true);
+        when(fisher.isAllowedToFishHere(any(), any())).thenReturn(true);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);
@@ -162,6 +164,8 @@ class OwnFadSetDiscretizedActionGeneratorTest {
         when(gear.isSafe(any())).thenReturn(true);
         final FadManager fadManager = gear.getFadManager();
         when(fadManager.getFisher()).thenReturn(fisher);
+        when(fisher.isAllowedAtSea()).thenReturn(true);
+        when(fisher.isAllowedToFishHere(any(), any())).thenReturn(true);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);
@@ -223,6 +227,8 @@ class OwnFadSetDiscretizedActionGeneratorTest {
             );
         final FadManager fadManager = gear.getFadManager();
         when(fadManager.getFisher()).thenReturn(fisher);
+        when(fisher.isAllowedAtSea()).thenReturn(true);
+        when(fisher.isAllowedToFishHere(any(), any())).thenReturn(true);
         when(fisher.getGear()).thenReturn(gear);
         when(fisher.grabState()).thenReturn(fishState);
         when(fishState.getMap()).thenReturn(map);
