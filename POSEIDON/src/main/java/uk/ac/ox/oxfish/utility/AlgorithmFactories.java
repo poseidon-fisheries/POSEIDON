@@ -822,7 +822,9 @@ public class AlgorithmFactories {
         addFactories(new Factories<>(
             CarryingCapacityInitializer.class,
             MaximumPerSpeciesCarryingCapacitiesFactory.class,
-            WeibullPerSpeciesCarryingCapacitiesFactory.class,
+            WeibullPerSpeciesCarryingCapacitiesFactory.class
+        ));
+        addFactories(new Factories<>(
             WeibullPerSpeciesCarryingCapacitiesFromFileFactory.class
         ));
         addFactories(new Factories<>(
