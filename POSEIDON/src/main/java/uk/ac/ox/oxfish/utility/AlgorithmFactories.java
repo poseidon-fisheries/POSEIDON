@@ -61,10 +61,7 @@ import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.InverseTimeScalarF
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.SigmoidalTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EmptyFleet;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.CarryingCapacityInitializer;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.MaximumPerSpeciesCarryingCapacitiesFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.SelectivityAbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullPerSpeciesCarryingCapacitiesFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.GenerateRandomPlansStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.PlanningModule;
@@ -825,7 +822,8 @@ public class AlgorithmFactories {
         addFactories(new Factories<>(
             CarryingCapacityInitializer.class,
             MaximumPerSpeciesCarryingCapacitiesFactory.class,
-            WeibullPerSpeciesCarryingCapacitiesFactory.class
+            WeibullPerSpeciesCarryingCapacitiesFactory.class,
+            WeibullPerSpeciesCarryingCapacitiesFromFileFactory.class
         ));
         addFactories(new Factories<>(
             FishValueCalculator.class,
