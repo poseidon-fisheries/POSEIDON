@@ -21,6 +21,9 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
     private IntegerParameter targetYear;
     private InputPath fadCarryingCapacityFile;
 
+    public WeibullPerSpeciesCarryingCapacitiesFromFileFactory() {
+    }
+
     public WeibullPerSpeciesCarryingCapacitiesFromFileFactory(
         final InputPath fadCarryingCapacityFile,
         final IntegerParameter targetYear,
