@@ -53,14 +53,14 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                                 "Yellowfin tuna", new FixedDoubleParameter(0.19660090528653174)
                             ),
                             new CalibratedParameter(
-                                1, 1.5, 0, 2, 1
+                                1, 2, 1, 5, 1
                             )
                         ),
                         getAbundanceFilters(),
                         ImmutableMap.of(
-                            "Bigeye tuna", new CalibratedParameter(0.03, 0.25, 0, 1, 0.16),
-                            "Skipjack tuna", new CalibratedParameter(0.005, 0.25, 0, 1, 0.075),
-                            "Yellowfin tuna", new CalibratedParameter(0.008, 0.25, 0, 1, 0.02)
+                            "Bigeye tuna", new CalibratedParameter(0.15, 0.3, 0, 1),
+                            "Skipjack tuna", new CalibratedParameter(0.15, 0.3, 0, 1),
+                            "Yellowfin tuna", new CalibratedParameter(0.15, 0.3, 0, 1)
                         ),
                         new EnvironmentalPenaltyFunctionFactory(
                             ImmutableMap.of(
@@ -87,10 +87,10 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                     getTargetYear(),
                     new LocationValuesFactory(
                         getInputFolder().path("location_values.csv"),
-                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
-                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
-                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
-                        new CalibratedParameter(0, 0.1, 0, 1, 0.01),
+                        new CalibratedParameter(0, 0.5, 0, 1, 0.01),
+                        new CalibratedParameter(0, 0.5, 0, 1, 0.01),
+                        new CalibratedParameter(0, 0.5, 0, 1, 0.01),
+                        new CalibratedParameter(0, 0.5, 0, 1, 0.01),
                         getTargetYear()
                     ),
                     new ValuePerSetPlanningModuleFactory(),

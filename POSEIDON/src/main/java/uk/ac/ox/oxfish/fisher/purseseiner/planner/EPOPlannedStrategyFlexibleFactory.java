@@ -34,17 +34,17 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * hours wasted after each DEL set
      */
     private DoubleParameter additionalHourlyDelayDolphinSets =
-        new CalibratedParameter(12.63818, 21.06363, 0, 24, 16);
+        new CalibratedParameter(5, 15, 0, 24);
     /**
      * hours wasted after every DPL
      */
     private DoubleParameter additionalHourlyDelayDeployment =
-        new CalibratedParameter(0.538688, 0.897813, 0, 24, 0);
+        new CalibratedParameter(0.1, 0.2, 0, 1);
     /**
      * hours wasted after every NOA
      */
     private DoubleParameter additionalHourlyDelayNonAssociatedSets =
-        new CalibratedParameter(7.758563, 12.93094, 0, 24, 6);
+        new CalibratedParameter(5, 15, 0, 24);
     /**
      * $ a stolen fad needs to have accumulated before we even try to target it
      */
@@ -54,41 +54,41 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * To probability of finding another vessel's FAD when you search for some.
      */
     private DoubleParameter probabilityOfFindingOtherFads =
-        new CalibratedParameter(0, 1, 0, 1);
+        new CalibratedParameter(0, 0.5, 0, 1);
     /**
      * if you tried to steal and failed, how many hours does it take for you to fish this out
      */
     private DoubleParameter hoursWastedOnFailedSearches =
-        new CalibratedParameter(0, 20, 0);
+        new CalibratedParameter(1, 5, 0, 24);
     /**
      * how many hours does it take for a plan to go stale and need replanning
      */
     private DoubleParameter planningHorizonInHours =
-        new CalibratedParameter(24 * 5, 24 * 10, 24, 24 * 28, 24 * 7);
+        new CalibratedParameter(24 * 7, 24 * 7 * 2, 24, 24 * 7 * 8);
     /**
      * a multiplier applied to the action weight of own fad (since it's quite low in the data)
      */
     private DoubleParameter ownFadActionWeightBias =
-        new CalibratedParameter(0.25, 0.99, 0.0, 1.0, 0.9565217);
+        new CalibratedParameter(0.25, 0.95, 0.0, 0.9999);
     /**
      * a multiplier applied to the action weight of DPL
      */
     private DoubleParameter deploymentBias =
-        new CalibratedParameter(0.25, 0.95, 0.0, 0.9999, 0.9090909);
+        new CalibratedParameter(0.25, 0.95, 0.0, 0.9999);
     private DoubleParameter noaBias =
-        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999, 0.6);
+        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
     private DoubleParameter delBias =
-        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999, 0.5);
+        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
     private DoubleParameter ofsBias =
-        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999, 0.5);
+        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
     private DoubleParameter minimumPercentageOfTripDurationAllowed =
-        new CalibratedParameter(0.4, 0.9, 0, 1, 0.7);
+        new CalibratedParameter(0.5, 1, 0, 1);
     private BooleanParameter noaSetsCanPoachFads = new BooleanParameter(false);
     private BooleanParameter purgeIllegalActionsImmediately = new BooleanParameter(true);
     private DoubleParameter noaSetsRangeInSeatiles =
-        new CalibratedParameter(0, 5, 0, 5, 3);
+        new CalibratedParameter(0, 2, 0, 5);
     private DoubleParameter delSetsRangeInSeatiles =
-        new CalibratedParameter(0, 5, 0, 5, 3);
+        new CalibratedParameter(0, 2, 0, 5);
     private BooleanParameter uniqueCatchSamplerForEachStrategy = new BooleanParameter(false);
     private AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule;
     private LocationValuesFactory locationValuesFactory;
