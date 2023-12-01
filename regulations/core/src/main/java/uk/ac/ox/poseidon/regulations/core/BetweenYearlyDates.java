@@ -40,4 +40,13 @@ public class BetweenYearlyDates extends DateCondition {
             : monthDay.isBefore(beginning) || monthDay.isAfter(end);
         return !outsideRange;
     }
+
+    @Override
+    public String toString() {
+        return "BetweenYearlyDates{" +
+            "beginning=" + beginning +
+            ", end=" + end +
+            ", yearSpanning=" + yearSpanning +
+            '}';
+    }
 }
