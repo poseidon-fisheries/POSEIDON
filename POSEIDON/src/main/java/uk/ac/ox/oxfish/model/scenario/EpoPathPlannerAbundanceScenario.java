@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.SelectivityAbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullPerSpeciesCarryingCapacitiesFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullPerSpeciesCarryingCapacitiesFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.ValuePerSetPlanningModuleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
@@ -36,22 +36,9 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                     new SelectivityAbundanceFadInitializerFactory(
                         // see https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1545974455
                         // for Weibull parameter values, obtained by fitting the distributions to observer data
-                        new WeibullPerSpeciesCarryingCapacitiesFactory(
-                            ImmutableMap.of(
-                                "Bigeye tuna", new FixedDoubleParameter(0.8171673593681151),
-                                "Skipjack tuna", new FixedDoubleParameter(0.7853352630396406),
-                                "Yellowfin tuna", new FixedDoubleParameter(0.7433541177856742)
-                            ),
-                            ImmutableMap.of(
-                                "Bigeye tuna", new FixedDoubleParameter(6.963430732400244),
-                                "Skipjack tuna", new FixedDoubleParameter(17.604745764579597),
-                                "Yellowfin tuna", new FixedDoubleParameter(6.220187515020116)
-                            ),
-                            ImmutableMap.of(
-                                "Bigeye tuna", new FixedDoubleParameter(0.6160218635237851),
-                                "Skipjack tuna", new FixedDoubleParameter(0.07626612007857204),
-                                "Yellowfin tuna", new FixedDoubleParameter(0.19660090528653174)
-                            ),
+                        new WeibullPerSpeciesCarryingCapacitiesFromFileFactory(
+                            getInputFolder().path("fad_carrying_capacity_parameters.csv"),
+                            getTargetYear(),
                             new CalibratedParameter(
                                 1, 2, 1, 5, 1
                             )
@@ -117,5 +104,3 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
     }
 
 }
-
-
