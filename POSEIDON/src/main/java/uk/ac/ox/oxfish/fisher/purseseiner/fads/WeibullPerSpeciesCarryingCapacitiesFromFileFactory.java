@@ -21,6 +21,7 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
     private IntegerParameter targetYear;
     private InputPath fadCarryingCapacityFile;
 
+    @SuppressWarnings("unused")
     public WeibullPerSpeciesCarryingCapacitiesFromFileFactory() {
     }
 
@@ -35,31 +36,30 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
     }
 
     @Override
-    public CarryingCapacityInitializer<PerSpeciesCarryingCapacity> apply(FishState fishState) {
+    public CarryingCapacityInitializer<PerSpeciesCarryingCapacity> apply(final FishState fishState) {
 
-        List<Record> recordList = recordStream(fadCarryingCapacityFile.get()).filter(record -> record.getInt("year") == targetYear.getIntValue())
-            .collect(toImmutableList());
+        final List<Record> recordList =
+            recordStream(fadCarryingCapacityFile.get())
+                .filter(record -> record.getInt("year") == targetYear.getIntValue())
+                .collect(toImmutableList());
 
-        Map<String, DoubleParameter> yearShapeParameters = recordList.stream()
+        final Map<String, DoubleParameter> yearShapeParameters = recordList.stream()
             .collect(Collectors.toMap(
-                    record -> record.getString("species_code"),
-                    record -> new FixedDoubleParameter(record.getDouble("weibull_shape"))
-                )
-            );
+                record -> record.getString("species_code"),
+                record -> new FixedDoubleParameter(record.getDouble("weibull_shape"))
+            ));
 
-        Map<String, DoubleParameter> yearScaleParameters = recordList.stream()
+        final Map<String, DoubleParameter> yearScaleParameters = recordList.stream()
             .collect(Collectors.toMap(
-                    record -> record.getString("species_code"),
-                    record -> new FixedDoubleParameter(record.getDouble("weibull_scale"))
-                )
-            );
+                record -> record.getString("species_code"),
+                record -> new FixedDoubleParameter(record.getDouble("weibull_scale"))
+            ));
 
-        Map<String, DoubleParameter> yearProportionOfZeros = recordList.stream()
+        final Map<String, DoubleParameter> yearProportionOfZeros = recordList.stream()
             .collect(Collectors.toMap(
-                    record -> record.getString("species_code"),
-                    record -> new FixedDoubleParameter(record.getDouble("probability_of_zeros"))
-                )
-            );
+                record -> record.getString("species_code"),
+                record -> new FixedDoubleParameter(record.getDouble("probability_of_zeros"))
+            ));
 
         return new WeibullPerSpeciesCarryingCapacitiesFactory(
             yearShapeParameters,
@@ -69,10 +69,12 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
         ).apply(fishState);
     }
 
+    @SuppressWarnings("unused")
     public DoubleParameter getScalingFactor() {
         return scalingFactor;
     }
 
+    @SuppressWarnings("unused")
     public void setScalingFactor(final DoubleParameter scalingFactor) {
         this.scalingFactor = scalingFactor;
     }
@@ -85,10 +87,12 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
         this.targetYear = targetYear;
     }
 
+    @SuppressWarnings("unused")
     public InputPath getFadCarryingCapacityFile() {
         return fadCarryingCapacityFile;
     }
 
+    @SuppressWarnings("unused")
     public void setFadCarryingCapacityFile(final InputPath fadCarryingCapacityFile) {
         this.fadCarryingCapacityFile = fadCarryingCapacityFile;
     }
