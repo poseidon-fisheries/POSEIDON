@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
@@ -37,11 +36,7 @@ public class EpoBiologyOnlyScenarioAllSpeciesTest {
 
         fishState.start();
 
-        final Species bet = fishState.getSpecies("Bigeye tuna");
-        final Species yft = fishState.getSpecies("Yellowfin tuna");
-        final Species skj = fishState.getSpecies("Skipjack tuna");
-
-        Map<Integer, Map<String, Double>> expectedBiomass = recordStream(biologyTestFile)
+        final Map<Integer, Map<String, Double>> expectedBiomass = recordStream(biologyTestFile)
             .collect(groupingBy(
                 record -> record.getInt("day"),
                 toMap(record -> record.getString("species"), record -> record.getDouble("biomass"))
