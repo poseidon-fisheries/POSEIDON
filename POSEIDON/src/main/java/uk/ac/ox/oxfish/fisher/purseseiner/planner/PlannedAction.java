@@ -202,13 +202,16 @@ public interface PlannedAction {
             return isActionAllowed(
                 fisher,
                 getLocation(),
-                new FadManager.DummyAction(OFS.name(), fisher) // fake action just to check for legality
+                new FadManager.DummyAction( // fake action just to check for legality
+                    OFS.name(),
+                    fisher,
+                    fisher.grabState().getMap().getCoordinates(getLocation())
+                )
             );
         }
 
         @Override
         public SeaTile getLocation() {
-
             return whereAreWeGoingToSearchForFads;
         }
 
@@ -380,7 +383,15 @@ public interface PlannedAction {
             return position;
         }
 
-        abstract protected uk.ac.ox.poseidon.agents.api.Action makeDummyPlannedAction(final Fisher fisher);
+        private uk.ac.ox.poseidon.agents.api.Action makeDummyPlannedAction(final Fisher fisher) {
+            return new FadManager.DummyAction(
+                getActionCode(),
+                fisher,
+                fisher.grabState().getMap().getCoordinates(getLocation())
+            );
+        }
+
+        abstract String getActionCode();
 
         /**
          * list of actions that need to take place for the planned action to take place
@@ -486,8 +497,8 @@ public interface PlannedAction {
         }
 
         @Override
-        protected uk.ac.ox.poseidon.agents.api.Action makeDummyPlannedAction(final Fisher fisher) {
-            return new FadManager.DummyAction(DEL.name(), fisher);
+        String getActionCode() {
+            return DEL.name();
         }
 
         @Override
@@ -533,8 +544,8 @@ public interface PlannedAction {
         }
 
         @Override
-        protected uk.ac.ox.poseidon.agents.api.Action makeDummyPlannedAction(final Fisher fisher) {
-            return new FadManager.DummyAction(NOA.name(), fisher);
+        String getActionCode() {
+            return NOA.name();
         }
 
         @Override

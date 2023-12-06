@@ -21,6 +21,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import sim.util.Bag;
@@ -341,12 +342,15 @@ public class FadManager {
         private final AtomicLong numberOfActiveFads;
 
         public DummyAction(
-            final String code, final Fisher fisher
+            final String code,
+            final Fisher fisher,
+            final Coordinate coordinate
         ) {
             this(
                 code,
                 fisher,
                 fisher.grabState().getDate().atStartOfDay(),
+                coordinate,
                 getFadManager(fisher).getYearlyActionCounter(),
                 new AtomicLong(getFadManager(fisher).getNumberOfActiveFads())
             );
@@ -356,10 +360,11 @@ public class FadManager {
             final String code,
             final Agent agent,
             final LocalDateTime dateTime,
+            final Coordinate coordinate,
             final YearlyActionCounts yearlyActionCounts,
             final AtomicLong numberOfActiveFads
         ) {
-            super(code, agent, dateTime, null);
+            super(code, agent, dateTime, coordinate);
             this.yearlyActionCounts = yearlyActionCounts;
             this.numberOfActiveFads = numberOfActiveFads;
         }
@@ -371,6 +376,16 @@ public class FadManager {
             final AtomicLong numberOfActiveFads
         ) {
             this(code, fisher, fisher.grabState().getDate().atStartOfDay(), yearlyActionCounts, numberOfActiveFads);
+        }
+
+        public DummyAction(
+            final String code,
+            final Agent agent,
+            final LocalDateTime dateTime,
+            final YearlyActionCounts yearlyActionCounts,
+            final AtomicLong numberOfActiveFads
+        ) {
+            this(code, agent, dateTime, null, yearlyActionCounts, numberOfActiveFads);
         }
 
         @Override

@@ -35,7 +35,7 @@ public class DepartIfAnyActionPermitted implements DepartingStrategy {
     public boolean shouldFisherLeavePort(final Fisher fisher, final FishState model, final MersenneTwisterFast random) {
         final Regulations regulations = model.getRegulations();
         return ActionClass.CODES.stream()
-            .map(code -> new FadManager.DummyAction(code, fisher))
+            .map(code -> new FadManager.DummyAction(code, fisher, null))
             .anyMatch(regulations::isPermitted);
     }
 
