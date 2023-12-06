@@ -106,8 +106,12 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
                 actionInProgress instanceof PlannedAction.FadSet;
 
         //we may have just arrived, if so get the queue of actions we need to take
-        if (actionQueueInProgress == null)
-            actionQueueInProgress = actionInProgress.actuate(agent);
+        if (actionQueueInProgress == null) {
+            if (actionInProgress.isAllowedNow(agent))
+                actionQueueInProgress = actionInProgress.actuate(agent);
+            else
+                actionQueueInProgress = new Action[]{};
+        }
         actionQueueIndex++;
         //okay, are there still actions to take? if so take it!
         if (actionQueueIndex < actionQueueInProgress.length) {
@@ -121,8 +125,10 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
             //you have finished the queue!
             resetActionQueue();
             //is it time for a replan?
-            if (model.getHoursSinceStart() - hoursInTheTripSinceWeLastReplanned > planningHorizonInHours &&
-                agent.getLocation() != agent.getHomePort().getLocation()) {
+            if (
+                model.getHoursSinceStart() - hoursInTheTripSinceWeLastReplanned > planningHorizonInHours &&
+                    agent.getLocation() != agent.getHomePort().getLocation()
+            ) {
                 replan(agent, model); //this will automatically move to new next action
             } else {
                 //move to next action
