@@ -10,17 +10,19 @@ import uk.ac.ox.oxfish.model.scenario.EpoAbundanceScenario;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
+/**
+ * Test to see if the simulated biomass is the same as the expected biomass for the first 4 quarters.
+ * Expected biomasses are generated in the preprocessing pipeline as "biomass_test.csv".
+ */
 public class EpoBiologyOnlyScenarioAllSpeciesTest {
 
     private final Path testInputs = Paths.get(
-            "D:", "alexn", "Documents", "Oxford", "epo_biology_data", "biomass"
+        "inputs", "epo_inputs", "tests"
     );
 
     private final Path biologyTestFile = testInputs.resolve("biomass_test.csv");
@@ -45,32 +47,40 @@ public class EpoBiologyOnlyScenarioAllSpeciesTest {
         System.out.println("breakpoint");
 
         Map<Integer, Map<String, Double>> expectedBiomass = recordStream(biologyTestFile)
-                .collect(Collectors.groupingBy(record -> record.getInt("day"),
-                        Collectors.toMap(record -> record.getString("species"), record -> record.getDouble("biomass"))));
+            .collect(Collectors.groupingBy(
+                record -> record.getInt("day"),
+                Collectors.toMap(record -> record.getString("species"), record -> record.getDouble("biomass"))
+            ));
 
         Map<Species, double[][]> speciesAbundances =
-                ImmutableMap.of(
-                        bet, fishState.getTotalAbundance(bet),
-                        yft, fishState.getTotalAbundance(yft),
-                        skj, fishState.getTotalAbundance(skj));
+            ImmutableMap.of(
+                bet, fishState.getTotalAbundance(bet),
+                yft, fishState.getTotalAbundance(yft),
+                skj, fishState.getTotalAbundance(skj)
+            );
 
         Map<Species, double[][]> speciesDeaths =
-                ImmutableMap.of(
-                        bet, fishState.getTotalAbundance(bet),
-                        yft, fishState.getTotalAbundance(yft),
-                        skj, fishState.getTotalAbundance(skj));
+            ImmutableMap.of(
+                bet, fishState.getTotalAbundance(bet),
+                yft, fishState.getTotalAbundance(yft),
+                skj, fishState.getTotalAbundance(skj)
+            );
 
         System.out.println("File found, start stepping model");
 
         do {
             System.out.println(fishState.getStep());
             if (expectedBiomass.containsKey(fishState.getStep())) {
-                speciesAbundances.forEach( (s, abundance) -> {
+                speciesAbundances.forEach((s, abundance) -> {
                     System.out.println(fishState.getStep() + " " + fishState.getTotalBiomass(s) / 1000);
-                    System.out.println("Bigeye estimated");
-                    Assertions.assertEquals(expectedBiomass.get(fishState.getStep()).get(s.getCode()), fishState.getTotalBiomass(s), 1000000);
+                    System.out.println("Estimated biomass");
+                    Assertions.assertEquals(
+                        expectedBiomass.get(fishState.getStep()).get(s.getCode()),
+                        fishState.getTotalBiomass(s),
+                        1000000
+                    );
                 });
-                   }
+            }
                     /*System.out.println(fishState.getStep() + " " + fishState.getTotalBiomass(yft) / 1000);
                     final double[][] totalAbundanceYFT = fishState.getTotalAbundance(yft);
                     for (int i = 0; i < totalAbundanceYFT.length; i++) {
