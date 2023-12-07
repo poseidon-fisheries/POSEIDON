@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.maximization.YearlyResultsRowProvider;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 
@@ -94,13 +93,10 @@ public class PolicyRuns {
                         .setPolicies(entry.getValue())
                         .setParallel(true)
                         .setWriteScenarioToFile(true)
-                        .registerRowProvider("spatial_closures.csv", RectangularAreaExtractor::new)
-                        .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
-                        .requestFisherYearlyData();
+                        .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new);
                 if (!policyName.equals("fad_limits_fine")) {
                     runner
-                        .requestFisherDailyData()
-                        .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
+                        .registerRowProvider("spatial_closures.csv", RectangularAreaExtractor::new)
                         .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
                 }
                 runner.run(3, numberOfRunsPerPolicy);
