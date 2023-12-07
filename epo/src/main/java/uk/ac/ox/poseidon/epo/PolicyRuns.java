@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.maximization.YearlyResultsRowProvider;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 
@@ -48,7 +49,7 @@ public class PolicyRuns {
                 "fad_limits_fine", new ActiveFadLimitsPolicies(
                     yearsActive,
                     2022,
-                    IntStream.rangeClosed(1, 19).mapToObj(i -> i * 0.05).collect(toImmutableList())
+                    IntStream.rangeClosed(1, 20).mapToObj(i -> i * 0.05).collect(toImmutableList())
                 ),
                 "extended_closures", new ExtendedClosurePolicies(
                     yearsActive,
@@ -72,7 +73,7 @@ public class PolicyRuns {
                 entry -> entry.getValue().getWithDefault()
             ));
 
-        final int numberOfRunsPerPolicy = 10;
+        final int numberOfRunsPerPolicy = 2;
         final int numberOfPolicies = policies.values().stream().mapToInt(List::size).sum();
         logger.info(String.format(
             "About to run %d policies %d times (%d total runs)",
@@ -93,10 +94,13 @@ public class PolicyRuns {
                         .setPolicies(entry.getValue())
                         .setParallel(true)
                         .setWriteScenarioToFile(true)
-                        .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new);
+                        .registerRowProvider("spatial_closures.csv", RectangularAreaExtractor::new)
+                        .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
+                        .requestFisherYearlyData();
                 if (!policyName.equals("fad_limits_fine")) {
                     runner
-                        .registerRowProvider("spatial_closures.csv", RectangularAreaExtractor::new)
+                        .requestFisherDailyData()
+                        .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
                         .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
                 }
                 runner.run(3, numberOfRunsPerPolicy);
