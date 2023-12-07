@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.maximization.YearlyResultsRowProvider;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 
@@ -14,7 +13,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.IntStream;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.toList;
 
@@ -24,7 +25,7 @@ public class PolicyRuns {
         final Path baseFolder = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
         final Path baseScenario = baseFolder.resolve(Paths.get(
             "calibrations",
-            "2023-11-14/cenv0729/2023-11-16_13.34.46_local",
+            "2023-12-01/cenv0729/2023-12-03_04.29.43_local",
             "calibrated_scenario.yaml"
         ));
         final Path baseOutputFolder = baseFolder.resolve(Paths.get("policy_runs"));
@@ -40,6 +41,11 @@ public class PolicyRuns {
                     yearsActive,
                     2022,
                     proportions
+                ),
+                "fad_limits_fine", new ActiveFadLimitsPolicies(
+                    yearsActive,
+                    2022,
+                    IntStream.rangeClosed(1, 19).mapToObj(i -> i * 0.05).collect(toImmutableList())
                 ),
                 "extended_closures", new ExtendedClosurePolicies(
                     yearsActive,
@@ -63,7 +69,7 @@ public class PolicyRuns {
                 entry -> entry.getValue().getWithDefault()
             ));
 
-        final int numberOfRunsPerPolicy = 5;
+        final int numberOfRunsPerPolicy = 10;
         final int numberOfPolicies = policies.values().stream().mapToInt(List::size).sum();
         System.out.printf(
             "About to run %d policies %d times (%d total runs)\n",
@@ -77,18 +83,19 @@ public class PolicyRuns {
             .stream()
             .parallel()
             .forEach(entry -> {
-                final Path outputFolder = baseOutputFolder.resolve(entry.getKey());
+                final String policyName = entry.getKey();
+                final Path outputFolder = baseOutputFolder.resolve(policyName);
                 final Runner<EpoPathPlannerAbundanceScenario> runner =
                     new Runner<>(EpoPathPlannerAbundanceScenario.class, baseScenario, outputFolder)
                         .setPolicies(entry.getValue())
                         .setParallel(true)
                         .setWriteScenarioToFile(true)
-                        .requestFisherYearlyData()
-                        .requestFisherDailyData()
+                        .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new);
+                if (!policyName.equals("fad_limits_fine")) {
+                    runner
                         .registerRowProvider("spatial_closures.csv", RectangularAreaExtractor::new)
-                        .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
-                        .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
                         .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
+                }
                 runner.run(3, numberOfRunsPerPolicy);
             });
     }
