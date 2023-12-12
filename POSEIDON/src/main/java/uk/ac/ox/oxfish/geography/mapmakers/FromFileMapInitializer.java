@@ -36,20 +36,23 @@ import uk.ac.ox.oxfish.geography.sampling.GeographicalSample;
 import uk.ac.ox.oxfish.geography.sampling.SampledMap;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.OptionalDouble;
+import java.util.logging.Logger;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.nio.file.Files.newInputStream;
 
 /**
- * Creates a map from file. If it is a csv it expects it being a depth map. If it is a data file it expects it
- * being a previous map that has been saved
- * Created by carrknight on 6/30/17.
+ * Creates a map from file. If it is a csv it expects it being a depth map. If it is a data file it expects it being a
+ * previous map that has been saved Created by carrknight on 6/30/17.
  */
 public class FromFileMapInitializer implements MapInitializer {
 
+    private static final Logger logger = Logger.getLogger(FromFileMapInitializer.class.getName());
 
     final private Path filePath;
 
@@ -57,7 +60,6 @@ public class FromFileMapInitializer implements MapInitializer {
      * how to grid it
      */
     final private int gridWidthInCells;
-
 
     private final double mapPaddingInDegrees;
 
@@ -69,19 +71,27 @@ public class FromFileMapInitializer implements MapInitializer {
     final private boolean latLong;
 
     /**
-     * additional information to force certain tiles to be of a specific depth.
-     * Useful to model straits that are too narrow and would get pixeliz
+     * additional information to force certain tiles to be of a specific depth. Useful to model straits that are too
+     * narrow and would get pixelated
      */
     final private Table<Integer, Integer, Double> overridenDepths;
 
     public FromFileMapInitializer(
-        Path filePath, int gridWidthInCells, double mapPaddingInDegrees, boolean header, boolean latLong
+        Path filePath,
+        int gridWidthInCells,
+        double mapPaddingInDegrees,
+        boolean header,
+        boolean latLong
     ) {
         this(filePath, gridWidthInCells, mapPaddingInDegrees, header, latLong, HashBasedTable.create(1, 1));
     }
 
     public FromFileMapInitializer(
-        Path filePath, int gridWidthInCells, double mapPaddingInDegrees, boolean header, boolean latLong,
+        Path filePath,
+        int gridWidthInCells,
+        double mapPaddingInDegrees,
+        boolean header,
+        boolean latLong,
         Table<Integer, Integer, Double> overridenDepths
     ) {
         this.filePath = filePath;
@@ -92,58 +102,109 @@ public class FromFileMapInitializer implements MapInitializer {
         this.overridenDepths = overridenDepths;
     }
 
+    public static NauticalMap sampledAltitudeToNauticalMap(
+        Table<Integer, Integer, LinkedList<Double>> sampledAltitudeGrid,
+        Envelope mbr,
+        int gridHeightInCells,
+        int gridWidthInCells,
+        final boolean latLong
+    ) {
+        // turn it into a proper map
+        ObjectGrid2D altitudeGrid = new ObjectGrid2D(gridWidthInCells, gridHeightInCells);
+
+        // so for altitude we just average them out
+        for (int x = 0; x < gridWidthInCells; x++)
+            for (int y = 0; y < gridHeightInCells; y++) {
+                OptionalDouble average =
+                    checkNotNull(sampledAltitudeGrid.get(x, y))
+                        .stream()
+                        .mapToDouble(value -> value)
+                        .filter(aDouble -> aDouble > -9999)
+                        .average();
+                altitudeGrid.set(x, y, new SeaTile(x, y, average.orElse(1000d), new TileHabitat(0)));
+            }
+
+        GeomGridField unitedMap = new GeomGridField(altitudeGrid);
+        unitedMap.setMBR(mbr);
+
+        // create the map
+        Distance distance = latLong ? new EquirectangularDistanceByCoordinate() : new CartesianUTMDistance();
+        NauticalMap nauticalMap = new NauticalMap(
+            unitedMap,
+            new GeomVectorField(),
+            distance,
+            new AStarPathfinder(distance)
+        );
+
+        // cell distance:
+        logger.fine(() -> String.format(
+            "coordinates for 0,0 are: %s%n" +
+                "coordinates for 1,1 are: %s%n" +
+                "the distance between 0,0 and 1,1 is: %.3f%n" +
+                "the number of water tiles is: %d%n",
+            nauticalMap.getCoordinates(0, 0),
+            nauticalMap.getCoordinates(1, 1),
+            distance.distance(
+                nauticalMap.getSeaTile(0, 0),
+                nauticalMap.getSeaTile(1, 1),
+                nauticalMap
+            ),
+            nauticalMap.getAllSeaTilesExcludingLandAsList().size()
+        ));
+        return nauticalMap;
+    }
+
     @Override
     public NauticalMap makeMap(
-        MersenneTwisterFast random, GlobalBiology biology, FishState model
+        MersenneTwisterFast random,
+        GlobalBiology biology,
+        FishState model
     ) {
 
-        //get the file extension
+        // get the file extension
         String fileExtension = Files.getFileExtension(filePath.getFileName().toString());
-
 
         try {
 
-            //prep the sampled map
+            // prep the sampled map
             SampledMap sampledMap;
 
             switch (fileExtension.trim().toLowerCase()) {
-                //assuming here you saved already the nautical map
+                // assuming here you saved already the nautical map
                 case "data":
-                    ObjectInputStream stream = new ObjectInputStream(
-                        new FileInputStream(filePath.toFile()));
+                    ObjectInputStream stream = new ObjectInputStream(newInputStream(filePath.toFile().toPath()));
 
                     sampledMap = (SampledMap) stream.readObject();
-                    return sampledAltitudeToNauticalMap(sampledMap.getAltitudeGrid(),
+                    return sampledAltitudeToNauticalMap(
+                        sampledMap.getAltitudeGrid(),
                         sampledMap.getMbr(),
                         sampledMap.getGridHeight(),
-                        sampledMap.getGridWith(), latLong
+                        sampledMap.getGridWith(),
+                        latLong
                     );
 
                 default:
                 case "csv":
-                    //otherwise read from data
-                    GeographicalSample altitudeSample = new GeographicalSample(
-                        filePath,
-                        header
-                    );
-                    //create the mbr from max-min stuff
+                    // otherwise read from data
+                    GeographicalSample altitudeSample = new GeographicalSample(filePath, header);
+                    // create the mbr from max-min stuff
                     Envelope mbr = new Envelope(
-                        //the additional epsilon is there to prevent the very edge observations from falling out
+                        // the additional epsilon is there to prevent the very edge observations from falling out
                         altitudeSample.getMinFirstCoordinate() - mapPaddingInDegrees,
                         altitudeSample.getMaxFirstCoordinate() + mapPaddingInDegrees,
                         altitudeSample.getMinSecondCoordinate() - mapPaddingInDegrees,
                         altitudeSample.getMaxSecondCoordinate() + mapPaddingInDegrees
                     );
-                    //find ratio height to width
+                    // find ratio height to width
                     double heightToWidth = mbr.getHeight() / mbr.getWidth();
                     int gridHeightInCells = (int) Math.round(gridWidthInCells * heightToWidth);
 
-                    //create backing grid
+                    // create backing grid
                     ObjectGrid2D backingObjectGrid = new ObjectGrid2D(gridWidthInCells, gridHeightInCells);
                     GeomGridField geomGrid = new GeomGridField(backingObjectGrid);
                     geomGrid.setMBR(mbr);
 
-                    //get the altitude grid
+                    // get the altitude grid
                     Table<Integer, Integer, LinkedList<Double>> sampledAltitudeGrid = SampledMap.fileToGrid(
                         geomGrid,
                         altitudeSample,
@@ -154,75 +215,24 @@ public class FromFileMapInitializer implements MapInitializer {
                     for (Table.Cell<Integer, Integer, Double> overriddenCell : overridenDepths.cellSet()) {
                         final LinkedList<Double> value = new LinkedList<>();
                         value.add(overriddenCell.getValue());
-                        sampledAltitudeGrid.put(
-                            overriddenCell.getRowKey(),
-                            overriddenCell.getColumnKey(),
-                            value
-                        );
+                        sampledAltitudeGrid.put(overriddenCell.getRowKey(), overriddenCell.getColumnKey(), value);
                     }
 
-                    return sampledAltitudeToNauticalMap(sampledAltitudeGrid, mbr, gridHeightInCells, gridWidthInCells,
+                    return sampledAltitudeToNauticalMap(
+                        sampledAltitudeGrid,
+                        mbr,
+                        gridHeightInCells,
+                        gridWidthInCells,
                         latLong
                     );
 
             }
 
-            //now turn the sampled map into
+            // now turn the sampled map into
 
         } catch (IOException | ClassNotFoundException e) {
             throw new IllegalStateException("Failed to initialize the map!", e);
         }
     }
-
-
-    public static NauticalMap sampledAltitudeToNauticalMap(
-        Table<Integer, Integer,
-            LinkedList<Double>> sampledAltitudeGrid,
-        Envelope mbr, int gridHeightInCells,
-        int gridWidthInCells,
-        final boolean latLong
-    ) {
-        //turn it into a proper map
-        ObjectGrid2D altitudeGrid = new ObjectGrid2D(gridWidthInCells, gridHeightInCells);
-
-
-        //so for altitude we just average them out
-        for (int x = 0; x < gridWidthInCells; x++)
-            for (int y = 0; y < gridHeightInCells; y++) {
-                OptionalDouble average = sampledAltitudeGrid.get(x, y).
-                    stream().mapToDouble(
-                        value -> value).filter(
-                        aDouble -> aDouble > -9999).average();
-                altitudeGrid.set(x, y,
-                    new SeaTile(x, y, average.orElseGet(() -> 1000d), new TileHabitat(0))
-                );
-            }
-
-        GeomGridField unitedMap = new GeomGridField(altitudeGrid);
-        unitedMap.setMBR(mbr);
-
-        //create the map
-        Distance distance = latLong ? new EquirectangularDistanceByCoordinate() : new CartesianUTMDistance();
-        NauticalMap nauticalMap = new NauticalMap(unitedMap, new GeomVectorField(),
-            distance,
-            new AStarPathfinder(distance)
-        );
-
-        //cell distance:
-        System.out.println("coordinates for 0,0 are: " + nauticalMap.getCoordinates(0, 0));
-        System.out.println("coordinates for 1,1 are: " + nauticalMap.getCoordinates(1, 1));
-        System.out.println("coordinates for max,max are: " + nauticalMap.getCoordinates(
-            nauticalMap.getWidth() - 1, nauticalMap.getHeight() - 1));
-        System.out.println("the distance between 0,0 and 1,1 is: " +
-            distance.distance(
-                nauticalMap.getSeaTile(0, 0),
-                nauticalMap.getSeaTile(1, 1),
-                nauticalMap
-            ));
-        System.out.println("the number of water tiles is: " + nauticalMap.getAllSeaTilesExcludingLandAsList().size());
-
-        return nauticalMap;
-    }
-
 
 }
