@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -20,6 +21,8 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.toList;
 
 public class PolicyRuns {
+
+    private static final Logger logger = Logger.getLogger(PolicyRuns.class.getName());
 
     public static void main(final String[] args) {
         final Path baseFolder = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
@@ -71,12 +74,12 @@ public class PolicyRuns {
 
         final int numberOfRunsPerPolicy = 10;
         final int numberOfPolicies = policies.values().stream().mapToInt(List::size).sum();
-        System.out.printf(
-            "About to run %d policies %d times (%d total runs)\n",
+        logger.info(String.format(
+            "About to run %d policies %d times (%d total runs)",
             numberOfPolicies,
             numberOfRunsPerPolicy,
             numberOfPolicies * numberOfRunsPerPolicy
-        );
+        ));
 
         policies
             .entrySet()
