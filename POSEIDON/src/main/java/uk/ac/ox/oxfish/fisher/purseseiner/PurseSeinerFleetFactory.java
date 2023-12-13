@@ -268,13 +268,15 @@ public class PurseSeinerFleetFactory
 
     private Consumer<Fisher> addHourlyCosts() {
         final RangeMap<ComparableQuantity<Mass>, HourlyCost> hourlyCostsPerCarryingCapacity =
-            recordStream(costsFile.get()).collect(toImmutableRangeMap(
-                r -> Range.openClosed(
-                    getQuantity(r.getInt("lower_capacity"), TONNE),
-                    getQuantity(r.getInt("upper_capacity"), TONNE)
-                ),
-                r -> new HourlyCost(r.getDouble("daily_cost") / 24.0)
-            ));
+            recordStream(costsFile.get())
+                .filter(r -> r.getInt("year") == getTargetYear().getIntValue())
+                .collect(toImmutableRangeMap(
+                    r -> Range.openClosed(
+                        getQuantity(r.getInt("lower_capacity"), TONNE),
+                        getQuantity(r.getInt("upper_capacity"), TONNE)
+                    ),
+                    r -> new HourlyCost(r.getDouble("daily_cost") / 24.0)
+                ));
         // Setup hourly costs as a function of capacity
         return fisher -> {
             final ComparableQuantity<Mass> capacity =
