@@ -19,6 +19,7 @@ import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
 import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
 
 public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
 
@@ -33,6 +34,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                 getTargetYear(),
                 getInputFolder(),
                 new AbundancePurseSeineGearFactory(
+                    getTargetYear(),
                     new SelectivityAbundanceFadInitializerFactory(
                         // see https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1545974455
                         // for Weibull parameter values, obtained by fitting the distributions to observer data
@@ -71,7 +73,8 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                     new UnreliableFishValueCalculatorFactory(new LogNormalErrorOperatorFactory(
                         new FixedDoubleParameter(-0.14452),
                         new FixedDoubleParameter(0.14097)
-                    ))
+                    )),
+                    new FixedParameterTableFromFile(getInputFolder().path("other_parameters.csv"))
                 ),
                 new EPOPlannedStrategyFlexibleFactory(
                     getTargetYear(),

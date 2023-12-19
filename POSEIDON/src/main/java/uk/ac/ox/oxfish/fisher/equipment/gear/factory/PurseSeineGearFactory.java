@@ -15,15 +15,16 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.oxfish.utility.parameters.ParameterTable;
 import uk.ac.ox.poseidon.agents.core.AtomicLongMapYearlyActionCounter;
 import uk.ac.ox.poseidon.common.api.Observer;
 
 import javax.measure.quantity.Mass;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -35,10 +36,6 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     private static final LocationFisherValuesByActionCache locationValuesCache =
         new LocationFisherValuesByActionCache();
 
-    // Obtained empirically, see:
-    // https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1545969444
-    // https://github.com/poseidon-fisheries/tuna-issues/issues/202#issue-1779551927
-    private DoubleParameter maxAllowableShear = new FixedDoubleParameter(0.891959);
     private Set<Observer<FadDeploymentAction>> fadDeploymentObservers = new LinkedHashSet<>();
     private final CacheByFishState<Set<Observer<FadDeploymentAction>>> fadDeploymentObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(fadDeploymentObservers));
@@ -61,21 +58,26 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     private final CacheByFishState<Set<Observer<DolphinSetAction>>> dolphinSetObserversCache =
         new CacheByFishState<>(__ -> ImmutableSet.copyOf(dolphinSetObservers));
     private GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
-    // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
-    private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.9231701);
-    private InputPath locationValuesFile;
+    private IntegerParameter targetYear;
     private AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializer;
     private AlgorithmFactory<? extends FishValueCalculator> fishValueCalculator;
+    private AlgorithmFactory<? extends ParameterTable> otherParameters;
 
+    @SuppressWarnings("WeakerAccess")
     public PurseSeineGearFactory() {
     }
 
+    @SuppressWarnings("WeakerAccess")
     public PurseSeineGearFactory(
+        final IntegerParameter targetYear,
         final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializer,
-        final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculator
+        final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculator,
+        final AlgorithmFactory<? extends ParameterTable> otherParameters
     ) {
+        this.targetYear = targetYear;
         this.fadInitializer = fadInitializer;
         this.fishValueCalculator = fishValueCalculator;
+        this.otherParameters = otherParameters;
     }
 
     public AlgorithmFactory<? extends FishValueCalculator> getFishValueCalculator() {
@@ -86,23 +88,11 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         this.fishValueCalculator = fishValueCalculator;
     }
 
-    public void setLocationValuesFile(final InputPath locationValuesFile) {
-        this.locationValuesFile = locationValuesFile;
-    }
-
-    public DoubleParameter getMaxAllowableShear() {
-        return maxAllowableShear;
-    }
-
-    public void setMaxAllowableShear(final DoubleParameter maxAllowableShear) {
-        this.maxAllowableShear = maxAllowableShear;
-    }
-
     public AlgorithmFactory<? extends FadInitializer<?, ?>> getFadInitializer() {
         return fadInitializer;
     }
 
-    public void setFadInitializer(final AlgorithmFactory<FadInitializer<?, ?>> fadInitializer) {
+    public void setFadInitializer(final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializer) {
         this.fadInitializer = fadInitializer;
     }
 
@@ -111,15 +101,125 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         return biomassLostMonitor;
     }
 
+    public void addMonitors(final Monitors monitors) {
+        grabFadDeploymentObservers()
+            .addAll(monitors.grabFadDeploymentMonitors());
+        grabAllSetsObservers()
+            .addAll(monitors.grabAllSetsMonitors());
+        grabFadSetObservers()
+            .addAll(monitors.grabFadSetMonitors());
+        grabNonAssociatedSetObservers()
+            .addAll(monitors.grabNonAssociatedSetMonitors());
+        grabDolphinSetObservers()
+            .addAll(monitors.grabDolphinSetMonitors());
+        setBiomassLostMonitor(monitors.grabBiomassLostMonitor());
+    }
+
     @SuppressWarnings({"unused", "WeakerAccess"})
-    public DoubleParameter getSuccessfulSetProbability() {
-        return successfulSetProbability;
+    public Set<Observer<FadDeploymentAction>> grabFadDeploymentObservers() {
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
+        return fadDeploymentObservers;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public Set<Observer<AbstractSetAction>> grabAllSetsObservers() {
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
+        return allSetsObservers;
+    }
+
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    public Set<Observer<AbstractFadSetAction>> grabFadSetObservers() {
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
+        return fadSetObservers;
+    }
+
+    @SuppressWarnings({"unused", "rawtypes", "WeakerAccess"})
+    public Set<Observer<NonAssociatedSetAction>> grabNonAssociatedSetObservers() {
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
+        return nonAssociatedSetObservers;
+    }
+
+    @SuppressWarnings({"rawtypes", "WeakerAccess"})
+    public Set<Observer<DolphinSetAction>> grabDolphinSetObservers() {
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
+        return dolphinSetObservers;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void setBiomassLostMonitor(
+        final GroupingMonitor<Species, BiomassLostEvent, Double,
+            Mass> biomassLostMonitor
+    ) {
+        this.biomassLostMonitor = biomassLostMonitor;
+    }
+
+    public void setAllSetsObservers(final Set<Observer<AbstractSetAction>> allSetsObservers) {
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.allSetsObservers = allSetsObservers;
     }
 
     @SuppressWarnings("unused")
-    public void setSuccessfulSetProbability(final DoubleParameter successfulSetProbability) {
-        this.successfulSetProbability = successfulSetProbability;
+    public void setFadSetObservers(
+        final Set<Observer<AbstractFadSetAction>> fadSetObservers
+    ) {
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.fadSetObservers = fadSetObservers;
     }
+
+    public void setDolphinSetObservers(
+        @SuppressWarnings("rawtypes") final Set<Observer<DolphinSetAction>> dolphinSetObservers
+    ) {
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.dolphinSetObservers = dolphinSetObservers;
+    }
+
+    @SuppressWarnings("unused")
+    public void setNonAssociatedSetObservers(
+        @SuppressWarnings("rawtypes") final Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers
+    ) {
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.nonAssociatedSetObservers = nonAssociatedSetObservers;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFadDeploymentObservers(
+        final Set<Observer<FadDeploymentAction>> fadDeploymentObservers
+    ) {
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
+        this.fadDeploymentObservers = fadDeploymentObservers;
+    }
+
+    @Override
+    public PurseSeineGear apply(final FishState fishState) {
+        final Map<String, ? extends DoubleParameter> parameters =
+            getOtherParameters()
+                .apply(fishState)
+                .getParameters(getTargetYear().getIntValue());
+        final MersenneTwisterFast rng = fishState.getRandom();
+        return makeGear(
+            makeFadManager(fishState),
+            parameters.get("successful_set_probability").applyAsDouble(rng),
+            parameters.get("max_allowable_shear").applyAsDouble(rng)
+        );
+    }
+
+    public AlgorithmFactory<? extends ParameterTable> getOtherParameters() {
+        return otherParameters;
+    }
+
+    public IntegerParameter getTargetYear() {
+        return targetYear;
+    }
+
+    public void setTargetYear(final IntegerParameter targetYear) {
+        this.targetYear = targetYear;
+    }
+
+    protected abstract PurseSeineGear makeGear(
+        FadManager fadManager,
+        double successfulSetProbability,
+        double maxAllowableShear
+    );
 
     FadManager makeFadManager(final FishState fishState) {
         checkNotNull(fadInitializer);
@@ -139,89 +239,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         );
     }
 
-    public void addMonitors(final Monitors monitors) {
-        grabFadDeploymentObservers()
-            .addAll(monitors.grabFadDeploymentMonitors());
-        grabAllSetsObservers()
-            .addAll(monitors.grabAllSetsMonitors());
-        grabFadSetObservers()
-            .addAll(monitors.grabFadSetMonitors());
-        grabNonAssociatedSetObservers()
-            .addAll(monitors.grabNonAssociatedSetMonitors());
-        grabDolphinSetObservers()
-            .addAll(monitors.grabDolphinSetMonitors());
-        setBiomassLostMonitor(monitors.grabBiomassLostMonitor());
-    }
-
-    @SuppressWarnings("unused")
-    public Set<Observer<FadDeploymentAction>> grabFadDeploymentObservers() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return fadDeploymentObservers;
-    }
-
-    public Set<Observer<AbstractSetAction>> grabAllSetsObservers() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return allSetsObservers;
-    }
-
-    @SuppressWarnings({"unused"})
-    public Set<Observer<AbstractFadSetAction>> grabFadSetObservers() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return fadSetObservers;
-    }
-
-    @SuppressWarnings({"unused", "rawtypes"})
-    public Set<Observer<NonAssociatedSetAction>> grabNonAssociatedSetObservers() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return nonAssociatedSetObservers;
-    }
-
-    @SuppressWarnings("rawtypes")
-    public Set<Observer<DolphinSetAction>> grabDolphinSetObservers() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        return dolphinSetObservers;
-    }
-
-    public void setBiomassLostMonitor(
-        final GroupingMonitor<Species, BiomassLostEvent, Double,
-            Mass> biomassLostMonitor
-    ) {
-        this.biomassLostMonitor = biomassLostMonitor;
-    }
-
-    public void setAllSetsObservers(final Set<Observer<AbstractSetAction>> allSetsObservers) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.allSetsObservers = allSetsObservers;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadSetObservers(
-        final Set<Observer<AbstractFadSetAction>> fadSetObservers
-    ) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.fadSetObservers = fadSetObservers;
-    }
-
-    public void setDolphinSetObservers(
-        @SuppressWarnings("rawtypes") final Set<Observer<DolphinSetAction>> dolphinSetObservers
-    ) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.dolphinSetObservers = dolphinSetObservers;
-    }
-
-    @SuppressWarnings("unused")
-    public void setNonAssociatedSetObservers(
-        @SuppressWarnings("rawtypes") final Set<Observer<NonAssociatedSetAction>> nonAssociatedSetObservers
-    ) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.nonAssociatedSetObservers = nonAssociatedSetObservers;
-    }
-
-    @SuppressWarnings("unused")
-    public void setFadDeploymentObservers(
-        final Set<Observer<FadDeploymentAction>> fadDeploymentObservers
-    ) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
-        this.fadDeploymentObservers = fadDeploymentObservers;
+    public void setOtherParameters(final AlgorithmFactory<? extends ParameterTable> otherParameters) {
+        this.otherParameters = otherParameters;
     }
 }

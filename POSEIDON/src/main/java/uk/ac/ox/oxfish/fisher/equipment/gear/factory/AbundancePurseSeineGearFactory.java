@@ -20,29 +20,39 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.AbundancePurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.oxfish.utility.parameters.ParameterTable;
 
 public class AbundancePurseSeineGearFactory extends PurseSeineGearFactory {
 
     public AbundancePurseSeineGearFactory(
+        final IntegerParameter targetYear,
         final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory,
-        final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory
+        final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory,
+        final AlgorithmFactory<? extends ParameterTable> otherParameters
     ) {
-        super(fadInitializerFactory, fishValueCalculatorFactory);
+        super(targetYear, fadInitializerFactory, fishValueCalculatorFactory, otherParameters);
     }
 
+    @SuppressWarnings("unused")
     public AbundancePurseSeineGearFactory() {
     }
 
     @Override
-    public PurseSeineGear apply(final FishState fishState) {
+    protected PurseSeineGear makeGear(
+        final FadManager fadManager,
+        final double successfulSetProbability,
+        final double maxAllowableShear
+    ) {
         return new AbundancePurseSeineGear(
-            makeFadManager(fishState),
-            getSuccessfulSetProbability().applyAsDouble(fishState.getRandom()),
-            getMaxAllowableShear().applyAsDouble(fishState.getRandom())
+            fadManager,
+            successfulSetProbability,
+            maxAllowableShear
         );
     }
+
 }

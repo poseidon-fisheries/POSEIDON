@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.geography.fads.CompressedBiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
 
 /**
  * The biomass-based IATTC tuna simulation scenario.
@@ -44,6 +45,7 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
                 getTargetYear(),
                 getInputFolder(),
                 new BiomassPurseSeineGearFactory(
+                    getTargetYear(),
                     new CompressedBiomassFadInitializerFactory(
                         // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
                         ImmutableMap.of(
@@ -70,7 +72,8 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
                     new UnreliableFishValueCalculatorFactory(new LogNormalErrorOperatorFactory(
                         new CalibratedParameter(-.2, .2, -.4, .4),
                         new CalibratedParameter(.2, .3, .01, .5)
-                    ))
+                    )),
+                    new FixedParameterTableFromFile(getInputFolder().path("other_parameters.csv"))
                 ),
                 new GravityDestinationStrategyFactory(
                     getTargetYear(),

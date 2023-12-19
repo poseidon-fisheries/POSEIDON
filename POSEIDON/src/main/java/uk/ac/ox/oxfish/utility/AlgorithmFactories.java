@@ -146,6 +146,8 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.factory.*;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
 import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
+import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
+import uk.ac.ox.oxfish.utility.parameters.ParameterTable;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 import uk.ac.ox.poseidon.regulations.api.Quantity;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
@@ -851,6 +853,10 @@ public class AlgorithmFactories {
         addFactories(new Factories<>(
             RecruitmentProcesses.class,
             RecruitmentProcessesFactory.class
+        ));
+        addFactories(new Factories<>(
+            ParameterTable.class,
+            FixedParameterTableFromFile.class
         ));
     }
 
