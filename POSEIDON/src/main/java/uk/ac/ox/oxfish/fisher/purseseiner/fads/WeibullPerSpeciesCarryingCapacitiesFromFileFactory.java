@@ -17,7 +17,8 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
     implements uk.ac.ox.oxfish.geography.fads.CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> {
 
-    private DoubleParameter scalingFactor;
+    private DoubleParameter capacityScalingFactor;
+    private DoubleParameter shapeScalingFactor;
     private IntegerParameter targetYear;
     private InputPath fadCarryingCapacityFile;
 
@@ -28,11 +29,23 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
     public WeibullPerSpeciesCarryingCapacitiesFromFileFactory(
         final InputPath fadCarryingCapacityFile,
         final IntegerParameter targetYear,
-        final DoubleParameter scalingFactor
+        final DoubleParameter capacityScalingFactor,
+        final DoubleParameter shapeScalingFactor
     ) {
         this.fadCarryingCapacityFile = fadCarryingCapacityFile;
         this.targetYear = targetYear;
-        this.scalingFactor = scalingFactor;
+        this.capacityScalingFactor = capacityScalingFactor;
+        this.shapeScalingFactor = shapeScalingFactor;
+    }
+
+    @SuppressWarnings("unused")
+    public DoubleParameter getShapeScalingFactor() {
+        return shapeScalingFactor;
+    }
+
+    @SuppressWarnings("unused")
+    public void setShapeScalingFactor(final DoubleParameter shapeScalingFactor) {
+        this.shapeScalingFactor = shapeScalingFactor;
     }
 
     @Override
@@ -65,18 +78,19 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
             yearShapeParameters,
             yearScaleParameters,
             yearProportionOfZeros,
-            scalingFactor
+            capacityScalingFactor,
+            shapeScalingFactor
         ).apply(fishState);
     }
 
     @SuppressWarnings("unused")
-    public DoubleParameter getScalingFactor() {
-        return scalingFactor;
+    public DoubleParameter getCapacityScalingFactor() {
+        return capacityScalingFactor;
     }
 
     @SuppressWarnings("unused")
-    public void setScalingFactor(final DoubleParameter scalingFactor) {
-        this.scalingFactor = scalingFactor;
+    public void setCapacityScalingFactor(final DoubleParameter capacityScalingFactor) {
+        this.capacityScalingFactor = capacityScalingFactor;
     }
 
     public IntegerParameter getTargetYear() {

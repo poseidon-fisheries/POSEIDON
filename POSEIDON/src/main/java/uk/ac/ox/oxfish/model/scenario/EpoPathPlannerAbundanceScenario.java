@@ -40,7 +40,10 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                             getInputFolder().path("fad_carrying_capacity_parameters.csv"),
                             getTargetYear(),
                             new CalibratedParameter(
-                                1, 2, 1, 5, 1
+                                0, 2, 0, 5, 1
+                            ),
+                            new CalibratedParameter(
+                                0.001, 1, 0.001, 1, 1
                             )
                         ),
                         getAbundanceFilters(),

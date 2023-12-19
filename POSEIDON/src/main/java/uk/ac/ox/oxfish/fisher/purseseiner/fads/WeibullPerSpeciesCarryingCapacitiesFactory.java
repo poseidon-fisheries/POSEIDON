@@ -16,8 +16,10 @@ public class WeibullPerSpeciesCarryingCapacitiesFactory
     private Map<String, DoubleParameter> shapeParameters;
     private Map<String, DoubleParameter> scaleParameters;
     private Map<String, DoubleParameter> proportionOfZeros;
-    private DoubleParameter scalingFactor;
+    private DoubleParameter capacityScalingFactor;
+    private DoubleParameter shapeScalingFactor;
 
+    @SuppressWarnings("unused")
     public WeibullPerSpeciesCarryingCapacitiesFactory() {
     }
 
@@ -25,28 +27,14 @@ public class WeibullPerSpeciesCarryingCapacitiesFactory
         final Map<String, DoubleParameter> shapeParameters,
         final Map<String, DoubleParameter> scaleParameters,
         final Map<String, DoubleParameter> proportionOfZeros,
-        final DoubleParameter scalingFactor
+        final DoubleParameter capacityScalingFactor,
+        final DoubleParameter shapeScalingFactor
     ) {
         this.shapeParameters = shapeParameters;
         this.scaleParameters = scaleParameters;
         this.proportionOfZeros = proportionOfZeros;
-        this.scalingFactor = scalingFactor;
-    }
-
-    public Map<String, DoubleParameter> getShapeParameters() {
-        return shapeParameters;
-    }
-
-    public void setShapeParameters(final Map<String, DoubleParameter> shapeParameters) {
-        this.shapeParameters = shapeParameters;
-    }
-
-    public Map<String, DoubleParameter> getScaleParameters() {
-        return scaleParameters;
-    }
-
-    public void setScaleParameters(final Map<String, DoubleParameter> scaleParameters) {
-        this.scaleParameters = scaleParameters;
+        this.capacityScalingFactor = capacityScalingFactor;
+        this.shapeScalingFactor = shapeScalingFactor;
     }
 
     @Override
@@ -71,35 +59,70 @@ public class WeibullPerSpeciesCarryingCapacitiesFactory
         final MersenneTwisterFast rng
     ) {
         final String speciesName = species.getName();
-        if (scaleParameters.containsKey(speciesName) && shapeParameters.containsKey(speciesName)) {
+        if (getScaleParameters().containsKey(speciesName) && getShapeParameters().containsKey(speciesName)) {
             return new ScaledDoubleParameter(
                 new ZeroInflatedDoubleParameter(
                     new WeibullDoubleParameter(
-                        shapeParameters.get(speciesName).applyAsDouble(rng),
-                        scaleParameters.get(speciesName).applyAsDouble(rng)
+                        getScaleParameters().get(speciesName).applyAsDouble(rng) *
+                            getShapeScalingFactor().applyAsDouble(rng),
+                        getScaleParameters().get(speciesName).applyAsDouble(rng)
                     ),
                     getProportionOfZeros().get(speciesName).applyAsDouble(rng)
                 ),
-                getScalingFactor().applyAsDouble(rng)
+                getCapacityScalingFactor().applyAsDouble(rng)
             );
         } else {
             return new FixedDoubleParameter(-1);
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
+    public Map<String, DoubleParameter> getScaleParameters() {
+        return scaleParameters;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public Map<String, DoubleParameter> getShapeParameters() {
+        return shapeParameters;
+    }
+
+    @SuppressWarnings("unused")
+    public void setShapeParameters(final Map<String, DoubleParameter> shapeParameters) {
+        this.shapeParameters = shapeParameters;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public DoubleParameter getShapeScalingFactor() {
+        return shapeScalingFactor;
+    }
+
+    @SuppressWarnings("unused")
+    public void setShapeScalingFactor(final DoubleParameter shapeScalingFactor) {
+        this.shapeScalingFactor = shapeScalingFactor;
+    }
+
+    @SuppressWarnings("WeakerAccess")
     public Map<String, DoubleParameter> getProportionOfZeros() {
         return proportionOfZeros;
     }
 
-    public DoubleParameter getScalingFactor() {
-        return scalingFactor;
+    @SuppressWarnings("WeakerAccess")
+    public DoubleParameter getCapacityScalingFactor() {
+        return capacityScalingFactor;
     }
 
-    public void setScalingFactor(final DoubleParameter scalingFactor) {
-        this.scalingFactor = scalingFactor;
+    @SuppressWarnings("unused")
+    public void setCapacityScalingFactor(final DoubleParameter capacityScalingFactor) {
+        this.capacityScalingFactor = capacityScalingFactor;
     }
 
+    @SuppressWarnings("unused")
     public void setProportionOfZeros(final Map<String, DoubleParameter> proportionOfZeros) {
         this.proportionOfZeros = proportionOfZeros;
+    }
+
+    @SuppressWarnings("unused")
+    public void setScaleParameters(final Map<String, DoubleParameter> scaleParameters) {
+        this.scaleParameters = scaleParameters;
     }
 }
