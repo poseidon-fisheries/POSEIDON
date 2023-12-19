@@ -31,7 +31,7 @@ public class OpportunisticFadSetLocationValues extends SetLocationValues<Opportu
     private static final long serialVersionUID = -2109718892320968451L;
 
     public OpportunisticFadSetLocationValues(
-        final Function<Fisher, Map<Int2D, Double>> loadValues,
+        final Function<? super Fisher, ? extends Map<Int2D, Double>> loadValues,
         final double decayRate
     ) {
         super(OpportunisticFadSetAction.class, loadValues, decayRate);

@@ -6,9 +6,9 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.NonAssociatedSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DolphinSetLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.NonAssociatedSetLocationValues;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.SetLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -69,12 +69,10 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
         Class<B> localBiologyClass
     );
 
-
     public static class DolphinActionGenerator<B extends LocalBiology>
         extends CatchSamplerPlannedActionGenerator<PlannedAction.DolphinSet<B>, B> {
 
         private final int rangeInSeaTiles;
-
 
         public DolphinActionGenerator(
             final DolphinSetLocationValues originalLocationValues,
@@ -129,7 +127,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
         private final int rangeInSeaTiles;
 
         public NonAssociatedActionGenerator(
-            final SetLocationValues<NonAssociatedSetAction<?>> originalLocationValues,
+            final NonAssociatedSetLocationValues originalLocationValues,
             final NauticalMap map,
             final MersenneTwisterFast random,
             final double additionalWaitTime,

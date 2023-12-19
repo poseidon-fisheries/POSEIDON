@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.ReliableFishValueCalculator;
 
 import java.util.Map;
@@ -38,7 +39,7 @@ public abstract class SetLocationValues<A extends AbstractSetAction>
 
     SetLocationValues(
         final Class<A> observedClass,
-        final Function<Fisher, Map<Int2D, Double>> loadValues,
+        final Function<? super Fisher, ? extends Map<Int2D, Double>> loadValues,
         final double decayRate
     ) {
         super(observedClass, loadValues, decayRate);
@@ -48,7 +49,7 @@ public abstract class SetLocationValues<A extends AbstractSetAction>
     Optional<Entry<Int2D, Double>> observeValue(final A setAction) {
         final Fisher fisher = setAction.getFisher();
         final Int2D gridLocation = fisher.getLocation().getGridLocation();
-        final ReliableFishValueCalculator fishValueCalculator =
+        final FishValueCalculator fishValueCalculator =
             new ReliableFishValueCalculator(fisher.grabState().getBiology());
         final double[] prices = fisher.getHomePort().getMarketMap(fisher).getPrices();
         return setAction.getCatchesKept()

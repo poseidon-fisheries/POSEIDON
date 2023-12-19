@@ -35,7 +35,7 @@ public class DeploymentLocationValues extends SetLocationValues<FadSetAction> {
     private static final long serialVersionUID = -7573058884700476680L;
 
     public DeploymentLocationValues(
-        final Function<Fisher, Map<Int2D, Double>> valueLoader,
+        final Function<? super Fisher, ? extends Map<Int2D, Double>> valueLoader,
         final double decayRate
     ) {
         super(FadSetAction.class, valueLoader, decayRate);

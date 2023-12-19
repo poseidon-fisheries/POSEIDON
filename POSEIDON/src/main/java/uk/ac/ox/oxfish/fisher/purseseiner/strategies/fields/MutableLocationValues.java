@@ -43,13 +43,13 @@ public abstract class MutableLocationValues<A>
     private static final int MAXIMUM_NUMBER_OF_VALUES = 50;
     private static final long serialVersionUID = 8981125814239200579L;
 
-    private final Function<Fisher, Map<Int2D, Double>> valueLoader;
+    private final Function<? super Fisher, ? extends Map<Int2D, Double>> valueLoader;
     private final double decayRate;
     private Map<Int2D, Double> values;
 
     MutableLocationValues(
         final Class<A> observedClass,
-        final Function<Fisher, Map<Int2D, Double>> valueLoader,
+        final Function<? super Fisher, ? extends Map<Int2D, Double>> valueLoader,
         final double decayRate
     ) {
         super(observedClass);
@@ -58,7 +58,10 @@ public abstract class MutableLocationValues<A>
     }
 
     @Override
-    public void start(final FishState model, final Fisher fisher) {
+    public void start(
+        final FishState model,
+        final Fisher fisher
+    ) {
         this.values = new HashMap<>(valueLoader.apply(fisher));
         getFadManager(fisher).registerObserver(getObservedClass(), this);
         model.scheduleEveryYear(this, POLICY_UPDATE);
@@ -96,7 +99,6 @@ public abstract class MutableLocationValues<A>
         // apply exponential decay
         values.replaceAll((location, value) -> value * (1 - decayRate));
     }
-
 
     public boolean hasStarted() {
         return values != null;
