@@ -18,7 +18,7 @@ public class TemperatureMapFactory extends EnvironmentalMapFactory {
             gridFile,
             new IntegerParameter(mapPeriod),
             new CalibratedParameter(26, 27, 25, 30, 26.5), // target
-            new CalibratedParameter(0, 1, 0, 1), // penalty
+            new CalibratedParameter(.25, .75, 0, 1), // penalty
             new CalibratedParameter(4, 6, 2, 8, 2.25) // margin
         );
     }
