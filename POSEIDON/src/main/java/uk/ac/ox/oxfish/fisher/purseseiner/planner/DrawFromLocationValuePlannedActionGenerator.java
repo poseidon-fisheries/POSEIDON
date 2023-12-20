@@ -4,10 +4,12 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.SetLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.MTFApache;
+import uk.ac.ox.poseidon.common.api.Observer;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +19,8 @@ import java.util.stream.Collectors;
  * this object exists to draw a location given a locationvalues object and then turn that location into a planned action
  * of any sort
  */
-public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends PlannedAction> {
+public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends PlannedAction>
+    implements Observer<LocationValues> {
 
     protected final NauticalMap map;
     /**
@@ -29,10 +32,6 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
      * here is a mapping coords --> weight
      */
     private final SetLocationValues<?> originalLocationValues;
-    // todo
-    // we can avoid ton of waste by not instantiating this every step and only
-    // when there is a change in the location value deployment
-    // but unfortunately it requires a bit of work with a specialized listener
     private EnumeratedDistribution<SeaTile> seaTilePicker;
 
     DrawFromLocationValuePlannedActionGenerator(
@@ -50,19 +49,20 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
             originalLocationValues.hasStarted(),
             "need to start the location values first!"
         );
-        preparePicker();
+        originalLocationValues.getObservers().register(LocationValues.class, this);
+        preparePicker(originalLocationValues);
     }
 
-    private void preparePicker() {
+    private void preparePicker(final LocationValues locationValues) {
 
-        if (!originalLocationValues.getValues().isEmpty()) {
-            List<Pair<SeaTile, Double>> valuePairs = originalLocationValues.getValues().stream().map(
-                entry -> new Pair<>(
-                    map.getSeaTile(entry.getKey()),
-                    entry.getValue()
-                )
-                // avoid areas where values have turned negative
-            ).filter(seaTileDoublePair -> seaTileDoublePair.getValue() >= 0).collect(Collectors.toList());
+        if (!locationValues.getValues().isEmpty()) {
+            List<Pair<SeaTile, Double>> valuePairs =
+                locationValues
+                    .getValues()
+                    .stream()
+                    .map(entry -> new Pair<>(map.getSeaTile(entry.getKey()), entry.getValue()))
+                    // avoid areas where values have turned negative
+                    .filter(seaTileDoublePair -> seaTileDoublePair.getValue() >= 0).collect(Collectors.toList());
             if (valuePairs.isEmpty())
                 return;
 
@@ -83,7 +83,6 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
                 localRng,
                 valuePairs
             );
-
         }
     }
 
@@ -106,4 +105,8 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
         return seaTilePicker != null || originalLocationValues.getValues().isEmpty();
     }
 
+    @Override
+    public void observe(final LocationValues locationValues) {
+        preparePicker(locationValues);
+    }
 }
