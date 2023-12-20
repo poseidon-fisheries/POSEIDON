@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.SetLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -15,29 +14,28 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * this object exists to draw a location given a locationvalues object
- * and then turn that location into a planned action of any sort
+ * this object exists to draw a location given a locationvalues object and then turn that location into a planned action
+ * of any sort
  */
-public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends PlannedAction, B extends LocalBiology> {
+public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends PlannedAction> {
 
     protected final NauticalMap map;
     /**
      * the rng to use (compatible with Apache)
      */
-    protected final MTFApache localRng;
+    private final MTFApache localRng;
     /**
-     * here I use Nic's object on location values to use the whole reading toolchain;
-     * in practice however all we need here is a mapping coords --> weight
+     * here I use Nic's object on location values to use the whole reading toolchain; in practice however all we need
+     * here is a mapping coords --> weight
      */
     private final SetLocationValues<?> originalLocationValues;
-    //todo
-    //we can avoid ton of waste by not instantiating this every step and only
-    //when there is a change in the location value deployment
-    //but unfortunately it requires a bit of work with a specialized listener
+    // todo
+    // we can avoid ton of waste by not instantiating this every step and only
+    // when there is a change in the location value deployment
+    // but unfortunately it requires a bit of work with a specialized listener
     private EnumeratedDistribution<SeaTile> seatilePicker;
 
-
-    public DrawFromLocationValuePlannedActionGenerator(
+    DrawFromLocationValuePlannedActionGenerator(
         final SetLocationValues<?> originalLocationValues,
         final NauticalMap map,
         final MersenneTwisterFast random
@@ -57,19 +55,19 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
 
     private void preparePicker() {
 
-        if (originalLocationValues.getValues().size() > 0) {
+        if (!originalLocationValues.getValues().isEmpty()) {
             List<Pair<SeaTile, Double>> valuePairs = originalLocationValues.getValues().stream().map(
                 entry -> new Pair<>(
                     map.getSeaTile(entry.getKey()),
                     entry.getValue()
                 )
-                //avoid areas where values have turned negative
+                // avoid areas where values have turned negative
             ).filter(seaTileDoublePair -> seaTileDoublePair.getValue() >= 0).collect(Collectors.toList());
             if (valuePairs.isEmpty())
                 return;
 
-            //some weird inputs have 0s everywhere. They need to sum up to something other than 0 or the randomizer
-            //goes in some sort of middle life crisis
+            // some weird inputs have 0s everywhere. They need to sum up to something other than 0 or the randomizer
+            // goes in some sort of middle life crisis
             double sum = 0;
             for (final Pair<SeaTile, Double> valuePair : valuePairs) {
                 sum += valuePair.getSecond();
@@ -86,14 +84,13 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
                 valuePairs
             );
 
-
         }
     }
 
     abstract public PA drawNewPlannedAction();
 
-    protected SeaTile drawNewLocation() {
-        if (originalLocationValues.getValues().size() == 0) {
+    SeaTile drawNewLocation() {
+        if (originalLocationValues.getValues().isEmpty()) {
 //            System.out.println("WARNING: " + this + " had to draw a completely random location due to empty " +
 //                    "locationValues");
             return map.getAllSeaTilesExcludingLandAsList().get(
@@ -106,7 +103,7 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
     }
 
     public boolean isReady() {
-        return seatilePicker != null || originalLocationValues.getValues().size() == 0;
+        return seatilePicker != null || originalLocationValues.getValues().isEmpty();
     }
 
 }

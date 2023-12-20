@@ -24,7 +24,7 @@ public class FadStealingFromLocationValuePlanningModule<B extends LocalBiology>
     ) {
         this(
             locationValues,
-            new FadStealingPlannedActionGenerator<>(
+            new FadStealingPlannedActionGenerator(
                 locationValues,
                 map,
                 random,
@@ -38,13 +38,16 @@ public class FadStealingFromLocationValuePlanningModule<B extends LocalBiology>
 
     private FadStealingFromLocationValuePlanningModule(
         final OpportunisticFadSetLocationValues locationValues,
-        final FadStealingPlannedActionGenerator<B> generator
+        final FadStealingPlannedActionGenerator generator
     ) {
         super(locationValues, generator);
     }
 
     @Override
-    public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
+    public int maximumActionsInAPlan(
+        final FishState state,
+        final Fisher fisher
+    ) {
         return getFadManager(fisher).numberOfPermissibleActions(
             OFS, 1000,
             state.getRegulations()

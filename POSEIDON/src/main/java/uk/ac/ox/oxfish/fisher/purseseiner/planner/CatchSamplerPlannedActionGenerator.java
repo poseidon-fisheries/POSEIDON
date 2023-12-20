@@ -17,7 +17,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
  * generates a random dolphin deployment action
  */
 public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedAction, B extends LocalBiology> extends
-    DrawFromLocationValuePlannedActionGenerator<PA, B> {
+    DrawFromLocationValuePlannedActionGenerator<PA> {
 
     private final double additionalWaitTime;
 
@@ -28,7 +28,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
     private final GlobalBiology biology;
     private final Class<B> localBiologyClass;
 
-    public CatchSamplerPlannedActionGenerator(
+    CatchSamplerPlannedActionGenerator(
         final SetLocationValues<? extends AbstractSetAction> originalLocationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
@@ -50,7 +50,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
     public PA drawNewPlannedAction() {
         Preconditions.checkState(isReady(), "Did not start the deploy generator yet!");
         return
-            turnSeatilePickedIntoAction(
+            turnSeaTilePickedIntoAction(
                 howMuchWeCanFishOutGenerator,
                 drawNewLocation(),
                 additionalWaitTime,
@@ -60,7 +60,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
             );
     }
 
-    abstract public PA turnSeatilePickedIntoAction(
+    abstract public PA turnSeaTilePickedIntoAction(
         CatchSampler<B> howMuchWeCanFishOutGenerator,
         SeaTile tile,
         double additionalWaitTime,
@@ -74,7 +74,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
 
         private final int rangeInSeaTiles;
 
-        public DolphinActionGenerator(
+        DolphinActionGenerator(
             final DolphinSetLocationValues originalLocationValues,
             final NauticalMap map,
             final MersenneTwisterFast random,
@@ -99,7 +99,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
         }
 
         @Override
-        public PlannedAction.DolphinSet<B> turnSeatilePickedIntoAction(
+        public PlannedAction.DolphinSet<B> turnSeaTilePickedIntoAction(
             final CatchSampler<B> howMuchWeCanFishOutGenerator,
             final SeaTile tile,
             final double additionalWaitTime,
@@ -126,7 +126,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
 
         private final int rangeInSeaTiles;
 
-        public NonAssociatedActionGenerator(
+        NonAssociatedActionGenerator(
             final NonAssociatedSetLocationValues originalLocationValues,
             final NauticalMap map,
             final MersenneTwisterFast random,
@@ -153,7 +153,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
         }
 
         @Override
-        public PlannedAction.NonAssociatedSet<B> turnSeatilePickedIntoAction(
+        public PlannedAction.NonAssociatedSet<B> turnSeaTilePickedIntoAction(
             final CatchSampler<B> howMuchWeCanFishOutGenerator,
             final SeaTile tile,
             final double additionalWaitTime,
