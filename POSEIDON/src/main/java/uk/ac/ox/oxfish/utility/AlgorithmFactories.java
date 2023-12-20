@@ -70,6 +70,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.regulations.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.CappedLocationValuesFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValueByActionClass;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
@@ -209,7 +212,6 @@ public class AlgorithmFactories {
                 entry(SurplusProductionDepletionFormulaController.class, "Schaefer Assessment Formula Controller"),
                 entry(SimpleFishSamplerFactory.class, "Simple Fisher Sampler"),
                 entry(ScheduledBiomassProcessesFactory.class, "Scheduled Biomass Processes"),
-                entry(BiomassRestorerFactory.class, "Biomass Restorer"),
                 entry(ExogenousFadMakerCSVFactory.class, "Exogenous Fad Maker CSV"),
                 entry(FadDemoFactory.class, "Fad Demo"),
                 entry(ExogenousFadSetterCSVFactory.class, "Exogenous Fad Setter CSV"),
@@ -857,6 +859,11 @@ public class AlgorithmFactories {
         addFactories(new Factories<>(
             ParameterTable.class,
             FixedParameterTableFromFile.class
+        ));
+        addFactories(new Factories<>(
+            LocationValueByActionClass.class,
+            LocationValuesFactory.class,
+            CappedLocationValuesFactory.class
         ));
     }
 

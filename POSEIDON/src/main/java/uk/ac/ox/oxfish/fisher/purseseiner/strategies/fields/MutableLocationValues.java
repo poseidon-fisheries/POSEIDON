@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 import static uk.ac.ox.oxfish.model.StepOrder.POLICY_UPDATE;
@@ -40,7 +41,6 @@ public abstract class MutableLocationValues<A>
     extends PurseSeinerActionObserver<A>
     implements LocationValues, Steppable {
 
-    private static final int MAXIMUM_NUMBER_OF_VALUES = 50;
     private static final long serialVersionUID = 8981125814239200579L;
 
     private final Function<? super Fisher, ? extends Map<Int2D, Double>> valueLoader;
@@ -89,15 +89,12 @@ public abstract class MutableLocationValues<A>
     @Override
     public void step(final SimState simState) {
 
-        if (values.size() > MAXIMUM_NUMBER_OF_VALUES) {
-            // when reaching the limit, forget all the values that are below average
-            values.values().stream().mapToDouble(Double::doubleValue).average().ifPresent(average ->
-                values.entrySet().removeIf(entry -> entry.getValue() < average)
-            );
-        }
-
         // apply exponential decay
         values.replaceAll((location, value) -> value * (1 - decayRate));
+    }
+
+    public void removeIf(final Predicate<? super Entry<Int2D, Double>> predicate) {
+        values.entrySet().removeIf(predicate);
     }
 
     public boolean hasStarted() {

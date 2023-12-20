@@ -49,7 +49,8 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * $ a stolen fad needs to have accumulated before we even try to target it
      */
     private DoubleParameter minimumValueOpportunisticFadSets =
-        new FixedDoubleParameter(0); // fixing at zero to disable for now; was 18135.37 (based on 10t of SKJ at 2017 price)
+        new FixedDoubleParameter(0);
+        // fixing at zero to disable for now; was 18135.37 (based on 10t of SKJ at 2017 price)
     /**
      * To probability of finding another vessel's FAD when you search for some.
      */
@@ -163,7 +164,6 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     @Override
     public PlannedStrategyProxy apply(final FishState state) {
 
-
         final MersenneTwisterFast rng = state.getRandom();
         final PlannedStrategyProxy proxy = new PlannedStrategyProxy(
             uniqueCatchSamplerForEachStrategy.getValue()
@@ -189,7 +189,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             (int) noaSetsRangeInSeatiles.applyAsDouble(rng),
             (int) delSetsRangeInSeatiles.applyAsDouble(rng),
             fadModule,
-            locationValuesFactory.apply(state)
+            locationValuesFactory.apply(state).asMap()
         );
 
         return proxy;
@@ -202,7 +202,6 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     public void setCatchSamplers(final CatchSamplersFactory<? extends LocalBiology> catchSamplers) {
         this.catchSamplers = catchSamplers;
     }
-
 
     public DoubleParameter getAdditionalHourlyDelayDolphinSets() {
         return additionalHourlyDelayDolphinSets;
@@ -227,7 +226,6 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     public void setAdditionalHourlyDelayNonAssociatedSets(final DoubleParameter additionalHourlyDelayNonAssociatedSets) {
         this.additionalHourlyDelayNonAssociatedSets = additionalHourlyDelayNonAssociatedSets;
     }
-
 
     public DoubleParameter getHoursWastedOnFailedSearches() {
         return hoursWastedOnFailedSearches;
@@ -308,7 +306,6 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     public void setOfsBias(final DoubleParameter ofsBias) {
         this.ofsBias = ofsBias;
     }
-
 
     public DoubleParameter getDelSetsRangeInSeatiles() {
         return delSetsRangeInSeatiles;

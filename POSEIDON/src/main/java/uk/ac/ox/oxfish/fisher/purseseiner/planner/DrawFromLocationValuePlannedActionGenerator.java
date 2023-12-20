@@ -33,7 +33,7 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
     // we can avoid ton of waste by not instantiating this every step and only
     // when there is a change in the location value deployment
     // but unfortunately it requires a bit of work with a specialized listener
-    private EnumeratedDistribution<SeaTile> seatilePicker;
+    private EnumeratedDistribution<SeaTile> seaTilePicker;
 
     DrawFromLocationValuePlannedActionGenerator(
         final SetLocationValues<?> originalLocationValues,
@@ -42,7 +42,7 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
     ) {
         this.originalLocationValues = originalLocationValues;
         this.map = map;
-        localRng = new MTFApache(random);
+        this.localRng = new MTFApache(random);
     }
 
     public void start() {
@@ -79,7 +79,7 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
                 }
                 valuePairs = valuePairsNew;
             }
-            seatilePicker = new EnumeratedDistribution<>(
+            seaTilePicker = new EnumeratedDistribution<>(
                 localRng,
                 valuePairs
             );
@@ -99,11 +99,11 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
                 )
             );
         } else
-            return seatilePicker.sample();
+            return seaTilePicker.sample();
     }
 
     public boolean isReady() {
-        return seatilePicker != null || originalLocationValues.getValues().isEmpty();
+        return seaTilePicker != null || originalLocationValues.getValues().isEmpty();
     }
 
 }

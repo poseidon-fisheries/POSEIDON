@@ -26,13 +26,14 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.CappedLocationValuesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.geography.fads.CompressedBiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 /**
  * The biomass-based IATTC tuna simulation scenario.
@@ -80,13 +81,14 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
                     getInputFolder().path("action_weights.csv"),
                     getInputFolder().path("vessels.csv"),
                     new AttractionFieldsFactory(
-                        new LocationValuesFactory(
+                        new CappedLocationValuesFactory(
                             getInputFolder().path("location_values.csv"),
                             new CalibratedParameter(0, 0.1, 0, 1, 0.01),
                             new CalibratedParameter(0, 0.1, 0, 1, 0.01),
                             new CalibratedParameter(0, 0.1, 0, 1, 0.01),
                             new CalibratedParameter(0, 0.1, 0, 1, 0.01),
-                            getTargetYear()
+                            getTargetYear(),
+                            new IntegerParameter(50)
                         ),
                         getInputFolder().path("max_current_speeds.csv"),
                         getTargetYear()

@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.function.DoubleUnaryOperator;
 
@@ -47,6 +46,7 @@ public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionF
     private double actionDistanceExponent = 10;
     private double destinationDistanceExponent = 2;
 
+    @SuppressWarnings("unused")
     public AttractionFieldsFactory() {
     }
 
@@ -72,93 +72,128 @@ public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionF
         return locationValuesFactory;
     }
 
+    @SuppressWarnings("unused")
     public void setLocationValuesSupplier(final LocationValuesFactory locationValuesFactory) {
         this.locationValuesFactory = locationValuesFactory;
     }
 
+    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends DoubleUnaryOperator> getPctHoldSpaceLeftModulationFunction() {
         return pctHoldSpaceLeftModulationFunction;
     }
 
+    @SuppressWarnings("unused")
     public void setPctHoldSpaceLeftModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> pctHoldSpaceLeftModulationFunction) {
         this.pctHoldSpaceLeftModulationFunction = pctHoldSpaceLeftModulationFunction;
     }
 
+    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends DoubleUnaryOperator> getPctSetsRemainingModulationFunction() {
         return pctSetsRemainingModulationFunction;
     }
 
+    @SuppressWarnings("unused")
     public void setPctSetsRemainingModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> pctSetsRemainingModulationFunction) {
         this.pctSetsRemainingModulationFunction = pctSetsRemainingModulationFunction;
     }
 
+    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends DoubleUnaryOperator> getNumFadsInStockModulationFunction() {
         return numFadsInStockModulationFunction;
     }
 
+    @SuppressWarnings("unused")
     public void setNumFadsInStockModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> numFadsInStockModulationFunction) {
         this.numFadsInStockModulationFunction = numFadsInStockModulationFunction;
     }
 
+    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends DoubleUnaryOperator> getFadDeploymentPctActiveFadsLimitModulationFunction() {
         return fadDeploymentPctActiveFadsLimitModulationFunction;
     }
 
-    public void setFadDeploymentPctActiveFadsLimitModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> fadDeploymentPctActiveFadsLimitModulationFunction) {
+    @SuppressWarnings("unused")
+    public void setFadDeploymentPctActiveFadsLimitModulationFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> fadDeploymentPctActiveFadsLimitModulationFunction
+    ) {
         this.fadDeploymentPctActiveFadsLimitModulationFunction = fadDeploymentPctActiveFadsLimitModulationFunction;
     }
 
+    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends DoubleUnaryOperator> getPctTravelTimeLeftModulationFunction() {
         return pctTravelTimeLeftModulationFunction;
     }
 
+    @SuppressWarnings("unused")
     public void setPctTravelTimeLeftModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> pctTravelTimeLeftModulationFunction) {
         this.pctTravelTimeLeftModulationFunction = pctTravelTimeLeftModulationFunction;
     }
 
+    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends DoubleUnaryOperator> getOpportunisticFadSetTimeSinceLastVisitModulationFunction() {
         return opportunisticFadSetTimeSinceLastVisitModulationFunction;
     }
 
-    public void setOpportunisticFadSetTimeSinceLastVisitModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> opportunisticFadSetTimeSinceLastVisitModulationFunction) {
-        this.opportunisticFadSetTimeSinceLastVisitModulationFunction = opportunisticFadSetTimeSinceLastVisitModulationFunction;
+    @SuppressWarnings("unused")
+    public void setOpportunisticFadSetTimeSinceLastVisitModulationFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> opportunisticFadSetTimeSinceLastVisitModulationFunction
+    ) {
+        this.opportunisticFadSetTimeSinceLastVisitModulationFunction =
+            opportunisticFadSetTimeSinceLastVisitModulationFunction;
     }
 
+    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends DoubleUnaryOperator> getNonAssociatedSetTimeSinceLastVisitModulationFunction() {
         return nonAssociatedSetTimeSinceLastVisitModulationFunction;
     }
 
-    public void setNonAssociatedSetTimeSinceLastVisitModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> nonAssociatedSetTimeSinceLastVisitModulationFunction) {
-        this.nonAssociatedSetTimeSinceLastVisitModulationFunction = nonAssociatedSetTimeSinceLastVisitModulationFunction;
+    @SuppressWarnings("unused")
+    public void setNonAssociatedSetTimeSinceLastVisitModulationFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> nonAssociatedSetTimeSinceLastVisitModulationFunction
+    ) {
+        this.nonAssociatedSetTimeSinceLastVisitModulationFunction =
+            nonAssociatedSetTimeSinceLastVisitModulationFunction;
     }
 
+    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends DoubleUnaryOperator> getDolphinSetTimeSinceLastVisitModulationFunction() {
         return dolphinSetTimeSinceLastVisitModulationFunction;
     }
 
-    public void setDolphinSetTimeSinceLastVisitModulationFunction(final AlgorithmFactory<? extends DoubleUnaryOperator> dolphinSetTimeSinceLastVisitModulationFunction) {
+    @SuppressWarnings("unused")
+    public void setDolphinSetTimeSinceLastVisitModulationFunction(
+        final AlgorithmFactory<?
+            extends DoubleUnaryOperator> dolphinSetTimeSinceLastVisitModulationFunction
+    ) {
         this.dolphinSetTimeSinceLastVisitModulationFunction = dolphinSetTimeSinceLastVisitModulationFunction;
     }
 
+    @SuppressWarnings("unused")
     public double getActionDistanceExponent() {
         return actionDistanceExponent;
     }
 
+    @SuppressWarnings("unused")
     public void setActionDistanceExponent(final double actionDistanceExponent) {
         this.actionDistanceExponent = actionDistanceExponent;
     }
 
+    @SuppressWarnings("unused")
     public double getDestinationDistanceExponent() {
         return destinationDistanceExponent;
     }
 
+    @SuppressWarnings("unused")
     public void setDestinationDistanceExponent(final double destinationDistanceExponent) {
         this.destinationDistanceExponent = destinationDistanceExponent;
     }
 
     @Override
     public Set<AttractionField> apply(final FishState fishState) {
-        final Map<Class<? extends PurseSeinerAction>, LocationValues> locationValues =
+        final LocationValueByActionClass locationValues =
             locationValuesFactory.apply(fishState);
         final PurseSeinerActionClassToDouble maxCurrentSpeed =
             PurseSeinerActionClassToDouble.fromFile(
@@ -247,10 +282,12 @@ public class AttractionFieldsFactory implements AlgorithmFactory<Set<AttractionF
             .build();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public InputPath getMaxCurrentSpeedsFile() {
         return maxCurrentSpeedsFile;
     }
 
+    @SuppressWarnings("unused")
     public void setMaxCurrentSpeedsFile(final InputPath maxCurrentSpeedsFile) {
         this.maxCurrentSpeedsFile = maxCurrentSpeedsFile;
     }

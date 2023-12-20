@@ -14,8 +14,7 @@ import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.util.Map;
 
-public class LocationValuesFactory
-    implements AlgorithmFactory<Map<Class<? extends PurseSeinerAction>, LocationValues>> {
+public class LocationValuesFactory implements AlgorithmFactory<LocationValueByActionClass> {
     private static final LocationFisherValuesByActionCache locationValuesCache =
         new LocationFisherValuesByActionCache();
     private InputPath locationValuesFile;
@@ -63,41 +62,43 @@ public class LocationValuesFactory
     }
 
     @Override
-    public Map<Class<? extends PurseSeinerAction>, LocationValues> apply(final FishState fishState) {
+    public LocationValueByActionClass apply(final FishState fishState) {
         final MersenneTwisterFast rng = fishState.getRandom();
-        return ImmutableMap.<Class<? extends PurseSeinerAction>, LocationValues>builder()
-            .put(
-                FadSetAction.class,
-                new FadLocationValues()
-            )
-            .put(
-                OpportunisticFadSetAction.class,
-                new OpportunisticFadSetLocationValues(
-                    fisher -> loadLocationValues(fisher, OpportunisticFadSetAction.class),
-                    getDecayRateOfOpportunisticFadSetLocationValues().applyAsDouble(rng)
+        return new LocationValueByActionClass(
+            ImmutableMap.<Class<? extends PurseSeinerAction>, LocationValues>builder()
+                .put(
+                    FadSetAction.class,
+                    new FadLocationValues()
                 )
-            )
-            .put(
-                NonAssociatedSetAction.class,
-                new NonAssociatedSetLocationValues(
-                    fisher -> loadLocationValues(fisher, NonAssociatedSetAction.class),
-                    getDecayRateOfNonAssociatedSetLocationValues().applyAsDouble(rng)
+                .put(
+                    OpportunisticFadSetAction.class,
+                    new OpportunisticFadSetLocationValues(
+                        fisher -> loadLocationValues(fisher, OpportunisticFadSetAction.class),
+                        getDecayRateOfOpportunisticFadSetLocationValues().applyAsDouble(rng)
+                    )
                 )
-            ).put(
-                DolphinSetAction.class,
-                new DolphinSetLocationValues(
-                    fisher -> loadLocationValues(fisher, DolphinSetAction.class),
-                    getDecayRateOfDolphinSetLocationValues().applyAsDouble(rng)
+                .put(
+                    NonAssociatedSetAction.class,
+                    new NonAssociatedSetLocationValues(
+                        fisher -> loadLocationValues(fisher, NonAssociatedSetAction.class),
+                        getDecayRateOfNonAssociatedSetLocationValues().applyAsDouble(rng)
+                    )
+                ).put(
+                    DolphinSetAction.class,
+                    new DolphinSetLocationValues(
+                        fisher -> loadLocationValues(fisher, DolphinSetAction.class),
+                        getDecayRateOfDolphinSetLocationValues().applyAsDouble(rng)
+                    )
                 )
-            )
-            .put(
-                FadDeploymentAction.class,
-                new DeploymentLocationValues(
-                    fisher -> loadLocationValues(fisher, FadDeploymentAction.class),
-                    getDecayRateOfDeploymentLocationValues().applyAsDouble(rng)
+                .put(
+                    FadDeploymentAction.class,
+                    new DeploymentLocationValues(
+                        fisher -> loadLocationValues(fisher, FadDeploymentAction.class),
+                        getDecayRateOfDeploymentLocationValues().applyAsDouble(rng)
+                    )
                 )
-            )
-            .build();
+                .build()
+        );
     }
 
     private Map<Int2D, Double> loadLocationValues(
