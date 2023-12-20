@@ -17,9 +17,9 @@ public class FrontalIndexMapFactory extends EnvironmentalMapFactory {
             "FrontalIndex",
             gridFile,
             new IntegerParameter(mapPeriod),
-            new CalibratedParameter(0, 2, 0, 3), //target
-            new CalibratedParameter(1, 3, 0, 5, 2), //penalty
-            new CalibratedParameter(0, 2, 0, 2) //margin
+            new CalibratedParameter(0, 2, 0, 3), // target
+            new CalibratedParameter(0, 1, 0, 1), // penalty
+            new CalibratedParameter(0, 2, 0, 2) // margin
         );
     }
 

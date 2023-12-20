@@ -6,6 +6,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.Map;
 import java.util.function.Function;
 
+import static java.lang.Math.*;
+
 public class EnvironmentalPenaltyFunctionFactory extends EnvironmentalFunctionFactory<Double> {
 
     public EnvironmentalPenaltyFunctionFactory() {
@@ -39,12 +41,16 @@ public class EnvironmentalPenaltyFunctionFactory extends EnvironmentalFunctionFa
                     .get(mapName)
                     .get()
                     .get(seaTile.getGridX(), seaTile.getGridY());
-            return Math.pow(Math.min(1d, margin / Math.abs(target-valueHere) ), penalty);
+            final double valueDifference = abs(valueHere - target) - margin;
+            return (valueDifference > 0) ? 1 / pow(1 + (-valueDifference * log(1 - penalty)), 4) : 1;
         };
     }
 
     @Override
-    Double accumulator(final Double a, final Double b) {
+    Double accumulator(
+        final Double a,
+        final Double b
+    ) {
         return a * b;
     }
 
