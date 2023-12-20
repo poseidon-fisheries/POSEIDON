@@ -63,7 +63,7 @@ public class WeibullPerSpeciesCarryingCapacitiesFactory
             return new ScaledDoubleParameter(
                 new ZeroInflatedDoubleParameter(
                     new WeibullDoubleParameter(
-                        getScaleParameters().get(speciesName).applyAsDouble(rng) *
+                        getShapeParameters().get(speciesName).applyAsDouble(rng) *
                             getShapeScalingFactor().applyAsDouble(rng),
                         getScaleParameters().get(speciesName).applyAsDouble(rng)
                     ),
