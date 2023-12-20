@@ -21,18 +21,24 @@ package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.model.FisherStartable;
+import uk.ac.ox.oxfish.model.data.monitors.observers.Observers;
 
 import java.util.Map.Entry;
 import java.util.Set;
 
 public interface LocationValues extends FisherStartable {
 
-    default double getValueAt(int gridX, int gridY) {
+    default double getValueAt(
+        final int gridX,
+        final int gridY
+    ) {
         return getValueAt(new Int2D(gridX, gridY));
     }
 
     double getValueAt(Int2D location);
 
     Set<Entry<Int2D, Double>> getValues();
+
+    Observers getObservers();
 
 }

@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 
 /**
@@ -17,7 +17,7 @@ public class DeploymentPlannedActionGenerator
     private final double delayInHoursAfterADeployment;
 
     public DeploymentPlannedActionGenerator(
-        final DeploymentLocationValues originalLocationValues,
+        final LocationValues originalLocationValues,
         final NauticalMap map,
         final MersenneTwisterFast random
     ) {
@@ -25,7 +25,7 @@ public class DeploymentPlannedActionGenerator
     }
 
     DeploymentPlannedActionGenerator(
-        final DeploymentLocationValues originalLocationValues,
+        final LocationValues originalLocationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
         final double delayInHoursAfterADeployment

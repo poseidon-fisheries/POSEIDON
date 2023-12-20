@@ -4,12 +4,9 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DolphinSetLocationValues;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.NonAssociatedSetLocationValues;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.SetLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -29,7 +26,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
     private final Class<B> localBiologyClass;
 
     CatchSamplerPlannedActionGenerator(
-        final SetLocationValues<? extends AbstractSetAction> originalLocationValues,
+        final LocationValues originalLocationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
         final double additionalWaitTime,
@@ -75,7 +72,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
         private final int rangeInSeaTiles;
 
         DolphinActionGenerator(
-            final DolphinSetLocationValues originalLocationValues,
+            final LocationValues originalLocationValues,
             final NauticalMap map,
             final MersenneTwisterFast random,
             final double additionalWaitTime,
@@ -127,7 +124,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
         private final int rangeInSeaTiles;
 
         NonAssociatedActionGenerator(
-            final NonAssociatedSetLocationValues originalLocationValues,
+            final LocationValues originalLocationValues,
             final NauticalMap map,
             final MersenneTwisterFast random,
             final double additionalWaitTime,

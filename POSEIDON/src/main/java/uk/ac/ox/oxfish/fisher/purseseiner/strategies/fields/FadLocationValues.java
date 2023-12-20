@@ -35,7 +35,7 @@ import static java.util.stream.Collectors.summingDouble;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
-public class FadLocationValues implements LocationValues {
+public class FadLocationValues extends ObservableLocationValues {
 
     private Fisher fisher;
 
@@ -57,7 +57,7 @@ public class FadLocationValues implements LocationValues {
         final double[] prices = fisher.getHomePort().getMarketMap(fisher).getPrices();
         final FadMap fadMap = fadManager.getFadMap();
 
-        //noinspection UnstableApiUsage
+        // noinspection UnstableApiUsage
         return getFadManager(fisher)
             .getDeployedFads()
             .stream()
@@ -73,7 +73,10 @@ public class FadLocationValues implements LocationValues {
     }
 
     @Override
-    public void start(final FishState model, final Fisher fisher) {
+    public void start(
+        final FishState model,
+        final Fisher fisher
+    ) {
         this.fisher = fisher;
     }
 

@@ -70,9 +70,10 @@ import uk.ac.ox.oxfish.fisher.purseseiner.regulations.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.CappedLocationValuesFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.CappedMutableLocationValuesFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.FixedLocationValuesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValueByActionClass;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.MutableLocationValuesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerBiomassFishingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
@@ -862,8 +863,9 @@ public class AlgorithmFactories {
         ));
         addFactories(new Factories<>(
             LocationValueByActionClass.class,
-            LocationValuesFactory.class,
-            CappedLocationValuesFactory.class
+            FixedLocationValuesFactory.class,
+            MutableLocationValuesFactory.class,
+            CappedMutableLocationValuesFactory.class
         ));
     }
 

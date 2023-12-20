@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DeploymentLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -38,7 +38,7 @@ public class DeploymentFromLocationValuePlanningModule
     extends LocationValuePlanningModule {
 
     public DeploymentFromLocationValuePlanningModule(
-        final DeploymentLocationValues locationValues,
+        final LocationValues locationValues,
         final NauticalMap map,
         final MersenneTwisterFast random
     ) {
@@ -49,7 +49,7 @@ public class DeploymentFromLocationValuePlanningModule
 
     @SuppressWarnings("unchecked")
     public DeploymentFromLocationValuePlanningModule(
-        final DeploymentLocationValues locationValues,
+        final LocationValues locationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
         final double delayInHoursAfterADeployment
@@ -64,17 +64,18 @@ public class DeploymentFromLocationValuePlanningModule
     }
 
     /**
-     * returns the minimum between
-     * (i) number of FADs in stock
-     * (ii) number of active fads we can still deploy
-     * (iii) number of allowed deploys this year
+     * returns the minimum between (i) number of FADs in stock (ii) number of active fads we can still deploy (iii)
+     * number of allowed deploys this year
      *
      * @param state
      * @param fisher
      * @return
      */
     @Override
-    public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
+    public int maximumActionsInAPlan(
+        final FishState state,
+        final Fisher fisher
+    ) {
         final FadManager fadManager = getFadManager(fisher);
         return fadManager.numberOfPermissibleActions(
             DPL,

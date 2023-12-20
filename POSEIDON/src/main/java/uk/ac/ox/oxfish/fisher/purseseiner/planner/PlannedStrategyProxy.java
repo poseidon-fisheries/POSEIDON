@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplers;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -25,15 +25,13 @@ import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
 /**
- * an issue with Fad related strategies is that ideally you are supposed to have strategies
- * who don't have fisher specific parameters until start(..) is called but because a lot of files
- * are read when the factory is called you get files with fisher specific parameters fed into
- * strategies that do not know who their fisher is. <br>
- * You can solve this by having strategies that depend on some form of loader/builder design
- * pattern, but that makes testing them quite a roundabout factor and makes them impossible to use
- * in the non-FAD scenarios. <br>
- * Here what we do is simply creating a proxy; this decorates a plannedstrategy but manages its
- * life cycle so that everything is loaded from files only when start is called
+ * an issue with Fad related strategies is that ideally you are supposed to have strategies who don't have fisher
+ * specific parameters until start(..) is called but because a lot of files are read when the factory is called you get
+ * files with fisher specific parameters fed into strategies that do not know who their fisher is. <br> You can solve
+ * this by having strategies that depend on some form of loader/builder design pattern, but that makes testing them
+ * quite a roundabout factor and makes them impossible to use in the non-FAD scenarios. <br> Here what we do is simply
+ * creating a proxy; this decorates a plannedstrategy but manages its life cycle so that everything is loaded from files
+ * only when start is called
  */
 @SuppressWarnings("unchecked")
 public class PlannedStrategyProxy implements FishingStrategy, DestinationStrategy {
@@ -70,8 +68,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      */
     private final double ownFadActionWeightBias;
     /**
-     * a multiplier to the DPL actions weight (makes it more or less common than what the data may suggest)
-     * removed deployment bias, added bias for del and ofs
+     * a multiplier to the DPL actions weight (makes it more or less common than what the data may suggest) removed
+     * deployment bias, added bias for del and ofs
      */
     private final double deploymentBias;
     /**
@@ -87,8 +85,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      */
     private final double opportunisticBias;
     /**
-     * $ a fad needs to have accumulated before we even try to target it when stealing in
-     * an area
+     * $ a fad needs to have accumulated before we even try to target it when stealing in an area
      */
     private final double minimumValueOpportunisticFadSets;
 
@@ -106,7 +103,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      */
     private final double planningHorizonInHours;
     /**
-     * the trip duration will be uniformly distributed between data max_trip_duration and max_trip_duration * this parameter (which is expected to be less or = 1)
+     * the trip duration will be uniformly distributed between data max_trip_duration and max_trip_duration * this
+     * parameter (which is expected to be less or = 1)
      */
     private final double minimumPercentageOfTripDurationAllowed;
     /**
@@ -114,9 +112,9 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      */
     private final boolean noaSetsCanPoachFads;
     /**
-     * when this is set to true you cannot put an action in the plan if it looks illegal now.
-     * When this is not true, illegal actions stay in the plan until it's time to execute them. If they didn't become legal
-     * then, they will trigger a replan
+     * when this is set to true you cannot put an action in the plan if it looks illegal now. When this is not true,
+     * illegal actions stay in the plan until it's time to execute them. If they didn't become legal then, they will
+     * trigger a replan
      */
     private final boolean doNotWaitToPurgeIllegalActions;
     /**
@@ -132,7 +130,6 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
 
     private final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadPlanningModule;
     private PlannedStrategy delegate;
-
 
     public PlannedStrategyProxy(
         final CatchSamplers<? extends LocalBiology> catchSamplers,
@@ -186,7 +183,10 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
 
     @SuppressWarnings("rawtypes")
     @Override
-    public void start(final FishState model, final Fisher fisher) {
+    public void start(
+        final FishState model,
+        final Fisher fisher
+    ) {
         Preconditions.checkState(delegate == null, "Already started!");
         final Map<ActionType, Double> plannableActionWeights = new HashMap<>();
         final HashMap<ActionType, PlanningModule> planModules = new HashMap<>();
@@ -202,16 +202,17 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         //(1) build planners
         final Map<Class<? extends PurseSeinerAction>, Double> fileAttractionWeights =
             attractionWeightsPerFisher.apply(fisher);
-        for (final Map.Entry<Class<? extends PurseSeinerAction>, Double> actionWeight : fileAttractionWeights.entrySet()) {
+        for (final Map.Entry<Class<? extends PurseSeinerAction>, Double> actionWeight :
+            fileAttractionWeights.entrySet()) {
             if (actionWeight.getValue() <= 0)
                 continue;
-            //big elif; this could have easily been cleaned up a bit with some
-            //common factory method, but it works for now
-            //DEL
+            // big elif; this could have easily been cleaned up a bit with some
+            // common factory method, but it works for now
+            // DEL
             if (actionWeight.getKey().equals(DolphinSetAction.class)) {
-                //add
-                final DolphinSetLocationValues locations =
-                    (DolphinSetLocationValues) locationValues.get(DolphinSetAction.class);
+                // add
+                final LocationValues locations =
+                    locationValues.get(DolphinSetAction.class);
                 if (locations.getValues().isEmpty())
                     System.out.println(fisher + " failed to create DEL location values, in spite of having" +
                         "a weight of " + actionWeight.getValue());
@@ -233,11 +234,11 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                     )
                 );
             }
-            //DPL
+            // DPL
             else if (actionWeight.getKey().equals(FadDeploymentAction.class)) {
 
-                final DeploymentLocationValues locations =
-                    (DeploymentLocationValues) locationValues.get(FadDeploymentAction.class);
+                final LocationValues locations =
+                    locationValues.get(FadDeploymentAction.class);
                 if (locations.getValues().isEmpty())
                     System.out.println(fisher + " failed to create DPL location values, in spite of having" +
                         "a weight of " + actionWeight.getValue());
@@ -255,11 +256,11 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                     )
                 );
             }
-            //NOA
+            // NOA
             else if (actionWeight.getKey().equals(NonAssociatedSetAction.class)) {
 
-                final NonAssociatedSetLocationValues locations =
-                    (NonAssociatedSetLocationValues) locationValues.get(NonAssociatedSetAction.class);
+                final LocationValues locations =
+                    locationValues.get(NonAssociatedSetAction.class);
                 plannableActionWeights.put(
                     ActionType.NonAssociatedSets,
                     actionWeight.getValue() * nonAssociatedBias / (1 - nonAssociatedBias)
@@ -280,7 +281,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                     )
                 );
             }
-            //FAD
+            // FAD
             else if (actionWeight.getKey().equals(FadSetAction.class)) {
                 plannableActionWeights.put(
                     ActionType.SetOwnFadAction,
@@ -291,11 +292,11 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                     fadPlanningModule.apply(model)
                 );
             }
-            //OFS
+            // OFS
             else if (actionWeight.getKey().equals(OpportunisticFadSetAction.class)) {
-                //add
-                final OpportunisticFadSetLocationValues locations =
-                    (OpportunisticFadSetLocationValues) locationValues.get(OpportunisticFadSetAction.class);
+                // add
+                final LocationValues locations =
+                    locationValues.get(OpportunisticFadSetAction.class);
                 if (locations.getValues().isEmpty()) {
                     System.out.println(fisher + " failed to create OFS location values, in spite of having" +
                         "a weight of " + actionWeight.getValue());
@@ -372,6 +373,5 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
     ) {
         return delegate.shouldFish(fisher, random, model, currentTrip);
     }
-
 
 }

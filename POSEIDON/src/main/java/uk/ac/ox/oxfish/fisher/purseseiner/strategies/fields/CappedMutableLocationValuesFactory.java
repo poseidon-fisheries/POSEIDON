@@ -9,11 +9,11 @@ import java.util.Map.Entry;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
-public class CappedLocationValuesFactory extends LocationValuesFactory {
+public class CappedMutableLocationValuesFactory extends MutableLocationValuesFactory {
 
     private IntegerParameter maximumNumberOfLocationValues;
 
-    public CappedLocationValuesFactory(
+    public CappedMutableLocationValuesFactory(
         final InputPath locationValuesFile,
         final DoubleParameter decayRateOfOpportunisticFadSetLocationValues,
         final DoubleParameter decayRateOfNonAssociatedSetLocationValues,
@@ -34,7 +34,7 @@ public class CappedLocationValuesFactory extends LocationValuesFactory {
     }
 
     @SuppressWarnings("unused")
-    public CappedLocationValuesFactory() {
+    public CappedMutableLocationValuesFactory() {
     }
 
     @SuppressWarnings("unused")

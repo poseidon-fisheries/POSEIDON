@@ -1,11 +1,9 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.SetLocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.MTFApache;
@@ -31,11 +29,11 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
      * here I use Nic's object on location values to use the whole reading toolchain; in practice however all we need
      * here is a mapping coords --> weight
      */
-    private final SetLocationValues<?> originalLocationValues;
+    private final LocationValues originalLocationValues;
     private EnumeratedDistribution<SeaTile> seaTilePicker;
 
     DrawFromLocationValuePlannedActionGenerator(
-        final SetLocationValues<?> originalLocationValues,
+        final LocationValues originalLocationValues,
         final NauticalMap map,
         final MersenneTwisterFast random
     ) {
@@ -45,10 +43,6 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
     }
 
     public void start() {
-        Preconditions.checkState(
-            originalLocationValues.hasStarted(),
-            "need to start the location values first!"
-        );
         originalLocationValues.getObservers().register(LocationValues.class, this);
         preparePicker(originalLocationValues);
     }

@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.ValuePerSetPlanningM
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.FixedLocationValuesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
@@ -78,12 +78,8 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                 ),
                 new EPOPlannedStrategyFlexibleFactory(
                     getTargetYear(),
-                    new LocationValuesFactory(
+                    new FixedLocationValuesFactory(
                         getInputFolder().path("location_values.csv"),
-                        new CalibratedParameter(0, 0.5, 0, 1, 0.01),
-                        new CalibratedParameter(0, 0.5, 0, 1, 0.01),
-                        new CalibratedParameter(0, 0.5, 0, 1, 0.01),
-                        new CalibratedParameter(0, 0.5, 0, 1, 0.01),
                         getTargetYear()
                     ),
                     new ValuePerSetPlanningModuleFactory(),

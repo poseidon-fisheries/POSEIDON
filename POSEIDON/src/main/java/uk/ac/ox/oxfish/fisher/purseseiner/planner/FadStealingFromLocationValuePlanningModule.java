@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.OpportunisticFadSetLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -14,7 +14,7 @@ public class FadStealingFromLocationValuePlanningModule<B extends LocalBiology>
     extends LocationValuePlanningModule<B> {
 
     FadStealingFromLocationValuePlanningModule(
-        final OpportunisticFadSetLocationValues locationValues,
+        final LocationValues locationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
         final double hoursItTakesToSet,
@@ -37,7 +37,7 @@ public class FadStealingFromLocationValuePlanningModule<B extends LocalBiology>
     }
 
     private FadStealingFromLocationValuePlanningModule(
-        final OpportunisticFadSetLocationValues locationValues,
+        final LocationValues locationValues,
         final FadStealingPlannedActionGenerator generator
     ) {
         super(locationValues, generator);

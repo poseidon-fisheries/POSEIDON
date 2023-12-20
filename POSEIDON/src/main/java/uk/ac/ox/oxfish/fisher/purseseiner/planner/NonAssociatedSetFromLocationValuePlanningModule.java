@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.NonAssociatedSetLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -16,9 +16,8 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 public class NonAssociatedSetFromLocationValuePlanningModule<B extends LocalBiology>
     extends LocationValuePlanningModule<B> {
 
-    @SuppressWarnings("unchecked")
-    public NonAssociatedSetFromLocationValuePlanningModule(
-        final NonAssociatedSetLocationValues locationValues,
+    NonAssociatedSetFromLocationValuePlanningModule(
+        final LocationValues locationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
         final double additionalWaitTime,
@@ -47,14 +46,17 @@ public class NonAssociatedSetFromLocationValuePlanningModule<B extends LocalBiol
     }
 
     public NonAssociatedSetFromLocationValuePlanningModule(
-        final NonAssociatedSetLocationValues locationValues,
+        final LocationValues locationValues,
         final CatchSamplerPlannedActionGenerator.NonAssociatedActionGenerator<B> generator
     ) {
         super(locationValues, generator);
     }
 
     @Override
-    public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
+    public int maximumActionsInAPlan(
+        final FishState state,
+        final Fisher fisher
+    ) {
         return getFadManager(fisher).numberOfPermissibleActions(
             NOA, 1000,
             state.getRegulations()

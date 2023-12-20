@@ -5,6 +5,7 @@ import sim.engine.Steppable;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.monitors.observers.Observers;
 import uk.ac.ox.oxfish.model.data.monitors.observers.PurseSeinerActionObserver;
 
 import java.util.Map;
@@ -41,6 +42,11 @@ public class CappedLocationValuesDecorator<A>
     @Override
     public Set<Map.Entry<Int2D, Double>> getValues() {
         return delegate.getValues();
+    }
+
+    @Override
+    public Observers getObservers() {
+        return delegate.getObservers();
     }
 
     @Override

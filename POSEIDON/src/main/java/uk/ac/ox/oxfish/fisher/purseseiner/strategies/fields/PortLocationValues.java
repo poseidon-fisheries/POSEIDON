@@ -19,36 +19,46 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.monitors.observers.Observers;
 
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class PortLocationValues implements LocationValues {
 
-    private Entry<Int2D, Double> portLocationValue;
+    private final Observers observers = new Observers();
+    private Map<Int2D, Double> values;
 
     @Override
     public double getValueAt(final Int2D location) {
-        return location.equals(portLocationValue.getKey())
-            ? portLocationValue.getValue()
-            : 0;
+        return checkNotNull(values).getOrDefault(location, 0.0);
     }
 
     @Override
-    public Set<Entry<Int2D, Double>> getValues() {
-        return ImmutableSet.of(portLocationValue);
+    public Set<Map.Entry<Int2D, Double>> getValues() {
+        return values.entrySet();
     }
 
     @Override
-    public void start(final FishState model, final Fisher fisher) {
-        final Int2D portLocation = fisher.getHomePort().getLocation().getGridLocation();
-        portLocationValue = entry(portLocation, 1.0);
+    public Observers getObservers() {
+        return observers;
+    }
+
+    @Override
+    public void start(
+        final FishState model,
+        final Fisher fisher
+    ) {
+        values = ImmutableMap.of(
+            fisher.getHomePort().getLocation().getGridLocation(),
+            1.0
+        );
     }
 
 }

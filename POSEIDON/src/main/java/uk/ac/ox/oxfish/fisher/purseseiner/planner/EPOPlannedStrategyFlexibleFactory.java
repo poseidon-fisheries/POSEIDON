@@ -50,7 +50,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      */
     private DoubleParameter minimumValueOpportunisticFadSets =
         new FixedDoubleParameter(0);
-        // fixing at zero to disable for now; was 18135.37 (based on 10t of SKJ at 2017 price)
+    // fixing at zero to disable for now; was 18135.37 (based on 10t of SKJ at 2017 price)
     /**
      * To probability of finding another vessel's FAD when you search for some.
      */

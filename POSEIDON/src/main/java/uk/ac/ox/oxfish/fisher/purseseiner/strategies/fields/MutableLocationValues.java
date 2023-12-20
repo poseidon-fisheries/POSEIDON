@@ -79,7 +79,7 @@ public abstract class MutableLocationValues<A>
 
     @Override
     public Set<Entry<Int2D, Double>> getValues() {
-        return values.entrySet();
+        return values == null ? null : values.entrySet();
     }
 
     @Override
@@ -101,10 +101,6 @@ public abstract class MutableLocationValues<A>
 
     void removeIf(final Predicate<? super Entry<Int2D, Double>> predicate) {
         values.entrySet().removeIf(predicate);
-    }
-
-    public boolean hasStarted() {
-        return values != null;
     }
 
 }

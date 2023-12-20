@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.DolphinSetLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -16,15 +16,8 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 public class DolphinSetFromLocationValuePlanningModule<B extends LocalBiology>
     extends LocationValuePlanningModule<B> {
 
-    public DolphinSetFromLocationValuePlanningModule(
-        final DolphinSetLocationValues locationValues,
-        final CatchSamplerPlannedActionGenerator.DolphinActionGenerator<B> generator
-    ) {
-        super(locationValues, generator);
-    }
-
-    public DolphinSetFromLocationValuePlanningModule(
-        final DolphinSetLocationValues locationValues,
+    DolphinSetFromLocationValuePlanningModule(
+        final LocationValues locationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
         final double additionalWaitTime,
@@ -51,7 +44,10 @@ public class DolphinSetFromLocationValuePlanningModule<B extends LocalBiology>
     }
 
     @Override
-    public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
+    public int maximumActionsInAPlan(
+        final FishState state,
+        final Fisher fisher
+    ) {
         return getFadManager(fisher).numberOfPermissibleActions(
             DEL, 1000,
             state.getRegulations()

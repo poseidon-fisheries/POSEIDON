@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.SetLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -14,12 +14,12 @@ import uk.ac.ox.oxfish.model.FishState;
 public abstract class LocationValuePlanningModule<B extends LocalBiology>
     implements PlanningModule {
 
-    final private SetLocationValues<?> locationValues;
+    final private LocationValues locationValues;
 
     final private DrawFromLocationValuePlannedActionGenerator<? extends PlannedAction> generator;
 
     public LocationValuePlanningModule(
-        final SetLocationValues<?> locationValues,
+        final LocationValues locationValues,
         final DrawFromLocationValuePlannedActionGenerator<? extends PlannedAction> generator
     ) {
         this.locationValues = locationValues;
@@ -41,12 +41,10 @@ public abstract class LocationValuePlanningModule<B extends LocalBiology>
         final FishState model,
         final Fisher fisher
     ) {
-
         // start the location value if needed; else start the generator
-        if (!locationValues.hasStarted())
+        if (locationValues.getValues() == null)
             locationValues.start(model, fisher);
         generator.start();
-
     }
 
     /**
@@ -57,7 +55,7 @@ public abstract class LocationValuePlanningModule<B extends LocalBiology>
         final FishState state,
         final Fisher fisher
     ) {
-        Preconditions.checkArgument(locationValues.hasStarted());
+        Preconditions.checkState(locationValues.getValues() != null);
         generator.start();
     }
 

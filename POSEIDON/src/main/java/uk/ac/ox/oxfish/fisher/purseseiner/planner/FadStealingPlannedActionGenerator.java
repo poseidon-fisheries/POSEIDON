@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.OpportunisticFadSetLocationValues;
+import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 
 public class FadStealingPlannedActionGenerator extends
@@ -22,7 +22,7 @@ public class FadStealingPlannedActionGenerator extends
     private final double probabilityOfFindingOtherFads;
 
     FadStealingPlannedActionGenerator(
-        final OpportunisticFadSetLocationValues originalLocationValues,
+        final LocationValues originalLocationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
         final double hoursItTakesToSet,

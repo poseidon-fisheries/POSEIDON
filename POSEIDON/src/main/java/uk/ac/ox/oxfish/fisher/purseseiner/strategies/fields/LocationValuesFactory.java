@@ -1,46 +1,31 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields;
 
-import com.google.common.collect.ImmutableMap;
-import ec.util.MersenneTwisterFast;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.PurseSeinerAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.LocationFisherValuesByActionCache;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.util.Map;
 
-public class LocationValuesFactory implements AlgorithmFactory<LocationValueByActionClass> {
+public abstract class LocationValuesFactory implements AlgorithmFactory<LocationValueByActionClass> {
     private static final LocationFisherValuesByActionCache locationValuesCache =
         new LocationFisherValuesByActionCache();
     private InputPath locationValuesFile;
-    private DoubleParameter decayRateOfOpportunisticFadSetLocationValues;
-    private DoubleParameter decayRateOfNonAssociatedSetLocationValues;
-    private DoubleParameter decayRateOfDolphinSetLocationValues;
-    private DoubleParameter decayRateOfDeploymentLocationValues;
     private IntegerParameter targetYear;
+
+    @SuppressWarnings("WeakerAccess")
+    public LocationValuesFactory() {
+    }
 
     public LocationValuesFactory(
         final InputPath locationValuesFile,
-        final DoubleParameter decayRateOfOpportunisticFadSetLocationValues,
-        final DoubleParameter decayRateOfNonAssociatedSetLocationValues,
-        final DoubleParameter decayRateOfDolphinSetLocationValues,
-        final DoubleParameter decayRateOfDeploymentLocationValues,
         final IntegerParameter targetYear
     ) {
         this.locationValuesFile = locationValuesFile;
-        this.decayRateOfOpportunisticFadSetLocationValues = decayRateOfOpportunisticFadSetLocationValues;
-        this.decayRateOfNonAssociatedSetLocationValues = decayRateOfNonAssociatedSetLocationValues;
-        this.decayRateOfDolphinSetLocationValues = decayRateOfDolphinSetLocationValues;
-        this.decayRateOfDeploymentLocationValues = decayRateOfDeploymentLocationValues;
         this.targetYear = targetYear;
-    }
-
-    public LocationValuesFactory() {
     }
 
     public IntegerParameter getTargetYear() {
@@ -61,47 +46,7 @@ public class LocationValuesFactory implements AlgorithmFactory<LocationValueByAc
         this.locationValuesFile = locationValuesFile;
     }
 
-    @Override
-    public LocationValueByActionClass apply(final FishState fishState) {
-        final MersenneTwisterFast rng = fishState.getRandom();
-        return new LocationValueByActionClass(
-            ImmutableMap.<Class<? extends PurseSeinerAction>, LocationValues>builder()
-                .put(
-                    FadSetAction.class,
-                    new FadLocationValues()
-                )
-                .put(
-                    OpportunisticFadSetAction.class,
-                    new OpportunisticFadSetLocationValues(
-                        fisher -> loadLocationValues(fisher, OpportunisticFadSetAction.class),
-                        getDecayRateOfOpportunisticFadSetLocationValues().applyAsDouble(rng)
-                    )
-                )
-                .put(
-                    NonAssociatedSetAction.class,
-                    new NonAssociatedSetLocationValues(
-                        fisher -> loadLocationValues(fisher, NonAssociatedSetAction.class),
-                        getDecayRateOfNonAssociatedSetLocationValues().applyAsDouble(rng)
-                    )
-                ).put(
-                    DolphinSetAction.class,
-                    new DolphinSetLocationValues(
-                        fisher -> loadLocationValues(fisher, DolphinSetAction.class),
-                        getDecayRateOfDolphinSetLocationValues().applyAsDouble(rng)
-                    )
-                )
-                .put(
-                    FadDeploymentAction.class,
-                    new DeploymentLocationValues(
-                        fisher -> loadLocationValues(fisher, FadDeploymentAction.class),
-                        getDecayRateOfDeploymentLocationValues().applyAsDouble(rng)
-                    )
-                )
-                .build()
-        );
-    }
-
-    private Map<Int2D, Double> loadLocationValues(
+    Map<Int2D, Double> loadLocationValues(
         final Fisher fisher,
         final Class<? extends PurseSeinerAction> actionClass
     ) {
@@ -112,37 +57,4 @@ public class LocationValuesFactory implements AlgorithmFactory<LocationValueByAc
             actionClass
         );
     }
-
-    public DoubleParameter getDecayRateOfOpportunisticFadSetLocationValues() {
-        return decayRateOfOpportunisticFadSetLocationValues;
-    }
-
-    public void setDecayRateOfOpportunisticFadSetLocationValues(final DoubleParameter decayRateOfOpportunisticFadSetLocationValues) {
-        this.decayRateOfOpportunisticFadSetLocationValues = decayRateOfOpportunisticFadSetLocationValues;
-    }
-
-    public DoubleParameter getDecayRateOfNonAssociatedSetLocationValues() {
-        return decayRateOfNonAssociatedSetLocationValues;
-    }
-
-    public void setDecayRateOfNonAssociatedSetLocationValues(final DoubleParameter decayRateOfNonAssociatedSetLocationValues) {
-        this.decayRateOfNonAssociatedSetLocationValues = decayRateOfNonAssociatedSetLocationValues;
-    }
-
-    public DoubleParameter getDecayRateOfDolphinSetLocationValues() {
-        return decayRateOfDolphinSetLocationValues;
-    }
-
-    public void setDecayRateOfDolphinSetLocationValues(final DoubleParameter decayRateOfDolphinSetLocationValues) {
-        this.decayRateOfDolphinSetLocationValues = decayRateOfDolphinSetLocationValues;
-    }
-
-    public DoubleParameter getDecayRateOfDeploymentLocationValues() {
-        return decayRateOfDeploymentLocationValues;
-    }
-
-    public void setDecayRateOfDeploymentLocationValues(final DoubleParameter decayRateOfDeploymentLocationValues) {
-        this.decayRateOfDeploymentLocationValues = decayRateOfDeploymentLocationValues;
-    }
-
 }
