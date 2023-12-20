@@ -24,22 +24,24 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ObserversTest {
+class ObserversTest {
 
     @Test
-    public void test() {
-        Observers observers = new Observers();
+    void test() {
+        final Observers observers = new Observers();
         final A a = new A(observers);
         final B b = new B(observers);
-        AtomicInteger count = new AtomicInteger();
+        final AtomicInteger count = new AtomicInteger();
         observers.register(A.class, (A __) -> count.incrementAndGet());
         observers.register(A.class, (O __) -> count.incrementAndGet());
         observers.register(B.class, (B __) -> count.incrementAndGet());
         observers.register(O.class, (O __) -> count.incrementAndGet());
         a.act();
-        Assertions.assertEquals(2, count.get());
-        b.act();
+        // we expect the two A-observers and the O-observer to kick in
         Assertions.assertEquals(3, count.get());
+        b.act();
+        // we expect the B-observer and the O-observer to kick in
+        Assertions.assertEquals(5, count.get());
     }
 
     private static class O {

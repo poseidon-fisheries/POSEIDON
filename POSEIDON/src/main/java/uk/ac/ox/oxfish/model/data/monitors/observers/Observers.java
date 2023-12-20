@@ -24,45 +24,75 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import uk.ac.ox.poseidon.common.api.Observer;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 public class Observers {
 
     private final Multimap<Class<?>, Observer<?>> observers = HashMultimap.create();
 
-    public <T> void register(final Class<T> observedClass, final Observer<? super T> observer) {
+    public <T> void register(
+        final Class<T> observedClass,
+        final Observer<? super T> observer
+    ) {
         this.observers.put(observedClass, observer);
     }
 
+    @SuppressWarnings("unused")
     public void unregister(final Observer<?> observer) {
         // copy the keys to avoid ConcurrentModificationException
         final ImmutableList<Class<?>> observedClasses = ImmutableList.copyOf(observers.keySet());
         observedClasses.forEach(observedClass -> unregister(observedClass, observer));
     }
 
-    public void unregister(final Class<?> observedClass, final Observer<?> observer) {
+    @SuppressWarnings("WeakerAccess")
+    public void unregister(
+        final Class<?> observedClass,
+        final Observer<?> observer
+    ) {
         this.observers.remove(observedClass, observer);
     }
 
     @SuppressWarnings("unchecked")
     public <O> void reactTo(final O observable) {
-        this.observers
-            .get(observable.getClass())
-            .forEach(observer -> ((Observer<O>) observer).observe(observable));
+        reactTo(
+            this.observers
+                .entries()
+                .stream()
+                .filter(entry -> entry.getKey().isInstance(observable))
+                .map(entry -> (Observer<O>) entry.getValue())
+                .collect(Collectors.toList()),
+            observable
+        );
+    }
+
+    public <O> void reactTo(
+        final Iterable<? extends Observer<O>> observers,
+        final O observable
+    ) {
+        observers.forEach(observer -> observer.observe(observable));
     }
 
     /**
-     * This method will only construct the observable if it's class is one we're interested in.
-     * Useful when observable construction is costly.
+     * This method will only construct the observable if it's class is one we're interested in. Useful when observable
+     * construction is costly.
      */
     @SuppressWarnings("unchecked")
-    public <O> void reactTo(final Class<O> observedClass, final Supplier<O> observableSupplier) {
-        final Collection<Observer<?>> relevantObservers = this.observers.get(observedClass);
+    public <O> void reactTo(
+        final Class<O> observedClass,
+        final Supplier<? extends O> observableSupplier
+    ) {
+        final List<Observer<O>> relevantObservers = this.observers
+            .entries()
+            .stream()
+            .filter(entry -> observedClass.isAssignableFrom(entry.getKey()))
+            .map(entry -> (Observer<O>) entry.getValue())
+            .collect(toImmutableList());
         if (!relevantObservers.isEmpty()) {
-            final O observable = observableSupplier.get();
-            relevantObservers.forEach(observer -> ((Observer<O>) observer).observe(observable));
+            reactTo(relevantObservers, observableSupplier.get());
         }
     }
 
