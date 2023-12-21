@@ -3,10 +3,14 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.*;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.ScaledDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.ZeroInflatedDoubleParameter;
 
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
@@ -59,26 +63,32 @@ public class WeibullPerSpeciesCarryingCapacitiesFactory
         final MersenneTwisterFast rng
     ) {
         final String speciesName = species.getName();
-        if (getScaleParameters().containsKey(speciesName) && getShapeParameters().containsKey(speciesName)) {
-            return new ScaledDoubleParameter(
-                new ZeroInflatedDoubleParameter(
-                    new WeibullDoubleParameter(
-                        getShapeParameters().get(speciesName).applyAsDouble(rng) *
-                            getShapeScalingFactor().applyAsDouble(rng),
-                        getScaleParameters().get(speciesName).applyAsDouble(rng)
-                    ),
-                    getProportionOfZeros().get(speciesName).applyAsDouble(rng)
+        final String errorMessageTemplate = "%s parameter not found for species '%s'. Known species are: %s";
+        checkState(
+            getShapeParameters().containsKey(speciesName),
+            errorMessageTemplate,
+            "Shape",
+            speciesName,
+            getShapeParameters().keySet()
+        );
+        checkState(
+            getScaleParameters().containsKey(speciesName),
+            errorMessageTemplate,
+            "Scale",
+            speciesName,
+            getScaleParameters().keySet()
+        );
+        return new ScaledDoubleParameter(
+            new ZeroInflatedDoubleParameter(
+                new WeibullDoubleParameter(
+                    getShapeParameters().get(speciesName).applyAsDouble(rng) *
+                        getShapeScalingFactor().applyAsDouble(rng),
+                    getScaleParameters().get(speciesName).applyAsDouble(rng)
                 ),
-                getCapacityScalingFactor().applyAsDouble(rng)
-            );
-        } else {
-            return new FixedDoubleParameter(-1);
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public Map<String, DoubleParameter> getScaleParameters() {
-        return scaleParameters;
+                getProportionOfZeros().get(speciesName).applyAsDouble(rng)
+            ),
+            getCapacityScalingFactor().applyAsDouble(rng)
+        );
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -86,9 +96,9 @@ public class WeibullPerSpeciesCarryingCapacitiesFactory
         return shapeParameters;
     }
 
-    @SuppressWarnings("unused")
-    public void setShapeParameters(final Map<String, DoubleParameter> shapeParameters) {
-        this.shapeParameters = shapeParameters;
+    @SuppressWarnings("WeakerAccess")
+    public Map<String, DoubleParameter> getScaleParameters() {
+        return scaleParameters;
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -124,5 +134,10 @@ public class WeibullPerSpeciesCarryingCapacitiesFactory
     @SuppressWarnings("unused")
     public void setScaleParameters(final Map<String, DoubleParameter> scaleParameters) {
         this.scaleParameters = scaleParameters;
+    }
+
+    @SuppressWarnings("unused")
+    public void setShapeParameters(final Map<String, DoubleParameter> shapeParameters) {
+        this.shapeParameters = shapeParameters;
     }
 }

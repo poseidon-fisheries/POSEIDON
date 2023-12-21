@@ -7,11 +7,12 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
@@ -50,37 +51,28 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
 
     @Override
     public CarryingCapacityInitializer<PerSpeciesCarryingCapacity> apply(final FishState fishState) {
-
         final List<Record> recordList =
             recordStream(fadCarryingCapacityFile.get())
                 .filter(record -> record.getInt("year") == targetYear.getIntValue())
                 .collect(toImmutableList());
-
-        final Map<String, DoubleParameter> yearShapeParameters = recordList.stream()
-            .collect(Collectors.toMap(
-                record -> record.getString("species_code"),
-                record -> new FixedDoubleParameter(record.getDouble("weibull_shape"))
-            ));
-
-        final Map<String, DoubleParameter> yearScaleParameters = recordList.stream()
-            .collect(Collectors.toMap(
-                record -> record.getString("species_code"),
-                record -> new FixedDoubleParameter(record.getDouble("weibull_scale"))
-            ));
-
-        final Map<String, DoubleParameter> yearProportionOfZeros = recordList.stream()
-            .collect(Collectors.toMap(
-                record -> record.getString("species_code"),
-                record -> new FixedDoubleParameter(record.getDouble("probability_of_zeros"))
-            ));
-
         return new WeibullPerSpeciesCarryingCapacitiesFactory(
-            yearShapeParameters,
-            yearScaleParameters,
-            yearProportionOfZeros,
+            extractParameter(recordList, fishState, "weibull_shape"),
+            extractParameter(recordList, fishState, "weibull_scale"),
+            extractParameter(recordList, fishState, "probability_of_zeros"),
             capacityScalingFactor,
             shapeScalingFactor
         ).apply(fishState);
+    }
+
+    private static Map<String, DoubleParameter> extractParameter(
+        final Collection<? extends Record> recordList,
+        final FishState fishState,
+        final String parameter
+    ) {
+        return recordList.stream().collect(toMap(
+            record -> fishState.getBiology().getSpeciesByCode(record.getString("species_code")).getName(),
+            record -> new FixedDoubleParameter(record.getDouble(parameter))
+        ));
     }
 
     @SuppressWarnings("unused")
