@@ -51,6 +51,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
 import static uk.ac.ox.oxfish.utility.Dummyable.maybeUseDummyData;
@@ -72,6 +73,7 @@ public abstract class EpoScenario<B extends LocalBiology>
             "East", entry(new Coordinate(-89.5, 49.5), new Coordinate(-70.5, -49.5))
         )
     );
+    private static final Logger logger = Logger.getLogger(EpoScenario.class.getName());
     private IntegerParameter targetYear = new IntegerParameter(2022);
     private InputPath inputFolder = InputPath.of("inputs", "epo_inputs");
     private final InputPath testInputFolder = inputFolder.path("tests");
@@ -105,7 +107,11 @@ public abstract class EpoScenario<B extends LocalBiology>
         );
     private AlgorithmFactory<ScenarioPopulation> fleet = new EmptyFleet();
 
-    public static int dayOfYear(final int year, final Month month, final int dayOfMonth) {
+    public static int dayOfYear(
+        final int year,
+        final Month month,
+        final int dayOfMonth
+    ) {
         return LocalDate.of(year, month, dayOfMonth).getDayOfYear();
     }
 
@@ -200,7 +206,7 @@ public abstract class EpoScenario<B extends LocalBiology>
 
     @Override
     public ScenarioEssentials start(final FishState fishState) {
-        System.out.println("Starting model...");
+        logger.info("Starting model...");
 
         final NauticalMap nauticalMap =
             getMapInitializer()

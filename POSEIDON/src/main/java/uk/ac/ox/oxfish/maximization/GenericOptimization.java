@@ -31,12 +31,18 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
+
+import static org.apache.commons.lang3.time.DurationFormatUtils.formatDuration;
 
 public class GenericOptimization extends SimpleProblemDouble implements Serializable {
 
+    private static final Logger logger = Logger.getLogger(GenericOptimization.class.getName());
     private static final long serialVersionUID = 3621186016008983379L;
     private String scenarioFile;
 
@@ -76,8 +82,10 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
      * create smaller optimization problem trying to climb within a small range of previously found optimal parameters
      * this assumes however all parameters are simple
      */
-    public static void buildLocalCalibrationProblem(
-        final Path optimizationFile, final double[] originalParameters,
+    @SuppressWarnings("SameParameterValue")
+    static void buildLocalCalibrationProblem(
+        final Path optimizationFile,
+        final double[] originalParameters,
         final String newCalibrationName,
         final double range
     ) throws IOException {
@@ -99,8 +107,6 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
 
         }
         yaml.dump(optimization, new FileWriter(optimizationFile.getParent().resolve(newCalibrationName).toFile()));
-
-
     }
 
     public List<OptimizationParameter> getParameters() {
@@ -111,18 +117,27 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
         this.parameters = parameters;
     }
 
-    public static Scenario buildScenario(final double[] x, final Path calibrationFile) throws FileNotFoundException {
-        final FishYAML yaml = new FishYAML();
-        final GenericOptimization optimization = yaml.loadAs(
-            new FileReader(calibrationFile.toFile()),
-            GenericOptimization.class
-        );
-        return buildScenario(x, Paths.get(optimization.getScenarioFile()).toFile(), optimization.getParameters());
+    static GenericOptimization fromFile(final Path calibrationFile) {
+        final FishYAML yamlReader = new FishYAML();
+        try (final FileReader fileReader = new FileReader(calibrationFile.toFile())) {
+            return yamlReader.loadAs(fileReader, GenericOptimization.class);
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    Scenario buildScenario(final double[] solution) {
+        try {
+            return buildScenario(solution, Paths.get(getScenarioFile()).toFile(), getParameters());
+        } catch (final FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Scenario buildScenario(
-        final double[] x, final File scenarioFile,
-        final List<OptimizationParameter> parameterList
+        final double[] x,
+        final File scenarioFile,
+        final Iterable<? extends OptimizationParameter> parameterList
     )
         throws FileNotFoundException {
         final FishYAML yaml = new FishYAML();
@@ -138,7 +153,6 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
             );
             parameter += optimizationParameter.size();
         }
-
         return scenario;
     }
 
@@ -148,42 +162,6 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
 
     public void setScenarioFile(final String scenarioFile) {
         this.scenarioFile = scenarioFile;
-    }
-
-    public static void saveCalibratedScenario(
-        final double[] optimalParameters, final Path optimizationYamlFile,
-        final Path pathWhereToSaveScenario
-    ) {
-
-
-        try (final FileWriter fileWriter = new FileWriter(pathWhereToSaveScenario.toFile())) {
-            final GenericOptimization optimization = GenericOptimization.fromFile(optimizationYamlFile);
-            final Scenario scenario = GenericOptimization.buildScenario(
-                optimalParameters,
-                Paths.get(optimization.getScenarioFile()).toFile(),
-                optimization.getParameters()
-            );
-            new FishYAML().dump(scenario, fileWriter);
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    public static GenericOptimization fromFile(final Path calibrationFile) {
-        final FishYAML yamlReader = new FishYAML();
-        try (final FileReader fileReader = new FileReader(calibrationFile.toFile())) {
-            return yamlReader.loadAs(fileReader, GenericOptimization.class);
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    public Scenario buildScenario(final double[] solution) {
-        try {
-            return buildScenario(solution, Paths.get(getScenarioFile()).toFile(), getParameters());
-        } catch (final FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**
@@ -200,82 +178,85 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
     }
 
     /**
-     * Evaluate a double vector representing a possible problem solution as
-     * part of an individual in the EvA framework. This makes up the
-     * target function to be evaluated.
+     * Evaluate a double vector representing a possible problem solution as part of an individual in the EvA framework.
+     * This makes up the target function to be evaluated.
      *
      * @param x a double vector to be evaluated
      * @return the fitness vector assigned to x as to the target function
      */
+    @SuppressWarnings("CallToPrintStackTrace")
     @Override
     public double[] evaluate(final double[] x) {
 
+        // read in and modify parameters
+        final Instant start = Instant.now();
+        final Scenario scenario;
         try {
-            double error = 0;
-
-            for (int i = 0; i < runsPerSetting; i++) {
-                //read in and modify parameters
-                final Scenario scenario = buildScenario(x, Paths.get(scenarioFile).toFile(), parameters);
-
-                //run the model
-                error += computeErrorGivenScenario(scenario, simulatedYears);
-
-            }
-
-            double finalError = error / (double) runsPerSetting;
-            if (maximization)
-                finalError = finalError * (-1);
-            if (!Double.isFinite(finalError)) {
-                System.out.println("was NAN!");
-                finalError = translateNANto;
-            }
-
-            System.out.println(Arrays.toString(x) + " ---> " + finalError);
-            return new double[]{finalError};
-
-        } catch (final Exception e) {
-            e.printStackTrace();
-            System.out.println("was NAN!");
-            System.out.println(Arrays.toString(x) + " ---> " + translateNANto);
-
-            return new double[]{translateNANto};
+            scenario = buildScenario(x, Paths.get(scenarioFile).toFile(), parameters);
+        } catch (final FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
+
+        double error = 0;
+        for (int i = 0; i < runsPerSetting; i++) {
+            try {
+                // run the model
+                error += computeErrorGivenScenario(scenario, simulatedYears);
+            } catch (final Exception e) {
+                e.printStackTrace();
+                error += translateNANto;
+            }
+        }
+        final Instant finish = Instant.now();
+
+        double finalError = error / (double) runsPerSetting;
+        if (maximization)
+            finalError = finalError * (-1);
+
+        if (!Double.isFinite(finalError)) {
+            finalError = translateNANto;
+        }
+
+        logger.info(String.format(
+            "%n  error: %.2f, runs: %d, duration: %s%n  solution: %s",
+            finalError,
+            runsPerSetting,
+            formatDuration(Duration.between(start, finish).toMillis(), "HH:mm:ss"),
+            Arrays.toString(Arrays.stream(x).mapToObj(v -> String.format("%.2f", v)).toArray())
+        ));
+        return new double[]{finalError};
     }
 
-    public double computeErrorGivenScenario(
+    private double computeErrorGivenScenario(
         final Scenario scenario,
         final int simulatedYears
     ) {
         final FishState model = new FishState(System.currentTimeMillis());
-
-        double error = 0;
         model.setScenario(scenario);
         model.start();
-        System.out.println("starting run");
         while (model.getYear() < simulatedYears) {
             model.schedule.step(model);
         }
         model.schedule.step(model);
-
-        //collect error
-        for (final DataTarget target : targets) {
-            error += target.computeError(model);
-        }
-        return error;
+        return targets.stream().mapToDouble(t -> t.computeError(model)).sum();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public List<DataTarget> getTargets() {
         return targets;
     }
 
+    @SuppressWarnings("unused")
     public void setTargets(final List<DataTarget> targets) {
         this.targets = targets;
     }
 
+    @SuppressWarnings("unused")
     public int getRunsPerSetting() {
         return runsPerSetting;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void setRunsPerSetting(final int runsPerSetting) {
         this.runsPerSetting = runsPerSetting;
     }
@@ -285,6 +266,7 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
      *
      * @return Value for property 'simulatedYears'.
      */
+    @SuppressWarnings("unused")
     public int getSimulatedYears() {
         return simulatedYears;
     }
@@ -294,6 +276,7 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
      *
      * @param simulatedYears Value to set for property 'simulatedYears'.
      */
+    @SuppressWarnings("unused")
     public void setSimulatedYears(final int simulatedYears) {
         this.simulatedYears = simulatedYears;
     }
@@ -321,6 +304,7 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
      *
      * @return Value for property 'translateNANto'.
      */
+    @SuppressWarnings("unused")
     public double getTranslateNANto() {
         return translateNANto;
     }
@@ -330,6 +314,7 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
      *
      * @param translateNANto Value to set for property 'translateNANto'.
      */
+    @SuppressWarnings("unused")
     public void setTranslateNANto(final double translateNANto) {
         this.translateNANto = translateNANto;
     }
