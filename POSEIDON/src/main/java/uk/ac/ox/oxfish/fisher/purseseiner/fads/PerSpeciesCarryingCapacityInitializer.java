@@ -5,9 +5,8 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Map;
-import java.util.stream.Stream;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.Arrays.stream;
 
 public class PerSpeciesCarryingCapacityInitializer
     implements CarryingCapacityInitializer<PerSpeciesCarryingCapacity> {
@@ -20,24 +19,26 @@ public class PerSpeciesCarryingCapacityInitializer
         this.carryingCapacities = carryingCapacities;
     }
 
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Override
     public PerSpeciesCarryingCapacity apply(final MersenneTwisterFast rng) {
-        // generate maps of carrying capacities per species until we find one where there
+        // Generate arrays of carrying capacities per species until we find one where there
         // is at least one species for which the carrying capacity is greater than zero
-        // and use that map to construct the `PerSpeciesCarryingCapacity` object
-        return Stream.<Map<Species, Double>>generate(() ->
-                carryingCapacities
-                    .entrySet()
-                    .stream()
-                    .collect(toImmutableMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue().applyAsDouble(rng)
-                    ))
-            )
-            .filter(carryingCapacityMap -> carryingCapacityMap.values().stream().anyMatch(cc -> cc > 0))
-            .map(PerSpeciesCarryingCapacity::new)
-            .findFirst()
-            .get();
+        // and use that array to construct the `PerSpeciesCarryingCapacity` object.
+        // Done with an array for performance reasons.
+        // Assumes that `carryingCapacities` covers all species.
+        // We currently have to limit the number of attempts because some combinations
+        // of Weibull shape/scale parameters with their scaling factors only generate zeros
+        // and we get stuck in an infinite loop otherwise.
+        // TODO: need to find a more elegant solution for this
+        final int MAX_ATTEMPTS = 10;
+        int attempts = 0;
+        final double[] capacities = new double[carryingCapacities.size()];
+        do {
+            attempts += 1;
+            carryingCapacities.forEach((species, doubleParameter) ->
+                capacities[species.getIndex()] = doubleParameter.applyAsDouble(rng)
+            );
+        } while (attempts < MAX_ATTEMPTS && stream(capacities).allMatch(v -> v == 0));
+        return new PerSpeciesCarryingCapacity(capacities);
     }
 }

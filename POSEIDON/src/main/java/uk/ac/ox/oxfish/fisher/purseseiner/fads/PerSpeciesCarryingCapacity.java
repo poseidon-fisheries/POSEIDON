@@ -12,6 +12,7 @@ public class PerSpeciesCarryingCapacity implements CarryingCapacity {
         this.carryingCapacities = carryingCapacities.clone();
     }
 
+    @SuppressWarnings("unused")
     public PerSpeciesCarryingCapacity(final Map<Species, Double> carryingCapacities) {
         this.carryingCapacities = makeArray(carryingCapacities);
     }
