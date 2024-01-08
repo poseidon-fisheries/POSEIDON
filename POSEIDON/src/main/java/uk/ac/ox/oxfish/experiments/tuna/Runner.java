@@ -81,7 +81,8 @@ public final class Runner<S extends Scenario> {
     private Consumer<State> afterRunConsumer = __ -> {};
 
     public Runner(
-        final Supplier<? extends S> scenarioSupplier, final Path outputPath
+        final Supplier<? extends S> scenarioSupplier,
+        final Path outputPath
     ) {
         this.scenarioSupplier = scenarioSupplier;
         this.outputPath = outputPath;
@@ -89,20 +90,24 @@ public final class Runner<S extends Scenario> {
 
     @SuppressWarnings("unused")
     public Runner(
-        final Class<S> scenarioClass, final Path scenarioPath
+        final Class<S> scenarioClass,
+        final Path scenarioPath
     ) {
         this(scenarioClass, scenarioPath, scenarioPath.getParent());
     }
 
     public Runner(
-        final Class<S> scenarioClass, final Path scenarioPath, final Path outputPath
+        final Class<S> scenarioClass,
+        final Path scenarioPath,
+        final Path outputPath
     ) {
         this.scenarioSupplier = makeScenarioSupplier(scenarioPath, scenarioClass);
         this.outputPath = outputPath;
     }
 
     private static <S extends Scenario> Supplier<S> makeScenarioSupplier(
-        final Path scenarioPath, final Class<S> scenarioClass
+        final Path scenarioPath,
+        final Class<S> scenarioClass
     ) {
         return () -> {
             try (final FileReader fileReader = new FileReader(scenarioPath.toFile())) {
@@ -168,7 +173,7 @@ public final class Runner<S extends Scenario> {
     }
 
     @SuppressWarnings("unused")
-    public Runner<S> setWriteScenarioToFile(boolean writeScenarioToFile) {
+    public Runner<S> setWriteScenarioToFile(final boolean writeScenarioToFile) {
         this.writeScenarioToFile = writeScenarioToFile;
         return this;
     }
@@ -178,12 +183,17 @@ public final class Runner<S extends Scenario> {
         run(numYearsToRun, 1);
     }
 
-    public void run(final int numYearsToRun, final int numberOfRunsPerPolicy) {
+    public void run(
+        final int numYearsToRun,
+        final int numberOfRunsPerPolicy
+    ) {
         run(numYearsToRun, numberOfRunsPerPolicy, new AtomicInteger(1));
     }
 
     public void run(
-        final int numYearsToRun, final int numberOfRunsPerPolicy, final AtomicInteger runCounter
+        final int numYearsToRun,
+        final int numberOfRunsPerPolicy,
+        final AtomicInteger runCounter
     ) {
         final int numRuns = policies.size() * numberOfRunsPerPolicy;
         final IntStream range = range(0, numberOfRunsPerPolicy);
@@ -209,7 +219,10 @@ public final class Runner<S extends Scenario> {
     }
 
     private State startRun(
-        final Policy<? super S> policy, final int runNumber, final int numRuns, final int numYearsToRun
+        final Policy<? super S> policy,
+        final int runNumber,
+        final int numRuns,
+        final int numYearsToRun
     ) {
         final LocalDateTime startTime = LocalDateTime.now();
         final S scenario = scenarioSupplier.get();
@@ -217,6 +230,18 @@ public final class Runner<S extends Scenario> {
         final FishState fishState = new FishState(System.currentTimeMillis() + runNumber);
         fishState.setScenario(scenario);
         return new State(scenario, policy, fishState, runNumber, numRuns, numYearsToRun, startTime);
+    }
+
+    private void writeScenarioToFile(final State runnerState) {
+        try {
+            final Path scenariosFolder = outputPath.resolve(SCENARIOS_FOLDER);
+            Files.createDirectories(scenariosFolder);
+            final Path scenarioFile =
+                scenariosFolder.resolve(runnerState.getPolicy().getName().replaceAll("[^a-zA-Z0-9-_.]", "_") + ".yaml");
+            new FishYAML().dump(runnerState.getScenario(), new FileWriter(scenarioFile.toFile()));
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Multimap<Path, RowProvider> makeRowProviders(final State state) {
@@ -233,10 +258,12 @@ public final class Runner<S extends Scenario> {
     }
 
     private void writeOutputs(
-        final int runNumber, final Multimap<? extends Path, RowProvider> rowProviders, final boolean isFinalStep
+        final int runNumber,
+        final Multimap<? extends Path, RowProvider> rowProviders,
+        final boolean isFinalStep
     ) {
         rowProviders.asMap().forEach((outputPath, providers) -> {
-            //noinspection ResultOfMethodCallIgnored
+            // noinspection ResultOfMethodCallIgnored
             outputPath.getParent().toFile().mkdirs();
             final Collection<RowProvider> activeProviders = isFinalStep ? providers
                 : providers.stream().filter(RowProvider::isEveryStep).collect(toImmutableList());
@@ -277,7 +304,8 @@ public final class Runner<S extends Scenario> {
 
     @SuppressWarnings("WeakerAccess")
     Runner<S> registerRowProviders(
-        final String fileName, final AlgorithmFactory<Iterable<? extends RowProvider>> rowProvidersFactory
+        final String fileName,
+        final AlgorithmFactory<Iterable<? extends RowProvider>> rowProvidersFactory
     ) {
         rowProviderFactories.put(outputPath.resolve(fileName), rowProvidersFactory);
         return this;
@@ -310,18 +338,6 @@ public final class Runner<S extends Scenario> {
     public Runner<S> setPolicies(final Iterable<? extends Policy<? super S>> policies) {
         this.policies = ImmutableList.copyOf(policies);
         return this;
-    }
-
-    private void writeScenarioToFile(State runnerState) {
-        try {
-            Path scenariosFolder = outputPath.resolve(SCENARIOS_FOLDER);
-            Files.createDirectories(scenariosFolder);
-            Path scenarioFile =
-                scenariosFolder.resolve(runnerState.getPolicy().getName().replaceAll("[^a-zA-Z0-9-_.]", "_") + ".yaml");
-            new FishYAML().dump(runnerState.getScenario(), new FileWriter(scenarioFile.toFile()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public class State implements RowProvider {
@@ -386,7 +402,7 @@ public final class Runner<S extends Scenario> {
 
         void printStep() {
             logger.info(String.format(
-                "---\nRun %" + runDigits + "d / %" + runDigits + "d, " + "step %5d (year %" + yearDigits + "d / %" +
+                "Run %" + runDigits + "d / %" + runDigits + "d, " + "step %5d (year %" + yearDigits + "d / %" +
                     yearDigits + "d, " + "day %3d), policy: %s",
                 runNumber,
                 numRuns,
