@@ -212,7 +212,6 @@ public class AlgorithmFactories {
                 entry(ITargetTACFactory.class, "Itarget Controller"),
                 entry(SurplusProductionDepletionFormulaController.class, "Schaefer Assessment Formula Controller"),
                 entry(SimpleFishSamplerFactory.class, "Simple Fisher Sampler"),
-                entry(ScheduledBiomassProcessesFactory.class, "Scheduled Biomass Processes"),
                 entry(ExogenousFadMakerCSVFactory.class, "Exogenous Fad Maker CSV"),
                 entry(FadDemoFactory.class, "Fad Demo"),
                 entry(ExogenousFadSetterCSVFactory.class, "Exogenous Fad Setter CSV"),
