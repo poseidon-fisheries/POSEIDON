@@ -28,7 +28,7 @@ public class PolicyRuns {
         final Path baseFolder = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
         final Path baseScenario = baseFolder.resolve(Paths.get(
             "calibrations",
-            "2023-12-01/cenv0729/2023-12-03_04.29.43_local",
+            "2023-12-20/cenv0729/2023-12-26_18.01.39_local",
             "calibrated_scenario.yaml"
         ));
         final Path baseOutputFolder = baseFolder.resolve(Paths.get("policy_runs"));
