@@ -115,6 +115,8 @@ import uk.ac.ox.oxfish.model.data.Averager;
 import uk.ac.ox.oxfish.model.data.collectors.AdditionalFishStateDailyCollectorsFactory;
 import uk.ac.ox.oxfish.model.data.collectors.HerfindalndexCollectorFactory;
 import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
+import uk.ac.ox.oxfish.model.data.distributions.EmpiricalCatchSizeDistributionsFromFile;
+import uk.ac.ox.oxfish.model.data.distributions.EmpiricalDistributions;
 import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.model.data.factory.IterativeAverageFactory;
 import uk.ac.ox.oxfish.model.data.factory.MovingAverageFactory;
@@ -865,6 +867,10 @@ public class AlgorithmFactories {
             FixedLocationValuesFactory.class,
             MutableLocationValuesFactory.class,
             CappedMutableLocationValuesFactory.class
+        ));
+        addFactories(new Factories<>(
+            EmpiricalDistributions.class,
+            EmpiricalCatchSizeDistributionsFromFile.class
         ));
     }
 
