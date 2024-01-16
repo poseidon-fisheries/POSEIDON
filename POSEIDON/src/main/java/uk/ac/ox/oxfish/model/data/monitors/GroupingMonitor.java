@@ -37,16 +37,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.stream;
-import static java.util.function.UnaryOperator.identity;
 
 public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMonitor<O, V, Q> {
 
     private static final long serialVersionUID = -520256027446952684L;
     private final Map<G, Monitor<O, V, Q>> subMonitors;
-    private final Function<? super O, Collection<G>> groupsExtractor;
+    private final Function<? super O, ? extends Collection<G>> groupsExtractor;
 
     @SuppressWarnings("WeakerAccess")
     public GroupingMonitor(
@@ -55,8 +55,8 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
         final Supplier<Accumulator<V>> masterAccumulatorSupplier,
         final Unit<Q> unit,
         final String yLabel,
-        final Function<? super O, Collection<G>> groupsExtractor,
-        final Collection<G> groups,
+        final Function<? super O, ? extends Collection<G>> groupsExtractor,
+        final Collection<? extends G> groups,
         final Function<? super G, ? extends Monitor<O, V, Q>> subMonitorBuilder
     ) {
         this(
@@ -67,7 +67,7 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
             yLabel,
             groupsExtractor,
             groups.stream().collect(toImmutableMap(
-                identity(),
+                UnaryOperator.identity(),
                 subMonitorBuilder
             ))
         );
@@ -79,7 +79,7 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
         final Supplier<Accumulator<V>> masterAccumulatorSupplier,
         final Unit<Q> unit,
         final String yLabel,
-        final Function<? super O, Collection<G>> groupsExtractor,
+        final Function<? super O, ? extends Collection<G>> groupsExtractor,
         final Map<G, Monitor<O, V, Q>> subMonitors
     ) {
         super(baseName, intervalPolicy, masterAccumulatorSupplier, unit, yLabel);
@@ -94,7 +94,7 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
         final Unit<Q> unit,
         final String yLabel,
         final Collection<Species> allSpecies,
-        final Function<? super Species, Function<? super O, V>> valueExtractorBuilder
+        final Function<? super Species, ? extends Function<? super O, V>> valueExtractorBuilder
     ) {
         return basicGroupingMonitor(
             baseName,
@@ -115,10 +115,10 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
         final Supplier<Accumulator<V>> accumulatorSupplier,
         final Unit<Q> unit,
         final String yLabel,
-        final Collection<G> groups,
+        final Collection<? extends G> groups,
         final Function<? super G, String> groupNameMaker,
-        final Function<? super O, Collection<G>> groupsExtractor,
-        final Function<? super G, Function<? super O, V>> valueExtractorBuilder
+        final Function<? super O, ? extends Collection<G>> groupsExtractor,
+        final Function<? super G, ? extends Function<? super O, V>> valueExtractorBuilder
     ) {
         return new GroupingMonitor<>(
             baseName,
@@ -128,7 +128,7 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
             yLabel,
             groupsExtractor,
             groups.stream().collect(toImmutableMap(
-                identity(),
+                UnaryOperator.identity(),
                 group -> new BasicMonitor<>(
                     groupNameMaker.apply(group),
                     intervalPolicy,
@@ -148,7 +148,7 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
         final Unit<Q> unit,
         final String yLabel,
         final Collection<Species> allSpecies,
-        final Function<? super Species, Function<Region, Function<? super O, V>>> valueExtractorBuilder,
+        final Function<? super Species, ? extends Function<Region, Function<? super O, V>>> valueExtractorBuilder,
         final RegionalDivision regionalDivision
     ) {
         return perSpeciesMonitor(
@@ -195,7 +195,7 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
         final String baseName,
         final IntervalPolicy resetInterval,
         final RegionalDivision regionalDivision,
-        final Function<? super Region, Function<? super O, V>> valueExtractorBuilder,
+        final Function<? super Region, ? extends Function<? super O, V>> valueExtractorBuilder,
         final Supplier<Accumulator<V>> accumulatorSupplier,
         final Unit<Q> unit,
         final String yLabel
@@ -225,7 +225,8 @@ public class GroupingMonitor<G, O, V, Q extends Quantity<Q>> extends AbstractMon
         final RegionalDivision regionalDivision,
         final Supplier<Accumulator<V>> accumulatorSupplier,
         final Unit<Q> unit,
-        final String yLabel, final Function<? super Region, ? extends Monitor<O, V, Q>> groupMonitorBuilder
+        final String yLabel,
+        final Function<? super Region, ? extends Monitor<O, V, Q>> groupMonitorBuilder
     ) {
         return new GroupingMonitor<>(
             baseName,
