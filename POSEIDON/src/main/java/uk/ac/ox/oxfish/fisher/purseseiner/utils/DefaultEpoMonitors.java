@@ -46,7 +46,7 @@ import static uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy.EVERY_YEAR;
 import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.*;
 
 @SuppressWarnings("rawtypes")
-public class Monitors {
+public class DefaultEpoMonitors {
 
     private final RegionalDivision regionalDivision;
     private final Collection<Monitor<FadDeploymentAction, ?, ?>> fadDeploymentMonitors;
@@ -57,7 +57,7 @@ public class Monitors {
     private final GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private final Collection<Monitor<?, ?, ?>> otherMonitors;
 
-    public Monitors(final FishState fishState) {
+    public DefaultEpoMonitors(final FishState fishState) {
 
         regionalDivision = EpoScenario.REGIONAL_DIVISION;
 
@@ -86,7 +86,7 @@ public class Monitors {
                 fadSet -> ImmutableList.of(fadSet.isOwnFad()),
                 __ -> identity()
             ));
-        //noinspection unchecked
+        // noinspection unchecked
         final GroupingMonitor<Species, AbstractFadSetAction, Double, Mass>
             catchFromFadSetsMonitor = perSpeciesMonitor(
             "catches from FAD sets",

@@ -114,10 +114,12 @@ import uk.ac.ox.oxfish.model.data.collectors.AdditionalFishStateDailyCollectorsF
 import uk.ac.ox.oxfish.model.data.collectors.HerfindalndexCollectorFactory;
 import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
 import uk.ac.ox.oxfish.model.data.distributions.EmpiricalCatchSizeDistributionsFromFile;
-import uk.ac.ox.oxfish.model.data.distributions.EmpiricalDistributions;
+import uk.ac.ox.oxfish.model.data.distributions.GroupedYearlyDistributions;
 import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.model.data.factory.IterativeAverageFactory;
 import uk.ac.ox.oxfish.model.data.factory.MovingAverageFactory;
+import uk.ac.ox.oxfish.model.data.monitors.CatchSizeDistributionMonitorsFactory;
+import uk.ac.ox.oxfish.model.data.monitors.Monitors;
 import uk.ac.ox.oxfish.model.event.AbundanceDrivenGearExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.event.ExogenousInstantaneousMortalityCatchesFactory;
@@ -860,7 +862,7 @@ public class AlgorithmFactories {
             CappedMutableLocationValuesFactory.class
         ));
         addFactories(new Factories<>(
-            EmpiricalDistributions.class,
+            GroupedYearlyDistributions.class,
             EmpiricalCatchSizeDistributionsFromFile.class
         ));
         addFactories(new Factories<>(
@@ -874,6 +876,10 @@ public class AlgorithmFactories {
             MaximumPerSpeciesCarryingCapacitiesFactory.class,
             WeibullPerSpeciesCarryingCapacitiesFactory.class,
             WeibullPerSpeciesCarryingCapacitiesFromFileFactory.class
+        ));
+        addFactories(new Factories<>(
+            Monitors.class,
+            CatchSizeDistributionMonitorsFactory.class
         ));
     }
 

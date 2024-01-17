@@ -9,14 +9,14 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import static java.util.stream.Collectors.*;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
-public class EmpiricalCatchSizeDistributionsFromFile implements AlgorithmFactory<EmpiricalDistributions> {
+public class EmpiricalCatchSizeDistributionsFromFile implements AlgorithmFactory<GroupedYearlyDistributions> {
 
-    private static final CacheByFile<EmpiricalDistributions> cache =
-        new CacheByFile<>(path -> new MapBasedEmpiricalDistributions(
+    private static final CacheByFile<GroupedYearlyDistributions> cache =
+        new CacheByFile<>(path -> new MapBasedGroupedYearlyDistributions(
             recordStream(path).collect(groupingBy(
-                record -> record.getInt("year"),
+                record -> record.getString("species_code"),
                 groupingBy(
-                    record -> record.getString("species_code"),
+                    record -> record.getInt("year"),
                     collectingAndThen(
                         mapping(
                             record -> record.getDouble("catch_in_tonnes") * 1000,
@@ -45,7 +45,7 @@ public class EmpiricalCatchSizeDistributionsFromFile implements AlgorithmFactory
     }
 
     @Override
-    public EmpiricalDistributions apply(final FishState fishState) {
+    public GroupedYearlyDistributions apply(final FishState fishState) {
         return cache.apply(path.get());
     }
 }

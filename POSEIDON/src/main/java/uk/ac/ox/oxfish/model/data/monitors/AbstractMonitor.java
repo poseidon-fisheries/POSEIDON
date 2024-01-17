@@ -82,8 +82,8 @@ abstract public class AbstractMonitor<O, V, Q extends Quantity<Q>> implements Mo
     }
 
     @Override
-    public Double apply(FishState fishState) {
-        return accumulator.get();
+    public Double apply(final FishState fishState) {
+        return accumulator.applyAsDouble(fishState);
     }
 
     @Override

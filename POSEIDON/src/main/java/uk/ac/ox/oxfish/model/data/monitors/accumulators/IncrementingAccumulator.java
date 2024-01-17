@@ -19,9 +19,12 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.accumulators;
 
-public class IncrementingAccumulator<V> implements Accumulator<V> {
+import uk.ac.ox.oxfish.model.FishState;
 
-    private static final long serialVersionUID = 6370068331086803528L;
+import java.util.function.DoubleSupplier;
+
+public class IncrementingAccumulator<V> implements Accumulator<V>, DoubleSupplier {
+
     private int count = 0;
 
     @Override
@@ -34,8 +37,12 @@ public class IncrementingAccumulator<V> implements Accumulator<V> {
     }
 
     @Override
-    public double get() {
-        return count;
+    public double applyAsDouble(final FishState fishState) {
+        return getAsDouble();
     }
 
+    @Override
+    public double getAsDouble() {
+        return count;
+    }
 }

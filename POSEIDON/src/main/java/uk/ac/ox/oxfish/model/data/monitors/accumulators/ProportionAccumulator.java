@@ -19,15 +19,17 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.accumulators;
 
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Averager;
 import uk.ac.ox.oxfish.model.data.IterativeAverage;
+
+import java.util.function.DoubleSupplier;
 
 /**
  * Accumulates the proportion of true values observed.
  */
-public class ProportionAccumulator implements Accumulator<Boolean> {
+public class ProportionAccumulator implements Accumulator<Boolean>, DoubleSupplier {
 
-    private static final long serialVersionUID = 270496675129037470L;
     private final Averager<Double> averager = new IterativeAverage<>();
 
     @Override
@@ -41,8 +43,12 @@ public class ProportionAccumulator implements Accumulator<Boolean> {
     }
 
     @Override
-    public double get() {
-        return averager.getSmoothedObservation();
+    public double applyAsDouble(final FishState fishState) {
+        return getAsDouble();
     }
 
+    @Override
+    public double getAsDouble() {
+        return averager.getSmoothedObservation();
+    }
 }

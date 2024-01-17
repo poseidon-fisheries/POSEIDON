@@ -8,12 +8,12 @@ import java.util.Map.Entry;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
-public class MapBasedEmpiricalDistributions implements EmpiricalDistributions {
+public class MapBasedGroupedYearlyDistributions implements GroupedYearlyDistributions {
 
-    private final Map<Integer, ? extends Map<String, double[]>> map;
+    private final Map<String, ? extends Map<Integer, double[]>> map;
 
-    public MapBasedEmpiricalDistributions(
-        final Map<Integer, ? extends Map<String, double[]>> map
+    MapBasedGroupedYearlyDistributions(
+        final Map<String, ? extends Map<Integer, double[]>> map
     ) {
         this.map =
             map.entrySet().stream().collect(toImmutableMap(
@@ -23,10 +23,7 @@ public class MapBasedEmpiricalDistributions implements EmpiricalDistributions {
     }
 
     @Override
-    public double[] get(
-        final int year,
-        final String speciesCode
-    ) {
-        return checkNotNull(map.get(year)).get(speciesCode);
+    public Map<Integer, double[]> apply(final String group) {
+        return checkNotNull(map.get(group));
     }
 }

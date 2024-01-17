@@ -38,6 +38,8 @@ import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.data.distributions.EmpiricalCatchSizeDistributionsFromFile;
+import uk.ac.ox.oxfish.model.data.distributions.GroupedYearlyDistributions;
 import uk.ac.ox.oxfish.model.data.monitors.regions.CustomRegionalDivision;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -88,6 +90,7 @@ public abstract class EpoScenario<B extends LocalBiology>
                 getInputFolder().path("currents", "shear_2022.csv")
             )
         ));
+
     private AlgorithmFactory<? extends Regulations> regulations = DefaultEpoRegulations.make(getInputFolder());
     private BiologicalProcessesFactory<B> biologicalProcesses;
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
@@ -106,6 +109,8 @@ public abstract class EpoScenario<B extends LocalBiology>
             0.5
         );
     private AlgorithmFactory<ScenarioPopulation> fleet = new EmptyFleet();
+    private AlgorithmFactory<GroupedYearlyDistributions> empiricalCatchSizeDistributions =
+        new EmpiricalCatchSizeDistributionsFromFile(getInputFolder().path("catch_size_distributions.csv"));
 
     public static int dayOfYear(
         final int year,
@@ -113,6 +118,14 @@ public abstract class EpoScenario<B extends LocalBiology>
         final int dayOfMonth
     ) {
         return LocalDate.of(year, month, dayOfMonth).getDayOfYear();
+    }
+
+    public AlgorithmFactory<GroupedYearlyDistributions> getEmpiricalCatchSizeDistributions() {
+        return empiricalCatchSizeDistributions;
+    }
+
+    public void setEmpiricalCatchSizeDistributions(final AlgorithmFactory<GroupedYearlyDistributions> empiricalCatchSizeDistributions) {
+        this.empiricalCatchSizeDistributions = empiricalCatchSizeDistributions;
     }
 
     public AlgorithmFactory<? extends Regulations> getRegulations() {

@@ -46,12 +46,11 @@ import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 /**
- * The FadAwareLogisticGrower is like a CommonLogisticGrower, but calculates growth by using the
- * memorized biomass from the previous year instead of using the current biomass.
- * This grower takes FAD biomass into account as part of the total memorized biomass, but only
- * redistributes new biomass in ocean cells. When the growth function is called, it also adds back
- * biomass that was lost by FADs drifting out of habitable ocean cells. If no FADs are present, it
- * works just like a CommonLogisticGrower (except of course for the memorized biomass bit).
+ * The FadAwareLogisticGrower is like a CommonLogisticGrower, but calculates growth by using the memorized biomass from
+ * the previous year instead of using the current biomass. This grower takes FAD biomass into account as part of the
+ * total memorized biomass, but only redistributes new biomass in ocean cells. When the growth function is called, it
+ * also adds back biomass that was lost by FADs drifting out of habitable ocean cells. If no FADs are present, it works
+ * just like a CommonLogisticGrower (except of course for the memorized biomass bit).
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FadAwareLogisticGrower implements Startable, Steppable {
@@ -129,7 +128,10 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
         // the biomass to allocate is the sum of the new biomass and the biomass lost by FADs drifting out,
         // while making sure we won't be exceeding the total carrying capacity of the ocean tiles
-        final double biomassLostByFads = biomassLostAccumulator.map(Accumulator::get).orElse(0.0);
+        final double biomassLostByFads =
+            biomassLostAccumulator
+                .map(accumulator -> accumulator.applyAsDouble(fishState))
+                .orElse(0.0);
         final double biomassToAllocate = Math.min(newBiomass + biomassLostByFads, availableCapacity);
 
         // the biomass to allocate should not be negative, barring tiny floating point errors

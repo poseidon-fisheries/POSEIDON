@@ -10,8 +10,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.caches.LocationFisherValuesByActionCac
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.DefaultEpoMonitors;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
@@ -101,7 +101,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         return biomassLostMonitor;
     }
 
-    public void addMonitors(final Monitors monitors) {
+    public void addMonitors(final DefaultEpoMonitors monitors) {
         grabFadDeploymentObservers()
             .addAll(monitors.grabFadDeploymentMonitors());
         grabAllSetsObservers()

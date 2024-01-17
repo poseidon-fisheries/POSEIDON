@@ -30,18 +30,20 @@ public class ProportionalGatherer<G, O, V, Q extends Quantity<Q>> extends Monito
 
     private final GroupingMonitor<G, O, V, Q> delegate;
 
-    public ProportionalGatherer(GroupingMonitor<G, O, V, Q> delegate) {
+    public ProportionalGatherer(final GroupingMonitor<G, O, V, Q> delegate) {
         super(delegate);
         this.delegate = delegate;
     }
 
     @Override
-    public void registerWith(TimeSeries<FishState> timeSeries) {
+    public void registerWith(final TimeSeries<FishState> timeSeries) {
         delegate.getSubMonitors().values().forEach(subMonitor -> {
             if (subMonitor.getBaseName() != null)
                 timeSeries.registerGatherer(
                     "Proportion of " + subMonitor.getBaseName(),
-                    __ -> subMonitor.getAccumulator().get() / getAccumulator().get(),
+                    fishState ->
+                        subMonitor.getAccumulator().applyAsDouble(fishState) /
+                            getAccumulator().applyAsDouble(fishState),
                     0.0,
                     ONE,
                     "Proportion"

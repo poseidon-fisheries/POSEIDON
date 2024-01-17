@@ -7,9 +7,10 @@ import com.google.common.collect.RangeMap;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.DestinationBasedDepartingStrategy;
-import uk.ac.ox.oxfish.fisher.purseseiner.utils.Monitors;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.DefaultEpoMonitors;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
@@ -21,6 +22,8 @@ import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.monitors.Monitor;
+import uk.ac.ox.oxfish.model.data.monitors.Monitors;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
@@ -34,6 +37,7 @@ import uk.ac.ox.oxfish.utility.Dummyable;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import javax.measure.quantity.Mass;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -58,6 +62,7 @@ public class PurseSeinerFleetFactory
     private AlgorithmFactory<? extends GearStrategy> gearStrategy;
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
     private AlgorithmFactory<? extends PortInitializer> portInitializer;
+    private AlgorithmFactory<? extends Monitors<AbstractSetAction>> additionalSetMonitors;
     private IntegerParameter targetYear;
 
     public PurseSeinerFleetFactory(
@@ -70,7 +75,8 @@ public class PurseSeinerFleetFactory
         final AlgorithmFactory<? extends FishingStrategy> fishingStrategy,
         final AlgorithmFactory<? extends DepartingStrategy> departingStrategy,
         final AlgorithmFactory<? extends MarketMap> marketMap,
-        final AlgorithmFactory<? extends PortInitializer> portInitializer
+        final AlgorithmFactory<? extends PortInitializer> portInitializer,
+        final AlgorithmFactory<? extends Monitors<AbstractSetAction>> additionalSetMonitors
     ) {
         this.targetYear = targetYear;
         this.vesselsFile = vesselsFile;
@@ -82,17 +88,18 @@ public class PurseSeinerFleetFactory
         this.departingStrategy = departingStrategy;
         this.marketMap = marketMap;
         this.portInitializer = portInitializer;
+        this.additionalSetMonitors = additionalSetMonitors;
     }
 
     public PurseSeinerFleetFactory() {
     }
 
-    public IntegerParameter getTargetYear() {
-        return targetYear;
+    public AlgorithmFactory<? extends Monitors<AbstractSetAction>> getAdditionalSetMonitors() {
+        return additionalSetMonitors;
     }
 
-    public void setTargetYear(final IntegerParameter targetYear) {
-        this.targetYear = targetYear;
+    public void setAdditionalSetMonitors(final AlgorithmFactory<? extends Monitors<AbstractSetAction>> additionalSetMonitors) {
+        this.additionalSetMonitors = additionalSetMonitors;
     }
 
     public AlgorithmFactory<? extends PortInitializer> getPortInitializer() {
@@ -166,7 +173,10 @@ public class PurseSeinerFleetFactory
         );
     }
 
-    public List<Fisher> makeFishers(final FishState fishState, final int targetYear) {
+    public List<Fisher> makeFishers(
+        final FishState fishState,
+        final int targetYear
+    ) {
         addMonitors(fishState);
         return new EpoPurseSeineVesselReader(
             getVesselsFile().get(),
@@ -177,9 +187,13 @@ public class PurseSeinerFleetFactory
     }
 
     private void addMonitors(final FishState fishState) {
-        final Monitors monitors = new Monitors(fishState);
-        monitors.getMonitors().forEach(fishState::registerStartable);
-        getGear().addMonitors(monitors);
+        final DefaultEpoMonitors defaultEpoMonitors = new DefaultEpoMonitors(fishState);
+        defaultEpoMonitors.getMonitors().forEach(fishState::registerStartable);
+        getGear().addMonitors(defaultEpoMonitors);
+        final Collection<Monitor<AbstractSetAction, ?, ?>> setMonitors =
+            additionalSetMonitors.apply(fishState).getMonitors();
+        setMonitors.forEach(fishState::registerStartable);
+        getGear().grabAllSetsObservers().addAll(setMonitors);
     }
 
     public InputPath getVesselsFile() {
@@ -290,7 +304,16 @@ public class PurseSeinerFleetFactory
         return marketMap;
     }
 
+    public IntegerParameter getTargetYear() {
+        return targetYear;
+    }
+
+    public void setTargetYear(final IntegerParameter targetYear) {
+        this.targetYear = targetYear;
+    }
+
     public void setMarketMap(final AlgorithmFactory<? extends MarketMap> marketMap) {
         this.marketMap = marketMap;
     }
+
 }

@@ -19,13 +19,21 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.accumulators;
 
-public class SummingAccumulator<V extends Number> implements Accumulator<V> {
+import uk.ac.ox.oxfish.model.FishState;
 
-    private static final long serialVersionUID = -2947987958295391850L;
+import java.util.function.DoubleSupplier;
+
+public class SummingAccumulator<V extends Number> implements Accumulator<V>, DoubleSupplier {
+
     private double sum;
 
     @Override
-    public double get() {
+    public double applyAsDouble(final FishState fishState) {
+        return getAsDouble();
+    }
+
+    @Override
+    public double getAsDouble() {
         return sum;
     }
 

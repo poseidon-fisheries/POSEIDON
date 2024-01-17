@@ -19,9 +19,12 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.accumulators;
 
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Averager;
 
-public abstract class AbstractAveragingAccumulator<V extends Number> implements Accumulator<V> {
+import java.util.function.DoubleSupplier;
+
+public abstract class AbstractAveragingAccumulator<V extends Number> implements Accumulator<V>, DoubleSupplier {
 
     private static final long serialVersionUID = 8405148290266756019L;
     private final boolean ignoreNulls;
@@ -44,7 +47,12 @@ public abstract class AbstractAveragingAccumulator<V extends Number> implements 
     abstract Averager<V> getAverager();
 
     @Override
-    public double get() {
+    public double applyAsDouble(final FishState fishState) {
+        return getAsDouble();
+    }
+
+    @Override
+    public double getAsDouble() {
         return getAverager().getSmoothedObservation();
     }
 

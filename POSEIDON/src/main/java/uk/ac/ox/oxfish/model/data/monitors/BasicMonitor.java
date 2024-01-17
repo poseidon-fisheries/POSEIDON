@@ -32,7 +32,7 @@ import static java.util.Collections.singletonList;
 public class BasicMonitor<O, V, Q extends Quantity<Q>> extends AbstractMonitor<O, V, Q> {
 
     private static final long serialVersionUID = -7516952997092729146L;
-    private final Function<? super O, V> valueExtractor;
+    private final Function<? super O, ? extends V> valueExtractor;
 
     public BasicMonitor(
         final String baseName,
@@ -40,7 +40,7 @@ public class BasicMonitor<O, V, Q extends Quantity<Q>> extends AbstractMonitor<O
         final Supplier<Accumulator<V>> accumulatorSupplier,
         final Unit<Q> unit,
         final String yLabel,
-        final Function<? super O, V> valueExtractor
+        final Function<? super O, ? extends V> valueExtractor
     ) {
         super(baseName, resetInterval, accumulatorSupplier, unit, yLabel);
         this.valueExtractor = valueExtractor;

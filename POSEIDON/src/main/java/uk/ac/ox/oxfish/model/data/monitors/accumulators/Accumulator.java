@@ -19,7 +19,11 @@
 
 package uk.ac.ox.oxfish.model.data.monitors.accumulators;
 
-public interface Accumulator<V> {
+import uk.ac.ox.oxfish.model.FishState;
+
+import java.util.function.ToDoubleFunction;
+
+public interface Accumulator<V> extends ToDoubleFunction<FishState> {
 
     default String makeName(final String baseName) {
         return String.format(getNameFormat(), baseName);
@@ -29,5 +33,4 @@ public interface Accumulator<V> {
 
     void accumulate(V value);
 
-    double get();
 }
