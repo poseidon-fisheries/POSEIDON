@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.SelectivityAbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullPerSpeciesCarryingCapacitiesFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.MinimumSetValuesFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.ValuePerSetPlanningModuleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
@@ -14,6 +15,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.FixedLocationValuesF
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
+import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
 import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
 import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
@@ -29,6 +31,10 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
         );
 
     public EpoPathPlannerAbundanceScenario() {
+        final MinimumSetValuesFromFileFactory minimumSetValues =
+            new MinimumSetValuesFromFileFactory(
+                getInputFolder().path("min_set_values.csv")
+            );
         setFleet(
             new EpoPurseSeinerFleetFactory(
                 getTargetYear(),
@@ -82,7 +88,13 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                         getInputFolder().path("location_values.csv"),
                         getTargetYear()
                     ),
-                    new ValuePerSetPlanningModuleFactory(),
+                    minimumSetValues,
+                    new ValuePerSetPlanningModuleFactory(
+                        minimumSetValues,
+                        getTargetYear(),
+                        new SquaresMapDiscretizerFactory(),
+                        new CalibratedParameter(0, 1, 0, 1)
+                    ),
                     new AbundanceCatchSamplersFactory(
                         getAbundanceFilters(),
                         getInputFolder().path("set_samples.csv"),
@@ -101,6 +113,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
         return abundanceFilters;
     }
 
+    @SuppressWarnings("unused")
     public void setAbundanceFilters(final AbundanceFiltersFactory abundanceFilters) {
         this.abundanceFilters = abundanceFilters;
     }

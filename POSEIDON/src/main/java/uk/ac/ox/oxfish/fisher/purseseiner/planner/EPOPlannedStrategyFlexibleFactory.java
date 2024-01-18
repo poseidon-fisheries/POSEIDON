@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplers;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
@@ -12,7 +13,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
-import uk.ac.ox.oxfish.utility.parameters.*;
+import uk.ac.ox.oxfish.utility.parameters.BooleanParameter;
+import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<PlannedStrategyProxy>, Dummyable {
 
@@ -45,12 +49,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      */
     private DoubleParameter additionalHourlyDelayNonAssociatedSets =
         new CalibratedParameter(5, 15, 0, 24);
-    /**
-     * $ a stolen fad needs to have accumulated before we even try to target it
-     */
-    private DoubleParameter minimumValueOpportunisticFadSets =
-        new FixedDoubleParameter(0);
-    // fixing at zero to disable for now; was 18135.37 (based on 10t of SKJ at 2017 price)
+
     /**
      * To probability of finding another vessel's FAD when you search for some.
      */
@@ -93,13 +92,16 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     private BooleanParameter uniqueCatchSamplerForEachStrategy = new BooleanParameter(false);
     private AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule;
     private LocationValuesFactory locationValuesFactory;
+    private AlgorithmFactory<MinimumSetValues> minimumSetValues;
 
+    @SuppressWarnings("unused")
     public EPOPlannedStrategyFlexibleFactory() {
     }
 
     public EPOPlannedStrategyFlexibleFactory(
         final IntegerParameter targetYear,
         final LocationValuesFactory locationValuesFactory,
+        final AlgorithmFactory<MinimumSetValues> minimumSetValues,
         final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule,
         final CatchSamplersFactory<? extends LocalBiology> catchSamplers,
         final InputPath actionWeightsFile,
@@ -107,10 +109,19 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     ) {
         this.targetYear = targetYear;
         this.locationValuesFactory = locationValuesFactory;
+        this.minimumSetValues = minimumSetValues;
         this.fadModule = fadModule;
         this.catchSamplers = catchSamplers;
         this.actionWeightsFile = actionWeightsFile;
         this.maxTripDurationFile = maxTripDurationFile;
+    }
+
+    public AlgorithmFactory<MinimumSetValues> getMinimumSetValues() {
+        return minimumSetValues;
+    }
+
+    public void setMinimumSetValues(final AlgorithmFactory<MinimumSetValues> minimumSetValues) {
+        this.minimumSetValues = minimumSetValues;
     }
 
     public DoubleParameter getProbabilityOfFindingOtherFads() {
@@ -179,7 +190,9 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             noaBias.applyAsDouble(rng),
             delBias.applyAsDouble(rng),
             ofsBias.applyAsDouble(rng),
-            minimumValueOpportunisticFadSets.applyAsDouble(rng),
+            minimumSetValues
+                .apply(state)
+                .getMinimumSetValue(getTargetYear().getValue(), ActionClass.OFS),
             probabilityOfFindingOtherFads.applyAsDouble(rng),
             hoursWastedOnFailedSearches.applyAsDouble(rng),
             planningHorizonInHours.applyAsDouble(rng),
@@ -242,15 +255,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     public void setPlanningHorizonInHours(final DoubleParameter planningHorizonInHours) {
         this.planningHorizonInHours = planningHorizonInHours;
     }
-
-    public DoubleParameter getMinimumValueOpportunisticFadSets() {
-        return minimumValueOpportunisticFadSets;
-    }
-
-    public void setMinimumValueOpportunisticFadSets(final DoubleParameter minimumValueOpportunisticFadSets) {
-        this.minimumValueOpportunisticFadSets = minimumValueOpportunisticFadSets;
-    }
-
+    
     public DoubleParameter getOwnFadActionWeightBias() {
         return ownFadActionWeightBias;
     }

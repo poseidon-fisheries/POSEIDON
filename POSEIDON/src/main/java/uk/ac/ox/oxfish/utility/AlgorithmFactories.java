@@ -62,9 +62,7 @@ import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.SigmoidalTimeScala
 import uk.ac.ox.oxfish.fisher.purseseiner.EmptyFleet;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.GenerateRandomPlansStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.PlanningModule;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.*;
@@ -871,6 +869,11 @@ public class AlgorithmFactories {
         addFactories(new Factories<>(
             EmpiricalDistributions.class,
             EmpiricalCatchSizeDistributionsFromFile.class
+        ));
+        addFactories(new Factories<>(
+            MinimumSetValues.class,
+            NoMinimumSetValuesFactory.class,
+            MinimumSetValuesFromFileFactory.class
         ));
     }
 

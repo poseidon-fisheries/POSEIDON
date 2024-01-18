@@ -20,20 +20,31 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.planner.factories;
 
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.MinimumSetValues;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.OwnFadSetDiscretizedActionGenerator;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.ValuePerSetFadModule;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 public class ValuePerSetPlanningModuleFactory extends PlanningModuleFactory<ValuePerSetFadModule> {
 
-    private DoubleParameter dampen =
-        new CalibratedParameter(0, 1, 0, 1);
+    private DoubleParameter dampen;
 
+    @SuppressWarnings("unused")
     public ValuePerSetPlanningModuleFactory() {
-        setMinimumValueFadSets(new FixedDoubleParameter(0));
+    }
+
+    public ValuePerSetPlanningModuleFactory(
+        final AlgorithmFactory<MinimumSetValues> minimumSetValues,
+        final IntegerParameter targetYear,
+        final AlgorithmFactory<? extends MapDiscretizer> discretization,
+        final DoubleParameter dampen
+    ) {
+        super(minimumSetValues, targetYear, discretization);
+        this.dampen = dampen;
     }
 
     @Override
