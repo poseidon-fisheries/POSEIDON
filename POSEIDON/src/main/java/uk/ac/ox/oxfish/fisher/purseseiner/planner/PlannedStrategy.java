@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.*;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishUntilFullStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
@@ -32,17 +33,18 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
+import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 /**
- * a combined destination and fishing strategy: it uses a planner to produce a full path of actions to take
- * then walks over this path.
- * It has a planning horizon so that it can re-plan at regular intervals to avoid the plan from getting stale.
+ * a combined destination and fishing strategy: it uses a planner to produce a full path of actions to take then walks
+ * over this path. It has a planning horizon so that it can re-plan at regular intervals to avoid the plan from getting
+ * stale.
  */
 public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
 
-
     final FishUntilFullStrategy delegate = new FishUntilFullStrategy(1.0);
+    private final double minimumValueOfSetOnOwnFad;
     /**
      * this guy draws the plans when asked and holds the plan
      */
@@ -63,19 +65,27 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
      * timestamp ( in how many hours had passed since this trip began) of last time we planned
      */
     private double hoursInTheTripSinceWeLastReplanned = 0;
-    //this get activated when we finished our last action
+    // this get activated when we finished our last action
     private PlannedAction actionInProgress;
-    //these get activated when we are at location and are performing whatever we said we were going to perform
+    // these get activated when we are at location and are performing whatever we said we were going to perform
     private Action[] actionQueueInProgress;
     private int actionQueueIndex = -1;
 
-    public PlannedStrategy(final DrawThenCheapestInsertionPlanner planner, final double planningHorizonInHours) {
+    public PlannedStrategy(
+        final DrawThenCheapestInsertionPlanner planner,
+        final double planningHorizonInHours,
+        final double minimumValueOfSetOnOwnFad
+    ) {
         this.planner = planner;
         this.planningHorizonInHours = planningHorizonInHours;
+        this.minimumValueOfSetOnOwnFad = minimumValueOfSetOnOwnFad;
     }
 
     @Override
-    public void start(final FishState model, final Fisher fisher) {
+    public void start(
+        final FishState model,
+        final Fisher fisher
+    ) {
         planner.start(model, fisher);
 
     }
@@ -86,26 +96,29 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
     }
 
     /**
-     * This is called by Arriving.act to decide whether or not to fish up arrival. Most fishing
-     * strategies should use this default implementation, but FAD fishing strategies are expected to
-     * override this method and result in action types other than `Fishing`.
+     * This is called by Arriving.act to decide whether or not to fish up arrival. Most fishing strategies should use
+     * this default implementation, but FAD fishing strategies are expected to override this method and result in action
+     * types other than `Fishing`.
      */
     @Override
     public ActionResult act(
-        final FishState model, final Fisher agent, final Regulation regulation, final double hoursLeft
+        final FishState model,
+        final Fisher agent,
+        final Regulation regulation,
+        final double hoursLeft
     ) {
 
-        //should not be called when going home is an override
+        // should not be called when going home is an override
         assert !doIJustWantToGoHome(agent);
 
-        //this gets called by arrival, so we have to make sure we are where we want to be
+        // this gets called by arrival, so we have to make sure we are where we want to be
         assert agent.getLocation() == actionInProgress.getLocation() ||
-            //there is an exception here when we have just finished setting on a fad
-            //which gets then destroyed: then the action location is null
+            // there is an exception here when we have just finished setting on a fad
+            // which gets then destroyed: then the action location is null
             actionQueueInProgress[actionQueueIndex] instanceof FadSetAction &&
                 actionInProgress instanceof PlannedAction.FadSet;
 
-        //we may have just arrived, if so get the queue of actions we need to take
+        // we may have just arrived, if so get the queue of actions we need to take
         if (actionQueueInProgress == null) {
             if (actionInProgress.isAllowedNow(agent))
                 actionQueueInProgress = actionInProgress.actuate(agent);
@@ -113,36 +126,49 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
                 actionQueueInProgress = new Action[]{};
         }
         actionQueueIndex++;
-        //okay, are there still actions to take? if so take it!
+        // okay, are there still actions to take? if so take it!
         if (actionQueueIndex < actionQueueInProgress.length) {
             final Action actionToTake = actionQueueInProgress[actionQueueIndex];
-            return agent.getGear().isSafe(actionToTake)
+            return agent.getGear().isSafe(actionToTake) && isStillDesirable(actionToTake)
                 // If the action is safe to take, take it
                 ? new ActionResult(actionToTake, hoursLeft)
                 // Otherwise move on to next action
                 : act(model, agent, regulation, hoursLeft);
         } else {
-            //you have finished the queue!
+            // you have finished the queue!
             resetActionQueue();
-            //is it time for a replan?
+            // is it time for a replan?
             if (
                 model.getHoursSinceStart() - hoursInTheTripSinceWeLastReplanned > planningHorizonInHours &&
                     agent.getLocation() != agent.getHomePort().getLocation()
             ) {
-                replan(agent, model); //this will automatically move to new next action
+                replan(agent, model); // this will automatically move to new next action
             } else {
-                //move to next action
+                // move to next action
                 actionInProgress = currentPlan.pollNextAction();
             }
-            //if it's here, start over
+            // if it's here, start over
             if (actionInProgress.getLocation() == agent.getLocation()) {
                 return act(model, agent, regulation, hoursLeft);
             } else {
-                //otherwise move
+                // otherwise move
                 return new ActionResult(new Moving(), hoursLeft);
             }
         }
 
+    }
+
+    private boolean isStillDesirable(final Action actionToTake) {
+        if (actionToTake instanceof FadSetAction) {
+            final FadSetAction fadSetAction = (FadSetAction) actionToTake;
+            final Fad fad = fadSetAction.getFad();
+            final Fisher fisher = fadSetAction.getFisher();
+            final double[] prices = fisher.getHomePort().getMarketMap(fisher).getPrices();
+            final double fadValue = getFadManager(fisher).getFishValueCalculator().valueOf(fad.getBiology(), prices);
+            return fadValue >= minimumValueOfSetOnOwnFad;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -156,23 +182,26 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
      */
     @Override
     public SeaTile chooseDestination(
-        final Fisher fisher, final MersenneTwisterFast random, final FishState model, final Action currentAction
+        final Fisher fisher,
+        final MersenneTwisterFast random,
+        final FishState model,
+        final Action currentAction
     ) {
-        //go home override
+        // go home override
         if (fisher.getLocation() != fisher.getHomePort().getLocation() && doIJustWantToGoHome(fisher))
             return fisher.getHomePort().getLocation();
 
-        //are we just departing? make new plan!
+        // are we just departing? make new plan!
         if (currentAction == null || currentAction instanceof AtPort)
             planNewTrip(model);
         else if (
-            //if the action is now not allowed or invalid, replan
+            // if the action is now not allowed or invalid, replan
             actionInProgress.getLocation() == null ||
                 (!actionInProgress.isAllowedNow(fisher))
         ) {
 
-            //check for the case when you just finished setting a fad that was destroyed (by you or others)
-            //in that case it will say that the location is unknown, but it you just need to be here a second longer
+            // check for the case when you just finished setting a fad that was destroyed (by you or others)
+            // in that case it will say that the location is unknown, but it you just need to be here a second longer
             if (
                 actionQueueInProgress != null &&
                     actionQueueInProgress[actionQueueIndex] instanceof FadSetAction &&
@@ -181,7 +210,7 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
                 return fisher.getLocation();
             }
 
-            //unless you are at port (probably because you beelined here after you were told to go home)
+            // unless you are at port (probably because you beelined here after you were told to go home)
             if (
                 fisher.getLocation() != fisher.getHomePort().getLocation() ||
                     fisher.getHoursAtSea() <= 0
@@ -191,7 +220,7 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
                 return fisher.getHomePort().getLocation();
             }
         }
-        //otherwise, you are going where the plan tells you to
+        // otherwise, you are going where the plan tells you to
         return actionInProgress.getLocation();
     }
 
@@ -205,9 +234,11 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
         final boolean amIFull = fisher.getTotalWeightOfCatchInHold() + EPSILON >=
             fisher.getMaximumHold();
         final boolean isItTooLate =
-            actionInProgress != null && !(actionInProgress instanceof PlannedAction.Arrival) &&
-                planner.getThisTripTargetHours() > 0 && planner.getThisTripTargetHours() < computeCurrentTripDurationInHours(
-                fisher.grabState());
+            actionInProgress != null &&
+                !(actionInProgress instanceof PlannedAction.Arrival) &&
+                planner.getThisTripTargetHours() > 0 &&
+                planner.getThisTripTargetHours() < computeCurrentTripDurationInHours(
+                    fisher.grabState());
         return amIFull || isItTooLate;
     }
 
@@ -216,33 +247,36 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
         timestampInHoursWhenTripStarted = model.getHoursSinceStart();
         currentPlan = planner.planNewTrip();
         assert currentPlan.numberOfStepsInPath() >= 2;
-        //the first step is always just "beginning of the trip"
-        //so we don't need to act on it
+        // the first step is always just "beginning of the trip"
+        // so we don't need to act on it
         assert currentPlan.peekNextAction() instanceof PlannedAction.Arrival;
         assert !((PlannedAction.Arrival) currentPlan.peekNextAction()).isEndOfTrip();
-        currentPlan.pollNextAction();//skip the start
+        currentPlan.pollNextAction();// skip the start
 
-        //set yourself for an action in progress
+        // set yourself for an action in progress
         actionInProgress = currentPlan.pollNextAction();
         resetActionQueue();
     }
 
-    private void replan(final Fisher fisher, final FishState state) {
+    private void replan(
+        final Fisher fisher,
+        final FishState state
+    ) {
         assert fisher.getCurrentTrip() != null;
         assert fisher.getCurrentTrip().getTripDay() <= state.getDay();
         assert !fisher.getCurrentTrip().isCompleted();
 
-        //asked to replan, let's do it
+        // asked to replan, let's do it
         final double computeCurrentTripDurationInHours = computeCurrentTripDurationInHours(state);
         hoursInTheTripSinceWeLastReplanned = state.getHoursSinceStart();
         currentPlan = planner.replan(computeCurrentTripDurationInHours);
 
-        //again, the first action is just a marker so we can safely skip it
+        // again, the first action is just a marker so we can safely skip it
         assert currentPlan.peekNextAction() instanceof PlannedAction.Arrival;
         assert !((PlannedAction.Arrival) currentPlan.peekNextAction()).isEndOfTrip();
-        currentPlan.pollNextAction();//skip the start
+        currentPlan.pollNextAction();// skip the start
 
-        //set yourself for an action in progress
+        // set yourself for an action in progress
         actionInProgress = currentPlan.pollNextAction();
         resetActionQueue();
 
@@ -270,10 +304,12 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
      */
     @Override
     public boolean shouldFish(
-        final Fisher fisher, final MersenneTwisterFast random, final FishState model, final TripRecord currentTrip
+        final Fisher fisher,
+        final MersenneTwisterFast random,
+        final FishState model,
+        final TripRecord currentTrip
     ) {
         return delegate.shouldFish(fisher, random, model, currentTrip);
     }
-
 
 }

@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplers;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
@@ -17,6 +16,9 @@ import uk.ac.ox.oxfish.utility.parameters.BooleanParameter;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.FAD;
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.OFS;
 
 public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<PlannedStrategyProxy>, Dummyable {
 
@@ -174,14 +176,18 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
 
     @Override
     public PlannedStrategyProxy apply(final FishState state) {
-
         final MersenneTwisterFast rng = state.getRandom();
-        final PlannedStrategyProxy proxy = new PlannedStrategyProxy(
+        final MinimumSetValues minSetValues = minimumSetValues.apply(state);
+        final Integer targetYear = getTargetYear().getValue();
+        return new PlannedStrategyProxy(
             uniqueCatchSamplerForEachStrategy.getValue()
                 ? catchSamplers.apply(state)
                 : catchSamplersCache.get(state),
-            PurseSeinerFishingStrategyFactory.loadActionWeights(targetYear.getValue(), actionWeightsFile.get()),
-            GravityDestinationStrategyFactory.loadMaxTripDuration(targetYear.getValue(), maxTripDurationFile.get()),
+            PurseSeinerFishingStrategyFactory.loadActionWeights(this.targetYear.getValue(), actionWeightsFile.get()),
+            GravityDestinationStrategyFactory.loadMaxTripDuration(
+                this.targetYear.getValue(),
+                maxTripDurationFile.get()
+            ),
             additionalHourlyDelayDolphinSets.applyAsDouble(rng),
             additionalHourlyDelayDeployment.applyAsDouble(rng),
             additionalHourlyDelayNonAssociatedSets.applyAsDouble(rng),
@@ -190,9 +196,8 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             noaBias.applyAsDouble(rng),
             delBias.applyAsDouble(rng),
             ofsBias.applyAsDouble(rng),
-            minimumSetValues
-                .apply(state)
-                .getMinimumSetValue(getTargetYear().getValue(), ActionClass.OFS),
+            minSetValues.getMinimumSetValue(targetYear, OFS),
+            minSetValues.getMinimumSetValue(targetYear, FAD),
             probabilityOfFindingOtherFads.applyAsDouble(rng),
             hoursWastedOnFailedSearches.applyAsDouble(rng),
             planningHorizonInHours.applyAsDouble(rng),
@@ -204,8 +209,6 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             fadModule,
             locationValuesFactory.apply(state).asMap()
         );
-
-        return proxy;
     }
 
     public CatchSamplersFactory<? extends LocalBiology> getCatchSamplers() {
@@ -255,7 +258,7 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     public void setPlanningHorizonInHours(final DoubleParameter planningHorizonInHours) {
         this.planningHorizonInHours = planningHorizonInHours;
     }
-    
+
     public DoubleParameter getOwnFadActionWeightBias() {
         return ownFadActionWeightBias;
     }

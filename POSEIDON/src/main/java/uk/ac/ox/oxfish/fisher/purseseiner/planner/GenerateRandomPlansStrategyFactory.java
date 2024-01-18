@@ -24,18 +24,18 @@ public class GenerateRandomPlansStrategyFactory implements AlgorithmFactory<Plan
         plannableActionWeights.put(
             ActionType.FishingOnTile,
             100d
-        ); //should normalize (actually probably ignore it altogether)
+        ); // should normalize (actually probably ignore it altogether)
         final HashMap<ActionType, PlanningModule> planModules = new HashMap<>();
         planModules.put(ActionType.FishingOnTile, fishingAtRandom);
 
         final DrawThenCheapestInsertionPlanner planner = new DrawThenCheapestInsertionPlanner(
-            new FixedDoubleParameter(5 * 24), //120hr
+            new FixedDoubleParameter(5 * 24), // 120hr
             plannableActionWeights,
             planModules,
             false
         );
 
-        return new PlannedStrategy(planner, 500); //there should be no replanning!
+        return new PlannedStrategy(planner, 500, 0); // there should be no replanning!
 
     }
 

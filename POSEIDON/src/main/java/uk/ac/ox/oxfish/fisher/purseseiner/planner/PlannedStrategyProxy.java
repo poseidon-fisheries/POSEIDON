@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
@@ -24,14 +23,19 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 /**
  * an issue with Fad related strategies is that ideally you are supposed to have strategies who don't have fisher
- * specific parameters until start(..) is called but because a lot of files are read when the factory is called you get
+ * specific parameters until start(...) is called but because a lot of files are read when the factory is called you get
  * files with fisher specific parameters fed into strategies that do not know who their fisher is. <br> You can solve
  * this by having strategies that depend on some form of loader/builder design pattern, but that makes testing them
  * quite a roundabout factor and makes them impossible to use in the non-FAD scenarios. <br> Here what we do is simply
- * creating a proxy; this decorates a plannedstrategy but manages its life cycle so that everything is loaded from files
- * only when start is called
+ * creating a proxy; this decorates a planned strategy but manages its life cycle so that everything is loaded from
+ * files only when start is called
  */
 @SuppressWarnings("unchecked")
 public class PlannedStrategyProxy implements FishingStrategy, DestinationStrategy {
@@ -90,6 +94,11 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
     private final double minimumValueOpportunisticFadSets;
 
     /**
+     * The minimum monetary value one's own FAD need to have before setting on it.
+     */
+    private final double minimumValueOfSetOnOwnFad;
+
+    /**
      * To probability of finding another vessel's FAD when you search for some.
      */
     private final double probabilityOfFindingOtherFads;
@@ -99,7 +108,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      */
     private final double hoursWastedOnFailedSearches;
     /**
-     * how many hours does it take for a plan to go stale and need replanning
+     * how many hours does it take for a plan to go stale and need re-planning
      */
     private final double planningHorizonInHours;
     /**
@@ -114,17 +123,17 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
     /**
      * when this is set to true you cannot put an action in the plan if it looks illegal now. When this is not true,
      * illegal actions stay in the plan until it's time to execute them. If they didn't become legal then, they will
-     * trigger a replan
+     * trigger a re-plan
      */
     private final boolean doNotWaitToPurgeIllegalActions;
     /**
-     * if this is is above 0, NOA sets can fish out of the seatile they actually happen in
+     * if this is above 0, NOA sets can fish out of the sea tile they actually happen in
      */
-    private final int noaSetsRangeInSeatiles;
+    private final int noaSetsRangeInSeaTiles;
     /**
-     * if this is is above 0, DEL sets can fish out
+     * if this is above 0, DEL sets can fish out
      */
-    private final int delSetsRangeInSeatiles;
+    private final int delSetsRangeInSeaTiles;
 
     private final Map<Class<? extends PurseSeinerAction>, ? extends LocationValues> locationValues;
 
@@ -144,41 +153,43 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         final double dolphinBias,
         final double opportunisticBias,
         final double minimumValueOpportunisticFadSets,
+        final double minimumValueOfSetOnOwnFad,
         final double probabilityOfFindingOtherFads,
         final double hoursWastedOnFailedSearches,
         final double planningHorizonInHours,
         final double minimumPercentageOfTripDurationAllowed,
         final boolean noaSetsCanPoachFads,
         final boolean doNotWaitToPurgeIllegalActions,
-        final int noaSetsRangeInSeatiles,
-        final int delSetsRangeInSeatiles,
+        final int noaSetsRangeInSeaTiles,
+        final int delSetsRangeInSeaTiles,
         final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadPlanningModule,
         final Map<Class<? extends PurseSeinerAction>, ? extends LocationValues> locationValues
     ) {
+        checkArgument(minimumPercentageOfTripDurationAllowed >= 0);
+        checkArgument(minimumPercentageOfTripDurationAllowed <= 1);
         this.catchSamplers = catchSamplers;
         this.attractionWeightsPerFisher = attractionWeightsPerFisher;
         this.maxTravelTimeLoader = maxTravelTimeLoader;
         this.additionalHourlyDelayDolphinSets = additionalHourlyDelayDolphinSets;
         this.additionalHourlyDelayDeployment = additionalHourlyDelayDeployment;
         this.additionalHourlyDelayNonAssociatedSets = additionalHourlyDelayNonAssociatedSets;
-        this.ownFadActionWeightBias = Math.max(Math.min(MAX_BIAS, ownFadActionWeightBias), MIN_BIAS);
-        this.deploymentBias = Math.max(Math.min(MAX_BIAS, deploymentBias), MIN_BIAS);
-        this.dolphinBias = Math.max(Math.min(MAX_BIAS, dolphinBias), MIN_BIAS);
-        this.opportunisticBias = Math.max(Math.min(MAX_BIAS, opportunisticBias), MIN_BIAS);
-        this.nonAssociatedBias = Math.max(Math.min(MAX_BIAS, nonAssociatedBias), MIN_BIAS);
+        this.ownFadActionWeightBias = max(min(MAX_BIAS, ownFadActionWeightBias), MIN_BIAS);
+        this.deploymentBias = max(min(MAX_BIAS, deploymentBias), MIN_BIAS);
+        this.dolphinBias = max(min(MAX_BIAS, dolphinBias), MIN_BIAS);
+        this.opportunisticBias = max(min(MAX_BIAS, opportunisticBias), MIN_BIAS);
+        this.nonAssociatedBias = max(min(MAX_BIAS, nonAssociatedBias), MIN_BIAS);
         this.minimumValueOpportunisticFadSets = minimumValueOpportunisticFadSets;
+        this.minimumValueOfSetOnOwnFad = minimumValueOfSetOnOwnFad;
         this.probabilityOfFindingOtherFads = probabilityOfFindingOtherFads;
         this.hoursWastedOnFailedSearches = hoursWastedOnFailedSearches;
         this.planningHorizonInHours = planningHorizonInHours;
         this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
         this.noaSetsCanPoachFads = noaSetsCanPoachFads;
         this.doNotWaitToPurgeIllegalActions = doNotWaitToPurgeIllegalActions;
-        this.delSetsRangeInSeatiles = delSetsRangeInSeatiles;
+        this.delSetsRangeInSeaTiles = delSetsRangeInSeaTiles;
         this.fadPlanningModule = fadPlanningModule;
         this.locationValues = locationValues;
-        Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed >= 0);
-        Preconditions.checkArgument(minimumPercentageOfTripDurationAllowed <= 1);
-        this.noaSetsRangeInSeatiles = noaSetsRangeInSeatiles;
+        this.noaSetsRangeInSeaTiles = noaSetsRangeInSeaTiles;
     }
 
     @SuppressWarnings("rawtypes")
@@ -187,7 +198,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         final FishState model,
         final Fisher fisher
     ) {
-        Preconditions.checkState(delegate == null, "Already started!");
+        checkState(delegate == null, "Already started!");
         final Map<ActionType, Double> plannableActionWeights = new HashMap<>();
         final HashMap<ActionType, PlanningModule> planModules = new HashMap<>();
 
@@ -214,8 +225,10 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 final LocationValues locations =
                     locationValues.get(DolphinSetAction.class);
                 if (locations.getValues().isEmpty())
-                    System.out.println(fisher + " failed to create DEL location values, in spite of having" +
-                        "a weight of " + actionWeight.getValue());
+                    System.out.println(
+                        fisher + " failed to create DEL location values, in spite of having" +
+                            "a weight of " + actionWeight.getValue()
+                    );
                 plannableActionWeights.put(
                     ActionType.DolphinSets,
                     actionWeight.getValue() * dolphinBias / (1 - dolphinBias)
@@ -230,7 +243,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                         catchSamplers.get(DolphinSetAction.class),
                         catchMaker,
                         model.getBiology(),
-                        localBiologyClass, delSetsRangeInSeatiles
+                        localBiologyClass, delSetsRangeInSeaTiles
                     )
                 );
             }
@@ -277,7 +290,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                         model.getBiology(),
                         localBiologyClass,
                         noaSetsCanPoachFads,
-                        noaSetsRangeInSeatiles
+                        noaSetsRangeInSeaTiles
                     )
                 );
             }
@@ -333,8 +346,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 doNotWaitToPurgeIllegalActions
             );
         //(2) create the delegate
-        delegate = new PlannedStrategy(
-            planner, planningHorizonInHours);
+        delegate = new PlannedStrategy(planner, planningHorizonInHours, minimumValueOfSetOnOwnFad);
 
         delegate.start(model, fisher);
     }
