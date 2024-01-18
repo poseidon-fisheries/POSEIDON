@@ -28,18 +28,17 @@ import java.util.function.DoubleSupplier;
 public class CompressedAbundanceFadInitializerFactory
     extends AbstractCompressedAbundanceFadInitializerFactory {
 
-
     private DoubleParameter fadDudRate = new FixedDoubleParameter(0);
-
 
     public CompressedAbundanceFadInitializerFactory() {
     }
 
     public CompressedAbundanceFadInitializerFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory,
+        final DoubleParameter totalCarryingCapacity,
         final String... speciesNames
     ) {
-        super(abundanceFiltersFactory, speciesNames);
+        super(abundanceFiltersFactory, totalCarryingCapacity, speciesNames);
     }
 
     protected DoubleSupplier buildCapacityGenerator(
@@ -59,7 +58,6 @@ public class CompressedAbundanceFadInitializerFactory
             };
         return capacityGenerator;
     }
-
 
     @SuppressWarnings("unused")
     public DoubleParameter getFadDudRate() {

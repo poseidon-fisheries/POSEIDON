@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.geography.fads.LinearAbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
@@ -55,6 +56,7 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
                     getTargetYear(),
                     new LinearAbundanceFadInitializerFactory(
                         getAbundanceFiltersFactory(),
+                        new FixedDoubleParameter(445_000),
                         "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
                     ),
                     new UnreliableFishValueCalculatorFactory(new LogNormalErrorOperatorFactory(

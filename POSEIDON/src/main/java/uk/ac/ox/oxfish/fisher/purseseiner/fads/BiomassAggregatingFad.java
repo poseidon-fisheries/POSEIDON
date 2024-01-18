@@ -38,29 +38,31 @@ public class BiomassAggregatingFad
         final FadManager owner,
         final BiomassLocalBiology biology,
         final FishAttractor<BiomassLocalBiology, BiomassAggregatingFad> fishAttractor,
-        final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final CarryingCapacity carryingCapacity
+        final CarryingCapacity carryingCapacity,
+        final Map<Species, Double> fishReleaseProbabilities
     ) {
         super(
             owner,
             biology,
             fishAttractor,
-            fishReleaseProbability,
             stepDeployed,
             locationDeployed,
-            carryingCapacity
+            carryingCapacity,
+            fishReleaseProbabilities
         );
     }
 
     /**
-     * Remove biomass from the FAD and send the biomass down to the sea tile's biology. If the local
-     * biology is not biomass based (most likely because we're outside the habitable zone), the fish
-     * is lost.
+     * Remove biomass from the FAD and send the biomass down to the sea tile's biology. If the local biology is not
+     * biomass based (most likely because we're outside the habitable zone), the fish is lost.
      */
     @Override
-    public void releaseFish(final Collection<? extends Species> allSpecies, final LocalBiology seaTileBiology) {
+    public void releaseFish(
+        final Collection<? extends Species> allSpecies,
+        final LocalBiology seaTileBiology
+    ) {
         if (seaTileBiology instanceof VariableBiomassBasedBiology) {
             releaseFish(allSpecies, (VariableBiomassBasedBiology) seaTileBiology);
         } else {
@@ -69,8 +71,8 @@ public class BiomassAggregatingFad
     }
 
     /**
-     * Remove biomass from the FAD and send the biomass down to the sea tile's biology. In the
-     * unlikely event that the sea tile's carrying capacity is exceeded, the extra fish is lost.
+     * Remove biomass from the FAD and send the biomass down to the sea tile's biology. In the unlikely event that the
+     * sea tile's carrying capacity is exceeded, the extra fish is lost.
      */
     private void releaseFish(
         final Collection<? extends Species> allSpecies,
@@ -93,8 +95,7 @@ public class BiomassAggregatingFad
     }
 
     /**
-     * Remove biomass for all the given species from the FAD without sending it anywhere, therefore
-     * losing the fish.
+     * Remove biomass for all the given species from the FAD without sending it anywhere, therefore losing the fish.
      */
     @Override
     public void releaseFish(final Collection<? extends Species> allSpecies) {

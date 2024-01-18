@@ -26,6 +26,7 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.
@@ -40,6 +41,7 @@ public class EpoFadsOnlyAbundanceScenario extends EpoAbundanceScenario {
                 new AbundanceFiltersFromFileFactory(
                     getInputFolder().path("abundance", "selectivity_2022.csv")
                 ),
+                new FixedDoubleParameter(445_000),
                 "Bigeye tuna", "Yellowfin tuna", "Skipjack tuna"
             )
         );

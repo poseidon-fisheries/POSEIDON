@@ -17,30 +17,20 @@ public abstract class AbundanceFadInitializerFactory
     public AbundanceFadInitializerFactory(
         final CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory,
         final Map<String, DoubleParameter> catchabilities,
+        final Map<String, DoubleParameter> fishReleaseProbabilities,
         final DoubleParameter daysInWaterBeforeAttraction,
-        final DoubleParameter fishReleaseProbabilityInPercent,
         final AbundanceFiltersFactory abundanceFilters
     ) {
         super(
             carryingCapacityInitializerFactory,
             catchabilities,
-            daysInWaterBeforeAttraction,
-            fishReleaseProbabilityInPercent
+            fishReleaseProbabilities,
+            daysInWaterBeforeAttraction
         );
         this.abundanceFilters = checkNotNull(abundanceFilters);
     }
 
-    protected AbundanceFadInitializerFactory(
-        final CarryingCapacityInitializerFactory<?> carryingCapacitiesFactory,
-        final Map<String, DoubleParameter> catchabilities,
-        final AbundanceFiltersFactory abundanceFilters
-    ) {
-        super(carryingCapacitiesFactory, catchabilities);
-        this.abundanceFilters = checkNotNull(abundanceFilters);
-    }
-
     public AbundanceFadInitializerFactory() {
-
     }
 
     public AbundanceFiltersFactory getAbundanceFilters() {

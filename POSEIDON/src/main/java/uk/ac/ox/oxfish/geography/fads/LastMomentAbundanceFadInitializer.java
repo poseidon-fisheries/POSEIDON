@@ -32,7 +32,8 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Map;
 
-public class LastMomentAbundanceFadInitializer implements FadInitializer<AbundanceLocalBiology, LastMomentAbundanceFad> {
+public class LastMomentAbundanceFadInitializer implements FadInitializer<AbundanceLocalBiology,
+    LastMomentAbundanceFad> {
 
     private final int daysItTakeToFillUp;
     private final int daysInWaterBeforeAttraction;
@@ -43,10 +44,13 @@ public class LastMomentAbundanceFadInitializer implements FadInitializer<Abundan
     private final double[] maxCatchabilityPerSpecies;
 
     private final GlobalBiology biology;
+    private Map<Species, Double> fishReleaseProbabilities;
 
     public LastMomentAbundanceFadInitializer(
-        final int daysItTakeToFillUp, final int daysInWaterBeforeAttraction,
-        final Map<Species, NonMutatingArrayFilter> selectivityFilters, final double dudProbability,
+        final int daysItTakeToFillUp,
+        final int daysInWaterBeforeAttraction,
+        final Map<Species, NonMutatingArrayFilter> selectivityFilters,
+        final double dudProbability,
         final double[] maxCatchabilityPerSpecies,
         final GlobalBiology biology
     ) {
@@ -69,14 +73,14 @@ public class LastMomentAbundanceFadInitializer implements FadInitializer<Abundan
             owner != null ? owner.getCurrentTrip() : null,
             owner.grabState().getStep(),
             initialLocation.getGridLocation(),
-            0d,
             fadManager,
             daysItTakeToFillUp,
             daysInWaterBeforeAttraction,
             rng.nextBoolean(dudProbability),
             maxCatchabilityPerSpecies,
             selectivityFilters,
-            biology
+            biology,
+            fishReleaseProbabilities
         );
 
     }

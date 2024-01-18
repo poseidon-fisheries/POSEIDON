@@ -4,8 +4,11 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Map;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.processSpeciesNameToDoubleParameterMap;
 
 public class CompressedBiomassFadInitializerFactory
     extends CompressedExponentialFadInitializerFactory<BiomassLocalBiology, BiomassAggregatingFad> {
@@ -18,22 +21,27 @@ public class CompressedBiomassFadInitializerFactory
     }
 
     public CompressedBiomassFadInitializerFactory(
+        final DoubleParameter totalCarryingCapacity,
         final String... speciesNames
     ) {
-        super(speciesNames);
+        super(totalCarryingCapacity, speciesNames);
     }
 
     public CompressedBiomassFadInitializerFactory(
-        final Map<String, Double> compressionExponents,
-        final Map<String, Double> attractableBiomassCoefficients,
-        final Map<String, Double> biomassInteractionsCoefficients,
-        final Map<String, Double> growthRates
+        final DoubleParameter totalCarryingCapacity,
+        final Map<String, DoubleParameter> compressionExponents,
+        final Map<String, DoubleParameter> attractableBiomassCoefficients,
+        final Map<String, DoubleParameter> biomassInteractionsCoefficients,
+        final Map<String, DoubleParameter> growthRates,
+        final Map<String, DoubleParameter> fishReleaseProbabilities
     ) {
         super(
+            totalCarryingCapacity,
             compressionExponents,
             attractableBiomassCoefficients,
             biomassInteractionsCoefficients,
-            growthRates
+            growthRates,
+            fishReleaseProbabilities
         );
     }
 
@@ -43,9 +51,13 @@ public class CompressedBiomassFadInitializerFactory
         return new BiomassFadInitializer(
             fishState.getBiology(),
             makeFishAttractor(fishState, rng),
-            getFishReleaseProbabilityInPercent().applyAsDouble(rng) / 100d,
             fishState::getStep,
-            new GlobalCarryingCapacityInitializer(getTotalCarryingCapacity())
+            new GlobalCarryingCapacityInitializer(getTotalCarryingCapacity()),
+            processSpeciesNameToDoubleParameterMap(
+                getFishReleaseProbabilities(),
+                fishState.getBiology(),
+                rng
+            )
         );
     }
 

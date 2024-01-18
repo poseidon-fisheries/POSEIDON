@@ -8,24 +8,21 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 /**
- * A simple algorithm factory to plop an unrealistic fad map and an exogenous fad maker csv;
- * may be changed later, but for now this is primarilly a vehicle to test FAD movement and deployment
- * without the full tuna scenario
+ * A simple algorithm factory to plop an unrealistic fad map and an exogenous fad maker csv; may be changed later, but
+ * for now this is primarilly a vehicle to test FAD movement and deployment without the full tuna scenario
  */
 public class FadDemoFactory implements AlgorithmFactory<AdditionalStartable> {
 
     private final ExogenousFadMakerCSVFactory exogenousFadMaker = new ExogenousFadMakerCSVFactory();
 
-
     private final FadMapDummyFactory map = new FadMapDummyFactory();
-
 
     @Override
     public AdditionalStartable apply(final FishState state) {
 
-        //we are going to put the fad map in right as soon as this is initialized
-        //since usually fad maps are needed by many strategies/objects
-        //when they start
+        // we are going to put the fad map in right as soon as this is initialized
+        // since usually fad maps are needed by many strategies/objects
+        // when they start
         final FadMap fadMap = map.apply(state);
         Preconditions.checkState(
             state.getFadMap() == null,
@@ -37,7 +34,6 @@ public class FadDemoFactory implements AlgorithmFactory<AdditionalStartable> {
             fadMaker.start(model);
             fadMap.start(state);
         };
-
 
     }
 
@@ -77,7 +73,7 @@ public class FadDemoFactory implements AlgorithmFactory<AdditionalStartable> {
         return exogenousFadMaker.getFadInitializer();
     }
 
-    public void setFadInitializer(final CompressedExponentialFadInitializerFactory<?, ?> fadInitializer) {
+    public void setFadInitializer(final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializer) {
         exogenousFadMaker.setFadInitializer(fadInitializer);
     }
 }

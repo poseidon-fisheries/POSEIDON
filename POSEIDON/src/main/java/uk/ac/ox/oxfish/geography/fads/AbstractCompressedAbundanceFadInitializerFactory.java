@@ -6,6 +6,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.processSpeciesNameToDoubleParameterMap;
 
 public abstract class AbstractCompressedAbundanceFadInitializerFactory
     extends CompressedExponentialFadInitializerFactory<AbundanceLocalBiology, AbundanceAggregatingFad> {
@@ -14,9 +17,10 @@ public abstract class AbstractCompressedAbundanceFadInitializerFactory
 
     AbstractCompressedAbundanceFadInitializerFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory,
+        final DoubleParameter totalCarryingCapacity,
         final String... speciesNames
     ) {
-        super(speciesNames);
+        super(totalCarryingCapacity, speciesNames);
         this.abundanceFiltersFactory = abundanceFiltersFactory;
     }
 
@@ -41,9 +45,9 @@ public abstract class AbstractCompressedAbundanceFadInitializerFactory
         return new AbundanceAggregatingFadInitializer(
             fishState.getBiology(),
             makeFishAttractor(fishState, rng),
-            getFishReleaseProbabilityInPercent().applyAsDouble(rng) / 100d,
             fishState::getStep,
-            new GlobalCarryingCapacityInitializer(getTotalCarryingCapacity())
+            new GlobalCarryingCapacityInitializer(getTotalCarryingCapacity()),
+            processSpeciesNameToDoubleParameterMap(getFishReleaseProbabilities(), fishState.getBiology(), rng)
         );
     }
 

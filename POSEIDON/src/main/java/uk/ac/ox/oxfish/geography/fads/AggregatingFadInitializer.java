@@ -19,14 +19,17 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
+import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
+import java.util.Map;
 import java.util.function.IntSupplier;
 
 public abstract class AggregatingFadInitializer<
@@ -35,23 +38,23 @@ public abstract class AggregatingFadInitializer<
     implements FadInitializer<B, F> {
 
     final double[] emptyBiomasses;
-    private final double fishReleaseProbability;
     private final FishAttractor<B, F> fishAttractor;
     private final IntSupplier timeStepSupplier;
     private final GlobalBiology biology;
     private final CarryingCapacityInitializer<?> carryingCapacityInitializer;
+    private final Map<Species, Double> fishReleaseProbabilities;
 
     AggregatingFadInitializer(
         final GlobalBiology globalBiology,
         final FishAttractor<B, F> fishAttractor,
-        final double fishReleaseProbability,
         final IntSupplier timeStepSupplier,
-        final CarryingCapacityInitializer<?> carryingCapacityInitializer
+        final CarryingCapacityInitializer<?> carryingCapacityInitializer,
+        final Map<Species, Double> fishReleaseProbabilities
     ) {
         this.emptyBiomasses = new double[globalBiology.getSize()];
+        this.fishReleaseProbabilities = ImmutableMap.copyOf(fishReleaseProbabilities);
         this.timeStepSupplier = timeStepSupplier;
         this.fishAttractor = fishAttractor;
-        this.fishReleaseProbability = fishReleaseProbability;
         this.biology = globalBiology;
         this.carryingCapacityInitializer = carryingCapacityInitializer;
     }
@@ -67,10 +70,10 @@ public abstract class AggregatingFadInitializer<
             fadManager,
             makeBiology(biology),
             fishAttractor,
-            fishReleaseProbability,
             timeStepSupplier.getAsInt(),
             new Int2D(initialLocation.getGridX(), initialLocation.getGridY()),
-            carryingCapacityInitializer.apply(rng)
+            carryingCapacityInitializer.apply(rng),
+            fishReleaseProbabilities
         );
     }
 
@@ -78,12 +81,11 @@ public abstract class AggregatingFadInitializer<
         FadManager owner,
         B biology,
         FishAttractor<B, F> fishAttractor,
-        double fishReleaseProbability,
         int stepDeployed,
         Int2D locationDeployed,
-        CarryingCapacity carryingCapacity
+        CarryingCapacity carryingCapacity,
+        Map<Species, Double> fishReleaseProbabilities
     );
-
 
     protected abstract B makeBiology(GlobalBiology globalBiology);
 

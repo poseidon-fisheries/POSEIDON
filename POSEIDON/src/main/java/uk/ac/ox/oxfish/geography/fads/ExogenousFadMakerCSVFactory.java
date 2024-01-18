@@ -11,8 +11,8 @@ import static java.util.stream.Collectors.*;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 /**
- * reads csv file, with column "day" for what day each fad gets dropped
- * x,y for the coordinates (simulated coordinates, not grid coordinates)
+ * reads csv file, with column "day" for what day each fad gets dropped x,y for the coordinates (simulated coordinates,
+ * not grid coordinates)
  */
 public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalStartable>, Dummyable {
 
@@ -27,10 +27,9 @@ public class ExogenousFadMakerCSVFactory implements AlgorithmFactory<AdditionalS
     public ExogenousFadMakerCSVFactory() {
     }
 
-
     public ExogenousFadMakerCSVFactory(
         final InputPath deploymentsFile,
-        @SuppressWarnings("rawtypes") final CompressedExponentialFadInitializerFactory<?, ?> fadInitializerFactory
+        final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory
     ) {
         this.deploymentsFile = deploymentsFile;
         this.fadInitializerFactory = fadInitializerFactory;

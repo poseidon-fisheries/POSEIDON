@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.geography.fads.CompressedBiomassFadInitializerFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
@@ -48,26 +49,32 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
                 new BiomassPurseSeineGearFactory(
                     getTargetYear(),
                     new CompressedBiomassFadInitializerFactory(
+                        new FixedDoubleParameter(445_000),
                         // use numbers from https://github.com/poseidon-fisheries/tuna/blob/9c6f775ced85179ec39e12d8a0818bfcc2fbc83f/calibration/results/ernesto/best_base_line/calibrated_scenario.yaml
                         ImmutableMap.of(
-                            "Bigeye tuna", 0.7697766896339598,
-                            "Yellowfin tuna", 1.1292389959739901,
-                            "Skipjack tuna", 0.0
+                            "Bigeye tuna", new FixedDoubleParameter(0.7697766896339598),
+                            "Yellowfin tuna", new FixedDoubleParameter(1.1292389959739901),
+                            "Skipjack tuna", new FixedDoubleParameter(0.0)
                         ),
                         ImmutableMap.of(
-                            "Bigeye tuna", 1.0184011081061861,
-                            "Yellowfin tuna", 0.0,
-                            "Skipjack tuna", 0.7138646301498129
+                            "Bigeye tuna", new FixedDoubleParameter(1.0184011081061861),
+                            "Yellowfin tuna", new FixedDoubleParameter(0.0),
+                            "Skipjack tuna", new FixedDoubleParameter(0.7138646301498129)
                         ),
                         ImmutableMap.of(
-                            "Bigeye tuna", 9.557509707646096,
-                            "Yellowfin tuna", 10.419783885948643,
-                            "Skipjack tuna", 9.492481930328207
+                            "Bigeye tuna", new FixedDoubleParameter(9.557509707646096),
+                            "Yellowfin tuna", new FixedDoubleParameter(10.419783885948643),
+                            "Skipjack tuna", new FixedDoubleParameter(9.492481930328207)
                         ),
                         ImmutableMap.of(
-                            "Bigeye tuna", 0.688914118975473,
-                            "Yellowfin tuna", 0.30133562299610883,
-                            "Skipjack tuna", 1.25
+                            "Bigeye tuna", new FixedDoubleParameter(0.688914118975473),
+                            "Yellowfin tuna", new FixedDoubleParameter(0.30133562299610883),
+                            "Skipjack tuna", new FixedDoubleParameter(1.25)
+                        ),
+                        ImmutableMap.of(
+                            "Bigeye tuna", new CalibratedParameter(0.08, 0.348, 0, 0.75),
+                            "Skipjack tuna", new CalibratedParameter(0.247, 0.75, 0, 0.75),
+                            "Yellowfin tuna", new CalibratedParameter(0.109, 0.226, 0, 0.75)
                         )
                     ),
                     new UnreliableFishValueCalculatorFactory(new LogNormalErrorOperatorFactory(

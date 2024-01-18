@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -42,20 +41,22 @@ public abstract class CompressedExponentialFadInitializerFactory<
     >
     implements AlgorithmFactory<FadInitializer<B, F>> {
 
-    private DoubleParameter fishReleaseProbabilityInPercent = new FixedDoubleParameter(2.0);
-    private DoubleParameter totalCarryingCapacity = new FixedDoubleParameter(445_000); // TODO
+    private DoubleParameter totalCarryingCapacity;
 
-
-    private Map<String, DoubleParameter> compressionExponents = new HashMap<>();
-    private Map<String, DoubleParameter> attractableBiomassCoefficients = new HashMap<>();
-    private Map<String, DoubleParameter> biomassInteractionsCoefficients = new HashMap<>();
-    private Map<String, DoubleParameter> growthRates = new HashMap<>();
+    private Map<String, DoubleParameter> compressionExponents;
+    private Map<String, DoubleParameter> attractableBiomassCoefficients;
+    private Map<String, DoubleParameter> biomassInteractionsCoefficients;
+    private Map<String, DoubleParameter> growthRates;
+    private Map<String, DoubleParameter> fishReleaseProbabilities;
 
     CompressedExponentialFadInitializerFactory(
+        final DoubleParameter totalCarryingCapacity,
         final String... speciesNames
     ) {
         // By setting all coefficients to zero, we'll get a 0.5 probability of attraction
         this(
+            totalCarryingCapacity,
+            makeZeros(speciesNames),
             makeZeros(speciesNames),
             makeZeros(speciesNames),
             makeZeros(speciesNames),
@@ -63,23 +64,30 @@ public abstract class CompressedExponentialFadInitializerFactory<
         );
     }
 
-    CompressedExponentialFadInitializerFactory(
-        final Map<String, Double> compressionExponents,
-        final Map<String, Double> attractableBiomassCoefficients,
-        final Map<String, Double> biomassInteractionsCoefficients,
-        final Map<String, Double> growthRates
+    public CompressedExponentialFadInitializerFactory(
+        final DoubleParameter totalCarryingCapacity,
+        final Map<String, DoubleParameter> compressionExponents,
+        final Map<String, DoubleParameter> attractableBiomassCoefficients,
+        final Map<String, DoubleParameter> biomassInteractionsCoefficients,
+        final Map<String, DoubleParameter> growthRates,
+        final Map<String, DoubleParameter> fishReleaseProbabilities
     ) {
-        setCompressionExponents(wrapParameters(compressionExponents));
-        setAttractableBiomassCoefficients(wrapParameters(attractableBiomassCoefficients));
-        setBiomassInteractionsCoefficients(wrapParameters(biomassInteractionsCoefficients));
-        setGrowthRates(wrapParameters(growthRates));
+        this.totalCarryingCapacity = totalCarryingCapacity;
+        this.compressionExponents = compressionExponents;
+        this.attractableBiomassCoefficients = attractableBiomassCoefficients;
+        this.biomassInteractionsCoefficients = biomassInteractionsCoefficients;
+        this.growthRates = growthRates;
+        this.fishReleaseProbabilities = fishReleaseProbabilities;
     }
 
-    private static Map<String, Double> makeZeros(final String[] speciesNames) {
+    private static Map<String, DoubleParameter> makeZeros(final String[] speciesNames) {
         return Arrays.stream(speciesNames).collect(toMap(
             identity(),
-            __ -> 0.0
+            __ -> new FixedDoubleParameter(0.0)
         ));
+    }
+
+    CompressedExponentialFadInitializerFactory() {
     }
 
     private static ImmutableMap<String, DoubleParameter> wrapParameters(
@@ -88,9 +96,6 @@ public abstract class CompressedExponentialFadInitializerFactory<
         return params.entrySet().stream().collect(toImmutableMap(
             Entry::getKey, entry -> new FixedDoubleParameter(entry.getValue())
         ));
-    }
-
-    CompressedExponentialFadInitializerFactory() {
     }
 
     static double[] processParameterMap(
@@ -106,16 +111,12 @@ public abstract class CompressedExponentialFadInitializerFactory<
         return a;
     }
 
-    @SuppressWarnings({"unused", "WeakerAccess"})
-    public DoubleParameter getFishReleaseProbabilityInPercent() {
-        return fishReleaseProbabilityInPercent;
+    public Map<String, DoubleParameter> getFishReleaseProbabilities() {
+        return fishReleaseProbabilities;
     }
 
-    @SuppressWarnings("unused")
-    public void setFishReleaseProbabilityInPercent(
-        final DoubleParameter fishReleaseProbabilityInPercent
-    ) {
-        this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
+    public void setFishReleaseProbabilities(final Map<String, DoubleParameter> fishReleaseProbabilities) {
+        this.fishReleaseProbabilities = fishReleaseProbabilities;
     }
 
     public DoubleParameter getTotalCarryingCapacity() {
@@ -129,19 +130,19 @@ public abstract class CompressedExponentialFadInitializerFactory<
 
     @SuppressWarnings({"unused", "WeakerAccess"})
     public Map<String, DoubleParameter> getCompressionExponents() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         return compressionExponents;
     }
 
     @SuppressWarnings("WeakerAccess")
     public void setCompressionExponents(final Map<String, DoubleParameter> compressionExponents) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         this.compressionExponents = compressionExponents;
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})
     public Map<String, DoubleParameter> getAttractableBiomassCoefficients() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         return attractableBiomassCoefficients;
     }
 
@@ -149,13 +150,13 @@ public abstract class CompressedExponentialFadInitializerFactory<
     public void setAttractableBiomassCoefficients(
         final Map<String, DoubleParameter> attractableBiomassCoefficients
     ) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         this.attractableBiomassCoefficients = attractableBiomassCoefficients;
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})
     public Map<String, DoubleParameter> getBiomassInteractionsCoefficients() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         return biomassInteractionsCoefficients;
     }
 
@@ -163,19 +164,19 @@ public abstract class CompressedExponentialFadInitializerFactory<
     public void setBiomassInteractionsCoefficients(
         final Map<String, DoubleParameter> biomassInteractionsCoefficients
     ) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         this.biomassInteractionsCoefficients = biomassInteractionsCoefficients;
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})
     public Map<String, DoubleParameter> getGrowthRates() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         return growthRates;
     }
 
     @SuppressWarnings("WeakerAccess")
     public void setGrowthRates(final Map<String, DoubleParameter> growthRates) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         this.growthRates = growthRates;
     }
 

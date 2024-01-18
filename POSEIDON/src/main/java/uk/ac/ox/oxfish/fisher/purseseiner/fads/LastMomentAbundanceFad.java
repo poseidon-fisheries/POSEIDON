@@ -46,25 +46,25 @@ public class LastMomentAbundanceFad extends LastMomentFad {
         final TripRecord tripDeployed,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final double fishReleaseProbability,
         final FadManager owner,
         final int daysItTakesToFillUp,
         final int daysInWaterBeforeAttraction,
         final boolean isDud,
         final double[] maxCatchabilityPerSpecies,
         final Map<Species, NonMutatingArrayFilter> selectivityFilters,
-        final GlobalBiology biology
+        final GlobalBiology biology,
+        final Map<Species, Double> fishReleaseProbabilities
     ) {
         super(
             tripDeployed,
             stepDeployed,
             locationDeployed,
-            fishReleaseProbability,
             owner,
             daysItTakesToFillUp,
             daysInWaterBeforeAttraction,
             maxCatchabilityPerSpecies,
-            isDud
+            isDud,
+            fishReleaseProbabilities
         );
         this.selectivityFilters = selectivityFilters;
         this.biology = biology;
@@ -96,7 +96,7 @@ public class LastMomentAbundanceFad extends LastMomentFad {
         final LocalBiology seaTileBiology,
         final Map<Species, NonMutatingArrayFilter> selectivityFilters
     ) {
-        //for each species, same operation
+        // for each species, same operation
         final Map<Species, double[][]> caughtAbundances = new HashMap<>();
         for (final Species species : state.getBiology().getSpecies()) {
             final StructuredAbundance localAbundance = seaTileBiology.getAbundance(species);
@@ -111,7 +111,6 @@ public class LastMomentAbundanceFad extends LastMomentFad {
 
                     if (caughtAbundance[subdivision][bins] < .0001)
                         caughtAbundance[subdivision][bins] = 0;
-
 
                 }
             }

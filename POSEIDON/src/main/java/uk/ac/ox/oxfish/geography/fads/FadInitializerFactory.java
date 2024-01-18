@@ -5,7 +5,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Map;
@@ -18,32 +17,30 @@ public abstract class FadInitializerFactory<
         new CacheByFishState<>(this::makeFadInitializer);
     private Map<String, DoubleParameter> catchabilities;
     private CarryingCapacityInitializerFactory<?> carryingCapacityInitializer;
-    private DoubleParameter daysInWaterBeforeAttraction =
-        new CalibratedParameter(13, 30, 5, 40, 14);
-    private DoubleParameter fishReleaseProbabilityInPercent =
-        new CalibratedParameter(5, 10, 0, 15);
+    private DoubleParameter daysInWaterBeforeAttraction;
+    private Map<String, DoubleParameter> fishReleaseProbabilities;
 
     FadInitializerFactory(
         final CarryingCapacityInitializerFactory<?> carryingCapacityInitializer,
         final Map<String, DoubleParameter> catchabilities,
-        final DoubleParameter daysInWaterBeforeAttraction,
-        final DoubleParameter fishReleaseProbabilityInPercent
+        final Map<String, DoubleParameter> fishReleaseProbabilities,
+        final DoubleParameter daysInWaterBeforeAttraction
     ) {
         this.carryingCapacityInitializer = carryingCapacityInitializer;
         this.catchabilities = catchabilities;
+        this.fishReleaseProbabilities = fishReleaseProbabilities;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
-        this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
     }
 
     FadInitializerFactory() {
     }
 
-    public FadInitializerFactory(
-        final CarryingCapacityInitializerFactory<?> carryingCapacityInitializer,
-        final Map<String, DoubleParameter> catchabilities
-    ) {
-        this.carryingCapacityInitializer = carryingCapacityInitializer;
-        this.catchabilities = catchabilities;
+    public Map<String, DoubleParameter> getFishReleaseProbabilities() {
+        return fishReleaseProbabilities;
+    }
+
+    public void setFishReleaseProbabilities(final Map<String, DoubleParameter> fishReleaseProbabilities) {
+        this.fishReleaseProbabilities = fishReleaseProbabilities;
     }
 
     public Map<String, DoubleParameter> getCatchabilities() {
@@ -65,15 +62,6 @@ public abstract class FadInitializerFactory<
 
     void invalidateCache() {
         cache.invalidateAll();
-    }
-
-    public DoubleParameter getFishReleaseProbabilityInPercent() {
-        return fishReleaseProbabilityInPercent;
-    }
-
-    public void setFishReleaseProbabilityInPercent(final DoubleParameter fishReleaseProbabilityInPercent) {
-        invalidateCache();
-        this.fishReleaseProbabilityInPercent = fishReleaseProbabilityInPercent;
     }
 
     @Override

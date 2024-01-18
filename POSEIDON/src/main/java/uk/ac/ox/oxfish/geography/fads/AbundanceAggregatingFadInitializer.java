@@ -20,9 +20,11 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 
+import java.util.Map;
 import java.util.function.IntSupplier;
 
 public class AbundanceAggregatingFadInitializer
@@ -31,11 +33,11 @@ public class AbundanceAggregatingFadInitializer
     public AbundanceAggregatingFadInitializer(
         final GlobalBiology globalBiology,
         final FishAttractor<AbundanceLocalBiology, AbundanceAggregatingFad> fishAttractor,
-        final double fishReleaseProbability,
         final IntSupplier timeStepSupplier,
-        final CarryingCapacityInitializer<?> carryingCapacityInitializer
+        final CarryingCapacityInitializer<?> carryingCapacityInitializer,
+        final Map<Species, Double> fishReleaseProbability
     ) {
-        super(globalBiology, fishAttractor, fishReleaseProbability, timeStepSupplier, carryingCapacityInitializer);
+        super(globalBiology, fishAttractor, timeStepSupplier, carryingCapacityInitializer, fishReleaseProbability);
     }
 
     @Override
@@ -48,19 +50,19 @@ public class AbundanceAggregatingFadInitializer
         final FadManager owner,
         final AbundanceLocalBiology biology,
         final FishAttractor<AbundanceLocalBiology, AbundanceAggregatingFad> fishAttractor,
-        final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final CarryingCapacity carryingCapacity
+        final CarryingCapacity carryingCapacity,
+        final Map<Species, Double> fishReleaseProbabilities
     ) {
         return new AbundanceAggregatingFad(
             owner,
             biology,
             fishAttractor,
-            fishReleaseProbability,
             stepDeployed,
             locationDeployed,
-            carryingCapacity
+            carryingCapacity,
+            fishReleaseProbabilities
         );
     }
 }

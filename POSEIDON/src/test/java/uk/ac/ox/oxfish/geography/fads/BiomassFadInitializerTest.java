@@ -18,6 +18,8 @@ import uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,9 +33,9 @@ public class BiomassFadInitializerTest {
         final BiomassFadInitializer fadInitializer = new BiomassFadInitializer(
             globalBiology,
             new DummyFishBiomassAttractor(globalBiology.getSize()),
-            0,
             () -> 0,
-            new GlobalCarryingCapacityInitializer(new FixedDoubleParameter(Double.POSITIVE_INFINITY))
+            new GlobalCarryingCapacityInitializer(new FixedDoubleParameter(Double.POSITIVE_INFINITY)),
+            globalBiology.getSpecies().stream().collect(toImmutableMap(identity(), __ -> 0.0))
         );
         final FadMap fadMap =
             new FadMap(

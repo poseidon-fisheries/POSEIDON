@@ -30,7 +30,10 @@ import uk.ac.ox.oxfish.model.plugins.EnvironmentalPredicateFunctionFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
+import java.util.Map;
 import java.util.Optional;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.processSpeciesNameToDoubleParameterMap;
 
 public class LinearIntervalAttractorFactory
     extends AbundanceFadInitializerFactory {
@@ -39,10 +42,18 @@ public class LinearIntervalAttractorFactory
     private EnvironmentalPredicateFunctionFactory environmentalPredicateFunctionFactory;
     private DoubleParameter daysItTakesToFillUp = new CalibratedParameter(30);
     private DoubleParameter minAbundanceThreshold = new CalibratedParameter(100);
+    private Map<String, DoubleParameter> fishReleaseProbabilities;
 
     public LinearIntervalAttractorFactory() {
     }
 
+    public Map<String, DoubleParameter> getFishReleaseProbabilities() {
+        return fishReleaseProbabilities;
+    }
+
+    public void setFishReleaseProbabilities(final Map<String, DoubleParameter> fishReleaseProbabilities) {
+        this.fishReleaseProbabilities = fishReleaseProbabilities;
+    }
 
     @Override
     protected FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> makeFadInitializer(
@@ -51,9 +62,13 @@ public class LinearIntervalAttractorFactory
         return new AbundanceAggregatingFadInitializer(
             fishState.getBiology(),
             generateFishAttractor(fishState),
-            getFishReleaseProbabilityInPercent().applyAsDouble(fishState.getRandom()) / 100d,
             fishState::getStep,
-            capacityCarryingCapacityInitializerFactory.apply(fishState)
+            capacityCarryingCapacityInitializerFactory.apply(fishState),
+            processSpeciesNameToDoubleParameterMap(
+                fishReleaseProbabilities,
+                fishState.getBiology(),
+                fishState.getRandom()
+            )
         );
     }
 

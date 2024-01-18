@@ -42,6 +42,8 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
@@ -75,9 +77,9 @@ public class MakeFadSetTest {
             fadBiology,
             new DummyFishBiomassAttractor(globalBiology.getSize()),
             0,
-            0,
             new Int2D(1, 1),
-            new GlobalCarryingCapacity(carryingCapacity)
+            new GlobalCarryingCapacity(carryingCapacity),
+            globalBiology.getSpecies().stream().collect(toImmutableMap(identity(), __ -> 0.0))
         );
         fillBiomassFad(fad);
         final VariableBiomassBasedBiology tileBiology =

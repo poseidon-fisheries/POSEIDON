@@ -40,19 +40,19 @@ public class AbundanceAggregatingFad
         final FadManager owner,
         final AbundanceLocalBiology biology,
         final FishAttractor<AbundanceLocalBiology, AbundanceAggregatingFad> fishAttractor,
-        final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final CarryingCapacity carryingCapacity
+        final CarryingCapacity carryingCapacity,
+        final Map<Species, Double> fishReleaseProbabilities
     ) {
         super(
             owner,
             biology,
             fishAttractor,
-            fishReleaseProbability,
             stepDeployed,
             locationDeployed,
-            carryingCapacity
+            carryingCapacity,
+            fishReleaseProbabilities
         );
     }
 
@@ -161,11 +161,10 @@ public class AbundanceAggregatingFad
             );
         }
 
-
         if (attracted == null)
             return null;
         if (attracted.getTotalWeight() < 0) {
-            //sometimes it is effectively 0
+            // sometimes it is effectively 0
             assert attracted.getTotalWeight() > -FishStateUtilities.EPSILON;
             Preconditions.checkArgument(attracted.getTotalWeight() > -FishStateUtilities.EPSILON);
             return null;

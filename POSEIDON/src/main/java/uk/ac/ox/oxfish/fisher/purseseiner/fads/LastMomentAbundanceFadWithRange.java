@@ -41,11 +41,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * like the lastmoment fad with abundance, but this fad doesn't sample only its own cell but those around it too.
- * Keeps track of how much it catches in each area and then if fishing does occur, kills off the right amount in each area
+ * like the lastmoment fad with abundance, but this fad doesn't sample only its own cell but those around it too. Keeps
+ * track of how much it catches in each area and then if fishing does occur, kills off the right amount in each area
  */
 public class LastMomentAbundanceFadWithRange extends LastMomentFad {
-
 
     private final static AbundanceAggregator AGGREGATOR = new AbundanceAggregator();
 
@@ -56,8 +55,8 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad {
     private final GlobalBiology biology;
     private final CatchMaker<AbundanceLocalBiology> catchMaker;
     /**
-     * here we store the (temporary) mapping linking back the local biology we have extracted (and that could potentially
-     * be caught)
+     * here we store the (temporary) mapping linking back the local biology we have extracted (and that could
+     * potentially be caught)
      */
     private HashMap<AbundanceLocalBiology, SeaTile> catchPerTile;
 
@@ -65,7 +64,6 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad {
         final TripRecord tripDeployed,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final double fishReleaseProbability,
         final FadManager owner,
         final int daysItTakesToFillUp,
         final int daysInWaterBeforeAttraction,
@@ -73,18 +71,19 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad {
         final boolean isDud,
         final int rangeInSeatiles,
         final Map<Species, NonMutatingArrayFilter> selectivityFilters,
-        final GlobalBiology biology
+        final GlobalBiology biology,
+        final Map<Species, Double> fishReleaseProbabilities
     ) {
         super(
             tripDeployed,
             stepDeployed,
             locationDeployed,
-            fishReleaseProbability,
             owner,
             daysItTakesToFillUp,
             daysInWaterBeforeAttraction,
             maxCatchabilityPerSpecies,
-            isDud
+            isDud,
+            fishReleaseProbabilities
         );
         this.selectivityFilters = selectivityFilters;
         this.biology = biology;
@@ -94,14 +93,18 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad {
     }
 
     @Override
-    public void reactToBeingFished(final FishState state, final Fisher fisher, final SeaTile location) {
+    public void reactToBeingFished(
+        final FishState state,
+        final Fisher fisher,
+        final SeaTile location
+    ) {
 
         for (final Map.Entry<AbundanceLocalBiology, SeaTile> catches : catchPerTile.entrySet()) {
             final AbundanceLocalBiology catchHere = catches.getKey();
             final Map.Entry<Catch, AbundanceLocalBiology> caughtHere = catchMaker.apply(
                 catchHere,
                 catchHere
-            );//all of it is caught all the time
+            );// all of it is caught all the time
             catches.getValue().reactToThisAmountOfBiomassBeingFished(
                 caughtHere.getKey(), caughtHere.getKey(), biology
             );
@@ -116,7 +119,7 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad {
 
     @Override
     public AbundanceLocalBiology getBiology() {
-        //empty local biology
+        // empty local biology
         final FishState state = super.getFishState();
         if (state == null) {
             catchPerTile = null;
@@ -129,7 +132,7 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad {
         }
 
         catchPerTile = new HashMap<>();
-        //get all neighbors
+        // get all neighbors
         final Bag mooreNeighbors = state.getMap().getMooreNeighbors(getLocation(), rangeInSeatiles);
         for (final Object mooreNeighbor : mooreNeighbors) {
             final LocalBiology neighborBiology = ((SeaTile) mooreNeighbor).getBiology();
@@ -143,14 +146,13 @@ public class LastMomentAbundanceFadWithRange extends LastMomentFad {
                 catchPerTile.put(catchableBiology, (SeaTile) mooreNeighbor);
             }
         }
-        //add the origin!
+        // add the origin!
         catchPerTile.put(LastMomentAbundanceFad.extractFadBiologyFromLocalBiology(
             state,
             catchability,
             getLocation().getBiology(),
             selectivityFilters
         ), getLocation());
-
 
         return AGGREGATOR.apply(biology, catchPerTile.keySet());
 

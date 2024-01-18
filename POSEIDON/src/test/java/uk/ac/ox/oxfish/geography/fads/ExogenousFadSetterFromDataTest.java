@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.jupiter.api.Assertions;
@@ -25,13 +24,11 @@ import static org.mockito.Mockito.*;
 
 public class ExogenousFadSetterFromDataTest {
 
-
     @SuppressWarnings("rawtypes")
     @Test
     public void choosesTheCorrectFADs() {
 
-
-        //2 observed sets: the first landing 100,100 the second landing 10,10
+        // 2 observed sets: the first landing 100,100 the second landing 10,10
         final FadSetObservation firstObservation = new FadSetObservation(
             new Coordinate(0.5, 0.5),
             new double[]{100, 100},
@@ -50,7 +47,7 @@ public class ExogenousFadSetterFromDataTest {
         when(first.getIndex()).thenReturn(0);
         final Species second = mock(Species.class);
         when(second.getIndex()).thenReturn(1);
-        //4 simulated fads in the water: holding 10,10;20,20;30,30;40,40 biomass
+        // 4 simulated fads in the water: holding 10,10;20,20;30,30;40,40 biomass
         final Bag localFads = new Bag();
         for (int i = 1; i <= 4; i++) {
             final AggregatingFad fad = mock(AggregatingFad.class, RETURNS_DEEP_STUBS);
@@ -63,15 +60,14 @@ public class ExogenousFadSetterFromDataTest {
 
         final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
 
-
         when(model.getSpecies()).thenReturn(Lists.newArrayList(first, second));
         setter.start(model);
         when(model.getDay()).thenReturn(123);
         when(model.getFadMap().fadsAt(any())).thenReturn(localFads);
         setter.step(model);
 
-        //there should have been 2 matches, not out of bounds, and the error ought to be sqrt(2(100-40)^2) since second
-        //fad has perfect match!
+        // there should have been 2 matches, not out of bounds, and the error ought to be sqrt(2(100-40)^2) since second
+        // fad has perfect match!
         Assertions.assertEquals(2, setter.getCounter().getColumn("Matches"), 0.0001);
         Assertions.assertEquals(0, setter.getCounter().getColumn("Failed Matches"), 0.0001);
         Assertions.assertEquals(0, setter.getCounter().getColumn("Out of Bounds"), 0.0001);
@@ -79,12 +75,11 @@ public class ExogenousFadSetterFromDataTest {
 
     }
 
-
     @SuppressWarnings("rawtypes")
     @Test
     public void twoObservationsOneFad() {
 
-        //2 observed sets: the first landing 100,100 the second landing 10,10
+        // 2 observed sets: the first landing 100,100 the second landing 10,10
         final FadSetObservation firstObservation = new FadSetObservation(
             new Coordinate(0.5, 0.5),
             new double[]{100, 100},
@@ -98,7 +93,7 @@ public class ExogenousFadSetterFromDataTest {
         final HashMap<Integer, List<FadSetObservation>> dataset = new HashMap<>();
         dataset.put(123, Lists.newArrayList(firstObservation, secondObservation));
         final ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dataset);
-        //let's log this
+        // let's log this
         final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         final Species secondSpecies = new Species("Species 1");
         secondSpecies.resetIndexTo(1);
@@ -110,8 +105,7 @@ public class ExogenousFadSetterFromDataTest {
         );
         setter.startOrResetLogger(model);
 
-
-        //4 simulated fads in the water: holding 10,10;20,20;30,30;40,40 biomass
+        // 4 simulated fads in the water: holding 10,10;20,20;30,30;40,40 biomass
         final Bag localFads = new Bag();
         final AggregatingFad fad = mock(AggregatingFad.class, RETURNS_DEEP_STUBS);
         final LocalBiology biology = mock(LocalBiology.class);
@@ -120,13 +114,12 @@ public class ExogenousFadSetterFromDataTest {
 //        when(fad.getBiomass()).thenReturn(new double[]{40,40});
         localFads.add(fad);
 
-
         setter.start(model);
         when(model.getDay()).thenReturn(123);
         when(model.getFadMap().fadsAt(any())).thenReturn(localFads);
         setter.step(model);
 
-        //there should have been 1 match, not out of bounds, and the error ought to be sqrt(2 (100-40)^2) +
+        // there should have been 1 match, not out of bounds, and the error ought to be sqrt(2 (100-40)^2) +
         // the penalty for unmatching
         Assertions.assertEquals(1, setter.getCounter().getColumn("Matches"), 0.0001);
         Assertions.assertEquals(1, setter.getCounter().getColumn("Failed Matches"), 0.0001);
@@ -148,7 +141,7 @@ public class ExogenousFadSetterFromDataTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void outOfBoundsSetsAreAccountedSeparately() {
-        //2 observed sets: both will be "out of the map"
+        // 2 observed sets: both will be "out of the map"
         final FadSetObservation firstObservation = new FadSetObservation(
             new Coordinate(0.5, 0.5),
             new double[]{100, 100},
@@ -163,23 +156,21 @@ public class ExogenousFadSetterFromDataTest {
         dataset.put(123, Lists.newArrayList(firstObservation, secondObservation));
         final ExogenousFadSetterFromData setter = new ExogenousFadSetterFromData(dataset);
 
-
-        //4 simulated fads in the water: holding 10,10;20,20;30,30;40,40 biomass
+        // 4 simulated fads in the water: holding 10,10;20,20;30,30;40,40 biomass
         final Bag localFads = new Bag();
         final AggregatingFad fad = mock(AggregatingFad.class, RETURNS_DEEP_STUBS);
         when(fad.getBiomass()).thenReturn(new double[]{40, 40});
         localFads.add(fad);
 
-
         final FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         setter.start(model);
         when(model.getDay()).thenReturn(123);
         when(model.getFadMap().fadsAt(any())).thenReturn(localFads);
-        //everything will be out of the map
+        // everything will be out of the map
         when(model.getMap().getSeaTile(any(Coordinate.class))).thenReturn(null);
         setter.step(model);
 
-        //there should have been 0 matches, 2 out of bounds, and the error ought to be
+        // there should have been 0 matches, 2 out of bounds, and the error ought to be
         // the penalty for out of bounds twice
         Assertions.assertEquals(0, setter.getCounter().getColumn("Matches"), 0.0001);
         Assertions.assertEquals(0, setter.getCounter().getColumn("Failed Matches"), 0.0001);
@@ -198,9 +189,9 @@ public class ExogenousFadSetterFromDataTest {
             0,
             2
         );
-        //should by now have beached or left the map
+        // should by now have beached or left the map
         Assertions.assertEquals(state.getFadMap().allFads().collect(Collectors.toList()).size(), 0);
-        //there should have been 2 matches, 1 failed match (day 0) and 1 out of bounds
+        // there should have been 2 matches, 1 failed match (day 0) and 1 out of bounds
         Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Failed Matches"),
             1,
@@ -233,26 +224,26 @@ public class ExogenousFadSetterFromDataTest {
         final FlexibleScenario scenario = new FlexibleScenario();
         ((SimpleMapInitializerFactory) scenario.getMapInitializer()).setMaxLandWidth(new FixedDoubleParameter(1));
         ((SimpleMapInitializerFactory) scenario.getMapInitializer()).setCoastalRoughness(new FixedDoubleParameter(0));
-        //two species
+        // two species
         scenario.setBiologyInitializer(new SplitInitializerFactory());
         scenario.getFisherDefinitions().get(0).setInitialFishersPerPort(new LinkedHashMap<>());
 
         final FadDemoFactory fadDemo = new FadDemoFactory();
         fadDemo.setBiomassOnly(true);
-        //assume a current that pushes you diagonally towards top-left
+        // assume a current that pushes you diagonally towards top-left
         fadDemo.setFixedXCurrent(new FixedDoubleParameter(+1));
         fadDemo.setFixedYCurrent(new FixedDoubleParameter(-1));
         fadDemo.setPathToFile(InputPath.of("inputs", "tests", "fad_dummy_deploy2.csv"));
-        //they will all be empty!
-        ((CompressedBiomassFadInitializerFactory) fadDemo.getFadInitializer()).setGrowthRates(
-            ImmutableMap.of(
-                "Species 0",
-                new FixedDoubleParameter(0)
+        // they will all be empty!
+        fadDemo.setFadInitializer(
+            new CompressedBiomassFadInitializerFactory(
+                new FixedDoubleParameter(445_000),
+                "Species 0"
             )
         );
         scenario.getPlugins().add(fadDemo);
 
-        //now add the fad setter
+        // now add the fad setter
         final ExogenousFadSetterCSVFactory setters = new ExogenousFadSetterCSVFactory();
         setters.setNeighborhoodSearchSize(new FixedDoubleParameter(neighborhoodSearchSize));
         setters.setSetsFile(setterFile);
@@ -264,10 +255,10 @@ public class ExogenousFadSetterFromDataTest {
         state.start();
         while (state.getDay() <= 10)
             state.schedule.step(state);
-        //there ought to be 2 fads left (4 dropped, 2 landed!)
+        // there ought to be 2 fads left (4 dropped, 2 landed!)
         Assertions.assertEquals(state.getFadMap().allFads().count(), expectedFadsRemainingAfter10Steps);
 
-        //go to the end of the year
+        // go to the end of the year
         while (state.getDay() <= 366)
             state.schedule.step(state);
         return state;
@@ -280,9 +271,9 @@ public class ExogenousFadSetterFromDataTest {
             0,
             4
         );
-        //should by now have beached or left the map
+        // should by now have beached or left the map
         Assertions.assertEquals(state.getFadMap().allFads().collect(Collectors.toList()).size(), 0);
-        //there should have been 0 matches, 3 failed matches  and 1 out of bounds
+        // there should have been 0 matches, 3 failed matches  and 1 out of bounds
         Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Failed Matches"),
             3,
@@ -300,10 +291,10 @@ public class ExogenousFadSetterFromDataTest {
         );
         Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Error"),
-            3 * ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR + ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR,
+            3 * ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR +
+                ExogenousFadSetterFromData.OUT_OF_BOUNDS_FAD_ERROR,
             .001d
         );
-
 
     }
 
@@ -314,11 +305,10 @@ public class ExogenousFadSetterFromDataTest {
             1,
             2
         );
-        //should by now have beached or left the map
+        // should by now have beached or left the map
         Assertions.assertEquals(state.getFadMap().allFads().count(), 0);
 
-
-        //there should have been 2 matches, 1 failed match (day 0) and 1 out of bounds
+        // there should have been 2 matches, 1 failed match (day 0) and 1 out of bounds
         Assertions.assertEquals(
             state.getYearlyDataSet().getLatestObservation("Exogenous Fad Setter Failed Matches"),
             1,
@@ -342,6 +332,5 @@ public class ExogenousFadSetterFromDataTest {
         );
 
     }
-
 
 }

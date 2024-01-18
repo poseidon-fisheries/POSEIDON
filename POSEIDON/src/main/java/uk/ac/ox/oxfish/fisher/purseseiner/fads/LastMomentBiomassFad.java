@@ -30,34 +30,35 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.BiomassCatchMaker;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.util.Map;
+
 public class LastMomentBiomassFad extends LastMomentFad {
 
     private final GlobalBiology globalBiology;
     private final BiomassCatchMaker catchMaker;
 
-
     public LastMomentBiomassFad(
         final TripRecord tripDeployed,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final double fishReleaseProbability,
         final FadManager owner,
         final int daysItTakesToFillUp,
         final int daysInWaterBeforeAttraction,
         final double[] maxCatchabilityPerSpecies,
         final boolean isDud,
-        final GlobalBiology globalBiology
+        final GlobalBiology globalBiology,
+        final Map<Species, Double> fishReleaseProbabilities
     ) {
         super(
             tripDeployed,
             stepDeployed,
             locationDeployed,
-            fishReleaseProbability,
             owner,
             daysItTakesToFillUp,
             daysInWaterBeforeAttraction,
             maxCatchabilityPerSpecies,
-            isDud
+            isDud,
+            fishReleaseProbabilities
         );
         this.globalBiology = globalBiology;
         this.catchMaker = new BiomassCatchMaker(globalBiology);
@@ -79,7 +80,7 @@ public class LastMomentBiomassFad extends LastMomentFad {
             return new BiomassLocalBiology(new double[globalBiology.getSize()]);
 
         final double[] caught = new double[state.getBiology().getSize()];
-        //for each species, same operation
+        // for each species, same operation
         for (final Species species : state.getBiology().getSpecies()) {
             if (catchability[species.getIndex()] > 0)
                 caught[species.getIndex()] = FishStateUtilities.catchSpecieGivenCatchability(

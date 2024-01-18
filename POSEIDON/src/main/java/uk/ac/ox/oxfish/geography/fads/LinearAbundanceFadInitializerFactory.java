@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAbundanceAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearFishAbundanceAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 public class LinearAbundanceFadInitializerFactory extends CompressedAbundanceFadInitializerFactory {
     public LinearAbundanceFadInitializerFactory() {
@@ -13,9 +14,10 @@ public class LinearAbundanceFadInitializerFactory extends CompressedAbundanceFad
 
     public LinearAbundanceFadInitializerFactory(
         final AbundanceFiltersFactory abundanceFiltersFactory,
+        final DoubleParameter totalCarryingCapacity,
         final String... speciesNames
     ) {
-        super(abundanceFiltersFactory, speciesNames);
+        super(abundanceFiltersFactory, totalCarryingCapacity, speciesNames);
     }
 
     @Override

@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.processSpeciesNameToDoubleParameterMap;
+
 public class SelectivityAbundanceFadInitializerFactory
     extends AbundanceFadInitializerFactory
     implements AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad>> {
@@ -35,34 +37,26 @@ public class SelectivityAbundanceFadInitializerFactory
         final CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> carryingCapacityInitializerFactory,
         final AbundanceFiltersFactory abundanceFiltersFactory,
         final DoubleParameter daysInWaterBeforeAttraction,
-        final DoubleParameter fishReleaseProbabilityInPercent,
         final Map<String, DoubleParameter> catchabilities,
+        final Map<String, DoubleParameter> fishReleaseProbabilities,
         final EnvironmentalPenaltyFunctionFactory environmentalPenaltyFunction
     ) {
         super(
             carryingCapacityInitializerFactory,
             catchabilities,
+            fishReleaseProbabilities,
             daysInWaterBeforeAttraction,
-            fishReleaseProbabilityInPercent,
             abundanceFiltersFactory
         );
         this.environmentalPenaltyFunction = environmentalPenaltyFunction;
     }
 
-    public SelectivityAbundanceFadInitializerFactory(
-        final CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory,
-        final AbundanceFiltersFactory abundanceFiltersFactory,
-        final Map<String, DoubleParameter> catchabilities,
-        final EnvironmentalPenaltyFunctionFactory environmentalPenaltyFunction
-    ) {
-        super(carryingCapacityInitializerFactory, catchabilities, abundanceFiltersFactory);
-        this.environmentalPenaltyFunction = environmentalPenaltyFunction;
-    }
-
+    @SuppressWarnings("unused")
     public EnvironmentalPenaltyFunctionFactory getEnvironmentalPenaltyFunction() {
         return environmentalPenaltyFunction;
     }
 
+    @SuppressWarnings("unused")
     public void setEnvironmentalPenaltyFunction(final EnvironmentalPenaltyFunctionFactory environmentalPenaltyFunction) {
         this.environmentalPenaltyFunction = environmentalPenaltyFunction;
     }
@@ -107,11 +101,14 @@ public class SelectivityAbundanceFadInitializerFactory
                 fishState,
                 getAbundanceFilters().apply(fishState).get(FadSetAction.class)
             ),
-            getFishReleaseProbabilityInPercent().applyAsDouble(rng) / 100d,
             fishState::getStep,
-            getCarryingCapacityInitializer().apply(fishState)
+            getCarryingCapacityInitializer().apply(fishState),
+            processSpeciesNameToDoubleParameterMap(
+                getFishReleaseProbabilities(),
+                globalBiology,
+                rng
+            )
         );
     }
-
 
 }

@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.geography.fads;
 
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
@@ -34,6 +35,8 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.HashMap;
 import java.util.Map;
 
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.processSpeciesNameToDoubleParameterMap;
+
 public class LastMomentAbundanceFadInitalizerFactory implements
     AlgorithmFactory<FadInitializer<AbundanceLocalBiology, ? extends LastMomentFad>> {
 
@@ -44,6 +47,7 @@ public class LastMomentAbundanceFadInitalizerFactory implements
     private DoubleParameter dudProbability = new FixedDoubleParameter(0.1);
     private HashMap<String, Double> maxCatchabilitiesPerSpecies = new HashMap<>();
     private DoubleParameter rangeInSeaTiles = new FixedDoubleParameter(0);
+    private Map<String, DoubleParameter> fishReleaseProbabilities;
 
     public LastMomentAbundanceFadInitalizerFactory() {
 
@@ -53,6 +57,14 @@ public class LastMomentAbundanceFadInitalizerFactory implements
         final AbundanceFiltersFactory abundanceFiltersFactory
     ) {
         this.abundanceFiltersFactory = abundanceFiltersFactory;
+    }
+
+    public Map<String, DoubleParameter> getFishReleaseProbabilities() {
+        return fishReleaseProbabilities;
+    }
+
+    public void setFishReleaseProbabilities(final Map<String, DoubleParameter> fishReleaseProbabilities) {
+        this.fishReleaseProbabilities = fishReleaseProbabilities;
     }
 
     public AbundanceFiltersFactory getAbundanceFiltersFactory() {
@@ -66,23 +78,24 @@ public class LastMomentAbundanceFadInitalizerFactory implements
     @Override
     public FadInitializer<AbundanceLocalBiology, ? extends LastMomentFad> apply(final FishState fishState) {
         final double[] catchabilities = new double[fishState.getBiology().getSize()];
-        //todo
+        // todo
         for (final Map.Entry<String, Double> catchability : maxCatchabilitiesPerSpecies.entrySet()) {
             catchabilities[fishState.getSpecies(catchability.getKey()).getIndex()] =
                 catchability.getValue();
 
         }
 
-        final double range = rangeInSeaTiles.applyAsDouble(fishState.getRandom());
+        final MersenneTwisterFast rng = fishState.getRandom();
+        final double range = rangeInSeaTiles.applyAsDouble(rng);
         final Map<Species, NonMutatingArrayFilter> selectivityFilters =
             abundanceFiltersFactory.apply(fishState)
                 .get(FadSetAction.class);
         if (Double.isNaN(range) || (int) range <= 0) {
             return new LastMomentAbundanceFadInitializer(
-                (int) daysItTakeToFillUp.applyAsDouble(fishState.getRandom()),
-                (int) daysInWaterBeforeAttraction.applyAsDouble(fishState.getRandom()),
+                (int) daysItTakeToFillUp.applyAsDouble(rng),
+                (int) daysInWaterBeforeAttraction.applyAsDouble(rng),
                 selectivityFilters,
-                dudProbability.applyAsDouble(fishState.getRandom()),
+                dudProbability.applyAsDouble(rng),
                 catchabilities,
                 fishState.getBiology()
             );
@@ -90,18 +103,22 @@ public class LastMomentAbundanceFadInitalizerFactory implements
 
             assert (int) range >= 1;
             return new LastMomentAbundanceFadWithRangeInitializer<>(
-                (int) daysItTakeToFillUp.applyAsDouble(fishState.getRandom()),
-                (int) daysInWaterBeforeAttraction.applyAsDouble(fishState.getRandom()),
+                (int) daysItTakeToFillUp.applyAsDouble(rng),
+                (int) daysInWaterBeforeAttraction.applyAsDouble(rng),
                 selectivityFilters,
-                dudProbability.applyAsDouble(fishState.getRandom()),
+                dudProbability.applyAsDouble(rng),
                 catchabilities,
                 fishState.getBiology(),
-                (int) range
+                (int) range,
+                processSpeciesNameToDoubleParameterMap(
+                    getFishReleaseProbabilities(),
+                    fishState.getBiology(),
+                    rng
+                )
             );
         }
 
     }
-
 
     public DoubleParameter getDaysItTakeToFillUp() {
         return daysItTakeToFillUp;

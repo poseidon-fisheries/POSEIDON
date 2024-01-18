@@ -55,10 +55,18 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                             )
                         ),
                         getAbundanceFilters(),
+                        new CalibratedParameter(
+                            13, 30, 5, 40, 14
+                        ),
                         ImmutableMap.of(
-                            "Bigeye tuna", new CalibratedParameter(0.15, 0.3, 0, 1),
-                            "Skipjack tuna", new CalibratedParameter(0.15, 0.3, 0, 1),
-                            "Yellowfin tuna", new CalibratedParameter(0.15, 0.3, 0, 1)
+                            "Bigeye tuna", new CalibratedParameter(0, 0.3, 0, 1),
+                            "Skipjack tuna", new CalibratedParameter(0, 0.3, 0, 1),
+                            "Yellowfin tuna", new CalibratedParameter(0, 0.3, 0, 1)
+                        ),
+                        ImmutableMap.of(
+                            "Bigeye tuna", new CalibratedParameter(0.08, 0.348, 0, 0.75),
+                            "Skipjack tuna", new CalibratedParameter(0.247, 0.75, 0, 0.75),
+                            "Yellowfin tuna", new CalibratedParameter(0.109, 0.226, 0, 0.75)
                         ),
                         new EnvironmentalPenaltyFunctionFactory(
                             ImmutableMap.of(

@@ -31,21 +31,20 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
- * this is a FAD that doesn't "store" fish in itself. It creates local biologies "on the fly" by attracting whatever
- * it finds under the particular cell it is in at that moment. <br>
- * Instead of loading up on fish, what it does is simply increasing its catchability
+ * this is a FAD that doesn't "store" fish in itself. It creates local biologies "on the fly" by attracting whatever it
+ * finds under the particular cell it is in at that moment. <br> Instead of loading up on fish, what it does is simply
+ * increasing its catchability
  */
 public abstract class LastMomentFad extends Fad {
 
-
-    //all this stuff really belongs to an attractor object, if I come up with different rules:
+    // all this stuff really belongs to an attractor object, if I come up with different rules:
 
     private final int daysItTakesToFillUp;
 
     private final int daysInWaterBeforeAttraction;
-
 
     private final double[] maxCatchabilityPerSpecies;
     private FishState state;
@@ -54,14 +53,21 @@ public abstract class LastMomentFad extends Fad {
         final TripRecord tripDeployed,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final double fishReleaseProbability,
         final FadManager owner,
         final int daysItTakesToFillUp,
         final int daysInWaterBeforeAttraction,
         final double[] maxCatchabilityPerSpecies,
-        final boolean isDud
+        final boolean isDud,
+        final Map<Species, Double> fishReleaseProbabilities
     ) {
-        super(tripDeployed, stepDeployed, locationDeployed, fishReleaseProbability, owner, isDud);
+        super(
+            tripDeployed,
+            stepDeployed,
+            locationDeployed,
+            fishReleaseProbabilities,
+            owner,
+            isDud
+        );
         this.daysItTakesToFillUp = daysItTakesToFillUp;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
         this.maxCatchabilityPerSpecies = maxCatchabilityPerSpecies;
@@ -73,23 +79,30 @@ public abstract class LastMomentFad extends Fad {
         final GlobalBiology globalBiology,
         final int currentStep
     ) {
-        //ignored
+        // ignored
     }
 
     @Override
-    public void releaseFish(final Collection<? extends Species> allSpecies, final LocalBiology seaTileBiology) {
-        //nothing to release
+    public void releaseFish(
+        final Collection<? extends Species> allSpecies,
+        final LocalBiology seaTileBiology
+    ) {
+        // nothing to release
     }
 
     @Override
     public void releaseFish(final Collection<? extends Species> allSpecies) {
-        //nothing to release
+        // nothing to release
     }
 
     @Override
-    public void reactToBeingFished(final FishState state, final Fisher fisher, final SeaTile location) {
+    public void reactToBeingFished(
+        final FishState state,
+        final Fisher fisher,
+        final SeaTile location
+    ) {
 
-        //basically everything that is in the biology needs to be turned into a catch and then destroyed
+        // basically everything that is in the biology needs to be turned into a catch and then destroyed
         final Catch theCatch = makeCatch();
         location.reactToThisAmountOfBiomassBeingFished(theCatch, theCatch, state.getBiology());
     }
@@ -99,13 +112,13 @@ public abstract class LastMomentFad extends Fad {
     @Override
     public void reactToStep(final FishState fishState) {
         super.reactToStep(fishState);
-        this.state = fishState; //hang on to this link if possible
+        this.state = fishState; // hang on to this link if possible
     }
 
     protected double[] getCurrentCatchabilityPerSpecies() {
 
         double multiplier = 0;
-        if (this.state != null) //you must have at least step once!
+        if (this.state != null) // you must have at least step once!
         {
             final int soakTimeInDays = super.soakTimeInDays(state);
             if (soakTimeInDays >= daysInWaterBeforeAttraction) {

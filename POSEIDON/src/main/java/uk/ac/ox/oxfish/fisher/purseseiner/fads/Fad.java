@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import sim.util.Double2D;
@@ -36,6 +37,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -50,6 +52,9 @@ public abstract class Fad implements Locatable {
     final private int stepDeployed;
     final private Int2D locationDeployed;
     final private double fishReleaseProbability;
+
+    final private Map<Species, Double> fishReleaseProbabilities;
+
     private final FadManager owner;
 
     /**
@@ -68,14 +73,16 @@ public abstract class Fad implements Locatable {
         final TripRecord tripDeployed,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final double fishReleaseProbability,
+        final Map<Species, Double> fishReleaseProbabilities,
         final FadManager owner,
         final boolean isActive
     ) {
         this.tripDeployed = tripDeployed;
         this.stepDeployed = stepDeployed;
         this.locationDeployed = locationDeployed;
-        this.fishReleaseProbability = fishReleaseProbability;
+        this.fishReleaseProbabilities = ImmutableMap.copyOf(fishReleaseProbabilities);
+        this.fishReleaseProbability =
+            Double.NaN; // TODO remove that once we have the per-species probabilities in place
         this.owner = owner;
         this.lost = false;
         this.isActive = isActive;
@@ -84,7 +91,6 @@ public abstract class Fad implements Locatable {
     public long getId() {
         return id;
     }
-
 
     public TripRecord getTripDeployed() {
         return tripDeployed;
@@ -104,7 +110,10 @@ public abstract class Fad implements Locatable {
         }
     }
 
-    public abstract void releaseFish(final Collection<? extends Species> allSpecies, LocalBiology seaTileBiology);
+    public abstract void releaseFish(
+        final Collection<? extends Species> allSpecies,
+        LocalBiology seaTileBiology
+    );
 
     public void maybeReleaseFish(
         final Collection<? extends Species> allSpecies,
@@ -118,11 +127,10 @@ public abstract class Fad implements Locatable {
     public abstract void releaseFish(final Collection<? extends Species> allSpecies);
 
     /**
-     * Infers the precise lon/lat coordinates of the FAD using a combination of the
-     * tile's geographical coordinates and the precise grid location of the FAD.
-     * This is a bit of hack and RELIES ON THE ASSUMPTION THAT WE HAVE A 1°x1° MAP.
-     * It's currently used to log FAD trajectories, but probably shouldn't be used
-     * to do anything that actually affects the model's behaviour.
+     * Infers the precise lon/lat coordinates of the FAD using a combination of the tile's geographical coordinates and
+     * the precise grid location of the FAD. This is a bit of hack and RELIES ON THE ASSUMPTION THAT WE HAVE A 1°x1°
+     * MAP. It's currently used to log FAD trajectories, but probably shouldn't be used to do anything that actually
+     * affects the model's behaviour.
      */
     public Coordinate getCoordinate() {
         final FadMap fadMap = getOwner().getFadMap();
@@ -157,8 +165,7 @@ public abstract class Fad implements Locatable {
 
     /**
      * basically asks if this is a dud or deactivated or in any other way whether it can hypothetically attract more
-     * fish
-     * (without considering whether it is "full")
+     * fish (without considering whether it is "full")
      *
      * @return true when the fad is functioning and is able to attract fish
      */
@@ -198,7 +205,11 @@ public abstract class Fad implements Locatable {
         return isActive;
     }
 
-    public abstract void reactToBeingFished(FishState state, Fisher fisher, SeaTile location);
+    public abstract void reactToBeingFished(
+        FishState state,
+        Fisher fisher,
+        SeaTile location
+    );
 
     @SuppressWarnings("unused")
     public int getDaysBeforeTurningOff() {

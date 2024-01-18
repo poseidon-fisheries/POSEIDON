@@ -21,8 +21,10 @@ package uk.ac.ox.oxfish.geography.fads;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 
+import java.util.Map;
 import java.util.function.IntSupplier;
 import java.util.stream.DoubleStream;
 
@@ -32,11 +34,11 @@ public class BiomassFadInitializer
     public BiomassFadInitializer(
         final GlobalBiology globalBiology,
         final FishAttractor<BiomassLocalBiology, BiomassAggregatingFad> fishAttractor,
-        final double fishReleaseProbability,
         final IntSupplier timeStepSupplier,
-        final CarryingCapacityInitializer<GlobalCarryingCapacity> carryingCapacityInitializer
+        final CarryingCapacityInitializer<GlobalCarryingCapacity> carryingCapacityInitializer,
+        final Map<Species, Double> fishReleaseProbabilities
     ) {
-        super(globalBiology, fishAttractor, fishReleaseProbability, timeStepSupplier, carryingCapacityInitializer);
+        super(globalBiology, fishAttractor, timeStepSupplier, carryingCapacityInitializer, fishReleaseProbabilities);
     }
 
     public BiomassLocalBiology makeBiology(final GlobalBiology globalBiology) {
@@ -52,19 +54,19 @@ public class BiomassFadInitializer
         final FadManager owner,
         final BiomassLocalBiology biology,
         final FishAttractor<BiomassLocalBiology, BiomassAggregatingFad> fishAttractor,
-        final double fishReleaseProbability,
         final int stepDeployed,
         final Int2D locationDeployed,
-        final CarryingCapacity carryingCapacity
+        final CarryingCapacity carryingCapacity,
+        final Map<Species, Double> fishReleaseProbabilities
     ) {
         return new BiomassAggregatingFad(
             owner,
             biology,
             fishAttractor,
-            fishReleaseProbability,
             stepDeployed,
             locationDeployed,
-            carryingCapacity
+            carryingCapacity,
+            fishReleaseProbabilities
         );
     }
 

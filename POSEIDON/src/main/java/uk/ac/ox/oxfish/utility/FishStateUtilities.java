@@ -43,6 +43,7 @@ import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.TowHeatmapGatherer;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import uk.ac.ox.oxfish.utility.yaml.ModelResults;
 
@@ -67,8 +68,7 @@ import static com.google.common.collect.Streams.zip;
 import static java.util.stream.Collectors.collectingAndThen;
 
 /**
- * Just a collector of all the utilities function i need
- * Created by carrknight on 6/19/15.
+ * Just a collector of all the utilities function i need Created by carrknight on 6/19/15.
  */
 public class FishStateUtilities {
 
@@ -77,7 +77,6 @@ public class FishStateUtilities {
     public final static int FEMALE = 1;
 
     private static final String JAR_NAME = "yamler.jar";
-
 
     private FishStateUtilities() {
     }
@@ -98,8 +97,8 @@ public class FishStateUtilities {
     }
 
     /**
-     * looks for a file first in the current directory, otherwise in the directory the jar is stored
-     * otherwise returns back the relative osmoseWFSPath
+     * looks for a file first in the current directory, otherwise in the directory the jar is stored otherwise returns
+     * back the relative osmoseWFSPath
      *
      * @param relativePath something like dir/file.txt
      * @return the absolute osmoseWFSPath
@@ -108,18 +107,18 @@ public class FishStateUtilities {
 
         relativePath = relativePath.replaceAll("\"", "");
 
-        //first try user dir (where java is called)
+        // first try user dir (where java is called)
         final String classPath = System.getProperty("user.dir");
         File file = new File(classPath + File.separator + relativePath);
         if (file.exists())
             return file.getAbsolutePath();
 
-        //otherwise try "."
+        // otherwise try "."
         file = new File(new File(".").getAbsolutePath() + File.separator + relativePath);
         if (file.exists())
             return file.getAbsolutePath();
 
-        //if there is no protection, you can try to "get the source code"
+        // if there is no protection, you can try to "get the source code"
         try {
             final CodeSource src = FishState.class.getProtectionDomain().getCodeSource();
             if (src != null) {
@@ -131,8 +130,8 @@ public class FishStateUtilities {
         } catch (final MalformedURLException | SecurityException | URISyntaxException ignored) {
         }
 
-        //finally you can just try to look for the jar file
-        //see here : http://stackoverflow.com/questions/775389/accessing-properties-files-outside-the-jar/775565
+        // finally you can just try to look for the jar file
+        // see here : http://stackoverflow.com/questions/775389/accessing-properties-files-outside-the-jar/775565
         final String classpath = System.getProperty("java.class.path");
         System.out.println("classpath " + classpath);
         if (classpath.length() > 0) {
@@ -149,10 +148,9 @@ public class FishStateUtilities {
         System.err.println("failed to find the absolute path of the default config file");
         return relativePath;
 
-
     }
 
-    //stolen from: http://stackoverflow.com/a/19136617/975904
+    // stolen from: http://stackoverflow.com/a/19136617/975904
     public static String removeParentheses(String toClean) {
         int open = 0;
         int closed = 0;
@@ -186,15 +184,19 @@ public class FishStateUtilities {
     }
 
     public static <T> Entry<T, Fisher> imitateFriendAtRandom(
-        final MersenneTwisterFast random, final double fitness, final T current, final Collection<Fisher> friends,
-        final ObjectiveFunction<Fisher> objectiveFunction, final Sensor<Fisher, T> sensor,
+        final MersenneTwisterFast random,
+        final double fitness,
+        final T current,
+        final Collection<Fisher> friends,
+        final ObjectiveFunction<Fisher> objectiveFunction,
+        final Sensor<Fisher, T> sensor,
         final Fisher fisherThinkingOfImitating
     ) {
-        //get random friend
+        // get random friend
         final List<Fisher> friendList = friends.stream().
-            //remove friends we can't imitate
+            // remove friends we can't imitate
                 filter(fisher -> sensor.scan(fisher) != null).
-            //sort by id (remove hashing randomness)
+            // sort by id (remove hashing randomness)
                 sorted((o1, o2) -> Integer.compare(o1.getID(), o2.getID())).collect(Collectors.toList());
 
         assert friends.size() > 0;
@@ -217,63 +219,68 @@ public class FishStateUtilities {
     /**
      * Just makes it nicer to create AbstractMap.SimpleImmutableEntry objects.
      */
-    public static <K, V> AbstractMap.SimpleImmutableEntry<K, V> entry(final K k, final V v) {
+    public static <K, V> AbstractMap.SimpleImmutableEntry<K, V> entry(
+        final K k,
+        final V v
+    ) {
         return new AbstractMap.SimpleImmutableEntry<>(k, v);
     }
 
     public static <T> Entry<T, Fisher> imitateBestFriend(
-        final MersenneTwisterFast random, final Fisher fisherDoingTheImitation, final double fitness,
-        final T current, final Collection<Fisher> friends,
+        final MersenneTwisterFast random,
+        final Fisher fisherDoingTheImitation,
+        final double fitness,
+        final T current,
+        final Collection<Fisher> friends,
         final ObjectiveFunction<Fisher> objectiveFunction,
         final Sensor<Fisher, T> sensor
     ) {
 
-        //if you have no friends, keep doing what you currently are doing
+        // if you have no friends, keep doing what you currently are doing
         if (friends.isEmpty())
             return entry(current, null);
 
-        //associate a fitness to each friend and compute the maxFitness
+        // associate a fitness to each friend and compute the maxFitness
         final double[] maxFitness = {fitness};
         final Set<Entry<Fisher, Double>> friendsFitnesses = friends.stream().
-            //ignore friends who we can't imitate
+            // ignore friends who we can't imitate
                 filter(fisher -> sensor.scan(fisher) != null).
-            //ignore fishers who aren't allowed out anyway
+            // ignore fishers who aren't allowed out anyway
                 collect(
                 Collectors.toMap((friend) -> friend, fisher -> {
-                    //get your friend fitness
+                    // get your friend fitness
                     final double friendFitness = objectiveFunction.computeCurrentFitness(
                         fisherDoingTheImitation, fisher);
-                    //if it is finite check if it is better than what we already have
+                    // if it is finite check if it is better than what we already have
                     if (Double.isFinite(friendFitness))
                         maxFitness[0] = Math.max(maxFitness[0], friendFitness);
-                    //return it
+                    // return it
                     return friendFitness;
                 })).entrySet();
 
-        //make sure it's finite and at least as good as our current fitness
+        // make sure it's finite and at least as good as our current fitness
         if (Double.isNaN(fitness) && Double.isNaN(maxFitness[0]))
             return entry(current, null);
 
         assert Double.isFinite(maxFitness[0]);
         assert maxFitness[0] >= fitness;
 
-        //if you are doing better than your friends, keep doing what you are doing
+        // if you are doing better than your friends, keep doing what you are doing
         if (Math.abs(maxFitness[0] - fitness) < EPSILON)
             return entry(current, null);
 
-        //prepare to store the possible imitation options
+        // prepare to store the possible imitation options
         final List<Fisher> bestFriends = new LinkedList<>();
-        //take all your friends
+        // take all your friends
         friendsFitnesses.stream().
-            //choose only the ones with the highest fitness
+            // choose only the ones with the highest fitness
                 filter(fisherDoubleEntry -> Math.abs(maxFitness[0] - fisherDoubleEntry.getValue()) < EPSILON).
             // sort them by id (we need to kill the hashing randomization which we can't control)
                 sorted((o1, o2) -> Integer.compare(o1.getKey().getID(), o2.getKey().getID())).
-            //now put in the best option list by scanning
+            // now put in the best option list by scanning
                 forEachOrdered(fisherDoubleEntry -> bestFriends.add(fisherDoubleEntry.getKey()));
 
-
-        //return a random best option
+        // return a random best option
 
         final Fisher bestFriend = bestFriends.size() == 1 ?
             bestFriends.get(0) :
@@ -281,13 +288,12 @@ public class FishStateUtilities {
         assert bestFriend != null;
         return entry(sensor.scan(bestFriend), bestFriend);
 
-
     }
 
     /**
      * stolen from here:
-     * http://stackoverflow.com/questions/442758/which-java-library-computes-the-cumulative-standard-normal-distribution-function
-     * this is a quick and dirty way of computing the STANDARD normal CDF function
+     * http://stackoverflow.com/questions/442758/which-java-library-computes-the-cumulative-standard-normal
+     * -distribution-function this is a quick and dirty way of computing the STANDARD normal CDF function
      *
      * @param x the value you want to compute the CDF of
      * @return the probability that a standard normal draw is below x
@@ -305,7 +311,10 @@ public class FishStateUtilities {
         return (1d - neg) * y + neg * (1d - y);
     }
 
-    public static void printCSVColumnToFile(final File file, final DataColumn column) {
+    public static void printCSVColumnToFile(
+        final File file,
+        final DataColumn column
+    ) {
         try {
             final FileWriter writer = new FileWriter(file);
             for (final Double aColumn : column) {
@@ -320,10 +329,13 @@ public class FishStateUtilities {
 
     }
 
-    public static void printCSVColumnsToFile(final File file, final DataColumn... columns) {
+    public static void printCSVColumnsToFile(
+        final File file,
+        final DataColumn... columns
+    ) {
         try {
             final FileWriter writer = new FileWriter(file);
-            //write header
+            // write header
             for (int i = 0; i < columns.length; i++) {
                 if (i != 0)
                     writer.write(",");
@@ -331,7 +343,7 @@ public class FishStateUtilities {
             }
             writer.write("\n");
 
-            //write columns
+            // write columns
             for (int row = 0; row < columns[0].size(); row++) {
                 for (int i = 0; i < columns.length; i++) {
                     if (i != 0)
@@ -350,7 +362,9 @@ public class FishStateUtilities {
     }
 
     public static void pollHistogramToFile(
-        final Collection<Fisher> fishers, final File file, final Sensor<Fisher, Double> poller
+        final Collection<Fisher> fishers,
+        final File file,
+        final Sensor<Fisher, Double> poller
     ) {
         // File histogramFile = Paths.get("runs", "lambda", "hist100.csv").toFile();
         final ArrayList<String> histogram = new ArrayList<>(fishers.size());
@@ -413,14 +427,14 @@ public class FishStateUtilities {
         final SerializableFunction<Double, Double> sumTransformer
     ) {
         return state -> {
-            //get the iterator
+            // get the iterator
             final Iterator<Double> iterator = column.descendingIterator();
-            if (!iterator.hasNext()) //not ready/year 1
+            if (!iterator.hasNext()) // not ready/year 1
                 return Double.NaN;
             double sum = 0;
             for (int i = 0; i < 365; i++) {
-                //it should be step 365 times at most, but it's possible that this agent was added halfway through
-                //and only has a partially filled collection
+                // it should be step 365 times at most, but it's possible that this agent was added halfway through
+                // and only has a partially filled collection
                 if (iterator.hasNext())
                     sum += iterator.next();
             }
@@ -438,14 +452,14 @@ public class FishStateUtilities {
     public static <T> Gatherer<T> generateYearlyAverage(final DataColumn column) {
 
         return state -> {
-            //get the iterator
+            // get the iterator
             final Iterator<Double> iterator = column.descendingIterator();
-            if (!iterator.hasNext()) //not ready/year 1
+            if (!iterator.hasNext()) // not ready/year 1
                 return Double.NaN;
             final DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
             for (int i = 0; i < 365; i++) {
-                //it should be step 365 times at most, but it's possible that this agent was added halfway through
-                //and only has a partially filled collection
+                // it should be step 365 times at most, but it's possible that this agent was added halfway through
+                // and only has a partially filled collection
                 if (iterator.hasNext()) {
                     final Double next = iterator.next();
                     if (Double.isFinite(next))
@@ -458,19 +472,23 @@ public class FishStateUtilities {
     }
 
     /**
-     * taken from the c++ version here: http://www.codeproject.com/Articles/49723/Linear-correlation-and-statistical-functions
-     * which explains the minimalistic naming convention
+     * taken from the c++ version here:
+     * http://www.codeproject.com/Articles/49723/Linear-correlation-and-statistical-functions which explains the
+     * minimalistic naming convention
      */
-    public static double computeCorrelation(final double[] x, final double[] y) {
+    public static double computeCorrelation(
+        final double[] x,
+        final double[] y
+    ) {
 
-        //will regularize the unusual case of complete correlation
+        // will regularize the unusual case of complete correlation
         final double TINY = 1.0e-20;
         int j;
         final int n = x.length;
         Double yt, xt, t, df;
         Double syy = 0.0, sxy = 0.0, sxx = 0.0, ay = 0.0, ax = 0.0;
         for (j = 0; j < n; j++) {
-            //finds the mean
+            // finds the mean
             ax += x[j];
             ay += y[j];
         }
@@ -490,11 +508,14 @@ public class FishStateUtilities {
     /**
      * returns L *  (1-(1/(Math.exp(-k*(x-x0)))));
      */
-    public static double logisticProbability(final double L, final double k, final double x0, final double x) {
-
+    public static double logisticProbability(
+        final double L,
+        final double k,
+        final double x0,
+        final double x
+    ) {
 
         return L * (1 - (1 / (1 + Math.exp(-k * (x - x0)))));
-
 
     }
 
@@ -508,17 +529,19 @@ public class FishStateUtilities {
      * @return
      */
     public static double catchSpecieGivenCatchability(
-        final LocalBiology where, final int hoursSpentFishing, final Species species, final double q
+        final LocalBiology where,
+        final int hoursSpentFishing,
+        final Species species,
+        final double q
     ) {
         Preconditions.checkState(q >= 0);
         Preconditions.checkArgument(hoursSpentFishing == Fishing.MINIMUM_HOURS_TO_PRODUCE_A_CATCH);
-        //catch
+        // catch
         final double specieCatch = Math.min(
             FishStateUtilities.round(where.getBiomass(species) *
                 q),
             where.getBiomass(species)
         );
-
 
         return specieCatch;
 
@@ -536,15 +559,18 @@ public class FishStateUtilities {
     }
 
     /**
-     * converts easting-northing UTM. taken from:
-     * http://stackoverflow.com/a/28224544/975904
+     * converts easting-northing UTM. taken from: http://stackoverflow.com/a/28224544/975904
      *
      * @param UTM
      * @param easting
      * @param northing
      * @return
      */
-    public static Point2D.Double utmToLatLong(final String UTM, final double easting, final double northing) {
+    public static Point2D.Double utmToLatLong(
+        final String UTM,
+        final double easting,
+        final double northing
+    ) {
         double latitude;
         double longitude;
         final String[] parts = UTM.split(" ");
@@ -574,190 +600,259 @@ public class FishStateUtilities {
                         / 2 * Math.pow(
                         Math.cos(north / 6366197.724 / 0.9996),
                         2
-                    ) / 3)) - Math.exp(-(easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                )))), 2) / 2 * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                ) / 3))) / 2 / Math.cos((north - 0.9996 * 6399593.625 * (north / 6366197.724 / 0.9996 - 0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + Math.sin(
-                    2 * north / 6366197.724 / 0.9996) / 2) + Math.pow(
-                    0.006739496742 * 3 / 4,
-                    2
-                ) * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north / 6366197.724 / 0.9996) / 2) + Math.sin(
-                    2 * north / 6366197.724 / 0.9996) * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                )) / 4 - Math.pow(
-                    0.006739496742 * 3 / 4,
-                    3
-                ) * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north / 6366197.724 / 0.9996) / 2) + Math.sin(
-                    2 * north / 6366197.724 / 0.9996) * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                )) / 4 + Math.sin(2 * north / 6366197.724 / 0.9996) * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                ) * Math.pow(Math.cos(north / 6366197.724 / 0.9996), 2)) / 3)) / (0.9996 * 6399593.625 / Math.sqrt(
-                    (1 + 0.006739496742 * Math.pow(
+                    ) / 3)) - Math.exp(-(easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 +
+                    0.006739496742 * Math.pow(
                         Math.cos(north / 6366197.724 / 0.9996),
                         2
-                    )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                )))), 2) / 2 * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                )) + north / 6366197.724 / 0.9996))) * Math.tan((north - 0.9996 * 6399593.625 * (north / 6366197.724 / 0.9996 - 0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + Math.sin(
-                2 * north / 6366197.724 / 0.9996) / 2) + Math.pow(
-                0.006739496742 * 3 / 4,
-                2
-            ) * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north / 6366197.724 / 0.9996) / 2) + Math.sin(
-                2 * north / 6366197.724 / 0.9996) * Math.pow(Math.cos(north / 6366197.724 / 0.9996), 2)) / 4 - Math.pow(
-                0.006739496742 * 3 / 4,
-                3
-            ) * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north / 6366197.724 / 0.9996) / 2) + Math.sin(
-                2 * north / 6366197.724 / 0.9996) * Math.pow(Math.cos(north / 6366197.724 / 0.9996), 2)) / 4 + Math.sin(
-                2 * north / 6366197.724 / 0.9996) * Math.pow(
-                Math.cos(north / 6366197.724 / 0.9996),
-                2
-            ) * Math.pow(
-                Math.cos(north / 6366197.724 / 0.9996),
-                2
-            )) / 3)) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-                Math.cos(north / 6366197.724 / 0.9996),
-                2
-            )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-                Math.cos(north / 6366197.724 / 0.9996),
-                2
-            )))), 2) / 2 * Math.pow(
-                Math.cos(north / 6366197.724 / 0.9996),
-                2
-            )) + north / 6366197.724 / 0.9996)) - north / 6366197.724 / 0.9996) * 3 / 2) * (Math.atan(Math.cos(Math.atan(
-                (Math.exp((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-                    Math.cos(
-                        north / 6366197.724 / 0.9996),
-                    2
-                )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                )))), 2) / 2 * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                ) / 3)) - Math.exp(-(easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                )))), 2) / 2 * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                ) / 3))) / 2 / Math.cos((north - 0.9996 * 6399593.625 * (north / 6366197.724 / 0.9996 - 0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + Math.sin(
-                    2 * north / 6366197.724 / 0.9996) / 2) + Math.pow(
-                    0.006739496742 * 3 / 4,
-                    2
-                ) * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north / 6366197.724 / 0.9996) / 2) + Math.sin(
-                    2 * north / 6366197.724 / 0.9996) * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                )) / 4 - Math.pow(
-                    0.006739496742 * 3 / 4,
-                    3
-                ) * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north / 6366197.724 / 0.9996) / 2) + Math.sin(
-                    2 * north / 6366197.724 / 0.9996) * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                )) / 4 + Math.sin(2 * north / 6366197.724 / 0.9996) * Math.pow(
-                    Math.cos(north / 6366197.724 / 0.9996),
-                    2
-                ) * Math.pow(Math.cos(north / 6366197.724 / 0.9996), 2)) / 3)) / (0.9996 * 6399593.625 / Math.sqrt(
-                    (1 + 0.006739496742 * Math.pow(
+                    )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) /
+                    (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
                         Math.cos(north / 6366197.724 / 0.9996),
                         2
-                    )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+                    )))), 2) / 2 * Math.pow(
                     Math.cos(north / 6366197.724 / 0.9996),
                     2
-                )))), 2) / 2 * Math.pow(
+                ) / 3))) /
+                    2 /
+                    Math.cos((north -
+                        0.9996 *
+                            6399593.625 *
+                            (north / 6366197.724 / 0.9996 -
+                                0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + Math.sin(
+                                    2 * north / 6366197.724 / 0.9996) / 2) + Math.pow(
+                                0.006739496742 * 3 / 4,
+                                2
+                            ) * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north /
+                                6366197.724 /
+                                0.9996) / 2) + Math.sin(
+                                2 * north / 6366197.724 / 0.9996) * Math.pow(
+                                Math.cos(north / 6366197.724 / 0.9996),
+                                2
+                            )) / 4 - Math.pow(
+                                0.006739496742 * 3 / 4,
+                                3
+                            ) * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north /
+                                6366197.724 /
+                                0.9996) / 2) + Math.sin(
+                                2 * north / 6366197.724 / 0.9996) * Math.pow(
+                                Math.cos(north / 6366197.724 / 0.9996),
+                                2
+                            )) / 4 + Math.sin(2 * north / 6366197.724 / 0.9996) * Math.pow(
+                                Math.cos(north / 6366197.724 / 0.9996),
+                                2
+                            ) * Math.pow(Math.cos(north / 6366197.724 / 0.9996), 2)) / 3)) /
+                        (0.9996 * 6399593.625 / Math.sqrt(
+                            (1 + 0.006739496742 * Math.pow(
+                                Math.cos(north / 6366197.724 / 0.9996),
+                                2
+                            )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) /
+                        (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+                            Math.cos(north / 6366197.724 / 0.9996),
+                            2
+                        )))), 2) / 2 * Math.pow(
+                        Math.cos(north / 6366197.724 / 0.9996),
+                        2
+                    )) + north / 6366197.724 / 0.9996))) *
+                Math.tan((north -
+                    0.9996 *
+                        6399593.625 *
+                        (north / 6366197.724 / 0.9996 -
+                            0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + Math.sin(
+                                2 * north / 6366197.724 / 0.9996) / 2) + Math.pow(
+                            0.006739496742 * 3 / 4,
+                            2
+                        ) * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north / 6366197.724 / 0.9996) /
+                            2) + Math.sin(
+                            2 * north / 6366197.724 / 0.9996) * Math.pow(Math.cos(north / 6366197.724 / 0.9996), 2)) /
+                            4 - Math.pow(
+                            0.006739496742 * 3 / 4,
+                            3
+                        ) * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north /
+                            6366197.724 /
+                            0.9996) / 2) + Math.sin(
+                            2 * north / 6366197.724 / 0.9996) * Math.pow(Math.cos(north / 6366197.724 / 0.9996), 2)) /
+                            4 + Math.sin(
+                            2 * north / 6366197.724 / 0.9996) * Math.pow(
+                            Math.cos(north / 6366197.724 / 0.9996),
+                            2
+                        ) * Math.pow(
+                            Math.cos(north / 6366197.724 / 0.9996),
+                            2
+                        )) / 3)) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
                     Math.cos(north / 6366197.724 / 0.9996),
                     2
-                )) + north / 6366197.724 / 0.9996))) * Math.tan((north - 0.9996 * 6399593.625 * (north / 6366197.724 / 0.9996 - 0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + Math.sin(
-                2 * north / 6366197.724 / 0.9996) / 2) + Math.pow(
-                0.006739496742 * 3 / 4,
-                2
-            ) * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north / 6366197.724 / 0.9996) / 2) + Math.sin(
-                2 * north / 6366197.724 / 0.9996) * Math.pow(Math.cos(north / 6366197.724 / 0.9996), 2)) / 4 - Math.pow(
-                0.006739496742 * 3 / 4,
-                3
-            ) * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north / 6366197.724 / 0.9996) / 2) + Math.sin(
-                2 * north / 6366197.724 / 0.9996) * Math.pow(Math.cos(north / 6366197.724 / 0.9996), 2)) / 4 + Math.sin(
-                2 * north / 6366197.724 / 0.9996) * Math.pow(
-                Math.cos(north / 6366197.724 / 0.9996),
-                2
-            ) * Math.pow(
-                Math.cos(north / 6366197.724 / 0.9996),
-                2
-            )) / 3)) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-                Math.cos(north / 6366197.724 / 0.9996),
-                2
-            )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-                Math.cos(north / 6366197.724 / 0.9996),
-                2
-            )))), 2) / 2 * Math.pow(
-                Math.cos(north / 6366197.724 / 0.9996),
-                2
-            )) + north / 6366197.724 / 0.9996)) - north / 6366197.724 / 0.9996)) * 180 / Math.PI;
+                )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) /
+                    (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+                        Math.cos(north / 6366197.724 / 0.9996),
+                        2
+                    )))), 2) / 2 * Math.pow(
+                    Math.cos(north / 6366197.724 / 0.9996),
+                    2
+                )) + north / 6366197.724 / 0.9996)) - north / 6366197.724 / 0.9996) * 3 / 2) *
+                (Math.atan(Math.cos(Math.atan(
+                    (Math.exp((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+                        Math.cos(
+                            north / 6366197.724 / 0.9996),
+                        2
+                    )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) /
+                        (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+                            Math.cos(north / 6366197.724 / 0.9996),
+                            2
+                        )))), 2) / 2 * Math.pow(
+                        Math.cos(north / 6366197.724 / 0.9996),
+                        2
+                    ) / 3)) - Math.exp(-(easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 +
+                        0.006739496742 * Math.pow(
+                            Math.cos(north / 6366197.724 / 0.9996),
+                            2
+                        )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) /
+                        (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+                            Math.cos(north / 6366197.724 / 0.9996),
+                            2
+                        )))), 2) / 2 * Math.pow(
+                        Math.cos(north / 6366197.724 / 0.9996),
+                        2
+                    ) / 3))) /
+                        2 /
+                        Math.cos((north -
+                            0.9996 *
+                                6399593.625 *
+                                (north / 6366197.724 / 0.9996 -
+                                    0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + Math.sin(
+                                        2 * north / 6366197.724 / 0.9996) / 2) + Math.pow(
+                                    0.006739496742 * 3 / 4,
+                                    2
+                                ) * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north /
+                                    6366197.724 /
+                                    0.9996) / 2) + Math.sin(
+                                    2 * north / 6366197.724 / 0.9996) * Math.pow(
+                                    Math.cos(north / 6366197.724 / 0.9996),
+                                    2
+                                )) / 4 - Math.pow(
+                                    0.006739496742 * 3 / 4,
+                                    3
+                                ) * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north /
+                                    6366197.724 /
+                                    0.9996) / 2) + Math.sin(
+                                    2 * north / 6366197.724 / 0.9996) * Math.pow(
+                                    Math.cos(north / 6366197.724 / 0.9996),
+                                    2
+                                )) / 4 + Math.sin(2 * north / 6366197.724 / 0.9996) * Math.pow(
+                                    Math.cos(north / 6366197.724 / 0.9996),
+                                    2
+                                ) * Math.pow(Math.cos(north / 6366197.724 / 0.9996), 2)) / 3)) /
+                            (0.9996 * 6399593.625 / Math.sqrt(
+                                (1 + 0.006739496742 * Math.pow(
+                                    Math.cos(north / 6366197.724 / 0.9996),
+                                    2
+                                )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) /
+                            (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+                                Math.cos(north / 6366197.724 / 0.9996),
+                                2
+                            )))), 2) / 2 * Math.pow(
+                            Math.cos(north / 6366197.724 / 0.9996),
+                            2
+                        )) + north / 6366197.724 / 0.9996))) *
+                    Math.tan((north -
+                        0.9996 *
+                            6399593.625 *
+                            (north / 6366197.724 / 0.9996 -
+                                0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + Math.sin(
+                                    2 * north / 6366197.724 / 0.9996) / 2) + Math.pow(
+                                0.006739496742 * 3 / 4,
+                                2
+                            ) * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north /
+                                6366197.724 /
+                                0.9996) / 2) + Math.sin(
+                                2 * north / 6366197.724 / 0.9996) * Math.pow(
+                                Math.cos(north / 6366197.724 / 0.9996),
+                                2
+                            )) / 4 - Math.pow(
+                                0.006739496742 * 3 / 4,
+                                3
+                            ) * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north /
+                                6366197.724 /
+                                0.9996) / 2) + Math.sin(
+                                2 * north / 6366197.724 / 0.9996) * Math.pow(
+                                Math.cos(north / 6366197.724 / 0.9996),
+                                2
+                            )) / 4 + Math.sin(
+                                2 * north / 6366197.724 / 0.9996) * Math.pow(
+                                Math.cos(north / 6366197.724 / 0.9996),
+                                2
+                            ) * Math.pow(
+                                Math.cos(north / 6366197.724 / 0.9996),
+                                2
+                            )) / 3)) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+                        Math.cos(north / 6366197.724 / 0.9996),
+                        2
+                    )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) /
+                        (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+                            Math.cos(north / 6366197.724 / 0.9996),
+                            2
+                        )))), 2) / 2 * Math.pow(
+                        Math.cos(north / 6366197.724 / 0.9996),
+                        2
+                    )) + north / 6366197.724 / 0.9996)) - north / 6366197.724 / 0.9996)) * 180 / Math.PI;
         latitude = Math.round(latitude * 10000000);
         latitude = latitude / 10000000;
-        longitude = Math.atan((Math.exp((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-            Math.cos(north / 6366197.724 / 0.9996),
-            2
-        )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-            Math.cos(north / 6366197.724 / 0.9996),
-            2
-        )))), 2) / 2 * Math.pow(
+        longitude = Math.atan((Math.exp((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 +
+            0.006739496742 * Math.pow(
+                Math.cos(north / 6366197.724 / 0.9996),
+                2
+            )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) /
+            (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+                Math.cos(north / 6366197.724 / 0.9996),
+                2
+            )))), 2) / 2 * Math.pow(
             Math.cos(north / 6366197.724 / 0.9996),
             2
         ) / 3)) - Math.exp(-(easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
             Math.cos(north / 6366197.724 / 0.9996),
             2
-        )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+        )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) /
+            (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+                Math.cos(north / 6366197.724 / 0.9996),
+                2
+            )))), 2) / 2 * Math.pow(
             Math.cos(north / 6366197.724 / 0.9996),
             2
-        )))), 2) / 2 * Math.pow(
-            Math.cos(north / 6366197.724 / 0.9996),
-            2
-        ) / 3))) / 2 / Math.cos((north - 0.9996 * 6399593.625 * (north / 6366197.724 / 0.9996 - 0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + Math.sin(
-            2 * north / 6366197.724 / 0.9996) / 2) + Math.pow(
-            0.006739496742 * 3 / 4,
-            2
-        ) * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north / 6366197.724 / 0.9996) / 2) + Math.sin(
-            2 * north / 6366197.724 / 0.9996) * Math.pow(Math.cos(north / 6366197.724 / 0.9996), 2)) / 4 - Math.pow(
-            0.006739496742 * 3 / 4,
-            3
-        ) * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north / 6366197.724 / 0.9996) / 2) + Math.sin(
-            2 * north / 6366197.724 / 0.9996) * Math.pow(
-            Math.cos(north / 6366197.724 / 0.9996),
-            2
-        )) / 4 + Math.sin(2 * north / 6366197.724 / 0.9996) * Math.pow(
-            Math.cos(north / 6366197.724 / 0.9996),
-            2
-        ) * Math.pow(
-            Math.cos(north / 6366197.724 / 0.9996),
-            2
-        )) / 3)) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-            Math.cos(north / 6366197.724 / 0.9996),
-            2
-        )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
-            Math.cos(north / 6366197.724 / 0.9996),
-            2
-        )))), 2) / 2 * Math.pow(
-            Math.cos(north / 6366197.724 / 0.9996),
-            2
-        )) + north / 6366197.724 / 0.9996)) * 180 / Math.PI + zone * 6 - 183;
+        ) / 3))) /
+            2 /
+            Math.cos((north -
+                0.9996 *
+                    6399593.625 *
+                    (north / 6366197.724 / 0.9996 - 0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + Math.sin(
+                        2 * north / 6366197.724 / 0.9996) / 2) + Math.pow(
+                        0.006739496742 * 3 / 4,
+                        2
+                    ) * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north / 6366197.724 / 0.9996) / 2) +
+                        Math.sin(
+                            2 * north / 6366197.724 / 0.9996) * Math.pow(Math.cos(north / 6366197.724 / 0.9996), 2)) /
+                        4 - Math.pow(
+                        0.006739496742 * 3 / 4,
+                        3
+                    ) * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + Math.sin(2 * north / 6366197.724 / 0.9996) /
+                        2) + Math.sin(
+                        2 * north / 6366197.724 / 0.9996) * Math.pow(
+                        Math.cos(north / 6366197.724 / 0.9996),
+                        2
+                    )) / 4 + Math.sin(2 * north / 6366197.724 / 0.9996) * Math.pow(
+                        Math.cos(north / 6366197.724 / 0.9996),
+                        2
+                    ) * Math.pow(
+                        Math.cos(north / 6366197.724 / 0.9996),
+                        2
+                    )) / 3)) / (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+                Math.cos(north / 6366197.724 / 0.9996),
+                2
+            )))) * (1 - 0.006739496742 * Math.pow((easting - 500000) /
+                (0.9996 * 6399593.625 / Math.sqrt((1 + 0.006739496742 * Math.pow(
+                    Math.cos(north / 6366197.724 / 0.9996),
+                    2
+                )))), 2) / 2 * Math.pow(
+                Math.cos(north / 6366197.724 / 0.9996),
+                2
+            )) + north / 6366197.724 / 0.9996)) * 180 / Math.PI + zone * 6 - 183;
         longitude = Math.round(longitude * 10000000);
         longitude = longitude / 10000000;
         return new Point2D.Double(latitude, longitude);
@@ -771,10 +866,14 @@ public class FishStateUtilities {
      * @param meristics
      * @return
      */
-    public static double weigh(final double[] male, final double[] female, final Meristics meristics) {
+    public static double weigh(
+        final double[] male,
+        final double[] female,
+        final Meristics meristics
+    ) {
 
         double totalWeight = 0;
-        //go through all the fish and sum up their weight at given age
+        // go through all the fish and sum up their weight at given age
         for (int age = 0; age < meristics.getNumberOfBins(); age++) {
             totalWeight += meristics.getWeight(MALE, age) * male[age];
             totalWeight += meristics.getWeight(FEMALE, age) * female[age];
@@ -782,7 +881,6 @@ public class FishStateUtilities {
 
         return totalWeight;
 
-
     }
 
     /**
@@ -792,10 +890,12 @@ public class FishStateUtilities {
      * @param meristics species object containig the details
      * @return the weight of hte fish
      */
-    public static double weigh(final StructuredAbundance abundance, final Meristics meristics) {
+    public static double weigh(
+        final StructuredAbundance abundance,
+        final Meristics meristics
+    ) {
         return weigh(abundance.asMatrix(), meristics);
 
-
     }
 
     /**
@@ -805,16 +905,18 @@ public class FishStateUtilities {
      * @param meristics species object containig the details
      * @return the weight of hte fish
      */
-    public static double weigh(final double[][] abundance, final Meristics meristics) {
-        //no female-male split
+    public static double weigh(
+        final double[][] abundance,
+        final Meristics meristics
+    ) {
+        // no female-male split
         double totalWeight = 0;
-        //go through all the fish and sum up their weight at given age
+        // go through all the fish and sum up their weight at given age
         for (int subdivision = 0; subdivision < meristics.getNumberOfSubdivisions(); subdivision++)
             for (int bin = 0; bin < meristics.getNumberOfBins(); bin++)
                 totalWeight += abundance[subdivision][bin] * meristics.getWeight(subdivision, bin);
 
         return totalWeight;
-
 
     }
 
@@ -828,17 +930,17 @@ public class FishStateUtilities {
      */
     public static double weigh(
         final StructuredAbundance abundance,
-        final Meristics meristics, final int binIndex
+        final Meristics meristics,
+        final int binIndex
     ) {
-        //no female-male split
+        // no female-male split
         double totalWeight = 0;
-        //go through all the fish and sum up their weight at given age
+        // go through all the fish and sum up their weight at given age
         for (int subdivision = 0; subdivision < meristics.getNumberOfSubdivisions(); subdivision++) {
             totalWeight += abundance.getAbundance(subdivision, binIndex) * meristics.getWeight(subdivision, binIndex);
         }
 
         return totalWeight;
-
 
     }
 
@@ -852,21 +954,20 @@ public class FishStateUtilities {
      */
     public static double weigh(
         final StructuredAbundance abundance,
-        final Meristics meristics, final int subdivisionIndex,
+        final Meristics meristics,
+        final int subdivisionIndex,
         final int binIndex
     ) {
-        //no female-male split
+        // no female-male split
         double totalWeight = 0;
-        //go through all the fish and sum up their weight at given age
+        // go through all the fish and sum up their weight at given age
 
         totalWeight += abundance.getAbundance(subdivisionIndex, binIndex) * meristics.getWeight(
             subdivisionIndex,
             binIndex
         );
 
-
         return totalWeight;
-
 
     }
 
@@ -877,15 +978,17 @@ public class FishStateUtilities {
      * @param species      species object containig the details
      * @return the weight of hte fish
      */
-    private static double weigh(final double[] ageStructure, final Meristics species) {
+    private static double weigh(
+        final double[] ageStructure,
+        final Meristics species
+    ) {
         double totalWeight = 0;
-        //go through all the fish and sum up their weight at given age
+        // go through all the fish and sum up their weight at given age
         for (int age = 0; age < species.getNumberOfBins(); age++) {
             totalWeight += species.getWeight(0, age) * ageStructure[age];
         }
 
         return totalWeight;
-
 
     }
 
@@ -930,7 +1033,6 @@ public class FishStateUtilities {
         }
         builder.append(columnSeparator);
 
-
         return builder.toString();
     }
 
@@ -957,7 +1059,10 @@ public class FishStateUtilities {
             throw new FileNotFoundException("Failed to delete file: " + f);
     }
 
-    public static Function<Double, Double> normalPDF(final double mean, final double standardDeviation) {
+    public static Function<Double, Double> normalPDF(
+        final double mean,
+        final double standardDeviation
+    ) {
         return x -> Math.exp(-Math.pow(x - mean, 2) / (2 * standardDeviation * standardDeviation)) /
             Math.sqrt(2 * standardDeviation * standardDeviation * Math.PI);
     }
@@ -989,13 +1094,11 @@ public class FishStateUtilities {
             for (final Entry<String, DoubleSummaryStatistics> average : averages.entrySet())
                 portColumns.get(average.getKey()).add(average.getValue().getAverage());
 
-
         }
-
 
         final StringBuilder builder = new StringBuilder();
 
-        //write header
+        // write header
         for (int i = 0; i < columns.size(); i++) {
             if (i != 0)
                 builder.append(",");
@@ -1003,7 +1106,7 @@ public class FishStateUtilities {
         }
         builder.append("\n");
 
-        //write columns
+        // write columns
         for (int row = 0; row < model.getYear() - firstValidYear; row++) {
             for (int i = 0; i < columns.size(); i++) {
                 if (i != 0)
@@ -1018,8 +1121,11 @@ public class FishStateUtilities {
 
     }
 
-    //from here: http://stackoverflow.com/questions/80476/how-can-i-concatenate-two-arrays-in-java
-    public static double[] concatenateArray(final double[] a, final double[] b) {
+    // from here: http://stackoverflow.com/questions/80476/how-can-i-concatenate-two-arrays-in-java
+    public static double[] concatenateArray(
+        final double[] a,
+        final double[] b
+    ) {
         final int aLen = a.length;
         final int bLen = b.length;
         final double[] c = new double[aLen + bLen];
@@ -1028,8 +1134,11 @@ public class FishStateUtilities {
         return c;
     }
 
-    //from here: https://gist.github.com/gubatron/c4c816fcec5a74b752ea
-    public static List<double[]> splitArray(final double[] items, final int maxSubArraySize) {
+    // from here: https://gist.github.com/gubatron/c4c816fcec5a74b752ea
+    public static List<double[]> splitArray(
+        final double[] items,
+        final int maxSubArraySize
+    ) {
         final List<double[]> result = new ArrayList<>();
         if (items == null || items.length == 0) {
             return result;
@@ -1060,19 +1169,17 @@ public class FishStateUtilities {
         final Integer heatmapGathererYear,
         final Consumer<? super Scenario> scenarioSetup,
         final Consumer<? super FishState> preStartSetup,
-        //if any of returns true, it stops the simulation before it is over!
+        // if any of returns true, it stops the simulation before it is over!
         final Iterable<? extends Entry<Integer, AlgorithmFactory<? extends AdditionalStartable>>> outsidePlugins,
         final Iterable<? extends Predicate<FishState>> circuitBreakers
     ) throws IOException {
 
-
         System.out.println("seed " + seed);
-        //create scenario and files
+        // create scenario and files
         final String fullScenario = String.join("\n", Files.readAllLines(scenarioYaml));
 
         final FishYAML yaml = new FishYAML();
         final Scenario scenario = yaml.loadAs(fullScenario, Scenario.class);
-
 
         if (outputFolder != null) {
             outputFolder.toFile().mkdirs();
@@ -1092,7 +1199,6 @@ public class FishStateUtilities {
             ? new FishStateLogger(model, outputFolder.resolve(simulationName + "_log.txt"))
             : Logger.getGlobal();
         logger.setLevel(Level.parse(logLevel));
-
 
         model.setScenario(scenario);
 
@@ -1119,13 +1225,12 @@ public class FishStateUtilities {
 
             if (model.getDayOfTheYear() == 1) {
 
-                //if you fail any of the
+                // if you fail any of the
                 if (circuitBreakers != null)
                     for (final Predicate<FishState> circuitBreaker : circuitBreakers) {
                         if (circuitBreaker.test(model))
                             break mainloop;
                     }
-
 
                 if (outsidePlugins != null)
                     for (final Entry<Integer,
@@ -1140,7 +1245,6 @@ public class FishStateUtilities {
 
                 logger.fine("Year " + model.getYear() + " starting");
             }
-
 
         }
 
@@ -1162,7 +1266,6 @@ public class FishStateUtilities {
             }
             writeAdditionalOutputsToFolder(outputFolder, model);
         }
-
 
         return model;
     }
@@ -1187,7 +1290,7 @@ public class FishStateUtilities {
         final Path outputFolder,
         final FishState model
     ) throws IOException {
-        FileWriter writer;//add additional outputs
+        FileWriter writer;// add additional outputs
         for (final OutputPlugin plugin : model.getOutputPlugins()) {
             plugin.reactToEndOfSimulation(model);
             writer = new FileWriter(outputFolder.resolve(plugin.getFileName()).toFile());
@@ -1198,9 +1301,9 @@ public class FishStateUtilities {
     }
 
     /**
-     * function that produces a predictor setup. Basically if the "usePredictor" flag is true this function
-     * will return a consumer that, when called, will add catch predictors to the fisher; the predictors are necessary
-     * to build ITQ reservation prices
+     * function that produces a predictor setup. Basically if the "usePredictor" flag is true this function will return
+     * a consumer that, when called, will add catch predictors to the fisher; the predictors are necessary to build ITQ
+     * reservation prices
      *
      * @param usePredictors if false it returns an empty consumer
      * @param biology       link to the model being initialize
@@ -1220,15 +1323,15 @@ public class FishStateUtilities {
 
                 for (final Species species : biology.getSpecies()) {
 
-                    //create the predictors
+                    // create the predictors
 
                     fisher.setDailyCatchesPredictor(
                         species.getIndex(),
                         MovingAveragePredictor.dailyMAPredictor(
                             "Predicted Daily Catches of " + species,
                             fisher1 ->
-                                //check the daily counter but do not input new values
-                                //if you were not allowed at sea
+                                // check the daily counter but do not input new values
+                                // if you were not allowed at sea
                                 fisher1.getDailyCounter().getLandingsPerSpecie(
                                     species.getIndex())
 
@@ -1237,29 +1340,26 @@ public class FishStateUtilities {
                         )
                     );
 
-
                     fisher.setProfitPerUnitPredictor(species.getIndex(), MovingAveragePredictor.perTripMAPredictor(
                         "Predicted Unit Profit " + species,
                         fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(species.getIndex()),
                         30
                     ));
 
-
                 }
 
-
-                //daily profits predictor
+                // daily profits predictor
                 fisher.assignDailyProfitsPredictor(
                     MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
                         fisher1 ->
-                            //check the daily counter but do not input new values
-                            //if you were not allowed at sea
+                            // check the daily counter but do not input new values
+                            // if you were not allowed at sea
                             fisher1.isAllowedAtSea() ?
                                 fisher1.getDailyCounter().
                                     getColumn(
                                         FisherYearlyTimeSeries.CASH_FLOW_COLUMN)
                                 :
-                                Double.NaN
+                                    Double.NaN
                         ,
 
                         7
@@ -1275,7 +1375,10 @@ public class FishStateUtilities {
      * @param random randomiser
      * @return x either ceiled or floored
      */
-    public static int randomRounding(double x, final MersenneTwisterFast random) {
+    public static int randomRounding(
+        double x,
+        final MersenneTwisterFast random
+    ) {
         final double signum = Math.signum(x);
         x = Math.abs(x);
         final boolean ceiling = random.nextDouble() < x - (int) x;
@@ -1315,7 +1418,10 @@ public class FishStateUtilities {
         return tile;
     }
 
-    public static double getAverage(final DataColumn column, final int startAtIndex) {
+    public static double getAverage(
+        final DataColumn column,
+        final int startAtIndex
+    ) {
         final Iterator<Double> iterator = column.iterator();
         for (int i = 0; i < startAtIndex; i++)
             iterator.next();
@@ -1325,10 +1431,12 @@ public class FishStateUtilities {
 
         return statistics.getAverage();
 
-
     }
 
-    public static double getWeightedAverage(final double[] observations, final double[] weight) {
+    public static double getWeightedAverage(
+        final double[] observations,
+        final double[] weight
+    ) {
         Preconditions.checkArgument(observations.length == weight.length);
         double sum = 0;
         double denominator = 0;
@@ -1341,7 +1449,8 @@ public class FishStateUtilities {
 
     public static double timeSeriesDistance(
         final DataColumn data,
-        final Path csvFilePath, final double exponent
+        final Path csvFilePath,
+        final double exponent
     ) throws IOException {
         return timeSeriesDistance(
             data,
@@ -1358,12 +1467,12 @@ public class FishStateUtilities {
     public static double timeSeriesDistance(
         final Iterable<Double> timeSeriesOne,
         final Iterable<Double> timeSeriesTwo,
-        final double exponent, final boolean cumulativeError
+        final double exponent,
+        final boolean cumulativeError
     ) {
         Preconditions.checkArgument(exponent > 0);
         final Iterator<Double> firstIterator = timeSeriesOne.iterator();
         final Iterator<Double> secondIterator = timeSeriesTwo.iterator();
-
 
         double error = 0;
         while (firstIterator.hasNext()) {
@@ -1388,9 +1497,9 @@ public class FishStateUtilities {
     }
 
     /**
-     * same as java.util.stream.Collectors::throwingMerger (which is annoyingly private)
-     * Useful for collecting a stream to a non-java.util.HashMap Map implementation.
-     * I think Java 9 has a toMap method that doesn't require this and that we could use once we upgrade.
+     * same as java.util.stream.Collectors::throwingMerger (which is annoyingly private) Useful for collecting a stream
+     * to a non-java.util.HashMap Map implementation. I think Java 9 has a toMap method that doesn't require this and
+     * that we could use once we upgrade.
      */
     public static <T> BinaryOperator<T> throwingMerger() {
         return (u, v) -> {
@@ -1399,11 +1508,14 @@ public class FishStateUtilities {
     }
 
     /**
-     * Builds an immutable map where each element of {@code keys}
-     * is associated with the corresponding element of {@code values}.
+     * Builds an immutable map where each element of {@code keys} is associated with the corresponding element of
+     * {@code values}.
      */
-    public static <K, V> ImmutableMap<K, V> zipToMap(final Iterable<K> keys, final Iterable<V> values) {
-        //noinspection UnstableApiUsage
+    public static <K, V> ImmutableMap<K, V> zipToMap(
+        final Iterable<K> keys,
+        final Iterable<V> values
+    ) {
+        // noinspection UnstableApiUsage
         return zip(stream(keys), stream(values), AbstractMap.SimpleImmutableEntry::new)
             .collect(toImmutableMap(Entry::getKey, Entry::getValue));
     }
@@ -1438,6 +1550,19 @@ public class FishStateUtilities {
                 Collections.shuffle(collection, new Random(rng.nextLong()));
                 return collection;
             }
+        );
+    }
+
+    public static Map<Species, Double> processSpeciesNameToDoubleParameterMap(
+        final Map<String, ? extends DoubleParameter> map,
+        final GlobalBiology globalBiology,
+        final MersenneTwisterFast rng
+    ) {
+        return map.entrySet().stream().collect(
+            toImmutableMap(
+                entry -> globalBiology.getSpeciesByCaseInsensitiveName(entry.getKey()),
+                entry -> entry.getValue().applyAsDouble(rng)
+            )
         );
     }
 

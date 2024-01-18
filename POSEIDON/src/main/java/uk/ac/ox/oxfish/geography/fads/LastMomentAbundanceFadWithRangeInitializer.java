@@ -47,6 +47,7 @@ public class LastMomentAbundanceFadWithRangeInitializer<B extends LocalBiology>
     private final GlobalBiology biology;
 
     private final int rangeInSeatiles;
+    private final Map<Species, Double> fishReleaseProbabilities;
 
     public LastMomentAbundanceFadWithRangeInitializer(
         final int daysItTakeToFillUp,
@@ -55,7 +56,8 @@ public class LastMomentAbundanceFadWithRangeInitializer<B extends LocalBiology>
         final double dudProbability,
         final double[] maxCatchabilityPerSpecies,
         final GlobalBiology biology,
-        final int rangeInSeatiles
+        final int rangeInSeatiles,
+        final Map<Species, Double> fishReleaseProbabilities
     ) {
         this.daysItTakeToFillUp = daysItTakeToFillUp;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
@@ -64,6 +66,7 @@ public class LastMomentAbundanceFadWithRangeInitializer<B extends LocalBiology>
         this.maxCatchabilityPerSpecies = maxCatchabilityPerSpecies;
         this.biology = biology;
         this.rangeInSeatiles = rangeInSeatiles;
+        this.fishReleaseProbabilities = fishReleaseProbabilities;
     }
 
     @Override
@@ -77,7 +80,6 @@ public class LastMomentAbundanceFadWithRangeInitializer<B extends LocalBiology>
             owner != null ? owner.getCurrentTrip() : null,
             owner.grabState().getStep(),
             initialLocation.getGridLocation(),
-            0d,
             fadManager,
             daysItTakeToFillUp,
             daysInWaterBeforeAttraction,
@@ -85,9 +87,9 @@ public class LastMomentAbundanceFadWithRangeInitializer<B extends LocalBiology>
             rng.nextBoolean(dudProbability),
             rangeInSeatiles,
             selectivityFilters,
-            biology
+            biology,
+            fishReleaseProbabilities
         );
     }
-
 
 }

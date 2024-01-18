@@ -66,7 +66,7 @@ public class BiomassResetterTest {
     public void snapshot() {
 
         final FishState fishState = MovingTest.generateSimple4x4Map();
-        //zero them all
+        // zero them all
         for (final SeaTile seaTile : fishState.getMap().getAllSeaTilesExcludingLandAsList()) {
             seaTile.setBiology(new EmptyLocalBiology());
         }
@@ -77,7 +77,7 @@ public class BiomassResetterTest {
         );
         final GlobalBiology biology = new GlobalBiology(species);
 
-        //fill 1x1 at top
+        // fill 1x1 at top
         final VariableBiomassBasedBiology zerozero = new BiomassLocalBiology(
             1000000, biology.getSize(), new MersenneTwisterFast()
         );
@@ -108,15 +108,15 @@ public class BiomassResetterTest {
             ));
         fishState.getMap().getSeaTile(1, 1).setBiology(oneone);
 
-        //biomass allocator wants to reallocate everythin to 0,1 (and triple it too)
+        // biomass allocator wants to reallocate everythin to 0,1 (and triple it too)
         final BiomassAllocator biomassAllocator = (tile, map, random) ->
             tile == fishState.getMap().getSeaTile(0, 1) ? 3d : 0;
 
-        //record the abundance as it is
+        // record the abundance as it is
         final BiologyResetter resetter = new BiomassResetter(biomassAllocator, species);
         resetter.recordHowMuchBiomassThereIs(fishState);
 
-        //reallocate!
+        // reallocate!
         resetter.resetAbundance(fishState.getMap(), new MersenneTwisterFast());
 
         for (int x = 0; x < 4; x++) {
@@ -187,9 +187,9 @@ public class BiomassResetterTest {
         final BiomassFadInitializer fadInitializer = new BiomassFadInitializer(
             globalBiology,
             fishBiomassAttractor,
-            0,
             () -> 0,
-            new GlobalCarryingCapacityInitializer(new FixedDoubleParameter(carryingCapacity))
+            new GlobalCarryingCapacityInitializer(new FixedDoubleParameter(carryingCapacity)),
+            globalBiology.getSpecies().stream().collect(toImmutableMap(identity(), __ -> 0.0))
         );
 
         when(fishState.getBiology()).thenReturn(globalBiology);
@@ -259,9 +259,11 @@ public class BiomassResetterTest {
         // Check that the sum of current tile and FAD biomasses is equal to the initial biomass
         final ImmutableMap<Species, Double> finalSeaTileBiomasses =
             totalBiomasses(globalBiology, seaTileBiologies);
-        species.forEach(s -> Assertions.assertEquals(finalFadBiomasses.get(s) + finalSeaTileBiomasses.get(s),
+        species.forEach(s -> Assertions.assertEquals(
+            finalFadBiomasses.get(s) + finalSeaTileBiomasses.get(s),
             initialSeaTileBiomasses.get(s),
-            EPSILON));
+            EPSILON
+        ));
 
     }
 

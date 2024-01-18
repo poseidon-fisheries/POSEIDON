@@ -30,6 +30,8 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 
 import java.util.Arrays;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.fillBiomassFad;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.TestUtilities.makeBiology;
@@ -50,10 +52,11 @@ public class FadTest {
             fadManager,
             fadBiology,
             new DummyFishBiomassAttractor(globalBiology.getSize()),
-            0.5,
             0,
             new Int2D(),
-            new GlobalCarryingCapacity(1.5)
+            new GlobalCarryingCapacity(1.5),
+            // TODO: release probabilities are set to zero for now but, this will need to be modified for a proper test
+            globalBiology.getSpecies().stream().collect(toImmutableMap(identity(), __ -> 0.0))
         );
         fillBiomassFad(fad);
 
@@ -102,10 +105,10 @@ public class FadTest {
             fadManager,
             fadBiology,
             new DummyFishBiomassAttractor(globalBiology.getSize()),
-            0.5,
             10,
             new Int2D(),
-            new GlobalCarryingCapacity(1.5)
+            new GlobalCarryingCapacity(1.5),
+            globalBiology.getSpecies().stream().collect(toImmutableMap(identity(), __ -> 0.0))
         );
         Assertions.assertNull(fad.getStepOfFirstAttraction());
         Assertions.assertNull(fad.getStepsBeforeFirstAttraction());
