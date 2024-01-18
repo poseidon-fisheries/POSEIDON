@@ -49,10 +49,6 @@ public class ValuePerSetFadModule
     ) {
         super(optionsGenerator);
         this.dampen = dampen;
-        Preconditions.checkArgument(
-            optionsGenerator.getMinimumFadValue() <= 0,
-            "by setting minimum value fad set >0 you bias the value per set computation!"
-        );
     }
 
 
