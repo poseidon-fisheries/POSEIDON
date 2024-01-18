@@ -21,12 +21,11 @@ import java.util.PriorityQueue;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
- * generates a list of possible fads to set on.
- * The way it works is that it discretizes space, and returns the best in each group.
- * That way we limit the number of actions to plan for <br>
- * The idea is that the planner starts this at the beginning (which gets all Fads sorted),
- * then look for the best in each group (through generateBestFadOpportunities) and then tell the generator which
- * was the selected one (through chooseFad)
+ * Generates a list of possible fads to set on. The way it works is that it discretizes space, and returns the best in
+ * each group. That way we limit the number of actions to plan for.
+ * <br> The idea is that the planner starts this at the beginning (which gets all Fads sorted), then look for the best
+ * in each group (through generateBestFadOpportunities) and then tell the generator which was the selected one (through
+ * chooseFad)
  */
 @SuppressWarnings("ALL")
 public class OwnFadSetDiscretizedActionGenerator {
@@ -42,13 +41,13 @@ public class OwnFadSetDiscretizedActionGenerator {
     private NauticalMap map;
     private PriorityQueue<ValuedFad>[] rankedFads;
     /**
-     * when this is set to true, the generator will immediately remove all fads that are currently not
-     * allowed to be caught. This is needs to be true, otherwise DrawThenCheapestInsertionPlanner will
-     * prevent further FAD sets to be added to the plan if we try to add a set on an illegal FAD.
+     * when this is set to true, the generator will immediately remove all fads that are currently not allowed to be
+     * caught. This is needs to be true, otherwise DrawThenCheapestInsertionPlanner will prevent further FAD sets to be
+     * added to the plan if we try to add a set on an illegal FAD.
      */
     private boolean filterOutCurrentlyInvalidFads = true;
 
-    //todo add minimum soaktime
+    // todo add minimum soaktime
 
     public OwnFadSetDiscretizedActionGenerator(
         final MapDiscretization discretization,
@@ -71,7 +70,7 @@ public class OwnFadSetDiscretizedActionGenerator {
     ) {
 
         this.map = map;
-        //if you haven't, discretize!
+        // if you haven't, discretize!
         if (!discretization.isActive())
             discretization.discretize(map);
 
@@ -80,7 +79,7 @@ public class OwnFadSetDiscretizedActionGenerator {
             rankedFads[i] = new PriorityQueue<>(COMPARATOR);
         }
 
-        //go through all your fads and rank them by profits
+        // go through all your fads and rank them by profits
         for (Fad fad : fadManager.getDeployedFads()) {
             Fisher fisher = fadManager.getFisher();
             final boolean fadSetAllowed = PlannedAction.FadSet.isFadSetAllowed(
@@ -106,29 +105,27 @@ public class OwnFadSetDiscretizedActionGenerator {
 
     }
 
-
     /**
-     * returns a list of possible fads so that you may select which to fish on next (the fads are returned with their monetary value,
-     * and the integer they are paired with is the group area of the map discretization)
+     * returns a list of possible fads so that you may select which to fish on next (the fads are returned with their
+     * monetary value, and the integer they are paired with is the group area of the map discretization)
      *
      * @return
      */
     @Nonnull
     public List<Entry<ValuedFad, Integer>> generateBestFadOpportunities() {
 
-        //you may be here asking: "why isn't this a map?".
-        //the answer, my friend, is blowing in the wind
+        // you may be here asking: "why isn't this a map?".
+        // the answer, my friend, is blowing in the wind
 
         assert rankedFads != null : "not started";
         List<Entry<ValuedFad, Integer>> toReturn = new LinkedList<>();
-        //for each group retrieve the best
+        // for each group retrieve the best
         for (int group = 0; group < rankedFads.length; group++) {
             if (rankedFads[group].size() > 0)
                 toReturn.add(entry(rankedFads[group].peek(), group));
         }
         return toReturn;
     }
-
 
     /**
      * returns the value of the "best" fad at this area
@@ -140,8 +137,8 @@ public class OwnFadSetDiscretizedActionGenerator {
     }
 
     /**
-     * returns a list of all fads, geographically discretized and each are has a queue sorting (descending) all fads in that area
-     * by their monetary amount
+     * returns a list of all fads, geographically discretized and each are has a queue sorting (descending) all fads in
+     * that area by their monetary amount
      *
      * @return
      */
@@ -149,7 +146,7 @@ public class OwnFadSetDiscretizedActionGenerator {
     public List<Entry<PriorityQueue<ValuedFad>, Integer>> peekAllFads() {
         assert rankedFads != null : "not started";
         List<Entry<PriorityQueue<ValuedFad>, Integer>> toReturn = new LinkedList<>();
-        //for each group retrieve the best
+        // for each group retrieve the best
         for (int group = 0; group < rankedFads.length; group++) {
             if (rankedFads[group].size() > 0)
                 toReturn.add(entry(rankedFads[group], group));
@@ -157,12 +154,10 @@ public class OwnFadSetDiscretizedActionGenerator {
         return toReturn;
     }
 
-
     public PlannedAction.FadSet chooseFad(Integer discretizationGroup) {
         ValuedFad selectedFad = rankedFads[discretizationGroup].poll();
         Preconditions.checkState(selectedFad != null);
         return new PlannedAction.FadSet(selectedFad.getKey());
-
     }
 
     public boolean isStarted() {
@@ -188,7 +183,10 @@ public class OwnFadSetDiscretizedActionGenerator {
     public static class ValuedFad extends SimpleImmutableEntry<Fad, Double> {
         private static final long serialVersionUID = 1L;
 
-        public ValuedFad(Fad first, Double second) {
+        public ValuedFad(
+            Fad first,
+            Double second
+        ) {
             super(first, second);
         }
     }
