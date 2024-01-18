@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
+import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -39,6 +40,8 @@ import static java.lang.Math.min;
  */
 @SuppressWarnings("unchecked")
 public class PlannedStrategyProxy implements FishingStrategy, DestinationStrategy {
+
+    private static final Logger logger = Logger.getLogger(PlannedStrategyProxy.class.getName());
 
     private static final double MIN_BIAS = 0.0001;
     private static final double MAX_BIAS = 0.9999;
@@ -225,7 +228,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 final LocationValues locations =
                     locationValues.get(DolphinSetAction.class);
                 if (locations.getValues().isEmpty())
-                    System.out.println(
+                    logger.warning(() ->
                         fisher + " failed to create DEL location values, in spite of having" +
                             "a weight of " + actionWeight.getValue()
                     );
@@ -253,8 +256,10 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 final LocationValues locations =
                     locationValues.get(FadDeploymentAction.class);
                 if (locations.getValues().isEmpty())
-                    System.out.println(fisher + " failed to create DPL location values, in spite of having" +
-                        "a weight of " + actionWeight.getValue());
+                    logger.warning(() ->
+                        fisher + " failed to create DPL location values, in spite of having" +
+                            "a weight of " + actionWeight.getValue()
+                    );
                 plannableActionWeights.put(
                     ActionType.DeploymentAction,
                     actionWeight.getValue() * deploymentBias / (1 - deploymentBias)
@@ -311,8 +316,10 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 final LocationValues locations =
                     locationValues.get(OpportunisticFadSetAction.class);
                 if (locations.getValues().isEmpty()) {
-                    System.out.println(fisher + " failed to create OFS location values, in spite of having" +
-                        "a weight of " + actionWeight.getValue());
+                    logger.warning(() ->
+                        fisher + " failed to create OFS location values, in spite of having" +
+                            "a weight of " + actionWeight.getValue()
+                    );
                     continue;
                 }
                 plannableActionWeights.put(
