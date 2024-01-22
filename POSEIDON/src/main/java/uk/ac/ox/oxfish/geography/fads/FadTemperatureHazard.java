@@ -68,26 +68,25 @@ public class FadTemperatureHazard implements AdditionalStartable, Steppable {
         model.getFadMap().allFads().forEach(
             abstractFad -> {
 
-                //if it is active and in the water long enough
+                // if it is active and in the water long enough
                 if (abstractFad.isActive() &&
                     abstractFad.getStepDeployed() >= minimumDaysBeforeHazardCanTakePlace
                 ) {
-                    //if it is too cold
+                    // if it is too cold
                     final SeaTile location = abstractFad.getLocation();
                     if (temperatureMap.get(
                         location.getGridX(),
                         location.getGridY()
                     ) <= valueBelowWhichHazardHappens &&
-                        //you have a chance
+                        // you have a chance
                         ((FishState) simState).getRandom().nextDouble() <= hazardProbability
                     )
-                        //to lose the fish!
-                        abstractFad.releaseFish(((FishState) simState).getSpecies());
+                        // to lose the fish!
+                        abstractFad.releaseFishIntoTheVoid(((FishState) simState).getSpecies());
                 }
 
             }
         );
-
 
     }
 

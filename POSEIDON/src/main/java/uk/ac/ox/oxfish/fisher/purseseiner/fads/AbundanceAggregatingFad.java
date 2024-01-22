@@ -57,16 +57,16 @@ public class AbundanceAggregatingFad
     }
 
     @Override
-    public void releaseFish(
-        final Collection<? extends Species> allSpecies,
+    public void releaseFishIntoTile(
+        final Collection<? extends Species> speciesToRelease,
         final LocalBiology seaTileBiology
     ) {
         getOwner().reactTo(
             AbundanceFadAttractionEvent.class,
-            () -> makeReleaseEvent(allSpecies, seaTileBiology)
+            () -> makeReleaseEvent(speciesToRelease, seaTileBiology)
         );
         if (seaTileBiology instanceof AbundanceLocalBiology) {
-            allSpecies.forEach(species -> {
+            speciesToRelease.forEach(species -> {
                 final double[][] fadAbundance = getBiology().getAbundance(species).asMatrix();
                 final double[][] tileAbundance = seaTileBiology.getAbundance(species).asMatrix();
                 for (int div = 0; div < fadAbundance.length; div++) {
@@ -77,7 +77,7 @@ public class AbundanceAggregatingFad
                 }
             });
         } else {
-            releaseFish(allSpecies);
+            releaseFishIntoTheVoid(speciesToRelease);
         }
     }
 
@@ -103,11 +103,11 @@ public class AbundanceAggregatingFad
     }
 
     @Override
-    public void releaseFish(final Collection<? extends Species> allSpecies) {
+    public void releaseFishIntoTheVoid(final Collection<? extends Species> speciesToRelease) {
 
         double totalBiomassToRelease = 0;
-        final Map<Species, Double> biomassLost = new HashMap<>(allSpecies.size());
-        for (final Species species : allSpecies) {
+        final Map<Species, Double> biomassLost = new HashMap<>(speciesToRelease.size());
+        for (final Species species : speciesToRelease) {
             final double biomassHere = getBiology().getBiomass(species);
             totalBiomassToRelease += biomassHere;
             biomassLost.put(species, biomassHere);

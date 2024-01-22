@@ -83,15 +83,15 @@ public abstract class LastMomentFad extends Fad {
     }
 
     @Override
-    public void releaseFish(
-        final Collection<? extends Species> allSpecies,
+    public void releaseFishIntoTile(
+        final Collection<? extends Species> speciesToRelease,
         final LocalBiology seaTileBiology
     ) {
         // nothing to release
     }
 
     @Override
-    public void releaseFish(final Collection<? extends Species> allSpecies) {
+    public void releaseFishIntoTheVoid(final Collection<? extends Species> speciesToRelease) {
         // nothing to release
     }
 

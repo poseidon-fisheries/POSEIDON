@@ -39,6 +39,7 @@ import uk.ac.ox.oxfish.model.data.monitors.regions.Locatable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -100,31 +101,34 @@ public abstract class Fad implements Locatable {
         return locationDeployed;
     }
 
-    public void maybeReleaseFish(
-        final Collection<? extends Species> allSpecies,
+    public void maybeReleaseFishIntoTile(
         final LocalBiology seaTileBiology,
         final MersenneTwisterFast rng
     ) {
-        if (rng.nextDouble() < fishReleaseProbability) {
-            releaseFish(allSpecies, seaTileBiology);
-        }
+        releaseFishIntoTile(getSpeciesToRelease(rng), seaTileBiology);
     }
 
-    public abstract void releaseFish(
-        final Collection<? extends Species> allSpecies,
+    public abstract void releaseFishIntoTile(
+        final Collection<? extends Species> speciesToRelease,
         LocalBiology seaTileBiology
     );
 
-    public void maybeReleaseFish(
-        final Collection<? extends Species> allSpecies,
+    public void maybeReleaseFishIntoTheVoid(
         final MersenneTwisterFast rng
     ) {
-        if (rng.nextDouble() < fishReleaseProbability) {
-            releaseFish(allSpecies);
-        }
+        releaseFishIntoTheVoid(getSpeciesToRelease(rng));
     }
 
-    public abstract void releaseFish(final Collection<? extends Species> allSpecies);
+    private Collection<? extends Species> getSpeciesToRelease(final MersenneTwisterFast rng) {
+        return fishReleaseProbabilities
+            .entrySet()
+            .stream()
+            .filter(entry -> rng.nextDouble() < entry.getValue())
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+    }
+
+    public abstract void releaseFishIntoTheVoid(final Collection<? extends Species> speciesToRelease);
 
     /**
      * Infers the precise lon/lat coordinates of the FAD using a combination of the tile's geographical coordinates and

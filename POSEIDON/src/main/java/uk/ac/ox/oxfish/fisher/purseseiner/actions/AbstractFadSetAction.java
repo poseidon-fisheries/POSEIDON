@@ -55,7 +55,10 @@ public abstract class AbstractFadSetAction
 
     @Override
     public ActionResult act(
-        final FishState fishState, final Fisher fisher, final Regulation regulation, final double hoursLeft
+        final FishState fishState,
+        final Fisher fisher,
+        final Regulation regulation,
+        final double hoursLeft
     ) {
         assert fisher.getLocation() == fad.getLocation();
         return super.act(fishState, fisher, regulation, hoursLeft);
@@ -69,7 +72,10 @@ public abstract class AbstractFadSetAction
     }
 
     @Override
-    public void reactToSuccessfulSet(final FishState fishState, final SeaTile locationOfSet) {
+    public void reactToSuccessfulSet(
+        final FishState fishState,
+        final SeaTile locationOfSet
+    ) {
         fad.reactToBeingFished(fishState, getFisher(), locationOfSet);
         // Nothing to do here since the biomass has already been removed from the ocean
         fishState.getFadMap().destroyFad(fad);
@@ -80,8 +86,11 @@ public abstract class AbstractFadSetAction
      * When a FAD set fails, the fish is returned to the underlying sea tile biology.
      */
     @Override
-    public void reactToFailedSet(final FishState fishState, final SeaTile locationOfSet) {
-        fad.releaseFish(fishState.getBiology().getSpecies(), locationOfSet.getBiology());
+    public void reactToFailedSet(
+        final FishState fishState,
+        final SeaTile locationOfSet
+    ) {
+        fad.releaseFishIntoTile(fishState.getBiology().getSpecies(), locationOfSet.getBiology());
         fishState.getFadMap().destroyFad(fad);
         getFadManager(getFisher()).putFadBackInStock();
     }

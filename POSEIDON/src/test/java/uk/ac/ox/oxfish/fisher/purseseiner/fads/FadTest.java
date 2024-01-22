@@ -67,21 +67,21 @@ class FadTest {
         // generate failed attempt to release the FAD's fish into the tile biology
         final MersenneTwisterFast rng = mock(MersenneTwisterFast.class);
         when(rng.nextDouble()).thenReturn(1.0);
-        fad.maybeReleaseFish(globalBiology.getSpecies(), tileBiology, rng);
+        fad.maybeReleaseFishIntoTile(tileBiology, rng);
         // check that the FAD is still full and the tile biology is still empty
         assertEquals(Arrays.stream(fad.getBiomass()).sum(), fad.getCarryingCapacity().getTotal(), 0.0);
         assertTrue(tileBiology.isEmpty());
 
         // release the FAD's fish into the tile biology
         when(rng.nextDouble()).thenReturn(0.0);
-        fad.maybeReleaseFish(globalBiology.getSpecies(), tileBiology, rng);
+        fad.maybeReleaseFishIntoTile(tileBiology, rng);
         // Check that the FAD is now empty and the tile has received the fish
         assertTrue(fadBiology.isEmpty());
         assertEquals(tileBiology.getTotalBiomass(), fad.getCarryingCapacity().getTotal(), 0);
 
         // Refill the FAD and release another batch of FAD fish into the tile biology
         fillBiomassFad(fad);
-        fad.maybeReleaseFish(globalBiology.getSpecies(), tileBiology, rng);
+        fad.maybeReleaseFishIntoTile(tileBiology, rng);
 
         // Check that the FAD is now empty and the tile is now at full carrying capacity
         assertTrue(fadBiology.isEmpty());
@@ -90,10 +90,10 @@ class FadTest {
         // Fill the FAD one last time and release the fish to nowhere
         fillBiomassFad(fad);
         when(rng.nextDouble()).thenReturn(1.0);
-        fad.maybeReleaseFish(globalBiology.getSpecies(), rng);
+        fad.maybeReleaseFishIntoTheVoid(rng);
         Assertions.assertFalse(fadBiology.isEmpty());
         when(rng.nextDouble()).thenReturn(0.0);
-        fad.maybeReleaseFish(globalBiology.getSpecies(), rng);
+        fad.maybeReleaseFishIntoTheVoid(rng);
         assertTrue(fadBiology.isEmpty());
 
     }

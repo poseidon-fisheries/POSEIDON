@@ -59,14 +59,14 @@ public class BiomassAggregatingFad
      * biomass based (most likely because we're outside the habitable zone), the fish is lost.
      */
     @Override
-    public void releaseFish(
-        final Collection<? extends Species> allSpecies,
+    public void releaseFishIntoTile(
+        final Collection<? extends Species> speciesToRelease,
         final LocalBiology seaTileBiology
     ) {
         if (seaTileBiology instanceof VariableBiomassBasedBiology) {
-            releaseFish(allSpecies, (VariableBiomassBasedBiology) seaTileBiology);
+            releaseFish(speciesToRelease, (VariableBiomassBasedBiology) seaTileBiology);
         } else {
-            releaseFish(allSpecies);
+            releaseFishIntoTheVoid(speciesToRelease);
         }
     }
 
@@ -91,18 +91,18 @@ public class BiomassAggregatingFad
             );
         });
         // release whatever is left in the FAD if the sea tile could not absorb it
-        releaseFish(allSpecies);
+        releaseFishIntoTheVoid(allSpecies);
     }
 
     /**
      * Remove biomass for all the given species from the FAD without sending it anywhere, therefore losing the fish.
      */
     @Override
-    public void releaseFish(final Collection<? extends Species> allSpecies) {
+    public void releaseFishIntoTheVoid(final Collection<? extends Species> speciesToRelease) {
         final Map<Species, Double> biomassLost =
-            allSpecies.stream().collect(toImmutableMap(identity(), getBiology()::getBiomass));
+            speciesToRelease.stream().collect(toImmutableMap(identity(), getBiology()::getBiomass));
         getOwner().reactTo(new BiomassLostEvent(biomassLost));
-        allSpecies.forEach(species -> getBiology().setCurrentBiomass(species, 0));
+        speciesToRelease.forEach(species -> getBiology().setCurrentBiomass(species, 0));
     }
 
     @Override

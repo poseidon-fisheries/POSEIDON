@@ -25,9 +25,9 @@ import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 /**
- * This class is mostly a wrapper around the DriftingObjectsMap class, but it adds a couple bits of
- * functionality: - It's a MASON Steppable, which applies drift when stepped. - It has methods for
- * deploying and removing FADs, setting the appropriate callback in the former case.
+ * This class is mostly a wrapper around the DriftingObjectsMap class, but it adds a couple bits of functionality: -
+ * It's a MASON Steppable, which applies drift when stepped. - It has methods for deploying and removing FADs, setting
+ * the appropriate callback in the former case.
  */
 public class FadMap
     implements AdditionalStartable, Steppable {
@@ -89,13 +89,12 @@ public class FadMap
                     .flatMap(this::getTileBiology);
             if (seaTileBiology.isPresent()) {
                 fad.aggregateFish(seaTileBiology.get(), globalBiology, fishState.getStep());
-                fad.maybeReleaseFish(
-                    globalBiology.getSpecies(),
+                fad.maybeReleaseFishIntoTile(
                     seaTileBiology.get(),
                     fishState.getRandom()
                 );
             } else {
-                fad.maybeReleaseFish(globalBiology.getSpecies(), fishState.getRandom());
+                fad.maybeReleaseFishIntoTheVoid(fishState.getRandom());
             }
         });
     }
@@ -128,14 +127,19 @@ public class FadMap
     }
 
     /**
-     * Deploys a FAD in the middle of the given sea tile, i.e., at the 0.5, 0.5 point inside the
-     * tile
+     * Deploys a FAD in the middle of the given sea tile, i.e., at the 0.5, 0.5 point inside the tile
      */
-    public void deployFad(final Fad fad, final SeaTile seaTile) {
+    public void deployFad(
+        final Fad fad,
+        final SeaTile seaTile
+    ) {
         deployFad(fad, new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5));
     }
 
-    public void deployFad(final Fad fad, final Double2D location) {
+    public void deployFad(
+        final Fad fad,
+        final Double2D location
+    ) {
         driftingObjectsMap.add(fad, location, onMove(fad));
     }
 
@@ -149,7 +153,7 @@ public class FadMap
                     // FAD should be removed (which will in turn trigger another call back to
                     // this function).
                     getSeaTile(oldLoc).ifPresent(seaTile ->
-                        fad.releaseFish(globalBiology.getSpecies(), seaTile.getBiology())
+                        fad.releaseFishIntoTile(globalBiology.getSpecies(), seaTile.getBiology())
                     );
                     remove(fad);
                 }
@@ -170,7 +174,7 @@ public class FadMap
     }
 
     private void reactToLostFad(final Fad fad) {
-        fad.releaseFish(globalBiology.getSpecies());
+        fad.releaseFishIntoTheVoid(globalBiology.getSpecies());
         if (fad.getOwner() != null)
             fad.getOwner().loseFad(fad);
     }
@@ -187,15 +191,18 @@ public class FadMap
         return fadsAt(seaTile.getGridX(), seaTile.getGridY());
     }
 
-    private Bag fadsAt(final int x, final int y) {
+    private Bag fadsAt(
+        final int x,
+        final int y
+    ) {
         final Int2D location = new Int2D(x, y);
         final Bag bag = driftingObjectsMap.getField().getObjectsAtDiscretizedLocation(location);
         return bag == null ? new Bag() : bag;
     }
 
     /**
-     * Returns the Continuous2D field backing the floating objects map. Only public because the GUI
-     * portrayal needs to access it.
+     * Returns the Continuous2D field backing the floating objects map. Only public because the GUI portrayal needs to
+     * access it.
      */
     public Continuous2D getField() {
         return driftingObjectsMap.getField();
@@ -212,6 +219,5 @@ public class FadMap
     public boolean isStarted() {
         return stoppable != null;
     }
-
 
 }
