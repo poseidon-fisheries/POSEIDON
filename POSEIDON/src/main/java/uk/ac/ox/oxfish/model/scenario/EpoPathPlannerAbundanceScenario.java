@@ -42,6 +42,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                 new AbundancePurseSeineGearFactory(
                     getTargetYear(),
                     new SelectivityAbundanceFadInitializerFactory(
+
                         // see https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1545974455
                         // for Weibull parameter values, obtained by fitting the distributions to observer data
                         new WeibullPerSpeciesCarryingCapacitiesFromFileFactory(

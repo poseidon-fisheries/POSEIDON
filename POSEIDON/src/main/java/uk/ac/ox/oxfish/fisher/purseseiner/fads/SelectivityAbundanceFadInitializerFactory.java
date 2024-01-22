@@ -8,7 +8,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.AbundanceAggregatingFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.geography.fads.CarryingCapacityInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
@@ -34,7 +33,7 @@ public class SelectivityAbundanceFadInitializerFactory
     }
 
     public SelectivityAbundanceFadInitializerFactory(
-        final CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> carryingCapacityInitializerFactory,
+        final AlgorithmFactory<CarryingCapacitySupplier> carryingCapacitySupplier,
         final AbundanceFiltersFactory abundanceFiltersFactory,
         final DoubleParameter daysInWaterBeforeAttraction,
         final Map<String, DoubleParameter> catchabilities,
@@ -42,7 +41,7 @@ public class SelectivityAbundanceFadInitializerFactory
         final EnvironmentalPenaltyFunctionFactory environmentalPenaltyFunction
     ) {
         super(
-            carryingCapacityInitializerFactory,
+            carryingCapacitySupplier,
             catchabilities,
             fishReleaseProbabilities,
             daysInWaterBeforeAttraction,
@@ -102,7 +101,7 @@ public class SelectivityAbundanceFadInitializerFactory
                 getAbundanceFilters().apply(fishState).get(FadSetAction.class)
             ),
             fishState::getStep,
-            getCarryingCapacityInitializer().apply(fishState),
+            getCarryingCapacitySupplier().apply(fishState),
             processSpeciesNameToDoubleParameterMap(
                 getFishReleaseProbabilities(),
                 globalBiology,

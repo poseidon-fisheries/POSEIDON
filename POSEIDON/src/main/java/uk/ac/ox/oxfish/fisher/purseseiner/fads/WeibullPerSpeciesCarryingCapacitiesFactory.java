@@ -15,7 +15,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
 public class WeibullPerSpeciesCarryingCapacitiesFactory
-    implements uk.ac.ox.oxfish.geography.fads.CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> {
+    implements uk.ac.ox.oxfish.utility.AlgorithmFactory<CarryingCapacitySupplier> {
 
     private Map<String, DoubleParameter> shapeParameters;
     private Map<String, DoubleParameter> scaleParameters;
@@ -27,6 +27,7 @@ public class WeibullPerSpeciesCarryingCapacitiesFactory
     public WeibullPerSpeciesCarryingCapacitiesFactory() {
     }
 
+    @SuppressWarnings("WeakerAccess")
     public WeibullPerSpeciesCarryingCapacitiesFactory(
         final Map<String, DoubleParameter> shapeParameters,
         final Map<String, DoubleParameter> scaleParameters,
@@ -42,23 +43,23 @@ public class WeibullPerSpeciesCarryingCapacitiesFactory
     }
 
     @Override
-    public CarryingCapacityInitializer<PerSpeciesCarryingCapacity> apply(
+    public CarryingCapacitySupplier apply(
         final FishState fishState
     ) {
         final MersenneTwisterFast rng = fishState.getRandom();
-        return new PerSpeciesCarryingCapacityInitializer(
+        return () -> new PerSpeciesCarryingCapacity(
             fishState
                 .getBiology()
                 .getSpecies()
                 .stream()
                 .collect(toImmutableMap(
                     identity(),
-                    species -> makeSpeciesCarryingCapacityParameter(species, rng)
+                    species -> speciesCarryingCapacity(species, rng)
                 ))
         );
     }
 
-    private DoubleParameter makeSpeciesCarryingCapacityParameter(
+    private double speciesCarryingCapacity(
         final Species species,
         final MersenneTwisterFast rng
     ) {
@@ -88,7 +89,7 @@ public class WeibullPerSpeciesCarryingCapacitiesFactory
                 getProportionOfZeros().get(speciesName).applyAsDouble(rng)
             ),
             getCapacityScalingFactor().applyAsDouble(rng)
-        );
+        ).applyAsDouble(rng);
     }
 
     @SuppressWarnings("WeakerAccess")

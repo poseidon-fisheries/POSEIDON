@@ -824,13 +824,6 @@ public class AlgorithmFactories {
             )
         ));
         addFactories(new Factories<>(
-            CarryingCapacityInitializer.class,
-            MaximumPerSpeciesCarryingCapacitiesFactory.class,
-            WeibullPerSpeciesCarryingCapacitiesFactory.class,
-            WeibullPerSpeciesCarryingCapacitiesFromFileFactory.class
-
-        ));
-        addFactories(new Factories<>(
             FishValueCalculator.class,
             UnreliableFishValueCalculatorFactory.class,
             ReliableFishValueCalculatorFactory.class
@@ -874,6 +867,13 @@ public class AlgorithmFactories {
             MinimumSetValues.class,
             NoMinimumSetValuesFactory.class,
             MinimumSetValuesFromFileFactory.class
+        ));
+        addFactories(new Factories<>(
+            CarryingCapacitySupplier.class,
+            FixedGlobalCarryingCapacitySupplierFactory.class,
+            MaximumPerSpeciesCarryingCapacitiesFactory.class,
+            WeibullPerSpeciesCarryingCapacitiesFactory.class,
+            WeibullPerSpeciesCarryingCapacitiesFromFileFactory.class
         ));
     }
 

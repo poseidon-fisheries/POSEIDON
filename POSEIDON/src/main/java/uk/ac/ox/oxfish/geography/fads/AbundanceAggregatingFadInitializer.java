@@ -34,10 +34,10 @@ public class AbundanceAggregatingFadInitializer
         final GlobalBiology globalBiology,
         final FishAttractor<AbundanceLocalBiology, AbundanceAggregatingFad> fishAttractor,
         final IntSupplier timeStepSupplier,
-        final CarryingCapacityInitializer<?> carryingCapacityInitializer,
+        final CarryingCapacitySupplier carryingCapacitySupplier,
         final Map<Species, Double> fishReleaseProbability
     ) {
-        super(globalBiology, fishAttractor, timeStepSupplier, carryingCapacityInitializer, fishReleaseProbability);
+        super(globalBiology, fishAttractor, timeStepSupplier, carryingCapacitySupplier, fishReleaseProbability);
     }
 
     @Override

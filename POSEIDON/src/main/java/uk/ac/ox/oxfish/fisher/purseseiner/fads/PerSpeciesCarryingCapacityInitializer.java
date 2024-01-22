@@ -9,7 +9,7 @@ import java.util.Map;
 import static java.util.Arrays.stream;
 
 public class PerSpeciesCarryingCapacityInitializer
-    implements CarryingCapacityInitializer<PerSpeciesCarryingCapacity> {
+    implements java.util.function.Function<MersenneTwisterFast, PerSpeciesCarryingCapacity> {
 
     private final Map<? extends Species, ? extends DoubleParameter> carryingCapacities;
 

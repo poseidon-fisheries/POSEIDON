@@ -24,7 +24,6 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.HeterogeneousLinearIntervalAttractor;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.PerSpeciesCarryingCapacity;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPredicateFunctionFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
@@ -38,7 +37,6 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.processSpeciesNameToDou
 public class LinearIntervalAttractorFactory
     extends AbundanceFadInitializerFactory {
 
-    private CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> capacityCarryingCapacityInitializerFactory;
     private EnvironmentalPredicateFunctionFactory environmentalPredicateFunctionFactory;
     private DoubleParameter daysItTakesToFillUp = new CalibratedParameter(30);
     private DoubleParameter minAbundanceThreshold = new CalibratedParameter(100);
@@ -63,7 +61,7 @@ public class LinearIntervalAttractorFactory
             fishState.getBiology(),
             generateFishAttractor(fishState),
             fishState::getStep,
-            capacityCarryingCapacityInitializerFactory.apply(fishState),
+            getCarryingCapacitySupplier().apply(fishState),
             processSpeciesNameToDoubleParameterMap(
                 fishReleaseProbabilities,
                 fishState.getBiology(),
@@ -87,27 +85,33 @@ public class LinearIntervalAttractorFactory
         return attractor;
     }
 
+    @SuppressWarnings("unused")
     public EnvironmentalPredicateFunctionFactory getEnvironmentalPredicateFunctionFactory() {
         return environmentalPredicateFunctionFactory;
     }
 
+    @SuppressWarnings("unused")
     public void setEnvironmentalPredicateFunctionFactory(final EnvironmentalPredicateFunctionFactory environmentalPredicateFunctionFactory) {
         this.environmentalPredicateFunctionFactory = environmentalPredicateFunctionFactory;
     }
 
+    @SuppressWarnings("unused")
     public DoubleParameter getDaysItTakesToFillUp() {
         return daysItTakesToFillUp;
     }
 
+    @SuppressWarnings("unused")
     public void setDaysItTakesToFillUp(final DoubleParameter daysItTakesToFillUp) {
         invalidateCache();
         this.daysItTakesToFillUp = daysItTakesToFillUp;
     }
 
+    @SuppressWarnings("unused")
     public DoubleParameter getMinAbundanceThreshold() {
         return minAbundanceThreshold;
     }
 
+    @SuppressWarnings("unused")
     public void setMinAbundanceThreshold(final DoubleParameter minAbundanceThreshold) {
         invalidateCache();
         this.minAbundanceThreshold = minAbundanceThreshold;

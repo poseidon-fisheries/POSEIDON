@@ -41,22 +41,23 @@ public abstract class AggregatingFadInitializer<
     private final FishAttractor<B, F> fishAttractor;
     private final IntSupplier timeStepSupplier;
     private final GlobalBiology biology;
-    private final CarryingCapacityInitializer<?> carryingCapacityInitializer;
+
+    private final CarryingCapacitySupplier carryingCapacitySupplier;
     private final Map<Species, Double> fishReleaseProbabilities;
 
     AggregatingFadInitializer(
         final GlobalBiology globalBiology,
         final FishAttractor<B, F> fishAttractor,
         final IntSupplier timeStepSupplier,
-        final CarryingCapacityInitializer<?> carryingCapacityInitializer,
+        final CarryingCapacitySupplier carryingCapacitySupplier,
         final Map<Species, Double> fishReleaseProbabilities
     ) {
         this.emptyBiomasses = new double[globalBiology.getSize()];
+        this.carryingCapacitySupplier = carryingCapacitySupplier;
         this.fishReleaseProbabilities = ImmutableMap.copyOf(fishReleaseProbabilities);
         this.timeStepSupplier = timeStepSupplier;
         this.fishAttractor = fishAttractor;
         this.biology = globalBiology;
-        this.carryingCapacityInitializer = carryingCapacityInitializer;
     }
 
     @Override
@@ -72,7 +73,7 @@ public abstract class AggregatingFadInitializer<
             fishAttractor,
             timeStepSupplier.getAsInt(),
             new Int2D(initialLocation.getGridX(), initialLocation.getGridY()),
-            carryingCapacityInitializer.apply(rng),
+            carryingCapacitySupplier.get(),
             fishReleaseProbabilities
         );
     }

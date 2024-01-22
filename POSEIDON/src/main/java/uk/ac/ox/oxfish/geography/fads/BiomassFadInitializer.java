@@ -35,10 +35,10 @@ public class BiomassFadInitializer
         final GlobalBiology globalBiology,
         final FishAttractor<BiomassLocalBiology, BiomassAggregatingFad> fishAttractor,
         final IntSupplier timeStepSupplier,
-        final CarryingCapacityInitializer<GlobalCarryingCapacity> carryingCapacityInitializer,
+        final CarryingCapacitySupplier carryingCapacitySupplier,
         final Map<Species, Double> fishReleaseProbabilities
     ) {
-        super(globalBiology, fishAttractor, timeStepSupplier, carryingCapacityInitializer, fishReleaseProbabilities);
+        super(globalBiology, fishAttractor, timeStepSupplier, carryingCapacitySupplier, fishReleaseProbabilities);
     }
 
     public BiomassLocalBiology makeBiology(final GlobalBiology globalBiology) {

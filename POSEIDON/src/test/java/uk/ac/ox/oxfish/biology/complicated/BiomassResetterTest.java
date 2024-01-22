@@ -32,7 +32,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.ConstantAttractionProbabilityFunction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.GlobalCarryingCapacityInitializer;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FixedGlobalCarryingCapacitySupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearFishBiomassAttractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
@@ -40,7 +40,6 @@ import uk.ac.ox.oxfish.geography.currents.CurrentVectorsEPO;
 import uk.ac.ox.oxfish.geography.fads.BiomassFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -188,7 +187,7 @@ public class BiomassResetterTest {
             globalBiology,
             fishBiomassAttractor,
             () -> 0,
-            new GlobalCarryingCapacityInitializer(new FixedDoubleParameter(carryingCapacity)),
+            new FixedGlobalCarryingCapacitySupplier(carryingCapacity),
             globalBiology.getSpecies().stream().collect(toImmutableMap(identity(), __ -> 0.0))
         );
 

@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
 public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
-    implements uk.ac.ox.oxfish.geography.fads.CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> {
+    implements uk.ac.ox.oxfish.utility.AlgorithmFactory<CarryingCapacitySupplier> {
 
     private DoubleParameter capacityScalingFactor;
     private DoubleParameter shapeScalingFactor;
@@ -50,7 +50,7 @@ public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
     }
 
     @Override
-    public CarryingCapacityInitializer<PerSpeciesCarryingCapacity> apply(final FishState fishState) {
+    public CarryingCapacitySupplier apply(final FishState fishState) {
         final List<Record> recordList =
             recordStream(fadCarryingCapacityFile.get())
                 .filter(record -> record.getInt("year") == targetYear.getIntValue())

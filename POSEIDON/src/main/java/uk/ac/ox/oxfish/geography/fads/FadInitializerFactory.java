@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.CarryingCapacitySupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -16,23 +17,33 @@ public abstract class FadInitializerFactory<
     private final CacheByFishState<FadInitializer<B, F>> cache =
         new CacheByFishState<>(this::makeFadInitializer);
     private Map<String, DoubleParameter> catchabilities;
-    private CarryingCapacityInitializerFactory<?> carryingCapacityInitializer;
+    private AlgorithmFactory<CarryingCapacitySupplier> carryingCapacitySupplier;
     private DoubleParameter daysInWaterBeforeAttraction;
     private Map<String, DoubleParameter> fishReleaseProbabilities;
 
     FadInitializerFactory(
-        final CarryingCapacityInitializerFactory<?> carryingCapacityInitializer,
+        final AlgorithmFactory<CarryingCapacitySupplier> carryingCapacitySupplier,
         final Map<String, DoubleParameter> catchabilities,
         final Map<String, DoubleParameter> fishReleaseProbabilities,
         final DoubleParameter daysInWaterBeforeAttraction
     ) {
-        this.carryingCapacityInitializer = carryingCapacityInitializer;
+        this.carryingCapacitySupplier = carryingCapacitySupplier;
         this.catchabilities = catchabilities;
         this.fishReleaseProbabilities = fishReleaseProbabilities;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
     }
 
     FadInitializerFactory() {
+    }
+
+    @SuppressWarnings("unused")
+    public AlgorithmFactory<CarryingCapacitySupplier> getCarryingCapacitySupplier() {
+        return carryingCapacitySupplier;
+    }
+
+    @SuppressWarnings("unused")
+    public void setCarryingCapacitySupplier(final AlgorithmFactory<CarryingCapacitySupplier> carryingCapacitySupplier) {
+        this.carryingCapacitySupplier = carryingCapacitySupplier;
     }
 
     public Map<String, DoubleParameter> getFishReleaseProbabilities() {
@@ -43,10 +54,12 @@ public abstract class FadInitializerFactory<
         this.fishReleaseProbabilities = fishReleaseProbabilities;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Map<String, DoubleParameter> getCatchabilities() {
         return catchabilities;
     }
 
+    @SuppressWarnings("unused")
     public void setCatchabilities(final Map<String, DoubleParameter> catchabilities) {
         this.catchabilities = catchabilities;
     }
@@ -71,11 +84,4 @@ public abstract class FadInitializerFactory<
 
     protected abstract FadInitializer<B, F> makeFadInitializer(FishState fishState);
 
-    public CarryingCapacityInitializerFactory<?> getCarryingCapacityInitializer() {
-        return carryingCapacityInitializer;
-    }
-
-    public void setCarryingCapacityInitializer(final CarryingCapacityInitializerFactory<?> carryingCapacityInitializer) {
-        this.carryingCapacityInitializer = carryingCapacityInitializer;
-    }
 }

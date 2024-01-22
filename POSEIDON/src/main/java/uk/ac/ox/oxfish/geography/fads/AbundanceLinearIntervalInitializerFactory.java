@@ -5,8 +5,7 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceLinearIntervalAttractor;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.CarryingCapacityInitializer;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.PerSpeciesCarryingCapacity;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.CarryingCapacitySupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -20,12 +19,11 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.processSpeciesNameToDou
 public class AbundanceLinearIntervalInitializerFactory implements
     AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad>> {
 
-    private CarryingCapacityInitializerFactory<PerSpeciesCarryingCapacity> carryingCapacityInitializerFactory;
-
     private AbundanceFiltersFactory abundanceFiltersFactory;
     private DoubleParameter daysInWaterBeforeAttraction = new FixedDoubleParameter(5);
     private DoubleParameter daysItTakesToFillUp = new FixedDoubleParameter(30);
     private DoubleParameter minAbundanceThreshold = new FixedDoubleParameter(100);
+    private AlgorithmFactory<CarryingCapacitySupplier> carryingCapacitySupplier;
     private Map<String, DoubleParameter> fishReleaseProbabilities;
 
     public AbundanceLinearIntervalInitializerFactory() {
@@ -39,12 +37,12 @@ public class AbundanceLinearIntervalInitializerFactory implements
         this.fishReleaseProbabilities = fishReleaseProbabilities;
     }
 
-    public Map<String, DoubleParameter> getFishReleaseProbabilities() {
-        return fishReleaseProbabilities;
+    public AlgorithmFactory<CarryingCapacitySupplier> getCarryingCapacitySupplier() {
+        return carryingCapacitySupplier;
     }
 
-    public void setFishReleaseProbabilities(final Map<String, DoubleParameter> fishReleaseProbabilities) {
-        this.fishReleaseProbabilities = fishReleaseProbabilities;
+    public void setCarryingCapacitySupplier(final AlgorithmFactory<CarryingCapacitySupplier> carryingCapacitySupplier) {
+        this.carryingCapacitySupplier = carryingCapacitySupplier;
     }
 
     public AbundanceFiltersFactory getAbundanceFiltersFactory() {
@@ -57,32 +55,41 @@ public class AbundanceLinearIntervalInitializerFactory implements
 
     @Override
     public FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> apply(final FishState fishState) {
+
+        final MersenneTwisterFast rng = fishState.getRandom();
         // This is all a bit awkward because the AbundanceLinearIntervalAttractor wants
         // to know the carrying capacities up-front, but the AbundanceAggregatingFadInitializer
-        // also wants a CarryingCapacityInitializer to init its carrying capacities, which will
+        // also wants a CarryingCapacitySupplier to init its carrying capacities, which will
         // be gleefully ignored by the AbundanceLinearIntervalAttractor. Needs more cleanup.
-        final CarryingCapacityInitializer<PerSpeciesCarryingCapacity> carryingCapacityInitializer =
-            carryingCapacityInitializerFactory.apply(fishState);
-        final MersenneTwisterFast rng = fishState.getRandom();
-        final AbundanceLinearIntervalAttractor abundanceLinearIntervalAttractor = new AbundanceLinearIntervalAttractor(
-            (int) daysInWaterBeforeAttraction.applyAsDouble(rng),
-            (int) daysItTakesToFillUp.applyAsDouble(rng),
-            carryingCapacityInitializer.apply(rng).getCarryingCapacities(),
-            minAbundanceThreshold.applyAsDouble(rng),
-            abundanceFiltersFactory.apply(fishState).get(FadSetAction.class),
-            fishState
-        );
+        final CarryingCapacitySupplier carryingCapacitySupplierInstance = carryingCapacitySupplier.apply(fishState);
+        final AbundanceLinearIntervalAttractor abundanceLinearIntervalAttractor =
+            new AbundanceLinearIntervalAttractor(
+                (int) daysInWaterBeforeAttraction.applyAsDouble(rng),
+                (int) daysItTakesToFillUp.applyAsDouble(rng),
+                carryingCapacitySupplierInstance.get().getCarryingCapacities(),
+                minAbundanceThreshold.applyAsDouble(rng),
+                abundanceFiltersFactory.apply(fishState).get(FadSetAction.class),
+                fishState
+            );
         return new AbundanceAggregatingFadInitializer(
             fishState.getBiology(),
             abundanceLinearIntervalAttractor,
             fishState::getStep,
-            carryingCapacityInitializer,
+            carryingCapacitySupplierInstance,
             processSpeciesNameToDoubleParameterMap(
                 getFishReleaseProbabilities(),
                 fishState.getBiology(),
                 rng
             )
         );
+    }
+
+    public Map<String, DoubleParameter> getFishReleaseProbabilities() {
+        return fishReleaseProbabilities;
+    }
+
+    public void setFishReleaseProbabilities(final Map<String, DoubleParameter> fishReleaseProbabilities) {
+        this.fishReleaseProbabilities = fishReleaseProbabilities;
     }
 
     public DoubleParameter getDaysInWaterBeforeAttraction() {

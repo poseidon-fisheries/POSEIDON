@@ -13,7 +13,6 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -57,7 +56,7 @@ public class FadMapTest {
             globalBiology,
             new DummyFishBiomassAttractor(globalBiology.getSize()),
             () -> 0,
-            new GlobalCarryingCapacityInitializer(new FixedDoubleParameter(2.0)),
+            new FixedGlobalCarryingCapacitySupplier(2.0),
             globalBiology.getSpecies().stream().collect(toImmutableMap(identity(), __ -> 0.0))
         );
         final FadMap fadMap = new FadMap(

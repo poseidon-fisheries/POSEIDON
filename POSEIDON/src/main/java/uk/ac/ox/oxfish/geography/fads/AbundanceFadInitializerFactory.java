@@ -2,7 +2,9 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.CarryingCapacitySupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Map;
@@ -15,14 +17,14 @@ public abstract class AbundanceFadInitializerFactory
     private AbundanceFiltersFactory abundanceFilters;
 
     public AbundanceFadInitializerFactory(
-        final CarryingCapacityInitializerFactory<?> carryingCapacityInitializerFactory,
+        final AlgorithmFactory<CarryingCapacitySupplier> carryingCapacitySupplier,
         final Map<String, DoubleParameter> catchabilities,
         final Map<String, DoubleParameter> fishReleaseProbabilities,
         final DoubleParameter daysInWaterBeforeAttraction,
         final AbundanceFiltersFactory abundanceFilters
     ) {
         super(
-            carryingCapacityInitializerFactory,
+            carryingCapacitySupplier,
             catchabilities,
             fishReleaseProbabilities,
             daysInWaterBeforeAttraction
@@ -33,10 +35,12 @@ public abstract class AbundanceFadInitializerFactory
     public AbundanceFadInitializerFactory() {
     }
 
+    @SuppressWarnings("WeakerAccess")
     public AbundanceFiltersFactory getAbundanceFilters() {
         return abundanceFilters;
     }
 
+    @SuppressWarnings("unused")
     public void setAbundanceFilters(final AbundanceFiltersFactory abundanceFilters) {
         invalidateCache();
         this.abundanceFilters = checkNotNull(abundanceFilters);

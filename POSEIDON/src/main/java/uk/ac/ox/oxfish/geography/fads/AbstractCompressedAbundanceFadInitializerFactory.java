@@ -46,7 +46,7 @@ public abstract class AbstractCompressedAbundanceFadInitializerFactory
             fishState.getBiology(),
             makeFishAttractor(fishState, rng),
             fishState::getStep,
-            new GlobalCarryingCapacityInitializer(getTotalCarryingCapacity()),
+            new FixedGlobalCarryingCapacitySupplier(getTotalCarryingCapacity().applyAsDouble(rng)),
             processSpeciesNameToDoubleParameterMap(getFishReleaseProbabilities(), fishState.getBiology(), rng)
         );
     }
