@@ -26,8 +26,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
- * Just a biology that has 0 biomass of everything
- * Created by carrknight on 4/11/15.
+ * Just a biology that has 0 biomass of everything Created by carrknight on 4/11/15.
  */
 public class EmptyLocalBiology implements LocalBiology {
 
@@ -38,8 +37,13 @@ public class EmptyLocalBiology implements LocalBiology {
      * @return the biomass of this species
      */
     @Override
-    public double getBiomass(Species species) {
+    public double getBiomass(final Species species) {
         return 0d;
+    }
+
+    @Override
+    public double getTotalBiomass() {
+        return 0;
     }
 
     /**
@@ -51,24 +55,26 @@ public class EmptyLocalBiology implements LocalBiology {
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-        Catch caught, Catch notDiscarded, GlobalBiology biology
+        final Catch caught,
+        final Catch notDiscarded,
+        final GlobalBiology biology
     ) {
-        Preconditions.checkArgument(caught.getTotalWeight() == 0,
-            "It's impossible to take biomass from the empty biology");
+        Preconditions.checkArgument(
+            caught.getTotalWeight() == 0,
+            "It's impossible to take biomass from the empty biology"
+        );
     }
-
 
     @Override
-    public StructuredAbundance getAbundance(Species species) {
+    public StructuredAbundance getAbundance(final Species species) {
         return new StructuredAbundance(new double[0]);
     }
-
 
     /**
      * ignored
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
     }
 

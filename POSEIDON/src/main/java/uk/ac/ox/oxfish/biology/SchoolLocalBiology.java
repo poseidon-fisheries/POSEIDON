@@ -27,11 +27,9 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.List;
 
 /**
- * Local biology that just asks "schools" if they are in the area
- * Created by carrknight on 11/17/16.
+ * Local biology that just asks "schools" if they are in the area Created by carrknight on 11/17/16.
  */
 public class SchoolLocalBiology extends AbstractBiomassBasedBiology {
-
 
     /**
      * list of all the schools of fish
@@ -43,8 +41,10 @@ public class SchoolLocalBiology extends AbstractBiomassBasedBiology {
      */
     private final SeaTile position;
 
-
-    public SchoolLocalBiology(List<InfiniteSchool> schools, SeaTile position) {
+    public SchoolLocalBiology(
+        final List<InfiniteSchool> schools,
+        final SeaTile position
+    ) {
         this.schools = schools;
         this.position = position;
     }
@@ -56,13 +56,22 @@ public class SchoolLocalBiology extends AbstractBiomassBasedBiology {
      * @return the biomass of this species
      */
     @Override
-    public double getBiomass(Species species) {
+    public double getBiomass(final Species species) {
 
         double sum = 0;
-        for (InfiniteSchool school : schools)
+        for (final InfiniteSchool school : schools)
             if (school.getSpecies().equals(species) && school.contains(position))
                 sum += school.getBiomassPerCell();
         return sum;
+    }
+
+    @Override
+    public double getTotalBiomass() {
+        return schools
+            .stream()
+            .filter(school -> school.contains(position))
+            .mapToDouble(InfiniteSchool::getBiomassPerCell)
+            .sum();
     }
 
     /**
@@ -74,7 +83,9 @@ public class SchoolLocalBiology extends AbstractBiomassBasedBiology {
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-        Catch caught, Catch notDiscarded, GlobalBiology biology
+        final Catch caught,
+        final Catch notDiscarded,
+        final GlobalBiology biology
     ) {
 
     }
@@ -83,7 +94,7 @@ public class SchoolLocalBiology extends AbstractBiomassBasedBiology {
      * ignored
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
     }
 

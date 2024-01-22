@@ -23,16 +23,17 @@ package uk.ac.ox.oxfish.biology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.util.Arrays;
+
 /**
- * A local biology where multiple species exist. Much like ConstantLocalBiology they do not change their
- * total biomass even after being fished out
- * Created by carrknight on 5/6/15.
+ * A local biology where multiple species exist. Much like ConstantLocalBiology they do not change their total biomass
+ * even after being fished out Created by carrknight on 5/6/15.
  */
 public class ConstantHeterogeneousLocalBiology extends AbstractBiomassBasedBiology {
 
     private final double[] biomasses;
 
-    public ConstantHeterogeneousLocalBiology(double... biomasses) {
+    public ConstantHeterogeneousLocalBiology(final double... biomasses) {
         this.biomasses = biomasses;
     }
 
@@ -43,8 +44,13 @@ public class ConstantHeterogeneousLocalBiology extends AbstractBiomassBasedBiolo
      * @return the biomass of this species
      */
     @Override
-    public double getBiomass(Species species) {
+    public double getBiomass(final Species species) {
         return biomasses[species.getIndex()];
+    }
+
+    @Override
+    public double getTotalBiomass() {
+        return Arrays.stream(biomasses).sum();
     }
 
     /**
@@ -56,17 +62,18 @@ public class ConstantHeterogeneousLocalBiology extends AbstractBiomassBasedBiolo
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-        Catch caught, Catch notDiscarded, GlobalBiology biology
+        final Catch caught,
+        final Catch notDiscarded,
+        final GlobalBiology biology
     ) {
 
     }
-
 
     /**
      * ignored
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
 
     }
 

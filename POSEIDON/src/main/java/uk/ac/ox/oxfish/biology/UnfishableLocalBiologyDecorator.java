@@ -38,7 +38,8 @@ public class UnfishableLocalBiologyDecorator implements LocalBiology {
     private FishState state;
 
     public UnfishableLocalBiologyDecorator(
-        int yearAfterWhichBiomassStopsBeingProtected, LocalBiology decorated
+        final int yearAfterWhichBiomassStopsBeingProtected,
+        final LocalBiology decorated
     ) {
         this.yearAfterWhichBiomassStopsBeingProtected = yearAfterWhichBiomassStopsBeingProtected;
         this.decorated = decorated;
@@ -51,8 +52,13 @@ public class UnfishableLocalBiologyDecorator implements LocalBiology {
      * @return the biomass of this species
      */
     @Override
-    public double getBiomass(Species species) {
+    public double getBiomass(final Species species) {
         return decorated.getBiomass(species);
+    }
+
+    @Override
+    public double getTotalBiomass() {
+        return decorated.getTotalBiomass();
     }
 
     /**
@@ -64,7 +70,9 @@ public class UnfishableLocalBiologyDecorator implements LocalBiology {
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-        Catch caught, Catch notDiscarded, GlobalBiology biology
+        final Catch caught,
+        final Catch notDiscarded,
+        final GlobalBiology biology
     ) {
 
         Preconditions.checkArgument(state != null, "Not started or already turned off!");
@@ -74,18 +82,18 @@ public class UnfishableLocalBiologyDecorator implements LocalBiology {
     }
 
     @Override
-    public StructuredAbundance getAbundance(Species species) {
+    public StructuredAbundance getAbundance(final Species species) {
         return decorated.getAbundance(species);
     }
 
     /**
-     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
-     * or just to percolate a reference to the model
+     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables or just
+     * to percolate a reference to the model
      *
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         this.state = model;
         decorated.start(model);
     }

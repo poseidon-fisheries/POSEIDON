@@ -35,6 +35,14 @@ public class PerSpeciesCarryingCapacity implements CarryingCapacity {
     }
 
     @Override
+    public boolean isFull(
+        final Fad fad,
+        final Species species
+    ) {
+        return fad.getBiology().getBiomass(species) >= carryingCapacities[species.getIndex()];
+    }
+
+    @Override
     public double getTotal() {
         return Arrays.stream(carryingCapacities).sum();
     }

@@ -26,12 +26,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.function.Function;
 
 /**
- * An exogenous local biology object that, when asked for biomass available just calls a previously given function
- * to return the answer. Doesn't track biomass fished.
- * Created by carrknight on 2/6/17.
+ * An exogenous local biology object that, when asked for biomass available just calls a previously given function to
+ * return the answer. Doesn't track biomass fished. Created by carrknight on 2/6/17.
  */
 public class GetterLocalBiology extends AbstractBiomassBasedBiology {
-
 
     /**
      * species being fished
@@ -48,22 +46,22 @@ public class GetterLocalBiology extends AbstractBiomassBasedBiology {
      */
     private FishState state;
 
-
     public GetterLocalBiology(
-        Species species, Function<FishState, Double> biomass
+        final Species species,
+        final Function<FishState, Double> biomass
     ) {
         this.species = species;
         this.biomass = biomass;
     }
 
     /**
-     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
-     * or just to percolate a reference to the model
+     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables or just
+     * to percolate a reference to the model
      *
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         this.state = model;
     }
 
@@ -75,6 +73,11 @@ public class GetterLocalBiology extends AbstractBiomassBasedBiology {
         this.state = null;
     }
 
+    @Override
+    public double getTotalBiomass() {
+        return getBiomass(this.species);
+    }
+
     /**
      * the biomass at this location for a single species.
      *
@@ -82,7 +85,7 @@ public class GetterLocalBiology extends AbstractBiomassBasedBiology {
      * @return the biomass of this species
      */
     @Override
-    public double getBiomass(Species species) {
+    public double getBiomass(final Species species) {
 
         if (species == this.species)
             return Math.max(0, biomass.apply(state));
@@ -99,12 +102,13 @@ public class GetterLocalBiology extends AbstractBiomassBasedBiology {
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-        Catch caught, Catch notDiscarded, GlobalBiology biology
+        final Catch caught,
+        final Catch notDiscarded,
+        final GlobalBiology biology
     ) {
 
-        //ignored
+        // ignored
     }
-
 
     /**
      * Getter for property 'species'.

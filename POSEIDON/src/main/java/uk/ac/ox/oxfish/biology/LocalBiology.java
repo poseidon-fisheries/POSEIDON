@@ -25,13 +25,11 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.Startable;
 
 /**
- * This is supposed to be a container of biological information we can attach to one or multiple sea tiles (because there
- * will probably be issues with data not having the same resolution as our model). For now it holds just local biomass
- * information
- * Created by carrknight on 4/11/15.
+ * This is supposed to be a container of biological information we can attach to one or multiple sea tiles (because
+ * there will probably be issues with data not having the same resolution as our model). For now it holds just local
+ * biomass information Created by carrknight on 4/11/15.
  */
 public interface LocalBiology extends Startable {
-
 
     /**
      * The biomass at this location for the specified species.
@@ -41,10 +39,9 @@ public interface LocalBiology extends Startable {
      */
     default double getTotalBiomass(final Iterable<? extends Species> species) {
         double totalBiomass = 0;
-        for (Species currentSpecies : species) {
+        for (final Species currentSpecies : species) {
             totalBiomass += getBiomass(currentSpecies);
         }
-
 
         return totalBiomass;
     }
@@ -58,6 +55,11 @@ public interface LocalBiology extends Startable {
     double getBiomass(Species species);
 
     /**
+     * @return The biomass at this location for all species combined.
+     */
+    double getTotalBiomass();
+
+    /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
      *
      * @param caught       the amount fished out of the sea
@@ -65,11 +67,11 @@ public interface LocalBiology extends Startable {
      * @param biology
      */
     void reactToThisAmountOfBiomassBeingFished(
-        Catch caught, Catch notDiscarded, GlobalBiology biology
+        Catch caught,
+        Catch notDiscarded,
+        GlobalBiology biology
     );
 
-
     StructuredAbundance getAbundance(Species species);
-
 
 }

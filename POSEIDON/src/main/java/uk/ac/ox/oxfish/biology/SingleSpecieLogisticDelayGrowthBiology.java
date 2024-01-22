@@ -74,9 +74,12 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
     private double currentBiomass;
     private Stoppable stoppable;
 
-
     public SingleSpecieLogisticDelayGrowthBiology(
-        final Species species, final double currentBiomass, final double maxBiomass, final int yearDelays, final double aParameter,
+        final Species species,
+        final double currentBiomass,
+        final double maxBiomass,
+        final int yearDelays,
+        final double aParameter,
         final double bParameter
     ) {
         checkArgument(yearDelays > 0, "Use undelayed biology rather than feeding 0 to a delayed one");
@@ -92,6 +95,11 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
         this.bParameter = bParameter;
         this.currentBiomass = currentBiomass;
         this.maxBiomass = maxBiomass;
+    }
+
+    @Override
+    public double getTotalBiomass() {
+        return getBiomass(this.species);
     }
 
     /**
@@ -115,9 +123,11 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(
-        final Catch caught, final Catch notDiscarded, final GlobalBiology biology
+        final Catch caught,
+        final Catch notDiscarded,
+        final GlobalBiology biology
     ) {
-        //focus on only the one you care about!
+        // focus on only the one you care about!
         final double biomassFished = caught.getWeightCaught(this.species);
 
         checkArgument(biomassFished <= currentBiomass);
@@ -135,12 +145,11 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
         currentBiomass = Math.min(currentBiomass + recruitment, maxBiomass);
         pastBiomass.add(currentBiomass);
 
-
     }
 
     /**
-     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
-     * or just to percolate a reference to the model
+     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables or just
+     * to percolate a reference to the model
      *
      * @param model the model
      */

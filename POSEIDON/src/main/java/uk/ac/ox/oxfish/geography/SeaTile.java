@@ -36,14 +36,13 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
- * This is the "cell", the tile of the sea grid. The plan is for this to have information about whether it is protected or not
- * a link to larger fishing-tiles if needed and more in general as a place where to store geographical information we don't
- * want to re-compute over and over again.
+ * This is the "cell", the tile of the sea grid. The plan is for this to have information about whether it is protected
+ * or not a link to larger fishing-tiles if needed and more in general as a place where to store geographical
+ * information we don't want to re-compute over and over again.
  * <p>
  * Created by carrknight on 4/2/15.
  */
 public class SeaTile implements Startable, LocalBiology {
-
 
     private final int gridX;
     private final int gridY;
@@ -63,12 +62,10 @@ public class SeaTile implements Startable, LocalBiology {
      */
     private LocalBiology biology;
 
-
     /**
      * a reference to a port if it is in the seatile
      */
     private Port portHere;
-
 
     /**
      * a description of the sea-bed and its properties
@@ -81,8 +78,12 @@ public class SeaTile implements Startable, LocalBiology {
     private LocalWeather weather;
     private String coords;
 
-
-    public SeaTile(int gridX, int gridY, double altitude, TileHabitat habitat) {
+    public SeaTile(
+        final int gridX,
+        final int gridY,
+        final double altitude,
+        final TileHabitat habitat
+    ) {
         this.gridX = gridX;
         this.gridY = gridY;
         this.altitude = altitude;
@@ -116,8 +117,13 @@ public class SeaTile implements Startable, LocalBiology {
         return mpa;
     }
 
-    public void assignMpa(MasonGeometry mpa) {
+    public void assignMpa(final MasonGeometry mpa) {
         this.mpa = mpa;
+    }
+
+    @Override
+    public double getTotalBiomass() {
+        return biology.getTotalBiomass();
     }
 
     /**
@@ -126,7 +132,7 @@ public class SeaTile implements Startable, LocalBiology {
      * @param species the species you care about
      * @return the biomass of this species
      */
-    public double getBiomass(Species species) {
+    public double getBiomass(final Species species) {
         return biology.getBiomass(species);
     }
 
@@ -155,7 +161,7 @@ public class SeaTile implements Startable, LocalBiology {
      * starts local biology
      */
     @Override
-    public void start(FishState model) {
+    public void start(final FishState model) {
         biology.start(model);
         coords = model.getMap().getCoordinates(this).toString();
 
@@ -173,7 +179,7 @@ public class SeaTile implements Startable, LocalBiology {
         return weather;
     }
 
-    public void assignLocalWeather(LocalWeather weather) {
+    public void assignLocalWeather(final LocalWeather weather) {
         this.weather = weather;
     }
 
@@ -193,7 +199,7 @@ public class SeaTile implements Startable, LocalBiology {
         return portHere != null;
     }
 
-    public void linkTileToPort(Port portHere) {
+    public void linkTileToPort(final Port portHere) {
         this.portHere = portHere;
     }
 
@@ -201,7 +207,7 @@ public class SeaTile implements Startable, LocalBiology {
         return habitat;
     }
 
-    public void setHabitat(TileHabitat habitat) {
+    public void setHabitat(final TileHabitat habitat) {
         this.habitat = habitat;
     }
 
@@ -213,24 +219,23 @@ public class SeaTile implements Startable, LocalBiology {
      * @param globalBiology biology object
      */
     public void reactToThisAmountOfBiomassBeingFished(
-        Catch caught, Catch notDiscarded, GlobalBiology globalBiology
+        final Catch caught,
+        final Catch notDiscarded,
+        final GlobalBiology globalBiology
     ) {
-        //don't bother cascading if it's nothing
+        // don't bother cascading if it's nothing
         if (caught.totalCatchWeight() >= FishStateUtilities.EPSILON)
             biology.reactToThisAmountOfBiomassBeingFished(caught, notDiscarded, globalBiology);
     }
 
     /**
-     * checks if the tile is valid for fishing, which means that it's on sea and not land AND that there is a biology in it
-     * that is not always empty; <b>THIS IS NOT A REGULATION CHECK</b>
+     * checks if the tile is valid for fishing, which means that it's on sea and not land AND that there is a biology in
+     * it that is not always empty; <b>THIS IS NOT A REGULATION CHECK</b>
      *
      * @return true if this tile can in theory contain fish
      */
     public boolean isFishingEvenPossibleHere() {
-        if (isLand() || getBiology() instanceof EmptyLocalBiology)
-            return false;
-        else
-            return true;
+        return !isLand() && !(getBiology() instanceof EmptyLocalBiology);
 
     }
 
@@ -247,19 +252,22 @@ public class SeaTile implements Startable, LocalBiology {
      *
      * @param biology the local biology
      */
-    public void setBiology(LocalBiology biology) {
+    public void setBiology(final LocalBiology biology) {
 
         this.setBiology(biology, true);
     }
 
-    public void setBiology(LocalBiology biology, boolean turnOffPreviousOne) {
+    public void setBiology(
+        final LocalBiology biology,
+        final boolean turnOffPreviousOne
+    ) {
 
         if (turnOffPreviousOne && this.biology != null)
             this.biology.turnOff();
         this.biology = biology;
     }
 
-    public StructuredAbundance getAbundance(Species species) {
+    public StructuredAbundance getAbundance(final Species species) {
         return biology.getAbundance(species);
     }
 
