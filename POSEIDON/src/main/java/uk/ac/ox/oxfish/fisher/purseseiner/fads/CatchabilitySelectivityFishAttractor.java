@@ -36,8 +36,8 @@ import static java.util.stream.Collectors.toMap;
 
 /**
  * simple "linear" attractor for abundance fads: as long as it is old enough (but not too old) the fad attracts a fixed
- * proportion (catchability) of the vulnerable population (i.e. the population that can be selected in a cell).
- * Each FAD also have a carrying capacity so that they cannot get any more full than a given amount
+ * proportion (catchability) of the vulnerable population (i.e. the population that can be selected in a cell). Each FAD
+ * also have a carrying capacity so that they cannot get any more full than a given amount
  */
 public class CatchabilitySelectivityFishAttractor
     implements FishAttractor<AbundanceLocalBiology, AbundanceAggregatingFad> {
@@ -46,7 +46,6 @@ public class CatchabilitySelectivityFishAttractor
      * given a fad, returns its current catchability per species
      */
     private final Function<Fad, double[]> catchabilityPerSpeciesSupplier;
-
 
     /**
      * as long as the FAD has been in the water less than this, it won't fill up
@@ -82,13 +81,12 @@ public class CatchabilitySelectivityFishAttractor
         this.globalSelectivityCurves = globalSelectivityCurves;
     }
 
-
     @Override
     public WeightedObject<AbundanceLocalBiology> attractImplementation(
         final LocalBiology seaTileBiology,
         final AbundanceAggregatingFad fad
     ) {
-        //if it's too early don't bother
+        // if it's too early don't bother
         if (
             model.getDay() - fad.getStepDeployed() / model.getStepsPerDay() < daysInWaterBeforeAttraction ||
                 !fad.isActive()
@@ -107,21 +105,19 @@ public class CatchabilitySelectivityFishAttractor
                     .map(a -> new double[a.length])
                     .toArray(double[][]::new)
             ));
-        //get the carrying capacities or generate them if they don't exist
-        final double[] carryingCapacityHere = fad.getCarryingCapacity().getCarryingCapacities();
         for (final Species species : model.getSpecies()) {
             final NonMutatingArrayFilter selectivity = globalSelectivityCurves.get(species);
 
-            //set up catches
+            // set up catches
             final double[][] abundanceInTile = abundanceHere.get(species);
             final double[][] abundanceCaught = caughtHere.get(species);
             caughtHere.put(species, abundanceCaught);
 
-            //if you are full, ignore it!
-            if (carryingCapacityHere[species.getIndex()] <= fad.getBiomass()[species.getIndex()])
+            // if you are full, ignore it!
+            if (fad.getCarryingCapacity().isFull(fad, species))
                 continue;
 
-            //start filling them up!
+            // start filling them up!
             final double[] catchabilityHere = catchabilityPerSpeciesSupplier.apply(fad);
             for (int subdivision = 0; subdivision < abundanceInTile.length; subdivision++) {
                 for (int bin = 0; bin < abundanceInTile[subdivision].length; bin++) {
@@ -137,7 +133,6 @@ public class CatchabilitySelectivityFishAttractor
         }
         final AbundanceLocalBiology toReturn = new AbundanceLocalBiology(caughtHere);
         return new WeightedObject<>(toReturn, toReturn.getTotalBiomass());
-
 
     }
 

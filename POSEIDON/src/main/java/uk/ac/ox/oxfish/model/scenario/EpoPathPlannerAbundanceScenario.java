@@ -3,8 +3,8 @@ package uk.ac.ox.oxfish.model.scenario;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.AbundancePurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FixedGlobalCarryingCapacitySupplierFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.SelectivityAbundanceFadInitializerFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.WeibullPerSpeciesCarryingCapacitiesFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.MinimumSetValuesFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.ValuePerSetPlanningModuleFactory;
@@ -42,18 +42,9 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                 new AbundancePurseSeineGearFactory(
                     getTargetYear(),
                     new SelectivityAbundanceFadInitializerFactory(
-
-                        // see https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1545974455
-                        // for Weibull parameter values, obtained by fitting the distributions to observer data
-                        new WeibullPerSpeciesCarryingCapacitiesFromFileFactory(
-                            getInputFolder().path("fad_carrying_capacity_parameters.csv"),
-                            getTargetYear(),
-                            new CalibratedParameter(
-                                0.75, 1.5, 0.5, 5, 1
-                            ),
-                            new CalibratedParameter(
-                                0.9, 1, 0.75, 1
-                            )
+                        new FixedGlobalCarryingCapacitySupplierFactory(
+                            // 456t is the biggest set in observer data from 2017-2023
+                            new FixedDoubleParameter(456_000)
                         ),
                         getAbundanceFilters(),
                         new CalibratedParameter(
