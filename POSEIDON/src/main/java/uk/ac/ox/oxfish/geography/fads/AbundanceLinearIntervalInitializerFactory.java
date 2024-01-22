@@ -3,9 +3,7 @@ package uk.ac.ox.oxfish.geography.fads;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceLinearIntervalAttractor;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.CarryingCapacitySupplier;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -14,6 +12,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.processSpeciesNameToDoubleParameterMap;
 
 public class AbundanceLinearIntervalInitializerFactory implements
@@ -62,11 +61,16 @@ public class AbundanceLinearIntervalInitializerFactory implements
         // also wants a CarryingCapacitySupplier to init its carrying capacities, which will
         // be gleefully ignored by the AbundanceLinearIntervalAttractor. Needs more cleanup.
         final CarryingCapacitySupplier carryingCapacitySupplierInstance = carryingCapacitySupplier.apply(fishState);
+        final CarryingCapacity carryingCapacity = carryingCapacitySupplierInstance.get();
+        checkArgument(
+            carryingCapacity instanceof PerSpeciesCarryingCapacity,
+            "This type of FADs only works with per-species carrying capacities."
+        );
         final AbundanceLinearIntervalAttractor abundanceLinearIntervalAttractor =
             new AbundanceLinearIntervalAttractor(
                 (int) daysInWaterBeforeAttraction.applyAsDouble(rng),
                 (int) daysItTakesToFillUp.applyAsDouble(rng),
-                carryingCapacitySupplierInstance.get().getCarryingCapacities(),
+                ((PerSpeciesCarryingCapacity) carryingCapacity).getCarryingCapacities(),
                 minAbundanceThreshold.applyAsDouble(rng),
                 abundanceFiltersFactory.apply(fishState).get(FadSetAction.class),
                 fishState

@@ -6,8 +6,6 @@ public interface CarryingCapacity {
 
     double getTotal();
 
-    double[] getCarryingCapacities();
-
     boolean isFull(
         Fad fad,
         Species species

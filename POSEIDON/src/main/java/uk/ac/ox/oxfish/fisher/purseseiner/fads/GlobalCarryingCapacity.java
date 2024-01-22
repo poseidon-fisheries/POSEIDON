@@ -15,11 +15,6 @@ public class GlobalCarryingCapacity implements CarryingCapacity {
     }
 
     @Override
-    public double[] getCarryingCapacities() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public boolean isFull(
         final Fad fad,
         final Species species

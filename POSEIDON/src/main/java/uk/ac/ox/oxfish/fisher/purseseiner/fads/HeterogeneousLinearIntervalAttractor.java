@@ -28,12 +28,13 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * carrying capacity here is generated at random and can differ for each FAD
  */
 public class HeterogeneousLinearIntervalAttractor
     extends AbstractAbundanceLinearIntervalAttractor implements FadRemovalListener {
-
 
     private static final long serialVersionUID = 9016254769011047135L;
     private final double minAbundanceThreshold;
@@ -73,7 +74,6 @@ public class HeterogeneousLinearIntervalAttractor
         return new WeightedObject<>(toReturn, toReturn.getTotalBiomass());
     }
 
-
     /**
      * compute what the fad ought to attract
      *
@@ -86,16 +86,21 @@ public class HeterogeneousLinearIntervalAttractor
         assert !dailyAttractionThreshold.containsKey(fad);
         assert !dailyAbundanceAttracted.containsKey(fad);
 
-        final double[] carryingCapacities = fad.getCarryingCapacity().getCarryingCapacities();
+        checkArgument(
+            fad.getCarryingCapacity() instanceof PerSpeciesCarryingCapacity,
+            "This attractor only works with per-species carrying capacities."
+        );
+        final double[] carryingCapacities =
+            ((PerSpeciesCarryingCapacity) fad.getCarryingCapacity()).getCarryingCapacities();
 
-        //compute daily kg landed per fad
+        // compute daily kg landed per fad
         final double[] dailyBiomassAttractedPerSpecies = new double[carryingCapacities.length];
         for (int i = 0; i < carryingCapacities.length; i++) {
             dailyBiomassAttractedPerSpecies[i] =
                 carryingCapacities[i] / (double) daysItTakesToFillUp;
         }
 
-        //turn that into abundance!
+        // turn that into abundance!
         final HashMap<Species, double[][]> dailyAttractionHere = new HashMap<>();
         final HashMap<Species, double[][]> dailyAttractionThresholdHere = new HashMap<>();
         fillUpAttractionAndThresholdAttractionMatrices(
@@ -111,7 +116,8 @@ public class HeterogeneousLinearIntervalAttractor
     }
 
     static void fillUpAttractionAndThresholdAttractionMatrices(
-        final double[] dailyBiomassAttractedPerSpecies, final Map<? super Species, double[][]> dailyAttractionHere,
+        final double[] dailyBiomassAttractedPerSpecies,
+        final Map<? super Species, double[][]> dailyAttractionHere,
         final Map<? super Species, double[][]> dailyAttractionThresholdHere,
         final double minAbundanceThreshold,
         final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves,
@@ -124,7 +130,7 @@ public class HeterogeneousLinearIntervalAttractor
             final double[][] dailyThreshold = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
             for (int sub = 0; sub < kgToAbundance.length; sub++) {
                 for (int bin = 0; bin < kgToAbundance[0].length; bin++) {
-                    //multiply abundance/kg converter by kg
+                    // multiply abundance/kg converter by kg
                     dailyStep[sub][bin] =
                         (dailyBiomassAttractedPerSpecies[species.getIndex()] * kgToAbundance[sub][bin]);
 
@@ -149,7 +155,6 @@ public class HeterogeneousLinearIntervalAttractor
         }
         return dailyAttractionThreshold.get(fad);
     }
-
 
     @Override
     public void onFadRemoval(final Fad fad) {
