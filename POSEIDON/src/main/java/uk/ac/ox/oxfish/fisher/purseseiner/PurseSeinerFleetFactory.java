@@ -192,7 +192,10 @@ public class PurseSeinerFleetFactory
         getGear().addMonitors(defaultEpoMonitors);
         final Collection<Monitor<AbstractSetAction, ?, ?>> setMonitors =
             additionalSetMonitors.apply(fishState).getMonitors();
-        setMonitors.forEach(fishState::registerStartable);
+        setMonitors.forEach(monitor -> {
+            monitor.registerWith(fishState.getYearlyDataSet());
+            fishState.registerStartable(monitor);
+        });
         getGear().grabAllSetsObservers().addAll(setMonitors);
     }
 
