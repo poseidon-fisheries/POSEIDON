@@ -32,7 +32,7 @@ public class KsTestAccumulator implements Accumulator<Double> {
 
     @Override
     public String getNameFormat() {
-        return "K.S. test statistic";
+        return "K.-S. test statistic for %s";
     }
 
     @Override

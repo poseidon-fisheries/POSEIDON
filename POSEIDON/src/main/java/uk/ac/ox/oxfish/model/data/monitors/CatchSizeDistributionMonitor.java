@@ -25,8 +25,7 @@ public class CatchSizeDistributionMonitor<A extends AbstractSetAction>
         final Map<Integer, double[]> empiricalDistributionPerYear
     ) {
         super(
-            "K.-S. test statistic for " + species.getName() + " catch-size distribution in " +
-                ActionClass.classMap.get(actionClass).name() + " sets",
+            species.getName() + " catches from " + ActionClass.classMap.get(actionClass).name() + " sets",
             EVERY_YEAR,
             () -> new KsTestAccumulator(empiricalDistributionPerYear),
             ONE,
