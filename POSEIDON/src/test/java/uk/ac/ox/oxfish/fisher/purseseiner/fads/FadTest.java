@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
+import com.google.common.collect.ImmutableMap;
 import ec.util.MersenneTwisterFast;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -56,8 +57,7 @@ class FadTest {
             0,
             new Int2D(),
             new GlobalCarryingCapacity(1.5),
-            // TODO: release probabilities are set to zero for now but, this will need to be modified for a proper test
-            globalBiology.getSpecies().stream().collect(toImmutableMap(identity(), __ -> 0.0))
+            globalBiology.getSpecies().stream().collect(toImmutableMap(identity(), __ -> 0.5))
         );
         fillBiomassFad(fad);
 
@@ -99,6 +99,58 @@ class FadTest {
     }
 
     @Test
+    void releaseOneSpecies() {
+
+        // Make a full FAD
+        final BiomassLocalBiology fadBiology = makeBiology(globalBiology, Double.POSITIVE_INFINITY);
+        final FadManager fadManager = mock(FadManager.class, RETURNS_DEEP_STUBS);
+        final BiomassAggregatingFad fad = new BiomassAggregatingFad(
+            fadManager,
+            fadBiology,
+            new DummyFishBiomassAttractor(globalBiology.getSize()),
+            0,
+            new Int2D(),
+            new GlobalCarryingCapacity(1.5),
+            ImmutableMap.of(
+                globalBiology.getSpeciesByName("A"), 0.1,
+                globalBiology.getSpeciesByName("B"), 0.5
+            )
+        );
+
+        fillBiomassFad(fad);
+        // ...and an empty tile biology, with a carrying capacity of 1.0:
+        final VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, 1.0);
+
+        // See what happens when fish "A" is released, "B" is not
+        final MersenneTwisterFast rng = mock(MersenneTwisterFast.class);
+        when(rng.nextDouble()).thenReturn(0.2);
+        fad.maybeReleaseFishIntoTile(tileBiology, rng);
+        // check that the FAD lost half the biomass and the tile biology is also half returned
+        assertEquals(Arrays.stream(fad.getBiomass()).sum(), fad.getCarryingCapacity().getTotal() * 0.5, 0.0);
+        assertEquals(tileBiology.getTotalBiomass(), fad.getCarryingCapacity().getTotal() * 0.5, 0.0);
+
+        // Refill the FAD
+        fillBiomassFad(fad);
+
+        // See what happens when both fish are released
+        when(rng.nextDouble()).thenReturn(0.05);
+        fad.maybeReleaseFishIntoTile(tileBiology, rng);
+        // check that the FAD lost the biomass and the tile biology is full
+        assertTrue(fadBiology.isEmpty());
+        assertEquals(tileBiology.getTotalBiomass(), 1.75, 0.0);
+
+        // Fill the FAD one last time and release the fish to nowhere
+        fillBiomassFad(fad);
+        when(rng.nextDouble()).thenReturn(1.0);
+        fad.maybeReleaseFishIntoTheVoid(rng);
+        Assertions.assertFalse(fadBiology.isEmpty());
+        when(rng.nextDouble()).thenReturn(0.0);
+        fad.maybeReleaseFishIntoTheVoid(rng);
+        assertTrue(fadBiology.isEmpty());
+
+    }
+
+    @Test
     void testAggregateFish() {
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, Double.POSITIVE_INFINITY);
         final FadManager fadManager = mock(FadManager.class, RETURNS_DEEP_STUBS);
@@ -109,7 +161,7 @@ class FadTest {
             10,
             new Int2D(),
             new GlobalCarryingCapacity(1.5),
-            globalBiology.getSpecies().stream().collect(toImmutableMap(identity(), __ -> 0.0))
+            globalBiology.getSpecies().stream().collect(toImmutableMap(identity(), __ -> 0.5))
         );
         Assertions.assertNull(fad.getStepOfFirstAttraction());
         Assertions.assertNull(fad.getStepsBeforeFirstAttraction());
