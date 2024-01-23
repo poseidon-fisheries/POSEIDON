@@ -38,7 +38,9 @@ import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import javax.measure.quantity.Mass;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
@@ -191,7 +193,9 @@ public class PurseSeinerFleetFactory
         defaultEpoMonitors.getMonitors().forEach(fishState::registerStartable);
         getGear().addMonitors(defaultEpoMonitors);
         final Collection<Monitor<AbstractSetAction, ?, ?>> setMonitors =
-            additionalSetMonitors.apply(fishState).getMonitors();
+            Optional.ofNullable(additionalSetMonitors)
+                .map(monitor -> monitor.apply(fishState).getMonitors())
+                .orElseGet(Collections::emptyList);
         setMonitors.forEach(monitor -> {
             monitor.registerWith(fishState.getYearlyDataSet());
             fishState.registerStartable(monitor);

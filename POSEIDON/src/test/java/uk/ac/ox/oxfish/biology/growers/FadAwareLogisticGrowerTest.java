@@ -43,8 +43,8 @@ public class FadAwareLogisticGrowerTest {
                 InputPath.of("inputs", "tests", "exogenous_catches.csv")
             );
 
-        final PurseSeinerFleetFactory fleet = (PurseSeinerFleetFactory) scenario.getFleet();
         scenario.setRegulations(new EverythingForbidden());
+        ((PurseSeinerFleetFactory) scenario.getFleet()).setAdditionalSetMonitors(null);
 
         final FishState state = new FishState();
         state.setScenario(scenario);
@@ -58,8 +58,6 @@ public class FadAwareLogisticGrowerTest {
         final Species yft = state.getBiology().getSpeciesByCaseInsensitiveName("Yellowfin tuna");
         Assertions.assertEquals(889195.40, state.getTotalBiomass(yft) / 1000.0, 10.0);
 
-
     }
-
 
 }

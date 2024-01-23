@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 public class KsTestAccumulator implements Accumulator<Double> {
@@ -20,6 +21,10 @@ public class KsTestAccumulator implements Accumulator<Double> {
     private final Map<Integer, double[]> referenceDistributionPerYear;
 
     public KsTestAccumulator(final Map<Integer, double[]> referenceDistributionPerYear) {
+        checkArgument(
+            referenceDistributionPerYear.values().stream().allMatch(a -> a.length > 1),
+            "Reference distributions must contain more than one element"
+        );
         this.referenceDistributionPerYear =
             referenceDistributionPerYear
                 .entrySet()
@@ -42,9 +47,12 @@ public class KsTestAccumulator implements Accumulator<Double> {
 
     @Override
     public double applyAsDouble(final FishState fishState) {
-        return kolmogorovSmirnovTest.kolmogorovSmirnovStatistic(
-            arrayBuilder.build().toArray(),
-            referenceDistributionPerYear.get(fishState.getCalendarYear())
-        );
+        final double[] simulatedDistribution = arrayBuilder.build().toArray();
+        return simulatedDistribution.length < 2
+            ? 1.0 // if we don't have enough events to do a proper test, we assume the distributions are different
+            : kolmogorovSmirnovTest.kolmogorovSmirnovStatistic(
+                simulatedDistribution,
+                referenceDistributionPerYear.get(fishState.getCalendarYear())
+            );
     }
 }
