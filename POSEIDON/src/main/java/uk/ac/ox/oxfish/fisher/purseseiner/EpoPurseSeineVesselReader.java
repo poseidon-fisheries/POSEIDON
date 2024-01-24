@@ -89,7 +89,10 @@ public class EpoPurseSeineVesselReader implements AlgorithmFactory<List<Fisher>>
         }
     }
 
-    public static void chooseClosurePeriod(final Fisher fisher, final String closure) {
+    public static void chooseClosurePeriod(
+        final Fisher fisher,
+        final String closure
+    ) {
         final ImmutableList<String> periods = ImmutableList.of("closure A", "closure B");
         final String tag = "closure " + closure;
         checkArgument(periods.contains(tag));
@@ -149,7 +152,7 @@ public class EpoPurseSeineVesselReader implements AlgorithmFactory<List<Fisher>>
                 fisher.getTagsList().add(capacityClass(fisher));
                 setFixedRestTime(
                     fisher.getDepartingStrategy(),
-                    record.getDouble("mean_time_at_port_in_hours")
+                    record.getDouble("median_time_at_port_in_hours")
                 );
                 if (record.getBoolean("has_del_license")) {
                     fisher.getTagsList().add("has_del_license");
