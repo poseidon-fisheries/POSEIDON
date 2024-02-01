@@ -32,6 +32,11 @@ public class LastStepFixedDataTarget implements FixedDataTarget {
     private double weight;
     private boolean verbose;
     private String columnName = "";
+
+    public LastStepFixedDataTarget(final ErrorMeasure errorMeasure) {
+        this.errorMeasure = errorMeasure;
+    }
+
     public LastStepFixedDataTarget(
         final ErrorMeasure errorMeasure,
         final String columnName,
