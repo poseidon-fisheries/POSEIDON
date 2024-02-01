@@ -13,7 +13,7 @@ import eva2.optimization.strategies.ClusterBasedNichingEA;
 import eva2.optimization.strategies.NelderMeadSimplex;
 import eva2.optimization.strategies.ParticleSwarmOptimizationGCPSO;
 import eva2.problems.SimpleProblemWrapper;
-import uk.ac.ox.oxfish.maximization.generic.AbstractLastStepFixedDataTarget;
+import uk.ac.ox.oxfish.maximization.generic.LastStepFixedDataTarget;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -53,8 +53,7 @@ public class TunaCalibrator {
     private int parameterRange = DEFAULT_RANGE;
     private int maxProcessorsToUse = MAX_PROCESSORS_TO_USE;
     /**
-     * if this is positive then ignore the number of runs per setting in the original YAML and use
-     * this number instead
+     * if this is positive then ignore the number of runs per setting in the original YAML and use this number instead
      */
     private int numberOfRunsPerSettingOverride = -1;
 
@@ -67,16 +66,13 @@ public class TunaCalibrator {
 
     private boolean verbose = false;
 
-
     /**
-     * list of individuals we want to force in the original population; usually these are just the
-     * output of some previous optimizations
+     * list of individuals we want to force in the original population; usually these are just the output of some
+     * previous optimizations
      */
     private List<double[]> bestGuess = new LinkedList<>();
 
-
     public static void main(final String[] args) {
-
 
         final TunaCalibrator tunaCalibrator = new TunaCalibrator();
 
@@ -119,7 +115,10 @@ public class TunaCalibrator {
         return solution;
     }
 
-    private static Path copyToFolder(final Path sourceFile, final Path targetFolder) {
+    private static Path copyToFolder(
+        final Path sourceFile,
+        final Path targetFolder
+    ) {
         try {
             return Files.copy(sourceFile, targetFolder.resolve(sourceFile.getFileName()));
         } catch (final IOException e) {
@@ -163,8 +162,8 @@ public class TunaCalibrator {
         System.out.println("Max fitness calls: " + maxFitnessCalls);
 
         optimizationProblem.getTargets().stream()
-            .filter(target -> target instanceof AbstractLastStepFixedDataTarget)
-            .forEach(target -> ((AbstractLastStepFixedDataTarget) target).setVerbose(verbose));
+            .filter(target -> target instanceof LastStepFixedDataTarget)
+            .forEach(target -> ((LastStepFixedDataTarget) target).setVerbose(verbose));
 
         final int numThreads = Math.min(getRuntime().availableProcessors(), maxProcessorsToUse);
 
@@ -194,7 +193,6 @@ public class TunaCalibrator {
                     }
 
                 }
-
 
             };
         }
@@ -345,7 +343,6 @@ public class TunaCalibrator {
         this.maxProcessorsToUse = maxProcessorsToUse;
     }
 
-
     public OptimizationRoutine getOptimizationRoutine() {
         return optimizationRoutine;
     }
@@ -355,12 +352,12 @@ public class TunaCalibrator {
     }
 
     List<double[]> getBestGuess() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         return bestGuess;
     }
 
     void setBestGuess(final List<double[]> bestGuess) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         this.bestGuess = bestGuess;
     }
 

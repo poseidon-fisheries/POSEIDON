@@ -24,20 +24,20 @@ import static java.lang.Math.abs;
 /**
  * Implements the SMAPE (Symmetric mean absolute percentage error) measure.
  * <p>
- * This is the version of the measure where the denominator is not divided by two,
- * thus producing a result between 0% and 100%.
+ * This is the version of the measure where the denominator is not divided by two, thus producing a result between 0 and
+ * 1. We also don't multiply it by 100 in order to make it usable with other measures in the unit interval.
  * <p>
- * See <a href="https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error">https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error</a>
+ * See <a href="https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error">https://en.wikipedia
+ * .org/wiki/Symmetric_mean_absolute_percentage_error</a>
  */
-public enum SymmetricMeanAbsolutePercentageErrorMeasure implements ForecastErrorMeasure {
-
-    INSTANCE;
-
+public class SymmetricMeanAbsolutePercentage implements ErrorMeasure {
     @Override
-    public double applyAsDouble(final double actualValue, final double predictedValue) {
-        return (actualValue == predictedValue)
+    public double applyAsDouble(
+        final double target,
+        final double result
+    ) {
+        return (target == result)
             ? 0 // avoids NaN when both actual and predicted are 0
-            : 100 * abs(actualValue - predictedValue) / (abs(predictedValue) + abs(actualValue));
+            : abs(target - result) / (abs(result) + abs(target));
     }
-
 }

@@ -31,7 +31,9 @@ public class PolicyRuns {
             "2023-12-20/cenv0729/2023-12-26_18.01.39_local",
             "calibrated_scenario.yaml"
         ));
-        final Path baseOutputFolder = baseFolder.resolve(Paths.get("policy_runs"));
+        final Path baseOutputFolder = Paths.get(
+            System.getProperty("user.home"), "workspace", "epo_policy_runs", "runs"
+        );
         final List<Integer> yearsActive = ImmutableList.of(2023);
         final ImmutableList<Double> proportions = ImmutableList.of(0.75, 0.50, 0.25, 0.10, 0.0);
         final ImmutableMap<String, List<Policy<EpoScenario<?>>>> policies = ImmutableMap.of(

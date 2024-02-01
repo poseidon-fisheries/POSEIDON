@@ -21,8 +21,10 @@ package uk.ac.ox.oxfish.maximization.generic;
 
 import java.util.function.DoubleBinaryOperator;
 
-@FunctionalInterface
-public interface ForecastErrorMeasure extends DoubleBinaryOperator {
+public interface ErrorMeasure extends DoubleBinaryOperator {
     @Override
-    double applyAsDouble(double actualValue, double predictedValue);
+    double applyAsDouble(
+        final double target,
+        final double result
+    );
 }

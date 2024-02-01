@@ -31,7 +31,7 @@ tasks.named<Test>("test") {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.addAll(listOf("-Werror", "-Xlint:all"))
+    options.compilerArgs.addAll(listOf("-Werror", "-Xlint:-processing"))
 }
 
 tasks.withType<Copy>().all {

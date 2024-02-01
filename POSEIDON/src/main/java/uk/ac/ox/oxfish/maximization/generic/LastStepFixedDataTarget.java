@@ -24,42 +24,38 @@ import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class AbstractLastStepFixedDataTarget implements FixedDataTarget {
+public class LastStepFixedDataTarget implements FixedDataTarget {
 
     private static final long serialVersionUID = -1736401434755470061L;
-    private final ForecastErrorMeasure forecastErrorMeasure;
-
+    private final ErrorMeasure errorMeasure;
     private double fixedTarget;
     private double weight;
     private boolean verbose;
     private String columnName = "";
+    public LastStepFixedDataTarget(
+        final ErrorMeasure errorMeasure,
+        final String columnName,
+        final double fixedTarget
+    ) {
+        this(errorMeasure, columnName, fixedTarget, 1, false);
+    }
 
-    public AbstractLastStepFixedDataTarget(
-        final ForecastErrorMeasure forecastErrorMeasure,
+    public LastStepFixedDataTarget(
+        final ErrorMeasure errorMeasure,
         final String columnName,
         final double fixedTarget,
         final double weight,
         final boolean verbose
     ) {
-        this.forecastErrorMeasure = forecastErrorMeasure;
+        this.errorMeasure = errorMeasure;
         this.fixedTarget = fixedTarget;
         this.weight = weight;
         this.verbose = verbose;
         this.columnName = columnName;
     }
 
-    AbstractLastStepFixedDataTarget(final ForecastErrorMeasure forecastErrorMeasure) {
-        this(forecastErrorMeasure, 1, false);
-    }
-
-    AbstractLastStepFixedDataTarget(
-        final ForecastErrorMeasure forecastErrorMeasure,
-        final double weight,
-        final boolean verbose
-    ) {
-        this.forecastErrorMeasure = forecastErrorMeasure;
-        this.weight = weight;
-        this.verbose = verbose;
+    public ErrorMeasure getErrorMeasure() {
+        return errorMeasure;
     }
 
     public boolean isVerbose() {
@@ -81,7 +77,7 @@ public abstract class AbstractLastStepFixedDataTarget implements FixedDataTarget
     @Override
     public double computeError(final FishState model) {
         final double value = getValue(model);
-        final double error = forecastErrorMeasure.applyAsDouble(fixedTarget, value) * weight;
+        final double error = errorMeasure.applyAsDouble(fixedTarget, value) * weight;
         if (verbose) printResult(value, error);
         return error;
     }
@@ -93,7 +89,10 @@ public abstract class AbstractLastStepFixedDataTarget implements FixedDataTarget
         return column.getLatest();
     }
 
-    private void printResult(final double value, final double error) {
+    private void printResult(
+        final double value,
+        final double error
+    ) {
         System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         System.out.println("column: " + getColumnName());
         System.out.println("output: " + value);
@@ -118,6 +117,5 @@ public abstract class AbstractLastStepFixedDataTarget implements FixedDataTarget
     public void setColumnName(final String columnName) {
         this.columnName = columnName;
     }
-
 
 }
