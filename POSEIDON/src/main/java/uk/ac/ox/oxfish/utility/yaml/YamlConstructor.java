@@ -28,19 +28,26 @@ import org.yaml.snakeyaml.nodes.*;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FactorySupplier;
 import uk.ac.ox.oxfish.utility.parameters.DateParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.Streams.stream;
+import static java.util.function.UnaryOperator.identity;
 import static uk.ac.ox.oxfish.model.scenario.Scenarios.SCENARIOS;
 
 /**
- * Constructor useful to implement YAML objects back into the Fishstate. I modify it so that it does the following things:
+ * Constructor useful to implement YAML objects back into the Fishstate. I modify it so that it does the following
+ * things:
  * <ul>
  *     <li> FixedDoubleParameters can be input as numbers and it is still valid</li>
  *     <li> Algorithm Factories can be input as map and it's still valid</li>
@@ -50,31 +57,41 @@ import static uk.ac.ox.oxfish.model.scenario.Scenarios.SCENARIOS;
 public class YamlConstructor extends Constructor {
 
     private static final LoaderOptions LOADER_OPTIONS = new LoaderOptions();
+    private final Map<String, FactorySupplier> factorySuppliers =
+        stream(ServiceLoader.load(FactorySupplier.class)).collect(toImmutableMap(
+            FactorySupplier::getFactoryName,
+            identity(),
+            (factorySupplier, __) -> {
+                throw new IllegalStateException(
+                    "Duplicate factory name: " + factorySupplier.getFactoryName()
+                );
+            }
+        ));
 
     YamlConstructor() {
 
         super(LOADER_OPTIONS);
 
-        //intercept the scalar nodes to see if they are actually Factories or DoubleParameters
+        // intercept the scalar nodes to see if they are actually Factories or DoubleParameters
         this.yamlClassConstructors.put(
             NodeId.scalar, new Constructor.ConstructScalar() {
                 @Override
                 public Object construct(final Node node) {
                     if (node.getType().equals(DateParameter.class))
                         return new DateParameter(LocalDate.parse(((ScalarNode) node).getValue()));
-                    //if the field you are trying to fill is a double parameter
+                    // if the field you are trying to fill is a double parameter
                     if (node.getType().equals(DoubleParameter.class))
-                        //then a simple scalar must be a fixed double parameter. Build it
+                        // then a simple scalar must be a fixed double parameter. Build it
                         return doubleParameterSplit((ScalarNode) node);
-                    //if it's a path type we write and read it as string rather than with the ugly !! notation
+                    // if it's a path type we write and read it as string rather than with the ugly !! notation
                     if (node.getType().equals(Path.class))
                         return Paths.get(((ScalarNode) node).getValue());
-                    //it's also possible that the scalar is an algorithm factory without any settable field
-                    //this is rare since factories are represented as maps, but this might be one of the simple
-                    //ones like AnarchyFactory
+                    // it's also possible that the scalar is an algorithm factory without any settable field
+                    // this is rare since factories are represented as maps, but this might be one of the simple
+                    // ones like AnarchyFactory
                     if (AlgorithmFactory.class.isAssignableFrom(node.getType()))
-                        return AlgorithmFactories.constructorLookup(constructScalar((ScalarNode) node));
-                        //otherwise I guess it's really a normal scalar!
+                        return constructFactory(constructScalar((ScalarNode) node));
+                        // otherwise I guess it's really a normal scalar!
                     else
                         // other FixedParameter subclasses will be handled here, as
                         // SnakeYAML is able to identify the one-argument constructor
@@ -83,7 +100,7 @@ public class YamlConstructor extends Constructor {
                 }
             });
 
-        //intercept maps as well, some of them could be factories
+        // intercept maps as well, some of them could be factories
         this.yamlClassConstructors.put(NodeId.mapping, new Constructor.ConstructMapping() {
             @Override
             public Object construct(final Node node) {
@@ -95,7 +112,7 @@ public class YamlConstructor extends Constructor {
                     // written as a map for readability, so try to construct it that way
                     final NodeTuple nodeTuple = ((MappingNode) node).getValue().get(0);
                     if (AlgorithmFactory.class.isAssignableFrom(node.getType())) {
-                        return constructNamedObject(nodeTuple, AlgorithmFactories::constructorLookup);
+                        return constructNamedObject(nodeTuple, YamlConstructor.this::constructFactory);
                     } else if (Scenario.class.isAssignableFrom(node.getType())) {
                         return constructNamedObject(nodeTuple, name -> SCENARIOS.get(name).get());
                     } else {
@@ -109,27 +126,39 @@ public class YamlConstructor extends Constructor {
                 final NodeTuple nodeTuple,
                 final Function<? super String, Object> constructor
             ) {
-                //the original construct failed, hopefully this means it's an algorithm factory
-                //written as a map, so get its name and look it up
+                // the original construct failed, hopefully this means it's an algorithm factory
+                // written as a map, so get its name and look it up
                 final String name = ((ScalarNode) nodeTuple.getKeyNode()).getValue();
                 final Object object = checkNotNull(constructor.apply(name));
                 // The top level mapping node is only there to identify the right
                 // factory. The actual construction is done using the value node.
                 final MappingNode valueNode = (MappingNode) nodeTuple.getValueNode();
-                //need to set the node to the correct return or the reflection magic of snakeYAML wouldn't work
+                // need to set the node to the correct return or the reflection magic of snakeYAML wouldn't work
                 valueNode.setType(object.getClass());
-                //use beans to set all the properties correctly
+                // use beans to set all the properties correctly
                 constructJavaBean2ndStep(valueNode, object);
-                //done!
+                // done!
                 return object;
             }
         });
     }
 
     private DoubleParameter doubleParameterSplit(final ScalarNode node) {
-        //get it as a string
+        // get it as a string
         final String nodeContent = constructScalar(node);
         return DoubleParameter.parseDoubleParameter(nodeContent);
+    }
+
+    private AlgorithmFactory<?> constructFactory(final String factoryName) {
+        // We first look for the factory in our map of service suppliers, and
+        // then fall back on the old AlgorithmFactories constructors if we can't
+        // find it, but the AlgorithmFactories class should go away once everything
+        // has been moved to the service architecture, and we should give a proper
+        // error message if we don't find it there.
+        final FactorySupplier factorySupplier = factorySuppliers.get(factoryName);
+        return factorySupplier != null
+            ? factorySupplier.get()
+            : AlgorithmFactories.constructorLookup(factoryName);
     }
 
     public static Coordinate convertToCoordinate(final String val) {

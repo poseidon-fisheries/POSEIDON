@@ -65,7 +65,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.samplers.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplers;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.CappedMutableLocationValuesFactory;
@@ -622,7 +624,6 @@ public class AlgorithmFactories {
         addFactories(new Factories<>(
             InitialAbundance.class,
             ImmutableMap.of(
-                InitialAbundanceFromFileFactory.class, "Abundance From File",
                 InitialAbundanceFromStringFactory.class, "Abundance From String",
                 InitialAbundanceFromListFactory.class, "Abundance From List",
                 OneBinAbundanceFactory.class, "Abundance in one bin"
@@ -728,10 +729,6 @@ public class AlgorithmFactories {
             PreviousYearActionCount.class,
             SumOf.class,
             YearlyCounter.class
-        ));
-        addFactories(new Factories<>(
-            AbundanceFilters.class,
-            AbundanceFiltersFromFileFactory.class
         ));
         addFactories(new Factories<>(
             NetworkPredicate.class,
@@ -930,11 +927,12 @@ public class AlgorithmFactories {
     /**
      * returns a stream with all the factories available in the constructor Maps
      */
-    public static Stream<Class<? extends AlgorithmFactory<?>>> getAllAlgorithmFactories() {
+    public static Stream<FactorySupplier> getAlgorithmFactoriesAsSuppliers() {
         return NAMES_MAP
             .entrySet()
             .stream()
-            .flatMap(entry -> entry.getValue().keySet().stream());
+            .flatMap(entry -> entry.getValue().entrySet().stream())
+            .map(entry -> new BasicFactorySupplier<>(entry.getKey(), entry.getValue()));
     }
 
     public static <T> Map<String, Supplier<AlgorithmFactory<? extends T>>> getConstructors(final Class<T> classObject) {

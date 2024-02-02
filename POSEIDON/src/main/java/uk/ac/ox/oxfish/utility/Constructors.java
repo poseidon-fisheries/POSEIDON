@@ -6,22 +6,18 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
-import static java.util.Arrays.stream;
-import static java.util.Locale.ENGLISH;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
-import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
+import static uk.ac.ox.oxfish.utility.BasicFactorySupplier.makeFactoryName;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.throwingMerger;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class Constructors {
 
     /**
-     * Given a map from class objects to names, uses reflection to build a map from names to constructors.
-     * This is meant to ease the building of the various classes that are used with AlgorithmFactories.
-     * Note: not sure that the return result *has* to be a LinkedHashMap.
+     * Given a map from class objects to names, uses reflection to build a map from names to constructors. This is meant
+     * to ease the building of the various classes that are used with AlgorithmFactories. Note: not sure that the return
+     * result *has* to be a LinkedHashMap.
      */
     public static <T> LinkedHashMap<String, Supplier<AlgorithmFactory<? extends T>>> fromNames(
         final Map<Class<? extends AlgorithmFactory<?>>, String> names
@@ -56,8 +52,8 @@ public class Constructors {
     }
 
     /**
-     * This is a convenience method to get around the fact that Java won't allow lambdas to
-     * throw checked Exceptions. Adapted from
+     * This is a convenience method to get around the fact that Java won't allow lambdas to throw checked Exceptions.
+     * Adapted from
      * <a href="https://stackoverflow.com/a/14045585/487946">https://stackoverflow.com/a/14045585/487946</a>.
      */
     private static <T> Supplier<T> wrap(final Callable<? extends T> callable) {
@@ -71,11 +67,9 @@ public class Constructors {
     }
 
     /**
-     * Utility method to add the simple name of a class to a NAMES map
-     * The name is split by letter case, the first word is left capitalized,
-     * following words are lower-cased, and they're joined by spaces.
-     * This might not work if any fancy capitalization is involved so
-     * manual naming is still required in some cases.
+     * Utility method to add the simple name of a class to a NAMES map The name is split by letter case, the first word
+     * is left capitalized, following words are lower-cased, and they're joined by spaces. This might not work if any
+     * fancy capitalization is involved so manual naming is still required in some cases.
      */
     public static void putName(
         final Map<? super Class<? extends AlgorithmFactory<?>>, ? super String> names,
@@ -84,18 +78,4 @@ public class Constructors {
         names.put(classObject, makeFactoryName(classObject));
     }
 
-    public static String makeFactoryName(final Class<? extends AlgorithmFactory<?>> classObject) {
-        final String[] words =
-            splitByCharacterTypeCamelCase(
-                classObject
-                    .getSimpleName()
-                    .replaceAll("Factory", "")
-            );
-        return Stream
-            .concat(
-                Stream.of(words[0]),
-                stream(words).skip(1).map(word -> word.toLowerCase(ENGLISH))
-            )
-            .collect(joining(" "));
-    }
 }
