@@ -148,7 +148,6 @@ import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SimpleFishSamplerFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
 import uk.ac.ox.oxfish.regulations.conditions.*;
-import uk.ac.ox.oxfish.regulations.quantities.*;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.*;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
@@ -157,7 +156,6 @@ import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
 import uk.ac.ox.oxfish.utility.parameters.ParameterTable;
 import uk.ac.ox.poseidon.regulations.api.Condition;
-import uk.ac.ox.poseidon.regulations.api.Quantity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -701,20 +699,6 @@ public class AlgorithmFactories {
             NotAbove.class,
             True.class,
             False.class
-        ));
-        addFactories(new Factories<>(
-            Quantity.class,
-            ImmutableMap.of(
-                NumberOfActiveFads.class, "Number of active FADs"
-            ),
-            CurrentYearActionCount.class,
-            LastYearlyFisherValue.class,
-            SecondLastYearlyFisherValue.class,
-            YearlyFisherValue.class,
-            YearlyGatherer.class,
-            PreviousYearActionCount.class,
-            SumOf.class,
-            YearlyCounter.class
         ));
         addFactories(new Factories<>(
             NetworkPredicate.class,
