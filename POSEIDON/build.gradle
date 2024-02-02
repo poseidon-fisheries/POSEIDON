@@ -85,9 +85,6 @@ dependencies {
     //testing:
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.7'
 
-    //guava. Useful for PreConditions and sometimes specialized collections
-    implementation "com.google.guava:guava:32.1.1-jre"
-
     // Google AutoService annotations, for generating ServiceLoader metadata automatically
     annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
     compileOnly 'com.google.auto.service:auto-service-annotations:1.1.1'

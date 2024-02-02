@@ -11,5 +11,4 @@ dependencies {
     runtimeOnly(project(":datasets:adaptors"))
 
     implementation("org.yaml:snakeyaml:2.0")
-    implementation("com.google.guava:guava:31.1-jre")
 }

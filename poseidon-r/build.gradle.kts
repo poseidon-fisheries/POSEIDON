@@ -4,7 +4,6 @@ plugins {
 }
 
 dependencies {
-    implementation("com.google.guava:guava:31.1-jre")
     implementation(project(":common:api"))
     implementation(project(":common:core"))
     implementation(project(":simulations:api"))

@@ -7,6 +7,9 @@ repositories {
 }
 
 dependencies {
+    // centralize the dependency on Guava, since that's the
+    // one library that we use almost everywhere
+    implementation("com.google.guava:guava:33.0.0-jre")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.mockito:mockito-core:4.11.0")
