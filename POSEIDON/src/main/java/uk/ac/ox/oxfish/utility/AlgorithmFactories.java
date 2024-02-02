@@ -64,7 +64,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.regulations.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.regulations.TemporalClosureExtensionAfter;
+import uk.ac.ox.oxfish.fisher.purseseiner.regulations.TemporalClosureExtensionBefore;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplers;
@@ -146,7 +147,6 @@ import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITargetTACFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SimpleFishSamplerFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
-import uk.ac.ox.oxfish.regulations.*;
 import uk.ac.ox.oxfish.regulations.conditions.*;
 import uk.ac.ox.oxfish.regulations.quantities.*;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
@@ -158,7 +158,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
 import uk.ac.ox.oxfish.utility.parameters.ParameterTable;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 import uk.ac.ox.poseidon.regulations.api.Quantity;
-import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -702,19 +701,6 @@ public class AlgorithmFactories {
             NotAbove.class,
             True.class,
             False.class
-        ));
-        addFactories(new Factories<>(
-            Regulations.class,
-            ImmutableMap.of(
-                ActiveFadLimits.class, "Active-FAD limits",
-                IndividualBetLimits.class, "Individual BET limits"
-            ),
-            NamedRegulations.class,
-            TemporalClosure.class,
-            EverythingForbidden.class,
-            EverythingPermitted.class,
-            ForbiddenIf.class,
-            ForbiddenAreasFromShapeFiles.class
         ));
         addFactories(new Factories<>(
             Quantity.class,
