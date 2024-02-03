@@ -21,8 +21,7 @@
 package uk.ac.ox.oxfish.utility;
 
 import uk.ac.ox.oxfish.model.FishState;
-
-import java.util.function.Function;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
 
 /**
  * It will be useful to have strategies created by a factory so that I can have the YAML and GUI instantiation separated
@@ -30,10 +29,5 @@ import java.util.function.Function;
  * <p>
  * Created by carrknight on 5/27/15.
  */
-public interface AlgorithmFactory<T> extends Function<FishState, T> {
-
-
+public interface AlgorithmFactory<T> extends ComponentFactory<FishState, T> {
 }
-
-
-

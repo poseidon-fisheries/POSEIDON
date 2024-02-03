@@ -11,10 +11,10 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.oxfish.utility.BasicFactorySupplier.makeFactoryName;
 import static uk.ac.ox.oxfish.utility.Constructors.getSupplier;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.throwingMerger;
+import static uk.ac.ox.poseidon.common.core.BasicFactorySupplier.makeFactoryName;
 
 public class Factories<T> {
 

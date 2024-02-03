@@ -28,9 +28,10 @@ import org.yaml.snakeyaml.nodes.*;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.FactorySupplier;
 import uk.ac.ox.oxfish.utility.parameters.DateParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
+import uk.ac.ox.poseidon.common.api.FactorySupplier;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -149,7 +150,7 @@ public class YamlConstructor extends Constructor {
         return DoubleParameter.parseDoubleParameter(nodeContent);
     }
 
-    private AlgorithmFactory<?> constructFactory(final String factoryName) {
+    private ComponentFactory<?, ?> constructFactory(final String factoryName) {
         // We first look for the factory in our map of service suppliers, and
         // then fall back on the old AlgorithmFactories constructors if we can't
         // find it, but the AlgorithmFactories class should go away once everything

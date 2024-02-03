@@ -155,6 +155,8 @@ import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
 import uk.ac.ox.oxfish.utility.parameters.ParameterTable;
+import uk.ac.ox.poseidon.common.api.FactorySupplier;
+import uk.ac.ox.poseidon.common.core.BasicFactorySupplier;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 
 import java.util.HashMap;

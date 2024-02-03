@@ -8,8 +8,8 @@ import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.oxfish.utility.BasicFactorySupplier.makeFactoryName;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.throwingMerger;
+import static uk.ac.ox.poseidon.common.core.BasicFactorySupplier.makeFactoryName;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class Constructors {

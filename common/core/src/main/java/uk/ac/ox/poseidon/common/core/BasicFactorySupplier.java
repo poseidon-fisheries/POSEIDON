@@ -1,4 +1,7 @@
-package uk.ac.ox.oxfish.utility;
+package uk.ac.ox.poseidon.common.core;
+
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
+import uk.ac.ox.poseidon.common.api.FactorySupplier;
 
 import java.util.stream.Stream;
 
@@ -7,7 +10,7 @@ import static java.util.Locale.ENGLISH;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 
-public class BasicFactorySupplier<T extends AlgorithmFactory<?>> implements FactorySupplier {
+public class BasicFactorySupplier<T extends ComponentFactory<?, ?>> implements FactorySupplier {
 
     private final Class<? extends T> factoryClass;
     private final String factoryName;
@@ -26,7 +29,7 @@ public class BasicFactorySupplier<T extends AlgorithmFactory<?>> implements Fact
         this.factoryName = factoryName;
     }
 
-    static String makeFactoryName(final Class<? extends AlgorithmFactory<?>> classObject) {
+    public static String makeFactoryName(final Class<? extends ComponentFactory<?, ?>> classObject) {
         final String[] words =
             splitByCharacterTypeCamelCase(
                 classObject
@@ -47,12 +50,12 @@ public class BasicFactorySupplier<T extends AlgorithmFactory<?>> implements Fact
     }
 
     @Override
-    public Class<? extends AlgorithmFactory<?>> getFactoryClass() {
+    public Class<? extends ComponentFactory<?, ?>> getFactoryClass() {
         return factoryClass;
     }
 
     @Override
-    public AlgorithmFactory<?> get() {
+    public ComponentFactory<?, ?> get() {
         try {
             return factoryClass.newInstance();
         } catch (final InstantiationException | IllegalAccessException e) {

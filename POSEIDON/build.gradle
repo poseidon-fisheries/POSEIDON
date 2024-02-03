@@ -39,13 +39,13 @@ sourceSets {
 dependencies {
 
     api(project(":common:api"))
+    implementation(project(":common:core"))
     api(project(":agents:api"))
     implementation(project(":agents:core"))
     api(project(":regulations:api"))
     implementation(project(":regulations:core"))
 
     //mason libraries. They aren't on maven so we have to lug their jars around
-    api fileTree(dir: 'libs/mason', include: '*.jar')
     api files("$rootDir/libs/geomason/geomason.1.5.jar")
 
     // JTS Topology Suite, a geomason dependency
