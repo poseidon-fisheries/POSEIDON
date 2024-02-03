@@ -26,8 +26,8 @@ import uk.ac.ox.oxfish.biology.initializer.ConstantInitialBiomass;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -41,7 +41,7 @@ import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 /**
  * A factory for a {@link BiomassInitializer} that reads the Schaefer parameters from a CSV file.
@@ -65,7 +65,6 @@ public class BiomassInitializerFactory
         this.speciesCodesSupplier = speciesCodesSupplier;
         this.schaeferParamsFile = schaeferParamsFile;
     }
-
 
     public InputPath getSchaeferParamsFile() {
         return schaeferParamsFile;

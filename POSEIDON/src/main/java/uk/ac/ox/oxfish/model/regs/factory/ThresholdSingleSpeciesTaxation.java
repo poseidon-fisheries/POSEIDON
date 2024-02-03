@@ -24,8 +24,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.regs.policymakers.SingleSpeciesBiomassTaxman;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import java.util.WeakHashMap;
 

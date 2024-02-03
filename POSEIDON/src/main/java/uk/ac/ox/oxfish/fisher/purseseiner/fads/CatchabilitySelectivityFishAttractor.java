@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 import java.util.Map;
 import java.util.function.Function;

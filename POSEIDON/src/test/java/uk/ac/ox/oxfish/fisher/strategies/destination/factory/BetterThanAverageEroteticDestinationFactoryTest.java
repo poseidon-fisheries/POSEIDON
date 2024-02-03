@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.IndependentLogisticFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

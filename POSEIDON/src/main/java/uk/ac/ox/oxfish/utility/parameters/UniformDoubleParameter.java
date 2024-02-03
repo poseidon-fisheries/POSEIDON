@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.utility.parameters;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 /**
  * A uniformly distributed double will be returned each time
@@ -37,11 +38,13 @@ public class UniformDoubleParameter implements DoubleParameter {
     public UniformDoubleParameter() {
     }
 
-    public UniformDoubleParameter(double minimum, double maximum) {
+    public UniformDoubleParameter(
+        double minimum,
+        double maximum
+    ) {
         this.minimum = minimum;
         this.maximum = maximum;
     }
-
 
     /**
      * Applies this function to the given argument.

@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerInitializer;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import static org.mockito.Mockito.mock;
 

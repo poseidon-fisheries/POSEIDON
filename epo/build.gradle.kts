@@ -4,5 +4,6 @@ plugins {
 
 dependencies {
     implementation(project(":POSEIDON"))
+    implementation(project(":common"))
     implementation(project(":regulations:core"))
 }

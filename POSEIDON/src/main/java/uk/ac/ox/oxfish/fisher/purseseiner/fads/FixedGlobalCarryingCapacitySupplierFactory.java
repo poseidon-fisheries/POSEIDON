@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 public class FixedGlobalCarryingCapacitySupplierFactory implements AlgorithmFactory<CarryingCapacitySupplier> {
 

@@ -26,13 +26,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
-
 public class FishingSeasonFactoryTest {
-
 
     @Test
     public void randomSeason() throws Exception {
-
 
         FishState state = new FishState(System.currentTimeMillis());
         FishingSeasonFactory factory = new FishingSeasonFactory();
@@ -44,7 +41,6 @@ public class FishingSeasonFactoryTest {
             Assertions.assertTrue(season.getDaysOpened() <= 150);
             Assertions.assertFalse(season.isRespectMPAs());
         }
-
 
     }
 }

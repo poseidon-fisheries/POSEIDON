@@ -2,13 +2,13 @@ package uk.ac.ox.oxfish.fisher.purseseiner.regulations;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.regulations.ForbiddenAreasFromShapeFiles;
-import uk.ac.ox.oxfish.regulations.ForbiddenIf;
-import uk.ac.ox.oxfish.regulations.NamedRegulations;
-import uk.ac.ox.oxfish.regulations.conditions.*;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
+import uk.ac.ox.poseidon.regulations.core.ForbiddenAreasFromShapeFiles;
+import uk.ac.ox.poseidon.regulations.core.ForbiddenIfFactory;
+import uk.ac.ox.poseidon.regulations.core.NamedRegulationsFactory;
+import uk.ac.ox.poseidon.regulations.core.conditions.*;
 
 import java.time.LocalDate;
 import java.time.MonthDay;
@@ -27,7 +27,7 @@ public class DefaultEpoRegulations {
     );
     public static final MonthDay EL_CORRALITO_BEGINNING = MonthDay.of(OCTOBER, 9);
     public static final MonthDay EL_CORRALITO_END = MonthDay.of(NOVEMBER, 8);
-    public static final InRectangularArea EL_CORRALITO_AREA = new InRectangularArea(
+    public static final InRectangularAreaFactory EL_CORRALITO_AREA = new InRectangularAreaFactory(
         4.0, -110.0, -3.0, -96.0
     );
     private static final Map<Integer, Integer> ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET = ImmutableMap.of(
@@ -45,7 +45,7 @@ public class DefaultEpoRegulations {
     private DefaultEpoRegulations() {
     }
 
-    public static AlgorithmFactory<Regulations> make(final InputPath inputFolder) {
+    public static ComponentFactory<Regulations> make(final InputPath inputFolder) {
         final InputPath regions = inputFolder.path("regions");
         final List<Integer> yearsActive = ImmutableList.of(2021, 2022, 2023);
         final TemporalClosure closureA = new TemporalClosure(
@@ -62,20 +62,20 @@ public class DefaultEpoRegulations {
             CLOSURE_B_END,
             15
         );
-        return new NamedRegulations(
+        return new NamedRegulationsFactory(
             ImmutableMap.of(
-                "DEL licence", new ForbiddenIf(
-                    new AllOf(
-                        new ActionCodeIs("DEL"),
-                        new Not(new AgentHasTag("has_del_license"))
+                "DEL licence", new ForbiddenIfFactory(
+                    new AllOfFactory(
+                        new ActionCodeIsFactory("DEL"),
+                        new NotFactory(new AgentHasTagFactory("has_del_license"))
                     )
                 ),
                 "Active-FAD limits", new ActiveFadLimits(ACTIVE_FAD_LIMITS),
                 "Closure A", closureA,
                 "Closure B", closureB,
-                "El Corralito", new ForbiddenIf(
-                    new AllOf(
-                        new BetweenYearlyDates(
+                "El Corralito", new ForbiddenIfFactory(
+                    new AllOfFactory(
+                        new BetweenYearlyDatesFactory(
                             EL_CORRALITO_BEGINNING,
                             EL_CORRALITO_END
                         ),
@@ -86,13 +86,13 @@ public class DefaultEpoRegulations {
                     regions,
                     regions.path("region_tags.csv")
                 ),
-                "Extended 2022 closure", new ForbiddenIf(
-                    new AllOf(
-                        new InYear(2022),
-                        new AgentHasTag("extended_2022_closure"),
-                        new AnyOf(
-                            new TemporalClosureExtensionBefore(closureA, 8),
-                            new TemporalClosureExtensionAfter(closureB, 8)
+                "Extended 2022 closure", new ForbiddenIfFactory(
+                    new AllOfFactory(
+                        new InYearFactory(2022),
+                        new AgentHasTagFactory("extended_2022_closure"),
+                        new AnyOfFactory(
+                            new TemporalClosureExtensionBeforeFactory(closureA, 8),
+                            new TemporalClosureExtensionAfterFactory(closureB, 8)
                         )
                     )
                 ),

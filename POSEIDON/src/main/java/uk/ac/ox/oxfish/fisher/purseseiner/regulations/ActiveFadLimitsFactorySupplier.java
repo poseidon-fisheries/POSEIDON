@@ -8,6 +8,6 @@ import uk.ac.ox.poseidon.common.core.BasicFactorySupplier;
 public class ActiveFadLimitsFactorySupplier
     extends BasicFactorySupplier<ActiveFadLimits> {
     public ActiveFadLimitsFactorySupplier() {
-        super(ActiveFadLimits.class);
+        super(ActiveFadLimits.class, "Active-FAD limits");
     }
 }

@@ -12,8 +12,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.AggregatingFad;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;

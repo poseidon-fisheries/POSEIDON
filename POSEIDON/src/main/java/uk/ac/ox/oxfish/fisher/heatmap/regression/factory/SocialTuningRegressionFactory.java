@@ -28,8 +28,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.util.Arrays;
@@ -42,12 +42,12 @@ import java.util.WeakHashMap;
  */
 public class SocialTuningRegressionFactory implements AlgorithmFactory<SocialTuningRegression<Double>> {
 
-
     /**
      * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
      */
     private final Set<FishState> weakStateMap = Collections.newSetFromMap(new WeakHashMap<>());
-    private AlgorithmFactory<? extends GeographicalRegression<Double>> nested = new CompleteNearestNeighborRegressionFactory();
+    private AlgorithmFactory<? extends GeographicalRegression<Double>> nested =
+        new CompleteNearestNeighborRegressionFactory();
     private boolean yearly = false;
 
     private AlgorithmFactory<? extends AdaptationProbability> probability = new FixedProbabilityFactory(.2, 1);
@@ -72,13 +72,11 @@ public class SocialTuningRegressionFactory implements AlgorithmFactory<SocialTun
     @Override
     public SocialTuningRegression<Double> apply(final FishState state) {
 
-
         final GeographicalRegression<Double> delegate = this.nested.apply(state);
         final DoubleParameter[] zeros = new DoubleParameter[delegate.getParametersAsArray().length];
         Arrays.fill(zeros, new FixedDoubleParameter(0));
 
-
-        //add data gathering if necessary
+        // add data gathering if necessary
         if (!weakStateMap.contains(state)) {
             weakStateMap.add(state);
             addDataGatherers(state, zeros.length);
@@ -93,12 +91,14 @@ public class SocialTuningRegressionFactory implements AlgorithmFactory<SocialTun
 
     }
 
-    private void addDataGatherers(final FishState state, final int length) {
-
+    private void addDataGatherers(
+        final FishState state,
+        final int length
+    ) {
 
         for (int i = 0; i < length; i++) {
 
-            //first add data gatherers
+            // first add data gatherers
             final int finalI = i;
             state.
                 getYearlyDataSet().
@@ -121,7 +121,6 @@ public class SocialTuningRegressionFactory implements AlgorithmFactory<SocialTun
         }
 
     }
-
 
     /**
      * Getter for property 'nested'.

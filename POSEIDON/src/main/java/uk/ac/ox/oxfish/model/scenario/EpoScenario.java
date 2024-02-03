@@ -43,9 +43,11 @@ import uk.ac.ox.oxfish.model.data.distributions.GroupedYearlyDistributions;
 import uk.ac.ox.oxfish.model.data.monitors.regions.CustomRegionalDivision;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
-import uk.ac.ox.oxfish.utility.parameters.StringParameter;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.StringParameter;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.nio.file.Paths;
@@ -91,7 +93,7 @@ public abstract class EpoScenario<B extends LocalBiology>
             )
         ));
 
-    private AlgorithmFactory<? extends Regulations> regulations = DefaultEpoRegulations.make(getInputFolder());
+    private ComponentFactory<? extends Regulations> regulations = DefaultEpoRegulations.make(getInputFolder());
     private BiologicalProcessesFactory<B> biologicalProcesses;
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
         inputFolder,
@@ -128,11 +130,11 @@ public abstract class EpoScenario<B extends LocalBiology>
         this.empiricalCatchSizeDistributions = empiricalCatchSizeDistributions;
     }
 
-    public AlgorithmFactory<? extends Regulations> getRegulations() {
+    public ComponentFactory<? extends Regulations> getRegulations() {
         return regulations;
     }
 
-    public void setRegulations(final AlgorithmFactory<? extends Regulations> regulations) {
+    public void setRegulations(final ComponentFactory<? extends Regulations> regulations) {
         this.regulations = regulations;
     }
 

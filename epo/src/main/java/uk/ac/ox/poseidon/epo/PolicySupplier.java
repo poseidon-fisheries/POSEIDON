@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.YearsActive;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import uk.ac.ox.oxfish.regulations.conditions.AnyOf;
-import uk.ac.ox.oxfish.regulations.conditions.InYear;
+import uk.ac.ox.poseidon.regulations.core.conditions.AnyOfFactory;
+import uk.ac.ox.poseidon.regulations.core.conditions.InYearFactory;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -30,8 +30,8 @@ abstract class PolicySupplier implements Supplier<List<Policy<EpoScenario<?>>>> 
         return yearsActive;
     }
 
-    AnyOf yearsActiveCondition() {
-        return new AnyOf(yearsActive.stream().map(InYear::new));
+    AnyOfFactory yearsActiveCondition() {
+        return new AnyOfFactory(yearsActive.stream().map(InYearFactory::new));
     }
 
     protected void deactivateForYearsActive(final YearsActive regulation) {

@@ -24,8 +24,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 import uk.ac.ox.oxfish.utility.parameters.ParameterTable;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 public class AbundancePurseSeineGearFactory extends PurseSeineGearFactory {
 

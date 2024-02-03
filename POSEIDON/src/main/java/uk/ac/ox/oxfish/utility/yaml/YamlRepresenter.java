@@ -33,8 +33,10 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.parameters.*;
-import uk.ac.ox.poseidon.common.api.ComponentFactory;
 import uk.ac.ox.poseidon.common.api.FactorySupplier;
+import uk.ac.ox.poseidon.common.api.GenericComponentFactory;
+import uk.ac.ox.poseidon.common.core.parameters.DateParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedParameter;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -138,7 +140,7 @@ class YamlRepresenter extends Representer {
             .flatMap(identity())
             .forEach(factorySupplier -> {
                 // for each class create a representer that shows it as a map
-                final Class<? extends ComponentFactory<?, ?>> factoryClass = factorySupplier.getFactoryClass();
+                final Class<? extends GenericComponentFactory<?, ?>> factoryClass = factorySupplier.getFactoryClass();
                 this.addClassTag(factoryClass, Tag.MAP);
                 this.representers.put(factoryClass, data -> {
                     // prepare the node

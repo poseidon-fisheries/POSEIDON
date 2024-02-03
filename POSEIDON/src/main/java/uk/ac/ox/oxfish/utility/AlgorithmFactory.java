@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.utility;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.poseidon.common.api.ComponentFactory;
+import uk.ac.ox.poseidon.common.api.GenericComponentFactory;
 
 /**
  * It will be useful to have strategies created by a factory so that I can have the YAML and GUI instantiation separated
@@ -29,5 +29,5 @@ import uk.ac.ox.poseidon.common.api.ComponentFactory;
  * <p>
  * Created by carrknight on 5/27/15.
  */
-public interface AlgorithmFactory<T> extends ComponentFactory<FishState, T> {
+public interface AlgorithmFactory<T> extends GenericComponentFactory<FishState, T> {
 }

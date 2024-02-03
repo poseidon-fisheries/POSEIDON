@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaITQRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.yaml.YamlConstructor;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -95,7 +95,7 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
         Arrays.fill(quotas, Double.POSITIVE_INFINITY);
         //read them in
         for (final Map.Entry<String, String> input : quotasInputted.entrySet()) {
-            final double yearlyQuota = DoubleParameter
+            final double yearlyQuota = YamlConstructor
                 .parseDoubleParameter(input.getValue().trim())
                 .applyAsDouble(state.getRandom());
             Preconditions.checkArgument(yearlyQuota > 0);

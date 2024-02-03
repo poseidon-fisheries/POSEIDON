@@ -64,8 +64,6 @@ import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.*;
-import uk.ac.ox.oxfish.fisher.purseseiner.regulations.TemporalClosureExtensionAfter;
-import uk.ac.ox.oxfish.fisher.purseseiner.regulations.TemporalClosureExtensionBefore;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplers;
@@ -97,7 +95,6 @@ import uk.ac.ox.oxfish.fisher.strategies.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.WindThresholdFactory;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.MapExtentFactory;
 import uk.ac.ox.oxfish.geography.discretization.CentroidMapFileFactory;
 import uk.ac.ox.oxfish.geography.discretization.IdentityDiscretizerFactory;
@@ -147,7 +144,6 @@ import uk.ac.ox.oxfish.model.regs.policymakers.factory.ITargetTACFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SimpleFishSamplerFactory;
 import uk.ac.ox.oxfish.model.regs.policymakers.sensors.SurplusProductionDepletionFormulaController;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
-import uk.ac.ox.oxfish.regulations.conditions.*;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.*;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
@@ -157,7 +153,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
 import uk.ac.ox.oxfish.utility.parameters.ParameterTable;
 import uk.ac.ox.poseidon.common.api.FactorySupplier;
 import uk.ac.ox.poseidon.common.core.BasicFactorySupplier;
-import uk.ac.ox.poseidon.regulations.api.Condition;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -680,27 +676,6 @@ public class AlgorithmFactories {
                 AbundanceDrivenGearExogenousCatchesFactory.class, "Abundance Gear Exogenous Catches",
                 ExogenousInstantaneousMortalityCatchesFactory.class, "Instantaneous Mortality Exogenous Catches"
             )
-        ));
-        addFactories(new Factories<>(
-            Condition.class,
-            Above.class,
-            ActionCodeIs.class,
-            AgentHasAnyOfTags.class,
-            AgentHasTag.class,
-            AllOf.class,
-            AnyOf.class,
-            Below.class,
-            BetweenDates.class,
-            BetweenYearlyDates.class,
-            TemporalClosureExtensionAfter.class,
-            TemporalClosureExtensionBefore.class,
-            InRectangularArea.class,
-            InYear.class,
-            Not.class,
-            NotBelow.class,
-            NotAbove.class,
-            True.class,
-            False.class
         ));
         addFactories(new Factories<>(
             NetworkPredicate.class,

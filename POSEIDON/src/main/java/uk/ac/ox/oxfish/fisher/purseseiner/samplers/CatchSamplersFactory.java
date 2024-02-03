@@ -28,9 +28,9 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,7 +44,7 @@ import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static com.google.common.collect.Streams.stream;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.getSetActionClass;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public abstract class CatchSamplersFactory<B extends LocalBiology>
     implements AlgorithmFactory<CatchSamplers<B>> {

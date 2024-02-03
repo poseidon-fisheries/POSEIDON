@@ -30,11 +30,11 @@ import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 import javax.measure.quantity.Mass;
 import java.util.Collection;
@@ -51,7 +51,7 @@ import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.EARNI
 import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.VARIABLE_COSTS;
 import static uk.ac.ox.oxfish.utility.Dummyable.maybeUseDummyData;
 import static uk.ac.ox.oxfish.utility.Measures.DOLLAR;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class PurseSeinerFleetFactory
     implements Dummyable, AlgorithmFactory<ScenarioPopulation> {

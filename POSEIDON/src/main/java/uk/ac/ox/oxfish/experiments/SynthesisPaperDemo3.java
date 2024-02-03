@@ -32,7 +32,7 @@ import uk.ac.ox.oxfish.model.regs.factory.MultiITQFactory;
 import uk.ac.ox.oxfish.model.regs.factory.TACMonoFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -50,11 +50,10 @@ import java.util.logging.Logger;
 
 public class SynthesisPaperDemo3 {
 
-
     public static final int NUMBER_OF_RUNS = 1000;
     public static final int NUMBER_OF_FISHERS = 20;
-    public static final int NUMBER_OF_YEARS_NOT_RECORDED = 1; //ignore first year
-    public static final int NUMBER_OF_YEARS_FISHING = 5; //20;
+    public static final int NUMBER_OF_YEARS_NOT_RECORDED = 1; // ignore first year
+    public static final int NUMBER_OF_YEARS_FISHING = 5; // 20;
     public static final int MIN_NUMBER_OF_FRIENDS = 0;
     public static final int MAX_NUMBER_OF_FRIENDS = 20;
     public static final String COMMON_HEADINGS = "regulation,run,year";
@@ -68,12 +67,10 @@ public class SynthesisPaperDemo3 {
 
     static {
 
-
         regulations.put(
             "anarchy",
             new AnarchyFactory()
         );
-
 
         final TACMonoFactory tac = new TACMonoFactory();
         tac.setQuota(new FixedDoubleParameter(10000d * NUMBER_OF_FISHERS));
@@ -89,7 +86,6 @@ public class SynthesisPaperDemo3 {
             iq
         );
 
-
         final MultiITQFactory itq = new MultiITQFactory();
         itq.setQuotaFirstSpecie(new FixedDoubleParameter(10000d));
         itq.setAllowMultipleTrades(true);
@@ -97,7 +93,6 @@ public class SynthesisPaperDemo3 {
             "high_itq",
             itq
         );
-
 
         final MultiITQFactory inefficient = new MultiITQFactory();
         inefficient.setQuotaFirstSpecie(new FixedDoubleParameter(10000d));
@@ -150,7 +145,6 @@ public class SynthesisPaperDemo3 {
         clubs();
     }
 
-
     public static void clubs() throws IOException {
 
         final Path scenarioFile = DIRECTORY.resolve(SCENARIO_NAME);
@@ -178,14 +172,13 @@ public class SynthesisPaperDemo3 {
 
                 scenario.setRegulation(regulation.getValue());
 
-                //these runs have all the same number of friends
+                // these runs have all the same number of friends
                 final ClubNetworkBuilder networkBuilder = new ClubNetworkBuilder();
                 networkBuilder.setClubSize(new UniformDoubleParameter(
                     MIN_NUMBER_OF_FRIENDS,
                     MAX_NUMBER_OF_FRIENDS
                 ));
                 scenario.setNetworkBuilder(networkBuilder);
-
 
                 state.start();
                 while (state.getYear() <= NUMBER_OF_YEARS_NOT_RECORDED)
@@ -194,7 +187,7 @@ public class SynthesisPaperDemo3 {
 
                 while (state.getYear() <= NUMBER_OF_YEARS_FISHING) {
                     state.schedule.step(state);
-                    //first day of the year!
+                    // first day of the year!
                     if (state.getDayOfTheYear() == 1) {
                         final String commonRows = regulation.getKey() + "," + run + "," + state.getYear();
                         for (final Fisher fisher : state.getFishers()) {
@@ -203,16 +196,19 @@ public class SynthesisPaperDemo3 {
                     }
                 }
 
-
             }
         }
         fileWriter.close();
 
     }
 
-    private static FileWriter writeHeading(final File outputFile, final String commonRows) throws IOException {
+    private static FileWriter writeHeading(
+        final File outputFile,
+        final String commonRows
+    ) throws IOException {
         final FileWriter writer = new FileWriter(outputFile);
-        //writer.write("price_low,price_high,landings,earnings,cash-flow,landings_0,landings_1,landings_2,discarding_agents,catches_0");
+        // writer.write("price_low,price_high,landings,earnings,cash-flow,landings_0,landings_1,landings_2,
+        // discarding_agents,catches_0");
         writer.write(commonRows);
         for (final Map.Entry<String, Function<Fisher, String>> column : columns.entrySet()) {
             writer.write(",");
@@ -224,7 +220,7 @@ public class SynthesisPaperDemo3 {
 
     }
 
-    //common rows is all the rows that do not depend on the fisher
+    // common rows is all the rows that do not depend on the fisher
     private static void writeLine(
         final Fisher fisher,
         final FileWriter writer,
@@ -237,7 +233,6 @@ public class SynthesisPaperDemo3 {
         }
         writer.write("\n");
         writer.flush();
-
 
     }
 

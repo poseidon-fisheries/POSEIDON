@@ -26,8 +26,8 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.components.CutoffAbundanceFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.FixedProportionFilter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 /**
  * An abundance based gear, catching fish only above/below a length quota

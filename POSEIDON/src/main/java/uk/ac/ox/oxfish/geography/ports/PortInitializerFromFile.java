@@ -26,23 +26,32 @@ import static java.util.Comparator.comparing;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class PortInitializerFromFile implements PortInitializer {
 
     private final int targetYear;
     private final Path portFile;
 
-    public PortInitializerFromFile(final int targetYear, final Path portFile) {
+    public PortInitializerFromFile(
+        final int targetYear,
+        final Path portFile
+    ) {
         this.targetYear = targetYear;
         this.portFile = portFile;
     }
 
-    public static boolean isCoastalTile(final SeaTile tile, final NauticalMap map) {
+    public static boolean isCoastalTile(
+        final SeaTile tile,
+        final NauticalMap map
+    ) {
         return tile.isLand() && neighbors(tile, map).anyMatch(SeaTile::isWater);
     }
 
-    private static Stream<SeaTile> neighbors(final SeaTile tile, final NauticalMap map) {
+    private static Stream<SeaTile> neighbors(
+        final SeaTile tile,
+        final NauticalMap map
+    ) {
         return bagToStream(map.getMooreNeighbors(tile, 1));
     }
 
@@ -57,9 +66,8 @@ public class PortInitializerFromFile implements PortInitializer {
     }
 
     /**
-     * Reads ports from a CSV file with only the "name", "lon" and "lat" columns
-     * and returns a collection of Ports. It also adds the ports to the map and
-     * starts the GasPriceMaker for each port.
+     * Reads ports from a CSV file with only the "name", "lon" and "lat" columns and returns a collection of Ports. It
+     * also adds the ports to the map and starts the GasPriceMaker for each port.
      */
     @Override
     public List<Port> buildPorts(
@@ -92,7 +100,10 @@ public class PortInitializerFromFile implements PortInitializer {
         return ports;
     }
 
-    private Map<String, Coordinate> readPortCoordinatesFromFile(final Path portFilePath, final int targetYear) {
+    private Map<String, Coordinate> readPortCoordinatesFromFile(
+        final Path portFilePath,
+        final int targetYear
+    ) {
         return recordStream(portFilePath)
             .filter(record -> record.getInt("year") == targetYear)
             .collect(toImmutableMap(
@@ -211,7 +222,7 @@ public class PortInitializerFromFile implements PortInitializer {
         // This really isn't the most efficient way to do this, because Sets.combinations
         // generate combinations with duplicated ports, but the numbers here are so small
         // that it really doesn't matter.
-        //noinspection OptionalGetWithoutIsPresent
+        // noinspection OptionalGetWithoutIsPresent
         return Sets.combinations(builder.build(), 3)
             .stream()
             .filter(entries -> entries.stream().map(Entry::getKey).distinct().count() == 3)

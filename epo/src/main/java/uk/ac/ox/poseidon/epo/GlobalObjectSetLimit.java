@@ -2,14 +2,13 @@ package uk.ac.ox.poseidon.epo;
 
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import uk.ac.ox.oxfish.regulations.ForbiddenIf;
-import uk.ac.ox.oxfish.regulations.NamedRegulations;
-import uk.ac.ox.oxfish.regulations.conditions.ActionCodeIs;
-import uk.ac.ox.oxfish.regulations.conditions.AllOf;
-import uk.ac.ox.oxfish.regulations.conditions.AnyOf;
-import uk.ac.ox.oxfish.regulations.conditions.NotBelow;
-import uk.ac.ox.oxfish.regulations.quantities.SumOf;
 import uk.ac.ox.oxfish.regulations.quantities.YearlyGatherer;
+import uk.ac.ox.poseidon.regulations.core.ForbiddenIfFactory;
+import uk.ac.ox.poseidon.regulations.core.NamedRegulationsFactory;
+import uk.ac.ox.poseidon.regulations.core.conditions.ActionCodeIsFactory;
+import uk.ac.ox.poseidon.regulations.core.conditions.AllOfFactory;
+import uk.ac.ox.poseidon.regulations.core.conditions.AnyOfFactory;
+import uk.ac.ox.poseidon.regulations.core.conditions.NotBelowFactory;
 
 import java.util.List;
 
@@ -35,18 +34,19 @@ public class GlobalObjectSetLimit extends PolicySupplier {
                 new Policy<EpoScenario<?>>(
                     String.format("Global limit of %04d object sets", limit),
                     scenario ->
-                        ((NamedRegulations) scenario.getRegulations())
+                        ((NamedRegulationsFactory) scenario.getRegulations())
                             .modify(
                                 "Global object-set limits",
-                                () -> new ForbiddenIf(
-                                    new AllOf(
+                                () -> new ForbiddenIfFactory(
+                                    new AllOfFactory(
                                         yearsActiveCondition(),
-                                        new AnyOf(
-                                            new ActionCodeIs("FAD"),
-                                            new ActionCodeIs("OFS")
+                                        new AnyOfFactory(
+                                            new ActionCodeIsFactory("FAD"),
+                                            new ActionCodeIsFactory("OFS")
                                         ),
-                                        new NotBelow(
-                                            new YearlyGatherer("Number of FAD sets"), // this includes both FAD and OFS sets
+                                        new NotBelowFactory(
+                                            new YearlyGatherer("Number of FAD sets"),
+                                            // this includes both FAD and OFS sets
                                             limit
                                         )
                                     )

@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.parameters;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
-import uk.ac.ox.oxfish.utility.parameters.Parameter;
+import uk.ac.ox.poseidon.common.api.parameters.Parameter;
 
 import java.util.stream.Stream;
 

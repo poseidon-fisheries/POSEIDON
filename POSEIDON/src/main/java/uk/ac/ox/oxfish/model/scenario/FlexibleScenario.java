@@ -36,8 +36,8 @@ import uk.ac.ox.oxfish.model.network.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.BoatColors;
 import uk.ac.ox.oxfish.utility.FixedMap;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import java.util.*;
 import java.util.stream.Collectors;

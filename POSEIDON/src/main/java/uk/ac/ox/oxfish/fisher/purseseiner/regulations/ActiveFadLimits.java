@@ -1,14 +1,15 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.regulations;
 
-import uk.ac.ox.oxfish.regulations.ForbiddenIf;
-import uk.ac.ox.oxfish.regulations.conditions.*;
 import uk.ac.ox.oxfish.regulations.quantities.NumberOfActiveFads;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
+import uk.ac.ox.poseidon.common.api.ModelState;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
+import uk.ac.ox.poseidon.regulations.core.ForbiddenIfFactory;
+import uk.ac.ox.poseidon.regulations.core.conditions.*;
 
 import java.util.Map;
 
-public class ActiveFadLimits implements RegulationFactory {
+public class ActiveFadLimits implements ComponentFactory<Regulations> {
 
     private Map<Integer, ? extends Map<String, Integer>> limitsPerYearAndClass;
 
@@ -34,19 +35,19 @@ public class ActiveFadLimits implements RegulationFactory {
     }
 
     @Override
-    public AlgorithmFactory<Regulations> get() {
-        return new ForbiddenIf(
-            new AllOf(
-                new ActionCodeIs("DPL"),
-                new AnyOf(
+    public Regulations apply(final ModelState modelState) {
+        return new ForbiddenIfFactory(
+            new AllOfFactory(
+                new ActionCodeIsFactory("DPL"),
+                new AnyOfFactory(
                     limitsPerYearAndClass.entrySet().stream().map(yearAndLimits ->
-                        new AllOf(
-                            new InYear(yearAndLimits.getKey()),
-                            new AnyOf(
+                        new AllOfFactory(
+                            new InYearFactory(yearAndLimits.getKey()),
+                            new AnyOfFactory(
                                 yearAndLimits.getValue().entrySet().stream().map(classAndLimit ->
-                                    new AllOf(
-                                        new AgentHasTag("class " + classAndLimit.getKey()),
-                                        new NotBelow(new NumberOfActiveFads(), classAndLimit.getValue())
+                                    new AllOfFactory(
+                                        new AgentHasTagFactory("class " + classAndLimit.getKey()),
+                                        new NotBelowFactory(new NumberOfActiveFads(), classAndLimit.getValue())
                                     )
                                 )
                             )
@@ -54,6 +55,6 @@ public class ActiveFadLimits implements RegulationFactory {
                     )
                 )
             )
-        );
+        ).apply(modelState);
     }
 }

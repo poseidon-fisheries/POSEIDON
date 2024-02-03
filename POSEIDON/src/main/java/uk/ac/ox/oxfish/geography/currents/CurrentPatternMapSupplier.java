@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.geography.currents;
 
 import com.google.common.collect.ImmutableMap;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -22,7 +22,10 @@ public class CurrentPatternMapSupplier implements Supplier<Map<CurrentPattern, P
     public CurrentPatternMapSupplier() {
     }
 
-    public CurrentPatternMapSupplier(final InputPath inputPath, final Map<CurrentPattern, Path> currentFiles) {
+    public CurrentPatternMapSupplier(
+        final InputPath inputPath,
+        final Map<CurrentPattern, Path> currentFiles
+    ) {
         this.inputPath = inputPath;
         this.currentFiles = currentFiles;
     }

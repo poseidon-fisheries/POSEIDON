@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.utility.parameters;
 import ec.util.MersenneTwisterFast;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 public class FixedDoubleParameterTest {
 

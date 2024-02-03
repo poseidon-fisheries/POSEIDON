@@ -3,8 +3,8 @@ package uk.ac.ox.poseidon.simulations.adaptors;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.maximization.generic.ParameterAddress;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import static com.google.common.base.Preconditions.checkArgument;
 

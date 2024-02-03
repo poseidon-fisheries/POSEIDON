@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.parameters;
 import com.google.common.collect.Streams;
 import uk.ac.ox.oxfish.maximization.generic.ParameterAddressBuilder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.Parameter;
+import uk.ac.ox.poseidon.common.api.parameters.Parameter;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;

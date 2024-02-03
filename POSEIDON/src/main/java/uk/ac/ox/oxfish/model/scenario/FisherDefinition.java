@@ -52,8 +52,8 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NullParameter;
 
@@ -115,8 +115,7 @@ public class FisherDefinition {
     private AlgorithmFactory<? extends LogbookInitializer> logbook =
         new NoLogbookFactory();
     /**
-     * additional variable cost (excluding oil) that we want to impose to the fishers;
-     * negative numbers are ignored!
+     * additional variable cost (excluding oil) that we want to impose to the fishers; negative numbers are ignored!
      */
     private DoubleParameter hourlyVariableCost = new FixedDoubleParameter(0);
     /**
@@ -126,22 +125,24 @@ public class FisherDefinition {
     /**
      * tags to add to each fisher created
      */
-    //the format would be something like "boat,black"
+    // the format would be something like "boat,black"
     private String tags = "";
     private boolean usePredictors = false;
     /**
-     * here we store an array with port names. If we need to create 3 fishers, 2 in portA and 1 in port B this will look:
-     * [portA portA portB]
+     * here we store an array with port names. If we need to create 3 fishers, 2 in portA and 1 in port B this will
+     * look: [portA portA portB]
      */
     private String[] flatPortArray;
-    //keeps track of how many fish have been built so far
-    //so that we can match each to a specific port
-    //when we have built enough, fishCreation resets to 0
+    // keeps track of how many fish have been built so far
+    // so that we can match each to a specific port
+    // when we have built enough, fishCreation resets to 0
     private int fishCreationIndex = 0;
 
     @SafeVarargs
     public final Entry<FisherFactory, List<Fisher>> instantiateFishers(
-        final FishState model, final List<Port> ports, final int firstFisherID,
+        final FishState model,
+        final List<Port> ports,
+        final int firstFisherID,
         final Consumer<Fisher>... additionalSetups
     ) {
         final FisherFactory factory = getFisherFactory(model, ports, firstFisherID);
@@ -156,7 +157,11 @@ public class FisherDefinition {
         return entry(factory, fishers);
     }
 
-    public FisherFactory getFisherFactory(final FishState model, final List<Port> ports, final int firstFisherID) {
+    public FisherFactory getFisherFactory(
+        final FishState model,
+        final List<Port> ports,
+        final int firstFisherID
+    ) {
 
         final GlobalBiology biology = model.getBiology();
         final MersenneTwisterFast random = model.random;
@@ -164,18 +169,17 @@ public class FisherDefinition {
         updateNumberOfInitialFishers();
         //   Preconditions.checkState(flatPortArray.length>0,"No fisher can be built because no port was provided!");
 
-
-        //create logbook initializer
+        // create logbook initializer
         final LogbookInitializer log = logbook.apply(model);
         log.start(model);
 
-        //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
-        //while the model is running
+        // create the fisher factory object, it will be used by the fishstate object to create and kill fishers
+        // while the model is running
         final Supplier<Boat> boatSupplier = makeBoatSupplier(random);
         final Supplier<Hold> holdSupplier = makeHoldSupplier(random, biology);
 
         final FisherFactory fisherFactory = new FisherFactory(
-            //default to grabbing first port!
+            // default to grabbing first port!
             () -> getNextFisher(ports, model),
             regulation,
             departingStrategy,
@@ -190,17 +194,17 @@ public class FisherDefinition {
             firstFisherID
         );
 
-        //add variable costs, if needed:
+        // add variable costs, if needed:
         fisherFactory.getAdditionalSetups().add(
             fisher -> {
 
                 ///////////////////////////////////////////////////////////////////////
                 // VARIABLE COSTS
-                //don't bother if we don't have any variable costs
+                // don't bother if we don't have any variable costs
                 if (hourlyVariableCost == null || hourlyVariableCost instanceof NullParameter)
                     return;
                 final double vc = hourlyVariableCost.applyAsDouble(fisher.grabRandomizer());
-                //don't bother if variable costs are negative!
+                // don't bother if variable costs are negative!
                 if (vc > 0)
                     fisher.getAdditionalTripCosts().add(
                         new HourlyCost(vc)
@@ -211,7 +215,7 @@ public class FisherDefinition {
                 if (hourlyEffortCost == null || hourlyEffortCost instanceof NullParameter)
                     return;
                 final double effortCost = hourlyEffortCost.applyAsDouble(fisher.grabRandomizer());
-                //don't bother if variable costs are negative!
+                // don't bother if variable costs are negative!
                 if (effortCost > 0)
                     fisher.getAdditionalTripCosts().add(
                         new EffortCost(effortCost)
@@ -221,8 +225,8 @@ public class FisherDefinition {
 
         fisherFactory.getAdditionalSetups().add(fisher -> log.add(fisher, model));
 
-        //adds predictors to the fisher if the usepredictors flag is up.
-        //without predictors agents do not participate in ITQs
+        // adds predictors to the fisher if the usepredictors flag is up.
+        // without predictors agents do not participate in ITQs
 
         fisherFactory.getAdditionalSetups().add(
             FishStateUtilities.predictorSetup(
@@ -231,13 +235,12 @@ public class FisherDefinition {
             )
         );
 
-        //add tags to fisher definition
+        // add tags to fisher definition
         final List<String> tags = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(this.tags);
         if (!tags.isEmpty()) fisherFactory.getAdditionalSetups().add(fisher -> fisher.getTagsList().addAll(tags));
 
-        //add other setups
+        // add other setups
         fisherFactory.getAdditionalSetups().addAll(additionalSetups);
-
 
         return fisherFactory;
     }
@@ -257,7 +260,6 @@ public class FisherDefinition {
             }
         }
 
-
     }
 
     Supplier<Boat> makeBoatSupplier(final MersenneTwisterFast random) {
@@ -267,7 +269,10 @@ public class FisherDefinition {
         );
     }
 
-    Supplier<Hold> makeHoldSupplier(final MersenneTwisterFast random, final GlobalBiology biology) {
+    Supplier<Hold> makeHoldSupplier(
+        final MersenneTwisterFast random,
+        final GlobalBiology biology
+    ) {
         return () -> new Hold(holdSize.applyAsDouble(random), biology);
     }
 
@@ -275,18 +280,18 @@ public class FisherDefinition {
         final List<Port> ports,
         final FishState model
     ) {
-        // this assret is not true anymore; now after creating the first batch of fishers the rest is randomized assert fishCreationIndex <flatPortArray.length;
+        // this assret is not true anymore; now after creating the first batch of fishers the rest is randomized
+        // assert fishCreationIndex <flatPortArray.length;
         final String portName;
-        //you are creating the original fishers!
+        // you are creating the original fishers!
         if (fishCreationIndex < flatPortArray.length) {
             portName = flatPortArray[fishCreationIndex];
         }
-        //you are creating additional fishers!, then pick stochastically
+        // you are creating additional fishers!, then pick stochastically
         else {
             assert model.getDay() > 0;
             portName = flatPortArray[model.getRandom().nextInt(flatPortArray.length)];
         }
-
 
         final Port toReturn = ports.stream()
             .filter(port -> port.getName().trim().equalsIgnoreCase(portName.trim()))
@@ -561,7 +566,6 @@ public class FisherDefinition {
         this.initialFishersPerPort = initialFishersPerPort;
     }
 
-
     /**
      * Getter for property 'usePredictors'.
      *
@@ -597,7 +601,6 @@ public class FisherDefinition {
     public void setTags(final String tags) {
         this.tags = tags;
     }
-
 
     /**
      * Getter for property 'logbook'.

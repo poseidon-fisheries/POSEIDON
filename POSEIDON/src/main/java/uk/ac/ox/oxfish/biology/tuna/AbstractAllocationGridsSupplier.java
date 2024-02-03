@@ -23,7 +23,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.univocity.parsers.common.record.Record;
 import sim.field.grid.DoubleGrid2D;
-import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -40,7 +40,7 @@ import static com.google.common.collect.Ordering.natural;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.groupingBy;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 abstract class AbstractAllocationGridsSupplier<K>
     implements Supplier<AllocationGrids<K>> {
@@ -129,7 +129,8 @@ abstract class AbstractAllocationGridsSupplier<K>
 
     private static DoubleGrid2D makeGrid(
         final MapExtent mapExtent,
-        final Iterable<? extends Record> records, final boolean normalize
+        final Iterable<? extends Record> records,
+        final boolean normalize
     ) {
         final DoubleGrid2D grid = new DoubleGrid2D(
             mapExtent.getGridWidth(),
@@ -148,7 +149,8 @@ abstract class AbstractAllocationGridsSupplier<K>
                     record.getDouble("value")
                 );
             } else {
-                //System.err.println( "grid cannot include the point at " + lon + "," + lat + " because it is out of bounds");
+                // System.err.println( "grid cannot include the point at " + lon + "," + lat + " because it is out of
+                // bounds");
             }
         });
         if (normalize) {

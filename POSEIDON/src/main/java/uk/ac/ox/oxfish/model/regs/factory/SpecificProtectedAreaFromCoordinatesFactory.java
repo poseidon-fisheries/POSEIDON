@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.util.function.BiPredicate;
 

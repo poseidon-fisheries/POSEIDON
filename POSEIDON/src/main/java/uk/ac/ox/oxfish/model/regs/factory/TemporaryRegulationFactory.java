@@ -6,8 +6,8 @@ import uk.ac.ox.oxfish.model.regs.DecoratedObjectFactory;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.TemporaryRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 public class TemporaryRegulationFactory
     extends DecoratedObjectFactory<AlgorithmFactory<? extends Regulation>>

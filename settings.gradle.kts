@@ -1,8 +1,7 @@
 rootProject.name = "POSEIDON"
 include("agents:api")
 include("agents:core")
-include("common:api")
-include("common:core")
+include("common")
 include("datasets:adaptors")
 include("datasets:api")
 include("datasets:core")

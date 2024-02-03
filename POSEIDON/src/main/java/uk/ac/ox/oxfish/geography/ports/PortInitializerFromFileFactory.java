@@ -1,9 +1,9 @@
 package uk.ac.ox.oxfish.geography.ports;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 import java.util.function.Supplier;
 

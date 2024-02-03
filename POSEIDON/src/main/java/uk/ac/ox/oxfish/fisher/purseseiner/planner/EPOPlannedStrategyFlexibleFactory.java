@@ -9,13 +9,13 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinat
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValuesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerFishingStrategyFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
 import uk.ac.ox.oxfish.utility.parameters.BooleanParameter;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.FAD;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.OFS;
@@ -150,14 +150,6 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.purgeIllegalActionsImmediately = purgeIllegalActionsImmediately;
     }
 
-    public IntegerParameter getTargetYear() {
-        return targetYear;
-    }
-
-    public void setTargetYear(final IntegerParameter targetYear) {
-        this.targetYear = targetYear;
-    }
-
     public InputPath getActionWeightsFile() {
         return actionWeightsFile;
     }
@@ -209,6 +201,14 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             fadModule,
             locationValuesFactory.apply(state).asMap()
         );
+    }
+
+    public IntegerParameter getTargetYear() {
+        return targetYear;
+    }
+
+    public void setTargetYear(final IntegerParameter targetYear) {
+        this.targetYear = targetYear;
     }
 
     public CatchSamplersFactory<? extends LocalBiology> getCatchSamplers() {

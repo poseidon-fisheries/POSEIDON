@@ -12,11 +12,11 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 /**
- * Test to see if the simulated biomass is the same as the expected biomass for the first 4 quarters.
- * Expected biomasses are generated in the preprocessing pipeline as "biomass_test.csv".
+ * Test to see if the simulated biomass is the same as the expected biomass for the first 4 quarters. Expected biomasses
+ * are generated in the preprocessing pipeline as "biomass_test.csv".
  */
 public class EpoBiologyOnlyScenarioAllSpeciesTest {
 

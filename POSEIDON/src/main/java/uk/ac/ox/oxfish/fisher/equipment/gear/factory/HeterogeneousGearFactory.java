@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.HeterogeneousAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NullParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 

@@ -4,9 +4,9 @@ import uk.ac.ox.oxfish.geography.fads.ExogenousFadMakerCSVFactory;
 import uk.ac.ox.oxfish.geography.fads.ExogenousFadSetterCSVFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoFadsOnlyAbundanceScenario;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -19,7 +19,6 @@ import java.nio.file.Paths;
  * small run checking how many matches we get depending on how far the exogenous setter looks.
  */
 public class NoBoatsFadMatching {
-
 
     private final static Path mainPath = Paths.get(
         "docs",
@@ -47,19 +46,17 @@ public class NoBoatsFadMatching {
                     writer.write(",");
                     writer.write(String.valueOf(model.getLatestYearlyObservation("Exogenous Fad Setter Matches")));
                     writer.write(",");
-                    writer.write(String.valueOf(model.getLatestYearlyObservation("Exogenous Fad Setter Failed Matches")));
+                    writer.write(String.valueOf(model.getLatestYearlyObservation("Exogenous Fad Setter Failed " +
+                        "Matches")));
                     writer.write("\n");
                     writer.flush();
                 }
 
             }
 
-
         }
 
-
     }
-
 
     static private FishState runModel(
         final int searchRange,

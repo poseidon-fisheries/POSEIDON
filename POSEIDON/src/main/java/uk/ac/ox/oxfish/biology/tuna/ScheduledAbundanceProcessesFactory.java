@@ -23,8 +23,8 @@ import com.google.common.collect.ImmutableListMultimap;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcesses;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -38,8 +38,8 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 /**
- * Factory that builds a {@link ScheduledBiologicalProcesses} for {@link AbundanceLocalBiology} by
- * scheduling a chain of processes that handle mortality, aging, recruitment and reallocation.
+ * Factory that builds a {@link ScheduledBiologicalProcesses} for {@link AbundanceLocalBiology} by scheduling a chain of
+ * processes that handle mortality, aging, recruitment and reallocation.
  */
 public class ScheduledAbundanceProcessesFactory
     extends ScheduledBiologicalProcessesFactory<AbundanceLocalBiology> {
@@ -83,14 +83,14 @@ public class ScheduledAbundanceProcessesFactory
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<RecruitmentProcesses> getRecruitmentProcesses() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         return recruitmentProcesses;
     }
 
     public void setRecruitmentProcesses(
         final AlgorithmFactory<RecruitmentProcesses> recruitmentProcesses
     ) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         this.recruitmentProcesses = recruitmentProcesses;
     }
 
@@ -101,7 +101,7 @@ public class ScheduledAbundanceProcessesFactory
 
     @SuppressWarnings("unused")
     public void setBiologicalProcessesDates(final List<String> biologicalProcessesDates) {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         this.biologicalProcessesDates = biologicalProcessesDates;
     }
 

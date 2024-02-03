@@ -27,10 +27,10 @@ import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.ActionAttractionFiel
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.AttractionFieldsFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -43,7 +43,7 @@ import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class GravityDestinationStrategyFactory
     implements AlgorithmFactory<GravityDestinationStrategy>, Dummyable {

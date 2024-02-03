@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 /**
  * A facade for a TwoSpeciesBoxInitializer where there is a single box covering everything and where

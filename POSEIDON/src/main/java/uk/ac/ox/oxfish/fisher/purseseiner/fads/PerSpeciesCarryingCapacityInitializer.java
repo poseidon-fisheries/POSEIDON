@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 import java.util.Map;
 

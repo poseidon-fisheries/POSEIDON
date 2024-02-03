@@ -31,13 +31,13 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.regulations.ForbiddenIf;
-import uk.ac.ox.oxfish.regulations.conditions.*;
 import uk.ac.ox.oxfish.regulations.quantities.CurrentYearActionCount;
 import uk.ac.ox.oxfish.regulations.quantities.NumberOfActiveFads;
 import uk.ac.ox.poseidon.agents.api.YearlyActionCounter;
 import uk.ac.ox.poseidon.agents.core.AtomicLongMapYearlyActionCounter;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
+import uk.ac.ox.poseidon.regulations.core.ForbiddenIfFactory;
+import uk.ac.ox.poseidon.regulations.core.conditions.*;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicLong;
@@ -129,16 +129,17 @@ public class FadManagerTest {
         final Fisher fisher = mock(Fisher.class);
         when(fisher.grabState()).thenReturn(fishState);
 
-        final AllOf activeFadsLimit = new AllOf(
-            new ActionCodeIs(DPL.name()),
-            new Not(new Below(new NumberOfActiveFads(), 30))
+        final AllOfFactory activeFadsLimit = new AllOfFactory(
+            new ActionCodeIsFactory(DPL.name()),
+            new NotFactory(new BelowFactory(new NumberOfActiveFads(), 30))
         );
-        final AllOf actionLimit = new AllOf(
-            new ActionCodeIs(DPL.name()),
-            new Not(new Below(new CurrentYearActionCount(DPL.name()), 20))
+        final AllOfFactory actionLimit = new AllOfFactory(
+            new ActionCodeIsFactory(DPL.name()),
+            new NotFactory(new BelowFactory(new CurrentYearActionCount(DPL.name()), 20))
         );
-        final Regulations fadLimitOnly = new ForbiddenIf(activeFadsLimit).apply(fishState);
-        final Regulations bothLimits = new ForbiddenIf(new AnyOf(activeFadsLimit, actionLimit)).apply(fishState);
+        final Regulations fadLimitOnly = new ForbiddenIfFactory(activeFadsLimit).apply(fishState);
+        final Regulations bothLimits = new ForbiddenIfFactory(new AnyOfFactory(activeFadsLimit, actionLimit)).apply(
+            fishState);
 
         final YearlyActionCounter yearlyActionCounter = AtomicLongMapYearlyActionCounter.create();
         final AtomicLong numberOfActiveFads = new AtomicLong(5);
@@ -152,7 +153,6 @@ public class FadManagerTest {
                 DPL,
                 50
             );
-
 
         final IntConsumer deploy = i -> {
             yearlyActionCounter.observe(new FadManager.DummyAction(

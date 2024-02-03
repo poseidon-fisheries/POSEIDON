@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HeterogeneousGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HoldLimitingDecoratorFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.LogisticSelectivityGearFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import java.lang.reflect.InvocationTargetException;
 

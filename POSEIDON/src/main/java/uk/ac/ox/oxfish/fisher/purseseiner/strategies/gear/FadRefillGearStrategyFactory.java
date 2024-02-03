@@ -22,17 +22,17 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 import java.nio.file.Path;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.groupingBy;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrategy>, Dummyable {
 
@@ -46,7 +46,10 @@ public class FadRefillGearStrategyFactory implements AlgorithmFactory<GearStrate
     public FadRefillGearStrategyFactory() {
     }
 
-    public FadRefillGearStrategyFactory(final IntegerParameter targetYear, final InputPath maxFadDeploymentsFile) {
+    public FadRefillGearStrategyFactory(
+        final IntegerParameter targetYear,
+        final InputPath maxFadDeploymentsFile
+    ) {
         this.targetYear = targetYear;
         this.maxFadDeploymentsFile = maxFadDeploymentsFile;
     }

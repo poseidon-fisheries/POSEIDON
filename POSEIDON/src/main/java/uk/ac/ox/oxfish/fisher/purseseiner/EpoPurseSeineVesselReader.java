@@ -51,7 +51,7 @@ import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.*;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class EpoPurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
 

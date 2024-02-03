@@ -4,5 +4,7 @@ plugins {
 
 dependencies {
     api(project(":regulations:api"))
-    api(files("$rootDir/libs/geomason/geomason.1.5.jar"))
+    implementation(project(":common"))
+    annotationProcessor("com.google.auto.service:auto-service:1.1.1")
+    compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
 }

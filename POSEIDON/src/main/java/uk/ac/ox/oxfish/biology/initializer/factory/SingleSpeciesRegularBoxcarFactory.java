@@ -25,7 +25,7 @@ import org.jfree.util.Log;
 import uk.ac.ox.oxfish.biology.boxcars.EquallySpacedBertalanffyFactory;
 import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 
 /**

@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.util.ArrayList;
@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Creates random rectangles of purely rocky areas, and assumes everywhere else you have sandy tiles
- * Created by carrknight on 9/28/15.
+ * Creates random rectangles of purely rocky areas, and assumes everywhere else you have sandy tiles Created by
+ * carrknight on 9/28/15.
  */
 public class RockyRectanglesHabitatInitializer implements HabitatInitializer {
 
@@ -50,9 +50,11 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer {
 
     private List<SeaTile> borderTiles = new ArrayList<>();
 
-
     public RockyRectanglesHabitatInitializer(
-        final int minRockyWidth, final int maxRockyWidth, final int minRockyHeight, final int maxRockyHeight,
+        final int minRockyWidth,
+        final int maxRockyWidth,
+        final int minRockyHeight,
+        final int maxRockyHeight,
         final int numberOfRectangles
     ) {
         this(new RandomRockyRectangles(
@@ -71,13 +73,18 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer {
         this.maker = maker;
     }
 
-
-    public RockyRectanglesHabitatInitializer(final int x, final int y, final int width, final int height) {
+    public RockyRectanglesHabitatInitializer(
+        final int x,
+        final int y,
+        final int width,
+        final int height
+    ) {
         this((random, map) -> new RockyRectangle[]{new RockyRectangle(x, y, width, height)});
     }
 
     public RockyRectanglesHabitatInitializer(
-        final DoubleParameter rockyHeight, final DoubleParameter rockyWidth,
+        final DoubleParameter rockyHeight,
+        final DoubleParameter rockyWidth,
         final int numberOfRectangles
     ) {
         this(new RandomRockyRectangles(rockyHeight, rockyWidth, numberOfRectangles));
@@ -90,36 +97,39 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer {
      * @param model
      */
     @Override
-    public void applyHabitats(final NauticalMap map, final MersenneTwisterFast random, final FishState model) {
+    public void applyHabitats(
+        final NauticalMap map,
+        final MersenneTwisterFast random,
+        final FishState model
+    ) {
 
-        //here I assume everything is sandy at first. I do not force it in case at some point I want to chain a series
-        //of initializers (unlikely as it is)
+        // here I assume everything is sandy at first. I do not force it in case at some point I want to chain a series
+        // of initializers (unlikely as it is)
 
-
-        //ask the maker to give you rectangles
+        // ask the maker to give you rectangles
         final RockyRectangle[] rectangles = maker.buildRectangles(random, map);
 
-        //turn rectangles into the real thing
+        // turn rectangles into the real thing
         for (final RockyRectangle rectangle : rectangles) {
-            //strip the rectangle class
+            // strip the rectangle class
             final int x = rectangle.getTopLeftX();
             final int y = rectangle.getTopLeftY();
             final int rockyWidth = rectangle.getWidth();
             final int rockyHeight = rectangle.getHeight();
-            //for each tile in the rectangle
+            // for each tile in the rectangle
             for (int w = 0; w < rockyWidth; w++) {
                 for (int h = 0; h < rockyHeight; h++) {
 
                     final SeaTile tile = map.getSeaTile(x + w, y + h);
-                    //if it's in the sea
+                    // if it's in the sea
                     if (tile != null && tile.isWater()) {
-                        //make it rocky
+                        // make it rocky
                         tile.setHabitat(new TileHabitat(1d));
                         rockyTiles.add(tile);
                     }
 
                 }
-                //get the border if it exists
+                // get the border if it exists
                 SeaTile border = map.getSeaTile(x + w, y + rockyHeight);
                 if (border != null && border.isWater())
                     borderTiles.add(border);
@@ -129,35 +139,30 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer {
 
             }
 
-
-            //find borders
+            // find borders
             for (int h = 0; h < rockyHeight; h++) {
 
-                //lower border
+                // lower border
                 SeaTile border = map.getSeaTile(x - 1, y + h);
-                //if it's in the sea
+                // if it's in the sea
                 if (border != null && border.isWater()) {
                     borderTiles.add(border);
                 }
-                //higher border
+                // higher border
                 border = map.getSeaTile(x + rockyWidth, y + h);
                 if (border != null && border.isWater()) {
                     borderTiles.add(border);
                 }
 
-
             }
-
 
         }
 
-        //rectangles could have covered previously border tiles
+        // rectangles could have covered previously border tiles
         rockyTiles = rockyTiles.stream().distinct().collect(Collectors.toList());
         borderTiles = borderTiles.stream().distinct().collect(Collectors.toList());
 
-
         borderTiles.removeAll(rockyTiles);
-
 
         model.getDailyDataSet().registerGatherer(ROCKY_FISHING_INTENSITY,
             state -> {

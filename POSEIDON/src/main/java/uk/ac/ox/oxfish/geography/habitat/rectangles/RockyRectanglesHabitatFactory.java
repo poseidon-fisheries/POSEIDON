@@ -22,27 +22,23 @@ package uk.ac.ox.oxfish.geography.habitat.rectangles;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 /**
- * A factory that creates the rocky rectangle habitat initializers.
- * Created by carrknight on 9/29/15.
+ * A factory that creates the rocky rectangle habitat initializers. Created by carrknight on 9/29/15.
  */
 public class RockyRectanglesHabitatFactory
     implements AlgorithmFactory<RockyRectanglesHabitatInitializer> {
-
 
     private DoubleParameter rockyHeight = new UniformDoubleParameter(25, 30);
     private DoubleParameter rockyWidth = new UniformDoubleParameter(20, 25);
 
     private DoubleParameter numberOfRectangles = new FixedDoubleParameter(1);
 
-
     public RockyRectanglesHabitatFactory() {
     }
-
 
     /**
      * Applies this function to the given argument.

@@ -5,7 +5,7 @@ import uk.ac.ox.poseidon.regulations.api.Condition;
 
 public class Not extends MonadicConditionalOperator {
 
-    public Not(Condition operand) {
+    public Not(final Condition operand) {
         super(operand);
     }
 

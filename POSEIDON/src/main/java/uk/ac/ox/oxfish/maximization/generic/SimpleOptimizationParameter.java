@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.maximization.generic;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import java.io.Serializable;
 import java.util.function.Consumer;

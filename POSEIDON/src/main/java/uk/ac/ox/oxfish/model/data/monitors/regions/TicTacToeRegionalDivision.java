@@ -20,7 +20,7 @@
 package uk.ac.ox.oxfish.model.data.monitors.regions;
 
 import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.util.List;
 

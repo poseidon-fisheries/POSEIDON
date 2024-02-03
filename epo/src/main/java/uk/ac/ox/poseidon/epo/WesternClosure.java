@@ -2,11 +2,11 @@ package uk.ac.ox.poseidon.epo;
 
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import uk.ac.ox.oxfish.regulations.ForbiddenIf;
-import uk.ac.ox.oxfish.regulations.NamedRegulations;
-import uk.ac.ox.oxfish.regulations.conditions.AllOf;
-import uk.ac.ox.oxfish.regulations.conditions.BetweenYearlyDates;
-import uk.ac.ox.oxfish.regulations.conditions.InRectangularArea;
+import uk.ac.ox.poseidon.regulations.core.ForbiddenIfFactory;
+import uk.ac.ox.poseidon.regulations.core.NamedRegulationsFactory;
+import uk.ac.ox.poseidon.regulations.core.conditions.AllOfFactory;
+import uk.ac.ox.poseidon.regulations.core.conditions.BetweenYearlyDatesFactory;
+import uk.ac.ox.poseidon.regulations.core.conditions.InRectangularAreaFactory;
 
 import java.util.List;
 
@@ -38,17 +38,18 @@ public class WesternClosure extends PolicySupplier {
                     extraDays
                 ),
                 epoScenario -> {
-                    final NamedRegulations namedRegulations = (NamedRegulations) epoScenario.getRegulations();
+                    final NamedRegulationsFactory namedRegulations =
+                        (NamedRegulationsFactory) epoScenario.getRegulations();
                     namedRegulations.modify(
                         "Western closure",
-                        () -> new ForbiddenIf(
-                            new AllOf(
+                        () -> new ForbiddenIfFactory(
+                            new AllOfFactory(
                                 yearsActiveCondition(),
-                                new BetweenYearlyDates(
+                                new BetweenYearlyDatesFactory(
                                     addDays(EL_CORRALITO_BEGINNING, -extraDays),
                                     addDays(EL_CORRALITO_END, extraDays)
                                 ),
-                                new InRectangularArea(
+                                new InRectangularAreaFactory(
                                     50,
                                     -150,
                                     -50,

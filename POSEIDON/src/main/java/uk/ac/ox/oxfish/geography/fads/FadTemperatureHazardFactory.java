@@ -22,16 +22,15 @@ package uk.ac.ox.oxfish.geography.fads;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.plugins.AdditionalMapFactory;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 /**
  * it creates its own map to produce hazard from
  */
 public class FadTemperatureHazardFactory implements AlgorithmFactory<FadTemperatureHazard> {
-
 
     AdditionalMapFactory additionalMapFactory = new AdditionalMapFactory();
     private DoubleParameter minimumDaysBeforeHazardCanTakePlace = new FixedDoubleParameter(10);
@@ -83,7 +82,6 @@ public class FadTemperatureHazardFactory implements AlgorithmFactory<FadTemperat
     public void setHazardProbability(final DoubleParameter hazardProbability) {
         this.hazardProbability = hazardProbability;
     }
-
 
     public InputPath getPathToMapFile() {
         return additionalMapFactory.getGridFile();

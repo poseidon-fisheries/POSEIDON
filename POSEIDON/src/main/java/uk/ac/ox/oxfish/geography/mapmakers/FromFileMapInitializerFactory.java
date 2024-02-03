@@ -22,16 +22,15 @@ package uk.ac.ox.oxfish.geography.mapmakers;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 /**
  * Created by carrknight on 6/30/17.
  */
 public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileMapInitializer> {
-
 
     public static double DEFAULT_MAP_PADDING_IN_DEGREES = 0.000001;
     private InputPath mapFile =
@@ -55,7 +54,6 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
         this.gridWidthInCell = new FixedDoubleParameter(gridWidthInCells);
         this.mapPaddingInDegrees = new FixedDoubleParameter(mapPaddingInDegrees);
     }
-
 
     /**
      * Applies this function to the given argument.
@@ -154,6 +152,5 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
     public void setLatLong(final boolean latLong) {
         this.latLong = latLong;
     }
-
 
 }

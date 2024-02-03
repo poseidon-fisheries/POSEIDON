@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class AllOf extends VariadicConditionalOperator {
 
-    public AllOf(Set<Condition> operands) {
+    public AllOf(final Set<Condition> operands) {
         super(operands);
     }
 

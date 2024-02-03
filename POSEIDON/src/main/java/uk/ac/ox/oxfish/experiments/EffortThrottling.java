@@ -33,7 +33,7 @@ import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.io.File;
@@ -43,18 +43,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * A few eamples to show how agents modify their effort
- * Created by carrknight on 8/13/15.
+ * A few eamples to show how agents modify their effort Created by carrknight on 8/13/15.
  */
 public class EffortThrottling {
-
 
     public static void main(String[] args) {
 
         Path root = Paths.get("runs", "effort");
         root.toFile().mkdirs();
 
-        //low effort
+        // low effort
         FixedPriceMarketFactory market = new FixedPriceMarketFactory();
         market.setMarketPrice(new FixedDoubleParameter(2.0));
 
@@ -64,8 +62,7 @@ public class EffortThrottling {
             root.resolve("low_grid.csv").toFile()
         );
 
-
-        //high effort
+        // high effort
         market = new FixedPriceMarketFactory();
         market.setMarketPrice(new FixedDoubleParameter(10.0));
 
@@ -75,10 +72,10 @@ public class EffortThrottling {
             root.resolve("high_grid.csv").toFile()
         );
 
-        //self-regulating effort
+        // self-regulating effort
         CongestedMarketFactory market2 = new CongestedMarketFactory();
-        market2.setAcceptableBiomassThreshold(new FixedDoubleParameter(0));//no weird intercept
-        market2.setDailyConsumption(new FixedDoubleParameter(8000000)); //no long term effect to demand
+        market2.setAcceptableBiomassThreshold(new FixedDoubleParameter(0));// no weird intercept
+        market2.setDailyConsumption(new FixedDoubleParameter(8000000)); // no long term effect to demand
         market2.setDemandSlope(new FixedDoubleParameter(0.001));
         market2.setMaxPrice(new FixedDoubleParameter(10.0));
 
@@ -89,7 +86,7 @@ public class EffortThrottling {
             root.resolve("variable_grid.csv").toFile()
         );
 
-        //print out the price!
+        // print out the price!
         FishStateUtilities.printCSVColumnToFile(
             root.resolve("variable_price.csv").toFile(),
             state.getPorts()
@@ -103,8 +100,7 @@ public class EffortThrottling {
                 )
         );
 
-
-        //self-regulating from below
+        // self-regulating from below
         state = EffortThrottling.effortThrottling(80, market2,
             0,
             new UniformDoubleParameter(0.001, 0.1),
@@ -126,7 +122,7 @@ public class EffortThrottling {
                     AbstractMarket.PRICE_COLUMN_NAME
                 )
         );
-        //self-regulating from above
+        // self-regulating from above
         state = EffortThrottling.effortThrottling(80, market2,
             0,
             new UniformDoubleParameter(0.8, 1),
@@ -147,38 +143,39 @@ public class EffortThrottling {
                 )
         );
 
-
     }
 
-
     public static FishState effortThrottling(
-        final int simulationYears, final AlgorithmFactory<? extends Market> market, final long seed,
-        final UniformDoubleParameter initialEffortProbability, File timeSeries, File grid
+        final int simulationYears,
+        final AlgorithmFactory<? extends Market> market,
+        final long seed,
+        final UniformDoubleParameter initialEffortProbability,
+        File timeSeries,
+        File grid
     ) {
 
-
-        //create the scenario
+        // create the scenario
         PrototypeScenario scenario = new PrototypeScenario();
-        //set the biology right
+        // set the biology right
         FromLeftToRightFactory biologyInitializer = new FromLeftToRightFactory();
         biologyInitializer.setMaximumBiomass(new FixedDoubleParameter(1000d));
         scenario.setBiologyInitializer(biologyInitializer);
 
-        //change getDistances
+        // change getDistances
         SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
         simpleMap.setCellSizeInKilometers(new FixedDoubleParameter(1d));
         scenario.setMapInitializer(simpleMap);
         scenario.setGasPricePerLiter(new FixedDoubleParameter(0.5));
 
-        //set very low price
+        // set very low price
         scenario.setMarket(market);
 
-        //set initially random chance of going out
+        // set initially random chance of going out
         FixedProbabilityDepartingFactory departingStrategy = new FixedProbabilityDepartingFactory();
         departingStrategy.setProbabilityToLeavePort(initialEffortProbability);
         scenario.setDepartingStrategy(departingStrategy);
 
-        //start it
+        // start it
         FishState state = new FishState(seed);
         state.setScenario(scenario);
         state.start();
@@ -188,12 +185,11 @@ public class EffortThrottling {
         state.schedule.step(state);
         System.out.println("start: " + state.getDailyDataSet().getLatestObservation("Probability to leave port"));
 
-
-        //lspiRun it for 40 years
+        // lspiRun it for 40 years
         while (state.getYear() < simulationYears)
             state.schedule.step(state);
 
-        //probability should be very low!
+        // probability should be very low!
         System.out.println("end: " + state.getDailyDataSet().getLatestObservation("Probability to leave port"));
 
         if (timeSeries != null)
@@ -204,12 +200,13 @@ public class EffortThrottling {
         if (grid != null)
             gridToCSV(state.getDailyTrawlsMap().field, grid);
 
-
         return state;
     }
 
-
-    public static void gridToCSV(int[][] grid, File file) {
+    public static void gridToCSV(
+        int[][] grid,
+        File file
+    ) {
 
         try {
             FileWriter writer = new FileWriter(file);
@@ -227,7 +224,6 @@ public class EffortThrottling {
             e.printStackTrace();
         }
     }
-
 
 }
 

@@ -38,7 +38,7 @@ import uk.ac.ox.oxfish.model.regs.factory.TACMonoFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -57,19 +57,17 @@ import java.util.function.Supplier;
  */
 public class SimpleDynamicNetworks {
 
-
     public static final int NUMBER_OF_RUNS = 100;
     public static final int YEARS_TO_RUN = 4;
     public static final int NUMBER_OF_FISHERS = 100;
-    //private final static Path INPUT_FILE = Paths.get("runs", "networks", "twenty_limited.yaml");
-    //private static final Path OUTPUT_FILE = Paths.get("runs", "networks", "twenty_limited.csv");
+    // private final static Path INPUT_FILE = Paths.get("runs", "networks", "twenty_limited.yaml");
+    // private static final Path OUTPUT_FILE = Paths.get("runs", "networks", "twenty_limited.csv");
     private final static Path INPUT_FILE = Paths.get("runs", "networks", "temp3.yaml");
     private static final Path OUTPUT_FILE = Paths.get("runs", "networks", "all_results.csv");
     private static final Path COV_FILE = Paths.get("runs", "networks", "covariances.csv");
     private static final Path COV_FILE2 = Paths.get("runs", "networks", "covariances_each.csv");
 
     public static void main(String[] args) throws IOException {
-
 
         File outputFile = OUTPUT_FILE.toFile();
         if (!outputFile.exists()) {
@@ -78,27 +76,27 @@ public class SimpleDynamicNetworks {
 
         File covarianceFile = COV_FILE.toFile();
         if (!covarianceFile.exists()) {
-            Files.write(COV_FILE,
-                "scenario,fishers,name,diameter,distance,degree,correlation_pre,correlation_suc,correlation_degree\n".getBytes());
+            Files.write(
+                COV_FILE,
+                "scenario,fishers,name,diameter,distance,degree,correlation_pre,correlation_suc,correlation_degree\n".getBytes()
+            );
         }
-
 
         File covarianceFileIndividual = COV_FILE2.toFile();
         if (!covarianceFileIndividual.exists()) {
-            Files.write(COV_FILE2,
-                "scenario,fishers,name,diameter,distance,avg_degree,predecessors,successors,degree,profits\n".getBytes());
+            Files.write(
+                COV_FILE2,
+                "scenario,fishers,name,diameter,distance,avg_degree,predecessors,successors,degree,profits\n".getBytes()
+            );
         }
 
-
-        //Uniformly Distributed Outdegree
+        // Uniformly Distributed Outdegree
         //      uniforOutdegreeRuns();
 
-
-        //Uniformly distributed indegree
+        // Uniformly distributed indegree
         indegreeUniformRuns();
 
-
-        //fixed degree policy sweeps
+        // fixed degree policy sweeps
         //     fixedDegreeSweeps();
 
 
@@ -143,7 +141,6 @@ public class SimpleDynamicNetworks {
             return builder;
         };
 
-
         run("uniform",
             YEARS_TO_RUN,
             INPUT_FILE,
@@ -152,7 +149,6 @@ public class SimpleDynamicNetworks {
             NUMBER_OF_RUNS,
             OUTPUT_FILE, COV_FILE, COV_FILE2
         );
-
 
         ITQMonoFactory itq = new ITQMonoFactory();
         itq.setIndividualQuota(new FixedDoubleParameter(4000));
@@ -165,7 +161,6 @@ public class SimpleDynamicNetworks {
             NUMBER_OF_RUNS,
             OUTPUT_FILE, COV_FILE, COV_FILE2
         );
-
 
         itq.setIndividualQuota(new FixedDoubleParameter(2000));
 
@@ -189,7 +184,6 @@ public class SimpleDynamicNetworks {
             OUTPUT_FILE, COV_FILE, COV_FILE2
         );
 
-
         itq.setIndividualQuota(new FixedDoubleParameter(8000));
 
         run("highitq_uniform",
@@ -200,7 +194,6 @@ public class SimpleDynamicNetworks {
             NUMBER_OF_RUNS,
             OUTPUT_FILE, COV_FILE, COV_FILE2
         );
-
 
         TACMonoFactory factory = new TACMonoFactory();
         factory.setQuota(new FixedDoubleParameter(4000 * NUMBER_OF_FISHERS));
@@ -214,7 +207,6 @@ public class SimpleDynamicNetworks {
             OUTPUT_FILE, COV_FILE, COV_FILE2
         );
 
-
         factory.setQuota(new FixedDoubleParameter(2000 * NUMBER_OF_FISHERS));
 
         run("lowtac_uniform",
@@ -225,7 +217,6 @@ public class SimpleDynamicNetworks {
             NUMBER_OF_RUNS,
             OUTPUT_FILE, COV_FILE, COV_FILE2
         );
-
 
         factory.setQuota(new FixedDoubleParameter(1000 * NUMBER_OF_FISHERS));
 
@@ -247,7 +238,9 @@ public class SimpleDynamicNetworks {
         AlgorithmFactory<? extends Regulation> regulation,
         Supplier<NetworkBuilder> builder,
         int numberOfRuns,
-        Path filePath, Path covariancePath, Path covariance2Path
+        Path filePath,
+        Path covariancePath,
+        Path covariance2Path
     ) throws IOException {
         for (int run = 0; run < numberOfRuns; run++) {
             FishYAML yaml = new FishYAML();
@@ -283,7 +276,6 @@ public class SimpleDynamicNetworks {
                 profits += cash;
             }
 
-
             String toWrite = inputYamlPath.getFileName().toString() + "," + scenario.getFishers() + "," +
                 true + "," +
                 name + "," + diameter + "," +
@@ -293,7 +285,6 @@ public class SimpleDynamicNetworks {
             for (Fisher fisher : state.getFishers())
                 fisher.turnOff();
             state.finish();
-
 
             double[] predeccesors = new double[NUMBER_OF_FISHERS];
             double[] successors = new double[NUMBER_OF_FISHERS];
@@ -309,7 +300,6 @@ public class SimpleDynamicNetworks {
                 successors[i] = fisher.getDirectedFriends().size();
                 profitArray[i] = fisher.getLatestYearlyObservation("NET_CASH_FLOW");
 
-
                 if (covariance2Path != null) {
                     toWrite = incipit +
                         predeccesors[i] + "," +
@@ -318,7 +308,6 @@ public class SimpleDynamicNetworks {
                         profitArray[i] + "\n";
                     Files.write(covariance2Path, toWrite.getBytes(), StandardOpenOption.APPEND);
                 }
-
 
             }
 
@@ -354,7 +343,6 @@ public class SimpleDynamicNetworks {
                 OUTPUT_FILE, COV_FILE, null
             );
 
-
             itq = new ITQMonoFactory();
             itq.setIndividualQuota(new FixedDoubleParameter(4000));
 
@@ -367,7 +355,6 @@ public class SimpleDynamicNetworks {
                 OUTPUT_FILE, COV_FILE, null
             );
 
-
             itq.setIndividualQuota(new FixedDoubleParameter(2000));
 
             run("lowitq_fixed" + degree,
@@ -379,7 +366,6 @@ public class SimpleDynamicNetworks {
                 OUTPUT_FILE, COV_FILE, null
             );
 
-
             itq.setIndividualQuota(new FixedDoubleParameter(8000));
 
             run("highitq_fixed" + degree,
@@ -390,7 +376,6 @@ public class SimpleDynamicNetworks {
                 NUMBER_OF_RUNS,
                 OUTPUT_FILE, COV_FILE, null
             );
-
 
             factory = new TACMonoFactory();
             factory.setQuota(new FixedDoubleParameter(4000 * NUMBER_OF_FISHERS));
@@ -404,7 +389,6 @@ public class SimpleDynamicNetworks {
                 OUTPUT_FILE, COV_FILE, null
             );
 
-
         }
     }
 
@@ -417,7 +401,6 @@ public class SimpleDynamicNetworks {
             return builder;
         };
 
-
         run("uniform",
             YEARS_TO_RUN,
             INPUT_FILE,
@@ -426,7 +409,6 @@ public class SimpleDynamicNetworks {
             NUMBER_OF_RUNS,
             OUTPUT_FILE, COV_FILE, COV_FILE2
         );
-
 
         ITQMonoFactory itq = new ITQMonoFactory();
         itq.setIndividualQuota(new FixedDoubleParameter(4000));
@@ -439,7 +421,6 @@ public class SimpleDynamicNetworks {
             NUMBER_OF_RUNS,
             OUTPUT_FILE, COV_FILE, COV_FILE2
         );
-
 
         itq.setIndividualQuota(new FixedDoubleParameter(2000));
 
@@ -463,7 +444,6 @@ public class SimpleDynamicNetworks {
             OUTPUT_FILE, COV_FILE, COV_FILE2
         );
 
-
         itq.setIndividualQuota(new FixedDoubleParameter(8000));
 
         run("highitq_uniform",
@@ -474,7 +454,6 @@ public class SimpleDynamicNetworks {
             NUMBER_OF_RUNS,
             OUTPUT_FILE, COV_FILE, COV_FILE2
         );
-
 
         TACMonoFactory factory = new TACMonoFactory();
         factory.setQuota(new FixedDoubleParameter(4000 * NUMBER_OF_FISHERS));
@@ -488,7 +467,6 @@ public class SimpleDynamicNetworks {
             OUTPUT_FILE, COV_FILE, COV_FILE2
         );
 
-
         factory.setQuota(new FixedDoubleParameter(2000 * NUMBER_OF_FISHERS));
 
         run("lowtac_uniform",
@@ -499,7 +477,6 @@ public class SimpleDynamicNetworks {
             NUMBER_OF_RUNS,
             OUTPUT_FILE, COV_FILE, COV_FILE2
         );
-
 
         factory.setQuota(new FixedDoubleParameter(1000 * NUMBER_OF_FISHERS));
 
@@ -525,7 +502,6 @@ public class SimpleDynamicNetworks {
         for (int run = 0; run < numberOfRuns; run++) {
             FishYAML yaml = new FishYAML();
             PrototypeScenario scenario = yaml.loadAs(new FileReader(inputYamlPath.toFile()), PrototypeScenario.class);
-
 
             scenario.setFishers(NUMBER_OF_FISHERS);
             scenario.setRegulation(regulation);
@@ -567,7 +543,6 @@ public class SimpleDynamicNetworks {
                 profits += cash;
             }
 
-
             String toWrite = inputYamlPath.getFileName().toString() + "," + scenario.getFishers() + "," +
                 false + "," +
                 name + "," + diameter + "," +
@@ -580,6 +555,5 @@ public class SimpleDynamicNetworks {
 
         }
     }
-
 
 }

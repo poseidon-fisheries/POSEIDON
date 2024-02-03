@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.utility.parameters;
 
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 /**
  * Not really random, just a A*sin(frequency * 2Pi*x) generator with x increased by one each

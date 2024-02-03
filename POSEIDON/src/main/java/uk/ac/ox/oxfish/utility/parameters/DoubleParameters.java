@@ -20,14 +20,17 @@
 
 package uk.ac.ox.oxfish.utility.parameters;
 
+import uk.ac.ox.poseidon.common.api.parameters.*;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * Just a collection of the doubleParameters that are available; useful for gui and instantiation
- * Created by carrknight on 6/7/15.
+ * Just a collection of the doubleParameters that are available; useful for gui and instantiation Created by carrknight
+ * on 6/7/15.
  */
 public class DoubleParameters {
 
@@ -61,6 +64,5 @@ public class DoubleParameters {
         DOUBLE_PARAMETERS_NAME = Collections.unmodifiableMap(names);
 
     }
-
 
 }

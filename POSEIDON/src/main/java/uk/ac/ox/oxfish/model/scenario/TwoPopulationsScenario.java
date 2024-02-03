@@ -71,8 +71,8 @@ import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 import java.util.HashMap;
@@ -87,17 +87,14 @@ import java.util.logging.Logger;
  */
 public class TwoPopulationsScenario implements Scenario {
 
-
     private AlgorithmFactory<? extends BiologyInitializer> biologyInitializer =
         new DiffusingLogisticFactory();
 
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer =
         new ConstantWeatherFactory();
 
-
     private AlgorithmFactory<? extends MapInitializer> mapInitializer =
         new SimpleMapInitializerFactory();
-
 
     /**
      * the number of fishers
@@ -106,19 +103,16 @@ public class TwoPopulationsScenario implements Scenario {
 
     private int largeFishers = 10;
 
-
     /**
-     * when this flag is true, agents use their memory to predict future catches and profits. It is necessary
-     * for ITQs to work
+     * when this flag is true, agents use their memory to predict future catches and profits. It is necessary for ITQs
+     * to work
      */
     private boolean usePredictors = false;
-
 
     /**
      * positions the port(s)
      */
     private AlgorithmFactory<? extends PortInitializer> ports = new RandomPortFactory();
-
 
     /**
      * boat speed
@@ -126,7 +120,6 @@ public class TwoPopulationsScenario implements Scenario {
     private DoubleParameter smallSpeed = new FixedDoubleParameter(5);
 
     private DoubleParameter largeSpeed = new FixedDoubleParameter(5);
-
 
     /**
      * hold size
@@ -142,16 +135,13 @@ public class TwoPopulationsScenario implements Scenario {
 
     private AlgorithmFactory<? extends Gear> gearLarge = new RandomCatchabilityTrawlFactory();
 
-
     private DoubleParameter enginePower = new NormalDoubleParameter(5000, 100);
 
     private DoubleParameter smallFuelTankSize = new FixedDoubleParameter(100000);
     private DoubleParameter largeFuelTankSize = new FixedDoubleParameter(100000);
 
-
     private DoubleParameter smallLitersPerKilometer = new FixedDoubleParameter(10);
     private DoubleParameter largeLitersPerKilometer = new FixedDoubleParameter(10);
-
 
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     /**
@@ -172,7 +162,6 @@ public class TwoPopulationsScenario implements Scenario {
     private AlgorithmFactory<? extends DestinationStrategy> destinationStrategyLarge =
         new PerTripImitativeDestinationFactory();
 
-
     private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategySmall =
         new NoDiscardingFactory();
 
@@ -187,21 +176,17 @@ public class TwoPopulationsScenario implements Scenario {
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategySmall =
         new MaximumStepsFactory();
 
-
     private AlgorithmFactory<? extends GearStrategy> gearStrategy =
         new FixedGearStrategyFactory();
 
-
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
         new IgnoreWeatherFactory();
-
 
     private boolean separateRegulations = true;
 
     private AlgorithmFactory<? extends Regulation> regulationSmall = new ProtectedAreasOnlyFactory();
 
     private AlgorithmFactory<? extends Regulation> regulationLarge = new ProtectedAreasOnlyFactory();
-
 
     private boolean allowTwoPopulationFriendships = false;
 
@@ -210,39 +195,34 @@ public class TwoPopulationsScenario implements Scenario {
     private NetworkBuilder networkBuilder =
         new EquidegreeBuilder();
 
-
     private AlgorithmFactory<? extends HabitatInitializer> habitatInitializer = new AllSandyHabitatFactory();
 
-
     private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
-
 
     private DoubleParameter hourlyTravellingCostLarge = new FixedDoubleParameter(0);
 
     private DoubleParameter hourlyTravellingCostSmall = new FixedDoubleParameter(0);
 
-
     private List<StartingMPA> startingMPAs = new LinkedList<>();
     /**
-     * If flag set to true, small boats will come from port 1, large boats from port 2.
-     * Careful, if you set this to true and there is only one port you'll get an exception
+     * If flag set to true, small boats will come from port 1, large boats from port 2. Careful, if you set this to true
+     * and there is only one port you'll get an exception
      */
     private boolean separatePorts = false;
     /**
-     * if this is not NaN then it is used as the random seed to feed into the map-making function. This allows for randomness
-     * in the biology/fishery
+     * if this is not NaN then it is used as the random seed to feed into the map-making function. This allows for
+     * randomness in the biology/fishery
      */
     private Long mapMakerDedicatedRandomSeed = null;
 
     {
-        //best first: startingMPAs.add(new StartingMPA(5,33,35,18));
-        //best third:
-        //startingMPAs.add(new StartingMPA(0,26,34,40));
+        // best first: startingMPAs.add(new StartingMPA(5,33,35,18));
+        // best third:
+        // startingMPAs.add(new StartingMPA(0,26,34,40));
     }
 
     public TwoPopulationsScenario() {
     }
-
 
     /**
      * this is the very first method called by the model when it is started. The scenario needs to instantiate all the
@@ -259,38 +239,33 @@ public class TwoPopulationsScenario implements Scenario {
         MersenneTwisterFast mapMakerRandom = model.random;
         if (mapMakerDedicatedRandomSeed != null)
             mapMakerRandom = new MersenneTwisterFast(mapMakerDedicatedRandomSeed);
-        //force the mapMakerRandom as the new random until the start is completed.
+        // force the mapMakerRandom as the new random until the start is completed.
         model.random = mapMakerRandom;
-
 
         final BiologyInitializer biology = biologyInitializer.apply(model);
         final WeatherInitializer weather = weatherInitializer.apply(model);
 
-        //create global biology
+        // create global biology
         final GlobalBiology global = biology.generateGlobal(mapMakerRandom, model);
-
 
         final MapInitializer mapMaker = mapInitializer.apply(model);
         final NauticalMap map = mapMaker.makeMap(random, global, model);
 
-        //set habitats
+        // set habitats
         final HabitatInitializer habitat = habitatInitializer.apply(model);
         habitat.applyHabitats(map, mapMakerRandom, model);
 
-
-        //this next static method calls biology.initialize, weather.initialize and the like
+        // this next static method calls biology.initialize, weather.initialize and the like
         NauticalMapFactory.initializeMap(map, random, biology,
             weather,
             global, model
         );
 
-
-        //create fixed price market
+        // create fixed price market
         final MarketMap marketMap = new MarketMap(global);
         /*
       market prices for each species
      */
-
 
         for (final Species species : global.getSpecies())
             marketMap.addMarket(species, market.apply(model));
@@ -302,20 +277,18 @@ public class TwoPopulationsScenario implements Scenario {
             new FixedGasPrice(gasPricePerLiter.applyAsDouble(mapMakerRandom))
         );
 
-
-        //create initial mpas
+        // create initial mpas
         if (startingMPAs != null)
             for (final StartingMPA mpa : startingMPAs) {
                 Logger.getGlobal().info(() -> "building MPA at " + mpa.getTopLeftX() + ", " + mpa.getTopLeftY());
                 mpa.buildMPA(map);
             }
 
-        //substitute back the original randomizer
+        // substitute back the original randomizer
         model.random = random;
 
         return new ScenarioEssentials(global, map);
     }
-
 
     /**
      * called shortly after the essentials are set, it is time now to return a list of all the agents
@@ -335,8 +308,7 @@ public class TwoPopulationsScenario implements Scenario {
         for (final Port port : ports)
             port.setGasPricePerLiter(gasPricePerLiter.applyAsDouble(random));
 
-
-        //create the fisher factory object, this is for the small fishers
+        // create the fisher factory object, this is for the small fishers
         final FisherFactory smallFisherFactory = new FisherFactory(
             getSmallPortSupplier(random, ports),
             regulationSmall,
@@ -359,7 +331,7 @@ public class TwoPopulationsScenario implements Scenario {
             0
         );
 
-        //create a factory for the large boats too
+        // create a factory for the large boats too
         final FisherFactory largeFishersFactory = new FisherFactory(
             getLargePortSupplier(random, ports),
             separateRegulations ? regulationLarge : regulationSmall,
@@ -382,19 +354,18 @@ public class TwoPopulationsScenario implements Scenario {
             0
         );
 
-
-        //adds predictors to the fisher if the usepredictors flag is up.
-        //without predictors agents do not participate in ITQs
+        // adds predictors to the fisher if the usepredictors flag is up.
+        // without predictors agents do not participate in ITQs
         final Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(usePredictors, biology);
 
         smallFisherFactory.getAdditionalSetups().add(predictorSetup);
         largeFishersFactory.getAdditionalSetups().add(predictorSetup);
-        //add tags
+        // add tags
         smallFisherFactory.getAdditionalSetups().add(fisher -> {
             fisher.getTagsList().add("small");
             fisher.getTagsList().add("yellow");
             fisher.getTagsList().add("canoe");
-            //add hourly cost
+            // add hourly cost
             fisher.getAdditionalTripCosts().add(
                 new HourlyCost(hourlyTravellingCostSmall.applyAsDouble(model.getRandom()))
             );
@@ -408,22 +379,20 @@ public class TwoPopulationsScenario implements Scenario {
             );
         });
 
-
-        //add the small fishers
+        // add the small fishers
         for (int i = 0; i < smallFishers; i++) {
             final Fisher newFisher = smallFisherFactory.buildFisher(model);
             fisherList.add(newFisher);
         }
 
-        //set the id so that all fishers have a different id
+        // set the id so that all fishers have a different id
         largeFishersFactory.setNextID(smallFisherFactory.getNextID());
         for (int i = 0; i < largeFishers; i++) {
             final Fisher newFisher = largeFishersFactory.buildFisher(model);
             fisherList.add(newFisher);
         }
 
-
-        //don't let large boats befriend small boats
+        // don't let large boats befriend small boats
         if (!allowTwoPopulationFriendships) {
             networkBuilder.addPredicate((NetworkPredicate) (from, to) -> (from.getTagsList()
                 .contains("small") && to.getTagsList().contains("small")) ||
@@ -431,7 +400,7 @@ public class TwoPopulationsScenario implements Scenario {
         }
 
         if (!allowFriendshipsBetweenPorts) {
-            //no friends from separate ports
+            // no friends from separate ports
             networkBuilder.addPredicate((NetworkPredicate) (from, to) -> from.getHomePort().equals(to.getHomePort()));
         }
 
@@ -450,7 +419,6 @@ public class TwoPopulationsScenario implements Scenario {
                     FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN
         );
 
-
         for (final Species species : biology.getSpecies()) {
             model.getYearlyDataSet()
                 .registerGatherer("Small Fishers " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
@@ -468,10 +436,9 @@ public class TwoPopulationsScenario implements Scenario {
                             species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN
                 );
 
-
         }
 
-        //count effort too!
+        // count effort too!
         final DataColumn smallEffort
             = model.getDailyDataSet().registerGatherer("Small Fishers Total Effort",
             (Gatherer<FishState>) ignored -> model.getFishers().stream().
@@ -514,11 +481,17 @@ public class TwoPopulationsScenario implements Scenario {
         }
     }
 
-    protected Supplier<Port> getSmallPortSupplier(final MersenneTwisterFast random, final Port[] ports) {
+    protected Supplier<Port> getSmallPortSupplier(
+        final MersenneTwisterFast random,
+        final Port[] ports
+    ) {
         return separatePorts ? () -> ports[0] : () -> ports[random.nextInt(ports.length)];
     }
 
-    protected Supplier<Port> getLargePortSupplier(final MersenneTwisterFast random, final Port[] ports) {
+    protected Supplier<Port> getLargePortSupplier(
+        final MersenneTwisterFast random,
+        final Port[] ports
+    ) {
         return separatePorts ? () -> ports[1] : () -> ports[random.nextInt(ports.length)];
     }
 
@@ -576,7 +549,6 @@ public class TwoPopulationsScenario implements Scenario {
         this.usePredictors = usePredictors;
     }
 
-
     public DoubleParameter getSmallSpeed() {
         return smallSpeed;
     }
@@ -609,7 +581,6 @@ public class TwoPopulationsScenario implements Scenario {
         this.largeHoldSize = largeHoldSize;
     }
 
-
     public DoubleParameter getEnginePower() {
         return enginePower;
     }
@@ -617,7 +588,6 @@ public class TwoPopulationsScenario implements Scenario {
     public void setEnginePower(final DoubleParameter enginePower) {
         this.enginePower = enginePower;
     }
-
 
     public DoubleParameter getSmallFuelTankSize() {
         return smallFuelTankSize;
@@ -790,7 +760,6 @@ public class TwoPopulationsScenario implements Scenario {
     public void setMapMakerDedicatedRandomSeed(final Long mapMakerDedicatedRandomSeed) {
         this.mapMakerDedicatedRandomSeed = mapMakerDedicatedRandomSeed;
     }
-
 
     /**
      * Getter for property 'gearSmall'.

@@ -21,6 +21,8 @@
 package uk.ac.ox.oxfish.utility.parameters;
 
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 /**
  * Basically a fixed double parameter that returns NaN if the flag is not active

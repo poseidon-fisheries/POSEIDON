@@ -33,14 +33,12 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.util.DoubleSummaryStatistics;
 
-
 public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<PlanningHeatmapDestinationStrategy> {
-
 
     /**
      * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
@@ -78,7 +76,7 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
     @Override
     public PlanningHeatmapDestinationStrategy apply(final FishState state) {
 
-        //add data gathering if necessary
+        // add data gathering if necessary
         if (!state.equals(locker.getCurrentKey())) {
             locker.presentKey(state.getUniqueID(), () -> null);
             addDataGatherers(state);
@@ -113,11 +111,9 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
             );
     }
 
-
     private void addDataGatherers(final FishState state) {
 
-
-        //first add data gatherers
+        // first add data gatherers
         state.getYearlyDataSet().registerGatherer("Average Prediction Error",
             model -> {
                 final double size = model.getFishers().size();
@@ -127,7 +123,8 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
                     double total = 0;
                     for (final Fisher fisher1 : state.getFishers()) {
                         final DoubleSummaryStatistics errors = new DoubleSummaryStatistics();
-                        for (final Double error : ((AbstractHeatmapDestinationStrategy<?>) fisher1.getDestinationStrategy()).getErrors())
+                        for (final Double error :
+                            ((AbstractHeatmapDestinationStrategy<?>) fisher1.getDestinationStrategy()).getErrors())
                             errors.accept(error);
                         total += errors.getAverage();
                     }
@@ -137,7 +134,6 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
         );
 
     }
-
 
     /**
      * Getter for property 'ignoreFailedTrips'.
@@ -194,7 +190,6 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
     public void setExplorationStepSize(final DoubleParameter explorationStepSize) {
         this.explorationStepSize = explorationStepSize;
     }
-
 
     /**
      * Getter for property 'regression'.

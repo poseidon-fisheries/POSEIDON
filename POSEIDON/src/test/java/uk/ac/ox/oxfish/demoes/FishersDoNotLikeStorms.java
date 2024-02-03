@@ -26,14 +26,12 @@ import uk.ac.ox.oxfish.biology.weather.initializer.factory.OscillatingWeatherFac
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.WindThresholdFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
-
 
 public class FishersDoNotLikeStorms {
 
-
-    //when the storm comes, boats go to port.
+    // when the storm comes, boats go to port.
     @Test
     public void doNotLikeStorms() throws Exception {
 
@@ -57,7 +55,7 @@ public class FishersDoNotLikeStorms {
         while (state.getDay() < 150)
             state.schedule.step(state);
 
-        //count fishers at sea, should be none
+        // count fishers at sea, should be none
         double fishersAtSea = state.getFishers().stream().mapToDouble(
             value -> value.getLocation().equals(value.getHomePort().getLocation()) ? 0 : 1).sum();
         Assertions.assertEquals(100, state.getMap().getSeaTile(0, 0).getWindSpeedInKph(), 1);
@@ -69,7 +67,6 @@ public class FishersDoNotLikeStorms {
             value -> value.getLocation().equals(value.getHomePort().getLocation()) ? 0 : 1).sum();
         Assertions.assertTrue(fishersAtSea >= 30);
         Assertions.assertEquals(0, state.getMap().getSeaTile(0, 0).getWindSpeedInKph(), 1);
-
 
     }
 }

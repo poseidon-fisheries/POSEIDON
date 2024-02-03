@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.geography.discretization;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-
 public class IdentityDiscretizerFactory implements AlgorithmFactory<IdentityDiscretizer> {
 
     /**

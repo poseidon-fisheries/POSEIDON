@@ -5,7 +5,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceAggregatingFad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.CarryingCapacitySupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 import java.util.Map;
 

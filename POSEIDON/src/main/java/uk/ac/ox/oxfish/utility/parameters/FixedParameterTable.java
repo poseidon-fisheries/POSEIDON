@@ -2,6 +2,8 @@ package uk.ac.ox.oxfish.utility.parameters;
 
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import java.util.Map;
 

@@ -24,7 +24,7 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborRegressi
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,7 +37,7 @@ public class SmootherFileAllocatorFactory implements FileBiomassAllocatorFactory
     private boolean inputFileHasHeader = true;
 
     private AlgorithmFactory<
-        ? extends GeographicalRegression<Double>> smoother = new NearestNeighborRegressionFactory();
+                ? extends GeographicalRegression<Double>> smoother = new NearestNeighborRegressionFactory();
 
     {
         ((NearestNeighborRegressionFactory) smoother).setNeighbors(new FixedDoubleParameter(1));

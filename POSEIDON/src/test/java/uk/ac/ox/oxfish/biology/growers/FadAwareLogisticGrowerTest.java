@@ -26,8 +26,8 @@ import uk.ac.ox.oxfish.biology.tuna.BiomassProcessesFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.PurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityBiomassScenario;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.regulations.EverythingForbidden;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.regulations.core.EverythingForbiddenFactory;
 
 public class FadAwareLogisticGrowerTest {
 
@@ -43,7 +43,7 @@ public class FadAwareLogisticGrowerTest {
                 InputPath.of("inputs", "tests", "exogenous_catches.csv")
             );
 
-        scenario.setRegulations(new EverythingForbidden());
+        scenario.setRegulations(new EverythingForbiddenFactory());
         ((PurseSeinerFleetFactory) scenario.getFleet()).setAdditionalSetMonitors(null);
 
         final FishState state = new FishState();

@@ -24,8 +24,8 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.initializer.OneSpeciesInfiniteSchoolsInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.util.Map.Entry;
@@ -33,11 +33,9 @@ import java.util.Map.Entry;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 /**
- * Creates the "chaser" biology with a school of fishers running around
- * Created by carrknight on 11/17/16.
+ * Creates the "chaser" biology with a school of fishers running around Created by carrknight on 11/17/16.
  */
 public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfiniteSchoolsInitializer> {
-
 
     private DoubleParameter numberOfSchools = new FixedDoubleParameter(1d);
 
@@ -52,7 +50,6 @@ public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfin
     private DoubleParameter speedInDays = new FixedDoubleParameter(10);
 
     private DoubleParameter biomassEach = new FixedDoubleParameter(10000);
-
 
     /**
      * Applies this function to the given argument.
@@ -74,7 +71,6 @@ public class OneSpeciesSchoolFactory implements AlgorithmFactory<OneSpeciesInfin
                 Integer.parseInt(waypoint[1].trim())
             );
         }
-
 
         return new OneSpeciesInfiniteSchoolsInitializer(
             (int) numberOfSchools.applyAsDouble(state.getRandom()),

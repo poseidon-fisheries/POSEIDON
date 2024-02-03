@@ -25,14 +25,13 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.experiments.EffortThrottling;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 /**
  * Created by carrknight on 8/13/15.
  */
 public class HighPriceMeansTotalEffort {
-
 
     /**
      * price becomes so high it's irresistible and everybody puts in infinite effort
@@ -42,7 +41,7 @@ public class HighPriceMeansTotalEffort {
     @Test
     public void priceIsSoHighEverybodyIsFishing() throws Exception {
 
-        //sets very low price
+        // sets very low price
         FixedPriceMarketFactory market = new FixedPriceMarketFactory();
         market.setMarketPrice(new FixedDoubleParameter(10.0));
 

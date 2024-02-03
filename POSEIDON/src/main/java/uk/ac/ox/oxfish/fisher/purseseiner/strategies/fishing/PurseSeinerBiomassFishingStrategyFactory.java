@@ -24,8 +24,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.BiomassCatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.BiomassCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 public class PurseSeinerBiomassFishingStrategyFactory
     extends PurseSeinerFishingStrategyFactory<BiomassLocalBiology> {

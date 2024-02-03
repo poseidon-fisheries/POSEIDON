@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.univocity.parsers.common.record.Record;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,7 +32,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.getSetActionClass;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class AbundanceFiltersFromFileFactory implements AbundanceFiltersFactory {
 

@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.fisher.log.initializers;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-
 public class NoLogbookFactory implements AlgorithmFactory<NoLogbookInitializer> {
 
 

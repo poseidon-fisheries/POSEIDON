@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.utility.parameters;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.math3.distribution.WeibullDistribution;
 import uk.ac.ox.oxfish.utility.MTFApache;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 public class WeibullDoubleParameter implements DoubleParameter {
 

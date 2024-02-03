@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.utility.parameters;
 
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+
 import java.util.Map;
 
 public interface ParameterTable {

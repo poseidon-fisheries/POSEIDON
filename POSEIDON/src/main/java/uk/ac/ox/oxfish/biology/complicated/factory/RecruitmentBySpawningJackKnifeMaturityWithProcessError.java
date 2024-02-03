@@ -7,8 +7,8 @@ import uk.ac.ox.oxfish.biology.complicated.NoiseMaker;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentBySpawningBiomass;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 /**
  * classic BH recruitment function with lognormal noise (a la DLMtoolkit, i.e. centered at 0); optionally we may want noise to only

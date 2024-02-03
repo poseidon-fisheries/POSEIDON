@@ -36,7 +36,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.*;
 import static uk.ac.ox.oxfish.utility.FishStateUtilitiesTest.writeTempFile;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class FisherValuesByActionFromFileCacheTest {
 
@@ -88,7 +88,12 @@ public class FisherValuesByActionFromFileCacheTest {
         check("", 1, NOA, path);
     }
 
-    private void check(final String result, final int fisherId, final ActionClass actionClass, final Path path) {
+    private void check(
+        final String result,
+        final int fisherId,
+        final ActionClass actionClass,
+        final Path path
+    ) {
         Assertions.assertEquals(result, cache.get(path, 2017, fishers.get(fisherId), actionClass.getActionClass()));
     }
 

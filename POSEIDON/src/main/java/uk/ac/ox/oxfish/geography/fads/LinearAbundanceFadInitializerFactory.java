@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FishAbundanceAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.LinearFishAbundanceAttractor;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 public class LinearAbundanceFadInitializerFactory extends CompressedAbundanceFadInitializerFactory {
     public LinearAbundanceFadInitializerFactory() {

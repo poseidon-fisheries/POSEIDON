@@ -11,13 +11,11 @@ public class UniformWithSpreadOptimizationParameter implements OptimizationParam
 
     private String addressToModify = "literPerKilometer";
 
-
     private double average = 650;
 
     private double minSpread = 10;
 
     private double maxSpread = 200;
-
 
     @Override
     public int size() {
@@ -25,7 +23,10 @@ public class UniformWithSpreadOptimizationParameter implements OptimizationParam
     }
 
     @Override
-    public String parametrize(Scenario scenario, double[] inputs) {
+    public String parametrize(
+        Scenario scenario,
+        double[] inputs
+    ) {
         Preconditions.checkArgument(maxSpread >= minSpread, "invalid bounds " + addressToModify);
         Preconditions.checkArgument(inputs.length == 1);
 
@@ -56,7 +57,6 @@ public class UniformWithSpreadOptimizationParameter implements OptimizationParam
     public String getName() {
         return addressToModify;
     }
-
 
     public String getAddressToModify() {
         return addressToModify;

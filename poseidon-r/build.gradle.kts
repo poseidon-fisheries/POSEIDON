@@ -4,8 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":common:api"))
-    implementation(project(":common:core"))
+    implementation(project(":common"))
     implementation(project(":simulations:api"))
     runtimeOnly(project(":simulations:adaptors"))
 }

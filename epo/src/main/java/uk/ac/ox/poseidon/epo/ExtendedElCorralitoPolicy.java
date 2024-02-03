@@ -2,10 +2,10 @@ package uk.ac.ox.poseidon.epo;
 
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import uk.ac.ox.oxfish.regulations.ForbiddenIf;
-import uk.ac.ox.oxfish.regulations.NamedRegulations;
-import uk.ac.ox.oxfish.regulations.conditions.*;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.regulations.core.ForbiddenIfFactory;
+import uk.ac.ox.poseidon.regulations.core.NamedRegulationsFactory;
+import uk.ac.ox.poseidon.regulations.core.conditions.*;
 
 import java.util.List;
 
@@ -39,24 +39,25 @@ public class ExtendedElCorralitoPolicy extends PolicySupplier {
             new Policy<EpoScenario<?>>(
                 String.format("Larger El Corralito + %02d days before/after", extraDays),
                 scenario -> {
-                    final NamedRegulations namedRegulations = (NamedRegulations) scenario.getRegulations();
+                    final NamedRegulationsFactory namedRegulations =
+                        (NamedRegulationsFactory) scenario.getRegulations();
                     namedRegulations.modify(
                         "El Corralito",
-                        () -> new ForbiddenIf(
-                            new AnyOf(
-                                new AllOf(
-                                    new Not(yearsActiveCondition()),
-                                    ((ForbiddenIf) namedRegulations.getRegulations()
+                        () -> new ForbiddenIfFactory(
+                            new AnyOfFactory(
+                                new AllOfFactory(
+                                    new NotFactory(yearsActiveCondition()),
+                                    ((ForbiddenIfFactory) namedRegulations.getRegulations()
                                         .get("El Corralito"))
                                         .getCondition()
                                 ),
-                                new AllOf(
+                                new AllOfFactory(
                                     yearsActiveCondition(),
-                                    new BetweenYearlyDates(
+                                    new BetweenYearlyDatesFactory(
                                         addDays(EL_CORRALITO_BEGINNING, -extraDays),
                                         addDays(EL_CORRALITO_END, extraDays)
                                     ),
-                                    new InRectangularArea(
+                                    new InRectangularAreaFactory(
                                         newNorthLatitude,
                                         newWestLongitude,
                                         newSouthLatitude,

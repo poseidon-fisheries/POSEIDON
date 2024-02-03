@@ -35,7 +35,7 @@ import java.util.function.BiConsumer;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.FishStateUtilitiesTest.writeTempFile;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class FisherValuesFromFileCacheTest {
 

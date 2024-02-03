@@ -12,7 +12,10 @@ public class CalibratedParameter extends UniformDoubleParameter {
         this(0, Integer.MAX_VALUE);
     }
 
-    public CalibratedParameter(final double minimumValue, final double maximumValue) {
+    public CalibratedParameter(
+        final double minimumValue,
+        final double maximumValue
+    ) {
         this(
             minimumValue,
             maximumValue,
@@ -20,7 +23,11 @@ public class CalibratedParameter extends UniformDoubleParameter {
         );
     }
 
-    public CalibratedParameter(final double minimumValue, final double maximumValue, final double defaultValue) {
+    public CalibratedParameter(
+        final double minimumValue,
+        final double maximumValue,
+        final double defaultValue
+    ) {
         this(
             minimumValue,
             maximumValue,

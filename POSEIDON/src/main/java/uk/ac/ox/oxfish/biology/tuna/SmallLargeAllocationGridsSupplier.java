@@ -19,7 +19,7 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import com.univocity.parsers.common.record.Record;
-import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -81,7 +81,10 @@ public class SmallLargeAllocationGridsSupplier
 
         private final SizeGroup sizeGroup;
 
-        Key(final String speciesCode, final SizeGroup sizeGroup) {
+        Key(
+            final String speciesCode,
+            final SizeGroup sizeGroup
+        ) {
             super(speciesCode);
             this.sizeGroup = sizeGroup;
         }

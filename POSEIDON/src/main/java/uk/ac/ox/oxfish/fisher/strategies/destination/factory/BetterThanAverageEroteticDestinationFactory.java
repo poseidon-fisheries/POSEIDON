@@ -27,22 +27,18 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy
 import uk.ac.ox.oxfish.fisher.strategies.destination.SimpleEroteticDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 /**
- * The Threshold Erotetic Destination Strategy where the threshold is the average
- * Created by carrknight on 4/11/16.
+ * The Threshold Erotetic Destination Strategy where the threshold is the average Created by carrknight on 4/11/16.
  */
 public class BetterThanAverageEroteticDestinationFactory implements AlgorithmFactory<SimpleEroteticDestinationStrategy> {
 
-
     private DoubleParameter minimumObservations = new FixedDoubleParameter(5);
 
-
     private DoubleParameter updateInterval = new UniformDoubleParameter(5, 15);
-
 
     /**
      * Applies this function to the given argument.
@@ -62,7 +58,6 @@ public class BetterThanAverageEroteticDestinationFactory implements AlgorithmFac
 
         );
     }
-
 
     /**
      * Getter for property 'minimumObservations'.

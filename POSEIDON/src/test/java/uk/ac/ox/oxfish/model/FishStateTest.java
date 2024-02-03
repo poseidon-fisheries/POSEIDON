@@ -34,8 +34,8 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
-import uk.ac.ox.oxfish.regulations.EverythingPermitted;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.regulations.core.EverythingPermittedFactory;
 
 import java.util.LinkedList;
 import java.util.logging.Logger;
@@ -43,18 +43,17 @@ import java.util.logging.Logger;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.oxfish.model.StepOrder.*;
 
-
 public class FishStateTest {
 
     @Test
     public void testScheduleEveryYear() throws Exception {
 
-        //steps every 365 steps starting from 365
+        // steps every 365 steps starting from 365
         final Steppable steppable = mock(Steppable.class);
 
         final FishState state = new FishState(1L);
         final Scenario scenario = mock(Scenario.class);
-        when(scenario.getRegulations()).thenAnswer(__ -> new EverythingPermitted());
+        when(scenario.getRegulations()).thenAnswer(__ -> new EverythingPermittedFactory());
         final ScenarioEssentials result = mock(ScenarioEssentials.class);
         when(result.getBiology()).thenReturn(mock(GlobalBiology.class));
         when(scenario.start(state)).thenReturn(result);
@@ -70,7 +69,7 @@ public class FishStateTest {
         state.scheduleEveryYear(steppable, StepOrder.POLICY_UPDATE);
         state.scheduleEveryStep(simState -> {
         }, StepOrder.AFTER_DATA);
-        //should step twice
+        // should step twice
         for (int i = 0; i < 730; i++)
             state.schedule.step(state);
         verify(steppable, times(2)).step(state);
@@ -82,7 +81,7 @@ public class FishStateTest {
 
         Logger.getGlobal().info("Testing that fishers can be created and destroyed");
         final PrototypeScenario scenario = new PrototypeScenario();
-        scenario.setBiologyInitializer(new FromLeftToRightFactory()); //faster
+        scenario.setBiologyInitializer(new FromLeftToRightFactory()); // faster
         final SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
         mapInitializer.setWidth(new FixedDoubleParameter(20));
         mapInitializer.setHeight(new FixedDoubleParameter(5));
@@ -118,12 +117,10 @@ public class FishStateTest {
             state.schedule.step(state);
         Assertions.assertEquals(10, newguy.getDailyData().numberOfObservations());
 
-
     }
 
     @Test
     public void hoursSinceStartWorks() throws Exception {
-
 
         final Scenario scenario = mock(Scenario.class, RETURNS_DEEP_STUBS);
         final FishState state = new FishState(System.currentTimeMillis(), 2);
@@ -135,7 +132,7 @@ public class FishStateTest {
         Assertions.assertEquals(2, state.getDayOfTheYear());
         Assertions.assertEquals(1, state.getYear());
         Assertions.assertEquals(366, state.getDay(), .001d);
-        //midnight is the previous day, so that the first valid step for day 366 will be at 12pm
+        // midnight is the previous day, so that the first valid step for day 366 will be at 12pm
         Assertions.assertEquals(8784 + 12, state.getHoursSinceStart(), 0.0001d);
     }
 
@@ -150,11 +147,11 @@ public class FishStateTest {
         final FishState state = new FishState();
         state.setScenario(mock(Scenario.class, RETURNS_DEEP_STUBS));
         state.start();
-        //increase array after 300 days
+        // increase array after 300 days
         state.scheduleOnceInXDays((Steppable) simState -> stepCounter[0]++, DAWN, 300);
-        //increase array after 800 days
+        // increase array after 800 days
         state.scheduleOnceInXDays((Steppable) simState -> stepCounter[0]++, DAWN, 800);
-        //increase array at the end of year 1
+        // increase array at the end of year 1
         state.scheduleOnceAtTheBeginningOfYear((Steppable) simState -> stepCounter[1]++, DAWN, 1);
 
         for (int day = 0; day < 350; day++) {

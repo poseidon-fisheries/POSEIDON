@@ -3,11 +3,11 @@ package uk.ac.ox.oxfish.model.data.distributions;
 import com.google.common.primitives.Doubles;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import static java.util.stream.Collectors.*;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class EmpiricalCatchSizeDistributionsFromFile implements AlgorithmFactory<GroupedYearlyDistributions> {
 

@@ -29,14 +29,12 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.nio.file.Paths;
 
-
 public class TACNotCaresAboutMileage {
-
 
     @Test
     public void tacNotCaresAboutMileage() throws Exception {
@@ -51,7 +49,7 @@ public class TACNotCaresAboutMileage {
 
         state.getRandom().setSeed(0);
 
-        //the correlation ought to be very small
+        // the correlation ought to be very small
         final Species species = state.getSpecies().get(0);
 
         final double[] mileage = new double[state.getFishers().size()];
@@ -71,7 +69,6 @@ public class TACNotCaresAboutMileage {
         System.out.println("Ideally it should be, in absolute value, less than .3");
         Assertions.assertTrue(correlation < .3);
         Assertions.assertTrue(correlation > -.3);
-
 
     }
 }

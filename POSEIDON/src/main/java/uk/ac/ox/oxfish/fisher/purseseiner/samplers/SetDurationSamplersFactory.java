@@ -5,9 +5,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.csv.CsvParserUtil;
+import uk.ac.ox.poseidon.common.core.csv.CsvParserUtil;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import java.util.List;
 import java.util.Map;

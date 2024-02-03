@@ -4,14 +4,14 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class InRectangularArea extends CachedCoordinateCondition {
-    public Envelope getEnvelope() {
-        return envelope;
-    }
-
     private final Envelope envelope;
 
-    public InRectangularArea(final Envelope envelope) {
+    InRectangularArea(final Envelope envelope) {
         this.envelope = envelope;
+    }
+
+    public Envelope getEnvelope() {
+        return envelope;
     }
 
     @Override

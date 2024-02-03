@@ -45,6 +45,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.MasonUtils;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -69,7 +70,7 @@ public class NauticalMap implements Startable {
     /**
      * when you don't want to use a real geometry you can use this singleton to just cover an mpa.
      */
-    //todo this is a placeholder; what I need to do is to kill off the geometry altogether and embrace the grid
+    // todo this is a placeholder; what I need to do is to kill off the geometry altogether and embrace the grid
     public static final MasonGeometry MPA_SINGLETON = new MasonGeometry();
     private final LinkedHashMap<String, Supplier<DoubleGrid2D>> additionalMaps;
     private final MapExtent mapExtent;
@@ -78,8 +79,8 @@ public class NauticalMap implements Startable {
      */
     private final GeomGridField rasterBathymetry;
     /**
-     * the proper grid behind raster bathymetry. You can get it by rasterBathymetry.getGrid() and cast but this skips the
-     * casting
+     * the proper grid behind raster bathymetry. You can get it by rasterBathymetry.getGrid() and cast but this skips
+     * the casting
      */
     private final ObjectGrid2D rasterBackingGrid;
     /**
@@ -103,8 +104,8 @@ public class NauticalMap implements Startable {
      */
     private final GeomVectorField mpaVectorField;
     /**
-     * computing neighborhoods is actually a very expensive computational process so we store here all the
-     * neighborhood we found for each tile and neighborhood size so we compute them but once
+     * computing neighborhoods is actually a very expensive computational process so we store here all the neighborhood
+     * we found for each tile and neighborhood size so we compute them but once
      */
     public Table<SeaTile, Integer, Bag> alreadyComputedNeighbors = HashBasedTable.create();
     /**
@@ -130,7 +131,6 @@ public class NauticalMap implements Startable {
      */
     private HashSet<SeaTile> lineTiles = null;
 
-
     /**
      * set all the base fields. Calls recomputeTilesMPA() in order to tell tiles if they are covered by an MPA or not
      *
@@ -139,8 +139,10 @@ public class NauticalMap implements Startable {
      * @param distance         the distance calculator
      */
     public NauticalMap(
-        final GeomGridField rasterBathymetry, final GeomVectorField mpaVectorField,
-        final Distance distance, final Pathfinder pathfinder
+        final GeomGridField rasterBathymetry,
+        final GeomVectorField mpaVectorField,
+        final Distance distance,
+        final Pathfinder pathfinder
     ) {
         this.rasterBathymetry = rasterBathymetry;
         this.pathfinder = pathfinder;
@@ -154,18 +156,19 @@ public class NauticalMap implements Startable {
         portMap = new SparseGrid2D(getWidth(), getHeight());
         fishersMap = new SparseGrid2D(getWidth(), getHeight());
         dailyTrawlsMap = new IntGrid2D(getWidth(), getHeight());
-        this.mapExtent = MapExtent.from(this);
+        this.mapExtent = MapExtent.from(getWidth(), getHeight(), getRasterBathymetry().getMBR());
     }
 
     /**
-     * this is called at initialization but can be called again if there is a change in MPAs. It basically checks
-     * for each tile if they belong to an MPA (strictly speaking if their center belongs to an MPA). If there is an MPA it is set to the tile.Bio
+     * this is called at initialization but can be called again if there is a change in MPAs. It basically checks for
+     * each tile if they belong to an MPA (strictly speaking if their center belongs to an MPA). If there is an MPA it
+     * is set to the tile.Bio
      */
     public void recomputeTilesMPA() {
         waterSeaTiles = null;
         allTiles = null;
         lineTiles = null;
-        //todo this works but make a test to be sure
+        // todo this works but make a test to be sure
         for (int i = 0; i < rasterBackingGrid.getWidth(); i++)
             for (int j = 0; j < rasterBackingGrid.getHeight(); j++) {
                 final Point gridPoint = rasterBathymetry.toPoint(i, j);
@@ -173,9 +176,11 @@ public class NauticalMap implements Startable {
                 final SeaTile seaTile = getSeaTile(i, j);
 
                 if (coveringObjects.size() > 0) {
-                    assert coveringObjects.size() == 1 : "got a tile covered by multiple MPAs, is that normal?"; //assume there is no double MPA
+                    assert coveringObjects.size() ==
+                        1 : "got a tile covered by multiple MPAs, is that normal?"; // assume there is no double MPA
                     seaTile.assignMpa((MasonGeometry) coveringObjects.get(0));
-                    assert seaTile.isProtected() : "Set a tile to an MPA but it doesn't set the protected state to true";
+                    assert seaTile.isProtected() : "Set a tile to an MPA but it doesn't set the protected state to " +
+                        "true";
                 } else {
 
                     if (seaTile.grabMPA() != MPA_SINGLETON)
@@ -198,6 +203,10 @@ public class NauticalMap implements Startable {
         return rasterBathymetry.getGridHeight();
     }
 
+    public GeomGridField getRasterBathymetry() {
+        return rasterBathymetry;
+    }
+
     /**
      * returns sea tile at that coordinates. If it isn't there returns null
      *
@@ -205,7 +214,10 @@ public class NauticalMap implements Startable {
      * @param gridY the y coordinate of the cell
      * @return the cell or null if there isn't anything
      */
-    public SeaTile getSeaTile(final int gridX, final int gridY) {
+    public SeaTile getSeaTile(
+        final int gridX,
+        final int gridY
+    ) {
         if (rasterBackingGrid.getHeight() <= gridY || rasterBackingGrid.getWidth() <= gridX
             || gridX < 0 || gridY < 0)
             return null;
@@ -221,14 +233,15 @@ public class NauticalMap implements Startable {
      */
     public void initializeBiology(
         final BiologyInitializer initializer,
-        final MersenneTwisterFast random, final GlobalBiology biology
+        final MersenneTwisterFast random,
+        final GlobalBiology biology
     ) {
         for (final Object element : rasterBackingGrid.elements()) {
-            final SeaTile tile = (SeaTile) element; //cast
+            final SeaTile tile = (SeaTile) element; // cast
             tile.setBiology(initializer.generateLocal(biology,
                 tile, random, getHeight(),
                 getWidth(), this
-            )); //put new biology in
+            )); // put new biology in
         }
 
     }
@@ -251,7 +264,7 @@ public class NauticalMap implements Startable {
         return waterSeaTiles;
     }
 
-    @SuppressWarnings("unchecked") //bags are annoying this way
+    @SuppressWarnings("unchecked") // bags are annoying this way
     /**
      * get all the tiles of the map as a list
      */
@@ -274,15 +287,14 @@ public class NauticalMap implements Startable {
     public void start(final FishState model) {
         Preconditions.checkArgument(receipt == null, "already started, love");
 
-
-        //start all tiles
+        // start all tiles
         for (final Object element : rasterBackingGrid.elements()) {
-            final SeaTile tile = (SeaTile) element; //cast
+            final SeaTile tile = (SeaTile) element; // cast
             tile.start(model);
         }
 
         Preconditions.checkArgument(receipt == null);
-        //reset fished map count
+        // reset fished map count
         receipt =
             model.scheduleEveryDay((Steppable) simState -> dailyTrawlsMap.setTo(0), StepOrder.DAWN);
 
@@ -300,10 +312,10 @@ public class NauticalMap implements Startable {
         if (receipt != null)
             receipt.stop();
 
-        //turn off all tiles
-        //start all tiles
+        // turn off all tiles
+        // start all tiles
         for (final Object element : rasterBackingGrid.elements()) {
-            final SeaTile tile = (SeaTile) element; //cast
+            final SeaTile tile = (SeaTile) element; // cast
             tile.turnOff();
         }
 
@@ -319,7 +331,10 @@ public class NauticalMap implements Startable {
         return getCoordinates(tile.getGridX(), tile.getGridY());
     }
 
-    public Coordinate getCoordinates(final int gridX, final int gridY) {
+    public Coordinate getCoordinates(
+        final int gridX,
+        final int gridY
+    ) {
         return mapExtent.getCoordinates(gridX, gridY);
     }
 
@@ -336,7 +351,12 @@ public class NauticalMap implements Startable {
      * @param endYGrid   the ending y grid coordinate
      * @return kilometers between the two points
      */
-    public double distance(final int startXGrid, final int startYGrid, final int endXGrid, final int endYGrid) {
+    public double distance(
+        final int startXGrid,
+        final int startYGrid,
+        final int endXGrid,
+        final int endYGrid
+    ) {
         return distance.distance(getSeaTile(startXGrid, startYGrid), getSeaTile(endXGrid, endYGrid), this);
     }
 
@@ -347,13 +367,16 @@ public class NauticalMap implements Startable {
      * @param end   ending sea-tile
      * @return kilometers between the two
      */
-    public double distance(final SeaTile start, final SeaTile end) {
+    public double distance(
+        final SeaTile start,
+        final SeaTile end
+    ) {
         return distance.distance(start, end, this);
     }
 
     /**
-     * tell the map some seatile has changed (not in its inner workings but really swapped out with a new seatile object).
-     * Forgets all precomputed neighborhoods and recomputes MPAs
+     * tell the map some seatile has changed (not in its inner workings but really swapped out with a new seatile
+     * object). Forgets all precomputed neighborhoods and recomputes MPAs
      */
     public void reactToSeaTileChange() {
         recomputeTilesMPA();
@@ -370,14 +393,14 @@ public class NauticalMap implements Startable {
      */
     public void addPort(final Port port) {
 
-        //check location
+        // check location
         final SeaTile portSite = port.getLocation();
         Preconditions.checkArgument(portSite.isLand(), "port is not on land");
-        //check it's coastal
+        // check it's coastal
         final boolean isCoastal = isCoastal(portSite);
         Preconditions.checkArgument(isCoastal, "port has no neighboring sea tiles");
 
-        //put it in the masterlist
+        // put it in the masterlist
         Preconditions.checkArgument(!ports.contains(port), "This port was already registered!");
         ports.add(port);
 
@@ -413,7 +436,11 @@ public class NauticalMap implements Startable {
         return distance.cumulativeTravelTimeAlongRouteInHours(route, this, speedInKph);
     }
 
-    public boolean recordFisherLocation(final Fisher fisher, final int x, final int y) {
+    public boolean recordFisherLocation(
+        final Fisher fisher,
+        final int x,
+        final int y
+    ) {
         return fishersMap.setObjectLocation(fisher, x, y);
     }
 
@@ -432,7 +459,6 @@ public class NauticalMap implements Startable {
     }
 
     public SeaTile getRandomBelowWaterLineSeaTile(final MersenneTwisterFast random) {
-
 
         final List<SeaTile> waterTiles = getAllSeaTilesExcludingLandAsList();
 
@@ -455,7 +481,10 @@ public class NauticalMap implements Startable {
      * @param end   the ending tile
      * @return a queue of steps from start to end or null if it isn't possible to go from start to end
      */
-    public Deque<SeaTile> getRoute(final SeaTile start, final SeaTile end) {
+    public Deque<SeaTile> getRoute(
+        final SeaTile start,
+        final SeaTile end
+    ) {
         return pathfinder.getRoute(this, start, end);
     }
 
@@ -466,7 +495,10 @@ public class NauticalMap implements Startable {
         );
     }
 
-    public Bag getFishersAtLocation(final int x, final int y) {
+    public Bag getFishersAtLocation(
+        final int x,
+        final int y
+    ) {
         return fishersMap.getObjectsAtLocation(x, y);
     }
 
@@ -492,7 +524,10 @@ public class NauticalMap implements Startable {
 
     }
 
-    public Bag getMooreNeighbors(final SeaTile tile, final int neighborhoodSize) {
+    public Bag getMooreNeighbors(
+        final SeaTile tile,
+        final int neighborhoodSize
+    ) {
         Bag neighbors;
         neighbors = neighborhoodSize == 1 ? sizeOneNeighborhoods.get(tile) :
             alreadyComputedNeighbors.get(tile, neighborhoodSize);
@@ -509,7 +544,10 @@ public class NauticalMap implements Startable {
         return neighbors;
     }
 
-    public Stream<SeaTile> getMooreNeighborsStream(final SeaTile tile, final int neighborhoodSize) {
+    public Stream<SeaTile> getMooreNeighborsStream(
+        final SeaTile tile,
+        final int neighborhoodSize
+    ) {
         return bagToStream(getMooreNeighbors(tile, neighborhoodSize));
     }
 
@@ -532,10 +570,6 @@ public class NauticalMap implements Startable {
             .collect(joining("\n"));
     }
 
-    public GeomGridField getRasterBathymetry() {
-        return rasterBathymetry;
-    }
-
     public Int2D getGridXY(final Coordinate coordinate) {
         return getSeaTile(coordinate).getGridLocation();
     }
@@ -547,7 +581,10 @@ public class NauticalMap implements Startable {
         );
     }
 
-    public double distance(final Int2D here, final Int2D there) {
+    public double distance(
+        final Int2D here,
+        final Int2D there
+    ) {
         final SeaTile tileHere = getSeaTile(here.x, here.y);
         final SeaTile tileThere = getSeaTile(there.x, there.y);
         return getDistance().distance(tileHere, tileThere, this);

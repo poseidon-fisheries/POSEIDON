@@ -3,9 +3,9 @@ package uk.ac.ox.oxfish.model.event;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.SpeciesCodes;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -16,7 +16,7 @@ import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class BiomassDrivenTimeSeriesExogenousCatchesFactory
     implements AlgorithmFactory<BiomassDrivenTimeSeriesExogenousCatches> {
@@ -72,9 +72,9 @@ public class BiomassDrivenTimeSeriesExogenousCatchesFactory
 
     /**
      * Reads from catchesFile to build the map of exogenous catches tobe passed to the
-     * BiomassDrivenTimeSeriesExogenousCatches constructor. Since we don't want to depend on the input file
-     * having the years in the right order, we first use sorted maps from year to catches as values in the
-     * main map and then convert the properly ordered values of these inner maps to linked lists of catches.
+     * BiomassDrivenTimeSeriesExogenousCatches constructor. Since we don't want to depend on the input file having the
+     * years in the right order, we first use sorted maps from year to catches as values in the main map and then
+     * convert the properly ordered values of these inner maps to linked lists of catches.
      */
     @Override
     public BiomassDrivenTimeSeriesExogenousCatches apply(final FishState fishState) {

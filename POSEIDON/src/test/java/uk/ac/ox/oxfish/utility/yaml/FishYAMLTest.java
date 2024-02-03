@@ -33,7 +33,7 @@ import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.SelectDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
@@ -42,9 +42,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-
 public class FishYAMLTest {
-
 
     @Test
     public void canReadAScenario() throws Exception {
@@ -112,24 +110,24 @@ public class FishYAMLTest {
 
         final FishYAML yaml = new FishYAML();
         final Object loaded = yaml.loadAs(scenarioFile, Scenario.class);
-        //read prototype scenario correctly
+        // read prototype scenario correctly
         Assertions.assertTrue(loaded instanceof PrototypeScenario);
         final PrototypeScenario scenario = (PrototypeScenario) loaded;
-        //read initializer correctly
+        // read initializer correctly
         Assertions.assertTrue(scenario.getBiologyInitializer() instanceof DiffusingLogisticFactory);
         final DiffusingLogisticFactory factory = (DiffusingLogisticFactory) scenario.getBiologyInitializer();
-        //reads double parameters correctly
+        // reads double parameters correctly
         Assertions.assertTrue(factory.getCarryingCapacity() instanceof FixedDoubleParameter);
         Assertions.assertEquals(((FixedDoubleParameter) factory.getCarryingCapacity()).getValue(), 14.0, .001);
-        //reads normal doubles correctly
-        final double[] possibleValues = ((SelectDoubleParameter) factory.getPercentageLimitOnDailyMovement()).getPossibleValues();
+        // reads normal doubles correctly
+        final double[] possibleValues =
+            ((SelectDoubleParameter) factory.getPercentageLimitOnDailyMovement()).getPossibleValues();
         Assertions.assertEquals(possibleValues[0], .2, .0001);
         Assertions.assertEquals(possibleValues[1], .5, .0001);
-        //reads anarchy factory just as well (it's a scalar algorithmFactory which is tricky)
+        // reads anarchy factory just as well (it's a scalar algorithmFactory which is tricky)
         Assertions.assertTrue(scenario.getRegulation() instanceof AnarchyFactory);
 
     }
-
 
     @Test
     public void writePrettilyAndReadBack() throws Exception {
@@ -142,13 +140,13 @@ public class FishYAMLTest {
         final String dumped = yaml.dump(factory);
         System.out.println(dumped);
 
-        //test pretty printing
+        // test pretty printing
         Assertions.assertTrue(dumped.contains("percentageLimitOnDailyMovement: uniform 0.0 10.0"));
         Assertions.assertTrue(dumped.contains("carryingCapacity: normal 10000.0 10.0"));
 
-        //now read it back! (notice that I need to do "loadAs" because when writing prettily the factory gets written
-        //as a map; that's not an issue in scenarios because the constructor knows where factories ought to be but when
-        //the factory is written without any warning that it's going to be an AlgorithmFactory then things go badly
+        // now read it back! (notice that I need to do "loadAs" because when writing prettily the factory gets written
+        // as a map; that's not an issue in scenarios because the constructor knows where factories ought to be but when
+        // the factory is written without any warning that it's going to be an AlgorithmFactory then things go badly
         final DiffusingLogisticFactory factory2 = yaml.loadAs(dumped, DiffusingLogisticFactory.class);
         Assertions.assertEquals(((NormalDoubleParameter) factory2.getCarryingCapacity()).getMean(), 10000, .001);
         Assertions.assertEquals(
@@ -173,25 +171,23 @@ public class FishYAMLTest {
         );
         final FishYAML yaml = new FishYAML();
         final String dumped = yaml.dump(scenario);
-        //load back! Notice that because it's made "pretty" I still have to call loadAs
+        // load back! Notice that because it's made "pretty" I still have to call loadAs
         final Scenario scenario2 = yaml.loadAs(dumped, Scenario.class);
         Assertions.assertTrue(scenario2 instanceof PrototypeScenario);
 
-        //make sure it remembers that the regulations have changed
+        // make sure it remembers that the regulations have changed
         Assertions.assertTrue(((PrototypeScenario) scenario2).getRegulation() instanceof ProtectedAreasOnlyFactory);
-        //make sure three recursions in this is still correct.
+        // make sure three recursions in this is still correct.
         Assertions.assertEquals(
             ((FixedDoubleParameter) ((DiffusingLogisticFactory) ((PrototypeScenario) scenario2).getBiologyInitializer()).getDifferentialPercentageToMove()).getValue(),
             .9,
             .0001
         );
 
-
-        //final test, if I redump you, it'll be exactly like before
+        // final test, if I redump you, it'll be exactly like before
         final String dump2 = yaml.dump(scenario2);
         Assertions.assertEquals(dumped, dump2);
     }
-
 
     @SuppressWarnings("unchecked")
     @Test
@@ -486,7 +482,7 @@ public class FishYAMLTest {
         );
 
         // System.out.println(read);
-        //System.out.println(read.get("Flexible"));
+        // System.out.println(read.get("Flexible"));
         final Object flexible = read.get("Flexible");
         System.out.println(flexible.getClass());
         final Object biologyInitializer = ((Map<String, Object>) flexible).get("biologyInitializer");
@@ -500,20 +496,19 @@ public class FishYAMLTest {
 
     }
 
-
     @SuppressWarnings("unchecked")
     @Test
     public void optimizationParameters() {
 
         List<OptimizationParameter> parameters = new LinkedList<>();
-        //gear
-        //catchabilities
+        // gear
+        // catchabilities
         parameters.add(new CommaMapOptimizationParameter(
             4, "fisherDefinitions$" + 0 + ".gear.delegate.delegate.catchabilityMap",
             0,
             1
         ));
-        //garbage collectors
+        // garbage collectors
         parameters.add(new SimpleOptimizationParameter(
             "fisherDefinitions$" + 1 + ".gear.delegate.proportionSimulatedToGarbage",
             .10,
@@ -527,7 +522,6 @@ public class FishYAMLTest {
 
             )
         );
-
 
         final FishYAML yaml = new FishYAML();
         final String output = yaml.dump(parameters);

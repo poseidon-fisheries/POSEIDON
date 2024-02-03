@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import com.univocity.parsers.common.record.Record;
-import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.nio.file.Path;
 
@@ -31,7 +31,8 @@ public class SimpleAllocationGridsSupplier extends AbstractAllocationGridsSuppli
 
     public SimpleAllocationGridsSupplier(
         final Path gridsFilePath,
-        final MapExtent mapExtent, final String keyName
+        final MapExtent mapExtent,
+        final String keyName
     ) {
         this(
             gridsFilePath,

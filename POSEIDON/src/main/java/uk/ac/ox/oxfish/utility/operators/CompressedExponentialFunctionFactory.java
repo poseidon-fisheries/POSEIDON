@@ -21,7 +21,6 @@ package uk.ac.ox.oxfish.utility.operators;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-
 public class CompressedExponentialFunctionFactory
     implements AlgorithmFactory<CompressedExponentialFunction> {
 

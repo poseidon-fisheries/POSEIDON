@@ -28,7 +28,7 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FullSeasonalRetiredDe
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.MaxHoursPerYearDepartingFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import static org.mockito.Mockito.*;
 

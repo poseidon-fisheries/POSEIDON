@@ -23,8 +23,8 @@ package uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.FixedProfitThresholdExtractor;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 /**
  * Creates a Fixed Profit Threshold Extractor

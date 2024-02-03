@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.utility.parameters;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 /**
  * Returns a gaussian double value randomly
@@ -30,7 +31,6 @@ import ec.util.MersenneTwisterFast;
  */
 public class NormalDoubleParameter implements DoubleParameter {
 
-
     private double mean;
 
     private double standardDeviation;
@@ -38,7 +38,10 @@ public class NormalDoubleParameter implements DoubleParameter {
     public NormalDoubleParameter() {
     }
 
-    public NormalDoubleParameter(double mean, double standardDeviation) {
+    public NormalDoubleParameter(
+        double mean,
+        double standardDeviation
+    ) {
         Preconditions.checkArgument(standardDeviation >= 0);
         this.mean = mean;
         this.standardDeviation = standardDeviation;

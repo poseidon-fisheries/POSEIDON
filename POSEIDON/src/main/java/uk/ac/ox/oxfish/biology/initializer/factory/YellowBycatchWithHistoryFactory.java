@@ -24,7 +24,7 @@ import com.google.common.collect.Lists;
 import uk.ac.ox.oxfish.biology.initializer.YellowBycatchInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 import java.util.ArrayList;
 import java.util.List;

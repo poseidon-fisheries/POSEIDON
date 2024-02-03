@@ -1,19 +1,19 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.regulations;
 
-import uk.ac.ox.oxfish.regulations.ForbiddenIf;
-import uk.ac.ox.oxfish.regulations.conditions.*;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
-import uk.ac.ox.oxfish.utility.parameters.StringParameter;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
+import uk.ac.ox.poseidon.common.api.ModelState;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.StringParameter;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
+import uk.ac.ox.poseidon.regulations.core.ForbiddenIfFactory;
+import uk.ac.ox.poseidon.regulations.core.conditions.*;
 
 import java.time.MonthDay;
 import java.util.List;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.regulations.DefaultEpoRegulations.addDays;
-import static uk.ac.ox.oxfish.regulations.conditions.False.FALSE;
 
-public class TemporalClosure implements RegulationFactory, YearsActive {
+public class TemporalClosure implements ComponentFactory<Regulations>, YearsActive {
     private List<Integer> yearsActive;
     private StringParameter agentTag;
     private IntegerParameter beginningDay;
@@ -134,31 +134,44 @@ public class TemporalClosure implements RegulationFactory, YearsActive {
         this.endMonth = endMonth;
     }
 
+    public void setEnd(final MonthDay monthDay) {
+        setEndMonth(new IntegerParameter(monthDay.getMonthValue()));
+        setEndDay(new IntegerParameter(monthDay.getDayOfMonth()));
+    }
+
+    public void setBeginning(final MonthDay monthDay) {
+        setBeginningMonth(new IntegerParameter(monthDay.getMonthValue()));
+        setBeginningDay(new IntegerParameter(monthDay.getDayOfMonth()));
+    }
+
     @Override
-    public AlgorithmFactory<Regulations> get() {
+    public Regulations apply(final ModelState modelState) {
         final MonthDay beginning = beginning();
-        return new ForbiddenIf(
-            new AllOf(
-                new AgentHasTag(agentTag.getValue()),
-                new AnyOf(yearsActive.stream().map(InYear::new)),
-                new AnyOf(
+        return new ForbiddenIfFactory(
+            new AllOfFactory(
+                new AgentHasTagFactory(agentTag.getValue()),
+                new AnyOfFactory(yearsActive.stream().map(InYearFactory::new)),
+                new AnyOfFactory(
                     daysToForbidDeploymentsBefore.getIntValue() >= 1
                         ? forbidDeploymentsBefore(beginning, daysToForbidDeploymentsBefore.getIntValue())
-                        : FALSE,
-                    new BetweenYearlyDates(beginning, end())
+                        : new FalseFactory(),
+                    new BetweenYearlyDatesFactory(beginning, end())
                 )
             )
-        );
+        ).apply(modelState);
     }
 
     public MonthDay beginning() {
         return makeMonthDay(beginningMonth, beginningDay);
     }
 
-    static AllOf forbidDeploymentsBefore(final MonthDay beginning, final int numDays) {
-        return new AllOf(
-            new ActionCodeIs("DPL"),
-            new BetweenYearlyDates(
+    static AllOfFactory forbidDeploymentsBefore(
+        final MonthDay beginning,
+        final int numDays
+    ) {
+        return new AllOfFactory(
+            new ActionCodeIsFactory("DPL"),
+            new BetweenYearlyDatesFactory(
                 addDays(beginning, -numDays),
                 addDays(beginning, -1)
             )
@@ -169,17 +182,10 @@ public class TemporalClosure implements RegulationFactory, YearsActive {
         return makeMonthDay(endMonth, endDay);
     }
 
-    private static MonthDay makeMonthDay(final IntegerParameter month, final IntegerParameter day) {
+    private static MonthDay makeMonthDay(
+        final IntegerParameter month,
+        final IntegerParameter day
+    ) {
         return MonthDay.of(month.getIntValue(), day.getIntValue());
-    }
-
-    public void setEnd(final MonthDay monthDay) {
-        setEndMonth(new IntegerParameter(monthDay.getMonthValue()));
-        setEndDay(new IntegerParameter(monthDay.getDayOfMonth()));
-    }
-
-    public void setBeginning(final MonthDay monthDay) {
-        setBeginningMonth(new IntegerParameter(monthDay.getMonthValue()));
-        setBeginningDay(new IntegerParameter(monthDay.getDayOfMonth()));
     }
 }

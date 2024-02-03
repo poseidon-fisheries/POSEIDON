@@ -2,10 +2,11 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import com.univocity.parsers.common.record.Record;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,10 +14,10 @@ import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class WeibullPerSpeciesCarryingCapacitiesFromFileFactory
-    implements uk.ac.ox.oxfish.utility.AlgorithmFactory<CarryingCapacitySupplier> {
+    implements AlgorithmFactory<CarryingCapacitySupplier> {
 
     private DoubleParameter capacityScalingFactor;
     private DoubleParameter shapeScalingFactor;

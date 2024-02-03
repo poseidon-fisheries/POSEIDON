@@ -36,7 +36,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class LocationFisherValuesByActionCache extends FisherValuesByActionFromFileCache<Map<Coordinate, Double>> {
 

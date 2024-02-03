@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
-
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
@@ -36,8 +35,8 @@ import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.DefaultBeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.util.function.Predicate;
@@ -53,7 +52,6 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
         new HourlyProfitObjectiveFactory();
 
     private DoubleParameter stepSize = new UniformDoubleParameter(1d, 10d);
-
 
     private AlgorithmFactory<? extends AdaptationProbability> probability =
         new ExplorationPenaltyProbabilityFactory(
@@ -72,15 +70,12 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
      */
     private DoubleParameter dropInUtilityNeededForUnfriend = new FixedDoubleParameter(-1);
 
-
     /**
      * whether, when imitating, you ask your friend who is doing best (true) or a friend at random (false)
      */
     private boolean alwaysCopyBest = BeamHillClimbing.DEFAULT_ALWAYS_COPY_BEST;
 
-
     private boolean backtracksOnBadExploration = BeamHillClimbing.DEFAULT_BACKTRACKS_ON_BAD_EXPLORATION;
-
 
     /**
      * if this is true, the exploration tries hard to avoid protected areas.
@@ -92,15 +87,12 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
      */
     private boolean automaticallyIgnoreAreasWhereFishNeverGrows = false;
 
-
     private boolean ignoreFailedTrips = false;
-
 
     /**
      * if this is a positive number then the very first "random" option cannot be more distant from port than
      */
     private double maxInitialDistance = -1;
-
 
     /**
      * Applies this function to the given argument.
@@ -124,7 +116,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
             explorationValidator =
                 explorationValidator.and(seaTile -> seaTile.isFishingEvenPossibleHere());
         }
-        if (probabilityUnfriending <= 0) { //no unfriending
+        if (probabilityUnfriending <= 0) { // no unfriending
 
             algorithm = new DefaultBeamHillClimbing(alwaysCopyBest,
                 BeamHillClimbing.DEFAULT_DYNAMIC_NETWORK,
@@ -140,15 +132,14 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
             );
         }
 
-        //never start from an invalid spot!
+        // never start from an invalid spot!
         SeaTile initialFavoriteSpot;
         do {
             initialFavoriteSpot = map.getRandomBelowWaterLineSeaTile(random);
         }
         while (!explorationValidator.test(initialFavoriteSpot));
 
-
-        //add gatherer if necessary
+        // add gatherer if necessary
         if (state.getYearlyDataSet().getColumn(EXPLORING_COLUMN_NAME) == null) {
             registerGatherer(state, EXPLORING_COLUMN_NAME);
             registerGatherer(state, EXPLOITING_COLUMN_NAME);
@@ -162,10 +153,12 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
             ignoreFailedTrips, maxInitialDistance
         );
 
-
     }
 
-    private void registerGatherer(final FishState state, final String exploringColumnName) {
+    private void registerGatherer(
+        final FishState state,
+        final String exploringColumnName
+    ) {
         state.getYearlyDataSet().registerGatherer(exploringColumnName,
             (Gatherer<FishState>) fishState -> {
                 double sum = 0;
@@ -200,13 +193,11 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
         return probability;
     }
 
-
     public void setProbability(
         final AlgorithmFactory<? extends AdaptationProbability> probability
     ) {
         this.probability = probability;
     }
-
 
     public DoubleParameter getDropInUtilityNeededForUnfriend() {
         return dropInUtilityNeededForUnfriend;
@@ -225,7 +216,6 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
     public void setAlwaysCopyBest(final boolean alwaysCopyBest) {
         this.alwaysCopyBest = alwaysCopyBest;
     }
-
 
     /**
      * Getter for property 'objectiveFunction'.
@@ -246,7 +236,6 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
     ) {
         this.objectiveFunction = objectiveFunction;
     }
-
 
     /**
      * Getter for property 'backtracksOnBadExploration'.
@@ -296,12 +285,12 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
     /**
      * Setter for property 'automaticallyIgnoreAreasWhereFishNeverGrows'.
      *
-     * @param automaticallyIgnoreAreasWhereFishNeverGrows Value to set for property 'automaticallyIgnoreAreasWhereFishNeverGrows'.
+     * @param automaticallyIgnoreAreasWhereFishNeverGrows Value to set for property
+     *                                                    'automaticallyIgnoreAreasWhereFishNeverGrows'.
      */
     public void setAutomaticallyIgnoreAreasWhereFishNeverGrows(final boolean automaticallyIgnoreAreasWhereFishNeverGrows) {
         this.automaticallyIgnoreAreasWhereFishNeverGrows = automaticallyIgnoreAreasWhereFishNeverGrows;
     }
-
 
     /**
      * Getter for property 'ignoreFailedTrips'.
@@ -320,7 +309,6 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
     public void setIgnoreFailedTrips(final boolean ignoreFailedTrips) {
         this.ignoreFailedTrips = ignoreFailedTrips;
     }
-
 
     /**
      * Getter for property 'maxInitialDistance'.

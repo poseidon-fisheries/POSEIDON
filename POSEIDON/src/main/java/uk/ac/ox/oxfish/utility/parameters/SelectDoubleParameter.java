@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.utility.parameters;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 import java.util.Arrays;
 

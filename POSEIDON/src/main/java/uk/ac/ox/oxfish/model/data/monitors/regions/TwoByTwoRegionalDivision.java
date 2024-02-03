@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.model.data.monitors.regions;
 import com.google.common.collect.ImmutableList;
 import com.vividsolutions.jts.geom.Coordinate;
 import sim.util.Double2D;
-import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.util.Collection;
 import java.util.List;

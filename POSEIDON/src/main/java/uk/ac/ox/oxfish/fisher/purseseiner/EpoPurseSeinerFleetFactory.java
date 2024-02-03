@@ -9,9 +9,9 @@ import uk.ac.ox.oxfish.geography.ports.PortInitializerFromFileFactory;
 import uk.ac.ox.oxfish.model.data.distributions.EmpiricalCatchSizeDistributionsFromFile;
 import uk.ac.ox.oxfish.model.data.monitors.CatchSizeDistributionMonitorsFactory;
 import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 public class EpoPurseSeinerFleetFactory extends PurseSeinerFleetFactory {
     @SuppressWarnings("unused")

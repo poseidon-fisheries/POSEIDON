@@ -28,13 +28,13 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.ParticleSwarmAlgorithm;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 /**
- * Creates a trip strategy that uses PSO for imitating and randomly shocks velocity for exploration
- * Created by carrknight on 7/28/15.
+ * Creates a trip strategy that uses PSO for imitating and randomly shocks velocity for exploration Created by
+ * carrknight on 7/28/15.
  */
 public class PerTripParticleSwarmFactory implements AlgorithmFactory<PerTripIterativeDestinationStrategy> {
 
@@ -42,13 +42,11 @@ public class PerTripParticleSwarmFactory implements AlgorithmFactory<PerTripIter
 
     private DoubleParameter explorationProbability = new FixedDoubleParameter(.3d);
 
-
     private DoubleParameter memoryWeight = new UniformDoubleParameter(.5, 1);
 
     private DoubleParameter friendWeight = new UniformDoubleParameter(.5, 1);
 
     private DoubleParameter inertia = new UniformDoubleParameter(.3, .8);
-
 
     /**
      * Applies this function to the given argument.
@@ -60,7 +58,6 @@ public class PerTripParticleSwarmFactory implements AlgorithmFactory<PerTripIter
     public PerTripIterativeDestinationStrategy apply(final FishState state) {
         final MersenneTwisterFast random = state.random;
         final NauticalMap map = state.getMap();
-
 
         return new PerTripIterativeDestinationStrategy(
             new FavoriteDestinationStrategy(map, random),
@@ -83,7 +80,6 @@ public class PerTripParticleSwarmFactory implements AlgorithmFactory<PerTripIter
         );
 
     }
-
 
     public DoubleParameter getExplorationShockSize() {
         return explorationShockSize;

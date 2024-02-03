@@ -56,6 +56,8 @@ import uk.ac.ox.oxfish.model.plugins.EntryPlugin;
 import uk.ac.ox.oxfish.model.scenario.*;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
+import uk.ac.ox.poseidon.common.api.ModelState;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.math.BigDecimal;
@@ -71,12 +73,10 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
 /**
- * The main model object. Like all the other simstates it holds the reference
- * to schedule and randomizer
- * Created by carrknight on 3/29/15.
+ * The main model object. Like all the other simstates it holds the reference to schedule and randomizer Created by
+ * carrknight on 3/29/15.
  */
-public class FishState extends SimState {
-
+public class FishState extends SimState implements ModelState {
 
     public static final String DEFAULT_POPULATION_NAME = "default_population";
     private static final long serialVersionUID = 6085587632144345700L;
@@ -155,8 +155,8 @@ public class FishState extends SimState {
      */
     private SocialNetwork socialNetwork;
     /**
-     * here you store all entryPlugins (any steppable that can automatically generate new fishers over time).
-     * This is useful for regulations to pause them
+     * here you store all entryPlugins (any steppable that can automatically generate new fishers over time). This is
+     * useful for regulations to pause them
      */
 
     private List<EntryPlugin> entryPlugins;
@@ -165,7 +165,10 @@ public class FishState extends SimState {
         this(System.currentTimeMillis(), 1);
     }
 
-    public FishState(final long seed, final int stepsPerDay) {
+    public FishState(
+        final long seed,
+        final int stepsPerDay
+    ) {
         super(seed);
         this.stepsPerDay = stepsPerDay;
 
@@ -176,7 +179,6 @@ public class FishState extends SimState {
                 aggregateYearlySteppables.put(order, new AggregateSteppable());
                 aggregateDailySteppables.put(order, new AggregateSteppable());
             }
-
 
     }
 
@@ -189,7 +191,10 @@ public class FishState extends SimState {
         this(seed, 1);
     }
 
-    public static double round(final double value, final int places) {
+    public static double round(
+        final double value,
+        final int places
+    ) {
         if (places < 0) throw new IllegalArgumentException();
 
         BigDecimal bd = new BigDecimal(value);
@@ -221,25 +226,22 @@ public class FishState extends SimState {
     }
 
     /**
-     * so far it does the following:
-     * * read in the data into a the raster
+     * so far it does the following: * read in the data into a the raster
      */
     @Override
     public void start() {
 
-
         Preconditions.checkState(!started, "Already started!");
         super.start();
 
-        //prepare containers
+        // prepare containers
         entryPlugins = new LinkedList<>();
 
-
-        //start the counter
+        // start the counter
         yearlyCounter.start(this);
         dailyCounter.start(this);
 
-        //schedule aggregate steppables
+        // schedule aggregate steppables
 
         for (final Entry<StepOrder, AggregateSteppable> steppable : aggregateYearlySteppables.entrySet())
             schedule.scheduleRepeating(steppable.getValue(), steppable.getKey().ordinal(), stepsPerDay * 365);
@@ -260,8 +262,7 @@ public class FishState extends SimState {
         socialNetwork.populate(this);
         map.start(this);
 
-
-        //start the markets (for each port
+        // start the markets (for each port
         for (final Port port : getPorts()) {
             for (final Market market : port.getDefaultMarketMap().getMarkets()) {
                 market.start(this);
@@ -273,12 +274,11 @@ public class FishState extends SimState {
                 );
         }
 
-        //start the fishers
+        // start the fishers
         for (final Fisher fisher : fishers)
             fisher.start(this);
 
-
-        //start everything else that required to be started
+        // start everything else that required to be started
         for (final Startable startable : toStart)
             startable.start(this);
 
@@ -288,7 +288,6 @@ public class FishState extends SimState {
         dailyDataSet.start(this, this);
         yearlyDataSet.start(this, this);
         started = true;
-
 
     }
 
@@ -379,7 +378,10 @@ public class FishState extends SimState {
         return ((timeStep / stepsPerDay) % 365) + 1;
     }
 
-    public void scheduleOnce(final Steppable steppable, final StepOrder order) {
+    public void scheduleOnce(
+        final Steppable steppable,
+        final StepOrder order
+    ) {
         schedule.scheduleOnce(steppable, order.ordinal());
     }
 
@@ -390,7 +392,11 @@ public class FishState extends SimState {
      * @param order       order at which to step it
      * @param daysFromNow how many days from now
      */
-    public void scheduleOnceInXDays(final Steppable steppable, final StepOrder order, final int daysFromNow) {
+    public void scheduleOnceInXDays(
+        final Steppable steppable,
+        final StepOrder order,
+        final int daysFromNow
+    ) {
         schedule.scheduleOnceIn(stepsPerDay * daysFromNow, steppable, order.ordinal());
     }
 
@@ -409,7 +415,7 @@ public class FishState extends SimState {
     ) {
 
         final Steppable container = simState -> {
-            //the plus one is because when this is stepped it's the 365th day
+            // the plus one is because when this is stepped it's the 365th day
             if (((FishState) simState).getYear() + 1 == year) {
                 steppable.step(simState);
             }
@@ -419,14 +425,21 @@ public class FishState extends SimState {
 
     }
 
-    public Stoppable scheduleEveryYear(final Steppable steppable, final StepOrder order) {
+    public Stoppable scheduleEveryYear(
+        final Steppable steppable,
+        final StepOrder order
+    ) {
         if (order.isToRandomize())
             return schedule.scheduleRepeating(steppable, order.ordinal(), 365 * stepsPerDay);
         else
             return aggregateYearlySteppables.get(order).add(steppable);
     }
 
-    public Stoppable schedulePerPolicy(final Steppable steppable, final StepOrder order, final IntervalPolicy policy) {
+    public Stoppable schedulePerPolicy(
+        final Steppable steppable,
+        final StepOrder order,
+        final IntervalPolicy policy
+    ) {
         switch (policy) {
             case EVERY_STEP:
                 return scheduleEveryStep(steppable, order);
@@ -443,18 +456,28 @@ public class FishState extends SimState {
         return null;
     }
 
-    public Stoppable scheduleEveryStep(final Steppable steppable, final StepOrder order) {
+    public Stoppable scheduleEveryStep(
+        final Steppable steppable,
+        final StepOrder order
+    ) {
         return schedule.scheduleRepeating(steppable, order.ordinal(), 1.0);
     }
 
-    public Stoppable scheduleEveryDay(final Steppable steppable, final StepOrder order) {
+    public Stoppable scheduleEveryDay(
+        final Steppable steppable,
+        final StepOrder order
+    ) {
         if (order.isToRandomize())
             return schedule.scheduleRepeating(steppable, order.ordinal(), stepsPerDay);
         else
             return aggregateDailySteppables.get(order).add(steppable);
     }
 
-    public Stoppable scheduleEveryXDay(final Steppable steppable, final StepOrder order, final int periodInDays) {
+    public Stoppable scheduleEveryXDay(
+        final Steppable steppable,
+        final StepOrder order,
+        final int periodInDays
+    ) {
         return schedule.scheduleRepeating(steppable, order.ordinal(), stepsPerDay * periodInDays);
     }
 
@@ -471,7 +494,10 @@ public class FishState extends SimState {
         return fadBiomass + map.getTotalBiomass(species);
     }
 
-    public double getTotalAbundance(final Species species, final int bin) {
+    public double getTotalAbundance(
+        final Species species,
+        final int bin
+    ) {
         return
             map.getAllSeaTilesExcludingLandAsList().stream().filter(
                     seaTile -> !(seaTile.getBiology() instanceof EmptyLocalBiology)
@@ -508,7 +534,11 @@ public class FishState extends SimState {
         return totalAbundance;
     }
 
-    public double getTotalAbundance(final Species species, final int subdivision, final int bin) {
+    public double getTotalAbundance(
+        final Species species,
+        final int subdivision,
+        final int bin
+    ) {
         double sum = 0;
         for (final SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
             if (seaTile.isFishingEvenPossibleHere())
@@ -522,7 +552,10 @@ public class FishState extends SimState {
      *
      * @param startable the object to start
      */
-    public void registerStartable(final FisherStartable startable, final Fisher fisher) {
+    public void registerStartable(
+        final FisherStartable startable,
+        final Fisher fisher
+    ) {
         if (started)
             startable.start(this, fisher);
         else
@@ -543,9 +576,9 @@ public class FishState extends SimState {
     }
 
     public List<Market> getAllMarketsForThisSpecie(final Species species) {
-        //ports can share markets and we don't want to double count
+        // ports can share markets and we don't want to double count
         final Set<Market> toAggregate = new HashSet<>();
-        //now get for each port, its markets
+        // now get for each port, its markets
         for (final Port port : getPorts()) {
             final Market market = port.getDefaultMarketMap().getMarket(species);
             if (market != null)
@@ -565,6 +598,15 @@ public class FishState extends SimState {
 
     public MersenneTwisterFast getRandom() {
         return random;
+    }
+
+    @Override
+    public MapExtent getMapExtent() {
+        return getMap().getMapExtent();
+    }
+
+    public NauticalMap getMap() {
+        return map;
     }
 
     public Double getLatestDailyObservation(final String columnName) {
@@ -629,7 +671,7 @@ public class FishState extends SimState {
     public void registerStartable(final Startable startable) {
         if (started) {
             startable.start(this);
-            //store it anyway
+            // store it anyway
             toStart.add(startable);
 
             //  scheduleOnce((Steppable) simState -> startable.start(FishState.this), StepOrder.DAWN);
@@ -644,7 +686,6 @@ public class FishState extends SimState {
      */
     public FisherFactory getFisherFactory(final String nameOfPopulation) {
         return fisherFactory.get(nameOfPopulation);
-
 
     }
 
@@ -684,7 +725,7 @@ public class FishState extends SimState {
      * //todo move this to a config file rather than an all or nothing switch
      */
     public void attachAdditionalGatherers() {
-        //keep track of average X location at the end of the year
+        // keep track of average X location at the end of the year
         final DataColumn dailyX = this.dailyDataSet.registerGatherer(
             "Average X Towed",
             makeMostFishedTileGatherer((fisher, mostFishedTileInTrip) ->
@@ -693,14 +734,14 @@ public class FishState extends SimState {
             Double.NaN
         );
 
-        //yearly you account for the average
+        // yearly you account for the average
         this.yearlyDataSet.registerGatherer(
             "Average X Towed",
             FishStateUtilities.generateYearlyAverage(dailyX),
             Double.NaN
         );
 
-        //keep track of average X location at the end of the year
+        // keep track of average X location at the end of the year
         this.dailyDataSet.registerGatherer(
             "Average Distance From Port",
             makeMostFishedTileGatherer((fisher, mostFishedTileInTrip) ->
@@ -734,7 +775,6 @@ public class FishState extends SimState {
             , Double.NaN
         );
 
-
         this.yearlyDataSet.registerGatherer("Mileage-Catch Correlation",
             (Gatherer<FishState>) state -> {
 
@@ -758,7 +798,6 @@ public class FishState extends SimState {
                     );
                 else
                     return Double.NaN;
-
 
             }
             , Double.NaN
@@ -785,18 +824,16 @@ public class FishState extends SimState {
         };
     }
 
-    public NauticalMap getMap() {
-        return map;
-    }
-
-    public Bag getFishersAtLocation(final int x, final int y) {
+    public Bag getFishersAtLocation(
+        final int x,
+        final int y
+    ) {
         return map.getFishersAtLocation(x, y);
     }
 
     public Bag getFishersAtLocation(final SeaTile tile) {
         return map.getFishersAtLocation(tile);
     }
-
 
     /**
      * Getter for property 'outputPlugins'.
@@ -846,7 +883,7 @@ public class FishState extends SimState {
             map.turnOff();
         aggregateYearlySteppables.clear();
         aggregateDailySteppables.clear();
-        entryPlugins.clear(); //should automatically turn off because they were scheduled
+        entryPlugins.clear(); // should automatically turn off because they were scheduled
 
     }
 

@@ -32,7 +32,7 @@ import uk.ac.ox.oxfish.model.regs.factory.IQMonoFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MultiITQFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -52,11 +52,10 @@ import java.util.logging.Logger;
 
 public class FriendsAndTac {
 
-
     public static final int NUMBER_OF_RUNS = 1000;
     public static final int NUMBER_OF_FISHERS = 20;
     public static final int NUMBER_OF_YEARS_NOT_RECORDED = 1;
-    public static final int NUMBER_OF_YEARS_FISHING = 5; //20;
+    public static final int NUMBER_OF_YEARS_FISHING = 5; // 20;
     public static final int MIN_NUMBER_OF_FRIENDS = 0;
     public static final int MAX_NUMBER_OF_FRIENDS = 20;
     public static final String COMMON_HEADINGS = "regulation,run,year";
@@ -69,7 +68,6 @@ public class FriendsAndTac {
         new LinkedHashMap<>();
 
     static {
-
 
 //        regulations.put(
 //                "anarchy",
@@ -84,7 +82,6 @@ public class FriendsAndTac {
 //                tac
 //        );
 
-
         final IQMonoFactory iq = new IQMonoFactory();
         iq.setIndividualQuota(new FixedDoubleParameter(10000d));
         regulations.put(
@@ -92,16 +89,14 @@ public class FriendsAndTac {
             iq
         );
 
-
         final MultiITQFactory itq = new MultiITQFactory();
         itq.setQuotaFirstSpecie(new FixedDoubleParameter(10000d));
         itq.setAllowMultipleTrades(true);
-        //itq.setIndividualQuota(new FixedDoubleParameter(5000d));
+        // itq.setIndividualQuota(new FixedDoubleParameter(5000d));
         regulations.put(
             "high_itq",
             itq
         );
-
 
     }
 
@@ -143,11 +138,11 @@ public class FriendsAndTac {
     }
 
     public static void main(final String[] args) throws IOException {
-        //spreadOut();
+        // spreadOut();
         spreadOutClub();
-        //allEqual(null);
-        //allEqualRaw(null);
-        //allEqualClubs();
+        // allEqual(null);
+        // allEqualRaw(null);
+        // allEqualClubs();
     }
 
     public static void spreadOutClub() throws IOException {
@@ -176,14 +171,13 @@ public class FriendsAndTac {
 
                 scenario.setRegulation(regulation.getValue());
 
-                //these runs have all the same number of friends
+                // these runs have all the same number of friends
                 final ClubNetworkBuilder networkBuilder = new ClubNetworkBuilder();
                 networkBuilder.setClubSize(new UniformDoubleParameter(
                     MIN_NUMBER_OF_FRIENDS,
                     MAX_NUMBER_OF_FRIENDS
                 ));
                 scenario.setNetworkBuilder(networkBuilder);
-
 
                 state.start();
                 while (state.getYear() <= NUMBER_OF_YEARS_NOT_RECORDED)
@@ -192,7 +186,7 @@ public class FriendsAndTac {
 
                 while (state.getYear() <= NUMBER_OF_YEARS_FISHING) {
                     state.schedule.step(state);
-                    //first day of the year!
+                    // first day of the year!
                     if (state.getDayOfTheYear() == 1) {
                         final String commonRows = regulation.getKey() + "," + run + "," + state.getYear();
                         for (final Fisher fisher : state.getFishers()) {
@@ -201,16 +195,19 @@ public class FriendsAndTac {
                     }
                 }
 
-
             }
         }
         fileWriter.close();
 
     }
 
-    private static FileWriter writeHeading(final File outputFile, final String commonRows) throws IOException {
+    private static FileWriter writeHeading(
+        final File outputFile,
+        final String commonRows
+    ) throws IOException {
         final FileWriter writer = new FileWriter(outputFile);
-        //writer.write("price_low,price_high,landings,earnings,cash-flow,landings_0,landings_1,landings_2,discarding_agents,catches_0");
+        // writer.write("price_low,price_high,landings,earnings,cash-flow,landings_0,landings_1,landings_2,
+        // discarding_agents,catches_0");
         writer.write(commonRows);
         for (final Map.Entry<String, Function<Fisher, String>> column : columns.entrySet()) {
             writer.write(",");
@@ -222,7 +219,7 @@ public class FriendsAndTac {
 
     }
 
-    //common rows is all the rows that do not depend on the fisher
+    // common rows is all the rows that do not depend on the fisher
     private static void writeLine(
         final Fisher fisher,
         final FileWriter writer,
@@ -235,7 +232,6 @@ public class FriendsAndTac {
         }
         writer.write("\n");
         writer.flush();
-
 
     }
 
@@ -254,7 +250,12 @@ public class FriendsAndTac {
                 for (int run = 0; run < NUMBER_OF_RUNS; run++) {
 
                     Logger.getGlobal()
-                        .info("STARTING WITH  CLUB SCENARIO " + regulation.getKey() + " - RUN " + run + " - FRIENDS " + friends);
+                        .info("STARTING WITH  CLUB SCENARIO " +
+                            regulation.getKey() +
+                            " - RUN " +
+                            run +
+                            " - FRIENDS " +
+                            friends);
                     final FishState state = new FishState(run);
                     final FishYAML yaml = new FishYAML();
                     final PrototypeScenario scenario = yaml.loadAs(
@@ -265,15 +266,13 @@ public class FriendsAndTac {
                     state.setScenario(scenario);
                     scenario.setFishers(NUMBER_OF_FISHERS);
 
-                    //these runs have all the same number of friends
+                    // these runs have all the same number of friends
 
                     final ClubNetworkBuilder clubs = new ClubNetworkBuilder();
                     clubs.setClubSize(new FixedDoubleParameter(friends));
                     scenario.setNetworkBuilder(clubs);
 
-
                     scenario.setRegulation(regulation.getValue());
-
 
                     state.start();
                     while (state.getYear() <= NUMBER_OF_YEARS_NOT_RECORDED)
@@ -282,7 +281,7 @@ public class FriendsAndTac {
 
                     while (state.getYear() <= NUMBER_OF_YEARS_FISHING) {
                         state.schedule.step(state);
-                        //first day of the year!
+                        // first day of the year!
                         if (state.getDayOfTheYear() == 1) {
                             final String commonRows = regulation.getKey() + "," + run + "," + state.getYear();
                             for (final Fisher fisher : state.getFishers()) {
@@ -291,7 +290,6 @@ public class FriendsAndTac {
                         }
                     }
                 }
-
 
             }
         }
@@ -325,13 +323,12 @@ public class FriendsAndTac {
 
                 scenario.setRegulation(regulation.getValue());
 
-                //these runs have all the same number of friends
+                // these runs have all the same number of friends
                 final FixedNumberOfEdges networkBuilder = new FixedNumberOfEdges();
                 networkBuilder.setEdges(new FixedDoubleParameter(MAX_NUMBER_OF_FRIENDS));
-                //set some runs for
+                // set some runs for
 
                 scenario.setNetworkBuilder(networkBuilder);
-
 
                 state.start();
                 while (state.getYear() <= NUMBER_OF_YEARS_NOT_RECORDED)
@@ -340,7 +337,7 @@ public class FriendsAndTac {
 
                 while (state.getYear() <= NUMBER_OF_YEARS_FISHING) {
                     state.schedule.step(state);
-                    //first day of the year!
+                    // first day of the year!
                     if (state.getDayOfTheYear() == 1) {
                         final String commonRows = regulation.getKey() + "," + run + "," + state.getYear();
                         for (final Fisher fisher : state.getFishers()) {
@@ -348,7 +345,6 @@ public class FriendsAndTac {
                         }
                     }
                 }
-
 
             }
         }
@@ -387,13 +383,12 @@ public class FriendsAndTac {
                     state.setScenario(scenario);
                     scenario.setFishers(NUMBER_OF_FISHERS);
 
-                    //these runs have all the same number of friends
+                    // these runs have all the same number of friends
                     final EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
                     networkBuilder.setDegree(new FixedDoubleParameter(friends));
                     scenario.setNetworkBuilder(networkBuilder);
 
                     scenario.setRegulation(regulation.getValue());
-
 
                     state.start();
                     while (state.getYear() <= NUMBER_OF_YEARS_NOT_RECORDED)
@@ -402,7 +397,7 @@ public class FriendsAndTac {
 
                     while (state.getYear() <= NUMBER_OF_YEARS_FISHING) {
                         state.schedule.step(state);
-                        //first day of the year!
+                        // first day of the year!
                         if (state.getDayOfTheYear() == 1) {
                             final String commonRows = regulation.getKey() + "," + run + "," + state.getYear();
                             for (final Fisher fisher : state.getFishers()) {
@@ -411,7 +406,6 @@ public class FriendsAndTac {
                         }
                     }
                 }
-
 
             }
         }
@@ -450,13 +444,12 @@ public class FriendsAndTac {
                     state.setScenario(scenario);
                     scenario.setFishers(NUMBER_OF_FISHERS);
 
-                    //these runs have all the same number of friends
+                    // these runs have all the same number of friends
                     final FixedNumberOfEdges networkBuilder = new FixedNumberOfEdges();
                     networkBuilder.setEdges(new FixedDoubleParameter(friends));
                     scenario.setNetworkBuilder(networkBuilder);
 
                     scenario.setRegulation(regulation.getValue());
-
 
                     state.start();
                     while (state.getYear() <= NUMBER_OF_YEARS_NOT_RECORDED)
@@ -465,16 +458,16 @@ public class FriendsAndTac {
 
                     while (state.getYear() <= NUMBER_OF_YEARS_FISHING) {
                         state.schedule.step(state);
-                        //first day of the year!
+                        // first day of the year!
                         if (state.getDayOfTheYear() == 1) {
-                            final String commonRows = regulation.getKey() + "," + run + "," + state.getYear() + "," + friends;
+                            final String commonRows =
+                                regulation.getKey() + "," + run + "," + state.getYear() + "," + friends;
                             for (final Fisher fisher : state.getFishers()) {
                                 writeLine(fisher, fileWriter, commonRows);
                             }
                         }
                     }
                 }
-
 
             }
         }

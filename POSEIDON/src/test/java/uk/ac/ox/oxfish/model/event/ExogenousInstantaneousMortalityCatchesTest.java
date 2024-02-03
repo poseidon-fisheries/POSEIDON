@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBoxcarAbstractFa
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesRegularBoxcarFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 public class ExogenousInstantaneousMortalityCatchesTest {
 

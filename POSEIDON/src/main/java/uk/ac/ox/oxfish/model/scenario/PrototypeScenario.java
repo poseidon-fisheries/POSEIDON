@@ -77,8 +77,8 @@ import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.FixedMap;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 import java.util.HashMap;
@@ -88,11 +88,10 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
- * This is the most general conceptual scenario we have. Almost everything is pluggable
- * Created by carrknight on 4/20/15.
+ * This is the most general conceptual scenario we have. Almost everything is pluggable Created by carrknight on
+ * 4/20/15.
  */
 public class PrototypeScenario implements Scenario {
-
 
     /**
      * automatically forces the "AdditionalFishStateDailyCollectors" plugin
@@ -117,11 +116,10 @@ public class PrototypeScenario implements Scenario {
      */
     private boolean cheaters = false;
     /**
-     * when this flag is true, agents use their memory to predict future catches and profits. It is necessary
-     * for ITQs to work
+     * when this flag is true, agents use their memory to predict future catches and profits. It is necessary for ITQs
+     * to work
      */
     private boolean usePredictors = false;
-
 
     /**
      * the X position of the port on the grid. If null or a negative number the position is randomized
@@ -174,8 +172,8 @@ public class PrototypeScenario implements Scenario {
     private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
     private List<StartingMPA> startingMPAs = new LinkedList<>();
     /**
-     * if this is not NaN then it is used as the random seed to feed into the map-making function. This allows for randomness
-     * in the biology/fishery
+     * if this is not NaN then it is used as the random seed to feed into the map-making function. This allows for
+     * randomness in the biology/fishery
      */
     private Long mapMakerDedicatedRandomSeed = null;
     private AlgorithmFactory<? extends LogbookInitializer> logbook =
@@ -184,9 +182,9 @@ public class PrototypeScenario implements Scenario {
         new LinkedList<>();
 
     {
-        //best first: startingMPAs.add(new StartingMPA(5,33,35,18));
-        //best third:
-        //startingMPAs.add(new StartingMPA(0,26,34,40));
+        // best first: startingMPAs.add(new StartingMPA(5,33,35,18));
+        // best third:
+        // startingMPAs.add(new StartingMPA(0,26,34,40));
     }
 
     {
@@ -221,43 +219,38 @@ public class PrototypeScenario implements Scenario {
         MersenneTwisterFast mapMakerRandom = model.random;
         if (mapMakerDedicatedRandomSeed != null)
             mapMakerRandom = new MersenneTwisterFast(mapMakerDedicatedRandomSeed);
-        //force the mapMakerRandom as the new random until the start is completed.
+        // force the mapMakerRandom as the new random until the start is completed.
         model.random = mapMakerRandom;
-
 
         final BiologyInitializer biology = biologyInitializer.apply(model);
         final WeatherInitializer weather = weatherInitializer.apply(model);
 
-        //create global biology
+        // create global biology
         final GlobalBiology global = biology.generateGlobal(mapMakerRandom, model);
-
 
         final MapInitializer mapMaker = mapInitializer.apply(model);
         final NauticalMap map = mapMaker.makeMap(mapMakerRandom, global, model);
 
-        //set habitats
+        // set habitats
         final HabitatInitializer habitat = habitatInitializer.apply(model);
         habitat.applyHabitats(map, mapMakerRandom, model);
 
-
-        //this next static method calls biology.initialize, weather.initialize and the like
+        // this next static method calls biology.initialize, weather.initialize and the like
         NauticalMapFactory.initializeMap(map, mapMakerRandom, biology,
             weather,
             global, model
         );
 
-
-        //create fixed price market
+        // create fixed price market
         final MarketMap marketMap = new MarketMap(global);
         /*
       market prices for each species
      */
 
-
         for (final Species species : global.getSpecies())
             marketMap.addMarket(species, market.apply(model));
 
-        //create random ports, all sharing the same market
+        // create random ports, all sharing the same market
         if (portPositionX == null || portPositionX < 0)
             RandomPortInitializer.addRandomPortsToMap(map, ports, seaTile -> marketMap, mapMakerRandom,
                 new FixedGasPrice(
@@ -271,22 +264,20 @@ public class PrototypeScenario implements Scenario {
             map.addPort(port);
         }
 
-        //create initial mpas
+        // create initial mpas
         if (startingMPAs != null)
             for (final StartingMPA mpa : startingMPAs) {
                 Logger.getGlobal().info("building MPA at " + mpa.getTopLeftX() + ", " + mpa.getTopLeftY());
                 mpa.buildMPA(map);
             }
 
-        //todo make sure the mapmaker randomizer is dead everywhere
+        // todo make sure the mapmaker randomizer is dead everywhere
 
-        //substitute back the original randomizer
+        // substitute back the original randomizer
         model.random = random;
-
 
         return new ScenarioEssentials(global, map);
     }
-
 
     /**
      * called shortly after the essentials are set, it is time now to return a list of all the agents
@@ -302,22 +293,20 @@ public class PrototypeScenario implements Scenario {
         final GlobalBiology biology = model.getBiology();
         final MersenneTwisterFast random = model.random;
 
-
         final Port[] ports = map.getPorts().toArray(new Port[map.getPorts().size()]);
         for (final Port port : ports)
             port.setGasPricePerLiter(gasPricePerLiter.applyAsDouble(random));
 
-        //create logbook initializer
+        // create logbook initializer
         final LogbookInitializer log = logbook.apply(model);
         log.start(model);
 
-
-        //adds predictors to the fisher if the usepredictors flag is up.
-        //without predictors agents do not participate in ITQs
+        // adds predictors to the fisher if the usepredictors flag is up.
+        // without predictors agents do not participate in ITQs
         final Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(usePredictors, biology);
 
-        //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
-        //while the model is running
+        // create the fisher factory object, it will be used by the fishstate object to create and kill fishers
+        // while the model is running
         final FisherFactory fisherFactory = new FisherFactory(
             () -> ports[random.nextInt(ports.length)],
             regulation,
@@ -339,14 +328,14 @@ public class PrototypeScenario implements Scenario {
 
             0
         );
-        //add predictor setup to the factory
+        // add predictor setup to the factory
         fisherFactory.getAdditionalSetups().add(predictorSetup);
         fisherFactory.getAdditionalSetups().add(fisher -> log.add(fisher, model));
 
-        //add snalsar info which should be moved elsewhere at some point
+        // add snalsar info which should be moved elsewhere at some point
         fisherFactory.getAdditionalSetups().add(fisher -> {
             fisher.setCheater(cheaters);
-            //todo move this somewhere else
+            // todo move this somewhere else
             fisher.addFeatureExtractor(
                 SNALSARutilities.PROFIT_FEATURE,
                 new RememberedProfitsExtractor(true)
@@ -364,8 +353,7 @@ public class PrototypeScenario implements Scenario {
             );
         });
 
-
-        //call the factory to keep creating fishers
+        // call the factory to keep creating fishers
         for (int i = 0; i < fishers; i++) {
             final Fisher newFisher = fisherFactory.buildFisher(model);
             fisherList.add(newFisher);
@@ -374,8 +362,7 @@ public class PrototypeScenario implements Scenario {
         assert fisherList.size() == fishers;
         assert fisherFactory.getNextID() == fishers;
 
-
-        //start additional elements
+        // start additional elements
         for (final AlgorithmFactory<? extends AdditionalStartable> additionalElement : plugins) {
             model.registerStartable(
                 additionalElement.apply(model)
@@ -404,7 +391,6 @@ public class PrototypeScenario implements Scenario {
         }
     }
 
-
     public int getPorts() {
         return ports;
     }
@@ -421,7 +407,6 @@ public class PrototypeScenario implements Scenario {
         this.speedInKmh = speedInKmh;
     }
 
-
     public AlgorithmFactory<? extends Regulation> getRegulation() {
         return regulation;
     }
@@ -431,7 +416,6 @@ public class PrototypeScenario implements Scenario {
     ) {
         this.regulation = regulation;
     }
-
 
     public AlgorithmFactory<? extends DepartingStrategy> getDepartingStrategy() {
         return departingStrategy;
@@ -452,7 +436,6 @@ public class PrototypeScenario implements Scenario {
     ) {
         this.fishingStrategy = fishingStrategy;
     }
-
 
     public DoubleParameter getHoldSize() {
         return holdSize;
@@ -481,7 +464,6 @@ public class PrototypeScenario implements Scenario {
     ) {
         this.biologyInitializer = biologyInitializer;
     }
-
 
     public NetworkBuilder getNetworkBuilder() {
         return networkBuilder;
@@ -517,7 +499,6 @@ public class PrototypeScenario implements Scenario {
         this.literPerKilometer = literPerKilometer;
     }
 
-
     public AlgorithmFactory<? extends Gear> getGear() {
         return gear;
     }
@@ -535,7 +516,6 @@ public class PrototypeScenario implements Scenario {
     public void setGasPricePerLiter(final DoubleParameter gasPricePerLiter) {
         this.gasPricePerLiter = gasPricePerLiter;
     }
-
 
     public AlgorithmFactory<? extends Market> getMarket() {
         return market;
@@ -632,7 +612,6 @@ public class PrototypeScenario implements Scenario {
     public void setPortPositionY(final Integer portPositionY) {
         this.portPositionY = portPositionY;
     }
-
 
     /**
      * Getter for property 'gearStrategy'.

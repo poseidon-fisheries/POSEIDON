@@ -43,7 +43,7 @@ import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.TowHeatmapGatherer;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import uk.ac.ox.oxfish.utility.yaml.ModelResults;
 

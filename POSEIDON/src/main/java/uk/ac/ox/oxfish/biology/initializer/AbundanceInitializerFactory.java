@@ -27,8 +27,8 @@ import uk.ac.ox.oxfish.biology.tuna.Reallocator;
 import uk.ac.ox.oxfish.biology.tuna.WeightGroups;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -40,7 +40,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class AbundanceInitializerFactory
     extends BiologyInitializerFactory<AbundanceLocalBiology> {
@@ -53,7 +53,8 @@ public class AbundanceInitializerFactory
     private Map<String, WeightGroups> weightGroupsPerSpecies;
 
     public AbundanceInitializerFactory(
-        final AlgorithmFactory<Reallocator<AbundanceLocalBiology>> reallocator, final InputPath binsFile,
+        final AlgorithmFactory<Reallocator<AbundanceLocalBiology>> reallocator,
+        final InputPath binsFile,
         final AlgorithmFactory<SpeciesCodes> speciesCodes
     ) {
         super(reallocator);
@@ -105,8 +106,8 @@ public class AbundanceInitializerFactory
     }
 
     /**
-     * This is named `assign` instead of `set` to avoid confusing the GUI and having it try to build
-     * a widget for a map it cannot build one for.
+     * This is named `assign` instead of `set` to avoid confusing the GUI and having it try to build a widget for a map
+     * it cannot build one for.
      */
     public void assignWeightGroupsPerSpecies(final Map<String, WeightGroups> weightGroupsPerSpecies) {
         this.weightGroupsPerSpecies = weightGroupsPerSpecies;

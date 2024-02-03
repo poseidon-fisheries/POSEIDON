@@ -3,13 +3,13 @@ package uk.ac.ox.oxfish.model.market;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import java.util.Map;
 
 import static java.util.stream.Collectors.*;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class YearlyMarketMapFromPriceFileFactory
     implements AlgorithmFactory<MarketMap> {

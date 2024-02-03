@@ -25,8 +25,8 @@ import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcesses;
 import uk.ac.ox.oxfish.biology.complicated.TunaMeristics;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import java.util.Map.Entry;
 
@@ -34,11 +34,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 /**
- * This will create the {@link RecruitmentProcess} objects to be used by the {@link
- * ScheduledAbundanceProcessesFactory}. It will read the parameters from the provided CSV file.
+ * This will create the {@link RecruitmentProcess} objects to be used by the {@link ScheduledAbundanceProcessesFactory}.
+ * It will read the parameters from the provided CSV file.
  */
 public class RecruitmentProcessesFactory
     implements AlgorithmFactory<RecruitmentProcesses> {

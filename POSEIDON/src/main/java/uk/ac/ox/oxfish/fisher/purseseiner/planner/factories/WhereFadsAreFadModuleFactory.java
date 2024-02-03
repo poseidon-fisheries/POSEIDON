@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.planner.OwnFadSetDiscretizedActionGene
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.WhereFadsArePlanningModule;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 public class WhereFadsAreFadModuleFactory extends PlanningModuleFactory<WhereFadsArePlanningModule> {
 

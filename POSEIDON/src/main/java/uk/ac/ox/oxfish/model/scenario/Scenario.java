@@ -21,9 +21,9 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.regulations.EverythingPermitted;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
+import uk.ac.ox.poseidon.regulations.core.EverythingPermittedFactory;
 
 import java.time.LocalDate;
 
@@ -41,7 +41,6 @@ public interface Scenario {
      */
     ScenarioEssentials start(FishState model);
 
-
     /**
      * called shortly after the essentials are set, it is time now to return a list of all the agents
      *
@@ -50,8 +49,8 @@ public interface Scenario {
      */
     ScenarioPopulation populateModel(FishState model);
 
-    default AlgorithmFactory<? extends Regulations> getRegulations() {
-        return new EverythingPermitted();
+    default ComponentFactory<? extends Regulations> getRegulations() {
+        return new EverythingPermittedFactory();
     }
 
     default LocalDate getStartDate() {

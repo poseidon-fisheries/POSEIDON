@@ -23,18 +23,15 @@ package uk.ac.ox.oxfish.fisher.strategies.weather.factory;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WindThresholdStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 /**
- * Creates WindThreshold strategies
- * Created by carrknight on 9/8/15.
+ * Creates WindThreshold strategies Created by carrknight on 9/8/15.
  */
 public class WindThresholdFactory implements AlgorithmFactory<WindThresholdStrategy> {
 
-
     private DoubleParameter maximumWindSpeedTolerated = new NormalDoubleParameter(50, 10);
-
 
     /**
      * Applies this function to the given argument.

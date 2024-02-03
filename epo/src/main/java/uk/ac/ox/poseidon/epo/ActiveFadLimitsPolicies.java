@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ActiveFadLimits;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import uk.ac.ox.oxfish.regulations.NamedRegulations;
+import uk.ac.ox.poseidon.regulations.core.NamedRegulationsFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class ActiveFadLimitsPolicies extends PolicySupplier {
                         (int) (proportion * 100)
                     ),
                     scenario ->
-                        ((NamedRegulations) scenario.getRegulations()).modify(
+                        ((NamedRegulationsFactory) scenario.getRegulations()).modify(
                             "Active-FAD limits",
                             () -> {
                                 final ImmutableMap<String, Integer> newLimits = ACTIVE_FAD_LIMITS

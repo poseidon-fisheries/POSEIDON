@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
-    api(project(":common:api"))
+    api(project(":common"))
     api(project(":agents:api"))
 }

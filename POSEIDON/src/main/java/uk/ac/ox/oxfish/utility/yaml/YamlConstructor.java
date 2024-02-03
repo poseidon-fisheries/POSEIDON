@@ -28,10 +28,12 @@ import org.yaml.snakeyaml.nodes.*;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DateParameter;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.poseidon.common.api.ComponentFactory;
+import uk.ac.ox.oxfish.utility.parameters.*;
 import uk.ac.ox.poseidon.common.api.FactorySupplier;
+import uk.ac.ox.poseidon.common.api.GenericComponentFactory;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.DateParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -112,7 +114,7 @@ public class YamlConstructor extends Constructor {
                     // If it fails, it might be a factory or a scenario that has been
                     // written as a map for readability, so try to construct it that way
                     final NodeTuple nodeTuple = ((MappingNode) node).getValue().get(0);
-                    if (AlgorithmFactory.class.isAssignableFrom(node.getType())) {
+                    if (GenericComponentFactory.class.isAssignableFrom(node.getType())) {
                         return constructNamedObject(nodeTuple, YamlConstructor.this::constructFactory);
                     } else if (Scenario.class.isAssignableFrom(node.getType())) {
                         return constructNamedObject(nodeTuple, name -> SCENARIOS.get(name).get());
@@ -144,22 +146,43 @@ public class YamlConstructor extends Constructor {
         });
     }
 
-    private DoubleParameter doubleParameterSplit(final ScalarNode node) {
-        // get it as a string
-        final String nodeContent = constructScalar(node);
-        return DoubleParameter.parseDoubleParameter(nodeContent);
-    }
+    public static DoubleParameter parseDoubleParameter(final String nodeContent) {
+        // trim and split
+        final String[] split = nodeContent.trim().replaceAll("(')|(\")", "").split("\\s+");
 
-    private ComponentFactory<?, ?> constructFactory(final String factoryName) {
-        // We first look for the factory in our map of service suppliers, and
-        // then fall back on the old AlgorithmFactories constructors if we can't
-        // find it, but the AlgorithmFactories class should go away once everything
-        // has been moved to the service architecture, and we should give a proper
-        // error message if we don't find it there.
-        final FactorySupplier factorySupplier = factorySuppliers.get(factoryName);
-        return factorySupplier != null
-            ? factorySupplier.get()
-            : AlgorithmFactories.constructorLookup(factoryName);
+        if (split[0].toLowerCase().trim().equals("nullparameter"))
+            return new NullParameter();
+
+        if (split.length == 1)
+            // fixed
+            return new FixedDoubleParameter(Double.parseDouble(split[0]));
+
+        if (split[0].equalsIgnoreCase("normal"))
+            return new NormalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+
+        if (split[0].equalsIgnoreCase("uniform"))
+            return new UniformDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+
+        if (split[0].equalsIgnoreCase("sin"))
+            return new SinusoidalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+
+        if (split[0].equalsIgnoreCase("select"))
+            return new SelectDoubleParameter(nodeContent.trim().replace("select", ""));
+
+        if (split[0].equalsIgnoreCase("beta"))
+            return new BetaDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+
+        if (split[0].equalsIgnoreCase("weibull"))
+            return new WeibullDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+
+        if (split[0].equalsIgnoreCase("conditional"))
+            return new ConditionalDoubleParameter(
+                Boolean.parseBoolean(split[1]),
+                parseDoubleParameter(split[2])
+            );
+
+        throw new IllegalArgumentException("Do not recognize this double parameter!");
+
     }
 
     public static Coordinate convertToCoordinate(final String val) {
@@ -172,6 +195,24 @@ public class YamlConstructor extends Constructor {
 
     private static double parseCoordinateString(final String coordinateString) {
         return Double.parseDouble(coordinateString.trim().replaceAll("'", "").replaceAll("\"", ""));
+    }
+
+    private DoubleParameter doubleParameterSplit(final ScalarNode node) {
+        // get it as a string
+        final String nodeContent = constructScalar(node);
+        return parseDoubleParameter(nodeContent);
+    }
+
+    private GenericComponentFactory<?, ?> constructFactory(final String factoryName) {
+        // We first look for the factory in our map of service suppliers, and
+        // then fall back on the old AlgorithmFactories constructors if we can't
+        // find it, but the AlgorithmFactories class should go away once everything
+        // has been moved to the service architecture, and we should give a proper
+        // error message if we don't find it there.
+        final FactorySupplier factorySupplier = factorySuppliers.get(factoryName);
+        return factorySupplier != null
+            ? factorySupplier.get()
+            : AlgorithmFactories.constructorLookup(factoryName);
     }
 
 }

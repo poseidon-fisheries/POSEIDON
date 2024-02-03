@@ -20,8 +20,8 @@ import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
 import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
 import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
 

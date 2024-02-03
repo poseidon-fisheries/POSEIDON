@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.geography.habitat.rectangles;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 /**
  * Class that builds a fixed number of rocky rectangles

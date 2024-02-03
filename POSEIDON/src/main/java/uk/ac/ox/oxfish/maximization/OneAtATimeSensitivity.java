@@ -14,7 +14,7 @@ import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.utility.csv.CsvParserUtil;
+import uk.ac.ox.poseidon.common.core.csv.CsvParserUtil;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -284,7 +284,10 @@ public class OneAtATimeSensitivity {
         private final GenericOptimization genericOptimization;
         private final FishState fishState;
 
-        ResultsProvider(final GenericOptimization genericOptimization, final FishState fishState) {
+        ResultsProvider(
+            final GenericOptimization genericOptimization,
+            final FishState fishState
+        ) {
             this.genericOptimization = genericOptimization;
             this.fishState = fishState;
         }

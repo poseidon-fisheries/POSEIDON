@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import static uk.ac.ox.oxfish.fisher.actions.MovingTest.generateSimple4x4Map;
 

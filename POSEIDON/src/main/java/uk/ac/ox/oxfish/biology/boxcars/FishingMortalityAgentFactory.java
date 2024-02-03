@@ -23,8 +23,8 @@ package uk.ac.ox.oxfish.biology.boxcars;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.LogisticSimpleFilter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMortalityAgent> {
 

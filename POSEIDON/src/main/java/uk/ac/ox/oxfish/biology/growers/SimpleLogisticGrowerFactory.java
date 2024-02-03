@@ -22,8 +22,8 @@ package uk.ac.ox.oxfish.biology.growers;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 /**
@@ -33,17 +33,17 @@ public class SimpleLogisticGrowerFactory implements AlgorithmFactory<SimpleLogis
 
     private DoubleParameter steepness = new FixedDoubleParameter(0.7);
 
-
     public SimpleLogisticGrowerFactory() {
     }
-
 
     public SimpleLogisticGrowerFactory(double steepness) {
         this.steepness = new FixedDoubleParameter(steepness);
     }
 
-
-    public SimpleLogisticGrowerFactory(double low, double high) {
+    public SimpleLogisticGrowerFactory(
+        double low,
+        double high
+    ) {
         this.steepness = new UniformDoubleParameter(low, high);
     }
 

@@ -21,11 +21,11 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import static java.util.stream.Collectors.*;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class MinimumSetValuesFromFileFactory implements AlgorithmFactory<MinimumSetValues> {
     private static final CacheByFile<MinimumSetValues> cache = new CacheByFile<>(path ->

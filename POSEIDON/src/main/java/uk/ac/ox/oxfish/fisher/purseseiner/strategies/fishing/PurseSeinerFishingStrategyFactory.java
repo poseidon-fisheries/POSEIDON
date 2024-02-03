@@ -34,14 +34,14 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.DurationSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.SetDurationSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.PurseSeinerActionClassToDouble;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
 import uk.ac.ox.oxfish.utility.operators.LogisticFunctionFactory;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -59,7 +59,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 import static uk.ac.ox.oxfish.geography.currents.CurrentVectorsFactory.metrePerSecondToXyPerDaysVector;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
     implements AlgorithmFactory<PurseSeinerFishingStrategy<B>>, Dummyable {
@@ -536,11 +536,11 @@ public abstract class PurseSeinerFishingStrategyFactory<B extends LocalBiology>
     }
 
     /**
-     * Convert the max current speeds in m/s per seconds given in the input file into degrees per day.
-     * For the purpose of the conversion, we assume that we're at the equator. This means that the max
-     * speeds we calculate in °/day represent lower speeds in m/s as we move away from the equator,
-     * and thus that fishers are slightly less tolerant of strong currents away from the equator but the
-     * difference is small enough to ignore and doing thing the right way would massively complicate things.
+     * Convert the max current speeds in m/s per seconds given in the input file into degrees per day. For the purpose
+     * of the conversion, we assume that we're at the equator. This means that the max speeds we calculate in °/day
+     * represent lower speeds in m/s as we move away from the equator, and thus that fishers are slightly less tolerant
+     * of strong currents away from the equator but the difference is small enough to ignore and doing thing the right
+     * way would massively complicate things.
      */
     private PurseSeinerActionClassToDouble getMaxCurrentSpeeds(final NauticalMap nauticalMap) {
         final Coordinate coordinate = new Coordinate(0, 0);

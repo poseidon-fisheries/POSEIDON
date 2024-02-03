@@ -6,14 +6,13 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.regulations.ForbiddenAreasFromShapeFiles;
 import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.agents.core.BasicAction;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 import uk.ac.ox.poseidon.regulations.api.ConditionalRegulations;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
+import uk.ac.ox.poseidon.regulations.core.ForbiddenAreasFromShapeFiles;
 import uk.ac.ox.poseidon.regulations.core.conditions.AllOf;
-import uk.ac.ox.poseidon.regulations.core.conditions.AnyOf;
 import uk.ac.ox.poseidon.regulations.core.conditions.InVectorField;
 
 import java.nio.file.Path;
@@ -27,7 +26,7 @@ import static com.google.common.collect.Iterables.getLast;
 import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 class SpecificProtectedAreaFactoryTest {
 
@@ -40,7 +39,7 @@ class SpecificProtectedAreaFactoryTest {
             regionsFolder.path("region_tags.csv")
         ).apply(fishState);
     private final List<InVectorField> vectorFields =
-        ((AnyOf) ((ConditionalRegulations) regulations).getCondition())
+        ((ConditionalRegulations) regulations).getCondition()
             .getSubConditions()
             .stream()
             .map(AllOf.class::cast)

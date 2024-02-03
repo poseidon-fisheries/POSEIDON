@@ -2,8 +2,8 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.vividsolutions.jts.geom.Point;
 import sim.field.geo.GeomVectorField;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.utility.GISReaders;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.nio.file.Path;
 import java.util.function.BiPredicate;
@@ -19,22 +19,22 @@ public class SpecificProtectedAreaFromShapeFileFactory extends SpecificProtected
     }
 
     public SpecificProtectedAreaFromShapeFileFactory(
-        Path shapeFilePath
+        final Path shapeFilePath
     ) {
-        //noinspection UnstableApiUsage
+        // noinspection UnstableApiUsage
         this(shapeFilePath, getNameWithoutExtension(shapeFilePath.getFileName()));
     }
 
     public SpecificProtectedAreaFromShapeFileFactory(
-        Path shapeFilePath,
-        String name
+        final Path shapeFilePath,
+        final String name
     ) {
         this.shapeFilePath = shapeFilePath;
         this.setName(name);
     }
 
     @Override
-    BiPredicate<Integer, Integer> inAreaPredicate(MapExtent mapExtent) {
+    BiPredicate<Integer, Integer> inAreaPredicate(final MapExtent mapExtent) {
         final GeomVectorField vectorField = readShapeFile();
         vectorField.setMBR(mapExtent.getEnvelope());
         return (x, y) -> {
@@ -53,7 +53,7 @@ public class SpecificProtectedAreaFromShapeFileFactory extends SpecificProtected
     }
 
     @SuppressWarnings("unused")
-    public void setShapeFilePath(Path shapeFilePath) {
+    public void setShapeFilePath(final Path shapeFilePath) {
         this.shapeFilePath = shapeFilePath;
     }
 

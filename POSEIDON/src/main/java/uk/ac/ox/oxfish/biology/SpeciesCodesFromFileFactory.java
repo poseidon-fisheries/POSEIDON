@@ -2,14 +2,14 @@ package uk.ac.ox.oxfish.biology;
 
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 /**
  * Builds a SpeciesCodes map from a CSV file. The CSV file columns must be:

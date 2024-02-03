@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 public abstract class BiologicalProcessesFactory<B extends LocalBiology>
     implements AlgorithmFactory<BiologicalProcesses> {

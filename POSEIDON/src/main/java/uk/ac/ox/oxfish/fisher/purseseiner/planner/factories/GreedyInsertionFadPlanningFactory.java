@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.planner.GreedyInsertionFadPlanningModu
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.OwnFadSetDiscretizedActionGenerator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 public class GreedyInsertionFadPlanningFactory extends PlanningModuleFactory<GreedyInsertionFadPlanningModule> {
 

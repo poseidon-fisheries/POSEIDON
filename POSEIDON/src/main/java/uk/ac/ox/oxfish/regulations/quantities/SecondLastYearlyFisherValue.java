@@ -1,11 +1,11 @@
 package uk.ac.ox.oxfish.regulations.quantities;
 
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.StringParameter;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
+import uk.ac.ox.poseidon.common.api.ModelState;
+import uk.ac.ox.poseidon.common.core.parameters.StringParameter;
 import uk.ac.ox.poseidon.regulations.api.Quantity;
 
-public class SecondLastYearlyFisherValue implements AlgorithmFactory<Quantity> {
+public class SecondLastYearlyFisherValue implements ComponentFactory<Quantity> {
 
     private StringParameter name;
 
@@ -31,7 +31,7 @@ public class SecondLastYearlyFisherValue implements AlgorithmFactory<Quantity> {
     }
 
     @Override
-    public Quantity apply(final FishState fishState) {
+    public Quantity apply(final ModelState ignored) {
         return YearlyFisherValue.makeQuantity(name.getValue(), 1);
     }
 }

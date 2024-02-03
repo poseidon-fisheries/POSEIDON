@@ -6,11 +6,11 @@ import uk.ac.ox.poseidon.regulations.api.Quantity;
 
 import java.util.Collection;
 
-public class SumOf implements Quantity {
+class SumOf implements Quantity {
 
     private final Collection<? extends Quantity> quantities;
 
-    public SumOf(final Collection<? extends Quantity> quantities) {
+    SumOf(final Collection<? extends Quantity> quantities) {
         this.quantities = ImmutableList.copyOf(quantities);
     }
 

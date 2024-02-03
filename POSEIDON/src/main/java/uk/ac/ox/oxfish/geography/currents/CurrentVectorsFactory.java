@@ -10,8 +10,8 @@ import sim.field.grid.SparseGrid2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.geography.EquirectangularDistance;
-import uk.ac.ox.oxfish.geography.MapExtent;
-import uk.ac.ox.oxfish.utility.csv.CsvParserUtil;
+import uk.ac.ox.poseidon.common.core.csv.CsvParserUtil;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.nio.file.Path;
 import java.util.EnumMap;
@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.getLocalDate;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.getLocalDate;
 
 public enum CurrentVectorsFactory {
 
@@ -94,9 +94,9 @@ public enum CurrentVectorsFactory {
     }
 
     /**
-     * Converts a metres/second vector at a location into a grid-xy offsets/day vector.
-     * This is slightly convoluted because the translation of distance into grid offsets depends on the latitude,
-     * so we need to use lon/lat coordinates as an intermediate and then convert back to grid coordinates.
+     * Converts a metres/second vector at a location into a grid-xy offsets/day vector. This is slightly convoluted
+     * because the translation of distance into grid offsets depends on the latitude, so we need to use lon/lat
+     * coordinates as an intermediate and then convert back to grid coordinates.
      */
     public static Double2D metrePerSecondToXyPerDaysVector(
         final Double2D metrePerSecondVector,
@@ -116,12 +116,16 @@ public enum CurrentVectorsFactory {
     }
 
     /**
-     * Takes a vector of offsets in metres and converts it to a vector of longitude/latitude
-     * offsets, assuming that we are in the vicinity of {@code coord}. Adapted from
+     * Takes a vector of offsets in metres and converts it to a vector of longitude/latitude offsets, assuming that we
+     * are in the vicinity of {@code coord}. Adapted from
      * <a href="https://stackoverflow.com/a/2839560">https://stackoverflow.com/a/2839560</a> and
      * <a href="https://stackoverflow.com/a/7478827">https://stackoverflow.com/a/7478827</a>.
      */
-    private static Double2D metresVectorToLonLatVector(final Coordinate coord, final Double u, final Double v) {
+    private static Double2D metresVectorToLonLatVector(
+        final Coordinate coord,
+        final Double u,
+        final Double v
+    ) {
         final double r = EquirectangularDistance.EARTH_RADIUS * 1000; // Earth radius in metres
         final double dx = (180 / Math.PI) * (u / r) / Math.cos(Math.PI / 180.0 * coord.y);
         final double dy = (180 / Math.PI) * (v / r);
@@ -135,6 +139,5 @@ public enum CurrentVectorsFactory {
     ) {
         return cache.getUnchecked(entry(mapExtent, entry(inputIsMetersPerSecond, currentFiles)));
     }
-
 
 }

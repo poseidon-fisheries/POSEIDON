@@ -24,8 +24,8 @@ import uk.ac.ox.oxfish.biology.tuna.AllocationGrids;
 import uk.ac.ox.oxfish.biology.tuna.SimpleAllocationGridsSupplier;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 public class AdditionalMapFactory implements AlgorithmFactory<AdditionalStartable> {
     public String mapVariableName;
@@ -35,11 +35,18 @@ public class AdditionalMapFactory implements AlgorithmFactory<AdditionalStartabl
     public AdditionalMapFactory() {
     }
 
-    public AdditionalMapFactory(final String mapVariableName, final InputPath gridFile) {
+    public AdditionalMapFactory(
+        final String mapVariableName,
+        final InputPath gridFile
+    ) {
         this(mapVariableName, gridFile, 365);
     }
 
-    public AdditionalMapFactory(final String mapVariableName, final InputPath gridFile, final int mapPeriod) {
+    public AdditionalMapFactory(
+        final String mapVariableName,
+        final InputPath gridFile,
+        final int mapPeriod
+    ) {
         this.mapVariableName = mapVariableName;
         this.gridFile = gridFile;
         this.mapPeriod = mapPeriod;

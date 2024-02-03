@@ -19,10 +19,10 @@
 package uk.ac.ox.oxfish.biology.tuna;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.geography.MapExtent;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 abstract class ReallocatorFactory<B extends LocalBiology, T extends Reallocator<B>>
     implements AlgorithmFactory<T> {

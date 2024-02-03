@@ -10,6 +10,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 abstract class MonadicConditionalOperator implements ConditionalOperator {
 
+    private final Condition condition;
+
+    MonadicConditionalOperator(final Condition condition) {
+        this.condition = checkNotNull(condition);
+    }
+
     @Override
     public Set<Condition> getSubConditions() {
         return ImmutableSet.of(condition);
@@ -17,11 +23,5 @@ abstract class MonadicConditionalOperator implements ConditionalOperator {
 
     public Condition getSubCondition() {
         return condition;
-    }
-
-    private final Condition condition;
-
-    MonadicConditionalOperator(Condition condition) {
-        this.condition = checkNotNull(condition);
     }
 }

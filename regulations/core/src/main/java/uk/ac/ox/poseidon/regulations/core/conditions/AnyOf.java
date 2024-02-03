@@ -7,8 +7,7 @@ import java.util.Set;
 
 public class AnyOf extends VariadicConditionalOperator {
 
-
-    public AnyOf(Set<Condition> operands) {
+    public AnyOf(final Set<Condition> operands) {
         super(operands);
     }
 

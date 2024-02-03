@@ -20,7 +20,7 @@
 package uk.ac.ox.oxfish.model.data.monitors.regions;
 
 import sim.util.Int2D;
-import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,7 +48,7 @@ abstract class SquareGridRegionalDivision extends RegionalDivision {
 
         // This is not the most efficient implementation, but it was an easy way of reusing the logic that
         // we had before the regional divisions refactoring, and shouldn't be noticeable anyway...
-        //noinspection OptionalGetWithoutIsPresent
+        // noinspection OptionalGetWithoutIsPresent
         this.regions =
             range(0, mapExtent.getGridWidth())
                 .boxed()

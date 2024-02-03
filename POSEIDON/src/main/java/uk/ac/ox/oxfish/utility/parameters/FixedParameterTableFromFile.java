@@ -1,11 +1,12 @@
 package uk.ac.ox.oxfish.utility.parameters;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import static com.google.common.collect.ImmutableTable.toImmutableTable;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class FixedParameterTableFromFile implements AlgorithmFactory<FixedParameterTable> {
     private InputPath parameterFile;

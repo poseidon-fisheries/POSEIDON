@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.AbundanceProcessesFactory;
 import uk.ac.ox.oxfish.biology.tuna.RecruitmentProcessesFactory;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 /**
  * An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.

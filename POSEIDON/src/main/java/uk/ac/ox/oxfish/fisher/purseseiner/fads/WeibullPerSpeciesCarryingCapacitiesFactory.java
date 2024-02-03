@@ -3,7 +3,8 @@ package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.ScaledDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.WeibullDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.ZeroInflatedDoubleParameter;
@@ -15,7 +16,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
 public class WeibullPerSpeciesCarryingCapacitiesFactory
-    implements uk.ac.ox.oxfish.utility.AlgorithmFactory<CarryingCapacitySupplier> {
+    implements AlgorithmFactory<CarryingCapacitySupplier> {
 
     private Map<String, DoubleParameter> shapeParameters;
     private Map<String, DoubleParameter> scaleParameters;

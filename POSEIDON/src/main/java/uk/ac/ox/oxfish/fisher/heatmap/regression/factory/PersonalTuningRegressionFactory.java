@@ -27,8 +27,8 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.AbstractHeatmapDestinationS
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.util.Arrays;
@@ -40,7 +40,6 @@ import java.util.WeakHashMap;
  * Created by carrknight on 9/13/16.
  */
 public class PersonalTuningRegressionFactory implements AlgorithmFactory<PersonalTuningRegression> {
-
 
     /**
      * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
@@ -74,13 +73,11 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
     @Override
     public PersonalTuningRegression apply(final FishState state) {
 
-
         final GeographicalRegression<Double> delegate = this.nested.apply(state);
         final DoubleParameter[] zeros = new DoubleParameter[delegate.getParametersAsArray().length];
         Arrays.fill(zeros, new FixedDoubleParameter(0));
 
-
-        //add data gathering if necessary
+        // add data gathering if necessary
         if (!weakStateMap.contains(state)) {
             weakStateMap.add(state);
             addDataGatherers(state, zeros.length);
@@ -96,12 +93,14 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
 
     }
 
-    private void addDataGatherers(final FishState state, final int length) {
-
+    private void addDataGatherers(
+        final FishState state,
+        final int length
+    ) {
 
         for (int i = 0; i < length; i++) {
 
-            //first add data gatherers
+            // first add data gatherers
             final int finalI = i;
             final Gatherer<FishState> gatherer = model -> {
                 final double size = model.getFishers().size();
@@ -131,7 +130,6 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
 
     }
 
-
     /**
      * Getter for property 'nested'.
      *
@@ -151,7 +149,6 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
     ) {
         this.nested = nested;
     }
-
 
     /**
      * Getter for property 'percentageChangeToGuessGradient'.
@@ -190,6 +187,5 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
     public void setStepSize(final DoubleParameter stepSize) {
         this.stepSize = stepSize;
     }
-
 
 }

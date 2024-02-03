@@ -4,7 +4,7 @@ import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.regulations.api.Condition;
 
 public enum True implements Condition {
-    
+
     TRUE;
 
     @Override

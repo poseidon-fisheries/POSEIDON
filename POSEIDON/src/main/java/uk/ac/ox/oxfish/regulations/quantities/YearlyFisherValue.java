@@ -5,8 +5,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
-import uk.ac.ox.oxfish.utility.parameters.StringParameter;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.StringParameter;
 import uk.ac.ox.poseidon.regulations.api.Quantity;
 
 public class YearlyFisherValue implements AlgorithmFactory<Quantity> {
@@ -18,7 +18,10 @@ public class YearlyFisherValue implements AlgorithmFactory<Quantity> {
     public YearlyFisherValue() {
     }
 
-    public YearlyFisherValue(final StringParameter name, final IntegerParameter entriesFromLast) {
+    public YearlyFisherValue(
+        final StringParameter name,
+        final IntegerParameter entriesFromLast
+    ) {
         this.name = name;
         this.entriesFromLast = entriesFromLast;
     }
@@ -44,7 +47,10 @@ public class YearlyFisherValue implements AlgorithmFactory<Quantity> {
         return makeQuantity(name.getValue(), entriesFromLast.getValue());
     }
 
-    static Quantity makeQuantity(final String name, final int entriesFromLast) {
+    static Quantity makeQuantity(
+        final String name,
+        final int entriesFromLast
+    ) {
         return action -> {
             final TimeSeries<Fisher> yearlyData = ((Fisher) action.getAgent()).getYearlyData();
             final DataColumn column = yearlyData.getColumn(name);

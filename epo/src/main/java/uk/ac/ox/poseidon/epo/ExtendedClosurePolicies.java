@@ -5,9 +5,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.regulations.IndividualBetLimits;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.TemporalClosure;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.YearsActive;
 import uk.ac.ox.oxfish.model.scenario.EpoScenario;
-import uk.ac.ox.oxfish.regulations.NamedRegulations;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
+import uk.ac.ox.poseidon.regulations.core.NamedRegulationsFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +20,10 @@ public class ExtendedClosurePolicies extends PolicySupplier {
 
     private final List<Integer> daysToExtend;
 
-    ExtendedClosurePolicies(final List<Integer> yearsActive, final List<Integer> daysToExtend) {
+    ExtendedClosurePolicies(
+        final List<Integer> yearsActive,
+        final List<Integer> daysToExtend
+    ) {
         super(yearsActive);
         this.daysToExtend = daysToExtend;
     }
@@ -31,8 +34,9 @@ public class ExtendedClosurePolicies extends PolicySupplier {
             new Policy<EpoScenario<?>>(
                 String.format("Closures extended by %02d days", days),
                 scenario -> {
-                    final NamedRegulations namedRegulations = (NamedRegulations) scenario.getRegulations();
-                    final Map<String, AlgorithmFactory<Regulations>> regulationMap = namedRegulations.getRegulations();
+                    final NamedRegulationsFactory namedRegulations =
+                        (NamedRegulationsFactory) scenario.getRegulations();
+                    final Map<String, ComponentFactory<Regulations>> regulationMap = namedRegulations.getRegulations();
                     final TemporalClosure closureA = (TemporalClosure) regulationMap.get("Closure A");
                     final TemporalClosure closureB = (TemporalClosure) regulationMap.get("Closure B");
                     final IndividualBetLimits betLimits = (IndividualBetLimits) regulationMap.get("BET limits");

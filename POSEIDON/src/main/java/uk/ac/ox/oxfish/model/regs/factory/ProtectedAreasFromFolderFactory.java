@@ -6,8 +6,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,8 +21,7 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.io.MoreFiles.getFileExtension;
 import static com.google.common.io.MoreFiles.getNameWithoutExtension;
 import static java.util.stream.Collectors.*;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
-
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class ProtectedAreasFromFolderFactory implements AlgorithmFactory<MultipleRegulations> {
 
@@ -35,11 +34,17 @@ public class ProtectedAreasFromFolderFactory implements AlgorithmFactory<Multipl
     public ProtectedAreasFromFolderFactory() {
     }
 
-    public ProtectedAreasFromFolderFactory(final InputPath shapefilesInputPath, final String tagsFile) {
+    public ProtectedAreasFromFolderFactory(
+        final InputPath shapefilesInputPath,
+        final String tagsFile
+    ) {
         this(shapefilesInputPath, shapefilesInputPath.path(tagsFile));
     }
 
-    public ProtectedAreasFromFolderFactory(final InputPath shapefilesInputPath, final InputPath tagsFile) {
+    public ProtectedAreasFromFolderFactory(
+        final InputPath shapefilesInputPath,
+        final InputPath tagsFile
+    ) {
         this.shapefilesInputPath = shapefilesInputPath;
         this.tagsFile = tagsFile;
     }

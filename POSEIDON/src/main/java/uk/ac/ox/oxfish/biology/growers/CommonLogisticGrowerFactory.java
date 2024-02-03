@@ -2,8 +2,8 @@ package uk.ac.ox.oxfish.biology.growers;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 public class CommonLogisticGrowerFactory implements AlgorithmFactory<CommonLogisticGrowerInitializer> {
@@ -18,13 +18,14 @@ public class CommonLogisticGrowerFactory implements AlgorithmFactory<CommonLogis
     public CommonLogisticGrowerFactory() {
     }
 
-
     public CommonLogisticGrowerFactory(final double steepness) {
         this.steepness = new FixedDoubleParameter(steepness);
     }
 
-
-    public CommonLogisticGrowerFactory(final double low, final double high) {
+    public CommonLogisticGrowerFactory(
+        final double low,
+        final double high
+    ) {
         this.steepness = new UniformDoubleParameter(low, high);
     }
 
@@ -59,7 +60,6 @@ public class CommonLogisticGrowerFactory implements AlgorithmFactory<CommonLogis
     public void setSteepness(final DoubleParameter steepness) {
         this.steepness = steepness;
     }
-
 
     /**
      * Getter for property 'distributionalWeight'.

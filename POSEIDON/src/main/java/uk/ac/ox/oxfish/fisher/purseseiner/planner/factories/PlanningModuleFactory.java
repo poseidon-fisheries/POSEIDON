@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 public abstract class PlanningModuleFactory<T extends PlanningModule> implements AlgorithmFactory<T> {
     private AlgorithmFactory<MinimumSetValues> minimumSetValues;
@@ -31,22 +31,6 @@ public abstract class PlanningModuleFactory<T extends PlanningModule> implements
         this.discretization = discretization;
     }
 
-    public IntegerParameter getTargetYear() {
-        return targetYear;
-    }
-
-    public void setTargetYear(final IntegerParameter targetYear) {
-        this.targetYear = targetYear;
-    }
-
-    public AlgorithmFactory<MinimumSetValues> getMinimumSetValues() {
-        return minimumSetValues;
-    }
-
-    public void setMinimumSetValues(final AlgorithmFactory<MinimumSetValues> minimumSetValues) {
-        this.minimumSetValues = minimumSetValues;
-    }
-
     @Override
     public T apply(final FishState fishState) {
         final OwnFadSetDiscretizedActionGenerator optionsGenerator =
@@ -61,14 +45,30 @@ public abstract class PlanningModuleFactory<T extends PlanningModule> implements
         return discretization;
     }
 
-    public void setDiscretization(
-        final AlgorithmFactory<? extends MapDiscretizer> discretization
-    ) {
-        this.discretization = discretization;
+    public AlgorithmFactory<MinimumSetValues> getMinimumSetValues() {
+        return minimumSetValues;
+    }
+
+    public IntegerParameter getTargetYear() {
+        return targetYear;
+    }
+
+    public void setTargetYear(final IntegerParameter targetYear) {
+        this.targetYear = targetYear;
     }
 
     protected abstract T makePlanningModule(
         FishState fishState,
         OwnFadSetDiscretizedActionGenerator optionsGenerator
     );
+
+    public void setMinimumSetValues(final AlgorithmFactory<MinimumSetValues> minimumSetValues) {
+        this.minimumSetValues = minimumSetValues;
+    }
+
+    public void setDiscretization(
+        final AlgorithmFactory<? extends MapDiscretizer> discretization
+    ) {
+        this.discretization = discretization;
+    }
 }

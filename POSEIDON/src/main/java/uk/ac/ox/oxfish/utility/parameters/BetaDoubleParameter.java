@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.utility.parameters;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.math3.distribution.BetaDistribution;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 /**
  * Returns a beta distributed double value randomly

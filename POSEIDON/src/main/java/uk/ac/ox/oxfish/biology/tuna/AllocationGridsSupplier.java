@@ -20,7 +20,7 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import com.univocity.parsers.common.record.Record;
 import uk.ac.ox.oxfish.biology.tuna.Reallocator.SpeciesKey;
-import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.nio.file.Path;
 

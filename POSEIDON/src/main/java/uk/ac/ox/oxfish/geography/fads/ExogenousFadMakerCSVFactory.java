@@ -3,12 +3,12 @@ package uk.ac.ox.oxfish.geography.fads;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import static java.util.stream.Collectors.*;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 /**
  * reads csv file, with column "day" for what day each fad gets dropped x,y for the coordinates (simulated coordinates,

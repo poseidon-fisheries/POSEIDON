@@ -22,8 +22,8 @@ package uk.ac.ox.oxfish.model.data.monitors.regions;
 import com.vividsolutions.jts.geom.Coordinate;
 import sim.util.Double2D;
 import sim.util.Int2D;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.util.Collection;
 
@@ -125,11 +125,17 @@ public abstract class RegionalDivision {
             return contains(gridXY.x, gridXY.y);
         }
 
-        public boolean contains(final int gridX, final int gridY) {
+        public boolean contains(
+            final int gridX,
+            final int gridY
+        ) {
             return gridX >= minX & gridX <= maxX & gridY >= minY & gridY <= maxY;
         }
 
-        public boolean contains(final Coordinate coordinate, final MapExtent mapExtent) {
+        public boolean contains(
+            final Coordinate coordinate,
+            final MapExtent mapExtent
+        ) {
             return contains(mapExtent.coordinateToXY(coordinate));
         }
 

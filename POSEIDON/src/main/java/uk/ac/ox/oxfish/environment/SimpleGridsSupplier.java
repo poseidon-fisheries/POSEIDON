@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.environment;
 
 import com.univocity.parsers.common.record.Record;
-import uk.ac.ox.oxfish.geography.MapExtent;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.nio.file.Path;
 
@@ -30,8 +30,9 @@ public class SimpleGridsSupplier extends AbstractGridsSupplier<String> {
     private final String keyName;
 
     public SimpleGridsSupplier(
-        Path gridsFilePath,
-        MapExtent mapExtent, String keyName
+        final Path gridsFilePath,
+        final MapExtent mapExtent,
+        final String keyName
     ) {
         this(gridsFilePath, mapExtent,
             365,
@@ -40,10 +41,11 @@ public class SimpleGridsSupplier extends AbstractGridsSupplier<String> {
     }
 
     public SimpleGridsSupplier(
-        Path gridsFilePath,
-        MapExtent mapExtent,
-        int period,
-        boolean toNormalize, String keyName
+        final Path gridsFilePath,
+        final MapExtent mapExtent,
+        final int period,
+        final boolean toNormalize,
+        final String keyName
     ) {
         super(null, gridsFilePath, mapExtent,
             period,
@@ -53,7 +55,7 @@ public class SimpleGridsSupplier extends AbstractGridsSupplier<String> {
     }
 
     @Override
-    String extractKeyFromRecord(Record record) {
+    String extractKeyFromRecord(final Record record) {
         return keyName;
     }
 }

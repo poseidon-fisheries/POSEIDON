@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.utility.parameters;
 
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 /**
  * always returns NaN

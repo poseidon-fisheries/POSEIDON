@@ -3,10 +3,10 @@ package uk.ac.ox.oxfish.model.regs.factory;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import uk.ac.ox.oxfish.geography.MapExtent;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.SpecificProtectedArea;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.util.Map.Entry;
 import java.util.function.BiPredicate;
@@ -25,7 +25,7 @@ abstract public class SpecificProtectedAreaFactory implements AlgorithmFactory<S
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -37,8 +37,8 @@ abstract public class SpecificProtectedAreaFactory implements AlgorithmFactory<S
     public boolean[][] makeInAreaArray(
         final MapExtent mapExtent
     ) {
-        int w = mapExtent.getGridWidth();
-        int h = mapExtent.getGridHeight();
+        final int w = mapExtent.getGridWidth();
+        final int h = mapExtent.getGridHeight();
         final BiPredicate<Integer, Integer> inAreaPredicate = inAreaPredicate(mapExtent);
         final boolean[][] inArea = new boolean[w][h];
         for (int x = 0; x < w; x++) {

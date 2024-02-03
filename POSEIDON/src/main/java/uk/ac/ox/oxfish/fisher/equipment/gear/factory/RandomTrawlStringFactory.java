@@ -25,8 +25,9 @@ import com.google.common.base.Splitter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.yaml.YamlConstructor;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import java.util.Map;
 
@@ -71,7 +72,7 @@ public class RandomTrawlStringFactory implements AlgorithmFactory<RandomCatchabi
             .split(catchabilityMap.trim());
         Preconditions.checkArgument(catchabilities.size() > 0, "no catchability!");
         for (final Map.Entry<String, String> catchability : catchabilities.entrySet()) {
-            means[Integer.parseInt(catchability.getKey().trim())] = DoubleParameter.parseDoubleParameter(
+            means[Integer.parseInt(catchability.getKey().trim())] = YamlConstructor.parseDoubleParameter(
                 catchability.getValue().trim()
             ).applyAsDouble(state.getRandom());
         }
@@ -82,7 +83,7 @@ public class RandomTrawlStringFactory implements AlgorithmFactory<RandomCatchabi
                 .split(standardDeviationMap);
             assert !deviations.isEmpty();
             for (final Map.Entry<String, String> deviation : deviations.entrySet()) {
-                std[Integer.parseInt(deviation.getKey().trim())] = DoubleParameter.parseDoubleParameter(
+                std[Integer.parseInt(deviation.getKey().trim())] = YamlConstructor.parseDoubleParameter(
                     deviation.getValue().trim()
                 ).applyAsDouble(state.getRandom());
             }

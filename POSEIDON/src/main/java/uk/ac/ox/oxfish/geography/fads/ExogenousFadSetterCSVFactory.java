@@ -3,35 +3,34 @@ package uk.ac.ox.oxfish.geography.fads;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.*;
-import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
+import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
 public class ExogenousFadSetterCSVFactory implements AlgorithmFactory<ExogenousFadSetterFromData>, Dummyable {
 
-
     /**
      * by default, data is in tonnes and simulation is in kg. Because we are dealing with squared errors that accumulate
-     * it is probably more numerically stable to deal with tonnes rather than kg (at the cost of rounding errors).
-     * This is called to take simulated fad biomass and turn it from kg to tonnes for comparison purposes
+     * it is probably more numerically stable to deal with tonnes rather than kg (at the cost of rounding errors). This
+     * is called to take simulated fad biomass and turn it from kg to tonnes for comparison purposes
      */
     private final static Function<Double, Double> DEFAULT_SIMULATED_TO_DATA_SCALER = simulatedBiomass ->
         simulatedBiomass / 1000;
 
-
     public boolean isDataInTonnes = true;
     private InputPath setsFile; // = "./inputs/tests/fad_dummmy_sets.csv";
     private DoubleParameter neighborhoodSearchSize = new FixedDoubleParameter(0);
-    private DoubleParameter missingFadError = new FixedDoubleParameter(ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR);
+    private DoubleParameter missingFadError =
+        new FixedDoubleParameter(ExogenousFadSetterFromData.DEFAULT_MISSING_FAD_ERROR);
     private boolean keepLog = false;
 
     /**

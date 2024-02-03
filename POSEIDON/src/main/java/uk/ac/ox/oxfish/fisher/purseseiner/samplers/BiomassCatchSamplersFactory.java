@@ -22,8 +22,8 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.InputPath;
-import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.InputPath;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 
 import java.util.Collection;
 
@@ -42,7 +42,8 @@ public class BiomassCatchSamplersFactory extends CatchSamplersFactory<BiomassLoc
 
     @Override
     CatchSampler<BiomassLocalBiology> makeCatchSampler(
-        final FishState fishState, final Class<? extends AbstractSetAction> actionClass,
+        final FishState fishState,
+        final Class<? extends AbstractSetAction> actionClass,
         final Collection<Collection<Double>> sample,
         final MersenneTwisterFast rng
     ) {

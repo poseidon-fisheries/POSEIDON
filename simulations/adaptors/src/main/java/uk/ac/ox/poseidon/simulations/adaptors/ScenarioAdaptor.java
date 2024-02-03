@@ -2,8 +2,12 @@ package uk.ac.ox.poseidon.simulations.adaptors;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.parameters.ParameterExtractor;
-import uk.ac.ox.oxfish.utility.parameters.*;
+import uk.ac.ox.oxfish.utility.parameters.BooleanParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 import uk.ac.ox.poseidon.common.core.AbstractAdaptor;
+import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.PathParameter;
+import uk.ac.ox.poseidon.common.core.parameters.StringParameter;
 import uk.ac.ox.poseidon.simulations.api.Parameter;
 import uk.ac.ox.poseidon.simulations.api.Scenario;
 import uk.ac.ox.poseidon.simulations.api.Simulation;
@@ -23,10 +27,10 @@ public class ScenarioAdaptor
 
     @Override
     public Map<String, uk.ac.ox.poseidon.simulations.api.Parameter> getParameters() {
-        return new ParameterExtractor<>(uk.ac.ox.oxfish.utility.parameters.Parameter.class)
+        return new ParameterExtractor<>(uk.ac.ox.poseidon.common.api.parameters.Parameter.class)
             .getParameters(getDelegate())
             .map(extractedParameter -> {
-                final uk.ac.ox.oxfish.utility.parameters.Parameter parameter = extractedParameter.getObject();
+                final uk.ac.ox.poseidon.common.api.parameters.Parameter parameter = extractedParameter.getObject();
                 if (parameter instanceof DoubleParameter)
                     return new DoubleParameterAdaptor(
                         (DoubleParameter) parameter,

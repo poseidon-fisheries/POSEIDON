@@ -25,12 +25,10 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.experiments.EffortThrottling;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
-
 public class LowPriceMeansNoEffort {
-
 
     /**
      * if the price doesn't pay for trips, just stay home.
@@ -40,8 +38,7 @@ public class LowPriceMeansNoEffort {
     @Test
     public void priceIsTooLowAgentsStopFishing() throws Exception {
 
-
-        //sets very low price
+        // sets very low price
         FixedPriceMarketFactory market = new FixedPriceMarketFactory();
         market.setMarketPrice(new FixedDoubleParameter(2.0));
 
@@ -49,7 +46,7 @@ public class LowPriceMeansNoEffort {
             new UniformDoubleParameter(0.001, 1), null, null
         );
 
-        //probability should be very low!
+        // probability should be very low!
         Assertions.assertTrue(state.getDailyDataSet().getLatestObservation("Probability to leave port") < .001);
 
     }

@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.experiments;
 
-
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -35,8 +34,8 @@ import uk.ac.ox.oxfish.model.regs.factory.ITQMonoFactory;
 import uk.ac.ox.oxfish.model.regs.factory.TACMonoFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.io.File;
@@ -48,7 +47,6 @@ import java.util.LinkedList;
 public class MarketFirstDemo {
 
     public static void main(String[] args) throws IOException {
-
 
         generateAndRunMarketDemo(MarketDemoPolicy.ITQ, new FixedDoubleParameter(.1),
             new FixedDoubleParameter(5),
@@ -68,7 +66,6 @@ public class MarketFirstDemo {
             10, 0, true
         );
 
-
         generateAndRunMarketDemo(MarketDemoPolicy.ITQ, new UniformDoubleParameter(0.01, 0.1),
             new FixedDoubleParameter(5),
             Paths.get("runs", "market1", "itqSmooth.csv").toFile(),
@@ -86,7 +83,6 @@ public class MarketFirstDemo {
             Paths.get("runs", "market1", "iqSmooth.csv").toFile(),
             10, 0, true
         );
-
 
         generateAndRunMarketDemo(MarketDemoPolicy.ITQ, new FixedDoubleParameter(.1),
             new UniformDoubleParameter(0, 20),
@@ -106,16 +102,17 @@ public class MarketFirstDemo {
             10, 0, true
         );
 
-
     }
 
     public static FishState generateAndRunMarketDemo(
         final MarketDemoPolicy policy,
         final DoubleParameter catchabilityMean,
         final DoubleParameter gasInefficiency,
-        final File file, //nullable
+        final File file,
+        // nullable
         final int yearsToRun,
-        final long seed, final boolean imitate
+        final long seed,
+        final boolean imitate
     ) throws IOException {
         FishState state = MarketFirstDemo.generateMarketedModel(policy, catchabilityMean,
             gasInefficiency, seed, imitate
@@ -124,7 +121,7 @@ public class MarketFirstDemo {
         while (state.getYear() < yearsToRun)
             state.schedule.step(state);
         Species species = state.getSpecies().get(0);
-        //now write to file
+        // now write to file
         if (file != null) {
 
             LinkedList<String> list = new LinkedList<>();
@@ -160,7 +157,8 @@ public class MarketFirstDemo {
         final MarketDemoPolicy policy,
         final DoubleParameter catchabilityMean,
         final DoubleParameter gasInefficiency,
-        final long seed, boolean imitate
+        final long seed,
+        boolean imitate
     ) {
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setBiologyInitializer(new FromLeftToRightFactory());
@@ -169,7 +167,7 @@ public class MarketFirstDemo {
         gear.setMeanCatchabilityFirstSpecies(catchabilityMean);
         gear.setGasPerHourFished(gasInefficiency);
         scenario.setGear(gear);
-        //make gas expensive!
+        // make gas expensive!
         scenario.setGasPricePerLiter(new FixedDoubleParameter(1));
         scenario.setLiterPerKilometer(new FixedDoubleParameter(0));
 
@@ -198,14 +196,11 @@ public class MarketFirstDemo {
             scenario.setUsePredictors(true);
         }
 
-
         FishState state = new FishState(seed, 2);
         state.setScenario(scenario);
 
-
         return state;
     }
-
 
     public enum MarketDemoPolicy {
 

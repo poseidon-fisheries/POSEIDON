@@ -11,8 +11,8 @@ import uk.ac.ox.oxfish.model.regs.policymakers.SurplusProductionStockAssessment;
 import uk.ac.ox.oxfish.model.regs.policymakers.TargetToTACController;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 //TAC=D*K*r/2
 public class SurplusProductionDepletionFormulaController implements

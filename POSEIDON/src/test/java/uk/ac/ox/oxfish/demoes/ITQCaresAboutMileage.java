@@ -30,18 +30,16 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.util.Iterator;
 import java.util.stream.DoubleStream;
 
-
 public class ITQCaresAboutMileage {
 
     @Test
     public void itqCaresAboutMileage() throws Exception {
-
 
         long seed = System.currentTimeMillis();
         FishState state =
@@ -52,7 +50,7 @@ public class ITQCaresAboutMileage {
                 5, seed, true
             );
 
-        //the correlation ought to be very small
+        // the correlation ought to be very small
         Species species = state.getSpecies().get(0);
 
         double[] mileage = new double[state.getFishers().size()];
@@ -70,11 +68,10 @@ public class ITQCaresAboutMileage {
         System.out.println("seed " + seed);
         System.out.println("Correlation: " +
             Double.toString(FishStateUtilities.computeCorrelation(mileage, catches)));
-        //efficiency is 100%
+        // efficiency is 100%
         Assertions.assertEquals(400000.0, DoubleStream.of(catches).sum(), .1);
 
-
-        //make sure the same number of landings is recorded in the market
+        // make sure the same number of landings is recorded in the market
         DataColumn marketData = state.getAllMarketsForThisSpecie(species).get(0).getData().getColumn(
             AbstractMarket.LANDINGS_COLUMN_NAME);
         Iterator<Double> doubleIterator = marketData.descendingIterator();
@@ -83,11 +80,10 @@ public class ITQCaresAboutMileage {
 
             landedCatches += doubleIterator.next();
         }
-        //sum up the last 365 days of observations
+        // sum up the last 365 days of observations
         Assertions.assertEquals(400000, landedCatches, .1);
 
         Assertions.assertTrue(FishStateUtilities.computeCorrelation(mileage, catches) < -.45);
-
 
     }
 }

@@ -24,7 +24,6 @@ public class FadMapFactory implements AlgorithmFactory<FadMap> {
         this.currentPatternMapSupplier = currentPatternMapSupplier;
     }
 
-
     FadMapFactory(
         final Class<? extends LocalBiology> localBiologyClass
     ) {
