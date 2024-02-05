@@ -40,8 +40,7 @@ dependencies {
 
     api(project(":common"))
     api(project(":regulations"))
-    api(project(":agents:api"))
-    implementation(project(":agents:core"))
+    api(project(":agents"))
 
     //fx collections; needed for sanity
     implementation fileTree(dir: 'libs/fxbase/', include: '*.jar')
