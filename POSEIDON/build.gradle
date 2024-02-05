@@ -76,10 +76,6 @@ dependencies {
     //testing:
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.7'
 
-    // Google AutoService annotations, for generating ServiceLoader metadata automatically
-    annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
-    compileOnly 'com.google.auto.service:auto-service-annotations:1.1.1'
-
     // Reference implementation of JSR-385 for units of measure
     implementation 'si.uom:si-quantity:2.1'
     implementation 'si.uom:si-units:2.1'
