@@ -46,7 +46,6 @@ public class Services {
         ));
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     public static <S> List<S> loadAll(
         final Class<? extends S> service,
         final Predicate<? super S> predicate

@@ -24,8 +24,7 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 /**
- * The parameter returned is always the same
- * Created by carrknight on 6/7/15.
+ * The parameter returned is always the same Created by carrknight on 6/7/15.
  */
 public class FixedDoubleParameter extends FixedParameter<Double> implements DoubleParameter {
 

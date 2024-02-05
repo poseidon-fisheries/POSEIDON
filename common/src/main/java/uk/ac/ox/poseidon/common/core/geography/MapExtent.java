@@ -47,7 +47,7 @@ public final class MapExtent {
         this.cellWidth = envelope.getWidth() / (double) this.getGridWidth();
         this.cellHeight = envelope.getHeight() / (double) this.getGridHeight();
         this.hashCode = Objects.hash(gridWidth, gridHeight, envelope);
-        this.coordinateField = new CoordinateField(this);
+        this.coordinateField = new CoordinateField(gridWidth, gridHeight, envelope);
     }
 
     public int getGridWidth() {
