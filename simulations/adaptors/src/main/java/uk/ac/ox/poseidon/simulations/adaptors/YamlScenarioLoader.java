@@ -1,5 +1,6 @@
 package uk.ac.ox.poseidon.simulations.adaptors;
 
+import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -15,6 +16,7 @@ import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+@AutoService(FileScenarioLoader.class)
 public class YamlScenarioLoader implements FileScenarioLoader {
     private static final Set<String> SUPPORTED_EXTENSIONS = ImmutableSet.of("yaml");
 
