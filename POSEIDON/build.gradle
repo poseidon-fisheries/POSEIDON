@@ -39,10 +39,9 @@ sourceSets {
 dependencies {
 
     api(project(":common"))
+    api(project(":regulations"))
     api(project(":agents:api"))
     implementation(project(":agents:core"))
-    api(project(":regulations:api"))
-    implementation(project(":regulations:core"))
 
     //fx collections; needed for sanity
     implementation fileTree(dir: 'libs/fxbase/', include: '*.jar')
