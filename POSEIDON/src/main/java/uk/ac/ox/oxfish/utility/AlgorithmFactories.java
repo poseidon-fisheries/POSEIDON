@@ -60,7 +60,6 @@ import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.ExponentialTimeSca
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.InverseTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.SigmoidalTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EmptyFleet;
-import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.*;
@@ -214,7 +213,6 @@ public class AlgorithmFactories {
                 entry(ExogenousFadMakerCSVFactory.class, "Exogenous Fad Maker CSV"),
                 entry(FadDemoFactory.class, "Fad Demo"),
                 entry(ExogenousFadSetterCSVFactory.class, "Exogenous Fad Setter CSV"),
-                entry(IattcClosurePeriodRandomizerFactory.class, "IATTC Closure Period Randomizer"),
                 entry(FadTemperatureHazardFactory.class, "Fad Temperature Hazard"),
                 entry(FadZapperFactory.class, "FAD zapper")
             ),
@@ -437,9 +435,7 @@ public class AlgorithmFactories {
                 entry(HoldLimitingDecoratorFactory.class, "Hold Upper Limit"),
                 entry(DelayGearDecoratorFactory.class, "Hour Delay Gear"),
                 entry(MaxThroughputDecoratorFactory.class, "Max Throughput Limit")
-            ),
-            BiomassPurseSeineGearFactory.class,
-            AbundancePurseSeineGearFactory.class
+            )
         ));
         addFactories(new Factories<>(
             MapInitializer.class,
@@ -786,9 +782,6 @@ public class AlgorithmFactories {
         ));
         addFactories(new Factories<>(
             ScenarioPopulation.class,
-            ImmutableMap.of(
-                EpoPurseSeinerFleetFactory.class, "EPO purse-seiner fleet"
-            ),
             EmptyFleet.class
         ));
         addFactories(new Factories<>(

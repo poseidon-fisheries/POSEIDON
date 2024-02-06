@@ -7,4 +7,5 @@ dependencies {
     implementation(project(":datasets:core"))
     implementation(project(":common"))
     implementation(project(":POSEIDON"))
+    implementation(project(":epo"))
 }

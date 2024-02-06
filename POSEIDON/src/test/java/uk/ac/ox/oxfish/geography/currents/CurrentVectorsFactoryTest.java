@@ -4,13 +4,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sim.util.Double2D;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
+import uk.ac.ox.oxfish.geography.MapExtentFactory;
 import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import static uk.ac.ox.oxfish.geography.currents.CurrentVectorsFactory.SECONDS_PER_DAY;
 import static uk.ac.ox.oxfish.geography.currents.CurrentVectorsFactory.metrePerSecondToXyPerDaysVector;
-import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 public class CurrentVectorsFactoryTest {
@@ -20,8 +18,9 @@ public class CurrentVectorsFactoryTest {
     @Test
     public void testMetrePerSecondToXyPerDaysVector() {
 
-        final FishState fishState = startTestableScenario(EpoGravityAbundanceScenario.class);
-        final MapExtent mapExtent = fishState.getMap().getMapExtent();
+        final MapExtent mapExtent = new MapExtentFactory(
+            101, 100, -171, -70, -50, 50
+        ).get();
 
         final double oneMeterPerSecondAtEquatorInDegreesPerDay =
             metrePerSecondToXyPerDaysVector(new Double2D(1, 0), new Coordinate(0, 0), mapExtent).length();

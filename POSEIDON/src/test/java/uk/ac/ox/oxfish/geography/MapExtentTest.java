@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.grid.ObjectGrid2D;
 import sim.util.Double2D;
-import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.util.List;
@@ -39,7 +38,9 @@ public class MapExtentTest {
 
     @Test
     public void testCoordToXyAndBack() {
-        final MapExtent mapExtent = EpoScenario.DEFAULT_MAP_EXTENT_FACTORY.get();
+        final MapExtent mapExtent = new MapExtentFactory(
+            101, 100, -171, -70, -50, 50
+        ).get();
         final Envelope envelope = mapExtent.getEnvelope();
         final List<Coordinate> coordinates =
             range((int) envelope.getMinX(), (int) envelope.getMaxX() - 1)

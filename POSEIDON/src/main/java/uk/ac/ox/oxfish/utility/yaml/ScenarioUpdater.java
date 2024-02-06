@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
-import uk.ac.ox.oxfish.model.scenario.EpoScenario;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -18,7 +18,7 @@ public class ScenarioUpdater {
         final Path inputScenario,
         final Path outputScenario,
         final Function<Stream<String>, String> lineProcessor,
-        final Consumer<EpoScenario<?>> scenarioConsumer
+        final Consumer<Scenario> scenarioConsumer
     ) {
         System.out.print("===\n" + inputScenario + "\n===\n");
         try (final Stream<String> scenarioLines = Files.lines(inputScenario)) {
@@ -26,9 +26,9 @@ public class ScenarioUpdater {
             final String scenarioYaml = lineProcessor.apply(scenarioLines);
             System.out.println(scenarioYaml);
             final FishYAML fishYAML = new FishYAML();
-            final EpoScenario<?> scenario = fishYAML.loadAs(scenarioYaml, EpoScenario.class);
+            final Scenario scenario = fishYAML.loadAs(scenarioYaml, Scenario.class);
             scenarioConsumer.accept(scenario);
-            //scenario.getCatchSamplersFactory().setSpeciesCodesSupplier(scenario.getSpeciesCodesSupplier());
+            // scenario.getCatchSamplersFactory().setSpeciesCodesSupplier(scenario.getSpeciesCodesSupplier());
             try (final FileOutputStream fileOutputStream = new FileOutputStream(outputScenario.toFile())) {
                 final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
                 fishYAML.dump(scenario, outputStreamWriter);

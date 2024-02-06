@@ -46,9 +46,7 @@ dependencies {
     implementation fileTree(dir: 'libs/fxbase/', include: '*.jar')
 
     // DO NOT use opencsv for new code, as we want to phase it out.
-
     implementation "com.opencsv:opencsv:3.8"
-
 
     //kd tree
     implementation fileTree(dir: 'libs/rednaxela', include: '*.jar')
@@ -60,7 +58,7 @@ dependencies {
     implementation 'net.sf.jung:jung-algorithms:2.0.1'
 
     //yaml parser, useful for reading configuration files
-    implementation 'org.yaml:snakeyaml:1.33'
+    api 'org.yaml:snakeyaml:1.33'
     //jcommander, useful to parse command line arguments
     implementation "com.beust:jcommander:1.81"
 
@@ -71,14 +69,14 @@ dependencies {
     implementation fileTree(dir: 'libs/discrete-choosers', include: '*.jar')
 
     // maximizer
-    implementation group: 'de.openea', name: 'eva2', version: '2.2.0'
+    api group: 'de.openea', name: 'eva2', version: '2.2.0'
 
     //testing:
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.7'
 
     // Reference implementation of JSR-385 for units of measure
-    implementation 'si.uom:si-quantity:2.1'
-    implementation 'si.uom:si-units:2.1'
+    api 'si.uom:si-quantity:2.1'
+    api 'si.uom:si-units:2.1'
 }
 
 processTestResources.doFirst {

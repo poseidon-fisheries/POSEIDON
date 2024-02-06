@@ -7,11 +7,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 
-class FileAndScreenWriter implements InterfaceTextListener, Closeable {
+public class FileAndScreenWriter implements InterfaceTextListener, Closeable {
 
     private final FileWriter fileWriter;
 
-    FileAndScreenWriter(Path outputFile) throws IOException {
+    public FileAndScreenWriter(final Path outputFile) throws IOException {
         this.fileWriter = new FileWriter(outputFile.toFile());
     }
 
@@ -21,17 +21,17 @@ class FileAndScreenWriter implements InterfaceTextListener, Closeable {
     }
 
     @Override
-    public void println(String str) {
+    public void println(final String str) {
         print(str + "\n");
     }
 
     @Override
-    public void print(String str) {
+    public void print(final String str) {
         System.out.println(str);
         try {
             fileWriter.write(str);
             fileWriter.flush();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
     }

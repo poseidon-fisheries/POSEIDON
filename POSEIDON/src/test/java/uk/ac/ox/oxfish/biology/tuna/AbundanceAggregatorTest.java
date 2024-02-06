@@ -18,26 +18,15 @@
 
 package uk.ac.ox.oxfish.biology.tuna;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Streams;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.GlobalBiomassLogger;
-import uk.ac.ox.oxfish.model.scenario.EpoGravityAbundanceScenario;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.IntStream.range;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
@@ -94,78 +83,6 @@ public class AbundanceAggregatorTest {
                 Assertions.assertEquals(expected, inputBiologies.get(b).getBiomass(species.get(s)), EPSILON);
             })
         );
-    }
-
-
-    @Test
-    public void testWithEpoAbundanceScenario() {
-        final EpoGravityAbundanceScenario scenario = new EpoGravityAbundanceScenario();
-        scenario.useDummyData();
-        final FishState fishState = new FishState();
-        fishState.setScenario(scenario);
-        fishState.start();
-
-        final List<Species> species = fishState.getSpecies();
-
-        final Map<Species, Double> biomassesBeforeExtraction = getBiomasses(fishState, species);
-
-        final Collection<AbundanceLocalBiology> extractedBiologies =
-            new AbundanceExtractorProcess(true, true)
-                .process(fishState, null);
-
-        compareBiomasses(
-            biomassesBeforeExtraction,
-            getBiomasses(fishState, species)
-        );
-        compareBiomasses(
-            biomassesBeforeExtraction,
-            getBiomasses(fishState, species, extractedBiologies)
-        );
-
-        final Collection<AbundanceLocalBiology> aggregatedBiologies =
-            new AbundanceAggregatorProcess().process(fishState, extractedBiologies);
-
-        compareBiomasses(
-            biomassesBeforeExtraction,
-            getBiomasses(fishState, species)
-        );
-        compareBiomasses(
-            biomassesBeforeExtraction,
-            getBiomasses(fishState, species, aggregatedBiologies)
-        );
-
-    }
-
-    private static Map<Species, Double> getBiomasses(
-        final FishState fishState,
-        final Collection<Species> species
-    ) {
-        return species.stream().collect(toImmutableMap(
-            Function.identity(),
-            fishState::getTotalBiomass
-        ));
-    }
-
-    private static void compareBiomasses(
-        final Map<Species, Double> expected,
-        final Map<Species, Double> actual
-    ) {
-        expected.forEach((species, biomass) ->
-            Assertions.assertEquals(biomass, actual.get(species), EPSILON)
-        );
-    }
-
-    private static ImmutableMap<Species, Double> getBiomasses(
-        final FishState fishState,
-        final Collection<Species> species,
-        final Collection<AbundanceLocalBiology> extractedBiologies
-    ) {
-        //noinspection UnstableApiUsage
-        return Streams.zip(
-            species.stream(),
-            GlobalBiomassLogger.getBiomassesStream(fishState, extractedBiologies),
-            FishStateUtilities::entry
-        ).collect(toImmutableMap(Entry::getKey, Entry::getValue));
     }
 
 }

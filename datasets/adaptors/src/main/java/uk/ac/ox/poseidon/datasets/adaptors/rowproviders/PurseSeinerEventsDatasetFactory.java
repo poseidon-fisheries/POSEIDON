@@ -6,8 +6,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
-import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.poseidon.datasets.api.DatasetFactory;
+import uk.ac.ox.poseidon.epo.scenarios.EpoScenario;
 
 import java.util.Map;
 import java.util.function.Function;

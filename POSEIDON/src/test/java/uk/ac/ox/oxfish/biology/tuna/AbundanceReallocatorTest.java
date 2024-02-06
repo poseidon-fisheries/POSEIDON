@@ -48,7 +48,7 @@ public class AbundanceReallocatorTest {
         );
 
         final AllocationGrids<Key> allocationGrids = new SmallLargeAllocationGridsSupplier(
-            Paths.get("inputs", "epo_inputs", "tests", "mock_grids.csv"),
+            Paths.get("inputs", "tests", "mock_grids.csv"),
             nauticalMap.getMapExtent(),
             365
         ).get();
@@ -63,13 +63,17 @@ public class AbundanceReallocatorTest {
 
         reallocator.reallocate(grids.get(0), globalBiology, nauticalMap.getAllSeaTilesAsList(), aggregatedBiology);
 
-        Assertions.assertEquals(0.991991733,
+        Assertions.assertEquals(
+            0.991991733,
             nauticalMap.getAllSeaTilesAsList().get(0).getAbundance(species1).asMatrix()[0][0],
-            .0000001);
+            .0000001
+        );
 
-        Assertions.assertEquals(1.13292204,
+        Assertions.assertEquals(
+            1.13292204,
             nauticalMap.getAllSeaTilesAsList().get(4).getAbundance(species1).asMatrix()[0][1],
-            .0000001);
+            .0000001
+        );
 
     }
 

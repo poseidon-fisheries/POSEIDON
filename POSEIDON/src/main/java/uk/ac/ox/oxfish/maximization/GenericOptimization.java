@@ -83,7 +83,7 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
      * this assumes however all parameters are simple
      */
     @SuppressWarnings("SameParameterValue")
-    static void buildLocalCalibrationProblem(
+    public static void buildLocalCalibrationProblem(
         final Path optimizationFile,
         final double[] originalParameters,
         final String newCalibrationName,
@@ -109,28 +109,12 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
         yaml.dump(optimization, new FileWriter(optimizationFile.getParent().resolve(newCalibrationName).toFile()));
     }
 
-    public List<OptimizationParameter> getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(final List<OptimizationParameter> parameters) {
-        this.parameters = parameters;
-    }
-
-    static GenericOptimization fromFile(final Path calibrationFile) {
+    public static GenericOptimization fromFile(final Path calibrationFile) {
         final FishYAML yamlReader = new FishYAML();
         try (final FileReader fileReader = new FileReader(calibrationFile.toFile())) {
             return yamlReader.loadAs(fileReader, GenericOptimization.class);
         } catch (final IOException e) {
             throw new IllegalStateException(e);
-        }
-    }
-
-    Scenario buildScenario(final double[] solution) {
-        try {
-            return buildScenario(solution, Paths.get(getScenarioFile()).toFile(), getParameters());
-        } catch (final FileNotFoundException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -154,6 +138,22 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
             parameter += optimizationParameter.size();
         }
         return scenario;
+    }
+
+    public List<OptimizationParameter> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(final List<OptimizationParameter> parameters) {
+        this.parameters = parameters;
+    }
+
+    Scenario buildScenario(final double[] solution) {
+        try {
+            return buildScenario(solution, Paths.get(getScenarioFile()).toFile(), getParameters());
+        } catch (final FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String getScenarioFile() {

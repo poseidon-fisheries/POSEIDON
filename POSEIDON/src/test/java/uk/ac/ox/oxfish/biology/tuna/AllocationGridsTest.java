@@ -22,7 +22,7 @@ public class AllocationGridsTest {
 
         final AllocationGrids<Key> allocationGrids =
             new SmallLargeAllocationGridsSupplier(
-                Paths.get("inputs", "epo_inputs", "tests", "mock_grids.csv"),
+                Paths.get("inputs", "tests", "mock_grids.csv"),
                 nauticalMap.getMapExtent(),
                 365
             ).get();
