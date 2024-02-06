@@ -20,12 +20,14 @@
 
 package uk.ac.ox.oxfish.utility.yaml;
 
+import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.*;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.model.scenario.ScenarioSupplier;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.*;
@@ -41,12 +43,12 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.stream;
 import static java.util.function.UnaryOperator.identity;
-import static uk.ac.ox.oxfish.model.scenario.Scenarios.SCENARIOS;
 
 /**
  * Constructor useful to implement YAML objects back into the Fishstate. I modify it so that it does the following
@@ -61,15 +63,10 @@ public class YamlConstructor extends Constructor {
 
     private static final LoaderOptions LOADER_OPTIONS = new LoaderOptions();
     private final Map<String, FactorySupplier> factorySuppliers =
-        stream(ServiceLoader.load(FactorySupplier.class)).collect(toImmutableMap(
-            FactorySupplier::getFactoryName,
-            identity(),
-            (factorySupplier, __) -> {
-                throw new IllegalStateException(
-                    "Duplicate factory name: " + factorySupplier.getFactoryName()
-                );
-            }
-        ));
+        makeSupplierMap(FactorySupplier.class, FactorySupplier::getFactoryName);
+
+    private final Map<String, ScenarioSupplier> scenarioSuppliers =
+        makeSupplierMap(ScenarioSupplier.class, ScenarioSupplier::getScenarioName);
 
     YamlConstructor() {
 
@@ -117,7 +114,7 @@ public class YamlConstructor extends Constructor {
                     if (GenericComponentFactory.class.isAssignableFrom(node.getType())) {
                         return constructNamedObject(nodeTuple, YamlConstructor.this::constructFactory);
                     } else if (Scenario.class.isAssignableFrom(node.getType())) {
-                        return constructNamedObject(nodeTuple, name -> SCENARIOS.get(name).get());
+                        return constructNamedObject(nodeTuple, YamlConstructor.this::constructScenario);
                     } else {
                         // If it's neither an algorithm factory nor a scenario, propagate the exception
                         throw e;
@@ -144,6 +141,21 @@ public class YamlConstructor extends Constructor {
                 return object;
             }
         });
+    }
+
+    private static <T, S extends Supplier<T>> ImmutableMap<String, S> makeSupplierMap(
+        final Class<S> supplierClass,
+        final Function<S, String> nameGetter
+    ) {
+        return stream(ServiceLoader.load(supplierClass)).collect(toImmutableMap(
+            nameGetter,
+            identity(),
+            (supplier, __) -> {
+                throw new IllegalStateException(
+                    "Duplicate supplier name: " + nameGetter.apply(supplier)
+                );
+            }
+        ));
     }
 
     public static DoubleParameter parseDoubleParameter(final String nodeContent) {
@@ -213,6 +225,16 @@ public class YamlConstructor extends Constructor {
         return factorySupplier != null
             ? factorySupplier.get()
             : AlgorithmFactories.constructorLookup(factoryName);
+    }
+
+    private Scenario constructScenario(final String scenarioName) {
+        final ScenarioSupplier scenarioSupplier = scenarioSuppliers.get(scenarioName);
+        if (scenarioSupplier != null)
+            return scenarioSupplier.get();
+        else throw new IllegalStateException(
+            "Scenario not found: " + scenarioName + ".\n" +
+                "Available scenarios are: \n" + String.join("\n", scenarioSuppliers.keySet())
+        );
     }
 
 }
