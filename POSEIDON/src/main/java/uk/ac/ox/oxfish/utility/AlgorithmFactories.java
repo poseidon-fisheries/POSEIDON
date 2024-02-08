@@ -763,7 +763,8 @@ public class AlgorithmFactories {
                 BiomassFadInitializerFactory.class, "Biomass FAD",
                 CompressedBiomassFadInitializerFactory.class, "Compressed biomass FAD",
                 CompressedAbundanceFadInitializerFactory.class, "Compressed abundance FAD"
-            )
+            ),
+            LinearAbundanceFadInitializerFactory.class
         ));
         addFactories(new Factories<>(
             FishValueCalculator.class,

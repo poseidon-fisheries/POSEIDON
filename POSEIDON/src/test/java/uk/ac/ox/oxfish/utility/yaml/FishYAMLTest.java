@@ -33,10 +33,10 @@ import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
-import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.SelectDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
+import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -84,12 +84,13 @@ public class FishYAMLTest {
                 "  habitatInitializer: All Sand\n" +
                 "  holdSize: '100.0'\n" +
                 "  literPerKilometer: '10.0'\n" +
-                "  mapInitializer: !!uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory\n" +
-                "    cellSizeInKilometers: '10.0'\n" +
-                "    coastalRoughness: '4.0'\n" +
-                "    depthSmoothing: '1000000.0'\n" +
-                "    height: '50.0'\n" +
-                "    width: '50.0'\n" +
+                "  mapInitializer:\n" +
+                "    Simple Map:\n" +
+                "      cellSizeInKilometers: '10.0'\n" +
+                "      coastalRoughness: '4.0'\n" +
+                "      depthSmoothing: '1000000.0'\n" +
+                "      height: '50.0'\n" +
+                "      width: '50.0'\n" +
                 "  mapMakerDedicatedRandomSeed: null\n" +
                 "  market:\n" +
                 "    Fixed Price Market:\n" +

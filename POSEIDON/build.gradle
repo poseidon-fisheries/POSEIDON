@@ -58,7 +58,7 @@ dependencies {
     implementation 'net.sf.jung:jung-algorithms:2.0.1'
 
     //yaml parser, useful for reading configuration files
-    api 'org.yaml:snakeyaml:1.33'
+    api 'org.yaml:snakeyaml:2.2'
     //jcommander, useful to parse command line arguments
     implementation "com.beust:jcommander:1.81"
 

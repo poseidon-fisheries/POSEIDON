@@ -42,11 +42,14 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Streams.stream;
 import static java.util.function.UnaryOperator.identity;
 
@@ -62,6 +65,29 @@ import static java.util.function.UnaryOperator.identity;
 public class YamlConstructor extends Constructor {
 
     private static final LoaderOptions LOADER_OPTIONS = new LoaderOptions();
+
+    static {
+        // Explicitly whitelist which classes can be loaded with a global tag
+        final Set<String> allowedClasses = Stream
+            .of(
+                uk.ac.ox.oxfish.maximization.GenericOptimization.class,
+                uk.ac.ox.oxfish.maximization.generic.CommaMapOptimizationParameter.class,
+                uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter.class,
+                uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter.class,
+                uk.ac.ox.oxfish.maximization.generic.UniformWithSpreadOptimizationParameter.class,
+                uk.ac.ox.oxfish.maximization.generic.MultipleOptimizationParameter.class,
+                uk.ac.ox.oxfish.maximization.generic.FixedOptimizationParameter.class,
+                uk.ac.ox.oxfish.maximization.generic.SmapeDataTarget.class,
+                uk.ac.ox.oxfish.maximization.generic.DifferenceDataTarget.class,
+                uk.ac.ox.oxfish.biology.initializer.DerisoParameters.class
+            )
+            .map(Class::getName)
+            .collect(toImmutableSet());
+        LOADER_OPTIONS.setTagInspector(tag ->
+            allowedClasses.contains(tag.getClassName())
+        );
+    }
+
     private final Map<String, FactorySupplier> factorySuppliers =
         makeSupplierMap(FactorySupplier.class, FactorySupplier::getFactoryName);
 
