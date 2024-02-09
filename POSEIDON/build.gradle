@@ -62,7 +62,9 @@ dependencies {
     implementation 'net.sf.jung:jung-algorithms:2.0.1'
 
     //yaml parser, useful for reading configuration files
-    api 'org.yaml:snakeyaml:2.2'
+    // We need to stay on SnakeYAML 1.33 despite the vulnerability
+    // because Eva2 is not compatible with SnakeYAML 2.x.
+    api 'org.yaml:snakeyaml:1.33'
     //jcommander, useful to parse command line arguments
     implementation "com.beust:jcommander:1.81"
 
