@@ -22,20 +22,16 @@ package uk.ac.ox.oxfish.geography.discretization;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 /**
- * The factory building squared maps
- * Created by carrknight on 1/27/17.
+ * The factory building squared maps Created by carrknight on 1/27/17.
  */
 public class SquaresMapDiscretizerFactory implements AlgorithmFactory<SquaresMapDiscretizer> {
 
-    private DoubleParameter horizontalSplits =
-        new CalibratedParameter(1, 10, 1, 50, 6);
+    private DoubleParameter horizontalSplits;
 
-    private DoubleParameter verticalSplits =
-        new CalibratedParameter(1, 10, 1, 50, 3);
+    private DoubleParameter verticalSplits;
 
     public SquaresMapDiscretizerFactory() {
     }
@@ -61,7 +57,6 @@ public class SquaresMapDiscretizerFactory implements AlgorithmFactory<SquaresMap
             (int) horizontalSplits.applyAsDouble(fishState.getRandom())
         );
     }
-
 
     /**
      * Getter for property 'horizontalSplits'.

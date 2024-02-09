@@ -61,12 +61,12 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * if you tried to steal and failed, how many hours does it take for you to fish this out
      */
     private DoubleParameter hoursWastedOnFailedSearches =
-        new CalibratedParameter(1, 5, 0, 24);
+        new CalibratedParameter(1, 8, 0, 24);
     /**
      * how many hours does it take for a plan to go stale and need replanning
      */
     private DoubleParameter planningHorizonInHours =
-        new CalibratedParameter(24 * 7, 24 * 7 * 2, 24, 24 * 7 * 8);
+        new CalibratedParameter(24 * 7, 24 * 7 * 5, 24, 24 * 7 * 8);
     /**
      * a multiplier applied to the action weight of own fad (since it's quite low in the data)
      */
