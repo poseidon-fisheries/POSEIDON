@@ -5,6 +5,10 @@ plugins {
     id "com.github.spotbugs" version "4.7.2"
 }
 
+shadowJar {
+    mergeServiceFiles()
+}
+
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(8))
