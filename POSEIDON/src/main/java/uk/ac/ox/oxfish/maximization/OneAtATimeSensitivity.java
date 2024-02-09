@@ -9,12 +9,10 @@ import com.univocity.parsers.annotations.Parsed;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.maximization.generic.FixedDataTarget;
-import uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.poseidon.common.core.csv.CsvParserUtil;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,7 +20,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.DoubleStream;
-import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.lang.Math.max;
@@ -80,7 +77,6 @@ public class OneAtATimeSensitivity {
         final GenericOptimization genericOptimization = GenericOptimization.fromFile(folder.resolve(calibrationFile));
         final double[] solution = new SolutionExtractor(folder.resolve(logFile)).bestSolution().getKey();
         final Path outputFolder = folder.resolve("ofat_outputs");
-        writeBounds(genericOptimization, solution, outputFolder.resolve("bounds.csv"));
         if (!boundsOnly) {
             final Scenario scenario = genericOptimization.buildScenario(solution);
             new Runner<>(() -> genericOptimization.buildScenario(solution), outputFolder)
@@ -91,39 +87,6 @@ public class OneAtATimeSensitivity {
                 )
                 .run(numYearsToRun, iterations);
         }
-    }
-
-    private void writeBounds(
-        final GenericOptimization genericOptimization,
-        final double[] solution,
-        final Path outputFile
-    ) {
-        final Scenario scenario = genericOptimization.buildScenario(solution);
-        final Stream<List<?>> rows =
-            genericOptimization.getParameters()
-                .stream()
-                .filter(p -> p instanceof HardEdgeOptimizationParameter)
-                .map(p -> (HardEdgeOptimizationParameter) p)
-                .map(p -> ImmutableList.of(
-                    p.getAddressToModify(),
-                    p.getMinimum(),
-                    p.getMaximum(),
-                    p.getHardMinimum(),
-                    p.getHardMaximum(),
-                    p.getValue(scenario)
-                ));
-        CsvParserUtil.writeRows(
-            outputFile,
-            ImmutableList.of(
-                "parameter",
-                "soft_minimum",
-                "soft_maximum",
-                "hard_minimum",
-                "hard_maximum",
-                "value"
-            ),
-            rows::iterator
-        );
     }
 
     private List<Variation> buildVariations(

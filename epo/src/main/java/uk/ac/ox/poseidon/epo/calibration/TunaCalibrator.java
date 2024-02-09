@@ -54,6 +54,7 @@ import static java.lang.Integer.parseInt;
 import static java.lang.Runtime.getRuntime;
 import static java.nio.file.Files.createDirectories;
 import static java.util.Arrays.stream;
+import static uk.ac.ox.oxfish.maximization.BoundsWriter.writeBounds;
 
 public class TunaCalibrator {
 
@@ -126,52 +127,17 @@ public class TunaCalibrator {
         }));
     }
 
-    private static Path copyToFolder(
-        final Path sourceFile,
-        final Path targetFolder
-    ) {
-        try {
-            return Files.copy(sourceFile, targetFolder.resolve(sourceFile.getFileName()));
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    static void evaluateSolutionAndPrintOutErrors(
-        final Path calibrationFilePath,
-        final double[] solution
-    ) {
-        saveCalibratedScenario(solution, calibrationFilePath);
-        new TunaEvaluator(calibrationFilePath, solution).run();
-    }
-
-    private static void saveCalibratedScenario(
-        final double[] optimalParameters,
-        final Path calibrationFilePath
-    ) {
-
-        final Path calibratedScenarioPath =
-            calibrationFilePath.getParent().resolve(CALIBRATED_SCENARIO_FILE_NAME);
-
-        try (final FileWriter fileWriter = new FileWriter(calibratedScenarioPath.toFile())) {
-            final GenericOptimization optimization =
-                GenericOptimization.fromFile(calibrationFilePath);
-            final Scenario scenario = GenericOptimization.buildScenario(
-                optimalParameters,
-                Paths.get(optimization.getScenarioFile()).toFile(),
-                optimization.getParameters()
-            );
-            new FishYAML().dump(scenario, fileWriter);
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     public double[] run() {
+        final Path outputFolder = makeOutputFolder();
         final Path calibrationFilePath =
-            copyToFolder(this.originalCalibrationFilePath, makeOutputFolder());
+            copyToFolder(this.originalCalibrationFilePath, outputFolder);
         final double[] solution = calibrate(calibrationFilePath);
         evaluateSolutionAndPrintOutErrors(calibrationFilePath, solution);
+        writeBounds(
+            GenericOptimization.fromFile(calibrationFilePath),
+            solution,
+            outputFolder.resolve("bounds.csv")
+        );
         return solution;
     }
 
@@ -193,6 +159,17 @@ public class TunaCalibrator {
             throw new IllegalStateException(e);
         }
         return outputFolderPath;
+    }
+
+    private static Path copyToFolder(
+        final Path sourceFile,
+        final Path targetFolder
+    ) {
+        try {
+            return Files.copy(sourceFile, targetFolder.resolve(sourceFile.getFileName()));
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private double[] calibrate(final Path calibrationFilePath) {
@@ -293,6 +270,36 @@ public class TunaCalibrator {
 
         return runnable.getDoubleSolution();
 
+    }
+
+    static void evaluateSolutionAndPrintOutErrors(
+        final Path calibrationFilePath,
+        final double[] solution
+    ) {
+        saveCalibratedScenario(solution, calibrationFilePath);
+        new TunaEvaluator(calibrationFilePath, solution).run();
+    }
+
+    private static void saveCalibratedScenario(
+        final double[] optimalParameters,
+        final Path calibrationFilePath
+    ) {
+
+        final Path calibratedScenarioPath =
+            calibrationFilePath.getParent().resolve(CALIBRATED_SCENARIO_FILE_NAME);
+
+        try (final FileWriter fileWriter = new FileWriter(calibratedScenarioPath.toFile())) {
+            final GenericOptimization optimization =
+                GenericOptimization.fromFile(calibrationFilePath);
+            final Scenario scenario = GenericOptimization.buildScenario(
+                optimalParameters,
+                Paths.get(optimization.getScenarioFile()).toFile(),
+                optimization.getParameters()
+            );
+            new FishYAML().dump(scenario, fileWriter);
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @SuppressWarnings("unused")
