@@ -56,7 +56,8 @@ public class PurseSeineGearTest {
         purseSeineGear = new BiomassPurseSeineGear(
             mock(FadManager.class),
             1,
-            0.9
+            0.9,
+            null
         );
     }
 

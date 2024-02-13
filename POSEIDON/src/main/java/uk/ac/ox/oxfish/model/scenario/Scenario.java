@@ -54,7 +54,7 @@ public interface Scenario {
     }
 
     default LocalDate getStartDate() {
-        return LocalDate.now();
+        return LocalDate.of(LocalDate.now().getYear(), 1, 1);
     }
 
 }

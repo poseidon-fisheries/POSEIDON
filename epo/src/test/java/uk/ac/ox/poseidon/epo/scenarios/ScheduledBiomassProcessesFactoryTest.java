@@ -23,8 +23,8 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.biology.tuna.AllocationGrids;
 import uk.ac.ox.oxfish.biology.tuna.BiomassReallocator;
 import uk.ac.ox.oxfish.biology.tuna.BiomassReallocatorFactory;
-import uk.ac.ox.oxfish.geography.MapExtentFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.poseidon.common.core.geography.MapExtentFactory;
 import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 

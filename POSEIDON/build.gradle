@@ -45,6 +45,7 @@ dependencies {
     api(project(":common"))
     api(project(":regulations"))
     api(project(":agents"))
+    api(project(":geography"))
 
     //fx collections; needed for sanity
     implementation fileTree(dir: 'libs/fxbase/', include: '*.jar')

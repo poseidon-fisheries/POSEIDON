@@ -42,6 +42,8 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.poseidon.common.core.temporal.ConstantTemporalMap;
+import uk.ac.ox.poseidon.geography.DoubleGrid;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -59,7 +61,6 @@ import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 import static uk.ac.ox.poseidon.regulations.api.Mode.PERMITTED;
 
 class OwnFadSetDiscretizedActionGeneratorTest {
-
 
     @Test
     void test() {
@@ -108,7 +109,7 @@ class OwnFadSetDiscretizedActionGeneratorTest {
         when(fadManager.getDeployedFads())
             .thenReturn(fads);
 
-        //discretized map split into 2x2
+        // discretized map split into 2x2
         final MapDiscretization discretization = new MapDiscretization(
             new SquaresMapDiscretizer(1, 1)
         );
@@ -122,18 +123,18 @@ class OwnFadSetDiscretizedActionGeneratorTest {
         generator.startOrReset(fadManager, new MersenneTwisterFast(), mock(NauticalMap.class));
         final List<Entry<ValuedFad, Integer>> initialOptions = generator.generateBestFadOpportunities();
         System.out.println(initialOptions);
-        //you should have only given me two fads: one in the upper-left quadrant and one in the lower-right quadrant
+        // you should have only given me two fads: one in the upper-left quadrant and one in the lower-right quadrant
         Assertions.assertEquals(0, (int) initialOptions.get(0).getValue());
         Assertions.assertEquals(3, (int) initialOptions.get(1).getValue());
 
         Entry<ValuedFad, Integer> firstGuess = initialOptions.get(0);
         Entry<ValuedFad, Integer> secondGuess = initialOptions.get(1);
 
-        //you should have only chosen the best!
+        // you should have only chosen the best!
         Assertions.assertEquals(firstGuess.getKey().getValue(), 1.0);
         Assertions.assertEquals(secondGuess.getKey().getValue(), 2.0);
 
-        //if I pick one option, next time I choose it shouldn't be present anymore
+        // if I pick one option, next time I choose it shouldn't be present anymore
         final PlannedAction.FadSet plannedFadSet = generator.chooseFad(0);
         Assertions.assertEquals(plannedFadSet.getLocation(), firstGuess.getKey().getKey().getLocation());
 
@@ -141,11 +142,11 @@ class OwnFadSetDiscretizedActionGeneratorTest {
         firstGuess = newOptions.get(0);
         secondGuess = newOptions.get(1);
 
-        //the 1$ fad should have gone
+        // the 1$ fad should have gone
         Assertions.assertEquals(firstGuess.getKey().getValue().doubleValue(), 0.0);
         Assertions.assertEquals(secondGuess.getKey().getValue().doubleValue(), 2.0);
 
-        //if you empty a queue, the group won't appear again
+        // if you empty a queue, the group won't appear again
         generator.chooseFad(0);
         final List<Entry<ValuedFad, Integer>> finalOptions = generator.generateBestFadOpportunities();
         Assertions.assertEquals(finalOptions.size(), 1);
@@ -196,7 +197,7 @@ class OwnFadSetDiscretizedActionGeneratorTest {
         when(fadManager.getDeployedFads())
             .thenReturn(ImmutableSet.copyOf(fads));
 
-        //discretized map split into 2x2
+        // discretized map split into 2x2
         final MapDiscretization discretization = new MapDiscretization(
             new SquaresMapDiscretizer(1, 1)
         );
@@ -212,18 +213,25 @@ class OwnFadSetDiscretizedActionGeneratorTest {
         Assertions.assertEquals(3, (int) initialOptions.get(0).getValue());
     }
 
-
     @Test
     void banLocations() {
         final FishState fishState = mock(FishState.class);
         when(fishState.getRegulations()).thenReturn(PERMITTED);
         final NauticalMap map = makeMap(4, 4);
         final Fisher fisher = mock(Fisher.class);
+
+        final DoubleGrid2D shearGrid = new DoubleGrid2D(4, 4);
+        range(0, 2).forEach(x ->
+            range(0, 4).forEach(y ->
+                shearGrid.set(x, y, 1)
+            )
+        );
         final PurseSeineGear gear =
             new BiomassPurseSeineGear(
                 mock(FadManager.class),
                 1.0,
-                0.9
+                0.9,
+                new ConstantTemporalMap<>(DoubleGrid.from(map.getMapExtent(), shearGrid))
             );
         final FadManager fadManager = gear.getFadManager();
         when(fadManager.getFisher()).thenReturn(fisher);
@@ -258,7 +266,7 @@ class OwnFadSetDiscretizedActionGeneratorTest {
 
         when(fadManager.getDeployedFads()).thenReturn(fads);
 
-        //discretized map split into 2x2
+        // discretized map split into 2x2
         final MapDiscretization discretization = new MapDiscretization(
             new SquaresMapDiscretizer(1, 1)
         );
@@ -267,14 +275,6 @@ class OwnFadSetDiscretizedActionGeneratorTest {
             discretization,
             0
         );
-
-        final DoubleGrid2D shearGrid = new DoubleGrid2D(4, 4);
-        range(0, 2).forEach(x ->
-            range(0, 4).forEach(y ->
-                shearGrid.set(x, y, 1)
-            )
-        );
-        map.getAdditionalMaps().put("Shear", () -> shearGrid);
 
         generator.startOrReset(fadManager, new MersenneTwisterFast(), map);
         final List<Entry<ValuedFad, Integer>> initialOptions =

@@ -21,6 +21,7 @@ package uk.ac.ox.poseidon.epo.scenarios;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FixedGlobalCarryingCapacitySupplierFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.SelectivityAbundanceFadInitializerFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.environment.EnvironmentalPenaltyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.MinimumSetValuesFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.ValuePerSetPlanningModuleFactory;
@@ -32,14 +33,13 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
-import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
-import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
-import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
 import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.poseidon.epo.fleet.AbundancePurseSeineGearFactory;
 import uk.ac.ox.poseidon.epo.fleet.EpoPurseSeinerFleetFactory;
+import uk.ac.ox.poseidon.geography.GridsByDateFromFileFactory;
+import uk.ac.ox.poseidon.geography.GridsByMonthDayFromFileFactory;
 
 public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
 
@@ -78,16 +78,24 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                             "Skipjack tuna", new CalibratedParameter(0.05, 0.75, 0, 0.75),
                             "Yellowfin tuna", new CalibratedParameter(0.109, 0.226, 0, 0.75)
                         ),
-                        new EnvironmentalPenaltyFunctionFactory(
-                            ImmutableMap.of(
-                                "Temperature", new TemperatureMapFactory(
+                        ImmutableMap.of(
+                            "Temperature", new EnvironmentalPenaltyFactory(
+                                new GridsByDateFromFileFactory(
                                     getInputFolder().path("environmental_maps", "temperature_2021_to_2023.csv"),
-                                    365 * 3
+                                    getMapExtentFactory()
                                 ),
-                                "FrontalIndex", new FrontalIndexMapFactory(
+                                new CalibratedParameter(26, 27, 25, 30, 26.5), // target
+                                new CalibratedParameter(4, 6, 2, 8, 2.25), // margin
+                                new CalibratedParameter(.25, .75, 0, 1) // penalty
+                            ),
+                            "FrontalIndex", new EnvironmentalPenaltyFactory(
+                                new GridsByDateFromFileFactory(
                                     getInputFolder().path("environmental_maps", "frontal_index_2021_to_2023.csv"),
-                                    365 * 3
-                                )
+                                    getMapExtentFactory()
+                                ),
+                                new CalibratedParameter(0, 2, 0, 3), // target
+                                new CalibratedParameter(0, 2, 0, 2), // margin
+                                new CalibratedParameter(.25, .75, 0, 1) // penalty
                             )
                         )
                     ),
@@ -98,7 +106,11 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                         new FixedDoubleParameter(-0.14452),
                         new FixedDoubleParameter(0.14097)
                     )),
-                    new FixedParameterTableFromFile(getInputFolder().path("other_parameters.csv"))
+                    new FixedParameterTableFromFile(getInputFolder().path("other_parameters.csv")),
+                    new GridsByMonthDayFromFileFactory(
+                        getInputFolder().path("currents", "shear_2022.csv"),
+                        getMapExtentFactory()
+                    )
                 ),
                 new EPOPlannedStrategyFlexibleFactory(
                     getTargetYear(),

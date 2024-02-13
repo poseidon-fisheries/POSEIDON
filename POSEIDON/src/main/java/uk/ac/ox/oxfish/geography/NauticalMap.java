@@ -31,7 +31,10 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
-import sim.field.grid.*;
+import sim.field.grid.Grid2D;
+import sim.field.grid.IntGrid2D;
+import sim.field.grid.ObjectGrid2D;
+import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
 import sim.util.Int2D;
 import sim.util.geo.MasonGeometry;
@@ -49,7 +52,6 @@ import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
@@ -72,7 +74,6 @@ public class NauticalMap implements Startable {
      */
     // todo this is a placeholder; what I need to do is to kill off the geometry altogether and embrace the grid
     public static final MasonGeometry MPA_SINGLETON = new MasonGeometry();
-    private final LinkedHashMap<String, Supplier<DoubleGrid2D>> additionalMaps;
     private final MapExtent mapExtent;
     /**
      * this holds the bathymetry raster grid
@@ -149,7 +150,6 @@ public class NauticalMap implements Startable {
         this.mpaVectorField = mpaVectorField;
         this.setDistance(distance);
         this.rasterBackingGrid = (ObjectGrid2D) rasterBathymetry.getGrid();
-        additionalMaps = new LinkedHashMap<>();
         recomputeTilesMPA();
 
         ports = new LinkedList<>();
@@ -175,7 +175,7 @@ public class NauticalMap implements Startable {
                 final Bag coveringObjects = mpaVectorField.getCoveringObjects(gridPoint);
                 final SeaTile seaTile = getSeaTile(i, j);
 
-                if (coveringObjects.size() > 0) {
+                if (!coveringObjects.isEmpty()) {
                     assert coveringObjects.size() ==
                         1 : "got a tile covered by multiple MPAs, is that normal?"; // assume there is no double MPA
                     seaTile.assignMpa((MasonGeometry) coveringObjects.get(0));
@@ -264,15 +264,14 @@ public class NauticalMap implements Startable {
         return waterSeaTiles;
     }
 
-    @SuppressWarnings("unchecked") // bags are annoying this way
     /**
      * get all the tiles of the map as a list
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public List<SeaTile> getAllSeaTilesAsList() {
-
         if (allTiles == null) {
             allTiles = new LinkedList<>(rasterBackingGrid.elements());
-            Collections.sort(allTiles, (o1, o2) -> {
+            allTiles.sort((o1, o2) -> {
                 final int xComparison = Integer.compare(o1.getGridX(), o2.getGridX());
                 if (xComparison == 0)
                     return Integer.compare(o1.getGridY(), o2.getGridY());
@@ -289,7 +288,7 @@ public class NauticalMap implements Startable {
 
         // start all tiles
         for (final Object element : rasterBackingGrid.elements()) {
-            final SeaTile tile = (SeaTile) element; // cast
+            final Startable tile = (SeaTile) element; // cast
             tile.start(model);
         }
 
@@ -315,7 +314,7 @@ public class NauticalMap implements Startable {
         // turn off all tiles
         // start all tiles
         for (final Object element : rasterBackingGrid.elements()) {
-            final SeaTile tile = (SeaTile) element; // cast
+            final Startable tile = (SeaTile) element; // cast
             tile.turnOff();
         }
 
@@ -504,10 +503,7 @@ public class NauticalMap implements Startable {
 
     /**
      * get all tiles that are unprotected but share a border with at least one protected line!
-     *
-     * @return
      */
-
     public HashSet<SeaTile> getTilesOnTheMPALine() {
         if (lineTiles == null) {
             lineTiles = new HashSet<>();
@@ -599,10 +595,6 @@ public class NauticalMap implements Startable {
 
     public void setDistance(final Distance distance) {
         this.distance = distance;
-    }
-
-    public LinkedHashMap<String, Supplier<DoubleGrid2D>> getAdditionalMaps() {
-        return additionalMaps;
     }
 
     public MapExtent getMapExtent() {

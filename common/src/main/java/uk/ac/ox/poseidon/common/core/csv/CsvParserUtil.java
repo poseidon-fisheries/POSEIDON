@@ -47,19 +47,22 @@ public class CsvParserUtil {
     }
 
     public static Stream<Record> recordStream(final Path inputFilePath) {
+        return recordStream(getReader(inputFilePath));
+    }
+
+    public static Stream<Record> recordStream(final Reader reader) {
         final CsvParser csvParser = getCsvParser();
-        final Reader reader = getReader(inputFilePath);
         final ResultIterator<Record, ParsingContext> iterator = csvParser.iterateRecords(reader).iterator();
         final Spliterator<Record> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
         return StreamSupport.stream(spliterator, false).onClose(csvParser::stopParsing);
     }
 
-    public static CsvParser getCsvParser() {
-        return new CsvParser(defaultParserSettings);
-    }
-
     public static Reader getReader(final Path inputFilePath) {
         return getReader(inputFilePath.normalize().toString());
+    }
+
+    public static CsvParser getCsvParser() {
+        return new CsvParser(defaultParserSettings);
     }
 
     private static Reader getReader(final String inputFileName) {

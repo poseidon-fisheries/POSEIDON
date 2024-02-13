@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
 import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
@@ -33,7 +34,7 @@ public class BiomassProcessesFactory extends BiologicalProcessesFactory<BiomassL
         final InputPath inputFolder,
         final SpeciesCodesFromFileFactory speciesCodesSupplier,
         final IntegerParameter targetYear,
-        final AlgorithmFactory<MapExtent> mapExtentFactory
+        final ComponentFactory<MapExtent> mapExtentFactory
 
     ) {
         final BiomassReallocatorFactory reallocator = new BiomassReallocatorFactory(

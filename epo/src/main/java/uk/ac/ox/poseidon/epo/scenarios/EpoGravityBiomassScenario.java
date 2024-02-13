@@ -32,8 +32,10 @@ import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
 import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.parameters.StringParameter;
 import uk.ac.ox.poseidon.epo.fleet.BiomassPurseSeineGearFactory;
 import uk.ac.ox.poseidon.epo.fleet.EpoPurseSeinerFleetFactory;
+import uk.ac.ox.poseidon.geography.GridsByMonthDayFromFileFactory;
 
 /**
  * The biomass-based IATTC tuna simulation scenario.
@@ -80,7 +82,15 @@ public class EpoGravityBiomassScenario extends EpoBiomassScenario {
                         new CalibratedParameter(-.2, .2, -.4, .4),
                         new CalibratedParameter(.2, .3, .01, .5)
                     )),
-                    new FixedParameterTableFromFile(getInputFolder().path("other_parameters.csv"))
+                    new FixedParameterTableFromFile(getInputFolder().path("other_parameters.csv")),
+                    new GridsByMonthDayFromFileFactory(
+                        getInputFolder().path("currents", "shear_2022.csv"),
+                        new StringParameter("date"),
+                        new StringParameter("lon"),
+                        new StringParameter("lat"),
+                        new StringParameter("value"),
+                        getMapExtentFactory()
+                    )
                 ),
                 new GravityDestinationStrategyFactory(
                     getTargetYear(),

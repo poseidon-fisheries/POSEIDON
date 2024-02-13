@@ -19,15 +19,12 @@
 package uk.ac.ox.poseidon.epo.scenarios;
 
 import com.google.common.collect.ImmutableMap;
-import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcesses;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
-import uk.ac.ox.oxfish.environment.EnvironmentalMapFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EmptyFleet;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.DefaultEpoRegulations;
-import uk.ac.ox.oxfish.geography.MapExtentFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
@@ -40,17 +37,15 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.distributions.EmpiricalCatchSizeDistributionsFromFile;
 import uk.ac.ox.oxfish.model.data.distributions.GroupedYearlyDistributions;
-import uk.ac.ox.oxfish.model.data.monitors.regions.CustomRegionalDivision;
-import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
 import uk.ac.ox.oxfish.model.scenario.TestableScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.common.api.ComponentFactory;
+import uk.ac.ox.poseidon.common.core.geography.MapExtentFactory;
 import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
-import uk.ac.ox.poseidon.common.core.parameters.StringParameter;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.nio.file.Paths;
@@ -62,25 +57,15 @@ import java.util.logging.Logger;
 
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
 import static uk.ac.ox.oxfish.utility.Dummyable.maybeUseDummyData;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public abstract class EpoScenario<B extends LocalBiology>
     implements TestableScenario {
 
-    public static final MapExtentFactory DEFAULT_MAP_EXTENT_FACTORY =
+    private static final Logger logger = Logger.getLogger(EpoScenario.class.getName());
+    private MapExtentFactory mapExtentFactory =
         new MapExtentFactory(
             101, 100, -171, -70, -50, 50
         );
-    public static final RegionalDivision REGIONAL_DIVISION = new CustomRegionalDivision(
-        DEFAULT_MAP_EXTENT_FACTORY.get(),
-        ImmutableMap.of(
-            "West", entry(new Coordinate(-170.5, 49.5), new Coordinate(-140.5, -49.5)),
-            "North", entry(new Coordinate(-139.5, 50), new Coordinate(-90.5, 0.5)),
-            "South", entry(new Coordinate(-139.5, -0.5), new Coordinate(-90.5, -49.5)),
-            "East", entry(new Coordinate(-89.5, 49.5), new Coordinate(-70.5, -49.5))
-        )
-    );
-    private static final Logger logger = Logger.getLogger(EpoScenario.class.getName());
     private IntegerParameter targetYear = new IntegerParameter(2022);
     private InputPath inputFolder = InputPath.of("epo_inputs");
     private final InputPath testInputFolder = inputFolder.path("tests");
@@ -89,13 +74,8 @@ public abstract class EpoScenario<B extends LocalBiology>
             "FAD zapper", new FadZapperFactory(
                 new FixedDoubleParameter(300),
                 new IntegerParameter(20)
-            ),
-            "Shear map", new EnvironmentalMapFactory(
-                new StringParameter("Shear"),
-                getInputFolder().path("currents", "shear_2022.csv")
             )
         ));
-
     private ComponentFactory<? extends Regulations> regulations = DefaultEpoRegulations.make(getInputFolder());
     private BiologicalProcessesFactory<B> biologicalProcesses;
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
@@ -123,6 +103,14 @@ public abstract class EpoScenario<B extends LocalBiology>
         final int dayOfMonth
     ) {
         return LocalDate.of(year, month, dayOfMonth).getDayOfYear();
+    }
+
+    public MapExtentFactory getMapExtentFactory() {
+        return mapExtentFactory;
+    }
+
+    public void setMapExtentFactory(final MapExtentFactory mapExtentFactory) {
+        this.mapExtentFactory = mapExtentFactory;
     }
 
     public AlgorithmFactory<GroupedYearlyDistributions> getEmpiricalCatchSizeDistributions() {

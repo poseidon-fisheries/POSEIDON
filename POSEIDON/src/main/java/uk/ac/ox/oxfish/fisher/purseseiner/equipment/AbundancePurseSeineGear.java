@@ -24,15 +24,18 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.poseidon.common.core.temporal.TemporalMap;
+import uk.ac.ox.poseidon.geography.DoubleGrid;
 
 public class AbundancePurseSeineGear extends PurseSeineGear {
 
     public AbundancePurseSeineGear(
         final FadManager fadManager,
         final double successfulFadSetProbability,
-        final double maxAllowableShear
+        final double maxAllowableShear,
+        final TemporalMap<DoubleGrid> shearGrid
     ) {
-        super(fadManager, successfulFadSetProbability, maxAllowableShear);
+        super(fadManager, successfulFadSetProbability, maxAllowableShear, shearGrid);
     }
 
     @Override
@@ -40,13 +43,15 @@ public class AbundancePurseSeineGear extends PurseSeineGear {
         return new AbundancePurseSeineGear(
             getFadManager(),
             getSuccessfulFadSetProbability(),
-            getMaxAllowableShear()
+            getMaxAllowableShear(),
+            getShearGrid()
         );
     }
 
     @Override
     Catch makeCatch(
-        final GlobalBiology globalBiology, final LocalBiology caughtBiology
+        final GlobalBiology globalBiology,
+        final LocalBiology caughtBiology
     ) {
         return new Catch(globalBiology, (AbundanceLocalBiology) caughtBiology);
     }

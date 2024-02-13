@@ -8,6 +8,7 @@ import sim.field.geo.GeomGridField;
 import sim.field.grid.ObjectGrid2D;
 import sim.util.Double2D;
 import uk.ac.ox.poseidon.common.core.geography.MapExtent;
+import uk.ac.ox.poseidon.common.core.geography.MapExtentFactory;
 
 import java.util.List;
 

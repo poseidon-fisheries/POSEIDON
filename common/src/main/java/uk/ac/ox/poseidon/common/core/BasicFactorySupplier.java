@@ -10,7 +10,8 @@ import static java.util.Locale.ENGLISH;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 
-public class BasicFactorySupplier<T extends GenericComponentFactory<?, ?>> implements FactorySupplier {
+public class BasicFactorySupplier<T extends GenericComponentFactory<?, ?>>
+    implements FactorySupplier {
 
     private final Class<? extends T> factoryClass;
     private final String factoryName;

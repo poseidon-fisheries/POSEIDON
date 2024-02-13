@@ -21,7 +21,7 @@ package uk.ac.ox.oxfish.biology.tuna;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
 import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
@@ -53,7 +53,7 @@ public class BiomassReallocatorFactory
     public BiomassReallocatorFactory(
         final InputPath biomassDistributionsFilePath,
         final IntegerParameter period,
-        final AlgorithmFactory<MapExtent> mapExtent
+        final ComponentFactory<MapExtent> mapExtent
     ) {
         super(biomassDistributionsFilePath, period, mapExtent);
     }

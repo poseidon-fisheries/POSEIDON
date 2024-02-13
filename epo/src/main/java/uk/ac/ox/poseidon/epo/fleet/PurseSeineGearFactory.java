@@ -35,10 +35,13 @@ import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.ParameterTable;
 import uk.ac.ox.poseidon.agents.core.AtomicLongMapYearlyActionCounter;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
 import uk.ac.ox.poseidon.common.api.Observer;
 import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.temporal.TemporalMap;
 import uk.ac.ox.poseidon.epo.monitors.DefaultEpoMonitors;
+import uk.ac.ox.poseidon.geography.DoubleGrid;
 
 import javax.measure.quantity.Mass;
 import java.util.LinkedHashSet;
@@ -80,6 +83,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     private AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializer;
     private AlgorithmFactory<? extends FishValueCalculator> fishValueCalculator;
     private AlgorithmFactory<? extends ParameterTable> otherParameters;
+    private ComponentFactory<? extends TemporalMap<DoubleGrid>> shearGridFactory;
 
     @SuppressWarnings("WeakerAccess")
     public PurseSeineGearFactory() {
@@ -90,12 +94,22 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         final IntegerParameter targetYear,
         final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializer,
         final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculator,
-        final AlgorithmFactory<? extends ParameterTable> otherParameters
+        final AlgorithmFactory<? extends ParameterTable> otherParameters,
+        final ComponentFactory<? extends TemporalMap<DoubleGrid>> shearGridFactory
     ) {
         this.targetYear = targetYear;
         this.fadInitializer = fadInitializer;
         this.fishValueCalculator = fishValueCalculator;
+        this.shearGridFactory = shearGridFactory;
         this.otherParameters = otherParameters;
+    }
+
+    public ComponentFactory<? extends TemporalMap<DoubleGrid>> getShearGridFactory() {
+        return shearGridFactory;
+    }
+
+    public void setShearGridFactory(final ComponentFactory<? extends TemporalMap<DoubleGrid>> shearGridFactory) {
+        this.shearGridFactory = shearGridFactory;
     }
 
     public AlgorithmFactory<? extends FishValueCalculator> getFishValueCalculator() {
@@ -217,7 +231,8 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         return makeGear(
             makeFadManager(fishState),
             parameters.get("successful_set_probability").applyAsDouble(rng),
-            parameters.get("max_allowable_shear").applyAsDouble(rng)
+            parameters.get("max_allowable_shear").applyAsDouble(rng),
+            shearGridFactory.apply(fishState)
         );
     }
 
@@ -240,7 +255,8 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
     protected abstract PurseSeineGear makeGear(
         FadManager fadManager,
         double successfulSetProbability,
-        double maxAllowableShear
+        double maxAllowableShear,
+        TemporalMap<DoubleGrid> shearGrid
     );
 
     FadManager makeFadManager(final FishState fishState) {

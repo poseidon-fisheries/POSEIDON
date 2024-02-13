@@ -19,6 +19,8 @@
 package uk.ac.ox.poseidon.epo.monitors;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.vividsolutions.jts.geom.Coordinate;
 import tech.units.indriya.AbstractUnit;
 import tech.units.indriya.unit.Units;
 import uk.ac.ox.oxfish.biology.Species;
@@ -29,6 +31,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.data.monitors.*;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.*;
+import uk.ac.ox.oxfish.model.data.monitors.regions.CustomRegionalDivision;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 
 import javax.measure.quantity.Dimensionless;
@@ -41,7 +44,7 @@ import static com.google.common.collect.Iterables.concat;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy.EVERY_YEAR;
 import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.*;
-import static uk.ac.ox.poseidon.epo.scenarios.EpoScenario.REGIONAL_DIVISION;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 @SuppressWarnings("rawtypes")
 public class DefaultEpoMonitors {
@@ -57,7 +60,15 @@ public class DefaultEpoMonitors {
 
     public DefaultEpoMonitors(final FishState fishState) {
 
-        regionalDivision = REGIONAL_DIVISION;
+        regionalDivision = new CustomRegionalDivision(
+            fishState.getMapExtent(),
+            ImmutableMap.of(
+                "West", entry(new Coordinate(-170.5, 49.5), new Coordinate(-140.5, -49.5)),
+                "North", entry(new Coordinate(-139.5, 50), new Coordinate(-90.5, 0.5)),
+                "South", entry(new Coordinate(-139.5, -0.5), new Coordinate(-90.5, -49.5)),
+                "East", entry(new Coordinate(-89.5, 49.5), new Coordinate(-70.5, -49.5))
+            )
+        );
 
         final FishStateYearlyTimeSeries yearlyTimeSeries = fishState.getYearlyDataSet();
 

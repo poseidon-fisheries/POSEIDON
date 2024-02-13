@@ -20,6 +20,7 @@ package uk.ac.ox.oxfish.biology.tuna;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
 import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
@@ -29,12 +30,12 @@ abstract class ReallocatorFactory<B extends LocalBiology, T extends Reallocator<
 
     private InputPath biomassDistributionsFile;
     private IntegerParameter period;
-    private AlgorithmFactory<MapExtent> mapExtent;
+    private ComponentFactory<MapExtent> mapExtent;
 
     public ReallocatorFactory(
         final InputPath biomassDistributionsFile,
         final IntegerParameter period,
-        final AlgorithmFactory<MapExtent> mapExtent
+        final ComponentFactory<MapExtent> mapExtent
     ) {
         this.biomassDistributionsFile = biomassDistributionsFile;
         this.period = period;
@@ -55,11 +56,11 @@ abstract class ReallocatorFactory<B extends LocalBiology, T extends Reallocator<
         this.period = period;
     }
 
-    public AlgorithmFactory<MapExtent> getMapExtent() {
+    public ComponentFactory<MapExtent> getMapExtent() {
         return mapExtent;
     }
 
-    public void setMapExtent(final AlgorithmFactory<MapExtent> mapExtent) {
+    public void setMapExtent(final ComponentFactory<MapExtent> mapExtent) {
         this.mapExtent = mapExtent;
     }
 

@@ -31,28 +31,32 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.HoldLimitingDecoratorGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.poseidon.common.core.temporal.TemporalMap;
+import uk.ac.ox.poseidon.geography.DoubleGrid;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public abstract class PurseSeineGear implements Gear {
 
     private final FadManager fadManager;
     private final double successfulFadSetProbability;
     private final double maxAllowableShear;
+    private final TemporalMap<DoubleGrid> shearGrid;
     private final Map<Int2D, Integer> lastVisits = new HashMap<>();
 
     public PurseSeineGear(
         final FadManager fadManager,
         final double successfulFadSetProbability,
-        final double maxAllowableShear
+        final double maxAllowableShear,
+        final TemporalMap<DoubleGrid> shearGrid
     ) {
         this.fadManager = fadManager;
         this.successfulFadSetProbability = successfulFadSetProbability;
         this.maxAllowableShear = maxAllowableShear;
+        this.shearGrid = shearGrid;
     }
 
     public static PurseSeineGear getPurseSeineGear(final Fisher fisher) {
@@ -65,8 +69,12 @@ public abstract class PurseSeineGear implements Gear {
     public static Optional<PurseSeineGear> maybeGetPurseSeineGear(final Fisher fisher) {
         return Optional
             .ofNullable(fisher.getGear())
-            .filter(gear -> gear instanceof PurseSeineGear)
-            .map(gear -> (PurseSeineGear) gear);
+            .filter(PurseSeineGear.class::isInstance)
+            .map(PurseSeineGear.class::cast);
+    }
+
+    public TemporalMap<DoubleGrid> getShearGrid() {
+        return shearGrid;
     }
 
     public double getMaxAllowableShear() {
@@ -96,7 +104,10 @@ public abstract class PurseSeineGear implements Gear {
         );
     }
 
-    abstract Catch makeCatch(GlobalBiology globalBiology, LocalBiology caughtBiology);
+    abstract Catch makeCatch(
+        GlobalBiology globalBiology,
+        LocalBiology caughtBiology
+    );
 
     @Override
     public double getFuelConsumptionPerHourOfFishing(
@@ -133,7 +144,10 @@ public abstract class PurseSeineGear implements Gear {
                 && Objects.equals(lastVisits, that.lastVisits);
     }
 
-    public void recordVisit(final Int2D gridLocation, final int timeStep) {
+    public void recordVisit(
+        final Int2D gridLocation,
+        final int timeStep
+    ) {
         lastVisits.put(gridLocation, timeStep);
     }
 
@@ -146,18 +160,10 @@ public abstract class PurseSeineGear implements Gear {
         if (action instanceof AbstractSetAction) {
             final AbstractSetAction setAction = (AbstractSetAction) action;
             final SeaTile tile = setAction.getLocation();
-            return Optional
-                .ofNullable(
-                    setAction.getFisher()
-                        .grabState()
-                        .getMap()
-                        .getAdditionalMaps()
-                        .getOrDefault("Shear", null)
-                )
-                .map(Supplier::get)
-                .map(shearMap -> shearMap.get(tile.getGridX(), tile.getGridY()))
-                .map(shear -> shear <= maxAllowableShear)
-                .orElse(true);
+            final double shear = shearGrid
+                .get(setAction.getDate())
+                .get(tile.getGridX(), tile.getGridY());
+            return shear <= maxAllowableShear;
         } else {
             return true;
         }

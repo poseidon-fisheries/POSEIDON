@@ -26,10 +26,10 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.NonMutatingArrayFilter;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
+import java.time.LocalDate;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toMap;
@@ -45,7 +45,7 @@ public class CatchabilitySelectivityFishAttractor
     /**
      * given a fad, returns its current catchability per species
      */
-    private final Function<Fad, double[]> catchabilityPerSpeciesSupplier;
+    private final BiFunction<? super LocalDate, ? super Fad, double[]> catchabilityPerSpeciesSupplier;
 
     /**
      * as long as the FAD has been in the water less than this, it won't fill up
@@ -54,28 +54,15 @@ public class CatchabilitySelectivityFishAttractor
 
     private final FishState model;
 
-    private final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves;
+    private final Map<Species, ? extends NonMutatingArrayFilter> globalSelectivityCurves;
 
     public CatchabilitySelectivityFishAttractor(
-        final Function<Fad, double[]> catchabilityPerSpeciesSupplier,
+        final BiFunction<? super LocalDate, ? super Fad, double[]> catchabilityPerSpeciesSupplier,
         final int daysInWaterBeforeAttraction,
         final FishState model,
-        final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves
+        final Map<Species, ? extends NonMutatingArrayFilter> globalSelectivityCurves
     ) {
         this.catchabilityPerSpeciesSupplier = catchabilityPerSpeciesSupplier;
-        this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
-        this.model = model;
-        this.globalSelectivityCurves = globalSelectivityCurves;
-    }
-
-    public CatchabilitySelectivityFishAttractor(
-        final DoubleParameter[] carryingCapacitiesGenerator,
-        final double[] catchabilityPerSpecies,
-        final int daysInWaterBeforeAttraction,
-        final FishState model,
-        final Map<Species, NonMutatingArrayFilter> globalSelectivityCurves
-    ) {
-        this.catchabilityPerSpeciesSupplier = abstractFad -> catchabilityPerSpecies;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
         this.model = model;
         this.globalSelectivityCurves = globalSelectivityCurves;
@@ -118,7 +105,7 @@ public class CatchabilitySelectivityFishAttractor
                 continue;
 
             // start filling them up!
-            final double[] catchabilityHere = catchabilityPerSpeciesSupplier.apply(fad);
+            final double[] catchabilityHere = catchabilityPerSpeciesSupplier.apply(model.getDate(), fad);
             for (int subdivision = 0; subdivision < abundanceInTile.length; subdivision++) {
                 for (int bin = 0; bin < abundanceInTile[subdivision].length; bin++) {
                     abundanceCaught[subdivision][bin] = Math.max(

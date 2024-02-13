@@ -32,7 +32,7 @@ public class EpoBiomassScenario extends EpoScenario<BiomassLocalBiology> {
                     getInputFolder().path("species_codes.csv")
                 ),
                 getTargetYear(),
-                DEFAULT_MAP_EXTENT_FACTORY
+                getMapExtentFactory()
             )
         );
         setFadMap(new BiomassFadMapFactory(getCurrentPatternMapSupplier()));

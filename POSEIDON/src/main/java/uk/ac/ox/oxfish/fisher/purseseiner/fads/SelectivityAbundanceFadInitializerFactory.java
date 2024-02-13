@@ -4,21 +4,23 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.environment.EnvironmentalPenalty;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.environment.EnvironmentalPenaltyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.AbundanceAggregatingFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.processSpeciesNameToDoubleParameterMap;
 
@@ -26,7 +28,7 @@ public class SelectivityAbundanceFadInitializerFactory
     extends AbundanceFadInitializerFactory
     implements AlgorithmFactory<FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad>> {
 
-    private EnvironmentalPenaltyFunctionFactory environmentalPenaltyFunction;
+    private Map<String, EnvironmentalPenaltyFactory> environmentalPenaltyFactories;
 
     public SelectivityAbundanceFadInitializerFactory() {
         super();
@@ -38,7 +40,7 @@ public class SelectivityAbundanceFadInitializerFactory
         final DoubleParameter daysInWaterBeforeAttraction,
         final Map<String, DoubleParameter> catchabilities,
         final Map<String, DoubleParameter> fishReleaseProbabilities,
-        final EnvironmentalPenaltyFunctionFactory environmentalPenaltyFunction
+        final Map<String, EnvironmentalPenaltyFactory> environmentalPenaltyFactories
     ) {
         super(
             carryingCapacitySupplier,
@@ -47,17 +49,7 @@ public class SelectivityAbundanceFadInitializerFactory
             daysInWaterBeforeAttraction,
             abundanceFiltersFactory
         );
-        this.environmentalPenaltyFunction = environmentalPenaltyFunction;
-    }
-
-    @SuppressWarnings("unused")
-    public EnvironmentalPenaltyFunctionFactory getEnvironmentalPenaltyFunction() {
-        return environmentalPenaltyFunction;
-    }
-
-    @SuppressWarnings("unused")
-    public void setEnvironmentalPenaltyFunction(final EnvironmentalPenaltyFunctionFactory environmentalPenaltyFunction) {
-        this.environmentalPenaltyFunction = environmentalPenaltyFunction;
+        this.environmentalPenaltyFactories = environmentalPenaltyFactories;
     }
 
     protected FadInitializer<AbundanceLocalBiology, AbundanceAggregatingFad> makeFadInitializer(
@@ -65,9 +57,6 @@ public class SelectivityAbundanceFadInitializerFactory
     ) {
 
         final GlobalBiology globalBiology = fishState.getBiology();
-
-        final Function<SeaTile, Double> finalCatchabilityPenaltyFunction =
-            environmentalPenaltyFunction.apply(fishState);
 
         final MersenneTwisterFast rng = fishState.getRandom();
 
@@ -80,17 +69,28 @@ public class SelectivityAbundanceFadInitializerFactory
                 )
                 .toArray();
 
-        final Function<Fad, double[]> catchabilitySupplier =
-            Optional.ofNullable(environmentalPenaltyFunction)
-                .map(factory -> factory.apply(fishState))
-                .map(penalityFunction -> (Function<Fad, double[]>) fad -> {
-                    final SeaTile fadLocation = fad.getLocation();
-                    final double penaltyHere = finalCatchabilityPenaltyFunction.apply(fadLocation);
-                    return (penaltyHere <= 0 || !Double.isFinite(penaltyHere))
-                        ? new double[globalBiology.getSize()]
-                        : Arrays.stream(catchabilityArray).map(c -> c * penaltyHere).toArray();
-                })
-                .orElse(fad -> catchabilityArray);
+        final BiFunction<? super LocalDate, ? super Fad, double[]> catchabilitySupplier;
+        if (environmentalPenaltyFactories.isEmpty()) {
+            catchabilitySupplier = (date, fad) -> catchabilityArray;
+        } else {
+            final List<EnvironmentalPenalty> environmentalPenalties =
+                environmentalPenaltyFactories
+                    .values()
+                    .stream()
+                    .map(factory -> factory.apply(fishState))
+                    .collect(Collectors.toList());
+            catchabilitySupplier = (date, fad) -> {
+                final double penalty = environmentalPenalties
+                    .stream()
+                    .mapToDouble(environmentalPenalty ->
+                        environmentalPenalty.applyAsDouble(date, fad.getLocation())
+                    )
+                    .reduce(1, (v1, v2) -> v1 * v2);
+                return (penalty <= 0 || !Double.isFinite(penalty))
+                    ? new double[globalBiology.getSize()]
+                    : Arrays.stream(catchabilityArray).map(c -> c * penalty).toArray();
+            };
+        }
 
         return new AbundanceAggregatingFadInitializer(
             globalBiology,
@@ -110,4 +110,11 @@ public class SelectivityAbundanceFadInitializerFactory
         );
     }
 
+    public Map<String, EnvironmentalPenaltyFactory> getEnvironmentalPenaltyFactories() {
+        return environmentalPenaltyFactories;
+    }
+
+    public void setEnvironmentalPenaltyFactories(final Map<String, EnvironmentalPenaltyFactory> environmentalPenaltyFactories) {
+        this.environmentalPenaltyFactories = environmentalPenaltyFactories;
+    }
 }

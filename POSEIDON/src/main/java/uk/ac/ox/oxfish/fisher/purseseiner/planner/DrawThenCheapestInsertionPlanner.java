@@ -440,48 +440,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
     public double getThisTripTargetHours() {
         return thisTripTargetHours;
     }
-
-//    public static void main(String[] args) throws IOException {
-////
-////
-//////        GenericOptimization.buildLocalCalibrationProblem(
-//////                Paths.get(
-//////                        "docs/20220223 tuna_calibration/pathfinder_julydata/carrknight/2022-07-13_12.05
-// .49_catchability_shorttrips_yearlyreset/local/original.yaml"),
-//////                new double[]{
-//////                        -7.282,-1.293,-15.000, 10.947,-4.055,-6.807, 2.555,-5.752, 10.731,-15.000, 12.893,-2
-// .702,-6.366, 7.338,-5.381, 14.320,-3.892,-0.708, 9.456, 13.734,-9.291,-0.551,-12.106,-9.638, 6.994                },
-//////                "local.yaml", .2
-//////        );
-////
-//////        GenericOptimization.buildLocalCalibrationProblem(
-//////                Paths.get(
-//////                        "docs/20220223 tuna_calibration/pathfinder_julydata/cenv0477/2022-07-13_14.22
-// .39_yearlyreset2/local/original.yaml"),
-//////                new double[]{
-//////                        14.995,-15.000, 15.000,-14.468,-8.013, 12.966,-6.046, 6.462,-15.000, 9.943,-15.000,-11
-// .069,-4.121, 15.000,-8.018,-11.889, 1.401, 1.426, 15.000,-8.334,-9.198, 1.559,-12.341, 4.376 },
-//////                "local.yaml", .2
-//////        );
-//////
-//        GenericOptimization.buildLocalCalibrationProblem(
-//                Paths.get(
-//                        "/home/carrknight/code/oxfish/docs/20220223
-//                        tuna_calibration/clorophill/environmental/skjincluded/weibull_value/more
-//                        /original_calibration.yaml"),
-//                new double[]{
-//                        1.6296715072412908,-86.7293032265776,-29.71955183248816,-23.301130791889246,147
-//                        .75630814989503,-2.1424338866954464,-25.718407690183653,18.800744639090695,10
-//                        .570074492531134,-27.154560249134107,-118.11745092021698,17.77260734197482,9
-//                        .965487262463206,-74.17039002034682,16.302644722665246,-54.543593904725434,-7
-//                        .646861465532954,-8.648538634304845,2.6422097519329606,14.154899325110927,-2
-//                        .6680704569728784,2.323597481426466,53.33190429315141,-14.358622067490462,20.7872931058517,
-//                        20.620703701194767
-//                },
-//                "more.yaml", .05
-//        );
-//}
-
+    
     public void setThisTripTargetHours(final double thisTripTargetHours) {
         this.thisTripTargetHours = thisTripTargetHours;
     }

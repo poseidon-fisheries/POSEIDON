@@ -25,7 +25,10 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.ParameterTable;
+import uk.ac.ox.poseidon.common.api.ComponentFactory;
 import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
+import uk.ac.ox.poseidon.common.core.temporal.TemporalMap;
+import uk.ac.ox.poseidon.geography.DoubleGrid;
 
 public class BiomassPurseSeineGearFactory extends PurseSeineGearFactory {
 
@@ -33,9 +36,10 @@ public class BiomassPurseSeineGearFactory extends PurseSeineGearFactory {
         final IntegerParameter targetYear,
         final AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializerFactory,
         final AlgorithmFactory<? extends FishValueCalculator> fishValueCalculatorFactory,
-        final AlgorithmFactory<? extends ParameterTable> otherParameters
+        final AlgorithmFactory<? extends ParameterTable> otherParameters,
+        final ComponentFactory<? extends TemporalMap<DoubleGrid>> shearGridFactory
     ) {
-        super(targetYear, fadInitializerFactory, fishValueCalculatorFactory, otherParameters);
+        super(targetYear, fadInitializerFactory, fishValueCalculatorFactory, otherParameters, shearGridFactory);
     }
 
     @SuppressWarnings("unused")
@@ -46,12 +50,14 @@ public class BiomassPurseSeineGearFactory extends PurseSeineGearFactory {
     protected PurseSeineGear makeGear(
         final FadManager fadManager,
         final double successfulSetProbability,
-        final double maxAllowableShear
+        final double maxAllowableShear,
+        final TemporalMap<DoubleGrid> shearGrid
     ) {
         return new BiomassPurseSeineGear(
             fadManager,
             successfulSetProbability,
-            maxAllowableShear
+            maxAllowableShear,
+            shearGrid
         );
     }
 }

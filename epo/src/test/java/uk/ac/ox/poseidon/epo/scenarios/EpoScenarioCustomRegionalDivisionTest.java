@@ -28,7 +28,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.monitors.regions.CustomRegionalDivision;
 import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
+import uk.ac.ox.poseidon.common.core.geography.MapExtentFactory;
 
 import java.io.*;
 import java.nio.file.Paths;
@@ -38,10 +40,21 @@ import java.util.DoubleSummaryStatistics;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.Collectors.*;
 import static uk.ac.ox.oxfish.model.scenario.TestableScenario.startTestableScenario;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
 public class EpoScenarioCustomRegionalDivisionTest {
 
-    final RegionalDivision division = EpoScenario.REGIONAL_DIVISION;
+    final RegionalDivision division = new CustomRegionalDivision(
+        new MapExtentFactory(
+            101, 100, -171, -70, -50, 50
+        ).get(),
+        ImmutableMap.of(
+            "West", entry(new Coordinate(-170.5, 49.5), new Coordinate(-140.5, -49.5)),
+            "North", entry(new Coordinate(-139.5, 50), new Coordinate(-90.5, 0.5)),
+            "South", entry(new Coordinate(-139.5, -0.5), new Coordinate(-90.5, -49.5)),
+            "East", entry(new Coordinate(-89.5, 49.5), new Coordinate(-70.5, -49.5))
+        )
+    );
 
     @Test
     public void testLocationsInDivision() {

@@ -38,7 +38,7 @@ public class EpoAbundanceScenario extends EpoScenario<AbundanceLocalBiology> {
                 new SpeciesCodesFromFileFactory(
                     getInputFolder().path("species_codes.csv")
                 ),
-                DEFAULT_MAP_EXTENT_FACTORY,
+                getMapExtentFactory(),
                 new RecruitmentProcessesFactory(
                     abundanceInputFolder.path("recruitment_parameters_2022.csv")
                 )

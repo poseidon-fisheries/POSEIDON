@@ -42,7 +42,6 @@ import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.OscillatingWeatherFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.TimeSeriesWeatherFactory;
-import uk.ac.ox.oxfish.environment.EnvironmentalMapFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.*;
@@ -94,7 +93,6 @@ import uk.ac.ox.oxfish.fisher.strategies.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.WindThresholdFactory;
-import uk.ac.ox.oxfish.geography.MapExtentFactory;
 import uk.ac.ox.oxfish.geography.discretization.CentroidMapFileFactory;
 import uk.ac.ox.oxfish.geography.discretization.IdentityDiscretizerFactory;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
@@ -152,7 +150,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
 import uk.ac.ox.oxfish.utility.parameters.ParameterTable;
 import uk.ac.ox.poseidon.common.api.FactorySupplier;
 import uk.ac.ox.poseidon.common.core.BasicFactorySupplier;
-import uk.ac.ox.poseidon.common.core.geography.MapExtent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -213,12 +210,8 @@ public class AlgorithmFactories {
                 entry(ExogenousFadMakerCSVFactory.class, "Exogenous Fad Maker CSV"),
                 entry(FadDemoFactory.class, "Fad Demo"),
                 entry(ExogenousFadSetterCSVFactory.class, "Exogenous Fad Setter CSV"),
-                entry(FadTemperatureHazardFactory.class, "Fad Temperature Hazard"),
                 entry(FadZapperFactory.class, "FAD zapper")
-            ),
-            EnvironmentalMapFactory.class,
-            TemperatureMapFactory.class,
-            FrontalIndexMapFactory.class
+            )
         ));
         addFactories(new Factories<>(
             DepartingStrategy.class,
@@ -730,10 +723,6 @@ public class AlgorithmFactories {
             BiomassRestorerFactory.class
         ));
         addFactories(new Factories<>(
-            MapExtent.class,
-            MapExtentFactory.class
-        ));
-        addFactories(new Factories<>(
             BiologicalProcesses.class,
             AbundanceProcessesFactory.class,
             BiomassProcessesFactory.class
@@ -759,7 +748,6 @@ public class AlgorithmFactories {
             FadInitializer.class,
             ImmutableMap.of(
                 SelectivityAbundanceFadInitializerFactory.class, "Selectivity abundance FAD",
-                LinearIntervalAttractorFactory.class, "Linear attractor abundance FAD",
                 BiomassFadInitializerFactory.class, "Biomass FAD",
                 CompressedBiomassFadInitializerFactory.class, "Compressed biomass FAD",
                 CompressedAbundanceFadInitializerFactory.class, "Compressed abundance FAD"
