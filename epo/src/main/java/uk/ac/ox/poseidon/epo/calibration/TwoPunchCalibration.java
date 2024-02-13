@@ -53,20 +53,6 @@ public class TwoPunchCalibration {
         twoPunchCalibration.runAll();
     }
 
-    private static void writeSolutionOut(
-        final Path calibrationFile,
-        final double[] gaSolution,
-        final String solutionName
-    ) throws IOException {
-        final FileWriter writer = new FileWriter(calibrationFile.getParent().resolve(solutionName).toFile());
-        writer.write(Double.toString(gaSolution[0]));
-        for (int i = 1; i < gaSolution.length; i++) {
-            writer.write(",");
-            writer.write(Double.toString(gaSolution[i]));
-        }
-        writer.close();
-    }
-
     private void runAll() throws IOException {
         // run GA
         final double[] gaSolution = stepOne();
@@ -107,6 +93,20 @@ public class TwoPunchCalibration {
         return firstStep.generateCalibratorProblem().run();
     }
 
+    private static void writeSolutionOut(
+        final Path calibrationFile,
+        final double[] gaSolution,
+        final String solutionName
+    ) throws IOException {
+        final FileWriter writer = new FileWriter(calibrationFile.getParent().resolve(solutionName).toFile());
+        writer.write(Double.toString(gaSolution[0]));
+        for (int i = 1; i < gaSolution.length; i++) {
+            writer.write(",");
+            writer.write(Double.toString(gaSolution[i]));
+        }
+        writer.close();
+    }
+
     private double[] stepTwo() throws IOException {
         final TunaCalibrationConsole secondStep = new TunaCalibrationConsole();
         secondStep.setLocalSearch(false);
@@ -116,7 +116,7 @@ public class TwoPunchCalibration {
         );
         secondStep.setPopulationSize(50);
         secondStep.setMaxProcessorsToUse(parallelThreads);
-        secondStep.setNumberOfRunsPerSettingOverride(3);
+        secondStep.setNumberOfRunsPerSettingOverride(2);
         secondStep.setMaxFitnessCalls(maxLocalCalls);
         secondStep.setParameterRange(17);
         secondStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
