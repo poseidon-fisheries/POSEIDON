@@ -78,19 +78,5 @@ public class Scenarios {
         SCENARIOS.put("Indonesia",IndonesiaScenario::new);
         DESCRIPTIONS.put("Indonesia","Minimum Working Model of Indonesia");
 
-        SCENARIOS.put("EPO Biomass", EpoBiomassScenario::new);
-        DESCRIPTIONS.put("EPO Biomass", "A biomass-based scenario for purse-seine fishing in the Eastern Pacific Ocean.");
-
-        SCENARIOS.put("EPO Abundance", EpoAbundanceScenario::new);
-        DESCRIPTIONS.put("EPO Abundance", "An age-structured scenario for purse-seine fishing in the Eastern Pacific Ocean.");
-
-        SCENARIOS.put("FAD only EPO Abundance", FadsOnlyEpoAbundanceScenario::new);
-        DESCRIPTIONS.put("FAD only Abundance", "A vessel-less scenario for FAD parameter calibration purposes.");
-
-
-        SCENARIOS.put("EPO Abundance Pathfinding", EpoScenarioPathfinding::new);
-        DESCRIPTIONS.put("EPO Abundance Pathfinding",
-                "Like EPO Abundance but using an alternative decision process");
-
     }
 }
