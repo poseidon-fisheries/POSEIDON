@@ -7,30 +7,19 @@ import uk.ac.ox.oxfish.model.data.IterativeAgerageBackAndForth;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class Plan {
 
     private final LinkedList<PlannedAction> plannedActions = new LinkedList<>();
 
-    //a decorator to return for objects to look at the planned actions without being able to touch them
+    // a decorator to return for objects to look at the planned actions without being able to touch them
     private final List<PlannedAction> plannedActionsView = UnmodifiableList.decorate(plannedActions);
 
-    /**
-     * this is where the plan starts
-     */
-    private final SeaTile initialPosition;
-
-    /**
-     * this is where the plan ought to end!
-     */
-    private final SeaTile finalPosition;
     private final IterativeAgerageBackAndForth<Integer>[] centroid = new IterativeAgerageBackAndForth[2];
-    private double hoursEstimatedThisPlanWillTake = 0;
 
     {
         centroid[0] = new IterativeAgerageBackAndForth();
@@ -38,32 +27,25 @@ public class Plan {
     }
 
     /**
-     * every plan must have an initial path from starting to end position (which could be the same, as
-     * in most cycles)
-     *
-     * @param initialPosition
-     * @param finalPosition
+     * every plan must have an initial path from starting to end position (which could be the same, as in most cycles)
      */
     public Plan(
         final SeaTile initialPosition,
         final SeaTile finalPosition
     ) {
-        this.initialPosition = initialPosition;
-        this.finalPosition = finalPosition;
         plannedActions.add(new PlannedAction.Arrival(initialPosition, false));
         plannedActions.add(new PlannedAction.Arrival(finalPosition, true));
 
-        //update centroid of the path
+        // update centroid of the path
         centroid[0].addObservationfromDouble(initialPosition.getGridX());
         centroid[0].addObservationfromDouble(finalPosition.getGridX());
         centroid[1].addObservationfromDouble(initialPosition.getGridY());
         centroid[1].addObservationfromDouble(finalPosition.getGridY());
     }
 
-
     public void insertAction(
-        final PlannedAction newAction, final int indexInPathOfNewAction,
-        final double additionalHoursEstimatedToTake
+        final PlannedAction newAction,
+        final int indexInPathOfNewAction
     ) {
         Preconditions.checkArgument(
             indexInPathOfNewAction > 0,
@@ -74,10 +56,9 @@ public class Plan {
             "You probably don't want to remove the very last step"
         );
         plannedActions.add(indexInPathOfNewAction, newAction);
-        //update centroid
+        // update centroid
         centroid[0].addObservationfromDouble(newAction.getLocation().getGridX());
         centroid[1].addObservationfromDouble(newAction.getLocation().getGridY());
-        hoursEstimatedThisPlanWillTake += additionalHoursEstimatedToTake;
     }
 
     public int numberOfStepsInPath() {
@@ -93,10 +74,10 @@ public class Plan {
     }
 
     public PlannedAction pollNextAction() {
-        final PlannedAction toReturn = plannedActions.poll();
-        if (plannedActions.size() >= 1) {
+        final PlannedAction toReturn = checkNotNull(plannedActions.poll());
+        if (!plannedActions.isEmpty()) {
             if (toReturn.getLocation() != null) {
-                //weird exception that can occur when you are targeting a moving object that has since left the map
+                // weird exception that can occur when you are targeting a moving object that has since left the map
                 centroid[0].removeObservation(toReturn.getLocation().getGridX());
                 centroid[1].removeObservation(toReturn.getLocation().getGridY());
             }
@@ -115,32 +96,16 @@ public class Plan {
         return centroid[1].getSmoothedObservation();
     }
 
-    public List<PlannedAction> lookAtPlan() {
+    public List<PlannedAction> plannedActions() {
         return plannedActionsView;
     }
 
     @Override
     public String toString() {
-        String sb = "Plan{" + "plannedActions=" + plannedActions.stream().
-            map(plannedAction -> plannedAction.toString()).
-            collect(Collectors.joining("\n")) +
+        return "Plan{" + "plannedActions=" +
+            plannedActions
+                .stream().map(Object::toString)
+                .collect(Collectors.joining("\n")) +
             '}';
-        return sb;
-    }
-
-    /**
-     * useful to add unplanned delays into the plan
-     *
-     * @param additionalHoursSpent
-     */
-    public void addHoursEstimatedItWillTake(final double additionalHoursSpent) {
-        hoursEstimatedThisPlanWillTake += additionalHoursSpent;
-    }
-
-    Map<Class<? extends PlannedAction>, Integer> getActionCounts() {
-        return plannedActions.stream().collect(groupingBy(
-            PlannedAction::getClass,
-            collectingAndThen(toList(), List::size)
-        ));
     }
 }

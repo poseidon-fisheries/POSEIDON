@@ -10,18 +10,15 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
 
-
 /**
- * picks the FAD (map discretized) that maximizes immediate
- * gain (i.e. revenue - cost of getting there and back).
+ * picks the FAD (map discretized) that maximizes immediate gain (i.e. revenue - cost of getting there and back).
  * <p>
- * In order to make the planning more "long term", you can pick greedily by computing the revenue of
- * multiple fads from that centroid. That way you pick somewhere you are likely going to pick more fads
+ * In order to make the planning more "long term", you can pick greedily by computing the revenue of multiple fads from
+ * that centroid. That way you pick somewhere you are likely going to pick more fads
  */
 public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningModule {
 
     private final int additionalFadInspected;
-
 
     public GreedyInsertionFadPlanningModule(
         final MapDiscretization discretization,
@@ -41,63 +38,31 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
         this.additionalFadInspected = additionalFadInspected;
     }
 
-    @Override
-    protected PlannedAction chooseFadSet(
+    public static int selectFadByCheapestInsertion(
         final Plan currentPlanSoFar,
         final Fisher fisher,
-        final FishState model,
         final NauticalMap map,
-        final OwnFadSetDiscretizedActionGenerator optionsGenerator
-    ) {
-        final List<Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options =
-            optionsGenerator.peekAllFads();
-
-        //if there are no options, don't bother
-        if (options == null || options.isEmpty())
-            return null;
-        //if there is only one option, also don't bother
-        if (options.size() == 1) {
-            if (options.get(0).getValue() > 0)
-                return optionsGenerator.chooseFad(options.get(0).getValue());
-            else return null;
-        }
-
-        final int fadGroupChosen = selectFadByCheapestInsertion(currentPlanSoFar, fisher, map, options,
-            speedInKmPerHours, additionalFadInspected
-        );
-
-
-        //all fads are empty, don't bother setting on any!
-        if (fadGroupChosen < 0 ||
-            fadGroupChosen >= optionsGenerator.getNumberOfGroups())
-            return null;
-        return optionsGenerator.chooseFad(fadGroupChosen);
-
-
-    }
-
-    public static int selectFadByCheapestInsertion(
-        final Plan currentPlanSoFar, final Fisher fisher, final NauticalMap map,
         final List<Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options,
-        final double boatSpeed, final int numberOfAdditionalFadToCount
+        final double boatSpeed,
+        final int numberOfAdditionalFadToCount
     ) {
         double maxProfitsSoFar = 0;
         int fadGroupChosen = -1;
 
         for (final Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer> option : options) {
-            //get the fads in centroid
+            // get the fads in centroid
             final PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad> fads = option.getKey();
-            //if there are none, don't bother
+            // if there are none, don't bother
             if (fads.isEmpty() || fads == null)
                 continue;
-            //check the cost to go to the "best" fad
+            // check the cost to go to the "best" fad
             final Iterator<OwnFadSetDiscretizedActionGenerator.ValuedFad> iterator = fads.iterator();
             final OwnFadSetDiscretizedActionGenerator.ValuedFad bestFad = iterator.next();
             final PlannedAction.FadSet potentialAction = new PlannedAction.FadSet(bestFad.getKey());
             final double additionalHoursTravelled = DrawThenCheapestInsertionPlanner.cheapestInsert(
                 currentPlanSoFar,
                 potentialAction,
-                Integer.MAX_VALUE, //don't want to censor time now
+                Integer.MAX_VALUE, // don't want to censor time now
                 boatSpeed,
                 map,
                 false
@@ -108,7 +73,7 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
                 additionalHoursTravelled / boatSpeed
             );
 
-            //compute the revenues for harvesting the first X fads
+            // compute the revenues for harvesting the first X fads
             // (the first we will actually do, the others are there to trick us into setting in more promising areas)
             double revenuesHere = bestFad.getValue();
             int additionalFadsInspected = 0;
@@ -125,6 +90,39 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
 
         }
         return fadGroupChosen;
+    }
+
+    @Override
+    protected PlannedAction chooseFadSet(
+        final Plan currentPlanSoFar,
+        final Fisher fisher,
+        final FishState model,
+        final NauticalMap map,
+        final OwnFadSetDiscretizedActionGenerator optionsGenerator
+    ) {
+        final List<Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options =
+            optionsGenerator.peekAllFads();
+
+        // if there are no options, don't bother
+        if (options == null || options.isEmpty())
+            return null;
+        // if there is only one option, also don't bother
+        if (options.size() == 1) {
+            if (options.get(0).getValue() > 0)
+                return optionsGenerator.chooseFad(options.get(0).getValue());
+            else return null;
+        }
+
+        final int fadGroupChosen = selectFadByCheapestInsertion(currentPlanSoFar, fisher, map, options,
+            speedInKmPerHours, additionalFadInspected
+        );
+
+        // all fads are empty, don't bother setting on any!
+        if (fadGroupChosen < 0 ||
+            fadGroupChosen >= optionsGenerator.getNumberOfGroups())
+            return null;
+        return optionsGenerator.chooseFad(fadGroupChosen);
+
     }
 
 }

@@ -30,13 +30,12 @@ import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 public class PlanTest {
 
-
     @Test
     public void insertGarbageInAPlanWorks() {
         final FishState fishState = mock(FishState.class);
         final NauticalMap map = makeMap(4, 4);
 
-        Plan plan = new Plan(
+        final Plan plan = new Plan(
             map.getSeaTile(0, 0),
             map.getSeaTile(0, 0)
         );
@@ -45,12 +44,12 @@ public class PlanTest {
 
         plan.insertAction(
             new PlannedAction.Deploy(map.getSeaTile(1, 1)),
-            1, 0.1
+            1
 
         );
         plan.insertAction(
             new PlannedAction.Deploy(map.getSeaTile(1, 3)),
-            1, 0.1
+            1
 
         );
         Assertions.assertEquals(plan.getGridXCentroid(), 0.5, .0001);
