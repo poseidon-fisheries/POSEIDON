@@ -364,41 +364,49 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         // length of the trip is reduced by how much we have already spent outside and duration of that last step
         double hoursAvailable = getThisTripTargetHours() - hoursAlreadySpent - lastStepCost;
 
-        if (hoursAvailable >= 0) {
-            for (final PlannedAction plannedAction : currentPlan.plannedActions()) {
-                if (plannedAction instanceof PlannedAction.Deploy) {
-                    final double hoursConsumed = cheapestInsert(
-                        newPlan,
-                        plannedAction,
-                        hoursAvailable,
-                        speed,
-                        map,
-                        true
-                    );
-                    if (!Double.isFinite(hoursConsumed))
-                        break;
+        if (hoursAvailable > 0) {
+
+            // Reset the number of allowed actions of each type
+            planModules.forEach((actionType, planningModule) -> {
+                final MutableInt actionsAllowed = stillAllowedActionsInPlan.get(actionType);
+                if (actionsAllowed == null) {
+                    // if no action of that type has ever been drawn, the planning module has not been started,
+                    // so we let readyPlanningModule initialise everything
+                    readyPlanningModule(actionType, fisher, model);
+                } else {
+                    // otherwise we just mutate the existing entry in actionsAllowed
+                    actionsAllowed.setValue(planningModule.maximumActionsInAPlan(model, fisher));
+                }
+            });
+
+            final Iterator<PlannedAction> previouslyPlannedDeployments = currentPlan
+                .plannedActions()
+                .stream()
+                .filter(PlannedAction.Deploy.class::isInstance)
+                .iterator();
+            final MutableInt deploymentsAllowed = stillAllowedActionsInPlan.get(ActionType.DeploymentAction);
+            while (
+                hoursAvailable > 0 &&
+                    deploymentsAllowed != null &&
+                    deploymentsAllowed.getValue() > 0 &&
+                    previouslyPlannedDeployments.hasNext()
+            ) {
+                final double hoursConsumed = cheapestInsert(
+                    newPlan,
+                    previouslyPlannedDeployments.next(),
+                    hoursAvailable,
+                    speed,
+                    map,
+                    true
+                );
+                if (!Double.isFinite(hoursConsumed)) {
+                    hoursAvailable = 0;
+                } else {
+                    deploymentsAllowed.decrement();
                     hoursAvailable -= hoursConsumed;
-                    assert hoursAvailable >= 0;
-                    if (hoursAvailable <= 0)
-                        break;
                 }
             }
         }
-        // reset valid actions
-        stillAllowedActionsInPlan.forEach((actionType, allowedActions) -> {
-            if (actionType == ActionType.DeploymentAction) {
-                // We do not allow more deployments to be added because we kept those from the original plan.
-                // (This is how it always worked, but I'm currently wondering whether it should work that way -- NP)
-                allowedActions.setValue(0);
-            } else {
-                final PlanningModule planningModule = planModules.get(actionType);
-                if (planningModule != null)
-                    allowedActions.setValue(planningModule.maximumActionsInAPlan(model, fisher));
-            }
-        });
-
-        // random delays (chasing FADs off course, for example), it can happen to be completely off
-        // assert hoursAvailable>=-FishStateUtilities.EPSILON : hoursAvailable;
 
         // add more events now.
         currentPlan = newPlan;
