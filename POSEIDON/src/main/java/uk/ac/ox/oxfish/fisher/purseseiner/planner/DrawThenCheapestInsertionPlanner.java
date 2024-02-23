@@ -37,6 +37,8 @@ import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 import java.util.*;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * A simple planner where given a budget of time you can spend out: 1 - Draw the next action to take from random
  * distribution 2 - Use a generator to turn that action into a planned action (or a set of possible choices) 3 - If you
@@ -308,24 +310,20 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
     }
 
     private ActionType drawNextAction(final MersenneTwisterFast random) {
-        final List<Pair<ActionType, Double>> toDraw = new ArrayList<>(plannableActionWeights.size());
-        for (final Map.Entry<ActionType, Double> actionsAvailable : plannableActionWeights.entrySet()) {
-            final boolean allowed = stillAllowedActionsInPlan.getOrDefault(
-                actionsAvailable.getKey(),
-                new MutableInt(1)
-            ).intValue() > 0;
-            if (!allowed)
-                continue;
-            toDraw.add(new Pair<>(actionsAvailable.getKey(), actionsAvailable.getValue()));
-        }
-        // feed it to the enumerated distribution
-        final ActionType nextAction;
-        if (toDraw.size() == 1)
-            nextAction = toDraw.get(0).getKey();
-        else {
-            nextAction = new EnumeratedDistribution<>(new MTFApache(random), toDraw).sample();
-        }
-        return nextAction;
+        final List<Pair<ActionType, Double>> pmf =
+            plannableActionWeights
+                .entrySet()
+                .stream()
+                .filter(entry ->
+                    stillAllowedActionsInPlan
+                        .getOrDefault(entry.getKey(), new MutableInt(1))
+                        .intValue() > 0
+                )
+                .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
+                .collect(toList());
+        return pmf.size() == 1
+            ? pmf.get(0).getKey()
+            : new EnumeratedDistribution<>(new MTFApache(random), pmf).sample();
     }
 
     public Plan planNewTrip() {
