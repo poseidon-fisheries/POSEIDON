@@ -48,6 +48,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 import static java.lang.Integer.parseInt;
@@ -62,7 +63,7 @@ public class TunaCalibrator {
     static final int DEFAULT_POPULATION_SIZE = 100;
     static final int MAX_FITNESS_CALLS = 2000;
     static final int DEFAULT_RANGE = 10;
-
+    private static final Logger logger = Logger.getLogger(TunaCalibrator.class.getName());
     private static final String CALIBRATION_LOG_FILE_NAME = "calibration_log.md";
     private static final String CALIBRATED_SCENARIO_FILE_NAME = "calibrated_scenario.yaml";
 
@@ -127,6 +128,49 @@ public class TunaCalibrator {
         }));
     }
 
+    private static Path copyToFolder(
+        final Path sourceFile,
+        final Path targetFolder
+    ) {
+        try {
+            return Files.copy(sourceFile, targetFolder.resolve(sourceFile.getFileName()));
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    static void evaluateSolutionAndPrintOutErrors(
+        final Path calibrationFilePath,
+        final double[] solution
+    ) {
+        saveCalibratedScenario(solution, calibrationFilePath);
+        final Evaluator evaluator = new Evaluator();
+        evaluator.setCalibrationFolder(calibrationFilePath.getParent());
+        evaluator.run();
+    }
+
+    private static void saveCalibratedScenario(
+        final double[] optimalParameters,
+        final Path calibrationFilePath
+    ) {
+
+        final Path calibratedScenarioPath =
+            calibrationFilePath.getParent().resolve(CALIBRATED_SCENARIO_FILE_NAME);
+
+        try (final FileWriter fileWriter = new FileWriter(calibratedScenarioPath.toFile())) {
+            final GenericOptimization optimization =
+                GenericOptimization.fromFile(calibrationFilePath);
+            final Scenario scenario = GenericOptimization.buildScenario(
+                optimalParameters,
+                Paths.get(optimization.getScenarioFile()).toFile(),
+                optimization.getParameters()
+            );
+            new FishYAML().dump(scenario, fileWriter);
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     public double[] run() {
         final Path outputFolder = makeOutputFolder();
         final Path calibrationFilePath =
@@ -161,17 +205,6 @@ public class TunaCalibrator {
         return outputFolderPath;
     }
 
-    private static Path copyToFolder(
-        final Path sourceFile,
-        final Path targetFolder
-    ) {
-        try {
-            return Files.copy(sourceFile, targetFolder.resolve(sourceFile.getFileName()));
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     private double[] calibrate(final Path calibrationFilePath) {
 
         final Path logFilePath = calibrationFilePath.getParent().resolve(CALIBRATION_LOG_FILE_NAME);
@@ -181,19 +214,21 @@ public class TunaCalibrator {
         if (numberOfRunsPerSettingOverride > 0) {
             optimizationProblem.setRunsPerSetting(numberOfRunsPerSettingOverride);
         }
+        final int numThreads = Math.min(getRuntime().availableProcessors(), maxProcessorsToUse);
 
-        System.out.println("Running calibration for: " + calibrationFilePath);
-        System.out.println("Logging to: " + logFilePath);
-        System.out.println("Population size: " + populationSize);
-        System.out.println("Max fitness calls: " + maxFitnessCalls);
+        logger.info(() -> String.format(
+            "Running calibration for: %s\n" +
+                "Logging to: %s\n" +
+                "Population size: %s\n" +
+                "Max fitness calls: %s\n" +
+                "Number of threads: %s\n",
+            calibrationFilePath, logFilePath, populationSize, maxFitnessCalls, numThreads
+        ));
 
         optimizationProblem.getTargets().stream()
             .filter(LastStepFixedDataTarget.class::isInstance)
             .forEach(target -> ((LastStepFixedDataTarget) target).setVerbose(verbose));
 
-        final int numThreads = Math.min(getRuntime().availableProcessors(), maxProcessorsToUse);
-
-        System.out.println("Requesting " + numThreads + " threads");
         final SimpleProblemWrapper problemWrapper;
         if (bestGuess == null) {
             problemWrapper = new SimpleProblemWrapper();
@@ -270,36 +305,6 @@ public class TunaCalibrator {
 
         return runnable.getDoubleSolution();
 
-    }
-
-    static void evaluateSolutionAndPrintOutErrors(
-        final Path calibrationFilePath,
-        final double[] solution
-    ) {
-        saveCalibratedScenario(solution, calibrationFilePath);
-        new TunaEvaluator(calibrationFilePath, solution).run();
-    }
-
-    private static void saveCalibratedScenario(
-        final double[] optimalParameters,
-        final Path calibrationFilePath
-    ) {
-
-        final Path calibratedScenarioPath =
-            calibrationFilePath.getParent().resolve(CALIBRATED_SCENARIO_FILE_NAME);
-
-        try (final FileWriter fileWriter = new FileWriter(calibratedScenarioPath.toFile())) {
-            final GenericOptimization optimization =
-                GenericOptimization.fromFile(calibrationFilePath);
-            final Scenario scenario = GenericOptimization.buildScenario(
-                optimalParameters,
-                Paths.get(optimization.getScenarioFile()).toFile(),
-                optimization.getParameters()
-            );
-            new FishYAML().dump(scenario, fileWriter);
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     @SuppressWarnings("unused")

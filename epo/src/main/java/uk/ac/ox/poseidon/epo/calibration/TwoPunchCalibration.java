@@ -53,6 +53,20 @@ public class TwoPunchCalibration {
         twoPunchCalibration.runAll();
     }
 
+    private static void writeSolutionOut(
+        final Path calibrationFile,
+        final double[] gaSolution,
+        final String solutionName
+    ) throws IOException {
+        final FileWriter writer = new FileWriter(calibrationFile.getParent().resolve(solutionName).toFile());
+        writer.write(Double.toString(gaSolution[0]));
+        for (int i = 1; i < gaSolution.length; i++) {
+            writer.write(",");
+            writer.write(Double.toString(gaSolution[i]));
+        }
+        writer.close();
+    }
+
     private void runAll() throws IOException {
         // run GA
         final double[] gaSolution = stepOne();
@@ -70,12 +84,6 @@ public class TwoPunchCalibration {
         final Path localCalibrationFile = calibrationFile.getParent().resolve("local_calibration.yaml");
         final double[] localSolution = stepTwo();
         writeSolutionOut(localCalibrationFile, localSolution, "local_solution.txt");
-
-        // run once again locally
-        final TunaEvaluator evaluator = new TunaEvaluator(localCalibrationFile, localSolution);
-        evaluator.setNumRuns(10);
-        evaluator.setParallel(false);
-        evaluator.run();
     }
 
     private double[] stepOne() throws IOException {
@@ -91,20 +99,6 @@ public class TwoPunchCalibration {
         firstStep.setRunNickName("global");
         firstStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
         return firstStep.generateCalibratorProblem().run();
-    }
-
-    private static void writeSolutionOut(
-        final Path calibrationFile,
-        final double[] gaSolution,
-        final String solutionName
-    ) throws IOException {
-        final FileWriter writer = new FileWriter(calibrationFile.getParent().resolve(solutionName).toFile());
-        writer.write(Double.toString(gaSolution[0]));
-        for (int i = 1; i < gaSolution.length; i++) {
-            writer.write(",");
-            writer.write(Double.toString(gaSolution[i]));
-        }
-        writer.close();
     }
 
     private double[] stepTwo() throws IOException {

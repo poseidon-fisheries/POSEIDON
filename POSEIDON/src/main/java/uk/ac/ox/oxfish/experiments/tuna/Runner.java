@@ -282,13 +282,14 @@ public final class Runner<S extends Scenario> {
         });
     }
 
-    public void writeScenarioToFile(final String outputFileName) {
+    public Runner<S> writeScenarioToFile(final String outputFileName) {
         final File outputFile = outputPath.resolve(outputFileName).toFile();
         try (final Writer writer = new FileWriter(outputFile)) {
             new FishYAML().dump(scenarioSupplier.get(), writer);
         } catch (final IOException e) {
             throw new IllegalStateException("Error while writing file: " + outputFile, e);
         }
+        return this;
     }
 
     public Runner<S> requestFisherYearlyData() {
