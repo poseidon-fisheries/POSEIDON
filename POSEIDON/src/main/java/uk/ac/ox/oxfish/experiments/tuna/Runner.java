@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -293,12 +294,20 @@ public final class Runner<S extends Scenario> {
     }
 
     public Runner<S> requestFisherYearlyData() {
+        return requestFisherYearlyData(__ -> true);
+    }
+
+    public Runner<S> requestFisherYearlyData(final Predicate<String> columnNamePredicate) {
         return registerRowProviders(
             FISHER_YEARLY_DATA_FILENAME,
             fishState -> fishState
                 .getFishers()
                 .stream()
-                .map(fisher -> new TidyFisherYearlyData(fisher.getYearlyData(), fisher.getTagsList().get(0)))
+                .map(fisher -> new TidyFisherYearlyData(
+                    fisher.getYearlyData(),
+                    columnNamePredicate,
+                    fisher.getTagsList().get(0)
+                ))
                 .collect(toImmutableList())
         );
     }
@@ -312,20 +321,27 @@ public final class Runner<S extends Scenario> {
         return this;
     }
 
-    public Runner<S> requestFisherDailyData() {
+    public Runner<S> requestFisherDailyData(final Predicate<String> columnNamePredicate) {
         return registerRowProviders(
             FISHER_DAILY_DATA_FILENAME,
             fishState -> fishState
                 .getFishers()
                 .stream()
-                .map(fisher -> new TidyFisherDailyData(fisher.getDailyData(), fisher.getTagsList().get(0)))
+                .map(fisher -> new TidyFisherDailyData(
+                    fisher.getDailyData(),
+                    columnNamePredicate,
+                    fisher.getTagsList().get(0)
+                ))
                 .collect(toImmutableList())
         );
     }
 
     @SuppressWarnings({"WeakerAccess", "unused"})
-    public Runner<S> requestYearlyData() {
-        return registerRowProvider(YEARLY_DATA_FILENAME, fishState -> new TidyYearlyData(fishState.getYearlyDataSet()));
+    public Runner<S> requestYearlyData(final Predicate<String> columnNamePredicate) {
+        return registerRowProvider(YEARLY_DATA_FILENAME, fishState -> new TidyYearlyData(
+            fishState.getYearlyDataSet(),
+            columnNamePredicate
+        ));
     }
 
     public Runner<S> registerRowProvider(

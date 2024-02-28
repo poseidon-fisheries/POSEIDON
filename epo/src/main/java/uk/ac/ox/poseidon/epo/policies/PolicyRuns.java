@@ -32,21 +32,19 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
-import java.util.stream.IntStream;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.stream.Collectors.toList;
 
 public class PolicyRuns {
 
     private static final Logger logger = Logger.getLogger(PolicyRuns.class.getName());
 
     public static void main(final String[] args) {
-        final Path baseFolder = Paths.get(System.getProperty("user.home"), "workspace", "tuna", "np");
+        final Path baseFolder = Paths.get(
+            System.getProperty("user.home"), "workspace", "epo_calibration_runs", "runs"
+        );
         final Path baseScenario = baseFolder.resolve(Paths.get(
-            "calibrations",
-            "2023-12-20/cenv0729/2023-12-26_18.01.39_local",
+            "2024-02-13", "cenv0729", "2024-02-17_06.26.53_local",
             "calibrated_scenario.yaml"
         ));
         final Path baseOutputFolder = Paths.get(
@@ -55,16 +53,19 @@ public class PolicyRuns {
         final List<Integer> yearsActive = ImmutableList.of(2023);
         final ImmutableList<Double> proportions = ImmutableList.of(0.75, 0.50, 0.25, 0.10, 0.0);
         final ImmutableMap<String, List<Policy<EpoScenario<?>>>> policies = ImmutableMap.of(
+/*
                 "global_object_set_limits", new GlobalObjectSetLimit(
                     yearsActive,
                     // 8729 FAD + 4003 OFS in 2022:
                     proportions.stream().map(p -> (int) (p * (8729 + 4003))).collect(toList())
                 ),
+*/
                 "fad_limits", new ActiveFadLimitsPolicies(
                     yearsActive,
                     2022,
                     proportions
-                ),
+                )
+/*
                 "fad_limits_fine", new ActiveFadLimitsPolicies(
                     yearsActive,
                     2022,
@@ -84,6 +85,7 @@ public class PolicyRuns {
                     -120,
                     ImmutableList.of(5, 15, 30)
                 )
+*/
             )
             .entrySet()
             .stream()
@@ -92,7 +94,7 @@ public class PolicyRuns {
                 entry -> entry.getValue().getWithDefault()
             ));
 
-        final int numberOfRunsPerPolicy = 2;
+        final int numberOfRunsPerPolicy = 1;
         final int numberOfPolicies = policies.values().stream().mapToInt(List::size).sum();
         logger.info(String.format(
             "About to run %d policies %d times (%d total runs)",
@@ -113,6 +115,8 @@ public class PolicyRuns {
                         .setPolicies(entry.getValue())
                         .setParallel(true)
                         .setWriteScenarioToFile(true)
+                        .requestFisherDailyData(columnName -> columnName.equals("Number of active FADs"))
+                        .requestFisherYearlyData()
                         .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new);
                 if (!policyName.equals("fad_limits_fine")) {
                     runner

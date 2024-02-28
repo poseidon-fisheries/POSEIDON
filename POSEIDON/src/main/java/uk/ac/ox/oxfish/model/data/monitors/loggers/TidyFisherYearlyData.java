@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import static java.lang.Math.toIntExact;
 
@@ -33,8 +34,12 @@ public class TidyFisherYearlyData extends TidyTimeSeries<TimeSeries<Fisher>> {
     private static final List<String> HEADERS = ImmutableList.of("ves_no", "year", "variable", "value", "unit");
     private final String boatId;
 
-    public TidyFisherYearlyData(final TimeSeries<Fisher> fisherYearlyData, final String boatId) {
-        super(fisherYearlyData);
+    public TidyFisherYearlyData(
+        final TimeSeries<Fisher> fisherYearlyData,
+        final Predicate<String> columnNamePredicate,
+        final String boatId
+    ) {
+        super(fisherYearlyData, columnNamePredicate);
         this.boatId = boatId;
     }
 
@@ -44,7 +49,10 @@ public class TidyFisherYearlyData extends TidyTimeSeries<TimeSeries<Fisher>> {
     }
 
     @Override
-    List<Object> makeRow(final DataColumn column, final int index) {
+    List<Object> makeRow(
+        final DataColumn column,
+        final int index
+    ) {
         return ImmutableList.of(
             boatId, // boat_id
             index + 1, // year

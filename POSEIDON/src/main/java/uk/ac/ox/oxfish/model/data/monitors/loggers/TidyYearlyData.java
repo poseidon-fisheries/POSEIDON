@@ -24,13 +24,17 @@ import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public class TidyYearlyData extends TidyTimeSeries<TimeSeries<?>> {
 
     private static final List<String> HEADERS = ImmutableList.of("year", "variable", "value", "unit", "y_label");
 
-    public TidyYearlyData(final TimeSeries<?> timeSeries) {
-        super(timeSeries);
+    public TidyYearlyData(
+        final TimeSeries<?> timeSeries,
+        final Predicate<String> columnNamePredicate
+    ) {
+        super(timeSeries, columnNamePredicate);
     }
 
     @Override
@@ -39,7 +43,10 @@ public class TidyYearlyData extends TidyTimeSeries<TimeSeries<?>> {
     }
 
     @Override
-    List<Object> makeRow(final DataColumn column, final int index) {
+    List<Object> makeRow(
+        final DataColumn column,
+        final int index
+    ) {
         return ImmutableList.of(
             index + 1, // year
             column.getName(), // variable

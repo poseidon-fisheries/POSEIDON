@@ -24,6 +24,7 @@ import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.stream.IntStream.range;
@@ -31,18 +32,29 @@ import static java.util.stream.IntStream.range;
 public abstract class TidyTimeSeries<T extends TimeSeries<?>> implements RowProvider {
 
     private final T timeSeries;
+    private final Predicate<String> columnNamePredicate;
 
-    TidyTimeSeries(final T timeSeries) {
+    TidyTimeSeries(
+        final T timeSeries,
+        final Predicate<String> columnNamePredicate
+    ) {
         this.timeSeries = timeSeries;
+        this.columnNamePredicate = columnNamePredicate;
     }
 
     @Override
     public Iterable<? extends Collection<?>> getRows() {
-        return timeSeries.getColumns().stream().flatMap(column ->
-            range(0, column.size()).mapToObj(index -> makeRow(column, index))
-        ).collect(toImmutableList());
+        return timeSeries
+            .getColumns()
+            .stream()
+            .filter(column -> columnNamePredicate.test(column.getName()))
+            .flatMap(column -> range(0, column.size()).mapToObj(index -> makeRow(column, index)))
+            .collect(toImmutableList());
     }
 
-    abstract List<Object> makeRow(DataColumn column, int index);
+    abstract List<Object> makeRow(
+        DataColumn column,
+        int index
+    );
 
 }
