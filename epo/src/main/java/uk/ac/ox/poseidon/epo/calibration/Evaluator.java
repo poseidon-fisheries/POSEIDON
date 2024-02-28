@@ -60,7 +60,7 @@ public class Evaluator implements Runnable {
     //  group_by(action_type) |>
     //  slice_max(n, with_ties = FALSE)
     @Parameter(names = "--track_fads_of_vessels")
-    private Set<String> vesselsOfWhichToTrackFads = ImmutableSet.of("1779", "453", "1552");
+    private Set<String> vesselsWhoseFadsToTrack = ImmutableSet.of("1779", "453", "1552");
     @Parameter(names = {"-r", "--num-runs"})
     private int numRuns = Math.min(16, getRuntime().availableProcessors());
     @Parameter(names = {"-y", "--years"})
@@ -122,13 +122,13 @@ public class Evaluator implements Runnable {
     }
 
     @SuppressWarnings("unused")
-    public Set<String> getVesselsOfWhichToTrackFads() {
-        return vesselsOfWhichToTrackFads;
+    public Set<String> getVesselsWhoseFadsToTrack() {
+        return vesselsWhoseFadsToTrack;
     }
 
     @SuppressWarnings("unused")
-    public void setVesselsOfWhichToTrackFads(final Set<String> vesselsOfWhichToTrackFads) {
-        this.vesselsOfWhichToTrackFads = vesselsOfWhichToTrackFads;
+    public void setVesselsWhoseFadsToTrack(final Set<String> vesselsWhoseFadsToTrack) {
+        this.vesselsWhoseFadsToTrack = vesselsWhoseFadsToTrack;
     }
 
     @SuppressWarnings("unused")
@@ -159,7 +159,7 @@ public class Evaluator implements Runnable {
         final AtomicInteger runCounter = new AtomicInteger(1);
         runner.run(numYearsToRuns, numRuns - 1, runCounter);
 
-        if (!vesselsOfWhichToTrackFads.isEmpty()) {
+        if (!vesselsWhoseFadsToTrack.isEmpty()) {
             registerFadAttractionEventProviders(runner);
         }
 
@@ -176,7 +176,7 @@ public class Evaluator implements Runnable {
             final AbundanceFadAttractionEventObserver observer =
                 new AbundanceFadAttractionEventObserver(fishState);
             fishState.getFishers().stream()
-                .filter(fisher -> vesselsOfWhichToTrackFads.contains(fisher.getTagsList().get(0)))
+                .filter(fisher -> vesselsWhoseFadsToTrack.contains(fisher.getTagsList().get(0)))
                 .map(FadManager::getFadManager)
                 .forEach(fadManager ->
                     fadManager.registerObserver(AbundanceFadAttractionEvent.class, observer)
