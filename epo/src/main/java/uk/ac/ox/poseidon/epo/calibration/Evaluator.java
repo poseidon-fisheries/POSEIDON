@@ -60,16 +60,13 @@ public class Evaluator implements Runnable {
     //  group_by(action_type) |>
     //  slice_max(n, with_ties = FALSE)
     @Parameter(names = "--track_fads_of_vessels")
-    private final Set<String> vesselsOfWhichToTrackFads = ImmutableSet.of("1779", "453", "1552");
+    private Set<String> vesselsOfWhichToTrackFads = ImmutableSet.of("1779", "453", "1552");
     @Parameter(names = {"-r", "--num-runs"})
     private int numRuns = Math.min(16, getRuntime().availableProcessors());
-
     @Parameter(names = {"-y", "--years"})
     private int numYearsToRuns = 3;
-
     @Parameter(names = "--parallel", arity = 1)
     private boolean parallel = true;
-
     @Parameter(converter = PathConverter.class)
     private Path calibrationFolder;
 
@@ -122,6 +119,16 @@ public class Evaluator implements Runnable {
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @SuppressWarnings("unused")
+    public Set<String> getVesselsOfWhichToTrackFads() {
+        return vesselsOfWhichToTrackFads;
+    }
+
+    @SuppressWarnings("unused")
+    public void setVesselsOfWhichToTrackFads(final Set<String> vesselsOfWhichToTrackFads) {
+        this.vesselsOfWhichToTrackFads = vesselsOfWhichToTrackFads;
     }
 
     @SuppressWarnings("unused")
@@ -207,6 +214,7 @@ public class Evaluator implements Runnable {
         return parallel;
     }
 
+    @SuppressWarnings("unused")
     public void setParallel(final boolean parallel) {
         this.parallel = parallel;
     }

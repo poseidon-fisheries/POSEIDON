@@ -217,11 +217,11 @@ public class TunaCalibrator {
         final int numThreads = Math.min(getRuntime().availableProcessors(), maxProcessorsToUse);
 
         logger.info(() -> String.format(
-            "Running calibration for: %s\n" +
-                "Logging to: %s\n" +
-                "Population size: %s\n" +
-                "Max fitness calls: %s\n" +
-                "Number of threads: %s\n",
+            "Running calibration for: %s%n" +
+                "Logging to: %s%n" +
+                "Population size: %s%n" +
+                "Max fitness calls: %s%n" +
+                "Number of threads: %s%n",
             calibrationFilePath, logFilePath, populationSize, maxFitnessCalls, numThreads
         ));
 
