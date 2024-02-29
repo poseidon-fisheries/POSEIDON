@@ -24,14 +24,17 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.Collection;
 
 /**
- * A  class that takes some kind of local biology, does something with it, and optionally returns
- * the same kind of local biology. It is expected that the returned biology will be a copy.
+ * A  class that takes some kind of local biology, does something with it, and optionally returns the same kind of local
+ * biology. It is expected that the returned biology will be a copy.
  *
  * @param <B> The type of local biology to be acted upon.
  */
 @FunctionalInterface
-interface BiologicalProcess<B extends LocalBiology> {
+public interface BiologicalProcess<B extends LocalBiology> {
 
-    Collection<B> process(FishState fishState, Collection<B> biologies);
+    Collection<B> process(
+        FishState fishState,
+        Collection<B> biologies
+    );
 
 }

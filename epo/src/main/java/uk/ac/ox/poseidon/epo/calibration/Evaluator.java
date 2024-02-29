@@ -167,6 +167,8 @@ public class Evaluator implements Runnable {
             .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new)
             .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
             .registerRowProvider("sim_global_biomass.csv", GlobalBiomassLogger::new)
+            // turn the following line on or off as needed:
+            // .registerRowProvider("death_events.csv", DeathEventsRowProvider::new)
             .run(numYearsToRuns, 1, runCounter);
     }
 

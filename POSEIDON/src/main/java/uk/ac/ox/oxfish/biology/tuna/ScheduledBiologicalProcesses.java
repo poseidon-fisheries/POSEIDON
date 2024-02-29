@@ -34,16 +34,14 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 
 /**
- * Objects of this class keep a schedule of biological processes to execute at specific time
- * indices. The actual time step of the simulation is mapped to a schedule index using the
- * stepMapper. Typically, the indices will be days of the year and the step mapper just a {@link
- * PeriodicStepMapper}.
+ * Objects of this class keep a schedule of biological processes to execute at specific time indices. The actual time
+ * step of the simulation is mapped to a schedule index using the stepMapper. Typically, the indices will be days of the
+ * year and the step mapper just a {@link PeriodicStepMapper}.
  *
  * <p>If there are processes to be executed for the given time step, the processes are executed in
- * order. We maintain a {@code biology} variable (initially {@code null}) that is optionally updated
- * if the process returns a biology and passed to the next process. Some processes operate directly
- * on the {@link FishState} and ignore the provided biology. Other processes are called only for
- * their side effects and do not return a biology.
+ * order. We maintain a {@code biology} variable (initially {@code null}) that is optionally updated if the process
+ * returns a biology and passed to the next process. Some processes operate directly on the {@link FishState} and ignore
+ * the provided biology. Other processes are called only for their side effects and do not return a biology.
  *
  * <p>See the {@link ScheduledAbundanceProcessesFactory} for a good example use of this class.
  *
@@ -67,9 +65,13 @@ public class ScheduledBiologicalProcesses<B extends LocalBiology>
         ));
     }
 
+    public Map<Integer, Collection<BiologicalProcess<B>>> getSchedule() {
+        return schedule;
+    }
+
     /**
-     * This is meant to be executed every step, but will only do the reallocation if we have one
-     * scheduled on that step.
+     * This is meant to be executed every step, but will only do the reallocation if we have one scheduled on that
+     * step.
      */
     @Override
     public void step(final SimState simState) {

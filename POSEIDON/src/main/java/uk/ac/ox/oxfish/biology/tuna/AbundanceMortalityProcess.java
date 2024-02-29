@@ -22,8 +22,10 @@ import com.google.common.primitives.ImmutableDoubleArray;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.poseidon.common.api.Observer;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,14 +36,12 @@ import static java.util.Arrays.stream;
 import static java.util.stream.IntStream.range;
 
 /**
- * A proportional mortality process. Note that "proportional mortality" here means mortality as a
- * direct percentage as opposed to
- * {@link uk.ac.ox.oxfish.biology.complicated.ProportionalMortalityProcess}
- * that does exponentiation.
+ * A proportional mortality process. Note that "proportional mortality" here means mortality as a direct percentage as
+ * opposed to {@link uk.ac.ox.oxfish.biology.complicated.ProportionalMortalityProcess} that does exponentiation.
  */
-@SuppressWarnings("UnstableApiUsage")
 public class AbundanceMortalityProcess implements BiologicalProcess<AbundanceLocalBiology> {
 
+    private final List<Observer<DeathEvent>> deathEventsObservers = new LinkedList<>();
     private final Map<Species, Map<String, List<ImmutableDoubleArray>>> mortalitySources;
 
     public AbundanceMortalityProcess(
@@ -61,6 +61,10 @@ public class AbundanceMortalityProcess implements BiologicalProcess<AbundanceLoc
             ));
     }
 
+    public List<Observer<DeathEvent>> getDeathEventsObservers() {
+        return deathEventsObservers;
+    }
+
     @Override
     public Collection<AbundanceLocalBiology> process(
         final FishState fishState,
@@ -76,7 +80,10 @@ public class AbundanceMortalityProcess implements BiologicalProcess<AbundanceLoc
         ).collect(toImmutableList());
     }
 
-    private double[][] applyMortality(final Species species, final double[][] abundance) {
+    private double[][] applyMortality(
+        final Species species,
+        final double[][] abundance
+    ) {
         final int subs = species.getNumberOfSubdivisions();
         final int bins = species.getNumberOfBins();
         final double[][] newAbundance =
@@ -96,11 +103,33 @@ public class AbundanceMortalityProcess implements BiologicalProcess<AbundanceLoc
             )
             .forEach(deaths ->
                 range(0, subs).forEach(sub ->
-                    range(0, bins).forEach(bin ->
-                        newAbundance[sub][bin] -= deaths[sub][bin]
-                    )
+                    range(0, bins).forEach(bin -> {
+                        deathEventsObservers.forEach(observer ->
+                            observer.observe(new DeathEvent(species, sub, bin, deaths[sub][bin]))
+                        );
+                        newAbundance[sub][bin] -= deaths[sub][bin];
+                    })
                 )
             );
         return newAbundance;
+    }
+
+    public static class DeathEvent {
+        public final Species species;
+        public final int sub;
+        public final int bin;
+        public final double deaths;
+
+        public DeathEvent(
+            final Species species,
+            final int sub,
+            final int bin,
+            final double deaths
+        ) {
+            this.species = species;
+            this.sub = sub;
+            this.bin = bin;
+            this.deaths = deaths;
+        }
     }
 }
