@@ -6,8 +6,8 @@ import uk.ac.ox.poseidon.common.core.BasicFactorySupplier;
 
 @AutoService(FactorySupplier.class)
 public class ActiveFadLimitsFactorySupplier
-    extends BasicFactorySupplier<ActiveFadLimits> {
+    extends BasicFactorySupplier<ActiveFadLimitsFactory> {
     public ActiveFadLimitsFactorySupplier() {
-        super(ActiveFadLimits.class, "Active-FAD limits");
+        super(ActiveFadLimitsFactory.class, "Active-FAD limits");
     }
 }

@@ -70,7 +70,7 @@ public class DefaultEpoRegulations {
                         new NotFactory(new AgentHasTagFactory("has_del_license"))
                     )
                 ),
-                "Active-FAD limits", new ActiveFadLimits(ACTIVE_FAD_LIMITS),
+                "Active-FAD limits", new ActiveFadLimitsFactory(ACTIVE_FAD_LIMITS),
                 "Closure A", closureA,
                 "Closure B", closureB,
                 "El Corralito", new ForbiddenIfFactory(

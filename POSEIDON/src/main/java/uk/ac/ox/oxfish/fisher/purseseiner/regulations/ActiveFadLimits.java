@@ -1,41 +1,59 @@
+/*
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.ox.oxfish.fisher.purseseiner.regulations;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.regulations.quantities.NumberOfActiveFads;
-import uk.ac.ox.poseidon.common.api.ComponentFactory;
+import uk.ac.ox.poseidon.agents.api.Action;
 import uk.ac.ox.poseidon.common.api.ModelState;
+import uk.ac.ox.poseidon.regulations.api.Mode;
 import uk.ac.ox.poseidon.regulations.api.Regulations;
 import uk.ac.ox.poseidon.regulations.core.ForbiddenIfFactory;
 import uk.ac.ox.poseidon.regulations.core.conditions.*;
 
+import java.util.Collection;
 import java.util.Map;
 
-public class ActiveFadLimits implements ComponentFactory<Regulations> {
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
-    private Map<Integer, ? extends Map<String, Integer>> limitsPerYearAndClass;
+public class ActiveFadLimits implements Regulations {
 
-    @SuppressWarnings("unused")
-    public ActiveFadLimits() {
-    }
-
-    @SuppressWarnings({"unused", "WeakerAccess"})
+    private final Map<Integer, ? extends Map<String, Integer>> limitsPerYearAndClass;
+    private final Regulations regulations;
     public ActiveFadLimits(
-        final Map<Integer, ? extends Map<String, Integer>> limitsPerYearAndClass
+        final Map<Integer, ? extends Map<String, Integer>> limitsPerYearAndClass,
+        final ModelState modelState
     ) {
-        this.limitsPerYearAndClass = limitsPerYearAndClass;
+        this.limitsPerYearAndClass =
+            limitsPerYearAndClass.entrySet().stream().collect(toImmutableMap(
+                Map.Entry::getKey,
+                entry -> ImmutableMap.copyOf(entry.getValue())
+            ));
+        this.regulations = makeRegulations(modelState);
     }
 
-    @SuppressWarnings("unused")
     public Map<Integer, ? extends Map<String, Integer>> getLimitsPerYearAndClass() {
         return limitsPerYearAndClass;
     }
 
-    @SuppressWarnings("unused")
-    public void setLimitsPerYearAndClass(final Map<Integer, ? extends Map<String, Integer>> limitsPerYearAndClass) {
-        this.limitsPerYearAndClass = limitsPerYearAndClass;
-    }
-
-    @Override
-    public Regulations apply(final ModelState modelState) {
+    private Regulations makeRegulations(final ModelState modelState) {
         return new ForbiddenIfFactory(
             new AllOfFactory(
                 new ActionCodeIsFactory("DPL"),
@@ -56,5 +74,15 @@ public class ActiveFadLimits implements ComponentFactory<Regulations> {
                 )
             )
         ).apply(modelState);
+    }
+
+    @Override
+    public Mode mode(final Action action) {
+        return regulations.mode(action);
+    }
+
+    @Override
+    public Collection<Regulations> getSubRegulations() {
+        return ImmutableList.of(regulations);
     }
 }

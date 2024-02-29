@@ -26,6 +26,7 @@ import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadDeactivationStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.DestinationBasedDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
@@ -82,6 +83,7 @@ public class PurseSeinerFleetFactory
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
     private AlgorithmFactory<? extends PortInitializer> portInitializer;
     private AlgorithmFactory<? extends Monitors<AbstractSetAction>> additionalSetMonitors;
+    private AlgorithmFactory<? extends FadDeactivationStrategy> fadDeactivationStrategyFactory;
     private IntegerParameter targetYear;
 
     public PurseSeinerFleetFactory(
@@ -95,7 +97,8 @@ public class PurseSeinerFleetFactory
         final AlgorithmFactory<? extends DepartingStrategy> departingStrategy,
         final AlgorithmFactory<? extends MarketMap> marketMap,
         final AlgorithmFactory<? extends PortInitializer> portInitializer,
-        final AlgorithmFactory<? extends Monitors<AbstractSetAction>> additionalSetMonitors
+        final AlgorithmFactory<? extends Monitors<AbstractSetAction>> additionalSetMonitors,
+        final AlgorithmFactory<? extends FadDeactivationStrategy> fadDeactivationStrategyFactory
     ) {
         this.targetYear = targetYear;
         this.vesselsFile = vesselsFile;
@@ -108,9 +111,18 @@ public class PurseSeinerFleetFactory
         this.marketMap = marketMap;
         this.portInitializer = portInitializer;
         this.additionalSetMonitors = additionalSetMonitors;
+        this.fadDeactivationStrategyFactory = fadDeactivationStrategyFactory;
     }
 
     public PurseSeinerFleetFactory() {
+    }
+
+    public AlgorithmFactory<? extends FadDeactivationStrategy> getFadDeactivationStrategyFactory() {
+        return fadDeactivationStrategyFactory;
+    }
+
+    public void setFadDeactivationStrategyFactory(final AlgorithmFactory<? extends FadDeactivationStrategy> fadDeactivationStrategyFactory) {
+        this.fadDeactivationStrategyFactory = fadDeactivationStrategyFactory;
     }
 
     public AlgorithmFactory<? extends Monitors<AbstractSetAction>> getAdditionalSetMonitors() {
@@ -267,7 +279,8 @@ public class PurseSeinerFleetFactory
             fisher -> fisher.addTripListener((tripRecord, fisher1) ->
                 fisher1.getYearlyCounter()
                     .count("Distance travelled", tripRecord.getDistanceTravelled())
-            )
+            ),
+            fisher -> fishState.registerStartable(getFadDeactivationStrategyFactory().apply(fishState), fisher)
         ));
 
         fishState.getYearlyDataSet().registerGatherer(

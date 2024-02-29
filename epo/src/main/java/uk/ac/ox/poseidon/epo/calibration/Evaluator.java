@@ -32,9 +32,6 @@ import uk.ac.ox.oxfish.maximization.SolutionExtractor;
 import uk.ac.ox.oxfish.maximization.YearlyResultsRowProvider;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.AbundanceFadAttractionEventObserver;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.GlobalBiomassLogger;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
-import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 
 import java.io.FileNotFoundException;
@@ -164,9 +161,9 @@ public class Evaluator implements Runnable {
         }
 
         runner
-            .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new)
-            .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
-            .registerRowProvider("sim_global_biomass.csv", GlobalBiomassLogger::new)
+//             .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new)
+//             .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
+//             .registerRowProvider("sim_global_biomass.csv", GlobalBiomassLogger::new)
             // turn the following line on or off as needed:
             // .registerRowProvider("death_events.csv", DeathEventsRowProvider::new)
             .run(numYearsToRuns, 1, runCounter);

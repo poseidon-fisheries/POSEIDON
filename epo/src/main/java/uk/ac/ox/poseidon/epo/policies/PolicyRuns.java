@@ -32,7 +32,9 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 public class PolicyRuns {
@@ -59,18 +61,18 @@ public class PolicyRuns {
                     // 8729 FAD + 4003 OFS in 2022:
                     proportions.stream().map(p -> (int) (p * (8729 + 4003))).collect(toList())
                 ),
-*/
                 "fad_limits", new ActiveFadLimitsPolicies(
                     yearsActive,
                     2022,
                     proportions
-                )
-/*
+                ),
+*/
                 "fad_limits_fine", new ActiveFadLimitsPolicies(
                     yearsActive,
                     2022,
                     IntStream.rangeClosed(1, 20).mapToObj(i -> i * 0.05).collect(toImmutableList())
-                ),
+                )
+/*
                 "extended_closures", new ExtendedClosurePolicies(
                     yearsActive,
                     ImmutableList.of(5, 15, 30)

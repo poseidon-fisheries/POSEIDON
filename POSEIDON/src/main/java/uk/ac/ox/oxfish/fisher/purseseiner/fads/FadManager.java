@@ -19,7 +19,6 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
@@ -50,7 +49,6 @@ import uk.ac.ox.poseidon.regulations.api.Regulations;
 import javax.measure.quantity.Mass;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -66,12 +64,6 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FadManager {
 
-    private static final List<Class<? extends PurseSeinerAction>> POSSIBLE_ACTIONS = ImmutableList.of(
-        FadDeploymentAction.class,
-        AbstractFadSetAction.class,
-        DolphinSetAction.class,
-        NonAssociatedSetAction.class
-    );
     private final FadMap fadMap;
     private final Observers observers = new Observers();
     private final YearlyActionCounter yearlyActionCounter;
@@ -103,9 +95,9 @@ public class FadManager {
     }
 
     /**
-     * Technical note: we're using raw types for the observer type parameters because those need to
-     * be supertypes of whatever class object we register the observers with, and because of type
-     * erasure, Java is unable to infer that relationship when generics come into play.
+     * Technical note: we're using raw types for the observer type parameters because those need to be supertypes of
+     * whatever class object we register the observers with, and because of type erasure, Java is unable to infer that
+     * relationship when generics come into play.
      */
     @SuppressWarnings("rawtypes")
     public FadManager(
@@ -152,12 +144,6 @@ public class FadManager {
         biomassLostMonitor.ifPresent(observer -> registerObserver(BiomassLostEvent.class, observer));
     }
 
-    public <T> void registerObserver(
-        final Class<T> observedClass, final Observer<? super T> observer
-    ) {
-        observers.register(observedClass, observer);
-    }
-
     public static FadManager getFadManager(
         final Fisher fisher
     ) {
@@ -170,21 +156,6 @@ public class FadManager {
         final Fisher fisher
     ) {
         return maybeGetPurseSeineGear(fisher).map(PurseSeineGear::getFadManager);
-    }
-
-    public int numberOfPermissibleActions(
-        final ActionClass actionClass,
-        final int maximumToCheckFor,
-        final Regulations regulations
-    ) {
-        return numberOfPermissibleActions(
-            getFisher(),
-            regulations,
-            getYearlyActionCounter(),
-            getNumberOfActiveFads(),
-            actionClass,
-            maximumToCheckFor
-        );
     }
 
     public static int numberOfPermissibleActions(
@@ -207,7 +178,11 @@ public class FadManager {
             private long addedCount;
 
             @Override
-            public long getCount(final int year, final Agent agent, final String actionCode) {
+            public long getCount(
+                final int year,
+                final Agent agent,
+                final String actionCode
+            ) {
                 final long realCount = yearlyActionCounter.getCount(year, agent, actionCode);
                 final boolean isOverride =
                     year == fisher.grabState().getCalendarYear() &&
@@ -238,8 +213,34 @@ public class FadManager {
 
     }
 
+    public <T> void registerObserver(
+        final Class<T> observedClass,
+        final Observer<? super T> observer
+    ) {
+        observers.register(observedClass, observer);
+    }
+
+    public int numberOfPermissibleActions(
+        final ActionClass actionClass,
+        final int maximumToCheckFor,
+        final Regulations regulations
+    ) {
+        return numberOfPermissibleActions(
+            getFisher(),
+            regulations,
+            getYearlyActionCounter(),
+            getNumberOfActiveFads(),
+            actionClass,
+            maximumToCheckFor
+        );
+    }
+
     public Fisher getFisher() {
         return fisher;
+    }
+
+    public void setFisher(final Fisher fisher) {
+        this.fisher = fisher;
     }
 
     public YearlyActionCounter getYearlyActionCounter() {
@@ -248,10 +249,6 @@ public class FadManager {
 
     public int getNumberOfActiveFads() {
         return deployedFads.size();
-    }
-
-    public void setFisher(final Fisher fisher) {
-        this.fisher = fisher;
     }
 
     public FishValueCalculator getFishValueCalculator() {
@@ -272,18 +269,28 @@ public class FadManager {
         fad.lose();
     }
 
-    public Fad deployFadInCenterOfTile(final SeaTile seaTile, final MersenneTwisterFast rng) {
+    public Fad deployFadInCenterOfTile(
+        final SeaTile seaTile,
+        final MersenneTwisterFast rng
+    ) {
         final Double2D location = new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5);
         return deployFad(seaTile, location, rng);
     }
 
-    public Fad deployFad(final SeaTile seaTile, final Double2D location, final MersenneTwisterFast rng) {
+    public Fad deployFad(
+        final SeaTile seaTile,
+        final Double2D location,
+        final MersenneTwisterFast rng
+    ) {
         final Fad newFad = initFad(seaTile, rng);
         fadMap.deployFad(newFad, location);
         return newFad;
     }
 
-    private Fad initFad(final SeaTile tile, final MersenneTwisterFast rng) {
+    private Fad initFad(
+        final SeaTile tile,
+        final MersenneTwisterFast rng
+    ) {
         checkState(numFadsInStock >= 1, "No FADs in stock!");
         numFadsInStock--;
         final Fad newFad = fadInitializer.makeFad(this, fisher, tile, rng);
@@ -294,7 +301,10 @@ public class FadManager {
     /**
      * Deploys a FAD at a random position in the given sea tile.
      */
-    public Fad deployFad(final SeaTile seaTile, final MersenneTwisterFast random) {
+    public Fad deployFad(
+        final SeaTile seaTile,
+        final MersenneTwisterFast random
+    ) {
         final Double2D location = new Double2D(
             seaTile.getGridX() + random.nextDouble(),
             seaTile.getGridY() + random.nextDouble()
@@ -306,7 +316,10 @@ public class FadManager {
         this.observers.reactTo(observable);
     }
 
-    public <O> void reactTo(final Class<O> observedClass, final Supplier<O> observableSupplier) {
+    public <O> void reactTo(
+        final Class<O> observedClass,
+        final Supplier<O> observableSupplier
+    ) {
         this.observers.reactTo(observedClass, observableSupplier);
     }
 
@@ -394,7 +407,10 @@ public class FadManager {
         }
 
         @Override
-        public long getYearlyActionCount(final int year, final String actionCode) {
+        public long getYearlyActionCount(
+            final int year,
+            final String actionCode
+        ) {
             return yearlyActionCounts.getCount(year, getAgent(), actionCode);
         }
     }

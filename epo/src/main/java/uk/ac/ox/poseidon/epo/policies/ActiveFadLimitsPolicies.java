@@ -20,7 +20,7 @@ package uk.ac.ox.poseidon.epo.policies;
 
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
-import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ActiveFadLimits;
+import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ActiveFadLimitsFactory;
 import uk.ac.ox.poseidon.epo.scenarios.EpoScenario;
 import uk.ac.ox.poseidon.regulations.core.NamedRegulationsFactory;
 
@@ -73,7 +73,7 @@ public class ActiveFadLimitsPolicies extends PolicySupplier {
                                     ImmutableMap.<Integer, Map<String, Integer>>builder()
                                         .putAll(ACTIVE_FAD_LIMITS);
                                 getYearsActive().forEach(year -> builder.put(year, newLimits));
-                                return new ActiveFadLimits(builder.buildKeepingLast());
+                                return new ActiveFadLimitsFactory(builder.buildKeepingLast());
                             }
                         )
                 )
