@@ -108,8 +108,8 @@ public class EpoPurseSeineVesselReader implements AlgorithmFactory<List<Fisher>>
         else if (t <= 181) return "class 3";
         else if (t <= 272) return "class 4";
         else if (t <= 363) return "class 5";
-        else if (fisher.getHold().getVolumeIn(CUBIC_METRE) < 1200) return "class 6A";
-        else return "class 6B";
+        else if (fisher.getHold().getVolumeIn(CUBIC_METRE) < 1200) return "class 6.b";
+        else return "class 6.a";
     }
 
     @Override

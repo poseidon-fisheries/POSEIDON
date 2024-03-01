@@ -20,10 +20,10 @@ import static java.time.Month.*;
 public class DefaultEpoRegulations {
 
     public static final Map<Integer, Map<String, Integer>> ACTIVE_FAD_LIMITS = ImmutableMap.of(
-        2021, ImmutableMap.of("6A", 300, "6B", 450),
-        2022, ImmutableMap.of("6A", 270, "6B", 400),
-        2023, ImmutableMap.of("6A", 255, "6B", 340),
-        2024, ImmutableMap.of("6A", 210, "6B", 340)
+        2021, ImmutableMap.of("6.b", 300, "6.a", 450),
+        2022, ImmutableMap.of("6.b", 270, "6.a", 400),
+        2023, ImmutableMap.of("6.b", 255, "6.a", 340),
+        2024, ImmutableMap.of("6.b", 210, "6.a", 340)
     );
     public static final MonthDay EL_CORRALITO_BEGINNING = MonthDay.of(OCTOBER, 9);
     public static final MonthDay EL_CORRALITO_END = MonthDay.of(NOVEMBER, 8);
