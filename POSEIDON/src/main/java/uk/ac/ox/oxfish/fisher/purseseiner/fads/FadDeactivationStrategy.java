@@ -24,6 +24,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ActiveFadLimits;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
 
 import java.util.Map;
 import java.util.Optional;
@@ -34,6 +35,7 @@ import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 import static uk.ac.ox.oxfish.model.StepOrder.FISHER_PHASE;
 
 public class FadDeactivationStrategy implements FisherStartable, Steppable {
+    private static final long serialVersionUID = 718758206768136198L;
     private FadManager fadManager;
 
     @Override
@@ -41,7 +43,6 @@ public class FadDeactivationStrategy implements FisherStartable, Steppable {
         final FishState fishState,
         final Fisher fisher
     ) {
-        System.out.println("Starting " + this + " for fisher " + fisher);
         this.fadManager = FadManager.getFadManager(fisher);
         // This is convoluted because we can't use FishState::scheduleEveryYear,
         // which schedules stuff on December 31st. We need to wait for the first
@@ -60,17 +61,29 @@ public class FadDeactivationStrategy implements FisherStartable, Steppable {
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public void step(final SimState simState) {
-        System.out.println(simState.schedule.getSteps() + " " + fadManager.getNumberOfActiveFads());
         final FishState fishState = (FishState) simState;
-        final OptionalInt limit = fishState
-            .getRegulations()
+        final OptionalInt optionalLimit = extractActiveFadsLimit(
+            fishState.getRegulations(),
+            fishState.getCalendarYear()
+        );
+        stream(optionalLimit)
+            .filter(limit -> limit < fadManager.getNumberOfActiveFads())
+            .forEach(limit -> {}); // TODO
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private OptionalInt extractActiveFadsLimit(
+        final Regulations regulations,
+        final int calendarYear
+    ) {
+        return regulations
             .getSubRegulations()
             .stream()
             .filter(ActiveFadLimits.class::isInstance)
             .map(ActiveFadLimits.class::cast)
             .map(ActiveFadLimits::getLimitsPerYearAndClass)
             .flatMapToInt(limits ->
-                stream(Optional.ofNullable(limits.get(fishState.getCalendarYear())))
+                stream(Optional.ofNullable(limits.get(calendarYear)))
                     .flatMap(yearlyLimits -> yearlyLimits.entrySet().stream())
                     .filter(classLimitEntry -> this.fadManager
                         .getFisher()
@@ -79,6 +92,5 @@ public class FadDeactivationStrategy implements FisherStartable, Steppable {
                     .mapToInt(Map.Entry::getValue)
             )
             .min();
-        System.out.println(limit);
     }
 }
