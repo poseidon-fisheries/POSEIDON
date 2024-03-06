@@ -34,9 +34,13 @@ import static com.google.common.collect.Streams.stream;
 import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 import static uk.ac.ox.oxfish.model.StepOrder.FISHER_PHASE;
 
-public class FadDeactivationStrategy implements FisherStartable, Steppable {
+public abstract class FadDeactivationStrategy implements FisherStartable, Steppable {
     private static final long serialVersionUID = 718758206768136198L;
     private FadManager fadManager;
+
+    public FadManager getFadManager() {
+        return fadManager;
+    }
 
     @Override
     public void start(
@@ -62,14 +66,14 @@ public class FadDeactivationStrategy implements FisherStartable, Steppable {
     @Override
     public void step(final SimState simState) {
         final FishState fishState = (FishState) simState;
-        final OptionalInt optionalLimit = extractActiveFadsLimit(
-            fishState.getRegulations(),
-            fishState.getCalendarYear()
-        );
-        stream(optionalLimit)
+        stream(extractActiveFadsLimit(fishState.getRegulations(), fishState.getCalendarYear()))
             .filter(limit -> limit < fadManager.getNumberOfActiveFads())
-            .forEach(limit -> {}); // TODO
+            .forEach(limit ->
+                deactivate(fadManager.getNumberOfActiveFads() - limit)
+            );
     }
+
+    protected abstract void deactivate(int numberOfFadsToDeactivate);
 
     @SuppressWarnings("UnstableApiUsage")
     private OptionalInt extractActiveFadsLimit(

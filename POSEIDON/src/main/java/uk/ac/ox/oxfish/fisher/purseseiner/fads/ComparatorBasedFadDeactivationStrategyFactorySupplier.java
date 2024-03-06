@@ -18,12 +18,17 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import com.google.auto.service.AutoService;
+import uk.ac.ox.poseidon.common.api.FactorySupplier;
+import uk.ac.ox.poseidon.common.core.BasicFactorySupplier;
 
-public class FadDeactivationStrategyFactory implements AlgorithmFactory<FadDeactivationStrategy> {
-    @Override
-    public FadDeactivationStrategy apply(final FishState fishState) {
-        return new FadDeactivationStrategy();
+@AutoService(FactorySupplier.class)
+public class ComparatorBasedFadDeactivationStrategyFactorySupplier
+    extends BasicFactorySupplier<ComparatorBasedFadDeactivationStrategyFactory> {
+    public ComparatorBasedFadDeactivationStrategyFactorySupplier() {
+        super(
+            ComparatorBasedFadDeactivationStrategyFactory.class,
+            "Comparator-based FAD deactivation strategy"
+        );
     }
 }

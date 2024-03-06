@@ -147,6 +147,16 @@ public abstract class Fad implements Locatable {
         return owner;
     }
 
+    public double getValueForOwner() {
+        final Fisher fisher = getOwner().getFisher();
+        return getOwner()
+            .getFishValueCalculator()
+            .valueOf(
+                getBiology(),
+                fisher.getHomePort().getMarketMap(fisher).getPrices()
+            );
+    }
+
     public SeaTile getLocation() {
         return getOwner().getFadMap()
             .getFadTile(this)

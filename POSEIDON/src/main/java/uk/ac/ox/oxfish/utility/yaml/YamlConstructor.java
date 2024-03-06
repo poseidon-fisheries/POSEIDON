@@ -29,7 +29,6 @@ import org.yaml.snakeyaml.nodes.*;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.ScenarioSupplier;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.*;
 import uk.ac.ox.poseidon.common.api.FactorySupplier;
 import uk.ac.ox.poseidon.common.api.GenericComponentFactory;
@@ -90,7 +89,7 @@ public class YamlConstructor extends Constructor {
                     // it's also possible that the scalar is an algorithm factory without any settable field
                     // this is rare since factories are represented as maps, but this might be one of the simple
                     // ones like AnarchyFactory
-                    if (AlgorithmFactory.class.isAssignableFrom(node.getType()))
+                    if (GenericComponentFactory.class.isAssignableFrom(node.getType()))
                         return constructFactory(constructScalar((ScalarNode) node));
                         // otherwise I guess it's really a normal scalar!
                     else

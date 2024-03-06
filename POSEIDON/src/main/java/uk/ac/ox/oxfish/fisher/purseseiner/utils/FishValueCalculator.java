@@ -6,13 +6,22 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 
 public interface FishValueCalculator {
 
-    default double valueOf(final Catch catchesKept, final double[] prices) {
+    default double valueOf(
+        final Catch catchesKept,
+        final double[] prices
+    ) {
         return valueOf(catchesKept.getBiomassArray(), prices);
     }
 
-    double valueOf(double[] biomasses, double[] prices);
+    double valueOf(
+        double[] biomasses,
+        double[] prices
+    );
 
-    default double valueOf(final LocalBiology biology, final double[] prices) {
+    default double valueOf(
+        final LocalBiology biology,
+        final double[] prices
+    ) {
         final double[] biomasses =
             getGlobalBiology().getSpecies().stream()
                 .mapToDouble(biology::getBiomass)
@@ -21,6 +30,5 @@ public interface FishValueCalculator {
     }
 
     GlobalBiology getGlobalBiology();
-
 
 }

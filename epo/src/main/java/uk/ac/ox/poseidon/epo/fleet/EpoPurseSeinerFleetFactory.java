@@ -18,7 +18,8 @@
 
 package uk.ac.ox.poseidon.epo.fleet;
 
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadDeactivationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.ComparatorBasedFadDeactivationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.LeastValuableFadComparatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.gear.FadRefillGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -67,7 +68,9 @@ public class EpoPurseSeinerFleetFactory extends PurseSeinerFleetFactory {
                     inputFolder.path("catch_size_distributions.csv")
                 )
             ),
-            new FadDeactivationStrategyFactory()
+            new ComparatorBasedFadDeactivationStrategyFactory(
+                new LeastValuableFadComparatorFactory()
+            )
         );
     }
 }
