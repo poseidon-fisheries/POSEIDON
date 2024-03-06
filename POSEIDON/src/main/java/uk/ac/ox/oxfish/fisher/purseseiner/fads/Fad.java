@@ -52,8 +52,6 @@ public abstract class Fad implements Locatable {
     final private TripRecord tripDeployed;
     final private int stepDeployed;
     final private Int2D locationDeployed;
-    final private double fishReleaseProbability;
-
     final private Map<Species, Double> fishReleaseProbabilities;
 
     private final FadManager owner;
@@ -82,8 +80,6 @@ public abstract class Fad implements Locatable {
         this.stepDeployed = stepDeployed;
         this.locationDeployed = locationDeployed;
         this.fishReleaseProbabilities = ImmutableMap.copyOf(fishReleaseProbabilities);
-        this.fishReleaseProbability =
-            Double.NaN; // TODO remove that once we have the per-species probabilities in place
         this.owner = owner;
         this.lost = false;
         this.isActive = isActive;
