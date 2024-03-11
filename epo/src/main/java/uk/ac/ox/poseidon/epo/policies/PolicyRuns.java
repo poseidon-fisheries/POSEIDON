@@ -2,18 +2,16 @@
  * POSEIDON, an agent-based model of fisheries
  * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.poseidon.epo.policies;
@@ -47,7 +45,7 @@ public class PolicyRuns {
         );
         final Path baseScenario = baseFolder.resolve(Paths.get(
             "2024-02-13", "cenv0729", "2024-02-17_06.26.53_local",
-            "calibrated_scenario.yaml"
+            "calibrated_scenario_updated.yaml"
         ));
         final Path baseOutputFolder = Paths.get(
             System.getProperty("user.home"), "workspace", "epo_policy_runs", "runs"
@@ -69,7 +67,7 @@ public class PolicyRuns {
 */
                 "fad_limits_fine", new ActiveFadLimitsPolicies(
                     yearsActive,
-                    2022,
+                    2023,
                     IntStream.rangeClosed(1, 20).mapToObj(i -> i * 0.05).collect(toImmutableList())
                 )
 /*
@@ -96,7 +94,7 @@ public class PolicyRuns {
                 entry -> entry.getValue().getWithDefault()
             ));
 
-        final int numberOfRunsPerPolicy = 1;
+        final int numberOfRunsPerPolicy = 3;
         final int numberOfPolicies = policies.values().stream().mapToInt(List::size).sum();
         logger.info(String.format(
             "About to run %d policies %d times (%d total runs)",

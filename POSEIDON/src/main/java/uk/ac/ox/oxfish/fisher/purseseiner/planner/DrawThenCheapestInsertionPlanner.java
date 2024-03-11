@@ -1,27 +1,24 @@
 /*
- *     POSEIDON, an agent-based model of fisheries
- *     Copyright (C) 2022  CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
+ * You should have received a copy of the GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
@@ -72,6 +69,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
      * trigger a re-plan
      */
     private final boolean doNotWaitToPurgeIllegalActions;
+    private List<ActionType> actionPreferenceOverrides = ImmutableList.of();
     private Plan currentPlan;
     private Fisher fisher;
     private FishState model;
@@ -180,6 +178,14 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
     }
 
+    public List<ActionType> getActionPreferenceOverrides() {
+        return actionPreferenceOverrides;
+    }
+
+    public void setActionPreferenceOverrides(final Collection<ActionType> actionPreferenceOverrides) {
+        this.actionPreferenceOverrides = ImmutableList.copyOf(actionPreferenceOverrides);
+    }
+
     @Override
     public void start(
         final FishState model,
@@ -240,6 +246,17 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         model = null;
     }
 
+    /**
+     * Returns whether the action is still allowed according to the counters in the {@code stillAllowedActionsInPlan}
+     * map. If there is no entry for this type of action, we assume it's allowed, which is arguably not the most
+     * intuitive way of doing things, so perhaps we could consider changing it if there ever is an opportunity.
+     */
+    private boolean stillAllowedInPlan(final ActionType actionType) {
+        return stillAllowedActionsInPlan
+            .getOrDefault(actionType, new MutableInt(1))
+            .intValue() > 0;
+    }
+
     private Plan planRecursively(
         final Plan currentPlan,
         double hoursLeftInBudget,
@@ -250,12 +267,14 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         // if there are no possible actions, stop
         if (!isAnyActionEvenPossible())
             return currentPlan;
-        // if there are some possible actions, do them
 
-        // pick at random next action!
-
-        // prepare pair list
-        final ActionType nextActionType = drawNextAction(model.getRandom());
+        // If we have preference overrides in place, pick the first legal one;
+        // otherwise draw a random next action.
+        final ActionType nextActionType = actionPreferenceOverrides
+            .stream()
+            .filter(this::stillAllowedInPlan)
+            .findAny()
+            .orElse(drawNextAction(model.getRandom()));
 
         // you can't draw any actions, the plan is over!
         if (nextActionType == null)
@@ -314,11 +333,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
             plannableActionWeights
                 .entrySet()
                 .stream()
-                .filter(entry ->
-                    stillAllowedActionsInPlan
-                        .getOrDefault(entry.getKey(), new MutableInt(1))
-                        .intValue() > 0
-                )
+                .filter(entry -> stillAllowedInPlan(entry.getKey()))
                 .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
                 .collect(toList());
         return pmf.size() == 1
