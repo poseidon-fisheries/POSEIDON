@@ -16,6 +16,9 @@
 
 package uk.ac.ox.poseidon.epo.policies;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.converters.PathConverter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
@@ -28,6 +31,7 @@ import uk.ac.ox.poseidon.epo.scenarios.EpoScenario;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -36,29 +40,46 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.toList;
 
-public class PolicyRuns {
+public class PolicyRuns implements Runnable {
 
     private static final Logger logger = Logger.getLogger(PolicyRuns.class.getName());
 
-    public static void main(final String[] args) {
-        final Path baseFolder = Paths.get(
-            System.getProperty("user.home"), "workspace", "epo_calibration_runs", "runs"
-        );
-        final Path baseScenario = baseFolder.resolve(Paths.get(
-            "2024-02-13", "cenv0729", "2024-02-17_06.26.53_local",
-            "calibrated_scenario_updated.yaml"
-        ));
+    @Parameter(names = "--output_folder", converter = PathConverter.class)
+    private final Path outputFolder = Paths.get(
+        System.getProperty("user.home"), "workspace", "epo_policy_runs", "runs"
+    );
 
-        final Path baseOutputFolder = Paths.get(
-            System.getProperty("user.home"), "workspace", "epo_policy_runs", "runs"
-        );
+    @Parameter(names = "--scenario", converter = PathConverter.class)
+    private final Path scenarioFile = Paths.get(
+        System.getProperty("user.home"), "workspace", "epo_calibration_runs", "runs",
+        "2024-02-13", "cenv0729", "2024-02-17_06.26.53_local",
+        "calibrated_scenario_updated.yaml"
+    );
+
+    @Parameter(names = {"-r", "--runs_per_policy"})
+    private final int numberOfRunsPerPolicy = 3;
+
+    @Parameter(names = {"-y", "--years_to_run"})
+    private final int numberOfYearsToRun = 3;
+
+    public static void main(final String[] args) {
+        final Runnable policyRuns = new PolicyRuns();
+        JCommander.newBuilder()
+            .addObject(policyRuns)
+            .build()
+            .parse(args);
+        policyRuns.run();
+    }
+
+    private static Map<String, List<Policy<EpoScenario<?>>>> makePolicies() {
         final List<Integer> yearsActive = ImmutableList.of(2023);
-        final ImmutableList<Double> proportions = ImmutableList.of(0.75, 0.50, 0.25, 0.10, 0.0);
+        final ImmutableList<Double> proportions =
+            ImmutableList.of(0.75, 0.50, 0.25, 0.10, 0.0);
         final ImmutableList<Double> fineProportions =
             IntStream.rangeClosed(1, 19)
                 .mapToObj(i -> i * 0.05)
                 .collect(toImmutableList());
-        final ImmutableMap<String, List<Policy<EpoScenario<?>>>> policies = ImmutableMap.of(
+        return ImmutableMap.of(
                 "global_object_set_limits", new GlobalObjectSetLimit(
                     yearsActive,
                     // 8729 FAD + 4003 OFS in 2022:
@@ -97,14 +118,18 @@ public class PolicyRuns {
                 Entry::getKey,
                 entry -> entry.getValue().getWithDefault()
             ));
+    }
 
-        final int numberOfRunsPerPolicy = 1;
+    @Override
+    public void run() {
+        final Map<String, List<Policy<EpoScenario<?>>>> policies = makePolicies();
+
         final int numberOfPolicies = policies.values().stream().mapToInt(List::size).sum();
         logger.info(String.format(
             "About to run %d policies %d times (%d total runs)",
             numberOfPolicies,
-            numberOfRunsPerPolicy,
-            numberOfPolicies * numberOfRunsPerPolicy
+            numberOfYearsToRun,
+            numberOfPolicies * numberOfYearsToRun
         ));
 
         policies
@@ -113,9 +138,9 @@ public class PolicyRuns {
             .parallel()
             .forEach(entry -> {
                 final String policyName = entry.getKey();
-                final Path outputFolder = baseOutputFolder.resolve(policyName);
+                final Path outputFolder = this.outputFolder.resolve(policyName);
                 final Runner<EpoPathPlannerAbundanceScenario> runner =
-                    new Runner<>(EpoPathPlannerAbundanceScenario.class, baseScenario, outputFolder)
+                    new Runner<>(EpoPathPlannerAbundanceScenario.class, scenarioFile, outputFolder)
                         .setPolicies(entry.getValue())
                         .setParallel(true)
                         .setWriteScenarioToFile(true)
@@ -127,7 +152,7 @@ public class PolicyRuns {
                         .registerRowProvider("spatial_closures.csv", RectangularAreaExtractor::new)
                         .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
                 }
-                runner.run(3, numberOfRunsPerPolicy);
+                runner.run(numberOfYearsToRun, numberOfRunsPerPolicy);
             });
     }
 }

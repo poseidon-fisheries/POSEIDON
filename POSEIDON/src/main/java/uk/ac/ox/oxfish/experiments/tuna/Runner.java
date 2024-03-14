@@ -192,7 +192,7 @@ public final class Runner<S extends Scenario> {
     }
 
     public void run(
-        final int numYearsToRun,
+        final int numberOfYearsToRun,
         final int numberOfRunsPerPolicy,
         final AtomicInteger runCounter
     ) {
@@ -202,7 +202,7 @@ public final class Runner<S extends Scenario> {
             : policies.stream()).forEach(policy -> {
             final int runNumber = runCounter.getAndIncrement();
             logger.info(String.format("=== Starting run %d / %s ===", runNumber, numRuns));
-            final State state = startRun(policy, runNumber, numRuns, numYearsToRun);
+            final State state = startRun(policy, runNumber, numRuns, numberOfYearsToRun);
             if (writeScenarioToFile) writeScenarioToFile(state);
             beforeStartConsumer.accept(state);
             state.model.start();
@@ -213,7 +213,7 @@ public final class Runner<S extends Scenario> {
                 state.printStep();
                 state.model.schedule.step(state.model);
                 afterStepConsumer.accept(state);
-            } while (state.model.getYear() < numYearsToRun);
+            } while (state.model.getYear() < numberOfYearsToRun);
             afterRunConsumer.accept(state);
             writeOutputs(runNumber, rowProviders, true);
         }));
