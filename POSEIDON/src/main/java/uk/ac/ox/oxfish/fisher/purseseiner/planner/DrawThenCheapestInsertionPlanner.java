@@ -178,8 +178,8 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
     }
 
-    public List<ActionType> getActionPreferenceOverrides() {
-        return actionPreferenceOverrides;
+    public Map<ActionType, PlanningModule> getPlanModules() {
+        return planModules;
     }
 
     public void setActionPreferenceOverrides(final Collection<ActionType> actionPreferenceOverrides) {

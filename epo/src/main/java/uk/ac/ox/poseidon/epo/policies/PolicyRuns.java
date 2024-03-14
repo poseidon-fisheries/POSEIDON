@@ -34,6 +34,7 @@ import java.util.stream.IntStream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.stream.Collectors.toList;
 
 public class PolicyRuns {
 
@@ -47,30 +48,34 @@ public class PolicyRuns {
             "2024-02-13", "cenv0729", "2024-02-17_06.26.53_local",
             "calibrated_scenario_updated.yaml"
         ));
+
         final Path baseOutputFolder = Paths.get(
             System.getProperty("user.home"), "workspace", "epo_policy_runs", "runs"
         );
         final List<Integer> yearsActive = ImmutableList.of(2023);
         final ImmutableList<Double> proportions = ImmutableList.of(0.75, 0.50, 0.25, 0.10, 0.0);
+        final ImmutableList<Double> fineProportions =
+            IntStream.rangeClosed(1, 19)
+                .mapToObj(i -> i * 0.05)
+                .collect(toImmutableList());
         final ImmutableMap<String, List<Policy<EpoScenario<?>>>> policies = ImmutableMap.of(
-/*
                 "global_object_set_limits", new GlobalObjectSetLimit(
                     yearsActive,
                     // 8729 FAD + 4003 OFS in 2022:
                     proportions.stream().map(p -> (int) (p * (8729 + 4003))).collect(toList())
                 ),
-                "fad_limits", new ActiveFadLimitsPolicies(
-                    yearsActive,
-                    2022,
-                    proportions
-                ),
-*/
                 "fad_limits_fine", new ActiveFadLimitsPolicies(
                     yearsActive,
                     2023,
-                    IntStream.rangeClosed(1, 20).mapToObj(i -> i * 0.05).collect(toImmutableList())
-                )
-/*
+                    fineProportions,
+                    false
+                ),
+                "fad_limits_fine_with_override", new ActiveFadLimitsPolicies(
+                    yearsActive,
+                    2023,
+                    fineProportions,
+                    true
+                ),
                 "extended_closures", new ExtendedClosurePolicies(
                     yearsActive,
                     ImmutableList.of(5, 15, 30)
@@ -85,7 +90,6 @@ public class PolicyRuns {
                     -120,
                     ImmutableList.of(5, 15, 30)
                 )
-*/
             )
             .entrySet()
             .stream()
@@ -94,7 +98,7 @@ public class PolicyRuns {
                 entry -> entry.getValue().getWithDefault()
             ));
 
-        final int numberOfRunsPerPolicy = 3;
+        final int numberOfRunsPerPolicy = 1;
         final int numberOfPolicies = policies.values().stream().mapToInt(List::size).sum();
         logger.info(String.format(
             "About to run %d policies %d times (%d total runs)",
@@ -118,7 +122,7 @@ public class PolicyRuns {
                         .requestFisherDailyData(columnName -> columnName.equals("Number of active FADs"))
                         .requestFisherYearlyData()
                         .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new);
-                if (!policyName.equals("fad_limits_fine")) {
+                if (!policyName.startsWith("fad_limits_fine")) {
                     runner
                         .registerRowProvider("spatial_closures.csv", RectangularAreaExtractor::new)
                         .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
