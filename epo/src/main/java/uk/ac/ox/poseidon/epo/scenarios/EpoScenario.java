@@ -2,18 +2,16 @@
  * POSEIDON, an agent-based model of fisheries
  * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.poseidon.epo.scenarios;
@@ -35,8 +33,6 @@ import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.data.distributions.EmpiricalCatchSizeDistributionsFromFile;
-import uk.ac.ox.oxfish.model.data.distributions.GroupedYearlyDistributions;
 import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
 import uk.ac.ox.oxfish.model.scenario.TestableScenario;
@@ -94,8 +90,6 @@ public abstract class EpoScenario<B extends LocalBiology>
             0.5
         );
     private AlgorithmFactory<ScenarioPopulation> fleet = new EmptyFleet();
-    private AlgorithmFactory<GroupedYearlyDistributions> empiricalCatchSizeDistributions =
-        new EmpiricalCatchSizeDistributionsFromFile(getInputFolder().path("catch_size_distributions.csv"));
 
     public static int dayOfYear(
         final int year,
@@ -111,14 +105,6 @@ public abstract class EpoScenario<B extends LocalBiology>
 
     public void setMapExtentFactory(final MapExtentFactory mapExtentFactory) {
         this.mapExtentFactory = mapExtentFactory;
-    }
-
-    public AlgorithmFactory<GroupedYearlyDistributions> getEmpiricalCatchSizeDistributions() {
-        return empiricalCatchSizeDistributions;
-    }
-
-    public void setEmpiricalCatchSizeDistributions(final AlgorithmFactory<GroupedYearlyDistributions> empiricalCatchSizeDistributions) {
-        this.empiricalCatchSizeDistributions = empiricalCatchSizeDistributions;
     }
 
     public ComponentFactory<? extends Regulations> getRegulations() {
