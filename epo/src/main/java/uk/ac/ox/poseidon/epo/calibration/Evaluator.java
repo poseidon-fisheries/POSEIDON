@@ -2,18 +2,16 @@
  * POSEIDON, an agent-based model of fisheries
  * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.poseidon.epo.calibration;
@@ -21,31 +19,26 @@ package uk.ac.ox.poseidon.epo.calibration;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.PathConverter;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFadAttractionEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
-import uk.ac.ox.oxfish.maximization.GenericOptimization;
-import uk.ac.ox.oxfish.maximization.SolutionExtractor;
 import uk.ac.ox.oxfish.maximization.YearlyResultsRowProvider;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.AbundanceFadAttractionEventObserver;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.io.Files.getFileExtension;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Runtime.getRuntime;
 
 public class Evaluator implements Runnable {
@@ -67,20 +60,10 @@ public class Evaluator implements Runnable {
     @Parameter(converter = PathConverter.class)
     private Path calibrationFolder;
 
-    private static Scenario makeScenario(
-        final GenericOptimization optimization,
-        final double[] optimalParameters
-    ) {
-        try {
-            return GenericOptimization.buildScenario(
-                optimalParameters,
-                Paths.get(optimization.getScenarioFile()).toFile(),
-                optimization.getParameters()
-            );
-        } catch (final FileNotFoundException e) {
-            throw new IllegalStateException(e);
-        }
-    }
+    // If `scenarioFile` is not provided, the Evaluator will extract a scenario from
+    // the calibration log and write it back to `calibrated_scenario.yaml`.
+    @Parameter(names = {"-s", "--scenario"}, converter = PathConverter.class)
+    private Path scenarioFile;
 
     public static void main(final String[] args) {
 
@@ -93,29 +76,12 @@ public class Evaluator implements Runnable {
         evaluator.run();
     }
 
-    private static Path findCalibrationFile(final Path folder) {
-        try (final Stream<Path> paths = Files.list(folder)) {
-            final ImmutableList<Path> calibrationFiles = paths
-                .filter(path -> getFileExtension(path.toString()).equals("yaml"))
-                .filter(Evaluator::isCalibrationFile)
-                .collect(toImmutableList());
-            checkState(!calibrationFiles.isEmpty(), "No calibration files found in %s", folder);
-            checkState(calibrationFiles.size() == 1, "More than one calibration files found in %s", folder);
-            return calibrationFiles.get(0);
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
+    public Path getScenarioFile() {
+        return scenarioFile;
     }
 
-    private static boolean isCalibrationFile(final Path path) {
-        try (final Stream<String> lines = Files.lines(path)) {
-            return lines
-                .findFirst()
-                .filter(line -> line.equals("!!uk.ac.ox.oxfish.maximization.GenericOptimization"))
-                .isPresent();
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
+    public void setScenarioFile(final Path scenarioFile) {
+        this.scenarioFile = scenarioFile;
     }
 
     @SuppressWarnings("unused")
@@ -141,14 +107,13 @@ public class Evaluator implements Runnable {
     @Override
     public void run() {
 
-        final Path calibrationFilePath = findCalibrationFile(calibrationFolder);
-        final Path logFilePath = calibrationFolder.resolve("calibration_log.md");
-        final double[] solution = new SolutionExtractor(logFilePath).bestSolution().getKey();
-        final GenericOptimization optimization = GenericOptimization.fromFile(calibrationFilePath);
+        final Scenario scenario =
+            scenarioFile == null
+                ? new ScenarioExtractor(calibrationFolder).getAndWriteToFile("calibrated_scenario.yaml")
+                : loadScenario();
 
         final Runner<Scenario> runner =
-            new Runner<>(() -> makeScenario(optimization, solution), calibrationFilePath.getParent())
-                .writeScenarioToFile("calibrated_scenario.yaml")
+            new Runner<>(() -> scenario, calibrationFolder)
                 .setParallel(parallel)
                 .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
                 .requestFisherYearlyData();
@@ -167,6 +132,20 @@ public class Evaluator implements Runnable {
             // turn the following line on or off as needed:
             // .registerRowProvider("death_events.csv", DeathEventsRowProvider::new)
             .run(numYearsToRuns, 1, runCounter);
+    }
+
+    private Scenario loadScenario() {
+        checkNotNull(this.calibrationFolder);
+        checkNotNull(this.scenarioFile);
+        final File scenarioFile = calibrationFolder.resolve(this.scenarioFile).toFile();
+        try (final FileReader fileReader = new FileReader(scenarioFile)) {
+            final FishYAML fishYAML = new FishYAML();
+            return fishYAML.loadAs(fileReader, Scenario.class);
+        } catch (final FileNotFoundException e) {
+            throw new IllegalArgumentException("Can't find scenario file: " + scenarioFile, e);
+        } catch (final IOException e) {
+            throw new IllegalStateException("Error while reading file: " + scenarioFile, e);
+        }
     }
 
     private void registerFadAttractionEventProviders(final Runner<Scenario> runner) {
