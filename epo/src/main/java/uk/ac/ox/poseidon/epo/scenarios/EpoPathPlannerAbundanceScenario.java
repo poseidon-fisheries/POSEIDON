@@ -1,21 +1,18 @@
 /*
  * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
-
 package uk.ac.ox.poseidon.epo.scenarios;
 
 import com.google.common.collect.ImmutableMap;
@@ -70,8 +67,8 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                         ),
                         ImmutableMap.of(
                             "Bigeye tuna", new CalibratedParameter(0.5, 0.9, 0, 1),
-                            "Skipjack tuna", new CalibratedParameter(0, 0.3, 0, 1),
-                            "Yellowfin tuna", new CalibratedParameter(0, 0.3, 0, 1)
+                            "Skipjack tuna", new CalibratedParameter(0, 0.5, 0, 1),
+                            "Yellowfin tuna", new CalibratedParameter(0, 0.5, 0, 1)
                         ),
                         ImmutableMap.of(
                             "Bigeye tuna", new CalibratedParameter(0.5, 0.75, 0, 0.85),
@@ -86,7 +83,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                                 ),
                                 new CalibratedParameter(26, 27, 25, 30, 26.5), // target
                                 new CalibratedParameter(4, 6, 2, 8, 2.25), // margin
-                                new CalibratedParameter(.25, .75, 0, 1) // penalty
+                                new CalibratedParameter(.25, .6, 0, 0.8) // penalty
                             ),
                             "FrontalIndex", new EnvironmentalPenaltyFactory(
                                 new GridsByDateFromFileFactory(
