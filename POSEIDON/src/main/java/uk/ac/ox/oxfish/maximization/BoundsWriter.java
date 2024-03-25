@@ -1,3 +1,18 @@
+/*
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (c) 2024-2024 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
 package uk.ac.ox.oxfish.maximization;
 
 import com.beust.jcommander.JCommander;
@@ -30,6 +45,47 @@ public class BoundsWriter implements Runnable {
             .build()
             .parse(args);
         boundsWriter.run();
+    }
+
+    public void run() {
+        writeBounds(
+            getCalibrationFolder().resolve(getCalibrationFileName()),
+            getCalibrationFolder().resolve(getLogFileName()),
+            getCalibrationFolder().resolve(getOutputFileName())
+        );
+    }
+
+    public static void writeBounds(
+        final Path calibrationFile,
+        final Path logFile,
+        final Path outputFile
+    ) {
+        writeBounds(
+            GenericOptimization.fromFile(calibrationFile),
+            new SolutionExtractor(logFile).bestSolution().getKey(),
+            outputFile
+        );
+    }
+
+    public Path getCalibrationFolder() {
+        return calibrationFolder;
+    }
+
+    public String getCalibrationFileName() {
+        return calibrationFileName;
+    }
+
+    @SuppressWarnings("unused")
+    public void setCalibrationFileName(final String calibrationFileName) {
+        this.calibrationFileName = calibrationFileName;
+    }
+
+    public String getLogFileName() {
+        return logFileName;
+    }
+
+    public String getOutputFileName() {
+        return outputFileName;
     }
 
     public static void writeBounds(
@@ -65,55 +121,14 @@ public class BoundsWriter implements Runnable {
         );
     }
 
-    public void run() {
-        writeBounds(
-            getCalibrationFolder().resolve(getCalibrationFileName()),
-            getCalibrationFolder().resolve(getLogFileName()),
-            getCalibrationFolder().resolve(getOutputFileName())
-        );
-    }
-
-    public void writeBounds(
-        final Path calibrationFile,
-        final Path logFile,
-        final Path outputFile
-    ) {
-        writeBounds(
-            GenericOptimization.fromFile(calibrationFile),
-            new SolutionExtractor(logFile).bestSolution().getKey(),
-            outputFile
-        );
-    }
-
-    public String getOutputFileName() {
-        return outputFileName;
-    }
-
     @SuppressWarnings("unused")
     public void setOutputFileName(final String outputFileName) {
         this.outputFileName = outputFileName;
     }
 
-    public String getCalibrationFileName() {
-        return calibrationFileName;
-    }
-
-    @SuppressWarnings("unused")
-    public void setCalibrationFileName(final String calibrationFileName) {
-        this.calibrationFileName = calibrationFileName;
-    }
-
-    public String getLogFileName() {
-        return logFileName;
-    }
-
     @SuppressWarnings("unused")
     public void setLogFileName(final String logFileName) {
         this.logFileName = logFileName;
-    }
-
-    public Path getCalibrationFolder() {
-        return calibrationFolder;
     }
 
     @SuppressWarnings("unused")

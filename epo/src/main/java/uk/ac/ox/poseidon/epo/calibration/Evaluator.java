@@ -1,6 +1,6 @@
 /*
  * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2024-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3
@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFadAttractionEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
+import uk.ac.ox.oxfish.maximization.BoundsWriter;
 import uk.ac.ox.oxfish.maximization.YearlyResultsRowProvider;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.AbundanceFadAttractionEventObserver;
@@ -107,10 +108,16 @@ public class Evaluator implements Runnable {
     @Override
     public void run() {
 
-        final Scenario scenario =
-            scenarioFile == null
-                ? new ScenarioExtractor(calibrationFolder).getAndWriteToFile("calibrated_scenario.yaml")
-                : loadScenario();
+        final Scenario scenario;
+        if (scenarioFile == null) {
+            scenario = new ScenarioExtractor(calibrationFolder)
+                .getAndWriteToFile("calibrated_scenario.yaml");
+            final BoundsWriter boundsWriter = new BoundsWriter();
+            boundsWriter.setCalibrationFolder(calibrationFolder);
+            boundsWriter.run();
+        } else {
+            scenario = loadScenario();
+        }
 
         final Runner<Scenario> runner =
             new Runner<>(() -> scenario, calibrationFolder)

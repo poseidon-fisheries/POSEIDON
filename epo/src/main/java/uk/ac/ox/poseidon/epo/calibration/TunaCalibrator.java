@@ -1,19 +1,17 @@
 /*
  * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2024-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.poseidon.epo.calibration;
@@ -128,60 +126,24 @@ public class TunaCalibrator {
         }));
     }
 
-    private static Path copyToFolder(
-        final Path sourceFile,
-        final Path targetFolder
-    ) {
-        try {
-            return Files.copy(sourceFile, targetFolder.resolve(sourceFile.getFileName()));
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    static void evaluateSolutionAndPrintOutErrors(
-        final Path calibrationFilePath,
-        final double[] solution
-    ) {
-        saveCalibratedScenario(solution, calibrationFilePath);
-        final Evaluator evaluator = new Evaluator();
-        evaluator.setCalibrationFolder(calibrationFilePath.getParent());
-        evaluator.run();
-    }
-
-    private static void saveCalibratedScenario(
-        final double[] optimalParameters,
-        final Path calibrationFilePath
-    ) {
-
-        final Path calibratedScenarioPath =
-            calibrationFilePath.getParent().resolve(CALIBRATED_SCENARIO_FILE_NAME);
-
-        try (final FileWriter fileWriter = new FileWriter(calibratedScenarioPath.toFile())) {
-            final GenericOptimization optimization =
-                GenericOptimization.fromFile(calibrationFilePath);
-            final Scenario scenario = GenericOptimization.buildScenario(
-                optimalParameters,
-                Paths.get(optimization.getScenarioFile()).toFile(),
-                optimization.getParameters()
-            );
-            new FishYAML().dump(scenario, fileWriter);
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     public double[] run() {
         final Path outputFolder = makeOutputFolder();
         final Path calibrationFilePath =
             copyToFolder(this.originalCalibrationFilePath, outputFolder);
         final double[] solution = calibrate(calibrationFilePath);
-        evaluateSolutionAndPrintOutErrors(calibrationFilePath, solution);
-        writeBounds(
-            GenericOptimization.fromFile(calibrationFilePath),
-            solution,
-            outputFolder.resolve("bounds.csv")
-        );
+        try {
+            evaluateSolutionAndPrintOutErrors(calibrationFilePath, solution);
+            writeBounds(
+                GenericOptimization.fromFile(calibrationFilePath),
+                solution,
+                outputFolder.resolve("bounds.csv")
+            );
+        } catch (final IllegalStateException e) {
+            // Don't crash if something goes wrong in the evaluation.
+            // This shouldn't be left in; but I need to get a new
+            // calibration going now and don't have another solution yet.
+            e.printStackTrace();
+        }
         return solution;
     }
 
@@ -203,6 +165,17 @@ public class TunaCalibrator {
             throw new IllegalStateException(e);
         }
         return outputFolderPath;
+    }
+
+    private static Path copyToFolder(
+        final Path sourceFile,
+        final Path targetFolder
+    ) {
+        try {
+            return Files.copy(sourceFile, targetFolder.resolve(sourceFile.getFileName()));
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private double[] calibrate(final Path calibrationFilePath) {
@@ -305,6 +278,38 @@ public class TunaCalibrator {
 
         return runnable.getDoubleSolution();
 
+    }
+
+    static void evaluateSolutionAndPrintOutErrors(
+        final Path calibrationFilePath,
+        final double[] solution
+    ) {
+        saveCalibratedScenario(solution, calibrationFilePath);
+        final Evaluator evaluator = new Evaluator();
+        evaluator.setCalibrationFolder(calibrationFilePath.getParent());
+        evaluator.run();
+    }
+
+    private static void saveCalibratedScenario(
+        final double[] optimalParameters,
+        final Path calibrationFilePath
+    ) {
+
+        final Path calibratedScenarioPath =
+            calibrationFilePath.getParent().resolve(CALIBRATED_SCENARIO_FILE_NAME);
+
+        try (final FileWriter fileWriter = new FileWriter(calibratedScenarioPath.toFile())) {
+            final GenericOptimization optimization =
+                GenericOptimization.fromFile(calibrationFilePath);
+            final Scenario scenario = GenericOptimization.buildScenario(
+                optimalParameters,
+                Paths.get(optimization.getScenarioFile()).toFile(),
+                optimization.getParameters()
+            );
+            new FishYAML().dump(scenario, fileWriter);
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @SuppressWarnings("unused")
