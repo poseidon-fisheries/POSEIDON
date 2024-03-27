@@ -45,22 +45,21 @@ public class PolicyRuns implements Runnable {
     private static final Logger logger = Logger.getLogger(PolicyRuns.class.getName());
 
     @Parameter(names = "--output_folder", converter = PathConverter.class)
-    private final Path outputFolder = Paths.get(
+    private Path outputFolder = Paths.get(
         System.getProperty("user.home"), "workspace", "epo_policy_runs", "runs"
     );
 
     @Parameter(names = "--scenario", converter = PathConverter.class)
-    private final Path scenarioFile = Paths.get(
+    private Path scenarioFile = Paths.get(
         System.getProperty("user.home"), "workspace", "epo_calibration_runs", "runs",
         "2024-02-13", "cenv0729", "2024-02-17_06.26.53_local",
         "calibrated_scenario_updated.yaml"
     );
 
     @Parameter(names = {"-r", "--runs_per_policy"})
-    private final int numberOfRunsPerPolicy = 3;
-
+    private int numberOfRunsPerPolicy = 3;
     @Parameter(names = {"-y", "--years_to_run"})
-    private final int numberOfYearsToRun = 3;
+    private int numberOfYearsToRun = 3;
 
     public static void main(final String[] args) {
         final Runnable policyRuns = new PolicyRuns();
@@ -118,6 +117,46 @@ public class PolicyRuns implements Runnable {
                 Entry::getKey,
                 entry -> entry.getValue().getWithDefault()
             ));
+    }
+
+    @SuppressWarnings("unused")
+    public Path getOutputFolder() {
+        return outputFolder;
+    }
+
+    @SuppressWarnings("unused")
+    public void setOutputFolder(final Path outputFolder) {
+        this.outputFolder = outputFolder;
+    }
+
+    @SuppressWarnings("unused")
+    public Path getScenarioFile() {
+        return scenarioFile;
+    }
+
+    @SuppressWarnings("unused")
+    public void setScenarioFile(final Path scenarioFile) {
+        this.scenarioFile = scenarioFile;
+    }
+
+    @SuppressWarnings("unused")
+    public int getNumberOfRunsPerPolicy() {
+        return numberOfRunsPerPolicy;
+    }
+
+    @SuppressWarnings("unused")
+    public void setNumberOfRunsPerPolicy(final int numberOfRunsPerPolicy) {
+        this.numberOfRunsPerPolicy = numberOfRunsPerPolicy;
+    }
+
+    @SuppressWarnings("unused")
+    public int getNumberOfYearsToRun() {
+        return numberOfYearsToRun;
+    }
+
+    @SuppressWarnings("unused")
+    public void setNumberOfYearsToRun(final int numberOfYearsToRun) {
+        this.numberOfYearsToRun = numberOfYearsToRun;
     }
 
     @Override
