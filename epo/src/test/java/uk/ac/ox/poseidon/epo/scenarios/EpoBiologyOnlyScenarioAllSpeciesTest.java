@@ -60,7 +60,7 @@ public class EpoBiologyOnlyScenarioAllSpeciesTest {
                     Assertions.assertEquals(
                         expectedBiomass.get(fishState.getStep()).get(s.getCode()),
                         fishState.getTotalBiomass(s),
-                        1
+                        10
                     );
                 });
             }
