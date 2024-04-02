@@ -1,21 +1,17 @@
 /*
- *     POSEIDON, an agent-based model of fisheries
- *     Copyright (C) 2018  CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (c) 2018-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
+ * You should have received a copy of the GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.oxfish.maximization.generic;
@@ -33,10 +29,8 @@ import java.util.function.Supplier;
  */
 public class SimpleOptimizationParameter implements OptimizationParameter, Serializable {
 
-
     private static final long serialVersionUID = 1148689356037897712L;
     private String addressToModify = "literPerKilometer";
-
 
     /**
      * assuming x comes in ranges of -10 to 10 (EVA dumb default), this represents -10
@@ -48,20 +42,22 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
      */
     private double maximum = 5;
 
-
     private boolean alwaysPositive = false;
 
     /**
-     * when this is set to true, it means the argument could never be a DoubleParameter. This usually doesn't matter
-     * but unfortunately it seems that YAML struggles with map<String,Number> and turn them into string,string maps
+     * when this is set to true, it means the argument could never be a DoubleParameter. This usually doesn't matter but
+     * unfortunately it seems that YAML struggles with map<String,Number> and turn them into string,string maps
      */
     private boolean isRawNumber = false;
-
 
     public SimpleOptimizationParameter() {
     }
 
-    public SimpleOptimizationParameter(final String addressToModify, final double minimum, final double maximum) {
+    public SimpleOptimizationParameter(
+        final String addressToModify,
+        final double minimum,
+        final double maximum
+    ) {
         this.addressToModify = addressToModify;
         this.minimum = minimum;
         this.maximum = maximum;
@@ -99,13 +95,15 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
      * @return
      */
     @Override
-    public String parametrize(final Scenario scenario, final double[] inputs) {
+    public String parametrize(
+        final Scenario scenario,
+        final double[] inputs
+    ) {
 
         Preconditions.checkArgument(maximum >= minimum, "invalid bounds " + addressToModify);
         Preconditions.checkArgument(inputs.length == 1);
 
         final double realValue = computeNumericValue(inputs[0]);
-
 
         if (!isRawNumber)
             quickParametrize(scenario, realValue, addressToModify);
@@ -120,15 +118,19 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
         return computeNumericValueFromEVABounds(input, minimum, maximum, alwaysPositive);
     }
 
-    public static void quickParametrize(final Scenario scenario, final double realValue, final String addressToModify) {
+    public static void quickParametrize(
+        final Scenario scenario,
+        final double realValue,
+        final String addressToModify
+    ) {
         try {
-            //try as double parameter
+            // try as double parameter
             OptimizationParameter.navigateAndSet(
                 scenario, addressToModify, new FixedDoubleParameter(realValue)
 
             );
         } catch (final Exception e) {
-            //try as raw number
+            // try as raw number
             try {
                 OptimizationParameter.navigateAndSet(
                     scenario, addressToModify, realValue
@@ -145,7 +147,7 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
         final double realValue,
         final String addressToModify
     ) {
-        //try as raw number
+        // try as raw number
         try {
             OptimizationParameter.navigateAndSet(
                 scenario, addressToModify, realValue
@@ -157,7 +159,9 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
     }
 
     public static double computeNumericValueFromEVABounds(
-        final double input, final double minimum, final double maximum,
+        final double input,
+        final double minimum,
+        final double maximum,
         final boolean forcePositive
     ) {
         double realValue = minimum + ((maximum - minimum) / (10 - (-10))) * (input - (-10));
@@ -166,7 +170,14 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
         return realValue;
     }
 
-    public double parametrizeRealValue(final Scenario scenario, final double realValue) {
+    public double computeMappedValue(final double realValue) {
+        return -10 + ((realValue - minimum) / (maximum - minimum)) * 20;
+    }
+
+    public double parametrizeRealValue(
+        final Scenario scenario,
+        final double realValue
+    ) {
         quickParametrize(scenario, realValue, addressToModify);
         return realValue;
 
