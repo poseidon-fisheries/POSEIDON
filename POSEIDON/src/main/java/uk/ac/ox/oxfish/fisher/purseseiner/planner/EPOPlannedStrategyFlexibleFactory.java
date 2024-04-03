@@ -91,13 +91,13 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * a multiplier applied to the action weight of DPL
      */
     private DoubleParameter deploymentBias =
-        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
+        new CalibratedParameter(0.25, 0.75, 0.0, 0.95);
     private DoubleParameter noaBias =
-        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
+        new CalibratedParameter(0.25, 0.75, 0.0, 0.95);
     private DoubleParameter delBias =
-        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
+        new CalibratedParameter(0.25, 0.75, 0.0, 0.95);
     private DoubleParameter ofsBias =
-        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
+        new CalibratedParameter(0.25, 0.75, 0.0, 0.95);
     private DoubleParameter minimumPercentageOfTripDurationAllowed =
         new CalibratedParameter(0.5, 1, 0, 1);
     private BooleanParameter noaSetsCanPoachFads = new BooleanParameter(false);
