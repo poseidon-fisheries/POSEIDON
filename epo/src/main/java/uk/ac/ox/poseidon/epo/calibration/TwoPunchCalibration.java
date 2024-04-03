@@ -18,104 +18,82 @@
 
 package uk.ac.ox.poseidon.epo.calibration;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.PathConverter;
+import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
+import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.nio.file.Paths;
+import java.util.List;
 
 import static java.lang.Runtime.getRuntime;
+import static uk.ac.ox.poseidon.epo.calibration.Calibrator.CALIBRATION_FILENAME;
 
-public class TwoPunchCalibration {
-
+public class TwoPunchCalibration implements JCommanderRunnable {
     @Parameter(names = {"-p", "--parallel_threads"})
     private int parallelThreads = getRuntime().availableProcessors();
-
     @Parameter(names = {"-g", "--max_global_calls"})
     private int maxGlobalCalls = 2000;
-
     @Parameter(names = {"-l", "--max_local_calls"})
     private int maxLocalCalls = 5000;
-
     @Parameter(converter = PathConverter.class)
-    private Path calibrationFile;
+    private Path rootCalibrationFolder;
+    @Parameter(names = {"-f", "--calibration_file"}, converter = PathConverter.class)
+    private Path calibrationFile = Paths.get(CALIBRATION_FILENAME);
+    @Parameter(names = {"-s", "--seed_scenarios"}, converter = PathConverter.class)
+    private List<Path> seedScenarios = ImmutableList.of();
 
-    public static void main(final String[] args) throws IOException {
-        final TwoPunchCalibration twoPunchCalibration = new TwoPunchCalibration();
-        JCommander.newBuilder()
-            .addObject(twoPunchCalibration)
-            .build()
-            .parse(args);
-        twoPunchCalibration.runAll();
+    public static void main(final String[] args) {
+        new TwoPunchCalibration().run(args);
     }
 
-    private static void writeSolutionOut(
-        final Path calibrationFile,
-        final double[] gaSolution,
-        final String solutionName
-    ) throws IOException {
-        final FileWriter writer = new FileWriter(calibrationFile.getParent().resolve(solutionName).toFile());
-        writer.write(Double.toString(gaSolution[0]));
-        for (int i = 1; i < gaSolution.length; i++) {
-            writer.write(",");
-            writer.write(Double.toString(gaSolution[i]));
+    @SuppressWarnings("unused")
+    public Path getRootCalibrationFolder() {
+        return rootCalibrationFolder;
+    }
+
+    @SuppressWarnings("unused")
+    public void setRootCalibrationFolder(final Path rootCalibrationFolder) {
+        this.rootCalibrationFolder = rootCalibrationFolder;
+    }
+
+    public GenericOptimization buildLocalCalibrationProblem(
+        final double[] solution,
+        final double range
+    ) {
+        final GenericOptimization genericOptimization;
+        try (final FileReader fileReader = new FileReader(calibrationFile.toFile())) {
+            genericOptimization = new FishYAML().loadAs(fileReader, GenericOptimization.class);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
-        writer.close();
+        for (int i = 0; i < genericOptimization.getParameters().size(); i++) {
+            final SimpleOptimizationParameter parameter =
+                ((SimpleOptimizationParameter) genericOptimization.getParameters().get(i));
+            final double optimalValue = parameter.computeNumericValue(solution[i]);
+            parameter.setMaximum(optimalValue * (1d + range));
+            parameter.setMinimum(optimalValue * (1d - range));
+            if (parameter.getMaximum() == parameter.getMinimum()) {
+                assert parameter.getMinimum() == 0;
+                parameter.setMaximum(0.001);
+            }
+        }
+        return genericOptimization;
     }
 
-    private void runAll() throws IOException {
-        // run GA
-        final double[] gaSolution = stepOne();
-        writeSolutionOut(calibrationFile, gaSolution, "ga_solution.txt");
-        final double[] zeros = new double[gaSolution.length];
-        Arrays.fill(zeros, 0d);
-        writeSolutionOut(calibrationFile, zeros, "zeros.txt");
-        // run PSO
-        GenericOptimization.buildLocalCalibrationProblem(
-            calibrationFile,
-            gaSolution,
-            "local_calibration.yaml",
-            .2
-        );
-        final Path localCalibrationFile = calibrationFile.getParent().resolve("local_calibration.yaml");
-        final double[] localSolution = stepTwo();
-        writeSolutionOut(localCalibrationFile, localSolution, "local_solution.txt");
+    @SuppressWarnings("unused")
+    public List<Path> getSeedScenarios() {
+        return seedScenarios;
     }
 
-    private double[] stepOne() throws IOException {
-
-        final TunaCalibrationConsole firstStep = new TunaCalibrationConsole();
-        firstStep.setLocalSearch(false);
-        firstStep.setPSO(false);
-        firstStep.setPopulationSize(200);
-        firstStep.setMaxProcessorsToUse(parallelThreads);
-        firstStep.setNumberOfRunsPerSettingOverride(1);
-        firstStep.setMaxFitnessCalls(maxGlobalCalls);
-        firstStep.setParameterRange(15);
-        firstStep.setRunNickName("global");
-        firstStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
-        return firstStep.generateCalibratorProblem().run();
-    }
-
-    private double[] stepTwo() throws IOException {
-        final TunaCalibrationConsole secondStep = new TunaCalibrationConsole();
-        secondStep.setLocalSearch(false);
-        secondStep.setPSO(true);
-        secondStep.setBestGuessesTextFile(
-            calibrationFile.getParent().resolve("zeros.txt").toFile().getAbsolutePath()
-        );
-        secondStep.setPopulationSize(50);
-        secondStep.setMaxProcessorsToUse(parallelThreads);
-        secondStep.setNumberOfRunsPerSettingOverride(2);
-        secondStep.setMaxFitnessCalls(maxLocalCalls);
-        secondStep.setParameterRange(17);
-        secondStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
-        secondStep.setRunNickName("local");
-        return secondStep.generateCalibratorProblem().run();
+    @SuppressWarnings("unused")
+    public void setSeedScenarios(final List<Path> seedScenarios) {
+        this.seedScenarios = seedScenarios;
     }
 
     public int getParallelThreads() {
@@ -153,6 +131,44 @@ public class TwoPunchCalibration {
     @SuppressWarnings("unused")
     public void setCalibrationFile(final Path calibrationFile) {
         this.calibrationFile = calibrationFile;
+    }
+
+    @Override
+    public void run() {
+        final Calibrator.Result globalCalibratorResult =
+            new Calibrator(
+                "global",
+                200,
+                maxGlobalCalls,
+                15,
+                parallelThreads,
+                false,
+                rootCalibrationFolder,
+                rootCalibrationFolder.resolve(calibrationFile),
+                seedScenarios,
+                new Calibrator.ClusterBasedNichingEAInitializer()
+            ).calibrate();
+
+        final GenericOptimization localCalibrationProblem =
+            buildLocalCalibrationProblem(globalCalibratorResult.getSolution(), 0.2);
+        localCalibrationProblem.setRunsPerSetting(3);
+
+        new Calibrator(
+            "local",
+            50,
+            maxLocalCalls,
+            17,
+            parallelThreads,
+            false,
+            rootCalibrationFolder,
+            null,
+            ImmutableList.of(globalCalibratorResult.getCalibratedScenarioFile()),
+            new Calibrator.ParticleSwarmOptimizationGCPSOInitializer()
+        ).calibrate(localCalibrationProblem);
+
+        // TODO run Evaluator and maybe sensitivity
+        // new Evaluator()
+
     }
 
 }

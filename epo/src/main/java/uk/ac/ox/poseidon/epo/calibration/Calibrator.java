@@ -5,11 +5,11 @@
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -17,13 +17,13 @@
 package uk.ac.ox.poseidon.epo.calibration;
 
 import com.beust.jcommander.IStringConverter;
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.PathConverter;
 import com.google.common.collect.ImmutableList;
 import eva2.OptimizerFactory;
 import eva2.OptimizerRunnable;
 import eva2.optimization.OptimizationParameters;
+import eva2.optimization.individuals.AbstractEAIndividual;
 import eva2.optimization.individuals.ESIndividualDoubleData;
 import eva2.optimization.operator.terminators.EvaluationTerminator;
 import eva2.optimization.population.Population;
@@ -49,6 +49,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.function.IntFunction;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -56,9 +58,9 @@ import static java.lang.Runtime.getRuntime;
 import static java.nio.file.Files.createDirectories;
 import static uk.ac.ox.oxfish.maximization.BoundsWriter.writeBounds;
 
-public class Calibrator implements Runnable {
-
-    private static final String CALIBRATION_FILENAME = "calibration.yaml";
+public class Calibrator implements JCommanderRunnable {
+    public static final String CALIBRATION_FILENAME = "calibration.yaml";
+    private static final Logger logger = Logger.getLogger(Calibrator.class.getName());
     private static final String BOUNDS_FILENAME = "bounds.csv";
     private static final String LOG_FILENAME = "calibration_log.md";
     private static final String CALIBRATED_SCENARIO_FILENAME = "calibrated_scenario.yaml";
@@ -83,13 +85,66 @@ public class Calibrator implements Runnable {
     @Parameter(names = {"-o", "--optimizer"}, converter = OptimizerInitializerConverter.class)
     private OptimizerInitializer optimizerInitializer = new ClusterBasedNichingEAInitializer();
 
+    public Calibrator() {
+    }
+
+    public Calibrator(
+        final String runFolderPrefix,
+        final int populationSize,
+        final int maxFitnessCalls,
+        final int parameterRange,
+        final int parallelThreads,
+        final boolean verbose,
+        final Path rootCalibrationFolder,
+        final Path calibrationFile,
+        final List<Path> seedScenarios,
+        final OptimizerInitializer optimizerInitializer
+    ) {
+        this.runFolderPrefix = runFolderPrefix;
+        this.populationSize = populationSize;
+        this.maxFitnessCalls = maxFitnessCalls;
+        this.parameterRange = parameterRange;
+        this.parallelThreads = parallelThreads;
+        this.verbose = verbose;
+        this.rootCalibrationFolder = rootCalibrationFolder;
+        this.calibrationFile = calibrationFile;
+        this.seedScenarios = seedScenarios;
+        this.optimizerInitializer = optimizerInitializer;
+    }
+
     public static void main(final String[] args) {
-        final Runnable calibrator = new Calibrator();
-        JCommander.newBuilder()
-            .addObject(calibrator)
-            .build()
-            .parse(args);
-        calibrator.run();
+        new Calibrator().run(args);
+    }
+
+    private static void saveCalibrationFile(
+        final GenericOptimization optimizationProblem,
+        final Path calibrationFile
+    ) {
+        try (final FileWriter fileWriter = new FileWriter(calibrationFile.toFile())) {
+            new FishYAML().dump(optimizationProblem, fileWriter);
+        } catch (final IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private static OptimizerRunnable makeOptimizerRunnable(
+        final OptimizationParameters optimizationParameters,
+        final Path logFilePath
+    ) {
+        final OptimizerRunnable runnable = new OptimizerRunnable(optimizationParameters, "");
+        runnable.setOutputFullStatsToText(true);
+        runnable.setVerbosityLevel(InterfaceStatisticsParameters.OutputVerbosity.ALL);
+        runnable.setOutputTo(InterfaceStatisticsParameters.OutputTo.WINDOW);
+
+        try (
+            final FileAndScreenWriter fileAndScreenWriter = new FileAndScreenWriter(logFilePath)
+        ) {
+            runnable.setTextListener(fileAndScreenWriter);
+            runnable.run();
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
+        return runnable;
     }
 
     @SuppressWarnings("unused")
@@ -114,26 +169,40 @@ public class Calibrator implements Runnable {
 
     @Override
     public void run() {
-        calibrate(rootCalibrationFolder.resolve(calibrationFile));
+        calibrate();
     }
 
-    public double[] calibrate(final Path calibrationFile) {
+    public Result calibrate() {
+        return calibrate(rootCalibrationFolder.resolve(calibrationFile));
+    }
+
+    public Result calibrate(final Path calibrationFile) {
         return calibrate(GenericOptimization.fromFile(calibrationFile));
     }
 
-    public double[] calibrate(final GenericOptimization optimizationProblem) {
+    public Result calibrate(final GenericOptimization optimizationProblem) {
         final Path runFolder = makeRunFolder();
-        saveCalibrationFile(optimizationProblem, runFolder.resolve(CALIBRATION_FILENAME));
-        final double[] solution = computeSolution(optimizationProblem);
-        saveCalibratedScenario(optimizationProblem, solution, runFolder.resolve(CALIBRATED_SCENARIO_FILENAME));
-        writeBounds(optimizationProblem, solution, runFolder.resolve(BOUNDS_FILENAME));
-        return solution;
+        final Path calibrationFile = runFolder.resolve(CALIBRATION_FILENAME);
+        final Path calibratedScenarioFile = runFolder.resolve(CALIBRATED_SCENARIO_FILENAME);
+        final Path boundsFile = runFolder.resolve(BOUNDS_FILENAME);
+        final Path logFile = runFolder.resolve(LOG_FILENAME);
+        saveCalibrationFile(optimizationProblem, calibrationFile);
+        final double[] solution = computeSolution(optimizationProblem, logFile);
+        saveCalibratedScenario(optimizationProblem, solution, calibratedScenarioFile);
+        writeBounds(optimizationProblem, solution, boundsFile);
+        return new Result(
+            calibrationFile,
+            calibratedScenarioFile,
+            logFile,
+            boundsFile,
+            solution
+        );
     }
 
     private Path makeRunFolder() {
         final StringBuilder runFolderBuilder = new StringBuilder();
         if (runFolderPrefix != null) {
-            runFolderBuilder.append("_").append(runFolderPrefix.trim());
+            runFolderBuilder.append(runFolderPrefix.trim()).append("_");
         }
         runFolderBuilder.append(new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date()));
         final Path runFolder = rootCalibrationFolder.resolve(runFolderBuilder.toString());
@@ -145,18 +214,10 @@ public class Calibrator implements Runnable {
         return runFolder;
     }
 
-    private static void saveCalibrationFile(
+    private double[] computeSolution(
         final GenericOptimization optimizationProblem,
-        final Path calibrationFile
+        final Path logFile
     ) {
-        try (final FileWriter fileWriter = new FileWriter(calibrationFile.toFile())) {
-            new FishYAML().dump(optimizationProblem, fileWriter);
-        } catch (final IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    private double[] computeSolution(final GenericOptimization optimizationProblem) {
 
         optimizationProblem.getTargets().stream()
             .filter(LastStepFixedDataTarget.class::isInstance)
@@ -180,7 +241,7 @@ public class Calibrator implements Runnable {
         final OptimizerRunnable runnable =
             makeOptimizerRunnable(
                 optimizationParameters,
-                rootCalibrationFolder.resolve(LOG_FILENAME)
+                logFile
             );
 
         return runnable.getDoubleSolution();
@@ -201,26 +262,6 @@ public class Calibrator implements Runnable {
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    private static OptimizerRunnable makeOptimizerRunnable(
-        final OptimizationParameters optimizationParameters,
-        final Path logFilePath
-    ) {
-        final OptimizerRunnable runnable = new OptimizerRunnable(optimizationParameters, "");
-        runnable.setOutputFullStatsToText(true);
-        runnable.setVerbosityLevel(InterfaceStatisticsParameters.OutputVerbosity.ALL);
-        runnable.setOutputTo(InterfaceStatisticsParameters.OutputTo.WINDOW);
-
-        try (
-            final FileAndScreenWriter fileAndScreenWriter = new FileAndScreenWriter(logFilePath)
-        ) {
-            runnable.setTextListener(fileAndScreenWriter);
-            runnable.run();
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-        return runnable;
     }
 
     @SuppressWarnings("unused")
@@ -348,13 +389,60 @@ public class Calibrator implements Runnable {
         }
     }
 
+    public static class Result {
+        private final Path calibrationFile;
+        private final Path calibratedScenarioFile;
+        private final Path logFile;
+        private final Path boundsFile;
+        private final double[] solution;
+
+        public Result(
+            final Path calibrationFile,
+            final Path calibratedScenarioFile,
+            final Path logFile,
+            final Path boundsFile,
+            final double[] solution
+        ) {
+            this.calibrationFile = calibrationFile;
+            this.calibratedScenarioFile = calibratedScenarioFile;
+            this.logFile = logFile;
+            this.boundsFile = boundsFile;
+            this.solution = solution;
+        }
+
+        @SuppressWarnings("unused")
+        public Path getCalibrationFile() {
+            return calibrationFile;
+        }
+
+        public Path getCalibratedScenarioFile() {
+            return calibratedScenarioFile;
+        }
+
+        @SuppressWarnings("unused")
+        public Path getBoundsFile() {
+            return boundsFile;
+        }
+
+        public double[] getSolution() {
+            return solution;
+        }
+
+        @SuppressWarnings("unused")
+        public Path getLogFile() {
+            return logFile;
+        }
+    }
+
     private class ProblemWrapper extends SimpleProblemWrapper {
 
         private static final long serialVersionUID = -3771406229118693099L;
 
         @Override
         public void initializePopulation(final Population population) {
-            super.initializePopulation(population);
+
+            initTemplate();
+            population.clear();
 
             final List<SimpleOptimizationParameter> parameters =
                 ((GenericOptimization) this.getSimpleProblem())
@@ -362,25 +450,46 @@ public class Calibrator implements Runnable {
                     .stream()
                     .map(SimpleOptimizationParameter.class::cast)
                     .collect(toImmutableList());
-
             final FishYAML fishYAML = new FishYAML();
-            seedScenarios.forEach(scenarioFile -> {
-                final Scenario scenario;
-                try (final FileReader fileReader = new FileReader(scenarioFile.toFile())) {
-                    scenario = fishYAML.loadAs(fileReader, Scenario.class);
-                } catch (final IOException e) {
-                    throw new RuntimeException(e);
-                }
-                final double[] solution = parameters
-                    .stream()
-                    .mapToDouble(parameter -> parameter.computeMappedValue(parameter.getValue(scenario)))
-                    .toArray();
-                final ESIndividualDoubleData individual =
-                    (ESIndividualDoubleData) getIndividualTemplate().clone();
-                individual.setDoubleGenotype(solution);
-                individual.setDoublePhenotype(solution);
-                population.add(individual);
-            });
+            final Stream<AbstractEAIndividual> seedIndividuals =
+                seedScenarios.stream().map(scenarioFile ->
+                    makeIndividualFromScenario(scenarioFile, fishYAML, parameters)
+                );
+
+            final Stream<AbstractEAIndividual> defaultIndividuals =
+                Stream.generate(() -> {
+                    final AbstractEAIndividual individual = (AbstractEAIndividual) template.clone();
+                    individual.initialize(this);
+                    return individual;
+                });
+
+            Stream
+                .concat(seedIndividuals, defaultIndividuals)
+                .limit(population.getTargetSize())
+                .forEach(population::add);
+            population.initialize();
+        }
+
+        private ESIndividualDoubleData makeIndividualFromScenario(
+            final Path scenarioFile,
+            final FishYAML fishYAML,
+            final List<SimpleOptimizationParameter> parameters
+        ) {
+            final Scenario scenario;
+            try (final FileReader fileReader = new FileReader(scenarioFile.toFile())) {
+                scenario = fishYAML.loadAs(fileReader, Scenario.class);
+            } catch (final IOException e) {
+                throw new RuntimeException(e);
+            }
+            final double[] solution = parameters
+                .stream()
+                .mapToDouble(parameter -> parameter.computeMappedValue(parameter.getValue(scenario)))
+                .toArray();
+            final ESIndividualDoubleData individual =
+                (ESIndividualDoubleData) getIndividualTemplate().clone();
+            individual.setDoubleGenotype(solution);
+            individual.setDoublePhenotype(solution);
+            return individual;
         }
     }
 

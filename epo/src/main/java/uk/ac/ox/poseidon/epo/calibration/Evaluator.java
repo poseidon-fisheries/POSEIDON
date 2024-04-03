@@ -16,7 +16,6 @@
 
 package uk.ac.ox.poseidon.epo.calibration;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.PathConverter;
 import com.google.common.collect.ImmutableMap;
@@ -42,7 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Runtime.getRuntime;
 
-public class Evaluator implements Runnable {
+public class Evaluator implements JCommanderRunnable {
 
     // I identified the vessels to follow using (in R):
     // obs_action_events |>
@@ -67,14 +66,7 @@ public class Evaluator implements Runnable {
     private Path scenarioFile;
 
     public static void main(final String[] args) {
-
-        final Runnable evaluator = new Evaluator();
-        JCommander.newBuilder()
-            .addObject(evaluator)
-            .build()
-            .parse(args);
-
-        evaluator.run();
+        new Evaluator().run(args);
     }
 
     public Path getScenarioFile() {
