@@ -60,10 +60,10 @@ import static uk.ac.ox.oxfish.maximization.BoundsWriter.writeBounds;
 
 public class Calibrator implements JCommanderRunnable {
     public static final String CALIBRATION_FILENAME = "calibration.yaml";
+    public static final String CALIBRATED_SCENARIO_FILENAME = "calibrated_scenario.yaml";
+    public static final String BOUNDS_FILENAME = "bounds.csv";
     private static final Logger logger = Logger.getLogger(Calibrator.class.getName());
-    private static final String BOUNDS_FILENAME = "bounds.csv";
     private static final String LOG_FILENAME = "calibration_log.md";
-    private static final String CALIBRATED_SCENARIO_FILENAME = "calibrated_scenario.yaml";
     @Parameter(names = "--prefix")
     private String runFolderPrefix = null;
     @Parameter(names = {"-n", "--population_size"})

@@ -35,11 +35,16 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.io.Files.getFileExtension;
 import static java.lang.Runtime.getRuntime;
+import static uk.ac.ox.poseidon.epo.calibration.Calibrator.BOUNDS_FILENAME;
+import static uk.ac.ox.poseidon.epo.calibration.Calibrator.CALIBRATED_SCENARIO_FILENAME;
 
 public class Evaluator implements JCommanderRunnable {
 
@@ -50,31 +55,36 @@ public class Evaluator implements JCommanderRunnable {
     //  group_by(action_type) |>
     //  slice_max(n, with_ties = FALSE)
     @Parameter(names = "--track_fads_of_vessels")
-    private Set<String> vesselsWhoseFadsToTrack = ImmutableSet.of("1779", "453", "1552");
+    private Set<String> vesselsWhoseFadsToTrack = ImmutableSet.of(); //"1779", "453", "1552");
     @Parameter(names = {"-r", "--num-runs"})
     private int numRuns = Math.min(16, getRuntime().availableProcessors());
     @Parameter(names = {"-y", "--years"})
     private int numYearsToRuns = 3;
-    @Parameter(names = "--parallel", arity = 1)
+    @Parameter(names = "--parallel")
     private boolean parallel = true;
     @Parameter(converter = PathConverter.class)
     private Path calibrationFolder;
 
-    // If `scenarioFile` is not provided, the Evaluator will extract a scenario from
-    // the calibration log and write it back to `calibrated_scenario.yaml`.
-    @Parameter(names = {"-s", "--scenario"}, converter = PathConverter.class)
-    private Path scenarioFile;
+    @Parameter(
+        names = {"-s", "--scenario_source"},
+        description = "Either a YAML scenario file or a markdown calibration log " +
+            "from which a scenario can be extracted.",
+        converter = PathConverter.class
+    )
+    private Path scenarioSource = Paths.get(CALIBRATED_SCENARIO_FILENAME);
 
     public static void main(final String[] args) {
         new Evaluator().run(args);
     }
 
-    public Path getScenarioFile() {
-        return scenarioFile;
+    @SuppressWarnings("unused")
+    public Path getScenarioSource() {
+        return scenarioSource;
     }
 
-    public void setScenarioFile(final Path scenarioFile) {
-        this.scenarioFile = scenarioFile;
+    @SuppressWarnings("unused")
+    public void setScenarioSource(final Path scenarioSource) {
+        this.scenarioSource = checkNotNull(scenarioSource);
     }
 
     @SuppressWarnings("unused")
@@ -83,8 +93,8 @@ public class Evaluator implements JCommanderRunnable {
     }
 
     @SuppressWarnings("unused")
-    public void setVesselsWhoseFadsToTrack(final Set<String> vesselsWhoseFadsToTrack) {
-        this.vesselsWhoseFadsToTrack = vesselsWhoseFadsToTrack;
+    public void setVesselsWhoseFadsToTrack(final Collection<String> vesselsWhoseFadsToTrack) {
+        this.vesselsWhoseFadsToTrack = checkNotNull(ImmutableSet.copyOf(vesselsWhoseFadsToTrack));
     }
 
     @SuppressWarnings("unused")
@@ -94,21 +104,30 @@ public class Evaluator implements JCommanderRunnable {
 
     @SuppressWarnings("unused")
     public void setCalibrationFolder(final Path calibrationFolder) {
-        this.calibrationFolder = calibrationFolder;
+        this.calibrationFolder = checkNotNull(calibrationFolder);
     }
 
     @Override
     public void run() {
-
         final Scenario scenario;
-        if (scenarioFile == null) {
-            scenario = new ScenarioExtractor(calibrationFolder)
-                .getAndWriteToFile("calibrated_scenario.yaml");
+        switch (getFileExtension(scenarioSource.toString())) {
+            case "yaml":
+                scenario = loadScenario();
+                break;
+            case "md":
+                scenario = new ScenarioExtractor(calibrationFolder)
+                    .getAndWriteToFile(CALIBRATED_SCENARIO_FILENAME);
+                break;
+            default:
+                throw new IllegalArgumentException(
+                    "Scenario source needs to be .yaml or .md file but was: " + scenarioSource
+                );
+        }
+
+        if (!java.nio.file.Files.exists(calibrationFolder.resolve(BOUNDS_FILENAME))) {
             final BoundsWriter boundsWriter = new BoundsWriter();
             boundsWriter.setCalibrationFolder(calibrationFolder);
             boundsWriter.run();
-        } else {
-            scenario = loadScenario();
         }
 
         final Runner<Scenario> runner =
@@ -125,9 +144,9 @@ public class Evaluator implements JCommanderRunnable {
         }
 
         runner
-//             .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new)
-//             .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
-//             .registerRowProvider("sim_global_biomass.csv", GlobalBiomassLogger::new)
+            /*.registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new)
+            .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
+            .registerRowProvider("sim_global_biomass.csv", GlobalBiomassLogger::new)*/
             // turn the following line on or off as needed:
             // .registerRowProvider("death_events.csv", DeathEventsRowProvider::new)
             .run(numYearsToRuns, 1, runCounter);
@@ -135,8 +154,8 @@ public class Evaluator implements JCommanderRunnable {
 
     private Scenario loadScenario() {
         checkNotNull(this.calibrationFolder);
-        checkNotNull(this.scenarioFile);
-        final File scenarioFile = calibrationFolder.resolve(this.scenarioFile).toFile();
+        checkNotNull(this.scenarioSource);
+        final File scenarioFile = calibrationFolder.resolve(this.scenarioSource).toFile();
         try (final FileReader fileReader = new FileReader(scenarioFile)) {
             final FishYAML fishYAML = new FishYAML();
             return fishYAML.loadAs(fileReader, Scenario.class);

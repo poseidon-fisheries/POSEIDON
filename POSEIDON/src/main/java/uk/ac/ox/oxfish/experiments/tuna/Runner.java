@@ -195,25 +195,25 @@ public final class Runner<S extends Scenario> {
     ) {
         final int numRuns = policies.size() * numberOfRunsPerPolicy;
         final IntStream range = range(0, numberOfRunsPerPolicy);
-        (parallel ? range.parallel() : range).forEach(i -> (parallel ? policies.parallelStream()
-            : policies.stream()).forEach(policy -> {
-            final int runNumber = runCounter.getAndIncrement();
-            logger.info(String.format("=== Starting run %d / %s ===", runNumber, numRuns));
-            final State state = startRun(policy, runNumber, numRuns, numberOfYearsToRun);
-            if (writeScenarioToFile) writeScenarioToFile(state);
-            beforeStartConsumer.accept(state);
-            state.model.start();
-            afterStartConsumer.accept(state);
-            final Multimap<Path, RowProvider> rowProviders = makeRowProviders(state);
-            do {
-                writeOutputs(runNumber, rowProviders, false);
-                state.printStep();
-                state.model.schedule.step(state.model);
-                afterStepConsumer.accept(state);
-            } while (state.model.getYear() < numberOfYearsToRun);
-            afterRunConsumer.accept(state);
-            writeOutputs(runNumber, rowProviders, true);
-        }));
+        (parallel ? range.parallel() : range).forEach(i ->
+            (parallel ? policies.parallelStream() : policies.stream()).forEach(policy -> {
+                final int runNumber = runCounter.getAndIncrement();
+                logger.info(String.format("=== Starting run %d / %s ===", runNumber, numRuns));
+                final State state = startRun(policy, runNumber, numRuns, numberOfYearsToRun);
+                if (writeScenarioToFile) writeScenarioToFile(state);
+                beforeStartConsumer.accept(state);
+                state.model.start();
+                afterStartConsumer.accept(state);
+                final Multimap<Path, RowProvider> rowProviders = makeRowProviders(state);
+                do {
+                    writeOutputs(runNumber, rowProviders, false);
+                    state.printStep();
+                    state.model.schedule.step(state.model);
+                    afterStepConsumer.accept(state);
+                } while (state.model.getYear() < numberOfYearsToRun);
+                afterRunConsumer.accept(state);
+                writeOutputs(runNumber, rowProviders, true);
+            }));
     }
 
     private State startRun(
@@ -263,7 +263,8 @@ public final class Runner<S extends Scenario> {
         rowProviders.asMap().forEach((outputPath, providers) -> {
             // noinspection ResultOfMethodCallIgnored
             outputPath.getParent().toFile().mkdirs();
-            final Collection<RowProvider> activeProviders = isFinalStep ? providers
+            final Collection<RowProvider> activeProviders = isFinalStep
+                ? providers
                 : providers.stream().filter(RowProvider::isEveryStep).collect(toImmutableList());
             if (!activeProviders.isEmpty()) {
                 synchronized (overwriteFiles) {
