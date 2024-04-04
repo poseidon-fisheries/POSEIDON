@@ -27,6 +27,9 @@ import uk.ac.ox.oxfish.maximization.BoundsWriter;
 import uk.ac.ox.oxfish.maximization.YearlyResultsRowProvider;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.AbundanceFadAttractionEventObserver;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.GlobalBiomassLogger;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -57,7 +60,7 @@ public class Evaluator implements JCommanderRunnable {
     @Parameter(names = "--track_fads_of_vessels")
     private Set<String> vesselsWhoseFadsToTrack = ImmutableSet.of(); //"1779", "453", "1552");
     @Parameter(names = {"-r", "--num-runs"})
-    private int numRuns = Math.min(16, getRuntime().availableProcessors());
+    private int numRuns = Math.min(8, getRuntime().availableProcessors());
     @Parameter(names = {"-y", "--years"})
     private int numYearsToRuns = 3;
     @Parameter(names = "--parallel")
@@ -115,7 +118,7 @@ public class Evaluator implements JCommanderRunnable {
                 scenario = loadScenario();
                 break;
             case "md":
-                scenario = new ScenarioExtractor(calibrationFolder)
+                scenario = new ScenarioExtractor(calibrationFolder, calibrationFolder.resolve(scenarioSource))
                     .getAndWriteToFile(CALIBRATED_SCENARIO_FILENAME);
                 break;
             default:
@@ -144,9 +147,9 @@ public class Evaluator implements JCommanderRunnable {
         }
 
         runner
-            /*.registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new)
+            .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new)
             .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
-            .registerRowProvider("sim_global_biomass.csv", GlobalBiomassLogger::new)*/
+            .registerRowProvider("sim_global_biomass.csv", GlobalBiomassLogger::new)
             // turn the following line on or off as needed:
             // .registerRowProvider("death_events.csv", DeathEventsRowProvider::new)
             .run(numYearsToRuns, 1, runCounter);

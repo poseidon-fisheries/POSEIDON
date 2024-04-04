@@ -38,44 +38,11 @@ public class ScenarioExtractor implements Supplier<Scenario> {
     private final Path calibrationFolder;
 
     public ScenarioExtractor(
-        final Path calibrationFolder
-    ) {
-        this(calibrationFolder, Paths.get("calibration_log.md"));
-    }
-
-    public ScenarioExtractor(
         final Path calibrationFolder,
         final Path calibrationLogFile
     ) {
-        this.calibrationLogFile = calibrationLogFile;
         this.calibrationFolder = calibrationFolder;
-    }
-
-    public Scenario getAndWriteToFile(final String outputFileName) {
-        final Scenario scenario = get();
-        writeScenarioToFile(scenario, outputFileName);
-        return scenario;
-    }
-
-    @Override
-    public Scenario get() {
-        final Path calibrationFilePath = findCalibrationFile(calibrationFolder);
-        final Path logFilePath = calibrationFolder.resolve(calibrationLogFile);
-        final double[] solution = new SolutionExtractor(logFilePath).bestSolution().getKey();
-        final GenericOptimization optimization = GenericOptimization.fromFile(calibrationFilePath);
-        return makeScenario(optimization, solution);
-    }
-
-    private void writeScenarioToFile(
-        final Scenario scenario,
-        final String outputFileName
-    ) {
-        final File outputFile = calibrationFolder.resolve(outputFileName).toFile();
-        try (final Writer writer = new FileWriter(outputFile)) {
-            new FishYAML().dump(scenario, writer);
-        } catch (final IOException e) {
-            throw new IllegalStateException("Error while writing file: " + outputFile, e);
-        }
+        this.calibrationLogFile = calibrationLogFile;
     }
 
     private static Path findCalibrationFile(final Path folder) {
@@ -115,6 +82,33 @@ public class ScenarioExtractor implements Supplier<Scenario> {
                 .isPresent();
         } catch (final IOException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    public Scenario getAndWriteToFile(final String outputFileName) {
+        final Scenario scenario = get();
+        writeScenarioToFile(scenario, outputFileName);
+        return scenario;
+    }
+
+    @Override
+    public Scenario get() {
+        final Path calibrationFilePath = findCalibrationFile(calibrationFolder);
+        final Path logFilePath = calibrationFolder.resolve(calibrationLogFile);
+        final double[] solution = new SolutionExtractor(logFilePath).bestSolution().getKey();
+        final GenericOptimization optimization = GenericOptimization.fromFile(calibrationFilePath);
+        return makeScenario(optimization, solution);
+    }
+
+    private void writeScenarioToFile(
+        final Scenario scenario,
+        final String outputFileName
+    ) {
+        final File outputFile = calibrationFolder.resolve(outputFileName).toFile();
+        try (final Writer writer = new FileWriter(outputFile)) {
+            new FishYAML().dump(scenario, writer);
+        } catch (final IOException e) {
+            throw new IllegalStateException("Error while writing file: " + outputFile, e);
         }
     }
 }

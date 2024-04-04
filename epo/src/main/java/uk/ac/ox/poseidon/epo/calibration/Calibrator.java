@@ -191,6 +191,7 @@ public class Calibrator implements JCommanderRunnable {
         saveCalibratedScenario(optimizationProblem, solution, calibratedScenarioFile);
         writeBounds(optimizationProblem, solution, boundsFile);
         return new Result(
+            runFolder,
             calibrationFile,
             calibratedScenarioFile,
             logFile,
@@ -390,6 +391,7 @@ public class Calibrator implements JCommanderRunnable {
     }
 
     public static class Result {
+        private final Path runFolder;
         private final Path calibrationFile;
         private final Path calibratedScenarioFile;
         private final Path logFile;
@@ -397,17 +399,23 @@ public class Calibrator implements JCommanderRunnable {
         private final double[] solution;
 
         public Result(
+            final Path runFolder,
             final Path calibrationFile,
             final Path calibratedScenarioFile,
             final Path logFile,
             final Path boundsFile,
             final double[] solution
         ) {
+            this.runFolder = runFolder;
             this.calibrationFile = calibrationFile;
             this.calibratedScenarioFile = calibratedScenarioFile;
             this.logFile = logFile;
             this.boundsFile = boundsFile;
             this.solution = solution;
+        }
+
+        public Path getRunFolder() {
+            return runFolder;
         }
 
         @SuppressWarnings("unused")

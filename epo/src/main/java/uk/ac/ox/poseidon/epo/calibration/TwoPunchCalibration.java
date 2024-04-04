@@ -153,7 +153,7 @@ public class TwoPunchCalibration implements JCommanderRunnable {
             buildLocalCalibrationProblem(globalCalibratorResult.getSolution(), 0.2);
         localCalibrationProblem.setRunsPerSetting(2);
 
-        new Calibrator(
+        final Calibrator.Result localCalibratorResult = new Calibrator(
             "local",
             50,
             maxLocalCalls,
@@ -166,9 +166,10 @@ public class TwoPunchCalibration implements JCommanderRunnable {
             new Calibrator.ParticleSwarmOptimizationGCPSOInitializer()
         ).calibrate(localCalibrationProblem);
 
-        // TODO run Evaluator and maybe sensitivity
-        // new Evaluator()
-
+        final Evaluator evaluator = new Evaluator();
+        evaluator.setCalibrationFolder(localCalibratorResult.getRunFolder());
+        evaluator.setScenarioSource(localCalibratorResult.getCalibratedScenarioFile());
+        evaluator.run();
     }
 
 }
