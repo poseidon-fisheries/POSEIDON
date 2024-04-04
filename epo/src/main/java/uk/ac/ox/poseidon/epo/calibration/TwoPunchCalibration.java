@@ -151,7 +151,7 @@ public class TwoPunchCalibration implements JCommanderRunnable {
 
         final GenericOptimization localCalibrationProblem =
             buildLocalCalibrationProblem(globalCalibratorResult.getSolution(), 0.2);
-        localCalibrationProblem.setRunsPerSetting(3);
+        localCalibrationProblem.setRunsPerSetting(2);
 
         new Calibrator(
             "local",

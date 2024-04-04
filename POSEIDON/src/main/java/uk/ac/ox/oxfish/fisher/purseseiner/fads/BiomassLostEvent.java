@@ -28,7 +28,7 @@ public class BiomassLostEvent {
 
     private final Map<Species, Double> biomassLost;
 
-    public BiomassLostEvent(Map<Species, Double> biomassLost) {
+    public BiomassLostEvent(final Map<Species, Double> biomassLost) {
         this.biomassLost = ImmutableMap.copyOf(biomassLost);
     }
 

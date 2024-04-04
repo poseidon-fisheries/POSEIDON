@@ -18,10 +18,7 @@
 
 package uk.ac.ox.poseidon.epo.fleet;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
+import com.google.common.collect.*;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
@@ -51,6 +48,7 @@ import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Dummyable;
 import uk.ac.ox.poseidon.common.api.ComponentFactory;
+import uk.ac.ox.poseidon.common.api.Observer;
 import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 import uk.ac.ox.poseidon.epo.monitors.DefaultEpoMonitors;
@@ -219,9 +217,8 @@ public class PurseSeinerFleetFactory
     }
 
     private void addMonitors(final FishState fishState) {
-        final DefaultEpoMonitors defaultEpoMonitors = new DefaultEpoMonitors(fishState);
-        defaultEpoMonitors.getMonitors().forEach(fishState::registerStartable);
-        getGear().addMonitors(defaultEpoMonitors);
+        final DefaultEpoMonitors epoMonitors = new DefaultEpoMonitors(fishState);
+        epoMonitors.getMonitors().forEach(fishState::registerStartable);
         final Collection<Monitor<AbstractSetAction, ?, ?>> setMonitors =
             Optional.ofNullable(additionalSetMonitors)
                 .map(monitor -> monitor.apply(fishState).getMonitors())
@@ -230,7 +227,18 @@ public class PurseSeinerFleetFactory
             monitor.registerWith(fishState.getYearlyDataSet());
             fishState.registerStartable(monitor);
         });
-        getGear().grabAllSetsObservers().addAll(setMonitors);
+        getGear().addMonitors(
+            fishState,
+            epoMonitors.grabFadDeploymentMonitors(),
+            ImmutableSet.<Observer<AbstractSetAction>>builder()
+                .addAll(epoMonitors.grabAllSetsMonitors())
+                .addAll(setMonitors)
+                .build(),
+            epoMonitors.grabFadSetMonitors(),
+            epoMonitors.grabNonAssociatedSetMonitors(),
+            epoMonitors.grabDolphinSetMonitors(),
+            epoMonitors.grabBiomassLostMonitor()
+        );
     }
 
     public InputPath getVesselsFile() {
