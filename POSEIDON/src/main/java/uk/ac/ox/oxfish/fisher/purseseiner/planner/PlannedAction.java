@@ -1,3 +1,18 @@
+/*
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (c) 2024-2024 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -19,9 +34,8 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.*;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 /**
- * this represents either the next step in a plan or a potential next step in a plan.
- * It is described by where it should take place, how much it takes in time, and the type of action
- * that will take place once you are in position
+ * this represents either the next step in a plan or a potential next step in a plan. It is described by where it should
+ * take place, how much it takes in time, and the type of action that will take place once you are in position
  */
 public interface PlannedAction {
 
@@ -32,7 +46,7 @@ public interface PlannedAction {
     ) {
         return fisher.isAllowedAtSea() &&
             fisher.grabState().getRegulations().isPermitted(action) &&
-            //we should be allowed to fish here
+            // we should be allowed to fish here
             fisher.isAllowedToFishHere(location, fisher.grabState());
     }
 
@@ -50,9 +64,11 @@ public interface PlannedAction {
      *
      * @param fisher the fisher
      */
-    //todo
+    // todo
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     boolean isAllowedNow(Fisher fisher);
+
+    ActionType getActionType();
 
     class Deploy implements PlannedAction {
 
@@ -64,7 +80,10 @@ public interface PlannedAction {
             this(tile, 0);
         }
 
-        public Deploy(final SeaTile tile, final double delayInHours) {
+        public Deploy(
+            final SeaTile tile,
+            final double delayInHours
+        ) {
             this.tile = tile;
             this.delayInHours = delayInHours;
         }
@@ -76,7 +95,7 @@ public interface PlannedAction {
 
         @Override
         public double hoursItTake() {
-            return delayInHours; //the deployment itself is immediate
+            return delayInHours; // the deployment itself is immediate
         }
 
         @Override
@@ -92,6 +111,11 @@ public interface PlannedAction {
                 !fisher.grabState()
                     .getRegulations()
                     .isForbidden(new FadDeploymentAction(fisher));
+        }
+
+        @Override
+        public ActionType getActionType() {
+            return ActionType.DeploymentAction;
         }
 
         @Override
@@ -125,12 +149,17 @@ public interface PlannedAction {
             final FadManager fadManager,
             final Fad fad
         ) {
-            return !fad.isLost() && //the fad has not since been destroyed
+            return !fad.isLost() && // the fad has not since been destroyed
                 isActionAllowed(
                     fisher,
                     fad.getLocation(),
                     new FadSetAction(fad, fisher, 0) // fake action just to check for legality
                 );
+        }
+
+        @Override
+        public ActionType getActionType() {
+            return ActionType.SetOwnFadAction;
         }
 
         @Override
@@ -150,14 +179,11 @@ public interface PlannedAction {
         }
     }
 
-
     /**
-     * stolen sets work a bit differently: you just show up at a place and steal
-     * something through the FadSearchAction but if you don't find anything you
-     * waste a bunch of time (also done through the FadSearchAction)
+     * stolen sets work a bit differently: you just show up at a place and steal something through the FadSearchAction
+     * but if you don't find anything you waste a bunch of time (also done through the FadSearchAction)
      */
     class OpportunisticFadSet implements PlannedAction {
-
 
         private final SeaTile whereAreWeGoingToSearchForFads;
 
@@ -185,7 +211,7 @@ public interface PlannedAction {
 
         @Override
         public double hoursItTake() {
-            //need to be pessimistic or you'll plan too many of these
+            // need to be pessimistic or you'll plan too many of these
             return hoursItTakesToSet + hoursWastedIfNoFadAround;
         }
 
@@ -208,6 +234,11 @@ public interface PlannedAction {
         }
 
         @Override
+        public ActionType getActionType() {
+            return ActionType.OpportunisticFadSets;
+        }
+
+        @Override
         public Action[] actuate(final Fisher fisher) {
             return new Action[]{
                 new FadSearchAction(
@@ -220,9 +251,8 @@ public interface PlannedAction {
         }
     }
 
-
-    //very simple class, used to define the beginning and ending of a trip
-    //in a plan: the action is always "arrival" at the end of the trip and "moving" at the beginning
+    // very simple class, used to define the beginning and ending of a trip
+    // in a plan: the action is always "arrival" at the end of the trip and "moving" at the beginning
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     class Arrival implements PlannedAction {
 
@@ -230,7 +260,10 @@ public interface PlannedAction {
 
         private final boolean endOfTrip;
 
-        public Arrival(final SeaTile position, final boolean endOfTrip) {
+        public Arrival(
+            final SeaTile position,
+            final boolean endOfTrip
+        ) {
             this.position = position;
             this.endOfTrip = endOfTrip;
         }
@@ -250,6 +283,11 @@ public interface PlannedAction {
             return fisher.isAllowedAtSea();
         }
 
+        @Override
+        public ActionType getActionType() {
+            return null; // we don't have an action type for "Arrival"
+        }
+
         /**
          * list of actions that need to take place for the planned action to take place
          */
@@ -263,10 +301,10 @@ public interface PlannedAction {
         }
     }
 
-    //this action represents an hour of fishing, followed by a # of hours of delay (due to local processing, recovery time,
-    //or whatever else works)
+    // this action represents an hour of fishing, followed by a # of hours of delay (due to local processing, recovery
+    // time,
+    // or whatever else works)
     class Fishing implements PlannedAction {
-
 
         private final SeaTile position;
 
@@ -295,6 +333,11 @@ public interface PlannedAction {
             return fisher.isAllowedAtSea() && fisher.isAllowedToFishHere(position, fisher.grabState());
         }
 
+        @Override
+        public ActionType getActionType() {
+            return ActionType.FishingOnTile;
+        }
+
         /**
          * list of actions that need to take place for the planned action to take place
          */
@@ -315,8 +358,8 @@ public interface PlannedAction {
         }
     }
 
-    //some of the purse seine gear stuff has "fit to data" catches per event
-    //this is what we are using now
+    // some of the purse seine gear stuff has "fit to data" catches per event
+    // this is what we are using now
     abstract class AbstractSetWithCatchSampler<B extends LocalBiology>
         implements PlannedAction {
 
@@ -436,8 +479,8 @@ public interface PlannedAction {
     }
 
     /**
-     * an object that prepares itself to use a catch sampler to fish stuff out but
-     * has not sampled yet (avoiding spoiling the sampler for sets that may end up not happening)
+     * an object that prepares itself to use a catch sampler to fish stuff out but has not sampled yet (avoiding
+     * spoiling the sampler for sets that may end up not happening)
      */
     class PotentialSetAction<B extends LocalBiology> implements Action {
 
@@ -445,7 +488,10 @@ public interface PlannedAction {
 
         private final Fisher fisher;
 
-        public PotentialSetAction(final AbstractSetWithCatchSampler<B> generator, final Fisher fisher) {
+        public PotentialSetAction(
+            final AbstractSetWithCatchSampler<B> generator,
+            final Fisher fisher
+        ) {
             this.generator = generator;
             this.fisher = fisher;
         }
@@ -461,9 +507,9 @@ public interface PlannedAction {
         }
     }
 
-    //this is not the only way to do dolphin sets, in fact it is sort of improvised
-    //but basically you decide you will go to a location and then you will draw
-    //some catches and hope for the best
+    // this is not the only way to do dolphin sets, in fact it is sort of improvised
+    // but basically you decide you will go to a location and then you will draw
+    // some catches and hope for the best
     class DolphinSet<B extends LocalBiology>
         extends AbstractSetWithCatchSampler<B> {
 
@@ -510,6 +556,11 @@ public interface PlannedAction {
                 catchMaker
             );
         }
+
+        @Override
+        public ActionType getActionType() {
+            return ActionType.DolphinSets;
+        }
     }
 
     class NonAssociatedSet<B extends LocalBiology>
@@ -518,7 +569,8 @@ public interface PlannedAction {
         public NonAssociatedSet(
             final SeaTile position,
             final CatchSampler<B> howMuchWeCanFishOutGenerator,
-            final CatchMaker<B> catchMaker, final double delayInHours,
+            final CatchMaker<B> catchMaker,
+            final double delayInHours,
             final boolean canPoachFromFads,
             final int rangeInSeaTiles,
             final Class<B> localBiologyClass
@@ -556,6 +608,11 @@ public interface PlannedAction {
                 targetBiologies,
                 catchMaker
             );
+        }
+
+        @Override
+        public ActionType getActionType() {
+            return ActionType.NonAssociatedSets;
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2024-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3
@@ -139,12 +139,6 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      */
     private final boolean noaSetsCanPoachFads;
     /**
-     * when this is set to true you cannot put an action in the plan if it looks illegal now. When this is not true,
-     * illegal actions stay in the plan until it's time to execute them. If they didn't become legal then, they will
-     * trigger a re-plan
-     */
-    private final boolean doNotWaitToPurgeIllegalActions;
-    /**
      * if this is above 0, NOA sets can fish out of the sea tile they actually happen in
      */
     private final int noaSetsRangeInSeaTiles;
@@ -177,7 +171,6 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         final double planningHorizonInHours,
         final double minimumPercentageOfTripDurationAllowed,
         final boolean noaSetsCanPoachFads,
-        final boolean doNotWaitToPurgeIllegalActions,
         final int noaSetsRangeInSeaTiles,
         final int delSetsRangeInSeaTiles,
         final AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadPlanningModule,
@@ -203,7 +196,6 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
         this.planningHorizonInHours = planningHorizonInHours;
         this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
         this.noaSetsCanPoachFads = noaSetsCanPoachFads;
-        this.doNotWaitToPurgeIllegalActions = doNotWaitToPurgeIllegalActions;
         this.delSetsRangeInSeaTiles = delSetsRangeInSeaTiles;
         this.fadPlanningModule = fadPlanningModule;
         this.locationValues = locationValues;
@@ -368,8 +360,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                     maxTravelTimeLoader.applyAsDouble(fisher)
                 ),
                 plannableActionWeights,
-                planModules,
-                doNotWaitToPurgeIllegalActions
+                planModules
             );
         //(2) create the delegate
         delegate = new PlannedStrategy(planner, planningHorizonInHours, minimumValueOfSetOnOwnFad);

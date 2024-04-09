@@ -1,6 +1,6 @@
 /*
  * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2024-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3
@@ -21,10 +21,12 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.PathConverter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
 import uk.ac.ox.oxfish.maximization.YearlyResultsRowProvider;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.poseidon.epo.scenarios.EpoPathPlannerAbundanceScenario;
 import uk.ac.ox.poseidon.epo.scenarios.EpoScenario;
 
@@ -33,6 +35,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
@@ -52,10 +55,18 @@ public class PolicyRuns implements Runnable {
     @Parameter(names = "--scenario", converter = PathConverter.class)
     private Path scenarioFile = Paths.get(
         System.getProperty("user.home"), "workspace", "epo_calibration_runs", "runs",
-        "2024-02-13", "cenv0729", "2024-02-17_06.26.53_local",
+        "2024-04-03", "local_2024-04-04_06.36.19",
         "calibrated_scenario_updated.yaml"
     );
-
+    @Parameter(names = {"-p", "--policies"})
+    private Set<String> policiesToRun = ImmutableSet.of(
+        "global_object_set_limits",
+        "fad_limits_fine",
+        "fad_limits_fine_with_override",
+        "extended_closures",
+        "el_corralito",
+        "western_closure"
+    );
     @Parameter(names = {"-r", "--runs_per_policy"})
     private int numberOfRunsPerPolicy = 3;
     @Parameter(names = {"-y", "--years_to_run"})
@@ -70,53 +81,14 @@ public class PolicyRuns implements Runnable {
         policyRuns.run();
     }
 
-    private static Map<String, List<Policy<EpoScenario<?>>>> makePolicies() {
-        final List<Integer> yearsActive = ImmutableList.of(2023);
-        final ImmutableList<Double> proportions =
-            ImmutableList.of(0.75, 0.50, 0.25, 0.10, 0.0);
-        final ImmutableList<Double> fineProportions =
-            IntStream.rangeClosed(1, 19)
-                .mapToObj(i -> i * 0.05)
-                .collect(toImmutableList());
-        return ImmutableMap.of(
-                "global_object_set_limits", new GlobalObjectSetLimit(
-                    yearsActive,
-                    // 8729 FAD + 4003 OFS in 2022:
-                    proportions.stream().map(p -> (int) (p * (8729 + 4003))).collect(toList())
-                ),
-                "fad_limits_fine", new ActiveFadLimitsPolicies(
-                    yearsActive,
-                    2023,
-                    fineProportions,
-                    false
-                ),
-                "fad_limits_fine_with_override", new ActiveFadLimitsPolicies(
-                    yearsActive,
-                    2023,
-                    fineProportions,
-                    true
-                ),
-                "extended_closures", new ExtendedClosurePolicies(
-                    yearsActive,
-                    ImmutableList.of(5, 15, 30)
-                ),
-                "el_corralito", new ExtendedElCorralitoPolicy(
-                    yearsActive,
-                    -5, 5, -120,
-                    ImmutableList.of(5, 15, 30)
-                ),
-                "western_closure", new WesternClosure(
-                    yearsActive,
-                    -120,
-                    ImmutableList.of(5, 15, 30)
-                )
-            )
-            .entrySet()
-            .stream()
-            .collect(toImmutableMap(
-                Entry::getKey,
-                entry -> entry.getValue().getWithDefault()
-            ));
+    @SuppressWarnings("unused")
+    public Set<String> getPoliciesToRun() {
+        return policiesToRun;
+    }
+
+    @SuppressWarnings("unused")
+    public void setPoliciesToRun(final Set<String> policiesToRun) {
+        this.policiesToRun = policiesToRun;
     }
 
     @SuppressWarnings("unused")
@@ -168,7 +140,7 @@ public class PolicyRuns implements Runnable {
             "About to run %d policies %d times (%d total runs)",
             numberOfPolicies,
             numberOfYearsToRun,
-            numberOfPolicies * numberOfYearsToRun
+            numberOfPolicies * numberOfRunsPerPolicy
         ));
 
         policies
@@ -185,13 +157,61 @@ public class PolicyRuns implements Runnable {
                         .setWriteScenarioToFile(true)
                         .requestFisherDailyData(columnName -> columnName.equals("Number of active FADs"))
                         .requestFisherYearlyData()
-                        .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new);
-                if (!policyName.startsWith("fad_limits_fine")) {
-                    runner
+                        .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
+                        .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
                         .registerRowProvider("spatial_closures.csv", RectangularAreaExtractor::new)
                         .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
-                }
                 runner.run(numberOfYearsToRun, numberOfRunsPerPolicy);
             });
+    }
+
+    private Map<String, List<Policy<EpoScenario<?>>>> makePolicies() {
+        final List<Integer> yearsActive = ImmutableList.of(2023);
+        final ImmutableList<Double> proportions =
+            ImmutableList.of(0.75, 0.50, 0.25, 0.10, 0.0);
+        final ImmutableList<Double> fineProportions =
+            IntStream.rangeClosed(20, 20)
+                .mapToObj(i -> i * 0.05)
+                .collect(toImmutableList());
+        return ImmutableMap.of(
+                "global_object_set_limits", new GlobalObjectSetLimit(
+                    yearsActive,
+                    // 8729 FAD + 4003 OFS in 2022:
+                    proportions.stream().map(p -> (int) (p * (8729 + 4003))).collect(toList())
+                ),
+                "fad_limits_fine", new ActiveFadLimitsPolicies(
+                    yearsActive,
+                    2023,
+                    fineProportions,
+                    false
+                ),
+                "fad_limits_fine_with_override", new ActiveFadLimitsPolicies(
+                    yearsActive,
+                    2023,
+                    fineProportions,
+                    true
+                ),
+                "extended_closures", new ExtendedClosurePolicies(
+                    yearsActive,
+                    ImmutableList.of(5, 15, 30)
+                ),
+                "el_corralito", new ExtendedElCorralitoPolicy(
+                    yearsActive,
+                    -5, 5, -120,
+                    ImmutableList.of(5, 15, 30)
+                ),
+                "western_closure", new WesternClosure(
+                    yearsActive,
+                    -120,
+                    ImmutableList.of(5, 15, 30)
+                )
+            )
+            .entrySet()
+            .stream()
+            .filter(entry -> policiesToRun.contains(entry.getKey()))
+            .collect(toImmutableMap(
+                Entry::getKey,
+                entry -> entry.getValue().get() // TODO: getWithDefault()
+            ));
     }
 }

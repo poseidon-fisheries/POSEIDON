@@ -1,6 +1,22 @@
+/*
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (c) 2024-2024 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
@@ -17,7 +33,6 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
     private Fisher fisher;
 
     private FishState fishState;
-
 
     public DiscretizedOwnFadPlanningModule(
         final MapDiscretization discretization,
@@ -39,7 +54,6 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
 
     @Override
     public PlannedAction chooseNextAction(final Plan currentPlanSoFar) {
-
 
         return chooseFadSet(
             currentPlanSoFar,
@@ -79,13 +93,19 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
      * @param fisher
      */
     @Override
-    public void prepareForReplanning(final FishState state, final Fisher fisher) {
+    public void prepareForReplanning(
+        final FishState state,
+        final Fisher fisher
+    ) {
         start(state, fisher);
         speedInKmPerHours = fisher.getBoat().getSpeedInKph();
     }
 
     @Override
-    public void start(final FishState model, final Fisher fisher) {
+    public void start(
+        final FishState model,
+        final Fisher fisher
+    ) {
         optionsGenerator.startOrReset(
             getFadManager(fisher),
             model.getRandom(),
@@ -98,23 +118,13 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
 
     }
 
-    /**
-     * if a plan is about to start, how many times are we allowed to call this planning module (it may fail before
-     * then, the
-     * point of this function is to deal with regulations or other constraints)
-     *
-     * @param state
-     * @param fisher
-     * @return
-     */
     @Override
-    public int maximumActionsInAPlan(final FishState state, final Fisher fisher) {
-        return getFadManager(fisher)
-            .numberOfPermissibleActions(
-                FAD,
-                MAX_OWN_FAD_SETS,
-                state.getRegulations()
-            );
+    public int numberOfPossibleActions(final Fisher fisher) {
+        return getFadManager(fisher).getNumberOfActiveFads();
     }
 
+    @Override
+    public ActionClass getActionClass() {
+        return FAD;
+    }
 }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2024-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3
@@ -125,7 +125,9 @@ public class ActiveFadLimitsPolicies extends PolicySupplier {
                                 // some vessels (mostly dolphin-setters) have zero empirical deployments
                                 // and thus no "plan module" with deployment location preferences, so
                                 // we exclude those from the "deploy as much as possible" variation
-                                .filter(planner -> planner.getPlanModules().containsKey(ActionType.DeploymentAction))
+                                .filter(planner -> planner
+                                    .getPlanningModules()
+                                    .containsKey(ActionType.DeploymentAction))
                                 .forEach(planner -> planner.setActionPreferenceOverrides(overrides));
                         },
                         StepOrder.DAWN,

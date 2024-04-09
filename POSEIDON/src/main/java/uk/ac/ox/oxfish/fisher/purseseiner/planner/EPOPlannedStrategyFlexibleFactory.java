@@ -1,6 +1,6 @@
 /*
  * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2024-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3
@@ -101,7 +101,6 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     private DoubleParameter minimumPercentageOfTripDurationAllowed =
         new CalibratedParameter(0.5, 1, 0, 1);
     private BooleanParameter noaSetsCanPoachFads = new BooleanParameter(false);
-    private BooleanParameter purgeIllegalActionsImmediately = new BooleanParameter(true);
     private DoubleParameter noaSetsRangeInSeatiles =
         new CalibratedParameter(0, 2, 0, 5);
     private DoubleParameter delSetsRangeInSeatiles =
@@ -157,14 +156,6 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.noaSetsCanPoachFads = noaSetsCanPoachFads;
     }
 
-    public BooleanParameter getPurgeIllegalActionsImmediately() {
-        return purgeIllegalActionsImmediately;
-    }
-
-    public void setPurgeIllegalActionsImmediately(final BooleanParameter purgeIllegalActionsImmediately) {
-        this.purgeIllegalActionsImmediately = purgeIllegalActionsImmediately;
-    }
-
     public InputPath getActionWeightsFile() {
         return actionWeightsFile;
     }
@@ -210,7 +201,6 @@ public class EPOPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             planningHorizonInHours.applyAsDouble(rng),
             minimumPercentageOfTripDurationAllowed.applyAsDouble(rng),
             noaSetsCanPoachFads.getValue(),
-            purgeIllegalActionsImmediately.getValue(),
             (int) noaSetsRangeInSeatiles.applyAsDouble(rng),
             (int) delSetsRangeInSeatiles.applyAsDouble(rng),
             fadModule,

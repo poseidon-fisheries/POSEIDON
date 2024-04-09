@@ -1,3 +1,18 @@
+/*
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (c) 2024-2024 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -38,60 +53,6 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
         this.additionalFadInspected = additionalFadInspected;
     }
 
-    public static int selectFadByCheapestInsertion(
-        final Plan currentPlanSoFar,
-        final Fisher fisher,
-        final NauticalMap map,
-        final List<Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options,
-        final double boatSpeed,
-        final int numberOfAdditionalFadToCount
-    ) {
-        double maxProfitsSoFar = 0;
-        int fadGroupChosen = -1;
-
-        for (final Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer> option : options) {
-            // get the fads in centroid
-            final PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad> fads = option.getKey();
-            // if there are none, don't bother
-            if (fads.isEmpty() || fads == null)
-                continue;
-            // check the cost to go to the "best" fad
-            final Iterator<OwnFadSetDiscretizedActionGenerator.ValuedFad> iterator = fads.iterator();
-            final OwnFadSetDiscretizedActionGenerator.ValuedFad bestFad = iterator.next();
-            final PlannedAction.FadSet potentialAction = new PlannedAction.FadSet(bestFad.getKey());
-            final double additionalHoursTravelled = DrawThenCheapestInsertionPlanner.cheapestInsert(
-                currentPlanSoFar,
-                potentialAction,
-                Integer.MAX_VALUE, // don't want to censor time now
-                boatSpeed,
-                map,
-                false
-            );
-            final double costHere = fisher.getExpectedAdditionalCosts(
-                additionalHoursTravelled,
-                potentialAction.hoursItTake(),
-                additionalHoursTravelled / boatSpeed
-            );
-
-            // compute the revenues for harvesting the first X fads
-            // (the first we will actually do, the others are there to trick us into setting in more promising areas)
-            double revenuesHere = bestFad.getValue();
-            int additionalFadsInspected = 0;
-            while (additionalFadsInspected < numberOfAdditionalFadToCount && iterator.hasNext()) {
-                revenuesHere += iterator.next().getValue();
-                additionalFadsInspected++;
-            }
-
-            final double profitHere = revenuesHere - costHere;
-            if (profitHere > maxProfitsSoFar) {
-                maxProfitsSoFar = profitHere;
-                fadGroupChosen = option.getValue();
-            }
-
-        }
-        return fadGroupChosen;
-    }
-
     @Override
     protected PlannedAction chooseFadSet(
         final Plan currentPlanSoFar,
@@ -123,6 +84,65 @@ public class GreedyInsertionFadPlanningModule extends DiscretizedOwnFadPlanningM
             return null;
         return optionsGenerator.chooseFad(fadGroupChosen);
 
+    }
+
+    public static int selectFadByCheapestInsertion(
+        final Plan currentPlanSoFar,
+        final Fisher fisher,
+        final NauticalMap map,
+        final List<Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer>> options,
+        final double boatSpeed,
+        final int numberOfAdditionalFadToCount
+    ) {
+        double maxProfitsSoFar = 0;
+        int fadGroupChosen = -1;
+
+        for (final Entry<PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad>, Integer> option : options) {
+            // get the fads in centroid
+            final PriorityQueue<OwnFadSetDiscretizedActionGenerator.ValuedFad> fads = option.getKey();
+            // if there are none, don't bother
+            if (fads.isEmpty() || fads == null)
+                continue;
+            // check the cost to go to the "best" fad
+            final Iterator<OwnFadSetDiscretizedActionGenerator.ValuedFad> iterator = fads.iterator();
+            final OwnFadSetDiscretizedActionGenerator.ValuedFad bestFad = iterator.next();
+            final PlannedAction.FadSet potentialAction = new PlannedAction.FadSet(bestFad.getKey());
+            final double additionalHoursTravelled = DrawThenCheapestInsertionPlanner
+                .cheapestInsert(
+                    currentPlanSoFar,
+                    potentialAction,
+                    Integer.MAX_VALUE, // don't want to censor time now
+                    boatSpeed,
+                    map,
+                    false
+                )
+                // the `cheapestInsert` method now returns an empty Optional if it can't
+                // add the action, but it used to return Double.NaN in those cases.
+                // We're just mimicking the old behaviour here; not sure if it matters.
+                .orElse(Double.NaN);
+            final double costHere = fisher.getExpectedAdditionalCosts(
+                additionalHoursTravelled,
+                potentialAction.hoursItTake(),
+                additionalHoursTravelled / boatSpeed
+            );
+
+            // compute the revenues for harvesting the first X fads
+            // (the first we will actually do, the others are there to trick us into setting in more promising areas)
+            double revenuesHere = bestFad.getValue();
+            int additionalFadsInspected = 0;
+            while (additionalFadsInspected < numberOfAdditionalFadToCount && iterator.hasNext()) {
+                revenuesHere += iterator.next().getValue();
+                additionalFadsInspected++;
+            }
+
+            final double profitHere = revenuesHere - costHere;
+            if (profitHere > maxProfitsSoFar) {
+                maxProfitsSoFar = profitHere;
+                fadGroupChosen = option.getValue();
+            }
+
+        }
+        return fadGroupChosen;
     }
 
 }

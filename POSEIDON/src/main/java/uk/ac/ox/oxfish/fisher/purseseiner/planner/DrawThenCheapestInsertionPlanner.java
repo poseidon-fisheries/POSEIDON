@@ -1,6 +1,6 @@
 /*
  * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2024-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3
@@ -16,11 +16,9 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import ec.util.MersenneTwisterFast;
-import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -28,13 +26,16 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.MTFApache;
 import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 
 import java.util.*;
+import java.util.Map.Entry;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static uk.ac.ox.poseidon.common.core.Entry.entry;
 
 /**
  * A simple planner where given a budget of time you can spend out: 1 - Draw the next action to take from random
@@ -47,6 +48,7 @@ import static java.util.stream.Collectors.toList;
  */
 public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
+    private static final int MAX_FAILED_ATTEMPTS = 100;
     /**
      * need this to generate your budget in hours
      */
@@ -54,37 +56,179 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
     /**
      * mapping that for each action returns the probability of it occurring
      */
-    final private Map<ActionType, Double> plannableActionWeights;
+    final private Map<ActionType, Double> actionPreferences;
     /**
      * mapping that for each action returns the planning module giving us one candidate action to take
      */
-    final private Map<ActionType, PlanningModule> planModules;
+    final private Map<ActionType, PlanningModule> planningModules;
+
     /**
-     * maximum number of times an action is still allowed to be added to the plan!
+     * Actions of types listed here will be added to the plan first, before preferences are taken into consideration.
+     * The first use case for this is forcing fishers to deploy FADs until they reach their active-FADs limits.
      */
-    final private Map<ActionType, MutableInt> stillAllowedActionsInPlan = new HashMap<>();
-    /**
-     * when this is set to true you cannot put an action in the plan if it looks illegal now. When this is not true,
-     * illegal actions stay in the plan until it's time to execute them. If they didn't become legal then, they will
-     * trigger a re-plan
-     */
-    private final boolean doNotWaitToPurgeIllegalActions;
     private List<ActionType> actionPreferenceOverrides = ImmutableList.of();
-    private Plan currentPlan;
     private Fisher fisher;
-    private FishState model;
+    private FishState fishState;
     private double thisTripTargetHours = 0;
 
     public DrawThenCheapestInsertionPlanner(
         final DoubleParameter maxHoursPerTripGenerator,
-        final Map<ActionType, Double> plannableActionWeights,
-        final Map<ActionType, PlanningModule> planModules,
-        final boolean doNotWaitToPurgeIllegalActions
+        final Map<ActionType, Double> actionPreferences,
+        final Map<ActionType, PlanningModule> planningModules
     ) {
         this.maxHoursPerTripGenerator = maxHoursPerTripGenerator;
-        this.plannableActionWeights = plannableActionWeights;
-        this.planModules = planModules;
-        this.doNotWaitToPurgeIllegalActions = doNotWaitToPurgeIllegalActions;
+        this.actionPreferences = actionPreferences;
+        this.planningModules = planningModules;
+    }
+
+    public Map<ActionType, PlanningModule> getPlanningModules() {
+        return planningModules;
+    }
+
+    public void setActionPreferenceOverrides(final Collection<ActionType> actionPreferenceOverrides) {
+        this.actionPreferenceOverrides = ImmutableList.copyOf(actionPreferenceOverrides);
+    }
+
+    @Override
+    public void start(
+        final FishState model,
+        final Fisher fisher
+    ) {
+        this.fisher = fisher;
+        this.fishState = model;
+    }
+
+    @Override
+    public void turnOff(final Fisher fisher) {
+        this.fisher = null;
+        this.fishState = null;
+    }
+
+    public Plan planNewTrip() {
+        final SeaTile portLocation = fisher.getHomePort().getLocation();
+        assert fisher.isAtPort();
+        assert fisher.isAllowedAtSea();
+        assert fisher.getLocation() == portLocation;
+        thisTripTargetHours = maxHoursPerTripGenerator.applyAsDouble(fishState.getRandom());
+        return makePlan(portLocation, portLocation, thisTripTargetHours);
+    }
+
+    private Plan makePlan(
+        final SeaTile initialPosition,
+        final SeaTile finalPosition,
+        final double hoursAvailable
+    ) {
+        final Map<ActionType, MutableLong> permittedActions = initPermittedActions();
+        final Plan plan = new Plan(initialPosition, finalPosition);
+        double hoursUsed =
+            fishState.getMap().distance(initialPosition, finalPosition) /
+                fisher.getBoat().getSpeedInKph();
+        int failedAttempts = 0;
+        while (
+            failedAttempts < MAX_FAILED_ATTEMPTS &&
+                hoursUsed < hoursAvailable &&
+                sumValues(permittedActions) > 0
+        ) {
+            final Set<ActionType> permittedActionTypes =
+                permittedActions
+                    .entrySet()
+                    .stream()
+                    .filter(entry -> entry.getValue().longValue() > 0)
+                    .map(Entry::getKey)
+                    .collect(toSet());
+
+            // If we have preference overrides in place, pick the first permitted one;
+            // otherwise draw a random next action.
+            final ActionType nextActionType =
+                actionPreferenceOverrides
+                    .stream()
+                    .filter(permittedActionTypes::contains)
+                    .findAny()
+                    .orElse(drawNextAction(permittedActionTypes));
+
+            final double hoursCurrentlyAvailable = hoursAvailable - hoursUsed;
+            final Optional<Double> insertionCost = Optional
+                .ofNullable(
+                    // the planning modules might return null if they can't generate an action
+                    planningModules.get(nextActionType).chooseNextAction(plan)
+                )
+                .filter(action ->
+                    // we should never be exceeding the number of available actions,
+                    // but there are other reasons why a disallowed action might be picked
+                    // (e.g., a new MPA covering locations valued by the fisher)
+                    action.isAllowedNow(fisher)
+                )
+                .flatMap(plannedAction ->
+                    cheapestInsert(
+                        plan,
+                        plannedAction,
+                        hoursCurrentlyAvailable,
+                        fisher.getBoat().getSpeedInKph(),
+                        fishState.getMap(),
+                        true
+                    )
+                );
+
+            if (insertionCost.isPresent()) {
+                hoursUsed = hoursUsed + insertionCost.get();
+                permittedActions.get(nextActionType).decrement();
+            } else {
+                // we might fail because we don't have enough hours left to insert
+                // new actions or because we keep on generating illegal actions.
+                failedAttempts += 1;
+            }
+        }
+        return plan;
+    }
+
+    /**
+     * Returns a map from action types to number of permitted actions, taking into action preferences and regulations.
+     * Only action types with one or more permitted actions are included in the map.
+     */
+    private Map<ActionType, MutableLong> initPermittedActions() {
+        final Map<ActionType, MutableLong> numberOfPermittedActions =
+            actionPreferences
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() > 0)
+                .map(Entry::getKey)
+                .map(actionType -> entry(
+                    actionType,
+                    new MutableLong(
+                        planningModules
+                            .get(actionType)
+                            .numberOfPermittedActions(fisher, fishState.getRegulations())
+                    )
+                ))
+                .filter(entry -> entry.getValue().longValue() > 0)
+                .collect(toImmutableMap(Entry::getKey, Entry::getValue));
+        // make sure planning modules are started for each permitted action type
+        numberOfPermittedActions
+            .keySet()
+            .stream()
+            .map(planningModules::get)
+            .filter(planningModule -> !planningModule.isStarted())
+            .forEach(planningModule -> planningModule.start(fishState, fisher));
+        return numberOfPermittedActions;
+    }
+
+    private static long sumValues(final Map<?, ? extends Number> numberMap) {
+        return numberMap.values().stream().mapToLong(Number::longValue).sum();
+    }
+
+    private ActionType drawNextAction(
+        final Collection<ActionType> permittedActionTypes
+    ) {
+        if (permittedActionTypes.size() == 1)
+            return permittedActionTypes.iterator().next();
+        final List<Pair<ActionType, Double>> pmf =
+            permittedActionTypes
+                .stream()
+                .map(actionType ->
+                    new Pair<>(actionType, actionPreferences.get(actionType))
+                )
+                .collect(toList());
+        return new EnumeratedDistribution<>(new MTFApache(fishState.getRandom()), pmf).sample();
     }
 
     /**
@@ -104,8 +248,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
      *                                         plan
      * @return the hours we consumed adding the action to the plan (or NAN if there are not enough hours)
      */
-    @VisibleForTesting
-    public static double cheapestInsert(
+    static Optional<Double> cheapestInsert(
         final Plan currentPlan,
         final PlannedAction actionToAddToPath,
         final double hoursAvailable,
@@ -171,190 +314,11 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
             assert bestIndex > 0;
             if (insertActionInPlanIfHoursAllowIt)
                 currentPlan.insertAction(actionToAddToPath, bestIndex);
-            return totalCostInHours;
+            return Optional.of(totalCostInHours);
         } else {
-            return Double.NaN;
+            return Optional.empty();
         }
 
-    }
-
-    public Map<ActionType, PlanningModule> getPlanModules() {
-        return planModules;
-    }
-
-    public void setActionPreferenceOverrides(final Collection<ActionType> actionPreferenceOverrides) {
-        this.actionPreferenceOverrides = ImmutableList.copyOf(actionPreferenceOverrides);
-    }
-
-    @Override
-    public void start(
-        final FishState model,
-        final Fisher fisher
-    ) {
-        this.fisher = fisher;
-        this.model = model;
-    }
-
-    /**
-     * checks that the module has started, and that the "stillAllowedActionsInPlan" is filled correctly, etc...
-     */
-    private void readyPlanningModule(
-        final ActionType action,
-        final Fisher fisher,
-        final FishState model
-    ) {
-
-        assert plannableActionWeights.get(action) > 0;
-
-        // has it been initialized?
-        if (!stillAllowedActionsInPlan.containsKey(action)) {
-
-            // find the module
-            final PlanningModule planningModule = planModules.get(action);
-            Preconditions.checkArgument(
-                planningModule != null,
-                "You have assigned weight to " + action.toString() + " without any module associated to it"
-            );
-            // start the planning module
-            planningModule.start(model, fisher);
-            // set maximum actions
-            stillAllowedActionsInPlan.put(action, new MutableInt(planningModule.maximumActionsInAPlan(model, fisher)));
-            // done!
-        }
-
-    }
-
-    /**
-     * returns true as long as at least one of the planning modules has not been started or there are still
-     * allowedActions for that type
-     */
-    private boolean isAnyActionEvenPossible() {
-        return plannableActionWeights
-            .entrySet()
-            .stream()
-            // can this action type be drawn?
-            .filter(entry -> entry.getValue() > 0)
-            // if it is drawn is it allowed? (it is also possible that this has never been started, so let's assume
-            // it is valid)
-            .map(entry -> stillAllowedActionsInPlan.get(entry.getKey()))
-            .anyMatch(allowedActions -> allowedActions == null || allowedActions.intValue() > 0);
-    }
-
-    @Override
-    public void turnOff(final Fisher fisher) {
-        this.fisher = null;
-        model = null;
-    }
-
-    /**
-     * Returns whether the action is still allowed according to the counters in the {@code stillAllowedActionsInPlan}
-     * map. If there is no entry for this type of action, we assume it's allowed, which is arguably not the most
-     * intuitive way of doing things, so perhaps we could consider changing it if there ever is an opportunity.
-     */
-    private boolean stillAllowedInPlan(final ActionType actionType) {
-        return stillAllowedActionsInPlan
-            .getOrDefault(actionType, new MutableInt(1))
-            .intValue() > 0;
-    }
-
-    private Plan planRecursively(
-        final Plan currentPlan,
-        double hoursLeftInBudget,
-        final FishState model,
-        final Fisher fisher
-    ) {
-
-        // if there are no possible actions, stop
-        if (!isAnyActionEvenPossible())
-            return currentPlan;
-
-        // If we have preference overrides in place, pick the first legal one;
-        // otherwise draw a random next action.
-        final ActionType nextActionType = actionPreferenceOverrides
-            .stream()
-            .filter(this::stillAllowedInPlan)
-            .findAny()
-            .orElse(drawNextAction(model.getRandom()));
-
-        // you can't draw any actions, the plan is over!
-        if (nextActionType == null)
-            return currentPlan;
-
-        // ask the planning module for an action to add to the path
-        final PlanningModule planningModule = planModules.get(nextActionType);
-        // might be the first time you call it, so get it ready
-        readyPlanningModule(nextActionType, fisher, model);
-        // it is possible that even though it's the first time we try this action, we actually can't do
-        // if so star over
-        if (stillAllowedActionsInPlan.get(nextActionType).intValue() <= 0)
-            return planRecursively(currentPlan, hoursLeftInBudget, model, fisher);
-
-        final PlannedAction plannedAction = planningModule.chooseNextAction(currentPlan);
-
-        // if the planning module cannot propose more actions, ignore them for this plan
-        if (plannedAction == null || (doNotWaitToPurgeIllegalActions && !plannedAction.isAllowedNow(fisher))) {
-            // If there is an attempt to add an illegal action to the plan, we don't allow any more actions of
-            // that type to be added. We're leaving that bit of code in for now, but we're questioning whether
-            // it's necessary. It caused problem when attempts to add FAD sets in, e.g., EEZs; preventing further
-            // FAD sets to be added. We fixed that by filtering out illegal FAD sets "upstream" (in the
-            // OwnFadSetDiscretizedActionGenerator) but we should be careful with this -- NP 2023-11-14.
-            stillAllowedActionsInPlan.get(nextActionType).setValue(0);
-            // try planning more
-            return planRecursively(currentPlan, hoursLeftInBudget, model, fisher);
-        } else {
-            // there is an action and we need to take it
-            final double hoursConsumed =
-                cheapestInsert(
-                    currentPlan,
-                    plannedAction,
-                    hoursLeftInBudget,
-                    fisher.getBoat().getSpeedInKph(),
-                    model.getMap(),
-                    true
-                );
-            if (Double.isNaN(hoursConsumed))
-                // went over budget! our plan is complete
-                return currentPlan;
-            else {
-                stillAllowedActionsInPlan.get(nextActionType).decrement();
-                hoursLeftInBudget = hoursLeftInBudget - hoursConsumed;
-                assert hoursLeftInBudget >= -FishStateUtilities.EPSILON;
-                if (hoursLeftInBudget <= 0)
-                    return currentPlan;
-                else
-                    return planRecursively(currentPlan, hoursLeftInBudget, model, fisher);
-            }
-        }
-
-    }
-
-    private ActionType drawNextAction(final MersenneTwisterFast random) {
-        final List<Pair<ActionType, Double>> pmf =
-            plannableActionWeights
-                .entrySet()
-                .stream()
-                .filter(entry -> stillAllowedInPlan(entry.getKey()))
-                .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
-                .collect(toList());
-        return pmf.size() == 1
-            ? pmf.get(0).getKey()
-            : new EnumeratedDistribution<>(new MTFApache(random), pmf).sample();
-    }
-
-    public Plan planNewTrip() {
-        assert fisher.isAtPort();
-        assert fisher.isAllowedAtSea();
-        assert fisher.getLocation() == fisher.getHomePort().getLocation();
-
-        // create an empty plan (circling back home)
-        currentPlan = new Plan(fisher.getLocation(), fisher.getLocation());
-
-        // start planning
-        stillAllowedActionsInPlan.clear();
-        thisTripTargetHours = maxHoursPerTripGenerator.applyAsDouble(model.getRandom());
-        currentPlan = planRecursively(currentPlan, thisTripTargetHours, model, fisher);
-
-        return currentPlan;
     }
 
     public Plan replan(final double hoursAlreadySpent) {
@@ -364,73 +328,15 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
                 fisher.getHoursAtSea() == 0
         );
 
-        // the new plan will remove all previous actions except for DPLs (if any)
-        // which are constraints we don't want to move
-        final SeaTile lastPlanLocation = fisher.getLocation();
-        final NauticalMap map = model.getMap();
-        final double speed = fisher.getBoat().getSpeedInKph();
-        final Plan newPlan = new Plan(fisher.getLocation(), fisher.getHomePort().getLocation());
-
-        // now take into consideration the very last step (return to port)
-        final double lastStepCost = map.distance(lastPlanLocation, newPlan.peekLastAction().getLocation()) / speed;
-
-        // length of the trip is reduced by how much we have already spent outside and duration of that last step
-        double hoursAvailable = getThisTripTargetHours() - hoursAlreadySpent - lastStepCost;
-
-        if (hoursAvailable > 0) {
-
-            // Reset the number of allowed actions of each type
-            planModules.forEach((actionType, planningModule) -> {
-                final MutableInt actionsAllowed = stillAllowedActionsInPlan.get(actionType);
-                if (actionsAllowed == null) {
-                    // if no action of that type has ever been drawn, the planning module has not been started,
-                    // so we let readyPlanningModule initialise everything
-                    readyPlanningModule(actionType, fisher, model);
-                } else {
-                    // otherwise we just mutate the existing entry in actionsAllowed
-                    actionsAllowed.setValue(planningModule.maximumActionsInAPlan(model, fisher));
-                }
-            });
-
-            final Iterator<PlannedAction> previouslyPlannedDeployments = currentPlan
-                .plannedActions()
-                .stream()
-                .filter(PlannedAction.Deploy.class::isInstance)
-                .iterator();
-            final MutableInt deploymentsAllowed = stillAllowedActionsInPlan.get(ActionType.DeploymentAction);
-            while (
-                hoursAvailable > 0 &&
-                    deploymentsAllowed != null &&
-                    deploymentsAllowed.getValue() > 0 &&
-                    previouslyPlannedDeployments.hasNext()
-            ) {
-                final double hoursConsumed = cheapestInsert(
-                    newPlan,
-                    previouslyPlannedDeployments.next(),
-                    hoursAvailable,
-                    speed,
-                    map,
-                    true
-                );
-                if (!Double.isFinite(hoursConsumed)) {
-                    hoursAvailable = 0;
-                } else {
-                    deploymentsAllowed.decrement();
-                    hoursAvailable -= hoursConsumed;
-                }
-            }
-        }
-
-        // add more events now.
-        currentPlan = newPlan;
-        if (hoursAvailable > 0) {
-            planModules.values().forEach(module -> module.prepareForReplanning(model, fisher));
-            currentPlan = planRecursively(currentPlan, hoursAvailable, model, fisher);
-        }
-        return currentPlan;
+        planningModules.values().forEach(module -> module.prepareForReplanning(fishState, fisher));
+        return makePlan(
+            fisher.getLocation(),
+            fisher.getHomePort().getLocation(),
+            thisTripTargetHours - hoursAlreadySpent
+        );
     }
 
-    public double getThisTripTargetHours() {
+    double getThisTripTargetHours() {
         return thisTripTargetHours;
     }
 
