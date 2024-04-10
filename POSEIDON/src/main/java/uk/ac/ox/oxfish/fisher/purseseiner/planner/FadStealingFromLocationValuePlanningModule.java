@@ -17,6 +17,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -24,9 +25,10 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.OFS;
 
 public class FadStealingFromLocationValuePlanningModule<B extends LocalBiology>
-    extends LocationValuePlanningModule<B> {
+    extends LocationValuePlanningModule {
 
     FadStealingFromLocationValuePlanningModule(
+        final Fisher fisher,
         final LocationValues locationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
@@ -38,6 +40,7 @@ public class FadStealingFromLocationValuePlanningModule<B extends LocalBiology>
         this(
             locationValues,
             new FadStealingPlannedActionGenerator(
+                fisher,
                 locationValues,
                 map,
                 random,

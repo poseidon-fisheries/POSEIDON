@@ -55,7 +55,7 @@ public class PolicyRuns implements Runnable {
     @Parameter(names = "--scenario", converter = PathConverter.class)
     private Path scenarioFile = Paths.get(
         System.getProperty("user.home"), "workspace", "epo_calibration_runs", "runs",
-        "2024-04-03", "local_2024-04-04_06.36.19",
+        "2024-04-03", "local_2024-04-05_13.30.59",
         "calibrated_scenario_updated.yaml"
     );
     @Parameter(names = {"-p", "--policies"})
@@ -139,7 +139,7 @@ public class PolicyRuns implements Runnable {
         logger.info(String.format(
             "About to run %d policies %d times (%d total runs)",
             numberOfPolicies,
-            numberOfYearsToRun,
+            numberOfRunsPerPolicy,
             numberOfPolicies * numberOfRunsPerPolicy
         ));
 

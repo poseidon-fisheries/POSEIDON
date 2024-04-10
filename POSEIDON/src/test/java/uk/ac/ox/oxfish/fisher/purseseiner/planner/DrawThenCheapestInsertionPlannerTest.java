@@ -151,10 +151,10 @@ public class DrawThenCheapestInsertionPlannerTest {
 
         final PlanningModule deploymentModule =
             new DeploymentFromLocationValuePlanningModule(
-                new DeploymentLocationValues(
-                    __ -> ImmutableMap.of(new Int2D(0, 1), 1.0),
-                    0.0
-                ),
+                fisher, new DeploymentLocationValues(
+                __ -> ImmutableMap.of(new Int2D(0, 1), 1.0),
+                0.0
+            ),
                 map,
                 new MersenneTwisterFast(0),
                 1.0

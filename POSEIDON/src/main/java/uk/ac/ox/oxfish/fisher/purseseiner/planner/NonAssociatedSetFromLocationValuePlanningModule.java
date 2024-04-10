@@ -18,6 +18,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
@@ -27,9 +28,10 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.NOA;
 
 public class NonAssociatedSetFromLocationValuePlanningModule<B extends LocalBiology>
-    extends LocationValuePlanningModule<B> {
+    extends LocationValuePlanningModule {
 
     NonAssociatedSetFromLocationValuePlanningModule(
+        final Fisher fisher,
         final LocationValues locationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
@@ -44,6 +46,7 @@ public class NonAssociatedSetFromLocationValuePlanningModule<B extends LocalBiol
         this(
             locationValues,
             new CatchSamplerPlannedActionGenerator.NonAssociatedActionGenerator<B>(
+                fisher,
                 locationValues,
                 map,
                 random,

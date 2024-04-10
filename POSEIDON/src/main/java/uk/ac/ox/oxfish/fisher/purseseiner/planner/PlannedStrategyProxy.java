@@ -250,7 +250,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 planModules.put(
                     ActionType.DolphinSets,
                     new DolphinSetFromLocationValuePlanningModule(
-                        locations,
+                        fisher, locations,
                         model.getMap(),
                         model.getRandom(),
                         additionalHourlyDelayDolphinSets,
@@ -278,7 +278,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 planModules.put(
                     ActionType.DeploymentAction,
                     new DeploymentFromLocationValuePlanningModule(
-                        locations,
+                        fisher, locations,
                         model.getMap(),
                         model.getRandom(),
                         additionalHourlyDelayDeployment
@@ -297,7 +297,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 planModules.put(
                     ActionType.NonAssociatedSets,
                     new NonAssociatedSetFromLocationValuePlanningModule(
-                        locations,
+                        fisher, locations,
                         model.getMap(),
                         model.getRandom(),
                         additionalHourlyDelayNonAssociatedSets,
@@ -340,7 +340,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                 planModules.put(
                     ActionType.OpportunisticFadSets,
                     new FadStealingFromLocationValuePlanningModule(
-                        locations,
+                        fisher, locations,
                         model.getMap(),
                         model.getRandom(),
                         2.779,

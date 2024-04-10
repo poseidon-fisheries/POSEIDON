@@ -33,6 +33,7 @@ public class DeploymentFromLocationValuePlanningModule
 
     @SuppressWarnings("unchecked")
     public DeploymentFromLocationValuePlanningModule(
+        final Fisher fisher,
         final LocationValues locationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
@@ -41,6 +42,7 @@ public class DeploymentFromLocationValuePlanningModule
         super(
             locationValues,
             new DeploymentPlannedActionGenerator(
+                fisher,
                 locationValues,
                 map,
                 random,

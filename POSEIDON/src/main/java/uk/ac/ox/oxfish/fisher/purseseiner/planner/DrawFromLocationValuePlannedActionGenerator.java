@@ -18,6 +18,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -26,7 +27,8 @@ import uk.ac.ox.poseidon.common.api.Observer;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * this object exists to draw a location given a locationvalues object and then turn that location into a planned action
@@ -36,6 +38,7 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
     implements Observer<LocationValues> {
 
     protected final NauticalMap map;
+    private final Fisher fisher;
     /**
      * the rng to use (compatible with Apache)
      */
@@ -48,10 +51,12 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
     private EnumeratedDistribution<SeaTile> seaTilePicker;
 
     DrawFromLocationValuePlannedActionGenerator(
+        final Fisher fisher,
         final LocationValues originalLocationValues,
         final NauticalMap map,
         final MersenneTwisterFast random
     ) {
+        this.fisher = fisher;
         this.originalLocationValues = originalLocationValues;
         this.map = map;
         this.localRng = new MTFApache(random);
@@ -71,7 +76,7 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
                     .stream()
                     .map(entry -> new Pair<>(map.getSeaTile(entry.getKey()), entry.getValue()))
                     // avoid areas where values have turned negative
-                    .filter(seaTileDoublePair -> seaTileDoublePair.getValue() >= 0).collect(Collectors.toList());
+                    .filter(seaTileDoublePair -> seaTileDoublePair.getValue() >= 0).collect(toList());
             if (valuePairs.isEmpty())
                 return;
 
@@ -95,7 +100,31 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
         }
     }
 
-    abstract public PA drawNewPlannedAction();
+    /**
+     * Draw location values until we find one that can generate a legal action, or we run out of possibilities (in which
+     * case we return null).
+     */
+    public PA drawNewPlannedAction() {
+        PA plannedAction = locationToPlannedAction(drawNewLocation());
+        while (!plannedAction.isAllowedNow(fisher)) {
+            final SeaTile location = plannedAction.getLocation();
+            final List<Pair<SeaTile, Double>> newPmf =
+                seaTilePicker
+                    .getPmf()
+                    .stream()
+                    .filter(pair -> pair.getKey() != location)
+                    .collect(toList());
+            if (newPmf.isEmpty()) {
+                plannedAction = null;
+                break;
+            }
+            seaTilePicker = new EnumeratedDistribution<>(localRng, newPmf);
+            plannedAction = locationToPlannedAction(drawNewLocation());
+        }
+        return plannedAction;
+    }
+
+    protected abstract PA locationToPlannedAction(SeaTile location);
 
     SeaTile drawNewLocation() {
         if (originalLocationValues.getValues().isEmpty()) {

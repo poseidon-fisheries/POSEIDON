@@ -16,7 +16,6 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.base.Preconditions;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.model.FishState;
@@ -26,8 +25,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * DrawFromLocationValuePlannedActionGenerator but need to take care into starting the location values with the right
  * fisher
  */
-public abstract class LocationValuePlanningModule<B extends LocalBiology>
-    implements PlanningModule {
+public abstract class LocationValuePlanningModule implements PlanningModule {
 
     final private LocationValues locationValues;
     final private DrawFromLocationValuePlannedActionGenerator<? extends PlannedAction> generator;

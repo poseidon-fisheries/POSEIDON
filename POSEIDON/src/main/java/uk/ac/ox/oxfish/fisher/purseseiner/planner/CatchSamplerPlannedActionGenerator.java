@@ -1,9 +1,25 @@
+/*
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (c) 2024-2024 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
@@ -26,6 +42,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
     private final Class<B> localBiologyClass;
 
     CatchSamplerPlannedActionGenerator(
+        final Fisher fisher,
         final LocationValues originalLocationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
@@ -35,7 +52,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
         final GlobalBiology biology,
         final Class<B> localBiologyClass
     ) {
-        super(originalLocationValues, map, random);
+        super(fisher, originalLocationValues, map, random);
         this.additionalWaitTime = additionalWaitTime;
         this.howMuchWeCanFishOutGenerator = howMuchWeCanFishOutGenerator;
         this.catchMaker = catchMaker;
@@ -44,7 +61,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
     }
 
     @Override
-    public PA drawNewPlannedAction() {
+    protected PA locationToPlannedAction(final SeaTile location) {
         Preconditions.checkState(isReady(), "Did not start the deploy generator yet!");
         return
             turnSeaTilePickedIntoAction(
@@ -72,6 +89,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
         private final int rangeInSeaTiles;
 
         DolphinActionGenerator(
+            final Fisher fisher,
             final LocationValues originalLocationValues,
             final NauticalMap map,
             final MersenneTwisterFast random,
@@ -83,6 +101,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
             final int rangeInSeaTiles
         ) {
             super(
+                fisher,
                 originalLocationValues,
                 map,
                 random,
@@ -124,6 +143,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
         private final int rangeInSeaTiles;
 
         NonAssociatedActionGenerator(
+            final Fisher fisher,
             final LocationValues originalLocationValues,
             final NauticalMap map,
             final MersenneTwisterFast random,
@@ -136,6 +156,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
             final int rangeInSeaTiles
         ) {
             super(
+                fisher,
                 originalLocationValues,
                 map,
                 random,
