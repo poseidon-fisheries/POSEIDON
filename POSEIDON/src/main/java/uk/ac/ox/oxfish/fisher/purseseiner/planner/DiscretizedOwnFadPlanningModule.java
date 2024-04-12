@@ -26,7 +26,6 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule {
 
-    private static final int MAX_OWN_FAD_SETS = 1000;
     final protected OwnFadSetDiscretizedActionGenerator optionsGenerator;
     protected double speedInKmPerHours;
     private NauticalMap map;
@@ -79,11 +78,6 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
         this.fisher = null;
         this.fishState = null;
 
-    }
-
-    @Override
-    public boolean isStarted() {
-        return this.map != null;
     }
 
     /**

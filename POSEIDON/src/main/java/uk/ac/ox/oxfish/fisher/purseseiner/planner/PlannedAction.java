@@ -89,11 +89,6 @@ public interface PlannedAction {
         }
 
         @Override
-        public SeaTile getLocation() {
-            return tile;
-        }
-
-        @Override
         public double hoursItTake() {
             return delayInHours; // the deployment itself is immediate
         }
@@ -110,7 +105,12 @@ public interface PlannedAction {
             return fisher.isAllowedAtSea() &&
                 !fisher.grabState()
                     .getRegulations()
-                    .isForbidden(new FadDeploymentAction(fisher));
+                    .isForbidden(new FadDeploymentAction(fisher, tile));
+        }
+
+        @Override
+        public SeaTile getLocation() {
+            return tile;
         }
 
         @Override

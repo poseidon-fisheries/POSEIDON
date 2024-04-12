@@ -48,7 +48,8 @@ import static uk.ac.ox.poseidon.common.core.Entry.entry;
  */
 public class DrawThenCheapestInsertionPlanner implements FisherStartable {
 
-    private static final int MAX_FAILED_ATTEMPTS = 100;
+    private static final int MAX_FAILED_ATTEMPTS = 5;
+    private static final int MAX_FAILED_ATTEMPTS_WITH_OVERRIDE = 500;
     /**
      * need this to generate your budget in hours
      */
@@ -118,14 +119,19 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         final SeaTile finalPosition,
         final double hoursAvailable
     ) {
+        this.planningModules.values().forEach(module -> module.prepareForReplanning(fishState, fisher));
         final Map<ActionType, MutableLong> permittedActions = initPermittedActions();
         final Plan plan = new Plan(initialPosition, finalPosition);
         double hoursUsed =
             fishState.getMap().distance(initialPosition, finalPosition) /
                 fisher.getBoat().getSpeedInKph();
         int failedAttempts = 0;
+        final int maxFailedAttempts =
+            actionPreferenceOverrides.isEmpty()
+                ? MAX_FAILED_ATTEMPTS
+                : MAX_FAILED_ATTEMPTS_WITH_OVERRIDE;
         while (
-            failedAttempts < MAX_FAILED_ATTEMPTS &&
+            failedAttempts < maxFailedAttempts &&
                 hoursUsed < hoursAvailable &&
                 sumValues(permittedActions) > 0
         ) {
@@ -147,27 +153,25 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
                     .orElse(drawNextAction(permittedActionTypes));
 
             final double hoursCurrentlyAvailable = hoursAvailable - hoursUsed;
-            final Optional<Double> insertionCost = Optional
-                .ofNullable(
-                    // the planning modules might return null if they can't generate an action
-                    planningModules.get(nextActionType).chooseNextAction(plan)
-                )
-                .filter(action ->
-                    // we should never be exceeding the number of available actions,
-                    // but there are other reasons why a disallowed action might be picked
-                    // (e.g., a new MPA covering locations valued by the fisher)
-                    action.isAllowedNow(fisher)
-                )
-                .flatMap(plannedAction ->
-                    cheapestInsert(
-                        plan,
-                        plannedAction,
-                        hoursCurrentlyAvailable,
-                        fisher.getBoat().getSpeedInKph(),
-                        fishState.getMap(),
-                        true
-                    )
+
+            // the planning modules might return null if they can't generate an action
+            final PlanningModule planningModule = planningModules.get(nextActionType);
+            final PlannedAction action = planningModule.chooseNextAction(plan);
+
+            // we should never be exceeding the number of available actions,
+            // but there are other reasons why a disallowed action might be picked
+            // (e.g., a new MPA covering locations valued by the fisher)
+            Optional<Double> insertionCost = Optional.empty();
+            if (action != null && action.isAllowedNow(fisher)) {
+                insertionCost = cheapestInsert(
+                    plan,
+                    action,
+                    hoursCurrentlyAvailable,
+                    fisher.getBoat().getSpeedInKph(),
+                    fishState.getMap(),
+                    true
                 );
+            }
 
             if (insertionCost.isPresent()) {
                 hoursUsed = hoursUsed + insertionCost.get();
@@ -176,6 +180,11 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
                 // we might fail because we don't have enough hours left to insert
                 // new actions or because we keep on generating illegal actions.
                 failedAttempts += 1;
+                // If we have an action but were unable to insert it into the plan
+                // remove its location from the planning module to prevent trying it again
+                if (action != null && planningModule instanceof LocationValuePlanningModule) {
+                    ((LocationValuePlanningModule) planningModule).removeLocation(action.getLocation());
+                }
             }
         }
         return plan;
@@ -186,30 +195,21 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
      * Only action types with one or more permitted actions are included in the map.
      */
     private Map<ActionType, MutableLong> initPermittedActions() {
-        final Map<ActionType, MutableLong> numberOfPermittedActions =
-            actionPreferences
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() > 0)
-                .map(Entry::getKey)
-                .map(actionType -> entry(
-                    actionType,
-                    new MutableLong(
-                        planningModules
-                            .get(actionType)
-                            .numberOfPermittedActions(fisher, fishState.getRegulations())
-                    )
-                ))
-                .filter(entry -> entry.getValue().longValue() > 0)
-                .collect(toImmutableMap(Entry::getKey, Entry::getValue));
-        // make sure planning modules are started for each permitted action type
-        numberOfPermittedActions
-            .keySet()
+        return actionPreferences
+            .entrySet()
             .stream()
-            .map(planningModules::get)
-            .filter(planningModule -> !planningModule.isStarted())
-            .forEach(planningModule -> planningModule.start(fishState, fisher));
-        return numberOfPermittedActions;
+            .filter(entry -> entry.getValue() > 0)
+            .map(Entry::getKey)
+            .map(actionType -> entry(
+                actionType,
+                new MutableLong(
+                    planningModules
+                        .get(actionType)
+                        .numberOfPermittedActions(fisher, fishState.getRegulations())
+                )
+            ))
+            .filter(entry -> entry.getValue().longValue() > 0)
+            .collect(toImmutableMap(Entry::getKey, Entry::getValue));
     }
 
     private static long sumValues(final Map<?, ? extends Number> numberMap) {
@@ -328,7 +328,6 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
                 fisher.getHoursAtSea() == 0
         );
 
-        planningModules.values().forEach(module -> module.prepareForReplanning(fishState, fisher));
         return makePlan(
             fisher.getLocation(),
             fisher.getHomePort().getLocation(),

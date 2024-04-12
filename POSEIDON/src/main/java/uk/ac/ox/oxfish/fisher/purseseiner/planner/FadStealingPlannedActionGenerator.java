@@ -58,7 +58,7 @@ public class FadStealingPlannedActionGenerator extends
     @Override
     protected PlannedAction.OpportunisticFadSet locationToPlannedAction(final SeaTile location) {
         return new PlannedAction.OpportunisticFadSet(
-            drawNewLocation(),
+            location,
             hoursItTakesToSet,
             hoursWastedIfNoFadAround,
             minimumFadValueToSteal,

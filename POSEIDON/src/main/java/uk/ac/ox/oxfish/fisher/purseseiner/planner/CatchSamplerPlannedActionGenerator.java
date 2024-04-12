@@ -66,7 +66,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
         return
             turnSeaTilePickedIntoAction(
                 howMuchWeCanFishOutGenerator,
-                drawNewLocation(),
+                location,
                 additionalWaitTime,
                 catchMaker,
                 biology,

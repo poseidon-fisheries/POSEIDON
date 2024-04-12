@@ -38,8 +38,6 @@ public interface PlanningModule extends FisherStartable {
 
     PlannedAction chooseNextAction(Plan currentPlanSoFar);
 
-    boolean isStarted();
-
     /**
      * this is like the start(...) but gets called when we want the module to be aware that a new plan is starting
      *

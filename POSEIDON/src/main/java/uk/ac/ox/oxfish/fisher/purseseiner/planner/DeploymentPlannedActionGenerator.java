@@ -58,7 +58,7 @@ public class DeploymentPlannedActionGenerator
     protected PlannedAction.Deploy locationToPlannedAction(final SeaTile location) {
         Preconditions.checkState(isReady(), "Did not start the deploy generator yet!");
         return new PlannedAction.Deploy(
-            drawNewLocation(),
+            location,
             delayInHoursAfterADeployment
         );
     }

@@ -75,12 +75,7 @@ public class DummyFishingPlanningModule implements PlanningModule {
         final FishState state,
         final Fisher fisher
     ) {
-        assert isStarted();
-    }
-
-    @Override
-    public boolean isStarted() {
-        return map != null;
+        assert map != null;
     }
 
     @Override

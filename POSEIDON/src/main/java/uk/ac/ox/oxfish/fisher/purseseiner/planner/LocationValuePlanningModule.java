@@ -18,6 +18,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -30,7 +31,7 @@ public abstract class LocationValuePlanningModule implements PlanningModule {
     final private LocationValues locationValues;
     final private DrawFromLocationValuePlannedActionGenerator<? extends PlannedAction> generator;
 
-    public LocationValuePlanningModule(
+    LocationValuePlanningModule(
         final LocationValues locationValues,
         final DrawFromLocationValuePlannedActionGenerator<? extends PlannedAction> generator
     ) {
@@ -44,11 +45,6 @@ public abstract class LocationValuePlanningModule implements PlanningModule {
     }
 
     @Override
-    public boolean isStarted() {
-        return generator.isReady();
-    }
-
-    @Override
     public void start(
         final FishState model,
         final Fisher fisher
@@ -56,7 +52,7 @@ public abstract class LocationValuePlanningModule implements PlanningModule {
         // start the location value if needed; else start the generator
         if (locationValues.getValues() == null)
             locationValues.start(model, fisher);
-        generator.start();
+        generator.init();
     }
 
     /**
@@ -68,13 +64,16 @@ public abstract class LocationValuePlanningModule implements PlanningModule {
         final Fisher fisher
     ) {
         Preconditions.checkState(locationValues.getValues() != null);
-        generator.start();
+        generator.init();
     }
 
     @Override
     public void turnOff(final Fisher fisher) {
         locationValues.turnOff(fisher);
+    }
 
+    void removeLocation(final SeaTile location) {
+        generator.removeLocation(location);
     }
 
 }

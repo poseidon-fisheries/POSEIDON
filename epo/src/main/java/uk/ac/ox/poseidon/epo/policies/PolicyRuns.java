@@ -170,7 +170,7 @@ public class PolicyRuns implements Runnable {
         final ImmutableList<Double> proportions =
             ImmutableList.of(0.75, 0.50, 0.25, 0.10, 0.0);
         final ImmutableList<Double> fineProportions =
-            IntStream.rangeClosed(20, 20)
+            IntStream.rangeClosed(1, 20)
                 .mapToObj(i -> i * 0.05)
                 .collect(toImmutableList());
         return ImmutableMap.of(
@@ -211,7 +211,7 @@ public class PolicyRuns implements Runnable {
             .filter(entry -> policiesToRun.contains(entry.getKey()))
             .collect(toImmutableMap(
                 Entry::getKey,
-                entry -> entry.getValue().get() // TODO: getWithDefault()
+                entry -> entry.getValue().getWithDefault()
             ));
     }
 }

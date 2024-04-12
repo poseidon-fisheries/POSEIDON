@@ -25,9 +25,11 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.MTFApache;
 import uk.ac.ox.poseidon.common.api.Observer;
 
-import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Comparator.comparingDouble;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -48,56 +50,57 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
      * here is a mapping coords --> weight
      */
     private final LocationValues originalLocationValues;
+    private boolean ready = false;
     private EnumeratedDistribution<SeaTile> seaTilePicker;
+
+    private boolean nearbyLocationsHaveBeenTried = false;
 
     DrawFromLocationValuePlannedActionGenerator(
         final Fisher fisher,
         final LocationValues originalLocationValues,
         final NauticalMap map,
-        final MersenneTwisterFast random
+        final MersenneTwisterFast rng
     ) {
-        this.fisher = fisher;
-        this.originalLocationValues = originalLocationValues;
-        this.map = map;
-        this.localRng = new MTFApache(random);
+        this.fisher = checkNotNull(fisher);
+        this.originalLocationValues = checkNotNull(originalLocationValues);
+        this.map = checkNotNull(map);
+        this.localRng = new MTFApache(checkNotNull(rng));
     }
 
-    public void start() {
+    public void init() {
         originalLocationValues.getObservers().register(LocationValues.class, this);
-        preparePicker(originalLocationValues);
+        nearbyLocationsHaveBeenTried = false;
+        seaTilePicker = pickerFromPmf(pmfFromLocationValues(originalLocationValues));
+        ready = true;
     }
 
-    private void preparePicker(final LocationValues locationValues) {
-
-        if (!locationValues.getValues().isEmpty()) {
-            List<Pair<SeaTile, Double>> valuePairs =
-                locationValues
-                    .getValues()
-                    .stream()
-                    .map(entry -> new Pair<>(map.getSeaTile(entry.getKey()), entry.getValue()))
-                    // avoid areas where values have turned negative
-                    .filter(seaTileDoublePair -> seaTileDoublePair.getValue() >= 0).collect(toList());
-            if (valuePairs.isEmpty())
-                return;
-
-            // some weird inputs have 0s everywhere. They need to sum up to something other than 0 or the randomizer
-            // goes in some sort of middle life crisis
-            double sum = 0;
-            for (final Pair<SeaTile, Double> valuePair : valuePairs) {
-                sum += valuePair.getSecond();
-            }
-            if (sum == 0) {
-                final List<Pair<SeaTile, Double>> valuePairsNew = new LinkedList<>();
-                for (final Pair<SeaTile, Double> valuePair : valuePairs) {
-                    valuePairsNew.add(new Pair<>(valuePair.getKey(), valuePair.getValue() + 1));
-                }
-                valuePairs = valuePairsNew;
-            }
-            seaTilePicker = new EnumeratedDistribution<>(
-                localRng,
-                valuePairs
-            );
+    private EnumeratedDistribution<SeaTile> pickerFromPmf(List<Pair<SeaTile, Double>> pmf) {
+        if (pmf.isEmpty() && !nearbyLocationsHaveBeenTried) {
+            nearbyLocationsHaveBeenTried = true;
+            pmf = pmfFromNearbyLocations();
         }
+        return pmf.isEmpty()
+            ? null
+            : new EnumeratedDistribution<>(localRng, pmf);
+    }
+
+    private List<Pair<SeaTile, Double>> pmfFromLocationValues(final LocationValues locationValues) {
+        return locationValues
+            .getValues()
+            .stream()
+            .filter(entry -> entry.getValue() >= 0)
+            .map(entry -> new Pair<>(map.getSeaTile(entry.getKey()), entry.getValue()))
+            .collect(toList());
+    }
+
+    private List<Pair<SeaTile, Double>> pmfFromNearbyLocations() {
+        return map
+            .getAllSeaTilesExcludingLandAsList()
+            .stream()
+            .map(seaTile -> new Pair<>(seaTile, 1 / (1 + map.distance(fisher.getLocation(), seaTile))))
+            .sorted(comparingDouble(pair -> 0.0 - pair.getValue()))
+            .limit(500)
+            .collect(toList());
     }
 
     /**
@@ -105,49 +108,40 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
      * case we return null).
      */
     public PA drawNewPlannedAction() {
-        PA plannedAction = locationToPlannedAction(drawNewLocation());
-        while (!plannedAction.isAllowedNow(fisher)) {
-            final SeaTile location = plannedAction.getLocation();
-            final List<Pair<SeaTile, Double>> newPmf =
-                seaTilePicker
-                    .getPmf()
-                    .stream()
-                    .filter(pair -> pair.getKey() != location)
-                    .collect(toList());
-            if (newPmf.isEmpty()) {
+        PA plannedAction = null;
+        while (plannedAction == null && seaTilePicker != null) {
+            plannedAction = locationToPlannedAction(seaTilePicker.sample());
+            if (!plannedAction.isAllowedNow(fisher)) {
+                removeLocation(plannedAction.getLocation());
                 plannedAction = null;
-                break;
             }
-            seaTilePicker = new EnumeratedDistribution<>(localRng, newPmf);
-            plannedAction = locationToPlannedAction(drawNewLocation());
         }
         return plannedAction;
     }
 
     protected abstract PA locationToPlannedAction(SeaTile location);
 
-    SeaTile drawNewLocation() {
-        if (originalLocationValues.getValues().isEmpty()) {
-//            System.out.println("WARNING: " + this + " had to draw a completely random location due to empty " +
-//                    "locationValues");
-            return map.getAllSeaTilesExcludingLandAsList().get(
-                localRng.nextInt(
-                    map.getAllSeaTilesExcludingLandAsList().size()
-                )
-            );
-        } else
-            return seaTilePicker.sample();
+    public void removeLocation(final SeaTile location) {
+        seaTilePicker = pickerFromPmf(removeSeaTileFromPmf(seaTilePicker.getPmf(), location));
+    }
+
+    private List<Pair<SeaTile, Double>> removeSeaTileFromPmf(
+        final Collection<? extends Pair<SeaTile, Double>> pmf,
+        final SeaTile seaTile
+    ) {
+        return pmf
+            .stream()
+            .filter(pair -> pair.getKey() != seaTile)
+            .collect(toList());
     }
 
     public boolean isReady() {
-        return seaTilePicker != null || (
-            originalLocationValues.getValues() != null &&
-                originalLocationValues.getValues().isEmpty()
-        );
+        return ready;
     }
 
     @Override
     public void observe(final LocationValues locationValues) {
-        preparePicker(locationValues);
+        seaTilePicker = pickerFromPmf(pmfFromLocationValues(originalLocationValues));
     }
+
 }
