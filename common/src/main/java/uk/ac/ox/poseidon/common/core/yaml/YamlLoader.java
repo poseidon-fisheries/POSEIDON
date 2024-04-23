@@ -15,17 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-plugins {
-    id("poseidon.java-conventions")
-}
+package uk.ac.ox.poseidon.common.core.yaml;
 
-dependencies {
-    api("com.univocity:univocity-parsers:2.9.1")
-    api(fileTree("$rootDir/libs/mason") { include("*.jar") })
-    api(files("$rootDir/libs/geomason/geomason.1.5.jar"))
-    api("com.vividsolutions:jts:1.13") // JTS Topology Suite, a geomason dependency
-    // We need to stay on SnakeYAML 1.33 despite the vulnerability
-    // because Eva2 is not compatible with SnakeYAML 2.x.
-    api("org.yaml:snakeyaml:1.33")
-    implementation("org.apache.commons:commons-lang3:3.14.0")
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Path;
+
+public class YamlLoader<T> {
+    private final Class<? extends T> type;
+
+    public YamlLoader(final Class<? extends T> type) {
+        this.type = type;
+    }
+
+    public T load(final Path yamlFile) {
+        return load(yamlFile.toFile());
+    }
+
+    public T load(final File yamlFile) {
+        final T object;
+        try (final FileReader fileReader = new FileReader(yamlFile)) {
+            object = new Yaml().loadAs(fileReader, type);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+        return object;
+    }
 }

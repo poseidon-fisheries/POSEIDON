@@ -1,6 +1,6 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,7 @@ import com.beust.jcommander.converters.PathConverter;
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -60,30 +57,6 @@ public class TwoPunchCalibration implements JCommanderRunnable {
     @SuppressWarnings("unused")
     public void setRootCalibrationFolder(final Path rootCalibrationFolder) {
         this.rootCalibrationFolder = rootCalibrationFolder;
-    }
-
-    public GenericOptimization buildLocalCalibrationProblem(
-        final double[] solution,
-        final double range
-    ) {
-        final GenericOptimization genericOptimization;
-        try (final FileReader fileReader = new FileReader(calibrationFile.toFile())) {
-            genericOptimization = new FishYAML().loadAs(fileReader, GenericOptimization.class);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
-        for (int i = 0; i < genericOptimization.getParameters().size(); i++) {
-            final SimpleOptimizationParameter parameter =
-                ((SimpleOptimizationParameter) genericOptimization.getParameters().get(i));
-            final double optimalValue = parameter.computeNumericValue(solution[i]);
-            parameter.setMaximum(optimalValue * (1d + range));
-            parameter.setMinimum(optimalValue * (1d - range));
-            if (parameter.getMaximum() == parameter.getMinimum()) {
-                assert parameter.getMinimum() == 0;
-                parameter.setMaximum(0.001);
-            }
-        }
-        return genericOptimization;
     }
 
     @SuppressWarnings("unused")
@@ -170,6 +143,26 @@ public class TwoPunchCalibration implements JCommanderRunnable {
         evaluator.setCalibrationFolder(localCalibratorResult.getRunFolder());
         evaluator.setScenarioSource(localCalibratorResult.getCalibratedScenarioFile());
         evaluator.run();
+    }
+
+    public GenericOptimization buildLocalCalibrationProblem(
+        final double[] solution,
+        final double range
+    ) {
+        final GenericOptimization genericOptimization =
+            GenericOptimization.fromFile(calibrationFile);
+        for (int i = 0; i < genericOptimization.getParameters().size(); i++) {
+            final SimpleOptimizationParameter parameter =
+                ((SimpleOptimizationParameter) genericOptimization.getParameters().get(i));
+            final double optimalValue = parameter.computeNumericValue(solution[i]);
+            parameter.setMaximum(optimalValue * (1d + range));
+            parameter.setMinimum(optimalValue * (1d - range));
+            if (parameter.getMaximum() == parameter.getMinimum()) {
+                assert parameter.getMinimum() == 0;
+                parameter.setMaximum(0.001);
+            }
+        }
+        return genericOptimization;
     }
 
 }
