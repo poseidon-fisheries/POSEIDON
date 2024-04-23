@@ -22,13 +22,18 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.PathConverter;
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
-import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
+import uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Streams.mapWithIndex;
 import static java.lang.Runtime.getRuntime;
+import static java.util.stream.Collectors.toList;
 import static uk.ac.ox.poseidon.epo.calibration.Calibrator.CALIBRATION_FILENAME;
 
 public class TwoPunchCalibration implements JCommanderRunnable {
@@ -123,7 +128,7 @@ public class TwoPunchCalibration implements JCommanderRunnable {
             ).calibrate();
 
         final GenericOptimization localCalibrationProblem =
-            buildLocalCalibrationProblem(globalCalibratorResult.getSolution(), 0.2);
+            buildLocalCalibrationProblem(globalCalibratorResult.getSolution(), 0.1);
         localCalibrationProblem.setRunsPerSetting(2);
 
         final Calibrator.Result localCalibratorResult = new Calibrator(
@@ -147,22 +152,63 @@ public class TwoPunchCalibration implements JCommanderRunnable {
 
     public GenericOptimization buildLocalCalibrationProblem(
         final double[] solution,
-        final double range
+        final double proportionOfGlobalRange
     ) {
+
+        checkArgument(proportionOfGlobalRange > 0);
+        checkArgument(proportionOfGlobalRange <= 1);
+
         final GenericOptimization genericOptimization =
             GenericOptimization.fromFile(calibrationFile);
-        for (int i = 0; i < genericOptimization.getParameters().size(); i++) {
-            final SimpleOptimizationParameter parameter =
-                ((SimpleOptimizationParameter) genericOptimization.getParameters().get(i));
-            final double optimalValue = parameter.computeNumericValue(solution[i]);
-            parameter.setMaximum(optimalValue * (1d + range));
-            parameter.setMinimum(optimalValue * (1d - range));
-            if (parameter.getMaximum() == parameter.getMinimum()) {
-                assert parameter.getMinimum() == 0;
-                parameter.setMaximum(0.001);
-            }
-        }
+
+        genericOptimization.setParameters(
+            makeLocalParameters(
+                genericOptimization
+                    .getParameters()
+                    .stream()
+                    .map(HardEdgeOptimizationParameter.class::cast)
+                    .collect(toList()),
+                solution,
+                proportionOfGlobalRange
+            )
+        );
+
         return genericOptimization;
+    }
+
+    static List<HardEdgeOptimizationParameter> makeLocalParameters(
+        final Collection<? extends HardEdgeOptimizationParameter> originalParameters,
+        final double[] solution,
+        final double proportionOfGlobalRange
+    ) {
+        checkArgument(solution.length == originalParameters.size());
+        return mapWithIndex(
+            originalParameters.stream(),
+            (originalParameter, i) -> {
+                final double optimalValue =
+                    originalParameter.computeNumericValue(solution[(int) i]);
+                final double localRange =
+                    (originalParameter.getHardMaximum() - originalParameter.getHardMinimum()) *
+                        proportionOfGlobalRange;
+                final HardEdgeOptimizationParameter newParameter =
+                    new HardEdgeOptimizationParameter(
+                        originalParameter.getAddressToModify(),
+                        optimalValue - localRange / 2.0,
+                        optimalValue + localRange / 2.0,
+                        originalParameter.isRawNumber(),
+                        originalParameter.getHardMinimum(),
+                        originalParameter.getHardMaximum()
+                    );
+                if (newParameter.getMinimum() < newParameter.getHardMinimum()) {
+                    newParameter.setMinimum(newParameter.getHardMinimum());
+                    newParameter.setMaximum(newParameter.getHardMinimum() + localRange);
+                } else if (newParameter.getMaximum() > newParameter.getHardMaximum()) {
+                    newParameter.setMinimum(newParameter.getHardMaximum() - localRange);
+                    newParameter.setMaximum(newParameter.getHardMaximum());
+                }
+                return newParameter;
+            }
+        ).collect(toImmutableList());
     }
 
 }

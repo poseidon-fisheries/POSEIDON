@@ -52,7 +52,7 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
     /**
      * list of all parameters that can be changed
      */
-    private List<OptimizationParameter> parameters = new LinkedList<>();
+    private List<? extends OptimizationParameter> parameters = new LinkedList<>();
     /**
      * map linking the name of the YearlyDataSet in the model with the path to file containing the real time series
      */
@@ -65,7 +65,7 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
 
     public GenericOptimization(
         final String scenarioFile,
-        final List<OptimizationParameter> parameters,
+        final List<? extends OptimizationParameter> parameters,
         final List<DataTarget> targets,
         final int runsPerSetting,
         final int simulatedYears
@@ -108,11 +108,11 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
         yaml.dump(optimization, new FileWriter(optimizationFile.getParent().resolve(newCalibrationName).toFile()));
     }
 
-    public List<OptimizationParameter> getParameters() {
+    public List<? extends OptimizationParameter> getParameters() {
         return parameters;
     }
 
-    public void setParameters(final List<OptimizationParameter> parameters) {
+    public void setParameters(final List<? extends OptimizationParameter> parameters) {
         this.parameters = parameters;
     }
 

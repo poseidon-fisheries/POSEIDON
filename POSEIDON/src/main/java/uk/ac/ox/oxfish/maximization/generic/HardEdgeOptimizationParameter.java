@@ -1,10 +1,27 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) -2024 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package uk.ac.ox.oxfish.maximization.generic;
 
 import com.google.common.base.Preconditions;
 
 /**
- * this is just like simple optimization parameter, but it has additional minimum and maximum which are never
- * crossed even if the EVA optimization allows for bounds to go beyond their usual -10,10 co-domain
+ * this is just like simple optimization parameter, but it has additional minimum and maximum which are never crossed
+ * even if the EVA optimization allows for bounds to go beyond their usual -10,10 co-domain
  */
 public class HardEdgeOptimizationParameter extends SimpleOptimizationParameter {
 
@@ -16,20 +33,17 @@ public class HardEdgeOptimizationParameter extends SimpleOptimizationParameter {
         final String addressToModify,
         final double minimum,
         final double maximum,
-        final boolean alwaysPositive,
         final boolean isRawNumber,
         final double hardMinimum,
         final double hardMaximum
     ) {
-        super(addressToModify, minimum, maximum, alwaysPositive, isRawNumber);
+        super(addressToModify, minimum, maximum, hardMinimum >= 0, isRawNumber);
         this.hardMinimum = hardMinimum;
         this.hardMaximum = hardMaximum;
     }
 
-
     public HardEdgeOptimizationParameter() {
     }
-
 
     @Override
     public double computeNumericValue(final double input) {
@@ -46,7 +60,6 @@ public class HardEdgeOptimizationParameter extends SimpleOptimizationParameter {
             return hardMaximum;
         return original;
     }
-
 
     public double getHardMinimum() {
         return hardMinimum;
