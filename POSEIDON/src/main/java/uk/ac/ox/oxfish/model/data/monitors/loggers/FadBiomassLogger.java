@@ -1,6 +1,6 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2021 CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2021-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
@@ -25,7 +25,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.Collection;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -56,9 +55,8 @@ public class FadBiomassLogger implements RowProvider {
         return headers;
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     @Override
-    public Iterable<? extends Collection<?>> getRows() {
+    public Iterable<? extends List<?>> getRows() {
         final NauticalMap nauticalMap = fishState.getMap();
         final ImmutableIntArray speciesIndices =
             ImmutableIntArray.copyOf(fishState.getSpecies().stream().mapToInt(Species::getIndex));

@@ -1,20 +1,19 @@
 /*
- *  POSEIDON, an agent-based model of fisheries
- *  Copyright (C) 2020  CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2020-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.oxfish.model.data.monitors.loggers;
@@ -93,7 +92,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
     }
 
     @Override
-    public Iterable<? extends Collection<?>> getRows() {
+    public Iterable<? extends List<?>> getRows() {
         return actionRecords.build().stream().map(ActionRecord::asRow).collect(toImmutableList());
     }
 
@@ -103,7 +102,10 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         observers.forEach(observer -> observer.start(fishState));
     }
 
-    private Map<String, Double> getCatchPerSize(final Species species, final StructuredAbundance abundance) {
+    private Map<String, Double> getCatchPerSize(
+        final Species species,
+        final StructuredAbundance abundance
+    ) {
         final TunaMeristics meristics = (TunaMeristics) species.getMeristics();
         final List<Map<String, List<Integer>>> weightBins = meristics.getWeightBins();
         return range(0, species.getNumberOfSubdivisions()).boxed()
@@ -151,7 +153,7 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
                 .map(action.getDate()::atTime)
                 .orElseThrow(() -> new IllegalStateException("Time not set for action: " + action));
             this.fadId = Optional.of(action)
-                .filter(a -> a instanceof FadRelatedAction)
+                .filter(FadRelatedAction.class::isInstance)
                 .map(a -> ((FadRelatedAction) a).getFad())
                 .map(Fad::getId)
                 .map(Object::toString)
@@ -170,8 +172,8 @@ public class PurseSeineActionsLogger implements AdditionalStartable, RowProvider
         private void setCatches(
             final Catch catchesKept,
             final String speciesName,
-            final Consumer<Double> weightCaughtSetter,
-            final Consumer<Map<String, Double>> catchPerSizeSetter
+            final Consumer<? super Double> weightCaughtSetter,
+            final Consumer<? super Map<String, Double>> catchPerSizeSetter
         ) {
             final Species species = fishState.getSpecies(speciesName);
             weightCaughtSetter.accept(catchesKept.getWeightCaught(species));

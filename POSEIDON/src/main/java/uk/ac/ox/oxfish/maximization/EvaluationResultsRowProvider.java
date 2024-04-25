@@ -1,6 +1,6 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2021 CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2021-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.oxfish.maximization;
@@ -23,7 +23,6 @@ import uk.ac.ox.oxfish.maximization.generic.FixedDataTarget;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
 
-import java.util.Collection;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -42,7 +41,8 @@ class EvaluationResultsRowProvider implements RowProvider {
     );
 
     EvaluationResultsRowProvider(
-        final FishState fishState, final GenericOptimization optimization
+        final FishState fishState,
+        final GenericOptimization optimization
     ) {
         this.fishState = fishState;
         this.optimization = optimization;
@@ -54,12 +54,12 @@ class EvaluationResultsRowProvider implements RowProvider {
     }
 
     @Override
-    public Iterable<? extends Collection<?>> getRows() {
+    public Iterable<? extends List<?>> getRows() {
         return optimization
             .getTargets()
             .stream()
-            .filter(target -> target instanceof FixedDataTarget)
-            .map(target -> (FixedDataTarget) target)
+            .filter(FixedDataTarget.class::isInstance)
+            .map(FixedDataTarget.class::cast)
             .map(target ->
                 ImmutableList.of(
                     target.getClass().getSimpleName(),

@@ -1,6 +1,6 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ public class DeathEventsRowProvider implements
     }
 
     @Override
-    public Iterable<? extends Collection<?>> getRows() {
+    public Iterable<? extends List<?>> getRows() {
         final ImmutableList<ImmutableList<Object>> rows = this.rows.build();
         this.rows = new ImmutableList.Builder<>();
         return rows;
