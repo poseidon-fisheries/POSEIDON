@@ -15,21 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+package uk.ac.ox.poseidon.r.adaptors.datasets;
 
-plugins {
-    id("poseidon.java-conventions")
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-}
+import java.util.Arrays;
+import java.util.Iterator;
 
-tasks {
-    named<ShadowJar>("shadowJar") {
-        mergeServiceFiles()
+public class DoubleColumn extends RColumn<Double> {
+
+    private final double[] doubles;
+
+    public DoubleColumn(
+        final String name,
+        final double[] doubles
+    ) {
+        super(name);
+        this.doubles = doubles;
     }
-}
-dependencies {
-    implementation(project(":common"))
-    implementation(project(":simulations:api"))
-    runtimeOnly(project(":simulations:adaptors"))
-    runtimeOnly(project(":poseidon-r:adaptors"))
+
+    @Override
+    public Object toArray() {
+        return doubles;
+    }
+
+    @Override
+    public Iterator<Double> iterator() {
+        return Arrays.stream(doubles).iterator();
+    }
 }

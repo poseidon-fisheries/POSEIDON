@@ -15,21 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     id("poseidon.java-conventions")
-    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
-tasks {
-    named<ShadowJar>("shadowJar") {
-        mergeServiceFiles()
-    }
-}
 dependencies {
-    implementation(project(":common"))
-    implementation(project(":simulations:api"))
-    runtimeOnly(project(":simulations:adaptors"))
-    runtimeOnly(project(":poseidon-r:adaptors"))
+    implementation(project(":POSEIDON"))
+    implementation(project(":epo"))
+    implementation(project(":datasets:adaptors"))
 }

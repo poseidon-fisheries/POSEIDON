@@ -15,21 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+package uk.ac.ox.poseidon.r.adaptors.datasets;
 
-plugins {
-    id("poseidon.java-conventions")
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-}
+public class DateTimeColumn extends DoubleColumn {
 
-tasks {
-    named<ShadowJar>("shadowJar") {
-        mergeServiceFiles()
+    private static final String[] S3_CLASSES = new String[]{"POSIXct", "POSIXt"};
+
+    DateTimeColumn(
+        final String name,
+        final double[] doubles
+    ) {
+        super(name, doubles);
     }
-}
-dependencies {
-    implementation(project(":common"))
-    implementation(project(":simulations:api"))
-    runtimeOnly(project(":simulations:adaptors"))
-    runtimeOnly(project(":poseidon-r:adaptors"))
+
+    @Override
+    public String[] getS3Classes() {
+        return S3_CLASSES;
+    }
 }

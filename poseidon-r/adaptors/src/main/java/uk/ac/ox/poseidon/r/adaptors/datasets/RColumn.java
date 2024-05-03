@@ -15,21 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+package uk.ac.ox.poseidon.r.adaptors.datasets;
 
-plugins {
-    id("poseidon.java-conventions")
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-}
+import uk.ac.ox.poseidon.datasets.api.Column;
 
-tasks {
-    named<ShadowJar>("shadowJar") {
-        mergeServiceFiles()
+abstract class RColumn<T> implements Column<T> {
+
+    private static final String[] NO_CLASSES = new String[0];
+
+    private final String name;
+
+    RColumn(final String name) {this.name = name;}
+
+    @Override
+    public String getName() {
+        return name;
     }
-}
-dependencies {
-    implementation(project(":common"))
-    implementation(project(":simulations:api"))
-    runtimeOnly(project(":simulations:adaptors"))
-    runtimeOnly(project(":poseidon-r:adaptors"))
+
+    public String[] getS3Classes() {return NO_CLASSES;}
 }
