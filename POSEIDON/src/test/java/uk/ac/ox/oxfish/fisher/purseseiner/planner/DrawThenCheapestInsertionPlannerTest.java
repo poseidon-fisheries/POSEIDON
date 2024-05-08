@@ -55,7 +55,8 @@ public class DrawThenCheapestInsertionPlannerTest {
         // the numbers are such that you will only draw fishing at location
         // 5,0; 1,1; 2,2; 1,1; before running out of budget
         // you should be able to
-        // (1) get them in right order in the plan path (port --> 1,1 --> 1,1 ---> 2,2 ---> 5,0 --> port
+        // (1) get them in right order in the plan path
+        //     (port --> 1,1 --> 1,1 --> 2,2 --> 5,0 --> port)
         // (2) not exceed your budget and add more actions
 
         final Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
@@ -72,7 +73,8 @@ public class DrawThenCheapestInsertionPlannerTest {
         when(fisher.isAtPort()).thenReturn(true);
         when(fisher.isAllowedAtSea()).thenReturn(true);
         when(fisher.isAllowedToFishHere(any(), any())).thenReturn(true);
-        when(fisher.getBoat().getSpeedInKph()).thenReturn(0.29); // takes about 50 hours to do 14 steps
+        // takes about 50 hours to do 14 steps
+        when(fisher.getBoat().getSpeedInKph()).thenReturn(0.29);
 
         final PlanningModule fakeModule = mock(PlanningModule.class);
         // you can take 1000 actions
@@ -143,18 +145,23 @@ public class DrawThenCheapestInsertionPlannerTest {
         when(fisher.grabState()).thenReturn(fishState);
 
         final FadManager fadmanager = mock(FadManager.class);
-        when(fadmanager.numberOfPermissibleActions(eq(ActionClass.DPL), anyInt(), any())).thenReturn(99);
+        when(fadmanager.numberOfPermissibleActions(eq(ActionClass.DPL), anyInt(), any()))
+            .thenReturn(99);
 
         final PurseSeineGear gear = mock(PurseSeineGear.class);
         when(fisher.getGear()).thenReturn(gear);
         when(gear.getFadManager()).thenReturn(fadmanager);
 
-        final PlanningModule deploymentModule =
-            new DeploymentFromLocationValuePlanningModule(
-                fisher, new DeploymentLocationValues(
+        final DeploymentLocationValues deploymentLocationValues =
+            new DeploymentLocationValues(
                 __ -> ImmutableMap.of(new Int2D(0, 1), 1.0),
                 0.0
-            ),
+            );
+        deploymentLocationValues.start(fishState, fisher);
+        final PlanningModule deploymentModule =
+            new DeploymentFromLocationValuePlanningModule(
+                fisher,
+                deploymentLocationValues,
                 map,
                 new MersenneTwisterFast(0),
                 1.0
