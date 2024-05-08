@@ -1,8 +1,8 @@
 plugins {
     id("poseidon.java-conventions")
     id 'jacoco'
-    id "com.github.johnrengelman.shadow" version "7.1.2"
-    id "com.github.spotbugs" version "4.7.2"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
+    id "com.github.spotbugs" version "6.0.14"
 }
 
 shadowJar {
@@ -96,6 +96,10 @@ tasks.withType(Test).configureEach {
 
 spotbugs {
     ignoreFailures = true
+}
+
+jacoco {
+    toolVersion = "0.8.11"
 }
 
 jacocoTestReport {
