@@ -42,7 +42,7 @@ dependencies {
     implementation("net.sf.jung:jung-algorithms:2.0.1")
 
     //jcommander, useful to parse command line arguments
-    implementation("com.beust:jcommander:1.81")
+    implementation("com.beust:jcommander:1.82")
 
     //commons math
     implementation("org.apache.commons:commons-math3:3.6.1")
