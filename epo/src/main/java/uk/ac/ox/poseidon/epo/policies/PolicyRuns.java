@@ -65,7 +65,8 @@ public class PolicyRuns implements Runnable {
         "fad_limits_fine_with_override",
         "extended_closures",
         "el_corralito",
-        "western_closure"
+        "western_closure",
+        "southern_closure"
     );
     @Parameter(names = {"-r", "--runs_per_policy"})
     private int numberOfRunsPerPolicy = 3;
@@ -155,7 +156,8 @@ public class PolicyRuns implements Runnable {
                         .setPolicies(entry.getValue())
                         .setParallel(true)
                         .setWriteScenarioToFile(true)
-                        .requestFisherDailyData(columnName -> columnName.equals("Number of active FADs"))
+                        .requestFisherDailyData(columnName -> columnName.equals(
+                            "Number of active FADs"))
                         .requestFisherYearlyData()
                         .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
                         .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
@@ -205,6 +207,15 @@ public class PolicyRuns implements Runnable {
                     yearsActive,
                     -120,
                     ImmutableList.of(5, 15, 30)
+                ),
+                "southern_closure", new SouthernClosure(
+                    yearsActive,
+                    2023,
+                    ImmutableList.of(0.2, 0.5, 1.0),
+                    // We get 5215 from:
+                    // obs_action_events %>% filter(year == 2022, action_type %in% c("FAD", "OFS"),
+                    // lon >= -125 & lon <= -80, lat >= -20 & lat <= 0) %>% nrow()
+                    ImmutableList.of(0, 5215)
                 )
             )
             .entrySet()

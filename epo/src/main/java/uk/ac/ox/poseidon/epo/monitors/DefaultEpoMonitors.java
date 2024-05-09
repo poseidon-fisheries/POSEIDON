@@ -1,6 +1,6 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -153,6 +153,21 @@ public class DefaultEpoMonitors {
                 Units.DAY,
                 "Soak time",
                 fadSet -> fadSet.getStep() - fadSet.getFad().getStepDeployed()
+            ),
+            new BasicMonitor<>(
+                "FAD and OFS sets in southern area",
+                EVERY_YEAR,
+                SummingAccumulator::new,
+                AbstractUnit.ONE,
+                "Number of sets",
+                fadSet -> fadSet
+                    .getCoordinate()
+                    .filter(coordinate ->
+                        coordinate.x >= -125 && coordinate.x <= -80 &&
+                            coordinate.y >= -20 && coordinate.y <= 0
+                    )
+                    .map(__ -> 1)
+                    .orElse(0)
             ),
             GroupingMonitor.basicPerRegionMonitor(
                 "sets on FADs deployed during current trip",

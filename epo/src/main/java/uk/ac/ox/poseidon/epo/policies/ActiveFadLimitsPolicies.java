@@ -1,17 +1,19 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (c) 2024-2024 CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.poseidon.epo.policies;
@@ -67,7 +69,12 @@ public class ActiveFadLimitsPolicies extends PolicySupplier {
                         (int) (proportion * 100)
                     ),
                     scenario -> {
-                        modifyActiveFadsLimit(proportion, scenario);
+                        modifyActiveFadsLimit(
+                            referenceYear,
+                            proportion,
+                            getYearsActive(),
+                            scenario
+                        );
                         if (addActionOverride) {
                             addActionOverride(scenario);
                         }
@@ -78,8 +85,10 @@ public class ActiveFadLimitsPolicies extends PolicySupplier {
             .collect(toImmutableList());
     }
 
-    private void modifyActiveFadsLimit(
+    public static void modifyActiveFadsLimit(
+        final int referenceYear,
         final Double proportion,
+        final List<Integer> yearsActive,
         final EpoScenario<?> scenario
     ) {
         ((NamedRegulationsFactory) scenario.getRegulations()).modify(
@@ -96,7 +105,7 @@ public class ActiveFadLimitsPolicies extends PolicySupplier {
                 final ImmutableMap.Builder<Integer, Map<String, Integer>> builder =
                     ImmutableMap.<Integer, Map<String, Integer>>builder()
                         .putAll(ACTIVE_FAD_LIMITS);
-                getYearsActive().forEach(year -> builder.put(year, newLimits));
+                yearsActive.forEach(year -> builder.put(year, newLimits));
                 return new ActiveFadLimitsFactory(builder.buildKeepingLast());
             }
         );
@@ -122,8 +131,10 @@ public class ActiveFadLimitsPolicies extends PolicySupplier {
                                 .map(PlannedStrategyProxy.class::cast)
                                 .map(PlannedStrategyProxy::getDelegate)
                                 .map(PlannedStrategy::getPlanner)
-                                // some vessels (mostly dolphin-setters) have zero empirical deployments
-                                // and thus no "plan module" with deployment location preferences, so
+                                // some vessels (mostly dolphin-setters) have zero empirical
+                                // deployments
+                                // and thus no "plan module" with deployment location
+                                // preferences, so
                                 // we exclude those from the "deploy as much as possible" variation
                                 .filter(planner -> planner
                                     .getPlanningModules()
