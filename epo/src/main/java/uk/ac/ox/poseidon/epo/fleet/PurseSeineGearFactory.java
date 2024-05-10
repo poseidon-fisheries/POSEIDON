@@ -1,6 +1,6 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,31 +18,24 @@
 
 package uk.ac.ox.poseidon.epo.fleet;
 
-import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.LocationFisherValuesByActionCache;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
-import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.ParameterTable;
 import uk.ac.ox.poseidon.agents.core.AtomicLongMapYearlyActionCounter;
 import uk.ac.ox.poseidon.common.api.ComponentFactory;
-import uk.ac.ox.poseidon.common.api.Observer;
 import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 import uk.ac.ox.poseidon.common.core.temporal.TemporalMap;
 import uk.ac.ox.poseidon.geography.DoubleGrid;
 
-import javax.measure.quantity.Mass;
-import java.util.*;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -51,16 +44,6 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
 
     private static final LocationFisherValuesByActionCache locationValuesCache =
         new LocationFisherValuesByActionCache();
-
-    private final Map<FishState, Set<Observer<FadDeploymentAction>>> fadDeploymentObservers = new WeakHashMap<>();
-    private final Map<FishState, Set<Observer<AbstractSetAction>>> allSetsObservers = new WeakHashMap<>();
-    private final Map<FishState, Set<Observer<AbstractFadSetAction>>> fadSetObservers = new WeakHashMap<>();
-    @SuppressWarnings("rawtypes")
-    private final Map<FishState, Set<Observer<NonAssociatedSetAction>>> nonAssociatedSetObservers = new WeakHashMap<>();
-    @SuppressWarnings("rawtypes")
-    private final Map<FishState, Set<Observer<DolphinSetAction>>> dolphinSetObservers = new WeakHashMap<>();
-    private final Map<FishState, GroupingMonitor<Species, BiomassLostEvent, Double, Mass>> biomassLostMonitor =
-        new WeakHashMap<>();
     private IntegerParameter targetYear;
     private AlgorithmFactory<? extends FadInitializer<?, ?>> fadInitializer;
     private AlgorithmFactory<? extends FishValueCalculator> fishValueCalculator;
@@ -110,24 +93,6 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         this.fadInitializer = fadInitializer;
     }
 
-    @SuppressWarnings("rawtypes")
-    public void addMonitors(
-        final FishState fishState,
-        final Collection<? extends Observer<FadDeploymentAction>> fadDeploymentObservers,
-        final Collection<? extends Observer<AbstractSetAction>> allSetsObservers,
-        final Collection<? extends Observer<AbstractFadSetAction>> fadSetObservers,
-        final Collection<? extends Observer<NonAssociatedSetAction>> nonAssociatedSetObservers,
-        final Collection<? extends Observer<DolphinSetAction>> dolphinSetObservers,
-        final GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor
-    ) {
-        this.fadDeploymentObservers.put(fishState, ImmutableSet.copyOf(fadDeploymentObservers));
-        this.allSetsObservers.put(fishState, ImmutableSet.copyOf(allSetsObservers));
-        this.fadSetObservers.put(fishState, ImmutableSet.copyOf(fadSetObservers));
-        this.nonAssociatedSetObservers.put(fishState, ImmutableSet.copyOf(nonAssociatedSetObservers));
-        this.dolphinSetObservers.put(fishState, ImmutableSet.copyOf(dolphinSetObservers));
-        this.biomassLostMonitor.put(fishState, biomassLostMonitor);
-    }
-
     @Override
     public PurseSeineGear apply(final FishState fishState) {
         final Map<String, ? extends DoubleParameter> parameters =
@@ -174,12 +139,6 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
             fishState.getFadMap(),
             fadInitializer.apply(fishState),
             AtomicLongMapYearlyActionCounter.create(),
-            fadDeploymentObservers.get(fishState),
-            allSetsObservers.get(fishState),
-            fadSetObservers.get(fishState),
-            nonAssociatedSetObservers.get(fishState),
-            dolphinSetObservers.get(fishState),
-            Optional.of(biomassLostMonitor.get(fishState)),
             fishValueCalculator.apply(fishState)
         );
     }

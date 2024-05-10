@@ -1,6 +1,6 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2021 CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2021-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.oxfish.biology.growers;
@@ -26,9 +25,11 @@ import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.tuna.Extractor;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.monitors.BiomassLostMonitor;
 import uk.ac.ox.oxfish.model.data.monitors.Monitor;
 import uk.ac.ox.oxfish.model.data.monitors.accumulators.Accumulator;
 
@@ -46,11 +47,12 @@ import static uk.ac.ox.oxfish.model.StepOrder.DAWN;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.EPSILON;
 
 /**
- * The FadAwareLogisticGrower is like a CommonLogisticGrower, but calculates growth by using the memorized biomass from
- * the previous year instead of using the current biomass. This grower takes FAD biomass into account as part of the
- * total memorized biomass, but only redistributes new biomass in ocean cells. When the growth function is called, it
- * also adds back biomass that was lost by FADs drifting out of habitable ocean cells. If no FADs are present, it works
- * just like a CommonLogisticGrower (except of course for the memorized biomass bit).
+ * The FadAwareLogisticGrower is like a CommonLogisticGrower, but calculates growth by using the
+ * memorized biomass from the previous year instead of using the current biomass. This grower takes
+ * FAD biomass into account as part of the total memorized biomass, but only redistributes new
+ * biomass in ocean cells. When the growth function is called, it also adds back biomass that was
+ * lost by FADs drifting out of habitable ocean cells. If no FADs are present, it works just like a
+ * CommonLogisticGrower (except of course for the memorized biomass bit).
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FadAwareLogisticGrower implements Startable, Steppable {
@@ -94,7 +96,15 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
             .stream()
             .flatMap(fisher ->
                 stream(maybeGetFadManager(fisher))
-                    .flatMap(fadManager -> stream(fadManager.getBiomassLostMonitor()))
+                    .flatMap(fadManager ->
+                        fadManager
+                            .getObservers()
+                            .view()
+                            .get(BiomassLostEvent.class)
+                            .stream()
+                    )
+                    .filter(BiomassLostMonitor.class::isInstance)
+                    .map(BiomassLostMonitor.class::cast)
                     .flatMap(monitor -> stream(monitor.getSubMonitor(species)))
             )
             .findAny()
@@ -108,9 +118,14 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
         final FishState fishState = (FishState) simState;
 
-        System.out.printf("Growing %s biomass at step %d\n", species.getName(), fishState.getStep());
+        System.out.printf(
+            "Growing %s biomass at step %d\n",
+            species.getName(),
+            fishState.getStep()
+        );
 
-        // the current biomass is the sum of biomass in all local habitats, including sea tiles and FADs
+        // the current biomass is the sum of biomass in all local habitats, including sea tiles
+        // and FADs
         final double currentBiomass =
             allBiologies(fishState).mapToDouble(biology -> biology.getBiomass(species)).sum();
 
@@ -121,31 +136,42 @@ public class FadAwareLogisticGrower implements Startable, Steppable {
 
         // we call the logistic function (r  * biomassToUse * (1 - biomassToUse / K))
         // to get the new biomass resulting from growth and recruitment
-        final double newBiomass = logisticRecruitment(biomassToUse, carryingCapacity, malthusianParameter);
+        final double newBiomass = logisticRecruitment(
+            biomassToUse,
+            carryingCapacity,
+            malthusianParameter
+        );
 
         // we calculate how much space we have left in the ocean to put new biomass
         final double availableCapacity = carryingCapacity - currentBiomass;
 
-        // the biomass to allocate is the sum of the new biomass and the biomass lost by FADs drifting out,
+        // the biomass to allocate is the sum of the new biomass and the biomass lost by FADs
+        // drifting out,
         // while making sure we won't be exceeding the total carrying capacity of the ocean tiles
         final double biomassLostByFads =
             biomassLostAccumulator
                 .map(accumulator -> accumulator.applyAsDouble(fishState))
                 .orElse(0.0);
-        final double biomassToAllocate = Math.min(newBiomass + biomassLostByFads, availableCapacity);
+        final double biomassToAllocate = Math.min(
+            newBiomass + biomassLostByFads,
+            availableCapacity
+        );
 
         // the biomass to allocate should not be negative, barring tiny floating point errors
         assert biomassToAllocate >= -EPSILON : "biomassToAllocate: " + biomassToAllocate;
 
         if (biomassToAllocate > EPSILON) {
-            // If we have some new biomass to allocate, we distribute it uniformly among the sea tiles (not the FADs).
-            // We expect the BiomassReallocator to kick right after, so it doesn't matter where we put it for now.
+            // If we have some new biomass to allocate, we distribute it uniformly among the sea
+            // tiles (not the FADs).
+            // We expect the BiomassReallocator to kick right after, so it doesn't matter where
+            // we put it for now.
             final double biomassToAddPerTile = biomassToAllocate / seaTileBiologies.size();
             seaTileBiologies.forEach(biology -> {
                 final double newCurrentBiomass = biology.getBiomass(species) + biomassToAddPerTile;
                 biology.setCurrentBiomass(species, newCurrentBiomass);
             });
-            final String columnName = fishState.getSpecies().get(species.getIndex()) + " Recruitment";
+            final String columnName =
+                fishState.getSpecies().get(species.getIndex()) + " Recruitment";
             fishState.getYearlyCounter().count(columnName, biomassToAllocate);
         }
     }

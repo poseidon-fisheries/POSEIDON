@@ -55,7 +55,7 @@ public class DefaultEpoMonitors {
     private final Collection<Monitor<AbstractFadSetAction, ?, ?>> fadSetMonitors;
     private final Collection<Monitor<NonAssociatedSetAction, ?, ?>> nonAssociatedSetMonitors;
     private final Collection<Monitor<DolphinSetAction, ?, ?>> dolphinSetMonitors;
-    private final GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
+    private final BiomassLostMonitor biomassLostMonitor;
     private final Collection<Monitor<?, ?, ?>> otherMonitors;
 
     public DefaultEpoMonitors(final FishState fishState) {
@@ -95,7 +95,6 @@ public class DefaultEpoMonitors {
                 fadSet -> ImmutableList.of(fadSet.isOwnFad()),
                 __ -> identity()
             ));
-        // noinspection unchecked
         final GroupingMonitor<Species, AbstractFadSetAction, Double, Mass>
             catchFromFadSetsMonitor = perSpeciesMonitor(
             "catches from FAD sets",
@@ -197,15 +196,7 @@ public class DefaultEpoMonitors {
                 fishState, "catches by dolphin sets", IterativeAveragingAccumulator::new)
         );
 
-        biomassLostMonitor = basicPerSpeciesMonitor(
-            "biomass lost",
-            EVERY_YEAR,
-            SummingAccumulator::new,
-            Units.KILOGRAM,
-            "Biomass",
-            fishState.getSpecies(),
-            species -> event -> event.getBiomassLost().get(species)
-        );
+        biomassLostMonitor = new BiomassLostMonitor(fishState.getSpecies());
 
         otherMonitors = ImmutableList.of(
             new ObservingAtIntervalMonitor<>(

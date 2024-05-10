@@ -1,6 +1,6 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,11 @@ package uk.ac.ox.poseidon.epo.fleet;
 import com.google.common.collect.*;
 import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
+import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadDeactivationStrategy;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.DestinationBasedDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
@@ -116,19 +118,13 @@ public class PurseSeinerFleetFactory
     public PurseSeinerFleetFactory() {
     }
 
-    public ComponentFactory<? extends FadDeactivationStrategy> getFadDeactivationStrategy() {
-        return fadDeactivationStrategy;
-    }
-
-    public void setFadDeactivationStrategy(final ComponentFactory<? extends FadDeactivationStrategy> fadDeactivationStrategy) {
-        this.fadDeactivationStrategy = fadDeactivationStrategy;
-    }
-
     public AlgorithmFactory<? extends Monitors<AbstractSetAction>> getAdditionalSetMonitors() {
         return additionalSetMonitors;
     }
 
-    public void setAdditionalSetMonitors(final AlgorithmFactory<? extends Monitors<AbstractSetAction>> additionalSetMonitors) {
+    public void setAdditionalSetMonitors(
+        final AlgorithmFactory<? extends Monitors<AbstractSetAction>> additionalSetMonitors
+    ) {
         this.additionalSetMonitors = additionalSetMonitors;
     }
 
@@ -207,38 +203,12 @@ public class PurseSeinerFleetFactory
         final FishState fishState,
         final int targetYear
     ) {
-        addMonitors(fishState);
         return new EpoPurseSeineVesselReader(
             getVesselsFile().get(),
             targetYear,
             makeFisherFactory(fishState),
             buildPorts(fishState)
         ).apply(fishState);
-    }
-
-    private void addMonitors(final FishState fishState) {
-        final DefaultEpoMonitors epoMonitors = new DefaultEpoMonitors(fishState);
-        epoMonitors.getMonitors().forEach(fishState::registerStartable);
-        final Collection<Monitor<AbstractSetAction, ?, ?>> setMonitors =
-            Optional.ofNullable(additionalSetMonitors)
-                .map(monitor -> monitor.apply(fishState).getMonitors())
-                .orElseGet(Collections::emptyList);
-        setMonitors.forEach(monitor -> {
-            monitor.registerWith(fishState.getYearlyDataSet());
-            fishState.registerStartable(monitor);
-        });
-        getGear().addMonitors(
-            fishState,
-            epoMonitors.grabFadDeploymentMonitors(),
-            ImmutableSet.<Observer<AbstractSetAction>>builder()
-                .addAll(epoMonitors.grabAllSetsMonitors())
-                .addAll(setMonitors)
-                .build(),
-            epoMonitors.grabFadSetMonitors(),
-            epoMonitors.grabNonAssociatedSetMonitors(),
-            epoMonitors.grabDolphinSetMonitors(),
-            epoMonitors.grabBiomassLostMonitor()
-        );
     }
 
     public InputPath getVesselsFile() {
@@ -266,7 +236,23 @@ public class PurseSeinerFleetFactory
                 0
             );
 
+        final DefaultEpoMonitors epoMonitors = new DefaultEpoMonitors(fishState);
+        epoMonitors.getMonitors().forEach(fishState::registerStartable);
+        final Collection<Monitor<AbstractSetAction, ?, ?>> setMonitors =
+            Optional.ofNullable(additionalSetMonitors)
+                .map(monitor -> monitor.apply(fishState).getMonitors())
+                .orElseGet(Collections::emptyList);
+        setMonitors.forEach(monitor -> {
+            monitor.registerWith(fishState.getYearlyDataSet());
+            fishState.registerStartable(monitor);
+        });
+
         fisherFactory.getAdditionalSetups().addAll(ImmutableList.of(
+            fisher -> registerMonitors(
+                ((PurseSeineGear) fisher.getGear()).getFadManager(),
+                epoMonitors,
+                setMonitors
+            ),
             fisher -> ((CompositeDepartingStrategy) fisher.getDepartingStrategy())
                 .getStrategies()
                 .stream()
@@ -289,7 +275,10 @@ public class PurseSeinerFleetFactory
                 fisher1.getYearlyCounter()
                     .count("Distance travelled", tripRecord.getDistanceTravelled())
             ),
-            fisher -> fishState.registerStartable(getFadDeactivationStrategy().apply(fishState), fisher)
+            fisher -> fishState.registerStartable(
+                getFadDeactivationStrategy().apply(fishState),
+                fisher
+            )
         ));
 
         fishState.getYearlyDataSet().registerGatherer(
@@ -318,12 +307,40 @@ public class PurseSeinerFleetFactory
         return fishState.getMap().getPorts();
     }
 
-    public PurseSeineGearFactory getGear() {
-        return gear;
-    }
-
-    public void setGear(final PurseSeineGearFactory gear) {
-        this.gear = gear;
+    private void registerMonitors(
+        final FadManager fadManager,
+        final DefaultEpoMonitors epoMonitors,
+        final Iterable<? extends Monitor<AbstractSetAction, ?, ?>> setMonitors
+    ) {
+        epoMonitors.grabFadDeploymentMonitors().forEach(observer -> fadManager.registerObserver(
+            FadDeploymentAction.class,
+            observer
+        ));
+        ImmutableSet.<Observer<AbstractSetAction>>builder()
+            .addAll(epoMonitors.grabAllSetsMonitors())
+            .addAll(setMonitors)
+            .build()
+            .forEach(observer -> {
+                fadManager.registerObserver(FadSetAction.class, observer);
+                fadManager.registerObserver(OpportunisticFadSetAction.class, observer);
+                fadManager.registerObserver(NonAssociatedSetAction.class, observer);
+                fadManager.registerObserver(DolphinSetAction.class, observer);
+            });
+        epoMonitors.grabFadSetMonitors().forEach(observer -> {
+            fadManager.registerObserver(FadSetAction.class, observer);
+            fadManager.registerObserver(OpportunisticFadSetAction.class, observer);
+        });
+        epoMonitors.grabNonAssociatedSetMonitors().forEach(observer -> fadManager.registerObserver(
+            NonAssociatedSetAction.class,
+            observer
+        ));
+        epoMonitors.grabDolphinSetMonitors().forEach(observer -> fadManager.registerObserver(
+            DolphinSetAction.class,
+            observer
+        ));
+        Optional
+            .ofNullable(epoMonitors.grabBiomassLostMonitor())
+            .ifPresent(observer -> fadManager.registerObserver(BiomassLostEvent.class, observer));
     }
 
     private Consumer<Fisher> addHourlyCosts() {
@@ -346,6 +363,17 @@ public class PurseSeinerFleetFactory
         };
     }
 
+    public ComponentFactory<? extends FadDeactivationStrategy> getFadDeactivationStrategy() {
+        return fadDeactivationStrategy;
+    }
+
+    public void setFadDeactivationStrategy(
+        final ComponentFactory<?
+            extends FadDeactivationStrategy> fadDeactivationStrategy
+    ) {
+        this.fadDeactivationStrategy = fadDeactivationStrategy;
+    }
+
     public AlgorithmFactory<? extends MarketMap> getMarketMap() {
         return marketMap;
     }
@@ -360,6 +388,14 @@ public class PurseSeinerFleetFactory
 
     public void setTargetYear(final IntegerParameter targetYear) {
         this.targetYear = targetYear;
+    }
+
+    public PurseSeineGearFactory getGear() {
+        return gear;
+    }
+
+    public void setGear(final PurseSeineGearFactory gear) {
+        this.gear = gear;
     }
 
 }
