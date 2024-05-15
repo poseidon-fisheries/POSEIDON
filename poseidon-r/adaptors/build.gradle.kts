@@ -22,5 +22,5 @@ plugins {
 dependencies {
     implementation(project(":POSEIDON"))
     implementation(project(":epo"))
-    implementation(project(":datasets:adaptors"))
+    implementation(project(":datasets:api"))
 }

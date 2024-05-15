@@ -17,20 +17,34 @@
  */
 package uk.ac.ox.poseidon.r.adaptors.datasets;
 
-import uk.ac.ox.poseidon.datasets.api.Column;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import uk.ac.ox.poseidon.datasets.api.Dataset;
+import uk.ac.ox.poseidon.datasets.api.Table;
 
-public abstract class RColumn<T> implements Column<T> {
+import java.util.List;
+import java.util.Map;
 
-    private static final String[] NO_CLASSES = new String[0];
+public class TableMapDataset implements Dataset {
 
-    private final String name;
+    private final Map<String, Table> tables;
 
-    RColumn(final String name) {this.name = name;}
-
-    @Override
-    public String getName() {
-        return name;
+    public TableMapDataset(final Map<String, Table> tables) {
+        this.tables = ImmutableMap.copyOf(tables);
     }
 
-    public String[] getS3Classes() {return NO_CLASSES;}
+    @Override
+    public List<String> getTableNames() {
+        return ImmutableList.copyOf(tables.keySet());
+    }
+
+    @Override
+    public List<Table> getTables() {
+        return ImmutableList.copyOf(tables.values());
+    }
+
+    @Override
+    public Table getTable(final String name) {
+        return tables.get(name);
+    }
 }

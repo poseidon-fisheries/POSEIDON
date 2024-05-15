@@ -17,12 +17,36 @@
  */
 package uk.ac.ox.poseidon.r.adaptors.datasets;
 
+import com.google.common.collect.Streams;
+
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.stream.Stream;
 
 public class IntegerColumn extends RColumn<Integer> {
 
+    private static final int NA_INTEGER = -2147483648;
+
     private final int[] ints;
+
+    public IntegerColumn(
+        final String name,
+        final Iterable<?> objects
+    ) {
+        this(name, Streams.stream(objects));
+    }
+
+    public IntegerColumn(
+        final String name,
+        final Stream<?> objects
+    ) {
+        this(
+            name,
+            objects
+                .mapToInt(o -> o instanceof Number ? ((Number) o).intValue() : NA_INTEGER)
+                .toArray()
+        );
+    }
 
     public IntegerColumn(
         final String name,

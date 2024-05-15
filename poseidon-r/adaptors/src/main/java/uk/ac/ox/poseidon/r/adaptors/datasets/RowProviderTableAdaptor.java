@@ -28,7 +28,6 @@ import uk.ac.ox.poseidon.datasets.api.Table;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -42,9 +41,6 @@ import static java.util.stream.IntStream.range;
 public class RowProviderTableAdaptor
     extends AbstractAdaptor<RowProvider>
     implements Table {
-
-    private final int NA_INTEGER = -2147483648;
-    private final double NA_REAL = Double.longBitsToDouble(0x7ff00000000007a2L);
 
     private final BiMap<String, Integer> columnIndices;
 
@@ -97,24 +93,11 @@ public class RowProviderTableAdaptor
         final String name,
         final Collection<Object> objectList
     ) {
-
         // All integer classes get converted to int, except Long, which R represents as double
         if (allOfClasses(objectList, ImmutableList.of(Integer.class, Short.class, Byte.class))) {
-            return new IntegerColumn(
-                name,
-                objectList
-                    .stream()
-                    .mapToInt(o -> o == null ? NA_INTEGER : ((Number) o).intValue())
-                    .toArray()
-            );
+            return new IntegerColumn(name, objectList);
         } else if (allOfClass(objectList, Number.class)) {
-            return new DoubleColumn(
-                name,
-                objectList
-                    .stream()
-                    .mapToDouble(o -> o == null ? NA_REAL : ((Number) o).doubleValue())
-                    .toArray()
-            );
+            return new DoubleColumn(name, objectList);
         } else if (allOfClass(objectList, Boolean.class)) {
             // it looks weird to return a Boolean[] instead of boolean[], but logical vectors
             // in R are implemented as integer arrays, and we can't return one of those directly
@@ -136,30 +119,11 @@ public class RowProviderTableAdaptor
                     .toArray(String[]::new)
             );
         } else if (allOfClass(objectList, LocalDate.class)) {
-            return new DateColumn(
-                name,
-                objectList
-                    .stream()
-                    .map(LocalDate.class::cast)
-                    .mapToDouble(localDate -> (double) localDate.toEpochDay())
-                    .toArray()
-            );
+            return new DateColumn(name, objectList);
         } else if (allOfClass(objectList, LocalDateTime.class)) {
-            return new DateTimeColumn(
-                name,
-                objectList
-                    .stream()
-                    .map(LocalDateTime.class::cast)
-                    .mapToDouble(localDateTime ->
-                        (double) localDateTime.toEpochSecond(ZoneOffset.UTC)
-                    )
-                    .toArray()
-            );
+            return new DateTimeColumn(name, objectList);
         } else {
-            return new ArrayColumn<>(
-                name,
-                objectList.toArray()
-            );
+            return new ArrayColumn<>(name, objectList.toArray());
         }
     }
 

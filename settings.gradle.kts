@@ -18,7 +18,6 @@
 rootProject.name = "POSEIDON"
 include("agents")
 include("common")
-include("datasets:adaptors")
 include("datasets:api")
 include("POSEIDON")
 include("poseidon-r")

@@ -15,16 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package uk.ac.ox.poseidon.datasets.adaptors.timeseries;
+package uk.ac.ox.poseidon.r.adaptors.datasets.timeseries;
 
-class DataColumnTableAdaptor extends AbstractTable {
-    static String VALUE_COLUMN_NAME = "value";
+import com.google.common.collect.Streams;
+import uk.ac.ox.poseidon.datasets.api.Column;
+import uk.ac.ox.poseidon.r.adaptors.datasets.DateColumn;
 
-    DataColumnTableAdaptor(
-        final IndexColumn<?> indexColumn,
-        final DataColumnColumnAdaptor valueColumn
+import java.time.LocalDate;
+
+class DailyIndexColumn<T> extends DateColumn {
+
+    DailyIndexColumn(
+        final String name,
+        final Column<T> indexedColumn,
+        final LocalDate startDate
     ) {
-        super(indexColumn, valueColumn);
+        super(
+            name,
+            Streams.mapWithIndex(
+                indexedColumn.stream(),
+                (__, index) -> startDate.plusDays(index)
+            )
+        );
     }
 
 }

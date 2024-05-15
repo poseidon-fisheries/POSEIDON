@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package uk.ac.ox.poseidon.datasets.adaptors.timeseries;
+package uk.ac.ox.poseidon.r.adaptors.datasets.timeseries;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -37,12 +37,12 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.Streams.mapWithIndex;
 import static java.util.function.Function.identity;
 
-public abstract class AbstractTable implements Table {
+public class TableAdaptor implements Table {
     private final ImmutableList<String> columnNames;
     private final Map<String, Integer> columnIndices;
     private final ImmutableMap<String, Column<?>> columns;
 
-    public AbstractTable(final Column<?>... columns) {
+    TableAdaptor(final Column<?>... columns) {
         checkArgument(columns.length > 0);
         this.columns = Arrays.stream(columns).collect(toImmutableMap(Column::getName, identity()));
         this.columnNames = this.columns.keySet().asList();
@@ -58,14 +58,16 @@ public abstract class AbstractTable implements Table {
 
     @SuppressWarnings("UnstableApiUsage")
     public Iterable<Row> getRows() {
-        return () -> getColumns().stream()
-            .map(col -> col.stream().map(Stream::of))
-            .reduce(
-                Stream.generate(Stream::of),
-                (a, b) -> Streams.zip(a, b, Stream::concat)
-            )
-            .map(s -> (Row) new TableRow(s.toArray()))
-            .iterator();
+        return () ->
+            getColumns()
+                .stream()
+                .map(col -> col.stream().map(Stream::of))
+                .reduce(
+                    Stream.generate(Stream::of),
+                    (a, b) -> Streams.zip(a, b, Stream::concat)
+                )
+                .map(s -> (Row) new TableRow(s.toArray()))
+                .iterator();
     }
 
     @Override

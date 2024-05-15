@@ -20,7 +20,6 @@ package uk.ac.ox.poseidon.r.adaptors.datasets;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
-import uk.ac.ox.poseidon.datasets.adaptors.TableMapDataset;
 
 import java.util.Map;
 import java.util.Map.Entry;

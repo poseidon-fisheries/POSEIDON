@@ -17,11 +17,40 @@
  */
 package uk.ac.ox.poseidon.r.adaptors.datasets;
 
+import com.google.common.collect.Streams;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.stream.Stream;
+
 public class DateTimeColumn extends DoubleColumn {
 
     private static final String[] S3_CLASSES = new String[]{"POSIXct", "POSIXt"};
 
     DateTimeColumn(
+        final String name,
+        final Iterable<?> objects
+    ) {
+        this(name, Streams.stream(objects));
+    }
+
+    private DateTimeColumn(
+        final String name,
+        final Stream<?> objects
+    ) {
+        this(
+            name,
+            objects
+                .mapToDouble(o ->
+                    o instanceof LocalDateTime
+                        ? (double) ((LocalDateTime) o).toEpochSecond(ZoneOffset.UTC)
+                        : NA_REAL
+                )
+                .toArray()
+        );
+    }
+
+    private DateTimeColumn(
         final String name,
         final double[] doubles
     ) {

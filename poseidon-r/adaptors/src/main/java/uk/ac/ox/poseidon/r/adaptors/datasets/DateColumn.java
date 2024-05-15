@@ -17,11 +17,42 @@
  */
 package uk.ac.ox.poseidon.r.adaptors.datasets;
 
+import com.google.common.collect.Streams;
+
+import java.time.LocalDate;
+import java.util.stream.Stream;
+
 public class DateColumn extends DoubleColumn {
 
     private static final String[] S3_CLASSES = new String[]{"Date"};
 
     DateColumn(
+        final String name,
+        final Iterable<Object> objects
+    ) {
+        this(
+            name,
+            Streams.stream(objects)
+        );
+    }
+
+    public DateColumn(
+        final String name,
+        final Stream<?> objects
+    ) {
+        this(
+            name,
+            objects
+                .mapToDouble(o ->
+                    o instanceof LocalDate
+                        ? (double) ((LocalDate) o).toEpochDay()
+                        : NA_REAL
+                )
+                .toArray()
+        );
+    }
+
+    private DateColumn(
         final String name,
         final double[] doubles
     ) {

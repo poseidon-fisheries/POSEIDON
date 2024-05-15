@@ -17,12 +17,35 @@
  */
 package uk.ac.ox.poseidon.r.adaptors.datasets;
 
+import com.google.common.collect.Streams;
+
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.stream.Stream;
 
 public class DoubleColumn extends RColumn<Double> {
 
+    protected static final double NA_REAL = Double.longBitsToDouble(0x7ff00000000007a2L);
     private final double[] doubles;
+
+    public DoubleColumn(
+        final String name,
+        final Iterable<?> objects
+    ) {
+        this(name, Streams.stream(objects));
+    }
+
+    public DoubleColumn(
+        final String name,
+        final Stream<?> objects
+    ) {
+        this(
+            name,
+            objects
+                .mapToDouble(o -> o instanceof Number ? ((Number) o).doubleValue() : NA_REAL)
+                .toArray()
+        );
+    }
 
     public DoubleColumn(
         final String name,

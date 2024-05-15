@@ -15,12 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-plugins {
-    id("poseidon.java-conventions")
-}
+package uk.ac.ox.poseidon.r.adaptors.datasets.timeseries;
 
-dependencies {
-    api(project(":datasets:api"))
-    implementation(project(":common"))
-    implementation(project(":POSEIDON"))
+import uk.ac.ox.poseidon.datasets.api.Column;
+import uk.ac.ox.poseidon.r.adaptors.datasets.IntegerColumn;
+
+import static com.google.common.collect.Streams.mapWithIndex;
+
+class YearlyIndexColumn extends IntegerColumn {
+
+    YearlyIndexColumn(
+        final String name,
+        final Column<?> indexedColumn,
+        final long startYear
+    ) {
+        super(
+            name,
+            mapWithIndex(indexedColumn.stream(), (__, index) -> startYear + index)
+                .mapToInt(Math::toIntExact)
+                .toArray()
+        );
+    }
 }
