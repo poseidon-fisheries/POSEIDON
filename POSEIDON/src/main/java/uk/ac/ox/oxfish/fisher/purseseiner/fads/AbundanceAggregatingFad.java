@@ -72,8 +72,7 @@ public class AbundanceAggregatingFad
                 for (int div = 0; div < fadAbundance.length; div++) {
                     for (int bin = 0; bin < fadAbundance[div].length; bin++) {
                         tileAbundance[div][bin] += fadAbundance[div][bin];
-                        fadAbundance[div][bin] =
-                            0;
+                        fadAbundance[div][bin] = 0;
                     }
                 }
             });
