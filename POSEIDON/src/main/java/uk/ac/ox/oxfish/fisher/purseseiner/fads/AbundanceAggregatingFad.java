@@ -72,7 +72,8 @@ public class AbundanceAggregatingFad
                 for (int div = 0; div < fadAbundance.length; div++) {
                     for (int bin = 0; bin < fadAbundance[div].length; bin++) {
                         tileAbundance[div][bin] += fadAbundance[div][bin];
-                        fadAbundance[div][bin] = 0;
+                        fadAbundance[div][bin] =
+                            0;
                     }
                 }
             });
@@ -82,22 +83,31 @@ public class AbundanceAggregatingFad
     }
 
     private AbundanceFadAttractionEvent makeReleaseEvent(
-        final Collection<? extends Species> allSpecies,
+        final Collection<? extends Species> speciesToRelease,
         final LocalBiology seaTileBiology
     ) {
         // If we're on a proper abundance tile, we grab that tile's biology directly.
         // Otherwise, we're probably on an empty biology, so we create an empty abundance
-        final AbundanceLocalBiology tileAbundanceBefore = seaTileBiology instanceof AbundanceLocalBiology
-            ? (AbundanceLocalBiology) seaTileBiology
-            : new AbundanceLocalBiology(allSpecies);
+        final AbundanceLocalBiology tileAbundanceBefore =
+            seaTileBiology instanceof AbundanceLocalBiology
+                ? (AbundanceLocalBiology) seaTileBiology
+                : new AbundanceLocalBiology(speciesToRelease);
 
         // turn all abundance numbers from the FAD to negative, since we're loosing it.
         // this will be horribly slow but hopefully doesn't happen *too* often
         final AbundanceLocalBiology fadAbundanceDelta = new AbundanceLocalBiology(
-            this.getBiology().getStructuredAbundance().entrySet().stream().collect(toImmutableMap(
-                Map.Entry::getKey,
-                entry -> entry.getValue().mapValues(v -> -v).asMatrix()
-            )));
+            this
+                .getBiology()
+                .getStructuredAbundance()
+                .entrySet()
+                .stream()
+                .collect(toImmutableMap(
+                    Map.Entry::getKey,
+                    entry ->
+                        speciesToRelease.contains(entry.getKey())
+                            ? entry.getValue().mapValues(v -> -v).asMatrix()
+                            : entry.getValue().mapValues(v -> 0).asMatrix()
+                )));
 
         return new AbundanceFadAttractionEvent(this, tileAbundanceBefore, fadAbundanceDelta);
     }
