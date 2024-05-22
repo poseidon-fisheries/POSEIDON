@@ -34,24 +34,25 @@ import java.util.Map;
 import static java.time.Month.*;
 
 public class DefaultEpoRegulations {
-    public static final Map<Integer, Map<String, Integer>> ACTIVE_FAD_LIMITS = ImmutableMap.of(
-        2021, ImmutableMap.of("6.b", 300, "6.a", 450),
-        2022, ImmutableMap.of("6.b", 270, "6.a", 400),
-        2023, ImmutableMap.of("6.b", 255, "6.a", 340),
-        2024, ImmutableMap.of("6.b", 210, "6.a", 340)
+    public static final Map<String, Map<String, Integer>> ACTIVE_FAD_LIMITS = ImmutableMap.of(
+        "2021", ImmutableMap.of("6.b", 300, "6.a", 450),
+        "2022", ImmutableMap.of("6.b", 270, "6.a", 400),
+        "2023", ImmutableMap.of("6.b", 255, "6.a", 340),
+        "2024", ImmutableMap.of("6.b", 210, "6.a", 340)
     );
     public static final MonthDay EL_CORRALITO_BEGINNING = MonthDay.of(OCTOBER, 9);
     public static final MonthDay EL_CORRALITO_END = MonthDay.of(NOVEMBER, 8);
     public static final InRectangularAreaFactory EL_CORRALITO_AREA = new InRectangularAreaFactory(
         4.0, -110.0, -3.0, -96.0
     );
-    private static final Map<Integer, Integer> ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET = ImmutableMap.of(
-        1200, 10,
-        1500, 13,
-        1800, 16,
-        2100, 19,
-        2400, 22
-    );
+    private static final Map<Integer, Integer> ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET =
+        ImmutableMap.of(
+            1200, 10,
+            1500, 13,
+            1800, 16,
+            2100, 19,
+            2400, 22
+        );
     private static final MonthDay CLOSURE_A_START = MonthDay.of(JULY, 29);
     private static final MonthDay CLOSURE_A_END = MonthDay.of(OCTOBER, 8);
     private static final MonthDay CLOSURE_B_START = MonthDay.of(NOVEMBER, 9);

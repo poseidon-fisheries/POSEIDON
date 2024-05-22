@@ -58,6 +58,32 @@ public class ActiveFadLimitsPolicies extends PolicySupplier {
         this.addActionOverride = addActionOverride;
     }
 
+    public static void modifyActiveFadsLimit(
+        final int referenceYear,
+        final Double proportion,
+        final Iterable<Integer> yearsActive,
+        final EpoScenario<?> scenario
+    ) {
+        ((NamedRegulationsFactory) scenario.getRegulations()).modify(
+            "Active-FAD limits",
+            () -> {
+                final ImmutableMap<String, Integer> newLimits = ACTIVE_FAD_LIMITS
+                    .get(Integer.toString(referenceYear))
+                    .entrySet()
+                    .stream()
+                    .collect(toImmutableMap(
+                        Entry::getKey,
+                        entry -> (int) (entry.getValue() * proportion)
+                    ));
+                final ImmutableMap.Builder<String, Map<String, Integer>> builder =
+                    ImmutableMap.<String, Map<String, Integer>>builder()
+                        .putAll(ACTIVE_FAD_LIMITS);
+                yearsActive.forEach(year -> builder.put(year.toString(), newLimits));
+                return new ActiveFadLimitsFactory(builder.buildKeepingLast());
+            }
+        );
+    }
+
     @Override
     public List<Policy<EpoScenario<?>>> get() {
         return proportionsOfCurrentLimits
@@ -83,32 +109,6 @@ public class ActiveFadLimitsPolicies extends PolicySupplier {
                 )
             )
             .collect(toImmutableList());
-    }
-
-    public static void modifyActiveFadsLimit(
-        final int referenceYear,
-        final Double proportion,
-        final List<Integer> yearsActive,
-        final EpoScenario<?> scenario
-    ) {
-        ((NamedRegulationsFactory) scenario.getRegulations()).modify(
-            "Active-FAD limits",
-            () -> {
-                final ImmutableMap<String, Integer> newLimits = ACTIVE_FAD_LIMITS
-                    .get(referenceYear)
-                    .entrySet()
-                    .stream()
-                    .collect(toImmutableMap(
-                        Entry::getKey,
-                        entry -> (int) (entry.getValue() * proportion)
-                    ));
-                final ImmutableMap.Builder<Integer, Map<String, Integer>> builder =
-                    ImmutableMap.<Integer, Map<String, Integer>>builder()
-                        .putAll(ACTIVE_FAD_LIMITS);
-                yearsActive.forEach(year -> builder.put(year, newLimits));
-                return new ActiveFadLimitsFactory(builder.buildKeepingLast());
-            }
-        );
     }
 
     private void addActionOverride(
