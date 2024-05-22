@@ -25,4 +25,5 @@ dependencies {
     compileOnly(project(":simulations:api"))
     compileOnly(project(":datasets:api"))
     implementation("org.yaml:snakeyaml:2.0")
+    implementation("commons-beanutils:commons-beanutils:1.9.4")
 }

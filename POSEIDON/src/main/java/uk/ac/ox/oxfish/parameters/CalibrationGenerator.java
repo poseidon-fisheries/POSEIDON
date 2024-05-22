@@ -19,11 +19,9 @@ package uk.ac.ox.oxfish.parameters;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.maximization.GenericOptimization;
-import uk.ac.ox.oxfish.maximization.generic.DataTarget;
-import uk.ac.ox.oxfish.maximization.generic.FixedDataTargetGenerator;
-import uk.ac.ox.oxfish.maximization.generic.HardEdgeOptimizationParameter;
-import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
+import uk.ac.ox.oxfish.maximization.generic.*;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -54,16 +52,26 @@ public class CalibrationGenerator {
         final Path scenarioFile = calibrationFolder.resolve("scenario.yaml");
         yaml.dump(scenario, scenarioFile);
         final List<OptimizationParameter> parameters =
-            new ParameterExtractor<>(CalibratedParameter.class)
+            new ParameterExtractor(
+                ImmutableSet.of(CalibratedParameter.class),
+                LegacyParameterAddressBuilder::new
+            )
                 .getParameters(scenario)
-                .map(parameter -> new HardEdgeOptimizationParameter(
-                    parameter.getAddress(),
-                    parameter.getObject().getMinimum(),
-                    parameter.getObject().getMaximum(),
-                    false,
-                    parameter.getObject().getHardMinimum(),
-                    parameter.getObject().getHardMaximum()
-                ))
+                .filter(extractedParameter ->
+                    extractedParameter.getObject() instanceof CalibratedParameter
+                )
+                .map(parameter -> {
+                    final CalibratedParameter calibratedParameter =
+                        (CalibratedParameter) parameter.getObject();
+                    return new HardEdgeOptimizationParameter(
+                        parameter.getAddress(),
+                        calibratedParameter.getMinimum(),
+                        calibratedParameter.getMaximum(),
+                        false,
+                        calibratedParameter.getHardMinimum(),
+                        calibratedParameter.getHardMaximum()
+                    );
+                })
                 .collect(Collectors.toList());
         final ImmutableMap<String, FixedDataTargetGenerator> targetGenerators =
             stream(ServiceLoader.load(FixedDataTargetGenerator.class))

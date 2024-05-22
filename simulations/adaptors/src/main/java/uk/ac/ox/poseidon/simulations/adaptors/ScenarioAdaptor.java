@@ -17,6 +17,9 @@
  */
 package uk.ac.ox.poseidon.simulations.adaptors;
 
+import com.google.common.collect.ImmutableSet;
+import org.apache.commons.beanutils.ConvertUtils;
+import uk.ac.ox.oxfish.maximization.generic.BeanParameterAddressBuilder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.parameters.ParameterExtractor;
 import uk.ac.ox.oxfish.utility.parameters.BooleanParameter;
@@ -44,11 +47,17 @@ public class ScenarioAdaptor
 
     @Override
     public Map<String, uk.ac.ox.poseidon.simulations.api.Parameter> getParameters() {
-        return new ParameterExtractor<>(uk.ac.ox.poseidon.common.api.parameters.Parameter.class)
-            .getParameters(getDelegate())
+        return new ParameterExtractor(
+            ImmutableSet.of(
+                uk.ac.ox.poseidon.common.api.parameters.Parameter.class,
+                Number.class,
+                Boolean.class,
+                String.class
+            ),
+            BeanParameterAddressBuilder::new
+        ).getParameters(getDelegate())
             .map(extractedParameter -> {
-                final uk.ac.ox.poseidon.common.api.parameters.Parameter parameter =
-                    extractedParameter.getObject();
+                final Object parameter = extractedParameter.getObject();
                 if (parameter instanceof DoubleParameter)
                     return new DoubleParameterAdaptor(
                         (DoubleParameter) parameter,
@@ -79,9 +88,11 @@ public class ScenarioAdaptor
                         extractedParameter.getAddress(),
                         this.getDelegate()
                     );
-                else
-                    throw new IllegalStateException(
-                        "No parameter adaptor found for " + parameter.getClass()
+                else return new BeanParameter<>(
+                        this.getDelegate(),
+                        extractedParameter.getAddress(),
+                        parameter.getClass(),
+                        ConvertUtils.lookup(parameter.getClass())
                     );
             })
             .collect(toImmutableMap(Parameter::getName, identity()));

@@ -1,65 +1,29 @@
+/*
+ * POSEIDON, an agent-based model of fisheries
+ * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.ox.oxfish.maximization.generic;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Streams;
-
-import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.lang.String.join;
+public interface ParameterAddressBuilder extends Supplier<String> {
+    ParameterAddressBuilder add(String element);
 
-public class ParameterAddressBuilder implements Supplier<String> {
-    private final ImmutableList<String> address;
+    ParameterAddressBuilder addKey(String key);
 
-    public ParameterAddressBuilder() {
-        this(ImmutableList.of());
-    }
-
-    public ParameterAddressBuilder(final List<String> address) {
-        this.address = ImmutableList.copyOf(address);
-    }
-
-    @Override
-    public String get() {
-        return join(".", address);
-    }
-
-    public ParameterAddressBuilder add(final String element) {
-        return new ParameterAddressBuilder(add(address, element));
-    }
-
-    private static <T> List<T> add(final List<T> list, final T element) {
-        return new ImmutableList.Builder<T>()
-            .addAll(list)
-            .add(element)
-            .build();
-    }
-
-    public ParameterAddressBuilder addKey(final String key) {
-        return new ParameterAddressBuilder(addSuffixToAddress(address, "~", key));
-    }
-
-    private static List<String> addSuffixToAddress(
-        final List<String> address,
-        final String separator,
-        final String suffix
-    ) {
-        checkArgument(!address.isEmpty());
-        final int size = address.size();
-        return Streams
-            .concat(
-                address.stream().limit(size - 1),
-                Stream.of(Iterables.getLast(address)).map(s -> s + separator + suffix)
-            )
-            .collect(toImmutableList());
-    }
-
-    public ParameterAddressBuilder addIndex(final long index) {
-        return new ParameterAddressBuilder(addSuffixToAddress(address, "$", String.valueOf(index)));
-    }
-
+    ParameterAddressBuilder addIndex(long index);
 }

@@ -1,9 +1,9 @@
 package uk.ac.ox.oxfish.parameters;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import uk.ac.ox.oxfish.maximization.generic.ParameterAddressBuilder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.poseidon.common.api.parameters.Parameter;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -11,20 +11,23 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ParameterExtractor<P extends Parameter> {
+public class ParameterExtractor {
 
-    private final Class<? extends P> parameterClass;
+    private final Set<Class<?>> parameterClasses;
+    private final Supplier<ParameterAddressBuilder> parameterAddressBuilderSupplier;
 
     @SuppressWarnings("WeakerAccess")
-    public ParameterExtractor(final Class<? extends P> parameterClass) {
-        this.parameterClass = parameterClass;
+    public ParameterExtractor(
+        final Collection<Class<?>> parameterClasses,
+        final Supplier<ParameterAddressBuilder> parameterAddressBuilderSupplier
+    ) {
+        this.parameterClasses = ImmutableSet.copyOf(parameterClasses);
+        this.parameterAddressBuilderSupplier = parameterAddressBuilderSupplier;
     }
 
     private static List<PropertyDescriptor> getPropertyDescriptors(final Object object) {
@@ -38,7 +41,10 @@ public class ParameterExtractor<P extends Parameter> {
         }
     }
 
-    private static Object invoke(final Object object, final Method method) {
+    private static Object invoke(
+        final Object object,
+        final Method method
+    ) {
         try {
             return method.invoke(object);
         } catch (final IllegalAccessException | InvocationTargetException e) {
@@ -46,12 +52,12 @@ public class ParameterExtractor<P extends Parameter> {
         }
     }
 
-    public Stream<Parameter> getParameters(final Object object) {
-        return getParameters(object, new ParameterAddressBuilder());
+    public Stream<ExtractedParameter> getParameters(final Object object) {
+        return getParameters(object, parameterAddressBuilderSupplier.get());
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private Stream<Parameter> getParameters(
+    private Stream<ExtractedParameter> getParameters(
         final Object object,
         final ParameterAddressBuilder addressBuilder
     ) {
@@ -59,13 +65,16 @@ public class ParameterExtractor<P extends Parameter> {
             .stream(Optional.ofNullable(object))
             .filter(o ->
                 // Exclude problematic types from search:
-                // - Class objects have annotation getters that generate IllegalAccessException on newer JVMs
+                // - Class objects have annotation getters that generate IllegalAccessException
+                // on newer JVMs
                 // - Path objects iterate on themselves, creating an infinite loop
                 !(o instanceof Class || o instanceof Path)
             )
             .flatMap(o -> {
-                if (parameterClass.isAssignableFrom(o.getClass())) {
-                    return Stream.of(new Parameter(addressBuilder.get(), parameterClass.cast(o)));
+                if (parameterClasses.stream().anyMatch(parameterClass ->
+                    parameterClass.isAssignableFrom(o.getClass())
+                )) {
+                    return Stream.of(new ExtractedParameter(addressBuilder.get(), o));
                 } else if (o instanceof Map) {
                     return getParametersFromMap((Map<?, ?>) o, addressBuilder);
                 } else if (o instanceof Iterable) {
@@ -76,7 +85,7 @@ public class ParameterExtractor<P extends Parameter> {
             });
     }
 
-    private Stream<Parameter> getParametersFromObject(
+    private Stream<ExtractedParameter> getParametersFromObject(
         final Object o,
         final ParameterAddressBuilder addressBuilder
     ) {
@@ -89,7 +98,7 @@ public class ParameterExtractor<P extends Parameter> {
             ));
     }
 
-    private Stream<Parameter> getParametersFromMap(
+    private Stream<ExtractedParameter> getParametersFromMap(
         final Map<?, ?> objectMap,
         final ParameterAddressBuilder address
     ) {
@@ -104,7 +113,7 @@ public class ParameterExtractor<P extends Parameter> {
             );
     }
 
-    private Stream<Parameter> getParametersFromIterable(
+    private Stream<ExtractedParameter> getParametersFromIterable(
         final Iterable<?> objects,
         final ParameterAddressBuilder address
     ) {
@@ -121,11 +130,14 @@ public class ParameterExtractor<P extends Parameter> {
             );
     }
 
-    public class Parameter {
+    public static class ExtractedParameter {
         private final String address;
-        private final P object;
+        private final Object object;
 
-        public Parameter(final String address, final P object) {
+        public ExtractedParameter(
+            final String address,
+            final Object object
+        ) {
             this.address = address;
             this.object = object;
         }
@@ -135,7 +147,7 @@ public class ParameterExtractor<P extends Parameter> {
             return address;
         }
 
-        public P getObject() {
+        public Object getObject() {
             return object;
         }
     }
