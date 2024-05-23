@@ -1,6 +1,6 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2021 CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2021-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.oxfish.biology.tuna;
@@ -25,13 +25,15 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Map;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+
 /**
  * The factory in charge of creating an {@link AbundanceRestorer}.
  */
 public class AbundanceRestorerFactory
     extends RestorerFactory<AbundanceLocalBiology> {
 
-    private Map<Integer, Integer> schedule;
+    private Map<String, Integer> schedule;
 
     /**
      * Empty constructor for YAML instantiation
@@ -42,19 +44,19 @@ public class AbundanceRestorerFactory
 
     public AbundanceRestorerFactory(
         final AlgorithmFactory<Reallocator<AbundanceLocalBiology>> reallocator,
-        final Map<Integer, Integer> schedule
+        final Map<String, Integer> schedule
     ) {
         super(reallocator);
         this.schedule = ImmutableMap.copyOf(schedule);
     }
 
     @SuppressWarnings("unused")
-    public Map<Integer, Integer> getSchedule() {
-        //noinspection AssignmentOrReturnOfFieldWithMutableType
+    public Map<String, Integer> getSchedule() {
+        // noinspection AssignmentOrReturnOfFieldWithMutableType
         return schedule;
     }
 
-    public void setSchedule(final Map<Integer, Integer> schedule) {
+    public void setSchedule(final Map<String, Integer> schedule) {
         this.schedule = ImmutableMap.copyOf(schedule);
     }
 
@@ -63,7 +65,10 @@ public class AbundanceRestorerFactory
         return new AbundanceRestorer(
             getReallocator().apply(fishState),
             new AbundanceAggregator(),
-            schedule
+            schedule.entrySet().stream().collect(toImmutableMap(
+                entry -> Integer.valueOf(entry.getKey()),
+                Map.Entry::getValue
+            ))
         );
     }
 }
