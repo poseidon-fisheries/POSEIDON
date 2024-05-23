@@ -18,16 +18,9 @@
 
 package uk.ac.ox.poseidon.epo.policies;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.ActionType;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.PlannedStrategy;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.PlannedStrategyProxy;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ActiveFadLimitsFactory;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.poseidon.epo.scenarios.EpoScenario;
 import uk.ac.ox.poseidon.regulations.core.NamedRegulationsFactory;
 
@@ -58,32 +51,6 @@ public class ActiveFadLimitsPolicies extends PolicySupplier {
         this.addActionOverride = addActionOverride;
     }
 
-    public static void modifyActiveFadsLimit(
-        final int referenceYear,
-        final Double proportion,
-        final Iterable<Integer> yearsActive,
-        final EpoScenario<?> scenario
-    ) {
-        ((NamedRegulationsFactory) scenario.getRegulations()).modify(
-            "Active-FAD limits",
-            () -> {
-                final ImmutableMap<String, Integer> newLimits = ACTIVE_FAD_LIMITS
-                    .get(Integer.toString(referenceYear))
-                    .entrySet()
-                    .stream()
-                    .collect(toImmutableMap(
-                        Entry::getKey,
-                        entry -> (int) (entry.getValue() * proportion)
-                    ));
-                final ImmutableMap.Builder<String, Map<String, Integer>> builder =
-                    ImmutableMap.<String, Map<String, Integer>>builder()
-                        .putAll(ACTIVE_FAD_LIMITS);
-                yearsActive.forEach(year -> builder.put(year.toString(), newLimits));
-                return new ActiveFadLimitsFactory(builder.buildKeepingLast());
-            }
-        );
-    }
-
     @Override
     public List<Policy<EpoScenario<?>>> get() {
         return proportionsOfCurrentLimits
@@ -111,39 +78,40 @@ public class ActiveFadLimitsPolicies extends PolicySupplier {
             .collect(toImmutableList());
     }
 
+    public static void modifyActiveFadsLimit(
+        final int referenceYear,
+        final Double proportion,
+        final Iterable<Integer> yearsActive,
+        final EpoScenario<?> scenario
+    ) {
+        ((NamedRegulationsFactory) scenario.getRegulations()).modify(
+            "Active-FAD limits",
+            () -> {
+                final ImmutableMap<String, Integer> newLimits = ACTIVE_FAD_LIMITS
+                    .get(Integer.toString(referenceYear))
+                    .entrySet()
+                    .stream()
+                    .collect(toImmutableMap(
+                        Entry::getKey,
+                        entry -> (int) (entry.getValue() * proportion)
+                    ));
+                final ImmutableMap.Builder<String, Map<String, Integer>> builder =
+                    ImmutableMap.<String, Map<String, Integer>>builder()
+                        .putAll(ACTIVE_FAD_LIMITS);
+                yearsActive.forEach(year -> builder.put(year.toString(), newLimits));
+                return new ActiveFadLimitsFactory(builder.buildKeepingLast());
+            }
+        );
+    }
+
     private void addActionOverride(
         final EpoScenario<?> scenario
     ) {
         scenario.getAdditionalStartables().put(
             "FAD deployment action override",
-            // Those lambdas are crazy, but we:
-            fishState1 -> // create an algorithm factory
-                fishState2 -> // that creates a startable
-                    fishState2.scheduleOnceInXDays(
-                        simState -> { // that schedules a steppable...
-                            final ImmutableList<ActionType> overrides =
-                                ImmutableList.of(ActionType.DeploymentAction);
-                            ((FishState) simState)
-                                .getFishers()
-                                .stream()
-                                .map(Fisher::getDestinationStrategy)
-                                .filter(PlannedStrategyProxy.class::isInstance)
-                                .map(PlannedStrategyProxy.class::cast)
-                                .map(PlannedStrategyProxy::getDelegate)
-                                .map(PlannedStrategy::getPlanner)
-                                // some vessels (mostly dolphin-setters) have zero empirical
-                                // deployments
-                                // and thus no "plan module" with deployment location
-                                // preferences, so
-                                // we exclude those from the "deploy as much as possible" variation
-                                .filter(planner -> planner
-                                    .getPlanningModules()
-                                    .containsKey(ActionType.DeploymentAction))
-                                .forEach(planner -> planner.setActionPreferenceOverrides(overrides));
-                        },
-                        StepOrder.DAWN,
-                        (365 * 2) + 1 // Jan. 1st of the third year
-                    )
+            new FadDeploymentActionOverrideFactory(
+                (365 * 2) + 1 // Jan. 1st of the third year
+            )
         );
     }
 }

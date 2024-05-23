@@ -1,3 +1,20 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package uk.ac.ox.oxfish.geography.currents;
 
 import com.google.common.collect.ImmutableMap;
@@ -5,7 +22,6 @@ import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -16,7 +32,7 @@ public class CurrentPatternMapSupplier implements Supplier<Map<CurrentPattern, P
         new CurrentPatternMapSupplier(null, ImmutableMap.of());
 
     private InputPath inputPath;
-    private Map<CurrentPattern, Path> currentFiles;
+    private Map<String, Path> currentFiles;
 
     @SuppressWarnings("unused")
     public CurrentPatternMapSupplier() {
@@ -24,7 +40,7 @@ public class CurrentPatternMapSupplier implements Supplier<Map<CurrentPattern, P
 
     public CurrentPatternMapSupplier(
         final InputPath inputPath,
-        final Map<CurrentPattern, Path> currentFiles
+        final Map<String, Path> currentFiles
     ) {
         this.inputPath = inputPath;
         this.currentFiles = currentFiles;
@@ -40,18 +56,18 @@ public class CurrentPatternMapSupplier implements Supplier<Map<CurrentPattern, P
         this.inputPath = inputPath;
     }
 
-    public Map<CurrentPattern, Path> getCurrentFiles() {
+    public Map<String, Path> getCurrentFiles() {
         return currentFiles;
     }
 
-    public void setCurrentFiles(final Map<CurrentPattern, Path> currentFiles) {
+    public void setCurrentFiles(final Map<String, Path> currentFiles) {
         this.currentFiles = currentFiles;
     }
 
     @Override
     public Map<CurrentPattern, Path> get() {
         return currentFiles.entrySet().stream().collect(toImmutableMap(
-            Entry::getKey,
+            entry -> CurrentPattern.valueOf(entry.getKey()),
             entry -> inputPath.get().resolve(entry.getValue())
         ));
     }

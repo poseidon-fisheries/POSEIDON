@@ -1,17 +1,19 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.poseidon.epo.scenarios;
@@ -51,7 +53,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
 import static uk.ac.ox.oxfish.utility.Dummyable.maybeUseDummyData;
 
 public abstract class EpoScenario<B extends LocalBiology>
@@ -72,14 +73,15 @@ public abstract class EpoScenario<B extends LocalBiology>
                 new IntegerParameter(20)
             )
         ));
-    private ComponentFactory<? extends Regulations> regulations = DefaultEpoRegulations.make(getInputFolder());
+    private ComponentFactory<? extends Regulations> regulations = DefaultEpoRegulations.make(
+        getInputFolder());
     private BiologicalProcessesFactory<B> biologicalProcesses;
     private CurrentPatternMapSupplier currentPatternMapSupplier = new CurrentPatternMapSupplier(
         inputFolder,
         ImmutableMap.of(
-            Y2021, Paths.get("currents", "currents_2021.csv"),
-            Y2022, Paths.get("currents", "currents_2022.csv"),
-            Y2023, Paths.get("currents", "currents_2017.csv") // using 2017 as proxy for 2023
+            "Y2021", Paths.get("currents", "currents_2021.csv"),
+            "Y2022", Paths.get("currents", "currents_2022.csv"),
+            "Y2023", Paths.get("currents", "currents_2017.csv") // using 2017 as proxy for 2023
         )
     );
     private FadMapFactory fadMap;

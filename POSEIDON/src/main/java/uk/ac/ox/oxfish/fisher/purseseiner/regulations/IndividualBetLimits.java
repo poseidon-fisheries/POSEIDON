@@ -1,3 +1,20 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package uk.ac.ox.oxfish.fisher.purseseiner.regulations;
 
 import uk.ac.ox.oxfish.regulations.quantities.LastYearlyFisherValue;
@@ -17,7 +34,7 @@ public class IndividualBetLimits implements ComponentFactory<Regulations>, Years
 
     private TemporalClosure closureA;
     private TemporalClosure closureB;
-    private Map<Integer, Integer> additionalClosureDaysByExcessTonnesOfBet;
+    private Map<String, Integer> additionalClosureDaysByExcessTonnesOfBet;
     private List<Integer> yearsActive;
 
     @SuppressWarnings("unused")
@@ -28,7 +45,7 @@ public class IndividualBetLimits implements ComponentFactory<Regulations>, Years
     public IndividualBetLimits(
         final TemporalClosure closureA,
         final TemporalClosure closureB,
-        final Map<Integer, Integer> additionalClosureDaysByExcessTonnesOfBet,
+        final Map<String, Integer> additionalClosureDaysByExcessTonnesOfBet,
         final List<Integer> yearsActive
     ) {
         this.closureA = closureA;
@@ -68,12 +85,12 @@ public class IndividualBetLimits implements ComponentFactory<Regulations>, Years
     }
 
     @SuppressWarnings("unused")
-    public Map<Integer, Integer> getAdditionalClosureDaysByExcessTonnesOfBet() {
+    public Map<String, Integer> getAdditionalClosureDaysByExcessTonnesOfBet() {
         return additionalClosureDaysByExcessTonnesOfBet;
     }
 
     @SuppressWarnings("unused")
-    public void setAdditionalClosureDaysByExcessTonnesOfBet(final Map<Integer, Integer> additionalClosureDaysByExcessTonnesOfBet) {
+    public void setAdditionalClosureDaysByExcessTonnesOfBet(final Map<String, Integer> additionalClosureDaysByExcessTonnesOfBet) {
         this.additionalClosureDaysByExcessTonnesOfBet = additionalClosureDaysByExcessTonnesOfBet;
     }
 
@@ -88,50 +105,80 @@ public class IndividualBetLimits implements ComponentFactory<Regulations>, Years
                     new AllOfFactory(
                         new AgentHasTagFactory(closureA.getAgentTag()),
                         new AnyOfFactory(
-                            additionalClosureDaysByExcessTonnesOfBet.entrySet().stream().map(entry ->
-                                new AllOfFactory(
-                                    new AboveFactory(
-                                        new LastYearlyFisherValue("Bigeye tuna Catches (kg)"),
-                                        entry.getKey() * 1000 // convert from tonnes to kg
-                                    ),
-                                    new TemporalClosureExtensionBeforeFactory(
-                                        closureA,
-                                        entry.getValue()
+                            additionalClosureDaysByExcessTonnesOfBet
+                                .entrySet()
+                                .stream()
+                                .map(entry ->
+                                    new AllOfFactory(
+                                        new AboveFactory(
+                                            new LastYearlyFisherValue("Bigeye tuna Catches (kg)"),
+                                            Integer.parseInt(entry.getKey()) * 1000
+                                            // convert from tonnes to kg
+                                        ),
+                                        new TemporalClosureExtensionBeforeFactory(
+                                            closureA,
+                                            entry.getValue()
+                                        )
                                     )
                                 )
-                            )
                         )
                     ),
                     new AllOfFactory(
                         new AgentHasTagFactory(closureB.getAgentTag()),
                         new AnyOfFactory(
-                            additionalClosureDaysByExcessTonnesOfBet.entrySet().stream().map(entry ->
-                                // This gets slightly complicated because we need to check for the catches
-                                // the year before the closure _starts_, and once we get to Jan 1st, that
-                                // not "last year" anymore, but the year before that, hence those different
-                                // conditions depending on where we are in the year. March 30 is an arbitrary
-                                // cutoff for the different checks. At least we do not need to deal with the
-                                // pre-closure DPL ban, since closure B gets extended at the end.
-                                new AllOfFactory(
-                                    new AnyOfFactory(
-                                        new AllOfFactory(
-                                            new BetweenYearlyDatesFactory(JANUARY, 1, MARCH, 30),
-                                            new AboveFactory(
-                                                new SecondLastYearlyFisherValue("Bigeye tuna Catches (kg)"),
-                                                entry.getKey() * 1000 // convert from tonnes to kg
+                            additionalClosureDaysByExcessTonnesOfBet
+                                .entrySet()
+                                .stream()
+                                .map(entry ->
+                                    // This gets slightly complicated because we need to check
+                                    // for the catches
+                                    // the year before the closure _starts_, and once we get to
+                                    // Jan 1st, that
+                                    // not "last year" anymore, but the year before that, hence
+                                    // those different
+                                    // conditions depending on where we are in the year. March 30
+                                    // is an arbitrary
+                                    // cutoff for the different checks. At least we do not need
+                                    // to deal with the
+                                    // pre-closure DPL ban, since closure B gets extended at the
+                                    // end.
+                                    new AllOfFactory(
+                                        new AnyOfFactory(
+                                            new AllOfFactory(
+                                                new BetweenYearlyDatesFactory(
+                                                    JANUARY,
+                                                    1,
+                                                    MARCH,
+                                                    30
+                                                ),
+                                                new AboveFactory(
+                                                    new SecondLastYearlyFisherValue(
+                                                        "Bigeye tuna Catches (kg)"),
+                                                    Integer.parseInt(entry.getKey()) * 1000
+                                                    // convert from tonnes to kg
+                                                )
+                                            ),
+                                            new AllOfFactory(
+                                                new BetweenYearlyDatesFactory(
+                                                    APRIL,
+                                                    1,
+                                                    DECEMBER,
+                                                    31
+                                                ),
+                                                new AboveFactory(
+                                                    new LastYearlyFisherValue(
+                                                        "Bigeye tuna Catches (kg)"),
+                                                    Integer.parseInt(entry.getKey()) * 1000
+                                                    // convert from tonnes to kg
+                                                )
                                             )
                                         ),
-                                        new AllOfFactory(
-                                            new BetweenYearlyDatesFactory(APRIL, 1, DECEMBER, 31),
-                                            new AboveFactory(
-                                                new LastYearlyFisherValue("Bigeye tuna Catches (kg)"),
-                                                entry.getKey() * 1000 // convert from tonnes to kg
-                                            )
+                                        new TemporalClosureExtensionAfterFactory(
+                                            closureB,
+                                            entry.getValue()
                                         )
-                                    ),
-                                    new TemporalClosureExtensionAfterFactory(closureB, entry.getValue())
+                                    )
                                 )
-                            )
                         )
                     )
                 )

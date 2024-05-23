@@ -1,17 +1,19 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.oxfish.fisher.purseseiner.regulations;
@@ -45,13 +47,13 @@ public class DefaultEpoRegulations {
     public static final InRectangularAreaFactory EL_CORRALITO_AREA = new InRectangularAreaFactory(
         4.0, -110.0, -3.0, -96.0
     );
-    private static final Map<Integer, Integer> ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET =
+    private static final Map<String, Integer> ADDITIONAL_CLOSURE_DAYS_BY_EXCESS_TONNES_OF_BET =
         ImmutableMap.of(
-            1200, 10,
-            1500, 13,
-            1800, 16,
-            2100, 19,
-            2400, 22
+            "1200", 10,
+            "1500", 13,
+            "1800", 16,
+            "2100", 19,
+            "2400", 22
         );
     private static final MonthDay CLOSURE_A_START = MonthDay.of(JULY, 29);
     private static final MonthDay CLOSURE_A_END = MonthDay.of(OCTOBER, 8);
