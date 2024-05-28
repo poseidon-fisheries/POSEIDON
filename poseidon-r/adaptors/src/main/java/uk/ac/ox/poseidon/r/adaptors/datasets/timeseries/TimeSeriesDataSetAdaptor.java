@@ -22,6 +22,7 @@ import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.poseidon.datasets.api.Dataset;
 import uk.ac.ox.poseidon.datasets.api.Table;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -67,15 +68,15 @@ public abstract class TimeSeriesDataSetAdaptor implements Dataset {
                 String.format(
                     "Unknown table: %s. Valid tables: %s.",
                     name,
-                    getTableNames()
+                    Arrays.toString(getTableNames())
                 )
             ));
     }
 
     @Override
-    public List<String> getTableNames() {
+    public String[] getTableNames() {
         return dataColumnStream()
             .map(DataColumn::getName)
-            .collect(toImmutableList());
+            .toArray(String[]::new);
     }
 }

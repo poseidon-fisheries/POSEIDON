@@ -17,7 +17,6 @@
  */
 package uk.ac.ox.poseidon.r.adaptors.datasets.timeseries;
 
-import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
@@ -35,6 +34,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.Streams.stream;
 import static java.util.stream.Collectors.groupingBy;
 import static uk.ac.ox.poseidon.common.core.Entry.entry;
 
@@ -50,10 +50,11 @@ public abstract class FisherTimeSeriesDataSetAdaptor implements Dataset {
         return getTimeSeries().keySet().stream().map(this::getTable).collect(toImmutableList());
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private Map<String, List<Entry<Fisher, DataColumn>>> getTimeSeries() {
-        return fishState
-            .getFishers()
-            .stream()
+        return stream(Optional.ofNullable(
+            fishState.getFishers()))
+            .flatMap(Collection::stream)
             .flatMap(fisher ->
                 getFisherTimeSeries(fisher).getColumns().stream().map(dataColumn ->
                     entry(fisher, dataColumn)
@@ -105,7 +106,7 @@ public abstract class FisherTimeSeriesDataSetAdaptor implements Dataset {
     );
 
     @Override
-    public List<String> getTableNames() {
-        return ImmutableList.copyOf(getTimeSeries().keySet());
+    public String[] getTableNames() {
+        return getTimeSeries().keySet().toArray(new String[0]);
     }
 }

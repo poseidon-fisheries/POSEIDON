@@ -34,8 +34,8 @@ public class TableMapDataset implements Dataset {
     }
 
     @Override
-    public List<String> getTableNames() {
-        return ImmutableList.copyOf(tables.keySet());
+    public String[] getTableNames() {
+        return tables.keySet().toArray(new String[0]);
     }
 
     @Override
