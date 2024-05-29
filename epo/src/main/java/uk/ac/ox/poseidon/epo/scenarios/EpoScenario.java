@@ -23,7 +23,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcesses;
 import uk.ac.ox.oxfish.biology.tuna.BiologicalProcessesFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.EmptyFleet;
+import uk.ac.ox.oxfish.fisher.purseseiner.EmptyFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.DefaultEpoRegulations;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.currents.CurrentPatternMapSupplier;
@@ -91,7 +91,7 @@ public abstract class EpoScenario<B extends LocalBiology>
             101,
             0.5
         );
-    private AlgorithmFactory<ScenarioPopulation> fleet = new EmptyFleet();
+    private AlgorithmFactory<ScenarioPopulation> fleet = new EmptyFleetFactory();
 
     public static int dayOfYear(
         final int year,

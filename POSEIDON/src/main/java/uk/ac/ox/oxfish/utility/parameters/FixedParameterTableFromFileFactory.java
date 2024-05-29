@@ -8,14 +8,14 @@ import uk.ac.ox.poseidon.common.core.parameters.InputPath;
 import static com.google.common.collect.ImmutableTable.toImmutableTable;
 import static uk.ac.ox.poseidon.common.core.csv.CsvParserUtil.recordStream;
 
-public class FixedParameterTableFromFile implements AlgorithmFactory<FixedParameterTable> {
+public class FixedParameterTableFromFileFactory implements AlgorithmFactory<FixedParameterTable> {
     private InputPath parameterFile;
 
     @SuppressWarnings("unused")
-    public FixedParameterTableFromFile() {
+    public FixedParameterTableFromFileFactory() {
     }
 
-    public FixedParameterTableFromFile(final InputPath parameterFile) {
+    public FixedParameterTableFromFileFactory(final InputPath parameterFile) {
         this.parameterFile = parameterFile;
     }
 

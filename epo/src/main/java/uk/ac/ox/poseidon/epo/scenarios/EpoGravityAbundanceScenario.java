@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.geography.fads.LinearAbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
+import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFileFactory;
 import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.poseidon.common.core.parameters.IntegerParameter;
 import uk.ac.ox.poseidon.common.core.parameters.StringParameter;
@@ -65,7 +65,8 @@ public class EpoGravityAbundanceScenario extends EpoAbundanceScenario {
                         new CalibratedParameter(-.2, .2, -.4, .4),
                         new CalibratedParameter(.2, .3, .01, .5)
                     )),
-                    new FixedParameterTableFromFile(getInputFolder().path("other_parameters.csv")),
+                    new FixedParameterTableFromFileFactory(getInputFolder().path(
+                        "other_parameters.csv")),
                     new GridsByMonthDayFromFileFactory(
                         getInputFolder().path("currents", "shear_2022.csv"),
                         new StringParameter("date"),

@@ -31,7 +31,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFac
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
+import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFileFactory;
 import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 import uk.ac.ox.poseidon.epo.fleet.AbundancePurseSeineGearFactory;
 import uk.ac.ox.poseidon.epo.fleet.EpoPurseSeinerFleetFactory;
@@ -78,7 +78,10 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                         ImmutableMap.of(
                             "Temperature", new EnvironmentalPenaltyFactory(
                                 new GridsByDateFromFileFactory(
-                                    getInputFolder().path("environmental_maps", "temperature_2021_to_2023.csv"),
+                                    getInputFolder().path(
+                                        "environmental_maps",
+                                        "temperature_2021_to_2023.csv"
+                                    ),
                                     getMapExtentFactory()
                                 ),
                                 new CalibratedParameter(26, 27, 25, 30, 26.5), // target
@@ -87,7 +90,10 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                             ),
                             "FrontalIndex", new EnvironmentalPenaltyFactory(
                                 new GridsByDateFromFileFactory(
-                                    getInputFolder().path("environmental_maps", "frontal_index_2021_to_2023.csv"),
+                                    getInputFolder().path(
+                                        "environmental_maps",
+                                        "frontal_index_2021_to_2023.csv"
+                                    ),
                                     getMapExtentFactory()
                                 ),
                                 new CalibratedParameter(0, 2, 0, 3), // target
@@ -103,7 +109,8 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                         new FixedDoubleParameter(-0.14452),
                         new FixedDoubleParameter(0.14097)
                     )),
-                    new FixedParameterTableFromFile(getInputFolder().path("other_parameters.csv")),
+                    new FixedParameterTableFromFileFactory(getInputFolder().path(
+                        "other_parameters.csv")),
                     new GridsByMonthDayFromFileFactory(
                         getInputFolder().path("currents", "shear_2022.csv"),
                         getMapExtentFactory()

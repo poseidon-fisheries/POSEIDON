@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-public class EmptyFleet implements AlgorithmFactory<ScenarioPopulation> {
+public class EmptyFleetFactory implements AlgorithmFactory<ScenarioPopulation> {
     @Override
     public ScenarioPopulation apply(final FishState fishState) {
         return new ScenarioPopulation(
