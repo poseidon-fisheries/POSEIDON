@@ -1,21 +1,19 @@
 /*
- *     POSEIDON, an agent-based model of fisheries
- *     Copyright (C) 2017  CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2017-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.oxfish.utility;
@@ -24,8 +22,6 @@ import com.google.common.collect.ImmutableMap;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import uk.ac.ox.oxfish.biology.BiomassResetterFactory;
 import uk.ac.ox.oxfish.biology.BiomassTotalResetterFactory;
-import uk.ac.ox.oxfish.biology.SpeciesCodes;
-import uk.ac.ox.oxfish.biology.SpeciesCodesFromFileFactory;
 import uk.ac.ox.oxfish.biology.boxcars.*;
 import uk.ac.ox.oxfish.biology.complicated.*;
 import uk.ac.ox.oxfish.biology.complicated.factory.*;
@@ -37,7 +33,7 @@ import uk.ac.ox.oxfish.biology.initializer.AbundanceInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.*;
 import uk.ac.ox.oxfish.biology.initializer.factory.*;
-import uk.ac.ox.oxfish.biology.tuna.*;
+import uk.ac.ox.oxfish.biology.tuna.BiomassInitializerFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.OscillatingWeatherFactory;
@@ -54,14 +50,8 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegressio
 import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializer;
 import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
 import uk.ac.ox.oxfish.fisher.log.initializers.TowAndAltitudeFactory;
-import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.TimeScalarFunction;
-import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.ExponentialTimeScalarFactory;
-import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.InverseTimeScalarFactory;
-import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.SigmoidalTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EPOPlannedStrategyFlexibleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.GenerateRandomPlansStrategyFactory;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.PlanningModule;
-import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.*;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.PurseSeinerDepartingStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.destination.GravityDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fishing.PurseSeinerAbundanceFishingStrategyFactory;
@@ -104,10 +94,6 @@ import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
 import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.model.data.factory.IterativeAverageFactory;
 import uk.ac.ox.oxfish.model.data.factory.MovingAverageFactory;
-import uk.ac.ox.oxfish.model.event.AbundanceDrivenGearExogenousCatchesFactory;
-import uk.ac.ox.oxfish.model.event.ExogenousCatches;
-import uk.ac.ox.oxfish.model.event.ExogenousInstantaneousMortalityCatchesFactory;
-import uk.ac.ox.oxfish.model.event.SimpleExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.YearlyMarketMapFromPriceFileFactory;
@@ -115,11 +101,14 @@ import uk.ac.ox.oxfish.model.market.factory.*;
 import uk.ac.ox.oxfish.model.market.gas.CsvTimeSeriesGasFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasFactory;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
-import uk.ac.ox.oxfish.model.network.*;
-import uk.ac.ox.oxfish.model.network.factory.MustShareTag;
-import uk.ac.ox.oxfish.model.network.factory.SamePortEdgesOnly;
+import uk.ac.ox.oxfish.model.network.BarabasiAlbertBuilder;
+import uk.ac.ox.oxfish.model.network.ClubNetworkBuilder;
+import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
+import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.plugins.*;
-import uk.ac.ox.oxfish.model.regs.*;
+import uk.ac.ox.oxfish.model.regs.ConjunctiveRegulationsFactory;
+import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.TaggedRegulationFactory;
 import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.model.regs.policymakers.*;
 import uk.ac.ox.oxfish.model.regs.policymakers.factory.ISlopeToTACControllerFactory;
@@ -697,73 +686,6 @@ public class AlgorithmFactories {
                 FixedGasFactory.class, "Fixed Gas Price",
                 CsvTimeSeriesGasFactory.class, "Gas Price from File"
             )
-        ));
-        addFactories(new Factories<>(
-            ExogenousCatches.class,
-            ImmutableMap.of(
-                SimpleExogenousCatchesFactory.class,
-                "Simple Exogenous Catches",
-                AbundanceDrivenGearExogenousCatchesFactory.class,
-                "Abundance Gear Exogenous Catches",
-                ExogenousInstantaneousMortalityCatchesFactory.class,
-                "Instantaneous Mortality Exogenous Catches"
-            )
-        ));
-        addFactories(new Factories<>(
-            NetworkPredicate.class,
-            ImmutableMap.of(
-                MustShareTag.class, "Must share a tag",
-                SamePortEdgesOnly.class, "Must share port"
-            )
-        ));
-        addFactories(new Factories<>(
-            PlanningModule.class,
-            ImmutableMap.of(
-                DiscretizedOwnFadPlanningFactory.class, "Centroid FAD Planning",
-                GreedyInsertionFadPlanningFactory.class, "Greedy FAD Module",
-                MarginalValueFadPlanningModuleFactory.class, "MVT FAD Module",
-                ValuePerSetPlanningModuleFactory.class, "VPS FAD Module",
-                WhereFadsAreFadModuleFactory.class, "Where Fads Are FAD Module",
-                WhereMoneyIsPlanningFactory.class, "Where Money Is FAD Module"
-            )
-        ));
-        addFactories(new Factories<>(
-            PermitAllocationPolicy.class,
-            ImmutableMap.of(
-                AllowAllAllocationPolicyFactory.class, "No effort limit",
-                MaxHoldSizeRandomAllocationPolicyFactory.class, "Max hold size limit",
-                ExogenousPercentagePermitFactory.class, "Yearly percentage of boats"
-            )
-        ));
-        addFactories(new Factories<>(
-            TimeScalarFunction.class,
-            ImmutableMap.of(
-                InverseTimeScalarFactory.class, "Inverse",
-                ExponentialTimeScalarFactory.class, "Exponential",
-                SigmoidalTimeScalarFactory.class, "Sigmoidal"
-            )
-        ));
-        addFactories(new Factories<>(
-            SPRAgent.class,
-            ImmutableMap.of(
-                SPRAgentBuilder.class, "SPR Agent",
-                SPRAgentBuilderSelectiveSampling.class, "SPR Selective Agent",
-                SPRAgentBuilderFixedSample.class, "SPR Fixed Sample Agent"
-            )
-        ));
-        addFactories(new Factories<>(
-            SpeciesCodes.class,
-            SpeciesCodesFromFileFactory.class
-        ));
-        addFactories(new Factories<>(
-            Reallocator.class,
-            AbundanceReallocatorFactory.class,
-            BiomassReallocatorFactory.class
-        ));
-        addFactories(new Factories<>(
-            Restorer.class,
-            AbundanceRestorerFactory.class,
-            BiomassRestorerFactory.class
         ));
     }
 
