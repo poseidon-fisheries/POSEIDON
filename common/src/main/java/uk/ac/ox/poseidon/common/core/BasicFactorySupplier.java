@@ -30,12 +30,10 @@ public class BasicFactorySupplier<T extends GenericComponentFactory<?, ?>>
         this.factoryName = factoryName;
     }
 
-    public static String makeFactoryName(final Class<? extends GenericComponentFactory<?, ?>> classObject) {
+    public static String makeFactoryName(final String className) {
         final String[] words =
             splitByCharacterTypeCamelCase(
-                classObject
-                    .getSimpleName()
-                    .replaceAll("Factory", "")
+                className.replaceAll("Factory", "")
             );
         return Stream
             .concat(
@@ -43,6 +41,10 @@ public class BasicFactorySupplier<T extends GenericComponentFactory<?, ?>>
                 stream(words).skip(1).map(word -> word.toLowerCase(ENGLISH))
             )
             .collect(joining(" "));
+    }
+
+    public static String makeFactoryName(final Class<? extends GenericComponentFactory<?, ?>> classObject) {
+        return makeFactoryName(classObject.getSimpleName());
     }
 
     @Override

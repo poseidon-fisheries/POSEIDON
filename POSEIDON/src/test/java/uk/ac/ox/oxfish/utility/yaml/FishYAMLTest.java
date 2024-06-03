@@ -32,15 +32,19 @@ import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.utility.AlgorithmFactories;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.SelectDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
+import uk.ac.ox.poseidon.common.api.FactorySupplier;
 import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
+
+import static com.google.common.collect.Streams.stream;
 
 public class FishYAMLTest {
 
@@ -112,21 +116,29 @@ public class FishYAMLTest {
         final FishYAML yaml = new FishYAML();
         final Object loaded = yaml.loadAs(scenarioFile, Scenario.class);
         // read prototype scenario correctly
-        Assertions.assertTrue(loaded instanceof PrototypeScenario);
+        Assertions.assertInstanceOf(PrototypeScenario.class, loaded);
         final PrototypeScenario scenario = (PrototypeScenario) loaded;
         // read initializer correctly
-        Assertions.assertTrue(scenario.getBiologyInitializer() instanceof DiffusingLogisticFactory);
-        final DiffusingLogisticFactory factory = (DiffusingLogisticFactory) scenario.getBiologyInitializer();
+        Assertions.assertInstanceOf(
+            DiffusingLogisticFactory.class,
+            scenario.getBiologyInitializer()
+        );
+        final DiffusingLogisticFactory factory =
+            (DiffusingLogisticFactory) scenario.getBiologyInitializer();
         // reads double parameters correctly
-        Assertions.assertTrue(factory.getCarryingCapacity() instanceof FixedDoubleParameter);
-        Assertions.assertEquals(((FixedDoubleParameter) factory.getCarryingCapacity()).getValue(), 14.0, .001);
+        Assertions.assertInstanceOf(FixedDoubleParameter.class, factory.getCarryingCapacity());
+        Assertions.assertEquals(
+            ((FixedDoubleParameter) factory.getCarryingCapacity()).getValue(),
+            14.0,
+            .001
+        );
         // reads normal doubles correctly
         final double[] possibleValues =
             ((SelectDoubleParameter) factory.getPercentageLimitOnDailyMovement()).getPossibleValues();
         Assertions.assertEquals(possibleValues[0], .2, .0001);
         Assertions.assertEquals(possibleValues[1], .5, .0001);
         // reads anarchy factory just as well (it's a scalar algorithmFactory which is tricky)
-        Assertions.assertTrue(scenario.getRegulation() instanceof AnarchyFactory);
+        Assertions.assertInstanceOf(AnarchyFactory.class, scenario.getRegulation());
 
     }
 
@@ -145,11 +157,21 @@ public class FishYAMLTest {
         Assertions.assertTrue(dumped.contains("percentageLimitOnDailyMovement: uniform 0.0 10.0"));
         Assertions.assertTrue(dumped.contains("carryingCapacity: normal 10000.0 10.0"));
 
-        // now read it back! (notice that I need to do "loadAs" because when writing prettily the factory gets written
-        // as a map; that's not an issue in scenarios because the constructor knows where factories ought to be but when
-        // the factory is written without any warning that it's going to be an AlgorithmFactory then things go badly
-        final DiffusingLogisticFactory factory2 = yaml.loadAs(dumped, DiffusingLogisticFactory.class);
-        Assertions.assertEquals(((NormalDoubleParameter) factory2.getCarryingCapacity()).getMean(), 10000, .001);
+        // now read it back! (notice that I need to do "loadAs" because when writing prettily the
+        // factory gets written
+        // as a map; that's not an issue in scenarios because the constructor knows where
+        // factories ought to be but when
+        // the factory is written without any warning that it's going to be an AlgorithmFactory
+        // then things go badly
+        final DiffusingLogisticFactory factory2 = yaml.loadAs(
+            dumped,
+            DiffusingLogisticFactory.class
+        );
+        Assertions.assertEquals(
+            ((NormalDoubleParameter) factory2.getCarryingCapacity()).getMean(),
+            10000,
+            .001
+        );
         Assertions.assertEquals(
             ((NormalDoubleParameter) factory2.getCarryingCapacity()).getStandardDeviation(),
             10,
@@ -162,22 +184,28 @@ public class FishYAMLTest {
     @Test
     public void writePrettilyAllSortsOfScenarios() {
         final PrototypeScenario scenario = new PrototypeScenario();
-        ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setDifferentialPercentageToMove(new FixedDoubleParameter(
-            .9));
+        ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setDifferentialPercentageToMove(
+            new FixedDoubleParameter(
+                .9));
         scenario.setRegulation(
-            AlgorithmFactories
-                .getConstructors(Regulation.class)
-                .get("MPA Only")
-                .get()
+            (AlgorithmFactory<? extends Regulation>)
+                stream(ServiceLoader.load(FactorySupplier.class))
+                    .filter(factorySupplier -> factorySupplier.getFactoryName().equals("MPA Only"))
+                    .findFirst()
+                    .get()
+                    .get()
         );
         final FishYAML yaml = new FishYAML();
         final String dumped = yaml.dump(scenario);
         // load back! Notice that because it's made "pretty" I still have to call loadAs
         final Scenario scenario2 = yaml.loadAs(dumped, Scenario.class);
-        Assertions.assertTrue(scenario2 instanceof PrototypeScenario);
+        Assertions.assertInstanceOf(PrototypeScenario.class, scenario2);
 
         // make sure it remembers that the regulations have changed
-        Assertions.assertTrue(((PrototypeScenario) scenario2).getRegulation() instanceof ProtectedAreasOnlyFactory);
+        Assertions.assertInstanceOf(
+            ProtectedAreasOnlyFactory.class,
+            ((PrototypeScenario) scenario2).getRegulation()
+        );
         // make sure three recursions in this is still correct.
         Assertions.assertEquals(
             ((FixedDoubleParameter) ((DiffusingLogisticFactory) ((PrototypeScenario) scenario2).getBiologyInitializer()).getDifferentialPercentageToMove()).getValue(),
@@ -215,7 +243,8 @@ public class FishYAMLTest {
             "            Shape File Allocator:\n" +
             "              delegate:\n" +
             "                From File Allocator:\n" +
-            "                  biomassPath: ./docs/indonesia_hub/runs/712/malabaricus_pixellated_map.csv\n" +
+            "                  biomassPath: " +
+            "./docs/indonesia_hub/runs/712/malabaricus_pixellated_map.csv\n" +
             "                  inputFileHasHeader: true\n" +
             "              insidePolygon: true\n" +
             "              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp   \n" +
@@ -237,7 +266,8 @@ public class FishYAMLTest {
             "            Shape File Allocator:\n" +
             "              delegate:\n" +
             "                From File Allocator:\n" +
-            "                  biomassPath: ./docs/indonesia_hub/runs/712/multidens_pixellated_map.csv\n" +
+            "                  biomassPath: " +
+            "./docs/indonesia_hub/runs/712/multidens_pixellated_map.csv\n" +
             "                  inputFileHasHeader: true\n" +
             "              insidePolygon: true\n" +
             "              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp   \n" +
@@ -259,7 +289,8 @@ public class FishYAMLTest {
             "            Shape File Allocator:\n" +
             "              delegate:\n" +
             "                From File Allocator:\n" +
-            "                  biomassPath: ./docs/indonesia_hub/runs/712/areolatus_pixellated_map.csv\n" +
+            "                  biomassPath: " +
+            "./docs/indonesia_hub/runs/712/areolatus_pixellated_map.csv\n" +
             "                  inputFileHasHeader: true\n" +
             "              insidePolygon: true\n" +
             "              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp   \n" +
@@ -281,7 +312,8 @@ public class FishYAMLTest {
             "            Shape File Allocator:\n" +
             "              delegate:\n" +
             "                From File Allocator:\n" +
-            "                  biomassPath: ./docs/indonesia_hub/runs/712/erythropterus_pixellated_map.csv\n" +
+            "                  biomassPath: " +
+            "./docs/indonesia_hub/runs/712/erythropterus_pixellated_map.csv\n" +
             "                  inputFileHasHeader: true\n" +
             "              insidePolygon: true\n" +
             "              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp   \n" +
@@ -450,7 +482,8 @@ public class FishYAMLTest {
             "      gridWidthInCell: '100.0'\n" +
             "      header: true\n" +
             "      latLong: true\n" +
-            "      mapFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/712_map.csv\n" +
+            "      mapFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/712_map" +
+            ".csv\n" +
             "  mapMakerDedicatedRandomSeed: null\n" +
             "  market:\n" +
             "    Fixed Price Market:\n" +
@@ -486,9 +519,11 @@ public class FishYAMLTest {
         // System.out.println(read.get("Flexible"));
         final Object flexible = read.get("Flexible");
         System.out.println(flexible.getClass());
-        final Object biologyInitializer = ((Map<String, Object>) flexible).get("biologyInitializer");
+        final Object biologyInitializer =
+            ((Map<String, Object>) flexible).get("biologyInitializer");
         System.out.println(biologyInitializer);
-        final Object multiple = ((Map<String, Object>) biologyInitializer).get("Multiple Species Biomass");
+        final Object multiple = ((Map<String, Object>) biologyInitializer).get(
+            "Multiple Species Biomass");
         System.out.println(multiple);
         System.out.println(multiple.getClass());
         final Object factories = ((Map<String, Object>) multiple).get("factories");

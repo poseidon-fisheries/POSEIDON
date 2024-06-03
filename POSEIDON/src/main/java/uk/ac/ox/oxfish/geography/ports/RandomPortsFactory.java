@@ -28,11 +28,9 @@ import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 1/21/17.
  */
-public class RandomPortFactory implements AlgorithmFactory<RandomPortInitializer> {
-
+public class RandomPortsFactory implements AlgorithmFactory<RandomPortInitializer> {
 
     private DoubleParameter numberOfPorts = new FixedDoubleParameter(1);
-
 
     /**
      * Applies this function to the given argument.

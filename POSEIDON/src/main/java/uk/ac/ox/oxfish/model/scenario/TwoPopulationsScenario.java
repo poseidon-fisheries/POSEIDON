@@ -55,7 +55,7 @@ import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.PortInitializer;
-import uk.ac.ox.oxfish.geography.ports.RandomPortFactory;
+import uk.ac.ox.oxfish.geography.ports.RandomPortsFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
@@ -71,9 +71,9 @@ import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 import uk.ac.ox.poseidon.common.api.parameters.DoubleParameter;
 import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -104,15 +104,15 @@ public class TwoPopulationsScenario implements Scenario {
     private int largeFishers = 10;
 
     /**
-     * when this flag is true, agents use their memory to predict future catches and profits. It is necessary for ITQs
-     * to work
+     * when this flag is true, agents use their memory to predict future catches and profits. It is
+     * necessary for ITQs to work
      */
     private boolean usePredictors = false;
 
     /**
      * positions the port(s)
      */
-    private AlgorithmFactory<? extends PortInitializer> ports = new RandomPortFactory();
+    private AlgorithmFactory<? extends PortInitializer> ports = new RandomPortsFactory();
 
     /**
      * boat speed
@@ -184,9 +184,11 @@ public class TwoPopulationsScenario implements Scenario {
 
     private boolean separateRegulations = true;
 
-    private AlgorithmFactory<? extends Regulation> regulationSmall = new ProtectedAreasOnlyFactory();
+    private AlgorithmFactory<? extends Regulation> regulationSmall =
+        new ProtectedAreasOnlyFactory();
 
-    private AlgorithmFactory<? extends Regulation> regulationLarge = new ProtectedAreasOnlyFactory();
+    private AlgorithmFactory<? extends Regulation> regulationLarge =
+        new ProtectedAreasOnlyFactory();
 
     private boolean allowTwoPopulationFriendships = false;
 
@@ -195,7 +197,8 @@ public class TwoPopulationsScenario implements Scenario {
     private NetworkBuilder networkBuilder =
         new EquidegreeBuilder();
 
-    private AlgorithmFactory<? extends HabitatInitializer> habitatInitializer = new AllSandyHabitatFactory();
+    private AlgorithmFactory<? extends HabitatInitializer> habitatInitializer =
+        new AllSandyHabitatFactory();
 
     private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
 
@@ -205,13 +208,13 @@ public class TwoPopulationsScenario implements Scenario {
 
     private List<StartingMPA> startingMPAs = new LinkedList<>();
     /**
-     * If flag set to true, small boats will come from port 1, large boats from port 2. Careful, if you set this to true
-     * and there is only one port you'll get an exception
+     * If flag set to true, small boats will come from port 1, large boats from port 2. Careful, if
+     * you set this to true and there is only one port you'll get an exception
      */
     private boolean separatePorts = false;
     /**
-     * if this is not NaN then it is used as the random seed to feed into the map-making function. This allows for
-     * randomness in the biology/fishery
+     * if this is not NaN then it is used as the random seed to feed into the map-making function.
+     * This allows for randomness in the biology/fishery
      */
     private Long mapMakerDedicatedRandomSeed = null;
 
@@ -225,11 +228,12 @@ public class TwoPopulationsScenario implements Scenario {
     }
 
     /**
-     * this is the very first method called by the model when it is started. The scenario needs to instantiate all the
-     * essential objects for the model to take place
+     * this is the very first method called by the model when it is started. The scenario needs to
+     * instantiate all the essential objects for the model to take place
      *
      * @param model the model
-     * @return a scenario-result object containing the map, the list of agents and the biology object
+     * @return a scenario-result object containing the map, the list of agents and the biology
+     * object
      */
     @Override
     public ScenarioEssentials start(final FishState model) {
@@ -280,7 +284,10 @@ public class TwoPopulationsScenario implements Scenario {
         // create initial mpas
         if (startingMPAs != null)
             for (final StartingMPA mpa : startingMPAs) {
-                Logger.getGlobal().info(() -> "building MPA at " + mpa.getTopLeftX() + ", " + mpa.getTopLeftY());
+                Logger.getGlobal().info(() -> "building MPA at " +
+                    mpa.getTopLeftX() +
+                    ", " +
+                    mpa.getTopLeftY());
                 mpa.buildMPA(map);
             }
 
@@ -291,7 +298,8 @@ public class TwoPopulationsScenario implements Scenario {
     }
 
     /**
-     * called shortly after the essentials are set, it is time now to return a list of all the agents
+     * called shortly after the essentials are set, it is time now to return a list of all the
+     * agents
      *
      * @param model the model
      * @return a list of agents
@@ -356,7 +364,10 @@ public class TwoPopulationsScenario implements Scenario {
 
         // adds predictors to the fisher if the usepredictors flag is up.
         // without predictors agents do not participate in ITQs
-        final Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(usePredictors, biology);
+        final Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(
+            usePredictors,
+            biology
+        );
 
         smallFisherFactory.getAdditionalSetups().add(predictorSetup);
         largeFishersFactory.getAdditionalSetups().add(predictorSetup);
@@ -401,7 +412,9 @@ public class TwoPopulationsScenario implements Scenario {
 
         if (!allowFriendshipsBetweenPorts) {
             // no friends from separate ports
-            networkBuilder.addPredicate((NetworkPredicate) (from, to) -> from.getHomePort().equals(to.getHomePort()));
+            networkBuilder.addPredicate((NetworkPredicate) (from, to) -> from
+                .getHomePort()
+                .equals(to.getHomePort()));
         }
 
         model.getYearlyDataSet().registerGatherer("Small Fishers Total Income",
@@ -421,7 +434,10 @@ public class TwoPopulationsScenario implements Scenario {
 
         for (final Species species : biology.getSpecies()) {
             model.getYearlyDataSet()
-                .registerGatherer("Small Fishers " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
+                .registerGatherer("Small Fishers " +
+                        species.getName() +
+                        " " +
+                        AbstractMarket.LANDINGS_COLUMN_NAME,
                     fishState -> fishState.getFishers().stream().
                         filter(fisher -> fisher.getTagsList().contains("small")).
                         mapToDouble(value -> value.getLatestYearlyObservation(
@@ -429,7 +445,10 @@ public class TwoPopulationsScenario implements Scenario {
                 );
 
             model.getYearlyDataSet()
-                .registerGatherer("Large Fishers " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
+                .registerGatherer("Large Fishers " +
+                        species.getName() +
+                        " " +
+                        AbstractMarket.LANDINGS_COLUMN_NAME,
                     fishState -> fishState.getFishers().stream().
                         filter(fisher -> !fisher.getTagsList().contains("small")).
                         mapToDouble(value -> value.getLatestYearlyObservation(
@@ -475,7 +494,11 @@ public class TwoPopulationsScenario implements Scenario {
         );
 
         if (fisherList.size() <= 1)
-            return new ScenarioPopulation(fisherList, new SocialNetwork(new EmptyNetworkBuilder()), factory);
+            return new ScenarioPopulation(
+                fisherList,
+                new SocialNetwork(new EmptyNetworkBuilder()),
+                factory
+            );
         else {
             return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), factory);
         }
@@ -869,7 +892,8 @@ public class TwoPopulationsScenario implements Scenario {
     /**
      * Setter for property 'allowTwoPopulationFriendships'.
      *
-     * @param allowTwoPopulationFriendships Value to set for property 'allowTwoPopulationFriendships'.
+     * @param allowTwoPopulationFriendships Value to set for property
+     *                                      'allowTwoPopulationFriendships'.
      */
     public void setAllowTwoPopulationFriendships(final boolean allowTwoPopulationFriendships) {
         this.allowTwoPopulationFriendships = allowTwoPopulationFriendships;
@@ -983,7 +1007,8 @@ public class TwoPopulationsScenario implements Scenario {
     /**
      * Setter for property 'allowFriendshipsBetweenPorts'.
      *
-     * @param allowFriendshipsBetweenPorts Value to set for property 'allowFriendshipsBetweenPorts'.
+     * @param allowFriendshipsBetweenPorts Value to set for property
+     *                                     'allowFriendshipsBetweenPorts'.
      */
     public void setAllowFriendshipsBetweenPorts(final boolean allowFriendshipsBetweenPorts) {
         this.allowFriendshipsBetweenPorts = allowFriendshipsBetweenPorts;

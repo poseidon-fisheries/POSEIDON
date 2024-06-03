@@ -24,27 +24,19 @@ import ec.util.MersenneTwisterFast;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.oxfish.fisher.equipment.gear.FixedProportionGear;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-
 public class FixedProportionGearFactoryTest {
-
 
     @Test
     public void fixedProportion() throws Exception {
 
         final FixedProportionGearFactory fixedProportionGearFactory =
-            (FixedProportionGearFactory) AlgorithmFactories
-                .CONSTRUCTOR_MAP
-                .get(Gear.class)
-                .get("Fixed Proportion")
-                .get();
+            new FixedProportionGearFactory();
 
         fixedProportionGearFactory.setCatchabilityPerHour(new FixedDoubleParameter(.5));
         final FishState state = mock(FishState.class);
@@ -52,7 +44,6 @@ public class FixedProportionGearFactoryTest {
 
         final FixedProportionGear gear = fixedProportionGearFactory.apply(state);
         Assertions.assertEquals(gear.getProportionFished(), .5, .001);
-
 
     }
 }
