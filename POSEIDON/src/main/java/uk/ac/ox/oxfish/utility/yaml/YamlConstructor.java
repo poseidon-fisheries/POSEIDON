@@ -1,21 +1,19 @@
 /*
- *     POSEIDON, an agent-based model of fisheries
- *     Copyright (C) 2017  CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2017-2024 CoHESyS Lab cohesys.lab@gmail.com
  *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ox.oxfish.utility.yaml;
@@ -28,7 +26,6 @@ import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.*;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.ScenarioSupplier;
-import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.parameters.*;
 import uk.ac.ox.poseidon.common.api.FactorySupplier;
 import uk.ac.ox.poseidon.common.api.GenericComponentFactory;
@@ -38,8 +35,10 @@ import uk.ac.ox.poseidon.common.core.parameters.FixedDoubleParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -50,8 +49,8 @@ import static com.google.common.collect.Streams.stream;
 import static java.util.function.UnaryOperator.identity;
 
 /**
- * Constructor useful to implement YAML objects back into the Fishstate. I modify it so that it does the following
- * things:
+ * Constructor useful to implement YAML objects back into the Fishstate. I modify it so that it does
+ * the following things:
  * <ul>
  *     <li> FixedDoubleParameters can be input as numbers and it is still valid</li>
  *     <li> Algorithm Factories can be input as map and it's still valid</li>
@@ -83,11 +82,14 @@ public class YamlConstructor extends Constructor {
                     if (node.getType().equals(DoubleParameter.class))
                         // then a simple scalar must be a fixed double parameter. Build it
                         return doubleParameterSplit((ScalarNode) node);
-                    // if it's a path type we write and read it as string rather than with the ugly !! notation
+                    // if it's a path type we write and read it as string rather than with the
+                    // ugly !! notation
                     if (node.getType().equals(Path.class))
                         return Paths.get(((ScalarNode) node).getValue());
-                    // it's also possible that the scalar is an algorithm factory without any settable field
-                    // this is rare since factories are represented as maps, but this might be one of the simple
+                    // it's also possible that the scalar is an algorithm factory without any
+                    // settable field
+                    // this is rare since factories are represented as maps, but this might be
+                    // one of the simple
                     // ones like AnarchyFactory
                     if (GenericComponentFactory.class.isAssignableFrom(node.getType()))
                         return constructFactory(constructScalar((ScalarNode) node));
@@ -112,11 +114,18 @@ public class YamlConstructor extends Constructor {
                     // written as a map for readability, so try to construct it that way
                     final NodeTuple nodeTuple = ((MappingNode) node).getValue().get(0);
                     if (GenericComponentFactory.class.isAssignableFrom(node.getType())) {
-                        return constructNamedObject(nodeTuple, YamlConstructor.this::constructFactory);
+                        return constructNamedObject(
+                            nodeTuple,
+                            YamlConstructor.this::constructFactory
+                        );
                     } else if (Scenario.class.isAssignableFrom(node.getType())) {
-                        return constructNamedObject(nodeTuple, YamlConstructor.this::constructScenario);
+                        return constructNamedObject(
+                            nodeTuple,
+                            YamlConstructor.this::constructScenario
+                        );
                     } else {
-                        // If it's neither an algorithm factory nor a scenario, propagate the exception
+                        // If it's neither an algorithm factory nor a scenario, propagate the
+                        // exception
                         throw e;
                     }
                 }
@@ -133,7 +142,8 @@ public class YamlConstructor extends Constructor {
                 // The top level mapping node is only there to identify the right
                 // factory. The actual construction is done using the value node.
                 final MappingNode valueNode = (MappingNode) nodeTuple.getValueNode();
-                // need to set the node to the correct return or the reflection magic of snakeYAML wouldn't work
+                // need to set the node to the correct return or the reflection magic of
+                // snakeYAML wouldn't work
                 valueNode.setType(object.getClass());
                 // use beans to set all the properties correctly
                 constructJavaBean2ndStep(valueNode, object);
@@ -170,22 +180,37 @@ public class YamlConstructor extends Constructor {
             return new FixedDoubleParameter(Double.parseDouble(split[0]));
 
         if (split[0].equalsIgnoreCase("normal"))
-            return new NormalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+            return new NormalDoubleParameter(
+                Double.parseDouble(split[1]),
+                Double.parseDouble(split[2])
+            );
 
         if (split[0].equalsIgnoreCase("uniform"))
-            return new UniformDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+            return new UniformDoubleParameter(
+                Double.parseDouble(split[1]),
+                Double.parseDouble(split[2])
+            );
 
         if (split[0].equalsIgnoreCase("sin"))
-            return new SinusoidalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+            return new SinusoidalDoubleParameter(
+                Double.parseDouble(split[1]),
+                Double.parseDouble(split[2])
+            );
 
         if (split[0].equalsIgnoreCase("select"))
             return new SelectDoubleParameter(nodeContent.trim().replace("select", ""));
 
         if (split[0].equalsIgnoreCase("beta"))
-            return new BetaDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+            return new BetaDoubleParameter(
+                Double.parseDouble(split[1]),
+                Double.parseDouble(split[2])
+            );
 
         if (split[0].equalsIgnoreCase("weibull"))
-            return new WeibullDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+            return new WeibullDoubleParameter(
+                Double.parseDouble(split[1]),
+                Double.parseDouble(split[2])
+            );
 
         if (split[0].equalsIgnoreCase("conditional"))
             return new ConditionalDoubleParameter(
@@ -216,25 +241,23 @@ public class YamlConstructor extends Constructor {
     }
 
     private GenericComponentFactory<?, ?> constructFactory(final String factoryName) {
-        // We first look for the factory in our map of service suppliers, and
-        // then fall back on the old AlgorithmFactories constructors if we can't
-        // find it, but the AlgorithmFactories class should go away once everything
-        // has been moved to the service architecture, and we should give a proper
-        // error message if we don't find it there.
-        final FactorySupplier factorySupplier = factorySuppliers.get(factoryName);
-        return factorySupplier != null
-            ? factorySupplier.get()
-            : AlgorithmFactories.constructorLookup(factoryName);
+        return Optional
+            .ofNullable(factorySuppliers.get(factoryName))
+            .map(Supplier::get)
+            .orElseThrow(() -> new IllegalStateException(
+                "Component factory not found: " + factoryName)
+            );
     }
 
     private Scenario constructScenario(final String scenarioName) {
-        final ScenarioSupplier scenarioSupplier = scenarioSuppliers.get(scenarioName);
-        if (scenarioSupplier != null)
-            return scenarioSupplier.get();
-        else throw new IllegalStateException(
-            "Scenario not found: " + scenarioName + ".\n" +
-                "Available scenarios are: \n" + String.join("\n", scenarioSuppliers.keySet())
-        );
+        return Optional
+            .ofNullable(scenarioSuppliers.get(scenarioName))
+            .map(Supplier::get)
+            .orElseThrow(() -> new IllegalStateException(MessageFormat.format(
+                "Scenario not found: {0}.\nAvailable scenarios are: \n{1}",
+                scenarioName,
+                String.join("\n", scenarioSuppliers.keySet())
+            )));
     }
 
 }
