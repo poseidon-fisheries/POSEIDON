@@ -18,6 +18,7 @@
 
 package uk.ac.ox.oxfish.utility.yaml;
 
+import com.google.common.collect.ImmutableList;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.introspector.Property;
@@ -27,22 +28,19 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.ScenarioSupplier;
 import uk.ac.ox.oxfish.utility.parameters.*;
 import uk.ac.ox.poseidon.common.api.FactorySupplier;
-import uk.ac.ox.poseidon.common.api.GenericComponentFactory;
 import uk.ac.ox.poseidon.common.core.parameters.DateParameter;
 import uk.ac.ox.poseidon.common.core.parameters.FixedParameter;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-import static com.google.common.collect.Streams.stream;
 import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 
 /**
@@ -134,85 +132,60 @@ class YamlRepresenter extends Representer {
             }
         );
 
-        stream(ServiceLoader.load(FactorySupplier.class)).forEach(factorySupplier -> {
-            // for each class create a representer that shows it as a map
-            final Class<? extends GenericComponentFactory<?, ?>> factoryClass =
-                factorySupplier.getFactoryClass();
-            this.addClassTag(factoryClass, Tag.MAP);
-            this.representers.put(factoryClass, data -> {
-                // prepare the node
+        addMapRepresenters(
+            FactorySupplier.class,
+            FactorySupplier::getFactoryClass,
+            FactorySupplier::getFactoryName
+        );
+
+        addMapRepresenters(
+            ScenarioSupplier.class,
+            scenarioSupplier -> scenarioSupplier.get().getClass(),
+            ScenarioSupplier::getScenarioName
+        );
+    }
+
+    /**
+     * Classes that are loaded as services (i.e., scenarios and component factories) are represent
+     * as maps in the YAML file. This function add representers for them.
+     *
+     * @param supplierClass        The class of supplier made available through the service loader
+     *                             (e.g., {@link ScenarioSupplier} or {@link FactorySupplier}).
+     * @param objectClassExtractor A function to get the target object class from the supplier.
+     * @param nameExtractor        A function to get the name of the target object from the
+     *                             supplier.
+     * @param <T>                  The type of the target object.
+     * @param <S>                  The type of the supplier.
+     */
+    private <T, S extends Supplier<T>> void addMapRepresenters(
+        final Class<? extends S> supplierClass,
+        final Function<? super S, Class<? extends T>> objectClassExtractor,
+        final Function<? super S, String> nameExtractor
+    ) {
+        // We loop through all the available suppliers of the desired class,
+        // and we add a representer for each of them.
+        ServiceLoader.load(supplierClass).forEach(supplier -> {
+            final Class<? extends T> objectClass = objectClassExtractor.apply(supplier);
+            final String name = nameExtractor.apply(supplier);
+            this.addClassTag(objectClass, Tag.MAP);
+            this.representers.put(objectClass, data -> {
                 final Set<Property> properties = getProperties(data.getClass());
-                final Node nameNode =
-                    YamlRepresenter.this.representData(factorySupplier.getFactoryName());
-                // if you have no properties don't bother making a map, just return your full
-                // name
-                if (properties.isEmpty()) {
-                    // just return your name in the constructor master-list as a string
+                final Node nameNode = YamlRepresenter.this.representData(name);
+                if (properties.isEmpty())
+                    // If the object class has no properties, we just encode the name.
                     return nameNode;
-                }
-
-                // otherwise print as map
-                // first prepare the "value" which is just a node map representing our
-                // properties
-                final List<NodeTuple> value = new ArrayList<>(properties.size());
-                // tag yourself as MAP, which means there will be no visible tag but just
-                // "name":
-                final Tag tag = Tag.MAP;
-                // create the holding node
-                final MappingNode node = new MappingNode(tag, value, BLOCK);
-                // here's the trick: this mapping contains a single node which is just the
-                // name of this factory
-                // in the constructor master list and then all the java-bean magic is a submap.
-                value.add(new NodeTuple(
-                    nameNode,
-                    representJavaBean(properties, data)
-                ));
-                return node;
-            });
-        });
-
-        // for each scenario create a representer that shows it as a map
-        // TODO: this code is almost the same as for factory suppliers and they should be unified
-        stream(ServiceLoader.load(ScenarioSupplier.class)).forEach(scenarioSupplier -> {
-            final Class<? extends Scenario> scenarioClass = scenarioSupplier.get().getClass();
-            this.addClassTag(scenarioClass, Tag.MAP);
-            this.representers.put(
-                scenarioClass,
-                data -> {
-                    final Node node;
-
-                    // prepare the node
-                    final Set<Property> properties;
-
-                    properties = getProperties(scenarioClass);
-
-                    // if you have no properties don't bother making a map, just return your full
-                    // name
-                    if (properties.isEmpty()) {
-                        // just return your name in the constructor master-list as a string
-                        node = YamlRepresenter.this.representData(data);
-                    } else {
-                        // otherwise print as map
-                        // first prepare the "value" which is just a node map representing our
-                        // properties
-                        final List<NodeTuple> value = new ArrayList<>(properties.size());
-                        // tag yourself as MAP, which means there will be no visible tag but just
-                        // "name":
-                        final Tag tag = Tag.MAP;
-                        // create the holding node
-                        node = new MappingNode(tag, value, BLOCK);
-                        // here's the trick: this mapping contains a single node which is just
-                        // the name of this factory
-                        // in the constructor master list and then all the java-bean magic is a
-                        // submap.
-                        value.add(new NodeTuple(
-                            YamlRepresenter.this.representData(scenarioSupplier.getScenarioName()),
+                else
+                    // otherwise, we represent it as a map with a single entry, using the object
+                    // name as a key and the set of properties as the value.
+                    return new MappingNode(
+                        Tag.MAP,
+                        ImmutableList.of(new NodeTuple(
+                            nameNode,
                             representJavaBean(properties, data)
-                        ));
-                    }
-                    return node;
-                }
-            );
+                        )),
+                        BLOCK
+                    );
+            });
         });
 
     }
