@@ -65,6 +65,16 @@ public class CalibrationGenerator implements Runnable {
     @Parameter(names = {"-r", "--num_runs_per_setting"})
     private int numRunsPerSetting = 1;
 
+    /**
+     * If you want to run this directly from IntelliJ and use a scenario that's defined in a
+     * separate module (e.g. "EPO Path Planner Abundance" that is defined in the POSEIDON.epo
+     * module), you need to change the setting in *Settings | Build, Execution, Deployment | Build
+     * Tools | Gradle* to use IntelliJ IDEA instead of Gradle for building and running. Only then
+     * will the module class path specified in the run configuration (e.g., `-cp POSEIDON.epo.main`)
+     * be honored. See: <a
+     * href="https://youtrack.jetbrains.com/issue/IDEA-220528">https://youtrack.jetbrains
+     * .com/issue/IDEA-220528</a>.
+     */
     public static void main(final String[] args) {
         final Runnable calibrationGenerator = new CalibrationGenerator();
         JCommander.newBuilder()
