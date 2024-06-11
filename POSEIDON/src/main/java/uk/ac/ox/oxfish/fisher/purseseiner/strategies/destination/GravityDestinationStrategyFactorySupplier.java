@@ -1,6 +1,6 @@
 /*
- * POSEIDON, an agent-based model of fisheries
- * Copyright (C) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,6 @@ import uk.ac.ox.poseidon.common.core.BasicFactorySupplier;
 public class GravityDestinationStrategyFactorySupplier
     extends BasicFactorySupplier<GravityDestinationStrategyFactory> {
     public GravityDestinationStrategyFactorySupplier() {
-        super(GravityDestinationStrategyFactory.class);
+        super(GravityDestinationStrategyFactory.class, "Gravity Destination Strategy");
     }
 }
