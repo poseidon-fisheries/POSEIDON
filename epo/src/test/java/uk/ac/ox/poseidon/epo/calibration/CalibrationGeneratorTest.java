@@ -30,7 +30,7 @@ class CalibrationGeneratorTest {
     void testGenerateCalibration() {
         final Path calibrationFolder = Paths.get("epo_inputs", "calibration");
         final CalibrationGenerator calibrationGenerator = new CalibrationGenerator();
-        calibrationGenerator.setScenarioName("EPO Abundance Pathfinding");
+        calibrationGenerator.setScenarioName("EPO Path Planner Abundance");
         calibrationGenerator.setTargetYear(2022);
         calibrationGenerator.setOutputFolder(calibrationFolder);
         calibrationGenerator.setTargetsFile(
