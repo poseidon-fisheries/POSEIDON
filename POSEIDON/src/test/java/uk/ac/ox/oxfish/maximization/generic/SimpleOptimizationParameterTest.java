@@ -33,14 +33,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SimpleOptimizationParameterTest {
 
     @Test
-    public void twoStepsWork() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public void twoStepsWork() throws IllegalAccessException, NoSuchMethodException,
+        InvocationTargetException {
         final PrototypeScenario scenario = new PrototypeScenario();
         final FromLeftToRightFactory biologyInitializer = new FromLeftToRightFactory();
 
         biologyInitializer.setExponent(new FixedDoubleParameter(100));
         scenario.setBiologyInitializer(biologyInitializer);
 
-        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(), 100, .0001);
+        assertEquals(
+            ((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(),
+            100,
+            .0001
+        );
 
         final SimpleOptimizationParameter parameter = new SimpleOptimizationParameter(
             "biologyInitializer.exponent",
@@ -52,11 +57,16 @@ public class SimpleOptimizationParameterTest {
             new double[]{10}
         );
 
-        assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(), 200, .0001);
+        assertEquals(
+            ((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(),
+            200,
+            .0001
+        );
     }
 
     @Test
-    public void oneStepWork() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public void oneStepWork() throws IllegalAccessException, NoSuchMethodException,
+        InvocationTargetException {
         final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setSpeedInKmh(new FixedDoubleParameter(150));
 
@@ -76,9 +86,11 @@ public class SimpleOptimizationParameterTest {
     }
 
     @Test
-    public void indexedWorks() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public void indexedWorks() throws IllegalAccessException, NoSuchMethodException,
+        InvocationTargetException {
         final PrototypeScenario scenario = new PrototypeScenario();
-        final MultipleIndependentSpeciesBiomassFactory biology = new MultipleIndependentSpeciesBiomassFactory();
+        final MultipleIndependentSpeciesBiomassFactory biology =
+            new MultipleIndependentSpeciesBiomassFactory();
         scenario.setBiologyInitializer(biology);
         biology.getFactories().clear();
         final SingleSpeciesBiomassFactory first = new SingleSpeciesBiomassFactory();
@@ -101,7 +113,7 @@ public class SimpleOptimizationParameterTest {
         );
 
         final SimpleOptimizationParameter parameter = new SimpleOptimizationParameter(
-            "biologyInitializer.factories$1.grower.steepness",
+            "biologyInitializer.factories[1].grower.steepness",
             10, 20
         );
 
@@ -112,7 +124,7 @@ public class SimpleOptimizationParameterTest {
 
         OptimizationParameter.navigateAndSet(
             scenario,
-            "biologyInitializer.factories$1.grower.steepness",
+            "biologyInitializer.factories[1].grower.steepness",
             new FixedDoubleParameter(10)
         );
 

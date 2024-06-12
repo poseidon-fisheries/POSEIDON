@@ -140,7 +140,7 @@ public class CalibrationGenerator implements Runnable {
         yaml.dump(scenario, scenarioFile);
         final ParameterExtractor parameterExtractor = new ParameterExtractor(
             ImmutableSet.of(CalibratedParameter.class),
-            LegacyParameterAddressBuilder::new
+            BeanParameterAddressBuilder::new
         );
         final List<OptimizationParameter> parameters =
             parameterExtractor

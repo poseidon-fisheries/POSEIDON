@@ -24,8 +24,9 @@ public class IntegerParameterAdaptor extends FixedParameterAdaptor<Integer> {
             getName(),
             value.getClass()
         );
-        new ParameterAddress(getName())
-            .getSetter(scenario)
-            .accept(new IntegerParameter(((Number) value).intValue()));
+        new ParameterAddress(getName()).setValue(
+            scenario,
+            new IntegerParameter(((Number) value).intValue())
+        );
     }
 }

@@ -24,8 +24,6 @@ public class BooleanParameterAdaptor extends FixedParameterAdaptor<Boolean> {
             getName(),
             value.getClass()
         );
-        new ParameterAddress(getName())
-            .getSetter(scenario)
-            .accept(new BooleanParameter((Boolean) value));
+        new ParameterAddress(getName()).setValue(scenario, new BooleanParameter((Boolean) value));
     }
 }

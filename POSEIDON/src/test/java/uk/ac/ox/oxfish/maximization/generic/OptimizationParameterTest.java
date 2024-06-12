@@ -36,17 +36,20 @@ import java.lang.reflect.InvocationTargetException;
 
 public class OptimizationParameterTest {
 
-
     @Test
-    public void twoStepsWork() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public void twoStepsWork() throws IllegalAccessException, NoSuchMethodException,
+        InvocationTargetException {
         final PrototypeScenario scenario = new PrototypeScenario();
         final FromLeftToRightFactory biologyInitializer = new FromLeftToRightFactory();
 
         biologyInitializer.setExponent(new FixedDoubleParameter(100));
         scenario.setBiologyInitializer(biologyInitializer);
 
-
-        Assertions.assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(), 100, .0001);
+        Assertions.assertEquals(
+            ((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(),
+            100,
+            .0001
+        );
 
         OptimizationParameter.navigateAndSet(
             scenario,
@@ -54,15 +57,18 @@ public class OptimizationParameterTest {
             new FixedDoubleParameter(200)
         );
 
-
-        Assertions.assertEquals(((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(), 200, .0001);
+        Assertions.assertEquals(
+            ((FixedDoubleParameter) biologyInitializer.getExponent()).getValue(),
+            200,
+            .0001
+        );
     }
 
     @Test
-    public void oneStepWork() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public void oneStepWork() throws IllegalAccessException, NoSuchMethodException,
+        InvocationTargetException {
         final PrototypeScenario scenario = new PrototypeScenario();
         scenario.setFishers(150);
-
 
         Assertions.assertEquals(scenario.getFishers(), 150, .0001);
 
@@ -72,14 +78,15 @@ public class OptimizationParameterTest {
             10
         );
 
-
         Assertions.assertEquals(scenario.getFishers(), 10, .0001);
     }
 
     @Test
-    public void indexedWorks() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public void indexedWorks() throws IllegalAccessException, NoSuchMethodException,
+        InvocationTargetException {
         final PrototypeScenario scenario = new PrototypeScenario();
-        final MultipleIndependentSpeciesBiomassFactory biology = new MultipleIndependentSpeciesBiomassFactory();
+        final MultipleIndependentSpeciesBiomassFactory biology =
+            new MultipleIndependentSpeciesBiomassFactory();
         scenario.setBiologyInitializer(biology);
         biology.getFactories().clear();
         final SingleSpeciesBiomassFactory first = new SingleSpeciesBiomassFactory();
@@ -89,7 +96,6 @@ public class OptimizationParameterTest {
 
         first.setGrower(new CommonLogisticGrowerFactory(.567));
         second.setGrower(new CommonLogisticGrowerFactory(.567));
-
 
         Assertions.assertEquals(
             ((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
@@ -104,10 +110,9 @@ public class OptimizationParameterTest {
 
         OptimizationParameter.navigateAndSet(
             scenario,
-            "biologyInitializer.factories$1.grower.steepness",
+            "biologyInitializer.factories[1].grower.steepness",
             new FixedDoubleParameter(10)
         );
-
 
         Assertions.assertEquals(
             ((FixedDoubleParameter) ((CommonLogisticGrowerFactory) first.getGrower()).getSteepness()).getValue(),
@@ -122,7 +127,8 @@ public class OptimizationParameterTest {
     }
 
     @Test
-    public void mappedWorks() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public void mappedWorks() throws IllegalAccessException, NoSuchMethodException,
+        InvocationTargetException {
         final PrototypeScenario scenario = new PrototypeScenario();
         final HeterogeneousGearFactory gears = new HeterogeneousGearFactory();
 
@@ -167,18 +173,16 @@ public class OptimizationParameterTest {
         limiting.setDelegate(gears);
         scenario.setGear(limiting);
 
-
         Assertions.assertEquals(((FixedDoubleParameter) gears.gears.get("Pristipomoides multidens")
             .getAverageCatchability()).getValue(), .01, .0001);
-        //change catchability of multidens!
+        // change catchability of multidens!
         OptimizationParameter.navigateAndSet(
             scenario,
-            "gear.delegate.gears~Pristipomoides multidens.averageCatchability",
+            "gear.delegate.gears(Pristipomoides multidens).averageCatchability",
             new FixedDoubleParameter(22)
         );
         Assertions.assertEquals(((FixedDoubleParameter) gears.gears.get("Pristipomoides multidens")
             .getAverageCatchability()).getValue(), 22, .0001);
-
 
     }
 

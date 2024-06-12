@@ -45,8 +45,9 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
     private boolean alwaysPositive = false;
 
     /**
-     * when this is set to true, it means the argument could never be a DoubleParameter. This usually doesn't matter but
-     * unfortunately it seems that YAML struggles with map<String,Number> and turn them into string,string maps
+     * when this is set to true, it means the argument could never be a DoubleParameter. This
+     * usually doesn't matter but unfortunately it seems that YAML struggles with map<String,Number>
+     * and turn them into string,string maps
      */
     private boolean isRawNumber = false;
 
@@ -75,47 +76,6 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
         this.maximum = maximum;
         this.alwaysPositive = alwaysPositive;
         this.isRawNumber = isRawNumber;
-    }
-
-    /**
-     * number of parameters this object actually represents
-     *
-     * @return
-     */
-    @Override
-    public int size() {
-        return 1;
-    }
-
-    /**
-     * consume the scenario and add the parameters
-     *
-     * @param scenario the scenario to modify
-     * @param inputs   the numerical values of the parameters to set
-     * @return
-     */
-    @Override
-    public String parametrize(
-        final Scenario scenario,
-        final double[] inputs
-    ) {
-
-        Preconditions.checkArgument(maximum >= minimum, "invalid bounds " + addressToModify);
-        Preconditions.checkArgument(inputs.length == 1);
-
-        final double realValue = computeNumericValue(inputs[0]);
-
-        if (!isRawNumber)
-            quickParametrize(scenario, realValue, addressToModify);
-        else
-            quickParametrizeRawNumber(scenario, realValue, addressToModify);
-
-        return String.valueOf(realValue);
-
-    }
-
-    public double computeNumericValue(final double input) {
-        return computeNumericValueFromEVABounds(input, minimum, maximum, alwaysPositive);
     }
 
     public static void quickParametrize(
@@ -168,6 +128,47 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
         if (realValue < 0 & forcePositive)
             realValue = 0;
         return realValue;
+    }
+
+    /**
+     * number of parameters this object actually represents
+     *
+     * @return
+     */
+    @Override
+    public int size() {
+        return 1;
+    }
+
+    /**
+     * consume the scenario and add the parameters
+     *
+     * @param scenario the scenario to modify
+     * @param inputs   the numerical values of the parameters to set
+     * @return
+     */
+    @Override
+    public String parametrize(
+        final Scenario scenario,
+        final double[] inputs
+    ) {
+
+        Preconditions.checkArgument(maximum >= minimum, "invalid bounds " + addressToModify);
+        Preconditions.checkArgument(inputs.length == 1);
+
+        final double realValue = computeNumericValue(inputs[0]);
+
+        if (!isRawNumber)
+            quickParametrize(scenario, realValue, addressToModify);
+        else
+            quickParametrizeRawNumber(scenario, realValue, addressToModify);
+
+        return String.valueOf(realValue);
+
+    }
+
+    public double computeNumericValue(final double input) {
+        return computeNumericValueFromEVABounds(input, minimum, maximum, alwaysPositive);
     }
 
     public double computeMappedValue(final double realValue) {
@@ -263,15 +264,13 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
     }
 
     public Supplier<Double> getGetter(final Scenario scenario) {
-        final Supplier<Object> getter = new ParameterAddress(addressToModify).getGetter(scenario);
-        return () -> ((FixedDoubleParameter) getter.get()).getValue();
+        final ParameterAddress parameterAddress = new ParameterAddress(addressToModify);
+        return () -> ((FixedDoubleParameter) parameterAddress.getValue(scenario)).getValue();
     }
 
     public Consumer<Double> getSetter(final Scenario scenario) {
-        return value ->
-            new ParameterAddress(addressToModify)
-                .getSetter(scenario)
-                .accept(new FixedDoubleParameter(value));
+        final ParameterAddress parameterAddress = new ParameterAddress(addressToModify);
+        return value -> parameterAddress.setValue(scenario, new FixedDoubleParameter(value));
     }
 
     @Override

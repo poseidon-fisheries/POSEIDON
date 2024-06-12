@@ -29,7 +29,7 @@ public interface OptimizationParameter {
         final String address,
         final Object value
     ) {
-        new ParameterAddress(address).getSetter(scenario).accept(value);
+        new ParameterAddress(address).setValue(scenario, value);
     }
 
     /**
@@ -46,7 +46,10 @@ public interface OptimizationParameter {
      * @param inputs   the numerical values of the parameters to set
      * @return
      */
-    String parametrize(Scenario scenario, double[] inputs);
+    String parametrize(
+        Scenario scenario,
+        double[] inputs
+    );
 
     String getName();
 }

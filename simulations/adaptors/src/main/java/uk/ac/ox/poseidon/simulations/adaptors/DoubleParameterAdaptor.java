@@ -43,9 +43,10 @@ public class DoubleParameterAdaptor extends ParameterAdaptor<DoubleParameter> {
             getName(),
             value.getClass()
         );
-        new ParameterAddress(getName())
-            .getSetter(scenario)
-            .accept(new FixedDoubleParameter(((Number) value).doubleValue()));
+        new ParameterAddress(getName()).setValue(
+            scenario,
+            new FixedDoubleParameter(((Number) value).doubleValue())
+        );
     }
 
 }
