@@ -20,17 +20,19 @@
 
 package uk.ac.ox.oxfish.utility;
 
-import com.opencsv.CSVReader;
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Iterator;
+import java.io.Reader;
+import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
- * Utility to read a csv file into
- * Created by carrknight on 11/29/16.
+ * Utility to read a csv file into Created by carrknight on 11/29/16.
  */
 public class CsvColumnToList {
 
@@ -40,8 +42,12 @@ public class CsvColumnToList {
     private char separator;
     private int columnNumber;
 
-
-    public CsvColumnToList(String pathToCSV, boolean headerInFile, char separator, int columnNumber) {
+    public CsvColumnToList(
+        final String pathToCSV,
+        final boolean headerInFile,
+        final char separator,
+        final int columnNumber
+    ) {
         this.pathToCSV = pathToCSV;
         this.headerInFile = headerInFile;
         this.separator = separator;
@@ -51,8 +57,11 @@ public class CsvColumnToList {
     }
 
     public CsvColumnToList(
-        String pathToCSV, boolean headerInFile, char separator, int columnNumber,
-        Function<Double, Double> transformer
+        final String pathToCSV,
+        final boolean headerInFile,
+        final char separator,
+        final int columnNumber,
+        final Function<Double, Double> transformer
     ) {
         this.pathToCSV = pathToCSV;
         this.headerInFile = headerInFile;
@@ -62,26 +71,21 @@ public class CsvColumnToList {
     }
 
     public LinkedList<Double> readColumn() {
-
-
-        //turn the csv column into a list of doubles
-        try {
-            CSVReader reader = new CSVReader(new FileReader(pathToCSV), separator);
-
-
-            Iterator<String[]> iterator = reader.iterator();
-
-            if (headerInFile)
-                iterator.next();
-
-            LinkedList<Double> column = new LinkedList<Double>();
-            while (iterator.hasNext())
-                column.add(transformer.apply(Double.parseDouble(iterator.next()[columnNumber])));
-
-            reader.close();
-            return column;
-        } catch (IOException e) {
-            throw new RuntimeException("failed to read or parse " + pathToCSV + " with exception " + e);
+        try (final Reader reader = new FileReader(pathToCSV)) {
+            final CsvParserSettings settings = new CsvParserSettings();
+            settings.setHeaderExtractionEnabled(headerInFile);
+            settings.getFormat().setDelimiter(separator);
+            return new CsvParser(settings)
+                .parseAll(reader)
+                .stream()
+                .map(strings -> transformer.apply(Double.parseDouble(strings[columnNumber])))
+                .collect(Collectors.toCollection(LinkedList::new));
+        } catch (final IOException e) {
+            throw new RuntimeException(MessageFormat.format(
+                "failed to read or parse {0} with exception {1}",
+                pathToCSV,
+                e
+            ));
         }
     }
 
@@ -99,7 +103,7 @@ public class CsvColumnToList {
      *
      * @param pathToCSV Value to set for property 'pathToCSV'.
      */
-    public void setPathToCSV(String pathToCSV) {
+    public void setPathToCSV(final String pathToCSV) {
         this.pathToCSV = pathToCSV;
     }
 
@@ -117,7 +121,7 @@ public class CsvColumnToList {
      *
      * @param headerInFile Value to set for property 'headerInFile'.
      */
-    public void setHeaderInFile(boolean headerInFile) {
+    public void setHeaderInFile(final boolean headerInFile) {
         this.headerInFile = headerInFile;
     }
 
@@ -135,7 +139,7 @@ public class CsvColumnToList {
      *
      * @param separator Value to set for property 'separator'.
      */
-    public void setSeparator(char separator) {
+    public void setSeparator(final char separator) {
         this.separator = separator;
     }
 
@@ -153,7 +157,7 @@ public class CsvColumnToList {
      *
      * @param columnNumber Value to set for property 'columnNumber'.
      */
-    public void setColumnNumber(int columnNumber) {
+    public void setColumnNumber(final int columnNumber) {
         this.columnNumber = columnNumber;
     }
 }

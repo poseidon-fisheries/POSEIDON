@@ -37,8 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static org.apache.commons.lang3.time.DurationFormatUtils.formatDuration;
-
 public class GenericOptimization extends SimpleProblemDouble implements Serializable {
 
     private static final Logger logger = Logger.getLogger(GenericOptimization.class.getName());
@@ -54,7 +52,8 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
      */
     private List<? extends OptimizationParameter> parameters = new LinkedList<>();
     /**
-     * map linking the name of the YearlyDataSet in the model with the path to file containing the real time series
+     * map linking the name of the YearlyDataSet in the model with the path to file containing the
+     * real time series
      */
     private List<DataTarget> targets = new LinkedList<>();
     private int runsPerSetting = 1;
@@ -78,8 +77,8 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
     }
 
     /**
-     * create smaller optimization problem trying to climb within a small range of previously found optimal parameters
-     * this assumes however all parameters are simple
+     * create smaller optimization problem trying to climb within a small range of previously found
+     * optimal parameters this assumes however all parameters are simple
      */
     @SuppressWarnings("SameParameterValue")
     public static void buildLocalCalibrationProblem(
@@ -94,8 +93,9 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
             GenericOptimization.class
         );
         for (int i = 0; i < optimization.getParameters().size(); i++) {
-            final SimpleOptimizationParameter parameter = ((SimpleOptimizationParameter) optimization.getParameters()
-                .get(i));
+            final SimpleOptimizationParameter parameter =
+                ((SimpleOptimizationParameter) optimization.getParameters()
+                    .get(i));
             final double optimalValue = parameter.computeNumericValue(originalParameters[i]);
             parameter.setMaximum(optimalValue * (1d + range));
             parameter.setMinimum(optimalValue * (1d - range));
@@ -105,27 +105,14 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
             }
 
         }
-        yaml.dump(optimization, new FileWriter(optimizationFile.getParent().resolve(newCalibrationName).toFile()));
-    }
-
-    public List<? extends OptimizationParameter> getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(final List<? extends OptimizationParameter> parameters) {
-        this.parameters = parameters;
+        yaml.dump(
+            optimization,
+            new FileWriter(optimizationFile.getParent().resolve(newCalibrationName).toFile())
+        );
     }
 
     public static GenericOptimization fromFile(final Path calibrationFile) {
         return new YamlLoader<>(GenericOptimization.class).load(calibrationFile);
-    }
-
-    Scenario buildScenario(final double[] solution) {
-        try {
-            return buildScenario(solution, Paths.get(getScenarioFile()).toFile(), getParameters());
-        } catch (final FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static Scenario buildScenario(
@@ -150,6 +137,34 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
         return scenario;
     }
 
+    private static String formatDuration(final Duration duration) {
+        final long seconds = duration.getSeconds();
+        final long absSeconds = Math.abs(seconds);
+        final String positive = String.format(
+            "%d:%02d:%02d",
+            absSeconds / 3600,
+            (absSeconds % 3600) / 60,
+            absSeconds % 60
+        );
+        return seconds < 0 ? "-" + positive : positive;
+    }
+
+    public List<? extends OptimizationParameter> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(final List<? extends OptimizationParameter> parameters) {
+        this.parameters = parameters;
+    }
+
+    Scenario buildScenario(final double[] solution) {
+        try {
+            return buildScenario(solution, Paths.get(getScenarioFile()).toFile(), getParameters());
+        } catch (final FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public String getScenarioFile() {
         return scenarioFile;
     }
@@ -172,8 +187,8 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
     }
 
     /**
-     * Evaluate a double vector representing a possible problem solution as part of an individual in the EvA framework.
-     * This makes up the target function to be evaluated.
+     * Evaluate a double vector representing a possible problem solution as part of an individual in
+     * the EvA framework. This makes up the target function to be evaluated.
      *
      * @param x a double vector to be evaluated
      * @return the fitness vector assigned to x as to the target function
@@ -215,7 +230,7 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
             "%n  error: %.2f, runs: %d, duration: %s%n  solution: %s",
             finalError,
             runsPerSetting,
-            formatDuration(Duration.between(start, finish).toMillis(), "HH:mm:ss"),
+            formatDuration(Duration.between(start, finish)),
             Arrays.toString(Arrays.stream(x).mapToObj(v -> String.format("%.2f", v)).toArray())
         ));
         return new double[]{finalError};

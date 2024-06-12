@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.basis;
 
 import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.mutable.MutableDouble;
+import com.google.common.util.concurrent.AtomicDouble;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
@@ -40,22 +40,18 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
  */
 public class RBFNetworkRegression implements GeographicalRegression<Double> {
 
-
     /**
-     * a list of pairs (rather than a map just because the link is so strong)
-     * Basis  to its weight when making predictions!
+     * a list of pairs (rather than a map just because the link is so strong) Basis  to its weight
+     * when making predictions!
      */
-    private final LinkedList<Entry<RBFBasis, MutableDouble>> network;
-
+    private final LinkedList<Entry<RBFBasis, AtomicDouble>> network;
 
     /**
      * functions used to turn an observation into a double[]
      */
     private final ObservationExtractor[] extractors;
 
-
     private final double learningRate;
-
 
     public RBFNetworkRegression(
         final ObservationExtractor[] extractors,
@@ -66,12 +62,11 @@ public class RBFNetworkRegression implements GeographicalRegression<Double> {
         final double initialWeight
     ) {
 
-
         Preconditions.checkArgument(max.length == min.length);
         Preconditions.checkArgument(max.length == extractors.length);
         this.extractors = extractors;
         this.learningRate = learningRate;
-        //check each step
+        // check each step
         final double[] step = new double[max.length];
         for (int i = 0; i < step.length; i++) {
             step[i] = (max[i] - min[i]) / (double) (order - 1);
@@ -81,13 +76,13 @@ public class RBFNetworkRegression implements GeographicalRegression<Double> {
 
         this.network = new LinkedList<>();
 
-        //builds combinations without recursion
-        //taken mostly from here : http://stackoverflow.com/a/29910788/975904
+        // builds combinations without recursion
+        // taken mostly from here : http://stackoverflow.com/a/29910788/975904
         final int totalDimension = (int) Math.pow(order, extractors.length);
         for (int i = 0; i < totalDimension; i++) {
             final double[] indices = new double[min.length];
 
-            //how often we need to reset
+            // how often we need to reset
             for (int j = 0; j < extractors.length; j++) {
                 final int period = (int) Math.pow(order, extractors.length - j - 1);
 
@@ -101,10 +96,9 @@ public class RBFNetworkRegression implements GeographicalRegression<Double> {
                     initialBandwidth,
                     Arrays.copyOf(indices, indices.length)
                 ),
-                new MutableDouble(initialWeight)
+                new AtomicDouble(initialWeight)
             ));
         }
-
 
     }
 
@@ -113,7 +107,7 @@ public class RBFNetworkRegression implements GeographicalRegression<Double> {
      *
      * @return Value for property 'network'.
      */
-    public LinkedList<Entry<RBFBasis, MutableDouble>> getNetwork() {
+    public LinkedList<Entry<RBFBasis, AtomicDouble>> getNetwork() {
         return network;
     }
 
@@ -127,8 +121,7 @@ public class RBFNetworkRegression implements GeographicalRegression<Double> {
     }
 
     /**
-     * extract numerical values for the x and feed that array into
-     * the RBF network to predict
+     * extract numerical values for the x and feed that array into the RBF network to predict
      *
      * @param tile   tile where we are predicting
      * @param time   time at which we are predicting
@@ -138,7 +131,10 @@ public class RBFNetworkRegression implements GeographicalRegression<Double> {
      */
     @Override
     public double predict(
-        final SeaTile tile, final double time, final Fisher fisher, final FishState model
+        final SeaTile tile,
+        final double time,
+        final Fisher fisher,
+        final FishState model
     ) {
 
         return predict(extractObservation(tile, time, fisher, model));
@@ -150,7 +146,7 @@ public class RBFNetworkRegression implements GeographicalRegression<Double> {
     private double predict(final double[] observation) {
 
         double sum = 0;
-        for (final Entry<RBFBasis, MutableDouble> basis : network) {
+        for (final Entry<RBFBasis, AtomicDouble> basis : network) {
             sum += basis.getValue().doubleValue() * basis.getKey().evaluate(observation);
         }
         return sum;
@@ -178,22 +174,25 @@ public class RBFNetworkRegression implements GeographicalRegression<Double> {
      */
     @Override
     public void addObservation(
-        final GeographicalObservation<Double> observation, final Fisher fisher, final FishState model
+        final GeographicalObservation<Double> observation,
+        final Fisher fisher,
+        final FishState model
     ) {
 
-        //get x and y
+        // get x and y
         final double[] x = extractObservation(observation.getTile(), observation.getTime(),
             fisher, model
         );
         final double y = observation.getValue();
-        //now get prediction
+        // now get prediction
         final double prediction = predict(x);
 
-        //gradient descent!
+        // gradient descent!
         final double increment = learningRate * (y - prediction);
-        for (final Entry<RBFBasis, MutableDouble> basis : network) {
-            //todo you can make this faster by storing the evaluate from the predict call!
-            basis.getValue().setValue(basis.getValue().doubleValue() + increment * basis.getKey().evaluate(x));
+        for (final Entry<RBFBasis, AtomicDouble> basis : network) {
+            // todo you can make this faster by storing the evaluate from the predict call!
+            basis.getValue().set(basis.getValue().doubleValue() +
+                increment * basis.getKey().evaluate(x));
         }
 
     }
@@ -207,7 +206,8 @@ public class RBFNetworkRegression implements GeographicalRegression<Double> {
      */
     @Override
     public double extractNumericalYFromObservation(
-        final GeographicalObservation<Double> observation, final Fisher fisher
+        final GeographicalObservation<Double> observation,
+        final Fisher fisher
     ) {
         return observation.getValue();
     }
@@ -239,7 +239,10 @@ public class RBFNetworkRegression implements GeographicalRegression<Double> {
     }
 
     @Override
-    public void start(final FishState model, final Fisher fisher) {
+    public void start(
+        final FishState model,
+        final Fisher fisher
+    ) {
 
     }
 

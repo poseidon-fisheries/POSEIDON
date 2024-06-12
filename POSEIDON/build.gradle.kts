@@ -29,9 +29,6 @@ dependencies {
     //fx collections; needed for sanity
     implementation(fileTree("libs/fxbase") { include("*.jar") })
 
-    // DO NOT use opencsv for new code, as we want to phase it out.
-    implementation("com.opencsv:opencsv:3.8")
-
     //kd tree
     implementation(fileTree("libs/rednaxela") { include("*.jar") })
 
@@ -44,8 +41,9 @@ dependencies {
     //jcommander, useful to parse command line arguments
     implementation("com.beust:jcommander:1.82")
 
-    //commons math
+    // Apache commons utilities
     implementation("org.apache.commons:commons-math3:3.6.1")
+    implementation("commons-beanutils:commons-beanutils:1.9.4")
 
     //discrete choosers
     implementation(fileTree("libs/discrete-choosers") { include("*.jar") })
