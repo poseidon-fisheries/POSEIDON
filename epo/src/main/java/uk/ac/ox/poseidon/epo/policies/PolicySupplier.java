@@ -67,4 +67,11 @@ abstract class PolicySupplier implements Supplier<List<Policy<EpoScenario<?>>>> 
             .addAll(get())
             .build();
     }
+
+    List<Policy<EpoScenario<?>>> getWithoutDefault() {
+        return ImmutableList.<Policy<EpoScenario<?>>>builder()
+            .addAll(get())
+            .build();
+    }
+
 }

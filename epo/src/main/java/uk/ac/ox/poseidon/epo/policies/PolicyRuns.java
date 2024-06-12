@@ -26,7 +26,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.experiments.tuna.Runner;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.AbundanceFadAttractionEvent;
+import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.maximization.YearlyResultsRowProvider;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.monitors.loggers.AbundanceFadAttractionEventObserver;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineActionsLogger;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.PurseSeineTripLogger;
 import uk.ac.ox.poseidon.epo.scenarios.EpoPathPlannerAbundanceScenario;
@@ -39,9 +43,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.stream.Collectors.toList;
 
 public class PolicyRuns implements Runnable {
 
@@ -156,45 +161,77 @@ public class PolicyRuns implements Runnable {
                         .setPolicies(entry.getValue())
                         .setParallel(true)
                         .setWriteScenarioToFile(true)
-                        .requestFisherDailyData(columnName -> columnName.equals(
-                            "Number of active FADs"))
+/*                        .requestFisherDailyData(columnName -> columnName.equals(
+                            "Bigeye tuna Catches (kg)"))*/
                         .requestFisherYearlyData()
+/*                        .registerRowProvider(
+                            "fad_density.csv",
+                            fishState -> new FadDensityHeatmapGatherer(30)
+                        )*/
                         .registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new)
                         .registerRowProvider("yearly_results.csv", YearlyResultsRowProvider::new)
                         .registerRowProvider("spatial_closures.csv", RectangularAreaExtractor::new)
                         .registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
+/*
+                registerFadAttractionEventProviders(runner, ImmutableSet.of("350", "309"));
+*/
                 runner.run(numberOfYearsToRun, numberOfRunsPerPolicy);
             });
+
+    }
+
+    private void registerFadAttractionEventProviders(
+        final Runner<EpoPathPlannerAbundanceScenario> runner,
+        final Set<String> vesselsWhoseFadsToTrack
+    ) {
+        runner.setAfterStartConsumer(state -> {
+            final FishState fishState = state.getModel();
+            final AbundanceFadAttractionEventObserver observer =
+                new AbundanceFadAttractionEventObserver(fishState);
+            fishState.getFishers().stream()
+                .filter(fisher -> vesselsWhoseFadsToTrack.contains(fisher.getTagsList().get(0)))
+                .map(FadManager::getFadManager)
+                .forEach(fadManager ->
+                    fadManager.registerObserver(AbundanceFadAttractionEvent.class, observer)
+                );
+            ImmutableMap.of(
+                "fad_attraction_events.csv", observer.getEventLogger(),
+                "tile_abundance_before.csv", observer.getTileAbundanceLogger(),
+                "fad_abundance_delta.csv", observer.getFadAbundanceLogger()
+            ).forEach((fileName, logger) -> runner.registerRowProvider(fileName, __ -> logger));
+        });
     }
 
     private Map<String, List<Policy<EpoScenario<?>>>> makePolicies() {
         final List<Integer> yearsActive = ImmutableList.of(2023);
         final ImmutableList<Double> proportions =
-            ImmutableList.of(0.75, 0.50, 0.25, 0.10, 0.0);
+            ImmutableList.of(0.25, 0.50, 0.75, 1.0);
         final ImmutableList<Double> fineProportions =
-            ImmutableList.of(1.00, 0.80, 0.50, 0.25);
-//             IntStream.rangeClosed(1, 20)
-//                 .mapToObj(i -> i * 0.05)
-//                 .collect(toImmutableList());
+/*
+            ImmutableList.of(1.00, 0.75, 0.50, 0.25);
+*/
+            IntStream.rangeClosed(1, 20)
+                .mapToObj(i -> i * 0.05)
+                .collect(toImmutableList());
         return ImmutableMap.of(
-                "global_object_set_limits", new GlobalObjectSetLimit(
+/*                "global_object_set_limits", new GlobalObjectSetLimit(
                     yearsActive,
                     // 8729 FAD + 4003 OFS in 2022:
                     proportions.stream().map(p -> (int) (p * (8729 + 4003))).collect(toList())
-                ),
+                ),*/
                 "fad_limits_fine", new ActiveFadLimitsPolicies(
                     yearsActive,
                     2023,
-                    fineProportions,
+                    proportions,
                     false
-                ),
-                "fad_limits_fine_with_override", new ActiveFadLimitsPolicies(
+                )
+/*                "fad_limits_fine_with_override", new ActiveFadLimitsPolicies(
                     yearsActive,
                     2023,
                     fineProportions,
                     true
-                ),
-                "extended_closures", new ExtendedClosurePolicies(
+                ),*/
+                /*"extended_closures", new ExtendedClosurePolicies(
                     yearsActive,
                     ImmutableList.of(5, 15, 30)
                 ),
@@ -207,8 +244,8 @@ public class PolicyRuns implements Runnable {
                     yearsActive,
                     -120,
                     ImmutableList.of(5, 15, 30)
-                ),
-                "southern_closure", new SouthernClosure(
+                ),*/
+/*                "southern_closure", new SouthernClosure(
                     yearsActive,
                     2023,
                     ImmutableList.of(0.2, 0.5, 1.0),
@@ -216,14 +253,14 @@ public class PolicyRuns implements Runnable {
                     // obs_action_events %>% filter(year == 2022, action_type %in% c("FAD", "OFS"),
                     // lon >= -125 & lon <= -80, lat >= -20 & lat <= 0) %>% nrow()
                     ImmutableList.of(0, 5215)
-                )
+                )*/
             )
             .entrySet()
             .stream()
             .filter(entry -> policiesToRun.contains(entry.getKey()))
             .collect(toImmutableMap(
                 Entry::getKey,
-                entry -> entry.getValue().getWithDefault()
+                entry -> entry.getValue().getWithoutDefault()
             ));
     }
 }

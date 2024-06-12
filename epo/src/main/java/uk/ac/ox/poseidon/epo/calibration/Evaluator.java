@@ -58,7 +58,8 @@ public class Evaluator implements JCommanderRunnable {
     //  group_by(action_type) |>
     //  slice_max(n, with_ties = FALSE)
     @Parameter(names = "--track_fads_of_vessels")
-    private Set<String> vesselsWhoseFadsToTrack = ImmutableSet.of(); //"1779", "453", "1552");
+    private Set<String> vesselsWhoseFadsToTrack = ImmutableSet.of("1779", "453", "1552");
+        //"1779", "453", "1552");
     @Parameter(names = {"-r", "--num-runs"})
     private int numRuns = Math.min(8, getRuntime().availableProcessors());
     @Parameter(names = {"-y", "--years"})
@@ -118,7 +119,10 @@ public class Evaluator implements JCommanderRunnable {
                 scenario = loadScenario();
                 break;
             case "md":
-                scenario = new ScenarioExtractor(calibrationFolder, calibrationFolder.resolve(scenarioSource))
+                scenario = new ScenarioExtractor(
+                    calibrationFolder,
+                    calibrationFolder.resolve(scenarioSource)
+                )
                     .getAndWriteToFile(CALIBRATED_SCENARIO_FILENAME);
                 break;
             default:
@@ -170,6 +174,13 @@ public class Evaluator implements JCommanderRunnable {
     }
 
     private void registerFadAttractionEventProviders(final Runner<Scenario> runner) {
+        registerFadAttractionEventProviders(runner, this.vesselsWhoseFadsToTrack);
+    }
+
+    private void registerFadAttractionEventProviders(
+        final Runner<Scenario> runner,
+        final Set<String> vesselsWhoseFadsToTrack
+    ) {
         runner.setAfterStartConsumer(state -> {
             final FishState fishState = state.getModel();
             final AbundanceFadAttractionEventObserver observer =

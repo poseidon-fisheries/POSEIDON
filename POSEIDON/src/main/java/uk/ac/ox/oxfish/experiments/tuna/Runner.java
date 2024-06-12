@@ -61,6 +61,8 @@ public final class Runner<S extends Scenario> {
     private static final String YEARLY_DATA_FILENAME = "yearly_data.csv";
     private static final String FISHER_YEARLY_DATA_FILENAME = "fisher_yearly_data.csv";
     private static final String FISHER_DAILY_DATA_FILENAME = "fisher_daily_data.csv";
+    private static final String FAD_DAILY_DATA_FILENAME = "fad_daily_data.csv";
+
     private static final String RUNS_FILENAME = "runs.csv";
     private static final String POLICIES_FILENAME = "policies.csv";
     private static final String SCENARIOS_FOLDER = "scenarios";
@@ -69,7 +71,8 @@ public final class Runner<S extends Scenario> {
 
     private final Supplier<? extends S> scenarioSupplier;
     private final Path outputPath;
-    private final Multimap<Path, AlgorithmFactory<Iterable<? extends RowProvider>>> rowProviderFactories =
+    private final Multimap<Path, AlgorithmFactory<Iterable<? extends RowProvider>>>
+        rowProviderFactories =
         HashMultimap.create();
     private boolean parallel = true;
     private boolean writeScenarioToFile = false;
@@ -237,7 +240,10 @@ public final class Runner<S extends Scenario> {
             final Path scenariosFolder = outputPath.resolve(SCENARIOS_FOLDER);
             Files.createDirectories(scenariosFolder);
             final Path scenarioFile =
-                scenariosFolder.resolve(runnerState.getPolicy().getName().replaceAll("[^a-zA-Z0-9-_.]", "_") + ".yaml");
+                scenariosFolder.resolve(runnerState
+                    .getPolicy()
+                    .getName()
+                    .replaceAll("[^a-zA-Z0-9-_.]", "_") + ".yaml");
             new FishYAML().dump(runnerState.getScenario(), new FileWriter(scenarioFile.toFile()));
         } catch (final IOException e) {
             throw new RuntimeException(e);
@@ -245,15 +251,18 @@ public final class Runner<S extends Scenario> {
     }
 
     private Multimap<Path, RowProvider> makeRowProviders(final State state) {
-        final ImmutableMultimap.Builder<Path, RowProvider> rowProviders = ImmutableMultimap.builder();
+        final ImmutableMultimap.Builder<Path, RowProvider> rowProviders =
+            ImmutableMultimap.builder();
         rowProviders.put(outputPath.resolve(RUNS_FILENAME), state);
         rowProviders.put(outputPath.resolve(POLICIES_FILENAME), state.policy);
-        rowProviderFactories.forEach((path, factory) -> factory.apply(state.model).forEach(rowProvider -> {
-            if (rowProvider instanceof Startable) {
-                state.model.registerStartable((Startable) rowProvider);
-            }
-            rowProviders.put(path, rowProvider);
-        }));
+        rowProviderFactories.forEach((path, factory) -> factory
+            .apply(state.model)
+            .forEach(rowProvider -> {
+                if (rowProvider instanceof Startable) {
+                    state.model.registerStartable((Startable) rowProvider);
+                }
+                rowProviders.put(path, rowProvider);
+            }));
         return rowProviders.build();
     }
 
@@ -271,9 +280,17 @@ public final class Runner<S extends Scenario> {
             if (!activeProviders.isEmpty()) {
                 synchronized (overwriteFiles) {
                     final boolean overwrite =
-                        overwriteFiles.computeIfAbsent(outputPath, __ -> new AtomicBoolean(true)).getAndSet(false);
-                    try (final Writer fileWriter = new FileWriter(outputPath.toFile(), !overwrite)) {
-                        final CsvWriter csvWriter = new CsvWriter(new BufferedWriter(fileWriter), csvWriterSettings);
+                        overwriteFiles
+                            .computeIfAbsent(outputPath, __ -> new AtomicBoolean(true))
+                            .getAndSet(false);
+                    try (final Writer fileWriter = new FileWriter(
+                        outputPath.toFile(),
+                        !overwrite
+                    )) {
+                        final CsvWriter csvWriter = new CsvWriter(
+                            new BufferedWriter(fileWriter),
+                            csvWriterSettings
+                        );
                         writeRows(csvWriter, activeProviders, runNumber, overwrite);
                     } catch (final IOException e) {
                         throw new IllegalStateException("Writing to " + outputPath + " failed.", e);
@@ -326,6 +343,21 @@ public final class Runner<S extends Scenario> {
         );
     }
 
+    public Runner<S> requestFadDailyData(final Predicate<String> columnNamePredicate) {
+        return registerRowProviders(
+            FAD_DAILY_DATA_FILENAME,
+            fishState -> fishState
+                .getFishers()
+                .stream()
+                .map(fisher -> new TidyFisherDailyData(
+                    fisher.getDailyData(),
+                    columnNamePredicate,
+                    fisher.getTagsList().get(0)
+                ))
+                .collect(toImmutableList())
+        );
+    }
+
     @SuppressWarnings({"WeakerAccess", "unused"})
     public Runner<S> requestYearlyData(final Predicate<String> columnNamePredicate) {
         return registerRowProvider(YEARLY_DATA_FILENAME, fishState -> new TidyYearlyData(
@@ -338,7 +370,10 @@ public final class Runner<S extends Scenario> {
         @SuppressWarnings("SameParameterValue") final String fileName,
         final AlgorithmFactory<? extends RowProvider> rowProviderFactory
     ) {
-        registerRowProviders(fileName, fishState -> ImmutableList.of(rowProviderFactory.apply(fishState)));
+        registerRowProviders(
+            fileName,
+            fishState -> ImmutableList.of(rowProviderFactory.apply(fishState))
+        );
         return this;
     }
 
@@ -409,8 +444,17 @@ public final class Runner<S extends Scenario> {
 
         void printStep() {
             logger.info(String.format(
-                "Run %" + runDigits + "d / %" + runDigits + "d, " + "step %5d (year %" + yearDigits + "d / %" +
-                    yearDigits + "d, " + "day %3d), policy: %s",
+                "Run %" +
+                    runDigits +
+                    "d / %" +
+                    runDigits +
+                    "d, " +
+                    "step %5d (year %" +
+                    yearDigits +
+                    "d / %" +
+                    yearDigits +
+                    "d, " +
+                    "day %3d), policy: %s",
                 runNumber,
                 numRuns,
                 model.getStep(),
