@@ -151,7 +151,12 @@ public class OneAtATimeSensitivity {
         final int steps
     ) {
         final double delta = maximum - minimum;
-        return range(0, steps).mapToDouble(i -> minimum + delta * ((double) i / (steps - 1)));
+        return Streams.concat(
+            range(0, steps - 1).mapToDouble(i -> minimum + delta * ((double) i / (steps - 1))),
+            // We want to make sure we get the precise maximum and not a generated floating point
+            // value that could be off by a tiny bit, so we add it to stream manually
+            DoubleStream.of(maximum)
+        );
     }
 
     @SuppressWarnings("unused")
