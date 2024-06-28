@@ -39,7 +39,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.toList;
 
@@ -172,10 +174,9 @@ public class PolicyRuns implements Runnable {
         final ImmutableList<Double> proportions =
             ImmutableList.of(0.75, 0.50, 0.25, 0.10, 0.0);
         final ImmutableList<Double> fineProportions =
-            ImmutableList.of(1.00, 0.80, 0.50, 0.25);
-//             IntStream.rangeClosed(1, 20)
-//                 .mapToObj(i -> i * 0.05)
-//                 .collect(toImmutableList());
+            IntStream.rangeClosed(1, 20)
+                .mapToObj(i -> i * 0.05)
+                .collect(toImmutableList());
         return ImmutableMap.of(
                 "global_object_set_limits", new GlobalObjectSetLimit(
                     yearsActive,
@@ -188,12 +189,12 @@ public class PolicyRuns implements Runnable {
                     fineProportions,
                     false
                 ),
-                "fad_limits_fine_with_override", new ActiveFadLimitsPolicies(
+/*                "fad_limits_fine_with_override", new ActiveFadLimitsPolicies(
                     yearsActive,
                     2023,
                     fineProportions,
                     true
-                ),
+                ),*/
                 "extended_closures", new ExtendedClosurePolicies(
                     yearsActive,
                     ImmutableList.of(5, 15, 30)
