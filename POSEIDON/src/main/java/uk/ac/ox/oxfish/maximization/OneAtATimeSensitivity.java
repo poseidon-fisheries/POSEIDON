@@ -56,8 +56,6 @@ public class OneAtATimeSensitivity {
     private int iterations = 5;
     @Parameter(names = {"-y", "--num_year_to_run"})
     private int numYearsToRun = 2;
-    @Parameter(names = {"-b", "--bounds_only"})
-    private boolean boundsOnly = false;
 
     @SuppressWarnings("WeakerAccess")
     public OneAtATimeSensitivity() {
@@ -89,20 +87,34 @@ public class OneAtATimeSensitivity {
         oneAtATimeSensitivity.run();
     }
 
+    static DoubleStream valueRange(
+        final double minimum,
+        final double maximum,
+        final int steps
+    ) {
+        final double delta = maximum - minimum;
+        return Streams.concat(
+            range(0, steps - 1).mapToDouble(i -> minimum + delta * ((double) i / (steps - 1))),
+            // We want to make sure we get the precise maximum and not a generated floating point
+            // value that could be off by a tiny bit, so we add it to stream manually
+            DoubleStream.of(maximum)
+        );
+    }
+
     public void run() {
-        final GenericOptimization genericOptimization = GenericOptimization.fromFile(folder.resolve(calibrationFile));
-        final double[] solution = new SolutionExtractor(folder.resolve(logFile)).bestSolution().getKey();
+        final GenericOptimization genericOptimization =
+            GenericOptimization.fromFile(folder.resolve(calibrationFile));
+        final double[] solution =
+            new SolutionExtractor(folder.resolve(logFile)).bestSolution().getKey();
         final Path outputFolder = folder.resolve("ofat_outputs");
-        if (!boundsOnly) {
-            final Scenario scenario = genericOptimization.buildScenario(solution);
-            new Runner<>(() -> genericOptimization.buildScenario(solution), outputFolder)
-                .setPolicies(buildVariations(genericOptimization, scenario))
-                .registerRowProvider(
-                    "results.csv",
-                    fishState -> new ResultsProvider(genericOptimization, fishState)
-                )
-                .run(numYearsToRun, iterations);
-        }
+        final Scenario scenario = genericOptimization.buildScenario(solution);
+        new Runner<>(() -> genericOptimization.buildScenario(solution), outputFolder)
+            .setPolicies(buildVariations(genericOptimization, scenario))
+            .registerRowProvider(
+                "results.csv",
+                fishState -> new ResultsProvider(genericOptimization, fishState)
+            )
+            .run(numYearsToRun, iterations);
     }
 
     private List<Variation> buildVariations(
@@ -113,7 +125,11 @@ public class OneAtATimeSensitivity {
         return getParameters(genericOptimization)
             .stream()
             .flatMap(parameter ->
-                valueRange(parameter, parameter.getValue(optimizedScenario), steps).mapToObj(value ->
+                valueRange(
+                    parameter,
+                    parameter.getValue(optimizedScenario),
+                    steps
+                ).mapToObj(value ->
                     new Variation(
                         parameter.getAddressToModify(),
                         value,
@@ -128,8 +144,8 @@ public class OneAtATimeSensitivity {
     ) {
         return genericOptimization.getParameters()
             .stream()
-            .filter(p -> p instanceof SimpleOptimizationParameter)
-            .map(p -> (SimpleOptimizationParameter) p)
+            .filter(SimpleOptimizationParameter.class::isInstance)
+            .map(SimpleOptimizationParameter.class::cast)
             .collect(toImmutableList());
     }
 
@@ -145,35 +161,11 @@ public class OneAtATimeSensitivity {
         );
     }
 
-    static DoubleStream valueRange(
-        final double minimum,
-        final double maximum,
-        final int steps
-    ) {
-        final double delta = maximum - minimum;
-        return Streams.concat(
-            range(0, steps - 1).mapToDouble(i -> minimum + delta * ((double) i / (steps - 1))),
-            // We want to make sure we get the precise maximum and not a generated floating point
-            // value that could be off by a tiny bit, so we add it to stream manually
-            DoubleStream.of(maximum)
-        );
-    }
-
-    @SuppressWarnings("unused")
-    public boolean isBoundsOnly() {
-        return boundsOnly;
-    }
-
-    @SuppressWarnings("unused")
-    public void setBoundsOnly(final boolean boundsOnly) {
-        this.boundsOnly = boundsOnly;
-    }
-
     private List<FixedDataTarget> getTargets(final GenericOptimization genericOptimization) {
         return genericOptimization.getTargets()
             .stream()
-            .filter(t -> t instanceof FixedDataTarget)
-            .map(t -> (FixedDataTarget) t)
+            .filter(FixedDataTarget.class::isInstance)
+            .map(FixedDataTarget.class::cast)
             .collect(toImmutableList());
     }
 
