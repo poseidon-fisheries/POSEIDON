@@ -54,6 +54,41 @@ public class TwoPunchCalibration implements JCommanderRunnable {
         new TwoPunchCalibration().run(args);
     }
 
+    static List<HardEdgeOptimizationParameter> makeLocalParameters(
+        final Collection<? extends HardEdgeOptimizationParameter> originalParameters,
+        final double[] solution,
+        final double proportionOfGlobalRange
+    ) {
+        checkArgument(solution.length == originalParameters.size());
+        return mapWithIndex(
+            originalParameters.stream(),
+            (originalParameter, i) -> {
+                final double optimalValue =
+                    originalParameter.computeNumericValue(solution[(int) i]);
+                final double localRange =
+                    (originalParameter.getHardMaximum() - originalParameter.getHardMinimum()) *
+                        proportionOfGlobalRange;
+                final HardEdgeOptimizationParameter newParameter =
+                    new HardEdgeOptimizationParameter(
+                        originalParameter.getAddressToModify(),
+                        optimalValue - localRange / 2.0,
+                        optimalValue + localRange / 2.0,
+                        originalParameter.isRawNumber(),
+                        originalParameter.getHardMinimum(),
+                        originalParameter.getHardMaximum()
+                    );
+                if (newParameter.getMinimum() < newParameter.getHardMinimum()) {
+                    newParameter.setMinimum(newParameter.getHardMinimum());
+                    newParameter.setMaximum(newParameter.getHardMinimum() + localRange);
+                } else if (newParameter.getMaximum() > newParameter.getHardMaximum()) {
+                    newParameter.setMinimum(newParameter.getHardMaximum() - localRange);
+                    newParameter.setMaximum(newParameter.getHardMaximum());
+                }
+                return newParameter;
+            }
+        ).collect(toImmutableList());
+    }
+
     @SuppressWarnings("unused")
     public Path getRootCalibrationFolder() {
         return rootCalibrationFolder;
@@ -113,6 +148,7 @@ public class TwoPunchCalibration implements JCommanderRunnable {
 
     @Override
     public void run() {
+        final Path calibrationFilePath = rootCalibrationFolder.resolve(calibrationFile);
         final Calibrator.Result globalCalibratorResult =
             new Calibrator(
                 "global",
@@ -122,13 +158,17 @@ public class TwoPunchCalibration implements JCommanderRunnable {
                 parallelThreads,
                 false,
                 rootCalibrationFolder,
-                rootCalibrationFolder.resolve(calibrationFile),
+                calibrationFilePath,
                 seedScenarios,
                 new Calibrator.ClusterBasedNichingEAInitializer()
             ).calibrate();
 
         final GenericOptimization localCalibrationProblem =
-            buildLocalCalibrationProblem(globalCalibratorResult.getSolution(), 0.1);
+            buildLocalCalibrationProblem(
+                globalCalibratorResult.getSolution(),
+                calibrationFilePath,
+                0.1
+            );
         localCalibrationProblem.setRunsPerSetting(2);
 
         final Calibrator.Result localCalibratorResult = new Calibrator(
@@ -152,6 +192,7 @@ public class TwoPunchCalibration implements JCommanderRunnable {
 
     public GenericOptimization buildLocalCalibrationProblem(
         final double[] solution,
+        final Path calibrationFilePath,
         final double proportionOfGlobalRange
     ) {
 
@@ -159,7 +200,7 @@ public class TwoPunchCalibration implements JCommanderRunnable {
         checkArgument(proportionOfGlobalRange <= 1);
 
         final GenericOptimization genericOptimization =
-            GenericOptimization.fromFile(calibrationFile);
+            GenericOptimization.fromFile(calibrationFilePath);
 
         genericOptimization.setParameters(
             makeLocalParameters(
@@ -174,41 +215,6 @@ public class TwoPunchCalibration implements JCommanderRunnable {
         );
 
         return genericOptimization;
-    }
-
-    static List<HardEdgeOptimizationParameter> makeLocalParameters(
-        final Collection<? extends HardEdgeOptimizationParameter> originalParameters,
-        final double[] solution,
-        final double proportionOfGlobalRange
-    ) {
-        checkArgument(solution.length == originalParameters.size());
-        return mapWithIndex(
-            originalParameters.stream(),
-            (originalParameter, i) -> {
-                final double optimalValue =
-                    originalParameter.computeNumericValue(solution[(int) i]);
-                final double localRange =
-                    (originalParameter.getHardMaximum() - originalParameter.getHardMinimum()) *
-                        proportionOfGlobalRange;
-                final HardEdgeOptimizationParameter newParameter =
-                    new HardEdgeOptimizationParameter(
-                        originalParameter.getAddressToModify(),
-                        optimalValue - localRange / 2.0,
-                        optimalValue + localRange / 2.0,
-                        originalParameter.isRawNumber(),
-                        originalParameter.getHardMinimum(),
-                        originalParameter.getHardMaximum()
-                    );
-                if (newParameter.getMinimum() < newParameter.getHardMinimum()) {
-                    newParameter.setMinimum(newParameter.getHardMinimum());
-                    newParameter.setMaximum(newParameter.getHardMinimum() + localRange);
-                } else if (newParameter.getMaximum() > newParameter.getHardMaximum()) {
-                    newParameter.setMinimum(newParameter.getHardMaximum() - localRange);
-                    newParameter.setMaximum(newParameter.getHardMaximum());
-                }
-                return newParameter;
-            }
-        ).collect(toImmutableList());
     }
 
 }
