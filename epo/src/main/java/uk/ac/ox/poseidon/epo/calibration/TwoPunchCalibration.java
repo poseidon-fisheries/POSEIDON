@@ -41,8 +41,12 @@ public class TwoPunchCalibration implements JCommanderRunnable {
     private int parallelThreads = getRuntime().availableProcessors();
     @Parameter(names = {"-g", "--max_global_calls"})
     private int maxGlobalCalls = 2000;
+    @Parameter(names = {"-gp", "--global_population_size"})
+    private int globalPopulationSize = 200;
     @Parameter(names = {"-l", "--max_local_calls"})
     private int maxLocalCalls = 5000;
+    @Parameter(names = {"-lp", "--local_population_size"})
+    private int localPopulationSize = 50;
     @Parameter(converter = PathConverter.class)
     private Path rootCalibrationFolder;
     @Parameter(names = {"-f", "--calibration_file"}, converter = PathConverter.class)
@@ -152,7 +156,7 @@ public class TwoPunchCalibration implements JCommanderRunnable {
         final Calibrator.Result globalCalibratorResult =
             new Calibrator(
                 "global",
-                200,
+                globalPopulationSize,
                 maxGlobalCalls,
                 15,
                 parallelThreads,
@@ -173,7 +177,7 @@ public class TwoPunchCalibration implements JCommanderRunnable {
 
         final Calibrator.Result localCalibratorResult = new Calibrator(
             "local",
-            50,
+            localPopulationSize,
             maxLocalCalls,
             17,
             parallelThreads,

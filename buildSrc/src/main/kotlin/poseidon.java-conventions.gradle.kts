@@ -36,8 +36,11 @@ dependencies {
     compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
 }
 
-tasks.withType<JavaCompile> {
-    options.release.set(8)
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+        vendor.set(JvmVendorSpec.ADOPTIUM)
+    }
 }
 
 tasks.named<Test>("test") {
