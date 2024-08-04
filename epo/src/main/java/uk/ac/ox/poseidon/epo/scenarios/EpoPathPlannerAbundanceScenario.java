@@ -66,7 +66,7 @@ public class EpoPathPlannerAbundanceScenario extends EpoAbundanceScenario {
                             13, 30, 5, 40, 14
                         ),
                         ImmutableMap.of(
-                            "Bigeye tuna", new FixedDoubleParameter(0.30),
+                            "Bigeye tuna", new FixedDoubleParameter(0.60),
                             "Skipjack tuna", new CalibratedParameter(0, 0.5, 0, 1),
                             "Yellowfin tuna", new CalibratedParameter(0, 0.5, 0, 1)
                         ),
