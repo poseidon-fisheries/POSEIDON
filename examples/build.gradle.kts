@@ -18,7 +18,7 @@
  */
 
 plugins {
-    id("buildlogic.java-library-conventions")
+    id("buildlogic.java-application-conventions")
 }
 
 dependencies {

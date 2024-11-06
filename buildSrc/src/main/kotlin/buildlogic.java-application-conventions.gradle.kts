@@ -28,3 +28,10 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
 }
+
+application {
+    mainClass.set(
+        project.findProperty("mainClass") as String?
+            ?: "uk.ac.ox.poseidon.examples.BasicScenarioWithUI"
+    )
+}
