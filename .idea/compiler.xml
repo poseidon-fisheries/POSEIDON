@@ -8,13 +8,13 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar" />
         </processorPath>
-        <module name="poseidon.geography.main" />
-        <module name="poseidon.examples.main" />
-        <module name="poseidon.biology.main" />
-        <module name="poseidon.gui.main" />
-        <module name="poseidon.io.main" />
-        <module name="poseidon.agents.main" />
-        <module name="poseidon.core.main" />
+        <module name="POSEIDON.agents.main" />
+        <module name="POSEIDON.core.main" />
+        <module name="POSEIDON.gui.main" />
+        <module name="POSEIDON.io.main" />
+        <module name="POSEIDON.geography.main" />
+        <module name="POSEIDON.biology.main" />
+        <module name="POSEIDON.examples.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="21">
