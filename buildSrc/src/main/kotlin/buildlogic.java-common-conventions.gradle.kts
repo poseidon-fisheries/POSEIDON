@@ -24,6 +24,7 @@
 plugins {
     java
     jacoco
+    id("com.github.spotbugs")
 }
 
 repositories {

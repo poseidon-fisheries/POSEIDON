@@ -30,3 +30,7 @@ repositories {
     // Use the plugin portal to apply community plugins in convention plugins.
     gradlePluginPortal()
 }
+
+dependencies {
+    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.26")
+}
