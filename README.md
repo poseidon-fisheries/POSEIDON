@@ -3,25 +3,14 @@ POSEIDON
 
 [![tests](https://github.com/poseidon-fisheries/POSEIDON/actions/workflows/tests.yml/badge.svg)](https://github.com/poseidon-fisheries/POSEIDON/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/poseidon-fisheries/POSEIDON/branch/main/graph/badge.svg)](https://codecov.io/gh/poseidon-fisheries/POSEIDON)
 
-This is the code for POSEIDON, a fishery agent-based model; currently under review but open-source under GPL.
-For all intents and purposes please consider this code pre-alpha.   
+This is the code for POSEIDON, a fishery agent-based model.
 
-A good run-down of what it is and does is available here:
-http://carrknight.github.io/poseidon/appendix.html
+The code is currently undergoing heavy refactoring as part of the [SURIMI](https://www.surimi-project.eu/) project.
 
+Work for that is happening on the SURIMI branch:
 
-How to run
-==============================
+https://github.com/poseidon-fisheries/POSEIDON/tree/SURIMI
 
-This is a simple gradle project. As long as you have an updated version of java on your computer you can just type in the terminal
+If you want to see POSEIDON in action or follow the old tutorial, your best bet is the `poseidon-gui` repo:
 
-    ./gradlew run
-    
-and it will download libraries, compile sources and run the program. If you are not on linux/mac you just use ```gradle.bat``` instead.
-
-Most IDEs should be able to open the project just by reading the ```build.gradle``` file.
-
-Tutorial
-==============================
-
-A full fledged tutorial for this project is available [here](http://carrknight.github.io/poseidon/tutorial/index.html)
+https://github.com/poseidon-fisheries/poseidon-gui
