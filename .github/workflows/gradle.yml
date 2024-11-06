@@ -35,9 +35,10 @@ jobs:
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         files: build/reports/jacoco/test/jacocoTestReport.xml
         fail_ci_if_error: true
-        
+
   dependency-submission:
 
     runs-on: ubuntu-latest
