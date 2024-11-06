@@ -1,8 +1,0 @@
-blue:
-  max: 2000000
-  min: 1
-  type: float
-red:
-  max: 2000000
-  min: 1
-  type: float

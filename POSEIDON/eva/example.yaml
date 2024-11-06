@@ -1,3 +1,0 @@
-!!uk.ac.ox.oxfish.maximization.OneGearExampleMaximization {landingData: landings_10.csv,
-  maxCatchability: 0.002, minCatchability: 1.0E-5, runsPerSetting: 1, scenarioFile: coe_new.yaml,
-  seed: 0, speciesName: Peter Snapper, summaryFile: ., yearsToIgnore: 0, yearsToRun: 9}

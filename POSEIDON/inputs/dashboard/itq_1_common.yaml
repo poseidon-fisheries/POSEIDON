@@ -1,6 +1,0 @@
-Abstract:
-   usePredictors: true
-   regulation:
-      Multi-ITQ:
-         quotaFirstSpecie: '8000.0'
-         quotaOtherSpecies: '0'

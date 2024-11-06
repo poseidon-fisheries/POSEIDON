@@ -1,5 +1,0 @@
-Abstract:
-  gasPricePerLiter: '0'
-  gear:
-    Random Catchability:
-      gasPerHourFished: uniform 0 20

@@ -1,8 +1,0 @@
-Proportional Mortality:
-  yearlyMortality: '0.1'
--------
-Exponential Mortality:
-  mortalityPerSubdivision:
-  - 0.1
-  - 0.1
--------
