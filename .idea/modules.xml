@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/agents/poseidon.agents.main.iml" filepath="$PROJECT_DIR$/.idea/modules/agents/poseidon.agents.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/biology/poseidon.biology.main.iml" filepath="$PROJECT_DIR$/.idea/modules/biology/poseidon.biology.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/poseidon.core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/core/poseidon.core.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/examples/poseidon.examples.main.iml" filepath="$PROJECT_DIR$/.idea/modules/examples/poseidon.examples.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/geography/poseidon.geography.main.iml" filepath="$PROJECT_DIR$/.idea/modules/geography/poseidon.geography.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gui/poseidon.gui.main.iml" filepath="$PROJECT_DIR$/.idea/modules/gui/poseidon.gui.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/io/poseidon.io.main.iml" filepath="$PROJECT_DIR$/.idea/modules/io/poseidon.io.main.iml" />
+    </modules>
+  </component>
+</project>
