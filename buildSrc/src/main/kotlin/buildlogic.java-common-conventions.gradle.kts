@@ -22,8 +22,8 @@
  */
 
 plugins {
-    // Apply the java Plugin to add support for Java.
     java
+    jacoco
 }
 
 repositories {
@@ -54,4 +54,13 @@ tasks.withType<JavaCompile>().configureEach {
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)  // Ensure tests run before generating the report
+    reports {
+        xml.required.set(true)  // XML report needed for coverage tools
+        html.required.set(true)  // HTML report for easier human viewing
+    }
 }
