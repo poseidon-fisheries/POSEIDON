@@ -17,6 +17,10 @@
         <module name="poseidon.core.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="21" />
+    <bytecodeTargetLevel target="21">
+      <module name="poseidon-conventions" target="19" />
+      <module name="poseidon-conventions.main" target="19" />
+      <module name="poseidon-conventions.test" target="19" />
+    </bytecodeTargetLevel>
   </component>
 </project>
