@@ -7,7 +7,7 @@ This is the code for POSEIDON, a fishery agent-based model.
 
 The code is currently undergoing heavy refactoring as part of the [SURIMI](https://www.surimi-project.eu/) project.
 
-Work for that is happening on the SURIMI branch:
+Work for that is happening on the `SURIMI` branch:
 
 https://github.com/poseidon-fisheries/POSEIDON/tree/SURIMI
 
