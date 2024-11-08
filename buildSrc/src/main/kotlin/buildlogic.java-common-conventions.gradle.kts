@@ -39,6 +39,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     testImplementation("net.jqwik:jqwik:1.9.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    compileOnly("com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
