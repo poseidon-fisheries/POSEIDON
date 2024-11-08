@@ -19,8 +19,9 @@
 
 package uk.ac.ox.poseidon.core;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.ac.ox.poseidon.core.time.DateFactory;
 
 import java.beans.IntrospectionException;
@@ -32,7 +33,8 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class Scenario {
 
