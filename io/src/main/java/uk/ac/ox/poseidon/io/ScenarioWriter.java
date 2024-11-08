@@ -26,6 +26,8 @@ import uk.ac.ox.poseidon.core.Scenario;
 import java.io.*;
 import java.nio.file.Path;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class ScenarioWriter {
     private final Yaml yaml;
 
@@ -58,7 +60,7 @@ public class ScenarioWriter {
         final Scenario scenario,
         final File file
     ) {
-        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(file, UTF_8))) {
             write(scenario, writer);
         } catch (final IOException e) {
             throw new RuntimeException(e);

@@ -45,6 +45,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Just a bunch of utility methods to facilitate the use of the Univocity CSV parsers.
@@ -90,7 +91,7 @@ public class CsvParserUtils {
 
     private static Reader getReader(final String inputFileName) {
         try {
-            return new FileReader(inputFileName);
+            return new FileReader(inputFileName, UTF_8);
         } catch (final IOException e) {
             throw new RuntimeException(
                 "Failed to read " + inputFileName + " with exception: " + e
