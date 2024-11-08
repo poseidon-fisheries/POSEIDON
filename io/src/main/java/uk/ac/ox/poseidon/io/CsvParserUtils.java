@@ -37,13 +37,11 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collection;
-import java.util.List;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -160,8 +158,7 @@ public class CsvParserUtils {
         final Collection<?> headers,
         final Iterable<C> rows
     ) {
-        // noinspection ResultOfMethodCallIgnored
-        outputFile.getParent().toFile().mkdirs();
+        createOutputFolderIfNeeded(outputFile);
         try (final OutputStream outputstream = Files.newOutputStream(outputFile)) {
             final CsvWriterSettings csvWriterSettings = new CsvWriterSettings();
             final CsvWriter csvWriter = new CsvWriter(outputstream, csvWriterSettings);
@@ -170,5 +167,18 @@ public class CsvParserUtils {
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void createOutputFolderIfNeeded(final Path outputFile) {
+        Optional
+            .ofNullable(checkNotNull(outputFile).toAbsolutePath().getParent())
+            .map(Path::toFile)
+            .filter(parentFolder -> !parentFolder.exists())
+            .ifPresent(parentFolder -> {
+                final boolean created = parentFolder.mkdirs();
+                if (!created) {
+                    throw new RuntimeException("Failed to create output folder: " + parentFolder);
+                }
+            });
     }
 }
