@@ -22,6 +22,7 @@ package uk.ac.ox.poseidon.geography.paths;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -49,6 +50,7 @@ public class DefaultPathCache<P> implements PathCache<P> {
      * </ul>
      */
     @Override
+    @SuppressFBWarnings("NP_OPTIONAL_RETURN_NULL")
     @SuppressWarnings("OptionalAssignedToNull")
     public Optional<ImmutableList<P>> getPath(
         final P start,
