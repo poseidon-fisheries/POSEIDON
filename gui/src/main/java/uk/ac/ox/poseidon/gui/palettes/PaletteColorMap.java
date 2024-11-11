@@ -17,6 +17,7 @@ import static java.lang.Math.min;
 public class PaletteColorMap extends AbstractColorMap {
 
     public static final String IMOLA = "imola";
+    public static final String LAJOLLA = "lajolla";
     public static final String OLERON = "oleron";
     public static final String TURKU = "turku";
     private static final Color TRANSPARENT = new Color(0, 0, 0, 0);

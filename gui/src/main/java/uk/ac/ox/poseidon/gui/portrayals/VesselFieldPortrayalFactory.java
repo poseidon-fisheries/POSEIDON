@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
-import static java.awt.Color.BLACK;
+import static java.awt.Color.*;
 import static sim.portrayal.simple.OrientedPortrayal2D.SHAPE_COMPASS;
 
 @Getter
@@ -52,7 +52,7 @@ public class VesselFieldPortrayalFactory extends SimulationScopeFactory<Continuo
                 new SimplePortrayal2D(),
                 0,
                 SCALE,
-                BLACK,
+                WHITE,
                 SHAPE_COMPASS
             )
         );
