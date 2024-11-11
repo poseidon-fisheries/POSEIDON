@@ -21,6 +21,7 @@ package uk.ac.ox.poseidon.agents.behaviours.destination;
 
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravelBehaviour;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -34,6 +35,7 @@ public class ChooseRandomDestinationBehaviour extends DestinationBehaviour {
     private final ImmutableList<Int2D> possibleDestinations;
     private final MersenneTwisterFast rng;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ChooseRandomDestinationBehaviour(
         final TravelBehaviour travelBehaviour,
         final List<Int2D> possibleDestinations,

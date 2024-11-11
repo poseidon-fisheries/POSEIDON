@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.geography.grids;
 
 import com.vividsolutions.jts.geom.Envelope;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
 
@@ -69,6 +70,7 @@ public class DoubleGrid extends AbstractGrid<DoubleGrid2D>
         this(gridExtent, new DoubleGrid2D(values));
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public DoubleGrid(
         final GridExtent gridExtent,
         final DoubleGrid2D grid

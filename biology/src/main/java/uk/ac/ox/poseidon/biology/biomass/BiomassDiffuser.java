@@ -38,13 +38,13 @@ public class BiomassDiffuser implements Steppable {
 
     @Serial private static final long serialVersionUID = 6904676724631409234L;
 
-    private final BiomassGrid biomassGrid;
+    private final transient BiomassGrid biomassGrid;
 
-    private final CarryingCapacityGrid carryingCapacityGrid;
+    private final transient CarryingCapacityGrid carryingCapacityGrid;
 
     private final Random rng;
 
-    private final BiomassDiffusionRule biomassDiffusionRule;
+    private final transient BiomassDiffusionRule biomassDiffusionRule;
 
     private final List<Int2D> habitableLocations;
 

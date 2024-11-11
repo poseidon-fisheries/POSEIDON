@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.geography.ports;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.MasonUtils;
@@ -36,6 +37,7 @@ public class DefaultPortGrid extends AbstractGrid<SparseGrid2D> implements PortG
 
     private final SparseGrid2D sparseGrid2D;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public DefaultPortGrid(
         final BathymetricGrid bathymetricGrid,
         final SparseGrid2D sparseGrid2D

@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.io;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.poseidon.core.Scenario;
@@ -35,6 +36,7 @@ public class ScenarioWriter {
         this(new Yaml(defaultDumperOptions()));
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ScenarioWriter(final Yaml yaml) {
         this.yaml = yaml;
     }

@@ -38,7 +38,7 @@ import java.util.stream.Stream;
 @NoArgsConstructor
 public class Scenario {
 
-    private Factory<? extends LocalDateTime> startingDateTime = new DateFactory();
+    protected Factory<? extends LocalDateTime> startingDateTime = new DateFactory();
 
     public Scenario(final Factory<? extends LocalDateTime> startingDateTime) {
         this.startingDateTime = startingDateTime;

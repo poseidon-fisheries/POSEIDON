@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PortGridPortrayalFactory extends SimulationScopeFactory<SparseGridPortrayal2D> {
+public final class PortGridPortrayalFactory extends SimulationScopeFactory<SparseGridPortrayal2D> {
 
     private Factory<? extends PortGrid> portGrid;
 

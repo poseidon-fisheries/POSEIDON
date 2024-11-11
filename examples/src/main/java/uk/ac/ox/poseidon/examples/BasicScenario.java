@@ -136,7 +136,7 @@ public class BasicScenario extends Scenario {
     private Factory<? extends Steppable> scheduledProcesses =
         new ScheduledRepeatingFactory<>(
             new DateTimeAfterFactory(
-                getStartingDateTime(),
+                startingDateTime,
                 new PeriodFactory(0, 1, 0)
             ),
             new PeriodFactory(0, 1, 0),

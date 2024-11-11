@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.io;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.poseidon.core.Scenario;
 
@@ -46,6 +47,7 @@ public class ScenarioLoader {
      *
      * @param yaml the {@code Yaml} instance to use for loading scenarios
      */
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ScenarioLoader(final Yaml yaml) {
         this.yaml = yaml;
     }
