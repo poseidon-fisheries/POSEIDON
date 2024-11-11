@@ -28,12 +28,14 @@ import uk.ac.ox.poseidon.core.Simulation;
 import javax.swing.*;
 import java.util.Map;
 
+import static sim.display.Display2D.UPDATE_RULE_STEPS;
+
 public abstract class DisplayWrapper<D, P extends FieldPortrayal> {
 
-    protected final String title;
-    protected final Map<String, Factory<? extends P>> portrayalFactories;
-    protected D display;
-    protected JFrame displayFrame;
+    private final String title;
+    final Map<String, Factory<? extends P>> portrayalFactories;
+    D display;
+    private JFrame displayFrame;
 
     DisplayWrapper(
         final String title,

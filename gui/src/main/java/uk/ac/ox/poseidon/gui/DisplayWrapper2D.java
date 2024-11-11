@@ -31,6 +31,8 @@ import java.util.Map;
 
 public class DisplayWrapper2D extends DisplayWrapper<Display2D, FieldPortrayal2D> {
 
+    private static final int DEFAULT_STEP_INTERVAL = 64;
+
     private final double width;
     private final double height;
     private final Paint backDrop;
@@ -50,9 +52,13 @@ public class DisplayWrapper2D extends DisplayWrapper<Display2D, FieldPortrayal2D
 
     @Override
     Display2D createDisplay(final GUIState guiState) {
-        final Display2D display = new Display2D(width, height, guiState);
-        display.setClipping(false);
-        return display;
+        return new Display2D(width, height, guiState) {
+            {
+                setClipping(false);
+                updateRule = UPDATE_RULE_STEPS;
+                stepInterval = DEFAULT_STEP_INTERVAL;
+            }
+        };
     }
 
     @Override
