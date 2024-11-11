@@ -76,7 +76,7 @@ public class BasicScenario extends Scenario {
     private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule =
         new SmoothBiomassDiffusionRuleFactory(0.01, 0.01);
     private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
-        new LogisticGrowthRuleFactory(0.5);
+        new LogisticGrowthRuleFactory(0.2);
 
     private GlobalScopeFactory<? extends GridExtent> gridExtent =
         new GridExtentFactory(
@@ -133,13 +133,13 @@ public class BasicScenario extends Scenario {
             speciesB,
             biomassAllocator
         );
-    private Factory<? extends Steppable> scheduledProcesses =
+    private Factory<? extends Steppable> dailyProcesses =
         new ScheduledRepeatingFactory<>(
             new DateTimeAfterFactory(
                 startingDateTime,
-                new PeriodFactory(0, 1, 0)
+                new PeriodFactory(0, 0, 1)
             ),
-            new PeriodFactory(0, 1, 0),
+            new PeriodFactory(0, 0, 1),
             new SteppableSequenceFactory(
                 new BiomassDiffuserFactory(
                     biomassGridA,
@@ -150,7 +150,18 @@ public class BasicScenario extends Scenario {
                     biomassGridB,
                     carryingCapacityGrid,
                     biomassDiffusionRule
-                ),
+                )
+            ),
+            0
+        );
+    private Factory<? extends Steppable> monthlyProcesses =
+        new ScheduledRepeatingFactory<>(
+            new DateTimeAfterFactory(
+                startingDateTime,
+                new PeriodFactory(0, 1, 0)
+            ),
+            new PeriodFactory(0, 1, 0),
+            new SteppableSequenceFactory(
                 new BiomassGrowerFactory(
                     biomassGridA,
                     carryingCapacityGrid,
@@ -165,7 +176,7 @@ public class BasicScenario extends Scenario {
             0
         );
     private Factory<? extends Fleet> fleet = new DefaultFleetFactory(
-        5,
+        100,
         new VesselFactory(
             new WaitBehaviourFactory(
                 new ExponentiallyDistributedDurationSupplierFactory(
