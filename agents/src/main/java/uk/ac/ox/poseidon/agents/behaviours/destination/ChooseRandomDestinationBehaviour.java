@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.destination;
 
+import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravelBehaviour;
@@ -30,7 +31,7 @@ import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 
 public class ChooseRandomDestinationBehaviour extends DestinationBehaviour {
 
-    private final List<Int2D> possibleDestinations;
+    private final ImmutableList<Int2D> possibleDestinations;
     private final MersenneTwisterFast rng;
 
     public ChooseRandomDestinationBehaviour(
@@ -39,7 +40,7 @@ public class ChooseRandomDestinationBehaviour extends DestinationBehaviour {
         final MersenneTwisterFast rng
     ) {
         super(travelBehaviour);
-        this.possibleDestinations = possibleDestinations;
+        this.possibleDestinations = ImmutableList.copyOf(possibleDestinations);
         this.rng = rng;
     }
 

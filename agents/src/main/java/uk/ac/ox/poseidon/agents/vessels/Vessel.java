@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -40,9 +41,10 @@ public class Vessel implements Oriented2D {
     private double cruisingSpeed;
     private double heading;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public Vessel(
         final String id,
-        @NonNull final Port homePort,
+        final Port homePort,
         final double cruisingSpeed,
         final VesselField vesselField
     ) {

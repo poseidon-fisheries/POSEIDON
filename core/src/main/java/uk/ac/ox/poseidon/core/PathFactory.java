@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.core;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import lombok.*;
 
@@ -27,6 +28,9 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,7 +38,26 @@ import java.util.Optional;
 public class PathFactory extends GlobalScopeFactory<Path> {
 
     private Factory<? extends Path> parent;
-    @NonNull private List<String> pathElements;
+    @NonNull private ImmutableList<String> pathElements;
+
+    public static PathFactory from(
+        final String path
+    ) {
+        return from(null, Path.of(path));
+    }
+
+    public static PathFactory from(
+        final Path path
+    ) {
+        return from(null, path);
+    }
+
+    public static PathFactory from(
+        final PathFactory parent,
+        final String path
+    ) {
+        return from(parent, Path.of(path));
+    }
 
     public static PathFactory from(
         final PathFactory parent,
@@ -48,13 +71,17 @@ public class PathFactory extends GlobalScopeFactory<Path> {
                     Streams.stream(path)
                 )
                 .map(Path::toString)
-                .toList()
+                .collect(toImmutableList())
         );
     }
 
     @Override
     protected Path newInstance(final Simulation simulation) {
-        final Path path = Paths.get(pathElements.getFirst(), pathElements.removeFirst());
+        checkState(!pathElements.isEmpty());
+        final Path path = Path.of(
+            pathElements.getFirst(),
+            pathElements.subList(1, pathElements.size()).toArray(String[]::new)
+        );
         return parent == null ? path : parent.get(null).resolve(path);
     }
 }

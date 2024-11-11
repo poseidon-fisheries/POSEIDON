@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -31,15 +32,16 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
+@RequiredArgsConstructor
 public class SvgRenderer {
 
     private final SVGDocument svgDocument;
 
-    public SvgRenderer(final InputStream svgInputStream) {
+    public static SvgRenderer from(final InputStream svgInputStream) {
         final String parser = XMLResourceDescriptor.getXMLParserClassName();
         final SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
         try {
-            svgDocument = factory.createSVGDocument(null, svgInputStream);
+            return new SvgRenderer(factory.createSVGDocument(null, svgInputStream));
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }

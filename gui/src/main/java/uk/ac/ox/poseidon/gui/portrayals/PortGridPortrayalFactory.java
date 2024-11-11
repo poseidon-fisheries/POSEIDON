@@ -42,7 +42,7 @@ public class PortGridPortrayalFactory extends SimulationScopeFactory<SparseGridP
         final SparseGridPortrayal2D sparseGridPortrayal2D = new SparseGridPortrayal2D();
         sparseGridPortrayal2D.setField(portGrid.get(simulation).getField());
         sparseGridPortrayal2D.setPortrayalForAll(
-            new SvgPortrayal(getClass().getResourceAsStream("/images/port.svg"))
+            SvgPortrayal.from(getClass().getResourceAsStream("/images/port.svg"))
         );
         return sparseGridPortrayal2D;
     }

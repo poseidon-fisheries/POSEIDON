@@ -44,7 +44,7 @@ public class PaletteColorMap extends AbstractColorMap {
         checkNotNull(colors);
         checkArgument(colors.length > 1);
         checkArgument(minimum < maximum);
-        this.colors = colors;
+        this.colors = colors.clone();
         this.minimum = minimum;
         this.maximum = maximum;
     }

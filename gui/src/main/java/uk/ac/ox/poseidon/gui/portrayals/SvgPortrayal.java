@@ -19,18 +19,20 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
+import lombok.RequiredArgsConstructor;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.simple.RectanglePortrayal2D;
 
 import java.awt.*;
 import java.io.InputStream;
 
+@RequiredArgsConstructor
 public class SvgPortrayal extends RectanglePortrayal2D {
 
     private final SvgRenderer renderer;
 
-    public SvgPortrayal(final InputStream svgInputStream) {
-        this.renderer = new SvgRenderer(svgInputStream);
+    public static SvgPortrayal from(final InputStream svgInputStream) {
+        return new SvgPortrayal(SvgRenderer.from(svgInputStream));
     }
 
     @Override

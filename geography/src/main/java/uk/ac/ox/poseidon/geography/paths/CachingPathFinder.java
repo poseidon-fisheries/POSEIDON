@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.geography.paths;
 
 import com.google.common.collect.ImmutableList;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Optional;
 
@@ -27,6 +28,7 @@ public class CachingPathFinder<P> implements PathFinder<P> {
     private final PathFinder<P> pathFinder;
     private final PathCache<P> cache;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CachingPathFinder(
         final PathFinder<P> pathFinder,
         final PathCache<P> cache

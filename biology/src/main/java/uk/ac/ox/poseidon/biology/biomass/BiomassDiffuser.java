@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import ec.util.MersenneTwisterFast;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.util.Double2D;
@@ -49,6 +50,7 @@ public class BiomassDiffuser implements Steppable {
 
     private final Map<Int2D, List<Int2D>> habitableNeighbours;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public BiomassDiffuser(
         final BiomassGrid biomassGrid,
         final CarryingCapacityGrid carryingCapacityGrid,

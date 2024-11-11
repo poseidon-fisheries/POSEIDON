@@ -20,24 +20,32 @@
 package uk.ac.ox.poseidon.gui;
 
 import com.formdev.flatlaf.FlatLightLaf;
+import com.google.common.collect.ImmutableList;
 import sim.display.Controller;
 import sim.display.GUIState;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class SimulationWithUI extends GUIState {
 
-    private final List<DisplayWrapper<?, ?>> displayWrappers;
-    private final Scenario scenario;
+    private final ImmutableList<DisplayWrapper<?, ?>> displayWrappers;
+    private final Supplier<Simulation> simulationSupplier;
 
     public SimulationWithUI(
-        final Scenario scenario,
+        final Supplier<Simulation> simulationSupplier,
         final List<DisplayWrapper<?, ?>> displayWrappers
     ) {
-        super(scenario.newSimulation());
-        this.scenario = scenario;
+        this(simulationSupplier, ImmutableList.copyOf(displayWrappers));
+    }
+    public SimulationWithUI(
+        final Supplier<Simulation> simulationSupplier,
+        final ImmutableList<DisplayWrapper<?, ?>> displayWrappers
+    ) {
+        super(simulationSupplier.get());
+        this.simulationSupplier = simulationSupplier;
         this.displayWrappers = displayWrappers;
         FlatLightLaf.setup();
     }
@@ -48,7 +56,7 @@ public class SimulationWithUI extends GUIState {
 
     @Override
     public void start() {
-        final Simulation simulation = scenario.newSimulation();
+        final Simulation simulation = simulationSupplier.get();
         super.state = simulation;
         super.start();
         displayWrappers.forEach(displayWrapper -> displayWrapper.setupPortrayals(simulation));

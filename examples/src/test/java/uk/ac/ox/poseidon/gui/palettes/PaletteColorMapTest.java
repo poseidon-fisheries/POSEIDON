@@ -29,20 +29,20 @@ import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
 
 class PaletteColorMapTest {
 
-    private final double max = 5;
-    private final double min = -max;
-    private final PaletteColorMap colorMap = new PaletteColorMap(OLERON, min, max);
+    private static final double MAX = 5;
+    private static final double MIN = -MAX;
+    private final PaletteColorMap colorMap = new PaletteColorMap(OLERON, MIN, MAX);
 
     @Test
     void getColor() {
         final Color[] palette = colorMap.getColors();
         Map.of(
-            min - 1, 0,
-            min, 0,
+            MIN - 1, 0,
+            MIN, 0,
             -1E-10, 127,
             0.0, 128,
-            max, palette.length - 1,
-            max + 1, palette.length - 1
+            MAX, palette.length - 1,
+            MAX + 1, palette.length - 1
         ).forEach((value, index) -> {
             final Color expected = palette[index];
             final Color actual = colorMap.getColor(value);

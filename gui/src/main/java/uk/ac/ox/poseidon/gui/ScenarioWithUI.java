@@ -32,6 +32,6 @@ public class ScenarioWithUI {
     private final List<DisplayWrapper<?, ?>> displays;
 
     public Controller createController() {
-        return new SimulationWithUI(scenario, displays).createController();
+        return new SimulationWithUI(scenario::newSimulation, displays).createController();
     }
 }

@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.agents.behaviours;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Data;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -37,6 +38,7 @@ public abstract class Action implements Steppable {
     private final Duration duration;
     private final Vessel vessel;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public Action(
         final LocalDateTime start,
         final Duration duration,

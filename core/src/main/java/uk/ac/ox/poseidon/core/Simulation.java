@@ -22,6 +22,7 @@
  */
 package uk.ac.ox.poseidon.core;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import sim.engine.SimState;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -64,6 +65,7 @@ public class Simulation extends SimState {
         );
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public Simulation(
         final long seed,
         final TemporalSchedule schedule,

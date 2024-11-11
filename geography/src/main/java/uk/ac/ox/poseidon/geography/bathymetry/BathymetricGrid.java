@@ -25,14 +25,24 @@ import uk.ac.ox.poseidon.geography.grids.NumberGrid;
 
 import java.util.List;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 public interface BathymetricGrid extends NumberGrid<Double, DoubleGrid2D> {
 
     default List<Int2D> getWaterCells() {
-        return getGridExtent().getAllCells().stream().filter(this::isWater).toList();
+        return getGridExtent()
+            .getAllCells()
+            .stream()
+            .filter(this::isWater)
+            .collect(toImmutableList());
     }
 
     default List<Int2D> getLandCells() {
-        return getGridExtent().getAllCells().stream().filter(this::isLand).toList();
+        return getGridExtent()
+            .getAllCells()
+            .stream()
+            .filter(this::isLand)
+            .collect(toImmutableList());
     }
 
     default List<Int2D> getAllCells() {
