@@ -31,12 +31,12 @@ import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class TravelAlongPathBehaviour extends TravelBehaviour {
+class TravelAlongPathBehaviour extends AbstractTravelBehaviour {
 
     private final PathFinder<Int2D> pathFinder;
     private List<Int2D> currentPath;
 
-    public TravelAlongPathBehaviour(
+    TravelAlongPathBehaviour(
         final Behaviour behaviourOnArrival,
         final PathFinder<Int2D> pathFinder,
         final Distance distance

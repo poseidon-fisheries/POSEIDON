@@ -21,7 +21,6 @@ package uk.ac.ox.poseidon.agents.behaviours.destination;
 
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
-import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravelBehaviour;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 

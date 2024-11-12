@@ -34,13 +34,13 @@ import uk.ac.ox.poseidon.geography.distance.Distance;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TravelDirectlyBehaviourFactory
-    extends BehaviourFactory<TravelDirectlyBehaviour> {
+    extends BehaviourFactory<TravelBehaviour> {
 
     private Factory<? extends Distance> distance;
     private BehaviourFactory<?> behaviourOnArrival;
 
     @Override
-    protected TravelDirectlyBehaviour newInstance(
+    protected TravelBehaviour newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {

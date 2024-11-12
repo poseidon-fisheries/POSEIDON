@@ -36,14 +36,14 @@ import uk.ac.ox.poseidon.geography.paths.PathFinder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TravelAlongPathBehaviourFactory
-    extends BehaviourFactory<TravelAlongPathBehaviour> {
+    extends BehaviourFactory<TravelBehaviour> {
 
     private BehaviourFactory<?> behaviourOnArrival;
     private Factory<? extends PathFinder<Int2D>> pathFinder;
     private Factory<? extends Distance> distance;
 
     @Override
-    protected TravelAlongPathBehaviour newInstance(
+    protected TravelBehaviour newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {

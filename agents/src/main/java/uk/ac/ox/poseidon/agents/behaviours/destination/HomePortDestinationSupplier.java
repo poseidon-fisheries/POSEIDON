@@ -21,7 +21,6 @@ package uk.ac.ox.poseidon.agents.behaviours.destination;
 
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.travel.TravelBehaviour;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 

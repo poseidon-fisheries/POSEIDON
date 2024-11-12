@@ -28,7 +28,7 @@ import uk.ac.ox.poseidon.geography.distance.Distance;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class TravelDirectlyBehaviour extends TravelBehaviour {
+class TravelDirectlyBehaviour extends AbstractTravelBehaviour {
 
     TravelDirectlyBehaviour(
         final Distance distance,

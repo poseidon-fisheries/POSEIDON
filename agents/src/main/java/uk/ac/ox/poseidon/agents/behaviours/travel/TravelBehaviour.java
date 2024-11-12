@@ -19,37 +19,17 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.travel;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.distance.Distance;
 
 import java.time.Duration;
 
-@SuppressWarnings("WeakerAccess")
-@RequiredArgsConstructor
-abstract class AbstractTravelBehaviour implements TravelBehaviour {
-    private static final long MINUTES_PER_HOUR = 60;
-    protected final Distance distance;
-    protected final Behaviour behaviourOnArrival;
-    @Getter
-    @Setter
-    protected Int2D currentDestination;
+public interface TravelBehaviour extends Behaviour {
+    Duration travelDuration(
+        Vessel vessel,
+        Int2D destination
+    );
 
-    @Override
-    public Duration travelDuration(
-        final Vessel vessel,
-        final Int2D destination
-    ) {
-        return Duration.ofMinutes(
-            Math.round(MINUTES_PER_HOUR *
-                distance.distanceBetween(
-                    vessel.getCurrentPoint(),
-                    vessel.getVesselField().getGridExtent().toPoint(destination)
-                ) / vessel.getCruisingSpeed()
-            ));
-    }
+    void setCurrentDestination(Int2D int2D);
 }
