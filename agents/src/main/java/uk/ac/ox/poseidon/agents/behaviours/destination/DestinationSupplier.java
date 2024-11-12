@@ -19,7 +19,9 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.destination;
 
-import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
+import sim.util.Int2D;
 
-public interface DestinationBehaviour extends Behaviour {
+import java.util.function.Supplier;
+
+public interface DestinationSupplier extends Supplier<Int2D> {
 }

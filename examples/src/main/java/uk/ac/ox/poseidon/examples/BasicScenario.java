@@ -25,8 +25,9 @@ import sim.engine.Steppable;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.BackToInitialBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.WaitBehaviourFactory;
-import uk.ac.ox.poseidon.agents.behaviours.destination.ChooseRandomDestinationBehaviourFactory;
-import uk.ac.ox.poseidon.agents.behaviours.destination.GoToHomePortBehaviourFactory;
+import uk.ac.ox.poseidon.agents.behaviours.destination.ChooseDestinationBehaviourFactory;
+import uk.ac.ox.poseidon.agents.behaviours.destination.HomePortDestinationSupplierFactory;
+import uk.ac.ox.poseidon.agents.behaviours.destination.RandomDestinationSupplierFactory;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DefaultFishingBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravelAlongPathBehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -182,8 +183,8 @@ public class BasicScenario extends Scenario {
                 new ExponentiallyDistributedDurationSupplierFactory(
                     new DurationFactory(10, 0, 0, 0)
                 ),
-                new ChooseRandomDestinationBehaviourFactory(
-                    bathymetricGrid,
+                new ChooseDestinationBehaviourFactory(
+                    new RandomDestinationSupplierFactory(bathymetricGrid, pathFinder),
                     new TravelAlongPathBehaviourFactory(
                         new DefaultFishingBehaviourFactory<>(
                             new FixedBiomassProportionGearFactory(
@@ -196,13 +197,13 @@ public class BasicScenario extends Scenario {
                                     List.of(biomassGridA, biomassGridB)
                                 )
                             ),
-                            new GoToHomePortBehaviourFactory(
+                            new ChooseDestinationBehaviourFactory(
+                                new HomePortDestinationSupplierFactory(portGrid),
                                 new TravelAlongPathBehaviourFactory(
                                     new BackToInitialBehaviourFactory(),
                                     pathFinder,
                                     distance
-                                ),
-                                portGrid
+                                )
                             )
                         ),
                         pathFinder,

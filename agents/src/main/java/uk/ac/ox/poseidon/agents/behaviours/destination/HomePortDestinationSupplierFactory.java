@@ -26,31 +26,28 @@ import lombok.Setter;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravelBehaviour;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChooseRandomDestinationBehaviourFactory
-    extends BehaviourFactory<ChooseRandomDestinationBehaviour> {
+public class HomePortDestinationSupplierFactory
+    extends VesselScopeFactory<HomePortDestinationSupplier> {
 
-    private Factory<? extends BathymetricGrid> bathymetricGrid;
-    private BehaviourFactory<? extends TravelBehaviour> travelBehaviour;
+    private Factory<? extends PortGrid> portGrid;
 
     @Override
-    protected ChooseRandomDestinationBehaviour newInstance(
+    protected HomePortDestinationSupplier newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new ChooseRandomDestinationBehaviour(
-            travelBehaviour.get(simulation, vessel),
-            // FIXME: this only works insofar as all water cells are accessible
-            //        from the agent's current position
-            bathymetricGrid.get(simulation).getWaterCells(),
-            simulation.random
+        return new HomePortDestinationSupplier(
+            vessel,
+            portGrid.get(simulation)
         );
     }
 }

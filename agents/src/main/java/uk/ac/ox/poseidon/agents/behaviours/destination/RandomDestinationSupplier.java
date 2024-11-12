@@ -19,7 +19,31 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.destination;
 
-import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
+import com.google.common.collect.ImmutableList;
+import ec.util.MersenneTwisterFast;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.core.MasonUtils;
 
-public interface DestinationBehaviour extends Behaviour {
+import java.util.List;
+
+@RequiredArgsConstructor
+class RandomDestinationSupplier implements DestinationSupplier {
+
+    @Getter private final ImmutableList<Int2D> possibleDestinations;
+    private final MersenneTwisterFast rng;
+
+    public RandomDestinationSupplier(
+        List<Int2D> possibleDestinations,
+        MersenneTwisterFast rng
+    ) {
+        this.possibleDestinations = ImmutableList.copyOf(possibleDestinations);
+        this.rng = rng;
+    }
+
+    @Override
+    public Int2D get() {
+        return MasonUtils.oneOf(possibleDestinations, rng);
+    }
 }

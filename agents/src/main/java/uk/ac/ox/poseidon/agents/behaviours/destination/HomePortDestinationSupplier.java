@@ -19,35 +19,20 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.destination;
 
-import com.google.common.collect.ImmutableList;
-import ec.util.MersenneTwisterFast;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravelBehaviour;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.util.List;
+@RequiredArgsConstructor
+class HomePortDestinationSupplier implements DestinationSupplier {
 
-import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
-
-public class ChooseRandomDestinationBehaviour extends DestinationBehaviour {
-
-    private final ImmutableList<Int2D> possibleDestinations;
-    private final MersenneTwisterFast rng;
-
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public ChooseRandomDestinationBehaviour(
-        final TravelBehaviour travelBehaviour,
-        final List<Int2D> possibleDestinations,
-        final MersenneTwisterFast rng
-    ) {
-        super(travelBehaviour);
-        this.possibleDestinations = ImmutableList.copyOf(possibleDestinations);
-        this.rng = rng;
-    }
+    private final Vessel vessel;
+    private final PortGrid portGrid;
 
     @Override
-    protected Int2D chooseDestination(final Vessel vessel) {
-        return oneOf(possibleDestinations, rng);
+    public Int2D get() {
+        return portGrid.getLocation(vessel.getHomePort());
     }
 }

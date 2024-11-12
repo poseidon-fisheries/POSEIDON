@@ -23,31 +23,33 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravelBehaviour;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GoToHomePortBehaviourFactory
-    extends BehaviourFactory<GoToHomePortBehaviour> {
+public class ChooseDestinationBehaviourFactory
+    extends BehaviourFactory<DestinationBehaviour> {
 
+    private VesselScopeFactory<? extends DestinationSupplier> destinationSupplier;
     private BehaviourFactory<? extends TravelBehaviour> travelBehaviour;
-    private Factory<? extends PortGrid> portGrid;
 
     @Override
-    protected GoToHomePortBehaviour newInstance(
+    protected DestinationBehaviour newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new GoToHomePortBehaviour(
-            travelBehaviour.get(simulation, vessel),
-            portGrid.get(simulation)
+        return new ChooseDestinationBehaviour(
+            destinationSupplier.get(simulation, vessel),
+            travelBehaviour.get(simulation, vessel)
         );
     }
 }

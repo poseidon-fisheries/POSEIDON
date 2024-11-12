@@ -19,25 +19,26 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.destination;
 
-import sim.util.Int2D;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.behaviours.Action;
+import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravelBehaviour;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-public class GoToHomePortBehaviour extends DestinationBehaviour {
+import java.time.LocalDateTime;
 
-    private final PortGrid portGrid;
+@RequiredArgsConstructor
+class ChooseDestinationBehaviour implements DestinationBehaviour {
 
-    public GoToHomePortBehaviour(
-        final TravelBehaviour travelBehaviour,
-        final PortGrid portGrid
-    ) {
-        super(travelBehaviour);
-        this.portGrid = portGrid;
-    }
+    private final DestinationSupplier destinationSupplier;
+    private final TravelBehaviour travelBehaviour;
 
     @Override
-    protected Int2D chooseDestination(final Vessel vessel) {
-        return portGrid.getLocation(vessel.getHomePort());
+    public Action newAction(
+        final LocalDateTime dateTime,
+        final Vessel vessel
+    ) {
+        travelBehaviour.setCurrentDestination(destinationSupplier.get());
+        return travelBehaviour.newAction(dateTime, vessel);
     }
 }
