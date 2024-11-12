@@ -26,6 +26,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.BackToInitialBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.WaitBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.destination.ChooseDestinationBehaviourFactory;
+import uk.ac.ox.poseidon.agents.behaviours.destination.FixedDestinationSupplierFactory;
 import uk.ac.ox.poseidon.agents.behaviours.destination.HomePortDestinationSupplierFactory;
 import uk.ac.ox.poseidon.agents.behaviours.destination.RandomDestinationSupplierFactory;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DefaultFishingBehaviourFactory;
@@ -184,7 +185,9 @@ public class BasicScenario extends Scenario {
                     new DurationFactory(10, 0, 0, 0)
                 ),
                 new ChooseDestinationBehaviourFactory(
-                    new RandomDestinationSupplierFactory(bathymetricGrid, pathFinder),
+                    new FixedDestinationSupplierFactory(
+                        new RandomDestinationSupplierFactory(bathymetricGrid, pathFinder)
+                    ),
                     new TravelAlongPathBehaviourFactory(
                         new DefaultFishingBehaviourFactory<>(
                             new FixedBiomassProportionGearFactory(
