@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import sim.engine.SimState;
+import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.io.Serial;
@@ -40,6 +41,7 @@ public class Simulation extends SimState {
 
     @Serial private static final long serialVersionUID = -8162246985852120341L;
     private static final AtomicLong idCounter = new AtomicLong();
+    private final EventManager eventManager = new EventManager();
     private final TemporalSchedule temporalSchedule;
     private final Scenario scenario;
     private final long id = idCounter.getAndIncrement();
