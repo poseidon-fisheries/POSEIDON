@@ -19,6 +19,8 @@
 
 package uk.ac.ox.poseidon.biology;
 
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
+
 public interface Content<C> {
 
     C add(C content);
@@ -26,4 +28,6 @@ public interface Content<C> {
     C subtract(C content);
 
     boolean isEmpty();
+
+    Biomass asBiomass();
 }

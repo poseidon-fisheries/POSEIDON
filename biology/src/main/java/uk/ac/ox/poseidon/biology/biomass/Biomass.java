@@ -52,4 +52,9 @@ public class Biomass implements Content<Biomass> {
     public boolean isEmpty() {
         return value == 0.0;
     }
+
+    @Override
+    public Biomass asBiomass() {
+        return this;
+    }
 }

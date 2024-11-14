@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.biology;
 
 import com.google.common.collect.ImmutableMap;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.HashMap;
@@ -93,6 +94,15 @@ public interface Bucket<C extends Content<C>> {
 
     default boolean isEmpty() {
         return getMap().values().stream().allMatch(C::isEmpty);
+    }
+
+    default Biomass getTotalBiomass() {
+        return getMap()
+            .values()
+            .stream()
+            .map(Content::asBiomass)
+            .reduce(Biomass::add)
+            .orElseGet(() -> Biomass.of(0));
     }
 
     class Builder<C extends Content<C>> {
