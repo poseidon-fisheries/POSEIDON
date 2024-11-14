@@ -27,6 +27,7 @@ import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.utils.IdSupplier;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -50,7 +51,8 @@ public class VesselFactory implements Factory<Vessel> {
             idSupplier.get(simulation).nextId(),
             portFactory.get(simulation),
             speed,
-            vesselField
+            vesselField,
+            new ForwardingEventManager(simulation.getEventManager())
         );
         vesselField
             .setCell(

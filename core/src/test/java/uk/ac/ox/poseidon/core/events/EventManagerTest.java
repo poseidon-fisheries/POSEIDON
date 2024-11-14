@@ -33,7 +33,7 @@ class EventManagerTest {
 
     @BeforeEach
     void setUp() {
-        eventManager = new EventManager();
+        eventManager = new SimpleEventManager();
     }
 
     @Test

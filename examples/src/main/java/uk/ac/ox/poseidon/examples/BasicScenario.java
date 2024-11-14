@@ -29,6 +29,7 @@ import uk.ac.ox.poseidon.agents.behaviours.destination.ChooseDestinationBehaviou
 import uk.ac.ox.poseidon.agents.behaviours.destination.FixedDestinationSupplierFactory;
 import uk.ac.ox.poseidon.agents.behaviours.destination.HomePortDestinationSupplierFactory;
 import uk.ac.ox.poseidon.agents.behaviours.destination.RandomDestinationSupplierFactory;
+import uk.ac.ox.poseidon.agents.behaviours.fishing.DefaultFishingBehaviour;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DefaultFishingBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravelAlongPathBehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -233,6 +234,12 @@ public class BasicScenario extends Scenario {
             Path.of("/home/nicolas/Desktop/scenario.yaml")
         );
         final Simulation simulation = scenario.newSimulation();
+        simulation
+            .getEventManager()
+            .addListener(
+                DefaultFishingBehaviour.Fishing.class,
+                System.out::println
+            );
         simulation.start();
         while (
             simulation

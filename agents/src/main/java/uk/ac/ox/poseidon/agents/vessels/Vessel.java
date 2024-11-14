@@ -21,13 +21,13 @@ package uk.ac.ox.poseidon.agents.vessels;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
+import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 @Getter
@@ -36,22 +36,25 @@ public class Vessel implements Oriented2D {
 
     private final String id;
     private final VesselField vesselField;
+    private final EventManager eventManager;
     private Behaviour initialBehaviour;
     private Port homePort;
     private double cruisingSpeed;
     private double heading;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public Vessel(
+    Vessel(
         final String id,
         final Port homePort,
         final double cruisingSpeed,
-        final VesselField vesselField
+        final VesselField vesselField,
+        final EventManager eventManager
     ) {
         this.id = id;
         this.homePort = homePort;
         this.cruisingSpeed = cruisingSpeed;
         this.vesselField = vesselField;
+        this.eventManager = eventManager;
     }
 
     @Override

@@ -19,75 +19,16 @@
 
 package uk.ac.ox.poseidon.core.events;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
+public interface EventManager {
+    <E> void addListener(
+        Class<E> eventClass,
+        Listener<E> listener
+    );
 
-import java.util.HashSet;
-import java.util.Set;
+    <E> void removeListener(
+        Class<E> eventClass,
+        Listener<E> listener
+    );
 
-public class EventManager {
-
-    private final Multimap<Class<?>, Listener<?>> listeners =
-        MultimapBuilder.hashKeys().arrayListValues().build();
-
-    public <E> void addListener(
-        final Class<E> eventClass,
-        final Listener<E> listener
-    ) {
-        listeners.put(eventClass, listener);
-    }
-
-    public <E> void removeListener(
-        final Class<E> eventClass,
-        final Listener<E> listener
-    ) {
-        listeners.get(eventClass).removeIf(l -> l == listener);
-    }
-
-    public <E> void broadcast(final E event) {
-        if (event != null) {
-            Class<?> eventClass = event.getClass();
-            final Set<Class<?>> visitedClasses = new HashSet<>();
-            // Traverse class hierarchy, including interfaces and their superinterfaces
-            while (eventClass != null) {
-                if (visitedClasses.add(eventClass)) { // Only process if not visited
-                    notifyListenersForClass(eventClass, event);
-                    traverseInterfaces(eventClass, event, visitedClasses);
-                }
-                eventClass = eventClass.getSuperclass();
-            }
-        }
-    }
-
-    // Helper method to recursively traverse and notify listeners for interfaces and their
-    // superinterfaces
-    private <E> void traverseInterfaces(
-        final Class<?> clazz,
-        final E event,
-        final Set<Class<?>> visitedClasses
-    ) {
-        for (final Class<?> interfaceClass : clazz.getInterfaces()) {
-            if (visitedClasses.add(interfaceClass)) { // Only process if not visited
-                notifyListenersForClass(interfaceClass, event);
-                traverseInterfaces(
-                    interfaceClass,
-                    event,
-                    visitedClasses
-                );
-            }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private <E> void notifyListenersForClass(
-        final Class<?> eventClass,
-        final E event
-    ) {
-        listeners
-            .get(eventClass)
-            .forEach(listener ->
-                ((Listener<E>) listener).receive(event)
-            );
-    }
-
+    <E> void broadcast(E event);
 }

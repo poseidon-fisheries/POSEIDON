@@ -52,10 +52,9 @@ public abstract class Action implements Steppable {
 
     @Override
     public final void step(final SimState simState) {
-        final Simulation simulation = (Simulation) simState;
-        final var schedule = simulation.getTemporalSchedule();
+        final var schedule = ((Simulation) simState).getTemporalSchedule();
         final var nextAction = complete(schedule.getDateTime());
-        simulation.getEventManager().broadcast(this);
+        vessel.getEventManager().broadcast(this);
         if (nextAction != null) {
             schedule.scheduleOnceIn(nextAction.getDuration(), nextAction);
         }
