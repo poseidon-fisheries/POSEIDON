@@ -24,7 +24,7 @@ import lombok.Data;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -52,8 +52,10 @@ public abstract class Action implements Steppable {
 
     @Override
     public final void step(final SimState simState) {
-        final var schedule = (TemporalSchedule) simState.schedule;
+        final Simulation simulation = (Simulation) simState;
+        final var schedule = simulation.getTemporalSchedule();
         final var nextAction = complete(schedule.getDateTime());
+        simulation.getEventManager().broadcast(this);
         if (nextAction != null) {
             schedule.scheduleOnceIn(nextAction.getDuration(), nextAction);
         }

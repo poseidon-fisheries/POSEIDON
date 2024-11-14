@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.agents.behaviours.fishing;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.ToString;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
@@ -50,8 +51,11 @@ public class DefaultFishingBehaviour<C extends Content<C>> implements Behaviour 
         return new Fishing(dateTime, fishingGear.nextDuration(), vessel);
     }
 
+    @Getter
     @ToString(callSuper = true)
     public class Fishing extends Action {
+
+        Bucket<C> fishCaught;
 
         public Fishing(
             final LocalDateTime start,
@@ -65,7 +69,7 @@ public class DefaultFishingBehaviour<C extends Content<C>> implements Behaviour 
         protected Action complete(
             final LocalDateTime dateTime
         ) {
-            final Bucket<C> fishCaught = fishingGear.fish(fisheableSupplier.get());
+            fishCaught = fishingGear.fish(fisheableSupplier.get());
             hold.store(fishCaught);
             return afterFishingBehaviour.newAction(dateTime, getVessel());
         }
