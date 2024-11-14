@@ -39,6 +39,7 @@ dependencies {
     implementation("one.util:streamex:0.8.3")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     testImplementation("net.jqwik:jqwik:1.9.0")
+    testImplementation("org.mockito:mockito-core:5.14.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     compileOnly("com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}")
 }
