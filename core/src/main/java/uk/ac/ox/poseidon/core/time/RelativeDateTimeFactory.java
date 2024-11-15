@@ -32,14 +32,14 @@ import java.time.temporal.TemporalAmount;
 @EqualsAndHashCode(callSuper = false)
 abstract class RelativeDateTimeFactory implements Factory<LocalDateTime> {
 
-    @NonNull private Factory<? extends LocalDateTime> referenceDateTimeFactory;
-    @NonNull private Factory<? extends TemporalAmount> temporalAmountFactory;
+    @NonNull private Factory<? extends LocalDateTime> referenceDateTime;
+    @NonNull private Factory<? extends TemporalAmount> temporalAmount;
 
     @Override
     public LocalDateTime get(final Simulation simulation) {
         return operation(
-            referenceDateTimeFactory.get(simulation),
-            temporalAmountFactory.get(simulation)
+            referenceDateTime.get(simulation),
+            temporalAmount.get(simulation)
         );
     }
 

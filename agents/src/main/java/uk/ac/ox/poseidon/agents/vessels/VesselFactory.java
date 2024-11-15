@@ -40,7 +40,7 @@ public class VesselFactory implements Factory<Vessel> {
     @NonNull private BehaviourFactory<?> initialBehaviour;
     @NonNull private Factory<? extends IdSupplier> idSupplier;
     @NonNull private Factory<? extends VesselField> vesselField;
-    @NonNull private Factory<? extends Port> portFactory;
+    @NonNull private Factory<? extends Port> homePort;
     @NonNull private Factory<? extends PortGrid> portGrid;
     private double speed;
 
@@ -50,7 +50,7 @@ public class VesselFactory implements Factory<Vessel> {
         final var vessel = new Vessel(
             idSupplier.get(simulation).nextId(),
             portGrid.get(simulation),
-            portFactory.get(simulation),
+            homePort.get(simulation),
             speed,
             vesselField,
             new ForwardingEventManager(simulation.getEventManager())

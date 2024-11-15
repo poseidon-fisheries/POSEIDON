@@ -40,13 +40,13 @@ import java.util.function.Supplier;
 public class CurrentCellFisheableFactory<C extends Content<C>>
     extends VesselScopeFactory<Supplier<Fisheable<C>>> {
 
-    private Factory<? extends FisheableGrid<C>> fisheableGridFactory;
+    private Factory<? extends FisheableGrid<C>> fisheableGrid;
 
     @Override
     protected Supplier<Fisheable<C>> newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new CurrentCellFisheable<>(vessel, fisheableGridFactory.get(simulation));
+        return new CurrentCellFisheable<>(vessel, fisheableGrid.get(simulation));
     }
 }
