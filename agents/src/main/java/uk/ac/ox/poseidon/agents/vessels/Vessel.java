@@ -29,6 +29,7 @@ import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.ports.Port;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 @Getter
 @Setter
@@ -36,6 +37,7 @@ public class Vessel implements Oriented2D {
 
     private final String id;
     private final VesselField vesselField;
+    private final PortGrid portGrid;
     private final EventManager eventManager;
     private Behaviour initialBehaviour;
     private Port homePort;
@@ -45,12 +47,14 @@ public class Vessel implements Oriented2D {
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     Vessel(
         final String id,
+        final PortGrid portGrid,
         final Port homePort,
         final double cruisingSpeed,
         final VesselField vesselField,
         final EventManager eventManager
     ) {
         this.id = id;
+        this.portGrid = portGrid;
         this.homePort = homePort;
         this.cruisingSpeed = cruisingSpeed;
         this.vesselField = vesselField;
@@ -91,5 +95,9 @@ public class Vessel implements Oriented2D {
 
     public Int2D getCurrentCell() {
         return vesselField.getCell(this);
+    }
+
+    public boolean isAtPort() {
+        return portGrid.anyPortsAt(getCurrentCell());
     }
 }

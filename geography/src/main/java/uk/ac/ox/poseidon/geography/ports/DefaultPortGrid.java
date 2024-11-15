@@ -100,6 +100,11 @@ public class DefaultPortGrid extends AbstractGrid<SparseGrid2D> implements PortG
     }
 
     @Override
+    public boolean anyPortsAt(final Int2D cell) {
+        return sparseGrid2D.numObjectsAtLocation(cell.x, cell.y) > 0;
+    }
+
+    @Override
     public Stream<Port> getAllPorts() {
         return MasonUtils.bagToStream(sparseGrid2D.allObjects);
     }

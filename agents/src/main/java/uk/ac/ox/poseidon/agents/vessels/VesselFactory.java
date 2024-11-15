@@ -49,6 +49,7 @@ public class VesselFactory implements Factory<Vessel> {
         final VesselField vesselField = this.vesselField.get(simulation);
         final var vessel = new Vessel(
             idSupplier.get(simulation).nextId(),
+            portGrid.get(simulation),
             portFactory.get(simulation),
             speed,
             vesselField,

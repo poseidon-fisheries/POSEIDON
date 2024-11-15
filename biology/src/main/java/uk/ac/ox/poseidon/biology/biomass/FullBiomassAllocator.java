@@ -17,20 +17,18 @@
  *
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.biology.biomass;
 
-import sim.field.grid.SparseGrid2D;
+import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.geography.grids.Grid;
 
-import java.util.stream.Stream;
+@RequiredArgsConstructor
+public class FullBiomassAllocator implements BiomassAllocator {
 
-public interface PortGrid extends Grid<SparseGrid2D> {
-    Int2D getLocation(Port port);
+    private final CarryingCapacityGrid carryingCapacityGrid;
 
-    Stream<Port> getPortsAt(Int2D location);
-
-    boolean anyPortsAt(Int2D cell);
-
-    Stream<Port> getAllPorts();
+    @Override
+    public double applyAsDouble(final Int2D cell) {
+        return carryingCapacityGrid.getCarryingCapacity(cell);
+    }
 }

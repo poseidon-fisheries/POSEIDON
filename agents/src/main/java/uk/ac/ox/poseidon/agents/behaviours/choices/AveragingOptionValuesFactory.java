@@ -17,20 +17,14 @@
  *
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.behaviours.choices;
 
-import sim.field.grid.SparseGrid2D;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.geography.grids.Grid;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.stream.Stream;
-
-public interface PortGrid extends Grid<SparseGrid2D> {
-    Int2D getLocation(Port port);
-
-    Stream<Port> getPortsAt(Int2D location);
-
-    boolean anyPortsAt(Int2D cell);
-
-    Stream<Port> getAllPorts();
+public class AveragingOptionValuesFactory<O> implements Factory<OptionValues<O>> {
+    @Override
+    public OptionValues<O> get(final Simulation simulation) {
+        return new AveragingOptionValues<>();
+    }
 }

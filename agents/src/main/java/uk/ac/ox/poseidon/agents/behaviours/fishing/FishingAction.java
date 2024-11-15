@@ -17,20 +17,23 @@
  *
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.behaviours.fishing;
 
-import sim.field.grid.SparseGrid2D;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.geography.grids.Grid;
+import uk.ac.ox.poseidon.agents.behaviours.Action;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-import java.util.stream.Stream;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
-public interface PortGrid extends Grid<SparseGrid2D> {
-    Int2D getLocation(Port port);
+public abstract class FishingAction extends Action {
 
-    Stream<Port> getPortsAt(Int2D location);
+    public FishingAction(
+        final LocalDateTime start,
+        final Duration duration,
+        final Vessel vessel
+    ) {
+        super(start, duration, vessel);
+    }
 
-    boolean anyPortsAt(Int2D cell);
-
-    Stream<Port> getAllPorts();
+    public abstract double getTotalBiomassCaught();
 }

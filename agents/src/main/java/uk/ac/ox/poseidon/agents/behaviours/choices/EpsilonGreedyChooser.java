@@ -17,43 +17,55 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.destination;
+package uk.ac.ox.poseidon.agents.behaviours.choices;
 
+import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
-import sim.util.Int2D;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 
-class EpsilonGreedyDestinationSupplier implements DestinationSupplier {
+public class EpsilonGreedyChooser<O> implements Supplier<O> {
 
+    private final ImmutableList<O> options;
     private final double epsilon;
-    private final Supplier<Int2D> greedyDestinationSupplier;
-    private final Supplier<Int2D> nonGreedyDestinationSupplier;
+    private final OptionValues<O> optionValues;
+    private final Evaluator<O> evaluator;
     private final MersenneTwisterFast rng;
+    private O currentOption;
+    private Evaluation currentEvaluation;
 
-    EpsilonGreedyDestinationSupplier(
+    public EpsilonGreedyChooser(
         final double epsilon,
-        final Supplier<Int2D> greedyDestinationSupplier,
-        final Supplier<Int2D> nonGreedyDestinationSupplier,
+        final List<O> options,
+        final OptionValues<O> optionValues,
+        final Evaluator<O> evaluator,
         final MersenneTwisterFast rng
     ) {
+        this.options = ImmutableList.copyOf(options);
+        this.optionValues = checkNotNull(optionValues);
+        this.evaluator = checkNotNull(evaluator);
         checkArgument(
             epsilon >= 0 && epsilon <= 1,
             "epsilon must be between 0 and 1"
         );
         this.epsilon = epsilon;
-        this.greedyDestinationSupplier = checkNotNull(greedyDestinationSupplier);
-        this.nonGreedyDestinationSupplier = checkNotNull(nonGreedyDestinationSupplier);
         this.rng = checkNotNull(rng);
     }
 
     @Override
-    public Int2D get() {
-        return rng.nextBoolean(epsilon)
-            ? greedyDestinationSupplier.get()
-            : nonGreedyDestinationSupplier.get();
+    public O get() {
+        if (currentOption != null) {
+            optionValues.observe(currentOption, currentEvaluation.getResult());
+        }
+        final List<O> bestOptions = optionValues.getBestOptions();
+        final boolean explore = bestOptions.isEmpty() || rng.nextDouble() < epsilon;
+        currentOption = oneOf(explore ? options : bestOptions, rng);
+        currentEvaluation = evaluator.newEvaluation(currentOption);
+        return currentOption;
     }
 }

@@ -22,6 +22,7 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.NumberGrid;
+import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 import java.util.List;
 
@@ -42,6 +43,16 @@ public interface BathymetricGrid extends NumberGrid<Double, DoubleGrid2D> {
             .getAllCells()
             .stream()
             .filter(this::isLand)
+            .collect(toImmutableList());
+    }
+
+    default List<Int2D> getAccessibleCells(
+        final Int2D startingCell,
+        final PathFinder<Int2D> pathFinder
+    ) {
+        return getWaterCells()
+            .stream()
+            .filter(cell -> pathFinder.getPath(startingCell, cell).isPresent())
             .collect(toImmutableList());
     }
 

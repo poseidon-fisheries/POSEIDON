@@ -25,11 +25,11 @@ import sim.engine.Steppable;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.BackToInitialBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.WaitBehaviourFactory;
+import uk.ac.ox.poseidon.agents.behaviours.choices.AveragingOptionValuesFactory;
 import uk.ac.ox.poseidon.agents.behaviours.destination.ChooseDestinationBehaviourFactory;
-import uk.ac.ox.poseidon.agents.behaviours.destination.FixedDestinationSupplierFactory;
+import uk.ac.ox.poseidon.agents.behaviours.destination.EpsilonGreedyDestinationSupplierFactory;
 import uk.ac.ox.poseidon.agents.behaviours.destination.HomePortDestinationSupplierFactory;
-import uk.ac.ox.poseidon.agents.behaviours.destination.RandomDestinationSupplierFactory;
-import uk.ac.ox.poseidon.agents.behaviours.fishing.DefaultFishingBehaviour;
+import uk.ac.ox.poseidon.agents.behaviours.destination.TotalBiomassCaughtPerHourDestinationEvaluatorFactory;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DefaultFishingBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravelAlongPathBehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -79,7 +79,7 @@ public class BasicScenario extends Scenario {
     private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule =
         new SmoothBiomassDiffusionRuleFactory(0.01, 0.01);
     private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
-        new LogisticGrowthRuleFactory(0.2);
+        new LogisticGrowthRuleFactory(0.1);
 
     private GlobalScopeFactory<? extends GridExtent> gridExtent =
         new GridExtentFactory(
@@ -123,7 +123,7 @@ public class BasicScenario extends Scenario {
             5000
         );
     private Factory<? extends BiomassAllocator> biomassAllocator =
-        new RandomBiomassAllocatorFactory(carryingCapacityGrid);
+        new FullBiomassAllocatorFactory(carryingCapacityGrid);
     private Factory<? extends BiomassGrid> biomassGridA =
         new BiomassGridFactory(
             gridExtent,
@@ -179,20 +179,24 @@ public class BasicScenario extends Scenario {
             0
         );
     private Factory<? extends Fleet> fleet = new DefaultFleetFactory(
-        100,
+        500,
         new VesselFactory(
             new WaitBehaviourFactory(
                 new ExponentiallyDistributedDurationSupplierFactory(
                     new DurationFactory(10, 0, 0, 0)
                 ),
                 new ChooseDestinationBehaviourFactory(
-                    new FixedDestinationSupplierFactory(
-                        new RandomDestinationSupplierFactory(bathymetricGrid, pathFinder)
+                    new EpsilonGreedyDestinationSupplierFactory(
+                        0.1,
+                        bathymetricGrid,
+                        pathFinder,
+                        new AveragingOptionValuesFactory<>(),
+                        new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
                     ),
                     new TravelAlongPathBehaviourFactory(
                         new DefaultFishingBehaviourFactory<>(
                             new FixedBiomassProportionGearFactory(
-                                1,
+                                0.05,
                                 new DurationFactory(0, 1, 0, 0)
                             ),
                             new VoidHoldFactory<>(),
@@ -234,12 +238,6 @@ public class BasicScenario extends Scenario {
             Path.of("/home/nicolas/Desktop/scenario.yaml")
         );
         final Simulation simulation = scenario.newSimulation();
-        simulation
-            .getEventManager()
-            .addListener(
-                DefaultFishingBehaviour.Fishing.class,
-                System.out::println
-            );
         simulation.start();
         while (
             simulation

@@ -23,5 +23,6 @@ import sim.util.Int2D;
 
 import java.util.function.Supplier;
 
+@FunctionalInterface
 public interface DestinationSupplier extends Supplier<Int2D> {
 }

@@ -53,16 +53,21 @@ public class DefaultFishingBehaviour<C extends Content<C>> implements Behaviour 
 
     @Getter
     @ToString(callSuper = true)
-    public class Fishing extends Action {
+    public class Fishing extends FishingAction {
 
         Bucket<C> fishCaught;
 
-        public Fishing(
+        private Fishing(
             final LocalDateTime start,
             final Duration duration,
             final Vessel vessel
         ) {
             super(start, duration, vessel);
+        }
+
+        @Override
+        public double getTotalBiomassCaught() {
+            return fishCaught.getTotalBiomass().getValue();
         }
 
         @Override
