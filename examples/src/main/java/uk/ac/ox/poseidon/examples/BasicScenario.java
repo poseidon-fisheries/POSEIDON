@@ -25,7 +25,7 @@ import sim.engine.Steppable;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.BackToInitialBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.WaitBehaviourFactory;
-import uk.ac.ox.poseidon.agents.behaviours.choices.AveragingOptionValuesFactory;
+import uk.ac.ox.poseidon.agents.behaviours.choices.ExponentialMovingAverageOptionValuesFactory;
 import uk.ac.ox.poseidon.agents.behaviours.destination.ChooseDestinationBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.destination.EpsilonGreedyDestinationSupplierFactory;
 import uk.ac.ox.poseidon.agents.behaviours.destination.HomePortDestinationSupplierFactory;
@@ -77,7 +77,7 @@ public class BasicScenario extends Scenario {
     private Factory<? extends Species> speciesA = new SpeciesFactory("A");
     private Factory<? extends Species> speciesB = new SpeciesFactory("B");
     private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule =
-        new SmoothBiomassDiffusionRuleFactory(0.01, 0.01);
+        new SmoothBiomassDiffusionRuleFactory(0.005, 0.01);
     private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
         new LogisticGrowthRuleFactory(0.1);
 
@@ -187,10 +187,10 @@ public class BasicScenario extends Scenario {
                 ),
                 new ChooseDestinationBehaviourFactory(
                     new EpsilonGreedyDestinationSupplierFactory(
-                        0.1,
+                        0.5,
                         bathymetricGrid,
                         pathFinder,
-                        new AveragingOptionValuesFactory<>(),
+                        new ExponentialMovingAverageOptionValuesFactory<>(0.1),
                         new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
                     ),
                     new TravelAlongPathBehaviourFactory(

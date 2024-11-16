@@ -28,14 +28,14 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AveragingOptionValuesTest {
+class AverageOptionValuesTest {
 
-    private AveragingOptionValues<String> optionValues;
+    private AverageOptionValues<String> optionValues;
     private MersenneTwisterFast rng;
 
     @BeforeEach
     void setUp() {
-        optionValues = new AveragingOptionValues<>();
+        optionValues = new AverageOptionValues<>();
         rng = new MersenneTwisterFast(12345);  // Fixed seed for repeatable results
     }
 

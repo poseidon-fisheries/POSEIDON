@@ -19,12 +19,23 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.choices;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-public class AveragingOptionValuesFactory<O> implements Factory<OptionValues<O>> {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ExponentialMovingAverageOptionValuesFactory<O> implements Factory<OptionValues<O>> {
+
+    private double alpha;
+
     @Override
     public OptionValues<O> get(final Simulation simulation) {
-        return new AveragingOptionValues<>();
+        return new ExponentialMovingAverageOptionValues<>(alpha);
     }
 }

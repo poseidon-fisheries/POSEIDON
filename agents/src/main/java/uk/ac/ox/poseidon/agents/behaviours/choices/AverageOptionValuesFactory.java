@@ -19,23 +19,12 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.choices;
 
-import java.util.HashMap;
-import java.util.Map;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-public class AveragingOptionValues<T> extends MapBasedOptionValues<T> {
-
-    private final Map<T, Integer> counts = new HashMap<>();
-
+public class AverageOptionValuesFactory<O> implements Factory<OptionValues<O>> {
     @Override
-    public void observe(
-        final T option,
-        final double value
-    ) {
-        final int count = counts.getOrDefault(option, 0);
-        counts.put(option, count + 1);
-        final double oldValue = values.getOrDefault(option, 0.0);
-        values.put(option, (count * oldValue + value) / (count + 1));
-        invalidateCache();
+    public OptionValues<O> get(final Simulation simulation) {
+        return new AverageOptionValues<>();
     }
-
 }

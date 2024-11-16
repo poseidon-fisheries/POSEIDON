@@ -77,4 +77,20 @@ public abstract class MapBasedOptionValues<O> implements OptionValues<O> {
     protected void invalidateCache() {
         cachedBest = null;
     }
+
+    @Override
+    public void observe(
+        final O option,
+        final double value
+    ) {
+        final double oldValue = values.getOrDefault(option, 0.0);
+        values.put(option, newValue(option, oldValue, value));
+        invalidateCache();
+    }
+
+    protected abstract double newValue(
+        O option,
+        double oldValue,
+        double observedValue
+    );
 }
