@@ -24,37 +24,34 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.choices.EpsilonGreedyChooser;
-import uk.ac.ox.poseidon.agents.behaviours.choices.Evaluator;
 import uk.ac.ox.poseidon.agents.behaviours.choices.Explorer;
-import uk.ac.ox.poseidon.agents.behaviours.choices.OptionValues;
+import uk.ac.ox.poseidon.agents.behaviours.choices.RandomExplorer;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EpsilonGreedyDestinationSupplierFactory extends VesselScopeFactory<DestinationSupplier> {
+public class RandomGridExplorerFactory extends VesselScopeFactory<Explorer<Int2D>> {
 
-    private double epsilon;
-    private Factory<? extends OptionValues<Int2D>> optionValues;
-    private VesselScopeFactory<? extends Explorer<Int2D>> explorer;
-    private VesselScopeFactory<? extends Evaluator<Int2D>> destinationEvaluator;
+    private Factory<? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? extends PathFinder<Int2D>> pathFinder;
 
     @Override
-    protected DestinationSupplier newInstance(
+    protected Explorer<Int2D> newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new EpsilonGreedyChooser<>(
-            epsilon,
-            optionValues.get(simulation),
-            explorer.get(simulation, vessel),
-            destinationEvaluator.get(simulation, vessel),
+        return new RandomExplorer<>(
+            bathymetricGrid
+                .get(simulation)
+                .getAccessibleCells(vessel.getCurrentCell(), pathFinder.get(simulation)),
             simulation.random
-        )::get;
+        );
     }
 }

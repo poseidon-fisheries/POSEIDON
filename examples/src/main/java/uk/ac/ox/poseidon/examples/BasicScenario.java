@@ -26,10 +26,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.BackToInitialBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.WaitBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.ExponentialMovingAverageOptionValuesFactory;
-import uk.ac.ox.poseidon.agents.behaviours.destination.ChooseDestinationBehaviourFactory;
-import uk.ac.ox.poseidon.agents.behaviours.destination.EpsilonGreedyDestinationSupplierFactory;
-import uk.ac.ox.poseidon.agents.behaviours.destination.HomePortDestinationSupplierFactory;
-import uk.ac.ox.poseidon.agents.behaviours.destination.TotalBiomassCaughtPerHourDestinationEvaluatorFactory;
+import uk.ac.ox.poseidon.agents.behaviours.destination.*;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DefaultFishingBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravelAlongPathBehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -188,9 +185,8 @@ public class BasicScenario extends Scenario {
                 new ChooseDestinationBehaviourFactory(
                     new EpsilonGreedyDestinationSupplierFactory(
                         0.5,
-                        bathymetricGrid,
-                        pathFinder,
                         new ExponentialMovingAverageOptionValuesFactory<>(0.1),
+                        new RandomGridExplorerFactory(bathymetricGrid, pathFinder),
                         new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
                     ),
                     new TravelAlongPathBehaviourFactory(

@@ -19,7 +19,6 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.choices;
 
-import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 
 import java.util.List;
@@ -31,9 +30,9 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 public class EpsilonGreedyChooser<O> implements Supplier<O> {
 
-    private final ImmutableList<O> options;
     private final double epsilon;
     private final OptionValues<O> optionValues;
+    private final Explorer<O> explorer;
     private final Evaluator<O> evaluator;
     private final MersenneTwisterFast rng;
     private O currentOption;
@@ -41,12 +40,12 @@ public class EpsilonGreedyChooser<O> implements Supplier<O> {
 
     public EpsilonGreedyChooser(
         final double epsilon,
-        final List<O> options,
         final OptionValues<O> optionValues,
+        final Explorer<O> explorer,
         final Evaluator<O> evaluator,
         final MersenneTwisterFast rng
     ) {
-        this.options = ImmutableList.copyOf(options);
+        this.explorer = explorer;
         this.optionValues = checkNotNull(optionValues);
         this.evaluator = checkNotNull(evaluator);
         this.epsilon = checkUnitRange(epsilon, "epsilon");
@@ -60,7 +59,9 @@ public class EpsilonGreedyChooser<O> implements Supplier<O> {
         }
         final List<O> bestOptions = optionValues.getBestOptions();
         final boolean explore = bestOptions.isEmpty() || rng.nextDouble() < epsilon;
-        currentOption = oneOf(explore ? options : bestOptions, rng);
+        currentOption = explore
+            ? explorer.explore(currentOption)
+            : oneOf(bestOptions, rng);
         currentEvaluation = evaluator.newEvaluation(currentOption);
         return currentOption;
     }
