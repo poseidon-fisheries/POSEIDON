@@ -25,9 +25,9 @@ import ec.util.MersenneTwisterFast;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 public class EpsilonGreedyChooser<O> implements Supplier<O> {
 
@@ -49,11 +49,7 @@ public class EpsilonGreedyChooser<O> implements Supplier<O> {
         this.options = ImmutableList.copyOf(options);
         this.optionValues = checkNotNull(optionValues);
         this.evaluator = checkNotNull(evaluator);
-        checkArgument(
-            epsilon >= 0 && epsilon <= 1,
-            "epsilon must be between 0 and 1"
-        );
-        this.epsilon = epsilon;
+        this.epsilon = checkUnitRange(epsilon, "epsilon");
         this.rng = checkNotNull(rng);
     }
 

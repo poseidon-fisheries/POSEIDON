@@ -25,7 +25,7 @@ import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
 import java.time.Duration;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 public class FixedBiomassProportionGear implements FishingGear<Biomass> {
 
@@ -36,8 +36,7 @@ public class FixedBiomassProportionGear implements FishingGear<Biomass> {
         final double proportion,
         final Duration duration
     ) {
-        checkArgument(proportion >= 0 && proportion <= 1);
-        this.proportion = proportion;
+        this.proportion = checkUnitRange(proportion, "proportion");
         this.duration = duration;
     }
 
