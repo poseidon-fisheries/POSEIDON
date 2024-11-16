@@ -17,43 +17,31 @@
  *
  */
 
-package uk.ac.ox.poseidon.biology.biomass;
+package uk.ac.ox.poseidon.geography.paths;
 
-import lombok.Data;
-import uk.ac.ox.poseidon.biology.Content;
+import lombok.RequiredArgsConstructor;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
+@RequiredArgsConstructor
+abstract class AbstractGridPathFinder implements GridPathFinder {
+    private final BathymetricGrid bathymetricGrid;
+    private final PortGrid portGrid;
 
-@Data
-public class Biomass implements Content<Biomass> {
-
-    private final double value;
-
-    private Biomass(final double value) {
-        this.value = value;
+    @Override
+    public boolean isNavigable(final Int2D cell) {
+        return isWater(cell) || portGrid.anyPortsAt(cell);
     }
 
     @Override
-    public Biomass add(final Biomass other) {
-        return of(value + other.value);
-    }
-
-    public static Biomass of(final double value) {
-        return new Biomass(checkNonNegative(value, "biomass"));
+    public boolean isWater(final Int2D cell) {
+        return bathymetricGrid.isWater(cell);
     }
 
     @Override
-    public Biomass subtract(final Biomass other) {
-        return of(value - other.value);
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return value == 0.0;
-    }
-
-    @Override
-    public Biomass asBiomass() {
-        return this;
+    public GridExtent getGridExtent() {
+        return bathymetricGrid.getGridExtent();
     }
 }

@@ -23,7 +23,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -35,28 +34,26 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DefaultPathFinderFactory extends GlobalScopeFactory<CachingPathFinder<Int2D>> {
+public class DefaultPathFinderFactory extends GlobalScopeFactory<GridPathFinder> {
 
     private Factory<? extends BathymetricGrid> bathymetricGrid;
     private Factory<? extends PortGrid> portGrid;
     private Factory<? extends Distance> distance;
 
     @Override
-    protected CachingPathFinder<Int2D> newInstance(final Simulation simulation) {
+    protected GridPathFinder newInstance(final Simulation simulation) {
         final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
         final PortGrid portGrid = this.portGrid.get(simulation);
-        return new CachingPathFinder<>(
-            new FallbackPathfinder<>(
+        return new CachingGridPathFinder(
+            new FallbackGridPathfinder(
                 new BresenhamPathFinder(
                     bathymetricGrid,
                     portGrid
                 ),
                 new AStarPathFinder(
-                    new GridAdaptor(
-                        bathymetricGrid,
-                        portGrid,
-                        distance.get(simulation)
-                    )
+                    bathymetricGrid,
+                    portGrid,
+                    distance.get(simulation)
                 )
             ),
             new DefaultPathCache<>()

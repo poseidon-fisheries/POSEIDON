@@ -23,26 +23,29 @@ import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.Heuristic;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.google.common.collect.ImmutableList;
-import lombok.AllArgsConstructor;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.distance.Distance;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.Optional;
 
-@AllArgsConstructor
-public class AStarPathFinder implements PathFinder<Int2D> {
+public class AStarPathFinder extends AbstractGridPathFinder {
 
     private final GridAdaptor gridAdaptor;
     private final IndexedAStarPathFinder<Int2D> pathFinder;
     private final Heuristic<Int2D> heuristic;
 
     public AStarPathFinder(
-        final GridAdaptor gridAdaptor
+        final BathymetricGrid bathymetricGrid,
+        final PortGrid portGrid,
+        final Distance distance
     ) {
-        this(
-            gridAdaptor,
-            new IndexedAStarPathFinder<>(gridAdaptor),
-            (Int2D a, Int2D b) -> (float) gridAdaptor.getDistance().distanceBetween(a, b)
-        );
+        super(bathymetricGrid, portGrid);
+        this.gridAdaptor = new GridAdaptor(bathymetricGrid, portGrid, distance);
+        this.pathFinder = new IndexedAStarPathFinder<>(gridAdaptor);
+        this.heuristic = (Int2D a, Int2D b) ->
+            (float) gridAdaptor.getDistance().distanceBetween(a, b);
     }
 
     @Override
@@ -50,6 +53,7 @@ public class AStarPathFinder implements PathFinder<Int2D> {
         final Int2D start,
         final Int2D end
     ) {
+        if (!(isNavigable(start) && isNavigable(end))) return Optional.empty();
         final DefaultGraphPath<Int2D> path = new DefaultGraphPath<>();
         final boolean found =
             pathFinder.searchNodePath(

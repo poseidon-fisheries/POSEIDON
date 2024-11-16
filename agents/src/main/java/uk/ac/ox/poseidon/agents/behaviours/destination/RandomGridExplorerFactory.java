@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-import uk.ac.ox.poseidon.geography.paths.PathFinder;
+import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 @Getter
 @Setter
@@ -40,7 +40,7 @@ import uk.ac.ox.poseidon.geography.paths.PathFinder;
 public class RandomGridExplorerFactory extends VesselScopeFactory<Explorer<Int2D>> {
 
     private Factory<? extends BathymetricGrid> bathymetricGrid;
-    private Factory<? extends PathFinder<Int2D>> pathFinder;
+    private Factory<? extends GridPathFinder> pathFinder;
 
     @Override
     protected Explorer<Int2D> newInstance(
@@ -48,9 +48,7 @@ public class RandomGridExplorerFactory extends VesselScopeFactory<Explorer<Int2D
         final Vessel vessel
     ) {
         return new RandomExplorer<>(
-            bathymetricGrid
-                .get(simulation)
-                .getAccessibleCells(vessel.getCurrentCell(), pathFinder.get(simulation)),
+            pathFinder.get(simulation).getAccessibleWaterCells(vessel.getCurrentCell()),
             simulation.random
         );
     }

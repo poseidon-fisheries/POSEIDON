@@ -22,7 +22,6 @@ package uk.ac.ox.poseidon.examples;
 import lombok.Getter;
 import lombok.Setter;
 import sim.engine.Steppable;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.BackToInitialBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.WaitBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.ExponentialMovingAverageOptionValuesFactory;
@@ -56,7 +55,7 @@ import uk.ac.ox.poseidon.geography.distance.EquirectangularDistanceFactory;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 import uk.ac.ox.poseidon.geography.grids.GridExtentFactory;
 import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
-import uk.ac.ox.poseidon.geography.paths.PathFinder;
+import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.geography.ports.RandomLocationsPortGridFactory;
 import uk.ac.ox.poseidon.geography.ports.SimplePortFactory;
@@ -108,7 +107,7 @@ public class BasicScenario extends Scenario {
             2
         );
 
-    private Factory<? extends PathFinder<Int2D>> pathFinder =
+    private Factory<? extends GridPathFinder> pathFinder =
         new DefaultPathFinderFactory(
             bathymetricGrid,
             portGrid,

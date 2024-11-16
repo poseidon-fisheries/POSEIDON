@@ -17,46 +17,50 @@
  *
  */
 
-package uk.ac.ox.poseidon.geography.bathymetry;
+package uk.ac.ox.poseidon.geography.paths;
 
-import sim.field.grid.DoubleGrid2D;
+import com.google.common.collect.ImmutableList;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.geography.grids.NumberGrid;
-
-import java.util.List;
+import uk.ac.ox.poseidon.geography.grids.GridExtent;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-public interface BathymetricGrid extends NumberGrid<Double, DoubleGrid2D> {
+public interface GridPathFinder extends PathFinder<Int2D> {
 
-    default List<Int2D> getWaterCells() {
+    boolean isNavigable(final Int2D cell);
+
+    default ImmutableList<Int2D> getAccessibleWaterCells(
+        final Int2D startingCell
+    ) {
         return getGridExtent()
             .getAllCells()
             .stream()
             .filter(this::isWater)
+            .filter(cell -> isAccessible(startingCell, cell))
             .collect(toImmutableList());
     }
 
-    default List<Int2D> getLandCells() {
+    GridExtent getGridExtent();
+
+    boolean isWater(final Int2D cell);
+
+    default boolean isAccessible(
+        final Int2D start,
+        final Int2D end
+    ) {
+        return getPath(start, end).isPresent();
+    }
+
+    default ImmutableList<Int2D> getAccessibleWaterNeighbours(
+        final Int2D startingCell,
+        final int neighbourhoodSize
+    ) {
         return getGridExtent()
-            .getAllCells()
+            .getNeighbours(startingCell, neighbourhoodSize)
             .stream()
-            .filter(this::isLand)
+            .filter(this::isWater)
+            .filter(cell -> isAccessible(startingCell, cell))
             .collect(toImmutableList());
     }
-
-    default List<Int2D> getAllCells() {
-        return getGridExtent().getAllCells();
-    }
-
-    default boolean isLand(final Int2D cell) {
-        return !isWater(cell);
-    }
-
-    default boolean isWater(final Int2D cell) {
-        return getElevation(cell) < 0;
-    }
-
-    double getElevation(final Int2D cell);
 
 }

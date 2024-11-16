@@ -23,24 +23,27 @@ import com.badlogic.gdx.math.Bresenham2;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import com.google.common.collect.ImmutableList;
-import lombok.AllArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.Optional;
 
-@AllArgsConstructor
-public class BresenhamPathFinder implements PathFinder<Int2D> {
+public class BresenhamPathFinder extends AbstractGridPathFinder {
 
-    private final BathymetricGrid bathymetricGrid;
-    private final PortGrid portGrid;
+    public BresenhamPathFinder(
+        final BathymetricGrid bathymetricGrid,
+        final PortGrid portGrid
+    ) {
+        super(bathymetricGrid, portGrid);
+    }
 
     @Override
     public Optional<ImmutableList<Int2D>> getPath(
         final Int2D start,
         final Int2D end
     ) {
+        if (!(isNavigable(start) && isNavigable(end))) return Optional.empty();
         final Array<GridPoint2> linePoints = new Bresenham2().line(start.x, start.y, end.x, end.y);
         final ImmutableList.Builder<Int2D> pathBuilder = ImmutableList.builder();
         for (final GridPoint2 point : linePoints) {
@@ -52,7 +55,4 @@ public class BresenhamPathFinder implements PathFinder<Int2D> {
         return Optional.of(pathBuilder.build());
     }
 
-    private boolean isNavigable(final Int2D cell) {
-        return bathymetricGrid.isWater(cell) || portGrid.getPortsAt(cell).findAny().isPresent();
-    }
 }

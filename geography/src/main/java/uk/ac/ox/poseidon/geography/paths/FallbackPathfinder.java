@@ -27,16 +27,16 @@ import java.util.Optional;
 @AllArgsConstructor
 public class FallbackPathfinder<P> implements PathFinder<P> {
 
-    private final PathFinder<P> primary;
-    private final PathFinder<P> secondary;
+    private final PathFinder<P> heuristicPathFinder;
+    private final PathFinder<P> canonicalPathFinder;
 
     @Override
     public Optional<ImmutableList<P>> getPath(
         final P start,
         final P end
     ) {
-        return primary
+        return heuristicPathFinder
             .getPath(start, end)
-            .or(() -> secondary.getPath(start, end));
+            .or(() -> canonicalPathFinder.getPath(start, end));
     }
 }
