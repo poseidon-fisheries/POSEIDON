@@ -46,6 +46,8 @@ import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
+import uk.ac.ox.poseidon.core.suppliers.PoissonIntSupplierFactory;
+import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
 import uk.ac.ox.poseidon.core.time.*;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
@@ -73,7 +75,7 @@ public class BasicScenario extends Scenario {
     private Factory<? extends Species> speciesA = new SpeciesFactory("A");
     private Factory<? extends Species> speciesB = new SpeciesFactory("B");
     private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule =
-        new SmoothBiomassDiffusionRuleFactory(0.005, 0.01);
+        new SmoothBiomassDiffusionRuleFactory(0.01, 0.01);
     private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
         new LogisticGrowthRuleFactory(0.1);
 
@@ -183,9 +185,12 @@ public class BasicScenario extends Scenario {
                 ),
                 new ChooseDestinationBehaviourFactory(
                     new EpsilonGreedyDestinationSupplierFactory(
-                        0.5,
+                        0.25,
                         new ExponentialMovingAverageOptionValuesFactory<>(0.1),
-                        new RandomGridExplorerFactory(bathymetricGrid, pathFinder),
+                        new NeighbourhoodGridExplorerFactory(
+                            pathFinder,
+                            new ShiftedIntSupplierFactory(new PoissonIntSupplierFactory(5), 1)
+                        ),
                         new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
                     ),
                     new TravelAlongPathBehaviourFactory(

@@ -17,37 +17,30 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.destination;
+package uk.ac.ox.poseidon.core.suppliers;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.choices.Explorer;
-import uk.ac.ox.poseidon.agents.behaviours.choices.RandomExplorer;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+
+import java.util.function.IntSupplier;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RandomGridExplorerFactory extends VesselScopeFactory<Explorer<Int2D>> {
+public class ShiftedIntSupplierFactory extends GlobalScopeFactory<IntSupplier> {
 
-    private Factory<? extends GridPathFinder> pathFinder;
+    private Factory<? extends IntSupplier> intSupplier;
+    private int shift;
 
     @Override
-    protected Explorer<Int2D> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new RandomExplorer<>(
-            pathFinder.get(simulation).getAccessibleWaterCells(vessel.getCurrentCell()),
-            simulation.random
-        );
+    protected IntSupplier newInstance(final Simulation simulation) {
+        final IntSupplier intSupplier = this.intSupplier.get(simulation);
+        return () -> intSupplier.getAsInt() + shift;
     }
 }

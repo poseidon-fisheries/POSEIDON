@@ -38,6 +38,8 @@ public class CachingGridPathFinder extends CachingPathFinder<Int2D> implements G
     private final Interner<ImmutableList<Int2D>> cellListInterner = Interners.newStrongInterner();
     private final LoadingCache<Int2D, ImmutableList<Int2D>> accessibleCells =
         CacheBuilder.newBuilder().build(CacheLoader.from(this::computeAccessibleCells));
+    private final LoadingCache<Entry<Int2D, Integer>, ImmutableList<Int2D>> accessibleNeighbours =
+        CacheBuilder.newBuilder().build(CacheLoader.from(this::computeAccessibleNeighbours));
 
     CachingGridPathFinder(
         final GridPathFinder pathFinder,
@@ -59,7 +61,7 @@ public class CachingGridPathFinder extends CachingPathFinder<Int2D> implements G
     private ImmutableList<Int2D> computeAccessibleNeighbours(
         final Entry<Int2D, Integer> entry
     ) {
-        return getAccessibleWaterNeighbours(entry.getKey(), entry.getValue());
+        return pathFinder.getAccessibleWaterNeighbours(entry.getKey(), entry.getValue());
     }
 
     @Override
@@ -84,8 +86,5 @@ public class CachingGridPathFinder extends CachingPathFinder<Int2D> implements G
     public boolean isNavigable(final Int2D cell) {
         return pathFinder.isNavigable(cell);
     }
-
-    private final LoadingCache<Entry<Int2D, Integer>, ImmutableList<Int2D>> accessibleNeighbours =
-        CacheBuilder.newBuilder().build(CacheLoader.from(this::computeAccessibleNeighbours));
 
 }
