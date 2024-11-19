@@ -19,35 +19,38 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.destination;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import ec.util.MersenneTwisterFast;
+import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.behaviours.choices.OptionValues;
 import uk.ac.ox.poseidon.agents.behaviours.choices.Picker;
-import uk.ac.ox.poseidon.agents.behaviours.choices.RandomPicker;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class RandomGridExplorerFactory extends VesselScopeFactory<Picker<Int2D>> {
+import java.util.Optional;
+import java.util.function.IntSupplier;
 
-    private Factory<? extends GridPathFinder> pathFinder;
+import static uk.ac.ox.poseidon.core.MasonUtils.upToOneOf;
+
+@RequiredArgsConstructor
+public class NeighbourhoodCellPicker implements Picker<Int2D> {
+
+    private final Vessel vessel;
+    private final OptionValues<Int2D> optionValues;
+    private final GridPathFinder pathFinder;
+    private final IntSupplier neighbourhoodSizeSupplier;
+    private final MersenneTwisterFast rng;
 
     @Override
-    protected Picker<Int2D> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new RandomPicker<>(
-            pathFinder.get(simulation).getAccessibleWaterCells(vessel.getCurrentCell()),
-            simulation.random
+    public Optional<Int2D> pick() {
+        return upToOneOf(
+            pathFinder.getAccessibleWaterNeighbours(
+                optionValues
+                    .getBestOption(rng)
+                    .orElse(vessel.getCurrentCell()),
+                neighbourhoodSizeSupplier.getAsInt()
+            ),
+            rng
         );
     }
 }

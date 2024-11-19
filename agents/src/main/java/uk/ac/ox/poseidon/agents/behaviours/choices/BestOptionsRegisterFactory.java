@@ -17,37 +17,37 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.destination;
+package uk.ac.ox.poseidon.agents.behaviours.choices;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.choices.Picker;
-import uk.ac.ox.poseidon.agents.behaviours.choices.RandomPicker;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import one.util.streamex.EntryStream;
+import uk.ac.ox.poseidon.agents.registers.Register;
+import uk.ac.ox.poseidon.agents.registers.TransformedRegister;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+
+import java.util.Map.Entry;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RandomGridExplorerFactory extends VesselScopeFactory<Picker<Int2D>> {
+public class BestOptionsRegisterFactory<O>
+    extends SimulationScopeFactory<Register<Entry<O, Double>>> {
 
-    private Factory<? extends GridPathFinder> pathFinder;
+    Factory<? extends Register<? extends OptionValues<O>>> optionValuesRegister;
 
     @Override
-    protected Picker<Int2D> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new RandomPicker<>(
-            pathFinder.get(simulation).getAccessibleWaterCells(vessel.getCurrentCell()),
-            simulation.random
+    protected Register<Entry<O, Double>> newInstance(final Simulation simulation) {
+        return new TransformedRegister<>(
+            optionValuesRegister.get(simulation),
+            entryStream -> EntryStream
+                .of(entryStream)
+                .flatMapValues(optionValues -> optionValues.getBestEntries().stream())
         );
     }
 }

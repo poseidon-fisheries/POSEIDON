@@ -30,6 +30,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Data
 public abstract class Action implements Steppable {
@@ -44,10 +45,14 @@ public abstract class Action implements Steppable {
         final Duration duration,
         final Vessel vessel
     ) {
-        checkArgument(duration.isPositive(), "Duration must be positive");
-        this.start = start;
-        this.duration = duration;
-        this.vessel = vessel;
+        checkArgument(
+            duration.isPositive(),
+            "Duration must be positive but was %s.",
+            duration
+        );
+        this.start = checkNotNull(start);
+        this.duration = checkNotNull(duration);
+        this.vessel = checkNotNull(vessel);
     }
 
     @Override

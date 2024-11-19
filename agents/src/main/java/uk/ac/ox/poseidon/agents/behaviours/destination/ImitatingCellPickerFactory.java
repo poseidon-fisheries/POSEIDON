@@ -24,29 +24,36 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.choices.Picker;
-import uk.ac.ox.poseidon.agents.behaviours.choices.RandomPicker;
+import uk.ac.ox.poseidon.agents.behaviours.choices.OptionValues;
+import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
+import java.util.Map.Entry;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RandomGridExplorerFactory extends VesselScopeFactory<Picker<Int2D>> {
+public class ImitatingCellPickerFactory extends VesselScopeFactory<ImitatingCellPicker> {
 
+    private VesselScopeFactory<? extends OptionValues<Int2D>> optionValues;
+    private Factory<? extends Register<Entry<Int2D, Double>>> candidateRegister;
     private Factory<? extends GridPathFinder> pathFinder;
 
     @Override
-    protected Picker<Int2D> newInstance(
+    protected ImitatingCellPicker newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new RandomPicker<>(
-            pathFinder.get(simulation).getAccessibleWaterCells(vessel.getCurrentCell()),
+        return new ImitatingCellPicker(
+            vessel,
+            optionValues.get(simulation, vessel),
+            candidateRegister.get(simulation),
+            pathFinder.get(simulation),
             simulation.random
         );
     }

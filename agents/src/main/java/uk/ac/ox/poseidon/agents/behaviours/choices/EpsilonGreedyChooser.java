@@ -21,18 +21,18 @@ package uk.ac.ox.poseidon.agents.behaviours.choices;
 
 import ec.util.MersenneTwisterFast;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 public class EpsilonGreedyChooser<O> implements Supplier<O> {
 
     private final double epsilon;
     private final OptionValues<O> optionValues;
-    private final Explorer<O> explorer;
+    private final Picker<O> explorer;
+    private final Picker<O> exploiter;
     private final Evaluator<O> evaluator;
     private final MersenneTwisterFast rng;
     private O currentOption;
@@ -41,12 +41,14 @@ public class EpsilonGreedyChooser<O> implements Supplier<O> {
     public EpsilonGreedyChooser(
         final double epsilon,
         final OptionValues<O> optionValues,
-        final Explorer<O> explorer,
+        final Picker<O> explorer,
+        final Picker<O> exploiter,
         final Evaluator<O> evaluator,
         final MersenneTwisterFast rng
     ) {
-        this.explorer = explorer;
         this.optionValues = checkNotNull(optionValues);
+        this.explorer = explorer;
+        this.exploiter = exploiter;
         this.evaluator = checkNotNull(evaluator);
         this.epsilon = checkUnitRange(epsilon, "epsilon");
         this.rng = checkNotNull(rng);
@@ -57,11 +59,13 @@ public class EpsilonGreedyChooser<O> implements Supplier<O> {
         if (currentOption != null) {
             optionValues.observe(currentOption, currentEvaluation.getResult());
         }
-        final List<O> bestOptions = optionValues.getBestOptions();
-        final boolean explore = bestOptions.isEmpty() || rng.nextDouble() < epsilon;
-        currentOption = explore
-            ? explorer.explore(currentOption)
-            : oneOf(bestOptions, rng);
+        final boolean explore = rng.nextBoolean(epsilon);
+        currentOption = Optional
+            .of(exploiter)
+            .filter(__ -> !explore)
+            .flatMap(Picker::pick)
+            .or(explorer::pick)
+            .orElseThrow(() -> new RuntimeException("Explorer did not find a valid option."));
         currentEvaluation = evaluator.newEvaluation(currentOption);
         return currentOption;
     }

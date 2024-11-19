@@ -19,6 +19,30 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.choices;
 
-public interface Explorer<O> {
-    O explore(final O currentOption);
+import com.google.common.collect.ImmutableList;
+import ec.util.MersenneTwisterFast;
+
+import java.util.List;
+import java.util.Optional;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static uk.ac.ox.poseidon.core.MasonUtils.upToOneOf;
+
+public class RandomPicker<O> implements Picker<O> {
+
+    private final ImmutableList<O> options;
+    private final MersenneTwisterFast rng;
+
+    public RandomPicker(
+        final List<O> options,
+        final MersenneTwisterFast rng
+    ) {
+        this.options = ImmutableList.copyOf(options);
+        this.rng = checkNotNull(rng);
+    }
+
+    @Override
+    public Optional<O> pick() {
+        return upToOneOf(options, rng);
+    }
 }

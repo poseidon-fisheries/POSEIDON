@@ -97,6 +97,16 @@ public class MasonUtils {
         return candidates.get(oneOfIndices(candidates, random));
     }
 
+    public static <T> Optional<T> upToOneOf(
+        final List<T> candidates,
+        final MersenneTwisterFast random
+    ) {
+        return Optional
+            .ofNullable(candidates)
+            .filter(xs -> !xs.isEmpty())
+            .map(xs -> xs.get(oneOfIndices(candidates, random)));
+    }
+
     public static boolean inBounds(
         final Double2D location,
         final Continuous2D continuous2D

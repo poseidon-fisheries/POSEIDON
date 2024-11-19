@@ -22,9 +22,12 @@ package uk.ac.ox.poseidon.examples;
 import lombok.Getter;
 import lombok.Setter;
 import sim.engine.Steppable;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.BackToInitialBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.WaitBehaviourFactory;
+import uk.ac.ox.poseidon.agents.behaviours.choices.BestOptionsRegisterFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.ExponentialMovingAverageOptionValuesFactory;
+import uk.ac.ox.poseidon.agents.behaviours.choices.OptionValues;
 import uk.ac.ox.poseidon.agents.behaviours.destination.*;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DefaultFishingBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravelAlongPathBehaviourFactory;
@@ -33,8 +36,12 @@ import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
 import uk.ac.ox.poseidon.agents.fleets.DefaultFleetFactory;
 import uk.ac.ox.poseidon.agents.fleets.Fleet;
+import uk.ac.ox.poseidon.agents.registers.MutableRegister;
+import uk.ac.ox.poseidon.agents.registers.MutableRegisterFactory;
+import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
 import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory;
 import uk.ac.ox.poseidon.agents.vessels.hold.VoidHoldFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
@@ -72,12 +79,14 @@ import java.util.List;
 @Setter
 public class BasicScenario extends Scenario {
 
+    private Factory<? extends MutableRegister<OptionValues<Int2D>>> optionValuesRegister =
+        new MutableRegisterFactory<>();
     private Factory<? extends Species> speciesA = new SpeciesFactory("A");
     private Factory<? extends Species> speciesB = new SpeciesFactory("B");
     private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule =
-        new SmoothBiomassDiffusionRuleFactory(0.01, 0.01);
+        new SmoothBiomassDiffusionRuleFactory(0.001, 0.01);
     private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
-        new LogisticGrowthRuleFactory(0.1);
+        new LogisticGrowthRuleFactory(0.7);
 
     private GlobalScopeFactory<? extends GridExtent> gridExtent =
         new GridExtentFactory(
@@ -176,56 +185,73 @@ public class BasicScenario extends Scenario {
             ),
             0
         );
-    private Factory<? extends Fleet> fleet = new DefaultFleetFactory(
-        500,
-        new VesselFactory(
-            new WaitBehaviourFactory(
-                new ExponentiallyDistributedDurationSupplierFactory(
-                    new DurationFactory(10, 0, 0, 0)
-                ),
-                new ChooseDestinationBehaviourFactory(
-                    new EpsilonGreedyDestinationSupplierFactory(
-                        0.25,
-                        new ExponentialMovingAverageOptionValuesFactory<>(0.1),
-                        new NeighbourhoodGridExplorerFactory(
-                            pathFinder,
-                            new ShiftedIntSupplierFactory(new PoissonIntSupplierFactory(5), 1)
-                        ),
-                        new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
+    private VesselScopeFactory<? extends OptionValues<Int2D>> optionValues =
+        new RegisteringFactory<>(
+            optionValuesRegister,
+            new ExponentialMovingAverageOptionValuesFactory<>(0.5)
+        );
+    private Factory<? extends Fleet> fleet =
+        new DefaultFleetFactory(
+            500,
+            new VesselFactory(
+                new WaitBehaviourFactory(
+                    new ExponentiallyDistributedDurationSupplierFactory(
+                        new DurationFactory(10, 0, 0, 0)
                     ),
-                    new TravelAlongPathBehaviourFactory(
-                        new DefaultFishingBehaviourFactory<>(
-                            new FixedBiomassProportionGearFactory(
-                                0.05,
-                                new DurationFactory(0, 1, 0, 0)
-                            ),
-                            new VoidHoldFactory<>(),
-                            new CurrentCellFisheableFactory<>(
-                                new BiomassGridsFactory(
-                                    List.of(biomassGridA, biomassGridB)
+                    new ChooseDestinationBehaviourFactory(
+                        new EpsilonGreedyDestinationSupplierFactory(
+                            0.2,
+                            optionValues,
+                            new NeighbourhoodGridExplorerFactory(
+                                optionValues,
+                                pathFinder,
+                                new ShiftedIntSupplierFactory(
+                                    new PoissonIntSupplierFactory(5),
+                                    1
                                 )
                             ),
-                            new ChooseDestinationBehaviourFactory(
-                                new HomePortDestinationSupplierFactory(portGrid),
-                                new TravelAlongPathBehaviourFactory(
-                                    new BackToInitialBehaviourFactory(),
-                                    pathFinder,
-                                    distance
-                                )
-                            )
+                            new ImitatingCellPickerFactory(
+                                optionValues,
+                                new BestOptionsRegisterFactory<>(
+                                    optionValuesRegister
+                                ),
+                                pathFinder
+                            ),
+                            new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
                         ),
-                        pathFinder,
-                        distance
+                        new TravelAlongPathBehaviourFactory(
+                            new DefaultFishingBehaviourFactory<>(
+                                new FixedBiomassProportionGearFactory(
+                                    0.05,
+                                    new DurationFactory(0, 1, 0, 0)
+                                ),
+                                new VoidHoldFactory<>(),
+                                new CurrentCellFisheableFactory<>(
+                                    new BiomassGridsFactory(
+                                        List.of(biomassGridA, biomassGridB)
+                                    )
+                                ),
+                                new ChooseDestinationBehaviourFactory(
+                                    new HomePortDestinationSupplierFactory(portGrid),
+                                    new TravelAlongPathBehaviourFactory(
+                                        new BackToInitialBehaviourFactory(),
+                                        pathFinder,
+                                        distance
+                                    )
+                                )
+                            ),
+                            pathFinder,
+                            distance
+                        )
                     )
-                )
-            ),
-            new PrefixedIdSupplierFactory("Vessel"),
-            vesselField,
-            new RandomHomePortFactory(portGrid),
-            portGrid,
-            15
-        )
-    );
+                ),
+                new PrefixedIdSupplierFactory("Vessel"),
+                vesselField,
+                new RandomHomePortFactory(portGrid),
+                portGrid,
+                15
+            )
+        );
 
     BasicScenario() {
         super(new DateFactory(LocalDate.now().getYear(), 1, 1));

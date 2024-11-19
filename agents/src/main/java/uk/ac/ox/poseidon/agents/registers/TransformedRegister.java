@@ -17,35 +17,39 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.destination;
+package uk.ac.ox.poseidon.agents.registers;
 
-import ec.util.MersenneTwisterFast;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.choices.Explorer;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
-import java.util.function.IntSupplier;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
+import static java.util.Map.entry;
 
 @RequiredArgsConstructor
-public class NeighbourhoodGridExplorer implements Explorer<Int2D> {
+public class TransformedRegister<S, T> implements Register<T> {
 
-    private final Vessel vessel;
-    private final GridPathFinder pathFinder;
-    private final IntSupplier neighbourhoodSizeSupplier;
-    private final MersenneTwisterFast rng;
+    private final Register<S> sourceRegister;
+    private final Function<Stream<Entry<Vessel, S>>, Stream<Entry<Vessel, T>>> transformer;
 
     @Override
-    public Int2D explore(final Int2D currentCell) {
-        return oneOf(
-            pathFinder.getAccessibleWaterNeighbours(
-                currentCell == null ? vessel.getCurrentCell() : currentCell,
-                neighbourhoodSizeSupplier.getAsInt()
-            ),
-            rng
-        );
+    public Optional<T> get(final Vessel vessel) {
+        final Optional<Entry<Vessel, S>> sourceEntry =
+            sourceRegister
+                .get(vessel)
+                .map(value -> entry(vessel, value));
+        return transformer
+            .apply(sourceEntry.stream())
+            .findAny()
+            .map(Entry::getValue);
     }
+
+    @Override
+    public Stream<Entry<Vessel, T>> getAllEntries() {
+        return transformer.apply(sourceRegister.getAllEntries());
+    }
+
 }

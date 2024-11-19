@@ -19,27 +19,9 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.choices;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import java.util.Optional;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ExponentialMovingAverageOptionValuesFactory<O> extends VesselScopeFactory<OptionValues<O>> {
-
-    private double alpha;
-
-    @Override
-    protected OptionValues<O> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new ExponentialMovingAverageOptionValues<>(alpha);
-    }
+@FunctionalInterface
+public interface Picker<O> {
+    Optional<O> pick();
 }

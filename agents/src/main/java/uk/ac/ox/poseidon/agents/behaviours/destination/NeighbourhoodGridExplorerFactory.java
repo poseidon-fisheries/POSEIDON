@@ -23,6 +23,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.behaviours.choices.OptionValues;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
@@ -35,18 +37,20 @@ import java.util.function.IntSupplier;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NeighbourhoodGridExplorerFactory extends VesselScopeFactory<NeighbourhoodGridExplorer> {
+public class NeighbourhoodGridExplorerFactory extends VesselScopeFactory<NeighbourhoodCellPicker> {
 
+    private VesselScopeFactory<? extends OptionValues<Int2D>> optionValues;
     private Factory<? extends GridPathFinder> pathFinder;
     private Factory<? extends IntSupplier> neighbourhoodSizeSupplier;
 
     @Override
-    protected NeighbourhoodGridExplorer newInstance(
+    protected NeighbourhoodCellPicker newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new NeighbourhoodGridExplorer(
+        return new NeighbourhoodCellPicker(
             vessel,
+            optionValues.get(simulation, vessel),
             pathFinder.get(simulation),
             neighbourhoodSizeSupplier.get(simulation),
             simulation.random

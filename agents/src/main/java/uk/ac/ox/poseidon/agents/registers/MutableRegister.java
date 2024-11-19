@@ -17,29 +17,34 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.choices;
+package uk.ac.ox.poseidon.agents.registers;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ExponentialMovingAverageOptionValuesFactory<O> extends VesselScopeFactory<OptionValues<O>> {
+import java.util.Map;
+import java.util.Optional;
+import java.util.WeakHashMap;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-    private double alpha;
+public class MutableRegister<T> implements Register<T> {
+
+    private final WeakHashMap<Vessel, T> map = new WeakHashMap<>();
 
     @Override
-    protected OptionValues<O> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
+    public Optional<T> get(final Vessel vessel) {
+        return Optional.ofNullable(map.get(vessel));
+    }
+
+    @Override
+    public Stream<Map.Entry<Vessel, T>> getAllEntries() {
+        return map.entrySet().stream();
+    }
+
+    public T computeIfAbsent(
+        final Vessel vessel,
+        final Function<Vessel, T> mappingFunction
     ) {
-        return new ExponentialMovingAverageOptionValues<>(alpha);
+        return map.computeIfAbsent(vessel, mappingFunction);
     }
 }

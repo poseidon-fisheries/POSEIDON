@@ -17,31 +17,22 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.choices;
+package uk.ac.ox.poseidon.agents.registers;
 
-import com.google.common.collect.ImmutableList;
-import ec.util.MersenneTwisterFast;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-import java.util.List;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Stream;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
+public interface Register<T> {
 
-public class RandomExplorer<O> implements Explorer<O> {
+    Optional<T> get(Vessel vessel);
 
-    private final ImmutableList<O> options;
-    private final MersenneTwisterFast rng;
+    Stream<Entry<Vessel, T>> getAllEntries();
 
-    public RandomExplorer(
-        final List<O> options,
-        final MersenneTwisterFast rng
-    ) {
-        this.options = ImmutableList.copyOf(options);
-        this.rng = checkNotNull(rng);
+    default Stream<Entry<Vessel, T>> getOtherEntries(final Vessel vessel) {
+        return getAllEntries().filter(entry -> !entry.getKey().equals(vessel));
     }
-
-    @Override
-    public O explore(final O currentOption) {
-        return oneOf(options, rng);
-    }
+    
 }

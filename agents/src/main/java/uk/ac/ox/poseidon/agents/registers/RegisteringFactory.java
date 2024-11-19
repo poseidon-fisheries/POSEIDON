@@ -17,37 +17,33 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.destination;
+package uk.ac.ox.poseidon.agents.registers;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.choices.Picker;
-import uk.ac.ox.poseidon.agents.behaviours.choices.RandomPicker;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RandomGridExplorerFactory extends VesselScopeFactory<Picker<Int2D>> {
+public class RegisteringFactory<T> extends VesselScopeFactory<T> {
 
-    private Factory<? extends GridPathFinder> pathFinder;
+    private Factory<? extends MutableRegister<T>> register;
+    private VesselScopeFactory<T> delegate;
 
     @Override
-    protected Picker<Int2D> newInstance(
+    protected T newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new RandomPicker<>(
-            pathFinder.get(simulation).getAccessibleWaterCells(vessel.getCurrentCell()),
-            simulation.random
-        );
+        return register
+            .get(simulation)
+            .computeIfAbsent(vessel, v -> delegate.get(simulation, v));
     }
 }

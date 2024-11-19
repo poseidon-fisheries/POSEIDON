@@ -17,29 +17,15 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.choices;
+package uk.ac.ox.poseidon.agents.registers;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ExponentialMovingAverageOptionValuesFactory<O> extends VesselScopeFactory<OptionValues<O>> {
-
-    private double alpha;
+public class MutableRegisterFactory<T> extends SimulationScopeFactory<MutableRegister<T>> {
 
     @Override
-    protected OptionValues<O> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new ExponentialMovingAverageOptionValues<>(alpha);
+    protected MutableRegister<T> newInstance(final Simulation simulation) {
+        return new MutableRegister<>();
     }
 }
