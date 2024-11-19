@@ -21,12 +21,9 @@ package uk.ac.ox.poseidon.agents.behaviours.destination;
 
 import ec.util.MersenneTwisterFast;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.choices.OptionValues;
 import uk.ac.ox.poseidon.agents.behaviours.choices.Picker;
 import uk.ac.ox.poseidon.agents.registers.Register;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -50,28 +47,25 @@ import static uk.ac.ox.poseidon.core.MasonUtils.upToOneOf;
  * option in a chain of explorers; it needs another one to fall back on.
  */
 @RequiredArgsConstructor
-public class ImitatingCellPicker implements Picker<Int2D> {
+public class ImitatingPicker<O> implements Picker<O> {
 
-    private final Vessel vessel;
-    private final OptionValues<Int2D> optionValues;
-    private final Register<Entry<Int2D, Double>> candidateRegister;
-    private final GridPathFinder pathFinder;
+    private final OptionValues<O> optionValues;
+    private final Register<Entry<O, Double>> candidateRegister;
     private final MersenneTwisterFast rng;
 
     @Override
-    public Optional<Int2D> pick() {
+    public Optional<O> pick() {
 
-        final Optional<Entry<Int2D, Double>> currentBestEntry =
+        final Optional<Entry<O, Double>> currentBestEntry =
             optionValues.getBestEntry(rng);
 
         final double currentBestValue =
             currentBestEntry.map(Entry::getValue).orElse(NEGATIVE_INFINITY);
 
-        final List<Int2D> candidates = candidateRegister
+        final List<O> candidates = candidateRegister
             .getAllEntries()
             .map(Entry::getValue)
             .filter(entry -> entry.getValue() > currentBestValue)
-            .filter(entry -> pathFinder.isAccessible(vessel.getCurrentCell(), entry.getKey()))
             .collect(maxAll(comparingByValue(), mapping(Entry::getKey, toList())));
 
         return upToOneOf(candidates, rng)

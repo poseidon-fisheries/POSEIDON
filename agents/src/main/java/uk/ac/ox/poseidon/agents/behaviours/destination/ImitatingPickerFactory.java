@@ -23,14 +23,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.choices.OptionValues;
 import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 import java.util.Map.Entry;
 
@@ -38,22 +36,19 @@ import java.util.Map.Entry;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ImitatingCellPickerFactory extends VesselScopeFactory<ImitatingCellPicker> {
+public class ImitatingPickerFactory<O> extends VesselScopeFactory<ImitatingPicker<O>> {
 
-    private VesselScopeFactory<? extends OptionValues<Int2D>> optionValues;
-    private Factory<? extends Register<Entry<Int2D, Double>>> candidateRegister;
-    private Factory<? extends GridPathFinder> pathFinder;
+    private VesselScopeFactory<? extends OptionValues<O>> optionValues;
+    private Factory<? extends Register<Entry<O, Double>>> candidateRegister;
 
     @Override
-    protected ImitatingCellPicker newInstance(
+    protected ImitatingPicker<O> newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new ImitatingCellPicker(
-            vessel,
+        return new ImitatingPicker<>(
             optionValues.get(simulation, vessel),
             candidateRegister.get(simulation),
-            pathFinder.get(simulation),
             simulation.random
         );
     }

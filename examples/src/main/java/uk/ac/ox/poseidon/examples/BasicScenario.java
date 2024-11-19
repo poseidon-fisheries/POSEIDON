@@ -210,12 +210,11 @@ public class BasicScenario extends Scenario {
                                     1
                                 )
                             ),
-                            new ImitatingCellPickerFactory(
+                            new ImitatingPickerFactory<>(
                                 optionValues,
                                 new BestOptionsRegisterFactory<>(
                                     optionValuesRegister
-                                ),
-                                pathFinder
+                                )
                             ),
                             new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
                         ),
