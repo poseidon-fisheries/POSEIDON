@@ -22,9 +22,9 @@ package uk.ac.ox.poseidon.agents.behaviours.choices;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-public class AverageOptionValuesFactory<O> implements Factory<OptionValues<O>> {
+public class AverageOptionValuesFactory<O> implements Factory<MutableOptionValues<O>> {
     @Override
-    public OptionValues<O> get(final Simulation simulation) {
+    public MutableOptionValues<O> get(final Simulation simulation) {
         return new AverageOptionValues<>();
     }
 }

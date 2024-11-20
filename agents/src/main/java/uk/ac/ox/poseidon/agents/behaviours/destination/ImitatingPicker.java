@@ -23,17 +23,13 @@ import ec.util.MersenneTwisterFast;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.behaviours.choices.OptionValues;
 import uk.ac.ox.poseidon.agents.behaviours.choices.Picker;
-import uk.ac.ox.poseidon.agents.registers.Register;
 
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static java.lang.Double.NEGATIVE_INFINITY;
-import static java.util.Map.Entry.comparingByValue;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toList;
-import static one.util.streamex.MoreCollectors.maxAll;
 import static uk.ac.ox.poseidon.core.MasonUtils.upToOneOf;
 
 /**
@@ -50,7 +46,7 @@ import static uk.ac.ox.poseidon.core.MasonUtils.upToOneOf;
 public class ImitatingPicker<O> implements Picker<O> {
 
     private final OptionValues<O> optionValues;
-    private final Register<Entry<O, Double>> candidateRegister;
+    private final Supplier<OptionValues<O>> candidatesSupplier;
     private final MersenneTwisterFast rng;
 
     @Override
@@ -62,11 +58,14 @@ public class ImitatingPicker<O> implements Picker<O> {
         final double currentBestValue =
             currentBestEntry.map(Entry::getValue).orElse(NEGATIVE_INFINITY);
 
-        final List<O> candidates = candidateRegister
-            .getAllEntries()
-            .map(Entry::getValue)
-            .filter(entry -> entry.getValue() > currentBestValue)
-            .collect(maxAll(comparingByValue(), mapping(Entry::getKey, toList())));
+        final List<O> candidates =
+            candidatesSupplier
+                .get()
+                .getBestEntries()
+                .stream()
+                .filter(entry -> entry.getValue() > currentBestValue)
+                .map(Entry::getKey)
+                .toList();
 
         return upToOneOf(candidates, rng)
             .or(() -> currentBestEntry.map(Entry::getKey));

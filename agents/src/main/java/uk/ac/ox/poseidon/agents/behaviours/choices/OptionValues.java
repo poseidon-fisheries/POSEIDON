@@ -27,11 +27,6 @@ import java.util.Optional;
 
 public interface OptionValues<O> {
 
-    void observe(
-        O option,
-        double value
-    );
-
     Optional<Double> getValue(O option);
 
     List<O> getBestOptions();

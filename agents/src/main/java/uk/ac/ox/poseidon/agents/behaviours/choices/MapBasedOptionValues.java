@@ -21,7 +21,6 @@ package uk.ac.ox.poseidon.agents.behaviours.choices;
 
 import ec.util.MersenneTwisterFast;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,12 +31,14 @@ import static one.util.streamex.MoreCollectors.maxAll;
 import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 
 public abstract class MapBasedOptionValues<O> implements OptionValues<O> {
-    protected final Map<O, Double> values = new HashMap<>();
-    private List<Map.Entry<O, Double>> cachedBest = null;
+
+    protected List<Map.Entry<O, Double>> cachedBest = null;
+
+    protected abstract Map<O, Double> getValues();
 
     @Override
     public Optional<Double> getValue(final O option) {
-        return Optional.ofNullable(values.get(option));
+        return Optional.ofNullable(getValues().get(option));
     }
 
     @Override
@@ -58,7 +59,7 @@ public abstract class MapBasedOptionValues<O> implements OptionValues<O> {
     @Override
     public List<Map.Entry<O, Double>> getBestEntries() {
         if (cachedBest == null) {
-            cachedBest = values
+            cachedBest = getValues()
                 .entrySet()
                 .stream()
                 .collect(maxAll(comparingByValue(), toImmutableList()));
@@ -74,23 +75,4 @@ public abstract class MapBasedOptionValues<O> implements OptionValues<O> {
             : Optional.of(oneOf(bestEntries, rng));
     }
 
-    protected void invalidateCache() {
-        cachedBest = null;
-    }
-
-    @Override
-    public void observe(
-        final O option,
-        final double value
-    ) {
-        final double oldValue = values.getOrDefault(option, 0.0);
-        values.put(option, newValue(option, oldValue, value));
-        invalidateCache();
-    }
-
-    protected abstract double newValue(
-        O option,
-        double oldValue,
-        double observedValue
-    );
 }

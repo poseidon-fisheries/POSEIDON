@@ -19,22 +19,9 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.choices;
 
-import java.util.HashMap;
-import java.util.Map;
-
-class AverageOptionValues<T> extends HashMapBasedOptionValues<T> {
-
-    private final Map<T, Integer> counts = new HashMap<>();
-
-    @Override
-    protected double newValue(
-        final T option,
-        final double oldValue,
-        final double observedValue
-    ) {
-        final int count = counts.getOrDefault(option, 0);
-        counts.put(option, count + 1);
-        return (count * oldValue + observedValue) / (count + 1);
-    }
-
+public interface MutableOptionValues<O> extends OptionValues<O> {
+    void observe(
+        O option,
+        double value
+    );
 }

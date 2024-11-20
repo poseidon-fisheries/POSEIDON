@@ -23,16 +23,23 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public interface Register<T> {
 
     Optional<T> get(Vessel vessel);
 
+    Stream<Vessel> getVessels();
+
     Stream<Entry<Vessel, T>> getAllEntries();
 
     default Stream<Entry<Vessel, T>> getOtherEntries(final Vessel vessel) {
         return getAllEntries().filter(entry -> !entry.getKey().equals(vessel));
     }
-    
+
+    T computeIfAbsent(
+        Vessel vessel,
+        Function<Vessel, T> mappingFunction
+    );
 }

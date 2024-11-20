@@ -24,13 +24,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.agents.behaviours.choices.OptionValues;
-import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 @Getter
 @Setter
@@ -39,7 +37,7 @@ import java.util.Map.Entry;
 public class ImitatingPickerFactory<O> extends VesselScopeFactory<ImitatingPicker<O>> {
 
     private VesselScopeFactory<? extends OptionValues<O>> optionValues;
-    private Factory<? extends Register<Entry<O, Double>>> candidateRegister;
+    private VesselScopeFactory<? extends Supplier<OptionValues<O>>> optionValuesSupplier;
 
     @Override
     protected ImitatingPicker<O> newInstance(
@@ -48,7 +46,7 @@ public class ImitatingPickerFactory<O> extends VesselScopeFactory<ImitatingPicke
     ) {
         return new ImitatingPicker<>(
             optionValues.get(simulation, vessel),
-            candidateRegister.get(simulation),
+            optionValuesSupplier.get(simulation, vessel),
             simulation.random
         );
     }

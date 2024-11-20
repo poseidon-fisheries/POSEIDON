@@ -21,7 +21,7 @@ package uk.ac.ox.poseidon.agents.behaviours.choices;
 
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
-class ExponentialMovingAverageOptionValues<T> extends MapBasedOptionValues<T> {
+class ExponentialMovingAverageOptionValues<T> extends HashMapBasedOptionValues<T> {
 
     private final double alpha;
 

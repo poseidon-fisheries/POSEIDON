@@ -23,23 +23,34 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
+
+import java.util.function.Supplier;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExponentialMovingAverageOptionValuesFactory<O> extends VesselScopeFactory<MutableOptionValues<O>> {
+public class BestOptionsFromFriendsSupplierFactory<O>
+    extends VesselScopeFactory<Supplier<OptionValues<O>>> {
 
-    private double alpha;
+    private int maxNumberOfFriends;
+    private Factory<? extends Register<? extends OptionValues<O>>> optionValuesRegister;
 
     @Override
-    protected MutableOptionValues<O> newInstance(
+    protected Supplier<OptionValues<O>> newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new ExponentialMovingAverageOptionValues<>(alpha);
+        return new BestOptionsFromFriendsSupplier<>(
+            vessel,
+            maxNumberOfFriends,
+            optionValuesRegister.get(simulation),
+            simulation.random
+        );
     }
 }

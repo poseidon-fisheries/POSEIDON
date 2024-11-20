@@ -33,6 +33,17 @@ public class Preconditions {
         return value;
     }
 
+    public static int checkNonNegative(
+        final int value,
+        final String name
+    ) {
+        checkArgument(
+            value >= 0,
+            name + " must be not be negative but was " + value
+        );
+        return value;
+    }
+
     public static double checkNonNegative(
         final double value,
         final String name

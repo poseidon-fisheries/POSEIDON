@@ -30,7 +30,7 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 public class EpsilonGreedyChooser<O> implements Supplier<O> {
 
     private final double epsilon;
-    private final OptionValues<O> optionValues;
+    private final MutableOptionValues<O> optionValues;
     private final Picker<O> explorer;
     private final Picker<O> exploiter;
     private final Evaluator<O> evaluator;
@@ -40,7 +40,7 @@ public class EpsilonGreedyChooser<O> implements Supplier<O> {
 
     public EpsilonGreedyChooser(
         final double epsilon,
-        final OptionValues<O> optionValues,
+        final MutableOptionValues<O> optionValues,
         final Picker<O> explorer,
         final Picker<O> exploiter,
         final Evaluator<O> evaluator,

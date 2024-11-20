@@ -26,7 +26,7 @@ import lombok.Setter;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.choices.EpsilonGreedyChooser;
 import uk.ac.ox.poseidon.agents.behaviours.choices.Evaluator;
-import uk.ac.ox.poseidon.agents.behaviours.choices.OptionValues;
+import uk.ac.ox.poseidon.agents.behaviours.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.behaviours.choices.Picker;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -39,7 +39,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 public class EpsilonGreedyDestinationSupplierFactory extends VesselScopeFactory<DestinationSupplier> {
 
     private double epsilon;
-    private VesselScopeFactory<? extends OptionValues<Int2D>> optionValues;
+    private VesselScopeFactory<? extends MutableOptionValues<Int2D>> optionValues;
     private VesselScopeFactory<? extends Picker<Int2D>> explorer;
     private VesselScopeFactory<? extends Picker<Int2D>> exploiter;
     private VesselScopeFactory<? extends Evaluator<Int2D>> destinationEvaluator;

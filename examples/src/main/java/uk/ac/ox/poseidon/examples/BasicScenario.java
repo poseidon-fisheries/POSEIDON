@@ -25,9 +25,9 @@ import sim.engine.Steppable;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.BackToInitialBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.WaitBehaviourFactory;
-import uk.ac.ox.poseidon.agents.behaviours.choices.BestOptionsRegisterFactory;
+import uk.ac.ox.poseidon.agents.behaviours.choices.BestOptionsFromFriendsSupplierFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.ExponentialMovingAverageOptionValuesFactory;
-import uk.ac.ox.poseidon.agents.behaviours.choices.OptionValues;
+import uk.ac.ox.poseidon.agents.behaviours.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.behaviours.destination.*;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DefaultFishingBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravelAlongPathBehaviourFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
 import uk.ac.ox.poseidon.agents.fleets.DefaultFleetFactory;
 import uk.ac.ox.poseidon.agents.fleets.Fleet;
-import uk.ac.ox.poseidon.agents.registers.MutableRegister;
-import uk.ac.ox.poseidon.agents.registers.MutableRegisterFactory;
+import uk.ac.ox.poseidon.agents.registers.Register;
+import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
 import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
 import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
@@ -79,8 +79,8 @@ import java.util.List;
 @Setter
 public class BasicScenario extends Scenario {
 
-    private Factory<? extends MutableRegister<OptionValues<Int2D>>> optionValuesRegister =
-        new MutableRegisterFactory<>();
+    private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
+        new RegisterFactory<>();
     private Factory<? extends Species> speciesA = new SpeciesFactory("A");
     private Factory<? extends Species> speciesB = new SpeciesFactory("B");
     private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule =
@@ -185,7 +185,7 @@ public class BasicScenario extends Scenario {
             ),
             0
         );
-    private VesselScopeFactory<? extends OptionValues<Int2D>> optionValues =
+    private VesselScopeFactory<? extends MutableOptionValues<Int2D>> optionValues =
         new RegisteringFactory<>(
             optionValuesRegister,
             new ExponentialMovingAverageOptionValuesFactory<>(0.5)
@@ -212,7 +212,8 @@ public class BasicScenario extends Scenario {
                             ),
                             new ImitatingPickerFactory<>(
                                 optionValues,
-                                new BestOptionsRegisterFactory<>(
+                                new BestOptionsFromFriendsSupplierFactory<>(
+                                    2,
                                     optionValuesRegister
                                 )
                             ),

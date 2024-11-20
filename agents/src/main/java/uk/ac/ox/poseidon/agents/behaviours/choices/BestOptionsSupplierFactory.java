@@ -23,31 +23,31 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import one.util.streamex.EntryStream;
 import uk.ac.ox.poseidon.agents.registers.Register;
-import uk.ac.ox.poseidon.agents.registers.TransformedRegister;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
-import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BestOptionsRegisterFactory<O>
-    extends SimulationScopeFactory<Register<Entry<O, Double>>> {
+public class BestOptionsSupplierFactory<O>
+    extends VesselScopeFactory<Supplier<OptionValues<O>>> {
 
     Factory<? extends Register<? extends OptionValues<O>>> optionValuesRegister;
 
     @Override
-    protected Register<Entry<O, Double>> newInstance(final Simulation simulation) {
-        return new TransformedRegister<>(
-            optionValuesRegister.get(simulation),
-            entryStream -> EntryStream
-                .of(entryStream)
-                .flatMapValues(optionValues -> optionValues.getBestEntries().stream())
+    protected Supplier<OptionValues<O>> newInstance(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
+        return new BestOptionsSupplier<>(
+            vessel,
+            optionValuesRegister.get(simulation)
         );
     }
 }

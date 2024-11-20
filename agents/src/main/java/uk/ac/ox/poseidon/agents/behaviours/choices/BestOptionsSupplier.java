@@ -17,39 +17,31 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.registers;
+package uk.ac.ox.poseidon.agents.behaviours.choices;
 
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Stream;
+import java.util.Map;
+import java.util.function.Supplier;
 
-import static java.util.Map.entry;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 @RequiredArgsConstructor
-public class TransformedRegister<S, T> implements Register<T> {
+public class BestOptionsSupplier<O> implements Supplier<OptionValues<O>> {
 
-    private final Register<S> sourceRegister;
-    private final Function<Stream<Entry<Vessel, S>>, Stream<Entry<Vessel, T>>> transformer;
-
-    @Override
-    public Optional<T> get(final Vessel vessel) {
-        final Optional<Entry<Vessel, S>> sourceEntry =
-            sourceRegister
-                .get(vessel)
-                .map(value -> entry(vessel, value));
-        return transformer
-            .apply(sourceEntry.stream())
-            .findAny()
-            .map(Entry::getValue);
-    }
+    private final Vessel vessel;
+    private final Register<? extends OptionValues<O>> optionValuesRegister;
 
     @Override
-    public Stream<Entry<Vessel, T>> getAllEntries() {
-        return transformer.apply(sourceRegister.getAllEntries());
+    public OptionValues<O> get() {
+        return new ImmutableOptionValues<>(
+            optionValuesRegister
+                .getOtherEntries(vessel)
+                .map(Map.Entry::getValue)
+                .flatMap(optionValues -> optionValues.getBestEntries().stream())
+                .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue, Math::max))
+        );
     }
-
 }

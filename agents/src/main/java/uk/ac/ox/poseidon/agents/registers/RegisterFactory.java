@@ -19,32 +19,13 @@
 
 package uk.ac.ox.poseidon.agents.registers;
 
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.WeakHashMap;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
-public class MutableRegister<T> implements Register<T> {
-
-    private final WeakHashMap<Vessel, T> map = new WeakHashMap<>();
+public class RegisterFactory<T> extends SimulationScopeFactory<Register<T>> {
 
     @Override
-    public Optional<T> get(final Vessel vessel) {
-        return Optional.ofNullable(map.get(vessel));
-    }
-
-    @Override
-    public Stream<Map.Entry<Vessel, T>> getAllEntries() {
-        return map.entrySet().stream();
-    }
-
-    public T computeIfAbsent(
-        final Vessel vessel,
-        final Function<Vessel, T> mappingFunction
-    ) {
-        return map.computeIfAbsent(vessel, mappingFunction);
+    protected HashMapRegister<T> newInstance(final Simulation simulation) {
+        return new HashMapRegister<>();
     }
 }

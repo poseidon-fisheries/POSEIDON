@@ -34,7 +34,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 @AllArgsConstructor
 public class RegisteringFactory<T> extends VesselScopeFactory<T> {
 
-    private Factory<? extends MutableRegister<T>> register;
+    private Factory<? extends Register<T>> register;
     private VesselScopeFactory<T> delegate;
 
     @Override

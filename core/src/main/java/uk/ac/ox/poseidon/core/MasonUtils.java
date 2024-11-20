@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.core;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import sim.field.continuous.Continuous2D;
@@ -36,6 +37,7 @@ import java.util.stream.Stream;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 
 public class MasonUtils {
 
@@ -105,6 +107,28 @@ public class MasonUtils {
             .ofNullable(candidates)
             .filter(xs -> !xs.isEmpty())
             .map(xs -> xs.get(oneOfIndices(candidates, random)));
+    }
+
+    public static <T> ImmutableList<T> upToNOf(
+        final int n,
+        final List<T> candidates,
+        final MersenneTwisterFast rng
+    ) {
+        checkNonNegative(n, "n");
+        if (n == 0 || candidates.isEmpty()) return ImmutableList.of();
+        final int size = candidates.size();
+        if (n < candidates.size()) return ImmutableList.copyOf(candidates);
+        final ImmutableList.Builder<T> builder = ImmutableList.builder();
+        int i = 0;
+        int j = 0;
+        while (j < n && i < size) {
+            if (rng.nextInt(size - i) < n - j) {
+                builder.add(candidates.get(i));
+                j += 1;
+            }
+            i += 1;
+        }
+        return builder.build();
     }
 
     public static boolean inBounds(

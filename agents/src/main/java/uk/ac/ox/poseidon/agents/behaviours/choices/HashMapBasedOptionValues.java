@@ -17,15 +17,37 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.registers;
+package uk.ac.ox.poseidon.agents.behaviours.choices;
 
-import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import lombok.Getter;
 
-public class MutableRegisterFactory<T> extends SimulationScopeFactory<MutableRegister<T>> {
+import java.util.HashMap;
+import java.util.Map;
+
+@Getter
+public abstract class HashMapBasedOptionValues<O>
+    extends MapBasedOptionValues<O>
+    implements MutableOptionValues<O> {
+
+    protected final Map<O, Double> values = new HashMap<>();
 
     @Override
-    protected MutableRegister<T> newInstance(final Simulation simulation) {
-        return new MutableRegister<>();
+    public void observe(
+        final O option,
+        final double value
+    ) {
+        final double oldValue = values.getOrDefault(option, 0.0);
+        values.put(option, newValue(option, oldValue, value));
+        invalidateCache();
     }
+
+    protected void invalidateCache() {
+        cachedBest = null;
+    }
+
+    protected abstract double newValue(
+        O option,
+        double oldValue,
+        double observedValue
+    );
 }

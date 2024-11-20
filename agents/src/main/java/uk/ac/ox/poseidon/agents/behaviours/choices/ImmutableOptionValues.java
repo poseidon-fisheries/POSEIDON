@@ -19,22 +19,18 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.choices;
 
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
+import lombok.Getter;
+
 import java.util.Map;
 
-class AverageOptionValues<T> extends HashMapBasedOptionValues<T> {
+@Getter
+public class ImmutableOptionValues<O> extends MapBasedOptionValues<O> {
 
-    private final Map<T, Integer> counts = new HashMap<>();
+    private final ImmutableMap<O, Double> values;
 
-    @Override
-    protected double newValue(
-        final T option,
-        final double oldValue,
-        final double observedValue
-    ) {
-        final int count = counts.getOrDefault(option, 0);
-        counts.put(option, count + 1);
-        return (count * oldValue + observedValue) / (count + 1);
+    public ImmutableOptionValues(final Map<O, Double> values) {
+        this.values = ImmutableMap.copyOf(values);
     }
 
 }
