@@ -17,25 +17,26 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.fishing;
+package uk.ac.ox.poseidon.agents.behaviours;
 
+import lombok.Getter;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.GridAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public abstract class FishingAction extends GridAction {
+@Getter
+public abstract class GridAction extends Action {
+    private final Int2D cell;
 
-    public FishingAction(
+    public GridAction(
         final LocalDateTime start,
         final Duration duration,
         final Vessel vessel,
         final Int2D cell
     ) {
-        super(start, duration, vessel, cell);
+        super(start, duration, vessel);
+        this.cell = cell;
     }
-
-    public abstract double getTotalBiomassCaught();
 }

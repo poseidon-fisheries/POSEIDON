@@ -115,4 +115,3 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
         }
     }
 }
-

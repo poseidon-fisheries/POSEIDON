@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package fishing;
+
+service BiomassGridService {
+    rpc Init (GridDef) returns (Grid);
+    rpc ApplyCatches (Catches) returns (Grid);
+    rpc ApplyGrowth (Void) returns (Grid);
+}
+
+message GridDef {
+    Grid grid = 1;
+    double carryingCapacity = 2;
+    double growthRate = 3;
+}
+
+message Grid {
+    message Column {
+        repeated double values = 1;
+    }
+    repeated Column columns = 1;
+}
+
+message Catches {
+    message Catch {
+        int32 x = 1;
+        int32 y = 2;
+        double biomassCaught = 3;
+    }
+    repeated Catch catches = 1;
+}
+
+message Void {}

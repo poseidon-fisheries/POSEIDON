@@ -32,6 +32,7 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import java.io.Serial;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -46,6 +47,7 @@ public class Simulation extends SimState {
     private final TemporalSchedule temporalSchedule;
     private final Scenario scenario;
     private final long id = idCounter.getAndIncrement();
+    private final List<Runnable> finalProcesses = new ArrayList<>();
     private boolean started = false;
     private List<?> components;
 
@@ -89,6 +91,16 @@ public class Simulation extends SimState {
                 .map(factory -> factory.get(this))
                 .toList();
         started = true;
+    }
+
+    public void addFinalProcess(final Runnable process) {
+        finalProcesses.add(process);
+    }
+
+    @Override
+    public void finish() {
+        finalProcesses.forEach(Runnable::run);
+        super.finish();
     }
 
     @Override

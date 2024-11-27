@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.examples;
+package uk.ac.ox.poseidon.examples.external;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -77,16 +77,11 @@ import java.util.List;
 @SuppressWarnings("MagicNumber")
 @Getter
 @Setter
-public class BasicScenario extends Scenario {
+public class ExternalScenario extends Scenario {
 
     private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
         new RegisterFactory<>();
     private Factory<? extends Species> speciesA = new SpeciesFactory("A");
-    private Factory<? extends Species> speciesB = new SpeciesFactory("B");
-    private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule =
-        new SmoothBiomassDiffusionRuleFactory(0.001, 0.01);
-    private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
-        new LogisticGrowthRuleFactory(0.7);
 
     private GlobalScopeFactory<? extends GridExtent> gridExtent =
         new GridExtentFactory(
@@ -137,33 +132,6 @@ public class BasicScenario extends Scenario {
             speciesA,
             biomassAllocator
         );
-    private Factory<? extends BiomassGrid> biomassGridB =
-        new BiomassGridFactory(
-            gridExtent,
-            speciesB,
-            biomassAllocator
-        );
-    private Factory<? extends Steppable> dailyProcesses =
-        new ScheduledRepeatingFactory<>(
-            new DateTimeAfterFactory(
-                startingDateTime,
-                new PeriodFactory(0, 0, 1)
-            ),
-            new PeriodFactory(0, 0, 1),
-            new SteppableSequenceFactory(
-                new BiomassDiffuserFactory(
-                    biomassGridA,
-                    carryingCapacityGrid,
-                    biomassDiffusionRule
-                ),
-                new BiomassDiffuserFactory(
-                    biomassGridB,
-                    carryingCapacityGrid,
-                    biomassDiffusionRule
-                )
-            ),
-            0
-        );
     private Factory<? extends Steppable> monthlyProcesses =
         new ScheduledRepeatingFactory<>(
             new DateTimeAfterFactory(
@@ -172,15 +140,12 @@ public class BasicScenario extends Scenario {
             ),
             new PeriodFactory(0, 1, 0),
             new SteppableSequenceFactory(
-                new BiomassGrowerFactory(
+                new ExternalBiomassGridProcessFactory(
+                    "localhost",
+                    5161,
                     biomassGridA,
-                    carryingCapacityGrid,
-                    biomassGrowthRule
-                ),
-                new BiomassGrowerFactory(
-                    biomassGridB,
-                    carryingCapacityGrid,
-                    biomassGrowthRule
+                    5000,
+                    0.5
                 )
             ),
             0
@@ -228,7 +193,7 @@ public class BasicScenario extends Scenario {
                                 new VoidHoldFactory<>(),
                                 new CurrentCellFisheableFactory<>(
                                     new BiomassGridsFactory(
-                                        List.of(biomassGridA, biomassGridB)
+                                        List.of(biomassGridA)
                                     )
                                 ),
                                 new ChooseDestinationBehaviourFactory(
@@ -253,12 +218,12 @@ public class BasicScenario extends Scenario {
             )
         );
 
-    BasicScenario() {
+    ExternalScenario() {
         super(new DateFactory(LocalDate.now().getYear(), 1, 1));
     }
 
     public static void main(final String[] args) {
-        final BasicScenario scenario = new BasicScenario();
+        final ExternalScenario scenario = new ExternalScenario();
         new ScenarioWriter().write(
             scenario,
             Path.of("/home/nicolas/Desktop/scenario.yaml")

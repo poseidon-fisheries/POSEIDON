@@ -19,6 +19,7 @@
 
 plugins {
     id("buildlogic.java-application-conventions")
+    id("com.google.protobuf") version "0.9.4"
 }
 
 dependencies {
@@ -26,4 +27,33 @@ dependencies {
     implementation(project(":biology"))
     implementation(project(":io"))
     implementation(project(":gui"))
+
+    // The following are all necessary for gRPC
+    implementation("io.grpc:grpc-netty-shaded:1.68.1")
+    implementation("io.grpc:grpc-protobuf:1.68.1")
+    implementation("io.grpc:grpc-stub:1.68.1")
+    implementation("com.google.protobuf:protobuf-java:4.28.3")
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
+}
+
+repositories {
+    mavenCentral()
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.28.3" // Specify Protoc compiler
+    }
+    plugins {
+        create("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.68.1" // Specify gRPC plugin
+        }
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.plugins {
+                create("grpc")
+            }
+        }
+    }
 }

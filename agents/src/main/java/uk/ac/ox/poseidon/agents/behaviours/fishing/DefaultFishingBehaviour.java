@@ -62,7 +62,7 @@ public class DefaultFishingBehaviour<C extends Content<C>> implements Behaviour 
             final Duration duration,
             final Vessel vessel
         ) {
-            super(start, duration, vessel);
+            super(start, duration, vessel, vessel.getCurrentCell());
         }
 
         @Override
