@@ -51,7 +51,12 @@ public class ExternalBiomassGridProcess implements Steppable, Listener<FishingAc
                         .newBuilder()
                         .setX(fishingAction.getCell().x)
                         .setY(fishingAction.getCell().y)
-                        .setBiomassCaught(fishingAction.getTotalBiomassCaught())
+                        .setBiomassCaught(
+                            fishingAction
+                                .getFishCaught()
+                                .getTotalBiomass()
+                                .getValue()
+                        )
                         .build())
                     ::iterator
                 )

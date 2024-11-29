@@ -38,7 +38,8 @@ dependencies {
     implementation("com.formdev:flatlaf:${flatlafVersion}:windows-arm64@dll")
 
     // Apache batik for SVG handling
-    implementation("org.apache.xmlgraphics:batik-transcoder:1.17")
-    implementation("org.apache.xmlgraphics:batik-dom:1.17")
-    implementation("org.apache.xmlgraphics:batik-awt-util:1.17")
+    val batikVersion = "1.18"
+    implementation("org.apache.xmlgraphics:batik-transcoder:${batikVersion}")
+    implementation("org.apache.xmlgraphics:batik-dom:${batikVersion}")
+    implementation("org.apache.xmlgraphics:batik-awt-util:${batikVersion}")
 }

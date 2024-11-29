@@ -17,38 +17,30 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.time;
+package uk.ac.ox.poseidon.agents.tables;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sim.util.distribution.Exponential;
+import uk.ac.ox.poseidon.agents.behaviours.fishing.FishingAction;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-
-import java.time.Duration;
-import java.util.function.Supplier;
+import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.io.tables.ListenerTableFactory;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExponentiallyDistributedDurationSupplierFactory
-    extends SimulationScopeFactory<Supplier<Duration>> {
+public class FishingActionListenerTableFactory
+    extends ListenerTableFactory<FishingAction, FishingActionListenerTable> {
 
-    private Factory<? extends Duration> meanDuration;
+    private Factory<? extends GridExtent> gridExtent;
 
     @Override
-    protected Supplier<Duration> newInstance(final Simulation simulation) {
-        final Exponential exponential =
-            new Exponential(
-                1.0 / meanDuration.get(simulation).getSeconds(),
-                simulation.random
-            );
-        return new DurationSupplier(
-            () -> (long) (1 + exponential.nextInt())
-        );
+    protected FishingActionListenerTable newTable(final Simulation simulation) {
+        return new FishingActionListenerTable(gridExtent.get(simulation));
     }
+
 }

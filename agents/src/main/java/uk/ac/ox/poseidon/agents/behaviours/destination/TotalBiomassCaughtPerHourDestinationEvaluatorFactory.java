@@ -49,7 +49,8 @@ public class TotalBiomassCaughtPerHourDestinationEvaluatorFactory
                 vessel.getEventManager(),
                 FishingAction.class,
                 0.0,
-                (caughtSoFar, fishingAction) -> caughtSoFar + fishingAction.getTotalBiomassCaught(),
+                (caughtSoFar, fishingAction) -> caughtSoFar +
+                    fishingAction.getFishCaught().getTotalBiomass().getValue(),
                 Action.class,
                 0.0,
                 (hoursSoFar, action) ->

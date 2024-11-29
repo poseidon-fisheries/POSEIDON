@@ -66,11 +66,6 @@ public class DefaultFishingBehaviour<C extends Content<C>> implements Behaviour 
         }
 
         @Override
-        public double getTotalBiomassCaught() {
-            return fishCaught.getTotalBiomass().getValue();
-        }
-
-        @Override
         protected Action complete(
             final LocalDateTime dateTime
         ) {

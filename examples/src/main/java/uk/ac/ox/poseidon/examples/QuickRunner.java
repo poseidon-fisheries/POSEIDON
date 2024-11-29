@@ -17,22 +17,32 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.time;
+package uk.ac.ox.poseidon.examples;
 
 import lombok.RequiredArgsConstructor;
-import sim.util.distribution.AbstractDistribution;
+import uk.ac.ox.poseidon.core.Scenario;
+import uk.ac.ox.poseidon.core.Simulation;
 
-import java.time.Duration;
-import java.util.function.Supplier;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAmount;
 
 @RequiredArgsConstructor
-public class DistributedDurationSupplier implements Supplier<Duration> {
+public class QuickRunner {
+    private final Scenario scenario;
 
-    private final AbstractDistribution distribution;
-
-    @Override
-    public Duration get() {
-        return Duration.ofSeconds(distribution.nextInt());
+    public void runFor(final TemporalAmount temporalAmount) {
+        final Simulation simulation = scenario.newSimulation();
+        simulation.start();
+        final LocalDateTime end =
+            scenario.getStartingDateTime().get(simulation).plus(temporalAmount);
+        while (
+            simulation
+                .getTemporalSchedule()
+                .getDateTime()
+                .isBefore(end)
+        ) {
+            simulation.schedule.step(simulation);
+        }
+        simulation.finish();
     }
-
 }

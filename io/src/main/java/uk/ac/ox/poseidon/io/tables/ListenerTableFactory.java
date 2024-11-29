@@ -17,12 +17,21 @@
  *
  */
 
-plugins {
-    id("buildlogic.java-library-conventions")
-}
+package uk.ac.ox.poseidon.io.tables;
 
-dependencies {
-    api(project(":biology"))
-    api(project(":geography"))
-    api(project(":io"))
+import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+
+public abstract class ListenerTableFactory<E, T extends ListenerTable<E>>
+    extends SimulationScopeFactory<T> {
+
+    protected abstract T newTable(final Simulation simulation);
+
+    @Override
+    protected final T newInstance(final Simulation simulation) {
+        final T listenerTable = newTable(simulation);
+        simulation.getEventManager().addListener(listenerTable.getEventClass(), listenerTable);
+        simulation.addFinalProcess(() -> System.out.println(listenerTable.get()));
+        return listenerTable;
+    }
 }

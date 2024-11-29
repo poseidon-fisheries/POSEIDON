@@ -22,6 +22,7 @@ package uk.ac.ox.poseidon.agents.behaviours.fishing;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.GridAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.biology.Bucket;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -37,5 +38,6 @@ public abstract class FishingAction extends GridAction {
         super(start, duration, vessel, cell);
     }
 
-    public abstract double getTotalBiomassCaught();
+    public abstract Bucket<?> getFishCaught();
+
 }

@@ -23,11 +23,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 import lombok.*;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
+import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
-import uk.ac.ox.poseidon.io.CsvParserUtils;
 
 import java.nio.file.Path;
 
@@ -54,16 +54,18 @@ public class BathymetricGridFromLongFormatCsvFactory
                 gridExtent.getGridHeight(),
                 defaultDepth
             );
-        CsvParserUtils
-            .recordStream(path.get(simulation))
-            .forEach(record -> {
-                final Int2D cell =
-                    gridExtent.toCell(new Coordinate(
-                        record.getDouble(longitudeColumnName),
-                        record.getDouble(latitudeColumnName)
-                    ));
-                doubleGrid2D.set(cell.x, cell.y, record.getDouble(depthColumnName));
-            });
+        Table.read().file(path.get(simulation).toFile()).forEach(row -> {
+            final Int2D cell =
+                gridExtent.toCell(new Coordinate(
+                    row.getDouble(longitudeColumnName),
+                    row.getDouble(latitudeColumnName)
+                ));
+            doubleGrid2D.set(
+                cell.x,
+                cell.y,
+                row.getDouble(depthColumnName)
+            );
+        });
         return new DefaultBathymetricGrid(gridExtent, doubleGrid2D);
     }
 

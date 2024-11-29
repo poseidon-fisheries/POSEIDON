@@ -17,12 +17,13 @@
  *
  */
 
-plugins {
-    id("buildlogic.java-library-conventions")
-}
+package uk.ac.ox.poseidon.io.tables;
 
-dependencies {
-    api(project(":biology"))
-    api(project(":geography"))
-    api(project(":io"))
+import tech.tablesaw.api.Table;
+import uk.ac.ox.poseidon.core.events.Listener;
+
+import java.util.function.Supplier;
+
+public interface ListenerTable<E> extends Listener<E>, Supplier<Table> {
+    Class<E> getEventClass();
 }

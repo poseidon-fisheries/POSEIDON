@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.Setter;
 import sim.engine.Steppable;
 import sim.util.Int2D;
+import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.behaviours.BackToInitialBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.WaitBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.BestOptionsFromFriendsSupplierFactory;
@@ -39,6 +40,7 @@ import uk.ac.ox.poseidon.agents.fleets.Fleet;
 import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
 import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
+import uk.ac.ox.poseidon.agents.tables.FishingActionListenerTableFactory;
 import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -50,7 +52,6 @@ import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scenario;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.suppliers.PoissonIntSupplierFactory;
@@ -72,7 +73,9 @@ import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
+import java.util.function.Supplier;
 
 @SuppressWarnings("MagicNumber")
 @Getter
@@ -84,9 +87,9 @@ public class BasicScenario extends Scenario {
     private Factory<? extends Species> speciesA = new SpeciesFactory("A");
     private Factory<? extends Species> speciesB = new SpeciesFactory("B");
     private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule =
-        new SmoothBiomassDiffusionRuleFactory(0.001, 0.01);
+        new SmoothBiomassDiffusionRuleFactory(0.01, 0.01);
     private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
-        new LogisticGrowthRuleFactory(0.7);
+        new LogisticGrowthRuleFactory(0.1);
 
     private GlobalScopeFactory<? extends GridExtent> gridExtent =
         new GridExtentFactory(
@@ -97,6 +100,8 @@ public class BasicScenario extends Scenario {
             -5,
             5
         );
+    private Factory<? extends Supplier<Table>> catchTable =
+        new FishingActionListenerTableFactory(gridExtent);
     private Factory<? extends VesselField> vesselField = new VesselFieldFactory(gridExtent);
     private Factory<? extends Distance> distance = new EquirectangularDistanceFactory(gridExtent);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
@@ -117,7 +122,6 @@ public class BasicScenario extends Scenario {
             3,
             2
         );
-
     private Factory<? extends GridPathFinder> pathFinder =
         new DefaultPathFinderFactory(
             bathymetricGrid,
@@ -200,20 +204,20 @@ public class BasicScenario extends Scenario {
                     ),
                     new ChooseDestinationBehaviourFactory(
                         new EpsilonGreedyDestinationSupplierFactory(
-                            0.2,
+                            0.25,
                             optionValues,
                             new NeighbourhoodGridExplorerFactory(
                                 optionValues,
                                 pathFinder,
                                 new ShiftedIntSupplierFactory(
-                                    new PoissonIntSupplierFactory(5),
+                                    new PoissonIntSupplierFactory(1),
                                     1
                                 )
                             ),
                             new ImitatingPickerFactory<>(
                                 optionValues,
                                 new BestOptionsFromFriendsSupplierFactory<>(
-                                    2,
+                                    5,
                                     optionValuesRegister
                                 )
                             ),
@@ -222,7 +226,7 @@ public class BasicScenario extends Scenario {
                         new TravelAlongPathBehaviourFactory(
                             new DefaultFishingBehaviourFactory<>(
                                 new FixedBiomassProportionGearFactory(
-                                    0.05,
+                                    0.1,
                                     new DurationFactory(0, 1, 0, 0)
                                 ),
                                 new VoidHoldFactory<>(),
@@ -263,16 +267,7 @@ public class BasicScenario extends Scenario {
             scenario,
             Path.of("/home/nicolas/Desktop/scenario.yaml")
         );
-        final Simulation simulation = scenario.newSimulation();
-        simulation.start();
-        while (
-            simulation
-                .getTemporalSchedule()
-                .getDateTime()
-                .isBefore(LocalDate.of(LocalDate.now().getYear() + 10, 1, 1).atStartOfDay())
-        ) {
-            simulation.schedule.step(simulation);
-        }
-        simulation.finish();
+        new QuickRunner(scenario).runFor(Period.ofYears(1));
+
     }
 }

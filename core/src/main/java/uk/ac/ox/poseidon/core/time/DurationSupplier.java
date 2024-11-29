@@ -17,12 +17,21 @@
  *
  */
 
-plugins {
-    id("buildlogic.java-library-conventions")
-}
+package uk.ac.ox.poseidon.core.time;
 
-dependencies {
-    api(project(":biology"))
-    api(project(":geography"))
-    api(project(":io"))
+import lombok.RequiredArgsConstructor;
+
+import java.time.Duration;
+import java.util.function.Supplier;
+
+@RequiredArgsConstructor
+public class DurationSupplier implements Supplier<Duration> {
+
+    private final Supplier<Long> secondsSupplier;
+
+    @Override
+    public Duration get() {
+        return Duration.ofSeconds(secondsSupplier.get());
+    }
+
 }

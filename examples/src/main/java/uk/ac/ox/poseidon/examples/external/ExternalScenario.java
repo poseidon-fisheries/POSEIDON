@@ -50,13 +50,13 @@ import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scenario;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.suppliers.PoissonIntSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
 import uk.ac.ox.poseidon.core.time.*;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
+import uk.ac.ox.poseidon.examples.QuickRunner;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.RoughCoastalBathymetricGridFactory;
 import uk.ac.ox.poseidon.geography.distance.Distance;
@@ -72,6 +72,7 @@ import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 
 @SuppressWarnings("MagicNumber")
@@ -228,16 +229,6 @@ public class ExternalScenario extends Scenario {
             scenario,
             Path.of("/home/nicolas/Desktop/scenario.yaml")
         );
-        final Simulation simulation = scenario.newSimulation();
-        simulation.start();
-        while (
-            simulation
-                .getTemporalSchedule()
-                .getDateTime()
-                .isBefore(LocalDate.of(LocalDate.now().getYear() + 10, 1, 1).atStartOfDay())
-        ) {
-            simulation.schedule.step(simulation);
-        }
-        simulation.finish();
+        new QuickRunner(new ExternalScenario()).runFor(Period.ofYears(10));
     }
 }
