@@ -225,10 +225,11 @@ public class ExternalScenario extends Scenario {
 
     public static void main(final String[] args) {
         final ExternalScenario scenario = new ExternalScenario();
+        final Path scenarioPath = Path.of("/home/nicolas/Desktop/scenario.yaml");
         new ScenarioWriter().write(
             scenario,
-            Path.of("/home/nicolas/Desktop/scenario.yaml")
+            scenarioPath
         );
-        new QuickRunner(new ExternalScenario()).runFor(Period.ofYears(10));
+        new QuickRunner(scenarioPath, Period.ofYears(1)).run();
     }
 }

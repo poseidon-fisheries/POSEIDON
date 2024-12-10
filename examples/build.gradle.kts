@@ -28,6 +28,8 @@ dependencies {
     implementation(project(":io"))
     implementation(project(":gui"))
 
+    implementation("com.beust:jcommander:1.82")
+    
     // The following are all necessary for gRPC
     implementation("io.grpc:grpc-netty-shaded:1.68.1")
     implementation("io.grpc:grpc-protobuf:1.68.1")

@@ -269,11 +269,11 @@ public class BasicScenario extends Scenario {
 
     public static void main(final String[] args) {
         final BasicScenario scenario = new BasicScenario();
+        final Path scenarioPath = Path.of("/home/nicolas/Desktop/scenario.yaml");
         new ScenarioWriter().write(
             scenario,
-            Path.of("/home/nicolas/Desktop/scenario.yaml")
+            scenarioPath
         );
-        new QuickRunner(scenario).runFor(Period.ofYears(1));
-
+        new QuickRunner(scenarioPath, Period.ofYears(1)).run();
     }
 }
