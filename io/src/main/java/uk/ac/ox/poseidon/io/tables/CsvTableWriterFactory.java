@@ -19,18 +19,34 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import tech.tablesaw.api.Table;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
-public abstract class ListenerTableFactory<E, T extends ListenerTable<E>>
-    extends SimulationScopeFactory<T> {
+import java.nio.file.Path;
+import java.util.function.Supplier;
 
-    protected abstract T newTable(final Simulation simulation);
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class CsvTableWriterFactory extends SimulationScopeFactory<CsvTableWriter> {
+
+    private Factory<? extends Supplier<Table>> tableSupplier;
+    private Factory<? extends Path> path;
+    private boolean clearAfterWriting;
 
     @Override
-    protected final T newInstance(final Simulation simulation) {
-        final T listenerTable = newTable(simulation);
-        simulation.getEventManager().addListener(listenerTable.getEventClass(), listenerTable);
-        return listenerTable;
+    protected CsvTableWriter newInstance(final Simulation simulation) {
+        return new CsvTableWriter(
+            tableSupplier.get(simulation),
+            path.get(simulation),
+            clearAfterWriting
+        );
     }
 }

@@ -19,18 +19,27 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import lombok.RequiredArgsConstructor;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import tech.tablesaw.api.Table;
 
-public abstract class ListenerTableFactory<E, T extends ListenerTable<E>>
-    extends SimulationScopeFactory<T> {
+import java.nio.file.Path;
+import java.util.function.Supplier;
 
-    protected abstract T newTable(final Simulation simulation);
+@RequiredArgsConstructor
+public class CsvTableWriter implements Steppable {
+
+    private final Supplier<Table> tableSupplier;
+    private final Path path;
+    private final boolean clearAfterWriting;
 
     @Override
-    protected final T newInstance(final Simulation simulation) {
-        final T listenerTable = newTable(simulation);
-        simulation.getEventManager().addListener(listenerTable.getEventClass(), listenerTable);
-        return listenerTable;
+    public void step(final SimState state) {
+        final Table table = tableSupplier.get();
+        table.write().csv(path.toFile());
+        if (clearAfterWriting) {
+            table.clear();
+        }
     }
 }

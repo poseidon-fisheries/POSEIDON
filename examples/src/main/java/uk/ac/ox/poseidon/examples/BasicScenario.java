@@ -23,7 +23,6 @@ import lombok.Getter;
 import lombok.Setter;
 import sim.engine.Steppable;
 import sim.util.Int2D;
-import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.behaviours.BackToInitialBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.WaitBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.BestOptionsFromFriendsSupplierFactory;
@@ -49,9 +48,7 @@ import uk.ac.ox.poseidon.agents.vessels.hold.VoidHoldFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Scenario;
+import uk.ac.ox.poseidon.core.*;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.suppliers.PoissonIntSupplierFactory;
@@ -70,12 +67,13 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.geography.ports.RandomLocationsPortGridFactory;
 import uk.ac.ox.poseidon.geography.ports.SimplePortFactory;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
+import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
+import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
-import java.util.function.Supplier;
 
 @SuppressWarnings("MagicNumber")
 @Getter
@@ -100,8 +98,16 @@ public class BasicScenario extends Scenario {
             -5,
             5
         );
-    private Factory<? extends Supplier<Table>> catchTable =
-        new FishingActionListenerTableFactory(gridExtent);
+
+    private Factory<? extends CsvTableWriter> catchTableWriter =
+        new FinalProcessFactory<>(
+            new CsvTableWriterFactory(
+                new FishingActionListenerTableFactory(gridExtent),
+                PathFactory.from("fishing_actions.csv"),
+                true
+            )
+        );
+
     private Factory<? extends VesselField> vesselField = new VesselFieldFactory(gridExtent);
     private Factory<? extends Distance> distance = new EquirectangularDistanceFactory(gridExtent);
     private Factory<? extends BathymetricGrid> bathymetricGrid =

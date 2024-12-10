@@ -17,20 +17,26 @@
  *
  */
 
-package uk.ac.ox.poseidon.io.tables;
+package uk.ac.ox.poseidon.core;
 
-import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import sim.engine.Steppable;
 
-public abstract class ListenerTableFactory<E, T extends ListenerTable<E>>
-    extends SimulationScopeFactory<T> {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class FinalProcessFactory<C extends Steppable> extends SimulationScopeFactory<C> {
 
-    protected abstract T newTable(final Simulation simulation);
+    private Factory<C> process;
 
     @Override
-    protected final T newInstance(final Simulation simulation) {
-        final T listenerTable = newTable(simulation);
-        simulation.getEventManager().addListener(listenerTable.getEventClass(), listenerTable);
-        return listenerTable;
+    protected C newInstance(final Simulation simulation) {
+        final C process = this.process.get(simulation);
+        simulation.addFinalProcess(process);
+        return process;
     }
 }

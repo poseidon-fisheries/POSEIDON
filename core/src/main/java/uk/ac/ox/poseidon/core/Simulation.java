@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import sim.engine.SimState;
+import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -47,7 +48,7 @@ public class Simulation extends SimState {
     private final TemporalSchedule temporalSchedule;
     private final Scenario scenario;
     private final long id = idCounter.getAndIncrement();
-    private final List<Runnable> finalProcesses = new ArrayList<>();
+    private final List<Steppable> finalProcesses = new ArrayList<>();
     private boolean started = false;
     private List<?> components;
 
@@ -93,13 +94,17 @@ public class Simulation extends SimState {
         started = true;
     }
 
-    public void addFinalProcess(final Runnable process) {
+    public void addFinalProcess(final Steppable process) {
         finalProcesses.add(process);
+    }
+
+    public void addFinalProcess(final Runnable process) {
+        finalProcesses.add(simState -> process.run());
     }
 
     @Override
     public void finish() {
-        finalProcesses.forEach(Runnable::run);
+        finalProcesses.forEach(process -> process.step(this));
         super.finish();
     }
 
