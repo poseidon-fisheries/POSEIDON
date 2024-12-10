@@ -42,14 +42,12 @@ public class CombiningEphemeralAccumulatingListener<E1, T1, E2, T2, R> implement
     ) {
         checkNotNull(eventManager);
         firstListener = new EphemeralAccumulatingListener<>(
-            eventManager,
-            firstEventClass,
+            firstEventClass, eventManager,
             firstInitialValue,
             firstAccumulator
         );
         secondListener = new EphemeralAccumulatingListener<>(
-            eventManager,
-            secondEventClass,
+            secondEventClass, eventManager,
             secondInitialValue,
             secondAccumulator
         );

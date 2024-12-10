@@ -24,25 +24,26 @@ import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class EphemeralAccumulatingListener<E, T> implements Listener<E>, Supplier<T> {
+public class EphemeralAccumulatingListener<E, T>
+    extends AbstractListener<E>
+    implements Supplier<T> {
 
     private final EventManager eventManager;
-    private final Class<E> eventClass;
     private final BiFunction<T, E, T> accumulator;
     private T value;
     private boolean stillListening = true;
 
     public EphemeralAccumulatingListener(
-        final EventManager eventManager,
         final Class<E> eventClass,
+        final EventManager eventManager,
         final T initialValue,
         final BiFunction<T, E, T> accumulator
     ) {
+        super(eventClass);
         this.eventManager = checkNotNull(eventManager);
-        this.eventClass = checkNotNull(eventClass);
         this.accumulator = checkNotNull(accumulator);
         this.value = initialValue;
-        eventManager.addListener(eventClass, this);
+        eventManager.addListener(this);
     }
 
     @Override
@@ -53,7 +54,7 @@ public class EphemeralAccumulatingListener<E, T> implements Listener<E>, Supplie
     @Override
     public T get() {
         if (stillListening) {
-            eventManager.removeListener(eventClass, this);
+            eventManager.removeListener(this);
             stillListening = false;
         }
         return value;

@@ -31,19 +31,15 @@ public class SimpleEventManager implements EventManager {
         MultimapBuilder.hashKeys().arrayListValues().build();
 
     @Override
-    public <E> void addListener(
-        final Class<E> eventClass,
-        final Listener<E> listener
-    ) {
-        listeners.put(eventClass, listener);
+    public void addListener(final Listener<?> listener) {
+        listeners.put(listener.getEventClass(), listener);
     }
 
     @Override
-    public <E> void removeListener(
-        final Class<E> eventClass,
-        final Listener<E> listener
+    public void removeListener(
+        final Listener<?> listener
     ) {
-        listeners.get(eventClass).removeIf(l -> l == listener);
+        listeners.get(listener.getEventClass()).removeIf(l -> l == listener);
     }
 
     @Override

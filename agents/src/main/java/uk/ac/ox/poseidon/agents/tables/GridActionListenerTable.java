@@ -29,8 +29,11 @@ public abstract class GridActionListenerTable<A extends GridAction> extends Acti
     private final DoubleColumn lon = DoubleColumn.create("lon");
     private final DoubleColumn lat = DoubleColumn.create("lat");
 
-    public GridActionListenerTable(final GridExtent gridExtent) {
-        super();
+    public GridActionListenerTable(
+        final Class<A> eventClass,
+        final GridExtent gridExtent
+    ) {
+        super(eventClass);
         get().addColumns(lon, lat);
         this.gridExtent = gridExtent;
     }

@@ -20,14 +20,13 @@
 package uk.ac.ox.poseidon.core.events;
 
 public interface EventManager {
-    <E> void addListener(
-        Class<E> eventClass,
-        Listener<E> listener
+
+    void addListener(
+        Listener<?> listener
     );
 
-    <E> void removeListener(
-        Class<E> eventClass,
-        Listener<E> listener
+    void removeListener(
+        Listener<?> listener
     );
 
     <E> void broadcast(E event);

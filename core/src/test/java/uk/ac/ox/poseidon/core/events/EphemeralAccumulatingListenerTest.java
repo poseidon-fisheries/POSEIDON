@@ -44,7 +44,7 @@ class EphemeralAccumulatingListenerTest {
 
         // Initialize the listener with an initial value of 0
         final EphemeralAccumulatingListener<Integer, Integer> listener =
-            new EphemeralAccumulatingListener<>(eventManager, Integer.class, 0, accumulator);
+            new EphemeralAccumulatingListener<>(Integer.class, eventManager, 0, accumulator);
 
         // Simulate events being received
         listener.receive(5);
@@ -61,13 +61,13 @@ class EphemeralAccumulatingListenerTest {
 
         // Initialize the listener with an initial value
         final EphemeralAccumulatingListener<String, String> listener =
-            new EphemeralAccumulatingListener<>(eventManager, String.class, "", accumulator);
+            new EphemeralAccumulatingListener<>(String.class, eventManager, "", accumulator);
 
         // Call get to retrieve the accumulated value, triggering unsubscription
         listener.get();
 
         // Verify that removeListener was called once on eventManager
-        verify(eventManager, times(1)).removeListener(String.class, listener);
+        verify(eventManager, times(1)).removeListener(listener);
     }
 
     @Test
@@ -77,7 +77,7 @@ class EphemeralAccumulatingListenerTest {
 
         // Initialize the listener with an initial value of 2
         final EphemeralAccumulatingListener<Integer, Integer> listener =
-            new EphemeralAccumulatingListener<>(eventManager, Integer.class, 2, accumulator);
+            new EphemeralAccumulatingListener<>(Integer.class, eventManager, 2, accumulator);
 
         // Simulate events being received
         listener.receive(3);
@@ -88,7 +88,7 @@ class EphemeralAccumulatingListenerTest {
         assertEquals(24, listener.get());
 
         // Verify that removeListener was only called once
-        verify(eventManager, times(1)).removeListener(Integer.class, listener);
+        verify(eventManager, times(1)).removeListener(listener);
     }
 
     @Test
@@ -96,15 +96,15 @@ class EphemeralAccumulatingListenerTest {
         // Verify that passing null to any constructor argument throws NullPointerException
         assertThrows(
             NullPointerException.class,
-            () -> new EphemeralAccumulatingListener<>(null, Integer.class, 0, Integer::sum)
+            () -> new EphemeralAccumulatingListener<>(Integer.class, null, 0, Integer::sum)
         );
         assertThrows(
             NullPointerException.class,
-            () -> new EphemeralAccumulatingListener<>(eventManager, null, 0, Integer::sum)
+            () -> new EphemeralAccumulatingListener<>(null, eventManager, 0, Integer::sum)
         );
         assertThrows(
             NullPointerException.class,
-            () -> new EphemeralAccumulatingListener<>(eventManager, Integer.class, 0, null)
+            () -> new EphemeralAccumulatingListener<>(Integer.class, eventManager, 0, null)
         );
     }
 
@@ -115,7 +115,7 @@ class EphemeralAccumulatingListenerTest {
 
         // Initialize the listener with an initial value of 100
         final EphemeralAccumulatingListener<Integer, Integer> listener =
-            new EphemeralAccumulatingListener<>(eventManager, Integer.class, 100, accumulator);
+            new EphemeralAccumulatingListener<>(Integer.class, eventManager, 100, accumulator);
 
         // Simulate events being received
         listener.receive(10);

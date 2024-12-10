@@ -19,10 +19,21 @@
 
 package uk.ac.ox.poseidon.core.events;
 
-public interface Listener<E> {
+import java.util.function.Consumer;
 
-    Class<E> getEventClass();
+public class SimpleListener<E> extends AbstractListener<E> {
+    private final Consumer<E> consumer;
 
-    void receive(E event);
+    public SimpleListener(
+        final Class<E> eventClass,
+        final Consumer<E> consumer
+    ) {
+        super(eventClass);
+        this.consumer = consumer;
+    }
 
+    @Override
+    public void receive(final E event) {
+        consumer.accept(event);
+    }
 }

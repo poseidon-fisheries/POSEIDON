@@ -21,16 +21,17 @@ package uk.ac.ox.poseidon.io.tables;
 
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.events.Listener;
 
-public abstract class ListenerTableFactory<E, T extends ListenerTable<E>>
+public abstract class SimulationEventListenerFactory<T extends Listener<?>>
     extends SimulationScopeFactory<T> {
 
-    protected abstract T newTable(final Simulation simulation);
+    protected abstract T newListener(final Simulation simulation);
 
     @Override
     protected final T newInstance(final Simulation simulation) {
-        final T listenerTable = newTable(simulation);
-        simulation.getEventManager().addListener(listenerTable.getEventClass(), listenerTable);
-        return listenerTable;
+        final T listener = newListener(simulation);
+        simulation.getEventManager().addListener(listener);
+        return listener;
     }
 }

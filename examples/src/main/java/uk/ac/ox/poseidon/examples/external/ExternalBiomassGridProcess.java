@@ -22,22 +22,31 @@ package uk.ac.ox.poseidon.examples.external;
 import com.google.common.collect.ImmutableList;
 import fishing.BiomassGridServiceGrpc;
 import fishing.Fishing;
-import lombok.RequiredArgsConstructor;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.FishingAction;
 import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
-import uk.ac.ox.poseidon.core.events.Listener;
+import uk.ac.ox.poseidon.core.events.AbstractListener;
 
 import java.util.List;
 
-@RequiredArgsConstructor
-public class ExternalBiomassGridProcess implements Steppable, Listener<FishingAction> {
+public class ExternalBiomassGridProcess
+    extends AbstractListener<FishingAction>
+    implements Steppable {
 
     private final BiomassGrid internalBiomassGrid;
     private final BiomassGridServiceGrpc.BiomassGridServiceBlockingStub stub;
     private ImmutableList.Builder<FishingAction> accumulator = new ImmutableList.Builder<>();
+
+    public ExternalBiomassGridProcess(
+        final BiomassGrid internalBiomassGrid,
+        final BiomassGridServiceGrpc.BiomassGridServiceBlockingStub stub
+    ) {
+        super(FishingAction.class);
+        this.internalBiomassGrid = internalBiomassGrid;
+        this.stub = stub;
+    }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override

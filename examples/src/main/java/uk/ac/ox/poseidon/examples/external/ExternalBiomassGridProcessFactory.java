@@ -28,19 +28,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.fishing.FishingAction;
 import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExternalBiomassGridProcessFactory
-    extends SimulationScopeFactory<ExternalBiomassGridProcess> {
+    extends SimulationEventListenerFactory<ExternalBiomassGridProcess> {
 
     private String serverName;
     private int serverPort;
@@ -50,7 +49,7 @@ public class ExternalBiomassGridProcessFactory
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    protected ExternalBiomassGridProcess newInstance(final Simulation simulation) {
+    protected ExternalBiomassGridProcess newListener(final Simulation simulation) {
 
         final BiomassGrid internalGrid = internalBiomassGrid.get(simulation);
         final GridExtent gridExtent = internalGrid.getGridExtent();
@@ -84,15 +83,6 @@ public class ExternalBiomassGridProcessFactory
                 .build()
         );
 
-        final ExternalBiomassGridProcess externalBiomassGridProcess =
-            new ExternalBiomassGridProcess(
-                internalGrid,
-                stub
-            );
-        simulation.getEventManager().addListener(
-            FishingAction.class,
-            externalBiomassGridProcess
-        );
-        return externalBiomassGridProcess;
+        return new ExternalBiomassGridProcess(internalGrid, stub);
     }
 }

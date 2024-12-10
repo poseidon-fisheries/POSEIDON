@@ -17,13 +17,17 @@
  *
  */
 
-package uk.ac.ox.poseidon.io.tables;
+package uk.ac.ox.poseidon.core.events;
 
-import tech.tablesaw.api.Table;
-import uk.ac.ox.poseidon.core.events.Listener;
+import lombok.Getter;
 
-import java.util.function.Supplier;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public interface ListenerTable<E> extends Listener<E>, Supplier<Table> {
-    Class<E> getEventClass();
+@Getter
+public abstract class AbstractListener<E> implements Listener<E> {
+    private final Class<E> eventClass;
+
+    protected AbstractListener(final Class<E> eventClass) {
+        this.eventClass = checkNotNull(eventClass);
+    }
 }

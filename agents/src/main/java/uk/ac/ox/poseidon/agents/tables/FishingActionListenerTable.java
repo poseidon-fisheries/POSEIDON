@@ -30,7 +30,7 @@ public class FishingActionListenerTable extends GridActionListenerTable<FishingA
     private final DoubleColumn biomassCaught = DoubleColumn.create("biomass_caught");
 
     public FishingActionListenerTable(final GridExtent gridExtent) {
-        super(gridExtent);
+        super(FishingAction.class, gridExtent);
         get().addColumns(speciesCode, biomassCaught);
     }
 
@@ -43,8 +43,4 @@ public class FishingActionListenerTable extends GridActionListenerTable<FishingA
         });
     }
 
-    @Override
-    public Class<FishingAction> getEventClass() {
-        return FishingAction.class;
-    }
 }

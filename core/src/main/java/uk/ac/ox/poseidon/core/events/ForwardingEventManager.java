@@ -28,19 +28,13 @@ public class ForwardingEventManager implements EventManager {
     private final EventManager secondaryEventManager;
 
     @Override
-    public <E> void addListener(
-        final Class<E> eventClass,
-        final Listener<E> listener
-    ) {
-        primaryEventManager.addListener(eventClass, listener);
+    public void addListener(final Listener<?> listener) {
+        primaryEventManager.addListener(listener);
     }
 
     @Override
-    public <E> void removeListener(
-        final Class<E> eventClass,
-        final Listener<E> listener
-    ) {
-        primaryEventManager.removeListener(eventClass, listener);
+    public void removeListener(final Listener<?> listener) {
+        primaryEventManager.removeListener(listener);
     }
 
     @Override

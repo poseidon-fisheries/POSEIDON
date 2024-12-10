@@ -42,7 +42,7 @@ class EventManagerTest {
         final List<String> receivedEvents = new ArrayList<>();
 
         // Add a listener using a lambda that adds events to the list
-        eventManager.addListener(String.class, receivedEvents::add);
+        eventManager.addListener(new SimpleListener<>(String.class, receivedEvents::add));
 
         // Broadcast a String event
         final String event = "Test Event";
@@ -59,9 +59,9 @@ class EventManagerTest {
         final List<String> receivedEvents = new ArrayList<>();
 
         // Add and then remove a listener
-        final Listener<String> listener = receivedEvents::add;
-        eventManager.addListener(String.class, listener);
-        eventManager.removeListener(String.class, listener);
+        final Listener<String> listener = new SimpleListener<>(String.class, receivedEvents::add);
+        eventManager.addListener(listener);
+        eventManager.removeListener(listener);
 
         // Broadcast a String event
         final String event = "Test Event";
@@ -78,8 +78,8 @@ class EventManagerTest {
         final List<String> receivedEvents2 = new ArrayList<>();
 
         // Register both listeners
-        eventManager.addListener(String.class, receivedEvents1::add);
-        eventManager.addListener(String.class, receivedEvents2::add);
+        eventManager.addListener(new SimpleListener<>(String.class, receivedEvents1::add));
+        eventManager.addListener(new SimpleListener<>(String.class, receivedEvents2::add));
 
         // Broadcast a String event
         final String event = "Test Event";
@@ -108,7 +108,7 @@ class EventManagerTest {
         final List<Number> receivedEvents = new ArrayList<>();
 
         // Add listener for the superclass Number
-        eventManager.addListener(Number.class, receivedEvents::add);
+        eventManager.addListener(new SimpleListener<>(Number.class, receivedEvents::add));
 
         // Broadcast an Integer event (subclass of Number)
         final Integer event = 42;
@@ -125,7 +125,7 @@ class EventManagerTest {
         final List<CharSequence> receivedEvents = new ArrayList<>();
 
         // Add listener for the interface CharSequence
-        eventManager.addListener(CharSequence.class, receivedEvents::add);
+        eventManager.addListener(new SimpleListener<>(CharSequence.class, receivedEvents::add));
 
         // Broadcast a String event (implements CharSequence)
         final String event = "Test Event";
@@ -142,7 +142,7 @@ class EventManagerTest {
         final List<CharSequence> receivedEvents = new ArrayList<>();
 
         // Add listener for the superinterface CharSequence
-        eventManager.addListener(CharSequence.class, receivedEvents::add);
+        eventManager.addListener(new SimpleListener<>(CharSequence.class, receivedEvents::add));
 
         // Broadcast a StringBuilder event (implements Appendable, which extends CharSequence)
         final StringBuilder event = new StringBuilder("Test Event");
@@ -161,9 +161,9 @@ class EventManagerTest {
         final List<Integer> integerEvents = new ArrayList<>();
 
         // Add listeners at different levels in the hierarchy
-        eventManager.addListener(Object.class, objectEvents::add);
-        eventManager.addListener(Number.class, numberEvents::add);
-        eventManager.addListener(Integer.class, integerEvents::add);
+        eventManager.addListener(new SimpleListener<>(Object.class, objectEvents::add));
+        eventManager.addListener(new SimpleListener<>(Number.class, numberEvents::add));
+        eventManager.addListener(new SimpleListener<>(Integer.class, integerEvents::add));
 
         // Broadcast an Integer event
         final Integer event = 100;

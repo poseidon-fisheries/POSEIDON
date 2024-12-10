@@ -23,9 +23,13 @@ import tech.tablesaw.api.DateTimeColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
-import uk.ac.ox.poseidon.io.tables.ListenerTable;
+import uk.ac.ox.poseidon.core.events.AbstractListener;
 
-public abstract class ActionListenerTable<A extends Action> implements ListenerTable<A> {
+import java.util.function.Supplier;
+
+public abstract class ActionListenerTable<A extends Action>
+    extends AbstractListener<A>
+    implements Supplier<Table> {
     private final StringColumn vesselId = StringColumn.create("vessel_id");
     private final DateTimeColumn actionStart = DateTimeColumn.create("action_start");
     private final DateTimeColumn actionEnd = DateTimeColumn.create("action_end");
@@ -36,6 +40,10 @@ public abstract class ActionListenerTable<A extends Action> implements ListenerT
             actionStart,
             actionEnd
         );
+
+    public ActionListenerTable(final Class<A> eventClass) {
+        super(eventClass);
+    }
 
     @Override
     public void receive(final A action) {
