@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.io;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.poseidon.core.Scenario;
 
@@ -39,7 +40,7 @@ public class ScenarioLoader {
      * Constructs a {@code ScenarioLoader} with a default {@code Yaml} instance.
      */
     public ScenarioLoader() {
-        this(new Yaml());
+        this(new Yaml(getLoaderOptions()));
     }
 
     /**
@@ -50,6 +51,12 @@ public class ScenarioLoader {
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ScenarioLoader(final Yaml yaml) {
         this.yaml = yaml;
+    }
+
+    private static LoaderOptions getLoaderOptions() {
+        final LoaderOptions options = new LoaderOptions();
+        options.setTagInspector(tag -> tag.getClassName().startsWith("uk.ac.ox.poseidon"));
+        return options;
     }
 
     /**
@@ -84,6 +91,6 @@ public class ScenarioLoader {
      * @return the loaded {@code Scenario} object
      */
     public Scenario load(final InputStream inputStream) {
-        return yaml.loadAs(inputStream, Scenario.class);
+        return yaml.load(inputStream);
     }
 }
