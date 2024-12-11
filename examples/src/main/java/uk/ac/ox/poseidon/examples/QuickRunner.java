@@ -20,7 +20,9 @@
 package uk.ac.ox.poseidon.examples;
 
 import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.converters.PathConverter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -39,8 +41,9 @@ public class QuickRunner implements Runnable {
 
     @Parameter(
         names = {"-s", "--scenario"},
-        description = "Path to the scenario file in YAML format",
-        converter = PathConverter.class
+        description = "Path to the scenario file in YAML format.",
+        converter = CustomPathConverter.class,
+        required = true
     )
     private Path scenarioPath;
 
@@ -49,13 +52,24 @@ public class QuickRunner implements Runnable {
         description =
             "Period to run the simulation for in ISO-8601 format (e.g., P2Y for two years). " +
                 "See https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/" +
-                "Period.html#parse(java.lang.CharSequence).",
-        converter = PeriodConverter.class
+                "Period.html#parse%28java.lang.CharSequence%29.",
+        converter = PeriodConverter.class,
+        required = true
     )
     private Period period;
 
     public static void main(final String[] args) {
-        // TODO
+        final QuickRunner quickRunner = new QuickRunner();
+        final JCommander jCommander = JCommander
+            .newBuilder()
+            .addObject(quickRunner)
+            .build();
+        try {
+            jCommander.parse(args);
+            quickRunner.run();
+        } catch (final ParameterException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     private void run(
@@ -83,6 +97,17 @@ public class QuickRunner implements Runnable {
             new ScenarioLoader().load(scenarioPath.toFile()),
             period
         );
+    }
+
+    private static class CustomPathConverter extends PathConverter {
+        public CustomPathConverter(final String optionName) {
+            super(optionName);
+        }
+
+        @Override
+        public Path convert(final String value) {
+            return super.convert(value.replaceFirst("^~", System.getProperty("user.home")));
+        }
     }
 
     private static class PeriodConverter implements IStringConverter<Period> {

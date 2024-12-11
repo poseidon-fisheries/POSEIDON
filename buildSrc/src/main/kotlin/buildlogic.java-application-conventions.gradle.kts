@@ -32,6 +32,6 @@ plugins {
 application {
     mainClass.set(
         project.findProperty("mainClass") as String?
-            ?: "uk.ac.ox.poseidon.examples.BasicScenarioWithUI"
+            ?: "uk.ac.ox.poseidon.examples.QuickRunner"
     )
 }

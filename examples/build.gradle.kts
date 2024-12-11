@@ -20,6 +20,7 @@
 plugins {
     id("buildlogic.java-application-conventions")
     id("com.google.protobuf") version "0.9.4"
+    id("com.gradleup.shadow") version "8.3.5"
 }
 
 dependencies {
@@ -29,7 +30,7 @@ dependencies {
     implementation(project(":gui"))
 
     implementation("com.beust:jcommander:1.82")
-    
+
     // The following are all necessary for gRPC
     implementation("io.grpc:grpc-netty-shaded:1.68.1")
     implementation("io.grpc:grpc-protobuf:1.68.1")
