@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.agents.behaviours;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -30,6 +31,10 @@ import java.time.LocalDateTime;
 public abstract class GridAction extends Action {
     private final Int2D cell;
 
+    @SuppressFBWarnings(
+        value = "EI2",
+        justification = "Int2D is immutable even if SpotBugs thinks otherwise."
+    )
     public GridAction(
         final LocalDateTime start,
         final Duration duration,

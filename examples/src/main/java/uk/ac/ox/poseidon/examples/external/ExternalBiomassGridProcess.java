@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.examples.external;
 
 import com.google.common.collect.ImmutableList;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import fishing.BiomassGridServiceGrpc;
 import fishing.Fishing;
 import sim.engine.SimState;
@@ -31,6 +32,7 @@ import uk.ac.ox.poseidon.core.events.AbstractListener;
 
 import java.util.List;
 
+@SuppressFBWarnings("Se")
 public class ExternalBiomassGridProcess
     extends AbstractListener<FishingAction>
     implements Steppable {
@@ -39,6 +41,7 @@ public class ExternalBiomassGridProcess
     private final BiomassGridServiceGrpc.BiomassGridServiceBlockingStub stub;
     private ImmutableList.Builder<FishingAction> accumulator = new ImmutableList.Builder<>();
 
+    @SuppressFBWarnings("EI2")
     public ExternalBiomassGridProcess(
         final BiomassGrid internalBiomassGrid,
         final BiomassGridServiceGrpc.BiomassGridServiceBlockingStub stub

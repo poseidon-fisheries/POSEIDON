@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.agents.behaviours.choices;
 
 import ec.util.MersenneTwisterFast;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -38,6 +39,7 @@ public class EpsilonGreedyChooser<O> implements Supplier<O> {
     private O currentOption;
     private Evaluation currentEvaluation;
 
+    @SuppressFBWarnings(value = "EI2")
     public EpsilonGreedyChooser(
         final double epsilon,
         final MutableOptionValues<O> optionValues,

@@ -19,6 +19,8 @@
 
 package uk.ac.ox.poseidon.core.events;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -33,6 +35,7 @@ public class EphemeralAccumulatingListener<E, T>
     private T value;
     private boolean stillListening = true;
 
+    @SuppressFBWarnings("EI2")
     public EphemeralAccumulatingListener(
         final Class<E> eventClass,
         final EventManager eventManager,

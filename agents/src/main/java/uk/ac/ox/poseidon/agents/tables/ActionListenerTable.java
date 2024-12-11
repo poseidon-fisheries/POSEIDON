@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.agents.tables;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import tech.tablesaw.api.DateTimeColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
@@ -52,6 +53,10 @@ public abstract class ActionListenerTable<A extends Action>
         vesselId.append(action.getVessel().getId());
     }
 
+    @SuppressFBWarnings(
+        value = "EI",
+        justification = "Mutable table willfully exposed; just be careful with it."
+    )
     @Override
     public Table get() {
         return table;

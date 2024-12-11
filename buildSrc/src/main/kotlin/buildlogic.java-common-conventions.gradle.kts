@@ -68,3 +68,7 @@ tasks.jacocoTestReport {
         html.required.set(true)  // HTML report for easier human viewing
     }
 }
+
+spotbugs {
+    excludeFilter.set(file("${rootProject.projectDir}/spotbugs_exclude.xml"))
+}

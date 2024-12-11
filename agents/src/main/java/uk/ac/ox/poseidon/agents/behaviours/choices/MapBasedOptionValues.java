@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.choices;
 
+import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 
 import java.util.List;
@@ -32,7 +33,7 @@ import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 
 public abstract class MapBasedOptionValues<O> implements OptionValues<O> {
 
-    protected List<Map.Entry<O, Double>> cachedBest = null;
+    protected ImmutableList<Map.Entry<O, Double>> cachedBest = null;
 
     protected abstract Map<O, Double> getValues();
 
