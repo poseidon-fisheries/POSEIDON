@@ -19,12 +19,10 @@
 
 package uk.ac.ox.poseidon.core;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import lombok.*;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +36,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 public class PathFactory extends GlobalScopeFactory<Path> {
 
     private Factory<? extends Path> parent;
-    @NonNull private ImmutableList<String> pathElements;
+    @NonNull private List<String> pathElements;
 
     public static PathFactory from(
         final String path
