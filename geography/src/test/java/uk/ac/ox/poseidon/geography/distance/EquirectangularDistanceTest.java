@@ -23,52 +23,67 @@ import com.vividsolutions.jts.geom.Coordinate;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.constraints.DoubleRange;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import javax.measure.Quantity;
 
-public class EquirectangularDistanceTest {
+import static javax.measure.MetricPrefix.KILO;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static tech.units.indriya.unit.Units.METRE;
+
+class EquirectangularDistanceTest {
 
     private final EquirectangularDistance equirectangularDistance =
         new EquirectangularDistance(null);
 
     @Test
-    public void testDistanceBetweenDifferentPoints() {
-        final Coordinate pointA = new Coordinate(-1.254, 51.751); // Example coordinate (Oxford)
-        final Coordinate pointB = new Coordinate(-0.1278, 51.5074); // Example coordinate (London)
-
-        final double expectedDistance =
-            82.0; // Approximate distance between Oxford and London in km
-        final double actualDistance = equirectangularDistance.distanceBetween(pointA, pointB);
-
+    void testDistanceBetweenDifferentPoints() {
+        final Coordinate oxford = new Coordinate(-1.254, 51.751);
+        final Coordinate london = new Coordinate(-0.1278, 51.5074);
         assertEquals(
-            expectedDistance,
-            actualDistance,
-            5.0
-        ); // Allowing some tolerance for approximation
+            getQuantity(82, KILO(METRE)),
+            equirectangularDistance.distanceBetween(oxford, london),
+            getQuantity(350, METRE)
+        );
     }
 
     @Test
-    public void testDistanceBetweenAcrossEquator() {
+    void testDistanceBetweenAcrossEquator() {
         final Coordinate pointA = new Coordinate(-79.3832, 43.6532); // Toronto
         // Hypothetical point in the Southern Hemisphere
         final Coordinate pointB = new Coordinate(-79.3832, -43.6532);
 
-        final double expectedDistance = 9710.0; // Approximate distance in km
-        final double actualDistance = equirectangularDistance.distanceBetween(pointA, pointB);
+        assertEquals(
+            getQuantity(9711, KILO(METRE)),
+            equirectangularDistance.distanceBetween(pointA, pointB),
+            getQuantity(1, KILO(METRE))
+        );
+    }
 
-        assertEquals(expectedDistance, actualDistance, 5); // Allowing some tolerance
+    private <Q extends Quantity<Q>> void assertEquals(
+        final Quantity<Q> expected,
+        final Quantity<Q> actual,
+        final Quantity<Q> delta
+    ) {
+        Assertions.assertEquals(
+            expected.toSystemUnit().getValue().doubleValue(),
+            actual.toSystemUnit().getValue().doubleValue(),
+            delta.toSystemUnit().getValue().doubleValue(),
+            () -> actual + " is not within " + delta + " of " + expected
+        );
     }
 
     @Test
-    public void otherCoordinates() {
+    void otherCoordinates() {
         assertEquals(
-            427.1,
+            getQuantity(427.2, KILO(METRE)),
             equirectangularDistance.distanceBetween(
                 new Coordinate(114.407067850409, -6.7958646820027),
                 new Coordinate(118.274833029541, -6.7958646820027)
             ),
-            .1
+            getQuantity(15, METRE)
         );
     }
 
@@ -78,8 +93,11 @@ public class EquirectangularDistanceTest {
         @ForAll @DoubleRange(min = -90, max = 90) final double lat
     ) {
         final Coordinate point = new Coordinate(lon, lat);
-        final double distance = equirectangularDistance.distanceBetween(point, point);
-        assertEquals(0.0, distance, 0.0001);
+        assertTrue(
+            equirectangularDistance
+                .distanceBetween(point, point)
+                .isEquivalentTo(getQuantity(0, METRE))
+        );
     }
 
     @Property
@@ -91,10 +109,10 @@ public class EquirectangularDistanceTest {
     ) {
         final Coordinate pointA = new Coordinate(lon1, lat1);
         final Coordinate pointB = new Coordinate(lon2, lat2);
-
-        final double distanceAB = equirectangularDistance.distanceBetween(pointA, pointB);
-        final double distanceBA = equirectangularDistance.distanceBetween(pointB, pointA);
-
-        assertEquals(distanceAB, distanceBA, 0.0001);
+        assertTrue(
+            equirectangularDistance
+                .distanceBetween(pointA, pointB)
+                .isEquivalentTo(equirectangularDistance.distanceBetween(pointB, pointA))
+        );
     }
 }

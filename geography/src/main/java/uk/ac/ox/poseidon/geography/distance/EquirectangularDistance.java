@@ -22,18 +22,24 @@ package uk.ac.ox.poseidon.geography.distance;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
+
 import static java.lang.Math.*;
+import static javax.measure.MetricPrefix.KILO;
+import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static tech.units.indriya.unit.Units.METRE;
 
 public class EquirectangularDistance extends CoordinateBasedDistance {
 
-    private final static double EARTH_RADIUS = 6373;
+    private final static Quantity<Length> EARTH_RADIUS = getQuantity(6373, KILO(METRE));
 
     public EquirectangularDistance(final GridExtent gridExtent) {
         super(gridExtent);
     }
 
     @Override
-    public double distanceBetween(
+    public Quantity<Length> distanceBetween(
         final Coordinate a,
         final Coordinate b
     ) {
@@ -43,6 +49,6 @@ public class EquirectangularDistance extends CoordinateBasedDistance {
         final double y2 = toRadians(b.y);
         final double x = (x2 - x1) * cos((y1 + y2) / 2d);
         final double y = y2 - y1;
-        return sqrt(x * x + y * y) * EARTH_RADIUS;
+        return EARTH_RADIUS.multiply(sqrt(x * x + y * y));
     }
 }

@@ -45,7 +45,7 @@ public class AStarPathFinder extends AbstractGridPathFinder {
         this.gridAdaptor = new GridAdaptor(bathymetricGrid, portGrid, distance);
         this.pathFinder = new IndexedAStarPathFinder<>(gridAdaptor);
         this.heuristic = (Int2D a, Int2D b) ->
-            (float) gridAdaptor.getDistance().distanceBetween(a, b);
+            gridAdaptor.getDistance().distanceBetween(a, b).getValue().floatValue();
     }
 
     @Override

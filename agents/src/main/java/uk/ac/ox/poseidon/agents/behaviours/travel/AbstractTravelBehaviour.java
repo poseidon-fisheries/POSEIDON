@@ -28,11 +28,11 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.Distance;
 
 import java.time.Duration;
+import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
 @RequiredArgsConstructor
 abstract class AbstractTravelBehaviour implements TravelBehaviour {
-    private static final long MINUTES_PER_HOUR = 60;
     protected final Distance distance;
     protected final Behaviour behaviourOnArrival;
     @Getter
@@ -44,12 +44,12 @@ abstract class AbstractTravelBehaviour implements TravelBehaviour {
         final Vessel vessel,
         final Int2D destination
     ) {
-        return Duration.ofMinutes(
-            Math.round(MINUTES_PER_HOUR *
-                distance.distanceBetween(
-                    vessel.getCurrentPoint(),
-                    vessel.getVesselField().getGridExtent().toPoint(destination)
-                ) / vessel.getCruisingSpeed()
-            ));
+        return distance.travelDuration(
+            List.of(
+                vessel.getCurrentPoint(),
+                vessel.getVesselField().getGridExtent().toPoint(destination)
+            ),
+            vessel.getCruisingSpeed()
+        );
     }
 }

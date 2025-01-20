@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import tech.units.indriya.format.SimpleQuantityFormat;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.core.Factory;
@@ -31,6 +32,8 @@ import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.utils.IdSupplier;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
+
+import javax.measure.quantity.Speed;
 
 @Data
 @NoArgsConstructor
@@ -42,7 +45,7 @@ public class VesselFactory implements Factory<Vessel> {
     @NonNull private Factory<? extends VesselField> vesselField;
     @NonNull private Factory<? extends Port> homePort;
     @NonNull private Factory<? extends PortGrid> portGrid;
-    private double speed;
+    private String speed;
 
     @Override
     public final Vessel get(final Simulation simulation) {
@@ -51,7 +54,7 @@ public class VesselFactory implements Factory<Vessel> {
             idSupplier.get(simulation).nextId(),
             portGrid.get(simulation),
             homePort.get(simulation),
-            speed,
+            SimpleQuantityFormat.getInstance().parse(speed).asType(Speed.class),
             vesselField,
             new ForwardingEventManager(simulation.getEventManager())
         );

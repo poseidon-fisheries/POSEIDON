@@ -35,6 +35,7 @@ import sim.field.grid.SparseGrid2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import sim.util.IntBag;
+import sim.util.Number2D;
 
 import java.util.Arrays;
 import java.util.List;
@@ -97,6 +98,20 @@ public final class GridExtent {
      */
     public Envelope getEnvelope() {
         return new Envelope(envelope);
+    }
+
+    /**
+     * Dispatches the correct method to convert a Number2D to a coordinate. Note that, in the case
+     * of Int2D, e.g. (3, 2), we assume that we are referring to the cell itself and return the
+     * coordinate at the centre of the cell (3.5, 2.5) instead of at its corner (3.0, 2.0). There is
+     * potential for confusion, so be careful.
+     */
+    public Coordinate toCoordinate(final Number2D number2D) {
+        return switch (number2D) {
+            case final Int2D cell -> toCoordinate(toPoint(cell));
+            case final Double2D point -> toCoordinate(point);
+            default -> throw new IllegalStateException("Unexpected value: " + number2D);
+        };
     }
 
     public Coordinate toCoordinate(final Int2D cell) {

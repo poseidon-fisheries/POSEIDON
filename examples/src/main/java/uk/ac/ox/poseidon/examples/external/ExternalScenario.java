@@ -215,7 +215,7 @@ public class ExternalScenario extends Scenario {
                 vesselField,
                 new RandomHomePortFactory(portGrid),
                 portGrid,
-                15
+                "15 km/h"
             )
         );
 

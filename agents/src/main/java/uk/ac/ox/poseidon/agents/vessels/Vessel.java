@@ -31,6 +31,9 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
+import javax.measure.Quantity;
+import javax.measure.quantity.Speed;
+
 @Getter
 @Setter
 public class Vessel implements Oriented2D {
@@ -41,7 +44,7 @@ public class Vessel implements Oriented2D {
     private final EventManager eventManager;
     private Behaviour initialBehaviour;
     private Port homePort;
-    private double cruisingSpeed;
+    private Quantity<Speed> cruisingSpeed;
     private double heading;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
@@ -49,7 +52,7 @@ public class Vessel implements Oriented2D {
         final String id,
         final PortGrid portGrid,
         final Port homePort,
-        final double cruisingSpeed,
+        final Quantity<Speed> cruisingSpeed,
         final VesselField vesselField,
         final EventManager eventManager
     ) {

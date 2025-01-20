@@ -20,9 +20,11 @@
 package uk.ac.ox.poseidon.geography.distance;
 
 import lombok.RequiredArgsConstructor;
-import sim.util.Double2D;
-import sim.util.Int2D;
+import sim.util.Number2D;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
 
 @RequiredArgsConstructor
 public abstract class CoordinateBasedDistance implements Distance {
@@ -30,20 +32,9 @@ public abstract class CoordinateBasedDistance implements Distance {
     private final GridExtent gridExtent;
 
     @Override
-    public double distanceBetween(
-        final Int2D start,
-        final Int2D end
-    ) {
-        return distanceBetween(
-            gridExtent.toCoordinate(start),
-            gridExtent.toCoordinate(end)
-        );
-    }
-
-    @Override
-    public double distanceBetween(
-        final Double2D start,
-        final Double2D end
+    public Quantity<Length> distanceBetween(
+        final Number2D start,
+        final Number2D end
     ) {
         return distanceBetween(
             gridExtent.toCoordinate(start),

@@ -87,7 +87,10 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
                                 new WeightedConnection(
                                     intern(cell),
                                     intern(neighbour),
-                                    (float) distance.distanceBetween(cell, neighbour)
+                                    distance
+                                        .distanceBetween(cell, neighbour)
+                                        .getValue()
+                                        .floatValue()
                                 )
                             )
                             .toArray(WeightedConnection[]::new)
