@@ -28,6 +28,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @Getter
@@ -37,6 +38,7 @@ import java.util.function.Supplier;
 public class ImitatingPickerFactory<O> extends VesselScopeFactory<ImitatingPicker<O>> {
 
     private VesselScopeFactory<? extends OptionValues<O>> optionValues;
+    private VesselScopeFactory<? extends Predicate<O>> optionPredicate;
     private VesselScopeFactory<? extends Supplier<OptionValues<O>>> optionValuesSupplier;
 
     @Override
@@ -46,6 +48,7 @@ public class ImitatingPickerFactory<O> extends VesselScopeFactory<ImitatingPicke
     ) {
         return new ImitatingPicker<>(
             optionValues.get(simulation, vessel),
+            optionPredicate.get(simulation, vessel),
             optionValuesSupplier.get(simulation, vessel),
             simulation.random
         );

@@ -39,6 +39,8 @@ import uk.ac.ox.poseidon.agents.fleets.Fleet;
 import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
 import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
+import uk.ac.ox.poseidon.agents.regulations.AlwaysPermittedFactory;
+import uk.ac.ox.poseidon.agents.regulations.FishingLocationCheckerFactory;
 import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -74,6 +76,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
+import java.util.function.Predicate;
 
 @SuppressWarnings("MagicNumber")
 @Getter
@@ -118,6 +121,12 @@ public class ExternalScenario extends Scenario {
         new DefaultPathFinderFactory(
             bathymetricGrid,
             portGrid,
+            distance
+        );
+    private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
+        new FishingLocationCheckerFactory(
+            new AlwaysPermittedFactory(),
+            pathFinder,
             distance
         );
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid =
@@ -170,6 +179,7 @@ public class ExternalScenario extends Scenario {
                             optionValues,
                             new NeighbourhoodGridExplorerFactory(
                                 optionValues,
+                                fishingLocationChecker,
                                 pathFinder,
                                 new ShiftedIntSupplierFactory(
                                     new PoissonIntSupplierFactory(5),
@@ -178,6 +188,7 @@ public class ExternalScenario extends Scenario {
                             ),
                             new ImitatingPickerFactory<>(
                                 optionValues,
+                                fishingLocationChecker,
                                 new BestOptionsFromFriendsSupplierFactory<>(
                                     2,
                                     optionValuesRegister

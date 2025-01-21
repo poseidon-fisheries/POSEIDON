@@ -46,7 +46,7 @@ public interface Distance {
 
     @SuppressWarnings("UnstableApiUsage")
     default Duration travelDuration(
-        final List<Number2D> path,
+        final List<? extends Number2D> path,
         final Quantity<Speed> cruisingSpeed
     ) {
         return Streams

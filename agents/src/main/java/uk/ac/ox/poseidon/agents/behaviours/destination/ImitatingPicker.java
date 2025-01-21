@@ -27,10 +27,11 @@ import uk.ac.ox.poseidon.agents.behaviours.choices.Picker;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static java.lang.Double.NEGATIVE_INFINITY;
-import static uk.ac.ox.poseidon.core.MasonUtils.upToOneOf;
+import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 /**
  * This picker will look for better options than the current option in a list of candidates to
@@ -46,6 +47,7 @@ import static uk.ac.ox.poseidon.core.MasonUtils.upToOneOf;
 public class ImitatingPicker<O> implements Picker<O> {
 
     private final OptionValues<O> optionValues;
+    private final Predicate<O> optionPredicate;
     private final Supplier<OptionValues<O>> candidatesSupplier;
     private final MersenneTwisterFast rng;
 
@@ -67,8 +69,11 @@ public class ImitatingPicker<O> implements Picker<O> {
                 .map(Entry::getKey)
                 .toList();
 
-        return upToOneOf(candidates, rng)
-            .or(() -> currentBestEntry.map(Entry::getKey));
+        return shuffledStream(candidates, rng)
+            .filter(optionPredicate)
+            .findFirst()
+            .or(() -> currentBestEntry.map(Entry::getKey))
+            .filter(optionPredicate);
 
     }
 }

@@ -21,8 +21,9 @@ package uk.ac.ox.poseidon.agents.behaviours.destination;
 
 import sim.util.Int2D;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 @FunctionalInterface
-public interface DestinationSupplier extends Supplier<Int2D> {
+public interface DestinationSupplier extends Supplier<Optional<Int2D>> {
 }

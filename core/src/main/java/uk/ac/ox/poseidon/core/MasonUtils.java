@@ -28,11 +28,11 @@ import sim.field.grid.Grid2D;
 import sim.util.Bag;
 import sim.util.Double2D;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -163,4 +163,32 @@ public class MasonUtils {
         return inBounds(location, geomField.getWidth(), geomField.getHeight());
     }
 
+    public static <T> Stream<T> shuffledStream(
+        final List<T> candidates,
+        final MersenneTwisterFast rng
+    ) {
+        final BitSet visited = new BitSet(candidates.size()); // Track visited indices
+        final Spliterator<T> spliterator = new Spliterators.AbstractSpliterator<>(
+            candidates.size(),
+            Spliterator.ORDERED
+        ) {
+            private int remaining = candidates.size();
+
+            @Override
+            public boolean tryAdvance(final Consumer<? super T> action) {
+                if (remaining == 0) {
+                    return false; // All elements have been visited
+                }
+                int index;
+                do {
+                    index = rng.nextInt(candidates.size());
+                } while (visited.get(index)); // Ensure no duplicates
+                visited.set(index); // Mark index as visited
+                remaining--;
+                action.accept(candidates.get(index)); // Provide the element
+                return true;
+            }
+        };
+        return StreamSupport.stream(spliterator, false);
+    }
 }

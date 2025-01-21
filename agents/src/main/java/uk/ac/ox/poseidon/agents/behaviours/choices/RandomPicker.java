@@ -25,26 +25,32 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static uk.ac.ox.poseidon.core.MasonUtils.upToOneOf;
+import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 public class RandomPicker<O> implements Picker<O> {
 
     private final ImmutableList<O> options;
+    private final Predicate<O> optionPredicate;
     private final MersenneTwisterFast rng;
 
     @SuppressFBWarnings(value = "EI2")
     public RandomPicker(
         final List<O> options,
+        final Predicate<O> optionPredicate,
         final MersenneTwisterFast rng
     ) {
         this.options = ImmutableList.copyOf(options);
+        this.optionPredicate = optionPredicate;
         this.rng = checkNotNull(rng);
     }
 
     @Override
     public Optional<O> pick() {
-        return upToOneOf(options, rng);
+        return shuffledStream(options, rng)
+            .filter(optionPredicate)
+            .findFirst();
     }
 }

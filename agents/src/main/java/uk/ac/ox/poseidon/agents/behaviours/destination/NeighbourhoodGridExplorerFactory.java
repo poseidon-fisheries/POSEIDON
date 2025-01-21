@@ -32,6 +32,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 import java.util.function.IntSupplier;
+import java.util.function.Predicate;
 
 @Getter
 @Setter
@@ -40,6 +41,7 @@ import java.util.function.IntSupplier;
 public class NeighbourhoodGridExplorerFactory extends VesselScopeFactory<NeighbourhoodCellPicker> {
 
     private VesselScopeFactory<? extends OptionValues<Int2D>> optionValues;
+    private VesselScopeFactory<? extends Predicate<Int2D>> cellPredicate;
     private Factory<? extends GridPathFinder> pathFinder;
     private Factory<? extends IntSupplier> neighbourhoodSizeSupplier;
 
@@ -51,6 +53,7 @@ public class NeighbourhoodGridExplorerFactory extends VesselScopeFactory<Neighbo
         return new NeighbourhoodCellPicker(
             vessel,
             optionValues.get(simulation, vessel),
+            cellPredicate.get(simulation, vessel),
             pathFinder.get(simulation),
             neighbourhoodSizeSupplier.get(simulation),
             simulation.random

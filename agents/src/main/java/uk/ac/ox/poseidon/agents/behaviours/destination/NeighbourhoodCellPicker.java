@@ -27,30 +27,34 @@ import uk.ac.ox.poseidon.agents.behaviours.choices.Picker;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.IntSupplier;
+import java.util.function.Predicate;
 
-import static uk.ac.ox.poseidon.core.MasonUtils.upToOneOf;
+import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 @RequiredArgsConstructor
 public class NeighbourhoodCellPicker implements Picker<Int2D> {
 
     private final Vessel vessel;
     private final OptionValues<Int2D> optionValues;
+    private final Predicate<Int2D> optionPredicate;
     private final GridPathFinder pathFinder;
     private final IntSupplier neighbourhoodSizeSupplier;
     private final MersenneTwisterFast rng;
 
     @Override
     public Optional<Int2D> pick() {
-        return upToOneOf(
+        final List<Int2D> candidates =
             pathFinder.getAccessibleWaterNeighbours(
                 optionValues
                     .getBestOption(rng)
                     .orElse(vessel.getCurrentCell()),
                 neighbourhoodSizeSupplier.getAsInt()
-            ),
-            rng
-        );
+            );
+        return shuffledStream(candidates, rng)
+            .filter(optionPredicate)
+            .findFirst();
     }
 }

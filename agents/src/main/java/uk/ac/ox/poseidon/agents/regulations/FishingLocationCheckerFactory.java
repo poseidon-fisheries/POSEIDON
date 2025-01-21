@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.destination;
+package uk.ac.ox.poseidon.agents.regulations;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,28 +27,30 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.distance.Distance;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RandomDestinationSupplierFactory
-    extends VesselScopeFactory<DestinationSupplier> {
+public class FishingLocationCheckerFactory extends VesselScopeFactory<FishingLocationChecker> {
 
-    private Factory<? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? extends Regulations> regulations;
     private Factory<? extends GridPathFinder> pathFinder;
+    private Factory<? extends Distance> distance;
 
     @Override
-    protected DestinationSupplier newInstance(
+    protected FishingLocationChecker newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        final GridPathFinder pathFinder = this.pathFinder.get(simulation);
-        return new RandomDestinationSupplier(
-            pathFinder.getAccessibleWaterCells(vessel.getCurrentCell()),
-            simulation.random
+        return new FishingLocationChecker(
+            regulations.get(simulation),
+            pathFinder.get(simulation),
+            distance.get(simulation),
+            () -> simulation.getTemporalSchedule().getDateTime(),
+            vessel
         );
     }
 }

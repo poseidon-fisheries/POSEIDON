@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,32 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.destination;
+package uk.ac.ox.poseidon.agents.behaviours.fishing;
 
-import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
+import uk.ac.ox.poseidon.biology.Bucket;
 
-import java.util.Optional;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
-@RequiredArgsConstructor
-class HomePortDestinationSupplier implements DestinationSupplier {
-
-    private final Vessel vessel;
-    private final PortGrid portGrid;
+public class DummyFishingAction extends FishingAction {
+    public DummyFishingAction(
+        final LocalDateTime start,
+        final Vessel vessel,
+        final Int2D cell
+    ) {
+        super(start, Duration.ofSeconds(1), vessel, cell);
+    }
 
     @Override
-    public Optional<Int2D> get() {
-        return Optional.of(portGrid.getLocation(vessel.getHomePort()));
+    public Bucket<?> getFishCaught() {
+        return Bucket.empty();
+    }
+
+    @Override
+    protected Action complete(final LocalDateTime dateTime) {
+        throw new RuntimeException("Dummy actions cannot be completed.");
     }
 }

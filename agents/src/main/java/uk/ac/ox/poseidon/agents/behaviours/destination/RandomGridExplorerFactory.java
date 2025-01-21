@@ -32,6 +32,8 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
+import java.util.function.Predicate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -39,6 +41,7 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 public class RandomGridExplorerFactory extends VesselScopeFactory<Picker<Int2D>> {
 
     private Factory<? extends GridPathFinder> pathFinder;
+    private VesselScopeFactory<? extends Predicate<Int2D>> cellPredicate;
 
     @Override
     protected Picker<Int2D> newInstance(
@@ -47,6 +50,7 @@ public class RandomGridExplorerFactory extends VesselScopeFactory<Picker<Int2D>>
     ) {
         return new RandomPicker<>(
             pathFinder.get(simulation).getAccessibleWaterCells(vessel.getCurrentCell()),
+            cellPredicate.get(simulation, vessel),
             simulation.random
         );
     }
