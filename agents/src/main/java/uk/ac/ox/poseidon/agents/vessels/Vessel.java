@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import sim.portrayal.Oriented2D;
@@ -28,11 +29,16 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.core.events.EventManager;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Speed;
+import java.time.LocalDateTime;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -42,10 +48,13 @@ public class Vessel implements Oriented2D {
     private final VesselField vesselField;
     private final PortGrid portGrid;
     private final EventManager eventManager;
-    private Behaviour initialBehaviour;
+    private final Deque<Behaviour> behaviourStack = new ArrayDeque<>();
     private Port homePort;
     private Quantity<Speed> cruisingSpeed;
     private double heading;
+    private Int2D currentDestination;
+    @Setter(AccessLevel.NONE)
+    private LocalDateTime arrivalTimeAtCurrentCell;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     Vessel(
@@ -75,7 +84,7 @@ public class Vessel implements Oriented2D {
         setHeadingTowards(getVesselField().getGridExtent().toPoint(destinationCell));
     }
 
-    public void setHeadingTowards(
+    private void setHeadingTowards(
         final Double2D destinationPoint
     ) {
         final Double2D location = getCurrentPoint();
@@ -88,12 +97,12 @@ public class Vessel implements Oriented2D {
         return vesselField.getPoint(this);
     }
 
-    public void setLocation(final Int2D cell) {
+    public void setCurrentCell(
+        final Int2D cell,
+        final LocalDateTime arrivalTime
+    ) {
         vesselField.setCell(this, cell);
-    }
-
-    public void setLocation(final Double2D point) {
-        vesselField.setPoint(this, point);
+        this.arrivalTimeAtCurrentCell = arrivalTime;
     }
 
     public Int2D getCurrentCell() {
@@ -102,5 +111,23 @@ public class Vessel implements Oriented2D {
 
     public boolean isAtPort() {
         return portGrid.anyPortsAt(getCurrentCell());
+    }
+
+    public void popBehaviour() {
+        behaviourStack.pop();
+    }
+
+    public void pushBehaviour(final Behaviour behaviour) {
+        behaviourStack.push(behaviour);
+    }
+
+    public void scheduleNextAction(final TemporalSchedule schedule) {
+        Optional
+            .ofNullable(getBehaviourStack().peek())
+            .map(behaviour -> behaviour.nextAction(this, schedule.getDateTime()))
+            .ifPresent(action -> {
+                action.init();
+                schedule.scheduleOnceIn(action.getDuration(), action);
+            });
     }
 }

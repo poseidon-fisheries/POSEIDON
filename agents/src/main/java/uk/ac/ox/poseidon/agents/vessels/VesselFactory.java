@@ -58,18 +58,12 @@ public class VesselFactory implements Factory<Vessel> {
             vesselField,
             new ForwardingEventManager(simulation.getEventManager())
         );
-        vesselField
-            .setCell(
-                vessel,
-                portGrid.get(simulation).getLocation(vessel.getHomePort())
-            );
-        vessel.setInitialBehaviour(initialBehaviour.get(simulation, vessel));
-        final var schedule = simulation.getTemporalSchedule();
-        final var initialAction =
-            vessel.getInitialBehaviour().newAction(schedule.getDateTime(), vessel);
-        if (initialAction != null) {
-            schedule.scheduleOnceIn(initialAction.getDuration(), initialAction);
-        }
+        vessel.setCurrentCell(
+            portGrid.get(simulation).getLocation(vessel.getHomePort()),
+            simulation.getTemporalSchedule().getDateTime()
+        );
+        vessel.pushBehaviour(initialBehaviour.get(simulation, vessel));
+        vessel.scheduleNextAction(simulation.getTemporalSchedule());
         return vessel;
     }
 

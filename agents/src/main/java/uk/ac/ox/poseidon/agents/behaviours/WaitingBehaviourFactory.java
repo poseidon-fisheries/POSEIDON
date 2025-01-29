@@ -19,18 +19,30 @@
 
 package uk.ac.ox.poseidon.agents.behaviours;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-public class DoNothingBehaviourFactory extends BehaviourFactory<DoNothingBehaviour> {
+import java.time.Duration;
+import java.util.function.Supplier;
 
-    private static final DoNothingBehaviour INSTANCE = new DoNothingBehaviour();
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class WaitingBehaviourFactory extends BehaviourFactory<Waiting> {
+
+    private Factory<? extends Supplier<Duration>> durationSupplier;
 
     @Override
-    protected DoNothingBehaviour newInstance(
+    protected Waiting newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return INSTANCE;
+        return new Waiting(durationSupplier.get(simulation));
     }
 }

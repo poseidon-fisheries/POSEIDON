@@ -17,34 +17,37 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.fishing;
+package uk.ac.ox.poseidon.agents.behaviours;
 
-import lombok.Getter;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.AbstractAction;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.Data;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.biology.Bucket;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-@Getter
-public class DummyFishingAction extends AbstractAction implements FishingAction {
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-    private final Int2D cell;
+@Data
+public abstract class AbstractAction implements Action {
+    protected final Vessel vessel;
+    protected final LocalDateTime start;
+    protected final Duration duration;
 
-    public DummyFishingAction(
-        final LocalDateTime start,
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public AbstractAction(
         final Vessel vessel,
-        final Int2D cell
+        final LocalDateTime start,
+        final Duration duration
     ) {
-        super(vessel, start, Duration.ofSeconds(1));
-        this.cell = cell;
+        checkArgument(
+            duration.isPositive(),
+            "Duration must be positive but was %s.",
+            duration
+        );
+        this.start = checkNotNull(start);
+        this.duration = checkNotNull(duration);
+        this.vessel = checkNotNull(vessel);
     }
-
-    @Override
-    public Bucket<?> getFishCaught() {
-        return Bucket.empty();
-    }
-
 }

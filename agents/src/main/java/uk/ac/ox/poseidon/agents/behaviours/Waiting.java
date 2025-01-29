@@ -19,16 +19,44 @@
 
 package uk.ac.ox.poseidon.agents.behaviours;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.function.Supplier;
 
-public class BackToInitialBehaviour implements Behaviour {
+@Getter
+@AllArgsConstructor
+public class Waiting implements Behaviour {
+
+    private final Supplier<Duration> waitingDurationSupplier;
+
     @Override
-    public Action newAction(
-        final LocalDateTime dateTime,
-        final Vessel vessel
+    public SteppableAction nextAction(
+        final Vessel vessel,
+        final LocalDateTime dateTime
     ) {
-        return vessel.getInitialBehaviour().newAction(dateTime, vessel);
+        return new Action(vessel, dateTime, waitingDurationSupplier.get());
     }
+
+    @ToString(callSuper = true)
+    private static class Action extends SteppableAction {
+
+        private Action(
+            final Vessel vessel,
+            final LocalDateTime start,
+            final Duration duration
+        ) {
+            super(vessel, start, duration);
+        }
+
+        @Override
+        public void complete(final LocalDateTime dateTime) {
+            getVessel().popBehaviour();
+        }
+    }
+
 }

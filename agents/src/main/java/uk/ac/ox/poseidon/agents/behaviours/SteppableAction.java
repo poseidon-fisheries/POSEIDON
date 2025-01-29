@@ -19,13 +19,39 @@
 
 package uk.ac.ox.poseidon.agents.behaviours;
 
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
-public interface Behaviour {
-    SteppableAction nextAction(
-        Vessel vessel,
+public abstract class SteppableAction extends AbstractAction implements Steppable {
+
+    public SteppableAction(
+        final Vessel vessel,
+        final LocalDateTime start,
+        final Duration duration
+    ) {
+        super(vessel, start, duration);
+    }
+
+    public void init() {}
+
+    protected abstract void complete(
         LocalDateTime dateTime
     );
+
+    @Override
+    public final void step(final SimState simState) {
+        if (simState.schedule instanceof final TemporalSchedule schedule) {
+            complete(schedule.getDateTime());
+            vessel.getEventManager().broadcast(this);
+            vessel.scheduleNextAction(schedule);
+        } else throw new IllegalStateException(
+            "Simulation schedule type must be " + TemporalSchedule.class.getName()
+        );
+    }
+
 }

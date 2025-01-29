@@ -17,9 +17,32 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.destination;
+package uk.ac.ox.poseidon.agents.behaviours;
 
-import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.Getter;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-public interface DestinationBehaviour extends Behaviour {
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+@Getter
+public abstract class SteppableGridAction extends SteppableAction implements GridAction {
+
+    private final Int2D cell;
+
+    @SuppressFBWarnings(
+        value = "EI2",
+        justification = "Int2D is immutable even if SpotBugs thinks otherwise."
+    )
+    public SteppableGridAction(
+        final Vessel vessel,
+        final LocalDateTime start,
+        final Duration duration,
+        final Int2D cell
+    ) {
+        super(vessel, start, duration);
+        this.cell = cell;
+    }
 }

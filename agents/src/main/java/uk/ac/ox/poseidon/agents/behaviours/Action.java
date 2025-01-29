@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,59 +19,20 @@
 
 package uk.ac.ox.poseidon.agents.behaviours;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import lombok.Data;
-import sim.engine.SimState;
-import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+public interface Action {
 
-@Data
-public abstract class Action implements Steppable {
-
-    private final LocalDateTime start;
-    private final Duration duration;
-    private final Vessel vessel;
-
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public Action(
-        final LocalDateTime start,
-        final Duration duration,
-        final Vessel vessel
-    ) {
-        checkArgument(
-            duration.isPositive(),
-            "Duration must be positive but was %s.",
-            duration
-        );
-        this.start = checkNotNull(start);
-        this.duration = checkNotNull(duration);
-        this.vessel = checkNotNull(vessel);
+    default LocalDateTime getEnd() {
+        return getStart().plus(getDuration());
     }
 
-    @Override
-    public final void step(final SimState simState) {
-        checkArgument(simState.schedule instanceof TemporalSchedule);
-        final var schedule = (TemporalSchedule) simState.schedule;
-        final var nextAction = complete(schedule.getDateTime());
-        vessel.getEventManager().broadcast(this);
-        if (nextAction != null) {
-            schedule.scheduleOnceIn(nextAction.getDuration(), nextAction);
-        }
-    }
+    Vessel getVessel();
 
-    protected abstract Action complete(
-        LocalDateTime dateTime
-    );
+    LocalDateTime getStart();
 
-    public LocalDateTime getEnd() {
-        return start.plus(duration);
-    }
-
+    Duration getDuration();
 }

@@ -23,14 +23,13 @@ import lombok.Getter;
 import lombok.Setter;
 import sim.engine.Steppable;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.BackToInitialBehaviourFactory;
-import uk.ac.ox.poseidon.agents.behaviours.WaitBehaviourFactory;
+import uk.ac.ox.poseidon.agents.behaviours.WaitingBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.BestOptionsFromFriendsSupplierFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.ExponentialMovingAverageOptionValuesFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.behaviours.destination.*;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DefaultFishingBehaviourFactory;
-import uk.ac.ox.poseidon.agents.behaviours.travel.TravelAlongPathBehaviourFactory;
+import uk.ac.ox.poseidon.agents.behaviours.travel.TravellingAlongPathBehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
@@ -169,11 +168,11 @@ public class ExternalScenario extends Scenario {
         new DefaultFleetFactory(
             500,
             new VesselFactory(
-                new WaitBehaviourFactory(
+                new WaitingBehaviourFactory(
                     new ExponentiallyDistributedDurationSupplierFactory(
                         new DurationFactory(10, 0, 0, 0)
                     ),
-                    new ChooseDestinationBehaviourFactory(
+                    new ChoosingDestinationBehaviourFactory(
                         new EpsilonGreedyDestinationSupplierFactory(
                             0.2,
                             optionValues,
@@ -196,7 +195,7 @@ public class ExternalScenario extends Scenario {
                             ),
                             new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
                         ),
-                        new TravelAlongPathBehaviourFactory(
+                        new TravellingAlongPathBehaviourFactory(
                             new DefaultFishingBehaviourFactory<>(
                                 new FixedBiomassProportionGearFactory(
                                     0.05,
@@ -208,9 +207,9 @@ public class ExternalScenario extends Scenario {
                                         List.of(biomassGridA)
                                     )
                                 ),
-                                new ChooseDestinationBehaviourFactory(
+                                new ChoosingDestinationBehaviourFactory(
                                     new HomePortDestinationSupplierFactory(portGrid),
-                                    new TravelAlongPathBehaviourFactory(
+                                    new TravellingAlongPathBehaviourFactory(
                                         new BackToInitialBehaviourFactory(),
                                         pathFinder,
                                         distance

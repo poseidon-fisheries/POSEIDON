@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,29 +19,8 @@
 
 package uk.ac.ox.poseidon.agents.behaviours;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import lombok.Getter;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
-@Getter
-public abstract class GridAction extends Action {
-    private final Int2D cell;
-
-    @SuppressFBWarnings(
-        value = "EI2",
-        justification = "Int2D is immutable even if SpotBugs thinks otherwise."
-    )
-    public GridAction(
-        final LocalDateTime start,
-        final Duration duration,
-        final Vessel vessel,
-        final Int2D cell
-    ) {
-        super(start, duration, vessel);
-        this.cell = cell;
-    }
+public interface GridAction extends Action {
+    Int2D getCell();
 }

@@ -17,54 +17,55 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.travel;
+package uk.ac.ox.poseidon.agents.behaviours.destination;
 
-import lombok.ToString;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
+import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.distance.Distance;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.function.Supplier;
 
-class TravelDirectlyBehaviour extends AbstractTravelBehaviour {
+@RequiredArgsConstructor
+public class ChoosingDestination implements Behaviour {
 
-    TravelDirectlyBehaviour(
-        final Distance distance,
-        final Behaviour behaviourOnArrival
-    ) {
-        super(distance, behaviourOnArrival);
-    }
+    private final DestinationSupplier destinationSupplier;
+    private final Supplier<Duration> durationSupplier;
+    private final Behaviour behaviourIfNoDestination;
 
     @Override
-    public Action newAction(
-        final LocalDateTime dateTime,
-        final Vessel vessel
+    public SteppableAction nextAction(
+        final Vessel vessel,
+        final LocalDateTime dateTime
     ) {
-        return new TravellingDirectly(
+        return new Action(
             dateTime,
-            travelDuration(vessel, currentDestination),
+            durationSupplier.get(),
             vessel
         );
     }
 
-    @ToString(callSuper = true)
-    public class TravellingDirectly extends Action {
+    private class Action extends SteppableAction {
 
-        private TravellingDirectly(
+        private Action(
             final LocalDateTime start,
             final Duration duration,
-            final Vessel agent
+            final Vessel vessel
         ) {
-            super(start, duration, agent);
+            super(vessel, start, duration);
         }
 
         @Override
-        protected Action complete(final LocalDateTime dateTime) {
-            getVessel().setLocation(currentDestination);
-            currentDestination = null;
-            return behaviourOnArrival.newAction(dateTime, getVessel());
+        protected void complete(final LocalDateTime dateTime) {
+            destinationSupplier.get().ifPresentOrElse(
+                destination -> {
+                    getVessel().setCurrentDestination(destination);
+                    getVessel().popBehaviour();
+                },
+                () -> getVessel().pushBehaviour(behaviourIfNoDestination)
+            );
         }
     }
 }

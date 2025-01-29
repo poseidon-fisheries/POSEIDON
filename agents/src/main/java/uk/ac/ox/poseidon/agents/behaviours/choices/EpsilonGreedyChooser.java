@@ -22,22 +22,25 @@ package uk.ac.ox.poseidon.agents.behaviours.choices;
 import ec.util.MersenneTwisterFast;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Map.entry;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
-public class EpsilonGreedyChooser<O> implements Supplier<O> {
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+public class EpsilonGreedyChooser<O> implements Supplier<Optional<O>> {
 
     private final double epsilon;
+
     private final MutableOptionValues<O> optionValues;
     private final Picker<O> explorer;
     private final Picker<O> exploiter;
     private final Evaluator<O> evaluator;
     private final MersenneTwisterFast rng;
-    private O currentOption;
-    private Evaluation currentEvaluation;
+    private Optional<Entry<O, Evaluation>> valuedOption = Optional.empty();
 
     @SuppressFBWarnings(value = "EI2")
     public EpsilonGreedyChooser(
@@ -57,18 +60,17 @@ public class EpsilonGreedyChooser<O> implements Supplier<O> {
     }
 
     @Override
-    public O get() {
-        if (currentOption != null) {
-            optionValues.observe(currentOption, currentEvaluation.getResult());
-        }
+    public Optional<O> get() {
+        valuedOption.ifPresent(entry ->
+            optionValues.observe(entry.getKey(), entry.getValue().getResult())
+        );
         final boolean explore = rng.nextBoolean(epsilon);
-        currentOption = Optional
+        valuedOption = Optional
             .of(exploiter)
             .filter(__ -> !explore)
             .flatMap(Picker::pick)
             .or(explorer::pick)
-            .orElseThrow(() -> new RuntimeException("Explorer did not find a valid option."));
-        currentEvaluation = evaluator.newEvaluation(currentOption);
-        return currentOption;
+            .map(option -> entry(option, evaluator.newEvaluation(option)));
+        return valuedOption.map(Entry::getKey);
     }
 }

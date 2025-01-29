@@ -40,7 +40,7 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DefaultFishingBehaviourFactory<C extends Content<C>>
-    extends BehaviourFactory<DefaultFishingBehaviour<C>> {
+    extends BehaviourFactory<Fishing<C>> {
 
     private Factory<? extends FishingGear<C>> fishingGear;
     private Factory<? extends Hold<C>> hold;
@@ -48,15 +48,14 @@ public class DefaultFishingBehaviourFactory<C extends Content<C>>
     private BehaviourFactory<?> afterFishingBehaviour;
 
     @Override
-    protected DefaultFishingBehaviour<C> newInstance(
+    protected Fishing<C> newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new DefaultFishingBehaviour<>(
+        return new Fishing<>(
             fishingGear.get(simulation),
             hold.get(simulation),
-            fisheableSupplier.get(simulation, vessel),
-            afterFishingBehaviour.get(simulation, vessel)
+            fisheableSupplier.get(simulation, vessel)
         );
     }
 }

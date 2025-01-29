@@ -19,25 +19,9 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.fishing;
 
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.GridAction;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.Bucket;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
-public abstract class FishingAction extends GridAction {
-
-    public FishingAction(
-        final LocalDateTime start,
-        final Duration duration,
-        final Vessel vessel,
-        final Int2D cell
-    ) {
-        super(start, duration, vessel, cell);
-    }
-
-    public abstract Bucket<?> getFishCaught();
-
+public interface FishingAction extends GridAction {
+    Bucket<?> getFishCaught();
 }

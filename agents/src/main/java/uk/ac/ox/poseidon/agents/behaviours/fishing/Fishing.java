@@ -22,8 +22,9 @@ package uk.ac.ox.poseidon.agents.behaviours.fishing;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
+import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
+import uk.ac.ox.poseidon.agents.behaviours.SteppableGridAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
 import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
@@ -36,42 +37,41 @@ import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
 @AllArgsConstructor
-public class DefaultFishingBehaviour<C extends Content<C>> implements Behaviour {
+public class Fishing<C extends Content<C>> implements Behaviour {
 
     protected final FishingGear<C> fishingGear;
     protected final Hold<C> hold;
     private final Supplier<Fisheable<C>> fisheableSupplier;
-    private final Behaviour afterFishingBehaviour;
 
     @Override
-    public Action newAction(
-        final LocalDateTime dateTime,
-        final Vessel vessel
+    public SteppableAction nextAction(
+        final Vessel vessel,
+        final LocalDateTime dateTime
     ) {
-        return new Fishing(dateTime, fishingGear.nextDuration(), vessel);
+        return new Action(vessel, dateTime, fishingGear.nextDuration());
     }
 
     @Getter
     @ToString(callSuper = true)
-    public class Fishing extends FishingAction {
+    public class Action extends SteppableGridAction implements FishingAction {
 
         Bucket<C> fishCaught;
 
-        private Fishing(
+        public Action(
+            final Vessel vessel,
             final LocalDateTime start,
-            final Duration duration,
-            final Vessel vessel
+            final Duration duration
         ) {
-            super(start, duration, vessel, vessel.getCurrentCell());
+            super(vessel, start, duration, vessel.getCurrentCell());
         }
 
         @Override
-        protected Action complete(
+        protected void complete(
             final LocalDateTime dateTime
         ) {
             fishCaught = fishingGear.fish(fisheableSupplier.get());
             hold.store(fishCaught);
-            return afterFishingBehaviour.newAction(dateTime, getVessel());
+            vessel.popBehaviour();
         }
     }
 

@@ -42,7 +42,7 @@ public abstract class ActionListenerTable<A extends Action>
             actionEnd
         );
 
-    public ActionListenerTable(final Class<A> eventClass) {
+    ActionListenerTable(final Class<A> eventClass) {
         super(eventClass);
     }
 

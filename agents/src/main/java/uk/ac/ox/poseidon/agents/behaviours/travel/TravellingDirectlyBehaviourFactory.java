@@ -17,36 +17,33 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours;
+package uk.ac.ox.poseidon.agents.behaviours.travel;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-
-import java.time.Duration;
-import java.util.function.Supplier;
+import uk.ac.ox.poseidon.geography.distance.Distance;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class WaitBehaviourFactory extends BehaviourFactory<WaitBehaviour> {
+public class TravellingDirectlyBehaviourFactory
+    extends BehaviourFactory<TravellingDirectly> {
 
-    private Factory<? extends Supplier<Duration>> durationSupplier;
-    private BehaviourFactory<?> afterWaitingBehaviour;
+    private Factory<? extends Distance> distance;
+    private BehaviourFactory<?> behaviourOnArrival;
 
     @Override
-    protected WaitBehaviour newInstance(
+    protected TravellingDirectly newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new WaitBehaviour(
-            durationSupplier.get(simulation),
-            afterWaitingBehaviour.get(simulation, vessel)
-        );
+        return new TravellingDirectly(distance.get(simulation));
     }
 }

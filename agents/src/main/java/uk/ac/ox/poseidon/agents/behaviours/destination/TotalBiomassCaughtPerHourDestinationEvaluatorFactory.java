@@ -56,7 +56,7 @@ public class TotalBiomassCaughtPerHourDestinationEvaluatorFactory
                 (hoursSoFar, action) ->
                     vessel.isAtPort()
                         ? hoursSoFar
-                        : hoursSoFar + action.getDuration().getSeconds() / 3600.0,
+                        : hoursSoFar + action.getDuration().toHours(),
                 (caught, hours) -> caught / hours
             );
         }

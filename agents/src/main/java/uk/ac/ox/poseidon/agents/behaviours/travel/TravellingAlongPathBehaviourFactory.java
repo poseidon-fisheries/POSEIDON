@@ -19,37 +19,36 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.travel;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
+import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.distance.Distance;
+import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
-import java.time.Duration;
-import java.util.List;
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class TravellingAlongPathBehaviourFactory
+    extends BehaviourFactory<TravellingAlongPath> {
 
-@SuppressWarnings("WeakerAccess")
-@RequiredArgsConstructor
-abstract class AbstractTravelBehaviour implements TravelBehaviour {
-    protected final Distance distance;
-    protected final Behaviour behaviourOnArrival;
-    @Getter
-    @Setter
-    protected Int2D currentDestination;
+    private Factory<? extends PathFinder<Int2D>> pathFinder;
+    private Factory<? extends Distance> distance;
 
     @Override
-    public Duration travelDuration(
-        final Vessel vessel,
-        final Int2D destination
+    protected TravellingAlongPath newInstance(
+        final Simulation simulation,
+        final Vessel vessel
     ) {
-        return distance.travelDuration(
-            List.of(
-                vessel.getCurrentPoint(),
-                vessel.getVesselField().getGridExtent().toPoint(destination)
-            ),
-            vessel.getCruisingSpeed()
+        return new TravellingAlongPath(
+            pathFinder.get(simulation),
+            distance.get(simulation)
         );
     }
 }

@@ -44,6 +44,14 @@ public interface Distance {
         Coordinate end
     );
 
+    default Duration travelDuration(
+        final Number2D start,
+        final Number2D end,
+        final Quantity<Speed> cruisingSpeed
+    ) {
+        return travelDuration(List.of(start, end), cruisingSpeed);
+    }
+
     @SuppressWarnings("UnstableApiUsage")
     default Duration travelDuration(
         final List<? extends Number2D> path,

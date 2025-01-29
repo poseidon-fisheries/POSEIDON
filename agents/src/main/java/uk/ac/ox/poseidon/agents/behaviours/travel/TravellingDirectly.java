@@ -17,49 +17,54 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours;
+package uk.ac.ox.poseidon.agents.behaviours.travel;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
+import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.distance.Distance;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.function.Supplier;
 
-@Getter
-@AllArgsConstructor
-public class WaitBehaviour implements Behaviour {
+@RequiredArgsConstructor
+public class TravellingDirectly implements Behaviour {
 
-    private final Supplier<Duration> waitingDurationSupplier;
-    private final Behaviour afterWaitingBehaviour;
+    private final Distance distance;
 
     @Override
-    public Action newAction(
-        final LocalDateTime dateTime,
-        final Vessel vessel
+    public SteppableAction nextAction(
+        final Vessel vessel,
+        final LocalDateTime dateTime
     ) {
-        return new Waiting(dateTime, waitingDurationSupplier.get(), vessel);
+        return new Action(
+            dateTime,
+            distance.travelDuration(
+                vessel.getCurrentCell(),
+                vessel.getCurrentDestination(),
+                vessel.getCruisingSpeed()
+            ),
+            vessel
+        );
     }
 
     @ToString(callSuper = true)
-    public class Waiting extends Action {
+    public static class Action extends SteppableAction {
 
-        public Waiting(
+        private Action(
             final LocalDateTime start,
             final Duration duration,
             final Vessel vessel
         ) {
-            super(start, duration, vessel);
+            super(vessel, start, duration);
         }
 
         @Override
-        protected Action complete(
-            final LocalDateTime dateTime
-        ) {
-            return afterWaitingBehaviour.newAction(dateTime, getVessel());
+        public void complete(final LocalDateTime dateTime) {
+            getVessel().setCurrentCell(getVessel().getCurrentDestination(), dateTime);
+            getVessel().popBehaviour();
         }
     }
-
 }

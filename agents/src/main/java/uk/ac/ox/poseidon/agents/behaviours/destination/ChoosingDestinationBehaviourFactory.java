@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.travel;
+package uk.ac.ox.poseidon.agents.behaviours.destination;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,28 +25,33 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.distance.Distance;
+
+import java.time.Duration;
+import java.util.function.Supplier;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TravelDirectlyBehaviourFactory
-    extends BehaviourFactory<TravelBehaviour> {
+public class ChoosingDestinationBehaviourFactory
+    extends BehaviourFactory<ChoosingDestination> {
 
-    private Factory<? extends Distance> distance;
-    private BehaviourFactory<?> behaviourOnArrival;
+    private VesselScopeFactory<? extends DestinationSupplier> destinationSupplier;
+    private Factory<? extends Supplier<Duration>> durationSupplier;
+    private BehaviourFactory<?> behaviourIfNoDestination;
 
     @Override
-    protected TravelBehaviour newInstance(
+    protected ChoosingDestination newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new TravelDirectlyBehaviour(
-            distance.get(simulation),
-            behaviourOnArrival.get(simulation, vessel)
+        return new ChoosingDestination(
+            destinationSupplier.get(simulation, vessel),
+            durationSupplier.get(simulation),
+            behaviourIfNoDestination.get(simulation, vessel)
         );
     }
 }
