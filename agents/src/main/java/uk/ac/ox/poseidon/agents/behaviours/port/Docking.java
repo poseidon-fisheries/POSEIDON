@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,12 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours;
+package uk.ac.ox.poseidon.agents.behaviours.port;
 
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
+import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.time.Duration;
@@ -28,7 +30,7 @@ import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
-public class Waiting implements Behaviour {
+public class Docking implements Behaviour {
 
     private final Supplier<Duration> durationSupplier;
 
@@ -53,6 +55,7 @@ public class Waiting implements Behaviour {
 
         @Override
         public void complete(final LocalDateTime dateTime) {
+            getVessel().setCurrentDestination(null);
             getVessel().popBehaviour();
         }
     }
