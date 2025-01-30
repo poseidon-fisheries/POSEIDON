@@ -70,7 +70,7 @@ public class Fishing<C extends Content<C>> implements Behaviour {
             final LocalDateTime dateTime
         ) {
             fishCaught = fishingGear.fish(fisheableSupplier.get());
-            hold.store(fishCaught);
+            hold.addContent(fishCaught);
             vessel.popBehaviour();
         }
     }

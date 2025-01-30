@@ -102,7 +102,7 @@ public interface Bucket<C extends Content<C>> {
             .stream()
             .map(Content::asBiomass)
             .reduce(Biomass::add)
-            .orElseGet(() -> Biomass.of(0));
+            .orElseGet(() -> Biomass.ofKg(0));
     }
 
     class Builder<C extends Content<C>> {

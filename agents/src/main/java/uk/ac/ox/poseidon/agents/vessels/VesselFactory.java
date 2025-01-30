@@ -22,7 +22,6 @@ package uk.ac.ox.poseidon.agents.vessels;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import tech.units.indriya.format.SimpleQuantityFormat;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -40,11 +39,12 @@ import javax.measure.quantity.Speed;
 @AllArgsConstructor
 public class VesselFactory implements Factory<Vessel> {
 
-    @NonNull private BehaviourFactory<?> initialBehaviour;
-    @NonNull private Factory<? extends IdSupplier> idSupplier;
-    @NonNull private Factory<? extends VesselField> vesselField;
-    @NonNull private Factory<? extends Port> homePort;
-    @NonNull private Factory<? extends PortGrid> portGrid;
+    private BehaviourFactory<?> initialBehaviour;
+    private Factory<? extends IdSupplier> idSupplier;
+    private Factory<? extends VesselField> vesselField;
+    private Factory<? extends Port> homePort;
+    private Factory<? extends PortGrid> portGrid;
+
     private String speed;
 
     @Override

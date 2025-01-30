@@ -73,7 +73,7 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
 
     @Override
     public Biomass getBiomass(final Int2D cell) {
-        return Biomass.of(getDouble(cell));
+        return Biomass.ofKg(getDouble(cell));
     }
 
     @Override
@@ -104,12 +104,12 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
             final Bucket.Builder<Biomass> fishExtracted = Bucket.newBuilder();
             fishToExtract
                 .maybeGetContent(species)
-                .map(Biomass::getValue)
+                .map(Biomass::asKg)
                 .ifPresent(biomassToExtract -> {
-                    final double gridBiomass = getBiomass(cell).getValue();
+                    final double gridBiomass = getBiomass(cell).asKg();
                     final double biomassExtracted = Math.min(biomassToExtract, gridBiomass);
                     setBiomass(cell, gridBiomass - biomassExtracted);
-                    fishExtracted.add(species, Biomass.of(biomassExtracted));
+                    fishExtracted.add(species, Biomass.ofKg(biomassExtracted));
                 });
             return fishExtracted.build();
         }

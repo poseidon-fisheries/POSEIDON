@@ -23,5 +23,31 @@ import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Content;
 
 public interface Hold<C extends Content<C>> {
-    Bucket<C> store(Bucket<C> fishToStore);
+
+    /**
+     * Adds the specified bucket of content to the current hold and returns the content that could
+     * not be stored (usually because lack of space).
+     *
+     * @param fishToStore the content to add
+     * @return the fish that could not be added, if any
+     */
+    Bucket<C> addContent(Bucket<C> fishToStore);
+
+    /**
+     * Retrieves the content held in the container without removing it.
+     *
+     * @return the current content.
+     */
+    Bucket<C> getContent();
+
+    /**
+     * Removes all content currently held in the container and returns it.
+     *
+     * @return the removed content. If the container was empty, returns an empty Bucket.
+     */
+    Bucket<C> removeContent();
+
+    default boolean isEmpty() {
+        return getContent().isEmpty();
+    }
 }

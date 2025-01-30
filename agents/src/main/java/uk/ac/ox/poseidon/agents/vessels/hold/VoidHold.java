@@ -22,11 +22,46 @@ package uk.ac.ox.poseidon.agents.vessels.hold;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Content;
 
+/**
+ * A container implementation where all content added to it is essentially discarded. This
+ * represents a "void" behavior, simulating a hold that does not store any content.
+ *
+ * @param <C> the type of content that this hold can handle, constrained by {@link Content}.
+ */
 public class VoidHold<C extends Content<C>> implements Hold<C> {
+    /**
+     * Adds the specified bucket of content to this void hold. Since this is a void hold, the
+     * provided content is discarded, and no actual storage occurs.
+     *
+     * @param fishToStore the content to attempt to add
+     * @return an empty bucket, indicating that the content has effectively been discarded
+     */
     @Override
-    public Bucket<C> store(final Bucket<C> fishToStore) {
+    public Bucket<C> addContent(final Bucket<C> fishToStore) {
         // Nothing happens here: the fish vanishes into the void.
         // We return an empty bucket as if everything had been stored.
+        return Bucket.empty();
+    }
+
+    /**
+     * Retrieves the current content held in the void hold. As this is a void hold, it does not
+     * store any content and will always return an empty bucket.
+     *
+     * @return an empty bucket representing the absence of any stored content.
+     */
+    @Override
+    public Bucket<C> getContent() {
+        return Bucket.empty();
+    }
+
+    /**
+     * Removes all content from the hold and returns it. In the context of a {@code VoidHold}, no
+     * content is actually stored, so this method will always return an empty bucket.
+     *
+     * @return an empty bucket, representing the absence of any stored content.
+     */
+    @Override
+    public Bucket<C> removeContent() {
         return Bucket.empty();
     }
 }

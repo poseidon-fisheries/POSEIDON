@@ -45,7 +45,7 @@ import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory;
-import uk.ac.ox.poseidon.agents.vessels.hold.VoidHoldFactory;
+import uk.ac.ox.poseidon.agents.vessels.hold.InfiniteHoldFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
@@ -245,7 +245,7 @@ public class BasicScenario extends Scenario {
                                     0.1,
                                     new DurationFactory(0, 1, 0, 0)
                                 ),
-                                new VoidHoldFactory<>(),
+                                new InfiniteHoldFactory<>(),
                                 new CurrentCellFisheableFactory<>(
                                     new BiomassGridsFactory(
                                         List.of(biomassGridA, biomassGridB)
@@ -254,7 +254,6 @@ public class BasicScenario extends Scenario {
                                 new ChoosingDestinationBehaviourFactory(
                                     new HomePortDestinationSupplierFactory(portGrid),
                                     new TravellingAlongPathBehaviourFactory(
-                                        new BackToInitialBehaviourFactory(),
                                         pathFinder,
                                         distance
                                     )

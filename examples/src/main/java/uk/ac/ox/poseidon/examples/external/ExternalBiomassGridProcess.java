@@ -67,7 +67,7 @@ public class ExternalBiomassGridProcess
                             fishingAction
                                 .getFishCaught()
                                 .getTotalBiomass()
-                                .getValue()
+                                .asKg()
                         )
                         .build())
                     ::iterator

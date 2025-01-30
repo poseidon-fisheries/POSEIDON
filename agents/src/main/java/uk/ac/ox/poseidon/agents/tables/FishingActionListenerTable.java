@@ -39,7 +39,7 @@ public class FishingActionListenerTable extends GridActionListenerTable<FishingA
         super.receive(fishingAction);
         fishingAction.getFishCaught().getMap().forEach((species, content) -> {
             speciesCode.append(species.getCode());
-            biomassCaught.append(content.asBiomass().getValue());
+            biomassCaught.append(content.asBiomass().asKg());
         });
     }
 

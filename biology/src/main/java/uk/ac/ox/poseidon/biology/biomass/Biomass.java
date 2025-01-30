@@ -19,41 +19,53 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import tech.units.indriya.quantity.Quantities;
 import uk.ac.ox.poseidon.biology.Content;
 
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
+import javax.measure.Quantity;
+import javax.measure.Unit;
+import javax.measure.quantity.Mass;
 
-@Data
+import static javax.measure.MetricPrefix.KILO;
+import static tech.units.indriya.unit.Units.GRAM;
+
+@AllArgsConstructor
+@Getter
 public class Biomass implements Content<Biomass> {
 
-    private final double value;
+    private Quantity<Mass> quantity;
 
-    private Biomass(final double value) {
-        this.value = value;
+    public Biomass(
+        final Number value,
+        final Unit<Mass> unit
+    ) {
+        this(Quantities.getQuantity(value, unit));
     }
 
-    @Override
-    public Biomass add(final Biomass other) {
-        return of(value + other.value);
+    public static Biomass ofKg(final double value) {
+        return new Biomass(value, KILO(GRAM));
     }
 
-    public static Biomass of(final double value) {
-        return new Biomass(checkNonNegative(value, "biomass"));
+    public Biomass add(final Biomass content) {
+        return new Biomass(quantity.add(content.quantity));
     }
 
-    @Override
-    public Biomass subtract(final Biomass other) {
-        return of(value - other.value);
+    public Biomass subtract(final Biomass content) {
+        return new Biomass(quantity.subtract(content.quantity));
     }
 
-    @Override
     public boolean isEmpty() {
-        return value == 0.0;
+        return quantity.isEquivalentTo(Quantities.getQuantity(0, KILO(GRAM)));
     }
 
     @Override
     public Biomass asBiomass() {
         return this;
+    }
+
+    public double asKg() {
+        return quantity.to(KILO(GRAM)).getValue().doubleValue();
     }
 }

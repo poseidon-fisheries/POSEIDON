@@ -51,7 +51,7 @@ public class FixedBiomassProportionGear implements FishingGear<Biomass> {
             fisheable
                 .availableFish()
                 .mapContent(biomass ->
-                    Biomass.of(biomass.getValue() * proportion)
+                    Biomass.ofKg(biomass.asKg() * proportion)
                 );
         final Bucket<Biomass> fishExtracted =
             fisheable.extract(fishToCatch);

@@ -25,25 +25,41 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.time.Duration;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DockingBehaviourFactory extends BehaviourFactory<Docking> {
+public class HomeBehaviourFactory extends BehaviourFactory<Home> {
 
-    private Factory<? extends Supplier<Duration>> durationSupplier;
+    private Factory<? extends PortGrid> portGrid;
+    private VesselScopeFactory<? extends Hold<?>> hold;
+    private VesselScopeFactory<? extends BooleanSupplier> readinessSupplier;
+    private BehaviourFactory<?> travelBehaviour;
+    private BehaviourFactory<?> landingBehaviour;
+    private BehaviourFactory<?> behaviourIfReady;
+    private BehaviourFactory<?> behaviourIfNotReady;
 
     @Override
-    protected Docking newInstance(
+    protected Home newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new Docking(durationSupplier.get(simulation));
+        return new Home(
+            portGrid.get(simulation),
+            hold.get(simulation, vessel),
+            readinessSupplier.get(simulation, vessel),
+            travelBehaviour.get(simulation, vessel),
+            landingBehaviour.get(simulation, vessel),
+            behaviourIfReady.get(simulation, vessel),
+            behaviourIfNotReady.get(simulation, vessel)
+        );
     }
 }

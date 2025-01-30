@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.fishing;
+package uk.ac.ox.poseidon.agents.behaviours.port;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,35 +26,31 @@ import lombok.Setter;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
 import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
 import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.biology.Fisheable;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
+import java.time.Duration;
 import java.util.function.Supplier;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DefaultFishingBehaviourFactory<C extends Content<C>>
-    extends BehaviourFactory<Fishing<C>> {
+public class LandingBehaviourFactory<C extends Content<C>> extends BehaviourFactory<Landing<C>> {
 
-    private VesselScopeFactory<? extends FishingGear<C>> fishingGear;
     private VesselScopeFactory<? extends Hold<C>> hold;
-    private VesselScopeFactory<? extends Supplier<Fisheable<C>>> fisheableSupplier;
-    private BehaviourFactory<?> afterFishingBehaviour;
+    private Factory<? extends Supplier<Duration>> durationSupplier;
 
     @Override
-    protected Fishing<C> newInstance(
+    protected Landing<C> newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new Fishing<>(
-            fishingGear.get(simulation, vessel),
+        return new Landing<>(
             hold.get(simulation, vessel),
-            fisheableSupplier.get(simulation, vessel)
+            durationSupplier.get(simulation)
         );
     }
 }

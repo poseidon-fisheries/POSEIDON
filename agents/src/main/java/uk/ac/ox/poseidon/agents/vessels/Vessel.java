@@ -48,6 +48,7 @@ public class Vessel implements Oriented2D {
     private final VesselField vesselField;
     private final PortGrid portGrid;
     private final EventManager eventManager;
+    @Getter(AccessLevel.NONE)
     private final Deque<Behaviour> behaviourStack = new ArrayDeque<>();
     private Port homePort;
     private Quantity<Speed> cruisingSpeed;
@@ -109,6 +110,10 @@ public class Vessel implements Oriented2D {
         return vesselField.getCell(this);
     }
 
+    public boolean isAtCurrentDestination() {
+        return getCurrentCell().equals(getCurrentDestination());
+    }
+
     public boolean isAtPort() {
         return portGrid.anyPortsAt(getCurrentCell());
     }
@@ -121,9 +126,13 @@ public class Vessel implements Oriented2D {
         behaviourStack.push(behaviour);
     }
 
+    public Behaviour currentBehaviour() {
+        return behaviourStack.peek();
+    }
+
     public void scheduleNextAction(final TemporalSchedule schedule) {
         Optional
-            .ofNullable(getBehaviourStack().peek())
+            .ofNullable(currentBehaviour())
             .map(behaviour -> behaviour.nextAction(this, schedule.getDateTime()))
             .ifPresent(action -> {
                 action.init();

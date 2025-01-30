@@ -20,39 +20,47 @@
 package uk.ac.ox.poseidon.agents.behaviours.port;
 
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
+import uk.ac.ox.poseidon.biology.Content;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.function.BooleanSupplier;
-
-import static com.google.common.base.Preconditions.checkState;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
-public class AtPort implements Behaviour {
+public class Landing<C extends Content<C>> implements Behaviour {
 
-    // TODO: handle hold emptying
-
-    private final BooleanSupplier isReady;
-    private final Behaviour dockingBehaviour;
-    private final Behaviour behaviourIfReady;
-    private final Behaviour behaviourIfNotReady;
+    private final Hold<C> hold;
+    private final Supplier<Duration> durationSupplier;
 
     @Override
     public SteppableAction nextAction(
         final Vessel vessel,
         final LocalDateTime dateTime
     ) {
-        checkState(vessel.isAtPort());
-        final Behaviour nextBehaviour;
-        if (vessel.getCurrentDestination() != null)
-            nextBehaviour = dockingBehaviour;
-        else if (isReady.getAsBoolean())
-            nextBehaviour = behaviourIfReady;
-        else
-            nextBehaviour = behaviourIfNotReady;
-        vessel.pushBehaviour(nextBehaviour);
-        return nextBehaviour.nextAction(vessel, dateTime);
+        return new Action(vessel, dateTime, durationSupplier.get());
+    }
+
+    @ToString(callSuper = true)
+    private class Action extends SteppableAction {
+
+        private Action(
+            final Vessel vessel,
+            final LocalDateTime start,
+            final Duration duration
+        ) {
+            super(vessel, start, duration);
+        }
+
+        @Override
+        public void complete(final LocalDateTime dateTime) {
+            hold.removeContent(); // TODO: do something with content!
+            getVessel().setCurrentDestination(null);
+            getVessel().popBehaviour();
+        }
     }
 }

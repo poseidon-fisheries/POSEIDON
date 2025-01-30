@@ -50,7 +50,7 @@ public class TotalBiomassCaughtPerHourDestinationEvaluatorFactory
                 FishingAction.class,
                 0.0,
                 (caughtSoFar, fishingAction) -> caughtSoFar +
-                    fishingAction.getFishCaught().getTotalBiomass().getValue(),
+                    fishingAction.getFishCaught().getTotalBiomass().asKg(),
                 Action.class,
                 0.0,
                 (hoursSoFar, action) ->

@@ -17,46 +17,39 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.port;
+package uk.ac.ox.poseidon.agents.behaviours.strategy;
 
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
-import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
+import uk.ac.ox.poseidon.agents.behaviours.BranchingBehaviour;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.function.Supplier;
 
 @RequiredArgsConstructor
-public class Docking implements Behaviour {
+public class ThereAndBack extends BranchingBehaviour {
 
-    private final Supplier<Duration> durationSupplier;
+    private final Behaviour fishingDestinationBehaviour;
+    private final Behaviour fishingBehaviour;
+    private final Behaviour travellingBehaviour;
+
+    private boolean done = false;
 
     @Override
-    public SteppableAction nextAction(
+    protected Behaviour nextBehaviour(
         final Vessel vessel,
         final LocalDateTime dateTime
     ) {
-        return new Action(vessel, dateTime, durationSupplier.get());
-    }
-
-    @ToString(callSuper = true)
-    private static class Action extends SteppableAction {
-
-        private Action(
-            final Vessel vessel,
-            final LocalDateTime start,
-            final Duration duration
-        ) {
-            super(vessel, start, duration);
-        }
-
-        @Override
-        public void complete(final LocalDateTime dateTime) {
-            getVessel().setCurrentDestination(null);
-            getVessel().popBehaviour();
+        if (done) {
+            return null;
+        } else if (vessel.isAtPort()) {
+            return fishingDestinationBehaviour;
+        } else if (vessel.isAtCurrentDestination()) {
+            done = true;
+            return fishingBehaviour;
+        } else {
+            return travellingBehaviour;
         }
     }
+
 }

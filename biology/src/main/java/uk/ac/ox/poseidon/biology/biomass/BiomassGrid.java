@@ -31,7 +31,7 @@ public interface BiomassGrid
     Species getSpecies();
 
     default Biomass getBiomass(final Int2D cell) {
-        return Biomass.of(getDouble(cell));
+        return Biomass.ofKg(getDouble(cell));
     }
 
     double getDouble(final Int2D cell);
@@ -40,7 +40,7 @@ public interface BiomassGrid
         final Int2D cell,
         final Biomass biomass
     ) {
-        setBiomass(cell, biomass.getValue());
+        setBiomass(cell, biomass.asKg());
     }
 
     void setBiomass(
