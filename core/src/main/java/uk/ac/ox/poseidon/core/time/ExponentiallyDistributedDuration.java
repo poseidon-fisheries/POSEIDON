@@ -19,19 +19,30 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import ec.util.MersenneTwisterFast;
 import lombok.RequiredArgsConstructor;
+import sim.util.distribution.Exponential;
 
 import java.time.Duration;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
-public class DurationSupplier implements Supplier<Duration> {
+public class ExponentiallyDistributedDuration implements Supplier<Duration> {
 
-    private final Supplier<Long> secondsSupplier;
+    private final Exponential exponential;
+
+    ExponentiallyDistributedDuration(
+        final Duration meanDuration,
+        final MersenneTwisterFast rng
+    ) {
+        this.exponential = new Exponential(1.0 / meanDuration.getSeconds(), rng);
+    }
 
     @Override
     public Duration get() {
-        return Duration.ofSeconds(secondsSupplier.get());
+        return Duration.ofSeconds(
+            1 + exponential.nextInt()
+        );
     }
 
 }

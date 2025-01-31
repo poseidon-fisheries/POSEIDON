@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -34,7 +35,7 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 public class ConstantSupplierFactory<T> extends GlobalScopeFactory<Supplier<T>> {
 
-    GlobalScopeFactory<? extends T> object;
+    Factory<? extends T> object;
 
     @Override
     protected Supplier<T> newInstance(final Simulation simulation) {

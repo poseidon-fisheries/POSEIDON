@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,25 +19,16 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.RequiredArgsConstructor;
 
-import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class FixedIntSupplierFactory extends GlobalScopeFactory<IntSupplier> {
-
-    private int value;
+@RequiredArgsConstructor
+public class ConstantSupplier<T> implements Supplier<T> {
+    private final T value;
 
     @Override
-    protected IntSupplier newInstance(final Simulation simulation) {
-        return () -> value;
+    public T get() {
+        return null;
     }
 }

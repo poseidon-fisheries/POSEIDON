@@ -44,7 +44,6 @@ public class DefaultFishingBehaviourFactory<C extends Content<C>>
     private VesselScopeFactory<? extends FishingGear<C>> fishingGear;
     private VesselScopeFactory<? extends Hold<C>> hold;
     private VesselScopeFactory<? extends Supplier<Fisheable<C>>> fisheableSupplier;
-    private BehaviourFactory<?> afterFishingBehaviour;
 
     @Override
     protected Fishing<C> newInstance(

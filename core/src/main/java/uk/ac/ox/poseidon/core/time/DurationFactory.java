@@ -34,10 +34,21 @@ import java.time.Duration;
 @AllArgsConstructor
 public class DurationFactory extends GlobalScopeFactory<Duration> {
 
+    public static final DurationFactory ONE_HOUR = new DurationFactory("PT1H");
+    public static final DurationFactory ONE_DAY = new DurationFactory("P1D");
+
     private long days;
     private long hours;
     private long minutes;
     private long seconds;
+
+    public DurationFactory(final String iso8601Duration) {
+        final Duration duration = Duration.parse(iso8601Duration);
+        days = duration.toDaysPart();
+        hours = duration.toHoursPart();
+        minutes = duration.toMinutesPart();
+        seconds = duration.toSecondsPart();
+    }
 
     @Override
     protected Duration newInstance(final Simulation simulation) {

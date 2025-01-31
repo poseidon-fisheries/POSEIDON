@@ -19,30 +19,28 @@
 
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
+import lombok.Getter;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
 import java.time.Duration;
+import java.util.function.Supplier;
 
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
+@Getter
 public class FixedBiomassProportionGear implements FishingGear<Biomass> {
 
     private final double proportion;
-    private final Duration duration;
+    private final Supplier<Duration> durationSupplier;
 
     public FixedBiomassProportionGear(
         final double proportion,
-        final Duration duration
+        final Supplier<Duration> durationSupplier
     ) {
         this.proportion = checkUnitRange(proportion, "proportion");
-        this.duration = duration;
-    }
-
-    @Override
-    public Duration nextDuration() {
-        return duration;
+        this.durationSupplier = durationSupplier;
     }
 
     @Override

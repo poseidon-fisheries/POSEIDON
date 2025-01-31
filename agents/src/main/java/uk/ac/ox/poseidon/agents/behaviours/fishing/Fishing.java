@@ -48,7 +48,7 @@ public class Fishing<C extends Content<C>> implements Behaviour {
         final Vessel vessel,
         final LocalDateTime dateTime
     ) {
-        return new Action(vessel, dateTime, fishingGear.nextDuration());
+        return new Action(vessel, dateTime, fishingGear.getDurationSupplier().get());
     }
 
     @Getter

@@ -17,32 +17,33 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.time;
+package uk.ac.ox.poseidon.core.suppliers;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
-import java.time.Duration;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExponentiallyDistributedDurationSupplierFactory
-    extends SimulationScopeFactory<Supplier<Duration>> {
+public class ConstantBooleanSupplierFactory extends GlobalScopeFactory<BooleanSupplier> {
 
-    private Factory<? extends Duration> meanDuration;
+    public static final ConstantBooleanSupplierFactory ALWAYS_TRUE =
+        new ConstantBooleanSupplierFactory(true);
+
+    public static final ConstantBooleanSupplierFactory ALWAYS_FALSE =
+        new ConstantBooleanSupplierFactory(false);
+
+    private boolean value;
 
     @Override
-    protected Supplier<Duration> newInstance(final Simulation simulation) {
-        return new ExponentiallyDistributedDuration(
-            meanDuration.get(simulation), simulation.random
-        );
+    protected BooleanSupplier newInstance(final Simulation simulation) {
+        return () -> value;
     }
 }

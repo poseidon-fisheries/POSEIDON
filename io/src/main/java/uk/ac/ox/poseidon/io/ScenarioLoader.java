@@ -34,6 +34,8 @@ import java.io.InputStream;
  * strings, files, and input streams. This class uses the SnakeYAML library to parse YAML data.
  */
 public class ScenarioLoader {
+
+    private static final int MAX_ALIASES_FOR_COLLECTIONS = 5000;
     private final Yaml yaml;
 
     /**
@@ -56,6 +58,7 @@ public class ScenarioLoader {
     private static LoaderOptions getLoaderOptions() {
         final LoaderOptions options = new LoaderOptions();
         options.setTagInspector(tag -> tag.getClassName().startsWith("uk.ac.ox.poseidon"));
+        options.setMaxAliasesForCollections(MAX_ALIASES_FOR_COLLECTIONS);
         return options;
     }
 

@@ -19,13 +19,17 @@
 
 package uk.ac.ox.poseidon.agents.vessels.hold;
 
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-public class InfiniteHoldFactory<C extends Content<C>> implements Factory<InfiniteHold<C>> {
+public class InfiniteHoldFactory<C extends Content<C>> extends VesselScopeFactory<InfiniteHold<C>> {
     @Override
-    public InfiniteHold<C> get(final Simulation simulation) {
+    protected InfiniteHold<C> newInstance(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
         return new InfiniteHold<>();
     }
 }

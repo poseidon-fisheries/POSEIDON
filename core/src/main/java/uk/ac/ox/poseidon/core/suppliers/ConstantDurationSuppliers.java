@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,18 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.vessels.gears;
+package uk.ac.ox.poseidon.core.suppliers;
 
-import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.biology.Fisheable;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.time.DurationFactory;
+import uk.ac.ox.poseidon.core.utils.ConstantSupplierFactory;
 
 import java.time.Duration;
 import java.util.function.Supplier;
 
-public interface FishingGear<C extends Content<C>> {
-
-    Supplier<Duration> getDurationSupplier();
-
-    Bucket<C> fish(Fisheable<C> fisheable);
-
+public class ConstantDurationSuppliers {
+    public static final Factory<Supplier<Duration>> ONE_DAY_DURATION_SUPPLIER =
+        new ConstantSupplierFactory<>(new DurationFactory(1, 0, 0, 0));
+    public static final Factory<Supplier<Duration>> ONE_HOUR_DURATION_SUPPLIER =
+        new ConstantSupplierFactory<>(new DurationFactory(1, 0, 0, 0));
 }

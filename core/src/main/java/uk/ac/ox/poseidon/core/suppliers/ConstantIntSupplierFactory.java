@@ -17,19 +17,27 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.vessels.gears;
+package uk.ac.ox.poseidon.core.suppliers;
 
-import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.biology.Fisheable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-import java.time.Duration;
-import java.util.function.Supplier;
+import java.util.function.IntSupplier;
 
-public interface FishingGear<C extends Content<C>> {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ConstantIntSupplierFactory extends GlobalScopeFactory<IntSupplier> {
 
-    Supplier<Duration> getDurationSupplier();
+    private int value;
 
-    Bucket<C> fish(Fisheable<C> fisheable);
-
+    @Override
+    protected IntSupplier newInstance(final Simulation simulation) {
+        return () -> value;
+    }
 }

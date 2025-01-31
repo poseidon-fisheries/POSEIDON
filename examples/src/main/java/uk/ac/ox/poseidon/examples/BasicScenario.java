@@ -23,12 +23,16 @@ import lombok.Getter;
 import lombok.Setter;
 import sim.engine.Steppable;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.WaitingBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.BestOptionsFromFriendsSupplierFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.ExponentialMovingAverageOptionValuesFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.behaviours.destination.*;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DefaultFishingBehaviourFactory;
+import uk.ac.ox.poseidon.agents.behaviours.port.HomeBehaviourFactory;
+import uk.ac.ox.poseidon.agents.behaviours.port.LandingBehaviourFactory;
+import uk.ac.ox.poseidon.agents.behaviours.strategy.ThereAndBackBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravellingAlongPathBehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
@@ -44,7 +48,9 @@ import uk.ac.ox.poseidon.agents.tables.FishingActionListenerTableFactory;
 import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactoryDecorator;
 import uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory;
+import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
 import uk.ac.ox.poseidon.agents.vessels.hold.InfiniteHoldFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.Species;
@@ -54,7 +60,11 @@ import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.suppliers.PoissonIntSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
-import uk.ac.ox.poseidon.core.time.*;
+import uk.ac.ox.poseidon.core.time.DateFactory;
+import uk.ac.ox.poseidon.core.time.DateTimeAfterFactory;
+import uk.ac.ox.poseidon.core.time.DurationFactory;
+import uk.ac.ox.poseidon.core.time.ExponentiallyDistributedDurationSupplierFactory;
+import uk.ac.ox.poseidon.core.utils.ConstantSupplierFactory;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.RoughCoastalBathymetricGridFactory;
@@ -76,6 +86,12 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.function.Predicate;
+
+import static uk.ac.ox.poseidon.core.suppliers.ConstantBooleanSupplierFactory.ALWAYS_TRUE;
+import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_DAY_DURATION_SUPPLIER;
+import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_HOUR_DURATION_SUPPLIER;
+import static uk.ac.ox.poseidon.core.time.PeriodFactory.DAILY;
+import static uk.ac.ox.poseidon.core.time.PeriodFactory.MONTHLY;
 
 @SuppressWarnings("MagicNumber")
 @Getter
@@ -142,6 +158,11 @@ public class BasicScenario extends Scenario {
             pathFinder,
             distance
         );
+    private BehaviourFactory<?> travellingBehaviour =
+        new TravellingAlongPathBehaviourFactory(
+            pathFinder,
+            distance
+        );
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid =
         new UniformCarryingCapacityGridFactory(
             bathymetricGrid,
@@ -165,9 +186,9 @@ public class BasicScenario extends Scenario {
         new ScheduledRepeatingFactory<>(
             new DateTimeAfterFactory(
                 startingDateTime,
-                new PeriodFactory(0, 0, 1)
+                DAILY
             ),
-            new PeriodFactory(0, 0, 1),
+            DAILY,
             new SteppableSequenceFactory(
                 new BiomassDiffuserFactory(
                     biomassGridA,
@@ -186,9 +207,9 @@ public class BasicScenario extends Scenario {
         new ScheduledRepeatingFactory<>(
             new DateTimeAfterFactory(
                 startingDateTime,
-                new PeriodFactory(0, 1, 0)
+                MONTHLY
             ),
-            new PeriodFactory(0, 1, 0),
+            MONTHLY,
             new SteppableSequenceFactory(
                 new BiomassGrowerFactory(
                     biomassGridA,
@@ -203,6 +224,7 @@ public class BasicScenario extends Scenario {
             ),
             0
         );
+    private VesselScopeFactory<? extends Hold<Biomass>> hold = new InfiniteHoldFactory<>();
     private VesselScopeFactory<? extends MutableOptionValues<Int2D>> optionValues =
         new RegisteringFactory<>(
             optionValuesRegister,
@@ -212,55 +234,53 @@ public class BasicScenario extends Scenario {
         new DefaultFleetFactory(
             500,
             new VesselFactory(
-                new WaitingBehaviourFactory(
-                    new ExponentiallyDistributedDurationSupplierFactory(
-                        new DurationFactory(10, 0, 0, 0)
-                    ),
-                    new ChoosingDestinationBehaviourFactory(
-                        new EpsilonGreedyDestinationSupplierFactory(
-                            0.25,
-                            optionValues,
-                            new NeighbourhoodGridExplorerFactory(
+                new HomeBehaviourFactory(
+                    portGrid,
+                    hold,
+                    new VesselScopeFactoryDecorator<>(ALWAYS_TRUE),
+                    travellingBehaviour,
+                    new LandingBehaviourFactory<>(hold, ONE_HOUR_DURATION_SUPPLIER),
+                    new ThereAndBackBehaviourFactory(
+                        new ChoosingDestinationBehaviourFactory(
+                            new EpsilonGreedyDestinationSupplierFactory(
+                                0.25,
                                 optionValues,
-                                fishingLocationChecker,
-                                pathFinder,
-                                new ShiftedIntSupplierFactory(
-                                    new PoissonIntSupplierFactory(1),
-                                    1
-                                )
+                                new NeighbourhoodGridExplorerFactory(
+                                    optionValues,
+                                    fishingLocationChecker,
+                                    pathFinder,
+                                    new ShiftedIntSupplierFactory(
+                                        new PoissonIntSupplierFactory(1),
+                                        1
+                                    )
+                                ),
+                                new ImitatingPickerFactory<>(
+                                    optionValues,
+                                    fishingLocationChecker,
+                                    new BestOptionsFromFriendsSupplierFactory<>(
+                                        5,
+                                        optionValuesRegister
+                                    )
+                                ),
+                                new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
                             ),
-                            new ImitatingPickerFactory<>(
-                                optionValues,
-                                fishingLocationChecker,
-                                new BestOptionsFromFriendsSupplierFactory<>(
-                                    5,
-                                    optionValuesRegister
-                                )
-                            ),
-                            new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
+                            new ConstantSupplierFactory<>(new DurationFactory(0, 1, 0, 0)),
+                            new WaitingBehaviourFactory(ONE_DAY_DURATION_SUPPLIER)
                         ),
-                        new TravellingAlongPathBehaviourFactory(
-                            new DefaultFishingBehaviourFactory<>(
-                                new FixedBiomassProportionGearFactory(
-                                    0.1,
-                                    new DurationFactory(0, 1, 0, 0)
-                                ),
-                                new InfiniteHoldFactory<>(),
-                                new CurrentCellFisheableFactory<>(
-                                    new BiomassGridsFactory(
-                                        List.of(biomassGridA, biomassGridB)
-                                    )
-                                ),
-                                new ChoosingDestinationBehaviourFactory(
-                                    new HomePortDestinationSupplierFactory(portGrid),
-                                    new TravellingAlongPathBehaviourFactory(
-                                        pathFinder,
-                                        distance
-                                    )
+                        new DefaultFishingBehaviourFactory<>(
+                            new FixedBiomassProportionGearFactory(0.1, ONE_HOUR_DURATION_SUPPLIER),
+                            hold,
+                            new CurrentCellFisheableFactory<>(
+                                new BiomassGridsFactory(
+                                    List.of(biomassGridA, biomassGridB)
                                 )
-                            ),
-                            pathFinder,
-                            distance
+                            )
+                        ),
+                        travellingBehaviour
+                    ),
+                    new WaitingBehaviourFactory(
+                        new ExponentiallyDistributedDurationSupplierFactory(
+                            new DurationFactory("P10D")
                         )
                     )
                 ),

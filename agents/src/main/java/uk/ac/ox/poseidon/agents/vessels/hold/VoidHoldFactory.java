@@ -19,13 +19,17 @@
 
 package uk.ac.ox.poseidon.agents.vessels.hold;
 
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-public class VoidHoldFactory<C extends Content<C>> implements Factory<VoidHold<C>> {
+public class VoidHoldFactory<C extends Content<C>> extends VesselScopeFactory<VoidHold<C>> {
     @Override
-    public VoidHold<C> get(final Simulation simulation) {
+    protected VoidHold<C> newInstance(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
         return new VoidHold<>();
     }
 }

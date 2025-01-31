@@ -23,12 +23,16 @@ import lombok.Getter;
 import lombok.Setter;
 import sim.engine.Steppable;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.WaitingBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.BestOptionsFromFriendsSupplierFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.ExponentialMovingAverageOptionValuesFactory;
 import uk.ac.ox.poseidon.agents.behaviours.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.behaviours.destination.*;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DefaultFishingBehaviourFactory;
+import uk.ac.ox.poseidon.agents.behaviours.port.HomeBehaviourFactory;
+import uk.ac.ox.poseidon.agents.behaviours.port.LandingBehaviourFactory;
+import uk.ac.ox.poseidon.agents.behaviours.strategy.ThereAndBackBehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.travel.TravellingAlongPathBehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
@@ -38,24 +42,28 @@ import uk.ac.ox.poseidon.agents.fleets.Fleet;
 import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
 import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
-import uk.ac.ox.poseidon.agents.regulations.AlwaysPermittedFactory;
 import uk.ac.ox.poseidon.agents.regulations.FishingLocationCheckerFactory;
+import uk.ac.ox.poseidon.agents.regulations.NeverPermittedFactory;
+import uk.ac.ox.poseidon.agents.tables.FishingActionListenerTableFactory;
 import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory;
-import uk.ac.ox.poseidon.agents.vessels.hold.VoidHoldFactory;
+import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
+import uk.ac.ox.poseidon.agents.vessels.hold.InfiniteHoldFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Scenario;
+import uk.ac.ox.poseidon.core.*;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.suppliers.PoissonIntSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
-import uk.ac.ox.poseidon.core.time.*;
+import uk.ac.ox.poseidon.core.time.DateFactory;
+import uk.ac.ox.poseidon.core.time.DateTimeAfterFactory;
+import uk.ac.ox.poseidon.core.time.DurationFactory;
+import uk.ac.ox.poseidon.core.time.ExponentiallyDistributedDurationSupplierFactory;
+import uk.ac.ox.poseidon.core.utils.ConstantSupplierFactory;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.examples.QuickRunner;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
@@ -70,12 +78,19 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.geography.ports.RandomLocationsPortGridFactory;
 import uk.ac.ox.poseidon.geography.ports.SimplePortFactory;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
+import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
+import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.function.Predicate;
+
+import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_DAY_DURATION_SUPPLIER;
+import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_HOUR_DURATION_SUPPLIER;
+import static uk.ac.ox.poseidon.core.time.PeriodFactory.DAILY;
+import static uk.ac.ox.poseidon.core.time.PeriodFactory.MONTHLY;
 
 @SuppressWarnings("MagicNumber")
 @Getter
@@ -85,6 +100,10 @@ public class ExternalScenario extends Scenario {
     private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
         new RegisterFactory<>();
     private Factory<? extends Species> speciesA = new SpeciesFactory("A");
+    private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule =
+        new SmoothBiomassDiffusionRuleFactory(0.01, 0.01);
+    private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
+        new LogisticGrowthRuleFactory(0.1);
 
     private GlobalScopeFactory<? extends GridExtent> gridExtent =
         new GridExtentFactory(
@@ -95,6 +114,16 @@ public class ExternalScenario extends Scenario {
             -5,
             5
         );
+
+    private Factory<? extends CsvTableWriter> catchTableWriter =
+        new FinalProcessFactory<>(
+            new CsvTableWriterFactory(
+                new FishingActionListenerTableFactory(gridExtent),
+                PathFactory.from("fishing_actions.csv"),
+                true
+            )
+        );
+
     private Factory<? extends VesselField> vesselField = new VesselFieldFactory(gridExtent);
     private Factory<? extends Distance> distance = new EquirectangularDistanceFactory(gridExtent);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
@@ -115,7 +144,6 @@ public class ExternalScenario extends Scenario {
             3,
             2
         );
-
     private Factory<? extends GridPathFinder> pathFinder =
         new DefaultPathFinderFactory(
             bathymetricGrid,
@@ -124,7 +152,12 @@ public class ExternalScenario extends Scenario {
         );
     private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
         new FishingLocationCheckerFactory(
-            new AlwaysPermittedFactory(),
+            new NeverPermittedFactory(),
+            pathFinder,
+            distance
+        );
+    private BehaviourFactory<?> travellingBehaviour =
+        new TravellingAlongPathBehaviourFactory(
             pathFinder,
             distance
         );
@@ -141,13 +174,29 @@ public class ExternalScenario extends Scenario {
             speciesA,
             biomassAllocator
         );
+    private Factory<? extends Steppable> dailyProcesses =
+        new ScheduledRepeatingFactory<>(
+            new DateTimeAfterFactory(
+                startingDateTime,
+                DAILY
+            ),
+            DAILY,
+            new SteppableSequenceFactory(
+                new BiomassDiffuserFactory(
+                    biomassGridA,
+                    carryingCapacityGrid,
+                    biomassDiffusionRule
+                )
+            ),
+            0
+        );
     private Factory<? extends Steppable> monthlyProcesses =
         new ScheduledRepeatingFactory<>(
             new DateTimeAfterFactory(
                 startingDateTime,
-                new PeriodFactory(0, 1, 0)
+                MONTHLY
             ),
-            new PeriodFactory(0, 1, 0),
+            MONTHLY,
             new SteppableSequenceFactory(
                 new ExternalBiomassGridProcessFactory(
                     "localhost",
@@ -159,6 +208,7 @@ public class ExternalScenario extends Scenario {
             ),
             0
         );
+    private VesselScopeFactory<? extends Hold<Biomass>> hold = new InfiniteHoldFactory<>();
     private VesselScopeFactory<? extends MutableOptionValues<Int2D>> optionValues =
         new RegisteringFactory<>(
             optionValuesRegister,
@@ -168,56 +218,53 @@ public class ExternalScenario extends Scenario {
         new DefaultFleetFactory(
             500,
             new VesselFactory(
-                new WaitingBehaviourFactory(
-                    new ExponentiallyDistributedDurationSupplierFactory(
-                        new DurationFactory(10, 0, 0, 0)
-                    ),
-                    new ChoosingDestinationBehaviourFactory(
-                        new EpsilonGreedyDestinationSupplierFactory(
-                            0.2,
-                            optionValues,
-                            new NeighbourhoodGridExplorerFactory(
+                new HomeBehaviourFactory(
+                    portGrid,
+                    hold,
+                    null, // TODO: readiness supplier
+                    travellingBehaviour,
+                    new LandingBehaviourFactory<>(hold, ONE_HOUR_DURATION_SUPPLIER),
+                    new ThereAndBackBehaviourFactory(
+                        new ChoosingDestinationBehaviourFactory(
+                            new EpsilonGreedyDestinationSupplierFactory(
+                                0.25,
                                 optionValues,
-                                fishingLocationChecker,
-                                pathFinder,
-                                new ShiftedIntSupplierFactory(
-                                    new PoissonIntSupplierFactory(5),
-                                    1
-                                )
+                                new NeighbourhoodGridExplorerFactory(
+                                    optionValues,
+                                    fishingLocationChecker,
+                                    pathFinder,
+                                    new ShiftedIntSupplierFactory(
+                                        new PoissonIntSupplierFactory(1),
+                                        1
+                                    )
+                                ),
+                                new ImitatingPickerFactory<>(
+                                    optionValues,
+                                    fishingLocationChecker,
+                                    new BestOptionsFromFriendsSupplierFactory<>(
+                                        5,
+                                        optionValuesRegister
+                                    )
+                                ),
+                                new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
                             ),
-                            new ImitatingPickerFactory<>(
-                                optionValues,
-                                fishingLocationChecker,
-                                new BestOptionsFromFriendsSupplierFactory<>(
-                                    2,
-                                    optionValuesRegister
-                                )
-                            ),
-                            new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
+                            new ConstantSupplierFactory<>(new DurationFactory(0, 1, 0, 0)),
+                            new WaitingBehaviourFactory(ONE_DAY_DURATION_SUPPLIER)
                         ),
-                        new TravellingAlongPathBehaviourFactory(
-                            new DefaultFishingBehaviourFactory<>(
-                                new FixedBiomassProportionGearFactory(
-                                    0.05,
-                                    new DurationFactory(0, 1, 0, 0)
-                                ),
-                                new VoidHoldFactory<>(),
-                                new CurrentCellFisheableFactory<>(
-                                    new BiomassGridsFactory(
-                                        List.of(biomassGridA)
-                                    )
-                                ),
-                                new ChoosingDestinationBehaviourFactory(
-                                    new HomePortDestinationSupplierFactory(portGrid),
-                                    new TravellingAlongPathBehaviourFactory(
-                                        new BackToInitialBehaviourFactory(),
-                                        pathFinder,
-                                        distance
-                                    )
+                        new DefaultFishingBehaviourFactory<>(
+                            new FixedBiomassProportionGearFactory(0.1, ONE_HOUR_DURATION_SUPPLIER),
+                            hold,
+                            new CurrentCellFisheableFactory<>(
+                                new BiomassGridsFactory(
+                                    List.of(biomassGridA)
                                 )
-                            ),
-                            pathFinder,
-                            distance
+                            )
+                        ),
+                        travellingBehaviour
+                    ),
+                    new WaitingBehaviourFactory(
+                        new ExponentiallyDistributedDurationSupplierFactory(
+                            new DurationFactory("P10D")
                         )
                     )
                 ),

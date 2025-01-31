@@ -20,26 +20,38 @@
 package uk.ac.ox.poseidon.core.time;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.Factory;
+import lombok.Setter;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.LocalDate;
 import java.time.Period;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PeriodFactory implements Factory<Period> {
+public class PeriodFactory extends GlobalScopeFactory<Period> {
+
+    public static final PeriodFactory DAILY = new PeriodFactory("P1D");
+    public static final PeriodFactory MONTHLY = new PeriodFactory("P1M");
+    public static final PeriodFactory YEARLY = new PeriodFactory("P1Y");
 
     private int year = LocalDate.now().getYear();
     private int month = LocalDate.now().getMonthValue();
     private int day = LocalDate.now().getDayOfMonth();
 
-    @Override
-    public Period get(final Simulation simulation) {
-        return Period.of(year, month, day);
+    public PeriodFactory(final String iso8601Period) {
+        final Period period = Period.parse(iso8601Period);
+        year = period.getYears();
+        this.month = period.getMonths();
+        this.day = period.getDays();
     }
 
+    @Override
+    protected Period newInstance(final Simulation simulation) {
+        return Period.of(year, month, day);
+    }
 }
