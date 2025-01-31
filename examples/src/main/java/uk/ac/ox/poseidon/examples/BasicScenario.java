@@ -42,8 +42,8 @@ import uk.ac.ox.poseidon.agents.fleets.Fleet;
 import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
 import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
+import uk.ac.ox.poseidon.agents.regulations.AlwaysPermittedFactory;
 import uk.ac.ox.poseidon.agents.regulations.FishingLocationCheckerFactory;
-import uk.ac.ox.poseidon.agents.regulations.NeverPermittedFactory;
 import uk.ac.ox.poseidon.agents.tables.FishingActionListenerTableFactory;
 import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
@@ -59,6 +59,7 @@ import uk.ac.ox.poseidon.core.*;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.suppliers.PoissonIntSupplierFactory;
+import uk.ac.ox.poseidon.core.suppliers.RandomBooleanSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
 import uk.ac.ox.poseidon.core.time.DateFactory;
 import uk.ac.ox.poseidon.core.time.DateTimeAfterFactory;
@@ -87,7 +88,6 @@ import java.time.Period;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static uk.ac.ox.poseidon.core.suppliers.ConstantBooleanSupplierFactory.ALWAYS_TRUE;
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_DAY_DURATION_SUPPLIER;
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_HOUR_DURATION_SUPPLIER;
 import static uk.ac.ox.poseidon.core.time.PeriodFactory.DAILY;
@@ -154,7 +154,7 @@ public class BasicScenario extends Scenario {
         );
     private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
         new FishingLocationCheckerFactory(
-            new NeverPermittedFactory(),
+            new AlwaysPermittedFactory(),
             pathFinder,
             distance
         );
@@ -237,7 +237,7 @@ public class BasicScenario extends Scenario {
                 new HomeBehaviourFactory(
                     portGrid,
                     hold,
-                    new VesselScopeFactoryDecorator<>(ALWAYS_TRUE),
+                    new VesselScopeFactoryDecorator<>(new RandomBooleanSupplierFactory(0.1)),
                     travellingBehaviour,
                     new LandingBehaviourFactory<>(hold, ONE_HOUR_DURATION_SUPPLIER),
                     new ThereAndBackBehaviourFactory(

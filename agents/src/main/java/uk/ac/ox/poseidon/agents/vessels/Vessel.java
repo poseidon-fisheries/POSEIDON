@@ -111,7 +111,8 @@ public class Vessel implements Oriented2D {
     }
 
     public boolean isAtCurrentDestination() {
-        return getCurrentCell().equals(getCurrentDestination());
+        final Int2D currentDestination = getCurrentDestination();
+        return currentDestination != null && getCurrentCell().equals(currentDestination);
     }
 
     public boolean isAtPort() {
@@ -138,5 +139,10 @@ public class Vessel implements Oriented2D {
                 action.init();
                 schedule.scheduleOnceIn(action.getDuration(), action);
             });
+    }
+
+    @Override
+    public String toString() {
+        return id;
     }
 }

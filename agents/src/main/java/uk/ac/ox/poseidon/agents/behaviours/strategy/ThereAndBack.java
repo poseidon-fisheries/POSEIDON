@@ -26,30 +26,37 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.time.LocalDateTime;
 
+import static uk.ac.ox.poseidon.agents.behaviours.strategy.ThereAndBack.Status.*;
+
 @RequiredArgsConstructor
 public class ThereAndBack extends BranchingBehaviour {
 
     private final Behaviour fishingDestinationBehaviour;
     private final Behaviour fishingBehaviour;
     private final Behaviour travellingBehaviour;
-
-    private boolean done = false;
+    private Status status = READY;
 
     @Override
     protected Behaviour nextBehaviour(
         final Vessel vessel,
         final LocalDateTime dateTime
     ) {
-        if (done) {
+        if (status == DONE) {
+            status = READY;
             return null;
-        } else if (vessel.isAtPort()) {
+        } else if (status == READY) {
+            status = ACTIVE;
             return fishingDestinationBehaviour;
         } else if (vessel.isAtCurrentDestination()) {
-            done = true;
+            status = DONE;
             return fishingBehaviour;
         } else {
             return travellingBehaviour;
         }
+    }
+
+    enum Status {
+        READY, ACTIVE, DONE
     }
 
 }

@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.agents.behaviours.destination;
 
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -47,6 +48,7 @@ public class ChoosingDestination implements Behaviour {
         );
     }
 
+    @ToString(callSuper = true)
     private class Action extends SteppableAction {
 
         private Action(

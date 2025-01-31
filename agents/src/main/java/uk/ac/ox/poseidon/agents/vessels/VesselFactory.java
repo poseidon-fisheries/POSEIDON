@@ -28,6 +28,7 @@ import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.utils.IdSupplier;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -58,12 +59,15 @@ public class VesselFactory implements Factory<Vessel> {
             vesselField,
             new ForwardingEventManager(simulation.getEventManager())
         );
+        final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
         vessel.setCurrentCell(
             portGrid.get(simulation).getLocation(vessel.getHomePort()),
-            simulation.getTemporalSchedule().getDateTime()
+            temporalSchedule.getDateTime()
         );
         vessel.pushBehaviour(initialBehaviour.get(simulation, vessel));
-        vessel.scheduleNextAction(simulation.getTemporalSchedule());
+        temporalSchedule.scheduleOnce(__ ->
+            vessel.scheduleNextAction(temporalSchedule)
+        );
         return vessel;
     }
 

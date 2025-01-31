@@ -21,6 +21,7 @@ package uk.ac.ox.poseidon.agents.behaviours;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
+import lombok.ToString;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
@@ -28,6 +29,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Getter
+@ToString(callSuper = true)
 public abstract class SteppableGridAction extends SteppableAction implements GridAction {
 
     private final Int2D cell;
