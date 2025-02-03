@@ -63,7 +63,7 @@ public class TravellingDirectly implements Behaviour {
 
         @Override
         public void complete(final LocalDateTime dateTime) {
-            getVessel().setCurrentCell(getVessel().getCurrentDestination(), dateTime);
+            getVessel().setCurrentCell(getVessel().getCurrentDestination());
             getVessel().popBehaviour();
         }
     }

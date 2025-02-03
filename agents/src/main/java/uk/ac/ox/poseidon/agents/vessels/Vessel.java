@@ -35,7 +35,6 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Speed;
-import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Optional;
@@ -54,8 +53,6 @@ public class Vessel implements Oriented2D {
     private Quantity<Speed> cruisingSpeed;
     private double heading;
     private Int2D currentDestination;
-    @Setter(AccessLevel.NONE)
-    private LocalDateTime arrivalTimeAtCurrentCell;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     Vessel(
@@ -98,16 +95,14 @@ public class Vessel implements Oriented2D {
         return vesselField.getPoint(this);
     }
 
-    public void setCurrentCell(
-        final Int2D cell,
-        final LocalDateTime arrivalTime
-    ) {
-        vesselField.setCell(this, cell);
-        this.arrivalTimeAtCurrentCell = arrivalTime;
-    }
-
     public Int2D getCurrentCell() {
         return vesselField.getCell(this);
+    }
+
+    public void setCurrentCell(
+        final Int2D cell
+    ) {
+        vesselField.setCell(this, cell);
     }
 
     public boolean isAtCurrentDestination() {

@@ -100,7 +100,7 @@ public class TravellingAlongPath implements Behaviour {
 
         @Override
         public void complete(final LocalDateTime dateTime) {
-            vessel.setCurrentCell(currentPath.getFirst(), dateTime);
+            vessel.setCurrentCell(currentPath.getFirst());
             if (currentPath.size() > 1) {
                 currentPath = currentPath.subList(1, currentPath.size());
             } else {

@@ -60,10 +60,7 @@ public class VesselFactory implements Factory<Vessel> {
             new ForwardingEventManager(simulation.getEventManager())
         );
         final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
-        vessel.setCurrentCell(
-            portGrid.get(simulation).getLocation(vessel.getHomePort()),
-            temporalSchedule.getDateTime()
-        );
+        vessel.setCurrentCell(portGrid.get(simulation).getLocation(vessel.getHomePort()));
         vessel.pushBehaviour(initialBehaviour.get(simulation, vessel));
         temporalSchedule.scheduleOnce(__ ->
             vessel.scheduleNextAction(temporalSchedule)
