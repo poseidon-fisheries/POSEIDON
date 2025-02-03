@@ -34,7 +34,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
-public class FishingLocationChecker implements Predicate<Int2D> {
+public class FishingLocationLegalityChecker implements Predicate<Int2D> {
 
     private final Regulations regulations;
     private final GridPathFinder pathFinder;

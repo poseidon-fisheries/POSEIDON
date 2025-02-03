@@ -42,7 +42,7 @@ import uk.ac.ox.poseidon.agents.fleets.Fleet;
 import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
 import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
-import uk.ac.ox.poseidon.agents.regulations.FishingLocationCheckerFactory;
+import uk.ac.ox.poseidon.agents.regulations.FishingLocationLegalityCheckerFactory;
 import uk.ac.ox.poseidon.agents.regulations.NeverPermittedFactory;
 import uk.ac.ox.poseidon.agents.tables.FishingActionListenerTableFactory;
 import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
@@ -151,7 +151,7 @@ public class ExternalScenario extends Scenario {
             distance
         );
     private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
-        new FishingLocationCheckerFactory(
+        new FishingLocationLegalityCheckerFactory(
             new NeverPermittedFactory(),
             pathFinder,
             distance

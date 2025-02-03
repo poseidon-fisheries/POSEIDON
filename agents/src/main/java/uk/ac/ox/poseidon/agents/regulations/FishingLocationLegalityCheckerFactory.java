@@ -34,18 +34,19 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FishingLocationCheckerFactory extends VesselScopeFactory<FishingLocationChecker> {
+public class FishingLocationLegalityCheckerFactory
+    extends VesselScopeFactory<FishingLocationLegalityChecker> {
 
     private Factory<? extends Regulations> regulations;
     private Factory<? extends GridPathFinder> pathFinder;
     private Factory<? extends Distance> distance;
 
     @Override
-    protected FishingLocationChecker newInstance(
+    protected FishingLocationLegalityChecker newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new FishingLocationChecker(
+        return new FishingLocationLegalityChecker(
             regulations.get(simulation),
             pathFinder.get(simulation),
             distance.get(simulation),
