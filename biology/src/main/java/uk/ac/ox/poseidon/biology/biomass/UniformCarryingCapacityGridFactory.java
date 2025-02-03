@@ -29,7 +29,8 @@ import uk.ac.ox.poseidon.geography.grids.GridExtent;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 
-import static si.uom.NonSI.TONNE;
+import static javax.measure.MetricPrefix.KILO;
+import static tech.units.indriya.unit.Units.GRAM;
 
 @Getter
 @Setter
@@ -46,16 +47,16 @@ public class UniformCarryingCapacityGridFactory
         final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
         final GridExtent gridExtent = bathymetricGrid.getGridExtent();
         final double[][] array = gridExtent.makeDoubleArray();
-        final double carryingCapacityInTonnes =
+        final double carryingCapacityInKg =
             carryingCapacity
                 .get(simulation)
-                .to(TONNE)
+                .to(KILO(GRAM))
                 .getValue()
                 .doubleValue();
         bathymetricGrid.getAllCells().forEach(cell ->
             array[cell.x][cell.y] =
                 bathymetricGrid.isWater(cell)
-                    ? carryingCapacityInTonnes
+                    ? carryingCapacityInKg
                     : Double.NaN
         );
         return new CarryingCapacityGrid(gridExtent, array);

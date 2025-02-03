@@ -51,7 +51,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactoryDecorator;
 import uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory;
 import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
-import uk.ac.ox.poseidon.agents.vessels.hold.InfiniteHoldFactory;
+import uk.ac.ox.poseidon.agents.vessels.hold.ProportionalBiomassOvercapacityDiscardingStrategyFactory;
+import uk.ac.ox.poseidon.agents.vessels.hold.StandardBiomassHoldFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
@@ -89,7 +90,6 @@ import java.time.Period;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static si.uom.NonSI.TONNE;
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_DAY_DURATION_SUPPLIER;
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_HOUR_DURATION_SUPPLIER;
 import static uk.ac.ox.poseidon.core.time.PeriodFactory.DAILY;
@@ -103,7 +103,7 @@ public class BasicScenario extends Scenario {
     private static final double PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT = 0.1;
     private static final double LOGISTIC_GROWTH_RATE = 0.001;
     private static final int GRID_SIZE = 51;
-    private static final int CARRYING_CAPACITY_IN_TONNES = 5;
+    private static final String CARRYING_CAPACITY = "5 t";
     private static final double LEARNING_ALPHA = 1;
     private static final double READINESS_PROBABILITY = 0.9;
     private static final int NUMBER_OF_PORTS = 1;
@@ -112,6 +112,7 @@ public class BasicScenario extends Scenario {
     private static final int MEAN_EXPLORATION_RADIUS = 1;
     private static final double CATCH_PROPORTION = 0.1;
     private static final int VESSEL_SPEED = 15;
+    private static final String VESSEL_HOLD_CAPACITY = "1 t";
 
     private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
         new RegisterFactory<>();
@@ -185,7 +186,7 @@ public class BasicScenario extends Scenario {
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid =
         new UniformCarryingCapacityGridFactory(
             bathymetricGrid,
-            new MassFactory(CARRYING_CAPACITY_IN_TONNES, TONNE)
+            new MassFactory(CARRYING_CAPACITY)
         );
     private Factory<? extends BiomassAllocator> biomassAllocator =
         new FullBiomassAllocatorFactory(carryingCapacityGrid);
@@ -243,7 +244,11 @@ public class BasicScenario extends Scenario {
             ),
             0
         );
-    private VesselScopeFactory<? extends Hold<Biomass>> hold = new InfiniteHoldFactory<>();
+    private VesselScopeFactory<? extends Hold<Biomass>> hold = new StandardBiomassHoldFactory(
+        new MassFactory(VESSEL_HOLD_CAPACITY),
+        new MassFactory("1 kg"),
+        new ProportionalBiomassOvercapacityDiscardingStrategyFactory()
+    );
     private VesselScopeFactory<? extends MutableOptionValues<Int2D>> optionValues =
         new RegisteringFactory<>(
             optionValuesRegister,

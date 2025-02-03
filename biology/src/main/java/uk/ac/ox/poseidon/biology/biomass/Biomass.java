@@ -35,6 +35,8 @@ import static tech.units.indriya.unit.Units.GRAM;
 @Getter
 public class Biomass implements Content<Biomass> {
 
+    // TODO: should I embrace the kilograms and provide a asQuantity method instead?
+
     private Quantity<Mass> quantity;
 
     public Biomass(
@@ -56,6 +58,14 @@ public class Biomass implements Content<Biomass> {
         return new Biomass(quantity.subtract(content.quantity));
     }
 
+    public Biomass multiply(final double value) {
+        return new Biomass(quantity.multiply(value));
+    }
+
+    public Biomass divide(final double value) {
+        return new Biomass(quantity.divide(value));
+    }
+
     public boolean isEmpty() {
         return quantity.isEquivalentTo(Quantities.getQuantity(0, KILO(GRAM)));
     }
@@ -68,4 +78,6 @@ public class Biomass implements Content<Biomass> {
     public double asKg() {
         return quantity.to(KILO(GRAM)).getValue().doubleValue();
     }
+
+    public String toString() {return "Biomass(" + this.getQuantity() + ")";}
 }

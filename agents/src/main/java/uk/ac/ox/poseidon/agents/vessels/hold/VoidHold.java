@@ -55,6 +55,16 @@ public class VoidHold<C extends Content<C>> implements Hold<C> {
     }
 
     /**
+     * A void hold is never full. There is always more room in the void.
+     *
+     * @return false
+     */
+    @Override
+    public boolean isFull() {
+        return false;
+    }
+
+    /**
      * Removes all content from the hold and returns it. In the context of a {@code VoidHold}, no
      * content is actually stored, so this method will always return an empty bucket.
      *

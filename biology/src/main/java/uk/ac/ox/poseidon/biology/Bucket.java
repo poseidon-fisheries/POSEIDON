@@ -45,6 +45,13 @@ public interface Bucket<C extends Content<C>> {
         return Bucket.from(other.getMap());
     }
 
+    static <C extends Content<C>> Bucket<C> of(
+        final Species species,
+        final C content
+    ) {
+        return Bucket.<C>newBuilder().put(species, content).build();
+    }
+
     static <C extends Content<C>> Bucket<C> from(
         final Map<Species, C> map
     ) {
@@ -162,7 +169,7 @@ public interface Bucket<C extends Content<C>> {
             final Species species,
             final C content
         ) {
-            map.merge(species, content, Content::add);
+            map.merge(species, content, Content::subtract);
             return this;
         }
 

@@ -44,6 +44,17 @@ public class InfiniteHold<C extends Content<C>> implements Hold<C> {
         return content;
     }
 
+    /**
+     * An infinite hold is never full (though there might be technical limits depending on content
+     * type, e.g. Double.MAX_VALUE).
+     *
+     * @return false
+     */
+    @Override
+    public boolean isFull() {
+        return false;
+    }
+
     @Override
     public Bucket<C> removeContent() {
         final Bucket<C> result = content;

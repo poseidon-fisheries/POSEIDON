@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import si.uom.NonSI;
 import tech.units.indriya.format.SimpleQuantityFormat;
 import tech.units.indriya.format.SimpleUnitFormat;
 import tech.units.indriya.quantity.Quantities;
@@ -38,6 +39,13 @@ import javax.measure.Unit;
 @AllArgsConstructor
 public abstract class AbstractQuantityFactory<Q extends Quantity<Q>>
     extends GlobalScopeFactory<Quantity<Q>> {
+
+    static {
+        // We need to trigger static initialization of the NonSI class
+        // in order for non-SI unit string formats to be registered
+        // noinspection ResultOfMethodCallIgnored
+        NonSI.getInstance();
+    }
 
     private final Class<Q> type;
     private double value;

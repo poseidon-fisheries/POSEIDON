@@ -40,6 +40,8 @@ public interface Hold<C extends Content<C>> {
      */
     Bucket<C> getContent();
 
+    boolean isFull();
+
     /**
      * Removes all content currently held in the container and returns it.
      *
