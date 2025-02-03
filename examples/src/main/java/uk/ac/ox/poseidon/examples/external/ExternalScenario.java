@@ -55,6 +55,8 @@ import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.*;
+import uk.ac.ox.poseidon.core.quantities.MassFactory;
+import uk.ac.ox.poseidon.core.quantities.SpeedFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.suppliers.PoissonIntSupplierFactory;
@@ -164,7 +166,7 @@ public class ExternalScenario extends Scenario {
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid =
         new UniformCarryingCapacityGridFactory(
             bathymetricGrid,
-            5000
+            new MassFactory("5000 kg")
         );
     private Factory<? extends BiomassAllocator> biomassAllocator =
         new FullBiomassAllocatorFactory(carryingCapacityGrid);
@@ -272,7 +274,7 @@ public class ExternalScenario extends Scenario {
                 vesselField,
                 new RandomHomePortFactory(portGrid),
                 portGrid,
-                "15 km/h"
+                new SpeedFactory("15 km/h")
             )
         );
 

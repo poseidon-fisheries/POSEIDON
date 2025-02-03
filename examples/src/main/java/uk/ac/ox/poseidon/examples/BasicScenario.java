@@ -56,6 +56,8 @@ import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.*;
+import uk.ac.ox.poseidon.core.quantities.MassFactory;
+import uk.ac.ox.poseidon.core.quantities.SpeedFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.suppliers.PoissonIntSupplierFactory;
@@ -87,6 +89,7 @@ import java.time.Period;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static si.uom.NonSI.TONNE;
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_DAY_DURATION_SUPPLIER;
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_HOUR_DURATION_SUPPLIER;
 import static uk.ac.ox.poseidon.core.time.PeriodFactory.DAILY;
@@ -100,7 +103,7 @@ public class BasicScenario extends Scenario {
     private static final double PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT = 0.1;
     private static final double LOGISTIC_GROWTH_RATE = 0.001;
     private static final int GRID_SIZE = 51;
-    private static final int CARRYING_CAPACITY = 5000;
+    private static final int CARRYING_CAPACITY_IN_TONNES = 5;
     private static final double LEARNING_ALPHA = 1;
     private static final double READINESS_PROBABILITY = 0.9;
     private static final int NUMBER_OF_PORTS = 1;
@@ -108,6 +111,7 @@ public class BasicScenario extends Scenario {
     private static final double EXPLORATION_PROBABILITY = 0.2;
     private static final int MEAN_EXPLORATION_RADIUS = 1;
     private static final double CATCH_PROPORTION = 0.1;
+    private static final int VESSEL_SPEED = 15;
 
     private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
         new RegisterFactory<>();
@@ -181,7 +185,7 @@ public class BasicScenario extends Scenario {
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid =
         new UniformCarryingCapacityGridFactory(
             bathymetricGrid,
-            CARRYING_CAPACITY
+            new MassFactory(CARRYING_CAPACITY_IN_TONNES, TONNE)
         );
     private Factory<? extends BiomassAllocator> biomassAllocator =
         new FullBiomassAllocatorFactory(carryingCapacityGrid);
@@ -308,7 +312,7 @@ public class BasicScenario extends Scenario {
                 vesselField,
                 new RandomHomePortFactory(portGrid),
                 portGrid,
-                "15 km/h"
+                new SpeedFactory(VESSEL_SPEED, "km/h")
             )
         );
 
