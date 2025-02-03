@@ -135,7 +135,7 @@ public class BasicScenario extends Scenario {
         new FinalProcessFactory<>(
             new CsvTableWriterFactory(
                 new FishingActionListenerTableFactory(gridExtent),
-                PathFactory.from("fishing_actions.csv"),
+                PathFactory.from("temp", "fishing_actions.csv"),
                 true
             )
         );

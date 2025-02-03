@@ -39,9 +39,10 @@ public class PathFactory extends GlobalScopeFactory<Path> {
     @NonNull private List<String> pathElements;
 
     public static PathFactory from(
-        final String path
+        final String first,
+        final String... more
     ) {
-        return from(null, Path.of(path));
+        return from(null, Path.of(first, more));
     }
 
     public static PathFactory from(
