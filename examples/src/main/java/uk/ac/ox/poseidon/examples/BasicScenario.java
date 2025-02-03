@@ -43,7 +43,7 @@ import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
 import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
 import uk.ac.ox.poseidon.agents.regulations.AlwaysPermittedFactory;
-import uk.ac.ox.poseidon.agents.regulations.FishingLocationCheckerFactory;
+import uk.ac.ox.poseidon.agents.regulations.FishingLocationLegalityCheckerFactory;
 import uk.ac.ox.poseidon.agents.tables.FishingActionListenerTableFactory;
 import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
@@ -65,7 +65,6 @@ import uk.ac.ox.poseidon.core.time.DateFactory;
 import uk.ac.ox.poseidon.core.time.DateTimeAfterFactory;
 import uk.ac.ox.poseidon.core.time.DurationFactory;
 import uk.ac.ox.poseidon.core.time.ExponentiallyDistributedDurationSupplierFactory;
-import uk.ac.ox.poseidon.core.utils.ConstantSupplierFactory;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.RoughCoastalBathymetricGridFactory;
@@ -93,24 +92,39 @@ import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_HOU
 import static uk.ac.ox.poseidon.core.time.PeriodFactory.DAILY;
 import static uk.ac.ox.poseidon.core.time.PeriodFactory.MONTHLY;
 
-@SuppressWarnings("MagicNumber")
 @Getter
 @Setter
 public class BasicScenario extends Scenario {
+
+    private static final double DIFFERENTIAL_PERCENTAGE_TO_MOVE = 0.01;
+    private static final double PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT = 0.1;
+    private static final double LOGISTIC_GROWTH_RATE = 0.001;
+    private static final int GRID_SIZE = 51;
+    private static final int CARRYING_CAPACITY = 5000;
+    private static final double LEARNING_ALPHA = 1;
+    private static final double READINESS_PROBABILITY = 0.9;
+    private static final int NUMBER_OF_PORTS = 1;
+    private static final int NUMBER_OF_VESSELS = 500;
+    private static final double EXPLORATION_PROBABILITY = 0.2;
+    private static final int MEAN_EXPLORATION_RADIUS = 1;
+    private static final double CATCH_PROPORTION = 0.1;
 
     private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
         new RegisterFactory<>();
     private Factory<? extends Species> speciesA = new SpeciesFactory("A");
     private Factory<? extends Species> speciesB = new SpeciesFactory("B");
     private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule =
-        new SmoothBiomassDiffusionRuleFactory(0.01, 0.01);
+        new SmoothBiomassDiffusionRuleFactory(
+            DIFFERENTIAL_PERCENTAGE_TO_MOVE,
+            PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT
+        );
     private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
-        new LogisticGrowthRuleFactory(0.1);
+        new LogisticGrowthRuleFactory(LOGISTIC_GROWTH_RATE);
 
     private GlobalScopeFactory<? extends GridExtent> gridExtent =
         new GridExtentFactory(
-            51,
-            51,
+            GRID_SIZE,
+            GRID_SIZE,
             -5,
             5,
             -5,
@@ -128,6 +142,7 @@ public class BasicScenario extends Scenario {
 
     private Factory<? extends VesselField> vesselField = new VesselFieldFactory(gridExtent);
     private Factory<? extends Distance> distance = new EquirectangularDistanceFactory(gridExtent);
+    @SuppressWarnings("MagicNumber")
     private Factory<? extends BathymetricGrid> bathymetricGrid =
         new RoughCoastalBathymetricGridFactory(
             gridExtent,
@@ -143,7 +158,7 @@ public class BasicScenario extends Scenario {
         new RandomLocationsPortGridFactory(
             bathymetricGrid,
             new SimplePortFactory(new PrefixedIdSupplierFactory("Port")),
-            3,
+            NUMBER_OF_PORTS,
             2
         );
     private Factory<? extends GridPathFinder> pathFinder =
@@ -153,7 +168,7 @@ public class BasicScenario extends Scenario {
             distance
         );
     private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
-        new FishingLocationCheckerFactory(
+        new FishingLocationLegalityCheckerFactory(
             new AlwaysPermittedFactory(),
             pathFinder,
             distance
@@ -166,7 +181,7 @@ public class BasicScenario extends Scenario {
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid =
         new UniformCarryingCapacityGridFactory(
             bathymetricGrid,
-            5000
+            CARRYING_CAPACITY
         );
     private Factory<? extends BiomassAllocator> biomassAllocator =
         new FullBiomassAllocatorFactory(carryingCapacityGrid);
@@ -228,29 +243,31 @@ public class BasicScenario extends Scenario {
     private VesselScopeFactory<? extends MutableOptionValues<Int2D>> optionValues =
         new RegisteringFactory<>(
             optionValuesRegister,
-            new ExponentialMovingAverageOptionValuesFactory<>(0.5)
+            new ExponentialMovingAverageOptionValuesFactory<>(LEARNING_ALPHA)
         );
     private Factory<? extends Fleet> fleet =
         new DefaultFleetFactory(
-            500,
+            NUMBER_OF_VESSELS,
             new VesselFactory(
                 new HomeBehaviourFactory(
                     portGrid,
                     hold,
-                    new VesselScopeFactoryDecorator<>(new RandomBooleanSupplierFactory(0.1)),
+                    new VesselScopeFactoryDecorator<>(new RandomBooleanSupplierFactory(
+                        READINESS_PROBABILITY
+                    )),
                     travellingBehaviour,
                     new LandingBehaviourFactory<>(hold, ONE_HOUR_DURATION_SUPPLIER),
                     new ThereAndBackBehaviourFactory(
                         new ChoosingDestinationBehaviourFactory(
                             new EpsilonGreedyDestinationSupplierFactory(
-                                0.25,
+                                EXPLORATION_PROBABILITY,
                                 optionValues,
                                 new NeighbourhoodGridExplorerFactory(
                                     optionValues,
                                     fishingLocationChecker,
                                     pathFinder,
                                     new ShiftedIntSupplierFactory(
-                                        new PoissonIntSupplierFactory(1),
+                                        new PoissonIntSupplierFactory(MEAN_EXPLORATION_RADIUS),
                                         1
                                     )
                                 ),
@@ -264,11 +281,14 @@ public class BasicScenario extends Scenario {
                                 ),
                                 new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
                             ),
-                            new ConstantSupplierFactory<>(new DurationFactory(0, 1, 0, 0)),
+                            ONE_HOUR_DURATION_SUPPLIER,
                             new WaitingBehaviourFactory(ONE_DAY_DURATION_SUPPLIER)
                         ),
                         new DefaultFishingBehaviourFactory<>(
-                            new FixedBiomassProportionGearFactory(0.1, ONE_HOUR_DURATION_SUPPLIER),
+                            new FixedBiomassProportionGearFactory(
+                                CATCH_PROPORTION,
+                                ONE_HOUR_DURATION_SUPPLIER
+                            ),
                             hold,
                             new CurrentCellFisheableFactory<>(
                                 new BiomassGridsFactory(
