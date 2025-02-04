@@ -69,6 +69,15 @@ tasks.jacocoTestReport {
     }
 }
 
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = "METHOD"
+            excludes = listOf("lombok.Generated")
+        }
+    }
+}
+
 spotbugs {
     excludeFilter.set(file("${rootProject.projectDir}/spotbugs_exclude.xml"))
 }
