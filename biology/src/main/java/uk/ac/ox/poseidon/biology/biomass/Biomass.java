@@ -20,7 +20,7 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import tech.units.indriya.quantity.Quantities;
 import uk.ac.ox.poseidon.biology.Content;
 
@@ -32,42 +32,45 @@ import static javax.measure.MetricPrefix.KILO;
 import static tech.units.indriya.unit.Units.GRAM;
 
 @AllArgsConstructor
-@Getter
+@Data
 public class Biomass implements Content<Biomass> {
 
-    // TODO: should I embrace the kilograms and provide a asQuantity method instead?
-
-    private Quantity<Mass> quantity;
+    // Biomass stored internally in kilograms
+    private final double biomassInKg;
 
     public Biomass(
         final Number value,
         final Unit<Mass> unit
     ) {
-        this(Quantities.getQuantity(value, unit));
+        this.biomassInKg = Quantities
+            .getQuantity(value, unit)
+            .to(KILO(GRAM))
+            .getValue()
+            .doubleValue();
     }
 
     public static Biomass ofKg(final double value) {
-        return new Biomass(value, KILO(GRAM));
+        return new Biomass(value);
     }
 
     public Biomass add(final Biomass content) {
-        return new Biomass(quantity.add(content.quantity));
+        return new Biomass(this.biomassInKg + content.biomassInKg);
     }
 
     public Biomass subtract(final Biomass content) {
-        return new Biomass(quantity.subtract(content.quantity));
+        return new Biomass(this.biomassInKg - content.biomassInKg);
     }
 
     public Biomass multiply(final double value) {
-        return new Biomass(quantity.multiply(value));
+        return new Biomass(this.biomassInKg * value);
     }
 
     public Biomass divide(final double value) {
-        return new Biomass(quantity.divide(value));
+        return new Biomass(this.biomassInKg / value);
     }
 
     public boolean isEmpty() {
-        return quantity.isEquivalentTo(Quantities.getQuantity(0, KILO(GRAM)));
+        return this.biomassInKg == 0;
     }
 
     @Override
@@ -75,9 +78,9 @@ public class Biomass implements Content<Biomass> {
         return this;
     }
 
-    public double asKg() {
-        return quantity.to(KILO(GRAM)).getValue().doubleValue();
+    public Quantity<Mass> asQuantity() {
+        return Quantities.getQuantity(this.biomassInKg, KILO(GRAM));
     }
 
-    public String toString() {return "Biomass(" + this.getQuantity() + ")";}
+    public String toString() {return "Biomass(" + this.asQuantity() + ")";}
 }

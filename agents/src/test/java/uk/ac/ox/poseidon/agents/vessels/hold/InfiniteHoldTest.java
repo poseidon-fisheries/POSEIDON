@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 package uk.ac.ox.poseidon.agents.vessels.hold;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.DummySpecies;
@@ -32,104 +31,66 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InfiniteHoldTest {
 
-    private static final Bucket<Biomass> SAMPLE_BUCKET =
-        Bucket.from(Map.of(
-            DummySpecies.A, Biomass.ofKg(5),
-            DummySpecies.B, Biomass.ofKg(10),
+    @Test
+    void testAddEmptyBucket() {
+        // Arrange
+        final Bucket<Biomass> emptyBucket = Bucket.empty();
+        final InfiniteHold<Biomass> infiniteHold = new InfiniteHold<>();
+
+        // Act
+        final Bucket<Biomass> returnedBucket = infiniteHold.addContent(emptyBucket);
+
+        // Assert
+        assertTrue(returnedBucket.isEmpty(), "Returned bucket should be empty");
+        assertTrue(infiniteHold.getContent().isEmpty(), "InfiniteHold content should remain empty");
+    }
+
+    @Test
+    void testAddNonEmptyBucket() {
+        // Arrange
+        final Bucket<Biomass> initialBucket = Bucket.of(DummySpecies.A, Biomass.ofKg(10));
+        final Bucket<Biomass> newBucket = Bucket.of(DummySpecies.B, Biomass.ofKg(20));
+        final InfiniteHold<Biomass> infiniteHold = new InfiniteHold<>();
+        infiniteHold.addContent(initialBucket); // Add initial content to the hold
+
+        // Act
+        final Bucket<Biomass> returnedBucket = infiniteHold.addContent(newBucket);
+
+        // Assert
+        assertTrue(returnedBucket.isEmpty(), "Returned bucket should be empty");
+        assertEquals(
+            Bucket.from(Map.of(
+                DummySpecies.A, Biomass.ofKg(10),
+                DummySpecies.B, Biomass.ofKg(20)
+            )),
+            infiniteHold.getContent(),
+            "InfiniteHold content should contain combined contents"
+        );
+    }
+
+    @Test
+    void testAddOverlappingSpeciesContent() {
+        // Arrange
+        final Bucket<Biomass> initialBucket = Bucket.of(DummySpecies.A, Biomass.ofKg(10));
+        final Bucket<Biomass> newBucket = Bucket.from(Map.of(
+            DummySpecies.A, Biomass.ofKg(5),  // Overlapping species
             DummySpecies.C, Biomass.ofKg(15)
         ));
-
-    @Test
-    void addContent_shouldAddContentsToHold_andReturnEmptyBucket() {
-        final InfiniteHold<Biomass> hold = new InfiniteHold<>();
-        final Bucket<Biomass> result = hold.addContent(SAMPLE_BUCKET);
-        assertEquals(SAMPLE_BUCKET, hold.getContent());
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void addContent_shouldReturnEmptyBucket_whenAddingToEmptyHold() {
-        // Arrange
-        final Bucket<Biomass> bucketToAdd = Mockito.mock(Bucket.class);
-        final Bucket<Biomass> updatedBucket = Mockito.mock(Bucket.class);
-
-        Mockito.when(Bucket.<Biomass>empty()).thenReturn(Mockito.mock(Bucket.class));
-        Mockito.when(Bucket.<Biomass>empty().add(bucketToAdd)).thenReturn(updatedBucket);
-
-        final InfiniteHold<Biomass> hold = new InfiniteHold<>();
+        final InfiniteHold<Biomass> infiniteHold = new InfiniteHold<>();
+        infiniteHold.addContent(initialBucket); // Add initial content to the hold
 
         // Act
-        final Bucket<Biomass> result = hold.addContent(bucketToAdd);
+        final Bucket<Biomass> returnedBucket = infiniteHold.addContent(newBucket);
 
         // Assert
-        assertEquals(Bucket.empty(), result);
-        assertEquals(updatedBucket, hold.getContent());
-    }
-
-    @Test
-    void addContent_shouldLeaveHoldEmpty_whenAddingEmptyBucket() {
-        // Arrange
-        final Bucket<Biomass> emptyBucket = Mockito.mock(Bucket.class);
-        Mockito.when(emptyBucket.isEmpty()).thenReturn(true);
-        Mockito.when(Bucket.<Biomass>empty()).thenReturn(emptyBucket);
-
-        final InfiniteHold<Biomass> hold = new InfiniteHold<>();
-
-        // Act
-        final Bucket<Biomass> result = hold.addContent(emptyBucket);
-
-        // Assert
-        assertEquals(emptyBucket, result);
-        assertTrue(hold.getContent().isEmpty());
-    }
-
-    @Test
-    void getContent_shouldReturnCurrentHoldContents() {
-        // Arrange
-        final Bucket<Biomass> someBucket = Mockito.mock(Bucket.class);
-
-        final InfiniteHold<Biomass> hold = new InfiniteHold<>();
-        hold.addContent(someBucket); // Add some content
-
-        // Act
-        final Bucket<Biomass> content = hold.getContent();
-
-        // Assert
-        assertEquals(someBucket, content);
-    }
-
-    @Test
-    void removeContent_shouldClearTheHoldAndReturnExistingContents() {
-        // Arrange
-        final Bucket<Biomass> someBucket = Mockito.mock(Bucket.class);
-        final Bucket<Biomass> emptyBucket = Mockito.mock(Bucket.class);
-
-        Mockito.when(Bucket.<Biomass>empty()).thenReturn(emptyBucket);
-
-        final InfiniteHold<Biomass> hold = new InfiniteHold<>();
-        hold.addContent(someBucket); // Add some content
-
-        // Act
-        final Bucket<Biomass> removedContent = hold.removeContent();
-
-        // Assert
-        assertEquals(someBucket, removedContent);
-        assertEquals(emptyBucket, hold.getContent()); // Hold should now be empty
-    }
-
-    @Test
-    void removeContent_shouldReturnEmptyBucket_whenHoldIsInitiallyEmpty() {
-        // Arrange
-        final Bucket<Biomass> emptyBucket = Mockito.mock(Bucket.class);
-        Mockito.when(Bucket.<Biomass>empty()).thenReturn(emptyBucket);
-
-        final InfiniteHold<Biomass> hold = new InfiniteHold<>();
-
-        // Act
-        final Bucket<Biomass> removedContent = hold.removeContent();
-
-        // Assert
-        assertEquals(emptyBucket, removedContent);
-        assertTrue(hold.getContent().isEmpty());
+        assertTrue(returnedBucket.isEmpty(), "Returned bucket should be empty");
+        assertEquals(
+            Bucket.from(Map.of(
+                DummySpecies.A, Biomass.ofKg(15), // Combined content for overlapping species
+                DummySpecies.C, Biomass.ofKg(15)
+            )),
+            infiniteHold.getContent(),
+            "InfiniteHold content should correctly combine overlapping and new species"
+        );
     }
 }

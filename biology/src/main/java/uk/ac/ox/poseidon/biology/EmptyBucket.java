@@ -27,6 +27,17 @@ import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 public class EmptyBucket<C extends Content<C>> implements Bucket<C> {
+
+    @Override
+    public boolean equals(final Object obj) {
+        return obj instanceof final Bucket<?> bucket && bucket.isEmpty();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return true;
+    }
+
     @Override
     public C getContent(final Species species) {
         return null;
