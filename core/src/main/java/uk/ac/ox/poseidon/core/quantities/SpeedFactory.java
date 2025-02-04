@@ -29,12 +29,6 @@ public class SpeedFactory extends AbstractQuantityFactory<Speed> {
     }
 
     public SpeedFactory(
-        final String quantity
-    ) {
-        super(Speed.class, quantity);
-    }
-
-    public SpeedFactory(
         final double value,
         final String unitString
     ) {
@@ -46,6 +40,11 @@ public class SpeedFactory extends AbstractQuantityFactory<Speed> {
         final Unit<Speed> unit
     ) {
         super(Speed.class, value, unit.toString());
+    }
+
+    public static SpeedFactory of(final String quantity) {
+        final var entry = parse(Speed.class, quantity);
+        return new SpeedFactory(entry.getValue(), entry.getKey());
     }
 
 }

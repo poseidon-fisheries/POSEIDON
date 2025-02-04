@@ -166,7 +166,7 @@ public class ExternalScenario extends Scenario {
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid =
         new UniformCarryingCapacityGridFactory(
             bathymetricGrid,
-            new MassFactory("5000 kg")
+            MassFactory.of("5000 kg")
         );
     private Factory<? extends BiomassAllocator> biomassAllocator =
         new FullBiomassAllocatorFactory(carryingCapacityGrid);
@@ -274,7 +274,7 @@ public class ExternalScenario extends Scenario {
                 vesselField,
                 new RandomHomePortFactory(portGrid),
                 portGrid,
-                new SpeedFactory("15 km/h")
+                SpeedFactory.of("15 km/h")
             )
         );
 

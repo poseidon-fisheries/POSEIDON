@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.fishing;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.AbstractAction;
@@ -29,6 +30,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Getter
+@SuppressFBWarnings(value = "EI2", justification = "Int2D is actually immutable.")
 public class DummyFishingAction extends AbstractAction implements FishingAction {
 
     private final Int2D cell;

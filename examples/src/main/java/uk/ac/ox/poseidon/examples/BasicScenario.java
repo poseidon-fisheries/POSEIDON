@@ -186,7 +186,7 @@ public class BasicScenario extends Scenario {
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid =
         new UniformCarryingCapacityGridFactory(
             bathymetricGrid,
-            new MassFactory(CARRYING_CAPACITY)
+            MassFactory.of(CARRYING_CAPACITY)
         );
     private Factory<? extends BiomassAllocator> biomassAllocator =
         new FullBiomassAllocatorFactory(carryingCapacityGrid);
@@ -245,8 +245,8 @@ public class BasicScenario extends Scenario {
             0
         );
     private VesselScopeFactory<? extends Hold<Biomass>> hold = new StandardBiomassHoldFactory(
-        new MassFactory(VESSEL_HOLD_CAPACITY),
-        new MassFactory("1 kg"),
+        MassFactory.of(VESSEL_HOLD_CAPACITY),
+        MassFactory.of("1 kg"),
         new ProportionalBiomassOvercapacityDiscardingStrategyFactory()
     );
     private VesselScopeFactory<? extends MutableOptionValues<Int2D>> optionValues =

@@ -29,12 +29,6 @@ public class MassFactory extends AbstractQuantityFactory<Mass> {
     }
 
     public MassFactory(
-        final String quantity
-    ) {
-        super(Mass.class, quantity);
-    }
-
-    public MassFactory(
         final double value,
         final String unitString
     ) {
@@ -47,4 +41,10 @@ public class MassFactory extends AbstractQuantityFactory<Mass> {
     ) {
         super(Mass.class, value, unit.toString());
     }
+
+    public static MassFactory of(final String quantity) {
+        final var entry = parse(Mass.class, quantity);
+        return new MassFactory(entry.getValue(), entry.getKey());
+    }
+
 }

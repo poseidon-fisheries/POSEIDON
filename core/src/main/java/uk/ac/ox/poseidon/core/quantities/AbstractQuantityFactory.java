@@ -32,6 +32,9 @@ import uk.ac.ox.poseidon.core.Simulation;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
+import java.util.Map.Entry;
+
+import static java.util.Map.entry;
 
 @Getter
 @Setter
@@ -51,14 +54,15 @@ public abstract class AbstractQuantityFactory<Q extends Quantity<Q>>
     private double value;
     private String unitString;
 
-    public AbstractQuantityFactory(
+    static <Q extends Quantity<Q>> Entry<String, Double> parse(
         final Class<Q> type,
         final String quantity
     ) {
-        this.type = type;
         final Quantity<Q> q = SimpleQuantityFormat.getInstance().parse(quantity).asType(type);
-        this.value = q.getValue().doubleValue();
-        this.unitString = q.getUnit().toString();
+        return entry(
+            q.getUnit().toString(),
+            q.getValue().doubleValue()
+        );
     }
 
     @Override
