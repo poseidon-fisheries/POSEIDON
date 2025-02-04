@@ -96,14 +96,14 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
 
         @Override
         public Bucket<Biomass> availableFish() {
-            return Bucket.from(ImmutableMap.of(species, getBiomass(cell)));
+            return Bucket.of(ImmutableMap.of(species, getBiomass(cell)));
         }
 
         @Override
         public Bucket<Biomass> extract(final Bucket<Biomass> fishToExtract) {
             final Bucket.Builder<Biomass> fishExtracted = Bucket.newBuilder();
             fishToExtract
-                .maybeGetContent(species)
+                .getContent(species)
                 .map(Biomass::asKg)
                 .ifPresent(biomassToExtract -> {
                     final double gridBiomass = getBiomass(cell).asKg();

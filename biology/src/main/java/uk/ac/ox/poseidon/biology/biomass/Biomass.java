@@ -19,7 +19,6 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import tech.units.indriya.quantity.Quantities;
 import uk.ac.ox.poseidon.biology.Content;
@@ -30,23 +29,29 @@ import javax.measure.quantity.Mass;
 
 import static javax.measure.MetricPrefix.KILO;
 import static tech.units.indriya.unit.Units.GRAM;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 
-@AllArgsConstructor
 @Data
 public class Biomass implements Content<Biomass> {
 
     // Biomass stored internally in kilograms
     private final double biomassInKg;
 
+    public Biomass(final double biomassInKg) {
+        this.biomassInKg = checkNonNegative(biomassInKg, "Biomass");
+    }
+
     public Biomass(
         final Number value,
         final Unit<Mass> unit
     ) {
-        this.biomassInKg = Quantities
-            .getQuantity(value, unit)
-            .to(KILO(GRAM))
-            .getValue()
-            .doubleValue();
+        this(
+            Quantities
+                .getQuantity(value, unit)
+                .to(KILO(GRAM))
+                .getValue()
+                .doubleValue()
+        );
     }
 
     public static Biomass ofKg(final double value) {
@@ -83,4 +88,8 @@ public class Biomass implements Content<Biomass> {
     }
 
     public String toString() {return "Biomass(" + this.asQuantity() + ")";}
+
+    public double asKg() {
+        return this.biomassInKg;
+    }
 }

@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.biology;
 
 import com.google.common.collect.ImmutableMap;
+import lombok.Data;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
@@ -28,61 +29,63 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
-public interface Bucket<C extends Content<C>> {
+@Data
+public final class Bucket<C extends Content<C>> {
 
-    static <C extends Content<C>> Bucket<C> empty() {
-        return new EmptyBucket<>();
+    private final ImmutableMap<Species, C> map;
+
+    private Bucket(final ImmutableMap<Species, C> map) {
+        this.map = map;
     }
 
-    static <C extends Content<C>> Builder<C> newBuilder() {
+    @SuppressWarnings("RedundantTypeArguments")
+    public static <C extends Content<C>> Bucket<C> empty() {
+        return new Bucket<>(ImmutableMap.<Species, C>of());
+    }
+
+    public static <C extends Content<C>> Builder<C> newBuilder() {
         return new Builder<>();
     }
 
-    static <C extends Content<C>> Bucket<C> copyOf(final Bucket<C> other) {
-        return Bucket.from(other.getMap());
+    public static <C extends Content<C>> Bucket<C> copyOf(final Bucket<C> other) {
+        return new Bucket<>(other.map);
     }
 
-    static <C extends Content<C>> Bucket<C> of(
+    public static <C extends Content<C>> Bucket<C> of(
         final Species species,
         final C content
     ) {
-        return Bucket.<C>newBuilder().put(species, content).build();
+        // we call `of` instead of the constructor to filter empty content
+        return Bucket.of(ImmutableMap.of(species, content));
     }
 
-    static <C extends Content<C>> Bucket<C> from(
+    public static <C extends Content<C>> Bucket<C> of(
         final Map<Species, C> map
     ) {
-        return Bucket.<C>newBuilder().put(map).build();
+        // we use a builder instead of the constructor to filter empty content
+        // and potentially add together multiple entries for the same species
+        return new Builder<C>().add(ImmutableMap.copyOf(map)).build();
     }
 
-    default Builder<C> toBuilder() {
+    public Builder<C> toBuilder() {
         return Bucket.<C>newBuilder().put(this);
     }
 
-    default C getContent(final Species species) {
-        return checkNotNull(
-            getMap().get(species),
-            "Species %s not present in bucket",
-            species
-        );
-    }
-
-    default Optional<C> maybeGetContent(final Species species) {
+    public Optional<C> getContent(final Species species) {
         return Optional.ofNullable(getMap().get(species));
     }
 
-    default Bucket<C> add(final Bucket<C> other) {
+    public Bucket<C> add(final Bucket<C> other) {
         return toBuilder().add(other).build();
     }
 
-    default Bucket<C> subtract(final Bucket<C> other) {
+    public Bucket<C> subtract(final Bucket<C> other) {
         return toBuilder().subtract(other).build();
     }
 
-    default Bucket<C> replaceContent(
+    public Bucket<C> replaceContent(
         final Species species,
         final C newContent
     ) {
@@ -91,19 +94,17 @@ public interface Bucket<C extends Content<C>> {
             .build();
     }
 
-    Map<Species, C> getMap();
-
-    default Bucket<C> mapContent(final UnaryOperator<C> mapper) {
+    public Bucket<C> mapContent(final UnaryOperator<C> mapper) {
         final Builder<C> builder = toBuilder();
         getMap().forEach((species, c) -> builder.put(species, mapper.apply(c)));
         return builder.build();
     }
 
-    default boolean isEmpty() {
+    public boolean isEmpty() {
         return getMap().values().stream().allMatch(C::isEmpty);
     }
 
-    default Biomass getTotalBiomass() {
+    public Biomass getTotalBiomass() {
         return getMap()
             .values()
             .stream()
@@ -112,7 +113,7 @@ public interface Bucket<C extends Content<C>> {
             .orElseGet(() -> Biomass.ofKg(0));
     }
 
-    class Builder<C extends Content<C>> {
+    public static class Builder<C extends Content<C>> {
         private final Map<Species, C> map = new HashMap<>();
 
         private Builder() {
@@ -183,7 +184,7 @@ public interface Bucket<C extends Content<C>> {
                 .stream()
                 .filter(entry -> !entry.getValue().isEmpty())
                 .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-            return new ImmutableBucket<>(newMap);
+            return new Bucket<>(newMap);
         }
 
     }

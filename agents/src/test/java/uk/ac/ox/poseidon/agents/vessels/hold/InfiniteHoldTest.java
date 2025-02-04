@@ -59,7 +59,7 @@ class InfiniteHoldTest {
         // Assert
         assertTrue(returnedBucket.isEmpty(), "Returned bucket should be empty");
         assertEquals(
-            Bucket.from(Map.of(
+            Bucket.of(Map.of(
                 DummySpecies.A, Biomass.ofKg(10),
                 DummySpecies.B, Biomass.ofKg(20)
             )),
@@ -72,7 +72,7 @@ class InfiniteHoldTest {
     void testAddOverlappingSpeciesContent() {
         // Arrange
         final Bucket<Biomass> initialBucket = Bucket.of(DummySpecies.A, Biomass.ofKg(10));
-        final Bucket<Biomass> newBucket = Bucket.from(Map.of(
+        final Bucket<Biomass> newBucket = Bucket.of(Map.of(
             DummySpecies.A, Biomass.ofKg(5),  // Overlapping species
             DummySpecies.C, Biomass.ofKg(15)
         ));
@@ -85,7 +85,7 @@ class InfiniteHoldTest {
         // Assert
         assertTrue(returnedBucket.isEmpty(), "Returned bucket should be empty");
         assertEquals(
-            Bucket.from(Map.of(
+            Bucket.of(Map.of(
                 DummySpecies.A, Biomass.ofKg(15), // Combined content for overlapping species
                 DummySpecies.C, Biomass.ofKg(15)
             )),

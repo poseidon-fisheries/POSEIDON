@@ -28,7 +28,9 @@ public class Preconditions {
     ) {
         checkArgument(
             value >= 0 && value <= 1,
-            name + " must be between 0 and 1 but was " + value
+            "%s must be between 0 and 1 but was %s",
+            name,
+            value
         );
         return value;
     }
@@ -39,7 +41,9 @@ public class Preconditions {
     ) {
         checkArgument(
             value >= 0,
-            name + " must be not be negative but was " + value
+            "%s must be not be negative but was %s",
+            name,
+            value
         );
         return value;
     }
@@ -50,7 +54,9 @@ public class Preconditions {
     ) {
         checkArgument(
             value >= 0,
-            name + " must be not be negative but was " + value
+            "%s must be not be negative but was %s",
+            name,
+            value
         );
         return value;
     }
@@ -61,7 +67,9 @@ public class Preconditions {
     ) {
         checkArgument(
             value > 0,
-            name + " must be positive but was " + value
+            "%s must be positive but was %s",
+            name,
+            value
         );
         return value;
     }
