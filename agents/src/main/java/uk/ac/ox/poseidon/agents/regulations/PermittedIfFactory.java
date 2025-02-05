@@ -19,15 +19,26 @@
 
 package uk.ac.ox.poseidon.agents.regulations;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-@FunctionalInterface
-public interface Regulations {
-    
-    boolean isPermitted(Action action);
+import java.util.function.Predicate;
 
-    default boolean isForbidden(final Action action) {
-        return !isPermitted(action);
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class PermittedIfFactory extends GlobalScopeFactory<PermittedIf> {
+
+    private GlobalScopeFactory<? extends Predicate<Action>> actionPredicate;
+
+    @Override
+    protected PermittedIf newInstance(final Simulation simulation) {
+        return new PermittedIf(actionPredicate.get(simulation));
     }
-
 }

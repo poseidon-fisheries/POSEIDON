@@ -17,17 +17,25 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.regulations;
+package uk.ac.ox.poseidon.agents.regulations.predicates.operators;
 
+import com.google.common.collect.ImmutableList;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 
-@FunctionalInterface
-public interface Regulations {
-    
-    boolean isPermitted(Action action);
+import java.util.function.Predicate;
 
-    default boolean isForbidden(final Action action) {
-        return !isPermitted(action);
+@Getter
+@RequiredArgsConstructor
+public class AllOf implements Predicate<Action> {
+
+    @NonNull
+    private final ImmutableList<Predicate<Action>> predicates;
+
+    @Override
+    public boolean test(final Action action) {
+        return predicates.stream().allMatch(predicate -> predicate.test(action));
     }
-
 }

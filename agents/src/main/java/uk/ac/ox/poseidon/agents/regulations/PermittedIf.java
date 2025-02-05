@@ -19,15 +19,18 @@
 
 package uk.ac.ox.poseidon.agents.regulations;
 
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 
-@FunctionalInterface
-public interface Regulations {
-    
-    boolean isPermitted(Action action);
+import java.util.function.Predicate;
 
-    default boolean isForbidden(final Action action) {
-        return !isPermitted(action);
+@RequiredArgsConstructor
+public class PermittedIf implements Regulations {
+
+    private final Predicate<Action> actionPredicate;
+
+    @Override
+    public boolean isPermitted(final Action action) {
+        return actionPredicate.test(action);
     }
-
 }

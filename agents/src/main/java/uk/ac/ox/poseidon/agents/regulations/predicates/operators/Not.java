@@ -17,17 +17,24 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.regulations;
+package uk.ac.ox.poseidon.agents.regulations.predicates.operators;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 
-@FunctionalInterface
-public interface Regulations {
-    
-    boolean isPermitted(Action action);
+import java.util.function.Predicate;
 
-    default boolean isForbidden(final Action action) {
-        return !isPermitted(action);
+@Getter
+@RequiredArgsConstructor
+public class Not implements Predicate<Action> {
+
+    @NonNull
+    private final Predicate<Action> predicate;
+
+    @Override
+    public boolean test(final Action action) {
+        return !predicate.test(action);
     }
-
 }
