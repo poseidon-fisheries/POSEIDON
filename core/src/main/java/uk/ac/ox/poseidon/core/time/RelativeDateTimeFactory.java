@@ -21,6 +21,7 @@ package uk.ac.ox.poseidon.core.time;
 
 import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.LocalDateTime;
@@ -30,13 +31,13 @@ import java.time.temporal.TemporalAmount;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-abstract class RelativeDateTimeFactory implements Factory<LocalDateTime> {
+abstract class RelativeDateTimeFactory extends GlobalScopeFactory<LocalDateTime> {
 
     @NonNull private Factory<? extends LocalDateTime> referenceDateTime;
     @NonNull private Factory<? extends TemporalAmount> temporalAmount;
 
     @Override
-    public LocalDateTime get(final Simulation simulation) {
+    protected LocalDateTime newInstance(final Simulation simulation) {
         return operation(
             referenceDateTime.get(simulation),
             temporalAmount.get(simulation)
