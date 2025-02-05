@@ -27,6 +27,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -95,15 +96,8 @@ class BetweenDatesFactoryTest {
         );
 
         // Act & Assert
-        try {
-            factory.newInstance(mockSimulation);
-        } catch (final NullPointerException e) {
-            assertEquals(
-                "start is marked non-null but is null",
-                e.getMessage(),
-                "Expected NullPointerException for null start date."
-            );
-        }
+        assertThrows(NullPointerException.class, () -> factory.newInstance(mockSimulation));
+
     }
 
     /**
@@ -127,15 +121,7 @@ class BetweenDatesFactoryTest {
         );
 
         // Act & Assert
-        try {
-            factory.newInstance(mockSimulation);
-        } catch (final NullPointerException e) {
-            assertEquals(
-                "end is marked non-null but is null",
-                e.getMessage(),
-                "Expected NullPointerException for null end date."
-            );
-        }
+        assertThrows(NullPointerException.class, () -> factory.newInstance(mockSimulation));
     }
 
     /**
