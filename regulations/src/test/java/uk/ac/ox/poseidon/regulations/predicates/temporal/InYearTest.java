@@ -53,6 +53,57 @@ class InYearTest {
     }
 
     @Test
+    void testActionSpansOverMultipleYearsIncludingTargetYear() {
+        // Arrange
+        final int targetYear = 2023;
+        final Action action = Mockito.mock(Action.class);
+        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2022, 12, 25, 23, 0));
+        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2024, 1, 5, 11, 0));
+
+        final InYear inYear = new InYear(targetYear);
+
+        // Act
+        final boolean result = inYear.test(action);
+
+        // Assert
+        assertTrue(result);
+    }
+
+    @Test
+    void testActionStartsAndEndsBeforeTargetYear() {
+        // Arrange
+        final int targetYear = 2023;
+        final Action action = Mockito.mock(Action.class);
+        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2021, 5, 1, 8, 0));
+        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2021, 7, 1, 18, 0));
+
+        final InYear inYear = new InYear(targetYear);
+
+        // Act
+        final boolean result = inYear.test(action);
+
+        // Assert
+        assertFalse(result);
+    }
+
+    @Test
+    void testActionStartsAndEndsAfterTargetYear() {
+        // Arrange
+        final int targetYear = 2023;
+        final Action action = Mockito.mock(Action.class);
+        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2024, 1, 2, 10, 0));
+        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2024, 12, 30, 20, 0));
+
+        final InYear inYear = new InYear(targetYear);
+
+        // Act
+        final boolean result = inYear.test(action);
+
+        // Assert
+        assertFalse(result);
+    }
+
+    @Test
     void testActionEndYearMatches() {
         // Arrange
         final int targetYear = 2023;
@@ -67,23 +118,6 @@ class InYearTest {
 
         // Assert
         assertTrue(result);
-    }
-
-    @Test
-    void testBothStartAndEndYearDoNotMatch() {
-        // Arrange
-        final int targetYear = 2023;
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2022, 5, 15, 12, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2024, 5, 15, 12, 0));
-
-        final InYear inYear = new InYear(targetYear);
-
-        // Act
-        final boolean result = inYear.test(action);
-
-        // Assert
-        assertFalse(result);
     }
 
     @Test
