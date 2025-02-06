@@ -41,7 +41,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * lies within the specified date range. Otherwise, it evaluates to {@code false}.
  */
 @Getter
-public class BetweenDates implements Predicate<Action> {
+public final class BetweenDates implements Predicate<Action> {
 
     @NonNull private final LocalDate start;
     @NonNull private final LocalDate end;

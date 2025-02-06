@@ -31,15 +31,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * Test class for {@link BetweenDatesFactory}.
+ * <p>
+ * This class contains tests for the `newInstance` method of `BetweenDatesFactory`. The
+ * `newInstance` method creates a new {@link BetweenDates} object using the start and end dates
+ * obtained from the provided {@link Simulation}.
+ */
+@SuppressWarnings("unchecked")
 class BetweenDatesFactoryTest {
-
-    /**
-     * Test class for {@link BetweenDatesFactory}.
-     *
-     * This class contains tests for the `newInstance` method of `BetweenDatesFactory`.
-     * The `newInstance` method creates a new {@link BetweenDates} object
-     * using the start and end dates obtained from the provided {@link Simulation}.
-     */
 
     /**
      * Test when `newInstance` method successfully creates a `BetweenDates` object with valid start
