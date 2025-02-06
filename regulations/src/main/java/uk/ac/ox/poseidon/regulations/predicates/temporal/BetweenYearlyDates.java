@@ -21,6 +21,7 @@ package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 
@@ -54,8 +55,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @EqualsAndHashCode
 public class BetweenYearlyDates implements Predicate<Action> {
 
-    private final MonthDay start;
-    private final MonthDay end;
+    @NonNull private final MonthDay start;
+    @NonNull private final MonthDay end;
     private final boolean yearSpanning;
 
     public BetweenYearlyDates(

@@ -21,6 +21,7 @@ package uk.ac.ox.poseidon.agents.behaviours;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Data;
+import lombok.NonNull;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.time.Duration;
@@ -31,9 +32,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Data
 public abstract class AbstractAction implements Action {
-    protected final Vessel vessel;
-    protected final LocalDateTime start;
-    protected final Duration duration;
+    @NonNull protected final Vessel vessel;
+    @NonNull protected final LocalDateTime start;
+    @NonNull protected final Duration duration;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AbstractAction(

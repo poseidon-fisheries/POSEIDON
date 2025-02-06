@@ -5,6 +5,7 @@
       <option name="GENERATE_FINAL_PARAMETERS" value="true" />
       <option name="VISIBILITY" value="packageLocal" />
       <option name="REPLACE_INSTANCEOF_AND_CAST" value="true" />
+      <option name="DO_NOT_WRAP_AFTER_SINGLE_ANNOTATION" value="true" />
     </JavaCodeStyleSettings>
     <codeStyleSettings language="JAVA">
       <indentOptions>

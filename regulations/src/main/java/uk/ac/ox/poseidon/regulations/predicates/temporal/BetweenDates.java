@@ -24,21 +24,27 @@ import lombok.NonNull;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * The BetweenDates class implements a predicate to determine whether an {@code Action}'s start or
- * end date falls within a specified range of dates. It uses {@code LocalDate} for comparison of
- * date ranges.
+ * The BetweenDates class implements a predicate to determine if a given {@code Action} occurs
+ * within a specified date range, defined by a start and end date.
  * <p>
- * This class is immutable and requires two {@code LocalDate} objects, representing the inclusive
- * start and end dates for the range.
+ * Features and Behavior: - The date range is inclusive of both the start and end dates. - The
+ * {@code Action} is considered to meet the predicate if any of the following conditions hold: 1.
+ * The {@code Action}'s start date falls within the specified range. 2. The {@code Action}'s end
+ * date falls within the specified range. 3. The range fully encompasses the {@code Action}'s
+ * duration.
  * <p>
- * The predicate evaluates {@code true} if either the start or the end date of the {@code Action}
- * lies within the specified date range. Otherwise, it evaluates to {@code false}.
+ * Immutability: - This class is immutable. Both the start and end dates are required to be
+ * non-null.
+ * <p>
+ * Preconditions: - The start date must not be after the end date.
+ * <p>
+ * Thread Safety: - Instances of this class are thread-safe as long as the {@code Action} instances
+ * provided are used in a thread-safe manner.
  */
 @Getter
 public final class BetweenDates implements Predicate<Action> {
@@ -62,11 +68,13 @@ public final class BetweenDates implements Predicate<Action> {
 
     @Override
     public boolean test(final Action action) {
-        return betweenDates(action.getStart()) || betweenDates(action.getEnd());
+        final LocalDate actionStart = action.getStart().toLocalDate();
+        final LocalDate actionEnd = action.getEnd().toLocalDate();
+        return betweenDates(actionStart) || betweenDates(actionEnd) ||
+            (actionStart.isBefore(start) && actionEnd.isAfter(end));
     }
 
-    private boolean betweenDates(final LocalDateTime dateTime) {
-        final var date = dateTime.toLocalDate();
+    private boolean betweenDates(final LocalDate date) {
         return !(date.isBefore(start) || date.isAfter(end));
     }
 
