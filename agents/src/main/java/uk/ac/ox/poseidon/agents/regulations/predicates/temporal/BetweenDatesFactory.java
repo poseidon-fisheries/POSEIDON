@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.regulations.predicates;
+package uk.ac.ox.poseidon.agents.regulations.predicates.temporal;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
