@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.regulations;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
@@ -28,7 +29,7 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class ForbiddenIf implements Regulations {
 
-    private final Predicate<Action> actionPredicate;
+    @NonNull private final Predicate<Action> actionPredicate;
 
     @Override
     public boolean isPermitted(final Action action) {

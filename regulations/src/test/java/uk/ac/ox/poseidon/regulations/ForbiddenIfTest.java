@@ -56,6 +56,55 @@ class ForbiddenIfTest {
     }
 
     @Test
+    void testActionIsNotPermittedWhenPredicateIsAlwaysTrue() {
+        // Arrange
+        final Predicate<Action> alwaysTruePredicate = action -> true;
+        final ForbiddenIf forbiddenIf = new ForbiddenIf(alwaysTruePredicate);
+        final Action mockAction = Mockito.mock(Action.class);
+
+        // Act
+        final boolean result = forbiddenIf.isPermitted(mockAction);
+
+        // Assert
+        assertFalse(result, "Expected action to be not permitted when predicate is always true.");
+    }
+
+    @Test
+    void testActionWithNullVessel() {
+        // Arrange
+        final Predicate<Action> predicate = action -> {
+            final Vessel vessel = action.getVessel();
+            return vessel == null || "BlockedVessel".equals(vessel.getId());
+        };
+        final ForbiddenIf forbiddenIf = new ForbiddenIf(predicate);
+        final Action mockAction = Mockito.mock(Action.class);
+        Mockito.when(mockAction.getVessel()).thenReturn(null);
+
+        // Act
+        final boolean result = forbiddenIf.isPermitted(mockAction);
+
+        // Assert
+        assertFalse(result, "Expected action to be not permitted when vessel is null.");
+    }
+
+    @Test
+    void testActionWithExtremelyLongDuration() {
+        // Arrange
+        final Predicate<Action> predicate =
+            action -> action.getDuration().compareTo(Duration.ofDays(365)) > 0;
+        final ForbiddenIf forbiddenIf = new ForbiddenIf(predicate);
+
+        final Action mockAction = Mockito.mock(Action.class);
+        Mockito.when(mockAction.getDuration()).thenReturn(Duration.ofDays(1000));
+
+        // Act
+        final boolean result = forbiddenIf.isPermitted(mockAction);
+
+        // Assert
+        assertFalse(result, "Expected action to be not permitted when duration exceeds 1 year.");
+    }
+
+    @Test
     void testActionIsNotPermittedWhenPredicateReturnsTrue() {
         // Arrange
         final Predicate<Action> predicate = action -> true;
