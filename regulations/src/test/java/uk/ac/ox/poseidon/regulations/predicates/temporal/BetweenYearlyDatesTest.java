@@ -33,6 +33,111 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BetweenYearlyDatesTest {
 
     @Test
+    void testActionStartsAndEndsOnExactStartDate() {
+        // Arrange
+        final MonthDay beginning = MonthDay.of(Month.JUNE, 1);
+        final MonthDay end = MonthDay.of(Month.JULY, 31);
+        final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
+
+        final Action action = Mockito.mock(Action.class);
+        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2023, 6, 1, 0, 0));
+        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2023, 6, 1, 23, 59));
+
+        // Act & Assert
+        assertTrue(predicate.test(action));
+    }
+
+    @Test
+    void testActionSpansMoreThanAYear() {
+        // Arrange
+        final MonthDay beginning = MonthDay.of(Month.JANUARY, 1);
+        final MonthDay end = MonthDay.of(Month.DECEMBER, 31);
+        final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
+
+        final Action action = Mockito.mock(Action.class);
+        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2022, 6, 15, 10, 0));
+        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2024, 7, 15, 10, 0));
+
+        // Act & Assert
+        assertTrue(predicate.test(action));
+    }
+
+    @Test
+    void testActionStartsAndEndsOnExactEndDate() {
+        // Arrange
+        final MonthDay beginning = MonthDay.of(Month.JUNE, 1);
+        final MonthDay end = MonthDay.of(Month.JULY, 31);
+        final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
+
+        final Action action = Mockito.mock(Action.class);
+        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2023, 7, 31, 0, 0));
+        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2023, 7, 31, 23, 59));
+
+        // Act & Assert
+        assertTrue(predicate.test(action));
+    }
+
+    @Test
+    void testActionSpansEntireYear() {
+        // Arrange
+        final MonthDay beginning = MonthDay.of(Month.NOVEMBER, 1);
+        final MonthDay end = MonthDay.of(Month.MARCH, 1);
+        final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
+
+        final Action action = Mockito.mock(Action.class);
+        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2022, 1, 1, 0, 0));
+        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2022, 12, 31, 23, 59));
+
+        // Act & Assert
+        assertTrue(predicate.test(action));
+    }
+
+    @Test
+    void testActionFullyOverlapsRange() {
+        // Arrange
+        final MonthDay beginning = MonthDay.of(Month.APRIL, 1);
+        final MonthDay end = MonthDay.of(Month.JUNE, 30);
+        final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
+
+        final Action action = Mockito.mock(Action.class);
+        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2023, 3, 25, 0, 0));
+        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2023, 7, 2, 23, 59));
+
+        // Act & Assert
+        assertTrue(predicate.test(action));
+    }
+
+    @Test
+    void testActionStartsAtYearBoundaryForYearSpanningRange() {
+        // Arrange
+        final MonthDay beginning = MonthDay.of(Month.NOVEMBER, 1);
+        final MonthDay end = MonthDay.of(Month.FEBRUARY, 28);
+        final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
+
+        final Action action = Mockito.mock(Action.class);
+        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2023, 12, 31, 0, 0));
+        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2024, 1, 1, 0, 0));
+
+        // Act & Assert
+        assertTrue(predicate.test(action));
+    }
+
+    @Test
+    void testActionStartsAndEndsSameDayInsideRange() {
+        // Arrange
+        final MonthDay beginning = MonthDay.of(Month.MARCH, 15);
+        final MonthDay end = MonthDay.of(Month.APRIL, 10);
+        final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
+
+        final Action action = Mockito.mock(Action.class);
+        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2023, 3, 20, 10, 0));
+        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2023, 3, 20, 20, 0));
+
+        // Act & Assert
+        assertTrue(predicate.test(action));
+    }
+
+    @Test
     void testActionWithinNonYearSpanningRange() {
         // Arrange
         final MonthDay beginning = MonthDay.of(Month.JUNE, 1);

@@ -24,11 +24,31 @@ import lombok.Getter;
 import lombok.ToString;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 
+import java.time.LocalDateTime;
 import java.time.MonthDay;
 import java.util.function.Predicate;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * The BetweenYearlyDates class implements a predicate to determine whether an {@code Action}'s
+ * start and end dates overlap with a specified range of dates, repeating every calendar year.
+ * <p>
+ * The range is defined using two {@code MonthDay} instances representing the inclusive start and
+ * end of the range. The class accounts for whether the range crosses the boundary of a calendar
+ * year (year spanning).
+ * <p>
+ * Key behavior:
+ * - If the date range does not span a year (start is before or equal to end within the same year),
+ * the predicate checks if the action's dates fall within this range.
+ * - If the date range spans a year (start is after end crossing into the next calendar year),
+ * actions are tested with respect to the wrapped year-spanning interval.
+ * - The predicate will return {@code true} if the action's start or end date lies inside the range,
+ * or if the range fully encompasses the action's entire duration.
+ * <p>
+ * This class is immutable, with precondition checks performed to ensure valid input parameters.
+ */
 @Getter
 @ToString
 @EqualsAndHashCode
@@ -49,13 +69,28 @@ public class BetweenYearlyDates implements Predicate<Action> {
 
     @Override
     public boolean test(final Action action) {
-        return test(MonthDay.from(action.getStart())) || test(MonthDay.from(action.getEnd()));
+        checkArgument(action.getStart().isBefore(action.getEnd()));
+        return insideRange(action.getStart()) || insideRange(action.getEnd()) ||
+            coversRange(action.getStart(), action.getEnd());
     }
 
-    private boolean test(final MonthDay monthDay) {
-        final boolean outsideRange = yearSpanning
-            ? monthDay.isAfter(end) && monthDay.isBefore(start)
-            : monthDay.isBefore(start) || monthDay.isAfter(end);
-        return !outsideRange;
+    private boolean coversRange(final LocalDateTime actionStart, final LocalDateTime actionEnd) {
+        final MonthDay startDay = MonthDay.from(actionStart);
+        final MonthDay endDay = MonthDay.from(actionEnd);
+        return switch (actionEnd.getYear() - actionStart.getYear()) {
+            // If the action is within a single year, it can only cover a range that isn't year spanning
+            case 0 -> !yearSpanning && startDay.isBefore(start) && endDay.isAfter(end);
+            // action spans year boundary, it can only cover a range that is year spanning
+            case 1 -> yearSpanning && startDay.isBefore(start) && endDay.isAfter(end);
+            // if action spans more than a year, it necessarily covers any range
+            default -> true;
+        };
+    }
+
+    private boolean insideRange(final LocalDateTime dateTime) {
+        final MonthDay monthDay = MonthDay.from(dateTime);
+        return yearSpanning
+            ? !monthDay.isAfter(end) || !monthDay.isBefore(start)
+            : !monthDay.isBefore(start) && !monthDay.isAfter(end);
     }
 }
