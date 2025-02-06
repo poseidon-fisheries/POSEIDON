@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,21 @@
  *
  */
 
-plugins {
-    // Apply the foojay-resolver plugin to allow automatic download of JDKs
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
-}
+package uk.ac.ox.poseidon.regulations;
 
-rootProject.name = "POSEIDON"
-include("core")
-include("geography")
-include("io")
-include("biology")
-include("examples")
-include("gui")
-include("agents")
-include("regulations")
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.behaviours.Action;
+import uk.ac.ox.poseidon.agents.regulations.Regulations;
+
+import java.util.function.Predicate;
+
+@RequiredArgsConstructor
+public class ForbiddenIf implements Regulations {
+
+    private final Predicate<Action> actionPredicate;
+
+    @Override
+    public boolean isPermitted(final Action action) {
+        return !actionPredicate.test(action);
+    }
+}

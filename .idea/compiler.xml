@@ -12,6 +12,7 @@
         <module name="POSEIDON.core.main" />
         <module name="POSEIDON.gui.main" />
         <module name="POSEIDON.io.main" />
+        <module name="POSEIDON.regulations.main" />
         <module name="POSEIDON.geography.main" />
         <module name="POSEIDON.biology.main" />
         <module name="POSEIDON.examples.main" />

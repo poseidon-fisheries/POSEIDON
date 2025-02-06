@@ -27,6 +27,7 @@
             <option value="$PROJECT_DIR$/geography" />
             <option value="$PROJECT_DIR$/gui" />
             <option value="$PROJECT_DIR$/io" />
+            <option value="$PROJECT_DIR$/regulations" />
           </set>
         </option>
       </GradleProjectSettings>
