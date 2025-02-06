@@ -17,12 +17,10 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.regulations.predicates;
+package uk.ac.ox.poseidon.agents.regulations.predicates.temporal;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import uk.ac.ox.poseidon.agents.regulations.predicates.temporal.BetweenDates;
-import uk.ac.ox.poseidon.agents.regulations.predicates.temporal.BetweenDatesFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -40,7 +38,6 @@ import static org.mockito.Mockito.when;
  * `newInstance` method creates a new {@link BetweenDates} object using the start and end dates
  * obtained from the provided {@link Simulation}.
  */
-@SuppressWarnings("unchecked")
 class BetweenDatesFactoryTest {
 
     /**

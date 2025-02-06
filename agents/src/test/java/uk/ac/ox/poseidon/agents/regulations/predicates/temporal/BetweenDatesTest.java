@@ -17,12 +17,11 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.regulations.predicates;
+package uk.ac.ox.poseidon.agents.regulations.predicates.temporal;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
-import uk.ac.ox.poseidon.agents.regulations.predicates.temporal.BetweenDates;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

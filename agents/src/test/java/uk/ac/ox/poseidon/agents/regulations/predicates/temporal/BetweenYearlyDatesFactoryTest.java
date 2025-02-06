@@ -17,12 +17,10 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.regulations.predicates;
+package uk.ac.ox.poseidon.agents.regulations.predicates.temporal;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import uk.ac.ox.poseidon.agents.regulations.predicates.temporal.BetweenYearlyDates;
-import uk.ac.ox.poseidon.agents.regulations.predicates.temporal.BetweenYearlyDatesFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.time.MonthDayFactory;
