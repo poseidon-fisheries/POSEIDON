@@ -17,14 +17,31 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations;
+package uk.ac.ox.poseidon.regulations.predicates;
 
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.behaviours.Action;
 
-public class NeverPermittedFactory extends GlobalScopeFactory<NeverPermitted> {
-    @Override
-    protected NeverPermitted newInstance(final Simulation simulation) {
-        return new NeverPermitted();
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.mock;
+
+class AlwaysFalseTest {
+
+    /**
+     * The AlwaysFalse class implements a Predicate<Action> that always returns false regardless of
+     * the input Action provided to the test method.
+     */
+
+    @Test
+    void test_alwaysReturnsFalse() {
+        // Arrange
+        final AlwaysFalse alwaysFalse = new AlwaysFalse();
+        final Action mockAction = mock(Action.class);
+
+        // Act
+        final boolean result = alwaysFalse.test(mockAction);
+
+        // Assert
+        assertFalse(result);
     }
 }

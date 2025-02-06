@@ -17,14 +17,18 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations;
+package uk.ac.ox.poseidon.regulations.predicates;
 
-import uk.ac.ox.poseidon.agents.behaviours.Action;
-import uk.ac.ox.poseidon.agents.regulations.Regulations;
+import lombok.Getter;
+import lombok.Setter;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-public class NeverPermitted implements Regulations {
+@Getter
+@Setter
+public class AlwaysTrueFactory extends GlobalScopeFactory<AlwaysTrue> {
     @Override
-    public boolean isPermitted(final Action action) {
-        return false;
+    protected AlwaysTrue newInstance(final Simulation simulation) {
+        return new AlwaysTrue();
     }
 }

@@ -81,7 +81,8 @@ import uk.ac.ox.poseidon.geography.ports.SimplePortFactory;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
-import uk.ac.ox.poseidon.regulations.NeverPermittedFactory;
+import uk.ac.ox.poseidon.regulations.PermittedIfFactory;
+import uk.ac.ox.poseidon.regulations.predicates.AlwaysFalseFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -154,7 +155,7 @@ public class ExternalScenario extends Scenario {
         );
     private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
         new FishingLocationLegalityCheckerFactory(
-            new NeverPermittedFactory(),
+            new PermittedIfFactory(new AlwaysFalseFactory()),
             pathFinder,
             distance
         );

@@ -17,14 +17,16 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations;
+package uk.ac.ox.poseidon.regulations.predicates;
 
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.NonNull;
+import uk.ac.ox.poseidon.agents.behaviours.Action;
 
-public class AlwaysPermittedFactory extends GlobalScopeFactory<AlwaysPermitted> {
+import java.util.function.Predicate;
+
+public class AlwaysTrue implements Predicate<Action> {
     @Override
-    protected AlwaysPermitted newInstance(final Simulation simulation) {
-        return new AlwaysPermitted();
+    public boolean test(@NonNull final Action action) {
+        return true;
     }
 }

@@ -17,14 +17,31 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations;
+package uk.ac.ox.poseidon.regulations.predicates;
 
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
-import uk.ac.ox.poseidon.agents.regulations.Regulations;
 
-public class AlwaysPermitted implements Regulations {
-    @Override
-    public boolean isPermitted(final Action action) {
-        return true;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+
+class AlwaysTrueTest {
+
+    /**
+     * The AlwaysTrue class implements a Predicate that always returns true when its test method is
+     * called, regardless of the provided input.
+     */
+
+    @Test
+    void testAlwaysReturnsTrueForAnyAction() {
+        // Arrange
+        final AlwaysTrue alwaysTrue = new AlwaysTrue();
+        final Action mockAction = mock(Action.class);
+
+        // Act
+        final boolean result = alwaysTrue.test(mockAction);
+
+        // Assert
+        assertTrue(result, "AlwaysTrue should always return true for any Action input.");
     }
 }
