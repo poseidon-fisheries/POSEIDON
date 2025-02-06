@@ -43,6 +43,7 @@ import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
 import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
 import uk.ac.ox.poseidon.agents.regulations.FishingLocationLegalityCheckerFactory;
+import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.tables.FishingActionListenerTableFactory;
 import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
@@ -82,7 +83,7 @@ import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 import uk.ac.ox.poseidon.regulations.PermittedIfFactory;
-import uk.ac.ox.poseidon.regulations.predicates.AlwaysFalseFactory;
+import uk.ac.ox.poseidon.regulations.predicates.temporal.InYearFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -153,12 +154,6 @@ public class ExternalScenario extends Scenario {
             portGrid,
             distance
         );
-    private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
-        new FishingLocationLegalityCheckerFactory(
-            new PermittedIfFactory(new AlwaysFalseFactory()),
-            pathFinder,
-            distance
-        );
     private BehaviourFactory<?> travellingBehaviour =
         new TravellingAlongPathBehaviourFactory(
             pathFinder,
@@ -217,6 +212,16 @@ public class ExternalScenario extends Scenario {
             optionValuesRegister,
             new ExponentialMovingAverageOptionValuesFactory<>(0.5)
         );
+    private Factory<? extends Regulations> regulations =
+        new PermittedIfFactory(
+            new InYearFactory(LocalDate.now().getYear())
+        );
+    private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
+        new FishingLocationLegalityCheckerFactory(
+            regulations,
+            pathFinder,
+            distance
+        );
     private Factory<? extends Fleet> fleet =
         new DefaultFleetFactory(
             500,
@@ -261,7 +266,8 @@ public class ExternalScenario extends Scenario {
                                 new BiomassGridsFactory(
                                     List.of(biomassGridA)
                                 )
-                            )
+                            ),
+                            regulations
                         ),
                         travellingBehaviour
                     ),

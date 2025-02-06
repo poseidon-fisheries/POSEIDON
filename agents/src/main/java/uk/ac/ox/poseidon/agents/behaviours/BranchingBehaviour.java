@@ -22,7 +22,6 @@ package uk.ac.ox.poseidon.agents.behaviours;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 public abstract class BranchingBehaviour implements Behaviour {
     @Override
@@ -30,19 +29,13 @@ public abstract class BranchingBehaviour implements Behaviour {
         final Vessel vessel,
         final LocalDateTime dateTime
     ) {
-        return Optional
-            .ofNullable(nextBehaviour(vessel, dateTime))
-            .map(behaviour -> {
-                vessel.pushBehaviour(behaviour);
-                return behaviour.nextAction(vessel, dateTime);
-            })
-            .or(() -> {
-                vessel.popBehaviour();
-                return Optional
-                    .ofNullable(vessel.currentBehaviour())
-                    .map(behaviour -> behaviour.nextAction(vessel, dateTime));
-            })
-            .orElse(null);
+        final var nextBehaviour = nextBehaviour(vessel, dateTime);
+        if (nextBehaviour != null) {
+            vessel.pushBehaviour(nextBehaviour);
+            return nextBehaviour.nextAction(vessel, dateTime);
+        } else {
+            return null;
+        }
     }
 
     protected abstract Behaviour nextBehaviour(

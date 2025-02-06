@@ -26,6 +26,7 @@ import lombok.Setter;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
+import java.time.Month;
 import java.time.MonthDay;
 
 @Getter
@@ -36,6 +37,13 @@ public class MonthDayFactory extends GlobalScopeFactory<MonthDay> {
 
     private int month;
     private int dayOfMonth;
+
+    public MonthDayFactory(
+        final Month month,
+        final int dayOfMonth
+    ) {
+        this(month.getValue(), dayOfMonth);
+    }
 
     public static MonthDayFactory parse(final CharSequence text) {
         final var monthDay = MonthDay.parse(text);

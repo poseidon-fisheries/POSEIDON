@@ -21,9 +21,11 @@ package uk.ac.ox.poseidon.agents.behaviours;
 
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 
 public interface Behaviour {
+    @Nullable
     SteppableAction nextAction(
         Vessel vessel,
         LocalDateTime dateTime

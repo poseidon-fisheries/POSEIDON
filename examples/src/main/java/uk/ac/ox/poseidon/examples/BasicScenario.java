@@ -43,6 +43,7 @@ import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
 import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
 import uk.ac.ox.poseidon.agents.regulations.FishingLocationLegalityCheckerFactory;
+import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.tables.FishingActionListenerTableFactory;
 import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
@@ -63,10 +64,7 @@ import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.suppliers.PoissonIntSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.RandomBooleanSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
-import uk.ac.ox.poseidon.core.time.DateFactory;
-import uk.ac.ox.poseidon.core.time.DateTimeAfterFactory;
-import uk.ac.ox.poseidon.core.time.DurationFactory;
-import uk.ac.ox.poseidon.core.time.ExponentiallyDistributedDurationSupplierFactory;
+import uk.ac.ox.poseidon.core.time.*;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.RoughCoastalBathymetricGridFactory;
@@ -82,11 +80,12 @@ import uk.ac.ox.poseidon.geography.ports.SimplePortFactory;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
-import uk.ac.ox.poseidon.regulations.PermittedIfFactory;
-import uk.ac.ox.poseidon.regulations.predicates.AlwaysTrueFactory;
+import uk.ac.ox.poseidon.regulations.ForbiddenIfFactory;
+import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenYearlyDatesFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.Period;
 import java.util.List;
 import java.util.function.Predicate;
@@ -173,12 +172,6 @@ public class BasicScenario extends Scenario {
             portGrid,
             distance
         );
-    private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
-        new FishingLocationLegalityCheckerFactory(
-            new PermittedIfFactory(new AlwaysTrueFactory()),
-            pathFinder,
-            distance
-        );
     private BehaviourFactory<?> travellingBehaviour =
         new TravellingAlongPathBehaviourFactory(
             pathFinder,
@@ -245,6 +238,20 @@ public class BasicScenario extends Scenario {
             ),
             0
         );
+    @SuppressWarnings("MagicNumber")
+    private Factory<? extends Regulations> regulations =
+        new ForbiddenIfFactory(
+            new BetweenYearlyDatesFactory(
+                new MonthDayFactory(Month.MARCH, 1),
+                new MonthDayFactory(Month.MAY, 31)
+            )
+        );
+    private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
+        new FishingLocationLegalityCheckerFactory(
+            regulations,
+            pathFinder,
+            distance
+        );
     private VesselScopeFactory<? extends Hold<Biomass>> hold = new StandardBiomassHoldFactory(
         MassFactory.of(VESSEL_HOLD_CAPACITY),
         MassFactory.of("1 kg"),
@@ -304,7 +311,8 @@ public class BasicScenario extends Scenario {
                                 new BiomassGridsFactory(
                                     List.of(biomassGridA, biomassGridB)
                                 )
-                            )
+                            ),
+                            regulations
                         ),
                         travellingBehaviour
                     ),

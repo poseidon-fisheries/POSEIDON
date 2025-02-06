@@ -37,7 +37,6 @@ import javax.measure.Quantity;
 import javax.measure.quantity.Speed;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Optional;
 
 @Getter
 @Setter
@@ -127,13 +126,16 @@ public class Vessel implements Oriented2D {
     }
 
     public void scheduleNextAction(final TemporalSchedule schedule) {
-        Optional
-            .ofNullable(currentBehaviour())
-            .map(behaviour -> behaviour.nextAction(this, schedule.getDateTime()))
-            .ifPresent(action -> {
+        while (currentBehaviour() != null) {
+            final var action = currentBehaviour().nextAction(this, schedule.getDateTime());
+            if (action != null) {
                 action.init();
                 schedule.scheduleOnceIn(action.getDuration(), action);
-            });
+                break;
+            } else {
+                popBehaviour();
+            }
+        }
     }
 
     @Override

@@ -19,17 +19,16 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.fishing;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
+import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
 import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.Fisheable;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.function.Supplier;
@@ -41,9 +40,10 @@ import java.util.function.Supplier;
 public class DefaultFishingBehaviourFactory<C extends Content<C>>
     extends BehaviourFactory<Fishing<C>> {
 
-    private VesselScopeFactory<? extends FishingGear<C>> fishingGear;
-    private VesselScopeFactory<? extends Hold<C>> hold;
-    private VesselScopeFactory<? extends Supplier<Fisheable<C>>> fisheableSupplier;
+    @NonNull private VesselScopeFactory<? extends FishingGear<C>> fishingGear;
+    @NonNull private VesselScopeFactory<? extends Hold<C>> hold;
+    @NonNull private VesselScopeFactory<? extends Supplier<Fisheable<C>>> fisheableSupplier;
+    @NonNull private Factory<? extends Regulations> regulations;
 
     @Override
     protected Fishing<C> newInstance(
@@ -53,7 +53,8 @@ public class DefaultFishingBehaviourFactory<C extends Content<C>>
         return new Fishing<>(
             fishingGear.get(simulation, vessel),
             hold.get(simulation, vessel),
-            fisheableSupplier.get(simulation, vessel)
+            fisheableSupplier.get(simulation, vessel),
+            regulations.get(simulation)
         );
     }
 }

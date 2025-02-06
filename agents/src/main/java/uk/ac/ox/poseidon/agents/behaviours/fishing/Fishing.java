@@ -21,10 +21,12 @@ package uk.ac.ox.poseidon.agents.behaviours.fishing;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
 import uk.ac.ox.poseidon.agents.behaviours.SteppableGridAction;
+import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
 import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
@@ -39,16 +41,18 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 public class Fishing<C extends Content<C>> implements Behaviour {
 
-    protected final FishingGear<C> fishingGear;
-    protected final Hold<C> hold;
-    private final Supplier<Fisheable<C>> fisheableSupplier;
+    @NonNull protected final FishingGear<C> fishingGear;
+    @NonNull protected final Hold<C> hold;
+    @NonNull private final Supplier<Fisheable<C>> fisheableSupplier;
+    @NonNull private final Regulations regulations;
 
     @Override
     public SteppableAction nextAction(
         final Vessel vessel,
         final LocalDateTime dateTime
     ) {
-        return new Action(vessel, dateTime, fishingGear.getDurationSupplier().get());
+        final var action = new Action(vessel, dateTime, fishingGear.getDurationSupplier().get());
+        return regulations.isPermitted(action) ? action : null;
     }
 
     @Getter
