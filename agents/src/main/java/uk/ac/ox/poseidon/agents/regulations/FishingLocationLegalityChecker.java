@@ -17,13 +17,12 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations;
+package uk.ac.ox.poseidon.agents.regulations;
 
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DummyFishingAction;
-import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.Distance;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;

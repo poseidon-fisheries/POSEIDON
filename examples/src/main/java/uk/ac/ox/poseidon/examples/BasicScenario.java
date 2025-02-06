@@ -42,6 +42,7 @@ import uk.ac.ox.poseidon.agents.fleets.Fleet;
 import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
 import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
+import uk.ac.ox.poseidon.agents.regulations.FishingLocationLegalityCheckerFactory;
 import uk.ac.ox.poseidon.agents.tables.FishingActionListenerTableFactory;
 import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
@@ -82,7 +83,6 @@ import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 import uk.ac.ox.poseidon.regulations.AlwaysPermittedFactory;
-import uk.ac.ox.poseidon.regulations.FishingLocationLegalityCheckerFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
