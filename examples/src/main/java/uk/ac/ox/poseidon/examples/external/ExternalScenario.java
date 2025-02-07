@@ -71,7 +71,7 @@ import uk.ac.ox.poseidon.examples.QuickRunner;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.RoughCoastalBathymetricGridFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
-import uk.ac.ox.poseidon.geography.distance.EquirectangularDistanceFactory;
+import uk.ac.ox.poseidon.geography.distance.EquirectangularDistanceCalculatorFactory;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 import uk.ac.ox.poseidon.geography.grids.GridExtentFactory;
 import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
@@ -134,8 +134,9 @@ public class ExternalScenario extends Scenario {
         );
 
     private Factory<? extends VesselField> vesselField = new VesselFieldFactory(gridExtent);
-    private Factory<? extends DistanceCalculator> distance = new EquirectangularDistanceFactory(
-        gridExtent);
+    private Factory<? extends DistanceCalculator> distance =
+        new EquirectangularDistanceCalculatorFactory(
+            gridExtent);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
         new RoughCoastalBathymetricGridFactory(
             gridExtent,

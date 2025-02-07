@@ -32,7 +32,7 @@ import uk.ac.ox.poseidon.geography.grids.GridExtent;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EquirectangularDistanceFactory extends GlobalScopeFactory<EquirectangularDistanceCalculator> {
+public class EquirectangularDistanceCalculatorFactory extends GlobalScopeFactory<EquirectangularDistanceCalculator> {
 
     private Factory<? extends GridExtent> gridExtent;
 

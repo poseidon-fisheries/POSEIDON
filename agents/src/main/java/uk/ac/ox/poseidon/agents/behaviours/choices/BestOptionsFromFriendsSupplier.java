@@ -26,10 +26,11 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Supplier;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static uk.ac.ox.poseidon.core.MasonUtils.upToNOf;
 
 @RequiredArgsConstructor
@@ -57,13 +58,20 @@ class BestOptionsFromFriendsSupplier<O> implements Supplier<OptionValues<O>> {
     }
 
     @Override
+
     public OptionValues<O> get() {
-        return new ImmutableOptionValues<>(
-            getFriends()
-                .stream()
-                .flatMap(vessel -> optionValuesRegister.get(vessel).stream())
-                .flatMap(optionValues -> optionValues.getBestEntries().stream())
-                .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue, Math::max))
-        );
+        // It's faster to build a hashmap first and then let
+        // ImmutableOptionValues copy it into an ImmutableMap
+        final Map<O, Double> aggregatedValues = new HashMap<>();
+        for (final Vessel friend : getFriends()) {
+            optionValuesRegister
+                .get(friend)
+                .ifPresent(values -> {
+                    for (final Entry<O, Double> entry : values.getBestEntries()) {
+                        aggregatedValues.merge(entry.getKey(), entry.getValue(), Math::max);
+                    }
+                });
+        }
+        return new ImmutableOptionValues<>(aggregatedValues);
     }
 }
