@@ -25,7 +25,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.distance.Distance;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 import java.text.MessageFormat;
@@ -39,7 +39,7 @@ import static com.google.common.base.Preconditions.checkState;
 public class TravellingAlongPath implements Behaviour {
 
     private final PathFinder<Int2D> pathFinder;
-    private final Distance distance;
+    private final DistanceCalculator distanceCalculator;
     private List<Int2D> currentPath;
 
     @Override
@@ -84,7 +84,7 @@ public class TravellingAlongPath implements Behaviour {
             super(
                 vessel,
                 start,
-                distance.travelDuration(
+                distanceCalculator.travelDuration(
                     vessel.getCurrentCell(),
                     currentPath.getFirst(),
                     vessel.getCruisingSpeed()

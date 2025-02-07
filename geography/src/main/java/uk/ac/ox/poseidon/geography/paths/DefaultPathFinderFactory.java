@@ -27,7 +27,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-import uk.ac.ox.poseidon.geography.distance.Distance;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 @Getter
@@ -38,7 +38,7 @@ public class DefaultPathFinderFactory extends GlobalScopeFactory<GridPathFinder>
 
     private Factory<? extends BathymetricGrid> bathymetricGrid;
     private Factory<? extends PortGrid> portGrid;
-    private Factory<? extends Distance> distance;
+    private Factory<? extends DistanceCalculator> distance;
 
     @Override
     protected GridPathFinder newInstance(final Simulation simulation) {

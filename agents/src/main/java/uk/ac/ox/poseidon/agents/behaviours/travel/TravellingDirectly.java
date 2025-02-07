@@ -24,7 +24,7 @@ import lombok.ToString;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.distance.Distance;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class TravellingDirectly implements Behaviour {
 
-    private final Distance distance;
+    private final DistanceCalculator distanceCalculator;
 
     @Override
     public SteppableAction nextAction(
@@ -41,7 +41,7 @@ public class TravellingDirectly implements Behaviour {
     ) {
         return new Action(
             dateTime,
-            distance.travelDuration(
+            distanceCalculator.travelDuration(
                 vessel.getCurrentCell(),
                 vessel.getCurrentDestination(),
                 vessel.getCruisingSpeed()

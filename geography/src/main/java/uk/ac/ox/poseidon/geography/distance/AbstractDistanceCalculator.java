@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,25 +19,13 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class EquirectangularDistanceFactory extends GlobalScopeFactory<EquirectangularDistanceCalculator> {
-
-    private Factory<? extends GridExtent> gridExtent;
-
-    @Override
-    protected EquirectangularDistanceCalculator newInstance(final Simulation simulation) {
-        return new EquirectangularDistanceCalculator(gridExtent.get(simulation));
-    }
+@RequiredArgsConstructor
+public abstract class AbstractDistanceCalculator implements DistanceCalculator {
+    public static final double EARTH_RADIUS_IN_KM = 6371.0;
+    protected final GridExtent gridExtent;
 }

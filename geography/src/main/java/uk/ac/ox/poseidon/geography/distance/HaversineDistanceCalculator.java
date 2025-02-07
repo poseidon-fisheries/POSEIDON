@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,33 +22,28 @@ package uk.ac.ox.poseidon.geography.distance;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
-
 import static java.lang.Math.*;
-import static javax.measure.MetricPrefix.KILO;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.METRE;
 
-public class EquirectangularDistance extends CoordinateBasedDistance {
+public class HaversineDistanceCalculator extends CoordinateBasedDistanceCalculator {
 
-    private final static Quantity<Length> EARTH_RADIUS = getQuantity(6373, KILO(METRE));
-
-    public EquirectangularDistance(final GridExtent gridExtent) {
+    public HaversineDistanceCalculator(final GridExtent gridExtent) {
         super(gridExtent);
     }
 
     @Override
-    public Quantity<Length> distanceBetween(
+    public double distanceInKm(
         final Coordinate a,
         final Coordinate b
     ) {
-        final double x1 = toRadians(a.x);
-        final double y1 = toRadians(a.y);
-        final double x2 = toRadians(b.x);
-        final double y2 = toRadians(b.y);
-        final double x = (x2 - x1) * cos((y1 + y2) / 2d);
-        final double y = y2 - y1;
-        return EARTH_RADIUS.multiply(sqrt(x * x + y * y));
+        final double lat1 = toRadians(a.y);
+        final double lon1 = toRadians(a.x);
+        final double lat2 = toRadians(b.y);
+        final double lon2 = toRadians(b.x);
+        final double dLat = lat2 - lat1;
+        final double dLon = lon2 - lon1;
+        final double h = sin(dLat / 2) * sin(dLat / 2) +
+            cos(lat1) * cos(lat2) * sin(dLon / 2) * sin(dLon / 2);
+        final double c = 2 * atan2(sqrt(h), sqrt(1 - h));
+        return EARTH_RADIUS_IN_KM * c;
     }
 }

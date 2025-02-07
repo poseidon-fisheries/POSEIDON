@@ -19,25 +19,21 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import sim.util.Number2D;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class EquirectangularDistanceFactory extends GlobalScopeFactory<EquirectangularDistanceCalculator> {
+public abstract class CoordinateBasedDistanceCalculator extends AbstractDistanceCalculator {
 
-    private Factory<? extends GridExtent> gridExtent;
+    public CoordinateBasedDistanceCalculator(final GridExtent gridExtent) {
+        super(gridExtent);
+    }
 
     @Override
-    protected EquirectangularDistanceCalculator newInstance(final Simulation simulation) {
-        return new EquirectangularDistanceCalculator(gridExtent.get(simulation));
+    public double distanceInKm(
+        final Number2D start,
+        final Number2D end
+    ) {
+        return distanceInKm(gridExtent.toCoordinate(start), gridExtent.toCoordinate(end));
     }
+
 }

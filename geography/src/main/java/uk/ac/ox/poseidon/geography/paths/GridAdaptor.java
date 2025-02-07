@@ -30,7 +30,7 @@ import lombok.Data;
 import lombok.Getter;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-import uk.ac.ox.poseidon.geography.distance.Distance;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -43,19 +43,19 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
     private final PortGrid portGrid;
     private final GridExtent gridExtent;
     @Getter
-    private final Distance distance;
+    private final DistanceCalculator distanceCalculator;
     private final Cache<Int2D, Array<Connection<Int2D>>> connectionsCache =
         CacheBuilder.newBuilder().build();
 
     public GridAdaptor(
         final BathymetricGrid bathymetricGrid,
         final PortGrid portGrid,
-        final Distance distance
+        final DistanceCalculator distanceCalculator
     ) {
         this.bathymetricGrid = bathymetricGrid;
         this.portGrid = portGrid;
         this.gridExtent = bathymetricGrid.getGridExtent();
-        this.distance = distance;
+        this.distanceCalculator = distanceCalculator;
     }
 
     private boolean isNavigable(final Int2D cell) {
@@ -87,10 +87,7 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
                                 new WeightedConnection(
                                     intern(cell),
                                     intern(neighbour),
-                                    distance
-                                        .distanceBetween(cell, neighbour)
-                                        .getValue()
-                                        .floatValue()
+                                    (float) distanceCalculator.distanceInKm(cell, neighbour)
                                 )
                             )
                             .toArray(WeightedConnection[]::new)

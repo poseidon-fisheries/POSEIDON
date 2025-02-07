@@ -25,7 +25,7 @@ import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.google.common.collect.ImmutableList;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-import uk.ac.ox.poseidon.geography.distance.Distance;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.Optional;
@@ -39,13 +39,13 @@ public class AStarPathFinder extends AbstractGridPathFinder {
     public AStarPathFinder(
         final BathymetricGrid bathymetricGrid,
         final PortGrid portGrid,
-        final Distance distance
+        final DistanceCalculator distanceCalculator
     ) {
         super(bathymetricGrid, portGrid);
-        this.gridAdaptor = new GridAdaptor(bathymetricGrid, portGrid, distance);
+        this.gridAdaptor = new GridAdaptor(bathymetricGrid, portGrid, distanceCalculator);
         this.pathFinder = new IndexedAStarPathFinder<>(gridAdaptor);
         this.heuristic = (Int2D a, Int2D b) ->
-            gridAdaptor.getDistance().distanceBetween(a, b).getValue().floatValue();
+            (float) gridAdaptor.getDistanceCalculator().distanceInKm(a, b);
     }
 
     @Override

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,27 +19,20 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import lombok.RequiredArgsConstructor;
-import sim.util.Number2D;
+import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
+public abstract class GridBasedDistanceCalculator extends AbstractDistanceCalculator {
 
-@RequiredArgsConstructor
-public abstract class CoordinateBasedDistance implements Distance {
-
-    private final GridExtent gridExtent;
-
-    @Override
-    public Quantity<Length> distanceBetween(
-        final Number2D start,
-        final Number2D end
-    ) {
-        return distanceBetween(
-            gridExtent.toCoordinate(start),
-            gridExtent.toCoordinate(end)
-        );
+    public GridBasedDistanceCalculator(final GridExtent gridExtent) {
+        super(gridExtent);
     }
 
+    @Override
+    public double distanceInKm(
+        final Coordinate a,
+        final Coordinate b
+    ) {
+        return distanceInKm(gridExtent.toPoint(a), gridExtent.toPoint(b));
+    }
 }

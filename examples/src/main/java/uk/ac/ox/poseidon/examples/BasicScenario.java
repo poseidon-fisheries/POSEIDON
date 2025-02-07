@@ -68,7 +68,7 @@ import uk.ac.ox.poseidon.core.time.*;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.RoughCoastalBathymetricGridFactory;
-import uk.ac.ox.poseidon.geography.distance.Distance;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.EquirectangularDistanceFactory;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 import uk.ac.ox.poseidon.geography.grids.GridExtentFactory;
@@ -114,6 +114,15 @@ public class BasicScenario extends Scenario {
     private static final int VESSEL_SPEED = 15;
     private static final String VESSEL_HOLD_CAPACITY = "1 t";
 
+    @SuppressWarnings("MagicNumber")
+    private Factory<? extends Regulations> regulations =
+        new ForbiddenIfFactory(
+            new BetweenYearlyDatesFactory(
+                new MonthDayFactory(Month.MARCH, 1),
+                new MonthDayFactory(Month.MAY, 31)
+            )
+        );
+
     private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
         new RegisterFactory<>();
     private Factory<? extends Species> speciesA = new SpeciesFactory("A");
@@ -146,7 +155,8 @@ public class BasicScenario extends Scenario {
         );
 
     private Factory<? extends VesselField> vesselField = new VesselFieldFactory(gridExtent);
-    private Factory<? extends Distance> distance = new EquirectangularDistanceFactory(gridExtent);
+    private Factory<? extends DistanceCalculator> distance = new EquirectangularDistanceFactory(
+        gridExtent);
     @SuppressWarnings("MagicNumber")
     private Factory<? extends BathymetricGrid> bathymetricGrid =
         new RoughCoastalBathymetricGridFactory(
@@ -174,6 +184,12 @@ public class BasicScenario extends Scenario {
         );
     private BehaviourFactory<?> travellingBehaviour =
         new TravellingAlongPathBehaviourFactory(
+            pathFinder,
+            distance
+        );
+    private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
+        new FishingLocationLegalityCheckerFactory(
+            regulations,
             pathFinder,
             distance
         );
@@ -237,20 +253,6 @@ public class BasicScenario extends Scenario {
                 )
             ),
             0
-        );
-    @SuppressWarnings("MagicNumber")
-    private Factory<? extends Regulations> regulations =
-        new ForbiddenIfFactory(
-            new BetweenYearlyDatesFactory(
-                new MonthDayFactory(Month.MARCH, 1),
-                new MonthDayFactory(Month.MAY, 31)
-            )
-        );
-    private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
-        new FishingLocationLegalityCheckerFactory(
-            regulations,
-            pathFinder,
-            distance
         );
     private VesselScopeFactory<? extends Hold<Biomass>> hold = new StandardBiomassHoldFactory(
         MassFactory.of(VESSEL_HOLD_CAPACITY),

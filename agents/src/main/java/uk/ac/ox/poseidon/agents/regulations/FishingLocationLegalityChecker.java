@@ -24,7 +24,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DummyFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.distance.Distance;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 import java.time.Duration;
@@ -38,7 +38,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
 
     private final Regulations regulations;
     private final GridPathFinder pathFinder;
-    private final Distance distance;
+    private final DistanceCalculator distanceCalculator;
     private final Supplier<LocalDateTime> currenDateTimeSupplier;
     private final Vessel vessel;
 
@@ -58,7 +58,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
                     fishingLocation
             ));
         final Duration travelDuration =
-            distance.travelDuration(
+            distanceCalculator.travelDuration(
                 pathToFishingLocation,
                 vessel.getCruisingSpeed()
             );

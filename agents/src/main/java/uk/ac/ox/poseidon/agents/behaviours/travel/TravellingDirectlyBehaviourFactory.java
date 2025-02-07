@@ -27,7 +27,7 @@ import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.distance.Distance;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
 @Getter
 @Setter
@@ -36,7 +36,7 @@ import uk.ac.ox.poseidon.geography.distance.Distance;
 public class TravellingDirectlyBehaviourFactory
     extends BehaviourFactory<TravellingDirectly> {
 
-    private Factory<? extends Distance> distance;
+    private Factory<? extends DistanceCalculator> distance;
     private BehaviourFactory<?> behaviourOnArrival;
 
     @Override

@@ -28,7 +28,7 @@ import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.distance.Distance;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 @Getter
@@ -39,7 +39,7 @@ public class TravellingAlongPathBehaviourFactory
     extends BehaviourFactory<TravellingAlongPath> {
 
     private Factory<? extends PathFinder<Int2D>> pathFinder;
-    private Factory<? extends Distance> distance;
+    private Factory<? extends DistanceCalculator> distance;
 
     @Override
     protected TravellingAlongPath newInstance(

@@ -70,7 +70,7 @@ import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.examples.QuickRunner;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.RoughCoastalBathymetricGridFactory;
-import uk.ac.ox.poseidon.geography.distance.Distance;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.EquirectangularDistanceFactory;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 import uk.ac.ox.poseidon.geography.grids.GridExtentFactory;
@@ -83,7 +83,7 @@ import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 import uk.ac.ox.poseidon.regulations.PermittedIfFactory;
-import uk.ac.ox.poseidon.regulations.predicates.temporal.InYearFactory;
+import uk.ac.ox.poseidon.regulations.predicates.AlwaysTrueFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -100,6 +100,11 @@ import static uk.ac.ox.poseidon.core.time.PeriodFactory.MONTHLY;
 @Getter
 @Setter
 public class ExternalScenario extends Scenario {
+
+    private Factory<? extends Regulations> regulations =
+        new PermittedIfFactory(
+            new AlwaysTrueFactory()
+        );
 
     private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
         new RegisterFactory<>();
@@ -129,7 +134,8 @@ public class ExternalScenario extends Scenario {
         );
 
     private Factory<? extends VesselField> vesselField = new VesselFieldFactory(gridExtent);
-    private Factory<? extends Distance> distance = new EquirectangularDistanceFactory(gridExtent);
+    private Factory<? extends DistanceCalculator> distance = new EquirectangularDistanceFactory(
+        gridExtent);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
         new RoughCoastalBathymetricGridFactory(
             gridExtent,
@@ -156,6 +162,12 @@ public class ExternalScenario extends Scenario {
         );
     private BehaviourFactory<?> travellingBehaviour =
         new TravellingAlongPathBehaviourFactory(
+            pathFinder,
+            distance
+        );
+    private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
+        new FishingLocationLegalityCheckerFactory(
+            regulations,
             pathFinder,
             distance
         );
@@ -211,16 +223,6 @@ public class ExternalScenario extends Scenario {
         new RegisteringFactory<>(
             optionValuesRegister,
             new ExponentialMovingAverageOptionValuesFactory<>(0.5)
-        );
-    private Factory<? extends Regulations> regulations =
-        new PermittedIfFactory(
-            new InYearFactory(LocalDate.now().getYear())
-        );
-    private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
-        new FishingLocationLegalityCheckerFactory(
-            regulations,
-            pathFinder,
-            distance
         );
     private Factory<? extends Fleet> fleet =
         new DefaultFleetFactory(

@@ -27,38 +27,39 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.measure.Quantity;
+import java.util.logging.Level;
 
 import static javax.measure.MetricPrefix.KILO;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.METRE;
+import static uk.ac.ox.poseidon.geography.distance.EquirectangularDistanceCalculator.LOGGER;
 
-class EquirectangularDistanceTest {
+class EquirectangularDistanceCalculatorTest {
 
-    private final EquirectangularDistance equirectangularDistance =
-        new EquirectangularDistance(null);
+    private final EquirectangularDistanceCalculator equirectangularDistance =
+        new EquirectangularDistanceCalculator(null);
 
     @Test
-    void testDistanceBetweenDifferentPoints() {
+    void testDistanceDifferentPoints() {
         final Coordinate oxford = new Coordinate(-1.254, 51.751);
         final Coordinate london = new Coordinate(-0.1278, 51.5074);
         assertEquals(
             getQuantity(82, KILO(METRE)),
-            equirectangularDistance.distanceBetween(oxford, london),
+            equirectangularDistance.distance(oxford, london),
             getQuantity(350, METRE)
         );
     }
 
     @Test
-    void testDistanceBetweenAcrossEquator() {
-        final Coordinate pointA = new Coordinate(-79.3832, 43.6532); // Toronto
-        // Hypothetical point in the Southern Hemisphere
-        final Coordinate pointB = new Coordinate(-79.3832, -43.6532);
+    void testDistanceAcrossEquator() {
+        final Coordinate pointA = new Coordinate(0, 1);
+        final Coordinate pointB = new Coordinate(0, -1);
 
         assertEquals(
-            getQuantity(9711, KILO(METRE)),
-            equirectangularDistance.distanceBetween(pointA, pointB),
-            getQuantity(1, KILO(METRE))
+            getQuantity(222, KILO(METRE)),
+            equirectangularDistance.distance(pointA, pointB),
+            getQuantity(500, METRE)
         );
     }
 
@@ -78,12 +79,12 @@ class EquirectangularDistanceTest {
     @Test
     void otherCoordinates() {
         assertEquals(
-            getQuantity(427.2, KILO(METRE)),
-            equirectangularDistance.distanceBetween(
-                new Coordinate(114.407067850409, -6.7958646820027),
-                new Coordinate(118.274833029541, -6.7958646820027)
+            getQuantity(106, KILO(METRE)),
+            equirectangularDistance.distance(
+                new Coordinate(-1.256, 51.7522), // Oxford
+                new Coordinate(0.1167, 52.2) // Cambridge
             ),
-            getQuantity(15, METRE)
+            getQuantity(500, METRE)
         );
     }
 
@@ -95,13 +96,13 @@ class EquirectangularDistanceTest {
         final Coordinate point = new Coordinate(lon, lat);
         assertTrue(
             equirectangularDistance
-                .distanceBetween(point, point)
+                .distance(point, point)
                 .isEquivalentTo(getQuantity(0, METRE))
         );
     }
 
     @Property
-    void distanceBetweenSymmetry(
+    void distanceSymmetry(
         @ForAll @DoubleRange(min = -180, max = 180) final double lon1,
         @ForAll @DoubleRange(min = -90, max = 90) final double lat1,
         @ForAll @DoubleRange(min = -180, max = 180) final double lon2,
@@ -109,10 +110,16 @@ class EquirectangularDistanceTest {
     ) {
         final Coordinate pointA = new Coordinate(lon1, lat1);
         final Coordinate pointB = new Coordinate(lon2, lat2);
-        assertTrue(
-            equirectangularDistance
-                .distanceBetween(pointA, pointB)
-                .isEquivalentTo(equirectangularDistance.distanceBetween(pointB, pointA))
-        );
+        final Level originalLevel = LOGGER.getLevel();
+        try {
+            LOGGER.setLevel(Level.SEVERE); // to avoid warning for big distances
+            assertTrue(
+                equirectangularDistance
+                    .distance(pointA, pointB)
+                    .isEquivalentTo(equirectangularDistance.distance(pointB, pointA))
+            );
+        } finally {
+            LOGGER.setLevel(originalLevel);
+        }
     }
 }

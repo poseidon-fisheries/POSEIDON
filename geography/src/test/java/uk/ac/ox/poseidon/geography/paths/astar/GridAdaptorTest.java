@@ -27,8 +27,8 @@ import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.DefaultBathymetricGrid;
-import uk.ac.ox.poseidon.geography.distance.Distance;
-import uk.ac.ox.poseidon.geography.distance.EquirectangularDistance;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.distance.EquirectangularDistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.AStarPathFinder;
 import uk.ac.ox.poseidon.geography.paths.GridAdaptor;
 import uk.ac.ox.poseidon.geography.ports.DefaultPortGrid;
@@ -53,8 +53,8 @@ class GridAdaptorTest {
             {-1d, -1d, -1d},
         });
 
-    private final Distance distance =
-        new EquirectangularDistance(
+    private final DistanceCalculator distanceCalculator =
+        new EquirectangularDistanceCalculator(
             bathymetricGrid.getGridExtent()
         );
 
@@ -68,7 +68,7 @@ class GridAdaptorTest {
         new GridAdaptor(
             bathymetricGrid,
             portGrid,
-            distance
+            distanceCalculator
         );
 
     @Test
@@ -141,7 +141,11 @@ class GridAdaptorTest {
 
     @Test
     void path() {
-        final AStarPathFinder pathFinder = new AStarPathFinder(bathymetricGrid, portGrid, distance);
+        final AStarPathFinder pathFinder = new AStarPathFinder(
+            bathymetricGrid,
+            portGrid,
+            distanceCalculator
+        );
         assertEquals(
             Optional.of(List.of(
                 new Int2D(0, 0),
