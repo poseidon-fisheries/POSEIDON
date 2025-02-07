@@ -31,7 +31,7 @@ public class EquirectangularDistanceCalculator extends CoordinateBasedDistanceCa
 
     static final Logger LOGGER =
         Logger.getLogger(EquirectangularDistanceCalculator.class.getName());
-    private final double WARNING_THRESHOLD = 250;
+    private static final double WARNING_THRESHOLD = 250;
 
     public EquirectangularDistanceCalculator(final GridExtent gridExtent) {
         super(gridExtent);
