@@ -19,8 +19,8 @@
 
 package uk.ac.ox.poseidon.agents.behaviours;
 
-import sim.util.Int2D;
+import com.vividsolutions.jts.geom.Coordinate;
 
-public interface GridAction extends Action {
-    Int2D getCell();
+public interface SpatialAction extends Action {
+    Coordinate getCoordinate();
 }

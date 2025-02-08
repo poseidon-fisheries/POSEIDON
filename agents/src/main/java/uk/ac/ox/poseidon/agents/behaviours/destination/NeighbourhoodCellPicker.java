@@ -50,7 +50,7 @@ public class NeighbourhoodCellPicker implements Picker<Int2D> {
             pathFinder.getAccessibleWaterNeighbours(
                 optionValues
                     .getBestOption(rng)
-                    .orElse(vessel.getCurrentCell()),
+                    .orElse(vessel.getCell()),
                 neighbourhoodSizeSupplier.getAsInt()
             );
         return shuffledStream(candidates, rng)

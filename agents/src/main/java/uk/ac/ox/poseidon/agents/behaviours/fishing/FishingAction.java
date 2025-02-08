@@ -19,9 +19,9 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.fishing;
 
-import uk.ac.ox.poseidon.agents.behaviours.GridAction;
+import uk.ac.ox.poseidon.agents.behaviours.SpatialAction;
 import uk.ac.ox.poseidon.biology.Bucket;
 
-public interface FishingAction extends GridAction {
+public interface FishingAction extends SpatialAction {
     Bucket<?> getFishCaught();
 }

@@ -17,34 +17,28 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.fishing;
+package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.vividsolutions.jts.geom.Coordinate;
-import lombok.Getter;
-import uk.ac.ox.poseidon.agents.behaviours.AbstractAction;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.agents.behaviours.Action;
+import uk.ac.ox.poseidon.agents.behaviours.SpatialAction;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
+import java.util.function.Predicate;
 
-@Getter
-public class DummyFishingAction extends AbstractAction implements FishingAction {
+public abstract class CachedCoordinatePredicate implements Predicate<Action> {
 
-    private final Coordinate coordinate;
-
-    public DummyFishingAction(
-        final LocalDateTime start,
-        final Vessel vessel,
-        final Coordinate coordinate
-    ) {
-        super(vessel, start, Duration.ofSeconds(1));
-        this.coordinate = coordinate;
-    }
+    private final LoadingCache<Coordinate, Boolean> cache =
+        CacheBuilder.newBuilder().build(CacheLoader.from(this::test));
 
     @Override
-    public Bucket<?> getFishCaught() {
-        return Bucket.empty();
+    public boolean test(final Action action) {
+        return (action instanceof final SpatialAction spatialAction) &&
+            cache.getUnchecked(spatialAction.getCoordinate());
     }
+
+    abstract public boolean test(final Coordinate coordinate);
 
 }

@@ -21,27 +21,23 @@ package uk.ac.ox.poseidon.agents.tables;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import tech.tablesaw.api.DoubleColumn;
-import uk.ac.ox.poseidon.agents.behaviours.GridAction;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.agents.behaviours.SpatialAction;
 
-public abstract class GridActionListenerTable<A extends GridAction> extends ActionListenerTable<A> {
-    private final GridExtent gridExtent;
+public abstract class SpatialActionListenerTable<A extends SpatialAction> extends ActionListenerTable<A> {
     private final DoubleColumn lon = DoubleColumn.create("lon");
     private final DoubleColumn lat = DoubleColumn.create("lat");
 
-    public GridActionListenerTable(
-        final Class<A> eventClass,
-        final GridExtent gridExtent
+    public SpatialActionListenerTable(
+        final Class<A> eventClass
     ) {
         super(eventClass);
         get().addColumns(lon, lat);
-        this.gridExtent = gridExtent;
     }
 
     @Override
     public void receive(final A action) {
         super.receive(action);
-        final Coordinate coordinate = gridExtent.toCoordinate(action.getCell());
+        final Coordinate coordinate = action.getCoordinate();
         lon.append(coordinate.x);
         lat.append(coordinate.y);
     }

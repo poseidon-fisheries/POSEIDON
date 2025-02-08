@@ -59,13 +59,13 @@ public class TravellingAlongPath implements Behaviour {
         } else {
             currentPath =
                 pathFinder
-                    .getPath(vessel.getCurrentCell(), currentDestination)
+                    .getPath(vessel.getCell(), currentDestination)
                     .filter(path -> path.size() > 1)
                     .map(path -> path.subList(1, path.size()))
                     .orElseThrow(() -> new IllegalStateException(
                         MessageFormat.format(
                             "No path found from {0} to {1} for vessel {2}.",
-                            vessel.getCurrentCell(),
+                            vessel.getCell(),
                             currentDestination,
                             vessel
                         )
@@ -85,7 +85,7 @@ public class TravellingAlongPath implements Behaviour {
                 vessel,
                 start,
                 distanceCalculator.travelDuration(
-                    vessel.getCurrentCell(),
+                    vessel.getCell(),
                     currentPath.getFirst(),
                     vessel.getCruisingSpeed()
                 )

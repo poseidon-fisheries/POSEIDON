@@ -49,11 +49,11 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
     private Action makeAction(final Int2D fishingLocation) {
         final List<Int2D> pathToFishingLocation =
             pathFinder.getPath(
-                vessel.getCurrentCell(),
+                vessel.getCell(),
                 fishingLocation
             ).orElseThrow(() -> new RuntimeException(
                 "No path from current vessel location " +
-                    vessel.getCurrentCell() +
+                    vessel.getCell() +
                     " to fishing location " +
                     fishingLocation
             ));
@@ -66,7 +66,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
         return new DummyFishingAction(
             currenDateTimeSupplier.get().plus(travelDuration),
             vessel,
-            fishingLocation
+            vessel.getVesselField().getGridExtent().toCoordinate(fishingLocation)
         );
     }
 }

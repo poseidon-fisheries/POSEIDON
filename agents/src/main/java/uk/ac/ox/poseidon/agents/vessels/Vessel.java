@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -84,17 +85,21 @@ public class Vessel implements Oriented2D {
     private void setHeadingTowards(
         final Double2D destinationPoint
     ) {
-        final Double2D location = getCurrentPoint();
+        final Double2D location = getPoint();
         final double dx = destinationPoint.x - location.x;
         final double dy = destinationPoint.y - location.y;
         setHeading(Math.atan2(dy, dx));
     }
 
-    public Double2D getCurrentPoint() {
+    public Double2D getPoint() {
         return vesselField.getPoint(this);
     }
 
-    public Int2D getCurrentCell() {
+    public Coordinate getCoordinate() {
+        return vesselField.getGridExtent().toCoordinate(getPoint());
+    }
+
+    public Int2D getCell() {
         return vesselField.getCell(this);
     }
 
@@ -106,11 +111,11 @@ public class Vessel implements Oriented2D {
 
     public boolean isAtCurrentDestination() {
         final Int2D currentDestination = getCurrentDestination();
-        return currentDestination != null && getCurrentCell().equals(currentDestination);
+        return currentDestination != null && getCell().equals(currentDestination);
     }
 
     public boolean isAtPort() {
-        return portGrid.anyPortsAt(getCurrentCell());
+        return portGrid.anyPortsAt(getCell());
     }
 
     public void popBehaviour() {

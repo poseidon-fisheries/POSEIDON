@@ -61,8 +61,16 @@ public class ExternalBiomassGridProcess
                 .addAllCatches(accumulator.build().stream()
                     .map(fishingAction -> Fishing.Catches.Catch
                         .newBuilder()
-                        .setX(fishingAction.getCell().x)
-                        .setY(fishingAction.getCell().y)
+                        .setX(
+                            internalBiomassGrid
+                                .getGridExtent()
+                                .toCell(fishingAction.getCoordinate()).x
+                        )
+                        .setY(
+                            internalBiomassGrid
+                                .getGridExtent()
+                                .toCell(fishingAction.getCoordinate()).y
+                        )
                         .setBiomassCaught(
                             fishingAction
                                 .getFishCaught()

@@ -19,27 +19,19 @@
 
 package uk.ac.ox.poseidon.agents.tables;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
 import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class FishingActionListenerTableFactory
     extends SimulationEventListenerFactory<FishingActionListenerTable> {
 
-    private Factory<? extends GridExtent> gridExtent;
-
     @Override
     protected FishingActionListenerTable newListener(final Simulation simulation) {
-        return new FishingActionListenerTable(gridExtent.get(simulation));
+        return new FishingActionListenerTable();
     }
 
 }

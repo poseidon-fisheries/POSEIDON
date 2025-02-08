@@ -19,10 +19,9 @@
 
 package uk.ac.ox.poseidon.agents.behaviours;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.vividsolutions.jts.geom.Coordinate;
 import lombok.Getter;
 import lombok.ToString;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.time.Duration;
@@ -30,21 +29,17 @@ import java.time.LocalDateTime;
 
 @Getter
 @ToString(callSuper = true)
-public abstract class SteppableGridAction extends SteppableAction implements GridAction {
+public abstract class SteppableSpatialAction extends SteppableAction implements SpatialAction {
 
-    private final Int2D cell;
+    private final Coordinate coordinate;
 
-    @SuppressFBWarnings(
-        value = "EI2",
-        justification = "Int2D is immutable even if SpotBugs thinks otherwise."
-    )
-    public SteppableGridAction(
+    public SteppableSpatialAction(
         final Vessel vessel,
         final LocalDateTime start,
         final Duration duration,
-        final Int2D cell
+        final Coordinate coordinate
     ) {
         super(vessel, start, duration);
-        this.cell = cell;
+        this.coordinate = coordinate;
     }
 }

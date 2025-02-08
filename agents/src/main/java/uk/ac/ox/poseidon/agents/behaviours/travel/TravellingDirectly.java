@@ -42,7 +42,7 @@ public class TravellingDirectly implements Behaviour {
         return new Action(
             dateTime,
             distanceCalculator.travelDuration(
-                vessel.getCurrentCell(),
+                vessel.getCell(),
                 vessel.getCurrentDestination(),
                 vessel.getCruisingSpeed()
             ),

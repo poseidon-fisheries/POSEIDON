@@ -35,6 +35,6 @@ public class CurrentCellFisheable<C extends Content<C>> implements Supplier<Fish
 
     @Override
     public Fisheable<C> get() {
-        return fisheableGrid.getFisheableCell(vessel.getCurrentCell());
+        return fisheableGrid.getFisheableCell(vessel.getCell());
     }
 }

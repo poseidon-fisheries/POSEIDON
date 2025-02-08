@@ -22,15 +22,14 @@ package uk.ac.ox.poseidon.agents.tables;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.FishingAction;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
 
-public class FishingActionListenerTable extends GridActionListenerTable<FishingAction> {
+public class FishingActionListenerTable extends SpatialActionListenerTable<FishingAction> {
 
     private final StringColumn speciesCode = StringColumn.create("species_code");
     private final DoubleColumn biomassCaught = DoubleColumn.create("biomass_caught");
 
-    public FishingActionListenerTable(final GridExtent gridExtent) {
-        super(FishingAction.class, gridExtent);
+    public FishingActionListenerTable() {
+        super(FishingAction.class);
         get().addColumns(speciesCode, biomassCaught);
     }
 

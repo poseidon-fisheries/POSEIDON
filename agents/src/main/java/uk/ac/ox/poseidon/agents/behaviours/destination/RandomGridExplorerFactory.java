@@ -49,7 +49,7 @@ public class RandomGridExplorerFactory extends VesselScopeFactory<Picker<Int2D>>
         final Vessel vessel
     ) {
         return new RandomPicker<>(
-            pathFinder.get(simulation).getAccessibleWaterCells(vessel.getCurrentCell()),
+            pathFinder.get(simulation).getAccessibleWaterCells(vessel.getCell()),
             cellPredicate.get(simulation, vessel),
             simulation.random
         );
