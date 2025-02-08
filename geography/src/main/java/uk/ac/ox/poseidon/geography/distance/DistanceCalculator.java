@@ -19,8 +19,8 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import sim.util.Number2D;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;

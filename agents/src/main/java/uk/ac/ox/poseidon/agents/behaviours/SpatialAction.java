@@ -19,7 +19,7 @@
 
 package uk.ac.ox.poseidon.agents.behaviours;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 public interface SpatialAction extends Action {
     Coordinate getCoordinate();

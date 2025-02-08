@@ -19,11 +19,11 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.MasonUtils;
+import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.AbstractGrid;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;

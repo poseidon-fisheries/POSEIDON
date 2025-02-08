@@ -19,11 +19,11 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.junit.jupiter.api.Test;
 import sim.util.Double2D;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.util.List;
 import java.util.Set;
@@ -68,11 +68,11 @@ class GridExtentTest {
     @Test
     void cellToCoordinate() {
         assertEquals(
-            new Coordinate(-4.5, 4.5, 0),
+            new Coordinate(-4.5, 4.5),
             gridExtent.toCoordinate(new Int2D(0, 0))
         );
         assertEquals(
-            new Coordinate(4.5, -4.5, 0),
+            new Coordinate(4.5, -4.5),
             gridExtent.toCoordinate(new Int2D(9, 9))
         );
     }
@@ -80,11 +80,11 @@ class GridExtentTest {
     @Test
     void pointToCoordinate() {
         assertEquals(
-            new Coordinate(-5, 5, 0),
+            new Coordinate(-5, 5),
             gridExtent.toCoordinate(new Double2D(0, 0))
         );
         assertEquals(
-            new Coordinate(5, -5, 0),
+            new Coordinate(5, -5),
             gridExtent.toCoordinate(new Double2D(10, 10))
         );
     }
@@ -93,11 +93,11 @@ class GridExtentTest {
     void coordinateToPoint() {
         assertEquals(
             new Double2D(0, 0),
-            gridExtent.toPoint(new Coordinate(-5, 5, 0))
+            gridExtent.toPoint(new Coordinate(-5, 5))
         );
         assertEquals(
             new Double2D(10, 10),
-            gridExtent.toPoint(new Coordinate(5, -5, 0))
+            gridExtent.toPoint(new Coordinate(5, -5))
         );
     }
 
@@ -105,19 +105,19 @@ class GridExtentTest {
     void coordinateToCell() {
         assertEquals(
             new Int2D(0, 0),
-            gridExtent.toCell(new Coordinate(-5, 5, 0))
+            gridExtent.toCell(new Coordinate(-5, 5))
         );
         assertEquals(
             new Int2D(0, 0),
-            gridExtent.toCell(new Coordinate(-4.5, 4.5, 0))
+            gridExtent.toCell(new Coordinate(-4.5, 4.5))
         );
         assertEquals(
             new Int2D(9, 9),
-            gridExtent.toCell(new Coordinate(4.5, -4.5, 0))
+            gridExtent.toCell(new Coordinate(4.5, -4.5))
         );
         assertEquals(
             new Int2D(10, 10),
-            gridExtent.toCell(new Coordinate(5, -5, 0))
+            gridExtent.toCell(new Coordinate(5, -5))
         );
     }
 

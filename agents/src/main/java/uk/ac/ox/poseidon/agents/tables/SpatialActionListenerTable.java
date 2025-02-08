@@ -19,9 +19,9 @@
 
 package uk.ac.ox.poseidon.agents.tables;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import tech.tablesaw.api.DoubleColumn;
 import uk.ac.ox.poseidon.agents.behaviours.SpatialAction;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 public abstract class SpatialActionListenerTable<A extends SpatialAction> extends ActionListenerTable<A> {
     private final DoubleColumn lon = DoubleColumn.create("lon");
@@ -38,7 +38,7 @@ public abstract class SpatialActionListenerTable<A extends SpatialAction> extend
     public void receive(final A action) {
         super.receive(action);
         final Coordinate coordinate = action.getCoordinate();
-        lon.append(coordinate.x);
-        lat.append(coordinate.y);
+        lon.append(coordinate.lon);
+        lat.append(coordinate.lat);
     }
 }

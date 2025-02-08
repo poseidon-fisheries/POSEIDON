@@ -19,7 +19,7 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 
 import static java.lang.Math.*;
@@ -35,10 +35,10 @@ public class HaversineDistanceCalculator extends CoordinateBasedDistanceCalculat
         final Coordinate a,
         final Coordinate b
     ) {
-        final double lat1 = toRadians(a.y);
-        final double lon1 = toRadians(a.x);
-        final double lat2 = toRadians(b.y);
-        final double lon2 = toRadians(b.x);
+        final double lat1 = toRadians(a.lat);
+        final double lon1 = toRadians(a.lon);
+        final double lat2 = toRadians(b.lat);
+        final double lon2 = toRadians(b.lon);
         final double dLat = lat2 - lat1;
         final double dLon = lon2 - lon1;
         final double h = sin(dLat / 2) * sin(dLat / 2) +

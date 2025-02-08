@@ -22,9 +22,9 @@ package uk.ac.ox.poseidon.regulations.predicates.spatial;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.agents.behaviours.SpatialAction;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.util.function.Predicate;
 

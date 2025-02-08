@@ -19,12 +19,12 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.constraints.DoubleRange;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 import javax.measure.Quantity;
 import java.util.logging.Level;

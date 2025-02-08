@@ -19,7 +19,7 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 
 import java.text.MessageFormat;
@@ -43,10 +43,10 @@ public class EquirectangularDistanceCalculator extends CoordinateBasedDistanceCa
         final Coordinate a,
         final Coordinate b
     ) {
-        final double x1 = toRadians(a.x);
-        final double y1 = toRadians(a.y);
-        final double x2 = toRadians(b.x);
-        final double y2 = toRadians(b.y);
+        final double x1 = toRadians(a.lon);
+        final double y1 = toRadians(a.lat);
+        final double x2 = toRadians(b.lon);
+        final double y2 = toRadians(b.lat);
         final double x = (x2 - x1) * cos((y1 + y2) / 2d);
         final double y = y2 - y1;
         final double result = EARTH_RADIUS_IN_KM * sqrt(x * x + y * y);

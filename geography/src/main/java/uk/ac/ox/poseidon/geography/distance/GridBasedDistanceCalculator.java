@@ -19,7 +19,7 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 
 public abstract class GridBasedDistanceCalculator extends AbstractDistanceCalculator {

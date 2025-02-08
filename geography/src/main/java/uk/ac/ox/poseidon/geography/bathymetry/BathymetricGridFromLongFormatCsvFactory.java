@@ -19,7 +19,6 @@
 
 package uk.ac.ox.poseidon.geography.bathymetry;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import lombok.*;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
@@ -27,6 +26,7 @@ import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
 
 import java.nio.file.Path;

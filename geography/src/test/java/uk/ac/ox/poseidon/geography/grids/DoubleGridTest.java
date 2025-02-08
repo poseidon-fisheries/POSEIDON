@@ -19,10 +19,10 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.util.List;
 

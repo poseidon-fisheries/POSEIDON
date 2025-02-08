@@ -23,7 +23,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Streams;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import ec.util.MersenneTwisterFast;
 import lombok.Data;
@@ -36,6 +35,7 @@ import sim.util.Double2D;
 import sim.util.Int2D;
 import sim.util.IntBag;
 import sim.util.Number2D;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.util.Arrays;
 import java.util.List;
@@ -121,8 +121,7 @@ public final class GridExtent {
     public Coordinate toCoordinate(final Double2D point) {
         return new Coordinate(
             envelope.getMinX() + point.x * cellWidth,
-            envelope.getMinY() + (gridHeight - point.y) * cellHeight,
-            0.0
+            envelope.getMinY() + (gridHeight - point.y) * cellHeight
         );
     }
 
@@ -135,8 +134,8 @@ public final class GridExtent {
     public Double2D toPoint(final Coordinate coordinate) {
         final double pixelWidth = envelope.getWidth() / gridWidth;
         final double pixelHeight = envelope.getHeight() / gridHeight;
-        final double x = (coordinate.x - envelope.getMinX()) / pixelWidth;
-        final double y = (envelope.getMaxY() - coordinate.y) / pixelHeight;
+        final double x = (coordinate.lon - envelope.getMinX()) / pixelWidth;
+        final double y = (envelope.getMaxY() - coordinate.lat) / pixelHeight;
         return new Double2D(x, y);
     }
 

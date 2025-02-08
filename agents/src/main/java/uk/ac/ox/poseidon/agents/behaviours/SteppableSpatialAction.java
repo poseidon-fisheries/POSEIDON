@@ -19,10 +19,10 @@
 
 package uk.ac.ox.poseidon.agents.behaviours;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import lombok.Getter;
 import lombok.ToString;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
