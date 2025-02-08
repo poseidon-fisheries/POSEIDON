@@ -23,6 +23,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Data;
 import lombok.NonNull;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -31,24 +32,39 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Data
+@SuppressFBWarnings(value = "EI2", justification = "Vessel is designed to be shared")
 public abstract class AbstractAction implements Action {
     @NonNull protected final Vessel vessel;
-    @NonNull protected final LocalDateTime start;
+    @NonNull protected final LocalDateTime startDateTime;
     @NonNull protected final Duration duration;
+    @NonNull protected final Coordinate startCoordinate;
+    @NonNull protected final Coordinate endCoordinate;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AbstractAction(
-        final Vessel vessel,
-        final LocalDateTime start,
-        final Duration duration
+        @NonNull final Vessel vessel,
+        @NonNull final LocalDateTime startDateTime,
+        @NonNull final Duration duration,
+        @NonNull final Coordinate startCoordinate,
+        @NonNull final Coordinate endCoordinate
     ) {
+        this.startCoordinate = startCoordinate;
+        this.endCoordinate = endCoordinate;
         checkArgument(
             duration.isPositive(),
             "Duration must be positive but was %s.",
             duration
         );
-        this.start = checkNotNull(start);
+        this.startDateTime = checkNotNull(startDateTime);
         this.duration = checkNotNull(duration);
         this.vessel = checkNotNull(vessel);
+    }
+
+    public AbstractAction(
+        @NonNull final Vessel vessel,
+        @NonNull final LocalDateTime startDateTime,
+        @NonNull final Duration duration,
+        @NonNull final Coordinate coordinate
+    ) {
+        this(vessel, startDateTime, duration, coordinate, coordinate);
     }
 }

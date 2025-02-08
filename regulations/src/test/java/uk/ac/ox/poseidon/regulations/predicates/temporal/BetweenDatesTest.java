@@ -53,8 +53,8 @@ class BetweenDatesTest {
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2023, 6, 15, 12, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2024, 1, 1, 12, 0));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 6, 15, 12, 0));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2024, 1, 1, 12, 0));
 
         // Act & Assert
         assertTrue(betweenDates.test(action));
@@ -68,8 +68,8 @@ class BetweenDatesTest {
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2022, 12, 31, 12, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2023, 6, 15, 12, 0));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2022, 12, 31, 12, 0));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 6, 15, 12, 0));
 
         // Act & Assert
         assertTrue(betweenDates.test(action));
@@ -83,8 +83,8 @@ class BetweenDatesTest {
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2023, 1, 1, 0, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2023, 12, 31, 23, 59));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 1, 1, 0, 0));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 12, 31, 23, 59));
 
         // Act & Assert
         assertTrue(betweenDates.test(action));
@@ -98,8 +98,8 @@ class BetweenDatesTest {
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2022, 12, 31, 23, 59));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2023, 12, 31, 0, 0));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2022, 12, 31, 23, 59));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 12, 31, 0, 0));
 
         // Act & Assert
         assertTrue(betweenDates.test(action));
@@ -113,8 +113,8 @@ class BetweenDatesTest {
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2022, 12, 30, 12, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2022, 12, 31, 23, 59));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2022, 12, 30, 12, 0));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2022, 12, 31, 23, 59));
 
         // Act & Assert
         assertFalse(betweenDates.test(action));
@@ -128,8 +128,8 @@ class BetweenDatesTest {
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2024, 1, 1, 0, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2024, 1, 2, 12, 0));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2024, 1, 1, 0, 0));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2024, 1, 2, 12, 0));
 
         // Act & Assert
         assertFalse(betweenDates.test(action));
@@ -143,8 +143,8 @@ class BetweenDatesTest {
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2023, 6, 1, 0, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2023, 6, 30, 23, 59));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 6, 1, 0, 0));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 6, 30, 23, 59));
 
         // Act & Assert
         assertTrue(betweenDates.test(action));
@@ -158,8 +158,8 @@ class BetweenDatesTest {
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2022, 12, 31, 12, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2024, 1, 1, 12, 0));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2022, 12, 31, 12, 0));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2024, 1, 1, 12, 0));
 
         // Act & Assert
         assertTrue(betweenDates.test(action));

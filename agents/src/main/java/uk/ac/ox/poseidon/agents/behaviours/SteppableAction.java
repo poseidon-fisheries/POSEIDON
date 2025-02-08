@@ -19,10 +19,12 @@
 
 package uk.ac.ox.poseidon.agents.behaviours;
 
+import lombok.NonNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -30,11 +32,30 @@ import java.time.LocalDateTime;
 public abstract class SteppableAction extends AbstractAction implements Steppable {
 
     public SteppableAction(
-        final Vessel vessel,
-        final LocalDateTime start,
-        final Duration duration
+        @NonNull final Vessel vessel,
+        @NonNull final LocalDateTime startDateTime,
+        @NonNull final Duration duration,
+        @NonNull final Coordinate startCoordinate,
+        @NonNull final Coordinate endCoordinate
     ) {
-        super(vessel, start, duration);
+        super(vessel, startDateTime, duration, startCoordinate, endCoordinate);
+    }
+
+    public SteppableAction(
+        @NonNull final Vessel vessel,
+        @NonNull final LocalDateTime startDateTime,
+        @NonNull final Duration duration,
+        @NonNull final Coordinate coordinate
+    ) {
+        super(vessel, startDateTime, duration, coordinate);
+    }
+
+    public SteppableAction(
+        @NonNull final Vessel vessel,
+        @NonNull final LocalDateTime startDateTime,
+        @NonNull final Duration duration
+    ) {
+        super(vessel, startDateTime, duration, vessel.getCoordinate());
     }
 
     public void init() {}

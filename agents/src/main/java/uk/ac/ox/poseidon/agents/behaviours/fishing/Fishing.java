@@ -25,7 +25,6 @@ import lombok.NonNull;
 import lombok.ToString;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
-import uk.ac.ox.poseidon.agents.behaviours.SteppableSpatialAction;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
@@ -57,7 +56,7 @@ public class Fishing<C extends Content<C>> implements Behaviour {
 
     @Getter
     @ToString(callSuper = true)
-    public class Action extends SteppableSpatialAction implements FishingAction {
+    public class Action extends SteppableAction implements FishingAction {
 
         Bucket<C> fishCaught;
 
@@ -66,7 +65,7 @@ public class Fishing<C extends Content<C>> implements Behaviour {
             final LocalDateTime start,
             final Duration duration
         ) {
-            super(vessel, start, duration, vessel.getCoordinate());
+            super(vessel, start, duration);
         }
 
         @Override

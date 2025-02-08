@@ -20,25 +20,31 @@
 package uk.ac.ox.poseidon.agents.tables;
 
 import tech.tablesaw.api.DoubleColumn;
-import uk.ac.ox.poseidon.agents.behaviours.SpatialAction;
+import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
-public abstract class SpatialActionListenerTable<A extends SpatialAction> extends ActionListenerTable<A> {
-    private final DoubleColumn lon = DoubleColumn.create("lon");
-    private final DoubleColumn lat = DoubleColumn.create("lat");
+public abstract class SpatialActionListenerTable<A extends Action> extends ActionListenerTable<A> {
+
+    private final DoubleColumn startLon = DoubleColumn.create("start_lon");
+    private final DoubleColumn startLat = DoubleColumn.create("start_lat");
+    private final DoubleColumn endLon = DoubleColumn.create("end_lon");
+    private final DoubleColumn endLat = DoubleColumn.create("end_lat");
 
     public SpatialActionListenerTable(
         final Class<A> eventClass
     ) {
         super(eventClass);
-        get().addColumns(lon, lat);
+        get().addColumns(startLon, startLat, endLon, endLat);
     }
 
     @Override
     public void receive(final A action) {
         super.receive(action);
-        final Coordinate coordinate = action.getCoordinate();
-        lon.append(coordinate.lon);
-        lat.append(coordinate.lat);
+        final Coordinate startCoordinate = action.getStartCoordinate();
+        startLat.append(startCoordinate.lon);
+        startLon.append(startCoordinate.lat);
+        final Coordinate endCoordinate = action.getEndCoordinate();
+        endLat.append(endCoordinate.lon);
+        endLon.append(endCoordinate.lat);
     }
 }

@@ -48,8 +48,8 @@ public abstract class ActionListenerTable<A extends Action>
 
     @Override
     public void receive(final A action) {
-        actionStart.append(action.getStart());
-        actionEnd.append(action.getEnd());
+        actionStart.append(action.getStartDateTime());
+        actionEnd.append(action.getEndDateTime());
         vesselId.append(action.getVessel().getId());
     }
 

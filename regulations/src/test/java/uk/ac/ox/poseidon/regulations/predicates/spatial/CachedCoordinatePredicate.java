@@ -23,7 +23,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
-import uk.ac.ox.poseidon.agents.behaviours.SpatialAction;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.util.function.Predicate;
@@ -35,8 +34,8 @@ public abstract class CachedCoordinatePredicate implements Predicate<Action> {
 
     @Override
     public boolean test(final Action action) {
-        return (action instanceof final SpatialAction spatialAction) &&
-            cache.getUnchecked(spatialAction.getCoordinate());
+        return cache.getUnchecked(action.getStartCoordinate()) ||
+            cache.getUnchecked(action.getEndCoordinate());
     }
 
     abstract public boolean test(final Coordinate coordinate);

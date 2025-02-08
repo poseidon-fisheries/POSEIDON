@@ -48,7 +48,7 @@ public class Waiting implements Behaviour {
             final LocalDateTime start,
             final Duration duration
         ) {
-            super(vessel, start, duration);
+            super(vessel, start, duration, vessel.getCoordinate());
         }
 
         @Override

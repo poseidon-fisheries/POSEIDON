@@ -21,6 +21,7 @@ package uk.ac.ox.poseidon.agents.behaviours;
 
 import lombok.NonNull;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -28,16 +29,22 @@ import java.time.LocalDateTime;
 public interface Action {
 
     @NonNull
-    default LocalDateTime getEnd() {
-        return getStart().plus(getDuration());
+    default LocalDateTime getEndDateTime() {
+        return getStartDateTime().plus(getDuration());
     }
 
     @NonNull
     Vessel getVessel();
 
     @NonNull
-    LocalDateTime getStart();
+    LocalDateTime getStartDateTime();
 
     @NonNull
     Duration getDuration();
+
+    @NonNull
+    Coordinate getStartCoordinate();
+
+    @NonNull
+    Coordinate getEndCoordinate();
 }

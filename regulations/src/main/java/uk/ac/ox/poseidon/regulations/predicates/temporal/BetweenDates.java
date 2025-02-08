@@ -68,8 +68,8 @@ public final class BetweenDates implements Predicate<Action> {
 
     @Override
     public boolean test(final Action action) {
-        final LocalDate actionStart = action.getStart().toLocalDate();
-        final LocalDate actionEnd = action.getEnd().toLocalDate();
+        final LocalDate actionStart = action.getStartDateTime().toLocalDate();
+        final LocalDate actionEnd = action.getEndDateTime().toLocalDate();
         return betweenDates(actionStart) || betweenDates(actionEnd) ||
             (actionStart.isBefore(start) && actionEnd.isAfter(end));
     }

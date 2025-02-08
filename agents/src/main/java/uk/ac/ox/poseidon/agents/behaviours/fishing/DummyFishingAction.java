@@ -31,15 +31,12 @@ import java.time.LocalDateTime;
 @Getter
 public class DummyFishingAction extends AbstractAction implements FishingAction {
 
-    private final Coordinate coordinate;
-
     public DummyFishingAction(
         final LocalDateTime start,
         final Vessel vessel,
         final Coordinate coordinate
     ) {
-        super(vessel, start, Duration.ofSeconds(1));
-        this.coordinate = coordinate;
+        super(vessel, start, Duration.ofSeconds(1), coordinate);
     }
 
     @Override

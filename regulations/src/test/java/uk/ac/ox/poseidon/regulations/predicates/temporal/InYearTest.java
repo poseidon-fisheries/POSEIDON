@@ -40,8 +40,8 @@ class InYearTest {
         // Arrange
         final int targetYear = 2023;
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2023, 5, 15, 12, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2024, 5, 15, 12, 0));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 5, 15, 12, 0));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2024, 5, 15, 12, 0));
 
         final InYear inYear = new InYear(targetYear);
 
@@ -57,8 +57,8 @@ class InYearTest {
         // Arrange
         final int targetYear = 2023;
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2022, 12, 25, 23, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2024, 1, 5, 11, 0));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2022, 12, 25, 23, 0));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2024, 1, 5, 11, 0));
 
         final InYear inYear = new InYear(targetYear);
 
@@ -74,8 +74,8 @@ class InYearTest {
         // Arrange
         final int targetYear = 2023;
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2021, 5, 1, 8, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2021, 7, 1, 18, 0));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2021, 5, 1, 8, 0));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2021, 7, 1, 18, 0));
 
         final InYear inYear = new InYear(targetYear);
 
@@ -91,8 +91,8 @@ class InYearTest {
         // Arrange
         final int targetYear = 2023;
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2024, 1, 2, 10, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2024, 12, 30, 20, 0));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2024, 1, 2, 10, 0));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2024, 12, 30, 20, 0));
 
         final InYear inYear = new InYear(targetYear);
 
@@ -108,8 +108,8 @@ class InYearTest {
         // Arrange
         final int targetYear = 2023;
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2022, 5, 15, 12, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2023, 5, 15, 12, 0));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2022, 5, 15, 12, 0));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 5, 15, 12, 0));
 
         final InYear inYear = new InYear(targetYear);
 
@@ -125,8 +125,8 @@ class InYearTest {
         // Arrange
         final int targetYear = 2023;
         final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStart()).thenReturn(LocalDateTime.of(2023, 1, 1, 0, 0));
-        Mockito.when(action.getEnd()).thenReturn(LocalDateTime.of(2023, 12, 31, 23, 59));
+        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 1, 1, 0, 0));
+        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 12, 31, 23, 59));
 
         final InYear inYear = new InYear(targetYear);
 

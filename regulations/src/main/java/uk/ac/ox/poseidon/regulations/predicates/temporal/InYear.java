@@ -33,8 +33,8 @@ public class InYear implements Predicate<Action> {
 
     @Override
     public boolean test(final Action action) {
-        final var actionStartYear = action.getStart().getYear();
-        final var actionEndYear = action.getEnd().getYear();
+        final var actionStartYear = action.getStartDateTime().getYear();
+        final var actionEndYear = action.getEndDateTime().getYear();
         return actionStartYear == this.year ||
             actionEndYear == this.year ||
             (actionStartYear < this.year && actionEndYear > this.year);
