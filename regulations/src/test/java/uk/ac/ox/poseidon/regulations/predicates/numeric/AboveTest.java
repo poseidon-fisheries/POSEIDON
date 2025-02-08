@@ -24,8 +24,7 @@ import uk.ac.ox.poseidon.agents.behaviours.Action;
 
 import java.util.function.ToDoubleFunction;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -101,10 +100,10 @@ class AboveTest {
         final Above predicate = new Above(threshold, mockDoubleFunction);
 
         // Act & Assert
-        try {
-            predicate.test(null);
-        } catch (final NullPointerException e) {
-            assertTrue(true, "NullPointerException was thrown as expected.");
-        }
+        assertThrows(
+            NullPointerException.class,
+            () -> predicate.test(null),
+            "NullPointerException was thrown as expected."
+        );
     }
 }
