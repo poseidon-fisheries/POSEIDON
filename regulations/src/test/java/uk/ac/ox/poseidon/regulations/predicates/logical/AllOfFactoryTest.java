@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.operators;
+package uk.ac.ox.poseidon.regulations.predicates.logical;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

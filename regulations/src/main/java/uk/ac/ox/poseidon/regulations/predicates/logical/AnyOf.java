@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.operators;
+package uk.ac.ox.poseidon.regulations.predicates.logical;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
@@ -29,13 +29,13 @@ import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
-public class AllOf implements Predicate<Action> {
+public class AnyOf implements Predicate<Action> {
 
     @NonNull
     private final ImmutableList<Predicate<Action>> predicates;
 
     @Override
     public boolean test(final Action action) {
-        return predicates.stream().allMatch(predicate -> predicate.test(action));
+        return predicates.stream().anyMatch(predicate -> predicate.test(action));
     }
 }

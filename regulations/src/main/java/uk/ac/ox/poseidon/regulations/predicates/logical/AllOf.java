@@ -17,37 +17,25 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.operators;
+package uk.ac.ox.poseidon.regulations.predicates.logical;
 
-import lombok.AllArgsConstructor;
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.List;
 import java.util.function.Predicate;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class AllOfFactory extends GlobalScopeFactory<AllOf> {
+@RequiredArgsConstructor
+public class AllOf implements Predicate<Action> {
 
-    List<Factory<? extends Predicate<Action>>> predicates;
+    @NonNull
+    private final ImmutableList<Predicate<Action>> predicates;
 
     @Override
-    protected AllOf newInstance(final Simulation simulation) {
-        return new AllOf(
-            predicates
-                .stream()
-                .map(p -> p.get(simulation))
-                .collect(toImmutableList())
-        );
+    public boolean test(final Action action) {
+        return predicates.stream().allMatch(predicate -> predicate.test(action));
     }
 }

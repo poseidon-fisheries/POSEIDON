@@ -17,24 +17,29 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.operators;
+package uk.ac.ox.poseidon.regulations.predicates.logical;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.function.Predicate;
 
 @Getter
-@RequiredArgsConstructor
-public class Not implements Predicate<Action> {
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class NotFactory extends GlobalScopeFactory<Not> {
 
-    @NonNull
-    private final Predicate<Action> predicate;
+    private Factory<? extends Predicate<Action>> predicate;
 
     @Override
-    public boolean test(final Action action) {
-        return !predicate.test(action);
+    protected Not newInstance(final Simulation simulation) {
+        return new Not(predicate.get(simulation));
     }
 }

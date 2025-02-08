@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.operators;
+package uk.ac.ox.poseidon.regulations.predicates.logical;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,13 +37,13 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnyOfFactory extends GlobalScopeFactory<AnyOf> {
+public class AllOfFactory extends GlobalScopeFactory<AllOf> {
 
     List<Factory<? extends Predicate<Action>>> predicates;
 
     @Override
-    protected AnyOf newInstance(final Simulation simulation) {
-        return new AnyOf(
+    protected AllOf newInstance(final Simulation simulation) {
+        return new AllOf(
             predicates
                 .stream()
                 .map(p -> p.get(simulation))
