@@ -19,10 +19,10 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import com.vividsolutions.jts.geom.Envelope;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.Envelope;
 
 public class DoubleGrid extends AbstractGrid<DoubleGrid2D>
     implements NumberGrid<Double, DoubleGrid2D> {

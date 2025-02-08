@@ -23,7 +23,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Streams;
-import com.vividsolutions.jts.geom.Envelope;
 import ec.util.MersenneTwisterFast;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -36,6 +35,7 @@ import sim.util.Int2D;
 import sim.util.IntBag;
 import sim.util.Number2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.Envelope;
 
 import java.util.Arrays;
 import java.util.List;
@@ -90,14 +90,6 @@ public final class GridExtent {
         this.envelope = new Envelope(envelope); // The Envelope class is mutable, so we store a copy
         this.cellWidth = envelope.getWidth() / (double) this.getGridWidth();
         this.cellHeight = envelope.getHeight() / (double) this.getGridHeight();
-    }
-
-    /**
-     * Returns a copy of the map's envelope. The Envelope class is mutable, so we don't want to
-     * expose a copy of our envelope and risk it being changed under our feet.
-     */
-    public Envelope getEnvelope() {
-        return new Envelope(envelope);
     }
 
     /**

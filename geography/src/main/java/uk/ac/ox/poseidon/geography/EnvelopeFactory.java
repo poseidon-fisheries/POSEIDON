@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.geography.grids;
+package uk.ac.ox.poseidon.geography;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,32 +25,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.Envelope;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class GridExtentFactory extends GlobalScopeFactory<GridExtent> {
+@AllArgsConstructor
+public class EnvelopeFactory extends GlobalScopeFactory<Envelope> {
 
-    private int gridWidth;
-    private int gridHeight;
-    private double westLongitude;
-    private double eastLongitude;
-    private double southLatitude;
-    private double northLatitude;
+    private double minX;
+    private double maxX;
+    private double minY;
+    private double maxY;
 
     @Override
-    protected GridExtent newInstance(final Simulation simulation) {
-        return new GridExtent(
-            gridWidth,
-            gridHeight,
-            new Envelope(
-                westLongitude,
-                eastLongitude,
-                southLatitude,
-                northLatitude
-            )
-        );
+    protected Envelope newInstance(final Simulation simulation) {
+        return new Envelope(minX, maxX, minY, maxY);
     }
 }
