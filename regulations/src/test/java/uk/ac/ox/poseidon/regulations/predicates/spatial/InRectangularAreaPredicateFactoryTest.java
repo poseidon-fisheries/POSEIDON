@@ -28,7 +28,7 @@ import uk.ac.ox.poseidon.geography.Envelope;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
-class InRectangularPredicateAreaFactoryTest {
+class InRectangularAreaPredicateFactoryTest {
 
     /**
      * Test class for the InRectangularPredicateAreaFactory. Verifies the behavior of the
@@ -46,7 +46,7 @@ class InRectangularPredicateAreaFactoryTest {
 
         when(mockFactory.get(mockSimulation)).thenReturn(mockEnvelope);
 
-        final InRectangularPredicateAreaFactory factory = new InRectangularPredicateAreaFactory(
+        final InRectangularAreaPredicateFactory factory = new InRectangularAreaPredicateFactory(
             mockFactory);
 
         // Act

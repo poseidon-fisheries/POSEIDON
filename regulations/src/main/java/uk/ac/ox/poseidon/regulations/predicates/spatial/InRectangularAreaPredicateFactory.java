@@ -29,7 +29,7 @@ import uk.ac.ox.poseidon.geography.Envelope;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class InRectangularPredicateAreaFactory extends GlobalScopeFactory<InRectangularAreaPredicate> {
+public class InRectangularAreaPredicateFactory extends GlobalScopeFactory<InRectangularAreaPredicate> {
 
     @NonNull private Factory<? extends Envelope> envelope;
 

@@ -41,6 +41,12 @@ public class AllOfFactory extends GlobalScopeFactory<AllOf> {
 
     List<Factory<? extends Predicate<Action>>> predicates;
 
+    @SafeVarargs
+    @SuppressWarnings("varargs")
+    public AllOfFactory(final Factory<? extends Predicate<Action>>... predicates) {
+        this(List.of(predicates));
+    }
+
     @Override
     protected AllOf newInstance(final Simulation simulation) {
         return new AllOf(

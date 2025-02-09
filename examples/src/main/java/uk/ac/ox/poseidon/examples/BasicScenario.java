@@ -66,6 +66,7 @@ import uk.ac.ox.poseidon.core.suppliers.RandomBooleanSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
 import uk.ac.ox.poseidon.core.time.*;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
+import uk.ac.ox.poseidon.geography.EnvelopeFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.RoughCoastalBathymetricGridFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
@@ -81,6 +82,8 @@ import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 import uk.ac.ox.poseidon.regulations.ForbiddenIfFactory;
+import uk.ac.ox.poseidon.regulations.predicates.logical.AnyOfFactory;
+import uk.ac.ox.poseidon.regulations.predicates.spatial.InRectangularAreaPredicateFactory;
 import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenYearlyDatesFactory;
 
 import java.nio.file.Path;
@@ -117,9 +120,14 @@ public class BasicScenario extends Scenario {
     @SuppressWarnings("MagicNumber")
     private Factory<? extends Regulations> regulations =
         new ForbiddenIfFactory(
-            new BetweenYearlyDatesFactory(
-                new MonthDayFactory(Month.MARCH, 1),
-                new MonthDayFactory(Month.MAY, 31)
+            new AnyOfFactory(
+                new BetweenYearlyDatesFactory(
+                    new MonthDayFactory(Month.MARCH, 1),
+                    new MonthDayFactory(Month.MAY, 31)
+                ),
+                new InRectangularAreaPredicateFactory(
+                    new EnvelopeFactory(-3, 3, -3, 3)
+                )
             )
         );
 
