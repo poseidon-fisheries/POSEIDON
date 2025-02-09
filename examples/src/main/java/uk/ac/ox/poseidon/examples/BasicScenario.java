@@ -102,7 +102,7 @@ import static uk.ac.ox.poseidon.core.time.PeriodFactory.MONTHLY;
 @Setter
 public class BasicScenario extends Scenario {
 
-    private static final double DIFFERENTIAL_PERCENTAGE_TO_MOVE = 0.01;
+    private static final double DIFFERENTIAL_PERCENTAGE_TO_MOVE = 0.05;
     private static final double PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT = 0.1;
     private static final double LOGISTIC_GROWTH_RATE = 0.001;
     private static final int GRID_SIZE = 51;
@@ -126,7 +126,7 @@ public class BasicScenario extends Scenario {
                     new MonthDayFactory(Month.MAY, 31)
                 ),
                 new InRectangularAreaPredicateFactory(
-                    new EnvelopeFactory(-3, 3, -3, 3)
+                    new EnvelopeFactory(-1.5, 1.5, -3.5, 3.5)
                 )
             )
         );

@@ -20,87 +20,115 @@
 package uk.ac.ox.poseidon.regulations.predicates.logical;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class AllOfFactoryTest {
 
     /**
-     * Test class for AllOfFactory. AllOfFactory is responsible for creating instances of AllOf. The
-     * method `newInstance` initializes an AllOf object with a collection of predicates by
-     * retrieving them through factories in the context of a provided simulation.
+     * Tests the `newInstance` method in the `AllOfFactory` class. This method creates a new
+     * instance of the `AllOf` object containing a list of predicates.
      */
-
-    @Test
-    void testNewInstanceWithEmptyPredicates() {
-        // Arrange
-        final List<Factory<? extends Predicate<Action>>> predicateFactories = new ArrayList<>();
-        final AllOfFactory allOfFactory = new AllOfFactory(predicateFactories);
-        final Simulation mockSimulation = mock(Simulation.class);
-
-        // Act
-        final AllOf result = allOfFactory.newInstance(mockSimulation);
-
-        // Assert
-        assertEquals(0, result.getPredicates().size());
-    }
 
     @Test
     void testNewInstanceWithSinglePredicate() {
         // Arrange
+        final Simulation mockSimulation = mock(Simulation.class);
         final Predicate<Action> mockPredicate = mock(Predicate.class);
         final Factory<Predicate<Action>> mockFactory = mock(Factory.class);
-        when(mockFactory.get(Mockito.any(Simulation.class))).thenReturn(mockPredicate);
 
-        final List<Factory<? extends Predicate<Action>>> predicateFactories = List.of(mockFactory);
-        final AllOfFactory allOfFactory = new AllOfFactory(predicateFactories);
-        final Simulation mockSimulation = mock(Simulation.class);
+        when(mockFactory.get(mockSimulation)).thenReturn(mockPredicate);
+        final AllOfFactory allOfFactory = new AllOfFactory(List.of(mockFactory));
 
         // Act
-        final AllOf result = allOfFactory.newInstance(mockSimulation);
+        final AllOf allOf = allOfFactory.newInstance(mockSimulation);
 
         // Assert
-        assertEquals(1, result.getPredicates().size());
-        assertEquals(mockPredicate, result.getPredicates().iterator().next());
+        assertNotNull(allOf, "The resulting AllOf instance should not be null");
+        assertEquals(
+            1,
+            allOf.getPredicates().count(),
+            "The AllOf instance should contain exactly one predicate"
+        );
+        assertEquals(
+            mockPredicate, allOf.getPredicates().findFirst().orElse(null),
+            "The predicate within AllOf should match the predicate returned by the factory"
+        );
     }
 
     @Test
     void testNewInstanceWithMultiplePredicates() {
         // Arrange
+        final Simulation mockSimulation = mock(Simulation.class);
         final Predicate<Action> mockPredicate1 = mock(Predicate.class);
         final Predicate<Action> mockPredicate2 = mock(Predicate.class);
-
         final Factory<Predicate<Action>> mockFactory1 = mock(Factory.class);
         final Factory<Predicate<Action>> mockFactory2 = mock(Factory.class);
 
-        when(mockFactory1.get(Mockito.any(Simulation.class))).thenReturn(mockPredicate1);
-        when(mockFactory2.get(Mockito.any(Simulation.class))).thenReturn(mockPredicate2);
-
-        final List<Factory<? extends Predicate<Action>>> predicateFactories = List.of(
-            mockFactory1,
-            mockFactory2
-        );
-        final AllOfFactory allOfFactory = new AllOfFactory(predicateFactories);
-        final Simulation mockSimulation = mock(Simulation.class);
+        when(mockFactory1.get(mockSimulation)).thenReturn(mockPredicate1);
+        when(mockFactory2.get(mockSimulation)).thenReturn(mockPredicate2);
+        final AllOfFactory allOfFactory = new AllOfFactory(List.of(mockFactory1, mockFactory2));
 
         // Act
-        final AllOf result = allOfFactory.newInstance(mockSimulation);
+        final AllOf allOf = allOfFactory.newInstance(mockSimulation);
 
         // Assert
-        assertEquals(2, result.getPredicates().size());
+        assertNotNull(allOf, "The resulting AllOf instance should not be null");
         assertEquals(
-            List.of(mockPredicate1, mockPredicate2),
-            new ArrayList<>(result.getPredicates())
+            2,
+            allOf.getPredicates().count(),
+            "The AllOf instance should contain exactly two predicates"
+        );
+    }
+
+    @Test
+    void testNewInstanceWithEmptyPredicatesList() {
+        // Arrange
+        final Simulation mockSimulation = mock(Simulation.class);
+        final AllOfFactory allOfFactory = new AllOfFactory(List.of());
+
+        // Act
+        final AllOf allOf = allOfFactory.newInstance(mockSimulation);
+
+        // Assert
+        assertNotNull(allOf, "The resulting AllOf instance should not be null");
+        assertEquals(
+            0,
+            allOf.getPredicates().count(),
+            "The AllOf instance should contain no predicates"
+        );
+    }
+
+    @Test
+    void testNewInstanceHandlesNullFactoryResponseGracefully() {
+        // Arrange
+        final Simulation mockSimulation = mock(Simulation.class);
+        final Factory<Predicate<Action>> mockFactory = mock(Factory.class);
+
+        when(mockFactory.get(mockSimulation)).thenReturn(null);
+        final AllOfFactory allOfFactory = new AllOfFactory(List.of(mockFactory));
+
+        // Act
+        final AllOf allOf = allOfFactory.newInstance(mockSimulation);
+
+        // Assert
+        assertNotNull(allOf, "The resulting AllOf instance should not be null");
+        assertEquals(
+            1,
+            allOf.getPredicates().count(),
+            "The AllOf instance should contain exactly one predicate"
+        );
+        assertNull(
+            allOf.getPredicates().findFirst().orElse(null),
+            "The predicate within AllOf should be null since the factory returned null"
         );
     }
 }

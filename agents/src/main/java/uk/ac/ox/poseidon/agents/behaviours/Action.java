@@ -27,12 +27,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public interface Action {
-
-    @NonNull
-    default LocalDateTime getEndDateTime() {
-        return getStartDateTime().plus(getDuration());
-    }
-
+    
     @NonNull
     Vessel getVessel();
 
@@ -41,6 +36,9 @@ public interface Action {
 
     @NonNull
     Duration getDuration();
+
+    @NonNull
+    LocalDateTime getEndDateTime();
 
     @NonNull
     Coordinate getStartCoordinate();

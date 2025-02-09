@@ -20,8 +20,10 @@
 package uk.ac.ox.poseidon.agents.behaviours;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
@@ -31,12 +33,15 @@ import java.time.LocalDateTime;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @SuppressFBWarnings(value = "EI2", justification = "Vessel is designed to be shared")
 public abstract class AbstractAction implements Action {
     @NonNull protected final Vessel vessel;
     @NonNull protected final LocalDateTime startDateTime;
     @NonNull protected final Duration duration;
+    @NonNull protected final LocalDateTime endDateTime;
     @NonNull protected final Coordinate startCoordinate;
     @NonNull protected final Coordinate endCoordinate;
 
@@ -56,6 +61,7 @@ public abstract class AbstractAction implements Action {
         );
         this.startDateTime = checkNotNull(startDateTime);
         this.duration = checkNotNull(duration);
+        this.endDateTime = startDateTime.plus(duration);
         this.vessel = checkNotNull(vessel);
     }
 

@@ -32,6 +32,38 @@ import static org.mockito.Mockito.when;
 
 class AnyOfTest {
 
+    @Test
+    void test_allPredicatesReturnFalse_shouldReturnFalse() {
+        // Arrange
+        final Action action = mock(Action.class);
+        final Predicate<Action> falsePredicate1 = act -> false;
+        final Predicate<Action> falsePredicate2 = act -> false;
+
+        final AnyOf anyOf = new AnyOf(ImmutableList.of(falsePredicate1, falsePredicate2));
+
+        // Act
+        final boolean result = anyOf.test(action);
+
+        // Assert
+        assertFalse(result, "Expected false when all predicates return false.");
+    }
+
+    @Test
+    void test_mixedPredicates_someTrueSomeFalse_shouldReturnTrue() {
+        // Arrange
+        final Action action = mock(Action.class);
+        final Predicate<Action> falsePredicate = act -> false;
+        final Predicate<Action> truePredicate = act -> true;
+
+        final AnyOf anyOf = new AnyOf(ImmutableList.of(falsePredicate, truePredicate));
+
+        // Act
+        final boolean result = anyOf.test(action);
+
+        // Assert
+        assertTrue(result, "Expected true when at least one predicate returns true.");
+    }
+
     /**
      * Tests the {@link AnyOf} class, which holds a collection of predicates and evaluates if any of
      * them return true when applied to a given {@link Action}.

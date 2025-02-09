@@ -31,8 +31,6 @@ import uk.ac.ox.poseidon.core.Simulation;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -53,7 +51,7 @@ public class AnyOfFactory extends GlobalScopeFactory<AnyOf> {
             predicates
                 .stream()
                 .map(p -> p.get(simulation))
-                .collect(toImmutableList())
+                .toList()
         );
     }
 }

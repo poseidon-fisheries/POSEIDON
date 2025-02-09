@@ -19,23 +19,34 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.logical;
 
-import com.google.common.collect.ImmutableList;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-@Getter
-@RequiredArgsConstructor
 public class AnyOf implements Predicate<Action> {
 
-    @NonNull
-    private final ImmutableList<Predicate<Action>> predicates;
+    // Using an array for performance reasons
+    @NonNull private final Predicate<Action>[] predicates;
+
+    @SuppressWarnings("unchecked")
+    public AnyOf(final List<? extends Predicate<Action>> predicates) {
+        this.predicates = predicates.toArray(Predicate[]::new);
+    }
+
+    public Stream<Predicate<Action>> getPredicates() {
+        return Stream.of(predicates);
+    }
 
     @Override
     public boolean test(final Action action) {
-        return predicates.stream().anyMatch(predicate -> predicate.test(action));
+        for (final Predicate<Action> predicate : predicates) {
+            if (predicate.test(action)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

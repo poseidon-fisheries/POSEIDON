@@ -27,6 +27,7 @@ import sim.engine.Steppable;
 
 import java.io.Serial;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
@@ -43,6 +44,10 @@ public class TemporalSchedule extends Schedule {
     @SuppressWarnings("WeakerAccess")
     public LocalDateTime getDateTime() {
         return toDateTime(getTime());
+    }
+
+    public LocalDate getDate() {
+        return getDateTime().toLocalDate();
     }
 
     public String getTimestamp() {
