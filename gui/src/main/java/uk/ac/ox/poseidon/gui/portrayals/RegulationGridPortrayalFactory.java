@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sim.field.grid.DoubleGrid2D;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
@@ -38,8 +35,11 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
 import java.awt.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalField;
+
+import static java.time.temporal.ChronoField.*;
+import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_MONTH;
 
 @Getter
 @Setter
@@ -58,8 +58,17 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
             simulation.getTemporalSchedule(),
             regulations.get(simulation),
             fleet.get(simulation),
-            bathymetric.get(simulation)
+            bathymetric.get(simulation),
+            EVERY_MONTH
         );
+    }
+
+    @RequiredArgsConstructor
+    enum UpdateFrequency {
+        EVERY_DAY(EPOCH_DAY),
+        EVERY_MONTH(PROLEPTIC_MONTH),
+        EVERY_YEAR(YEAR);
+        private final TemporalField field;
     }
 
     private static class Portrayal extends FastValueGridPortrayal2D {
@@ -69,14 +78,15 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
         private final Fleet fleet;
         private final BathymetricGrid bathymetricGrid;
         private final DoubleGrid2D grid;
-
-        private LocalDate lastUpdated;
+        private final UpdateFrequency updateFrequency;
+        private long lastUpdated;
 
         private Portrayal(
             final TemporalSchedule schedule,
             final Regulations regulations,
             final Fleet fleet,
-            final BathymetricGrid bathymetricGrid
+            final BathymetricGrid bathymetricGrid,
+            final UpdateFrequency updateFrequency
         ) {
             super();
             this.regulations = regulations;
@@ -88,6 +98,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
                 0
             );
             this.schedule = schedule;
+            this.updateFrequency = updateFrequency;
             setField(grid);
             setMap(new SimpleColorMap(
                 0,
@@ -103,11 +114,10 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
             final Graphics2D graphics,
             final DrawInfo2D info
         ) {
-            // TODO: allow more flexible update frequency than "once a day"
-            final LocalDate currentDate = schedule.getDate();
-            if (!currentDate.equals(lastUpdated)) {
+            final long currentFieldValue = schedule.getDate().getLong(updateFrequency.field);
+            if (currentFieldValue != lastUpdated) {
                 updateGrid();
-                lastUpdated = currentDate;
+                lastUpdated = currentFieldValue;
             }
             super.draw(object, graphics, info);
         }
@@ -128,6 +138,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
                 grid.field[cell.x][cell.y] = forbidden ? 1 : 0;
             }
         }
+
     }
 
 }
