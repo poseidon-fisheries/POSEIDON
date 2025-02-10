@@ -68,7 +68,7 @@ import uk.ac.ox.poseidon.core.time.*;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.EnvelopeFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-import uk.ac.ox.poseidon.geography.bathymetry.RoughCoastalBathymetricGridFactory;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromGebcoNetCdfGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
@@ -105,7 +105,7 @@ public class BasicScenario extends Scenario {
     private static final double DIFFERENTIAL_PERCENTAGE_TO_MOVE = 0.05;
     private static final double PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT = 0.1;
     private static final double LOGISTIC_GROWTH_RATE = 0.001;
-    private static final int GRID_SIZE = 51;
+    private static final int GRID_SIZE = 75;
     private static final String CARRYING_CAPACITY = "5 t";
     private static final double LEARNING_ALPHA = 1;
     private static final double READINESS_PROBABILITY = 0.9;
@@ -126,7 +126,7 @@ public class BasicScenario extends Scenario {
                     new MonthDayFactory(Month.MAY, 31)
                 ),
                 new InRectangularAreaPredicateFactory(
-                    new EnvelopeFactory(-1.5, 1.5, -3.5, 3.5)
+                    new EnvelopeFactory(-1.5, 1.5, -35, 40)
                 )
             )
         );
@@ -147,10 +147,10 @@ public class BasicScenario extends Scenario {
         new GridExtentFactory(
             GRID_SIZE,
             GRID_SIZE,
-            -5,
-            5,
-            -5,
-            5
+            -6,
+            6,
+            34,
+            43
         );
 
     private Factory<? extends CsvTableWriter> catchTableWriter =
@@ -167,15 +167,12 @@ public class BasicScenario extends Scenario {
         new HaversineDistanceCalculatorFactory(gridExtent);
     @SuppressWarnings("MagicNumber")
     private Factory<? extends BathymetricGrid> bathymetricGrid =
-        new RoughCoastalBathymetricGridFactory(
-            gridExtent,
-            10,
-            1000,
-            0.01,
-            15,
-            -150,
-            75,
-            0.1
+        new BathymetricGridFromGebcoNetCdfGrid(
+            PathFactory.from(
+                System.getProperty("user.home"), "Desktop",
+                "gebco_2024_n43.0_s34.0_w-6.0_e6.0.nc"
+            ),
+            gridExtent
         );
     private Factory<? extends PortGrid> portGrid =
         new RandomLocationsPortGridFactory(

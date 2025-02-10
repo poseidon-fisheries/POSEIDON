@@ -71,7 +71,8 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
         private final TemporalField field;
     }
 
-    private static class Portrayal extends FastValueGridPortrayal2D {
+    @Getter
+    static class Portrayal extends FastValueGridPortrayal2D {
 
         private final TemporalSchedule schedule;
         private final Regulations regulations;
@@ -81,7 +82,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
         private final UpdateFrequency updateFrequency;
         private long lastUpdated;
 
-        private Portrayal(
+        Portrayal(
             final TemporalSchedule schedule,
             final Regulations regulations,
             final Fleet fleet,
@@ -122,7 +123,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
             super.draw(object, graphics, info);
         }
 
-        private void updateGrid() {
+        void updateGrid() {
             for (final Int2D cell : bathymetricGrid.getWaterCells()) {
                 final LocalDateTime dateTime = schedule.getDateTime();
                 final boolean forbidden =

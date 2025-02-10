@@ -30,6 +30,10 @@ plugins {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    maven {
+        // For edu.ucar:netcdf4
+        url = uri("https://artifacts.unidata.ucar.edu/repository/unidata-all/")
+    }
 }
 
 dependencies {

@@ -25,4 +25,6 @@ dependencies {
     api(project(":core"))
     implementation(project(":io"))
     implementation("com.badlogicgames.gdx:gdx-ai:1.8.2")
+    implementation("edu.ucar:cdm-core:5.7.0")
+    implementation("edu.ucar:netcdf4:5.7.0")
 }
