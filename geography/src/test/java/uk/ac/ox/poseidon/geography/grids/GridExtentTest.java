@@ -125,7 +125,7 @@ class GridExtentTest {
     void testCoordToXyAndBack() {
         final GridExtent gridExtent =
             new GridExtentFactory(
-                101, 100, -171, -70, -50, 50
+                1.0, -171, -70, -50, 50
             ).get(null);
         final Envelope envelope = gridExtent.getEnvelope();
         final List<Coordinate> coordinates =

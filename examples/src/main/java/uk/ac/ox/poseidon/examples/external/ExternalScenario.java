@@ -116,8 +116,7 @@ public class ExternalScenario extends Scenario {
 
     private GlobalScopeFactory<? extends GridExtent> gridExtent =
         new GridExtentFactory(
-            51,
-            51,
+            0.2,
             -5,
             5,
             -5,

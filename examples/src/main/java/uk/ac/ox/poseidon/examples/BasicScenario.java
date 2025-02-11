@@ -143,14 +143,14 @@ public class BasicScenario extends Scenario {
     private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
         new LogisticGrowthRuleFactory(LOGISTIC_GROWTH_RATE);
 
+    @SuppressWarnings("MagicNumber")
     private GlobalScopeFactory<? extends GridExtent> gridExtent =
         new GridExtentFactory(
-            GRID_SIZE,
-            GRID_SIZE,
-            -6,
-            6,
-            34,
-            43
+            0.1,
+            -6.0,
+            6.0,
+            34.0,
+            43.0
         );
 
     private Factory<? extends CsvTableWriter> catchTableWriter =
@@ -165,7 +165,6 @@ public class BasicScenario extends Scenario {
     private Factory<? extends VesselField> vesselField = new VesselFieldFactory(gridExtent);
     private Factory<? extends DistanceCalculator> distance =
         new HaversineDistanceCalculatorFactory(gridExtent);
-    @SuppressWarnings("MagicNumber")
     private Factory<? extends BathymetricGrid> bathymetricGrid =
         new BathymetricGridFromGebcoNetCdfGrid(
             PathFactory.from(

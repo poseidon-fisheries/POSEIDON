@@ -36,12 +36,15 @@ class CarryingCapacityGridTest {
 
     @BeforeEach
     void setUp() {
-        final GridExtent gridExtent = new GridExtentFactory(3, 3, -1.5, 1.5, -1.5, 1.5).get(null);
-        grid = new CarryingCapacityGrid(gridExtent, new double[][]{
-            {0, 0, 1},
-            {0, 0, 1},
-            {0, 0, 1}
-        });
+        final GridExtent gridExtent = new GridExtentFactory(0.5, -1.5, 1.5, -1.5, 1.5).get(null);
+        grid = new CarryingCapacityGrid(
+            gridExtent,
+            new double[][]{
+                {0, 0, 1},
+                {0, 0, 1},
+                {0, 0, 1}
+            }
+        );
     }
 
     @Test

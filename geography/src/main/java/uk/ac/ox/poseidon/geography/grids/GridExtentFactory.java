@@ -27,14 +27,16 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.Envelope;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.math.DoubleMath.isMathematicalInteger;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class GridExtentFactory extends GlobalScopeFactory<GridExtent> {
 
-    private int gridWidth;
-    private int gridHeight;
+    private double resolutionInDegrees;
     private double westLongitude;
     private double eastLongitude;
     private double southLatitude;
@@ -42,6 +44,10 @@ public class GridExtentFactory extends GlobalScopeFactory<GridExtent> {
 
     @Override
     protected GridExtent newInstance(final Simulation simulation) {
+        final double widthInDegrees = eastLongitude - westLongitude;
+        final double heightInDegrees = northLatitude - southLatitude;
+        final int gridWidth = validateDimension("Width", widthInDegrees, resolutionInDegrees);
+        final int gridHeight = validateDimension("Height", heightInDegrees, resolutionInDegrees);
         return new GridExtent(
             gridWidth,
             gridHeight,
@@ -52,5 +58,22 @@ public class GridExtentFactory extends GlobalScopeFactory<GridExtent> {
                 northLatitude
             )
         );
+    }
+
+    private int validateDimension(
+        final String dimensionName,
+        final double dimensionSize,
+        final double resolution
+    ) {
+        final double gridDimension = dimensionSize / resolution;
+        checkState(
+            isMathematicalInteger(gridDimension),
+            String.format(
+                "%s must be an exact multiple of the resolution. " +
+                    "%s: %s degrees, Resolution: %s degrees.",
+                dimensionName, dimensionName, dimensionSize, resolution
+            )
+        );
+        return (int) gridDimension;
     }
 }
