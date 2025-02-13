@@ -54,6 +54,11 @@ public class VectorFieldFromShapeFileFactory extends GlobalScopeFactory<GeomVect
         final GeomVectorField vectorField = new GeomVectorField();
         try {
             ShapeFileImporter.read(path.toURI().toURL(), vectorField);
+            if (vectorField.getGeometries().isEmpty()) {
+                throw new RuntimeException(
+                    "Shape file importer failed to read any geometries."
+                );
+            }
         } catch (final FileNotFoundException | MalformedURLException e) {
             throw new RuntimeException(e);
         }

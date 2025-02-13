@@ -19,20 +19,18 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.RequiredArgsConstructor;
+import sim.field.geo.GeomVectorField;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class InVectorFieldPredicateFactory extends GlobalScopeFactory<InVectorFieldPredicate> {
+@RequiredArgsConstructor
+public class InVectorField extends CachedCoordinatePredicate {
+
+    private final GeomVectorField vectorField;
+
     @Override
-    protected InVectorFieldPredicate newInstance(final Simulation simulation) {
-        return null;
+    public boolean test(final Coordinate coordinate) {
+        return vectorField.isCovered(coordinate.toJTS());
     }
+
 }

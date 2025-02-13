@@ -66,7 +66,6 @@ import uk.ac.ox.poseidon.core.suppliers.RandomBooleanSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
 import uk.ac.ox.poseidon.core.time.*;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
-import uk.ac.ox.poseidon.geography.EnvelopeFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromGebcoNetCdfGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
@@ -78,12 +77,13 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.geography.ports.RandomLocationsPortGridFactory;
 import uk.ac.ox.poseidon.geography.ports.SimplePortFactory;
+import uk.ac.ox.poseidon.geography.vectors.VectorFieldFromShapeFileFactory;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 import uk.ac.ox.poseidon.regulations.ForbiddenIfFactory;
 import uk.ac.ox.poseidon.regulations.predicates.logical.AnyOfFactory;
-import uk.ac.ox.poseidon.regulations.predicates.spatial.InRectangularAreaPredicateFactory;
+import uk.ac.ox.poseidon.regulations.predicates.spatial.InVectorFieldFactory;
 import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenYearlyDatesFactory;
 
 import java.nio.file.Path;
@@ -117,20 +117,9 @@ public class BasicScenario extends Scenario {
     private static final int VESSEL_SPEED = 15;
     private static final String VESSEL_HOLD_CAPACITY = "1 t";
 
-    @SuppressWarnings("MagicNumber")
-    private Factory<? extends Regulations> regulations =
-        new ForbiddenIfFactory(
-            new AnyOfFactory(
-                new BetweenYearlyDatesFactory(
-                    new MonthDayFactory(Month.MARCH, 1),
-                    new MonthDayFactory(Month.MAY, 31)
-                ),
-                new InRectangularAreaPredicateFactory(
-                    new EnvelopeFactory(-1.5, 1.5, -35, 40)
-                )
-            )
-        );
-
+    private PathFactory inputPath = PathFactory.from(
+        System.getProperty("user.home"), "workspace", "surimi_western_med", "data"
+    );
     private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
         new RegisterFactory<>();
     private Factory<? extends Species> speciesA = new SpeciesFactory("A");
@@ -142,7 +131,6 @@ public class BasicScenario extends Scenario {
         );
     private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
         new LogisticGrowthRuleFactory(LOGISTIC_GROWTH_RATE);
-
     @SuppressWarnings("MagicNumber")
     private GlobalScopeFactory<? extends GridExtent> gridExtent =
         new GridExtentFactory(
@@ -152,7 +140,25 @@ public class BasicScenario extends Scenario {
             34.0,
             43.0
         );
-
+    @SuppressWarnings("MagicNumber")
+    private Factory<? extends Regulations> regulations =
+        new ForbiddenIfFactory(
+            new AnyOfFactory(
+                new BetweenYearlyDatesFactory(
+                    new MonthDayFactory(Month.MARCH, 1),
+                    new MonthDayFactory(Month.MAY, 31)
+                ),
+                new InVectorFieldFactory(
+                    new VectorFieldFromShapeFileFactory(
+                        PathFactory.from(
+                            inputPath,
+                            Path.of("eez", "algerian_exclusive_economic_zone.shp")
+                        ),
+                        gridExtent
+                    )
+                )
+            )
+        );
     private Factory<? extends CsvTableWriter> catchTableWriter =
         new FinalProcessFactory<>(
             new CsvTableWriterFactory(
@@ -167,10 +173,7 @@ public class BasicScenario extends Scenario {
         new HaversineDistanceCalculatorFactory(gridExtent);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
         new BathymetricGridFromGebcoNetCdfGrid(
-            PathFactory.from(
-                System.getProperty("user.home"), "Desktop",
-                "gebco_2024_n43.0_s34.0_w-6.0_e6.0.nc"
-            ),
+            PathFactory.from(inputPath, "bathymetry.nc"),
             gridExtent
         );
     private Factory<? extends PortGrid> portGrid =
