@@ -27,8 +27,6 @@ plugins {
 
 dependencies {
     api(fileTree("libs/mason") { include("*.jar") })
-    api(files("libs/geomason/geomason.1.5.jar"))
     api("tech.units:indriya:2.2.2")
     api("si.uom:si-units:2.2")
-    api("com.vividsolutions:jts:1.13") // JTS Topology Suite, a geomason dependency
 }

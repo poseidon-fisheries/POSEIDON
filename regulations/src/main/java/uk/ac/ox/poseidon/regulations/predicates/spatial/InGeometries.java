@@ -19,18 +19,30 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
-import lombok.RequiredArgsConstructor;
-import sim.field.geo.GeomVectorField;
+import lombok.NonNull;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
-@RequiredArgsConstructor
-public class InVectorField extends CachedCoordinatePredicate {
+import java.util.Collection;
 
-    private final GeomVectorField vectorField;
+public class InGeometries extends CachedCoordinatePredicate {
+
+    private final Geometry[] geometries;
+
+    public InGeometries(@NonNull final Collection<? extends Geometry> geometries) {
+        this.geometries = geometries.toArray(Geometry[]::new);
+    }
 
     @Override
     public boolean test(final Coordinate coordinate) {
-        return vectorField.isCovered(coordinate.toJTS());
+        for (final Geometry geometry : geometries) {
+            final Point point = geometry.getFactory().createPoint(coordinate.toJTS());
+            if (geometry.contains(point)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

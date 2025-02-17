@@ -27,4 +27,5 @@ dependencies {
     implementation("com.badlogicgames.gdx:gdx-ai:1.8.2")
     implementation("edu.ucar:cdm-core:5.7.0")
     implementation("edu.ucar:netcdf4:5.7.0")
+    api("org.geotoolkit:geotk-feature-shapefile:25.01.16")
 }

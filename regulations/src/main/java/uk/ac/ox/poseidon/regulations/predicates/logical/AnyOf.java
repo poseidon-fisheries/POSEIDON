@@ -22,7 +22,7 @@ package uk.ac.ox.poseidon.regulations.predicates.logical;
 import lombok.NonNull;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -32,7 +32,7 @@ public class AnyOf implements Predicate<Action> {
     @NonNull private final Predicate<Action>[] predicates;
 
     @SuppressWarnings("unchecked")
-    public AnyOf(final List<? extends Predicate<Action>> predicates) {
+    public AnyOf(final Collection<? extends Predicate<Action>> predicates) {
         this.predicates = predicates.toArray(Predicate[]::new);
     }
 

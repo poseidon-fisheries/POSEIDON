@@ -23,21 +23,23 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sim.field.geo.GeomVectorField;
+import org.locationtech.jts.geom.Geometry;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
+
+import java.util.Collection;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class InVectorFieldFactory extends GlobalScopeFactory<InVectorField> {
+public class InGeometriesFactory extends GlobalScopeFactory<InGeometries> {
 
-    private Factory<? extends GeomVectorField> vectorField;
+    private Factory<? extends Collection<? extends Geometry>> geometries;
 
     @Override
-    protected InVectorField newInstance(final Simulation simulation) {
-        return new InVectorField(vectorField.get(simulation));
+    protected InGeometries newInstance(final Simulation simulation) {
+        return new InGeometries(geometries.get(simulation));
     }
 }

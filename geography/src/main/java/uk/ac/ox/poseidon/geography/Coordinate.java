@@ -34,13 +34,13 @@ public final class Coordinate {
     public final double lat;
 
     public static Coordinate fromJTS(
-        @NonNull final com.vividsolutions.jts.geom.Coordinate jtsCoordinate
+        @NonNull final org.locationtech.jts.geom.Coordinate jtsCoordinate
     ) {
         return new Coordinate(jtsCoordinate.x, jtsCoordinate.y);
     }
 
-    public com.vividsolutions.jts.geom.Coordinate toJTS() {
-        return new com.vividsolutions.jts.geom.Coordinate(lon, lat);
+    public org.locationtech.jts.geom.Coordinate toJTS() {
+        return new org.locationtech.jts.geom.Coordinate(lon, lat);
     }
 
     @Override

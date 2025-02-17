@@ -128,7 +128,7 @@ public final class Envelope {
     /**
      * Creates an immutable Envelope from a JTS Envelope.
      */
-    public static Envelope fromJTS(final com.vividsolutions.jts.geom.Envelope jtsEnv) {
+    public static Envelope fromJTS(final org.locationtech.jts.geom.Envelope jtsEnv) {
         if (jtsEnv == null) {
             return new Envelope(); // null envelope
         }
@@ -375,7 +375,7 @@ public final class Envelope {
     /**
      * Converts this immutable Envelope to a JTS Envelope.
      */
-    public com.vividsolutions.jts.geom.Envelope toJTS() {
-        return new com.vividsolutions.jts.geom.Envelope(minX, maxX, minY, maxY);
+    public org.locationtech.jts.geom.Envelope toJTS() {
+        return new org.locationtech.jts.geom.Envelope(minX, maxX, minY, maxY);
     }
 }

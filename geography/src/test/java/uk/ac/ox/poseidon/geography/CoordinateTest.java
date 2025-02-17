@@ -30,8 +30,8 @@ class CoordinateTest {
         // Arrange
         final double x = 1.23;
         final double y = 4.56;
-        final com.vividsolutions.jts.geom.Coordinate jtsCoordinate =
-            new com.vividsolutions.jts.geom.Coordinate(x, y);
+        final org.locationtech.jts.geom.Coordinate jtsCoordinate =
+            new org.locationtech.jts.geom.Coordinate(x, y);
 
         // Act
         final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
@@ -47,8 +47,8 @@ class CoordinateTest {
         // Arrange
         final double x = Double.MAX_VALUE;
         final double y = -Double.MAX_VALUE;
-        final com.vividsolutions.jts.geom.Coordinate jtsCoordinate =
-            new com.vividsolutions.jts.geom.Coordinate(x, y);
+        final org.locationtech.jts.geom.Coordinate jtsCoordinate =
+            new org.locationtech.jts.geom.Coordinate(x, y);
 
         // Act
         final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
@@ -64,8 +64,8 @@ class CoordinateTest {
         // Arrange
         final double x = 0.0;
         final double y = 0.0;
-        final com.vividsolutions.jts.geom.Coordinate jtsCoordinate =
-            new com.vividsolutions.jts.geom.Coordinate(x, y);
+        final org.locationtech.jts.geom.Coordinate jtsCoordinate =
+            new org.locationtech.jts.geom.Coordinate(x, y);
 
         // Act
         final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
@@ -81,8 +81,8 @@ class CoordinateTest {
         // Arrange
         final double x = -12.34;
         final double y = -56.78;
-        final com.vividsolutions.jts.geom.Coordinate jtsCoordinate =
-            new com.vividsolutions.jts.geom.Coordinate(x, y);
+        final org.locationtech.jts.geom.Coordinate jtsCoordinate =
+            new org.locationtech.jts.geom.Coordinate(x, y);
 
         // Act
         final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
@@ -96,6 +96,7 @@ class CoordinateTest {
     @Test
     void testFromJTSWithNullInput() {
         // Act & Assert
+        // noinspection DataFlowIssue
         assertThrows(
             NullPointerException.class, () -> Coordinate.fromJTS(null),
             "Passing a null JTSCoordinate should throw NullPointerException"

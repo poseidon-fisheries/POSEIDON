@@ -28,11 +28,20 @@ plugins {
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
+    maven {
+        // We put this before Maven central in order to make sure we look for
+        // jai_core here first, but we need to restrict it to jai_core otherwise
+        // we fail to find flatlaf-3.5.1-macos-arm64.dylib and flatlaf-3.5.1-macos-x86_64.dylib
+        url = uri("https://nexus.geomatys.com/repository/maven-public/")
+        content {
+            includeModule("javax.media", "jai_core")
+        }
+    }
     mavenCentral()
     maven {
-        // For edu.ucar:netcdf4
-        url = uri("https://artifacts.unidata.ucar.edu/repository/unidata-all/")
+        // Now we list nexus.geomatys.com for other jars (i.e. geotoolkit and netcdf4)
+        // not hosted on Maven central.
+        url = uri("https://nexus.geomatys.com/repository/maven-public/")
     }
 }
 

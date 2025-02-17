@@ -77,13 +77,13 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.geography.ports.RandomLocationsPortGridFactory;
 import uk.ac.ox.poseidon.geography.ports.SimplePortFactory;
-import uk.ac.ox.poseidon.geography.vectors.VectorFieldFromShapeFileFactory;
+import uk.ac.ox.poseidon.geography.vectors.GeometriesFromShapeFileFactory;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 import uk.ac.ox.poseidon.regulations.ForbiddenIfFactory;
 import uk.ac.ox.poseidon.regulations.predicates.logical.AnyOfFactory;
-import uk.ac.ox.poseidon.regulations.predicates.spatial.InVectorFieldFactory;
+import uk.ac.ox.poseidon.regulations.predicates.spatial.InGeometriesFactory;
 import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenYearlyDatesFactory;
 
 import java.nio.file.Path;
@@ -105,7 +105,6 @@ public class BasicScenario extends Scenario {
     private static final double DIFFERENTIAL_PERCENTAGE_TO_MOVE = 0.05;
     private static final double PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT = 0.1;
     private static final double LOGISTIC_GROWTH_RATE = 0.001;
-    private static final int GRID_SIZE = 75;
     private static final String CARRYING_CAPACITY = "5 t";
     private static final double LEARNING_ALPHA = 1;
     private static final double READINESS_PROBABILITY = 0.9;
@@ -148,13 +147,12 @@ public class BasicScenario extends Scenario {
                     new MonthDayFactory(Month.MARCH, 1),
                     new MonthDayFactory(Month.MAY, 31)
                 ),
-                new InVectorFieldFactory(
-                    new VectorFieldFromShapeFileFactory(
+                new InGeometriesFactory(
+                    new GeometriesFromShapeFileFactory(
                         PathFactory.from(
                             inputPath,
                             Path.of("eez", "algerian_exclusive_economic_zone.shp")
-                        ),
-                        gridExtent
+                        )
                     )
                 )
             )

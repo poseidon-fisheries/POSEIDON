@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import sim.field.continuous.Continuous2D;
-import sim.field.geo.GeomField;
 import sim.field.grid.Grid2D;
 import sim.util.Bag;
 import sim.util.Double2D;
@@ -154,13 +153,6 @@ public class MasonUtils {
         final Grid2D grid2D
     ) {
         return inBounds(location, grid2D.getWidth(), grid2D.getHeight());
-    }
-
-    public static boolean inBounds(
-        final Double2D location,
-        final GeomField geomField
-    ) {
-        return inBounds(location, geomField.getWidth(), geomField.getHeight());
     }
 
     public static <T> Stream<T> shuffledStream(
