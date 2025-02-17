@@ -67,7 +67,7 @@ import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
 import uk.ac.ox.poseidon.core.time.*;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromGebcoNetCdfGrid;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromGebcoNetCdfGridFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
@@ -170,7 +170,7 @@ public class BasicScenario extends Scenario {
     private Factory<? extends DistanceCalculator> distance =
         new HaversineDistanceCalculatorFactory(gridExtent);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
-        new BathymetricGridFromGebcoNetCdfGrid(
+        new BathymetricGridFromGebcoNetCdfGridFactory(
             PathFactory.from(inputPath, "bathymetry.nc"),
             gridExtent
         );

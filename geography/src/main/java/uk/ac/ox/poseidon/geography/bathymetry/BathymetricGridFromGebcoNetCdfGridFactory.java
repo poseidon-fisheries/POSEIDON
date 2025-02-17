@@ -41,14 +41,14 @@ import java.nio.file.Path;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BathymetricGridFromGebcoNetCdfGrid extends GlobalScopeFactory<BathymetricGrid> {
+public class BathymetricGridFromGebcoNetCdfGridFactory extends GlobalScopeFactory<BathymetricGrid> {
     @NonNull private Factory<? extends Path> path;
     @NonNull private Factory<? extends GridExtent> gridExtent;
     @NonNull private String latitudeVariableName = "lat";
     @NonNull private String longitudeVariableName = "lon";
     @NonNull private String elevationVariableName = "elevation";
 
-    public BathymetricGridFromGebcoNetCdfGrid(
+    public BathymetricGridFromGebcoNetCdfGridFactory(
         @NonNull final Factory<? extends Path> path,
         @NonNull final Factory<? extends GridExtent> gridExtent
     ) {
