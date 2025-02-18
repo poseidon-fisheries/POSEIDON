@@ -24,21 +24,21 @@ import sim.field.continuous.Continuous2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 @Getter
 public class VesselField {
 
     private final Continuous2D field;
-    private final GridExtent gridExtent;
+    private final ModelGrid modelGrid;
 
-    public VesselField(final GridExtent gridExtent) {
+    public VesselField(final ModelGrid modelGrid) {
         this.field = new Continuous2D(
             1,
-            gridExtent.getGridWidth(),
-            gridExtent.getGridHeight()
+            modelGrid.getGridWidth(),
+            modelGrid.getGridHeight()
         );
-        this.gridExtent = gridExtent;
+        this.modelGrid = modelGrid;
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -46,7 +46,7 @@ public class VesselField {
         final Vessel vessel,
         final Int2D cell
     ) {
-        return setPoint(vessel, gridExtent.toPoint(cell));
+        return setPoint(vessel, modelGrid.toPoint(cell));
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -62,7 +62,7 @@ public class VesselField {
     }
 
     public Int2D getCell(final Vessel vessel) {
-        return gridExtent.toCell(getPoint(vessel));
+        return modelGrid.toCell(getPoint(vessel));
     }
 
 }

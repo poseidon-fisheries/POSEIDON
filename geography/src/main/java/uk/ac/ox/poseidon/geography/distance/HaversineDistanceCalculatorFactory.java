@@ -26,7 +26,7 @@ import lombok.Setter;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 @Getter
 @Setter
@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.geography.grids.GridExtent;
 @AllArgsConstructor
 public class HaversineDistanceCalculatorFactory extends GlobalScopeFactory<HaversineDistanceCalculator> {
 
-    private Factory<? extends GridExtent> gridExtent;
+    private Factory<? extends ModelGrid> modelGrid;
 
     @Override
     protected HaversineDistanceCalculator newInstance(final Simulation simulation) {
-        return new HaversineDistanceCalculator(gridExtent.get(simulation));
+        return new HaversineDistanceCalculator(modelGrid.get(simulation));
     }
-    
+
 }

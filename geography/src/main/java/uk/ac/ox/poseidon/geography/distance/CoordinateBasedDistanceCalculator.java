@@ -20,12 +20,12 @@
 package uk.ac.ox.poseidon.geography.distance;
 
 import sim.util.Number2D;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 public abstract class CoordinateBasedDistanceCalculator extends AbstractDistanceCalculator {
 
-    public CoordinateBasedDistanceCalculator(final GridExtent gridExtent) {
-        super(gridExtent);
+    public CoordinateBasedDistanceCalculator(final ModelGrid modelGrid) {
+        super(modelGrid);
     }
 
     @Override
@@ -33,7 +33,7 @@ public abstract class CoordinateBasedDistanceCalculator extends AbstractDistance
         final Number2D start,
         final Number2D end
     ) {
-        return distanceInKm(gridExtent.toCoordinate(start), gridExtent.toCoordinate(end));
+        return distanceInKm(modelGrid.toCoordinate(start), modelGrid.toCoordinate(end));
     }
 
 }

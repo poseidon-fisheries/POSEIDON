@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.Map.Entry;
 
@@ -73,8 +73,8 @@ public class CachingGridPathFinder extends CachingPathFinder<Int2D> implements G
     }
 
     @Override
-    public GridExtent getGridExtent() {
-        return pathFinder.getGridExtent();
+    public ModelGrid getModelGrid() {
+        return pathFinder.getModelGrid();
     }
 
     @Override

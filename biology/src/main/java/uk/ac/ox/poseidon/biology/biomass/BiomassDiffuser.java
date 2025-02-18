@@ -57,7 +57,7 @@ public class BiomassDiffuser implements Steppable {
         final BiomassDiffusionRule biomassDiffusionRule,
         final MersenneTwisterFast rng
     ) {
-        checkArgument(biomassGrid.getGridExtent().equals(carryingCapacityGrid.getGridExtent()));
+        checkArgument(biomassGrid.getModelGrid().equals(carryingCapacityGrid.getModelGrid()));
         this.biomassGrid = biomassGrid;
         this.carryingCapacityGrid = carryingCapacityGrid;
         this.biomassDiffusionRule = biomassDiffusionRule;
@@ -72,7 +72,7 @@ public class BiomassDiffuser implements Steppable {
                     identity(),
                     location ->
                         carryingCapacityGrid
-                            .getGridExtent()
+                            .getModelGrid()
                             .getNeighbours(location)
                             .stream()
                             .filter(habitableLocationsSet::contains)

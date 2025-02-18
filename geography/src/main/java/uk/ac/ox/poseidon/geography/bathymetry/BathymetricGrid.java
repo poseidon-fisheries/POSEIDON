@@ -30,7 +30,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 public interface BathymetricGrid extends NumberGrid<Double, DoubleGrid2D> {
 
     default List<Int2D> getWaterCells() {
-        return getGridExtent()
+        return getModelGrid()
             .getAllCells()
             .stream()
             .filter(this::isWater)
@@ -38,7 +38,7 @@ public interface BathymetricGrid extends NumberGrid<Double, DoubleGrid2D> {
     }
 
     default List<Int2D> getLandCells() {
-        return getGridExtent()
+        return getModelGrid()
             .getAllCells()
             .stream()
             .filter(this::isLand)
@@ -46,7 +46,7 @@ public interface BathymetricGrid extends NumberGrid<Double, DoubleGrid2D> {
     }
 
     default List<Int2D> getAllCells() {
-        return getGridExtent().getAllCells();
+        return getModelGrid().getAllCells();
     }
 
     default boolean isLand(final Int2D cell) {

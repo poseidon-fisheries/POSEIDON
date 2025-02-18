@@ -24,7 +24,7 @@ import net.jqwik.api.Property;
 import net.jqwik.api.constraints.DoubleRange;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,9 +34,9 @@ class HaversineDistanceCalculatorTest {
 
     @Test
     void testDistanceBetweenSamePoints() {
-        final GridExtent mockGridExtent = mock(GridExtent.class);
+        final ModelGrid mockModelGrid = mock(ModelGrid.class);
         final HaversineDistanceCalculator calculator = new HaversineDistanceCalculator(
-            mockGridExtent);
+            mockModelGrid);
 
         // Coordinates for London (long, lat) but here both points are the same
         final Coordinate point = new Coordinate(-0.1278, 51.5074);
@@ -50,9 +50,9 @@ class HaversineDistanceCalculatorTest {
 
     @Test
     void testDistanceBetweenKnownPoints() {
-        final GridExtent mockGridExtent = mock(GridExtent.class);
+        final ModelGrid mockModelGrid = mock(ModelGrid.class);
         final HaversineDistanceCalculator calculator = new HaversineDistanceCalculator(
-            mockGridExtent);
+            mockModelGrid);
 
         // London (longitude, latitude) => (-0.1278, 51.5074)
         final Coordinate london = new Coordinate(-0.1278, 51.5074);
@@ -72,9 +72,9 @@ class HaversineDistanceCalculatorTest {
 
     @Test
     void testDistanceAcrossEquator() {
-        final GridExtent mockGridExtent = mock(GridExtent.class);
+        final ModelGrid mockModelGrid = mock(ModelGrid.class);
         final HaversineDistanceCalculator calculator = new HaversineDistanceCalculator(
-            mockGridExtent);
+            mockModelGrid);
 
         // 1 degree north and south of equator, same longitude (37.0)
         final Coordinate pointNorth = new Coordinate(37.0, 1.0);
@@ -93,9 +93,9 @@ class HaversineDistanceCalculatorTest {
 
     @Test
     void testDistanceBetweenDistantPoints() {
-        final GridExtent mockGridExtent = mock(GridExtent.class);
+        final ModelGrid mockModelGrid = mock(ModelGrid.class);
         final HaversineDistanceCalculator calculator = new HaversineDistanceCalculator(
-            mockGridExtent);
+            mockModelGrid);
 
         // New York  => longitude = -74.0060, latitude = 40.7128
         final Coordinate newYork = new Coordinate(-74.0060, 40.7128);
@@ -115,9 +115,9 @@ class HaversineDistanceCalculatorTest {
 
     @Test
     void testDistanceForExtremeCoordinates() {
-        final GridExtent mockGridExtent = mock(GridExtent.class);
+        final ModelGrid mockModelGrid = mock(ModelGrid.class);
         final HaversineDistanceCalculator calculator = new HaversineDistanceCalculator(
-            mockGridExtent);
+            mockModelGrid);
 
         // North Pole => (longitude = 0.0, latitude = 90.0)
         final Coordinate northPole = new Coordinate(0.0, 90.0);
@@ -142,9 +142,9 @@ class HaversineDistanceCalculatorTest {
         @ForAll @DoubleRange(min = -180, max = 180) final double lon2,
         @ForAll @DoubleRange(min = -90, max = 90) final double lat2
     ) {
-        final GridExtent mockGridExtent = mock(GridExtent.class);
+        final ModelGrid mockModelGrid = mock(ModelGrid.class);
         final HaversineDistanceCalculator calculator =
-            new HaversineDistanceCalculator(mockGridExtent);
+            new HaversineDistanceCalculator(mockModelGrid);
         final Coordinate pointA = new Coordinate(lon1, lat1);
         final Coordinate pointB = new Coordinate(lon2, lat2);
         assertTrue(

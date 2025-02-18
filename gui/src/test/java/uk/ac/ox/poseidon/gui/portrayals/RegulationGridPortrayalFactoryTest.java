@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.awt.*;
 import java.util.Collections;
@@ -150,7 +150,7 @@ class RegulationGridPortrayalFactoryTest {
 
         when(mockBathymetricGrid.getWaterCells()).thenReturn(List.of(mockInt2D));
         when(mockFleet.getVessels()).thenReturn(Collections.emptyList());
-        when(mockBathymetricGrid.getGridExtent()).thenReturn(mock(GridExtent.class));
+        when(mockBathymetricGrid.getModelGrid()).thenReturn(mock(ModelGrid.class));
 
         when(mockRegulations.isForbidden(Mockito.any(DummyFishingAction.class))).thenReturn(true);
         when(mockBathymetricGrid.getField()).thenReturn(new DoubleGrid2D(10, 10, 0));

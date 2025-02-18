@@ -23,7 +23,7 @@ import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 @Getter
 @Setter
@@ -31,11 +31,11 @@ import uk.ac.ox.poseidon.geography.grids.GridExtent;
 @AllArgsConstructor
 public class UniformBathymetricGridFactory extends GlobalScopeFactory<BathymetricGrid> {
 
-    @NonNull private Factory<? extends GridExtent> gridExtent;
+    @NonNull private Factory<? extends ModelGrid> modelGrid;
     private double depth;
 
     @Override
     protected BathymetricGrid newInstance(final Simulation simulation) {
-        return new DefaultBathymetricGrid(gridExtent.get(simulation), depth);
+        return new DefaultBathymetricGrid(modelGrid.get(simulation), depth);
     }
 }

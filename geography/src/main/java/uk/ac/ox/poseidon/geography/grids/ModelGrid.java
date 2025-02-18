@@ -47,7 +47,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.IntStream.range;
 
 @Data
-public final class GridExtent {
+public final class ModelGrid {
 
     private final int gridWidth;   // the width in cells
     private final int gridHeight;  // the height in cells
@@ -78,7 +78,7 @@ public final class GridExtent {
     private final List<Coordinate> allCoordinates =
         getAllCells().stream().map(this::toCoordinate).toList();
 
-    GridExtent(
+    ModelGrid(
         final int gridWidth,
         final int gridHeight,
         final Envelope envelope

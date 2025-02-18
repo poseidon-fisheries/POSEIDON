@@ -23,7 +23,7 @@ import sim.field.grid.Grid2D;
 
 public interface Grid<F extends Grid2D> {
 
-    GridExtent getGridExtent();
+    ModelGrid getModelGrid();
 
     F getField();
 

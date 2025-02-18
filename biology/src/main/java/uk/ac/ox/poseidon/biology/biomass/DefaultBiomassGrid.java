@@ -28,7 +28,7 @@ import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableDoubleGrid;
 
 @Getter
@@ -37,37 +37,37 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
     private final Species species;
 
     public DefaultBiomassGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final Species species
     ) {
-        super(gridExtent);
+        super(modelGrid);
         this.species = species;
     }
 
     public DefaultBiomassGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final Species species,
         final double initialValue
     ) {
-        super(gridExtent, initialValue);
+        super(modelGrid, initialValue);
         this.species = species;
     }
 
     public DefaultBiomassGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final Species species,
         final double[][] values
     ) {
-        super(gridExtent, values);
+        super(modelGrid, values);
         this.species = species;
     }
 
     public DefaultBiomassGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final Species species,
         final DoubleGrid2D grid
     ) {
-        super(gridExtent, grid);
+        super(modelGrid, grid);
         this.species = species;
     }
 

@@ -29,17 +29,17 @@ public class DoubleGrid extends AbstractGrid<DoubleGrid2D>
 
     protected final DoubleGrid2D doubleGrid2D;
 
-    public DoubleGrid(final GridExtent gridExtent) {
-        this(gridExtent, 0.0);
+    public DoubleGrid(final ModelGrid modelGrid) {
+        this(modelGrid, 0.0);
     }
 
     public DoubleGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final double initialValue
     ) {
         this(
-            gridExtent,
-            new DoubleGrid2D(gridExtent.getGridWidth(), gridExtent.getGridHeight(), initialValue)
+            modelGrid,
+            new DoubleGrid2D(modelGrid.getGridWidth(), modelGrid.getGridHeight(), initialValue)
         );
     }
 
@@ -51,7 +51,7 @@ public class DoubleGrid extends AbstractGrid<DoubleGrid2D>
 
     public DoubleGrid(final DoubleGrid2D grid2D) {
         this(
-            new GridExtent(
+            new ModelGrid(
                 grid2D.width,
                 grid2D.height,
                 new Envelope(
@@ -64,18 +64,18 @@ public class DoubleGrid extends AbstractGrid<DoubleGrid2D>
     }
 
     public DoubleGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final double[][] values
     ) {
-        this(gridExtent, new DoubleGrid2D(values));
+        this(modelGrid, new DoubleGrid2D(values));
     }
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public DoubleGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final DoubleGrid2D grid
     ) {
-        super(gridExtent, grid);
+        super(modelGrid, grid);
         this.doubleGrid2D = grid;
     }
 

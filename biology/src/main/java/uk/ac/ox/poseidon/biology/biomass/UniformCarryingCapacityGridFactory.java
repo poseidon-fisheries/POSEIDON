@@ -24,7 +24,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -45,8 +45,8 @@ public class UniformCarryingCapacityGridFactory
     @Override
     protected CarryingCapacityGrid newInstance(final Simulation simulation) {
         final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
-        final GridExtent gridExtent = bathymetricGrid.getGridExtent();
-        final double[][] array = gridExtent.makeDoubleArray();
+        final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
+        final double[][] array = modelGrid.makeDoubleArray();
         final double carryingCapacityInKg =
             carryingCapacity
                 .get(simulation)
@@ -59,6 +59,6 @@ public class UniformCarryingCapacityGridFactory
                     ? carryingCapacityInKg
                     : Double.NaN
         );
-        return new CarryingCapacityGrid(gridExtent, array);
+        return new CarryingCapacityGrid(modelGrid, array);
     }
 }

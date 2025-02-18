@@ -72,8 +72,8 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.RoughCoastalBathymetricGridFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.EquirectangularDistanceCalculatorFactory;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
-import uk.ac.ox.poseidon.geography.grids.GridExtentFactory;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.grids.ModelGridFactory;
 import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -114,8 +114,8 @@ public class ExternalScenario extends Scenario {
     private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
         new LogisticGrowthRuleFactory(0.1);
 
-    private GlobalScopeFactory<? extends GridExtent> gridExtent =
-        new GridExtentFactory(
+    private GlobalScopeFactory<? extends ModelGrid> modelGrid =
+        new ModelGridFactory(
             0.2,
             -5,
             5,
@@ -132,13 +132,13 @@ public class ExternalScenario extends Scenario {
             )
         );
 
-    private Factory<? extends VesselField> vesselField = new VesselFieldFactory(gridExtent);
+    private Factory<? extends VesselField> vesselField = new VesselFieldFactory(modelGrid);
     private Factory<? extends DistanceCalculator> distance =
         new EquirectangularDistanceCalculatorFactory(
-            gridExtent);
+            modelGrid);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
         new RoughCoastalBathymetricGridFactory(
-            gridExtent,
+            modelGrid,
             10,
             1000,
             0.01,
@@ -180,7 +180,7 @@ public class ExternalScenario extends Scenario {
         new FullBiomassAllocatorFactory(carryingCapacityGrid);
     private Factory<? extends BiomassGrid> biomassGridA =
         new BiomassGridFactory(
-            gridExtent,
+            modelGrid,
             speciesA,
             biomassAllocator
         );

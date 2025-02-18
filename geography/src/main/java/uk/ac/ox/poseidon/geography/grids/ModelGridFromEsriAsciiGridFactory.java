@@ -21,6 +21,7 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import lombok.*;
 import org.apache.sis.coverage.grid.GridCoverage;
+import org.apache.sis.coverage.grid.GridExtent;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.storage.DataStores;
@@ -36,17 +37,16 @@ import java.nio.file.Path;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GridExtentFromEsriAsciiGridFactory
-    extends GlobalScopeFactory<uk.ac.ox.poseidon.geography.grids.GridExtent> {
+public class ModelGridFromEsriAsciiGridFactory
+    extends GlobalScopeFactory<ModelGrid> {
     @NonNull private Factory<? extends Path> path;
 
     @Override
-    protected uk.ac.ox.poseidon.geography.grids.GridExtent newInstance(final Simulation simulation) {
+    protected ModelGrid newInstance(final Simulation simulation) {
         try (final DataStore store = DataStores.open(this.path.get(simulation))) {
             final GridCoverageResource r = (GridCoverageResource) store;
             final GridCoverage coverage = r.read(null, null);
-            final org.apache.sis.coverage.grid.GridExtent sisExtent =
-                coverage.getGridGeometry().getExtent();
+            final GridExtent sisExtent = coverage.getGridGeometry().getExtent();
             final int width = (int) (sisExtent.getHigh(0) - sisExtent.getLow(0)) + 1;
             final int height = (int) (sisExtent.getHigh(1) - sisExtent.getLow(1)) + 1;
             final Envelope envelope = coverage
@@ -60,7 +60,7 @@ public class GridExtentFromEsriAsciiGridFactory
                 .orElseThrow(
                     // TODO: write proper exception message
                 );
-            return new uk.ac.ox.poseidon.geography.grids.GridExtent(
+            return new ModelGrid(
                 width,
                 height,
                 envelope

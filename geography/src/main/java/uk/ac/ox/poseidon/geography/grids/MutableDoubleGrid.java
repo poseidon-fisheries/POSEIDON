@@ -23,29 +23,29 @@ import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
 
 public class MutableDoubleGrid extends DoubleGrid {
-    public MutableDoubleGrid(final GridExtent gridExtent) {
-        super(gridExtent);
+    public MutableDoubleGrid(final ModelGrid modelGrid) {
+        super(modelGrid);
     }
 
     public MutableDoubleGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final double initialValue
     ) {
-        super(gridExtent, initialValue);
+        super(modelGrid, initialValue);
     }
 
     public MutableDoubleGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final double[][] values
     ) {
-        super(gridExtent, values);
+        super(modelGrid, values);
     }
 
     public MutableDoubleGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final DoubleGrid2D grid
     ) {
-        super(gridExtent, grid);
+        super(modelGrid, grid);
     }
 
     protected void setValue(

@@ -21,7 +21,7 @@ package uk.ac.ox.poseidon.geography.paths;
 
 import com.google.common.collect.ImmutableList;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
@@ -32,7 +32,7 @@ public interface GridPathFinder extends PathFinder<Int2D> {
     default ImmutableList<Int2D> getAccessibleWaterCells(
         final Int2D startingCell
     ) {
-        return getGridExtent()
+        return getModelGrid()
             .getAllCells()
             .stream()
             .filter(this::isWater)
@@ -40,7 +40,7 @@ public interface GridPathFinder extends PathFinder<Int2D> {
             .collect(toImmutableList());
     }
 
-    GridExtent getGridExtent();
+    ModelGrid getModelGrid();
 
     boolean isWater(final Int2D cell);
 
@@ -55,7 +55,7 @@ public interface GridPathFinder extends PathFinder<Int2D> {
         final Int2D startingCell,
         final int neighbourhoodSize
     ) {
-        return getGridExtent()
+        return getModelGrid()
             .getNeighbours(startingCell, neighbourhoodSize)
             .stream()
             .filter(this::isWater)

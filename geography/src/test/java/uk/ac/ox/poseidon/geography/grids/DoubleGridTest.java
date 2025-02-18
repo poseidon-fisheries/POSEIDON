@@ -56,10 +56,10 @@ class DoubleGridTest {
     }
 
     @Test
-    void testGridExtent() {
-        final GridExtent gridExtent = grid.getGridExtent();
-        assertEquals(3, gridExtent.getGridWidth());
-        assertEquals(3, gridExtent.getGridHeight());
+    void testModelGrid() {
+        final ModelGrid modelGrid = grid.getModelGrid();
+        assertEquals(3, modelGrid.getGridWidth());
+        assertEquals(3, modelGrid.getGridHeight());
         assertEquals(
             List.of(
                 new Coordinate(0.5, 2.5),
@@ -72,13 +72,13 @@ class DoubleGridTest {
                 new Coordinate(2.5, 1.5),
                 new Coordinate(2.5, 0.5)
             ),
-            gridExtent.getAllCoordinates()
+            modelGrid.getAllCoordinates()
         );
     }
 
     @Test
     void testEnvelope() {
-        final Envelope envelope = grid.getGridExtent().getEnvelope();
+        final Envelope envelope = grid.getModelGrid().getEnvelope();
         assertEquals(3, envelope.getWidth());
         assertEquals(3, envelope.getHeight());
     }

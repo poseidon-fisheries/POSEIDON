@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -45,37 +45,37 @@ import java.util.Collection;
 @AllArgsConstructor
 public class BathymetricGridFromGebcoNetCdfGridFactory extends GlobalScopeFactory<BathymetricGrid> {
     @NonNull private Factory<? extends Path> path;
-    @NonNull private Factory<? extends GridExtent> gridExtent;
+    @NonNull private Factory<? extends ModelGrid> modelGrid;
     @NonNull private String latitudeVariableName = "lat";
     @NonNull private String longitudeVariableName = "lon";
     @NonNull private String elevationVariableName = "elevation";
 
     public BathymetricGridFromGebcoNetCdfGridFactory(
         @NonNull final Factory<? extends Path> path,
-        @NonNull final Factory<? extends GridExtent> gridExtent
+        @NonNull final Factory<? extends ModelGrid> modelGrid
     ) {
         this.path = path;
-        this.gridExtent = gridExtent;
+        this.modelGrid = modelGrid;
     }
 
     @Override
     protected BathymetricGrid newInstance(final Simulation simulation) {
-        final GridExtent gridExtent = this.gridExtent.get(simulation);
-        final double[][] array = gridExtent.makeDoubleArray();
+        final ModelGrid modelGrid = this.modelGrid.get(simulation);
+        final double[][] array = modelGrid.makeDoubleArray();
         final Multimap<Int2D, Short> elevationValues =
-            readElevationValues(path.get(simulation), gridExtent);
-        for (final Int2D int2D : gridExtent.getAllCells()) {
+            readElevationValues(path.get(simulation), modelGrid);
+        for (final Int2D int2D : modelGrid.getAllCells()) {
             final Collection<Short> elevations = elevationValues.get(int2D);
             if (!elevations.isEmpty()) {
                 array[int2D.x][int2D.y] = Quantiles.median().compute(elevations);
             }
         }
-        return new DefaultBathymetricGrid(gridExtent, array);
+        return new DefaultBathymetricGrid(modelGrid, array);
     }
 
     private Multimap<Int2D, Short> readElevationValues(
         final Path path,
-        final GridExtent gridExtent
+        final ModelGrid modelGrid
     ) {
         try (final NetcdfFile ncFile = NetcdfFiles.open(path.toString())) {
             final Variable latVar = findVariable(ncFile, latitudeVariableName);
@@ -98,7 +98,7 @@ public class BathymetricGridFromGebcoNetCdfGridFactory extends GlobalScopeFactor
                     final double lon = lonArray.getDouble(j);
                     elevIndex.set(i, j);
                     elevationValues.put(
-                        gridExtent.toCell(new Coordinate(lon, lat)),
+                        modelGrid.toCell(new Coordinate(lon, lat)),
                         elevArray.getShort(elevIndex)
                     );
                 }

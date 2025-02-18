@@ -31,10 +31,10 @@ import java.util.Set;
 import static java.util.stream.IntStream.range;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class GridExtentTest {
+class ModelGridTest {
 
-    private final GridExtent gridExtent =
-        new GridExtent(
+    private final ModelGrid modelGrid =
+        new ModelGrid(
             10,
             10,
             new Envelope(-5, 5, -5, 5)
@@ -53,7 +53,7 @@ class GridExtentTest {
                 new Int2D(6, 4),
                 new Int2D(6, 5)
             ),
-            Set.copyOf(gridExtent.getNeighbours(new Int2D(5, 5)))
+            Set.copyOf(modelGrid.getNeighbours(new Int2D(5, 5)))
         );
         assertEquals(
             Set.of(
@@ -61,7 +61,7 @@ class GridExtentTest {
                 new Int2D(1, 0),
                 new Int2D(1, 1)
             ),
-            Set.copyOf(gridExtent.getNeighbours(new Int2D(0, 0)))
+            Set.copyOf(modelGrid.getNeighbours(new Int2D(0, 0)))
         );
     }
 
@@ -69,11 +69,11 @@ class GridExtentTest {
     void cellToCoordinate() {
         assertEquals(
             new Coordinate(-4.5, 4.5),
-            gridExtent.toCoordinate(new Int2D(0, 0))
+            modelGrid.toCoordinate(new Int2D(0, 0))
         );
         assertEquals(
             new Coordinate(4.5, -4.5),
-            gridExtent.toCoordinate(new Int2D(9, 9))
+            modelGrid.toCoordinate(new Int2D(9, 9))
         );
     }
 
@@ -81,11 +81,11 @@ class GridExtentTest {
     void pointToCoordinate() {
         assertEquals(
             new Coordinate(-5, 5),
-            gridExtent.toCoordinate(new Double2D(0, 0))
+            modelGrid.toCoordinate(new Double2D(0, 0))
         );
         assertEquals(
             new Coordinate(5, -5),
-            gridExtent.toCoordinate(new Double2D(10, 10))
+            modelGrid.toCoordinate(new Double2D(10, 10))
         );
     }
 
@@ -93,11 +93,11 @@ class GridExtentTest {
     void coordinateToPoint() {
         assertEquals(
             new Double2D(0, 0),
-            gridExtent.toPoint(new Coordinate(-5, 5))
+            modelGrid.toPoint(new Coordinate(-5, 5))
         );
         assertEquals(
             new Double2D(10, 10),
-            gridExtent.toPoint(new Coordinate(5, -5))
+            modelGrid.toPoint(new Coordinate(5, -5))
         );
     }
 
@@ -105,29 +105,29 @@ class GridExtentTest {
     void coordinateToCell() {
         assertEquals(
             new Int2D(0, 0),
-            gridExtent.toCell(new Coordinate(-5, 5))
+            modelGrid.toCell(new Coordinate(-5, 5))
         );
         assertEquals(
             new Int2D(0, 0),
-            gridExtent.toCell(new Coordinate(-4.5, 4.5))
+            modelGrid.toCell(new Coordinate(-4.5, 4.5))
         );
         assertEquals(
             new Int2D(9, 9),
-            gridExtent.toCell(new Coordinate(4.5, -4.5))
+            modelGrid.toCell(new Coordinate(4.5, -4.5))
         );
         assertEquals(
             new Int2D(10, 10),
-            gridExtent.toCell(new Coordinate(5, -5))
+            modelGrid.toCell(new Coordinate(5, -5))
         );
     }
 
     @Test
     void testCoordToXyAndBack() {
-        final GridExtent gridExtent =
-            new GridExtentFactory(
+        final ModelGrid modelGrid =
+            new ModelGridFactory(
                 1.0, -171, -70, -50, 50
             ).get(null);
-        final Envelope envelope = gridExtent.getEnvelope();
+        final Envelope envelope = modelGrid.getEnvelope();
         final List<Coordinate> coordinates =
             range((int) envelope.getMinX(), (int) envelope.getMaxX() - 1)
                 .mapToObj(x -> x + 0.5)
@@ -138,10 +138,10 @@ class GridExtentTest {
                 ).toList();
 
         coordinates.forEach(coordinate -> {
-            final Double2D xy = gridExtent.toPoint(coordinate);
+            final Double2D xy = modelGrid.toPoint(coordinate);
             assertEquals(
                 coordinate,
-                gridExtent.toCoordinate(new Int2D((int) xy.x, (int) xy.y)),
+                modelGrid.toCoordinate(new Int2D((int) xy.x, (int) xy.y)),
                 coordinate.toString()
             );
         });

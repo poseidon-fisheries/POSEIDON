@@ -66,7 +66,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
         return new DummyFishingAction(
             currenDateTimeSupplier.get().plus(travelDuration),
             vessel,
-            vessel.getVesselField().getGridExtent().toCoordinate(fishingLocation)
+            vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation)
         );
     }
 }

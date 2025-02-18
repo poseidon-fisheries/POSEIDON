@@ -52,7 +52,7 @@ public class DivergingNumberGridPortrayalFactory extends NumberGridPortrayalFact
         final NumberGrid<?, ?> grid = getGrid().get(simulation);
         final DoubleSummaryStatistics stats =
             grid
-                .getGridExtent()
+                .getModelGrid()
                 .getAllCells()
                 .stream()
                 .mapToDouble(cell -> grid.getValue(cell).doubleValue())

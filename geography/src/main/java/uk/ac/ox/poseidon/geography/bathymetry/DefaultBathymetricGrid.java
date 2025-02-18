@@ -23,7 +23,7 @@ import lombok.Getter;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.List;
 
@@ -35,8 +35,8 @@ public class DefaultBathymetricGrid extends DoubleGrid implements BathymetricGri
     @Getter(lazy = true)
     private final List<Int2D> landCells = BathymetricGrid.super.getLandCells();
 
-    public DefaultBathymetricGrid(final GridExtent gridExtent) {
-        super(gridExtent);
+    public DefaultBathymetricGrid(final ModelGrid modelGrid) {
+        super(modelGrid);
     }
 
     public DefaultBathymetricGrid(final double[][] values) {
@@ -44,24 +44,24 @@ public class DefaultBathymetricGrid extends DoubleGrid implements BathymetricGri
     }
 
     DefaultBathymetricGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final double initialValue
     ) {
-        super(gridExtent, initialValue);
+        super(modelGrid, initialValue);
     }
 
     public DefaultBathymetricGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final double[][] values
     ) {
-        super(gridExtent, values);
+        super(modelGrid, values);
     }
 
     DefaultBathymetricGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final DoubleGrid2D grid
     ) {
-        super(gridExtent, grid);
+        super(modelGrid, grid);
     }
 
     @Override

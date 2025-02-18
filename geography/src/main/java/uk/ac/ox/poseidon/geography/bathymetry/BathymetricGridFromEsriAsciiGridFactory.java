@@ -30,7 +30,7 @@ import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.awt.*;
 import java.awt.image.RenderedImage;
@@ -44,13 +44,14 @@ public class BathymetricGridFromEsriAsciiGridFactory
     extends GlobalScopeFactory<BathymetricGrid> {
 
     @NonNull private Factory<? extends Path> path;
-    @NonNull private Factory<? extends GridExtent> gridExtent;
+    @NonNull private Factory<? extends ModelGrid> modelGrid;
 
     @Override
     protected BathymetricGrid newInstance(final Simulation simulation) {
 
-        // TODO: make sure this is equal to the grid extent from the file
-        final GridExtent gridExtent = this.gridExtent.get(simulation);
+        // TODO: make sure this is equal to the model grid from the file
+        //       or that only cell that are part of the model grid are loaded
+        final ModelGrid modelGrid = this.modelGrid.get(simulation);
 
         try (final DataStore store = DataStores.open(this.path.get(simulation))) {
             // Assuming that we know that the data is a single raster:
@@ -59,7 +60,7 @@ public class BathymetricGridFromEsriAsciiGridFactory
             // Subset of data could be specified here (no subset in this example):
             final GridCoverage coverage = r.read(null, null);
 
-            final DoubleGrid2D doubleGrid2D = new DoubleGrid2D(gridExtent.makeDoubleArray());
+            final DoubleGrid2D doubleGrid2D = new DoubleGrid2D(modelGrid.makeDoubleArray());
 
             final RenderedImage image = coverage.render(coverage.getGridGeometry().getExtent());
             /*
@@ -74,7 +75,7 @@ public class BathymetricGridFromEsriAsciiGridFactory
             }
 
             return new DefaultBathymetricGrid(
-                gridExtent,
+                modelGrid,
                 doubleGrid2D
             );
 

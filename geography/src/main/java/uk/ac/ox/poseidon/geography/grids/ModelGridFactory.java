@@ -34,7 +34,7 @@ import static com.google.common.math.DoubleMath.isMathematicalInteger;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GridExtentFactory extends GlobalScopeFactory<GridExtent> {
+public class ModelGridFactory extends GlobalScopeFactory<ModelGrid> {
 
     private double resolutionInDegrees;
     private double westLongitude;
@@ -43,12 +43,12 @@ public class GridExtentFactory extends GlobalScopeFactory<GridExtent> {
     private double northLatitude;
 
     @Override
-    protected GridExtent newInstance(final Simulation simulation) {
+    protected ModelGrid newInstance(final Simulation simulation) {
         final double widthInDegrees = eastLongitude - westLongitude;
         final double heightInDegrees = northLatitude - southLatitude;
         final int gridWidth = validateDimension("Width", widthInDegrees, resolutionInDegrees);
         final int gridHeight = validateDimension("Height", heightInDegrees, resolutionInDegrees);
-        return new GridExtent(
+        return new ModelGrid(
             gridWidth,
             gridHeight,
             new Envelope(

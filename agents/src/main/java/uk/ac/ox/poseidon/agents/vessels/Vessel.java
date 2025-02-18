@@ -79,7 +79,7 @@ public class Vessel implements Oriented2D {
     public void setHeadingTowards(
         final Int2D destinationCell
     ) {
-        setHeadingTowards(getVesselField().getGridExtent().toPoint(destinationCell));
+        setHeadingTowards(getVesselField().getModelGrid().toPoint(destinationCell));
     }
 
     private void setHeadingTowards(
@@ -96,7 +96,7 @@ public class Vessel implements Oriented2D {
     }
 
     public Coordinate getCoordinate() {
-        return vesselField.getGridExtent().toCoordinate(getPoint());
+        return vesselField.getModelGrid().toCoordinate(getPoint());
     }
 
     public Int2D getCell() {

@@ -26,7 +26,7 @@ import uk.ac.ox.poseidon.core.MasonUtils;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.AbstractGrid;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -42,7 +42,7 @@ public class DefaultPortGrid extends AbstractGrid<SparseGrid2D> implements PortG
         final BathymetricGrid bathymetricGrid,
         final SparseGrid2D sparseGrid2D
     ) {
-        super(bathymetricGrid.getGridExtent(), sparseGrid2D);
+        super(bathymetricGrid.getModelGrid(), sparseGrid2D);
         this.sparseGrid2D = sparseGrid2D;
     }
 
@@ -60,13 +60,13 @@ public class DefaultPortGrid extends AbstractGrid<SparseGrid2D> implements PortG
         final BathymetricGrid bathymetricGrid,
         final Map<? extends Port, ? extends Coordinate> portCoordinates
     ) {
-        final GridExtent gridExtent = bathymetricGrid.getGridExtent();
+        final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
         final SparseGrid2D grid = new SparseGrid2D(
-            gridExtent.getGridWidth(),
-            gridExtent.getGridHeight()
+            modelGrid.getGridWidth(),
+            modelGrid.getGridHeight()
         );
         portCoordinates.forEach((port, coordinate) -> {
-            final Int2D cell = gridExtent.toCell(coordinate);
+            final Int2D cell = modelGrid.toCell(coordinate);
             checkArgument(
                 bathymetricGrid.isLand(cell),
                 "Port %s at coordinate %s is on water.",
@@ -74,7 +74,7 @@ public class DefaultPortGrid extends AbstractGrid<SparseGrid2D> implements PortG
                 coordinate
             );
             checkArgument(
-                gridExtent
+                modelGrid
                     .getNeighbours(cell)
                     .stream()
                     .anyMatch(bathymetricGrid::isWater),

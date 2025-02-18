@@ -28,20 +28,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Getter
 public abstract class AbstractGrid<F extends Grid2D> implements Grid<F> {
 
-    private final GridExtent gridExtent;
+    private final ModelGrid modelGrid;
     private final F field;
 
     protected AbstractGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final F field
     ) {
-        checkNotNull(gridExtent);
+        checkNotNull(modelGrid);
         checkNotNull(field);
         checkArgument(field.getWidth() > 0);
         checkArgument(field.getHeight() > 0);
-        checkArgument(gridExtent.getGridWidth() == field.getWidth());
-        checkArgument(gridExtent.getGridHeight() == field.getHeight());
-        this.gridExtent = gridExtent;
+        checkArgument(modelGrid.getGridWidth() == field.getWidth());
+        checkArgument(modelGrid.getGridHeight() == field.getHeight());
+        this.modelGrid = modelGrid;
         this.field = field;
     }
 }

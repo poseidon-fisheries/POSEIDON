@@ -22,7 +22,7 @@ package uk.ac.ox.poseidon.geography.paths;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 @RequiredArgsConstructor
@@ -41,7 +41,7 @@ abstract class AbstractGridPathFinder implements GridPathFinder {
     }
 
     @Override
-    public GridExtent getGridExtent() {
-        return bathymetricGrid.getGridExtent();
+    public ModelGrid getModelGrid() {
+        return bathymetricGrid.getModelGrid();
     }
 }

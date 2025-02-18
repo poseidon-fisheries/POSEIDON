@@ -70,8 +70,8 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromGebcoNetCdfGridFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
-import uk.ac.ox.poseidon.geography.grids.GridExtentFromEsriAsciiGridFactory;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.grids.ModelGridFromEsriAsciiGridFactory;
 import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -134,12 +134,12 @@ public class BasicScenario extends Scenario {
         inputPath, "NWMed_excluded_grid.asc"
     );
 
-    private GlobalScopeFactory<? extends GridExtent> gridExtent =
-        new GridExtentFromEsriAsciiGridFactory(exclusionGridPath);
+    private GlobalScopeFactory<? extends ModelGrid> modelGrid =
+        new ModelGridFromEsriAsciiGridFactory(exclusionGridPath);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
         new BathymetricGridFromGebcoNetCdfGridFactory(
             PathFactory.from(inputPath, "gebco_2024_n43.85_s37.01_w-1.02_e8.07.nc"),
-            gridExtent
+            modelGrid
         );
     private Factory<? extends PortGrid> portGrid =
         new RandomLocationsPortGridFactory(
@@ -157,13 +157,13 @@ public class BasicScenario extends Scenario {
         new FullBiomassAllocatorFactory(carryingCapacityGrid);
     private Factory<? extends BiomassGrid> biomassGridA =
         new BiomassGridFactory(
-            gridExtent,
+            modelGrid,
             speciesA,
             biomassAllocator
         );
     private Factory<? extends BiomassGrid> biomassGridB =
         new BiomassGridFactory(
-            gridExtent,
+            modelGrid,
             speciesB,
             biomassAllocator
         );
@@ -209,9 +209,9 @@ public class BasicScenario extends Scenario {
             ),
             0
         );
-    private Factory<? extends VesselField> vesselField = new VesselFieldFactory(gridExtent);
+    private Factory<? extends VesselField> vesselField = new VesselFieldFactory(modelGrid);
     private Factory<? extends DistanceCalculator> distance =
-        new HaversineDistanceCalculatorFactory(gridExtent);
+        new HaversineDistanceCalculatorFactory(modelGrid);
     private Factory<? extends GridPathFinder> pathFinder =
         new DefaultPathFinderFactory(
             bathymetricGrid,

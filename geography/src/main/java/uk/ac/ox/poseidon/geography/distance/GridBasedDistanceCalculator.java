@@ -20,12 +20,12 @@
 package uk.ac.ox.poseidon.geography.distance;
 
 import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 public abstract class GridBasedDistanceCalculator extends AbstractDistanceCalculator {
 
-    public GridBasedDistanceCalculator(final GridExtent gridExtent) {
-        super(gridExtent);
+    public GridBasedDistanceCalculator(final ModelGrid modelGrid) {
+        super(modelGrid);
     }
 
     @Override
@@ -33,6 +33,6 @@ public abstract class GridBasedDistanceCalculator extends AbstractDistanceCalcul
         final Coordinate a,
         final Coordinate b
     ) {
-        return distanceInKm(gridExtent.toPoint(a), gridExtent.toPoint(b));
+        return distanceInKm(modelGrid.toPoint(a), modelGrid.toPoint(b));
     }
 }

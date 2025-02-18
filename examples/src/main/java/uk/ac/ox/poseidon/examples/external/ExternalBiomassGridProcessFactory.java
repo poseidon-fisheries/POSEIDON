@@ -31,7 +31,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
 @Getter
@@ -52,11 +52,11 @@ public class ExternalBiomassGridProcessFactory
     protected ExternalBiomassGridProcess newListener(final Simulation simulation) {
 
         final BiomassGrid internalGrid = internalBiomassGrid.get(simulation);
-        final GridExtent gridExtent = internalGrid.getGridExtent();
+        final ModelGrid modelGrid = internalGrid.getModelGrid();
         final var gridBuilder = Fishing.Grid.newBuilder();
-        for (int x = 0; x < gridExtent.getGridWidth(); x++) {
+        for (int x = 0; x < modelGrid.getGridWidth(); x++) {
             final var columnBuilder = Fishing.Grid.Column.newBuilder();
-            for (int y = 0; y < gridExtent.getGridHeight(); y++) {
+            for (int y = 0; y < modelGrid.getGridHeight(); y++) {
                 columnBuilder.addValues(internalGrid.getValue(new Int2D(x, y)));
             }
             gridBuilder.addColumns(columnBuilder);

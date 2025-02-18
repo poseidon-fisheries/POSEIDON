@@ -22,7 +22,7 @@ package uk.ac.ox.poseidon.geography.distance;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -37,23 +37,23 @@ class HaversineDistanceCalculatorFactoryTest {
      */
 
     @Test
-    void testNewInstance_createsHaversineDistanceCalculatorWithValidGridExtent() {
+    void testNewInstance_createsHaversineDistanceCalculatorWithValidModelGrid() {
         // Arrange
-        final GridExtent mockedGridExtent = mock(GridExtent.class);
-        @SuppressWarnings("unchecked") final Factory<GridExtent> gridExtentFactory =
+        final ModelGrid mockedModelGrid = mock(ModelGrid.class);
+        @SuppressWarnings("unchecked") final Factory<ModelGrid> modelGridFactory =
             mock(Factory.class);
         final Simulation simulation = mock(Simulation.class);
 
-        when(gridExtentFactory.get(simulation)).thenReturn(mockedGridExtent);
+        when(modelGridFactory.get(simulation)).thenReturn(mockedModelGrid);
 
         final HaversineDistanceCalculatorFactory factory = new HaversineDistanceCalculatorFactory();
-        factory.setGridExtent(gridExtentFactory);
+        factory.setModelGrid(modelGridFactory);
 
         // Act
         final HaversineDistanceCalculator result = factory.newInstance(simulation);
 
         // Assert
         assertNotNull(result);
-        verify(gridExtentFactory, times(1)).get(simulation);
+        verify(modelGridFactory, times(1)).get(simulation);
     }
 }

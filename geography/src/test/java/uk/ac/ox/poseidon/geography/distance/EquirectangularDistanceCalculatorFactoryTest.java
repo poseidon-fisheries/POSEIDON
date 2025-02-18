@@ -22,7 +22,7 @@ package uk.ac.ox.poseidon.geography.distance;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -35,19 +35,19 @@ class EquirectangularDistanceCalculatorFactoryTest {
      * class.
      * <p>
      * The method is responsible for creating a new instance of `EquirectangularDistanceCalculator`
-     * using a `GridExtent` provided by the factory and the `Simulation` passed as a parameter.
+     * using a `ModelGrid` provided by the factory and the `Simulation` passed as a parameter.
      */
 
     @Test
     void testNewInstanceCreatesEquirectangularDistanceCalculator() {
         // Arrange
-        final Factory<GridExtent> mockedGridExtentFactory = mock(Factory.class);
+        final Factory<ModelGrid> mockedModelGridFactory = mock(Factory.class);
         final Simulation simulation = mock(Simulation.class);
-        final GridExtent mockedGridExtent = mock(GridExtent.class);
-        when(mockedGridExtentFactory.get(simulation)).thenReturn(mockedGridExtent);
+        final ModelGrid mockedModelGrid = mock(ModelGrid.class);
+        when(mockedModelGridFactory.get(simulation)).thenReturn(mockedModelGrid);
 
         final EquirectangularDistanceCalculatorFactory factory =
-            new EquirectangularDistanceCalculatorFactory(mockedGridExtentFactory);
+            new EquirectangularDistanceCalculatorFactory(mockedModelGridFactory);
 
         // Act
         final EquirectangularDistanceCalculator result = factory.newInstance(simulation);

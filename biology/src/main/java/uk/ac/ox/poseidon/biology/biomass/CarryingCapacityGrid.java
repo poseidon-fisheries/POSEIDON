@@ -23,7 +23,7 @@ import lombok.Getter;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.List;
 
@@ -31,35 +31,35 @@ public class CarryingCapacityGrid extends DoubleGrid {
 
     @Getter(lazy = true)
     private final List<Int2D> habitableCells =
-        getGridExtent()
+        getModelGrid()
             .getAllCells()
             .stream()
             .filter(cell -> getCarryingCapacity(cell) > 0)
             .toList();
 
-    public CarryingCapacityGrid(final GridExtent gridExtent) {
-        super(gridExtent);
+    public CarryingCapacityGrid(final ModelGrid modelGrid) {
+        super(modelGrid);
     }
 
     public CarryingCapacityGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final double initialValue
     ) {
-        super(gridExtent, initialValue);
+        super(modelGrid, initialValue);
     }
 
     public CarryingCapacityGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final double[][] values
     ) {
-        super(gridExtent, values);
+        super(modelGrid, values);
     }
 
     public CarryingCapacityGrid(
-        final GridExtent gridExtent,
+        final ModelGrid modelGrid,
         final DoubleGrid2D grid
     ) {
-        super(gridExtent, grid);
+        super(modelGrid, grid);
     }
 
     public double getCarryingCapacity(final Int2D cell) {

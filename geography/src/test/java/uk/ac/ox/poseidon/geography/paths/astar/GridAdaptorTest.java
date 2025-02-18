@@ -55,7 +55,7 @@ class GridAdaptorTest {
 
     private final DistanceCalculator distanceCalculator =
         new EquirectangularDistanceCalculator(
-            bathymetricGrid.getGridExtent()
+            bathymetricGrid.getModelGrid()
         );
 
     private final PortGrid portGrid =

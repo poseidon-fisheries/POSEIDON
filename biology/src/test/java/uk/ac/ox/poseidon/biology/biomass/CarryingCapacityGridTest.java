@@ -22,8 +22,8 @@ package uk.ac.ox.poseidon.biology.biomass;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
-import uk.ac.ox.poseidon.geography.grids.GridExtentFactory;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.grids.ModelGridFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,9 +36,9 @@ class CarryingCapacityGridTest {
 
     @BeforeEach
     void setUp() {
-        final GridExtent gridExtent = new GridExtentFactory(0.5, -1.5, 1.5, -1.5, 1.5).get(null);
+        final ModelGrid modelGrid = new ModelGridFactory(0.5, -1.5, 1.5, -1.5, 1.5).get(null);
         grid = new CarryingCapacityGrid(
-            gridExtent,
+            modelGrid,
             new double[][]{
                 {0, 0, 1},
                 {0, 0, 1},
@@ -49,7 +49,7 @@ class CarryingCapacityGridTest {
 
     @Test
     void getCarryingCapacity() {
-        grid.getGridExtent().getAllCells().forEach(cell ->
+        grid.getModelGrid().getAllCells().forEach(cell ->
             assertEquals(cell.y == 2 ? 1 : 0, grid.getCarryingCapacity(cell))
         );
     }

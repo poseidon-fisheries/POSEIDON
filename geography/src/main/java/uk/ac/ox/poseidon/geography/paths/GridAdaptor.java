@@ -31,7 +31,7 @@ import lombok.Getter;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.concurrent.ExecutionException;
@@ -41,7 +41,7 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
     private final Interner<Int2D> interner = Interners.newStrongInterner();
     private final BathymetricGrid bathymetricGrid;
     private final PortGrid portGrid;
-    private final GridExtent gridExtent;
+    private final ModelGrid modelGrid;
     @Getter
     private final DistanceCalculator distanceCalculator;
     private final Cache<Int2D, Array<Connection<Int2D>>> connectionsCache =
@@ -54,7 +54,7 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
     ) {
         this.bathymetricGrid = bathymetricGrid;
         this.portGrid = portGrid;
-        this.gridExtent = bathymetricGrid.getGridExtent();
+        this.modelGrid = bathymetricGrid.getModelGrid();
         this.distanceCalculator = distanceCalculator;
     }
 
@@ -64,12 +64,12 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
 
     @Override
     public int getIndex(final Int2D cell) {
-        return cell.x + cell.y * gridExtent.getGridWidth();
+        return cell.x + cell.y * modelGrid.getGridWidth();
     }
 
     @Override
     public int getNodeCount() {
-        return gridExtent.getGridHeight() * gridExtent.getGridWidth();
+        return modelGrid.getGridHeight() * modelGrid.getGridWidth();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
                 cell,
                 () ->
                     !isNavigable(cell) ? new Array<>() : new Array<>(
-                        gridExtent
+                        modelGrid
                             .getNeighbours(cell)
                             .stream()
                             .filter(this::isNavigable)

@@ -20,7 +20,7 @@
 package uk.ac.ox.poseidon.geography.distance;
 
 import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.text.MessageFormat;
 import java.util.logging.Logger;
@@ -33,8 +33,8 @@ public class EquirectangularDistanceCalculator extends CoordinateBasedDistanceCa
         Logger.getLogger(EquirectangularDistanceCalculator.class.getName());
     private static final double WARNING_THRESHOLD = 250;
 
-    public EquirectangularDistanceCalculator(final GridExtent gridExtent) {
-        super(gridExtent);
+    public EquirectangularDistanceCalculator(final ModelGrid modelGrid) {
+        super(modelGrid);
     }
 
     @SuppressWarnings("SuspiciousNameCombination")

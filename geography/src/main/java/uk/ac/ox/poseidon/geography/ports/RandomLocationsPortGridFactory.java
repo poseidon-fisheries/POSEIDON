@@ -26,7 +26,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,13 +50,13 @@ public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortG
     @Override
     protected PortGrid newInstance(final Simulation simulation) {
         final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
-        final GridExtent gridExtent = bathymetricGrid.getGridExtent();
+        final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
         final List<Int2D> suitableTiles =
             bathymetricGrid
                 .getLandCells()
                 .stream()
                 .filter(cell ->
-                    gridExtent
+                    modelGrid
                         .getNeighbours(cell)
                         .stream()
                         .filter(bathymetricGrid::isWater)
@@ -75,8 +75,8 @@ public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortG
         );
         final SparseGrid2D sparseGrid2D =
             new SparseGrid2D(
-                gridExtent.getGridWidth(),
-                gridExtent.getGridHeight()
+                modelGrid.getGridWidth(),
+                modelGrid.getGridHeight()
             );
         suitableTiles
             .stream()

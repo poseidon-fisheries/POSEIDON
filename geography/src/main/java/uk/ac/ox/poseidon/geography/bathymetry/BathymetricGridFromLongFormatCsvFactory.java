@@ -27,7 +27,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.nio.file.Path;
 
@@ -39,7 +39,7 @@ public class BathymetricGridFromLongFormatCsvFactory
     extends GlobalScopeFactory<BathymetricGrid> {
 
     @NonNull private Factory<? extends Path> path;
-    @NonNull private Factory<? extends GridExtent> gridExtent;
+    @NonNull private Factory<? extends ModelGrid> modelGrid;
     @NonNull private String longitudeColumnName;
     @NonNull private String latitudeColumnName;
     @NonNull private String depthColumnName;
@@ -47,16 +47,16 @@ public class BathymetricGridFromLongFormatCsvFactory
 
     @Override
     protected BathymetricGrid newInstance(final Simulation simulation) {
-        final GridExtent gridExtent = this.gridExtent.get(simulation);
+        final ModelGrid modelGrid = this.modelGrid.get(simulation);
         final DoubleGrid2D doubleGrid2D =
             new DoubleGrid2D(
-                gridExtent.getGridWidth(),
-                gridExtent.getGridHeight(),
+                modelGrid.getGridWidth(),
+                modelGrid.getGridHeight(),
                 defaultDepth
             );
         Table.read().file(path.get(simulation).toFile()).forEach(row -> {
             final Int2D cell =
-                gridExtent.toCell(new Coordinate(
+                modelGrid.toCell(new Coordinate(
                     row.getDouble(longitudeColumnName),
                     row.getDouble(latitudeColumnName)
                 ));
@@ -66,7 +66,7 @@ public class BathymetricGridFromLongFormatCsvFactory
                 row.getDouble(depthColumnName)
             );
         });
-        return new DefaultBathymetricGrid(gridExtent, doubleGrid2D);
+        return new DefaultBathymetricGrid(modelGrid, doubleGrid2D);
     }
 
 }

@@ -133,7 +133,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
                             new DummyFishingAction(
                                 dateTime,
                                 vessel,
-                                bathymetricGrid.getGridExtent().toCoordinate(cell)
+                                bathymetricGrid.getModelGrid().toCoordinate(cell)
                             )
                         ).anyMatch(regulations::isForbidden);
                 grid.field[cell.x][cell.y] = forbidden ? 1 : 0;

@@ -21,11 +21,11 @@ package uk.ac.ox.poseidon.geography.distance;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 @Getter
 @RequiredArgsConstructor
 public abstract class AbstractDistanceCalculator implements DistanceCalculator {
     public static final double EARTH_RADIUS_IN_KM = 6371.0;
-    protected final GridExtent gridExtent;
+    protected final ModelGrid modelGrid;
 }

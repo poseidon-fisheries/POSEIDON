@@ -24,7 +24,7 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 @Getter
 @Setter
@@ -32,19 +32,19 @@ import uk.ac.ox.poseidon.geography.grids.GridExtent;
 @NoArgsConstructor
 public class BiomassGridFactory extends SimulationScopeFactory<BiomassGrid> {
 
-    @NonNull private Factory<? extends GridExtent> gridExtent;
+    @NonNull private Factory<? extends ModelGrid> modelGrid;
     @NonNull private Factory<? extends Species> species;
     @NonNull private Factory<? extends BiomassAllocator> biomassAllocator;
 
     @Override
     protected BiomassGrid newInstance(final Simulation simulation) {
         final BiomassAllocator biomassAllocator = this.biomassAllocator.get(simulation);
-        final GridExtent gridExtent = this.gridExtent.get(simulation);
-        final double[][] biomassArray = gridExtent.makeDoubleArray();
-        gridExtent.getAllCells().forEach(cell ->
+        final ModelGrid modelGrid = this.modelGrid.get(simulation);
+        final double[][] biomassArray = modelGrid.makeDoubleArray();
+        modelGrid.getAllCells().forEach(cell ->
             biomassArray[cell.x][cell.y] = biomassAllocator.applyAsDouble(cell)
         );
-        return new DefaultBiomassGrid(gridExtent, species.get(simulation), biomassArray);
+        return new DefaultBiomassGrid(modelGrid, species.get(simulation), biomassArray);
     }
 
 }

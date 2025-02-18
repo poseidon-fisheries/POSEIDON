@@ -26,7 +26,7 @@ import lombok.Setter;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 @Getter
 @Setter
@@ -34,10 +34,10 @@ import uk.ac.ox.poseidon.geography.grids.GridExtent;
 @AllArgsConstructor
 public class VesselFieldFactory extends SimulationScopeFactory<VesselField> {
 
-    private Factory<? extends GridExtent> gridExtent;
+    private Factory<? extends ModelGrid> modelGrid;
 
     @Override
     protected VesselField newInstance(final Simulation simulation) {
-        return new VesselField(gridExtent.get(simulation));
+        return new VesselField(modelGrid.get(simulation));
     }
 }

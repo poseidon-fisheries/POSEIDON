@@ -20,14 +20,14 @@
 package uk.ac.ox.poseidon.geography.distance;
 
 import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import static java.lang.Math.*;
 
 public class HaversineDistanceCalculator extends CoordinateBasedDistanceCalculator {
 
-    public HaversineDistanceCalculator(final GridExtent gridExtent) {
-        super(gridExtent);
+    public HaversineDistanceCalculator(final ModelGrid modelGrid) {
+        super(modelGrid);
     }
 
     @Override

@@ -25,7 +25,7 @@ import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Math.max;
@@ -40,7 +40,7 @@ import static java.util.stream.Collectors.toMap;
 public class RoughCoastalBathymetricGridFactory
     extends SimulationScopeFactory<BathymetricGrid> {
 
-    @NonNull private Factory<? extends GridExtent> gridExtent;
+    @NonNull private Factory<? extends ModelGrid> modelGrid;
     private int coastalRoughness;
     private int smoothingIterations;
     private double smoothingStrength;
@@ -54,11 +54,11 @@ public class RoughCoastalBathymetricGridFactory
         checkState(minimumElevation < 0);
         checkState(maximumElevation > 0);
 
-        final GridExtent gridExtent = this.gridExtent.get(simulation);
+        final ModelGrid modelGrid = this.modelGrid.get(simulation);
         final MersenneTwisterFast rng = simulation.random;
         final DoubleGrid2D doubleGrid2D = new DoubleGrid2D(
-            gridExtent.getGridWidth(),
-            gridExtent.getGridHeight()
+            modelGrid.getGridWidth(),
+            modelGrid.getGridHeight()
         );
 
         for (int x = 0; x < doubleGrid2D.width; x++)
@@ -79,12 +79,12 @@ public class RoughCoastalBathymetricGridFactory
             // underlying array, which messes up the cached land/water
             // tile lists.
             final DefaultBathymetricGrid bathymetricGrid =
-                new DefaultBathymetricGrid(gridExtent, doubleGrid2D);
+                new DefaultBathymetricGrid(modelGrid, doubleGrid2D);
             bathymetricGrid
                 .getLandCells()
                 .stream()
                 .filter(cell ->
-                    gridExtent
+                    modelGrid
                         .getNeighbours(cell)
                         .stream()
                         .anyMatch(bathymetricGrid::isWater)
@@ -98,17 +98,17 @@ public class RoughCoastalBathymetricGridFactory
 
         for (int i = 0; i < smoothingIterations; i++) {
             final BathymetricGrid bathymetricGrid = new DefaultBathymetricGrid(
-                gridExtent,
+                modelGrid,
                 doubleGrid2D
             );
-            gridExtent
+            modelGrid
                 .getAllCells()
                 .stream()
                 .collect(toMap(
                     identity(),
                     target -> {
                         final double oldElevation = bathymetricGrid.getElevation(target);
-                        final double neighbourElevation = gridExtent
+                        final double neighbourElevation = modelGrid
                             .getNeighbours(target)
                             .stream()
                             .mapToDouble(bathymetricGrid::getElevation)
@@ -127,7 +127,7 @@ public class RoughCoastalBathymetricGridFactory
                     doubleGrid2D.field[cell.x][cell.y] = newElevation
                 );
         }
-        return new DefaultBathymetricGrid(gridExtent, doubleGrid2D);
+        return new DefaultBathymetricGrid(modelGrid, doubleGrid2D);
     }
 
 }

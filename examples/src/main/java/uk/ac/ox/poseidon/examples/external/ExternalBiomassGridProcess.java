@@ -55,13 +55,13 @@ public class ExternalBiomassGridProcess
     @Override
     public void step(final SimState simState) {
         // report catches to external service
-        final var gridExtent = internalBiomassGrid.getGridExtent();
+        final var modelGrid = internalBiomassGrid.getModelGrid();
         stub.applyCatches(
             Fishing.Catches
                 .newBuilder()
                 .addAllCatches(accumulator.build().stream()
                     .map(fishingAction -> {
-                        var cell = gridExtent.toCell(fishingAction.getEndCoordinate());
+                        var cell = modelGrid.toCell(fishingAction.getEndCoordinate());
                         return Fishing.Catches.Catch
                             .newBuilder()
                             .setX(cell.x)

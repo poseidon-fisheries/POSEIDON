@@ -21,7 +21,7 @@ package uk.ac.ox.poseidon.geography.paths;
 
 import com.google.common.collect.ImmutableList;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.geography.grids.GridExtent;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 public class FallbackGridPathfinder extends FallbackPathfinder<Int2D> implements GridPathFinder {
 
@@ -36,8 +36,8 @@ public class FallbackGridPathfinder extends FallbackPathfinder<Int2D> implements
     }
 
     @Override
-    public GridExtent getGridExtent() {
-        return canonicalPathFinder.getGridExtent();
+    public ModelGrid getModelGrid() {
+        return canonicalPathFinder.getModelGrid();
     }
 
     @Override
