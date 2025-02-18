@@ -71,7 +71,7 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromGebcoNetCdfGrid
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
 import uk.ac.ox.poseidon.geography.grids.GridExtent;
-import uk.ac.ox.poseidon.geography.grids.GridExtentFactory;
+import uk.ac.ox.poseidon.geography.grids.GridExtentFromEsriAsciiGridFactory;
 import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -116,62 +116,29 @@ public class BasicScenario extends Scenario {
     private static final int VESSEL_SPEED = 15;
     private static final String VESSEL_HOLD_CAPACITY = "1 t";
 
-    private PathFactory inputPath = PathFactory.from(
-        System.getProperty("user.home"), "workspace", "surimi_western_med", "data"
-    );
-    private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
-        new RegisterFactory<>();
     private Factory<? extends Species> speciesA = new SpeciesFactory("A");
     private Factory<? extends Species> speciesB = new SpeciesFactory("B");
+
+    private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
+        new LogisticGrowthRuleFactory(LOGISTIC_GROWTH_RATE);
     private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule =
         new SmoothBiomassDiffusionRuleFactory(
             DIFFERENTIAL_PERCENTAGE_TO_MOVE,
             PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT
         );
-    private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
-        new LogisticGrowthRuleFactory(LOGISTIC_GROWTH_RATE);
-    @SuppressWarnings("MagicNumber")
-    private GlobalScopeFactory<? extends GridExtent> gridExtent =
-        new GridExtentFactory(
-            0.1,
-            -6.0,
-            6.0,
-            34.0,
-            43.0
-        );
-    @SuppressWarnings("MagicNumber")
-    private Factory<? extends Regulations> regulations =
-        new ForbiddenIfFactory(
-            new AnyOfFactory(
-                new BetweenYearlyDatesFactory(
-                    new MonthDayFactory(Month.MARCH, 1),
-                    new MonthDayFactory(Month.MAY, 31)
-                ),
-                new InGeometriesFactory(
-                    new GeometriesFromShapeFileFactory(
-                        PathFactory.from(
-                            inputPath,
-                            Path.of("eez", "algerian_exclusive_economic_zone.shp")
-                        )
-                    )
-                )
-            )
-        );
-    private Factory<? extends CsvTableWriter> catchTableWriter =
-        new FinalProcessFactory<>(
-            new CsvTableWriterFactory(
-                new FishingActionListenerTableFactory(),
-                PathFactory.from("temp", "fishing_actions.csv"),
-                true
-            )
-        );
 
-    private Factory<? extends VesselField> vesselField = new VesselFieldFactory(gridExtent);
-    private Factory<? extends DistanceCalculator> distance =
-        new HaversineDistanceCalculatorFactory(gridExtent);
+    private PathFactory inputPath = PathFactory.from(
+        System.getProperty("user.home"), "workspace", "surimi_western_med", "data"
+    );
+    private PathFactory exclusionGridPath = PathFactory.from(
+        inputPath, "NWMed_excluded_grid.asc"
+    );
+
+    private GlobalScopeFactory<? extends GridExtent> gridExtent =
+        new GridExtentFromEsriAsciiGridFactory(exclusionGridPath);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
         new BathymetricGridFromGebcoNetCdfGridFactory(
-            PathFactory.from(inputPath, "bathymetry.nc"),
+            PathFactory.from(inputPath, "gebco_2024_n43.85_s37.01_w-1.02_e8.07.nc"),
             gridExtent
         );
     private Factory<? extends PortGrid> portGrid =
@@ -180,23 +147,6 @@ public class BasicScenario extends Scenario {
             new SimplePortFactory(new PrefixedIdSupplierFactory("Port")),
             NUMBER_OF_PORTS,
             2
-        );
-    private Factory<? extends GridPathFinder> pathFinder =
-        new DefaultPathFinderFactory(
-            bathymetricGrid,
-            portGrid,
-            distance
-        );
-    private BehaviourFactory<?> travellingBehaviour =
-        new TravellingAlongPathBehaviourFactory(
-            pathFinder,
-            distance
-        );
-    private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
-        new FishingLocationLegalityCheckerFactory(
-            regulations,
-            pathFinder,
-            distance
         );
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid =
         new UniformCarryingCapacityGridFactory(
@@ -258,6 +208,54 @@ public class BasicScenario extends Scenario {
                 )
             ),
             0
+        );
+    private Factory<? extends VesselField> vesselField = new VesselFieldFactory(gridExtent);
+    private Factory<? extends DistanceCalculator> distance =
+        new HaversineDistanceCalculatorFactory(gridExtent);
+    private Factory<? extends GridPathFinder> pathFinder =
+        new DefaultPathFinderFactory(
+            bathymetricGrid,
+            portGrid,
+            distance
+        );
+    private BehaviourFactory<?> travellingBehaviour =
+        new TravellingAlongPathBehaviourFactory(
+            pathFinder,
+            distance
+        );
+    private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
+        new RegisterFactory<>();
+    @SuppressWarnings("MagicNumber")
+    private Factory<? extends Regulations> regulations =
+        new ForbiddenIfFactory(
+            new AnyOfFactory(
+                new BetweenYearlyDatesFactory(
+                    new MonthDayFactory(Month.MARCH, 1),
+                    new MonthDayFactory(Month.MAY, 31)
+                ),
+                new InGeometriesFactory(
+                    new GeometriesFromShapeFileFactory(
+                        PathFactory.from(
+                            inputPath,
+                            Path.of("eez", "algerian_exclusive_economic_zone.shp")
+                        )
+                    )
+                )
+            )
+        );
+    private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
+        new FishingLocationLegalityCheckerFactory(
+            regulations,
+            pathFinder,
+            distance
+        );
+    private Factory<? extends CsvTableWriter> catchTableWriter =
+        new FinalProcessFactory<>(
+            new CsvTableWriterFactory(
+                new FishingActionListenerTableFactory(),
+                PathFactory.from("temp", "fishing_actions.csv"),
+                true
+            )
         );
     private VesselScopeFactory<? extends Hold<Biomass>> hold = new StandardBiomassHoldFactory(
         MassFactory.of(VESSEL_HOLD_CAPACITY),

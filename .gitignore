@@ -8,3 +8,5 @@ out
 # Ignore property-based testing data file
 .jqwik-database
 
+# Apache Derby database log
+derby.log

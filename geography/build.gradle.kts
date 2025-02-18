@@ -27,5 +27,11 @@ dependencies {
     implementation("com.badlogicgames.gdx:gdx-ai:1.8.2")
     implementation("edu.ucar:cdm-core:5.7.0")
     implementation("edu.ucar:netcdf4:5.7.0")
-    api("org.geotoolkit:geotk-feature-shapefile:25.01.16")
+    val sisVersion = 1.4
+    implementation("org.apache.sis.storage:sis-storage:${sisVersion}")
+    implementation("org.apache.sis.core:sis-feature:${sisVersion}")
+    runtimeOnly("org.apache.sis.non-free:sis-embedded-data:${sisVersion}")
+    // We are temporarily using geotoolkit for loading shapefiles, in the hope
+    // that this feature will eventually be ported to SIS with a similar API
+    api("org.geotoolkit:geotk-feature-shapefile:24.11.19")
 }

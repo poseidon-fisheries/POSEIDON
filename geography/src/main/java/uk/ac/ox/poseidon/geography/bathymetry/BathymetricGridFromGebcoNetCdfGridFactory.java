@@ -21,6 +21,7 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.math.Quantiles;
 import lombok.*;
 import sim.util.Int2D;
 import ucar.ma2.Array;
@@ -36,6 +37,7 @@ import uk.ac.ox.poseidon.geography.grids.GridExtent;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
 
 @Getter
 @Setter
@@ -60,12 +62,14 @@ public class BathymetricGridFromGebcoNetCdfGridFactory extends GlobalScopeFactor
     protected BathymetricGrid newInstance(final Simulation simulation) {
         final GridExtent gridExtent = this.gridExtent.get(simulation);
         final double[][] array = gridExtent.makeDoubleArray();
-        readElevationValues(path.get(simulation), gridExtent)
-            .asMap()
-            .forEach((cell, elevations) -> {
-                array[cell.x][cell.y] =
-                    elevations.stream().mapToDouble(Short::doubleValue).average().orElse(0);
-            });
+        final Multimap<Int2D, Short> elevationValues =
+            readElevationValues(path.get(simulation), gridExtent);
+        for (final Int2D int2D : gridExtent.getAllCells()) {
+            final Collection<Short> elevations = elevationValues.get(int2D);
+            if (!elevations.isEmpty()) {
+                array[int2D.x][int2D.y] = Quantiles.median().compute(elevations);
+            }
+        }
         return new DefaultBathymetricGrid(gridExtent, array);
     }
 
