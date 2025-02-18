@@ -87,7 +87,7 @@ public final class ModelGrid {
         checkArgument(gridHeight > 0);
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
-        this.envelope = new Envelope(envelope); // The Envelope class is mutable, so we store a copy
+        this.envelope = envelope;
         this.cellWidth = envelope.getWidth() / (double) this.getGridWidth();
         this.cellHeight = envelope.getHeight() / (double) this.getGridHeight();
     }
