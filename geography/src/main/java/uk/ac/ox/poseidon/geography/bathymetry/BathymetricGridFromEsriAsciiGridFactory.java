@@ -27,6 +27,7 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.storage.DataStores;
 import org.apache.sis.storage.GridCoverageResource;
 import sim.field.grid.DoubleGrid2D;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -49,8 +50,6 @@ public class BathymetricGridFromEsriAsciiGridFactory
     @Override
     protected BathymetricGrid newInstance(final Simulation simulation) {
 
-        // TODO: make sure this is equal to the model grid from the file
-        //       or that only cell that are part of the model grid are loaded
         final ModelGrid modelGrid = this.modelGrid.get(simulation);
 
         try (final DataStore store = DataStores.open(this.path.get(simulation))) {
@@ -63,15 +62,13 @@ public class BathymetricGridFromEsriAsciiGridFactory
             final DoubleGrid2D doubleGrid2D = new DoubleGrid2D(modelGrid.makeDoubleArray());
 
             final RenderedImage image = coverage.render(coverage.getGridGeometry().getExtent());
-            /*
-             * Prints the value at a few positions. For avoiding to flood the output stream,
-             * this example prints a value only for the 3 first pixel, then an arbitrary pixel.
-             */
             final PixelIterator pit = PixelIterator.create(image);
             while (pit.next()) {
                 final Point pos = pit.getPosition();
-                final float value = pit.getSampleFloat(0);
-                doubleGrid2D.set(pos.x, pos.y, -value);
+                if (modelGrid.isInGrid(new Int2D(pos))) {
+                    final float value = pit.getSampleFloat(0);
+                    doubleGrid2D.set(pos.x, pos.y, -value);
+                }
             }
 
             return new DefaultBathymetricGrid(

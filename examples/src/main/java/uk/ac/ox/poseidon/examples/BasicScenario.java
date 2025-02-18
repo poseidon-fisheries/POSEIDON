@@ -71,7 +71,7 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromGebcoNetCdfGrid
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-import uk.ac.ox.poseidon.geography.grids.ModelGridFromEsriAsciiGridFactory;
+import uk.ac.ox.poseidon.geography.grids.ModelGridFromEsriAsciiExclusionGridFactory;
 import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -135,7 +135,7 @@ public class BasicScenario extends Scenario {
     );
 
     private GlobalScopeFactory<? extends ModelGrid> modelGrid =
-        new ModelGridFromEsriAsciiGridFactory(exclusionGridPath);
+        new ModelGridFromEsriAsciiExclusionGridFactory(exclusionGridPath, -1);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
         new BathymetricGridFromGebcoNetCdfGridFactory(
             PathFactory.from(inputPath, "gebco_2024_n43.85_s37.01_w-1.02_e8.07.nc"),

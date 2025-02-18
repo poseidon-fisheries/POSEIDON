@@ -51,7 +51,7 @@ public class DoubleGrid extends AbstractGrid<DoubleGrid2D>
 
     public DoubleGrid(final DoubleGrid2D grid2D) {
         this(
-            new ModelGrid(
+            ModelGrid.withAllCellsActive(
                 grid2D.width,
                 grid2D.height,
                 new Envelope(

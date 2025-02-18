@@ -22,10 +22,11 @@ package uk.ac.ox.poseidon.geography.grids;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import ec.util.MersenneTwisterFast;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import sim.field.grid.Grid2D;
 import sim.field.grid.SparseGrid2D;
@@ -37,53 +38,123 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Map.entry;
 import static java.util.function.Function.identity;
+import static java.util.function.Predicate.not;
 import static java.util.stream.IntStream.range;
 
-@Data
+@Getter
+@ToString
+@EqualsAndHashCode
 public final class ModelGrid {
 
     private final int gridWidth;   // the width in cells
     private final int gridHeight;  // the height in cells
+    private final Envelope envelope;
     private final double cellWidth;   // the width of a cell in degrees
     private final double cellHeight;  // the height of a cell in degrees
-    private final Envelope envelope;
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private final Int2D[] allCells;
+
+    // Using ImmutableSet here as it should provide fast lookup _and_ iteration
+    @ToString.Exclude
+    private final ImmutableSet<Int2D> activeCells;
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private final LoadingCache<Entry<Int2D, Integer>, List<Int2D>> mooreNeighbourhoods =
         CacheBuilder.newBuilder().build(CacheLoader.from(this::computeMooreNeighbourhood));
 
-    ModelGrid(
+    private ModelGrid(
         final int gridWidth,
         final int gridHeight,
-        final Envelope envelope
+        final Envelope envelope,
+        final Int2D[] allCells,
+        final ImmutableSet<Int2D> activeCells
     ) {
-        checkArgument(gridWidth > 0);
-        checkArgument(gridHeight > 0);
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
         this.envelope = envelope;
         this.cellWidth = envelope.getWidth() / (double) this.getGridWidth();
         this.cellHeight = envelope.getHeight() / (double) this.getGridHeight();
-        this.allCells =
-            range(0, gridWidth)
-                .mapToObj(x ->
-                    range(0, gridHeight)
-                        .mapToObj(y -> new Int2D(x, y))
-                )
-                .flatMap(identity())
-                .toArray(Int2D[]::new);
+        this.allCells = allCells;
+        this.activeCells = activeCells;
+    }
+
+    public static ModelGrid withActiveCells(
+        final int gridWidth,
+        final int gridHeight,
+        final Envelope envelope,
+        final Collection<Int2D> activeCells
+    ) {
+        final Set<Int2D> activeCellsSet = toSet(activeCells);
+        return makeModelGrid(gridWidth, gridHeight, envelope, activeCellsSet::contains);
+    }
+
+    private static Set<Int2D> toSet(final Collection<Int2D> cells) {
+        return cells instanceof Set<Int2D>
+            ? (Set<Int2D>) cells
+            : ImmutableSet.copyOf(cells);
+    }
+
+    public static ModelGrid withInactiveCells(
+        final int gridWidth,
+        final int gridHeight,
+        final Envelope envelope,
+        final Collection<Int2D> inactiveCells
+    ) {
+        final Set<Int2D> inactiveCellSet = toSet(inactiveCells);
+        return makeModelGrid(gridWidth, gridHeight, envelope, not(inactiveCellSet::contains));
+    }
+
+    private static ModelGrid makeModelGrid(
+        final int gridWidth,
+        final int gridHeight,
+        final Envelope envelope,
+        final Predicate<Int2D> activePredicate
+    ) {
+        final Int2D[] allCells = makeAllCellsArray(gridWidth, gridHeight);
+        return new ModelGrid(
+            gridWidth,
+            gridHeight,
+            envelope,
+            allCells,
+            Arrays.stream(allCells).filter(activePredicate).collect(toImmutableSet())
+        );
+    }
+
+    public static ModelGrid withAllCellsActive(
+        final int gridWidth,
+        final int gridHeight,
+        final Envelope envelope
+    ) {
+        return makeModelGrid(gridWidth, gridHeight, envelope, __ -> true);
+    }
+
+    private static Int2D[] makeAllCellsArray(
+        final int gridWidth,
+        final int gridHeight
+    ) {
+        checkArgument(gridWidth > 0);
+        checkArgument(gridHeight > 0);
+        return range(0, gridWidth)
+            .mapToObj(x ->
+                range(0, gridHeight)
+                    .mapToObj(y -> new Int2D(x, y))
+            )
+            .flatMap(identity())
+            .toArray(Int2D[]::new);
     }
 
     public Stream<Int2D> getAllCells() {
@@ -191,16 +262,29 @@ public final class ModelGrid {
         return getNeighbours(cell, 1);
     }
 
-    public boolean inGrid(final Coordinate coordinate) {
-        return inGrid(toCell(coordinate));
+    public boolean isInGrid(final Coordinate coordinate) {
+        return isInGrid(toCell(coordinate));
     }
 
-    public boolean inGrid(final Double2D point) {
-        return inGrid(toCell(point));
+    public boolean isInGrid(final Double2D point) {
+        return isInGrid(toCell(point));
     }
 
-    public boolean inGrid(final Int2D cell) {
+    public boolean isInGrid(final Int2D cell) {
         return cell.x >= 0 && cell.y >= 0 && cell.x < gridWidth && cell.y < gridHeight;
     }
+
+    public boolean isActive(final Coordinate coordinate) {
+        return isActive(toCell(coordinate));
+    }
+
+    public boolean isActive(final Double2D point) {
+        return isActive(toCell(point));
+    }
+
+    public boolean isActive(final Int2D cell) {
+        return activeCells.contains(cell);
+    }
+
 }
 
