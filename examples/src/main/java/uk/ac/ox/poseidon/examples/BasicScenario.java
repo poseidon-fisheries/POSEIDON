@@ -77,13 +77,11 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.geography.ports.RandomLocationsPortGridFactory;
 import uk.ac.ox.poseidon.geography.ports.SimplePortFactory;
-import uk.ac.ox.poseidon.geography.vectors.GeometriesFromShapeFileFactory;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 import uk.ac.ox.poseidon.regulations.ForbiddenIfFactory;
 import uk.ac.ox.poseidon.regulations.predicates.logical.AnyOfFactory;
-import uk.ac.ox.poseidon.regulations.predicates.spatial.InGeometriesFactory;
 import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenYearlyDatesFactory;
 
 import java.nio.file.Path;
@@ -125,6 +123,17 @@ public class BasicScenario extends Scenario {
         new SmoothBiomassDiffusionRuleFactory(
             DIFFERENTIAL_PERCENTAGE_TO_MOVE,
             PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT
+        );
+
+    @SuppressWarnings("MagicNumber")
+    private Factory<? extends Regulations> regulations =
+        new ForbiddenIfFactory(
+            new AnyOfFactory(
+                new BetweenYearlyDatesFactory(
+                    new MonthDayFactory(Month.MARCH, 1),
+                    new MonthDayFactory(Month.MAY, 31)
+                )
+            )
         );
 
     private PathFactory inputPath = PathFactory.from(
@@ -223,32 +232,14 @@ public class BasicScenario extends Scenario {
             pathFinder,
             distance
         );
-    private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
-        new RegisterFactory<>();
-    @SuppressWarnings("MagicNumber")
-    private Factory<? extends Regulations> regulations =
-        new ForbiddenIfFactory(
-            new AnyOfFactory(
-                new BetweenYearlyDatesFactory(
-                    new MonthDayFactory(Month.MARCH, 1),
-                    new MonthDayFactory(Month.MAY, 31)
-                ),
-                new InGeometriesFactory(
-                    new GeometriesFromShapeFileFactory(
-                        PathFactory.from(
-                            inputPath,
-                            Path.of("eez", "algerian_exclusive_economic_zone.shp")
-                        )
-                    )
-                )
-            )
-        );
     private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
         new FishingLocationLegalityCheckerFactory(
             regulations,
             pathFinder,
             distance
         );
+    private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
+        new RegisterFactory<>();
     private Factory<? extends CsvTableWriter> catchTableWriter =
         new FinalProcessFactory<>(
             new CsvTableWriterFactory(
