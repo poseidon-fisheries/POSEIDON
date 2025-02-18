@@ -34,7 +34,6 @@ public interface GridPathFinder extends PathFinder<Int2D> {
     ) {
         return getModelGrid()
             .getAllCells()
-            .stream()
             .filter(this::isWater)
             .filter(cell -> isAccessible(startingCell, cell))
             .collect(toImmutableList());

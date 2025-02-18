@@ -72,7 +72,7 @@ class DoubleGridTest {
                 new Coordinate(2.5, 1.5),
                 new Coordinate(2.5, 0.5)
             ),
-            modelGrid.getAllCoordinates()
+            modelGrid.getAllCells().map(modelGrid::toCoordinate).toList()
         );
     }
 

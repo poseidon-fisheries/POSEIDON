@@ -64,12 +64,12 @@ public class BathymetricGridFromGebcoNetCdfGridFactory extends GlobalScopeFactor
         final double[][] array = modelGrid.makeDoubleArray();
         final Multimap<Int2D, Short> elevationValues =
             readElevationValues(path.get(simulation), modelGrid);
-        for (final Int2D int2D : modelGrid.getAllCells()) {
+        modelGrid.getAllCells().forEach(int2D -> {
             final Collection<Short> elevations = elevationValues.get(int2D);
             if (!elevations.isEmpty()) {
                 array[int2D.x][int2D.y] = Quantiles.median().compute(elevations);
             }
-        }
+        });
         return new DefaultBathymetricGrid(modelGrid, array);
     }
 

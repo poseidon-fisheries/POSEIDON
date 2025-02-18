@@ -24,6 +24,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.NumberGrid;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
@@ -32,7 +33,6 @@ public interface BathymetricGrid extends NumberGrid<Double, DoubleGrid2D> {
     default List<Int2D> getWaterCells() {
         return getModelGrid()
             .getAllCells()
-            .stream()
             .filter(this::isWater)
             .collect(toImmutableList());
     }
@@ -40,12 +40,11 @@ public interface BathymetricGrid extends NumberGrid<Double, DoubleGrid2D> {
     default List<Int2D> getLandCells() {
         return getModelGrid()
             .getAllCells()
-            .stream()
             .filter(this::isLand)
             .collect(toImmutableList());
     }
 
-    default List<Int2D> getAllCells() {
+    default Stream<Int2D> getAllCells() {
         return getModelGrid().getAllCells();
     }
 

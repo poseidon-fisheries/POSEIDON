@@ -103,7 +103,6 @@ public class RoughCoastalBathymetricGridFactory
             );
             modelGrid
                 .getAllCells()
-                .stream()
                 .collect(toMap(
                     identity(),
                     target -> {

@@ -54,7 +54,6 @@ public class DivergingNumberGridPortrayalFactory extends NumberGridPortrayalFact
             grid
                 .getModelGrid()
                 .getAllCells()
-                .stream()
                 .mapToDouble(cell -> grid.getValue(cell).doubleValue())
                 .summaryStatistics();
         final double absMax = max(abs(stats.getMin()), abs(stats.getMax()));

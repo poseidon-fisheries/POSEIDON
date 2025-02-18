@@ -26,7 +26,6 @@ import com.google.common.collect.Streams;
 import ec.util.MersenneTwisterFast;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
 import sim.field.grid.Grid2D;
 import sim.field.grid.SparseGrid2D;
@@ -40,6 +39,7 @@ import uk.ac.ox.poseidon.geography.Envelope;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Map.entry;
@@ -57,26 +57,12 @@ public final class ModelGrid {
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    private final Int2D[] allCells;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private final LoadingCache<Entry<Int2D, Integer>, List<Int2D>> mooreNeighbourhoods =
         CacheBuilder.newBuilder().build(CacheLoader.from(this::computeMooreNeighbourhood));
-
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @Getter(lazy = true)
-    private final List<Int2D> allCells =
-        range(0, getGridWidth())
-            .mapToObj(x ->
-                range(0, getGridHeight())
-                    .mapToObj(y -> new Int2D(x, y))
-            )
-            .flatMap(identity())
-            .toList();
-
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @Getter(lazy = true)
-    private final List<Coordinate> allCoordinates =
-        getAllCells().stream().map(this::toCoordinate).toList();
 
     ModelGrid(
         final int gridWidth,
@@ -90,6 +76,18 @@ public final class ModelGrid {
         this.envelope = envelope;
         this.cellWidth = envelope.getWidth() / (double) this.getGridWidth();
         this.cellHeight = envelope.getHeight() / (double) this.getGridHeight();
+        this.allCells =
+            range(0, gridWidth)
+                .mapToObj(x ->
+                    range(0, gridHeight)
+                        .mapToObj(y -> new Int2D(x, y))
+                )
+                .flatMap(identity())
+                .toArray(Int2D[]::new);
+    }
+
+    public Stream<Int2D> getAllCells() {
+        return Arrays.stream(allCells);
     }
 
     /**
