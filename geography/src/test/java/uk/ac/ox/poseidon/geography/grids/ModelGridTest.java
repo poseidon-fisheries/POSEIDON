@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ModelGridTest {
 
     private final ModelGrid modelGrid =
-        new ModelGrid(
+        ModelGrid.withAllCellsActive(
             10,
             10,
             new Envelope(-5, 5, -5, 5)
