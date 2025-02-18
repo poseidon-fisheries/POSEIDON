@@ -41,7 +41,7 @@ class ModelGridTest {
         );
 
     @Test
-    void getNeighbours() {
+    void getActiveNeighbours() {
         assertEquals(
             Set.of(
                 new Int2D(4, 4),
@@ -53,7 +53,7 @@ class ModelGridTest {
                 new Int2D(6, 4),
                 new Int2D(6, 5)
             ),
-            Set.copyOf(modelGrid.getNeighbours(new Int2D(5, 5)))
+            Set.copyOf(modelGrid.getActiveNeighbours(new Int2D(5, 5)))
         );
         assertEquals(
             Set.of(
@@ -61,7 +61,7 @@ class ModelGridTest {
                 new Int2D(1, 0),
                 new Int2D(1, 1)
             ),
-            Set.copyOf(modelGrid.getNeighbours(new Int2D(0, 0)))
+            Set.copyOf(modelGrid.getActiveNeighbours(new Int2D(0, 0)))
         );
     }
 

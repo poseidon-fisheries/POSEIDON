@@ -32,7 +32,8 @@ public class CarryingCapacityGrid extends DoubleGrid {
     @Getter(lazy = true)
     private final List<Int2D> habitableCells =
         getModelGrid()
-            .getAllCells()
+            .getActiveCells()
+            .stream()
             .filter(cell -> getCarryingCapacity(cell) > 0)
             .toList();
 

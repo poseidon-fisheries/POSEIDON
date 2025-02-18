@@ -57,7 +57,7 @@ public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortG
                 .stream()
                 .filter(cell ->
                     modelGrid
-                        .getNeighbours(cell)
+                        .getActiveNeighbours(cell)
                         .stream()
                         .filter(bathymetricGrid::isWater)
                         .count() >= minimumAdjacentWaterTiles

@@ -85,7 +85,7 @@ public class RoughCoastalBathymetricGridFactory
                 .stream()
                 .filter(cell ->
                     modelGrid
-                        .getNeighbours(cell)
+                        .getActiveNeighbours(cell)
                         .stream()
                         .anyMatch(bathymetricGrid::isWater)
                         && rng.nextBoolean(probabilityOfFlippingLandToWater)
@@ -108,7 +108,7 @@ public class RoughCoastalBathymetricGridFactory
                     target -> {
                         final double oldElevation = bathymetricGrid.getElevation(target);
                         final double neighbourElevation = modelGrid
-                            .getNeighbours(target)
+                            .getActiveNeighbours(target)
                             .stream()
                             .mapToDouble(bathymetricGrid::getElevation)
                             .average()

@@ -73,7 +73,7 @@ public class BiomassDiffuser implements Steppable {
                     location ->
                         carryingCapacityGrid
                             .getModelGrid()
-                            .getNeighbours(location)
+                            .getActiveNeighbours(location)
                             .stream()
                             .filter(habitableLocationsSet::contains)
                             .collect(toCollection(ArrayList::new))

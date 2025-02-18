@@ -80,7 +80,7 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
                 () ->
                     !isNavigable(cell) ? new Array<>() : new Array<>(
                         modelGrid
-                            .getNeighbours(cell)
+                            .getActiveNeighbours(cell)
                             .stream()
                             .filter(this::isNavigable)
                             .map(neighbour ->

@@ -75,10 +75,10 @@ public class DefaultPortGrid extends AbstractGrid<SparseGrid2D> implements PortG
             );
             checkArgument(
                 modelGrid
-                    .getNeighbours(cell)
+                    .getActiveNeighbours(cell)
                     .stream()
                     .anyMatch(bathymetricGrid::isWater),
-                "Port %s at coordinate %s is not adjacent to water.",
+                "Port %s at coordinate %s is not adjacent to an active water cell.",
                 port.getName(),
                 coordinate
             );

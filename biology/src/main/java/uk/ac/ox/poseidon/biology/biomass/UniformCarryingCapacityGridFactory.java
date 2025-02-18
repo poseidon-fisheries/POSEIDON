@@ -55,7 +55,7 @@ public class UniformCarryingCapacityGridFactory
                 .doubleValue();
         bathymetricGrid.getAllCells().forEach(cell ->
             array[cell.x][cell.y] =
-                bathymetricGrid.isWater(cell)
+                modelGrid.isActive(cell) && bathymetricGrid.isWater(cell)
                     ? carryingCapacityInKg
                     : Double.NaN
         );

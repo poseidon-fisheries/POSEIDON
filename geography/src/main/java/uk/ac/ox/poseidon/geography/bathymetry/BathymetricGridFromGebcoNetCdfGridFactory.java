@@ -21,7 +21,6 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.math.Quantiles;
 import lombok.*;
 import sim.util.Int2D;
 import ucar.ma2.Array;
@@ -66,9 +65,8 @@ public class BathymetricGridFromGebcoNetCdfGridFactory extends GlobalScopeFactor
             readElevationValues(path.get(simulation), modelGrid);
         modelGrid.getAllCells().forEach(int2D -> {
             final Collection<Short> elevations = elevationValues.get(int2D);
-            if (!elevations.isEmpty()) {
-                array[int2D.x][int2D.y] = Quantiles.median().compute(elevations);
-            }
+            array[int2D.x][int2D.y] =
+                elevations.stream().mapToDouble(Short::doubleValue).max().orElse(0);
         });
         return new DefaultBathymetricGrid(modelGrid, array);
     }

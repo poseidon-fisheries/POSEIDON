@@ -55,7 +55,7 @@ public interface GridPathFinder extends PathFinder<Int2D> {
         final int neighbourhoodSize
     ) {
         return getModelGrid()
-            .getNeighbours(startingCell, neighbourhoodSize)
+            .getActiveNeighbours(startingCell, neighbourhoodSize)
             .stream()
             .filter(this::isWater)
             .filter(cell -> isAccessible(startingCell, cell))

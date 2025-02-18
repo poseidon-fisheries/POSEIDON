@@ -73,8 +73,8 @@ public final class ModelGrid {
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private final LoadingCache<Entry<Int2D, Integer>, List<Int2D>> mooreNeighbourhoods =
-        CacheBuilder.newBuilder().build(CacheLoader.from(this::computeMooreNeighbourhood));
+    private final LoadingCache<Entry<Int2D, Integer>, List<Int2D>> activeMooreNeighbourhoods =
+        CacheBuilder.newBuilder().build(CacheLoader.from(this::computeActiveMooreNeighbourhood));
 
     private ModelGrid(
         final int gridWidth,
@@ -213,15 +213,15 @@ public final class ModelGrid {
         return new Int2D((int) point.x, (int) point.y);
     }
 
-    public List<Int2D> getNeighbours(
+    public List<Int2D> getActiveNeighbours(
         final Int2D cell,
         @SuppressWarnings("SameParameterValue") final int neighbourhoodSize
     ) {
-        return mooreNeighbourhoods.getUnchecked(entry(cell, neighbourhoodSize));
+        return activeMooreNeighbourhoods.getUnchecked(entry(cell, neighbourhoodSize));
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private List<Int2D> computeMooreNeighbourhood(
+    private List<Int2D> computeActiveMooreNeighbourhood(
         final Entry<Int2D, Integer> entry
     ) {
         final Int2D cell = entry.getKey();
@@ -239,11 +239,14 @@ public final class ModelGrid {
                 xPositions,
                 yPositions
             );
-        return Streams.zip(
-            Arrays.stream(xPositions.toArray()).boxed(),
-            Arrays.stream(yPositions.toArray()).boxed(),
-            Int2D::new
-        ).toList();
+        return Streams
+            .zip(
+                Arrays.stream(xPositions.toArray()).boxed(),
+                Arrays.stream(yPositions.toArray()).boxed(),
+                Int2D::new
+            )
+            .filter(this::isActive)
+            .toList();
     }
 
     public Int2D randomCell(final MersenneTwisterFast rng) {
@@ -256,10 +259,10 @@ public final class ModelGrid {
         return new double[getGridWidth()][getGridHeight()];
     }
 
-    public List<Int2D> getNeighbours(
+    public List<Int2D> getActiveNeighbours(
         final Int2D cell
     ) {
-        return getNeighbours(cell, 1);
+        return getActiveNeighbours(cell, 1);
     }
 
     public boolean isInGrid(final Coordinate coordinate) {
