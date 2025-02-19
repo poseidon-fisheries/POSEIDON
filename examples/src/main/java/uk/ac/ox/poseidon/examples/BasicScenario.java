@@ -67,7 +67,7 @@ import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
 import uk.ac.ox.poseidon.core.time.*;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromGebcoNetCdfGridFactory;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromEsriAsciiGridFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -140,15 +140,16 @@ public class BasicScenario extends Scenario {
         System.getProperty("user.home"), "workspace", "surimi_western_med", "data"
     );
     private PathFactory exclusionGridPath = PathFactory.from(
-        inputPath, "NWMed_excluded_grid.asc"
+        inputPath, "exclusion_grid.asc"
     );
 
     private GlobalScopeFactory<? extends ModelGrid> modelGrid =
         new ModelGridFromEsriAsciiExclusionGridFactory(exclusionGridPath, -1);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
-        new BathymetricGridFromGebcoNetCdfGridFactory(
-            PathFactory.from(inputPath, "gebco_2024_n43.85_s37.01_w-1.02_e8.07.nc"),
-            modelGrid
+        new BathymetricGridFromEsriAsciiGridFactory(
+            PathFactory.from(inputPath, "bathymetry_grid.asc"),
+            modelGrid,
+            false
         );
     private Factory<? extends PortGrid> portGrid =
         new RandomLocationsPortGridFactory(

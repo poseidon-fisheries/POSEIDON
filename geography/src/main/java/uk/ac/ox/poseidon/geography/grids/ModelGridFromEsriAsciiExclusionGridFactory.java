@@ -44,7 +44,7 @@ import java.nio.file.Path;
 public class ModelGridFromEsriAsciiExclusionGridFactory
     extends GlobalScopeFactory<ModelGrid> {
     @NonNull private Factory<? extends Path> path;
-    private double excludedValue;
+    private int excludedValue;
 
     @Override
     protected ModelGrid newInstance(final Simulation simulation) {
@@ -69,7 +69,7 @@ public class ModelGridFromEsriAsciiExclusionGridFactory
             final PixelIterator pit = PixelIterator.create(image);
             final ImmutableSet.Builder<Int2D> inactiveCells = ImmutableSet.builder();
             while (pit.next()) {
-                if (pit.getSampleFloat(0) == excludedValue) {
+                if (pit.getSample(0) == excludedValue) {
                     inactiveCells.add(new Int2D(pit.getPosition()));
                 }
             }

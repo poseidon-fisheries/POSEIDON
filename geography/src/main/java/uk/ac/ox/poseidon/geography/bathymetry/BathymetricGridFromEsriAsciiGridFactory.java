@@ -46,6 +46,7 @@ public class BathymetricGridFromEsriAsciiGridFactory
 
     @NonNull private Factory<? extends Path> path;
     @NonNull private Factory<? extends ModelGrid> modelGrid;
+    private boolean inverted = false;
 
     @Override
     protected BathymetricGrid newInstance(final Simulation simulation) {
@@ -66,8 +67,8 @@ public class BathymetricGridFromEsriAsciiGridFactory
             while (pit.next()) {
                 final Point pos = pit.getPosition();
                 if (modelGrid.isInGrid(new Int2D(pos))) {
-                    final float value = pit.getSampleFloat(0);
-                    doubleGrid2D.set(pos.x, pos.y, -value);
+                    final double value = pit.getSampleDouble(0);
+                    doubleGrid2D.set(pos.x, pos.y, inverted ? -value : value);
                 }
             }
 
