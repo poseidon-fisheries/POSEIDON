@@ -24,7 +24,8 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class PathFactoryTest {
 
@@ -33,7 +34,7 @@ class PathFactoryTest {
 
     @Test
     void newInstanceSimpleFile() {
-        final PathFactory pathFactory = PathFactory.from(FILENAME);
+        final PathFactory pathFactory = PathFactory.of(FILENAME);
         assertNull(pathFactory.getParent());
         assertEquals(ImmutableList.of(FILENAME), pathFactory.getPathElements());
         assertEquals(Path.of(FILENAME), pathFactory.newInstance(null));
@@ -41,7 +42,7 @@ class PathFactoryTest {
 
     @Test
     void newInstanceFileInFolder() {
-        final PathFactory pathFactory = PathFactory.from(FOLDERS + FILENAME);
+        final PathFactory pathFactory = PathFactory.of(FOLDERS + FILENAME);
         assertNull(pathFactory.getParent());
         assertEquals(ImmutableList.of("/", "a", "b", "c", FILENAME), pathFactory.getPathElements());
         assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.newInstance(null));
@@ -49,7 +50,7 @@ class PathFactoryTest {
 
     @Test
     void newInstanceWithParent() {
-        final PathFactory pathFactory = PathFactory.from(PathFactory.from(FOLDERS), FILENAME);
+        final PathFactory pathFactory = PathFactory.of(FOLDERS).plus(FILENAME);
         assertEquals(Path.of(FOLDERS), pathFactory.getParent().get(null));
         assertEquals(ImmutableList.of(FILENAME), pathFactory.getPathElements());
         assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.newInstance(null));

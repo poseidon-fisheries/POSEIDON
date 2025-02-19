@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.core;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import lombok.*;
 
@@ -38,40 +39,46 @@ public class PathFactory extends GlobalScopeFactory<Path> {
     private Factory<? extends Path> parent;
     @NonNull private List<String> pathElements;
 
-    public static PathFactory from(
+    private PathFactory(
+        final PathFactory parent,
+        final Path path
+    ) {
+        this(parent, getPathElements(path));
+    }
+
+    // root
+    public static PathFactory of(final Path path) {
+        return new PathFactory(null, path);
+    }
+    // string
+
+    // first/more
+    public static PathFactory of(
         final String first,
         final String... more
     ) {
-        return from(null, Path.of(first, more));
+        return of(Path.of(first, more));
     }
 
-    public static PathFactory from(
-        final Path path
-    ) {
-        return from(null, path);
+    private static ImmutableList<String> getPathElements(final Path path) {
+        return Streams
+            .concat(
+                Optional.ofNullable(path.getRoot()).stream(),
+                Streams.stream(path)
+            )
+            .map(Path::toString)
+            .collect(toImmutableList());
     }
 
-    public static PathFactory from(
-        final PathFactory parent,
-        final String path
-    ) {
-        return from(parent, Path.of(path));
+    public PathFactory plus(final Path path) {
+        return new PathFactory(this, path);
     }
 
-    public static PathFactory from(
-        final PathFactory parent,
-        final Path path
+    public PathFactory plus(
+        final String first,
+        final String... more
     ) {
-        return new PathFactory(
-            parent,
-            Streams
-                .concat(
-                    Optional.ofNullable(path.getRoot()).stream(),
-                    Streams.stream(path)
-                )
-                .map(Path::toString)
-                .collect(toImmutableList())
-        );
+        return plus(Path.of(first, more));
     }
 
     @Override

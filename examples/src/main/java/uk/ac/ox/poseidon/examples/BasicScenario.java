@@ -77,11 +77,13 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.geography.ports.RandomLocationsPortGridFactory;
 import uk.ac.ox.poseidon.geography.ports.SimplePortFactory;
+import uk.ac.ox.poseidon.geography.vectors.GeometriesFromShapeFileFactory;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 import uk.ac.ox.poseidon.regulations.ForbiddenIfFactory;
 import uk.ac.ox.poseidon.regulations.predicates.logical.AnyOfFactory;
+import uk.ac.ox.poseidon.regulations.predicates.spatial.InGeometriesFactory;
 import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenYearlyDatesFactory;
 
 import java.nio.file.Path;
@@ -125,6 +127,10 @@ public class BasicScenario extends Scenario {
             PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT
         );
 
+    private PathFactory inputPath = PathFactory.of(
+        System.getProperty("user.home"), "workspace", "surimi_western_med", "data"
+    );
+
     @SuppressWarnings("MagicNumber")
     private Factory<? extends Regulations> regulations =
         new ForbiddenIfFactory(
@@ -132,22 +138,22 @@ public class BasicScenario extends Scenario {
                 new BetweenYearlyDatesFactory(
                     new MonthDayFactory(Month.MARCH, 1),
                     new MonthDayFactory(Month.MAY, 31)
+                ),
+                new InGeometriesFactory(
+                    new GeometriesFromShapeFileFactory(
+                        inputPath.plus("eez", "french_exclusive_economic_zone.shp")
+                    )
                 )
             )
         );
 
-    private PathFactory inputPath = PathFactory.from(
-        System.getProperty("user.home"), "workspace", "surimi_western_med", "data"
-    );
-    private PathFactory exclusionGridPath = PathFactory.from(
-        inputPath, "exclusion_grid.asc"
-    );
+    private PathFactory exclusionGridPath = inputPath.plus("exclusion_grid.asc");
 
     private GlobalScopeFactory<? extends ModelGrid> modelGrid =
         new ModelGridFromEsriAsciiExclusionGridFactory(exclusionGridPath, -1);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
         new BathymetricGridFromEsriAsciiGridFactory(
-            PathFactory.from(inputPath, "bathymetry_grid.asc"),
+            inputPath.plus("bathymetry_grid.asc"),
             modelGrid,
             false
         );
@@ -245,7 +251,7 @@ public class BasicScenario extends Scenario {
         new FinalProcessFactory<>(
             new CsvTableWriterFactory(
                 new FishingActionListenerTableFactory(),
-                PathFactory.from("temp", "fishing_actions.csv"),
+                PathFactory.of("temp", "fishing_actions.csv"),
                 true
             )
         );
