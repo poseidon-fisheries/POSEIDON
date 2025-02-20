@@ -18,20 +18,23 @@
 
 package uk.ac.ox.poseidon.geography.vectors;
 
+import com.google.common.collect.ImmutableList;
 import lombok.*;
-import org.apache.sis.storage.DataStoreException;
-import org.geotoolkit.data.shapefile.ShapefileFeatureStore;
-import org.geotoolkit.storage.feature.query.Query;
-import org.geotoolkit.storage.feature.session.Session;
+import org.geotools.api.data.DataStore;
+import org.geotools.api.data.DataStoreFinder;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureIterator;
 import org.locationtech.jts.geom.Geometry;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -48,23 +51,23 @@ public class GeometriesFromShapeFileFactory extends GlobalScopeFactory<Collectio
         return readShapeFile(filePath);
     }
 
-    @SuppressWarnings("deprecation")
     private List<Geometry> readShapeFile(
         final Path path
     ) {
-        try (final ShapefileFeatureStore featureStore = new ShapefileFeatureStore(path.toUri())) {
-            final Session session = featureStore.createSession(true);
-            final var result = featureStore
-                .getNames()
-                .stream()
-                .map(Query::new)
-                .flatMap(query -> session.getFeatureCollection(query).stream())
-                .map(feature -> feature.getPropertyValue("sis:geometry"))
-                .map(Geometry.class::cast)
-                .toList();
-            featureStore.close();
-            return result;
-        } catch (final DataStoreException | MalformedURLException e) {
+        try {
+            final Map<String, URL> params = Map.of("url", path.toFile().toURI().toURL());
+            final DataStore dataStore = DataStoreFinder.getDataStore(params);
+            final SimpleFeatureCollection featureCollection =
+                dataStore.getFeatureSource(dataStore.getTypeNames()[0]).getFeatures();
+            final ImmutableList.Builder<Geometry> geometries = ImmutableList.builder();
+            try (final SimpleFeatureIterator iterator = featureCollection.features()) {
+                while (iterator.hasNext())
+                    if (iterator.next().getDefaultGeometry() instanceof final Geometry geometry)
+                        geometries.add(geometry);
+            }
+            dataStore.dispose();
+            return geometries.build();
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
     }

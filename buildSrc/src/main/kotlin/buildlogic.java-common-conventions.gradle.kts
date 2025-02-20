@@ -28,19 +28,12 @@ plugins {
 }
 
 repositories {
-    maven {
-        // We put this before Maven central in order to make sure we look for
-        // jai_core here first, but we need to restrict it to jai_core otherwise
-        // we fail to find flatlaf-3.5.1-macos-arm64.dylib and flatlaf-3.5.1-macos-x86_64.dylib
-        url = uri("https://nexus.geomatys.com/repository/maven-public/")
-        content {
-            includeModule("javax.media", "jai_core")
-        }
-    }
+    maven { url = uri("https://repo.osgeo.org/repository/geotools-releases/") }
+    maven { url = uri("https://maven.geo-solutions.it/") }
     mavenCentral()
     maven {
-        // Now we list nexus.geomatys.com for other jars (i.e. geotoolkit and netcdf4)
-        // not hosted on Maven central.
+        // needs to come after mavenCentral otherwise we fail to find
+        // flatlaf-3.5.1-macos-arm64.dylib and flatlaf-3.5.1-macos-x86_64.dylib
         url = uri("https://nexus.geomatys.com/repository/maven-public/")
     }
 }

@@ -67,7 +67,7 @@ import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
 import uk.ac.ox.poseidon.core.time.*;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromEsriAsciiGridFactory;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromGridFileFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -152,11 +152,12 @@ public class BasicScenario extends Scenario {
     private GlobalScopeFactory<? extends ModelGrid> modelGrid =
         new ModelGridFromEsriAsciiExclusionGridFactory(exclusionGridPath, -1);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
-        new BathymetricGridFromEsriAsciiGridFactory(
+        new BathymetricGridFromGridFileFactory(
             inputPath.plus("bathymetry_grid.asc"),
             modelGrid,
             false
         );
+
     private Factory<? extends PortGrid> portGrid =
         new RandomLocationsPortGridFactory(
             bathymetricGrid,

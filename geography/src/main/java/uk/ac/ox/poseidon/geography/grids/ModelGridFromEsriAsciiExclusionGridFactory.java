@@ -21,21 +21,19 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.*;
-import org.apache.sis.coverage.grid.GridCoverage;
-import org.apache.sis.coverage.grid.GridExtent;
-import org.apache.sis.image.PixelIterator;
-import org.apache.sis.storage.DataStore;
-import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.storage.DataStores;
-import org.apache.sis.storage.GridCoverageResource;
+import org.geotools.api.geometry.Bounds;
+import org.geotools.coverage.grid.GridCoverage2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.Envelope;
 
+import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.nio.file.Path;
+
+import static uk.ac.ox.poseidon.geography.Utils.readCoverage;
 
 @Getter
 @Setter
@@ -46,36 +44,37 @@ public class ModelGridFromEsriAsciiExclusionGridFactory
     @NonNull private Factory<? extends Path> path;
     private int excludedValue;
 
+    private static Envelope makeEnvelope(final GridCoverage2D coverage) {
+        final Bounds bounds = coverage.getEnvelope();
+        return new Envelope(
+            bounds.getMinimum(0),
+            bounds.getMaximum(0),
+            bounds.getMinimum(1),
+            bounds.getMaximum(1)
+        );
+    }
+
     @Override
     protected ModelGrid newInstance(final Simulation simulation) {
-        try (final DataStore store = DataStores.open(this.path.get(simulation))) {
-            final GridCoverageResource r = (GridCoverageResource) store;
-            final GridCoverage coverage = r.read(null, null);
-            final GridExtent sisExtent = coverage.getGridGeometry().getExtent();
-            final int width = (int) (sisExtent.getHigh(0) - sisExtent.getLow(0)) + 1;
-            final int height = (int) (sisExtent.getHigh(1) - sisExtent.getLow(1)) + 1;
-            final Envelope envelope = coverage
-                .getEnvelope()
-                .map(sisEnvelope -> new Envelope(
-                    sisEnvelope.getMinimum(0),
-                    sisEnvelope.getMaximum(0),
-                    sisEnvelope.getMinimum(1),
-                    sisEnvelope.getMaximum(1)
-                ))
-                .orElseThrow(() -> new RuntimeException(
-                    "Failed to retrieve envelope from coverage. Envelope is missing or invalid."
-                ));
-            final RenderedImage image = coverage.render(coverage.getGridGeometry().getExtent());
-            final PixelIterator pit = PixelIterator.create(image);
-            final ImmutableSet.Builder<Int2D> inactiveCells = ImmutableSet.builder();
-            while (pit.next()) {
-                if (pit.getSample(0) == excludedValue) {
-                    inactiveCells.add(new Int2D(pit.getPosition()));
+        final GridCoverage2D coverage = readCoverage(path.get(simulation).toFile());
+        final RenderedImage image = coverage.getRenderedImage();
+        final int width = image.getWidth();
+        final int height = image.getHeight();
+        final Raster raster = image.getData();
+        final ImmutableSet.Builder<Int2D> inactiveCells = ImmutableSet.builder();
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (raster.getSampleDouble(x, y, 0) == excludedValue) {
+                    inactiveCells.add(new Int2D(x, y));
                 }
             }
-            return ModelGrid.withInactiveCells(width, height, envelope, inactiveCells.build());
-        } catch (final DataStoreException e) {
-            throw new RuntimeException(e);
         }
+        return ModelGrid.withInactiveCells(
+            width,
+            height,
+            makeEnvelope(coverage),
+            inactiveCells.build()
+        );
     }
+
 }
