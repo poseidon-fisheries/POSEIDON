@@ -29,6 +29,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
@@ -45,23 +46,19 @@ import static uk.ac.ox.poseidon.geography.Utils.readCoverage;
 public class BathymetricGridFromGridFileFactory extends GlobalScopeFactory<BathymetricGrid> {
     @NonNull private Factory<? extends Path> path;
     @NonNull private Factory<? extends ModelGrid> modelGrid;
+    @NonNull private Factory<? extends Aggregator> aggregator;
     private boolean inverted = false;
 
     @Override
     protected BathymetricGrid newInstance(final Simulation simulation) {
         final File gridFile = this.path.get(simulation).toFile();
         final ModelGrid modelGrid = this.modelGrid.get(simulation);
+        final Aggregator aggregator = this.aggregator.get(simulation);
         final Multimap<Int2D, Double> elevationValues =
             readElevationValues(readCoverage(gridFile), modelGrid);
         final double[][] array = modelGrid.makeDoubleArray();
         modelGrid.getAllCells().forEach(int2D ->
-            array[int2D.x][int2D.y] =
-                elevationValues
-                    .get(int2D)
-                    .stream()
-                    .mapToDouble(x -> x)
-                    .max()
-                    .orElse(0)
+            array[int2D.x][int2D.y] = aggregator.apply(elevationValues.get(int2D)).orElse(0)
         );
         return new DefaultBathymetricGrid(modelGrid, array);
     }

@@ -57,6 +57,7 @@ import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.*;
+import uk.ac.ox.poseidon.core.aggregators.MaxFactory;
 import uk.ac.ox.poseidon.core.quantities.MassFactory;
 import uk.ac.ox.poseidon.core.quantities.SpeedFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
@@ -155,6 +156,7 @@ public class BasicScenario extends Scenario {
         new BathymetricGridFromGridFileFactory(
             inputPath.plus("bathymetry_grid.asc"),
             modelGrid,
+            new MaxFactory(),
             false
         );
 
