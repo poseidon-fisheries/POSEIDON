@@ -19,54 +19,64 @@
 
 package uk.ac.ox.poseidon.geography.bathymetry;
 
-import lombok.*;
-import sim.field.grid.DoubleGrid2D;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
 import sim.util.Int2D;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Map;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class BathymetricGridFromLongFormatCsvFactory
-    extends GlobalScopeFactory<BathymetricGrid> {
+public class BathymetricGridFromLongFormatCsvFactory extends BathymetricGridFactory {
 
-    @NonNull private Factory<? extends Path> path;
-    @NonNull private Factory<? extends ModelGrid> modelGrid;
     @NonNull private String longitudeColumnName;
     @NonNull private String latitudeColumnName;
     @NonNull private String depthColumnName;
-    private double defaultDepth;
+
+    public BathymetricGridFromLongFormatCsvFactory(
+        @NonNull final Factory<? extends Path> path,
+        @NonNull final Factory<? extends ModelGrid> modelGrid,
+        @NonNull final Factory<? extends Aggregator> aggregator,
+        final boolean inverted,
+        @NonNull final String longitudeColumnName,
+        @NonNull final String latitudeColumnName,
+        @NonNull final String depthColumnName
+    ) {
+        super(path, modelGrid, aggregator, inverted);
+        this.longitudeColumnName = longitudeColumnName;
+        this.latitudeColumnName = latitudeColumnName;
+        this.depthColumnName = depthColumnName;
+    }
 
     @Override
-    protected BathymetricGrid newInstance(final Simulation simulation) {
-        final ModelGrid modelGrid = this.modelGrid.get(simulation);
-        final DoubleGrid2D doubleGrid2D =
-            new DoubleGrid2D(
-                modelGrid.getGridWidth(),
-                modelGrid.getGridHeight(),
-                defaultDepth
-            );
-        Table.read().file(path.get(simulation).toFile()).forEach(row -> {
+    protected Map<Int2D, Collection<Double>> readElevationValues(
+        final File gridFile,
+        final ModelGrid modelGrid
+    ) {
+        final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
+        Table.read().csv(gridFile).forEach(row -> {
             final Int2D cell =
                 modelGrid.toCell(new Coordinate(
                     row.getDouble(longitudeColumnName),
                     row.getDouble(latitudeColumnName)
                 ));
-            doubleGrid2D.set(
-                cell.x,
-                cell.y,
-                row.getDouble(depthColumnName)
-            );
+            final double value = row.getDouble(depthColumnName);
+            elevationValues.put(cell, isInverted() ? -value : value);
         });
-        return new DefaultBathymetricGrid(modelGrid, doubleGrid2D);
+        return elevationValues.asMap();
     }
 
 }

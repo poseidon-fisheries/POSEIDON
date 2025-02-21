@@ -21,14 +21,12 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import lombok.*;
+import lombok.NonNull;
 import org.geotools.api.referencing.operation.MathTransform2D;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.coverage.grid.GridCoverage2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -36,37 +34,31 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Map;
 
 import static uk.ac.ox.poseidon.geography.Utils.readCoverage;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class BathymetricGridFromGridFileFactory extends GlobalScopeFactory<BathymetricGrid> {
-    @NonNull private Factory<? extends Path> path;
-    @NonNull private Factory<? extends ModelGrid> modelGrid;
-    @NonNull private Factory<? extends Aggregator> aggregator;
-    private boolean inverted = false;
+public class BathymetricGridFromGridFileFactory extends BathymetricGridFactory {
 
-    @Override
-    protected BathymetricGrid newInstance(final Simulation simulation) {
-        final File gridFile = this.path.get(simulation).toFile();
-        final ModelGrid modelGrid = this.modelGrid.get(simulation);
-        final Aggregator aggregator = this.aggregator.get(simulation);
-        final Multimap<Int2D, Double> elevationValues =
-            readElevationValues(readCoverage(gridFile), modelGrid);
-        final double[][] array = modelGrid.makeDoubleArray();
-        modelGrid.getAllCells().forEach(int2D ->
-            array[int2D.x][int2D.y] = aggregator.apply(elevationValues.get(int2D)).orElse(0)
-        );
-        return new DefaultBathymetricGrid(modelGrid, array);
+    public BathymetricGridFromGridFileFactory(
+        @NonNull final Factory<? extends Path> path,
+        @NonNull final Factory<? extends ModelGrid> modelGrid,
+        @NonNull final Factory<? extends Aggregator> aggregator,
+        final boolean inverted
+    ) {
+        super(path, modelGrid, aggregator, inverted);
     }
 
-    private Multimap<Int2D, Double> readElevationValues(
-        final GridCoverage2D coverage,
+    public BathymetricGridFromGridFileFactory() {
+    }
+
+    @Override
+    protected Map<Int2D, Collection<Double>> readElevationValues(
+        final File gridFile,
         final ModelGrid modelGrid
     ) {
+        final GridCoverage2D coverage = readCoverage(gridFile);
         final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
         final MathTransform2D gridToCRS2D = coverage.getGridGeometry().getGridToCRS2D();
         final int width = coverage.getRenderedImage().getWidth();
@@ -81,13 +73,13 @@ public class BathymetricGridFromGridFileFactory extends GlobalScopeFactory<Bathy
                     gridToCRS2D.transform(new Point2D.Double(x, y), worldPos);
                     final Int2D cell = modelGrid.toCell(new Coordinate(worldPos.x, worldPos.y));
                     final double value = coverage.evaluate(worldPos, elevation)[0];
-                    elevationValues.put(cell, inverted ? -value : value);
+                    elevationValues.put(cell, isInverted() ? -value : value);
                 }
             }
         } catch (final TransformException e) {
             throw new RuntimeException(e);
         }
-        return elevationValues;
+        return elevationValues.asMap();
     }
 
 }
