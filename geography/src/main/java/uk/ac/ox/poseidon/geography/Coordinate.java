@@ -22,6 +22,8 @@ package uk.ac.ox.poseidon.geography;
 import lombok.Data;
 import lombok.NonNull;
 
+import java.awt.geom.Point2D;
+
 /**
  * Represents a geographic coordinate specified by latitude and longitude. This class provides
  * methods for conversion to and from instances of {@code com.vividsolutions.jts.geom.Coordinate},
@@ -32,6 +34,12 @@ import lombok.NonNull;
 public final class Coordinate {
     public final double lon;
     public final double lat;
+
+    public static Coordinate fromPoint2D(
+        @NonNull final Point2D point
+    ) {
+        return new Coordinate(point.getX(), point.getY());
+    }
 
     public static Coordinate fromJTS(
         @NonNull final org.locationtech.jts.geom.Coordinate jtsCoordinate

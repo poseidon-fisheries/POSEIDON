@@ -21,14 +21,15 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.geotools.api.referencing.operation.MathTransform2D;
 import org.geotools.api.referencing.operation.TransformException;
-import org.geotools.coverage.grid.GridCoverage2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.CoverageWrapper;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.awt.geom.Point2D;
@@ -37,8 +38,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
-import static uk.ac.ox.poseidon.geography.Utils.readCoverage;
-
+@NoArgsConstructor
 public class BathymetricGridFromGridFileFactory extends BathymetricGridFactory {
 
     public BathymetricGridFromGridFileFactory(
@@ -50,35 +50,27 @@ public class BathymetricGridFromGridFileFactory extends BathymetricGridFactory {
         super(path, modelGrid, aggregator, inverted);
     }
 
-    public BathymetricGridFromGridFileFactory() {
-    }
-
     @Override
     protected Map<Int2D, Collection<Double>> readElevationValues(
         final File gridFile,
         final ModelGrid modelGrid
     ) {
-        final GridCoverage2D coverage = readCoverage(gridFile);
+        final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
         final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
-        final MathTransform2D gridToCRS2D = coverage.getGridGeometry().getGridToCRS2D();
-        final int width = coverage.getRenderedImage().getWidth();
-        final int height = coverage.getRenderedImage().getHeight();
+        final MathTransform2D gridToCRS2D =
+            coverageWrapper.getCoverage().getGridGeometry().getGridToCRS2D();
 
-        // elevation and worldPos will both be mutated while reading
+        // worldPos will be mutated while reading
         final Point2D.Double worldPos = new Point2D.Double();
-        final double[] elevation = new double[1];
-        try {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    gridToCRS2D.transform(new Point2D.Double(x, y), worldPos);
-                    final Int2D cell = modelGrid.toCell(new Coordinate(worldPos.x, worldPos.y));
-                    final double value = coverage.evaluate(worldPos, elevation)[0];
-                    elevationValues.put(cell, isInverted() ? -value : value);
-                }
+        coverageWrapper.processGrid((int2D, value) -> {
+            try {
+                gridToCRS2D.transform(new Point2D.Double(int2D.x, int2D.y), worldPos);
+                final Int2D cell = modelGrid.toCell(Coordinate.fromPoint2D(worldPos));
+                elevationValues.put(cell, isInverted() ? -value : value);
+            } catch (final TransformException e) {
+                throw new RuntimeException(e);
             }
-        } catch (final TransformException e) {
-            throw new RuntimeException(e);
-        }
+        });
         return elevationValues.asMap();
     }
 

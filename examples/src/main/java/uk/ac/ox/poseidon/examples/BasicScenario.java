@@ -71,20 +71,20 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromGridFileFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
+import uk.ac.ox.poseidon.geography.grids.CellSetFromGridFileFactory;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-import uk.ac.ox.poseidon.geography.grids.ModelGridFromEsriAsciiExclusionGridFactory;
+import uk.ac.ox.poseidon.geography.grids.ModelGridWithActiveCellsFromGridFile;
 import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.geography.ports.RandomLocationsPortGridFactory;
 import uk.ac.ox.poseidon.geography.ports.SimplePortFactory;
-import uk.ac.ox.poseidon.geography.vectors.GeometriesFromShapeFileFactory;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 import uk.ac.ox.poseidon.regulations.ForbiddenIfFactory;
 import uk.ac.ox.poseidon.regulations.predicates.logical.AnyOfFactory;
-import uk.ac.ox.poseidon.regulations.predicates.spatial.InGeometriesFactory;
+import uk.ac.ox.poseidon.regulations.predicates.spatial.InCellSetFactory;
 import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenYearlyDatesFactory;
 
 import java.nio.file.Path;
@@ -131,7 +131,13 @@ public class BasicScenario extends Scenario {
     private PathFactory inputPath = PathFactory.of(
         System.getProperty("user.home"), "workspace", "surimi_western_med", "data"
     );
-
+    private GlobalScopeFactory<? extends ModelGrid> modelGrid =
+        new ModelGridWithActiveCellsFromGridFile(
+            new CellSetFromGridFileFactory(
+                inputPath.plus("exclusion_grid.asc"),
+                0
+            )
+        );
     @SuppressWarnings("MagicNumber")
     private Factory<? extends Regulations> regulations =
         new ForbiddenIfFactory(
@@ -140,18 +146,15 @@ public class BasicScenario extends Scenario {
                     new MonthDayFactory(Month.MARCH, 1),
                     new MonthDayFactory(Month.MAY, 31)
                 ),
-                new InGeometriesFactory(
-                    new GeometriesFromShapeFileFactory(
-                        inputPath.plus("eez", "french_exclusive_economic_zone.shp")
+                new InCellSetFactory(
+                    modelGrid,
+                    new CellSetFromGridFileFactory(
+                        inputPath.plus("french_eez.asc"),
+                        1
                     )
                 )
             )
         );
-
-    private PathFactory exclusionGridPath = inputPath.plus("exclusion_grid.asc");
-
-    private GlobalScopeFactory<? extends ModelGrid> modelGrid =
-        new ModelGridFromEsriAsciiExclusionGridFactory(exclusionGridPath, -1);
     private Factory<? extends BathymetricGrid> bathymetricGrid =
         new BathymetricGridFromGridFileFactory(
             inputPath.plus("bathymetry_grid.asc"),
