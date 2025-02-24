@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.awt.*;
 import java.util.Collections;
-import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -148,7 +148,7 @@ class RegulationGridPortrayalFactoryTest {
 
         final Int2D mockInt2D = new Int2D(0, 0);
 
-        when(mockBathymetricGrid.getWaterCells()).thenReturn(List.of(mockInt2D));
+        when(mockBathymetricGrid.getWaterCells()).thenReturn(Stream.of(mockInt2D));
         when(mockFleet.getVessels()).thenReturn(Collections.emptyList());
         when(mockBathymetricGrid.getModelGrid()).thenReturn(mock(ModelGrid.class));
 

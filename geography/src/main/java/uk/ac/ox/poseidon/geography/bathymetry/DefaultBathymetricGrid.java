@@ -25,15 +25,24 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Stream;
+
+import static lombok.AccessLevel.PRIVATE;
 
 public class DefaultBathymetricGrid extends DoubleGrid implements BathymetricGrid {
 
-    @Getter(lazy = true)
-    private final List<Int2D> waterCells = BathymetricGrid.super.getWaterCells();
+    @Getter(value = PRIVATE, lazy = true)
+    private final Int2D[] landCellsArray =
+        BathymetricGrid.super.getLandCells().toArray(Int2D[]::new);
 
-    @Getter(lazy = true)
-    private final List<Int2D> landCells = BathymetricGrid.super.getLandCells();
+    @Getter(value = PRIVATE, lazy = true)
+    private final Int2D[] waterCellsArray =
+        BathymetricGrid.super.getWaterCells().toArray(Int2D[]::new);
+
+    @Getter(value = PRIVATE, lazy = true)
+    private final Int2D[] activeWaterCellsArray =
+        BathymetricGrid.super.getActiveWaterCells().toArray(Int2D[]::new);
 
     public DefaultBathymetricGrid(final ModelGrid modelGrid) {
         super(modelGrid);
@@ -62,6 +71,21 @@ public class DefaultBathymetricGrid extends DoubleGrid implements BathymetricGri
         final DoubleGrid2D grid
     ) {
         super(modelGrid, grid);
+    }
+
+    @Override
+    public Stream<Int2D> getActiveWaterCells() {
+        return Arrays.stream(getActiveWaterCellsArray());
+    }
+
+    @Override
+    public Stream<Int2D> getWaterCells() {
+        return Arrays.stream(getWaterCellsArray());
+    }
+
+    @Override
+    public Stream<Int2D> getLandCells() {
+        return Arrays.stream(getLandCellsArray());
     }
 
     @Override

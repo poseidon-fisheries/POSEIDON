@@ -23,7 +23,6 @@ import lombok.*;
 import sim.field.grid.DoubleGrid2D;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
-import sim.util.Int2D;
 import sim.util.gui.SimpleColorMap;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DummyFishingAction;
 import uk.ac.ox.poseidon.agents.fleets.Fleet;
@@ -124,7 +123,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
         }
 
         void updateGrid() {
-            for (final Int2D cell : bathymetricGrid.getWaterCells()) {
+            bathymetricGrid.getActiveWaterCells().forEach(cell -> {
                 final LocalDateTime dateTime = schedule.getDateTime();
                 final boolean forbidden =
                     fleet.getVessels()
@@ -137,7 +136,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
                             )
                         ).anyMatch(regulations::isForbidden);
                 grid.field[cell.x][cell.y] = forbidden ? 1 : 0;
-            }
+            });
         }
 
     }

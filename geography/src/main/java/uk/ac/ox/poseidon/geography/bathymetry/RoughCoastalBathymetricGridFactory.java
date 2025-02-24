@@ -82,7 +82,6 @@ public class RoughCoastalBathymetricGridFactory
                 new DefaultBathymetricGrid(modelGrid, doubleGrid2D);
             bathymetricGrid
                 .getLandCells()
-                .stream()
                 .filter(cell ->
                     modelGrid
                         .getActiveNeighbours(cell)

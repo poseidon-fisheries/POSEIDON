@@ -54,7 +54,6 @@ public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortG
         final List<Int2D> suitableTiles =
             bathymetricGrid
                 .getLandCells()
-                .stream()
                 .filter(cell ->
                     modelGrid
                         .getActiveNeighbours(cell)
