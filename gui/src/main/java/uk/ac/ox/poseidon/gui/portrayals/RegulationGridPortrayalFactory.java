@@ -20,10 +20,10 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import lombok.*;
-import sim.field.grid.DoubleGrid2D;
+import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.DrawInfo2D;
-import sim.portrayal.grid.FastValueGridPortrayal2D;
-import sim.util.gui.SimpleColorMap;
+import sim.portrayal.grid.ObjectGridPortrayal2D;
+import sim.portrayal.simple.ImagePortrayal2D;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DummyFishingAction;
 import uk.ac.ox.poseidon.agents.fleets.Fleet;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
@@ -44,21 +44,24 @@ import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.Up
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastValueGridPortrayal2D> {
-    private static final int OPACITY = 32;
+public class RegulationGridPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
 
     private Factory<? extends Regulations> regulations;
     private Factory<? extends Fleet> fleet;
     private Factory<? extends BathymetricGrid> bathymetric;
+    private int displayWidth;
+    private int displayHeight;
 
     @Override
-    protected FastValueGridPortrayal2D newInstance(final Simulation simulation) {
+    protected ObjectGridPortrayal2D newInstance(final Simulation simulation) {
         return new Portrayal(
             simulation.getTemporalSchedule(),
             regulations.get(simulation),
             fleet.get(simulation),
             bathymetric.get(simulation),
-            EVERY_MONTH
+            EVERY_MONTH,
+            displayWidth,
+            displayHeight
         );
     }
 
@@ -71,13 +74,13 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
     }
 
     @Getter
-    static class Portrayal extends FastValueGridPortrayal2D {
+    static class Portrayal extends ObjectGridPortrayal2D {
 
         private final TemporalSchedule schedule;
         private final Regulations regulations;
         private final Fleet fleet;
         private final BathymetricGrid bathymetricGrid;
-        private final DoubleGrid2D grid;
+        private final ObjectGrid2D grid;
         private final UpdateFrequency updateFrequency;
         private long lastUpdated;
 
@@ -86,26 +89,34 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
             final Regulations regulations,
             final Fleet fleet,
             final BathymetricGrid bathymetricGrid,
-            final UpdateFrequency updateFrequency
+            final UpdateFrequency updateFrequency,
+            final int displayWidth,
+            final int displayHeight
         ) {
             super();
             this.regulations = regulations;
             this.fleet = fleet;
             this.bathymetricGrid = bathymetricGrid;
-            this.grid = new DoubleGrid2D(
-                bathymetricGrid.getField().width,
-                bathymetricGrid.getField().height,
-                0
-            );
+            final int gridWidth = bathymetricGrid.getField().width;
+            final int gridHeight = bathymetricGrid.getField().height;
+            this.grid = new ObjectGrid2D(gridWidth, gridHeight);
             this.schedule = schedule;
             this.updateFrequency = updateFrequency;
             setField(grid);
-            setMap(new SimpleColorMap(
-                0,
-                1,
-                new Color(0, 0, 0, 0),
-                new Color(0, 0, 0, OPACITY)
-            ));
+
+            final Image originalImage =
+                Toolkit.getDefaultToolkit().getImage(
+                    "/home/nicolas/Desktop/checkered.png"
+                );
+
+            final Image scaledImage =
+                originalImage.getScaledInstance(
+                    displayWidth / gridWidth,
+                    displayHeight / gridHeight,
+                    Image.SCALE_SMOOTH
+                );
+
+            setPortrayalForNonNull(new ImagePortrayal2D(scaledImage));
         }
 
         @Override
@@ -135,7 +146,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<FastV
                                 bathymetricGrid.getModelGrid().toCoordinate(cell)
                             )
                         ).anyMatch(regulations::isForbidden);
-                grid.field[cell.x][cell.y] = forbidden ? 1 : 0;
+                grid.field[cell.x][cell.y] = forbidden ? "X" : null;
             });
         }
 

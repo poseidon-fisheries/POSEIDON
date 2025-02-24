@@ -31,8 +31,8 @@ import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.*;
 
 public class BasicScenarioWithUI extends ScenarioWithUI {
 
-    private static final int WIDTH = 1000;
-    private static final int HEIGHT = 1000;
+    private static final int WIDTH = 1090;
+    private static final int HEIGHT = 820;
 
     public BasicScenarioWithUI(final BasicScenario scenario) {
         super(
@@ -79,7 +79,9 @@ public class BasicScenarioWithUI extends ScenarioWithUI {
                         new RegulationGridPortrayalFactory(
                             scenario.getRegulations(),
                             scenario.getFleet(),
-                            scenario.getBathymetricGrid()
+                            scenario.getBathymetricGrid(),
+                            WIDTH,
+                            HEIGHT
                         )
                     ),
                     WIDTH,

@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import sim.field.grid.DoubleGrid2D;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
+import sim.portrayal.grid.ObjectGridPortrayal2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DummyFishingAction;
 import uk.ac.ox.poseidon.agents.fleets.Fleet;
@@ -60,7 +61,9 @@ class RegulationGridPortrayalFactoryTest {
         final RegulationGridPortrayalFactory factory = new RegulationGridPortrayalFactory(
             mockRegulationsFactory,
             mockFleetFactory,
-            mockBathymetricGridFactory
+            mockBathymetricGridFactory,
+            100,
+            100
         );
 
         assertNotNull(
@@ -88,14 +91,16 @@ class RegulationGridPortrayalFactoryTest {
         final RegulationGridPortrayalFactory factory = new RegulationGridPortrayalFactory(
             mockRegulationsFactory,
             mockFleetFactory,
-            mockBathymetricGridFactory
+            mockBathymetricGridFactory,
+            100,
+            100
         );
 
-        final FastValueGridPortrayal2D portrayal = factory.newInstance(mockSimulation);
+        final ObjectGridPortrayal2D portrayal = factory.newInstance(mockSimulation);
 
         assertEquals(
-            DoubleGrid2D.class, portrayal.getField().getClass(),
-            "Expected Portrayal to use a DoubleGrid2D as its field"
+            ObjectGrid2D.class, portrayal.getField().getClass(),
+            "Expected Portrayal to use a ObjectGrid2D as its field"
         );
     }
 
