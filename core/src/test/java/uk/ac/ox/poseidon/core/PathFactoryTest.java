@@ -19,7 +19,6 @@
 
 package uk.ac.ox.poseidon.core;
 
-import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -36,7 +35,7 @@ class PathFactoryTest {
     void newInstanceSimpleFile() {
         final PathFactory pathFactory = PathFactory.of(FILENAME);
         assertNull(pathFactory.getParent());
-        assertEquals(ImmutableList.of(FILENAME), pathFactory.getPathElements());
+        assertEquals(FILENAME, pathFactory.getPath());
         assertEquals(Path.of(FILENAME), pathFactory.newInstance(null));
     }
 
@@ -44,7 +43,7 @@ class PathFactoryTest {
     void newInstanceFileInFolder() {
         final PathFactory pathFactory = PathFactory.of(FOLDERS + FILENAME);
         assertNull(pathFactory.getParent());
-        assertEquals(ImmutableList.of("/", "a", "b", "c", FILENAME), pathFactory.getPathElements());
+        assertEquals("/a/b/c/" + FILENAME, pathFactory.getPath());
         assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.newInstance(null));
     }
 
@@ -52,7 +51,7 @@ class PathFactoryTest {
     void newInstanceWithParent() {
         final PathFactory pathFactory = PathFactory.of(FOLDERS).plus(FILENAME);
         assertEquals(Path.of(FOLDERS), pathFactory.getParent().get(null));
-        assertEquals(ImmutableList.of(FILENAME), pathFactory.getPathElements());
+        assertEquals(FILENAME, pathFactory.getPath());
         assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.newInstance(null));
     }
 

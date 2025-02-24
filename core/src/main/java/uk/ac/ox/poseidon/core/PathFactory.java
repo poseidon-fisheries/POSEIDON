@@ -19,16 +19,9 @@
 
 package uk.ac.ox.poseidon.core;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
 import lombok.*;
 
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.ImmutableList.toImmutableList;
 
 @Getter
 @Setter
@@ -37,37 +30,24 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 public class PathFactory extends GlobalScopeFactory<Path> {
 
     private Factory<? extends Path> parent;
-    @NonNull private List<String> pathElements;
+    @NonNull private String path;
 
     private PathFactory(
         final PathFactory parent,
         final Path path
     ) {
-        this(parent, getPathElements(path));
+        this(parent, path.toString().replace("\\", "/"));
     }
 
-    // root
     public static PathFactory of(final Path path) {
         return new PathFactory(null, path);
     }
-    // string
 
-    // first/more
     public static PathFactory of(
         final String first,
         final String... more
     ) {
         return of(Path.of(first, more));
-    }
-
-    private static ImmutableList<String> getPathElements(final Path path) {
-        return Streams
-            .concat(
-                Optional.ofNullable(path.getRoot()).stream(),
-                Streams.stream(path)
-            )
-            .map(Path::toString)
-            .collect(toImmutableList());
     }
 
     public PathFactory plus(final Path path) {
@@ -83,11 +63,6 @@ public class PathFactory extends GlobalScopeFactory<Path> {
 
     @Override
     protected Path newInstance(final Simulation simulation) {
-        checkState(!pathElements.isEmpty());
-        final Path path = Path.of(
-            pathElements.getFirst(),
-            pathElements.subList(1, pathElements.size()).toArray(String[]::new)
-        );
-        return parent == null ? path : parent.get(null).resolve(path);
+        return parent == null ? Path.of(path) : parent.get(null).resolve(path);
     }
 }
