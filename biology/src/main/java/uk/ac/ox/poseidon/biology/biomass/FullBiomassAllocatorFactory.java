@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -36,7 +33,7 @@ public class FullBiomassAllocatorFactory extends SimulationScopeFactory<BiomassA
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid;
 
     @Override
-    protected BiomassAllocator newInstance(final Simulation simulation) {
+    protected BiomassAllocator newInstance(final @NonNull Simulation simulation) {
         return new FullBiomassAllocator(
             carryingCapacityGrid.get(simulation)
         );

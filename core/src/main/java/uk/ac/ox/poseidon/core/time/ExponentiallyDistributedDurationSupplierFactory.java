@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.core.time;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -40,7 +37,7 @@ public class ExponentiallyDistributedDurationSupplierFactory
     private Factory<? extends Duration> meanDuration;
 
     @Override
-    protected Supplier<Duration> newInstance(final Simulation simulation) {
+    protected Supplier<Duration> newInstance(final @NonNull Simulation simulation) {
         return new ExponentiallyDistributedDuration(
             meanDuration.get(simulation), simulation.random
         );

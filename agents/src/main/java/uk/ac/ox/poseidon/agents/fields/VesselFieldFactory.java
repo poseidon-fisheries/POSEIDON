@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.agents.fields;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -37,7 +34,7 @@ public class VesselFieldFactory extends SimulationScopeFactory<VesselField> {
     private Factory<? extends ModelGrid> modelGrid;
 
     @Override
-    protected VesselField newInstance(final Simulation simulation) {
+    protected VesselField newInstance(final @NonNull Simulation simulation) {
         return new VesselField(modelGrid.get(simulation));
     }
 }

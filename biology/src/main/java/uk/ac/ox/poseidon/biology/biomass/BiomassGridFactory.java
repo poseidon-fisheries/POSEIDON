@@ -37,7 +37,7 @@ public class BiomassGridFactory extends SimulationScopeFactory<BiomassGrid> {
     @NonNull private Factory<? extends BiomassAllocator> biomassAllocator;
 
     @Override
-    protected BiomassGrid newInstance(final Simulation simulation) {
+    protected BiomassGrid newInstance(final @NonNull Simulation simulation) {
         final BiomassAllocator biomassAllocator = this.biomassAllocator.get(simulation);
         final ModelGrid modelGrid = this.modelGrid.get(simulation);
         final double[][] biomassArray = modelGrid.makeDoubleArray();

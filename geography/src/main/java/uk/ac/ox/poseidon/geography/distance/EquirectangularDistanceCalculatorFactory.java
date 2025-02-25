@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -37,7 +34,7 @@ public class EquirectangularDistanceCalculatorFactory extends GlobalScopeFactory
     private Factory<? extends ModelGrid> modelGrid;
 
     @Override
-    protected EquirectangularDistanceCalculator newInstance(final Simulation simulation) {
+    protected EquirectangularDistanceCalculator newInstance(final @NonNull Simulation simulation) {
         return new EquirectangularDistanceCalculator(modelGrid.get(simulation));
     }
 }

@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -35,7 +32,7 @@ public class LogisticGrowthRuleFactory extends GlobalScopeFactory<LogisticGrowth
     private double growthRate;
 
     @Override
-    protected LogisticGrowthRule newInstance(final Simulation simulation) {
+    protected LogisticGrowthRule newInstance(final @NonNull Simulation simulation) {
         return new LogisticGrowthRule(growthRate);
     }
 

@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.geography;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -38,7 +35,7 @@ public class EnvelopeFactory extends GlobalScopeFactory<Envelope> {
     private double maxY;
 
     @Override
-    protected Envelope newInstance(final Simulation simulation) {
+    protected Envelope newInstance(final @NonNull Simulation simulation) {
         return new Envelope(minX, maxX, minY, maxY);
     }
 }

@@ -19,12 +19,13 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
+import lombok.NonNull;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 public class MedianFactory extends GlobalScopeFactory<Median> {
     @Override
-    protected Median newInstance(final Simulation simulation) {
+    protected Median newInstance(final @NonNull Simulation simulation) {
         return new Median();
     }
 }

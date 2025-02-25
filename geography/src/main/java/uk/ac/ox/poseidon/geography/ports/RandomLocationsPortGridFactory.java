@@ -48,7 +48,7 @@ public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortG
     private int minimumAdjacentWaterTiles;
 
     @Override
-    protected PortGrid newInstance(final Simulation simulation) {
+    protected PortGrid newInstance(final @NonNull Simulation simulation) {
         final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
         final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
         final List<Int2D> suitableTiles =

@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -38,7 +35,7 @@ public class ModelGridWithActiveCellsFromGridFile
     CellSetFromGridFileFactory cellSetFromGridFile;
 
     @Override
-    protected ModelGrid newInstance(final Simulation simulation) {
+    protected ModelGrid newInstance(final @NonNull Simulation simulation) {
         final File gridFile = cellSetFromGridFile.getPath().get(simulation).toFile();
         final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
         return ModelGrid.withActiveCells(

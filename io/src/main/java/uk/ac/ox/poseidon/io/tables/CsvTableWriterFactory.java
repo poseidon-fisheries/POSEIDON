@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -42,7 +39,7 @@ public class CsvTableWriterFactory extends SimulationScopeFactory<CsvTableWriter
     private boolean clearAfterWriting;
 
     @Override
-    protected CsvTableWriter newInstance(final Simulation simulation) {
+    protected CsvTableWriter newInstance(final @NonNull Simulation simulation) {
         return new CsvTableWriter(
             tableSupplier.get(simulation),
             path.get(simulation),

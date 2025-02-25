@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -44,7 +41,7 @@ public class SmoothBiomassDiffusionRuleFactory
     private double percentageLimitOnDailyMovement;
 
     @Override
-    protected SmoothBiomassDiffusionRule newInstance(final Simulation simulation) {
+    protected SmoothBiomassDiffusionRule newInstance(final @NonNull Simulation simulation) {
         return new SmoothBiomassDiffusionRule(
             differentialPercentageToMove,
             percentageLimitOnDailyMovement

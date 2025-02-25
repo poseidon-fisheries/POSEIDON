@@ -37,7 +37,7 @@ public class BelowFactory extends GlobalScopeFactory<Below> {
     @NonNull private Factory<? extends ToDoubleFunction<Action>> doubleFunction;
 
     @Override
-    protected Below newInstance(final Simulation simulation) {
+    protected Below newInstance(final @NonNull Simulation simulation) {
         return new Below(threshold, doubleFunction.get(simulation));
     }
 }

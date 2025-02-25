@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sim.portrayal.SimplePortrayal2D;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.simple.OrientedPortrayal2D;
@@ -44,7 +41,7 @@ public class VesselFieldPortrayalFactory extends SimulationScopeFactory<Continuo
     private Factory<? extends VesselField> vesselField;
 
     @Override
-    protected ContinuousPortrayal2D newInstance(final Simulation simulation) {
+    protected ContinuousPortrayal2D newInstance(final @NonNull Simulation simulation) {
         final ContinuousPortrayal2D continuousPortrayal2D = new ContinuousPortrayal2D();
         continuousPortrayal2D.setField(vesselField.get(simulation).getField());
         continuousPortrayal2D.setPortrayalForAll(

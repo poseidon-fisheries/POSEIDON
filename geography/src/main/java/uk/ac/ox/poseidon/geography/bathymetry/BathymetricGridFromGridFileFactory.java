@@ -66,7 +66,8 @@ public class BathymetricGridFromGridFileFactory extends BathymetricGridFactory {
             try {
                 gridToCRS2D.transform(new Point2D.Double(int2D.x, int2D.y), worldPos);
                 final Int2D cell = modelGrid.toCell(Coordinate.fromPoint2D(worldPos));
-                elevationValues.put(cell, isInverted() ? -value : value);
+                final double elevation = isInverted() ? -value : value;
+                elevationValues.put(cell, elevation);
             } catch (final TransformException e) {
                 throw new RuntimeException(e);
             }

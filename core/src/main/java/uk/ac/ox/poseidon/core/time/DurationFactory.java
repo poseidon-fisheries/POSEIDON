@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.core.time;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -51,7 +48,7 @@ public class DurationFactory extends GlobalScopeFactory<Duration> {
     }
 
     @Override
-    protected Duration newInstance(final Simulation simulation) {
+    protected Duration newInstance(final @NonNull Simulation simulation) {
         return Duration.ofDays(days).plusHours(hours).plusMinutes(minutes).plusSeconds(seconds);
     }
 }

@@ -34,7 +34,7 @@ public class InRectangularAreaPredicateFactory extends GlobalScopeFactory<InRect
     @NonNull private Factory<? extends Envelope> envelope;
 
     @Override
-    protected InRectangularAreaPredicate newInstance(final Simulation simulation) {
+    protected InRectangularAreaPredicate newInstance(final @NonNull Simulation simulation) {
         return new InRectangularAreaPredicate(envelope.get(simulation));
     }
 }

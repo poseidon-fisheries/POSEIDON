@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.core.time;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -51,7 +48,7 @@ public class PeriodFactory extends GlobalScopeFactory<Period> {
     }
 
     @Override
-    protected Period newInstance(final Simulation simulation) {
+    protected Period newInstance(final @NonNull Simulation simulation) {
         return Period.of(year, month, day);
     }
 }

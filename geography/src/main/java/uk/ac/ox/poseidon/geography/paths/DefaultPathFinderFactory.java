@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.geography.paths;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -41,7 +38,7 @@ public class DefaultPathFinderFactory extends GlobalScopeFactory<GridPathFinder>
     private Factory<? extends DistanceCalculator> distance;
 
     @Override
-    protected GridPathFinder newInstance(final Simulation simulation) {
+    protected GridPathFinder newInstance(final @NonNull Simulation simulation) {
         final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
         final PortGrid portGrid = this.portGrid.get(simulation);
         return new CachingGridPathFinder(

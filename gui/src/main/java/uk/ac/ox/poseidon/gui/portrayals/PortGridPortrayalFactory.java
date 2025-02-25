@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sim.portrayal.grid.SparseGridPortrayal2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -38,7 +35,7 @@ public final class PortGridPortrayalFactory extends SimulationScopeFactory<Spars
     private Factory<? extends PortGrid> portGrid;
 
     @Override
-    protected SparseGridPortrayal2D newInstance(final Simulation simulation) {
+    protected SparseGridPortrayal2D newInstance(final @NonNull Simulation simulation) {
         final SparseGridPortrayal2D sparseGridPortrayal2D = new SparseGridPortrayal2D();
         sparseGridPortrayal2D.setField(portGrid.get(simulation).getField());
         sparseGridPortrayal2D.setPortrayalForAll(

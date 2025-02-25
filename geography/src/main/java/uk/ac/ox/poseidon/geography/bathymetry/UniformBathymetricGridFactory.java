@@ -35,7 +35,7 @@ public class UniformBathymetricGridFactory extends GlobalScopeFactory<Bathymetri
     private double depth;
 
     @Override
-    protected BathymetricGrid newInstance(final Simulation simulation) {
+    protected BathymetricGrid newInstance(final @NonNull Simulation simulation) {
         return new DefaultBathymetricGrid(modelGrid.get(simulation), depth);
     }
 }

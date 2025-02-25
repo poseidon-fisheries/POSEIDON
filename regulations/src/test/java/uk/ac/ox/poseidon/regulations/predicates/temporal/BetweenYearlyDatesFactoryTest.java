@@ -129,9 +129,9 @@ class BetweenYearlyDatesFactoryTest {
         assertNotNull(factory);
         assertInstanceOf(MonthDayFactory.class, factory.getStart());
         assertInstanceOf(MonthDayFactory.class, factory.getEnd());
-
-        final MonthDay startDate = ((MonthDayFactory) factory.getStart()).get(null);
-        final MonthDay endDate = ((MonthDayFactory) factory.getEnd()).get(null);
+        final Simulation simulation = mock(Simulation.class);
+        final MonthDay startDate = ((MonthDayFactory) factory.getStart()).get(simulation);
+        final MonthDay endDate = ((MonthDayFactory) factory.getEnd()).get(simulation);
 
         assertEquals(MonthDay.parse(start), startDate);
         assertEquals(MonthDay.parse(end), endDate);

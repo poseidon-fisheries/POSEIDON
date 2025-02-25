@@ -56,7 +56,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
     private int displayHeight;
 
     @Override
-    protected ObjectGridPortrayal2D newInstance(final Simulation simulation) {
+    protected ObjectGridPortrayal2D newInstance(final @NonNull Simulation simulation) {
         return new Portrayal(
             simulation.getTemporalSchedule(),
             regulations.get(simulation),

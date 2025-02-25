@@ -50,7 +50,7 @@ public class RoughCoastalBathymetricGridFactory
     private double probabilityOfFlippingLandToWater;
 
     @Override
-    protected BathymetricGrid newInstance(final Simulation simulation) {
+    protected BathymetricGrid newInstance(final @NonNull Simulation simulation) {
         checkState(minimumElevation < 0);
         checkState(maximumElevation > 0);
 

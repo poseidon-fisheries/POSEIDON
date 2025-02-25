@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import lombok.NonNull;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.events.Listener;
@@ -29,7 +30,7 @@ public abstract class SimulationEventListenerFactory<T extends Listener<?>>
     protected abstract T newListener(final Simulation simulation);
 
     @Override
-    protected final T newInstance(final Simulation simulation) {
+    protected final T newInstance(final @NonNull Simulation simulation) {
         final T listener = newListener(simulation);
         simulation.getEventManager().addListener(listener);
         return listener;

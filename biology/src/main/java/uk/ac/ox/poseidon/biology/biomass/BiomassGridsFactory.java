@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -40,7 +37,7 @@ public class BiomassGridsFactory extends SimulationScopeFactory<BiomassGrids> {
     private List<? extends Factory<? extends BiomassGrid>> biomassGrids;
 
     @Override
-    protected BiomassGrids newInstance(final Simulation simulation) {
+    protected BiomassGrids newInstance(final @NonNull Simulation simulation) {
         return new BiomassGrids(
             biomassGrids
                 .stream()

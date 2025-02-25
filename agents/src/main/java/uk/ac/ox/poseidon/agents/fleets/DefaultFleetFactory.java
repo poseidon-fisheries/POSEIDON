@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.agents.fleets;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -40,7 +37,7 @@ public class DefaultFleetFactory extends SimulationScopeFactory<Fleet> {
     private Factory<? extends Vessel> vesselFactory;
 
     @Override
-    protected Fleet newInstance(final Simulation simulation) {
+    protected Fleet newInstance(final @NonNull Simulation simulation) {
         return new DefaultFleet(
             Stream
                 .generate(() -> vesselFactory.get(simulation))

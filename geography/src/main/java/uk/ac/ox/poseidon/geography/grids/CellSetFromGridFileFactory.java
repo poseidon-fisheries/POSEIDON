@@ -37,7 +37,7 @@ public class CellSetFromGridFileFactory extends GlobalScopeFactory<ImmutableSet<
     private double includedValue;
 
     @Override
-    protected ImmutableSet<Int2D> newInstance(final Simulation simulation) {
+    protected ImmutableSet<Int2D> newInstance(final @NonNull Simulation simulation) {
         final CoverageWrapper coverageWrapper = new CoverageWrapper(path.get(simulation).toFile());
         final ImmutableSet.Builder<Int2D> builder = ImmutableSet.builder();
         coverageWrapper.processGrid((cell, value) -> {

@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sim.util.distribution.Poisson;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -38,7 +35,7 @@ public class PoissonIntSupplierFactory extends SimulationScopeFactory<IntSupplie
     private double mean;
 
     @Override
-    protected IntSupplier newInstance(final Simulation simulation) {
+    protected IntSupplier newInstance(final @NonNull Simulation simulation) {
         final Poisson poisson = new Poisson(mean, simulation.random);
         return poisson::nextInt;
     }

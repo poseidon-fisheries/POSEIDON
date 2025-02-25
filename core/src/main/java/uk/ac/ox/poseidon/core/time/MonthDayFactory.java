@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.core.time;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -51,7 +48,7 @@ public class MonthDayFactory extends GlobalScopeFactory<MonthDay> {
     }
 
     @Override
-    protected MonthDay newInstance(final Simulation simulation) {
+    protected MonthDay newInstance(final @NonNull Simulation simulation) {
         return MonthDay.of(month, dayOfMonth);
     }
 }

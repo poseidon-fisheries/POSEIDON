@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.locationtech.jts.geom.Geometry;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
@@ -39,7 +36,7 @@ public class InGeometriesFactory extends GlobalScopeFactory<InGeometries> {
     private Factory<? extends Collection<? extends Geometry>> geometries;
 
     @Override
-    protected InGeometries newInstance(final Simulation simulation) {
+    protected InGeometries newInstance(final @NonNull Simulation simulation) {
         return new InGeometries(geometries.get(simulation));
     }
 }

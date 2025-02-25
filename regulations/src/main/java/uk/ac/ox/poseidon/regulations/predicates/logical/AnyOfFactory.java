@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.logical;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
@@ -46,7 +43,7 @@ public class AnyOfFactory extends GlobalScopeFactory<AnyOf> {
     }
 
     @Override
-    protected AnyOf newInstance(final Simulation simulation) {
+    protected AnyOf newInstance(final @NonNull Simulation simulation) {
         return new AnyOf(
             predicates
                 .stream()

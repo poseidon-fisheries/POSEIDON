@@ -20,10 +20,7 @@
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
 import com.google.common.collect.ImmutableSet;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
@@ -41,7 +38,7 @@ public class InCellSetFactory extends GlobalScopeFactory<InCellSet> {
     private Factory<? extends Collection<? extends Int2D>> cells;
 
     @Override
-    protected InCellSet newInstance(final Simulation simulation) {
+    protected InCellSet newInstance(final @NonNull Simulation simulation) {
         return new InCellSet(
             modelGrid.get(simulation),
             ImmutableSet.copyOf(cells.get(simulation))

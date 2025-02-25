@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.util.gui.ColorMap;
 import uk.ac.ox.poseidon.core.Factory;
@@ -44,7 +41,7 @@ public class NumberGridPortrayalFactory
     private Factory<? extends NumberGrid<?, ?>> grid;
 
     @Override
-    protected FastValueGridPortrayal2D newInstance(final Simulation simulation) {
+    protected FastValueGridPortrayal2D newInstance(final @NonNull Simulation simulation) {
         final var portrayal = new FastValueGridPortrayal2D(valueName, immutableField);
         portrayal.setField(grid.get(simulation).getField());
         portrayal.setMap(newColorMap(simulation));

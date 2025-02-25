@@ -37,7 +37,7 @@ abstract class RelativeDateTimeFactory extends GlobalScopeFactory<LocalDateTime>
     @NonNull private Factory<? extends TemporalAmount> temporalAmount;
 
     @Override
-    protected LocalDateTime newInstance(final Simulation simulation) {
+    protected LocalDateTime newInstance(final @NonNull Simulation simulation) {
         return operation(
             referenceDateTime.get(simulation),
             temporalAmount.get(simulation)

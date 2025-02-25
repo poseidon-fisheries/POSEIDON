@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.core.time;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -39,7 +36,7 @@ public class DateFactory extends GlobalScopeFactory<LocalDateTime> {
     private int month = LocalDate.now().getMonthValue();
     private int day = LocalDate.now().getDayOfMonth();
 
-    protected LocalDateTime newInstance(final Simulation simulation) {
+    protected LocalDateTime newInstance(final @NonNull Simulation simulation) {
         return LocalDate.of(year, month, day).atStartOfDay();
     }
 

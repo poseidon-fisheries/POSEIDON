@@ -46,7 +46,7 @@ public class GeometriesFromShapeFileFactory extends GlobalScopeFactory<Collectio
     private Factory<? extends Path> path;
 
     @Override
-    protected List<Geometry> newInstance(final Simulation simulation) {
+    protected List<Geometry> newInstance(final @NonNull Simulation simulation) {
         final Path filePath = this.path.get(simulation);
         return readShapeFile(filePath);
     }

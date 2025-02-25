@@ -43,7 +43,7 @@ public class UniformCarryingCapacityGridFactory
     private Factory<? extends Quantity<Mass>> carryingCapacity;
 
     @Override
-    protected CarryingCapacityGrid newInstance(final Simulation simulation) {
+    protected CarryingCapacityGrid newInstance(final @NonNull Simulation simulation) {
         final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
         final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
         final double[][] array = modelGrid.makeDoubleArray();

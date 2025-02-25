@@ -43,7 +43,7 @@ public abstract class BathymetricGridFactory extends GlobalScopeFactory<Bathymet
     private boolean inverted = false;
 
     @Override
-    protected BathymetricGrid newInstance(final Simulation simulation) {
+    protected BathymetricGrid newInstance(final @NonNull Simulation simulation) {
         final File gridFile = this.path.get(simulation).toFile();
         final ModelGrid modelGrid = this.modelGrid.get(simulation);
         final Aggregator aggregator = this.aggregator.get(simulation);

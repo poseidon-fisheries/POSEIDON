@@ -62,7 +62,7 @@ public class PathFactory extends GlobalScopeFactory<Path> {
     }
 
     @Override
-    protected Path newInstance(final Simulation simulation) {
+    protected Path newInstance(final @NonNull Simulation simulation) {
         return parent == null ? Path.of(path) : parent.get(null).resolve(path);
     }
 }

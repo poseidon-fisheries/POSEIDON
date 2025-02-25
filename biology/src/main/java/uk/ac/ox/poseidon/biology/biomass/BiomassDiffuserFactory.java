@@ -40,7 +40,7 @@ public class BiomassDiffuserFactory extends SimulationScopeFactory<BiomassDiffus
     private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule;
 
     @Override
-    protected BiomassDiffuser newInstance(final Simulation simulation) {
+    protected BiomassDiffuser newInstance(final @NonNull Simulation simulation) {
         return new BiomassDiffuser(
             biomassGrid.get(simulation),
             carryingCapacityGrid.get(simulation),

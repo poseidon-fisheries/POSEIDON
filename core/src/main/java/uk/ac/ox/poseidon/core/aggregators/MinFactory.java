@@ -19,12 +19,13 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
+import lombok.NonNull;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 public class MinFactory extends GlobalScopeFactory<Min> {
     @Override
-    protected Min newInstance(final Simulation simulation) {
+    protected Min newInstance(final @NonNull Simulation simulation) {
         return new Min();
     }
 }

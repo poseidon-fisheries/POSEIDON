@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.Envelope;
@@ -43,7 +40,7 @@ public class ModelGridFactory extends GlobalScopeFactory<ModelGrid> {
     private double northLatitude;
 
     @Override
-    protected ModelGrid newInstance(final Simulation simulation) {
+    protected ModelGrid newInstance(final @NonNull Simulation simulation) {
         final double widthInDegrees = eastLongitude - westLongitude;
         final double heightInDegrees = northLatitude - southLatitude;
         final int gridWidth = validateDimension("Width", widthInDegrees, resolutionInDegrees);

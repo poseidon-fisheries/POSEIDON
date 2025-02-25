@@ -36,7 +36,7 @@ public class SpeciesListFactory
     private Map<String, String> speciesNameByCode;
 
     @Override
-    protected SpeciesList newInstance(final Simulation simulation) {
+    protected SpeciesList newInstance(final @NonNull Simulation simulation) {
         return new ImmutableSpeciesList(
             speciesNameByCode
                 .entrySet()

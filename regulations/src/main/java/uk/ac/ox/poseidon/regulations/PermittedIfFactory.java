@@ -37,7 +37,7 @@ public class PermittedIfFactory extends GlobalScopeFactory<PermittedIf> {
     @NonNull private GlobalScopeFactory<? extends Predicate<Action>> actionPredicate;
 
     @Override
-    protected PermittedIf newInstance(final Simulation simulation) {
+    protected PermittedIf newInstance(final @NonNull Simulation simulation) {
         return new PermittedIf(actionPredicate.get(simulation));
     }
 

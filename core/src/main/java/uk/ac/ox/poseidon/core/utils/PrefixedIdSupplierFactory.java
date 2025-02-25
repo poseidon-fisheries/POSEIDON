@@ -34,7 +34,7 @@ public class PrefixedIdSupplierFactory extends SimulationScopeFactory<PrefixedId
     @NonNull private String prefix;
 
     @Override
-    protected PrefixedIdSupplier newInstance(final Simulation simulation) {
+    protected PrefixedIdSupplier newInstance(final @NonNull Simulation simulation) {
         return new PrefixedIdSupplier(prefix, new AtomicLong());
     }
 }

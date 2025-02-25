@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -39,7 +36,7 @@ public class ShiftedIntSupplierFactory extends GlobalScopeFactory<IntSupplier> {
     private int shift;
 
     @Override
-    protected IntSupplier newInstance(final Simulation simulation) {
+    protected IntSupplier newInstance(final @NonNull Simulation simulation) {
         final IntSupplier intSupplier = this.intSupplier.get(simulation);
         return () -> intSupplier.getAsInt() + shift;
     }

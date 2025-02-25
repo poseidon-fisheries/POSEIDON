@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.core;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import sim.engine.Steppable;
 
 @Getter
@@ -34,7 +31,7 @@ public class FinalProcessFactory<C extends Steppable> extends SimulationScopeFac
     private Factory<C> process;
 
     @Override
-    protected C newInstance(final Simulation simulation) {
+    protected C newInstance(final @NonNull Simulation simulation) {
         final C process = this.process.get(simulation);
         simulation.addFinalProcess(process);
         return process;

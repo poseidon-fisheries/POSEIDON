@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -37,7 +34,7 @@ public class BiomassGrowerFactory extends SimulationScopeFactory<BiomassGrower> 
     private Factory<? extends BiomassGrowthRule> biomassGrowthRule;
 
     @Override
-    protected BiomassGrower newInstance(final Simulation simulation) {
+    protected BiomassGrower newInstance(final @NonNull Simulation simulation) {
         return new BiomassGrower(
             biomassGrid.get(simulation),
             carryingCapacityGrid.get(simulation),

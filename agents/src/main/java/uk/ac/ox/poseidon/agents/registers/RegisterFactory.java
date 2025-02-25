@@ -19,13 +19,14 @@
 
 package uk.ac.ox.poseidon.agents.registers;
 
+import lombok.NonNull;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
 public class RegisterFactory<T> extends SimulationScopeFactory<Register<T>> {
 
     @Override
-    protected HashMapRegister<T> newInstance(final Simulation simulation) {
+    protected HashMapRegister<T> newInstance(final @NonNull Simulation simulation) {
         return new HashMapRegister<>();
     }
 }

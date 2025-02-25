@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
@@ -37,7 +34,7 @@ public class RandomBooleanSupplierFactory extends SimulationScopeFactory<Boolean
     private double probability;
 
     @Override
-    protected BooleanSupplier newInstance(final Simulation simulation) {
+    protected BooleanSupplier newInstance(final @NonNull Simulation simulation) {
         return new RandomBooleanSupplier(probability, simulation.random);
     }
 }

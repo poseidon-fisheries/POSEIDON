@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.regulations.predicates;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -28,7 +29,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 @Setter
 public class AlwaysFalseFactory extends GlobalScopeFactory<AlwaysFalse> {
     @Override
-    protected AlwaysFalse newInstance(final Simulation simulation) {
+    protected AlwaysFalse newInstance(final @NonNull Simulation simulation) {
         return new AlwaysFalse();
     }
 }

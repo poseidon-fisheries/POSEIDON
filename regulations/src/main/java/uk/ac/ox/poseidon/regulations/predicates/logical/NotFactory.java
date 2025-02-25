@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.logical;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
@@ -39,7 +36,7 @@ public class NotFactory extends GlobalScopeFactory<Not> {
     private Factory<? extends Predicate<Action>> predicate;
 
     @Override
-    protected Not newInstance(final Simulation simulation) {
+    protected Not newInstance(final @NonNull Simulation simulation) {
         return new Not(predicate.get(simulation));
     }
 }

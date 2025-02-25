@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -50,7 +47,7 @@ public class BetweenYearlyDatesFactory extends GlobalScopeFactory<BetweenYearlyD
     }
 
     @Override
-    protected BetweenYearlyDates newInstance(final Simulation simulation) {
+    protected BetweenYearlyDates newInstance(final @NonNull Simulation simulation) {
         return new BetweenYearlyDates(
             start.get(simulation),
             end.get(simulation)

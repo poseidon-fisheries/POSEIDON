@@ -35,7 +35,7 @@ public class ForbiddenIfFactory extends GlobalScopeFactory<ForbiddenIf> {
     @NonNull private GlobalScopeFactory<? extends Predicate<Action>> actionPredicate;
 
     @Override
-    protected ForbiddenIf newInstance(final Simulation simulation) {
+    protected ForbiddenIf newInstance(final @NonNull Simulation simulation) {
         return new ForbiddenIf(actionPredicate.get(simulation));
     }
 }

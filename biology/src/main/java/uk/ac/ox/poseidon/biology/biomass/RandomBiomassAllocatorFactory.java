@@ -33,7 +33,7 @@ public class RandomBiomassAllocatorFactory extends SimulationScopeFactory<Biomas
     @NonNull private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid;
 
     @Override
-    protected BiomassAllocator newInstance(final Simulation simulation) {
+    protected BiomassAllocator newInstance(final @NonNull Simulation simulation) {
         return new RandomBiomassAllocator(
             simulation.random,
             carryingCapacityGrid.get(simulation)

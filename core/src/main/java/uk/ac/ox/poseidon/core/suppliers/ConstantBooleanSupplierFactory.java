@@ -19,10 +19,7 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -43,7 +40,7 @@ public class ConstantBooleanSupplierFactory extends GlobalScopeFactory<BooleanSu
     private boolean value;
 
     @Override
-    protected BooleanSupplier newInstance(final Simulation simulation) {
+    protected BooleanSupplier newInstance(final @NonNull Simulation simulation) {
         return () -> value;
     }
 }
