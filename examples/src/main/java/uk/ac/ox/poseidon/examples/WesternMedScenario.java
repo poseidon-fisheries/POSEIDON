@@ -101,7 +101,7 @@ import static uk.ac.ox.poseidon.core.time.PeriodFactory.MONTHLY;
 
 @Getter
 @Setter
-public class BasicScenario extends Scenario {
+public class WesternMedScenario extends Scenario {
 
     private static final double DIFFERENTIAL_PERCENTAGE_TO_MOVE = 0.05;
     private static final double PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT = 0.1;
@@ -339,12 +339,12 @@ public class BasicScenario extends Scenario {
             )
         );
 
-    BasicScenario() {
+    WesternMedScenario() {
         super(new DateFactory(LocalDate.now().getYear(), 1, 1));
     }
 
     public static void main(final String[] args) {
-        final BasicScenario scenario = new BasicScenario();
+        final WesternMedScenario scenario = new WesternMedScenario();
         final Path scenarioPath = Path.of("/home/nicolas/Desktop/scenario.yaml");
         new ScenarioWriter().write(
             scenario,

@@ -29,17 +29,17 @@ import java.util.List;
 import static java.awt.Color.WHITE;
 import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.*;
 
-public class BasicScenarioWithUI extends ScenarioWithUI {
+public class WesternMedScenarioWithUI extends ScenarioWithUI {
 
     private static final int WIDTH = 1090;
     private static final int HEIGHT = 820;
 
-    public BasicScenarioWithUI(final BasicScenario scenario) {
+    public WesternMedScenarioWithUI(final WesternMedScenario scenario) {
         super(
             scenario,
             List.of(
                 new DisplayWrapper2D(
-                    "Ocean",
+                    "Catalan Mediterranean Sea",
                     ImmutableMap.of(
                         "Bathymetry",
                         new DivergingNumberGridPortrayalFactory(
@@ -93,9 +93,9 @@ public class BasicScenarioWithUI extends ScenarioWithUI {
     }
 
     public static void main(final String[] args) {
-        final BasicScenarioWithUI basicScenarioWithUI =
-            new BasicScenarioWithUI(new BasicScenario());
-        basicScenarioWithUI.createController();
+        final WesternMedScenarioWithUI westernMedScenarioWithUI =
+            new WesternMedScenarioWithUI(new WesternMedScenario());
+        westernMedScenarioWithUI.createController();
     }
 
 }
