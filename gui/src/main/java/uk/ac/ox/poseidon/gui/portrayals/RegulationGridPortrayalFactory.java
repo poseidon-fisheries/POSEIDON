@@ -33,9 +33,12 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalField;
+import java.util.Objects;
 
 import static java.time.temporal.ChronoField.*;
 import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_MONTH;
@@ -76,6 +79,20 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
     @Getter
     static class Portrayal extends ObjectGridPortrayal2D {
 
+        private static final Image texture;
+
+        static {
+            try {
+                texture = ImageIO.read(Objects.requireNonNull(
+                    RegulationGridPortrayalFactory.class.getResource(
+                        "/images/checkered.png"
+                    )
+                ));
+            } catch (final IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         private final TemporalSchedule schedule;
         private final Regulations regulations;
         private final Fleet fleet;
@@ -104,13 +121,8 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
             this.updateFrequency = updateFrequency;
             setField(grid);
 
-            final Image originalImage =
-                Toolkit.getDefaultToolkit().getImage(
-                    "/home/nicolas/Desktop/checkered.png"
-                );
-
             final Image scaledImage =
-                originalImage.getScaledInstance(
+                texture.getScaledInstance(
                     displayWidth / gridWidth,
                     displayHeight / gridHeight,
                     Image.SCALE_SMOOTH
@@ -146,7 +158,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
                                 bathymetricGrid.getModelGrid().toCoordinate(cell)
                             )
                         ).anyMatch(regulations::isForbidden);
-                grid.field[cell.x][cell.y] = forbidden ? "X" : null;
+                grid.field[cell.x][cell.y] = forbidden ? "FORBIDDEN" : null;
             });
         }
 
