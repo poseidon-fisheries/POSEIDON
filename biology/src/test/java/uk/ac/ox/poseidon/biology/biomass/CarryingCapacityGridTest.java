@@ -36,7 +36,7 @@ class CarryingCapacityGridTest {
 
     @BeforeEach
     void setUp() {
-        final ModelGrid modelGrid = new ModelGridFactory(0.5, -1.5, 1.5, -1.5, 1.5).get(null);
+        final ModelGrid modelGrid = new ModelGridFactory(1.0, -1.5, 1.5, -1.5, 1.5).get(null);
         grid = new CarryingCapacityGrid(
             modelGrid,
             new double[][]{
