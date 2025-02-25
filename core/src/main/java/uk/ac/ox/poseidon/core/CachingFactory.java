@@ -19,8 +19,6 @@
 
 package uk.ac.ox.poseidon.core;
 
-import lombok.NonNull;
-
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -31,7 +29,7 @@ import static java.beans.Introspector.getBeanInfo;
 
 public abstract class CachingFactory<C> implements Factory<C> {
 
-    protected abstract C newInstance(@NonNull Simulation simulation);
+    protected abstract C newInstance(Simulation simulation);
 
     List<Object> makeKey(final Simulation simulation) {
         try {
