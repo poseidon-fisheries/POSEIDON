@@ -31,6 +31,22 @@ public interface BathymetricGrid extends NumberGrid<Double, DoubleGrid2D> {
         return getWaterCells().filter(getModelGrid()::isActive);
     }
 
+    default Stream<Int2D> getActiveWaterNeighbours(
+        final Int2D cell
+    ) {
+        return getActiveWaterNeighbours(cell, 1);
+    }
+
+    default Stream<Int2D> getActiveWaterNeighbours(
+        final Int2D cell,
+        final int neighbourhoodSize
+    ) {
+        return getModelGrid()
+            .getActiveNeighbours(cell, neighbourhoodSize)
+            .stream()
+            .filter(this::isWater);
+    }
+
     default Stream<Int2D> getWaterCells() {
         return getModelGrid()
             .getAllCells()

@@ -67,6 +67,7 @@ import uk.ac.ox.poseidon.core.suppliers.RandomBooleanSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
 import uk.ac.ox.poseidon.core.time.*;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
+import uk.ac.ox.poseidon.geography.CoordinateFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromGridFileFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
@@ -77,8 +78,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGridWithActiveCellsFromGridFile;
 import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
-import uk.ac.ox.poseidon.geography.ports.RandomLocationsPortGridFactory;
-import uk.ac.ox.poseidon.geography.ports.SimplePortFactory;
+import uk.ac.ox.poseidon.geography.ports.PortGridFromLocationsFactory;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
@@ -92,6 +92,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Period;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_DAY_DURATION_SUPPLIER;
@@ -109,8 +110,7 @@ public class WesternMedScenario extends Scenario {
     private static final String CARRYING_CAPACITY = "5 t";
     private static final double LEARNING_ALPHA = 1;
     private static final double READINESS_PROBABILITY = 0.9;
-    private static final int NUMBER_OF_PORTS = 1;
-    private static final int NUMBER_OF_VESSELS = 500;
+    private static final int NUMBER_OF_VESSELS = 61;
     private static final double EXPLORATION_PROBABILITY = 0.2;
     private static final int MEAN_EXPLORATION_RADIUS = 1;
     private static final double CATCH_PROPORTION = 0.1;
@@ -163,12 +163,19 @@ public class WesternMedScenario extends Scenario {
             false
         );
 
+    @SuppressWarnings("MagicNumber")
     private Factory<? extends PortGrid> portGrid =
-        new RandomLocationsPortGridFactory(
+        new PortGridFromLocationsFactory(
             bathymetricGrid,
-            new SimplePortFactory(new PrefixedIdSupplierFactory("Port")),
-            NUMBER_OF_PORTS,
-            2
+            Map.of(
+                "L'Escala", new CoordinateFactory(3.132, 42.125),
+                "Blanes", new CoordinateFactory(2.79, 41.7),
+                "Arenys de Mar", new CoordinateFactory(2.55, 41.6),
+                "Vilanova i la Geltrú", new CoordinateFactory(1.73, 41.22),
+                "Barcelona", new CoordinateFactory(2.1684, 41.3462),
+                "Tarragona", new CoordinateFactory(1.25, 41.11),
+                "Palamós", new CoordinateFactory(3.129, 41.848)
+            )
         );
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid =
         new UniformCarryingCapacityGridFactory(
