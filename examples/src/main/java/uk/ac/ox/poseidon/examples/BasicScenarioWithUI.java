@@ -58,7 +58,7 @@ public class BasicScenarioWithUI extends ScenarioWithUI {
                         "Species A Biomass",
                         new NumberGridWithCapacityPortrayalFactory(
                             LAJOLLA,
-                            "Biomass",
+                            "Species A Biomass",
                             false,
                             scenario.getBiomassGridA(),
                             scenario.getCarryingCapacityGrid()
@@ -66,7 +66,7 @@ public class BasicScenarioWithUI extends ScenarioWithUI {
                         "Species B Biomass",
                         new NumberGridWithCapacityPortrayalFactory(
                             LAJOLLA,
-                            "Biomass",
+                            "Species B Biomass",
                             false,
                             scenario.getBiomassGridB(),
                             scenario.getCarryingCapacityGrid()
