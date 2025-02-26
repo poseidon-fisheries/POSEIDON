@@ -17,22 +17,21 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.logical;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
 import lombok.NonNull;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class AllOf<T> implements Predicate<T> {
+public class AnyOf<T> implements Predicate<T> {
 
-    // Using an array for performance reason (and not exposing outside the class)
+    // Using an array for performance reasons
     @NonNull private final Predicate<T>[] predicates;
 
     @SuppressWarnings("unchecked")
-    public AllOf(@NonNull final Collection<Predicate<Action>> predicates) {
+    public AnyOf(final Collection<? extends Predicate<T>> predicates) {
         this.predicates = predicates.toArray(Predicate[]::new);
     }
 
@@ -43,10 +42,10 @@ public class AllOf<T> implements Predicate<T> {
     @Override
     public boolean test(final T t) {
         for (final Predicate<T> predicate : predicates) {
-            if (!predicate.test(t)) {
-                return false;
+            if (predicate.test(t)) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 }

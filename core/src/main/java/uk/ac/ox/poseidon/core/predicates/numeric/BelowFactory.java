@@ -17,37 +17,26 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.logical;
+package uk.ac.ox.poseidon.core.predicates.numeric;
 
 import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.List;
-import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnyOfFactory<T> extends GlobalScopeFactory<AnyOf<T>> {
+public class BelowFactory<T> extends GlobalScopeFactory<Below<T>> {
 
-    List<Factory<? extends Predicate<T>>> predicates;
-
-    @SafeVarargs
-    @SuppressWarnings("varargs")
-    public AnyOfFactory(final Factory<? extends Predicate<T>>... predicates) {
-        this(List.of(predicates));
-    }
+    private double threshold;
+    @NonNull private Factory<? extends ToDoubleFunction<T>> doubleFunction;
 
     @Override
-    protected AnyOf<T> newInstance(final @NonNull Simulation simulation) {
-        return new AnyOf<>(
-            predicates
-                .stream()
-                .map(p -> p.get(simulation))
-                .toList()
-        );
+    protected Below<T> newInstance(final @NonNull Simulation simulation) {
+        return new Below<>(threshold, doubleFunction.get(simulation));
     }
 }

@@ -17,10 +17,9 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.logical;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -36,15 +35,15 @@ class AnyOfFactoryTest {
     /**
      * Tests the `newInstance` method of the `AnyOfFactory` class. This method is responsible for
      * creating a new instance of `AnyOf` by transforming a list of `Factory` objects into their
-     * corresponding `Predicate<Action>` objects using a provided `Simulation`.
+     * corresponding `Predicate<Object>` objects using a provided `Simulation`.
      */
 
     @Test
     void testNewInstance_WithSinglePredicate() {
         // Arrange
         final Simulation simulation = mock(Simulation.class);
-        final Predicate<Action> mockPredicate = mock(Predicate.class);
-        final Factory<Predicate<Action>> mockFactory = mock(Factory.class);
+        final Predicate<Object> mockPredicate = mock(Predicate.class);
+        final Factory<Predicate<Object>> mockFactory = mock(Factory.class);
         when(mockFactory.get(simulation)).thenReturn(mockPredicate);
 
         final AnyOfFactory anyOfFactory = new AnyOfFactory(List.of(mockFactory));
@@ -71,12 +70,12 @@ class AnyOfFactoryTest {
         // Arrange
         final Simulation simulation = mock(Simulation.class);
 
-        final Predicate<Action> mockPredicate1 = mock(Predicate.class);
-        final Factory<Predicate<Action>> mockFactory1 = mock(Factory.class);
+        final Predicate<Object> mockPredicate1 = mock(Predicate.class);
+        final Factory<Predicate<Object>> mockFactory1 = mock(Factory.class);
         when(mockFactory1.get(simulation)).thenReturn(mockPredicate1);
 
-        final Predicate<Action> mockPredicate2 = mock(Predicate.class);
-        final Factory<Predicate<Action>> mockFactory2 = mock(Factory.class);
+        final Predicate<Object> mockPredicate2 = mock(Predicate.class);
+        final Factory<Predicate<Object>> mockFactory2 = mock(Factory.class);
         when(mockFactory2.get(simulation)).thenReturn(mockPredicate2);
 
         final AnyOfFactory anyOfFactory = new AnyOfFactory(List.of(mockFactory1, mockFactory2));
@@ -115,7 +114,7 @@ class AnyOfFactoryTest {
     void testNewInstance_CallsFactoryGetMethod() {
         // Arrange
         final Simulation simulation = mock(Simulation.class);
-        final Factory<Predicate<Action>> mockFactory = mock(Factory.class);
+        final Factory<Predicate<Object>> mockFactory = mock(Factory.class);
         when(mockFactory.get(simulation)).thenReturn(mock(Predicate.class));
 
         final AnyOfFactory anyOfFactory = new AnyOfFactory(List.of(mockFactory));

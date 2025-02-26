@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.numeric;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -28,13 +28,13 @@ import java.util.function.ToDoubleFunction;
 
 @Getter
 @RequiredArgsConstructor
-public class Below<T> implements Predicate<T> {
+public class Above<T> implements Predicate<T> {
 
     private final double threshold;
     @NonNull private final ToDoubleFunction<T> doubleFunction;
 
     @Override
     public boolean test(@NonNull final T t) {
-        return doubleFunction.applyAsDouble(t) < threshold;
+        return doubleFunction.applyAsDouble(t) > threshold;
     }
 }

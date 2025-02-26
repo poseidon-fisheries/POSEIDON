@@ -17,12 +17,11 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.logical;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 
 import java.util.function.Predicate;
 
@@ -32,69 +31,69 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AllOfTest {
 
     /**
-     * Tests the {@link AllOf#test(Action)} method which checks if all predicates in the collection
-     * return true for the given action.
+     * Tests the {@link AllOf#test(Object)} method which checks if all predicates in the collection
+     * return true for the given object.
      */
 
     @Test
     void testAllPredicatesReturnTrue() {
-        final Action action = Mockito.mock(Action.class);
+        final Object object = Mockito.mock(Object.class);
 
-        final Predicate<Action> predicate1 = Mockito.mock(Predicate.class);
-        final Predicate<Action> predicate2 = Mockito.mock(Predicate.class);
-        final Predicate<Action> predicate3 = Mockito.mock(Predicate.class);
+        final Predicate<Object> predicate1 = Mockito.mock(Predicate.class);
+        final Predicate<Object> predicate2 = Mockito.mock(Predicate.class);
+        final Predicate<Object> predicate3 = Mockito.mock(Predicate.class);
 
-        Mockito.when(predicate1.test(action)).thenReturn(true);
-        Mockito.when(predicate2.test(action)).thenReturn(true);
-        Mockito.when(predicate3.test(action)).thenReturn(true);
+        Mockito.when(predicate1.test(object)).thenReturn(true);
+        Mockito.when(predicate2.test(object)).thenReturn(true);
+        Mockito.when(predicate3.test(object)).thenReturn(true);
 
         final AllOf allOf = new AllOf(ImmutableList.of(predicate1, predicate2, predicate3));
-        assertTrue(allOf.test(action), "Expected all predicates to return true.");
+        assertTrue(allOf.test(object), "Expected all predicates to return true.");
     }
 
     @Test
     void testOnePredicateReturnsFalse() {
-        final Action action = Mockito.mock(Action.class);
+        final Object object = Mockito.mock(Object.class);
 
-        final Predicate<Action> predicate1 = Mockito.mock(Predicate.class);
-        final Predicate<Action> predicate2 = Mockito.mock(Predicate.class);
-        final Predicate<Action> predicate3 = Mockito.mock(Predicate.class);
+        final Predicate<Object> predicate1 = Mockito.mock(Predicate.class);
+        final Predicate<Object> predicate2 = Mockito.mock(Predicate.class);
+        final Predicate<Object> predicate3 = Mockito.mock(Predicate.class);
 
-        Mockito.when(predicate1.test(action)).thenReturn(true);
-        Mockito.when(predicate2.test(action)).thenReturn(false);
-        Mockito.when(predicate3.test(action)).thenReturn(true);
+        Mockito.when(predicate1.test(object)).thenReturn(true);
+        Mockito.when(predicate2.test(object)).thenReturn(false);
+        Mockito.when(predicate3.test(object)).thenReturn(true);
 
         final AllOf allOf = new AllOf(ImmutableList.of(predicate1, predicate2, predicate3));
         assertFalse(
-            allOf.test(action),
+            allOf.test(object),
             "Expected test to return false as one predicate returned false."
         );
     }
 
     @Test
     void testAllPredicatesReturnFalse() {
-        final Action action = Mockito.mock(Action.class);
+        final Object object = Mockito.mock(Object.class);
 
-        final Predicate<Action> predicate1 = Mockito.mock(Predicate.class);
-        final Predicate<Action> predicate2 = Mockito.mock(Predicate.class);
+        final Predicate<Object> predicate1 = Mockito.mock(Predicate.class);
+        final Predicate<Object> predicate2 = Mockito.mock(Predicate.class);
 
-        Mockito.when(predicate1.test(action)).thenReturn(false);
-        Mockito.when(predicate2.test(action)).thenReturn(false);
+        Mockito.when(predicate1.test(object)).thenReturn(false);
+        Mockito.when(predicate2.test(object)).thenReturn(false);
 
         final AllOf allOf = new AllOf(ImmutableList.of(predicate1, predicate2));
         assertFalse(
-            allOf.test(action),
+            allOf.test(object),
             "Expected test to return false as all predicates returned false."
         );
     }
 
     @Test
     void testEmptyPredicates() {
-        final Action action = Mockito.mock(Action.class);
+        final Object object = Mockito.mock(Object.class);
 
         final AllOf allOf = new AllOf(ImmutableList.of());
         assertTrue(
-            allOf.test(action),
+            allOf.test(object),
             "Expected test to return true as no predicates are present."
         );
     }

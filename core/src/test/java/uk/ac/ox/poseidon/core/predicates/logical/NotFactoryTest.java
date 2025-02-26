@@ -17,11 +17,10 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.logical;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -36,14 +35,14 @@ class NotFactoryTest {
 
     /**
      * Tests the `newInstance` method of the NotFactory class. Verifies that the method creates a
-     * `Not` instance correctly when a valid `Factory` for a `Predicate<Action>` is provided and is
+     * `Not` instance correctly when a valid `Factory` for a `Predicate<Object>` is provided and is
      * functional.
      */
     @Test
     void testNewInstanceWithValidPredicateFactory() {
         // Arrange
-        final Factory<Predicate<Action>> mockFactory = mock(Factory.class);
-        final Predicate<Action> mockPredicate = mock(Predicate.class);
+        final Factory<Predicate<Object>> mockFactory = mock(Factory.class);
+        final Predicate<Object> mockPredicate = mock(Predicate.class);
         final Simulation mockSimulation = mock(Simulation.class);
 
         when(mockFactory.get(Mockito.any())).thenReturn(mockPredicate);
@@ -64,7 +63,7 @@ class NotFactoryTest {
     @Test
     void testNewInstanceWithNullPredicateThrowsException() {
         // Arrange
-        final Factory<Predicate<Action>> mockFactory = mock(Factory.class);
+        final Factory<Predicate<Object>> mockFactory = mock(Factory.class);
         final Simulation mockSimulation = mock(Simulation.class);
 
         when(mockFactory.get(Mockito.any())).thenReturn(null);

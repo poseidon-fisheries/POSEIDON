@@ -17,10 +17,9 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.numeric;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -41,9 +40,9 @@ class BelowFactoryTest {
         // Arrange
         final double expectedThreshold = 5.0;
         final Simulation simulation = mock(Simulation.class);
-        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Action>>
+        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Object>>
             mockDoubleFunctionFactory = mock(Factory.class);
-        @SuppressWarnings("unchecked") final ToDoubleFunction<Action> mockDoubleFunction = mock(
+        @SuppressWarnings("unchecked") final ToDoubleFunction<Object> mockDoubleFunction = mock(
             ToDoubleFunction.class);
 
         when(mockDoubleFunctionFactory.get(simulation)).thenReturn(mockDoubleFunction);
@@ -79,9 +78,9 @@ class BelowFactoryTest {
         // Arrange
         final double threshold = 15.0;
         final Simulation simulation = mock(Simulation.class);
-        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Action>>
+        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Object>>
             mockDoubleFunctionFactory = mock(Factory.class);
-        @SuppressWarnings("unchecked") final ToDoubleFunction<Action> mockDoubleFunction = mock(
+        @SuppressWarnings("unchecked") final ToDoubleFunction<Object> mockDoubleFunction = mock(
             ToDoubleFunction.class);
 
         when(mockDoubleFunctionFactory.get(simulation)).thenReturn(mockDoubleFunction);
@@ -112,7 +111,7 @@ class BelowFactoryTest {
         // Arrange
         final BelowFactory belowFactory = new BelowFactory();
         belowFactory.setThreshold(10.0);
-        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Action>>
+        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Object>>
             mockDoubleFunctionFactory = mock(Factory.class);
         belowFactory.setDoubleFunction(mockDoubleFunctionFactory);
 
@@ -132,9 +131,9 @@ class BelowFactoryTest {
     void testNewInstance_HandlesNegativeThreshold() {
         // Arrange
         final Simulation simulation = mock(Simulation.class);
-        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Action>>
+        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Object>>
             mockDoubleFunctionFactory = mock(Factory.class);
-        @SuppressWarnings("unchecked") final ToDoubleFunction<Action> mockDoubleFunction = mock(
+        @SuppressWarnings("unchecked") final ToDoubleFunction<Object> mockDoubleFunction = mock(
             ToDoubleFunction.class);
 
         when(mockDoubleFunctionFactory.get(simulation)).thenReturn(mockDoubleFunction);
@@ -157,5 +156,5 @@ class BelowFactoryTest {
             "The threshold should match the negative value set."
         );
     }
-    
+
 }

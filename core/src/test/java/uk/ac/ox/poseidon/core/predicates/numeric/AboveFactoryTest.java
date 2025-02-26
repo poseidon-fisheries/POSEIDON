@@ -17,10 +17,9 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.numeric;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -37,7 +36,7 @@ class AboveFactoryTest {
      * The AboveFactory class is a factory responsible for creating instances of the Above class.
      * The `newInstance` method of AboveFactory takes a Simulation object and produces a new Above
      * instance. Instances of Above require a threshold and a function to extract double values from
-     * Actions.
+     * Objects.
      */
 
     @Test
@@ -46,9 +45,9 @@ class AboveFactoryTest {
         final double threshold = 10.0;
         final Simulation simulation = mock(Simulation.class);
 
-        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Action>>
+        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Object>>
             doubleFunctionFactory = mock(Factory.class);
-        final ToDoubleFunction<Action> doubleFunction = mock(ToDoubleFunction.class);
+        final ToDoubleFunction<Object> doubleFunction = mock(ToDoubleFunction.class);
 
         when(doubleFunctionFactory.get(simulation)).thenReturn(doubleFunction);
 

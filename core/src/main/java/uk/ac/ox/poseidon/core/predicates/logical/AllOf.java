@@ -17,23 +17,35 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.logical;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
+import java.util.Collection;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-@Getter
-@RequiredArgsConstructor
-public class Not<T> implements Predicate<T> {
+public class AllOf<T> implements Predicate<T> {
 
-    @NonNull
-    private final Predicate<T> predicate;
+    // Using an array for performance reason (and not exposing outside the class)
+    @NonNull private final Predicate<T>[] predicates;
+
+    @SuppressWarnings("unchecked")
+    public AllOf(@NonNull final Collection<Predicate<T>> predicates) {
+        this.predicates = predicates.toArray(Predicate[]::new);
+    }
+
+    public Stream<Predicate<T>> getPredicates() {
+        return Stream.of(predicates);
+    }
 
     @Override
     public boolean test(final T t) {
-        return !predicate.test(t);
+        for (final Predicate<T> predicate : predicates) {
+            if (!predicate.test(t)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

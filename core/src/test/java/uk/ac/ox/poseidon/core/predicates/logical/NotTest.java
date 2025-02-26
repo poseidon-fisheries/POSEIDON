@@ -17,11 +17,10 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.logical;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 
 import java.util.function.Predicate;
 
@@ -33,13 +32,13 @@ class NotTest {
     @Test
     void testWhenInnerPredicateReturnsTrue() {
         // Arrange
-        final Predicate<Action> innerPredicate = Mockito.mock(Predicate.class);
+        final Predicate<Object> innerPredicate = Mockito.mock(Predicate.class);
         Mockito.when(innerPredicate.test(Mockito.any())).thenReturn(true);
         final Not notPredicate = new Not(innerPredicate);
-        final Action mockAction = Mockito.mock(Action.class);
+        final Object mockObject = Mockito.mock(Object.class);
 
         // Act
-        final boolean result = notPredicate.test(mockAction);
+        final boolean result = notPredicate.test(mockObject);
 
         // Assert
         assertFalse(
@@ -51,13 +50,13 @@ class NotTest {
     @Test
     void testWhenInnerPredicateReturnsFalse() {
         // Arrange
-        final Predicate<Action> innerPredicate = Mockito.mock(Predicate.class);
+        final Predicate<Object> innerPredicate = Mockito.mock(Predicate.class);
         Mockito.when(innerPredicate.test(Mockito.any())).thenReturn(false);
         final Not notPredicate = new Not(innerPredicate);
-        final Action mockAction = Mockito.mock(Action.class);
+        final Object mockObject = Mockito.mock(Object.class);
 
         // Act
-        final boolean result = notPredicate.test(mockAction);
+        final boolean result = notPredicate.test(mockObject);
 
         // Assert
         assertTrue(

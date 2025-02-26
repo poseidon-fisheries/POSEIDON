@@ -17,10 +17,9 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.numeric;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 
 import java.util.function.ToDoubleFunction;
 
@@ -31,74 +30,74 @@ import static org.mockito.Mockito.when;
 class BelowTest {
 
     @Test
-    void testActionValueBelowThreshold() {
+    void testObjectValueBelowThreshold() {
         // Arrange
         final double threshold = 100.0;
-        final ToDoubleFunction<Action> doubleFunction = mock(ToDoubleFunction.class);
-        final Action action = mock(Action.class);
-        when(doubleFunction.applyAsDouble(action)).thenReturn(50.0);
+        final ToDoubleFunction<Object> doubleFunction = mock(ToDoubleFunction.class);
+        final Object object = mock(Object.class);
+        when(doubleFunction.applyAsDouble(object)).thenReturn(50.0);
         final Below below = new Below(threshold, doubleFunction);
 
         // Act
-        final boolean result = below.test(action);
+        final boolean result = below.test(object);
 
         // Assert
         assertTrue(
             result,
-            "Expected the test to return true when action's value is below the threshold"
+            "Expected the test to return true when object's value is below the threshold"
         );
     }
 
     @Test
-    void testActionValueEqualToThreshold() {
+    void testObjectValueEqualToThreshold() {
         // Arrange
         final double threshold = 100.0;
-        final ToDoubleFunction<Action> doubleFunction = mock(ToDoubleFunction.class);
-        final Action action = mock(Action.class);
-        when(doubleFunction.applyAsDouble(action)).thenReturn(100.0);
+        final ToDoubleFunction<Object> doubleFunction = mock(ToDoubleFunction.class);
+        final Object object = mock(Object.class);
+        when(doubleFunction.applyAsDouble(object)).thenReturn(100.0);
         final Below below = new Below(threshold, doubleFunction);
 
         // Act
-        final boolean result = below.test(action);
+        final boolean result = below.test(object);
 
         // Assert
         assertFalse(
             result,
-            "Expected the test to return false when action's value equals the threshold"
+            "Expected the test to return false when object's value equals the threshold"
         );
     }
 
     @Test
-    void testActionValueAboveThreshold() {
+    void testObjectValueAboveThreshold() {
         // Arrange
         final double threshold = 100.0;
-        final ToDoubleFunction<Action> doubleFunction = mock(ToDoubleFunction.class);
-        final Action action = mock(Action.class);
-        when(doubleFunction.applyAsDouble(action)).thenReturn(150.0);
+        final ToDoubleFunction<Object> doubleFunction = mock(ToDoubleFunction.class);
+        final Object object = mock(Object.class);
+        when(doubleFunction.applyAsDouble(object)).thenReturn(150.0);
         final Below below = new Below(threshold, doubleFunction);
 
         // Act
-        final boolean result = below.test(action);
+        final boolean result = below.test(object);
 
         // Assert
         assertFalse(
             result,
-            "Expected the test to return false when action's value is above the threshold"
+            "Expected the test to return false when object's value is above the threshold"
         );
     }
 
     @Test
-    void testNullActionThrowsException() {
+    void testNullObjectThrowsException() {
         // Arrange
         final double threshold = 100.0;
-        final ToDoubleFunction<Action> doubleFunction = mock(ToDoubleFunction.class);
+        final ToDoubleFunction<Object> doubleFunction = mock(ToDoubleFunction.class);
         final Below below = new Below(threshold, doubleFunction);
 
         // Act & Assert
         assertThrows(
             NullPointerException.class,
             () -> below.test(null),
-            "Expected NullPointerException when action is null"
+            "Expected NullPointerException when object is null"
         );
     }
 }

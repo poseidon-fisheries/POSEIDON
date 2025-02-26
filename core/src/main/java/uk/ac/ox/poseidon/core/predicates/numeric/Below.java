@@ -17,35 +17,24 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.logical;
+package uk.ac.ox.poseidon.core.predicates.numeric;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Collection;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.function.ToDoubleFunction;
 
-public class AnyOf<T> implements Predicate<T> {
+@Getter
+@RequiredArgsConstructor
+public class Below<T> implements Predicate<T> {
 
-    // Using an array for performance reasons
-    @NonNull private final Predicate<T>[] predicates;
-
-    @SuppressWarnings("unchecked")
-    public AnyOf(final Collection<? extends Predicate<T>> predicates) {
-        this.predicates = predicates.toArray(Predicate[]::new);
-    }
-
-    public Stream<Predicate<T>> getPredicates() {
-        return Stream.of(predicates);
-    }
+    private final double threshold;
+    @NonNull private final ToDoubleFunction<T> doubleFunction;
 
     @Override
-    public boolean test(final T t) {
-        for (final Predicate<T> predicate : predicates) {
-            if (predicate.test(t)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean test(@NonNull final T t) {
+        return doubleFunction.applyAsDouble(t) < threshold;
     }
 }

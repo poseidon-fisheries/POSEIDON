@@ -17,10 +17,9 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.logical;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -43,11 +42,11 @@ class AllOfFactoryTest {
     void newInstance_createsInstanceWithAllPredicates() {
         // Arrange
         final Simulation simulationMock = mock(Simulation.class);
-        final Predicate<Action> predicate1 = mock(Predicate.class);
-        final Predicate<Action> predicate2 = mock(Predicate.class);
+        final Predicate<Object> predicate1 = mock(Predicate.class);
+        final Predicate<Object> predicate2 = mock(Predicate.class);
 
-        final Factory<Predicate<Action>> factoryMock1 = mock(Factory.class);
-        final Factory<Predicate<Action>> factoryMock2 = mock(Factory.class);
+        final Factory<Predicate<Object>> factoryMock1 = mock(Factory.class);
+        final Factory<Predicate<Object>> factoryMock2 = mock(Factory.class);
 
         when(factoryMock1.get(simulationMock)).thenReturn(predicate1);
         when(factoryMock2.get(simulationMock)).thenReturn(predicate2);
@@ -70,7 +69,7 @@ class AllOfFactoryTest {
     @Test
     void newInstance_throwsExceptionWhenSimulationIsNull() {
         // Arrange
-        final Factory<Predicate<Action>> factoryMock = mock(Factory.class);
+        final Factory<Predicate<Object>> factoryMock = mock(Factory.class);
         final AllOfFactory allOfFactory = new AllOfFactory(List.of(factoryMock));
 
         // Act & Assert
@@ -101,8 +100,8 @@ class AllOfFactoryTest {
     void newInstance_predicateCalledOnlyOncePerFactory() {
         // Arrange
         final Simulation simulationMock = mock(Simulation.class);
-        final Factory<Predicate<Action>> factoryMock = mock(Factory.class);
-        final Predicate<Action> predicateMock = mock(Predicate.class);
+        final Factory<Predicate<Object>> factoryMock = mock(Factory.class);
+        final Predicate<Object> predicateMock = mock(Predicate.class);
 
         when(factoryMock.get(simulationMock)).thenReturn(predicateMock);
 

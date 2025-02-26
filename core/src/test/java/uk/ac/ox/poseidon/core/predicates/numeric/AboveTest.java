@@ -17,10 +17,9 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.numeric;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 
 import java.util.function.ToDoubleFunction;
 
@@ -34,15 +33,15 @@ class AboveTest {
     void testAboveThreshold() {
         // Arrange
         final double threshold = 50.0;
-        final Action mockAction = mock(Action.class);
-        final ToDoubleFunction<Action> mockDoubleFunction = mock(ToDoubleFunction.class);
-        when(mockDoubleFunction.applyAsDouble(mockAction)).thenReturn(60.0); // Value above
+        final Object mockObject = mock(Object.class);
+        final ToDoubleFunction<Object> mockDoubleFunction = mock(ToDoubleFunction.class);
+        when(mockDoubleFunction.applyAsDouble(mockObject)).thenReturn(60.0); // Value above
         // threshold
 
         final Above predicate = new Above(threshold, mockDoubleFunction);
 
         // Act
-        final boolean result = predicate.test(mockAction);
+        final boolean result = predicate.test(mockObject);
 
         // Assert
         assertTrue(result, "Expected the result to be true when the value is above the threshold.");
@@ -52,15 +51,15 @@ class AboveTest {
     void testEqualToThreshold() {
         // Arrange
         final double threshold = 50.0;
-        final Action mockAction = mock(Action.class);
-        final ToDoubleFunction<Action> mockDoubleFunction = mock(ToDoubleFunction.class);
-        when(mockDoubleFunction.applyAsDouble(mockAction)).thenReturn(50.0); // Value equal to
+        final Object mockObject = mock(Object.class);
+        final ToDoubleFunction<Object> mockDoubleFunction = mock(ToDoubleFunction.class);
+        when(mockDoubleFunction.applyAsDouble(mockObject)).thenReturn(50.0); // Value equal to
         // threshold
 
         final Above predicate = new Above(threshold, mockDoubleFunction);
 
         // Act
-        final boolean result = predicate.test(mockAction);
+        final boolean result = predicate.test(mockObject);
 
         // Assert
         assertFalse(
@@ -73,15 +72,15 @@ class AboveTest {
     void testBelowThreshold() {
         // Arrange
         final double threshold = 50.0;
-        final Action mockAction = mock(Action.class);
-        final ToDoubleFunction<Action> mockDoubleFunction = mock(ToDoubleFunction.class);
-        when(mockDoubleFunction.applyAsDouble(mockAction)).thenReturn(40.0); // Value below
+        final Object mockObject = mock(Object.class);
+        final ToDoubleFunction<Object> mockDoubleFunction = mock(ToDoubleFunction.class);
+        when(mockDoubleFunction.applyAsDouble(mockObject)).thenReturn(40.0); // Value below
         // threshold
 
         final Above predicate = new Above(threshold, mockDoubleFunction);
 
         // Act
-        final boolean result = predicate.test(mockAction);
+        final boolean result = predicate.test(mockObject);
 
         // Assert
         assertFalse(
@@ -91,10 +90,10 @@ class AboveTest {
     }
 
     @Test
-    void testNullActionHandling() {
+    void testNullObjectHandling() {
         // Arrange
         final double threshold = 50.0;
-        final ToDoubleFunction<Action> mockDoubleFunction = mock(ToDoubleFunction.class);
+        final ToDoubleFunction<Object> mockDoubleFunction = mock(ToDoubleFunction.class);
         when(mockDoubleFunction.applyAsDouble(null)).thenThrow(NullPointerException.class);
 
         final Above predicate = new Above(threshold, mockDoubleFunction);

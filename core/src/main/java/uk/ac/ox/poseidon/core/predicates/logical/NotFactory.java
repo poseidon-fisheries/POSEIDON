@@ -17,26 +17,25 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
 import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.function.ToDoubleFunction;
+import java.util.function.Predicate;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BelowFactory<T> extends GlobalScopeFactory<Below<T>> {
+public class NotFactory<T> extends GlobalScopeFactory<Not<T>> {
 
-    private double threshold;
-    @NonNull private Factory<? extends ToDoubleFunction<T>> doubleFunction;
+    private Factory<? extends Predicate<T>> predicate;
 
     @Override
-    protected Below<T> newInstance(final @NonNull Simulation simulation) {
-        return new Below<>(threshold, doubleFunction.get(simulation));
+    protected Not<T> newInstance(final @NonNull Simulation simulation) {
+        return new Not<>(predicate.get(simulation));
     }
 }

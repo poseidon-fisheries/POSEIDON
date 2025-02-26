@@ -17,24 +17,26 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.numeric;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 
 @Getter
-@RequiredArgsConstructor
-public class Above<T> implements Predicate<T> {
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class AboveFactory<T> extends GlobalScopeFactory<Above<T>> {
 
-    private final double threshold;
-    @NonNull private final ToDoubleFunction<T> doubleFunction;
+    private double threshold;
+    @NonNull private Factory<? extends ToDoubleFunction<T>> doubleFunction;
 
     @Override
-    public boolean test(@NonNull final T t) {
-        return doubleFunction.applyAsDouble(t) > threshold;
+    protected Above<T> newInstance(final @NonNull Simulation simulation) {
+        return new Above<>(threshold, doubleFunction.get(simulation));
     }
 }
