@@ -22,29 +22,19 @@ package uk.ac.ox.poseidon.regulations.predicates.numeric;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 
-/**
- * The Below class is a Predicate implementation that evaluates whether the result derived from
- * applying a specified ToDoubleFunction to a given Action falls below a defined threshold.
- * <p>
- * Constructor parameters:
- * <li>threshold: The numeric value representing the upper limit for the evaluation.
- * <li>doubleFunction: A ToDoubleFunction that extracts a double value from an Action to
- * be compared against the threshold.
- */
 @Getter
 @RequiredArgsConstructor
-public class Below implements Predicate<Action> {
+public class Below<T> implements Predicate<T> {
 
     private final double threshold;
-    @NonNull private final ToDoubleFunction<Action> doubleFunction;
+    @NonNull private final ToDoubleFunction<T> doubleFunction;
 
     @Override
-    public boolean test(@NonNull final Action action) {
-        return doubleFunction.applyAsDouble(action) < threshold;
+    public boolean test(@NonNull final T t) {
+        return doubleFunction.applyAsDouble(t) < threshold;
     }
 }

@@ -20,7 +20,6 @@
 package uk.ac.ox.poseidon.regulations.predicates.numeric;
 
 import lombok.*;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -31,13 +30,13 @@ import java.util.function.ToDoubleFunction;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AboveFactory extends GlobalScopeFactory<Above> {
+public class AboveFactory<T> extends GlobalScopeFactory<Above<T>> {
 
     private double threshold;
-    @NonNull private Factory<? extends ToDoubleFunction<Action>> doubleFunction;
+    @NonNull private Factory<? extends ToDoubleFunction<T>> doubleFunction;
 
     @Override
-    protected Above newInstance(final @NonNull Simulation simulation) {
-        return new Above(threshold, doubleFunction.get(simulation));
+    protected Above<T> newInstance(final @NonNull Simulation simulation) {
+        return new Above<>(threshold, doubleFunction.get(simulation));
     }
 }
