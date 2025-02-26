@@ -20,13 +20,12 @@
 package uk.ac.ox.poseidon.regulations.predicates;
 
 import lombok.NonNull;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 
 import java.util.function.Predicate;
 
-public class AlwaysTrue implements Predicate<Action> {
+public class AlwaysTrue<T> implements Predicate<T> {
     @Override
-    public boolean test(@NonNull final Action action) {
+    public boolean test(@NonNull final T t) {
         return true;
     }
 }

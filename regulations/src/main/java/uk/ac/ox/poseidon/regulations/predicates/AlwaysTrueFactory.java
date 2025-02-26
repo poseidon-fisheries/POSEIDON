@@ -27,9 +27,9 @@ import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
 @Setter
-public class AlwaysTrueFactory extends GlobalScopeFactory<AlwaysTrue> {
+public class AlwaysTrueFactory<T> extends GlobalScopeFactory<AlwaysTrue<T>> {
     @Override
-    protected AlwaysTrue newInstance(final @NonNull Simulation simulation) {
-        return new AlwaysTrue();
+    protected AlwaysTrue<T> newInstance(final @NonNull Simulation simulation) {
+        return new AlwaysTrue<>();
     }
 }
