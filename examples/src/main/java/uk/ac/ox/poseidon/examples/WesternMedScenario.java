@@ -58,13 +58,15 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.*;
 import uk.ac.ox.poseidon.core.aggregators.MaxFactory;
+import uk.ac.ox.poseidon.core.conditions.ConditionFactory;
 import uk.ac.ox.poseidon.core.predicates.logical.AnyOfFactory;
+import uk.ac.ox.poseidon.core.predicates.temporal.TimeIsAfterFactory;
 import uk.ac.ox.poseidon.core.quantities.MassFactory;
 import uk.ac.ox.poseidon.core.quantities.SpeedFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
+import uk.ac.ox.poseidon.core.suppliers.CurrentTimeSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.PoissonIntSupplierFactory;
-import uk.ac.ox.poseidon.core.suppliers.RandomBooleanSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
 import uk.ac.ox.poseidon.core.time.*;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
@@ -141,7 +143,7 @@ public class WesternMedScenario extends Scenario {
     @SuppressWarnings("MagicNumber")
     private Factory<? extends Regulations> regulations =
         new ForbiddenIfFactory(
-            new AnyOfFactory(
+            new AnyOfFactory<>(
                 new BetweenYearlyDatesFactory(
                     new MonthDayFactory(Month.MARCH, 1),
                     new MonthDayFactory(Month.MAY, 31)
@@ -285,8 +287,9 @@ public class WesternMedScenario extends Scenario {
                 new HomeBehaviourFactory(
                     portGrid,
                     hold,
-                    new VesselScopeFactoryDecorator<>(new RandomBooleanSupplierFactory(
-                        READINESS_PROBABILITY
+                    new VesselScopeFactoryDecorator<>(new ConditionFactory<>(
+                        new CurrentTimeSupplierFactory(),
+                        new TimeIsAfterFactory(new TimeFactory(10, 0, 0))
                     )),
                     travellingBehaviour,
                     new LandingBehaviourFactory<>(hold, ONE_HOUR_DURATION_SUPPLIER),
