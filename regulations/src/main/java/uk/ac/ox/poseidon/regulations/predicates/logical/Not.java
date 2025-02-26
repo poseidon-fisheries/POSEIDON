@@ -22,19 +22,18 @@ package uk.ac.ox.poseidon.regulations.predicates.logical;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 
 import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
-public class Not implements Predicate<Action> {
+public class Not<T> implements Predicate<T> {
 
     @NonNull
-    private final Predicate<Action> predicate;
+    private final Predicate<T> predicate;
 
     @Override
-    public boolean test(final Action action) {
-        return !predicate.test(action);
+    public boolean test(final T t) {
+        return !predicate.test(t);
     }
 }

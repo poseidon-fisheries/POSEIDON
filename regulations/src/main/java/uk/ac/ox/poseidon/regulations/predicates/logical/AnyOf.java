@@ -20,30 +20,29 @@
 package uk.ac.ox.poseidon.regulations.predicates.logical;
 
 import lombok.NonNull;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class AnyOf implements Predicate<Action> {
+public class AnyOf<T> implements Predicate<T> {
 
     // Using an array for performance reasons
-    @NonNull private final Predicate<Action>[] predicates;
+    @NonNull private final Predicate<T>[] predicates;
 
     @SuppressWarnings("unchecked")
-    public AnyOf(final Collection<? extends Predicate<Action>> predicates) {
+    public AnyOf(final Collection<? extends Predicate<T>> predicates) {
         this.predicates = predicates.toArray(Predicate[]::new);
     }
 
-    public Stream<Predicate<Action>> getPredicates() {
+    public Stream<Predicate<T>> getPredicates() {
         return Stream.of(predicates);
     }
 
     @Override
-    public boolean test(final Action action) {
-        for (final Predicate<Action> predicate : predicates) {
-            if (predicate.test(action)) {
+    public boolean test(final T t) {
+        for (final Predicate<T> predicate : predicates) {
+            if (predicate.test(t)) {
                 return true;
             }
         }

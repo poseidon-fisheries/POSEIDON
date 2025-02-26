@@ -34,7 +34,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AllOfFactory extends GlobalScopeFactory<AllOf> {
+public class AllOfFactory<T> extends GlobalScopeFactory<AllOf<T>> {
 
     List<Factory<? extends Predicate<Action>>> predicates;
 
@@ -45,8 +45,8 @@ public class AllOfFactory extends GlobalScopeFactory<AllOf> {
     }
 
     @Override
-    protected AllOf newInstance(final @NonNull Simulation simulation) {
-        return new AllOf(
+    protected AllOf<T> newInstance(final @NonNull Simulation simulation) {
+        return new AllOf<>(
             predicates
                 .stream()
                 .map(p -> p.get(simulation))

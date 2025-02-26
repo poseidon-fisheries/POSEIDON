@@ -20,7 +20,6 @@
 package uk.ac.ox.poseidon.regulations.predicates.logical;
 
 import lombok.*;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -32,19 +31,19 @@ import java.util.function.Predicate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnyOfFactory extends GlobalScopeFactory<AnyOf> {
+public class AnyOfFactory<T> extends GlobalScopeFactory<AnyOf<T>> {
 
-    List<Factory<? extends Predicate<Action>>> predicates;
+    List<Factory<? extends Predicate<T>>> predicates;
 
     @SafeVarargs
     @SuppressWarnings("varargs")
-    public AnyOfFactory(final Factory<? extends Predicate<Action>>... predicates) {
+    public AnyOfFactory(final Factory<? extends Predicate<T>>... predicates) {
         this(List.of(predicates));
     }
 
     @Override
-    protected AnyOf newInstance(final @NonNull Simulation simulation) {
-        return new AnyOf(
+    protected AnyOf<T> newInstance(final @NonNull Simulation simulation) {
+        return new AnyOf<>(
             predicates
                 .stream()
                 .map(p -> p.get(simulation))

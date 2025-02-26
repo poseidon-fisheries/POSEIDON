@@ -26,24 +26,24 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class AllOf implements Predicate<Action> {
+public class AllOf<T> implements Predicate<T> {
 
     // Using an array for performance reason (and not exposing outside the class)
-    @NonNull private final Predicate<Action>[] predicates;
+    @NonNull private final Predicate<T>[] predicates;
 
     @SuppressWarnings("unchecked")
     public AllOf(@NonNull final Collection<Predicate<Action>> predicates) {
         this.predicates = predicates.toArray(Predicate[]::new);
     }
 
-    public Stream<Predicate<Action>> getPredicates() {
+    public Stream<Predicate<T>> getPredicates() {
         return Stream.of(predicates);
     }
 
     @Override
-    public boolean test(final Action action) {
-        for (final Predicate<Action> predicate : predicates) {
-            if (!predicate.test(action)) {
+    public boolean test(final T t) {
+        for (final Predicate<T> predicate : predicates) {
+            if (!predicate.test(t)) {
                 return false;
             }
         }

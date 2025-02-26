@@ -20,7 +20,6 @@
 package uk.ac.ox.poseidon.regulations.predicates.logical;
 
 import lombok.*;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -31,12 +30,12 @@ import java.util.function.Predicate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NotFactory extends GlobalScopeFactory<Not> {
+public class NotFactory<T> extends GlobalScopeFactory<Not<T>> {
 
-    private Factory<? extends Predicate<Action>> predicate;
+    private Factory<? extends Predicate<T>> predicate;
 
     @Override
-    protected Not newInstance(final @NonNull Simulation simulation) {
-        return new Not(predicate.get(simulation));
+    protected Not<T> newInstance(final @NonNull Simulation simulation) {
+        return new Not<>(predicate.get(simulation));
     }
 }
