@@ -17,38 +17,38 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates;
+package uk.ac.ox.poseidon.core.predicates;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Simulation;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class AlwaysFalseFactoryTest {
+class AlwaysTrueFactoryTest {
 
     /**
-     * The AlwaysFalseFactory class is responsible for creating
-     * instances of the AlwaysFalse class in the context of a simulation.
-     *
-     * The newInstance method is a protected method that overrides the behavior
-     * from the GlobalScopeFactory superclass to instantiate and return
-     * an AlwaysFalse object using a given Simulation input.
+     * Test class for AlwaysTrueFactory. The AlwaysTrueFactory is responsible for creating new
+     * instances of the AlwaysTrue class in the context of a given Simulation.
+     * <p>
+     * The newInstance method should always return a non-null instance of the AlwaysTrue class.
      */
 
-    /**
-     * Test to verify that the `newInstance` method correctly creates a new instance of the
-     * AlwaysFalse class.
-     */
     @Test
-    void testNewInstanceCreatesAlwaysFalse() {
+    void newInstance_shouldReturnNonNullAlwaysTrueInstance() {
         // Arrange
-        final AlwaysFalseFactory factory = new AlwaysFalseFactory();
+        final AlwaysTrueFactory factory = new AlwaysTrueFactory();
         final Simulation simulation = new Simulation();
 
         // Act
-        final AlwaysFalse result = factory.newInstance(simulation);
+        final AlwaysTrue result = factory.newInstance(simulation);
 
         // Assert
-        assertNotNull(result, "newInstance should not return null");
+        assertNotNull(result, "newInstance should return a non-null AlwaysTrue instance");
+        assertInstanceOf(
+            AlwaysTrue.class,
+            result,
+            "newInstance should return an instance of AlwaysTrue"
+        );
     }
 }

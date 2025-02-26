@@ -17,15 +17,29 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates;
+package uk.ac.ox.poseidon.core.predicates;
 
-import lombok.NonNull;
+import org.junit.jupiter.api.Test;
 
-import java.util.function.Predicate;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AlwaysTrue<T> implements Predicate<T> {
-    @Override
-    public boolean test(@NonNull final T t) {
-        return true;
+class AlwaysTrueTest {
+
+    /**
+     * The AlwaysTrue class implements a Predicate that always returns true when its test method is
+     * called, regardless of the provided input.
+     */
+
+    @Test
+    void testAlwaysReturnsTrueForAnyAction() {
+        // Arrange
+        final AlwaysTrue alwaysTrue = new AlwaysTrue();
+        final Object o = new Object();
+
+        // Act
+        final boolean result = alwaysTrue.test(o);
+
+        // Assert
+        assertTrue(result, "AlwaysTrue should always return true for any Action input.");
     }
 }

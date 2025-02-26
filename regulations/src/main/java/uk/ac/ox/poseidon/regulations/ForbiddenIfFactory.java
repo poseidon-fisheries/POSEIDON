@@ -32,7 +32,7 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 public class ForbiddenIfFactory extends GlobalScopeFactory<ForbiddenIf> {
 
-    @NonNull private GlobalScopeFactory<? extends Predicate<Action>> actionPredicate;
+    @NonNull private GlobalScopeFactory<? extends Predicate<? super Action>> actionPredicate;
 
     @Override
     protected ForbiddenIf newInstance(final @NonNull Simulation simulation) {

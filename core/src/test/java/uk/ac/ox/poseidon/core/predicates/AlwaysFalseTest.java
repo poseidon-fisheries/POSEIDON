@@ -17,31 +17,29 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates;
+package uk.ac.ox.poseidon.core.predicates;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class AlwaysTrueTest {
+class AlwaysFalseTest {
 
     /**
-     * The AlwaysTrue class implements a Predicate that always returns true when its test method is
-     * called, regardless of the provided input.
+     * The AlwaysFalse class implements a Predicate<Action> that always returns false regardless of
+     * the input Action provided to the test method.
      */
 
     @Test
-    void testAlwaysReturnsTrueForAnyAction() {
+    void test_alwaysReturnsFalse() {
         // Arrange
-        final AlwaysTrue alwaysTrue = new AlwaysTrue();
-        final Action mockAction = mock(Action.class);
+        final AlwaysFalse alwaysFalse = new AlwaysFalse();
+        final Object o = new Object();
 
         // Act
-        final boolean result = alwaysTrue.test(mockAction);
+        final boolean result = alwaysFalse.test(o);
 
         // Assert
-        assertTrue(result, "AlwaysTrue should always return true for any Action input.");
+        assertFalse(result);
     }
 }

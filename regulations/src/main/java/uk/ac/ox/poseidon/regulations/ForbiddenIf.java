@@ -29,7 +29,7 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class ForbiddenIf implements Regulations {
 
-    @NonNull private final Predicate<Action> actionPredicate;
+    @NonNull private final Predicate<? super Action> actionPredicate;
 
     @Override
     public boolean isPermitted(final Action action) {

@@ -17,15 +17,15 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates;
+package uk.ac.ox.poseidon.core.predicates;
 
 import lombok.NonNull;
 
 import java.util.function.Predicate;
 
-public class AlwaysFalse<T> implements Predicate<T> {
+public class AlwaysFalse implements Predicate<Object> {
     @Override
-    public boolean test(@NonNull final T t) {
+    public boolean test(@NonNull final Object o) {
         return false;
     }
 }
