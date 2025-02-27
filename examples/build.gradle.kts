@@ -29,7 +29,7 @@ dependencies {
     implementation(project(":io"))
     implementation(project(":gui"))
 
-    implementation("com.beust:jcommander:1.82")
+    implementation("org.jcommander:jcommander:2.0")
 
     // The following are all necessary for gRPC
     implementation("io.grpc:grpc-netty-shaded:1.68.1")
@@ -37,10 +37,6 @@ dependencies {
     implementation("io.grpc:grpc-stub:1.68.1")
     implementation("com.google.protobuf:protobuf-java:4.28.3")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
-}
-
-repositories {
-    mavenCentral()
 }
 
 protobuf {
@@ -53,8 +49,8 @@ protobuf {
         }
     }
     generateProtoTasks {
-        all().forEach { task ->
-            task.plugins {
+        all().configureEach {
+            plugins {
                 create("grpc")
             }
         }
