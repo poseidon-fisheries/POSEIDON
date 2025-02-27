@@ -39,6 +39,14 @@ dependencies {
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 }
 
+tasks.shadowJar {
+    mergeServiceFiles {
+        // those exclusions prevent GeoTools from trying to load the CLib plugin, which crashes:
+        exclude("com/sun/media/imageioimpl/plugins/jpeg/CLib*")
+        exclude("META-INF/services/javax.imageio.spi.*")
+    }
+}
+
 protobuf {
     protoc {
         artifact = "com.google.protobuf:protoc:4.28.3" // Specify Protoc compiler
