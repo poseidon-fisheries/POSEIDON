@@ -111,7 +111,6 @@ public class WesternMedScenario extends Scenario {
     private static final double LOGISTIC_GROWTH_RATE = 0.001;
     private static final String CARRYING_CAPACITY = "5 t";
     private static final double LEARNING_ALPHA = 1;
-    private static final double READINESS_PROBABILITY = 0.9;
     private static final int NUMBER_OF_VESSELS = 61;
     private static final double EXPLORATION_PROBABILITY = 0.2;
     private static final int MEAN_EXPLORATION_RADIUS = 1;
@@ -130,9 +129,7 @@ public class WesternMedScenario extends Scenario {
             PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT
         );
 
-    private PathFactory inputPath = PathFactory.of(
-        System.getProperty("user.home"), "workspace", "surimi_western_med", "data"
-    );
+    private PathFactory inputPath = PathFactory.of("data");
     private GlobalScopeFactory<? extends ModelGrid> modelGrid =
         new ModelGridWithActiveCellsFromGridFile(
             new CellSetFromGridFileFactory(
@@ -266,7 +263,7 @@ public class WesternMedScenario extends Scenario {
         new FinalProcessFactory<>(
             new CsvTableWriterFactory(
                 new FishingActionListenerTableFactory(),
-                PathFactory.of("temp", "fishing_actions.csv"),
+                PathFactory.of("outputs", "fishing_actions.csv"),
                 true
             )
         );
@@ -355,11 +352,8 @@ public class WesternMedScenario extends Scenario {
 
     public static void main(final String[] args) {
         final WesternMedScenario scenario = new WesternMedScenario();
-        final Path scenarioPath = Path.of("/home/nicolas/Desktop/scenario.yaml");
-        new ScenarioWriter().write(
-            scenario,
-            scenarioPath
-        );
+        final Path scenarioPath = Path.of("scenario.yaml");
+        new ScenarioWriter().write(scenario, scenarioPath);
         new QuickRunner(scenarioPath, Period.ofYears(1)).run();
     }
 }
