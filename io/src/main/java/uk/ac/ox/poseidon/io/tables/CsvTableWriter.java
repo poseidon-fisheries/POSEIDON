@@ -26,9 +26,12 @@ import tech.tablesaw.api.Table;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 public class CsvTableWriter implements Steppable {
+
+    private static final Logger LOGGER = Logger.getLogger(CsvTableWriter.class.getName());
 
     private final Supplier<Table> tableSupplier;
     private final Path path;
@@ -41,5 +44,6 @@ public class CsvTableWriter implements Steppable {
         if (clearAfterWriting) {
             table.clear();
         }
+        LOGGER.info("Written " + path.toAbsolutePath());
     }
 }
