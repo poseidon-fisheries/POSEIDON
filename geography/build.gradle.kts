@@ -32,5 +32,4 @@ dependencies {
     implementation("org.geotools:gt-coverage:${geoToolsVersion}")
     runtimeOnly("org.geotools:gt-shapefile:${geoToolsVersion}")
     runtimeOnly("org.geotools:gt-arcgrid:$geoToolsVersion")
-    runtimeOnly("org.geotools:gt-netcdf:${geoToolsVersion}")
 }
