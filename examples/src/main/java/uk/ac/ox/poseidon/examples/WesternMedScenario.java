@@ -60,9 +60,11 @@ import uk.ac.ox.poseidon.core.*;
 import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentDayOfWeekFactory;
 import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentTimeFactory;
 import uk.ac.ox.poseidon.core.aggregators.MaxFactory;
+import uk.ac.ox.poseidon.core.predicates.AdaptedPredicateFactory;
 import uk.ac.ox.poseidon.core.predicates.InSetFactory;
 import uk.ac.ox.poseidon.core.predicates.logical.AllOfFactory;
 import uk.ac.ox.poseidon.core.predicates.logical.AnyOfFactory;
+import uk.ac.ox.poseidon.core.predicates.numeric.AboveFactory;
 import uk.ac.ox.poseidon.core.predicates.temporal.TimeIsAfterFactory;
 import uk.ac.ox.poseidon.core.quantities.MassFactory;
 import uk.ac.ox.poseidon.core.quantities.SpeedFactory;
@@ -74,12 +76,12 @@ import uk.ac.ox.poseidon.core.suppliers.temporal.DurationUntilSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.temporal.NextDayAtTimeSupplierFactory;
 import uk.ac.ox.poseidon.core.time.DateFactory;
 import uk.ac.ox.poseidon.core.time.DateTimeAfterFactory;
-import uk.ac.ox.poseidon.core.time.MonthDayFactory;
 import uk.ac.ox.poseidon.core.time.TimeFactory;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.CoordinateFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromGridFileFactory;
+import uk.ac.ox.poseidon.geography.bathymetry.adaptors.CellElevationFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
 import uk.ac.ox.poseidon.geography.grids.CellSetFromGridFileFactory;
@@ -94,11 +96,9 @@ import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 import uk.ac.ox.poseidon.regulations.ForbiddenIfFactory;
 import uk.ac.ox.poseidon.regulations.predicates.spatial.ActionCellPredicateFactory;
-import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenYearlyDatesFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.Period;
 import java.util.List;
 import java.util.Map;
@@ -227,6 +227,28 @@ public class WesternMedScenario extends Scenario {
             ),
             0
         );
+    @SuppressWarnings("MagicNumber")
+    private Factory<? extends Regulations> regulations =
+        new ForbiddenIfFactory(
+            new AnyOfFactory<>(
+                new ActionCellPredicateFactory(
+                    modelGrid,
+                    new AdaptedPredicateFactory<>(
+                        new CellElevationFactory(bathymetricGrid),
+                        new AboveFactory<>(-35)
+                    )
+                ),
+                new ActionCellPredicateFactory(
+                    modelGrid,
+                    new InSetFactory<>(
+                        new CellSetFromGridFileFactory(
+                            inputPath.plus("french_eez.asc"),
+                            1
+                        )
+                    )
+                )
+            )
+        );
     private Factory<? extends VesselField> vesselField = new VesselFieldFactory(modelGrid);
     private Factory<? extends DistanceCalculator> distance =
         new HaversineDistanceCalculatorFactory(modelGrid);
@@ -240,25 +262,6 @@ public class WesternMedScenario extends Scenario {
         new TravellingAlongPathBehaviourFactory(
             pathFinder,
             distance
-        );
-    @SuppressWarnings("MagicNumber")
-    private Factory<? extends Regulations> regulations =
-        new ForbiddenIfFactory(
-            new AnyOfFactory<>(
-                new BetweenYearlyDatesFactory(
-                    new MonthDayFactory(Month.MARCH, 1),
-                    new MonthDayFactory(Month.MAY, 31)
-                ),
-                new ActionCellPredicateFactory(
-                    modelGrid,
-                    new InSetFactory<>(
-                        new CellSetFromGridFileFactory(
-                            inputPath.plus("french_eez.asc"),
-                            1
-                        )
-                    )
-                )
-            )
         );
     private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
         new FishingLocationLegalityCheckerFactory(

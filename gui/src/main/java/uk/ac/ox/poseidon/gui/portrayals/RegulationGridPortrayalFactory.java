@@ -125,7 +125,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
                 texture.getScaledInstance(
                     displayWidth / gridWidth,
                     displayHeight / gridHeight,
-                    Image.SCALE_SMOOTH
+                    Image.SCALE_DEFAULT
                 );
 
             setPortrayalForNonNull(new ImagePortrayal2D(scaledImage));

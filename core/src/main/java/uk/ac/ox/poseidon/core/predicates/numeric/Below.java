@@ -24,17 +24,15 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
 
 @Getter
 @RequiredArgsConstructor
-public class Below<T> implements Predicate<T> {
+public class Below implements Predicate<Double> {
 
     private final double threshold;
-    @NonNull private final ToDoubleFunction<T> doubleFunction;
 
     @Override
-    public boolean test(@NonNull final T t) {
-        return doubleFunction.applyAsDouble(t) < threshold;
+    public boolean test(@NonNull final Double value) {
+        return value < threshold;
     }
 }

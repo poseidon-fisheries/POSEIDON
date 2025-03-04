@@ -20,23 +20,19 @@
 package uk.ac.ox.poseidon.core.predicates.numeric;
 
 import lombok.*;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
-
-import java.util.function.ToDoubleFunction;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AboveFactory<T> extends GlobalScopeFactory<Above<T>> {
+public class AboveFactory<T> extends GlobalScopeFactory<Above> {
 
     private double threshold;
-    @NonNull private Factory<? extends ToDoubleFunction<T>> doubleFunction;
 
     @Override
-    protected Above<T> newInstance(final @NonNull Simulation simulation) {
-        return new Above<>(threshold, doubleFunction.get(simulation));
+    protected Above newInstance(final @NonNull Simulation simulation) {
+        return new Above(threshold);
     }
 }
