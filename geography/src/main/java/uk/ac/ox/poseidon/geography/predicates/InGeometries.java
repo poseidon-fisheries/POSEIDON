@@ -17,21 +17,33 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.spatial;
+package uk.ac.ox.poseidon.geography.predicates;
 
-import com.google.common.collect.ImmutableSet;
-import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
+import lombok.NonNull;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-@RequiredArgsConstructor
-public class InCellSet extends CachedCoordinatePredicate {
-    private final ModelGrid modelGrid;
-    private final ImmutableSet<Int2D> cells;
+import java.util.Collection;
+import java.util.function.Predicate;
+
+public class InGeometries implements Predicate<Coordinate> {
+
+    private final Geometry[] geometries;
+
+    public InGeometries(@NonNull final Collection<? extends Geometry> geometries) {
+        this.geometries = geometries.toArray(Geometry[]::new);
+    }
 
     @Override
     public boolean test(final Coordinate coordinate) {
-        return cells.contains(modelGrid.toCell(coordinate));
+        for (final Geometry geometry : geometries) {
+            final Point point = geometry.getFactory().createPoint(coordinate.toJTS());
+            if (geometry.contains(point)) {
+                return true;
+            }
+        }
+        return false;
     }
+
 }

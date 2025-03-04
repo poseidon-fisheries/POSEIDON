@@ -17,27 +17,24 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.spatial;
+package uk.ac.ox.poseidon.geography.predicates;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
-import uk.ac.ox.poseidon.geography.Coordinate;
+import lombok.*;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.geography.Envelope;
 
-import java.util.function.Predicate;
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class InRectangularAreaPredicateFactory extends GlobalScopeFactory<InRectangularAreaPredicate> {
 
-public abstract class CachedCoordinatePredicate implements Predicate<Action> {
-
-    private final LoadingCache<Coordinate, Boolean> cache =
-        CacheBuilder.newBuilder().build(CacheLoader.from(this::test));
+    @NonNull private Factory<? extends Envelope> envelope;
 
     @Override
-    public boolean test(final Action action) {
-        return cache.getUnchecked(action.getStartCoordinate()) ||
-            cache.getUnchecked(action.getEndCoordinate());
+    protected InRectangularAreaPredicate newInstance(final @NonNull Simulation simulation) {
+        return new InRectangularAreaPredicate(envelope.get(simulation));
     }
-
-    abstract public boolean test(final Coordinate coordinate);
-
 }

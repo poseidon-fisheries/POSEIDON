@@ -17,21 +17,26 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.spatial;
+package uk.ac.ox.poseidon.geography.predicates;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.geography.Envelope;
+import lombok.*;
+import org.locationtech.jts.geom.Geometry;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
+
+import java.util.Collection;
 
 @Getter
-@RequiredArgsConstructor
-public class InRectangularAreaPredicate extends CachedCoordinatePredicate {
-    
-    private final Envelope envelope;
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class InGeometriesFactory extends GlobalScopeFactory<InGeometries> {
+
+    private Factory<? extends Collection<? extends Geometry>> geometries;
 
     @Override
-    public boolean test(final Coordinate coordinate) {
-        return envelope.contains(coordinate);
+    protected InGeometries newInstance(final @NonNull Simulation simulation) {
+        return new InGeometries(geometries.get(simulation));
     }
 }

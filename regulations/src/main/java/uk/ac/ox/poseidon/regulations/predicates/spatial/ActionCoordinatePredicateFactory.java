@@ -17,26 +17,30 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.predicates;
+package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
-import com.google.common.collect.ImmutableSet;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
-import java.util.Collection;
 import java.util.function.Predicate;
 
-@RequiredArgsConstructor
-public class IsEqualToAny<T> implements Predicate<T> {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ActionCoordinatePredicateFactory extends GlobalScopeFactory<ActionCoordinatePredicate> {
 
-    private final ImmutableSet<T> values;
-
-    public IsEqualToAny(final Collection<T> values) {
-        this(ImmutableSet.copyOf(values));
-    }
+    private Factory<? extends Predicate<Coordinate>> coordinatePredicate;
 
     @Override
-    public boolean test(final T t) {
-        return values.contains(t);
+    protected ActionCoordinatePredicate newInstance(final Simulation simulation) {
+        return new ActionCoordinatePredicate(coordinatePredicate.get(simulation));
     }
 
 }

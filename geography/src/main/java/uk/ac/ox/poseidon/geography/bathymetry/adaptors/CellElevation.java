@@ -17,26 +17,22 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.spatial;
+package uk.ac.ox.poseidon.geography.bathymetry.adaptors;
 
-import lombok.*;
-import org.locationtech.jts.geom.Geometry;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.RequiredArgsConstructor;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
-import java.util.Collection;
+import java.util.function.Function;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class InGeometriesFactory extends GlobalScopeFactory<InGeometries> {
+@RequiredArgsConstructor
+public class CellElevation implements Function<Int2D, Double> {
 
-    private Factory<? extends Collection<? extends Geometry>> geometries;
+    private final BathymetricGrid bathymetricGrid;
 
     @Override
-    protected InGeometries newInstance(final @NonNull Simulation simulation) {
-        return new InGeometries(geometries.get(simulation));
+    public Double apply(final Int2D cell) {
+        return bathymetricGrid.getElevation(cell);
     }
+
 }

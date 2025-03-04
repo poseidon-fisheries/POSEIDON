@@ -19,30 +19,22 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
-import lombok.NonNull;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
-import uk.ac.ox.poseidon.geography.Coordinate;
+import lombok.RequiredArgsConstructor;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.behaviours.Action;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.util.Collection;
+import java.util.function.Predicate;
 
-public class InGeometries extends CachedCoordinatePredicate {
+@RequiredArgsConstructor
+public class ActionCellPredicate implements Predicate<Action> {
 
-    private final Geometry[] geometries;
-
-    public InGeometries(@NonNull final Collection<? extends Geometry> geometries) {
-        this.geometries = geometries.toArray(Geometry[]::new);
-    }
+    private final ModelGrid modelGrid;
+    private final Predicate<Int2D> cellPredicate;
 
     @Override
-    public boolean test(final Coordinate coordinate) {
-        for (final Geometry geometry : geometries) {
-            final Point point = geometry.getFactory().createPoint(coordinate.toJTS());
-            if (geometry.contains(point)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean test(final Action action) {
+        return cellPredicate.test(modelGrid.toCell(action.getStartCoordinate())) ||
+            cellPredicate.test(modelGrid.toCell(action.getEndCoordinate()));
     }
-
 }

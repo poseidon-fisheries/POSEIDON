@@ -17,31 +17,28 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.spatial;
+package uk.ac.ox.poseidon.geography.bathymetry.adaptors;
 
-import com.google.common.collect.ImmutableSet;
-import lombok.*;
-import sim.util.Int2D;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-
-import java.util.Collection;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class InCellSetFactory extends GlobalScopeFactory<InCellSet> {
-    private Factory<? extends ModelGrid> modelGrid;
-    private Factory<? extends Collection<? extends Int2D>> cells;
+public class CellElevationFactory extends GlobalScopeFactory<CellElevation> {
+
+    private Factory<? extends BathymetricGrid> bathymetricGrid;
 
     @Override
-    protected InCellSet newInstance(final @NonNull Simulation simulation) {
-        return new InCellSet(
-            modelGrid.get(simulation),
-            ImmutableSet.copyOf(cells.get(simulation))
-        );
+    protected CellElevation newInstance(final Simulation simulation) {
+        return new CellElevation(bathymetricGrid.get(simulation));
     }
+
 }

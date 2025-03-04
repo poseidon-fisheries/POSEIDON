@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.predicates;
+package uk.ac.ox.poseidon.core.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,23 +26,17 @@ import lombok.Setter;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IsEqualToAnyFactory<T> extends GlobalScopeFactory<IsEqualToAny<T>> {
+public class ConstantFactory<T> extends GlobalScopeFactory<T> {
 
-    private List<T> values;
-
-    @SafeVarargs
-    public IsEqualToAnyFactory(final T... values) {
-        this.values = List.of(values);
-    }
+    private T value;
 
     @Override
-    protected IsEqualToAny<T> newInstance(final Simulation simulation) {
-        return new IsEqualToAny<>(values);
+    protected T newInstance(final Simulation simulation) {
+        return value;
     }
+
 }

@@ -60,7 +60,7 @@ import uk.ac.ox.poseidon.core.*;
 import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentDayOfWeekFactory;
 import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentTimeFactory;
 import uk.ac.ox.poseidon.core.aggregators.MaxFactory;
-import uk.ac.ox.poseidon.core.predicates.IsEqualToAnyFactory;
+import uk.ac.ox.poseidon.core.predicates.InSetFactory;
 import uk.ac.ox.poseidon.core.predicates.logical.AllOfFactory;
 import uk.ac.ox.poseidon.core.predicates.logical.AnyOfFactory;
 import uk.ac.ox.poseidon.core.predicates.temporal.TimeIsAfterFactory;
@@ -93,7 +93,7 @@ import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 import uk.ac.ox.poseidon.regulations.ForbiddenIfFactory;
-import uk.ac.ox.poseidon.regulations.predicates.spatial.InCellSetFactory;
+import uk.ac.ox.poseidon.regulations.predicates.spatial.ActionCellPredicateFactory;
 import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenYearlyDatesFactory;
 
 import java.nio.file.Path;
@@ -145,23 +145,6 @@ public class WesternMedScenario extends Scenario {
                 0
             )
         );
-    @SuppressWarnings("MagicNumber")
-    private Factory<? extends Regulations> regulations =
-        new ForbiddenIfFactory(
-            new AnyOfFactory<>(
-                new BetweenYearlyDatesFactory(
-                    new MonthDayFactory(Month.MARCH, 1),
-                    new MonthDayFactory(Month.MAY, 31)
-                ),
-                new InCellSetFactory(
-                    modelGrid,
-                    new CellSetFromGridFileFactory(
-                        inputPath.plus("french_eez.asc"),
-                        1
-                    )
-                )
-            )
-        );
     private Factory<? extends BathymetricGrid> bathymetricGrid =
         new BathymetricGridFromGridFileFactory(
             inputPath.plus("bathymetry_grid.asc"),
@@ -169,7 +152,6 @@ public class WesternMedScenario extends Scenario {
             new MaxFactory(),
             false
         );
-
     @SuppressWarnings("MagicNumber")
     private Factory<? extends PortGrid> portGrid =
         new PortGridFromLocationsFactory(
@@ -259,6 +241,25 @@ public class WesternMedScenario extends Scenario {
             pathFinder,
             distance
         );
+    @SuppressWarnings("MagicNumber")
+    private Factory<? extends Regulations> regulations =
+        new ForbiddenIfFactory(
+            new AnyOfFactory<>(
+                new BetweenYearlyDatesFactory(
+                    new MonthDayFactory(Month.MARCH, 1),
+                    new MonthDayFactory(Month.MAY, 31)
+                ),
+                new ActionCellPredicateFactory(
+                    modelGrid,
+                    new InSetFactory<>(
+                        new CellSetFromGridFileFactory(
+                            inputPath.plus("french_eez.asc"),
+                            1
+                        )
+                    )
+                )
+            )
+        );
     private VesselScopeFactory<? extends Predicate<Int2D>> fishingLocationChecker =
         new FishingLocationLegalityCheckerFactory(
             regulations,
@@ -299,7 +300,7 @@ public class WesternMedScenario extends Scenario {
                         ),
                         new AdaptedVesselPredicateFactory<>(
                             new CurrentDayOfWeekFactory(),
-                            new IsEqualToAnyFactory<>(
+                            new InSetFactory<>(
                                 SUNDAY,
                                 MONDAY,
                                 TUESDAY,

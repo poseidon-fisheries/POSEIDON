@@ -19,22 +19,30 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+
+import java.util.function.Predicate;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class InRectangularAreaPredicateFactory extends GlobalScopeFactory<InRectangularAreaPredicate> {
+public class ActionCellPredicateFactory extends GlobalScopeFactory<ActionCellPredicate> {
 
-    @NonNull private Factory<? extends Envelope> envelope;
+    private Factory<? extends ModelGrid> modelGrid;
+    private Factory<? extends Predicate<Int2D>> cellPredicate;
 
     @Override
-    protected InRectangularAreaPredicate newInstance(final @NonNull Simulation simulation) {
-        return new InRectangularAreaPredicate(envelope.get(simulation));
+    protected ActionCellPredicate newInstance(final Simulation simulation) {
+        return new ActionCellPredicate(modelGrid.get(simulation), cellPredicate.get(simulation));
     }
+    
 }
