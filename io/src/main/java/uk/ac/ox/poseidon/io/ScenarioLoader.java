@@ -57,7 +57,10 @@ public class ScenarioLoader {
 
     private static LoaderOptions getLoaderOptions() {
         final LoaderOptions options = new LoaderOptions();
-        options.setTagInspector(tag -> tag.getClassName().startsWith("uk.ac.ox.poseidon"));
+        options.setTagInspector(tag ->
+            tag.getClassName().startsWith("uk.ac.ox.poseidon") ||
+                tag.getClassName().startsWith("java")
+        );
         options.setMaxAliasesForCollections(MAX_ALIASES_FOR_COLLECTIONS);
         return options;
     }

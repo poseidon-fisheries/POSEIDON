@@ -28,20 +28,20 @@ import java.util.stream.Stream;
 public class AnyOf<T> implements Predicate<T> {
 
     // Using an array for performance reasons
-    @NonNull private final Predicate<T>[] predicates;
+    @NonNull private final Predicate<? super T>[] predicates;
 
     @SuppressWarnings("unchecked")
-    public AnyOf(final Collection<? extends Predicate<T>> predicates) {
+    public AnyOf(final Collection<? extends Predicate<? super T>> predicates) {
         this.predicates = predicates.toArray(Predicate[]::new);
     }
 
-    public Stream<Predicate<T>> getPredicates() {
+    public Stream<Predicate<? super T>> getPredicates() {
         return Stream.of(predicates);
     }
 
     @Override
     public boolean test(final T t) {
-        for (final Predicate<T> predicate : predicates) {
+        for (final Predicate<? super T> predicate : predicates) {
             if (predicate.test(t)) {
                 return true;
             }

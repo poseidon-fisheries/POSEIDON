@@ -27,7 +27,7 @@ import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.time.LocalDateTime;
-import java.util.function.BooleanSupplier;
+import java.util.function.Predicate;
 
 @RequiredArgsConstructor
 public class Home extends BranchingBehaviour {
@@ -35,7 +35,7 @@ public class Home extends BranchingBehaviour {
     private final PortGrid portGrid;
     private final Hold<?> hold;
 
-    private final BooleanSupplier readinessSupplier;
+    private final Predicate<? super Vessel> readinessPredicate;
     private final Behaviour travelBehaviour;
     private final Behaviour landingBehaviour;
     private final Behaviour behaviourIfReady;
@@ -51,7 +51,7 @@ public class Home extends BranchingBehaviour {
             return travelBehaviour;
         } else if (!hold.isEmpty()) {
             return landingBehaviour;
-        } else if (readinessSupplier.getAsBoolean()) {
+        } else if (readinessPredicate.test(vessel)) {
             return behaviourIfReady;
         } else {
             return behaviourIfNotReady;

@@ -17,29 +17,32 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.conditions;
+package uk.ac.ox.poseidon.core.predicates;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConditionFactory<T> extends GlobalScopeFactory<Condition<T>> {
-    private Factory<? extends Supplier<T>> supplier;
-    private Factory<? extends Predicate<T>> predicate;
+public class IsEqualToAnyFactory<T> extends GlobalScopeFactory<IsEqualToAny<T>> {
+
+    private List<T> values;
+
+    @SafeVarargs
+    public IsEqualToAnyFactory(final T... values) {
+        this.values = List.of(values);
+    }
 
     @Override
-    protected Condition<T> newInstance(final Simulation simulation) {
-        return new Condition<>(supplier.get(simulation), predicate.get(simulation));
+    protected IsEqualToAny<T> newInstance(final Simulation simulation) {
+        return new IsEqualToAny<>(values);
     }
 }

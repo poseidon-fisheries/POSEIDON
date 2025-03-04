@@ -17,21 +17,21 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.suppliers;
+package uk.ac.ox.poseidon.core.adaptors.temporal;
 
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
-import java.time.LocalTime;
-import java.util.function.Supplier;
+import java.time.DayOfWeek;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
-public class CurrentTimeSupplier implements Supplier<LocalTime> {
+public class CurrentDayOfWeekAdaptor implements Function<Object, DayOfWeek> {
 
-    private final TemporalSchedule temporalSchedule;
+    private final TemporalSchedule schedule;
 
     @Override
-    public LocalTime get() {
-        return temporalSchedule.getDateTime().toLocalTime();
+    public DayOfWeek apply(final Object o) {
+        return schedule.getDate().getDayOfWeek();
     }
 }

@@ -33,11 +33,11 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 public class AnyOfFactory<T> extends GlobalScopeFactory<AnyOf<T>> {
 
-    List<Factory<? extends Predicate<T>>> predicates;
+    List<Factory<? extends Predicate<? super T>>> predicates;
 
     @SafeVarargs
     @SuppressWarnings("varargs")
-    public AnyOfFactory(final Factory<? extends Predicate<T>>... predicates) {
+    public AnyOfFactory(final Factory<? extends Predicate<? super T>>... predicates) {
         this(List.of(predicates));
     }
 

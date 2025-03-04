@@ -17,39 +17,14 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.predicates.logical;
+package uk.ac.ox.poseidon.core.suppliers.temporal;
 
-import lombok.*;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.List;
-import java.util.function.Predicate;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class AllOfFactory<T> extends GlobalScopeFactory<AllOf<T>> {
-
-    List<Factory<? extends Predicate<? super T>>> predicates;
-
-    @SafeVarargs
-    @SuppressWarnings("varargs")
-    public AllOfFactory(final Factory<? extends Predicate<? super T>>... predicates) {
-        this(List.of(predicates));
-    }
-
+public class CurrentDateTimeSupplierFactory extends GlobalScopeFactory<CurrentDateTimeSupplier> {
     @Override
-    protected AllOf<T> newInstance(final @NonNull Simulation simulation) {
-        return new AllOf<>(
-            predicates
-                .stream()
-                .map(p -> p.get(simulation))
-                .collect(toImmutableList())
-        );
+    protected CurrentDateTimeSupplier newInstance(final Simulation simulation) {
+        return new CurrentDateTimeSupplier(simulation.getTemporalSchedule());
     }
 }

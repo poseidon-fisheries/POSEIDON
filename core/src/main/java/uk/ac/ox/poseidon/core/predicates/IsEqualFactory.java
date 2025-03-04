@@ -17,39 +17,26 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.predicates.logical;
+package uk.ac.ox.poseidon.core.predicates;
 
-import lombok.*;
-import uk.ac.ox.poseidon.core.Factory;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
-
-import java.util.List;
-import java.util.function.Predicate;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AllOfFactory<T> extends GlobalScopeFactory<AllOf<T>> {
+public class IsEqualFactory<T> extends GlobalScopeFactory<IsEqual<T>> {
 
-    List<Factory<? extends Predicate<? super T>>> predicates;
-
-    @SafeVarargs
-    @SuppressWarnings("varargs")
-    public AllOfFactory(final Factory<? extends Predicate<? super T>>... predicates) {
-        this(List.of(predicates));
-    }
+    private T value;
 
     @Override
-    protected AllOf<T> newInstance(final @NonNull Simulation simulation) {
-        return new AllOf<>(
-            predicates
-                .stream()
-                .map(p -> p.get(simulation))
-                .collect(toImmutableList())
-        );
+    protected IsEqual<T> newInstance(final Simulation simulation) {
+        return new IsEqual<>(value);
     }
+
 }

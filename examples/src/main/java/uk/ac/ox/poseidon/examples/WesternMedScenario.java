@@ -45,10 +45,10 @@ import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
 import uk.ac.ox.poseidon.agents.regulations.FishingLocationLegalityCheckerFactory;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.tables.FishingActionListenerTableFactory;
+import uk.ac.ox.poseidon.agents.vessels.AdaptedVesselPredicateFactory;
 import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactoryDecorator;
 import uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory;
 import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
 import uk.ac.ox.poseidon.agents.vessels.hold.ProportionalBiomassOvercapacityDiscardingStrategyFactory;
@@ -57,18 +57,25 @@ import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.*;
+import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentDayOfWeekAdaptorFactory;
+import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentTimeAdaptorFactory;
 import uk.ac.ox.poseidon.core.aggregators.MaxFactory;
-import uk.ac.ox.poseidon.core.conditions.ConditionFactory;
+import uk.ac.ox.poseidon.core.predicates.IsEqualToAnyFactory;
+import uk.ac.ox.poseidon.core.predicates.logical.AllOfFactory;
 import uk.ac.ox.poseidon.core.predicates.logical.AnyOfFactory;
 import uk.ac.ox.poseidon.core.predicates.temporal.TimeIsAfterFactory;
 import uk.ac.ox.poseidon.core.quantities.MassFactory;
 import uk.ac.ox.poseidon.core.quantities.SpeedFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
-import uk.ac.ox.poseidon.core.suppliers.CurrentTimeSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.PoissonIntSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
-import uk.ac.ox.poseidon.core.time.*;
+import uk.ac.ox.poseidon.core.suppliers.temporal.DurationUntilSupplierFactory;
+import uk.ac.ox.poseidon.core.suppliers.temporal.NextDayAtTimeSupplierFactory;
+import uk.ac.ox.poseidon.core.time.DateFactory;
+import uk.ac.ox.poseidon.core.time.DateTimeAfterFactory;
+import uk.ac.ox.poseidon.core.time.MonthDayFactory;
+import uk.ac.ox.poseidon.core.time.TimeFactory;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.CoordinateFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
@@ -97,6 +104,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import static java.time.DayOfWeek.*;
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_DAY_DURATION_SUPPLIER;
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_HOUR_DURATION_SUPPLIER;
 import static uk.ac.ox.poseidon.core.time.PeriodFactory.DAILY;
@@ -277,19 +285,29 @@ public class WesternMedScenario extends Scenario {
             optionValuesRegister,
             new ExponentialMovingAverageOptionValuesFactory<>(LEARNING_ALPHA)
         );
-    private Factory<? extends Fleet> fleet =
+    @SuppressWarnings("MagicNumber") private Factory<? extends Fleet> fleet =
         new DefaultFleetFactory(
             NUMBER_OF_VESSELS,
             new VesselFactory(
                 new HomeBehaviourFactory(
                     portGrid,
                     hold,
-                    new VesselScopeFactoryDecorator<>(new ConditionFactory<>(
-                        new CurrentTimeSupplierFactory(),
-                        new TimeIsAfterFactory(new TimeFactory(10, 0, 0))
-                    )),
-                    travellingBehaviour,
-                    new LandingBehaviourFactory<>(hold, ONE_HOUR_DURATION_SUPPLIER),
+                    new AllOfFactory<>(
+                        new AdaptedVesselPredicateFactory<>(
+                            new CurrentTimeAdaptorFactory(),
+                            new TimeIsAfterFactory(new TimeFactory(21, 59, 59))
+                        ),
+                        new AdaptedVesselPredicateFactory<>(
+                            new CurrentDayOfWeekAdaptorFactory(),
+                            new IsEqualToAnyFactory<>(
+                                SUNDAY,
+                                MONDAY,
+                                TUESDAY,
+                                WEDNESDAY,
+                                THURSDAY
+                            )
+                        )
+                    ),
                     new ThereAndBackBehaviourFactory(
                         new ChoosingDestinationBehaviourFactory(
                             new EpsilonGreedyDestinationSupplierFactory(
@@ -333,10 +351,14 @@ public class WesternMedScenario extends Scenario {
                         travellingBehaviour
                     ),
                     new WaitingBehaviourFactory(
-                        new ExponentiallyDistributedDurationSupplierFactory(
-                            new DurationFactory("P10D")
+                        new DurationUntilSupplierFactory(
+                            new NextDayAtTimeSupplierFactory(
+                                new TimeFactory(22, 0, 0)
+                            )
                         )
-                    )
+                    ),
+                    travellingBehaviour,
+                    new LandingBehaviourFactory<>(hold, ONE_HOUR_DURATION_SUPPLIER)
                 ),
                 new PrefixedIdSupplierFactory("Vessel"),
                 vesselField,

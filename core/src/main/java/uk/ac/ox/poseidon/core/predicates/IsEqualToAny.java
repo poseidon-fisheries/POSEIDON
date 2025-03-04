@@ -17,35 +17,26 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.predicates.logical;
+package uk.ac.ox.poseidon.core.predicates;
 
-import lombok.NonNull;
+import com.google.common.collect.ImmutableSet;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
-public class AllOf<T> implements Predicate<T> {
+@RequiredArgsConstructor
+public class IsEqualToAny<T> implements Predicate<T> {
 
-    // Using an array for performance reason (and not exposing outside the class)
-    @NonNull private final Predicate<? super T>[] predicates;
+    private final ImmutableSet<T> values;
 
-    @SuppressWarnings("unchecked")
-    public AllOf(@NonNull final Collection<Predicate<? super T>> predicates) {
-        this.predicates = predicates.toArray(Predicate[]::new);
-    }
-
-    public Stream<Predicate<? super T>> getPredicates() {
-        return Stream.of(predicates);
+    public IsEqualToAny(final Collection<T> values) {
+        this(ImmutableSet.copyOf(values));
     }
 
     @Override
     public boolean test(final T t) {
-        for (final Predicate<? super T> predicate : predicates) {
-            if (!predicate.test(t)) {
-                return false;
-            }
-        }
-        return true;
+        return values.contains(t);
     }
+
 }

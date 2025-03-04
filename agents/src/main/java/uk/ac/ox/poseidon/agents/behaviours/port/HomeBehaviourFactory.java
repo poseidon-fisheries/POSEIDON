@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.util.function.BooleanSupplier;
+import java.util.function.Predicate;
 
 @Getter
 @Setter
@@ -41,11 +41,11 @@ public class HomeBehaviourFactory extends BehaviourFactory<Home> {
 
     private Factory<? extends PortGrid> portGrid;
     private VesselScopeFactory<? extends Hold<?>> hold;
-    private VesselScopeFactory<? extends BooleanSupplier> readinessSupplier;
-    private BehaviourFactory<?> travelBehaviour;
-    private BehaviourFactory<?> landingBehaviour;
+    private Factory<? extends Predicate<? super Vessel>> readinessPredicate;
     private BehaviourFactory<?> behaviourIfReady;
     private BehaviourFactory<?> behaviourIfNotReady;
+    private BehaviourFactory<?> travelBehaviour;
+    private BehaviourFactory<?> landingBehaviour;
 
     @Override
     protected Home newInstance(
@@ -55,7 +55,7 @@ public class HomeBehaviourFactory extends BehaviourFactory<Home> {
         return new Home(
             portGrid.get(simulation),
             hold.get(simulation, vessel),
-            readinessSupplier.get(simulation, vessel),
+            readinessPredicate.get(simulation),
             travelBehaviour.get(simulation, vessel),
             landingBehaviour.get(simulation, vessel),
             behaviourIfReady.get(simulation, vessel),

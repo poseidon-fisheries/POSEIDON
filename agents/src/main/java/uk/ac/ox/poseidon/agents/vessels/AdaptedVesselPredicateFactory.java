@@ -17,39 +17,36 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.predicates.logical;
+package uk.ac.ox.poseidon.agents.vessels;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.predicates.AdaptedPredicate;
 
-import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AllOfFactory<T> extends GlobalScopeFactory<AllOf<T>> {
+public class AdaptedVesselPredicateFactory<T> extends GlobalScopeFactory<Predicate<? super Vessel>> {
 
-    List<Factory<? extends Predicate<? super T>>> predicates;
-
-    @SafeVarargs
-    @SuppressWarnings("varargs")
-    public AllOfFactory(final Factory<? extends Predicate<? super T>>... predicates) {
-        this(List.of(predicates));
-    }
+    private Factory<? extends Function<? super Vessel, T>> adaptor;
+    private Factory<? extends Predicate<? super T>> predicate;
 
     @Override
-    protected AllOf<T> newInstance(final @NonNull Simulation simulation) {
-        return new AllOf<>(
-            predicates
-                .stream()
-                .map(p -> p.get(simulation))
-                .collect(toImmutableList())
+    protected Predicate<? super Vessel> newInstance(
+        final Simulation simulation
+    ) {
+        return new AdaptedPredicate<>(
+            adaptor.get(simulation),
+            predicate.get(simulation)
         );
     }
 }

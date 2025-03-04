@@ -17,14 +17,14 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.suppliers;
+package uk.ac.ox.poseidon.core.adaptors.temporal;
 
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-public class CurrentDateTimeSupplierFactory extends GlobalScopeFactory<CurrentDateTimeSupplier> {
+public class CurrentTimeAdaptorFactory extends GlobalScopeFactory<CurrentTimeAdaptor> {
     @Override
-    protected CurrentDateTimeSupplier newInstance(final Simulation simulation) {
-        return new CurrentDateTimeSupplier(simulation.getTemporalSchedule());
+    protected CurrentTimeAdaptor newInstance(final Simulation simulation) {
+        return new CurrentTimeAdaptor(simulation.getTemporalSchedule());
     }
 }

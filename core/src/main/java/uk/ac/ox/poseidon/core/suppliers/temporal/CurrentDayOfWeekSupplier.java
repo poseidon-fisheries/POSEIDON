@@ -17,27 +17,21 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.vessels;
+package uk.ac.ox.poseidon.core.suppliers.temporal;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class VesselScopeFactoryDecorator<C> extends VesselScopeFactory<C> {
-    private Factory<C> delegate;
+import java.time.DayOfWeek;
+import java.util.function.Supplier;
+
+@RequiredArgsConstructor
+public class CurrentDayOfWeekSupplier implements Supplier<DayOfWeek> {
+
+    private final TemporalSchedule temporalSchedule;
 
     @Override
-    protected C newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return delegate.get(simulation);
+    public DayOfWeek get() {
+        return temporalSchedule.getDateTime().getDayOfWeek();
     }
 }

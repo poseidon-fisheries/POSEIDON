@@ -17,35 +17,20 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.predicates.logical;
+package uk.ac.ox.poseidon.core.predicates;
 
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Collection;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
-public class AllOf<T> implements Predicate<T> {
+@RequiredArgsConstructor
+public class IsEqual<T> implements Predicate<T> {
 
-    // Using an array for performance reason (and not exposing outside the class)
-    @NonNull private final Predicate<? super T>[] predicates;
-
-    @SuppressWarnings("unchecked")
-    public AllOf(@NonNull final Collection<Predicate<? super T>> predicates) {
-        this.predicates = predicates.toArray(Predicate[]::new);
-    }
-
-    public Stream<Predicate<? super T>> getPredicates() {
-        return Stream.of(predicates);
-    }
+    private final T value;
 
     @Override
     public boolean test(final T t) {
-        for (final Predicate<? super T> predicate : predicates) {
-            if (!predicate.test(t)) {
-                return false;
-            }
-        }
-        return true;
+        return this.value.equals(t);
     }
+
 }

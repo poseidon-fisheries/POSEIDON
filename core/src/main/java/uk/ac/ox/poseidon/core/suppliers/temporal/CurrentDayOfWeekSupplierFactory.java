@@ -17,22 +17,14 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.conditions;
+package uk.ac.ox.poseidon.core.suppliers.temporal;
 
-import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
-@RequiredArgsConstructor
-public class Condition<T> implements BooleanSupplier {
-
-    private final Supplier<T> supplier;
-    private final Predicate<T> predicate;
-
+public class CurrentDayOfWeekSupplierFactory extends GlobalScopeFactory<CurrentDayOfWeekSupplier> {
     @Override
-    public boolean getAsBoolean() {
-        return predicate.test(supplier.get());
+    protected CurrentDayOfWeekSupplier newInstance(final Simulation simulation) {
+        return new CurrentDayOfWeekSupplier(simulation.getTemporalSchedule());
     }
 }

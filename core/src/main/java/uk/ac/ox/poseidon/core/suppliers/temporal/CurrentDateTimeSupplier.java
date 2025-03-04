@@ -17,14 +17,21 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.suppliers;
+package uk.ac.ox.poseidon.core.suppliers.temporal;
 
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
-public class CurrentTimeSupplierFactory extends GlobalScopeFactory<CurrentTimeSupplier> {
+import java.time.LocalDateTime;
+import java.util.function.Supplier;
+
+@RequiredArgsConstructor
+public class CurrentDateTimeSupplier implements Supplier<LocalDateTime> {
+
+    private final TemporalSchedule temporalSchedule;
+
     @Override
-    protected CurrentTimeSupplier newInstance(final Simulation simulation) {
-        return new CurrentTimeSupplier(simulation.getTemporalSchedule());
+    public LocalDateTime get() {
+        return temporalSchedule.getDateTime();
     }
 }

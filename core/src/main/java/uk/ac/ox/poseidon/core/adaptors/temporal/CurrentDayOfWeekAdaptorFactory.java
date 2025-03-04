@@ -17,21 +17,14 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.suppliers;
+package uk.ac.ox.poseidon.core.adaptors.temporal;
 
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-import java.time.LocalDate;
-import java.util.function.Supplier;
-
-@RequiredArgsConstructor
-public class CurrentDateSupplier implements Supplier<LocalDate> {
-
-    private final TemporalSchedule temporalSchedule;
-
+public class CurrentDayOfWeekAdaptorFactory extends GlobalScopeFactory<CurrentDayOfWeekAdaptor> {
     @Override
-    public LocalDate get() {
-        return temporalSchedule.getDate();
+    protected CurrentDayOfWeekAdaptor newInstance(final Simulation simulation) {
+        return new CurrentDayOfWeekAdaptor(simulation.getTemporalSchedule());
     }
 }
