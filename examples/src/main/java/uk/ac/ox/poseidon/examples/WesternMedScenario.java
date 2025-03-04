@@ -57,8 +57,8 @@ import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.*;
-import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentDayOfWeekAdaptorFactory;
-import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentTimeAdaptorFactory;
+import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentDayOfWeekFactory;
+import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentTimeFactory;
 import uk.ac.ox.poseidon.core.aggregators.MaxFactory;
 import uk.ac.ox.poseidon.core.predicates.IsEqualToAnyFactory;
 import uk.ac.ox.poseidon.core.predicates.logical.AllOfFactory;
@@ -294,11 +294,11 @@ public class WesternMedScenario extends Scenario {
                     hold,
                     new AllOfFactory<>(
                         new AdaptedVesselPredicateFactory<>(
-                            new CurrentTimeAdaptorFactory(),
+                            new CurrentTimeFactory(),
                             new TimeIsAfterFactory(new TimeFactory(21, 59, 59))
                         ),
                         new AdaptedVesselPredicateFactory<>(
-                            new CurrentDayOfWeekAdaptorFactory(),
+                            new CurrentDayOfWeekFactory(),
                             new IsEqualToAnyFactory<>(
                                 SUNDAY,
                                 MONDAY,

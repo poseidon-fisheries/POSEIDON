@@ -26,7 +26,7 @@ import java.time.DayOfWeek;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
-public class CurrentDayOfWeekAdaptor implements Function<Object, DayOfWeek> {
+public class CurrentDayOfWeek implements Function<Object, DayOfWeek> {
 
     private final TemporalSchedule schedule;
 

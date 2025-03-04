@@ -22,9 +22,9 @@ package uk.ac.ox.poseidon.core.adaptors.temporal;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-public class CurrentTimeAdaptorFactory extends GlobalScopeFactory<CurrentTimeAdaptor> {
+public class CurrentTimeFactory extends GlobalScopeFactory<CurrentTime> {
     @Override
-    protected CurrentTimeAdaptor newInstance(final Simulation simulation) {
-        return new CurrentTimeAdaptor(simulation.getTemporalSchedule());
+    protected CurrentTime newInstance(final Simulation simulation) {
+        return new CurrentTime(simulation.getTemporalSchedule());
     }
 }

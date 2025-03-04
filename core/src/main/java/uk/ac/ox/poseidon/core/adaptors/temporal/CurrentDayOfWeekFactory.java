@@ -19,20 +19,12 @@
 
 package uk.ac.ox.poseidon.core.adaptors.temporal;
 
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-import java.time.LocalTime;
-import java.util.function.Function;
-
-@RequiredArgsConstructor
-public class CurrentTimeAdaptor implements Function<Object, LocalTime> {
-
-    private final TemporalSchedule schedule;
-
+public class CurrentDayOfWeekFactory extends GlobalScopeFactory<CurrentDayOfWeek> {
     @Override
-    public LocalTime apply(final Object o) {
-        return schedule.getDateTime().toLocalTime();
+    protected CurrentDayOfWeek newInstance(final Simulation simulation) {
+        return new CurrentDayOfWeek(simulation.getTemporalSchedule());
     }
-
 }
