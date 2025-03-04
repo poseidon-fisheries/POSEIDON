@@ -26,6 +26,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
+import java.io.File;
 import java.nio.file.Path;
 
 @Getter
@@ -38,7 +39,11 @@ public class CellSetFromGridFileFactory extends GlobalScopeFactory<ImmutableSet<
 
     @Override
     protected ImmutableSet<Int2D> newInstance(final @NonNull Simulation simulation) {
-        final CoverageWrapper coverageWrapper = new CoverageWrapper(path.get(simulation).toFile());
+        final File gridFile = path.get(simulation).toFile();
+        if (!gridFile.isFile()) {
+            throw new RuntimeException(gridFile + " does not point to a file.");
+        }
+        final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
         final ImmutableSet.Builder<Int2D> builder = ImmutableSet.builder();
         coverageWrapper.processGrid((cell, value) -> {
             if (value == includedValue) {
