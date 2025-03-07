@@ -150,7 +150,7 @@ public class ExternalScenario extends Scenario {
     private Factory<? extends PortGrid> portGrid =
         new RandomLocationsPortGridFactory(
             bathymetricGrid,
-            new SimplePortFactory(new PrefixedIdSupplierFactory("Port")),
+            new SimplePortFactory(new PrefixedIdSupplierFactory("P")),
             3,
             2
         );

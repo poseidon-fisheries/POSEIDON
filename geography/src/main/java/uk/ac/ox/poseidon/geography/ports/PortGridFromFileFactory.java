@@ -22,31 +22,31 @@ package uk.ac.ox.poseidon.geography.ports;
 import lombok.*;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
+import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.utils.IdSupplier;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkState;
+import java.nio.file.Path;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PortGridFromLocationsFactory extends GlobalScopeFactory<DefaultPortGrid> {
+public class PortGridFromFileFactory extends GlobalScopeFactory<DefaultPortGrid> {
 
-    @NonNull private Factory<? extends IdSupplier> idSupplier;
     @NonNull private Factory<? extends BathymetricGrid> bathymetricGrid;
-    @NonNull private Map<String, Factory<? extends Coordinate>> ports;
+    @NonNull private Factory<? extends Path> path;
+    @NonNull private String idColumn;
+    @NonNull private String nameColumn;
+    @NonNull private String longitudeColumn;
+    @NonNull private String latitudeColumn;
 
     @Override
     protected DefaultPortGrid newInstance(final Simulation simulation) {
-        final IdSupplier idSupplier = this.idSupplier.get(simulation);
         final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
         final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
         final SparseGrid2D sparseGrid2D =
@@ -54,34 +54,19 @@ public class PortGridFromLocationsFactory extends GlobalScopeFactory<DefaultPort
                 modelGrid.getGridWidth(),
                 modelGrid.getGridHeight()
             );
-        ports.forEach((portName, coordinateFactory) -> {
-            final Coordinate coordinate = coordinateFactory.get(simulation);
-            final SimplePort port = new SimplePort(idSupplier.nextId(), portName);
+        Table.read().file(path.get(simulation).toFile()).forEach(row -> {
+            final Coordinate coordinate = new Coordinate(
+                row.getDouble(longitudeColumn),
+                row.getDouble(latitudeColumn)
+            );
+            final SimplePort port = new SimplePort(
+                row.getString(idColumn),
+                row.getString(nameColumn)
+            );
             final Int2D cell = modelGrid.toCell(coordinate);
-            checkCell(cell, coordinate, portName, bathymetricGrid);
+            // checkCell(cell, coordinate, portName, bathymetricGrid);
             sparseGrid2D.setObjectLocation(port, cell);
         });
         return new DefaultPortGrid(bathymetricGrid, sparseGrid2D);
     }
-
-    private void checkCell(
-        final Int2D cell,
-        final Coordinate coordinate,
-        final String portName,
-        final BathymetricGrid bathymetricGrid
-    ) {
-        checkState(
-            bathymetricGrid.isLand(cell),
-            "Coordinate " + coordinate + " for port " + portName + " is not on land."
-        );
-        checkState(
-            bathymetricGrid.getActiveWaterNeighbours(cell).findAny().isPresent(),
-            "Coordinate " +
-                coordinate +
-                " for port " +
-                portName +
-                " does not have any active water neighbors."
-        );
-    }
-
 }

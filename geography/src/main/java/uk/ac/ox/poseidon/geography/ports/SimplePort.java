@@ -23,5 +23,6 @@ import lombok.Data;
 
 @Data
 public class SimplePort implements Port {
+    private final String id;
     private final String name;
 }
