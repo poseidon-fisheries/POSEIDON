@@ -23,16 +23,21 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.google.common.collect.ImmutableList;
 import sim.display.Controller;
 import sim.display.GUIState;
+import sim.engine.Steppable;
+import sim.portrayal.Inspector;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class SimulationWithUI extends GUIState {
 
     private final ImmutableList<DisplayWrapper<?, ?>> displayWrappers;
     private final Supplier<Simulation> simulationSupplier;
+    private Simulation simulation;
 
     public SimulationWithUI(
         final Supplier<Simulation> simulationSupplier,
@@ -40,6 +45,7 @@ public class SimulationWithUI extends GUIState {
     ) {
         this(simulationSupplier, ImmutableList.copyOf(displayWrappers));
     }
+
     public SimulationWithUI(
         final Supplier<Simulation> simulationSupplier,
         final ImmutableList<DisplayWrapper<?, ?>> displayWrappers
@@ -56,8 +62,8 @@ public class SimulationWithUI extends GUIState {
 
     @Override
     public void start() {
-        final Simulation simulation = simulationSupplier.get();
-        super.state = simulation;
+        this.simulation = simulationSupplier.get();
+        super.state = this.simulation;
         super.start();
         displayWrappers.forEach(displayWrapper -> displayWrapper.setupPortrayals(simulation));
     }
@@ -70,7 +76,14 @@ public class SimulationWithUI extends GUIState {
 
     @Override
     public Object getSimulationInspectedObject() {
-        return state;
+        return new SimulationProxy();
+    }
+
+    @Override
+    public Inspector getInspector() {
+        final Inspector inspector = super.getInspector();
+        inspector.setVolatile(true);
+        return inspector;
     }
 
     @Override
@@ -78,4 +91,36 @@ public class SimulationWithUI extends GUIState {
         super.quit();
         displayWrappers.forEach(DisplayWrapper::quit);
     }
+
+    @SuppressWarnings("WeakerAccess")
+    public class SimulationProxy {
+
+        private <T> T propertyOrNull(final Function<Simulation, T> property) {
+            return SimulationWithUI.this.simulation != null
+                ? property.apply(SimulationWithUI.this.simulation)
+                : null;
+        }
+
+        public Scenario getScenario() {
+            return propertyOrNull(Simulation::getScenario);
+        }
+
+        public Long getId() {
+            return propertyOrNull(Simulation::getId);
+        }
+
+        public TemporalSchedule getTemporalSchedule() {
+            return propertyOrNull(Simulation::getTemporalSchedule);
+        }
+
+        public List<Steppable> getFinalProcess() {
+            return propertyOrNull(Simulation::getFinalProcesses);
+        }
+
+        public List<?> getComponents() {
+            return propertyOrNull(Simulation::getComponents);
+        }
+
+    }
+
 }
