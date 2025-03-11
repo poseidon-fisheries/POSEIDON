@@ -24,12 +24,11 @@ plugins {
 dependencies {
     api(project(":core"))
     implementation(project(":io"))
-    implementation("com.badlogicgames.gdx:gdx-ai:1.8.2")
-    api("org.locationtech.jts:jts-core:1.20.0")
-    val geoToolsVersion = 32.2
-    implementation("org.geotools:gt-api:${geoToolsVersion}")
-    implementation("org.geotools:gt-main:${geoToolsVersion}")
-    implementation("org.geotools:gt-coverage:${geoToolsVersion}")
-    runtimeOnly("org.geotools:gt-shapefile:${geoToolsVersion}")
-    runtimeOnly("org.geotools:gt-arcgrid:$geoToolsVersion")
+    implementation(libs.gdx.ai)
+    api(libs.jts.core)
+    implementation(libs.gt.api)
+    implementation(libs.gt.main)
+    implementation(libs.gt.coverage)
+    runtimeOnly(libs.gt.shapefile)
+    runtimeOnly(libs.gt.arcgrid)
 }

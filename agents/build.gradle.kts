@@ -25,4 +25,5 @@ dependencies {
     api(project(":biology"))
     api(project(":geography"))
     api(project(":io"))
+    implementation(libs.streamex)
 }

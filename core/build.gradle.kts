@@ -27,6 +27,6 @@ plugins {
 
 dependencies {
     api(fileTree("libs/mason") { include("*.jar") })
-    api("tech.units:indriya:2.2.2")
-    api("si.uom:si-units:2.1") // upgrading past 2.1 breaks GeoTools 32.2
+    api(libs.indriya)
+    api(libs.si.units)
 }

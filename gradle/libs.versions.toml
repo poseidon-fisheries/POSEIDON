@@ -2,11 +2,48 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-commons-math3 = "3.6.1"
-guava = "33.1.0-jre"
+batik = "1.18"
+flatlaf = "3.5.4"
+gdx = "1.8.2"
+geotools = "32.2"
+guava = "33.4.0-jre"
+indriya = "2.2.2"
+jcommander = "2.0"
+jqwik = "1.9.2"
+jts = "1.20.0"
+junit = "5.12.0"
+lombok = "1.18.30"
 mockito = "5.14.0"
+si-units = "2.1" # upgrading past 2.1 breaks GeoTools 32.2
+slf4j = "2.0.16"
+snakeyaml = "2.2"
+streamex = "0.8.3"
+tablesaw = "0.44.0"
 
 [libraries]
-commons-math3 = { module = "org.apache.commons:commons-math3", version.ref = "commons-math3" }
+batik-awt-util = { module = "org.apache.xmlgraphics:batik-awt-util", version.ref = "batik" }
+batik-dom = { module = "org.apache.xmlgraphics:batik-dom", version.ref = "batik" }
+batik-transcoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.ref = "batik" }
+flatlaf = { module = "com.formdev:flatlaf", version.ref = "flatlaf" }
+gdx-ai = { module = "com.badlogicgames.gdx:gdx-ai", version.ref = "gdx" }
+gt-api = { module = "org.geotools:gt-api", version.ref = "geotools" }
+gt-arcgrid = { module = "org.geotools:gt-arcgrid", version.ref = "geotools" }
+gt-coverage = { module = "org.geotools:gt-coverage", version.ref = "geotools" }
+gt-main = { module = "org.geotools:gt-main", version.ref = "geotools" }
+gt-shapefile = { module = "org.geotools:gt-shapefile", version.ref = "geotools" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
+indriya = { module = "tech.units:indriya", version.ref = "indriya" }
+jcommander = { module = "org.jcommander:jcommander", version.ref = "jcommander" }
+jqwik = { module = "net.jqwik:jqwik", version.ref = "jqwik" }
+jts-core = { module = "org.locationtech.jts:jts-core", version.ref = "jts" }
+junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+si-units = { module = "si.uom:si-units", version.ref = "si-units" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
+streamex = { module = "one.util:streamex", version.ref = "streamex" }
+tablesaw-core = { module = "net.tlabs-data:tablesaw-core", version.ref = "tablesaw" }
+
+[bundles]
+batik = ["batik-transcoder", "batik-dom", "batik-awt-util"]

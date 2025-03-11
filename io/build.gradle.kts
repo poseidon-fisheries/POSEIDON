@@ -23,7 +23,7 @@ plugins {
 
 dependencies {
     api(project(":core"))
-    api("net.tlabs-data:tablesaw-core:0.43.2-rc1")
-    implementation("org.yaml:snakeyaml:2.2")
-    implementation("org.slf4j:slf4j-simple:2.0.16")
+    api(libs.tablesaw.core)
+    implementation(libs.snakeyaml)
+    implementation(libs.slf4j.simple)
 }

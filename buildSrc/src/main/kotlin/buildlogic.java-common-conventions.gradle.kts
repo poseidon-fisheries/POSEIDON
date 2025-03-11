@@ -41,17 +41,15 @@ repositories {
 val mockitoAgent: Configuration = configurations.create("mockitoAgent")
 
 dependencies {
-    implementation("org.projectlombok:lombok:1.18.30")
-    annotationProcessor("org.projectlombok:lombok:1.18.30")
-    implementation("com.google.guava:guava:33.2.1-jre")
-    implementation("one.util:streamex:0.8.3")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
-    testImplementation("net.jqwik:jqwik:1.9.0")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    compileOnly("com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}")
-
+    implementation(libs.guava)
+    implementation(libs.lombok)
+    annotationProcessor(libs.lombok)
+    testImplementation(libs.junit)
+    testImplementation(libs.jqwik)
     testImplementation(libs.mockito)
     mockitoAgent(libs.mockito) { isTransitive = false }
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    compileOnly("com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}")
 }
 
 

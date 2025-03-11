@@ -27,19 +27,12 @@ dependencies {
     implementation(project(":biology"))
     implementation(project(":agents"))
 
-    val flatlafVersion = "3.5.1"
-    implementation("com.formdev:flatlaf:${flatlafVersion}")
-    implementation("com.formdev:flatlaf:${flatlafVersion}:linux-x86_64@so")
-    implementation("com.formdev:flatlaf:${flatlafVersion}:macos-arm64@dylib")
-    implementation("com.formdev:flatlaf:${flatlafVersion}:macos-x86_64@dylib")
-    implementation("com.formdev:flatlaf:${flatlafVersion}:windows-x86_64@dll")
+    implementation(libs.flatlaf)
+    implementation("com.formdev:flatlaf:${libs.versions.flatlaf.get()}:linux-x86_64@so")
+    implementation("com.formdev:flatlaf:${libs.versions.flatlaf.get()}:macos-arm64@dylib")
+    implementation("com.formdev:flatlaf:${libs.versions.flatlaf.get()}:macos-x86_64@dylib")
+    implementation("com.formdev:flatlaf:${libs.versions.flatlaf.get()}:windows-x86_64@dll")
+    implementation("com.formdev:flatlaf:${libs.versions.flatlaf.get()}:windows-arm64@dll")
 
-    // ARM 64-bit (not needed if your application does not support Windows on ARM)
-    implementation("com.formdev:flatlaf:${flatlafVersion}:windows-arm64@dll")
-
-    // Apache batik for SVG handling
-    val batikVersion = "1.18"
-    implementation("org.apache.xmlgraphics:batik-transcoder:${batikVersion}")
-    implementation("org.apache.xmlgraphics:batik-dom:${batikVersion}")
-    implementation("org.apache.xmlgraphics:batik-awt-util:${batikVersion}")
+    implementation(libs.bundles.batik) // Apache batik for SVG handling
 }
