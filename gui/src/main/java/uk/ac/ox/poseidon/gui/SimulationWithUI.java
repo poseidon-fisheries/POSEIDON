@@ -92,6 +92,13 @@ public class SimulationWithUI extends GUIState {
         displayWrappers.forEach(DisplayWrapper::quit);
     }
 
+    /**
+     * This class is there to get around the fact that the MASON model inspector is tied to a
+     * particular object that cannot be changed without reconstructing the inspector. Since we build
+     * a new simulation object everytime it is restarted (instead of re-initialising the same object
+     * as is more common in MASON), we use this proxy class pointing to the current simulation for
+     * the inspector to display.
+     */
     @SuppressWarnings("WeakerAccess")
     public class SimulationProxy {
 
