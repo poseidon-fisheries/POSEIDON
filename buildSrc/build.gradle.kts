@@ -34,3 +34,7 @@ repositories {
 dependencies {
     implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.26")
 }
+
+tasks.withType<Jar>().configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
