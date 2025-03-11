@@ -21,83 +21,117 @@ package uk.ac.ox.poseidon.core.predicates.numeric;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.function.ToDoubleFunction;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class BelowTest {
 
+    /**
+     * Tests the `Below` class which is an implementation of a Predicate<Double>. It evaluates
+     * whether a given value is below the specified threshold.
+     */
+
     @Test
-    void testObjectValueBelowThreshold() {
+    void testValueBelowThreshold() {
         // Arrange
-        final double threshold = 100.0;
-        final ToDoubleFunction<Object> doubleFunction = mock(ToDoubleFunction.class);
-        final Object object = mock(Object.class);
-        when(doubleFunction.applyAsDouble(object)).thenReturn(50.0);
-        final Below below = new Below(threshold, doubleFunction);
+        final double threshold = 10.0;
+        final Below below = new Below(threshold);
 
         // Act
-        final boolean result = below.test(object);
+        final boolean result = below.test(5.0);
 
         // Assert
-        assertTrue(
-            result,
-            "Expected the test to return true when object's value is below the threshold"
-        );
+        assertTrue(result, "The value 5.0 should be below the threshold 10.0");
     }
 
     @Test
-    void testObjectValueEqualToThreshold() {
+    void testValueEqualsThreshold() {
         // Arrange
-        final double threshold = 100.0;
-        final ToDoubleFunction<Object> doubleFunction = mock(ToDoubleFunction.class);
-        final Object object = mock(Object.class);
-        when(doubleFunction.applyAsDouble(object)).thenReturn(100.0);
-        final Below below = new Below(threshold, doubleFunction);
+        final double threshold = 10.0;
+        final Below below = new Below(threshold);
 
         // Act
-        final boolean result = below.test(object);
+        final boolean result = below.test(10.0);
 
         // Assert
-        assertFalse(
-            result,
-            "Expected the test to return false when object's value equals the threshold"
-        );
+        assertFalse(result, "The value 10.0 should not be below the threshold 10.0");
     }
 
     @Test
-    void testObjectValueAboveThreshold() {
+    void testValueAboveThreshold() {
         // Arrange
-        final double threshold = 100.0;
-        final ToDoubleFunction<Object> doubleFunction = mock(ToDoubleFunction.class);
-        final Object object = mock(Object.class);
-        when(doubleFunction.applyAsDouble(object)).thenReturn(150.0);
-        final Below below = new Below(threshold, doubleFunction);
+        final double threshold = 10.0;
+        final Below below = new Below(threshold);
 
         // Act
-        final boolean result = below.test(object);
+        final boolean result = below.test(15.0);
 
         // Assert
-        assertFalse(
-            result,
-            "Expected the test to return false when object's value is above the threshold"
-        );
+        assertFalse(result, "The value 15.0 should not be below the threshold 10.0");
     }
 
     @Test
-    void testNullObjectThrowsException() {
+    void testNegativeValueBelowNegativeThreshold() {
         // Arrange
-        final double threshold = 100.0;
-        final ToDoubleFunction<Object> doubleFunction = mock(ToDoubleFunction.class);
-        final Below below = new Below(threshold, doubleFunction);
+        final double threshold = -5.0;
+        final Below below = new Below(threshold);
+
+        // Act
+        final boolean result = below.test(-10.0);
+
+        // Assert
+        assertTrue(result, "The value -10.0 should be below the threshold -5.0");
+    }
+
+    @Test
+    void testNegativeValueEqualsNegativeThreshold() {
+        // Arrange
+        final double threshold = -5.0;
+        final Below below = new Below(threshold);
+
+        // Act
+        final boolean result = below.test(-5.0);
+
+        // Assert
+        assertFalse(result, "The value -5.0 should not be below the threshold -5.0");
+    }
+
+    @Test
+    void testNegativeValueAboveNegativeThreshold() {
+        // Arrange
+        final double threshold = -10.0;
+        final Below below = new Below(threshold);
+
+        // Act
+        final boolean result = below.test(-5.0);
+
+        // Assert
+        assertFalse(result, "The value -5.0 should not be below the threshold -10.0");
+    }
+
+    @Test
+    void testWithZeroValue() {
+        // Arrange
+        final double threshold = 0.0;
+        final Below below = new Below(threshold);
+
+        // Act
+        final boolean result = below.test(-1.0);
+
+        // Assert
+        assertTrue(result, "The value -1.0 should be below the threshold 0.0");
+    }
+
+    @Test
+    void testValueIsNull() {
+        // Arrange
+        final double threshold = 10.0;
+        final Below below = new Below(threshold);
 
         // Act & Assert
         assertThrows(
             NullPointerException.class,
             () -> below.test(null),
-            "Expected NullPointerException when object is null"
+            "Passing null should throw NullPointerException"
         );
     }
 }

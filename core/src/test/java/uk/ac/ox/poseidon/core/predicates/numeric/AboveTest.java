@@ -21,88 +21,89 @@ package uk.ac.ox.poseidon.core.predicates.numeric;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.function.ToDoubleFunction;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class AboveTest {
 
-    @Test
-    void testAboveThreshold() {
-        // Arrange
-        final double threshold = 50.0;
-        final Object mockObject = mock(Object.class);
-        final ToDoubleFunction<Object> mockDoubleFunction = mock(ToDoubleFunction.class);
-        when(mockDoubleFunction.applyAsDouble(mockObject)).thenReturn(60.0); // Value above
-        // threshold
-
-        final Above predicate = new Above(threshold, mockDoubleFunction);
-
-        // Act
-        final boolean result = predicate.test(mockObject);
-
-        // Assert
-        assertTrue(result, "Expected the result to be true when the value is above the threshold.");
-    }
+    /**
+     * The Above class represents a Predicate<Double> that checks whether a given value is above a
+     * certain threshold. The test(Double value) method returns true if the provided value is
+     * greater than the threshold, and false otherwise.
+     */
 
     @Test
-    void testEqualToThreshold() {
+    void testValueAboveThresholdShouldReturnTrue() {
         // Arrange
-        final double threshold = 50.0;
-        final Object mockObject = mock(Object.class);
-        final ToDoubleFunction<Object> mockDoubleFunction = mock(ToDoubleFunction.class);
-        when(mockDoubleFunction.applyAsDouble(mockObject)).thenReturn(50.0); // Value equal to
-        // threshold
-
-        final Above predicate = new Above(threshold, mockDoubleFunction);
+        final double threshold = 10.0;
+        final Above above = new Above(threshold);
 
         // Act
-        final boolean result = predicate.test(mockObject);
+        final boolean result = above.test(15.0);
 
         // Assert
-        assertFalse(
+        assertTrue(
             result,
-            "Expected the result to be false when the value is equal to the threshold."
+            "Expected the test to return true when the value is above the threshold"
         );
     }
 
     @Test
-    void testBelowThreshold() {
+    void testValueBelowThresholdShouldReturnFalse() {
         // Arrange
-        final double threshold = 50.0;
-        final Object mockObject = mock(Object.class);
-        final ToDoubleFunction<Object> mockDoubleFunction = mock(ToDoubleFunction.class);
-        when(mockDoubleFunction.applyAsDouble(mockObject)).thenReturn(40.0); // Value below
-        // threshold
-
-        final Above predicate = new Above(threshold, mockDoubleFunction);
+        final double threshold = 10.0;
+        final Above above = new Above(threshold);
 
         // Act
-        final boolean result = predicate.test(mockObject);
+        final boolean result = above.test(5.0);
 
         // Assert
         assertFalse(
             result,
-            "Expected the result to be false when the value is below the threshold."
+            "Expected the test to return false when the value is below the threshold"
         );
     }
 
     @Test
-    void testNullObjectHandling() {
+    void testValueEqualToThresholdShouldReturnFalse() {
         // Arrange
-        final double threshold = 50.0;
-        final ToDoubleFunction<Object> mockDoubleFunction = mock(ToDoubleFunction.class);
-        when(mockDoubleFunction.applyAsDouble(null)).thenThrow(NullPointerException.class);
+        final double threshold = 10.0;
+        final Above above = new Above(threshold);
 
-        final Above predicate = new Above(threshold, mockDoubleFunction);
+        // Act
+        final boolean result = above.test(10.0);
+
+        // Assert
+        assertFalse(
+            result,
+            "Expected the test to return false when the value is equal to the threshold"
+        );
+    }
+
+    @Test
+    void testValueIsNotNull() {
+        // Arrange
+        final double threshold = 10.0;
+        final Above above = new Above(threshold);
+
+        // Act & Assert
+        assertDoesNotThrow(
+            () -> above.test(12.0),
+            "Expected the test to execute without throwing a NullPointerException when the value " +
+                "is not null"
+        );
+    }
+
+    @Test
+    void testValueIsNullShouldThrowException() {
+        // Arrange
+        final double threshold = 10.0;
+        final Above above = new Above(threshold);
 
         // Act & Assert
         assertThrows(
             NullPointerException.class,
-            () -> predicate.test(null),
-            "NullPointerException was thrown as expected."
+            () -> above.test(null),
+            "Expected the test to throw NullPointerException when the value is null"
         );
     }
 }

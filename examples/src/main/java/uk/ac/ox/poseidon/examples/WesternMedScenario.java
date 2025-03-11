@@ -225,7 +225,7 @@ public class WesternMedScenario extends Scenario {
                     modelGrid,
                     new AdaptedPredicateFactory<>(
                         new CellElevationFactory(bathymetricGrid),
-                        new AboveFactory<>(-35)
+                        new AboveFactory(-35)
                     )
                 ),
                 new ActionCellPredicateFactory(

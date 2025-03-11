@@ -20,141 +20,71 @@
 package uk.ac.ox.poseidon.core.predicates.numeric;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.function.ToDoubleFunction;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class BelowFactoryTest {
 
     /**
-     * Test description: Verifies that the `newInstance` method in the `BelowFactory` class
-     * correctly creates instances of the `Below` class with the expected threshold value and double
-     * function.
+     * Tests for the BelowFactory class.
+     * <p>
+     * The BelowFactory class is responsible for creating a new instance of the Below class. It uses
+     * the threshold value set in the factory to initialize a Below instance.
      */
+
     @Test
-    void testNewInstance_CreatesInstanceWithCorrectThresholdAndFunction() {
+    void testNewInstance_CreatesBelowInstanceWithCorrectThreshold() {
         // Arrange
-        final double expectedThreshold = 5.0;
-        final Simulation simulation = mock(Simulation.class);
-        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Object>>
-            mockDoubleFunctionFactory = mock(Factory.class);
-        @SuppressWarnings("unchecked") final ToDoubleFunction<Object> mockDoubleFunction = mock(
-            ToDoubleFunction.class);
-
-        when(mockDoubleFunctionFactory.get(simulation)).thenReturn(mockDoubleFunction);
-
-        final BelowFactory belowFactory = new BelowFactory();
-        belowFactory.setThreshold(expectedThreshold);
-        belowFactory.setDoubleFunction(mockDoubleFunctionFactory);
+        final double threshold = 10.5;
+        final BelowFactory factory = new BelowFactory(threshold);
+        final Simulation simulation = new Simulation(); // Dummy object as it's not directly used.
 
         // Act
-        final Below result = belowFactory.newInstance(simulation);
+        final Below result = factory.newInstance(simulation);
 
         // Assert
-        assertNotNull(result, "The Below instance should not be null.");
+        assertNotNull(result, "The result should not be null");
         assertEquals(
-            expectedThreshold,
-            belowFactory.getThreshold(),
-            "The threshold value should match the initialized value."
+            threshold, result.getThreshold(),
+            "The Below instance should be created with the correct threshold value"
         );
-        assertEquals(
-            result.getDoubleFunction(),
-            mockDoubleFunction,
-            "The double function should be properly injected."
-        );
-        verify(mockDoubleFunctionFactory, times(1)).get(simulation);
     }
 
-    /**
-     * Test description: Verifies that the `newInstance` method successfully handles and
-     * incorporates a valid simulation object passed to the method.
-     */
     @Test
-    void testNewInstance_HandlesSimulationCorrectly() {
+    void testNewInstance_ThresholdIsZero() {
         // Arrange
-        final double threshold = 15.0;
-        final Simulation simulation = mock(Simulation.class);
-        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Object>>
-            mockDoubleFunctionFactory = mock(Factory.class);
-        @SuppressWarnings("unchecked") final ToDoubleFunction<Object> mockDoubleFunction = mock(
-            ToDoubleFunction.class);
-
-        when(mockDoubleFunctionFactory.get(simulation)).thenReturn(mockDoubleFunction);
-
-        final BelowFactory belowFactory = new BelowFactory();
-        belowFactory.setThreshold(threshold);
-        belowFactory.setDoubleFunction(mockDoubleFunctionFactory);
+        final double threshold = 0.0;
+        final BelowFactory factory = new BelowFactory(threshold);
+        final Simulation simulation = new Simulation();
 
         // Act
-        final Below result = belowFactory.newInstance(simulation);
+        final Below result = factory.newInstance(simulation);
 
         // Assert
-        assertNotNull(result, "The Below instance should not be null.");
+        assertNotNull(result, "The result should not be null");
         assertEquals(
-            mockDoubleFunction,
-            result.getDoubleFunction(),
-            "The double function should match the one returned from the factory."
-        );
-        verify(mockDoubleFunctionFactory, times(1)).get(simulation);
-    }
-
-    /**
-     * Test description: Verifies that the `newInstance` method throws a NullPointerException when a
-     * null simulation object is passed.
-     */
-    @Test
-    void testNewInstance_ThrowsExceptionForNullSimulation() {
-        // Arrange
-        final BelowFactory belowFactory = new BelowFactory();
-        belowFactory.setThreshold(10.0);
-        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Object>>
-            mockDoubleFunctionFactory = mock(Factory.class);
-        belowFactory.setDoubleFunction(mockDoubleFunctionFactory);
-
-        // Act & Assert
-        assertThrows(
-            NullPointerException.class,
-            () -> belowFactory.newInstance(null),
-            "Expected newInstance to throw NullPointerException for null simulation."
+            threshold, result.getThreshold(),
+            "The Below instance should handle a zero threshold correctly"
         );
     }
 
-    /**
-     * Test description: Verifies that the `newInstance` method handles a negative threshold value
-     * without errors.
-     */
     @Test
-    void testNewInstance_HandlesNegativeThreshold() {
+    void testNewInstance_ThresholdIsNegative() {
         // Arrange
-        final Simulation simulation = mock(Simulation.class);
-        @SuppressWarnings("unchecked") final Factory<ToDoubleFunction<Object>>
-            mockDoubleFunctionFactory = mock(Factory.class);
-        @SuppressWarnings("unchecked") final ToDoubleFunction<Object> mockDoubleFunction = mock(
-            ToDoubleFunction.class);
-
-        when(mockDoubleFunctionFactory.get(simulation)).thenReturn(mockDoubleFunction);
-
-        final BelowFactory belowFactory = new BelowFactory();
-        belowFactory.setThreshold(-10.0); // Negative threshold
-        belowFactory.setDoubleFunction(mockDoubleFunctionFactory);
+        final double threshold = -5.0;
+        final BelowFactory factory = new BelowFactory(threshold);
+        final Simulation simulation = new Simulation();
 
         // Act
-        final Below result = belowFactory.newInstance(simulation);
+        final Below result = factory.newInstance(simulation);
 
         // Assert
-        assertNotNull(
-            result,
-            "The Below instance should not be null, even for a negative threshold."
-        );
+        assertNotNull(result, "The result should not be null");
         assertEquals(
-            -10.0,
-            belowFactory.getThreshold(),
-            "The threshold should match the negative value set."
+            threshold, result.getThreshold(),
+            "The Below instance should correctly set a negative threshold value"
         );
     }
-
 }

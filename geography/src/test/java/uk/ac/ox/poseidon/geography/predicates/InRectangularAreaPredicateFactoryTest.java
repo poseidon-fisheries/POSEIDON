@@ -17,15 +17,13 @@
  *
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.spatial;
+package uk.ac.ox.poseidon.geography.predicates;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.Envelope;
-import uk.ac.ox.poseidon.geography.predicates.InRectangularAreaPredicate;
-import uk.ac.ox.poseidon.geography.predicates.InRectangularAreaPredicateFactory;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;

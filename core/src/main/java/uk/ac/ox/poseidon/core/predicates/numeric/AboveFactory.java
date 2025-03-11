@@ -27,7 +27,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AboveFactory<T> extends GlobalScopeFactory<Above> {
+public class AboveFactory extends GlobalScopeFactory<Above> {
 
     private double threshold;
 

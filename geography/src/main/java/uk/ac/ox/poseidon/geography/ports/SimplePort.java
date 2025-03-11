@@ -19,10 +19,17 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class SimplePort implements Port {
+
     private final String id;
     private final String name;
+
+    public SimplePort(final String nameAndId) {
+        this(nameAndId, nameAndId);
+    }
 }
