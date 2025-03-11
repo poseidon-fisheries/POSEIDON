@@ -19,13 +19,21 @@ slf4j = "2.0.16"
 snakeyaml = "2.2"
 streamex = "0.8.3"
 tablesaw = "0.44.0"
+spotbugs = "6.0.26"
+grpc = "1.68.1"
+protobuf = "4.28.3"
+annotation-api = "1.3.2"
 
 [libraries]
+annotation-api = { module = "javax.annotation:javax.annotation-api", version.ref = "annotation-api" }
 batik-awt-util = { module = "org.apache.xmlgraphics:batik-awt-util", version.ref = "batik" }
 batik-dom = { module = "org.apache.xmlgraphics:batik-dom", version.ref = "batik" }
 batik-transcoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.ref = "batik" }
 flatlaf = { module = "com.formdev:flatlaf", version.ref = "flatlaf" }
 gdx-ai = { module = "com.badlogicgames.gdx:gdx-ai", version.ref = "gdx" }
+grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc" }
+grpc-protobuf = { module = "io.grpc:grpc-protobuf ", version.ref = "grpc" }
+grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
 gt-api = { module = "org.geotools:gt-api", version.ref = "geotools" }
 gt-arcgrid = { module = "org.geotools:gt-arcgrid", version.ref = "geotools" }
 gt-coverage = { module = "org.geotools:gt-coverage", version.ref = "geotools" }
@@ -37,13 +45,25 @@ jcommander = { module = "org.jcommander:jcommander", version.ref = "jcommander" 
 jqwik = { module = "net.jqwik:jqwik", version.ref = "jqwik" }
 jts-core = { module = "org.locationtech.jts:jts-core", version.ref = "jts" }
 junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
+protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
+protocGenGrpcJava = { module = "io.grpc:protoc-gen-grpc-java", version.ref = "grpc" }
 si-units = { module = "si.uom:si-units", version.ref = "si-units" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
+spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations" }
+spotbugs-gradle-plugin = { module = "com.github.spotbugs.snom:spotbugs-gradle-plugin", version.ref = "spotbugs" }
 streamex = { module = "one.util:streamex", version.ref = "streamex" }
 tablesaw-core = { module = "net.tlabs-data:tablesaw-core", version.ref = "tablesaw" }
 
 [bundles]
 batik = ["batik-transcoder", "batik-dom", "batik-awt-util"]
+grpc = ["grpc-netty-shaded", "grpc-protobuf", "grpc-stub", "protobuf-java", "annotation-api"]
+
+[plugins]
+spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugs" }
+shadow = { id = "com.gradleup.shadow", version = "8.3.5" }
+protobuf = { id = "com.google.protobuf", version = "0.9.4" }

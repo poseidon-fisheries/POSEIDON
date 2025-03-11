@@ -32,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.26")
+    implementation(libs.spotbugs.gradle.plugin)
 }
 
 tasks.withType<Jar>().configureEach {

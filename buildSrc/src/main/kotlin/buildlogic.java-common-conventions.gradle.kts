@@ -24,7 +24,7 @@
 plugins {
     java
     jacoco
-    id("com.github.spotbugs")
+    alias(libs.plugins.spotbugs)
 }
 
 repositories {
@@ -48,8 +48,8 @@ dependencies {
     testImplementation(libs.jqwik)
     testImplementation(libs.mockito)
     mockitoAgent(libs.mockito) { isTransitive = false }
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    compileOnly("com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}")
+    testRuntimeOnly(libs.junit.platform.launcher)
+    compileOnly("${libs.spotbugs.annotations.get()}:${spotbugs.toolVersion.get()}")
 }
 
 

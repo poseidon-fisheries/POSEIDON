@@ -19,8 +19,8 @@
 
 plugins {
     id("buildlogic.java-application-conventions")
-    id("com.google.protobuf") version "0.9.4"
-    id("com.gradleup.shadow") version "8.3.5"
+    alias(libs.plugins.protobuf)
+    alias(libs.plugins.shadow)
 }
 
 dependencies {
@@ -28,15 +28,8 @@ dependencies {
     implementation(project(":biology"))
     implementation(project(":io"))
     implementation(project(":gui"))
-
-    implementation("org.jcommander:jcommander:2.0")
-
-    // The following are all necessary for gRPC
-    implementation("io.grpc:grpc-netty-shaded:1.68.1")
-    implementation("io.grpc:grpc-protobuf:1.68.1")
-    implementation("io.grpc:grpc-stub:1.68.1")
-    implementation("com.google.protobuf:protobuf-java:4.28.3")
-    implementation("javax.annotation:javax.annotation-api:1.3.2")
+    implementation(libs.jcommander)
+    implementation(libs.bundles.grpc)
 }
 
 tasks.shadowJar {
@@ -49,11 +42,11 @@ tasks.shadowJar {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:4.28.3" // Specify Protoc compiler
+        artifact = libs.protoc.get().toString()
     }
     plugins {
         create("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.68.1" // Specify gRPC plugin
+            artifact = libs.protocGenGrpcJava.get().toString()
         }
     }
     generateProtoTasks {
