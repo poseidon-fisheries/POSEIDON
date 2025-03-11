@@ -23,11 +23,10 @@
  * This settings file is used to specify which projects to include in your build-logic build.
  */
 
-dependencyResolutionManagement {
-    // Reuse version catalog from the main build.
-    versionCatalogs {
-        create("libs") { from(files("../gradle/libs.versions.toml")) }
-    }
+plugins {
+    // This is to make the version catalog (i.e., accessed through `libs....`)
+    // available within buildSrc convention plugins:
+    id("dev.panuszewski.typesafe-conventions") version "0.5.0"
 }
 
 rootProject.name = "buildSrc"
