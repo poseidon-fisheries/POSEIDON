@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.examples.external;
+package uk.ac.ox.poseidon.server;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

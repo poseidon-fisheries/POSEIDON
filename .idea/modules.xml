@@ -11,6 +11,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/gui/POSEIDON.gui.main.iml" filepath="$PROJECT_DIR$/.idea/modules/gui/POSEIDON.gui.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/io/POSEIDON.io.main.iml" filepath="$PROJECT_DIR$/.idea/modules/io/POSEIDON.io.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/regulations/POSEIDON.regulations.main.iml" filepath="$PROJECT_DIR$/.idea/modules/regulations/POSEIDON.regulations.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/POSEIDON.server.main.iml" filepath="$PROJECT_DIR$/.idea/modules/server/POSEIDON.server.main.iml" />
     </modules>
   </component>
 </project>

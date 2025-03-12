@@ -28,6 +28,7 @@
             <option value="$PROJECT_DIR$/gui" />
             <option value="$PROJECT_DIR$/io" />
             <option value="$PROJECT_DIR$/regulations" />
+            <option value="$PROJECT_DIR$/server" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -19,6 +19,7 @@
 
 plugins {
     id("buildlogic.java-application-conventions")
+    alias(libs.plugins.protobuf)
     alias(libs.plugins.shadow)
 }
 
@@ -26,8 +27,8 @@ dependencies {
     implementation(project(":regulations"))
     implementation(project(":biology"))
     implementation(project(":io"))
-    implementation(project(":gui"))
     implementation(libs.jcommander)
+    implementation(libs.bundles.grpc)
 }
 
 tasks.shadowJar {
@@ -35,5 +36,23 @@ tasks.shadowJar {
         // those exclusions prevent GeoTools from trying to load the CLib plugin, which crashes:
         exclude("com/sun/media/imageioimpl/plugins/jpeg/CLib*")
         exclude("META-INF/services/javax.imageio.spi.*")
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = libs.protoc.get().toString()
+    }
+    plugins {
+        create("grpc") {
+            artifact = libs.protocGenGrpcJava.get().toString()
+        }
+    }
+    generateProtoTasks {
+        all().configureEach {
+            plugins {
+                create("grpc")
+            }
+        }
     }
 }

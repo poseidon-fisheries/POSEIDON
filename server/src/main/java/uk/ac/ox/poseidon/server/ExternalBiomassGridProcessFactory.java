@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.examples.external;
+package uk.ac.ox.poseidon.server;
 
 import fishing.BiomassGridServiceGrpc;
 import fishing.Fishing;

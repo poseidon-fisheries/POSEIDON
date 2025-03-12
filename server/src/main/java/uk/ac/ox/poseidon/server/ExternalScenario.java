@@ -17,7 +17,7 @@
  *
  */
 
-package uk.ac.ox.poseidon.examples.external;
+package uk.ac.ox.poseidon.server;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -68,7 +68,6 @@ import uk.ac.ox.poseidon.core.time.DurationFactory;
 import uk.ac.ox.poseidon.core.time.ExponentiallyDistributedDurationSupplierFactory;
 import uk.ac.ox.poseidon.core.utils.ConstantSupplierFactory;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
-import uk.ac.ox.poseidon.examples.QuickRunner;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.RoughCoastalBathymetricGridFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
@@ -80,14 +79,11 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.geography.ports.RandomLocationsPortGridFactory;
 import uk.ac.ox.poseidon.geography.ports.SimplePortFactory;
-import uk.ac.ox.poseidon.io.ScenarioWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriter;
 import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 import uk.ac.ox.poseidon.regulations.PermittedIfFactory;
 
-import java.nio.file.Path;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -291,13 +287,4 @@ public class ExternalScenario extends Scenario {
         super(new DateFactory(LocalDate.now().getYear(), 1, 1));
     }
 
-    public static void main(final String[] args) {
-        final ExternalScenario scenario = new ExternalScenario();
-        final Path scenarioPath = Path.of("/home/nicolas/Desktop/scenario.yaml");
-        new ScenarioWriter().write(
-            scenario,
-            scenarioPath
-        );
-        new QuickRunner(scenarioPath, Period.ofYears(1)).run();
-    }
 }
