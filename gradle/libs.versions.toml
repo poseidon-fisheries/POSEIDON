@@ -15,7 +15,6 @@ junit = "5.12.0"
 lombok = "1.18.30"
 mockito = "5.14.0"
 si-units = "2.1" # upgrading past 2.1 breaks GeoTools 32.2
-slf4j = "2.0.16"
 snakeyaml = "2.2"
 streamex = "0.8.3"
 tablesaw = "0.44.0"
@@ -52,7 +51,6 @@ protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "p
 protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
 protocGenGrpcJava = { module = "io.grpc:protoc-gen-grpc-java", version.ref = "grpc" }
 si-units = { module = "si.uom:si-units", version.ref = "si-units" }
-slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations" }
 spotbugs-gradle-plugin = { module = "com.github.spotbugs.snom:spotbugs-gradle-plugin", version.ref = "spotbugs" }

@@ -22,22 +22,22 @@ package uk.ac.ox.poseidon.geography.distance;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
+import java.lang.System.Logger;
 import java.text.MessageFormat;
-import java.util.logging.Logger;
 
+import static java.lang.System.Logger.Level.WARNING;
 import static org.apache.commons.math3.util.FastMath.*;
 
 public class EquirectangularDistanceCalculator extends CoordinateBasedDistanceCalculator {
 
-    static final Logger LOGGER =
-        Logger.getLogger(EquirectangularDistanceCalculator.class.getName());
+    private static final Logger logger =
+        System.getLogger(EquirectangularDistanceCalculator.class.getName());
     private static final double WARNING_THRESHOLD = 250;
 
     public EquirectangularDistanceCalculator(final ModelGrid modelGrid) {
         super(modelGrid);
     }
 
-    @SuppressWarnings("SuspiciousNameCombination")
     @Override
     public double distanceInKm(
         final Coordinate a,
@@ -52,11 +52,13 @@ public class EquirectangularDistanceCalculator extends CoordinateBasedDistanceCa
         final double result = EARTH_RADIUS_IN_KM * sqrt(x * x + y * y);
 
         if (result > WARNING_THRESHOLD) {
-            LOGGER.warning(MessageFormat.format(
-                "Equirectangular distance calculator is not accurate for distances " +
-                    "over {0} km. (Calculated {1} km between {2} and {3}.)",
-                WARNING_THRESHOLD, result, a, b
-            ));
+            logger.log(
+                WARNING, MessageFormat.format(
+                    "Equirectangular distance calculator is not accurate for distances " +
+                        "over {0} km. (Calculated {1} km between {2} and {3}.)",
+                    WARNING_THRESHOLD, result, a, b
+                )
+            );
         }
         return result;
     }

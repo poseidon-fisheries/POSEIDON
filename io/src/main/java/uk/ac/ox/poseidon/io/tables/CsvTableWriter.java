@@ -24,14 +24,16 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import tech.tablesaw.api.Table;
 
+import java.lang.System.Logger;
 import java.nio.file.Path;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
+
+import static java.lang.System.Logger.Level.INFO;
 
 @RequiredArgsConstructor
 public class CsvTableWriter implements Steppable {
 
-    private static final Logger LOGGER = Logger.getLogger(CsvTableWriter.class.getName());
+    private static final Logger logger = System.getLogger(CsvTableWriter.class.getName());
 
     private final Supplier<Table> tableSupplier;
     private final Path path;
@@ -44,6 +46,6 @@ public class CsvTableWriter implements Steppable {
         if (clearAfterWriting) {
             table.clear();
         }
-        LOGGER.info("Written " + path.toAbsolutePath());
+        logger.log(INFO, "Written " + path.toAbsolutePath());
     }
 }

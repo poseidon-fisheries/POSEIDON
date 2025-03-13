@@ -25,5 +25,4 @@ dependencies {
     api(project(":core"))
     api(libs.tablesaw.core)
     implementation(libs.snakeyaml)
-    implementation(libs.slf4j.simple)
 }

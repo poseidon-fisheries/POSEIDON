@@ -27,13 +27,13 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 import javax.measure.Quantity;
-import java.util.logging.Level;
+import java.util.logging.Filter;
+import java.util.logging.LogManager;
 
 import static javax.measure.MetricPrefix.KILO;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.METRE;
-import static uk.ac.ox.poseidon.geography.distance.EquirectangularDistanceCalculator.LOGGER;
 
 class EquirectangularDistanceCalculatorTest {
 
@@ -110,16 +110,24 @@ class EquirectangularDistanceCalculatorTest {
     ) {
         final Coordinate pointA = new Coordinate(lon1, lat1);
         final Coordinate pointB = new Coordinate(lon2, lat2);
-        final Level originalLevel = LOGGER.getLevel();
-        try {
-            LOGGER.setLevel(Level.SEVERE); // to avoid warning for big distances
-            assertTrue(
-                equirectangularDistance
-                    .distance(pointA, pointB)
-                    .isEquivalentTo(equirectangularDistance.distance(pointB, pointA))
-            );
-        } finally {
-            LOGGER.setLevel(originalLevel);
-        }
+
+        // Retrieve the underlying java.util.logging.Logger
+        final java.util.logging.Logger julLogger = LogManager
+            .getLogManager()
+            .getLogger(EquirectangularDistanceCalculator.class.getName());
+
+        // Save the current log filter and apply a new one that suppresses warnings
+        final Filter originalFilter = julLogger.getFilter();
+        julLogger.setFilter(record ->
+            record.getLevel().intValue() > java.util.logging.Level.WARNING.intValue()
+        );
+        
+        assertTrue(
+            equirectangularDistance
+                .distance(pointA, pointB)
+                .isEquivalentTo(equirectangularDistance.distance(pointB, pointA))
+        );
+        // Restore the original filter after the test
+        julLogger.setFilter(originalFilter);
     }
 }

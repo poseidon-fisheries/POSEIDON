@@ -31,18 +31,20 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 
+import java.lang.System.Logger;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.TemporalAmount;
 import java.util.Arrays;
-import java.util.logging.Logger;
+
+import static java.lang.System.Logger.Level.INFO;
 
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuickRunner implements Runnable {
 
-    private static final Logger LOGGER = Logger.getLogger(QuickRunner.class.getName());
+    private static final Logger logger = System.getLogger(QuickRunner.class.getName());
 
     @Parameter(
         names = {"-s", "--scenario"},
@@ -64,7 +66,7 @@ public class QuickRunner implements Runnable {
     private Period period;
 
     public static void main(final String[] args) {
-        LOGGER.info(() -> "Received arguments: " + Arrays.toString(args));
+        logger.log(INFO, () -> "Received arguments: " + Arrays.toString(args));
         // System.out.println("Received arguments: " + Arrays.toString(args));
         final QuickRunner quickRunner = new QuickRunner();
         final JCommander jCommander = JCommander
@@ -86,21 +88,22 @@ public class QuickRunner implements Runnable {
         final Simulation simulation = scenario.newSimulation();
         simulation.start();
         final TemporalSchedule schedule = simulation.getTemporalSchedule();
-        LOGGER.info(() -> "Simulation started (" + schedule.getDateTime() + ")");
+        logger.log(INFO, () -> "Simulation started (" + schedule.getDateTime() + ")");
         final LocalDateTime end =
             scenario.getStartingDateTime().get(simulation).plus(temporalAmount);
         while (schedule.getDateTime().isBefore(end)) {
             simulation.schedule.step(simulation);
         }
         simulation.finish();
-        LOGGER.info(() ->
-            "Simulation completed (" + schedule.getDateTime() + ")"
+        logger.log(
+            INFO, () ->
+                "Simulation completed (" + schedule.getDateTime() + ")"
         );
     }
 
     @Override
     public void run() {
-        LOGGER.info(() -> "Loading scenario: " + scenarioPath);
+        logger.log(INFO, () -> "Loading scenario: " + scenarioPath);
         run(
             new ScenarioLoader().load(scenarioPath.toFile()),
             period
