@@ -21,8 +21,6 @@ package uk.ac.ox.poseidon.server;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import fishing.BiomassGridServiceGrpc;
-import fishing.Fishing;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.util.Int2D;

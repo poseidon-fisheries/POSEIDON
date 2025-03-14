@@ -24,5 +24,6 @@ plugins {
 dependencies {
     api(project(":core"))
     api(libs.tablesaw.core)
+    runtimeOnly(libs.slf4j.jdk14) // tablesaw uses slf4j, which we reroute to j.u.Logging
     implementation(libs.snakeyaml)
 }

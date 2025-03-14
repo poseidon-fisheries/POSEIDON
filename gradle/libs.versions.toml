@@ -3,6 +3,7 @@
 
 [versions]
 batik = "1.18"
+commons-beanutils = "1.10.1"
 flatlaf = "3.5.4"
 gdx = "1.8.2"
 geotools = "32.2"
@@ -15,6 +16,7 @@ junit = "5.12.0"
 lombok = "1.18.30"
 mockito = "5.14.0"
 si-units = "2.1" # upgrading past 2.1 breaks GeoTools 32.2
+slf4j = "2.0.16"
 snakeyaml = "2.2"
 streamex = "0.8.3"
 tablesaw = "0.44.0"
@@ -28,6 +30,7 @@ annotation-api = { module = "javax.annotation:javax.annotation-api", version.ref
 batik-awt-util = { module = "org.apache.xmlgraphics:batik-awt-util", version.ref = "batik" }
 batik-dom = { module = "org.apache.xmlgraphics:batik-dom", version.ref = "batik" }
 batik-transcoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.ref = "batik" }
+commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "commons-beanutils" }
 flatlaf = { module = "com.formdev:flatlaf", version.ref = "flatlaf" }
 gdx-ai = { module = "com.badlogicgames.gdx:gdx-ai", version.ref = "gdx" }
 grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc" }
@@ -51,6 +54,7 @@ protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "p
 protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
 protocGenGrpcJava = { module = "io.grpc:protoc-gen-grpc-java", version.ref = "grpc" }
 si-units = { module = "si.uom:si-units", version.ref = "si-units" }
+slf4j-jdk14 = { module = "org.slf4j:slf4j-jdk14", version.ref = "slf4j" }
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations" }
 spotbugs-gradle-plugin = { module = "com.github.spotbugs.snom:spotbugs-gradle-plugin", version.ref = "spotbugs" }

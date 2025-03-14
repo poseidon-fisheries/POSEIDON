@@ -19,8 +19,6 @@
 
 package uk.ac.ox.poseidon.server;
 
-import fishing.BiomassGridServiceGrpc;
-import fishing.Fishing;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lombok.AllArgsConstructor;

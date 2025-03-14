@@ -27,8 +27,10 @@ dependencies {
     implementation(project(":regulations"))
     implementation(project(":biology"))
     implementation(project(":io"))
+    runtimeOnly(project(":examples")) // temporary, to load western med scenario
     implementation(libs.jcommander)
     implementation(libs.bundles.grpc)
+    implementation(libs.commons.beanutils)
 }
 
 tasks.shadowJar {

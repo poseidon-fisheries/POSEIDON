@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package surimi.abm;
+
+option java_package = "uk.ac.ox.poseidon.server";
+
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+service Abm {
+    rpc LoadScenario(FilePath) returns (ScenarioId) {}
+    rpc UnloadScenario(ScenarioId) returns (google.protobuf.Empty) {}
+    rpc StartSimulation(ScenarioId) returns (SimulationId) {}
+    rpc SetProperty(SetPropertyRequest) returns (google.protobuf.Empty);
+}
+
+message SetPropertyRequest {
+    ScenarioId scenario_id = 1;
+    string property_name = 2;
+    google.protobuf.Any value = 3;
+}
+
+message FilePath {
+    string path = 1;
+}
+
+message ScenarioId {
+    string id = 1;
+}
+
+message SimulationId {
+    string id = 1;
+}

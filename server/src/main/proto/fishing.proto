@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package fishing;
+option java_package = "uk.ac.ox.poseidon.server";
 
 service BiomassGridService {
     rpc Init (GridDef) returns (Grid);
