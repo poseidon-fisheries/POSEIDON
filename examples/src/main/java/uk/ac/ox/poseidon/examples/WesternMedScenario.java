@@ -121,7 +121,7 @@ public class WesternMedScenario extends Scenario {
     private static final double EXPLORATION_PROBABILITY = 0.2;
     private static final int MEAN_EXPLORATION_RADIUS = 1;
     private static final double CATCH_PROPORTION = 0.1;
-    private static final int VESSEL_SPEED = 15;
+    private static final String VESSEL_SPEED = "9.5 kn"; // as per email on 2025-03-18 08:20
     private static final String VESSEL_HOLD_CAPACITY = "1 t";
 
     private Factory<? extends Species> speciesA = new SpeciesFactory("A");
@@ -358,7 +358,7 @@ public class WesternMedScenario extends Scenario {
                 vesselField,
                 new RandomHomePortFactory(portGrid),
                 portGrid,
-                new SpeedFactory(VESSEL_SPEED, "km/h")
+                SpeedFactory.of(VESSEL_SPEED)
             )
         );
 
