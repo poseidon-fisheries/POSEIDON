@@ -8,9 +8,10 @@ import "google/protobuf/any.proto";
 import "google/protobuf/empty.proto";
 
 service Abm {
-    rpc LoadScenario(FilePath) returns (ScenarioId) {}
-    rpc UnloadScenario(ScenarioId) returns (google.protobuf.Empty) {}
-    rpc StartSimulation(ScenarioId) returns (SimulationId) {}
+    rpc LoadScenario(FilePath) returns (ScenarioId);
+    rpc UnloadScenario(ScenarioId) returns (google.protobuf.Empty);
+    rpc StartSimulation(ScenarioId) returns (SimulationId);
+    rpc FinishSimulation(SimulationId) returns (google.protobuf.Empty);
     rpc SetProperty(SetPropertyRequest) returns (google.protobuf.Empty);
 }
 

@@ -82,6 +82,18 @@ public class AbmService extends AbmGrpc.AbmImplBase {
     }
 
     @Override
+    public void finishSimulation(
+        final AbmOuterClass.SimulationId request,
+        final StreamObserver<Empty> responseObserver
+    ) {
+        final UUID simulationId = UUID.fromString(request.getId());
+        simulationManager.finishSimulation(simulationId);
+        logger.log(INFO, "Simulation finished: {0}", simulationId);
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void setProperty(
         final AbmOuterClass.SetPropertyRequest request,
         final StreamObserver<Empty> responseObserver
