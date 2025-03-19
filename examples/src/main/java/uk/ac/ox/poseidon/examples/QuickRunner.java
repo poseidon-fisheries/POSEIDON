@@ -23,12 +23,12 @@ import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
-import com.beust.jcommander.converters.PathConverter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.utils.CustomPathConverter;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 
 import java.lang.System.Logger;
@@ -108,17 +108,6 @@ public class QuickRunner implements Runnable {
             new ScenarioLoader().load(scenarioPath.toFile()),
             period
         );
-    }
-
-    private static class CustomPathConverter extends PathConverter {
-        public CustomPathConverter(final String optionName) {
-            super(optionName);
-        }
-
-        @Override
-        public Path convert(final String value) {
-            return super.convert(value.replaceFirst("^~", System.getProperty("user.home")));
-        }
     }
 
     private static class PeriodConverter implements IStringConverter<Period> {

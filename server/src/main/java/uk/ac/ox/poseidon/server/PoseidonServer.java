@@ -38,11 +38,18 @@ public class PoseidonServer {
     private final Server grpcServer;
 
     public PoseidonServer(final int port) {
+        this(port, new SimulationManager(new ScenarioLoader()));
+    }
+
+    public PoseidonServer(
+        final int port,
+        final SimulationManager simulationManager
+    ) {
         this(
             port,
             ServerBuilder
                 .forPort(port)
-                .addService(new PoseidonService(new SimulationManager(new ScenarioLoader())))
+                .addService(new PoseidonService(simulationManager))
                 .build()
         );
     }
