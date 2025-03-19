@@ -32,9 +32,9 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @NoArgsConstructor
 public class BiomassGridFactory extends SimulationScopeFactory<BiomassGrid> {
 
-    @NonNull private Factory<? extends ModelGrid> modelGrid;
-    @NonNull private Factory<? extends Species> species;
-    @NonNull private Factory<? extends BiomassAllocator> biomassAllocator;
+    private Factory<? extends ModelGrid> modelGrid;
+    private Factory<? extends Species> species;
+    private Factory<? extends BiomassAllocator> biomassAllocator;
 
     @Override
     protected BiomassGrid newInstance(final @NonNull Simulation simulation) {

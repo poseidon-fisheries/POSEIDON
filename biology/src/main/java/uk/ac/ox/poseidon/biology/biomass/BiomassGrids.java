@@ -38,7 +38,7 @@ public class BiomassGrids implements FisheableGrid<Biomass> {
 
     private final Map<Species, BiomassGrid> grids;
 
-    public BiomassGrids(final Collection<BiomassGrid> grids) {
+    public BiomassGrids(final Collection<? extends BiomassGrid> grids) {
         this(
             grids.stream().collect(toImmutableMap(
                 BiomassGrid::getSpecies,

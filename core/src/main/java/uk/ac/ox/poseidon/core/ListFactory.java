@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,37 +17,33 @@
  *
  */
 
-package uk.ac.ox.poseidon.core.schedule;
+package uk.ac.ox.poseidon.core;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sim.engine.RandomSequence;
-import sim.engine.Steppable;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.ListFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class SteppableRandomSequenceFactory extends GlobalScopeFactory<Steppable> {
+@AllArgsConstructor
+public class ListFactory<C> extends GlobalScopeFactory<List<? extends C>> {
 
-    private Factory<List<? extends Steppable>> steppables;
+    protected List<? extends Factory<? extends C>> components;
 
     @SafeVarargs
-    public SteppableRandomSequenceFactory(final Factory<? extends Steppable>... steppables) {
-        this(new ListFactory<>(steppables));
+    public ListFactory(final Factory<? extends C>... components) {
+        this(List.of(components));
     }
 
     @Override
-    protected Steppable newInstance(final Simulation simulation) {
-        return new RandomSequence(steppables.get(simulation));
+    protected List<? extends C> newInstance(final Simulation simulation) {
+        return components
+            .stream()
+            .map(c -> c.get(simulation))
+            .toList();
     }
-
 }

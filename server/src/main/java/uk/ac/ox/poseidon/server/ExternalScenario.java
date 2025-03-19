@@ -84,7 +84,6 @@ import uk.ac.ox.poseidon.io.tables.CsvTableWriterFactory;
 import uk.ac.ox.poseidon.regulations.PermittedIfFactory;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.function.Predicate;
 
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_DAY_DURATION_SUPPLIER;
@@ -188,10 +187,12 @@ public class ExternalScenario extends Scenario {
             ),
             DAILY,
             new SteppableSequenceFactory(
-                new BiomassDiffuserFactory(
-                    biomassGridA,
-                    carryingCapacityGrid,
-                    biomassDiffusionRule
+                new ListFactory<>(
+                    new BiomassDiffuserFactory(
+                        biomassGridA,
+                        carryingCapacityGrid,
+                        biomassDiffusionRule
+                    )
                 )
             ),
             0
@@ -204,12 +205,14 @@ public class ExternalScenario extends Scenario {
             ),
             MONTHLY,
             new SteppableSequenceFactory(
-                new ExternalBiomassGridProcessFactory(
-                    "localhost",
-                    5161,
-                    biomassGridA,
-                    5000,
-                    0.5
+                new ListFactory<>(
+                    new ExternalBiomassGridProcessFactory(
+                        "localhost",
+                        5161,
+                        biomassGridA,
+                        5000,
+                        0.5
+                    )
                 )
             ),
             0
@@ -262,7 +265,7 @@ public class ExternalScenario extends Scenario {
                             hold,
                             new CurrentCellFisheableFactory<>(
                                 new BiomassGridsFactory(
-                                    List.of(biomassGridA)
+                                    new ListFactory<>(biomassGridA)
                                 )
                             ),
                             regulations

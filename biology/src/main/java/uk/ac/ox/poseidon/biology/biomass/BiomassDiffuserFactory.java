@@ -30,13 +30,8 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 @NoArgsConstructor
 public class BiomassDiffuserFactory extends SimulationScopeFactory<BiomassDiffuser> {
 
-    @NonNull
     private Factory<? extends BiomassGrid> biomassGrid;
-
-    @NonNull
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid;
-
-    @NonNull
     private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule;
 
     @Override

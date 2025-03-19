@@ -54,7 +54,6 @@ import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
 import uk.ac.ox.poseidon.agents.vessels.hold.ProportionalBiomassOvercapacityDiscardingStrategyFactory;
 import uk.ac.ox.poseidon.agents.vessels.hold.StandardBiomassHoldFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
-import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.*;
 import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentDayOfWeekFactory;
@@ -124,9 +123,6 @@ public class WesternMedScenario extends Scenario {
     private static final String VESSEL_SPEED = "9.5 kn"; // as per email on 2025-03-18 08:20
     private static final String VESSEL_HOLD_CAPACITY = "1 t";
 
-    private Factory<? extends Species> speciesA = new SpeciesFactory("A");
-    private Factory<? extends Species> speciesB = new SpeciesFactory("B");
-
     private Factory<? extends BiomassGrowthRule> biomassGrowthRule =
         new LogisticGrowthRuleFactory(LOGISTIC_GROWTH_RATE);
     private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule =
@@ -134,7 +130,6 @@ public class WesternMedScenario extends Scenario {
             DIFFERENTIAL_PERCENTAGE_TO_MOVE,
             PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT
         );
-
     private PathFactory inputPath = PathFactory.of("data");
     private GlobalScopeFactory<? extends ModelGrid> modelGrid =
         new ModelGridWithActiveCellsFromGridFile(
@@ -163,18 +158,20 @@ public class WesternMedScenario extends Scenario {
         );
     private Factory<? extends BiomassAllocator> biomassAllocator =
         new FullBiomassAllocatorFactory(carryingCapacityGrid);
-    private Factory<? extends BiomassGrid> biomassGridA =
-        new BiomassGridFactory(
-            modelGrid,
-            speciesA,
-            biomassAllocator
+    private Factory<List<BiomassGrid>> biomassGrids =
+        new MappedFactory<>(
+            new ListFactory<>(
+                new SpeciesFactory("A"),
+                new SpeciesFactory("B")
+            ),
+            new BiomassGridFactory(
+                modelGrid,
+                null,
+                biomassAllocator
+            ),
+            "species"
         );
-    private Factory<? extends BiomassGrid> biomassGridB =
-        new BiomassGridFactory(
-            modelGrid,
-            speciesB,
-            biomassAllocator
-        );
+
     private Factory<? extends Steppable> dailyProcesses =
         new ScheduledRepeatingFactory<>(
             new DateTimeAfterFactory(
@@ -183,15 +180,14 @@ public class WesternMedScenario extends Scenario {
             ),
             DAILY,
             new SteppableSequenceFactory(
-                new BiomassDiffuserFactory(
-                    biomassGridA,
-                    carryingCapacityGrid,
-                    biomassDiffusionRule
-                ),
-                new BiomassDiffuserFactory(
-                    biomassGridB,
-                    carryingCapacityGrid,
-                    biomassDiffusionRule
+                new MappedFactory<>(
+                    biomassGrids,
+                    new BiomassDiffuserFactory(
+                        null,
+                        carryingCapacityGrid,
+                        biomassDiffusionRule
+                    ),
+                    "biomassGrid"
                 )
             ),
             0
@@ -204,15 +200,14 @@ public class WesternMedScenario extends Scenario {
             ),
             MONTHLY,
             new SteppableSequenceFactory(
-                new BiomassGrowerFactory(
-                    biomassGridA,
-                    carryingCapacityGrid,
-                    biomassGrowthRule
-                ),
-                new BiomassGrowerFactory(
-                    biomassGridB,
-                    carryingCapacityGrid,
-                    biomassGrowthRule
+                new MappedFactory<>(
+                    biomassGrids,
+                    new BiomassGrowerFactory(
+                        null,
+                        carryingCapacityGrid,
+                        biomassGrowthRule
+                    ),
+                    "biomassGrid"
                 )
             ),
             0
@@ -337,7 +332,7 @@ public class WesternMedScenario extends Scenario {
                             hold,
                             new CurrentCellFisheableFactory<>(
                                 new BiomassGridsFactory(
-                                    List.of(biomassGridA, biomassGridB)
+                                    biomassGrids
                                 )
                             ),
                             regulations

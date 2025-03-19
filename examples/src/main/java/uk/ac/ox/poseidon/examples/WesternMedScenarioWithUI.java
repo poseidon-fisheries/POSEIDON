@@ -27,7 +27,8 @@ import uk.ac.ox.poseidon.gui.portrayals.*;
 import java.util.List;
 
 import static java.awt.Color.WHITE;
-import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.*;
+import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.IMOLA;
+import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
 
 public class WesternMedScenarioWithUI extends ScenarioWithUI {
 
@@ -55,6 +56,7 @@ public class WesternMedScenarioWithUI extends ScenarioWithUI {
                             true,
                             scenario.getCarryingCapacityGrid()
                         ),
+/*
                         "Species A Biomass",
                         new NumberGridWithCapacityPortrayalFactory(
                             LAJOLLA,
@@ -71,6 +73,7 @@ public class WesternMedScenarioWithUI extends ScenarioWithUI {
                             scenario.getBiomassGridB(),
                             scenario.getCarryingCapacityGrid()
                         ),
+*/
                         "Ports",
                         new PortGridPortrayalFactory(scenario.getPortGrid()),
                         "Vessels",

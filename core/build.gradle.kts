@@ -30,4 +30,5 @@ dependencies {
     api(libs.indriya)
     api(libs.si.units)
     implementation(libs.jcommander)
+    implementation(libs.commons.beanutils)
 }

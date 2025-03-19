@@ -26,23 +26,16 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class BiomassGridsFactory extends SimulationScopeFactory<BiomassGrids> {
 
-    private List<? extends Factory<? extends BiomassGrid>> biomassGrids;
+    private Factory<? extends List<? extends BiomassGrid>> biomassGrids;
 
     @Override
     protected BiomassGrids newInstance(final @NonNull Simulation simulation) {
-        return new BiomassGrids(
-            biomassGrids
-                .stream()
-                .map(factory -> factory.get(simulation))
-                .collect(toList())
-        );
+        return new BiomassGrids(biomassGrids.get(simulation));
     }
 }

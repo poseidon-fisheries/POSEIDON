@@ -19,31 +19,35 @@
 
 package uk.ac.ox.poseidon.core.schedule;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sim.engine.Sequence;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.ListFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class SteppableSequenceFactory extends AbtractSteppableSequenceFactory {
-    public SteppableSequenceFactory(final List<? extends Factory<? extends Steppable>> steppables) {
-        super(steppables);
-    }
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class SteppableSequenceFactory extends GlobalScopeFactory<Steppable> {
 
-    public SteppableSequenceFactory() {
-    }
+    private Factory<? extends List<? extends Steppable>> steppables;
 
     @SafeVarargs
     public SteppableSequenceFactory(final Factory<? extends Steppable>... steppables) {
-        super(steppables);
+        this(new ListFactory<>(steppables));
     }
 
     @Override
-    protected Steppable newSequence(final List<? extends Steppable> steppables) {
-        return new Sequence(steppables);
+    protected Steppable newInstance(final Simulation simulation) {
+        return new Sequence(steppables.get(simulation));
     }
+
 }
