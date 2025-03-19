@@ -30,19 +30,19 @@ import java.lang.System.Logger;
 import static java.lang.System.Logger.Level.INFO;
 
 @RequiredArgsConstructor
-public class AbmServer {
+public class PoseidonServer {
 
-    private static final Logger logger = System.getLogger(AbmServer.class.getName());
+    private static final Logger logger = System.getLogger(PoseidonServer.class.getName());
 
     private final int port;
     private final Server grpcServer;
 
-    public AbmServer(final int port) {
+    public PoseidonServer(final int port) {
         this(
             port,
             ServerBuilder
                 .forPort(port)
-                .addService(new AbmService(new SimulationManager(new ScenarioLoader())))
+                .addService(new PoseidonService(new SimulationManager(new ScenarioLoader())))
                 .build()
         );
     }

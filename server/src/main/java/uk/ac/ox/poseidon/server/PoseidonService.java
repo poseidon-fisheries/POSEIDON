@@ -31,22 +31,22 @@ import java.util.UUID;
 import static java.lang.System.Logger.Level.INFO;
 
 @RequiredArgsConstructor
-public class AbmService extends AbmGrpc.AbmImplBase {
+public class PoseidonService extends PoseidonGrpc.PoseidonImplBase {
 
-    private static final System.Logger logger = System.getLogger(AbmService.class.getName());
+    private static final System.Logger logger = System.getLogger(PoseidonService.class.getName());
     private final SimulationManager simulationManager;
 
     @Override
     public void loadScenario(
-        final AbmOuterClass.FilePath request,
-        final StreamObserver<AbmOuterClass.ScenarioId> responseObserver
+        final PoseidonOuterClass.FilePath request,
+        final StreamObserver<PoseidonOuterClass.ScenarioId> responseObserver
     ) {
         final File scenarioFile = Path.of(request.getPath()).toFile();
         logger.log(INFO, "Loading scenario: {0}", scenarioFile.getAbsolutePath());
         final UUID scenarioId = simulationManager.loadScenario(scenarioFile);
         logger.log(INFO, "Scenario loaded: {0}", scenarioId);
         responseObserver.onNext(
-            AbmOuterClass.ScenarioId
+            PoseidonOuterClass.ScenarioId
                 .newBuilder()
                 .setId(scenarioId.toString())
                 .build()
@@ -56,7 +56,7 @@ public class AbmService extends AbmGrpc.AbmImplBase {
 
     @Override
     public void unloadScenario(
-        final AbmOuterClass.ScenarioId request,
+        final PoseidonOuterClass.ScenarioId request,
         final StreamObserver<Empty> responseObserver
     ) {
         simulationManager.unloadScenario(UUID.fromString(request.getId()));
@@ -66,14 +66,14 @@ public class AbmService extends AbmGrpc.AbmImplBase {
 
     @Override
     public void startSimulation(
-        final AbmOuterClass.ScenarioId request,
-        final StreamObserver<AbmOuterClass.SimulationId> responseObserver
+        final PoseidonOuterClass.ScenarioId request,
+        final StreamObserver<PoseidonOuterClass.SimulationId> responseObserver
     ) {
         final UUID scenarioId = UUID.fromString(request.getId());
         final UUID simulationId = simulationManager.startSimulation(scenarioId);
         logger.log(INFO, "Simulation started: {0}", scenarioId);
         responseObserver.onNext(
-            AbmOuterClass.SimulationId
+            PoseidonOuterClass.SimulationId
                 .newBuilder()
                 .setId(simulationId.toString())
                 .build()
@@ -83,7 +83,7 @@ public class AbmService extends AbmGrpc.AbmImplBase {
 
     @Override
     public void finishSimulation(
-        final AbmOuterClass.SimulationId request,
+        final PoseidonOuterClass.SimulationId request,
         final StreamObserver<Empty> responseObserver
     ) {
         final UUID simulationId = UUID.fromString(request.getId());
@@ -95,7 +95,7 @@ public class AbmService extends AbmGrpc.AbmImplBase {
 
     @Override
     public void setProperty(
-        final AbmOuterClass.SetPropertyRequest request,
+        final PoseidonOuterClass.SetPropertyRequest request,
         final StreamObserver<Empty> responseObserver
     ) {
         final UUID scenarioId;

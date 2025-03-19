@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-class AbmServerTest {
+class PoseidonServerTest {
 
     private static final String HOST = "localhost";
     private static final int PORT = 8080;
@@ -35,25 +35,25 @@ class AbmServerTest {
     @Test
     void testServer() {
 
-        final AbmServer server = new AbmServer(PORT);
+        final PoseidonServer server = new PoseidonServer(PORT);
         assertDoesNotThrow(server::start);
 
         final ManagedChannel channel = ManagedChannelBuilder.forAddress(HOST, PORT)
             .usePlaintext()
             .build();
 
-        final AbmGrpc.AbmBlockingStub stub = AbmGrpc.newBlockingStub(channel);
+        final PoseidonGrpc.PoseidonBlockingStub stub = PoseidonGrpc.newBlockingStub(channel);
 
-        final AbmOuterClass.FilePath scenarioFilePath =
-            AbmOuterClass.FilePath
+        final PoseidonOuterClass.FilePath scenarioFilePath =
+            PoseidonOuterClass.FilePath
                 .newBuilder()
                 .setPath("/home/nicolas/workspace/surimi_western_med/scenario.yaml")
                 .build();
 
-        final AbmOuterClass.ScenarioId scenarioId = stub.loadScenario(scenarioFilePath);
+        final PoseidonOuterClass.ScenarioId scenarioId = stub.loadScenario(scenarioFilePath);
 
         stub.setProperty(
-            AbmOuterClass.SetPropertyRequest
+            PoseidonOuterClass.SetPropertyRequest
                 .newBuilder()
                 .setScenarioId(scenarioId)
                 .setPropertyName("inputPath.path")
@@ -68,7 +68,7 @@ class AbmServerTest {
                 .build()
         );
 
-        final AbmOuterClass.SimulationId simulationId = stub.startSimulation(scenarioId);
+        final PoseidonOuterClass.SimulationId simulationId = stub.startSimulation(scenarioId);
 
         channel.shutdown();
         server.shutdown();
