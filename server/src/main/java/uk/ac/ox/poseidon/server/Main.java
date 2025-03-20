@@ -23,11 +23,12 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
 import uk.ac.ox.poseidon.core.utils.CustomPathConverter;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -73,8 +74,9 @@ public class Main {
             simulationManager,
             scenarioPath.toFile()
         );
-        final Server grpcServer = ServerBuilder
-            .forPort(this.port)
+        // Bind to 0.0.0.0 so the server listens on all network interfaces
+        final Server grpcServer = NettyServerBuilder
+            .forAddress(new InetSocketAddress("0.0.0.0", this.port))
             .addService(workflowService)
             .build();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
