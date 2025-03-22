@@ -94,7 +94,7 @@ import static uk.ac.ox.poseidon.core.time.PeriodFactory.MONTHLY;
 @SuppressWarnings("MagicNumber")
 @Getter
 @Setter
-public class ExternalScenario extends Scenario {
+public class ExternalScenario extends ScenarioSupplier {
 
     private Factory<? extends Regulations> regulations =
         new PermittedIfFactory(

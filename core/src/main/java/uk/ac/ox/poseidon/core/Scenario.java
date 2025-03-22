@@ -19,30 +19,25 @@
 
 package uk.ac.ox.poseidon.core;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.core.time.DateFactory;
 
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class Scenario {
+@AllArgsConstructor
+public final class Scenario {
 
-    protected Factory<? extends LocalDateTime> startingDateTime = new DateFactory();
+    private Factory<? extends LocalDateTime> startingDateTime = new DateFactory();
 
-    public Scenario(final Factory<? extends LocalDateTime> startingDateTime) {
-        this.startingDateTime = startingDateTime;
-    }
+    private Map<String, ? extends Factory<?>> components = new HashMap<>();
 
     public Simulation newSimulation() {
         return newSimulation(System.currentTimeMillis());
@@ -52,27 +47,14 @@ public class Scenario {
         return new Simulation(seed, startingDateTime.get(null), this);
     }
 
-    public Stream<? extends Factory<?>> extractFactories() {
-        try {
-            return Arrays
-                .stream(Introspector.getBeanInfo(this.getClass()).getPropertyDescriptors())
-                .filter(propertyDescriptor ->
-                    !propertyDescriptor.getName().equals("startingDateTime")
-                )
-                .map(PropertyDescriptor::getReadMethod)
-                .filter(Objects::nonNull)
-                .filter(readMethod -> Factory.class.isAssignableFrom(readMethod.getReturnType()))
-                .map(readMethod -> {
-                    try {
-                        return readMethod.invoke(this);
-                    } catch (final IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .map(o -> (Factory<?>) o);
-        } catch (final IntrospectionException e) {
-            throw new RuntimeException(e);
+    public <C> Factory<? extends C> component(
+        final String componentName
+    ) {
+        final Factory<?> factory = components.get(componentName);
+        if (factory == null) {
+            throw new IllegalArgumentException("Component not found: " + componentName);
         }
+        return (Factory<? extends C>) factory;
     }
 
 }

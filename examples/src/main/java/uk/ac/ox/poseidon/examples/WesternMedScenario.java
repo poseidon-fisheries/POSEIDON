@@ -73,7 +73,6 @@ import uk.ac.ox.poseidon.core.suppliers.PoissonIntSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.ShiftedIntSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.temporal.DurationUntilSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.temporal.NextDayAtTimeSupplierFactory;
-import uk.ac.ox.poseidon.core.time.DateFactory;
 import uk.ac.ox.poseidon.core.time.DateTimeAfterFactory;
 import uk.ac.ox.poseidon.core.time.TimeFactory;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
@@ -96,7 +95,6 @@ import uk.ac.ox.poseidon.regulations.ForbiddenIfFactory;
 import uk.ac.ox.poseidon.regulations.predicates.spatial.ActionCellPredicateFactory;
 
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.function.Predicate;
@@ -109,7 +107,7 @@ import static uk.ac.ox.poseidon.core.time.PeriodFactory.MONTHLY;
 
 @Getter
 @Setter
-public class WesternMedScenario extends Scenario {
+public class WesternMedScenario extends ScenarioSupplier {
 
     private static final double DIFFERENTIAL_PERCENTAGE_TO_MOVE = 0.05;
     private static final double PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT = 0.1;
@@ -358,12 +356,8 @@ public class WesternMedScenario extends Scenario {
             )
         );
 
-    WesternMedScenario() {
-        super(new DateFactory(LocalDate.now().getYear(), 1, 1));
-    }
-
     public static void main(final String[] args) {
-        final WesternMedScenario scenario = new WesternMedScenario();
+        final Scenario scenario = new WesternMedScenario().get();
         final Path scenarioPath = Path.of("scenario.yaml");
         new ScenarioWriter().write(scenario, scenarioPath);
         new QuickRunner(scenarioPath, Period.ofYears(1)).run();

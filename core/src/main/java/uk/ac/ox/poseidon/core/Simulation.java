@@ -88,7 +88,9 @@ public class Simulation extends SimState {
         super.start();
         this.components =
             scenario
-                .extractFactories()
+                .getComponents()
+                .values()
+                .stream()
                 .map(factory -> factory.get(this))
                 .toList();
         started = true;

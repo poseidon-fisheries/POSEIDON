@@ -19,7 +19,9 @@
 
 package uk.ac.ox.poseidon.examples;
 
+import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
 import uk.ac.ox.poseidon.core.MappedFactory;
+import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.gui.DisplayWrapper2D;
 import uk.ac.ox.poseidon.gui.ScenarioWithUI;
 import uk.ac.ox.poseidon.gui.portrayals.*;
@@ -34,7 +36,7 @@ public class WesternMedScenarioWithUI extends ScenarioWithUI {
     private static final int WIDTH = 1090;
     private static final int HEIGHT = 820;
 
-    public WesternMedScenarioWithUI(final WesternMedScenario scenario) {
+    public WesternMedScenarioWithUI(final Scenario scenario) {
         super(
             scenario,
             List.of(
@@ -42,7 +44,7 @@ public class WesternMedScenarioWithUI extends ScenarioWithUI {
                     "Catalan Mediterranean Sea",
                     List.of(
                         new BathymetryFieldPortrayalFactory(
-                            scenario.getBathymetricGrid()
+                            scenario.component("bathymetricGrid")
                         ),
                         new SimpleFieldPortrayalFactory(
                             "Carrying capacity",
@@ -50,31 +52,35 @@ public class WesternMedScenarioWithUI extends ScenarioWithUI {
                                 IMOLA,
                                 "Carrying capacity",
                                 true,
-                                scenario.getCarryingCapacityGrid()
+                                scenario.component("carryingCapacityGrid")
                             )
                         ),
                         new MappedFactory<>(
-                            scenario.getBiomassGrids(),
+                            scenario.<List<BiomassGrid>>component("biomassGrids"),
                             new SpeciesBiomassFieldPortrayalFactory(
                                 null,
-                                scenario.getCarryingCapacityGrid()
+                                scenario.component("carryingCapacityGrid")
                             ),
                             "biomassGrid"
                         ),
                         new SimpleFieldPortrayalFactory(
                             "Ports",
-                            new PortGridPortrayalFactory(scenario.getPortGrid())
+                            new PortGridPortrayalFactory(
+                                scenario.component("portGrid")
+                            )
                         ),
                         new SimpleFieldPortrayalFactory(
                             "Vessels",
-                            new VesselFieldPortrayalFactory(scenario.getVesselField())
+                            new VesselFieldPortrayalFactory(
+                                scenario.component("vesselField")
+                            )
                         ),
                         new SimpleFieldPortrayalFactory(
                             "Regulations",
                             new RegulationGridPortrayalFactory(
-                                scenario.getRegulations(),
-                                scenario.getFleet(),
-                                scenario.getBathymetricGrid(),
+                                scenario.component("regulations"),
+                                scenario.component("fleet"),
+                                scenario.component("bathymetricGrid"),
                                 WIDTH,
                                 HEIGHT
                             )
@@ -90,7 +96,7 @@ public class WesternMedScenarioWithUI extends ScenarioWithUI {
 
     public static void main(final String[] args) {
         final WesternMedScenarioWithUI westernMedScenarioWithUI =
-            new WesternMedScenarioWithUI(new WesternMedScenario());
+            new WesternMedScenarioWithUI(new WesternMedScenario().get());
         westernMedScenarioWithUI.createController();
     }
 
