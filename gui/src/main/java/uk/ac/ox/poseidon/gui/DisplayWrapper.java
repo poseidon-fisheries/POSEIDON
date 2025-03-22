@@ -21,28 +21,20 @@ package uk.ac.ox.poseidon.gui;
 
 import sim.display.Controller;
 import sim.display.GUIState;
-import sim.portrayal.FieldPortrayal;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 import javax.swing.*;
-import java.util.Map;
 
-import static sim.display.Display2D.UPDATE_RULE_STEPS;
-
-public abstract class DisplayWrapper<D, P extends FieldPortrayal> {
+public abstract class DisplayWrapper<D> {
 
     private final String title;
-    final Map<String, Factory<? extends P>> portrayalFactories;
     D display;
     private JFrame displayFrame;
 
     DisplayWrapper(
-        final String title,
-        final Map<String, Factory<? extends P>> portrayalFactories
+        final String title
     ) {
         this.title = title;
-        this.portrayalFactories = portrayalFactories;
     }
 
     void init(

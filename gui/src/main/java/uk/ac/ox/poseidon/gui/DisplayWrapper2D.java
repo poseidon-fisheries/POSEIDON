@@ -21,30 +21,38 @@ package uk.ac.ox.poseidon.gui;
 
 import sim.display.Display2D;
 import sim.display.GUIState;
-import sim.portrayal.FieldPortrayal2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.gui.portrayals.NamedPortrayal;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Map;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
 
-public class DisplayWrapper2D extends DisplayWrapper<Display2D, FieldPortrayal2D> {
+import static java.lang.System.Logger.Level.WARNING;
+
+public class DisplayWrapper2D extends DisplayWrapper<Display2D> {
+
+    private static final System.Logger logger = System.getLogger(DisplayWrapper2D.class.getName());
 
     private static final int DEFAULT_STEP_INTERVAL = 64;
 
+    private final List<Factory<?>> fieldPortrayalFactories;
     private final double width;
     private final double height;
     private final Paint backDrop;
 
     public DisplayWrapper2D(
         final String title,
-        final Map<String, Factory<? extends FieldPortrayal2D>> portrayalFactories,
+        final List<Factory<?>> fieldPortrayalFactories,
         final double width,
         final double height,
         final Paint backDrop
     ) {
-        super(title, portrayalFactories);
+        super(title);
+        this.fieldPortrayalFactories = fieldPortrayalFactories;
         this.width = width;
         this.height = height;
         this.backDrop = backDrop;
@@ -69,9 +77,25 @@ public class DisplayWrapper2D extends DisplayWrapper<Display2D, FieldPortrayal2D
     @Override
     void setupPortrayals(final Simulation simulation) {
         display.detachAll();
-        portrayalFactories.forEach((name, factory) ->
-            display.attach(factory.get(simulation), name)
-        );
+        fieldPortrayalFactories
+            .stream()
+            .flatMap(factory -> {
+                final Object o = factory.get(simulation);
+                return factory.get(simulation) instanceof final Collection<?> os
+                    ? os.stream()
+                    : Stream.of(o);
+            })
+            .forEach(o -> {
+                if (o instanceof final NamedPortrayal namedPortrayal) {
+                    display.attach(namedPortrayal.getPortrayal(), namedPortrayal.getName());
+                } else {
+                    logger.log(
+                        WARNING,
+                        "Expected named portrayal but got {0}",
+                        o.getClass().getName()
+                    );
+                }
+            });
         display.reset();
         display.setBackdrop(backDrop);
         display.repaint();

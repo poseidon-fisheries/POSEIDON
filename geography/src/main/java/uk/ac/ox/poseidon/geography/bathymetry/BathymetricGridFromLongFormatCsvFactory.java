@@ -42,23 +42,23 @@ import java.util.Map;
 @NoArgsConstructor
 public class BathymetricGridFromLongFormatCsvFactory extends BathymetricGridFactory {
 
-    @NonNull private String longitudeColumnName;
-    @NonNull private String latitudeColumnName;
-    @NonNull private String depthColumnName;
+    @NonNull private String longitudeColumn;
+    @NonNull private String latitudeColumn;
+    @NonNull private String depthColumn;
 
     public BathymetricGridFromLongFormatCsvFactory(
         @NonNull final Factory<? extends Path> path,
         @NonNull final Factory<? extends ModelGrid> modelGrid,
         @NonNull final Factory<? extends Aggregator> aggregator,
         final boolean inverted,
-        @NonNull final String longitudeColumnName,
-        @NonNull final String latitudeColumnName,
-        @NonNull final String depthColumnName
+        @NonNull final String longitudeColumn,
+        @NonNull final String latitudeColumn,
+        @NonNull final String depthColumn
     ) {
         super(path, modelGrid, aggregator, inverted);
-        this.longitudeColumnName = longitudeColumnName;
-        this.latitudeColumnName = latitudeColumnName;
-        this.depthColumnName = depthColumnName;
+        this.longitudeColumn = longitudeColumn;
+        this.latitudeColumn = latitudeColumn;
+        this.depthColumn = depthColumn;
     }
 
     @Override
@@ -70,10 +70,10 @@ public class BathymetricGridFromLongFormatCsvFactory extends BathymetricGridFact
         Table.read().csv(gridFile).forEach(row -> {
             final Int2D cell =
                 modelGrid.toCell(new Coordinate(
-                    row.getDouble(longitudeColumnName),
-                    row.getDouble(latitudeColumnName)
+                    row.getDouble(longitudeColumn),
+                    row.getDouble(latitudeColumn)
                 ));
-            final double value = row.getDouble(depthColumnName);
+            final double value = row.getDouble(depthColumn);
             elevationValues.put(cell, isInverted() ? -value : value);
         });
         return elevationValues.asMap();

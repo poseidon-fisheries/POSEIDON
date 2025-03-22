@@ -19,7 +19,7 @@
 
 package uk.ac.ox.poseidon.examples;
 
-import com.google.common.collect.ImmutableMap;
+import uk.ac.ox.poseidon.core.MappedFactory;
 import uk.ac.ox.poseidon.gui.DisplayWrapper2D;
 import uk.ac.ox.poseidon.gui.ScenarioWithUI;
 import uk.ac.ox.poseidon.gui.portrayals.*;
@@ -28,7 +28,6 @@ import java.util.List;
 
 import static java.awt.Color.WHITE;
 import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.IMOLA;
-import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
 
 public class WesternMedScenarioWithUI extends ScenarioWithUI {
 
@@ -41,50 +40,44 @@ public class WesternMedScenarioWithUI extends ScenarioWithUI {
             List.of(
                 new DisplayWrapper2D(
                     "Catalan Mediterranean Sea",
-                    ImmutableMap.of(
-                        "Bathymetry",
-                        new DivergingNumberGridPortrayalFactory(
-                            OLERON,
-                            "Elevation",
-                            true,
+                    List.of(
+                        new BathymetryFieldPortrayalFactory(
                             scenario.getBathymetricGrid()
                         ),
-                        "Carrying capacity",
-                        new NumberGridPortrayalFactory(
-                            IMOLA,
+                        new SimpleFieldPortrayalFactory(
                             "Carrying capacity",
-                            true,
-                            scenario.getCarryingCapacityGrid()
+                            new NumberGridPortrayalFactory(
+                                IMOLA,
+                                "Carrying capacity",
+                                true,
+                                scenario.getCarryingCapacityGrid()
+                            )
                         ),
-/*
-                        "Species A Biomass",
-                        new NumberGridWithCapacityPortrayalFactory(
-                            LAJOLLA,
-                            "Species A Biomass",
-                            false,
-                            scenario.getBiomassGridA(),
-                            scenario.getCarryingCapacityGrid()
+                        new MappedFactory<>(
+                            scenario.getBiomassGrids(),
+                            new SpeciesBiomassFieldPortrayalFactory(
+                                null,
+                                scenario.getCarryingCapacityGrid()
+                            ),
+                            "biomassGrid"
                         ),
-                        "Species B Biomass",
-                        new NumberGridWithCapacityPortrayalFactory(
-                            LAJOLLA,
-                            "Species B Biomass",
-                            false,
-                            scenario.getBiomassGridB(),
-                            scenario.getCarryingCapacityGrid()
+                        new SimpleFieldPortrayalFactory(
+                            "Ports",
+                            new PortGridPortrayalFactory(scenario.getPortGrid())
                         ),
-*/
-                        "Ports",
-                        new PortGridPortrayalFactory(scenario.getPortGrid()),
-                        "Vessels",
-                        new VesselFieldPortrayalFactory(scenario.getVesselField()),
-                        "Regulations",
-                        new RegulationGridPortrayalFactory(
-                            scenario.getRegulations(),
-                            scenario.getFleet(),
-                            scenario.getBathymetricGrid(),
-                            WIDTH,
-                            HEIGHT
+                        new SimpleFieldPortrayalFactory(
+                            "Vessels",
+                            new VesselFieldPortrayalFactory(scenario.getVesselField())
+                        ),
+                        new SimpleFieldPortrayalFactory(
+                            "Regulations",
+                            new RegulationGridPortrayalFactory(
+                                scenario.getRegulations(),
+                                scenario.getFleet(),
+                                scenario.getBathymetricGrid(),
+                                WIDTH,
+                                HEIGHT
+                            )
                         )
                     ),
                     WIDTH,

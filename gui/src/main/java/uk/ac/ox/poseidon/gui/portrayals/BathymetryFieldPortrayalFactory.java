@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,26 @@
  *
  */
 
-package uk.ac.ox.poseidon.biology.species;
+package uk.ac.ox.poseidon.gui.portrayals;
 
-import java.util.List;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
-public interface SpeciesList {
+import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
 
-    List<Species> getAllSpecies();
+public class BathymetryFieldPortrayalFactory extends SimpleFieldPortrayalFactory {
 
-    Species getByName(String speciesName);
-
-    Species getByCode(String speciesCode);
+    public BathymetryFieldPortrayalFactory(
+        final Factory<? extends BathymetricGrid> bathymetricGrid
+    ) {
+        super(
+            "Bathymetry",
+            new DivergingNumberGridPortrayalFactory(
+                OLERON,
+                "Elevation",
+                true,
+                bathymetricGrid
+            )
+        );
+    }
 }

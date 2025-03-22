@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,13 @@
  *
  */
 
-package uk.ac.ox.poseidon.gui;
+package uk.ac.ox.poseidon.gui.portrayals;
 
-import lombok.RequiredArgsConstructor;
-import sim.display.Controller;
-import uk.ac.ox.poseidon.core.Scenario;
+import lombok.Data;
+import sim.portrayal.FieldPortrayal2D;
 
-import java.util.List;
-
-@RequiredArgsConstructor
-public class ScenarioWithUI {
-
-    private final Scenario scenario;
-    private final List<DisplayWrapper<?>> displays;
-
-    public Controller createController() {
-        return new SimulationWithUI(scenario::newSimulation, displays).createController();
-    }
+@Data
+public class NamedPortrayal {
+    private final String name;
+    private final FieldPortrayal2D portrayal;
 }

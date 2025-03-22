@@ -54,7 +54,7 @@ import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
 import uk.ac.ox.poseidon.agents.vessels.hold.ProportionalBiomassOvercapacityDiscardingStrategyFactory;
 import uk.ac.ox.poseidon.agents.vessels.hold.StandardBiomassHoldFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
-import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
+import uk.ac.ox.poseidon.biology.species.SpeciesFromFileFactory;
 import uk.ac.ox.poseidon.core.*;
 import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentDayOfWeekFactory;
 import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentTimeFactory;
@@ -160,9 +160,10 @@ public class WesternMedScenario extends Scenario {
         new FullBiomassAllocatorFactory(carryingCapacityGrid);
     private Factory<List<BiomassGrid>> biomassGrids =
         new MappedFactory<>(
-            new ListFactory<>(
-                new SpeciesFactory("A"),
-                new SpeciesFactory("B")
+            new SpeciesFromFileFactory(
+                inputPath.plus("species.csv"),
+                "species_code",
+                "species_name"
             ),
             new BiomassGridFactory(
                 modelGrid,

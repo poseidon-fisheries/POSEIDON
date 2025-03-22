@@ -35,20 +35,20 @@ import java.util.function.Supplier;
 
 public class SimulationWithUI extends GUIState {
 
-    private final ImmutableList<DisplayWrapper<?, ?>> displayWrappers;
+    private final ImmutableList<DisplayWrapper<?>> displayWrappers;
     private final Supplier<Simulation> simulationSupplier;
     private Simulation simulation;
 
     public SimulationWithUI(
         final Supplier<Simulation> simulationSupplier,
-        final List<DisplayWrapper<?, ?>> displayWrappers
+        final List<DisplayWrapper<?>> displayWrappers
     ) {
         this(simulationSupplier, ImmutableList.copyOf(displayWrappers));
     }
 
     public SimulationWithUI(
         final Supplier<Simulation> simulationSupplier,
-        final ImmutableList<DisplayWrapper<?, ?>> displayWrappers
+        final ImmutableList<DisplayWrapper<?>> displayWrappers
     ) {
         super(simulationSupplier.get());
         this.simulationSupplier = simulationSupplier;

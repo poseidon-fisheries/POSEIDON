@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,30 +19,40 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import tech.tablesaw.api.Table;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.Map;
+import java.nio.file.Path;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SpeciesListFactory
-    extends GlobalScopeFactory<SpeciesList> {
+public class SpeciesFromFileFactory extends GlobalScopeFactory<List<Species>> {
 
-    @NonNull
-    private Map<String, String> speciesNameByCode;
+    private Factory<? extends Path> path;
+    private String speciesCodeColumn;
+    private String speciesNameColumn;
 
     @Override
-    protected SpeciesList newInstance(final @NonNull Simulation simulation) {
-        return new ImmutableSpeciesList(
-            speciesNameByCode
-                .entrySet()
-                .stream()
-                .map(entry -> Species.of(entry.getKey(), entry.getValue()))
-                .toList()
-        );
+    protected List<Species> newInstance(final Simulation simulation) {
+        return Table
+            .read()
+            .csv(path.get(simulation).toFile())
+            .stream()
+            .map(row ->
+                Species.of(
+                    row.getString(speciesCodeColumn),
+                    row.getString(speciesNameColumn)
+                )
+            )
+            .toList();
     }
 }
