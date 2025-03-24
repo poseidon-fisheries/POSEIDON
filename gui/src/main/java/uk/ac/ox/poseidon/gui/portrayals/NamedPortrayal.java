@@ -26,4 +26,5 @@ import sim.portrayal.FieldPortrayal2D;
 public class NamedPortrayal {
     private final String name;
     private final FieldPortrayal2D portrayal;
+    private final boolean visible;
 }

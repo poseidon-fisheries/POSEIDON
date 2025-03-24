@@ -39,6 +39,7 @@ public class SpeciesBiomassFieldPortrayalFactory extends GlobalScopeFactory<Name
 
     private Factory<? extends BiomassGrid> biomassGrid;
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid;
+    private boolean visible;
 
     @Override
     protected NamedPortrayal newInstance(final Simulation simulation) {
@@ -51,7 +52,8 @@ public class SpeciesBiomassFieldPortrayalFactory extends GlobalScopeFactory<Name
                 false,
                 this.biomassGrid,
                 this.carryingCapacityGrid
-            ).get(simulation)
+            ).get(simulation),
+            visible
         );
     }
 }

@@ -36,9 +36,10 @@ public class SimpleFieldPortrayalFactory extends GlobalScopeFactory<NamedPortray
 
     private String name;
     private Factory<? extends FieldPortrayal2D> portrayal;
+    private boolean visible;
 
     @Override
     protected NamedPortrayal newInstance(final Simulation simulation) {
-        return new NamedPortrayal(name, portrayal.get(simulation));
+        return new NamedPortrayal(name, portrayal.get(simulation), visible);
     }
 }

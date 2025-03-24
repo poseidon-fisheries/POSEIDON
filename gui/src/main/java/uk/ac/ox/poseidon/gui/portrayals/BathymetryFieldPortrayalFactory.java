@@ -29,6 +29,13 @@ public class BathymetryFieldPortrayalFactory extends SimpleFieldPortrayalFactory
     public BathymetryFieldPortrayalFactory(
         final Factory<? extends BathymetricGrid> bathymetricGrid
     ) {
+        this(bathymetricGrid, true);
+    }
+
+    public BathymetryFieldPortrayalFactory(
+        final Factory<? extends BathymetricGrid> bathymetricGrid,
+        final boolean visible
+    ) {
         super(
             "Bathymetry",
             new DivergingNumberGridPortrayalFactory(
@@ -36,7 +43,8 @@ public class BathymetryFieldPortrayalFactory extends SimpleFieldPortrayalFactory
                 "Elevation",
                 true,
                 bathymetricGrid
-            )
+            ),
+            visible
         );
     }
 }

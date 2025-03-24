@@ -87,7 +87,11 @@ public class DisplayWrapper2D extends DisplayWrapper<Display2D> {
             })
             .forEach(o -> {
                 if (o instanceof final NamedPortrayal namedPortrayal) {
-                    display.attach(namedPortrayal.getPortrayal(), namedPortrayal.getName());
+                    display.attach(
+                        namedPortrayal.getPortrayal(),
+                        namedPortrayal.getName(),
+                        namedPortrayal.isVisible()
+                    );
                 } else {
                     logger.log(
                         WARNING,

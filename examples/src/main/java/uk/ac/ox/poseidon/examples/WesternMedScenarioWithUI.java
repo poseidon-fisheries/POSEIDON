@@ -53,13 +53,15 @@ public class WesternMedScenarioWithUI extends ScenarioWithUI {
                                 "Carrying capacity",
                                 true,
                                 scenario.component("carryingCapacityGrid")
-                            )
+                            ),
+                            false
                         ),
                         new MappedFactory<>(
                             scenario.<List<BiomassGrid>>component("biomassGrids"),
                             new SpeciesBiomassFieldPortrayalFactory(
                                 null,
-                                scenario.component("carryingCapacityGrid")
+                                scenario.component("carryingCapacityGrid"),
+                                false
                             ),
                             "biomassGrid"
                         ),
@@ -67,13 +69,15 @@ public class WesternMedScenarioWithUI extends ScenarioWithUI {
                             "Ports",
                             new PortGridPortrayalFactory(
                                 scenario.component("portGrid")
-                            )
+                            ),
+                            true
                         ),
                         new SimpleFieldPortrayalFactory(
                             "Vessels",
                             new VesselFieldPortrayalFactory(
                                 scenario.component("vesselField")
-                            )
+                            ),
+                            true
                         ),
                         new SimpleFieldPortrayalFactory(
                             "Regulations",
@@ -83,7 +87,8 @@ public class WesternMedScenarioWithUI extends ScenarioWithUI {
                                 scenario.component("bathymetricGrid"),
                                 WIDTH,
                                 HEIGHT
-                            )
+                            ),
+                            true
                         )
                     ),
                     WIDTH,
