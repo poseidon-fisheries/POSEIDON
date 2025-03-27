@@ -21,9 +21,8 @@ package uk.ac.ox.poseidon.server;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.protobuf.Empty;
-import eu.project.surimi.Surimi;
-import eu.project.surimi.WorkflowGrpc;
+import eu.project.surimi.Workflow;
+import eu.project.surimi.WorkflowServiceGrpc;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +33,7 @@ import java.util.UUID;
 import static java.lang.System.Logger.Level.INFO;
 
 @RequiredArgsConstructor
-class WorkflowService extends WorkflowGrpc.WorkflowImplBase {
+class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
 
     private static final System.Logger logger = System.getLogger(WorkflowService.class.getName());
     private final SimulationManager simulationManager;
@@ -44,8 +43,8 @@ class WorkflowService extends WorkflowGrpc.WorkflowImplBase {
 
     @Override
     public void init(
-        final Surimi.InitRequest request,
-        final StreamObserver<Empty> responseObserver
+        final Workflow.InitRequest request,
+        final StreamObserver<Workflow.InitResponse> responseObserver
     ) {
         final String experimentId = request.getExperimentId();
         logger.log(INFO, "Received init request for experiment: {0}", experimentId);
@@ -62,7 +61,15 @@ class WorkflowService extends WorkflowGrpc.WorkflowImplBase {
                     logger.log(INFO, "Simulation started: {0}", simulationId);
                 }
             );
-        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onNext(Workflow.InitResponse.newBuilder().build());
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void updatePrices(
+        final Workflow.UpdatePricesRequest request,
+        final StreamObserver<Workflow.UpdatePricesResponse> responseObserver
+    ) {
+        super.updatePrices(request, responseObserver);
     }
 }
