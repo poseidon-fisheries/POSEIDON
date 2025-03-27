@@ -37,10 +37,14 @@ import javax.measure.Quantity;
 import javax.measure.quantity.Speed;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.lang.System.Logger.Level.ERROR;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 
 @Getter
 @Setter
@@ -64,48 +68,62 @@ public class VesselsFromFileFactory extends SimulationScopeFactory<List<Vessel>>
     @Override
     protected List<Vessel> newInstance(final Simulation simulation) {
         final VesselField vesselField = this.vesselField.get(simulation);
-        return Table.read().file(path.get(simulation).toFile())
+        final List<Vessel> vessels =
+            Table.read().file(path.get(simulation).toFile())
+                .stream()
+                .flatMap(row -> {
+                    final PortGrid portGrid = this.portGrid.get(simulation);
+                    return Optional
+                        .ofNullable(portGrid.getPort(row.getString(portIdColumn)))
+                        .map(homePort -> {
+                            final var vessel = new Vessel(
+                                row.getString(vesselIdColumn),
+                                row.getString(vesselNameColumn),
+                                portGrid,
+                                homePort,
+                                speed.get(simulation),
+                                vesselField,
+                                new ForwardingEventManager(simulation.getEventManager())
+                            );
+                            // TODO: I don't think this is the right place to set and schedule
+                            //  behaviours. That should probably be handled by a separate
+                            //  behaviour factory that is given a list of vessels and takes care
+                            //  of setting that up.
+                            final TemporalSchedule temporalSchedule =
+                                simulation.getTemporalSchedule();
+                            vessel.setCurrentCell(portGrid.getLocation(vessel.getHomePort()));
+                            vessel.pushBehaviour(initialBehaviour.get(simulation, vessel));
+                            temporalSchedule.scheduleOnce(__ ->
+                                vessel.scheduleNextAction(temporalSchedule)
+                            );
+                            return vessel;
+                        })
+                        .map(Stream::of)
+                        .orElseGet(() -> {
+                            logger.log(
+                                ERROR,
+                                "Home port " +
+                                    row.getString(portIdColumn) +
+                                    " not found for vessel " +
+                                    row.getString(vesselIdColumn) +
+                                    "."
+                            );
+                            return Stream.empty();
+                        });
+                }).toList();
+        final Map<String, List<Vessel>> duplicateVesselIds = vessels
             .stream()
-            .flatMap(row -> {
-                // TODO: check that vessel id is unique
-                final PortGrid portGrid = this.portGrid.get(simulation);
-                return Optional
-                    .ofNullable(portGrid.getPort(row.getString(portIdColumn)))
-                    .map(homePort -> {
-                        // checkNotNull(homePort, "Port %s not found", row.getString(portIdColumn));
-                        final var vessel = new Vessel(
-                            row.getString(vesselIdColumn),
-                            portGrid,
-                            homePort,
-                            speed.get(simulation),
-                            vesselField,
-                            new ForwardingEventManager(simulation.getEventManager())
-                        );
-                        // TODO: I don't think this is the right place to set and schedule
-                        //  behaviours.
-                        //       That should probably be handled by a separate behaviour factory
-                        //       that
-                        //       is given a list of vessels and takes care of setting that up.
-                        final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
-                        vessel.setCurrentCell(portGrid.getLocation(vessel.getHomePort()));
-                        vessel.pushBehaviour(initialBehaviour.get(simulation, vessel));
-                        temporalSchedule.scheduleOnce(__ ->
-                            vessel.scheduleNextAction(temporalSchedule)
-                        );
-                        return vessel;
-                    })
-                    .map(Stream::of)
-                    .orElseGet(() -> {
-                        logger.log(
-                            ERROR,
-                            "Home port " +
-                                row.getString(portIdColumn) +
-                                " not found for vessel " +
-                                row.getString(vesselIdColumn) +
-                                "."
-                        );
-                        return Stream.empty();
-                    });
-            }).toList();
+            .collect(groupingBy(Vessel::getId))
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getValue().size() > 1)
+            .collect(toMap(Entry::getKey, Entry::getValue));
+        if (!duplicateVesselIds.isEmpty()) {
+            logger.log(
+                ERROR,
+                "Duplicate vessel ids found: " + duplicateVesselIds
+            );
+        }
+        return vessels;
     }
 }

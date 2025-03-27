@@ -44,6 +44,7 @@ import java.util.Deque;
 public class Vessel implements Oriented2D {
 
     private final String id;
+    private final String name;
     private final VesselField vesselField;
     private final PortGrid portGrid;
     private final EventManager eventManager;
@@ -57,6 +58,7 @@ public class Vessel implements Oriented2D {
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     Vessel(
         final String id,
+        final String name,
         final PortGrid portGrid,
         final Port homePort,
         final Quantity<Speed> cruisingSpeed,
@@ -64,6 +66,7 @@ public class Vessel implements Oriented2D {
         final EventManager eventManager
     ) {
         this.id = id;
+        this.name = name;
         this.portGrid = portGrid;
         this.homePort = homePort;
         this.cruisingSpeed = cruisingSpeed;
@@ -145,6 +148,6 @@ public class Vessel implements Oriented2D {
 
     @Override
     public String toString() {
-        return id;
+        return name + " (" + id + ")";
     }
 }

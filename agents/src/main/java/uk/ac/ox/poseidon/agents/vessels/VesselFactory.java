@@ -50,8 +50,10 @@ public class VesselFactory implements Factory<Vessel> {
     @Override
     public final Vessel get(final Simulation simulation) {
         final VesselField vesselField = this.vesselField.get(simulation);
+        final String id = idSupplier.get(simulation).nextId();
         final var vessel = new Vessel(
-            idSupplier.get(simulation).nextId(),
+            id,
+            "Vessel " + id,
             portGrid.get(simulation),
             homePort.get(simulation),
             speed.get(simulation),
