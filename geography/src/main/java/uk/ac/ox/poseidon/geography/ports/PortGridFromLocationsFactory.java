@@ -56,7 +56,7 @@ public class PortGridFromLocationsFactory extends GlobalScopeFactory<DefaultPort
             );
         ports.forEach((portName, coordinateFactory) -> {
             final Coordinate coordinate = coordinateFactory.get(simulation);
-            final SimplePort port = new SimplePort(idSupplier.nextId(), portName);
+            final Port port = new Port(idSupplier.nextId(), portName);
             final Int2D cell = modelGrid.toCell(coordinate);
             checkCell(cell, coordinate, portName, bathymetricGrid);
             sparseGrid2D.setObjectLocation(port, cell);

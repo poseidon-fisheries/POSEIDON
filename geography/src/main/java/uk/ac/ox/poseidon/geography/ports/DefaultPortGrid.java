@@ -32,10 +32,14 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
 
 public class DefaultPortGrid extends AbstractGrid<SparseGrid2D> implements PortGrid {
 
     private final SparseGrid2D sparseGrid2D;
+    private final Map<String, Port> portsById;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public DefaultPortGrid(
@@ -44,6 +48,9 @@ public class DefaultPortGrid extends AbstractGrid<SparseGrid2D> implements PortG
     ) {
         super(bathymetricGrid.getModelGrid(), sparseGrid2D);
         this.sparseGrid2D = sparseGrid2D;
+        this.portsById =
+            MasonUtils.<Port>bagToStream(sparseGrid2D.getAllObjects())
+                .collect(toImmutableMap(Port::getId, identity()));
     }
 
     public DefaultPortGrid(
@@ -93,8 +100,13 @@ public class DefaultPortGrid extends AbstractGrid<SparseGrid2D> implements PortG
     }
 
     @Override
+    public Port getPort(final String portId) {
+        return portsById.get(portId);
+    }
+
+    @Override
     public Stream<Port> getPortsAt(final Int2D cell) {
-        return MasonUtils.bagToStream(
+        return bagToStream(
             sparseGrid2D.getObjectsAtLocation(cell.x, cell.y)
         );
     }
@@ -106,7 +118,7 @@ public class DefaultPortGrid extends AbstractGrid<SparseGrid2D> implements PortG
 
     @Override
     public Stream<Port> getAllPorts() {
-        return MasonUtils.bagToStream(sparseGrid2D.allObjects);
+        return bagToStream(sparseGrid2D.allObjects);
     }
 
 }

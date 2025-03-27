@@ -72,7 +72,7 @@ public class PortGridFromFileFactory extends GlobalScopeFactory<DefaultPortGrid>
                 row.getDouble(longitudeColumn),
                 row.getDouble(latitudeColumn)
             );
-            final SimplePort port = new SimplePort(
+            final Port port = new Port(
                 row.getString(idColumn),
                 row.getString(nameColumn)
             );

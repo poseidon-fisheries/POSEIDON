@@ -36,7 +36,7 @@ public class SimplePortFactory implements Factory<Port> {
     @Override
     public Port get(final Simulation simulation) {
         final String id = idSupplier.get(simulation).nextId();
-        return new SimplePort(id, "Port " + id);
+        return new Port(id, "Port " + id);
     }
 
 }

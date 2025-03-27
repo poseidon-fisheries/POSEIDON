@@ -25,8 +25,8 @@ import sim.portrayal.DrawInfo2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DummyFishingAction;
-import uk.ac.ox.poseidon.agents.fleets.Fleet;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -38,6 +38,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalField;
+import java.util.List;
 import java.util.Objects;
 
 import static java.time.temporal.ChronoField.*;
@@ -50,7 +51,7 @@ import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.Up
 public class RegulationGridPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
 
     private Factory<? extends Regulations> regulations;
-    private Factory<? extends Fleet> fleet;
+    private Factory<? extends List<Vessel>> vessels;
     private Factory<? extends BathymetricGrid> bathymetric;
     private int displayWidth;
     private int displayHeight;
@@ -60,7 +61,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
         return new Portrayal(
             simulation.getTemporalSchedule(),
             regulations.get(simulation),
-            fleet.get(simulation),
+            vessels.get(simulation),
             bathymetric.get(simulation),
             EVERY_MONTH,
             displayWidth,
@@ -95,7 +96,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
 
         private final TemporalSchedule schedule;
         private final Regulations regulations;
-        private final Fleet fleet;
+        private final List<Vessel> vessels;
         private final BathymetricGrid bathymetricGrid;
         private final ObjectGrid2D grid;
         private final UpdateFrequency updateFrequency;
@@ -104,7 +105,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
         Portrayal(
             final TemporalSchedule schedule,
             final Regulations regulations,
-            final Fleet fleet,
+            final List<Vessel> vessels,
             final BathymetricGrid bathymetricGrid,
             final UpdateFrequency updateFrequency,
             final int displayWidth,
@@ -112,7 +113,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
         ) {
             super();
             this.regulations = regulations;
-            this.fleet = fleet;
+            this.vessels = vessels;
             this.bathymetricGrid = bathymetricGrid;
             final int gridWidth = bathymetricGrid.getField().width;
             final int gridHeight = bathymetricGrid.getField().height;
@@ -149,7 +150,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
             bathymetricGrid.getActiveWaterCells().forEach(cell -> {
                 final LocalDateTime dateTime = schedule.getDateTime();
                 final boolean forbidden =
-                    fleet.getVessels()
+                    vessels
                         .stream()
                         .map(vessel ->
                             new DummyFishingAction(

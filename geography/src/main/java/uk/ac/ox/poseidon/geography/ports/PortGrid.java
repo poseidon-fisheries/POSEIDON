@@ -28,6 +28,8 @@ import java.util.stream.Stream;
 public interface PortGrid extends Grid<SparseGrid2D> {
     Int2D getLocation(Port port);
 
+    Port getPort(String portId);
+
     Stream<Port> getPortsAt(Int2D location);
 
     boolean anyPortsAt(Int2D cell);

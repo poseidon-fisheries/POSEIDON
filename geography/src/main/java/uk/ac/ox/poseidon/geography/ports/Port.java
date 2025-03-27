@@ -19,6 +19,18 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
-public interface Port {
-    String getName();
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class Port {
+
+    private final String id;
+    private final String name;
+
+    public Port(final String nameAndId) {
+        this(nameAndId, nameAndId);
+    }
 }
+

@@ -22,12 +22,14 @@ package uk.ac.ox.poseidon.gui.portrayals;
 import org.junit.jupiter.api.Test;
 import sim.field.grid.DoubleGrid2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
-import uk.ac.ox.poseidon.agents.fleets.Fleet;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -49,14 +51,14 @@ class RegulationGridPortrayalFactoryTest {
         when(mockSimulation.getTemporalSchedule()).thenReturn(mockSchedule);
 
         final Regulations mockRegulations = mock(Regulations.class);
-        final Fleet mockFleet = mock(Fleet.class);
+        final List<Vessel> mockVessels = mock(List.class);
         final BathymetricGrid mockBathymetricGrid = mock(BathymetricGrid.class);
 
         final Factory<Regulations> regulationsFactory = mock(Factory.class);
         when(regulationsFactory.get(mockSimulation)).thenReturn(mockRegulations);
 
-        final Factory<Fleet> fleetFactory = mock(Factory.class);
-        when(fleetFactory.get(mockSimulation)).thenReturn(mockFleet);
+        final Factory<List<Vessel>> vesselsFactory = mock(Factory.class);
+        when(vesselsFactory.get(mockSimulation)).thenReturn(mockVessels);
 
         final DoubleGrid2D mockField = new DoubleGrid2D(10, 20);
         when(mockBathymetricGrid.getField()).thenReturn(mockField);
@@ -66,7 +68,7 @@ class RegulationGridPortrayalFactoryTest {
 
         final RegulationGridPortrayalFactory factory = new RegulationGridPortrayalFactory(
             regulationsFactory,
-            fleetFactory,
+            vesselsFactory,
             bathymetricFactory,
             800,
             600

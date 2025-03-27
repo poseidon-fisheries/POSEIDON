@@ -37,8 +37,6 @@ import uk.ac.ox.poseidon.agents.behaviours.travel.TravellingAlongPathBehaviourFa
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
-import uk.ac.ox.poseidon.agents.fleets.DefaultFleetFactory;
-import uk.ac.ox.poseidon.agents.fleets.Fleet;
 import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
 import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
@@ -46,9 +44,9 @@ import uk.ac.ox.poseidon.agents.regulations.FishingLocationLegalityCheckerFactor
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.tables.FishingActionListenerTableFactory;
 import uk.ac.ox.poseidon.agents.vessels.AdaptedVesselPredicateFactory;
-import uk.ac.ox.poseidon.agents.vessels.RandomHomePortFactory;
-import uk.ac.ox.poseidon.agents.vessels.VesselFactory;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselsFromFileFactory;
 import uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory;
 import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
 import uk.ac.ox.poseidon.agents.vessels.hold.ProportionalBiomassOvercapacityDiscardingStrategyFactory;
@@ -75,7 +73,6 @@ import uk.ac.ox.poseidon.core.suppliers.temporal.DurationUntilSupplierFactory;
 import uk.ac.ox.poseidon.core.suppliers.temporal.NextDayAtTimeSupplierFactory;
 import uk.ac.ox.poseidon.core.time.DateTimeAfterFactory;
 import uk.ac.ox.poseidon.core.time.TimeFactory;
-import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromGridFileFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.adaptors.CellElevationFactory;
@@ -114,7 +111,6 @@ public class WesternMedScenario extends ScenarioSupplier {
     private static final double LOGISTIC_GROWTH_RATE = 0.001;
     private static final String CARRYING_CAPACITY = "5 t";
     private static final double LEARNING_ALPHA = 1;
-    private static final int NUMBER_OF_VESSELS = 61;
     private static final double EXPLORATION_PROBABILITY = 0.2;
     private static final int MEAN_EXPLORATION_RADIUS = 1;
     private static final double CATCH_PROPORTION = 0.1;
@@ -273,87 +269,86 @@ public class WesternMedScenario extends ScenarioSupplier {
             optionValuesRegister,
             new ExponentialMovingAverageOptionValuesFactory<>(LEARNING_ALPHA)
         );
-    @SuppressWarnings("MagicNumber") private Factory<? extends Fleet> fleet =
-        new DefaultFleetFactory(
-            NUMBER_OF_VESSELS,
-            new VesselFactory(
-                new HomeBehaviourFactory(
-                    portGrid,
-                    hold,
-                    new AllOfFactory<>(
-                        new AdaptedVesselPredicateFactory<>(
-                            new CurrentTimeFactory(),
-                            new TimeIsAfterFactory(new TimeFactory(21, 59, 59))
-                        ),
-                        new AdaptedVesselPredicateFactory<>(
-                            new CurrentDayOfWeekFactory(),
-                            new InSetFactory<>(
-                                SUNDAY,
-                                MONDAY,
-                                TUESDAY,
-                                WEDNESDAY,
-                                THURSDAY
-                            )
-                        )
+    private Factory<List<Vessel>> vessels =
+        new VesselsFromFileFactory(
+            inputPath.plus("vessels.csv"),
+            "vessel_id",
+            "vessel_name",
+            "port_id",
+            new HomeBehaviourFactory(
+                portGrid,
+                hold,
+                new AllOfFactory<>(
+                    new AdaptedVesselPredicateFactory<>(
+                        new CurrentTimeFactory(),
+                        new TimeIsAfterFactory(new TimeFactory(21, 59, 59))
                     ),
-                    new ThereAndBackBehaviourFactory(
-                        new ChoosingDestinationBehaviourFactory(
-                            new EpsilonGreedyDestinationSupplierFactory(
-                                EXPLORATION_PROBABILITY,
+                    new AdaptedVesselPredicateFactory<>(
+                        new CurrentDayOfWeekFactory(),
+                        new InSetFactory<>(
+                            SUNDAY,
+                            MONDAY,
+                            TUESDAY,
+                            WEDNESDAY,
+                            THURSDAY
+                        )
+                    )
+                ),
+                new ThereAndBackBehaviourFactory(
+                    new ChoosingDestinationBehaviourFactory(
+                        new EpsilonGreedyDestinationSupplierFactory(
+                            EXPLORATION_PROBABILITY,
+                            optionValues,
+                            new NeighbourhoodGridExplorerFactory(
                                 optionValues,
-                                new NeighbourhoodGridExplorerFactory(
-                                    optionValues,
-                                    fishingLocationChecker,
-                                    pathFinder,
-                                    new ShiftedIntSupplierFactory(
-                                        new PoissonIntSupplierFactory(MEAN_EXPLORATION_RADIUS),
-                                        1
-                                    )
-                                ),
-                                new ImitatingPickerFactory<>(
-                                    optionValues,
-                                    fishingLocationChecker,
-                                    new BestOptionsFromFriendsSupplierFactory<>(
-                                        5,
-                                        optionValuesRegister
-                                    )
-                                ),
-                                new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
-                            ),
-                            ONE_HOUR_DURATION_SUPPLIER,
-                            new WaitingBehaviourFactory(ONE_DAY_DURATION_SUPPLIER)
-                        ),
-                        new DefaultFishingBehaviourFactory<>(
-                            new FixedBiomassProportionGearFactory(
-                                CATCH_PROPORTION,
-                                ONE_HOUR_DURATION_SUPPLIER
-                            ),
-                            hold,
-                            new CurrentCellFisheableFactory<>(
-                                new BiomassGridsFactory(
-                                    biomassGrids
+                                fishingLocationChecker,
+                                pathFinder,
+                                new ShiftedIntSupplierFactory(
+                                    new PoissonIntSupplierFactory(MEAN_EXPLORATION_RADIUS),
+                                    1
                                 )
                             ),
-                            regulations
+                            new ImitatingPickerFactory<>(
+                                optionValues,
+                                fishingLocationChecker,
+                                new BestOptionsFromFriendsSupplierFactory<>(
+                                    5,
+                                    optionValuesRegister
+                                )
+                            ),
+                            new TotalBiomassCaughtPerHourDestinationEvaluatorFactory()
                         ),
-                        travellingBehaviour
+                        ONE_HOUR_DURATION_SUPPLIER,
+                        new WaitingBehaviourFactory(ONE_DAY_DURATION_SUPPLIER)
                     ),
-                    new WaitingBehaviourFactory(
-                        new DurationUntilSupplierFactory(
-                            new NextDayAtTimeSupplierFactory(
-                                new TimeFactory(22, 0, 0)
+                    new DefaultFishingBehaviourFactory<>(
+                        new FixedBiomassProportionGearFactory(
+                            CATCH_PROPORTION,
+                            ONE_HOUR_DURATION_SUPPLIER
+                        ),
+                        hold,
+                        new CurrentCellFisheableFactory<>(
+                            new BiomassGridsFactory(
+                                biomassGrids
                             )
-                        )
+                        ),
+                        regulations
                     ),
-                    travellingBehaviour,
-                    new LandingBehaviourFactory<>(hold, ONE_HOUR_DURATION_SUPPLIER)
+                    travellingBehaviour
                 ),
-                new PrefixedIdSupplierFactory("Vessel"),
-                vesselField,
-                new RandomHomePortFactory(portGrid),
-                portGrid,
-                SpeedFactory.of(VESSEL_SPEED)
-            )
+                new WaitingBehaviourFactory(
+                    new DurationUntilSupplierFactory(
+                        new NextDayAtTimeSupplierFactory(
+                            new TimeFactory(22, 0, 0)
+                        )
+                    )
+                ),
+                travellingBehaviour,
+                new LandingBehaviourFactory<>(hold, ONE_HOUR_DURATION_SUPPLIER)
+            ),
+            vesselField,
+            portGrid,
+            SpeedFactory.of(VESSEL_SPEED)
         );
 
     public static void main(final String[] args) {

@@ -32,8 +32,8 @@ import uk.ac.ox.poseidon.geography.distance.EquirectangularDistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.AStarPathFinder;
 import uk.ac.ox.poseidon.geography.paths.GridAdaptor;
 import uk.ac.ox.poseidon.geography.ports.DefaultPortGrid;
+import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
-import uk.ac.ox.poseidon.geography.ports.SimplePort;
 
 import java.util.List;
 import java.util.Map;
@@ -61,7 +61,7 @@ class GridAdaptorTest {
     private final PortGrid portGrid =
         new DefaultPortGrid(
             bathymetricGrid,
-            Map.of(new SimplePort("Test port"), new Coordinate(0.5, 2.5))
+            Map.of(new Port("Test port"), new Coordinate(0.5, 2.5))
         );
 
     private final GridAdaptor gridAdaptor =
