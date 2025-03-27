@@ -143,12 +143,6 @@ public class WesternMedScenario extends ScenarioSupplier {
             new MaxFactory(),
             false
         );
-    private Factory<? extends PortGrid> portGrid =
-        new PortGridFromFileFactory(
-            bathymetricGrid,
-            inputPath.plus("ports.csv"),
-            "port_id", "port_name", "lon", "lat"
-        );
     private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid =
         new UniformCarryingCapacityGridFactory(
             bathymetricGrid,
@@ -160,7 +154,7 @@ public class WesternMedScenario extends ScenarioSupplier {
         new MappedFactory<>(
             new SpeciesFromFileFactory(
                 inputPath.plus("species.csv"),
-                "species_code",
+                "species_id",
                 "species_name"
             ),
             new BiomassGridFactory(
@@ -170,7 +164,6 @@ public class WesternMedScenario extends ScenarioSupplier {
             ),
             "species"
         );
-
     private Factory<? extends Steppable> dailyProcesses =
         new ScheduledRepeatingFactory<>(
             new DateTimeAfterFactory(
@@ -236,6 +229,13 @@ public class WesternMedScenario extends ScenarioSupplier {
     private Factory<? extends VesselField> vesselField = new VesselFieldFactory(modelGrid);
     private Factory<? extends DistanceCalculator> distance =
         new HaversineDistanceCalculatorFactory(modelGrid);
+    private Factory<? extends PortGrid> portGrid =
+        new PortGridFromFileFactory(
+            bathymetricGrid,
+            distance,
+            inputPath.plus("ports.csv"),
+            "port_id", "port_name", "lon", "lat"
+        );
     private Factory<? extends GridPathFinder> pathFinder =
         new DefaultPathFinderFactory(
             bathymetricGrid,

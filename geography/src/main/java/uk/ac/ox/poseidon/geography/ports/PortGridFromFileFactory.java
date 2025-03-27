@@ -19,7 +19,10 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
 import tech.tablesaw.api.Table;
@@ -28,9 +31,14 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.nio.file.Path;
+import java.util.Optional;
+
+import static java.lang.System.Logger.Level.ERROR;
+import static java.util.Comparator.comparingDouble;
 
 @Getter
 @Setter
@@ -38,16 +46,21 @@ import java.nio.file.Path;
 @NoArgsConstructor
 public class PortGridFromFileFactory extends GlobalScopeFactory<DefaultPortGrid> {
 
-    @NonNull private Factory<? extends BathymetricGrid> bathymetricGrid;
-    @NonNull private Factory<? extends Path> path;
-    @NonNull private String idColumn;
-    @NonNull private String nameColumn;
-    @NonNull private String longitudeColumn;
-    @NonNull private String latitudeColumn;
+    private static final System.Logger logger =
+        System.getLogger(PortGridFromFileFactory.class.getName());
+
+    private Factory<? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? extends DistanceCalculator> distanceCalculator;
+    private Factory<? extends Path> path;
+    private String idColumn;
+    private String nameColumn;
+    private String longitudeColumn;
+    private String latitudeColumn;
 
     @Override
     protected DefaultPortGrid newInstance(final Simulation simulation) {
         final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
+        final DistanceCalculator distanceCalculator = this.distanceCalculator.get(simulation);
         final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
         final SparseGrid2D sparseGrid2D =
             new SparseGrid2D(
@@ -63,10 +76,50 @@ public class PortGridFromFileFactory extends GlobalScopeFactory<DefaultPortGrid>
                 row.getString(idColumn),
                 row.getString(nameColumn)
             );
-            final Int2D cell = modelGrid.toCell(coordinate);
-            // checkCell(cell, coordinate, portName, bathymetricGrid);
-            sparseGrid2D.setObjectLocation(port, cell);
+            coordinateToCell(
+                bathymetricGrid,
+                coordinate,
+                distanceCalculator
+            ).ifPresentOrElse(
+                cell -> sparseGrid2D.setObjectLocation(port, cell),
+                () -> logger.log(
+                    ERROR,
+                    () -> "No suitable land cell found for " + port + " near " + coordinate + "."
+                )
+            );
+
         });
         return new DefaultPortGrid(bathymetricGrid, sparseGrid2D);
     }
+
+    private Optional<Int2D> coordinateToCell(
+        final BathymetricGrid bathymetricGrid,
+        final Coordinate coordinate,
+        final DistanceCalculator distanceCalculator
+    ) {
+        final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
+        final Int2D cell = modelGrid.toCell(coordinate);
+        if (validPortLocation(bathymetricGrid, cell)) {
+            return Optional.of(cell);
+        } else {
+            return bathymetricGrid
+                .getActiveLandNeighbours(cell)
+                .min(comparingDouble(landNeighbour ->
+                    distanceCalculator.distanceInKm(
+                        coordinate,
+                        modelGrid.toCoordinate(landNeighbour)
+                    ))
+                );
+        }
+    }
+
+    private boolean validPortLocation(
+        final BathymetricGrid bathymetricGrid,
+        final Int2D cell
+    ) {
+        return bathymetricGrid.getModelGrid().isInGrid(cell) &&
+            bathymetricGrid.isLand(cell) &&
+            bathymetricGrid.getActiveWaterNeighbours(cell).findAny().isPresent();
+    }
+
 }
