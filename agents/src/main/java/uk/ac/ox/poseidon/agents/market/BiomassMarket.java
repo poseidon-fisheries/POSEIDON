@@ -21,6 +21,7 @@ package uk.ac.ox.poseidon.agents.market;
 
 import com.google.common.collect.ImmutableTable;
 import org.joda.money.Money;
+import tech.units.indriya.format.SimpleUnitFormat;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
@@ -32,12 +33,21 @@ import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
+import static tech.units.indriya.unit.UnitDimension.MASS;
+
 public class BiomassMarket implements Market<Biomass> {
 
     private final Map<Species, Price> prices;
 
     public BiomassMarket(final Map<Species, Price> prices) {
         this.prices = new HashMap<>(prices);
+    }
+
+    public static Unit<Mass> parseMassUnit(final String unitString) {
+        final Unit<?> unit = SimpleUnitFormat.getInstance().parse(unitString);
+        return unit.getDimension() == MASS
+            ? unit.asType(Mass.class)
+            : null;
     }
 
     @Override
@@ -70,5 +80,13 @@ public class BiomassMarket implements Market<Biomass> {
         );
     }
 
+    public void setPrice(
+        final Species species,
+        final Price price
+    ) {
+        prices.put(species, price);
+    }
+
     public record Price(Money amount, Unit<Mass> biomassUnit) {}
+
 }

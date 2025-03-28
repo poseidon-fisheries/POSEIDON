@@ -118,7 +118,7 @@ public class SimulationManager {
         return scenario;
     }
 
-    private Simulation getSimulation(final UUID simulationId) {
+    Simulation getSimulation(final UUID simulationId) {
         final Simulation simulation = simulations.getIfPresent(simulationId);
         if (simulation == null) {
             throw new SimulationNotFoundException(simulationId);

@@ -27,7 +27,6 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
-import tech.units.indriya.format.SimpleUnitFormat;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -41,21 +40,19 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.Streams.stream;
 import static java.lang.System.Logger.Level.ERROR;
 import static java.math.RoundingMode.HALF_EVEN;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
-import static tech.units.indriya.unit.UnitDimension.MASS;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class BiomassMarketsFromPriceFileFactory
-    extends SimulationScopeFactory<Map<Port, BiomassMarket>> {
+    extends SimulationScopeFactory<BiomassMarkets> {
 
     private static final System.Logger logger =
         System.getLogger(BiomassMarketsFromPriceFileFactory.class.getName());
@@ -72,7 +69,7 @@ public class BiomassMarketsFromPriceFileFactory
     private Factory<? extends Iterable<? extends Species>> species;
 
     @Override
-    protected Map<Port, BiomassMarket> newInstance(final Simulation simulation) {
+    protected BiomassMarkets newInstance(final Simulation simulation) {
         final Map<String, Port> portsByCode =
             stream(this.ports.get(simulation))
                 .collect(toMap(Port::getCode, identity()));
@@ -98,7 +95,7 @@ public class BiomassMarketsFromPriceFileFactory
                                 file,
                                 row,
                                 measurementUnitColumn,
-                                this::parseMassUnit,
+                                BiomassMarket::parseMassUnit,
                                 "measurement unit"
                             ).map(measurementUnit ->
                                 new PriceEntry(
@@ -116,18 +113,22 @@ public class BiomassMarketsFromPriceFileFactory
                     )
                 ).stream()
             )
-            .collect(groupingBy(
-                    PriceEntry::port,
-                    collectingAndThen(
-                        Collectors.toMap(
-                            PriceEntry::species,
-                            priceEntry -> new BiomassMarket.Price(
-                                priceEntry.price(),
-                                priceEntry.unit()
-                            )
-                        ),
-                        BiomassMarket::new
-                    )
+            .collect(
+                collectingAndThen(
+                    groupingBy(
+                        PriceEntry::port,
+                        collectingAndThen(
+                            toMap(
+                                PriceEntry::species,
+                                priceEntry -> new BiomassMarket.Price(
+                                    priceEntry.price(),
+                                    priceEntry.unit()
+                                )
+                            ),
+                            BiomassMarket::new
+                        )
+                    ),
+                    BiomassMarkets::new
                 )
             );
     }
@@ -156,13 +157,6 @@ public class BiomassMarketsFromPriceFileFactory
             );
             return Optional.empty();
         }
-    }
-
-    private Unit<Mass> parseMassUnit(final String unitString) {
-        final Unit<?> unit = SimpleUnitFormat.getInstance().parse(unitString);
-        return unit.getDimension() == MASS
-            ? unit.asType(Mass.class)
-            : null;
     }
 
     private record PriceEntry(

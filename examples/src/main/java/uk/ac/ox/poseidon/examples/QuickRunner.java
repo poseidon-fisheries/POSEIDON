@@ -67,7 +67,6 @@ public class QuickRunner implements Runnable {
 
     public static void main(final String[] args) {
         logger.log(INFO, () -> "Received arguments: " + Arrays.toString(args));
-        // System.out.println("Received arguments: " + Arrays.toString(args));
         final QuickRunner quickRunner = new QuickRunner();
         final JCommander jCommander = JCommander
             .newBuilder()
@@ -95,10 +94,7 @@ public class QuickRunner implements Runnable {
             simulation.schedule.step(simulation);
         }
         simulation.finish();
-        logger.log(
-            INFO, () ->
-                "Simulation completed (" + schedule.getDateTime() + ")"
-        );
+        logger.log(INFO, () -> "Simulation completed (" + schedule.getDateTime() + ")");
     }
 
     @Override

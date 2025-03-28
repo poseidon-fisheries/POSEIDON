@@ -34,10 +34,14 @@ import java.io.Serial;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 @Getter
 public class Simulation extends SimState {
@@ -118,5 +122,24 @@ public class Simulation extends SimState {
     @Override
     public final boolean equals(final Object obj) {
         return super.equals(obj);
+    }
+
+    private <T> Stream<T> getComponents(
+        final Collection<?> component,
+        final Class<T> componentClass
+    ) {
+        return component
+            .stream()
+            .flatMap(o ->
+                o instanceof final Collection<?> c
+                    ? getComponents(c, componentClass)
+                    : Stream.of(o)
+            )
+            .filter(componentClass::isInstance)
+            .map(componentClass::cast);
+    }
+
+    public <T> Set<T> getComponents(final Class<T> componentClass) {
+        return getComponents(components, componentClass).collect(toImmutableSet());
     }
 }

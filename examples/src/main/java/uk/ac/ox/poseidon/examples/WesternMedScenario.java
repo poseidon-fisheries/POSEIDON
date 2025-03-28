@@ -37,7 +37,7 @@ import uk.ac.ox.poseidon.agents.behaviours.travel.TravellingAlongPathBehaviourFa
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
-import uk.ac.ox.poseidon.agents.market.BiomassMarket;
+import uk.ac.ox.poseidon.agents.market.BiomassMarkets;
 import uk.ac.ox.poseidon.agents.market.BiomassMarketsFromPriceFileFactory;
 import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
@@ -86,7 +86,6 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGridWithActiveCellsFromGridFile;
 import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
-import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGridFromFileFactory;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
@@ -98,7 +97,6 @@ import uk.ac.ox.poseidon.regulations.predicates.spatial.ActionCellPredicateFacto
 import java.nio.file.Path;
 import java.time.Period;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
 import static java.time.DayOfWeek.*;
@@ -256,7 +254,7 @@ public class WesternMedScenario extends ScenarioSupplier {
             ),
             0
         );
-    private Factory<Map<Port, BiomassMarket>> markets =
+    private Factory<? extends BiomassMarkets> markets =
         new BiomassMarketsFromPriceFileFactory(
             inputPath.plus("prices.csv"),
             "port_id",

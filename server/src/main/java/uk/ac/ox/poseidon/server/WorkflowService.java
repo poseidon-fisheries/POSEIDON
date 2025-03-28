@@ -19,18 +19,27 @@
 
 package uk.ac.ox.poseidon.server;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import eu.project.surimi.Workflow;
 import eu.project.surimi.WorkflowServiceGrpc;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
+import uk.ac.ox.poseidon.agents.market.BiomassMarket;
+import uk.ac.ox.poseidon.agents.market.BiomassMarkets;
+import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.io.File;
+import java.math.RoundingMode;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.System.Logger.Level.INFO;
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toMap;
 
 @RequiredArgsConstructor
 class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
@@ -39,7 +48,9 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
     private final SimulationManager simulationManager;
     private final File scenarioFile;
 
-    private final Cache<String, UUID> simulations = CacheBuilder.newBuilder().build();
+    // TODO: replace we proper cache once we sort out our simulation id business and do not
+    //  need to loop through values anymore.
+    private final ConcurrentHashMap<String, UUID> simulations = new ConcurrentHashMap<>();
 
     @Override
     public void init(
@@ -49,7 +60,7 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         final String experimentId = request.getExperimentId();
         logger.log(INFO, "Received init request for experiment: {0}", experimentId);
         Optional
-            .ofNullable(simulations.getIfPresent(experimentId))
+            .ofNullable(simulations.get(experimentId))
             .ifPresentOrElse(
                 simulationId ->
                     logger.log(INFO, "Simulation already started: {0}", simulationId),
@@ -70,6 +81,46 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         final Workflow.UpdatePricesRequest request,
         final StreamObserver<Workflow.UpdatePricesResponse> responseObserver
     ) {
-        super.updatePrices(request, responseObserver);
+        logger.log(INFO, "Received updatePrices request.");
+        // TODO: I'm currently looping through all the simulations in the simulation manager
+        //  because we are not passing a simulation id in the request, but this is not a good
+        //  long-term solution. Note that I'm loop through all simulations instead of just first
+        //  or last one, but I prefer not to implement logic that legitimizes the current situation
+        simulations
+            .values()
+            .stream()
+            .map(simulationManager::getSimulation)
+            .forEach(simulation -> {
+                final Map<String, Species> speciesByCode =
+                    simulation.getComponents(Species.class).stream()
+                        .collect(toMap(Species::getCode, identity()));
+                simulation.getComponents(BiomassMarkets.class).forEach(biomassMarkets -> {
+                    final Map<String, Port> portsByCode =
+                        biomassMarkets.keySet().stream().collect(toMap(Port::getCode, identity()));
+                    request.getPricesList().forEach(price -> {
+                        Optional
+                            .ofNullable(portsByCode.get(price.getPortId()))
+                            .map(biomassMarkets::get)
+                            .ifPresent(market ->
+                                Optional
+                                    .ofNullable(speciesByCode.get(price.getSpeciesId()))
+                                    .ifPresent(
+                                        species -> market.setPrice(
+                                            species, new BiomassMarket.Price(
+                                                Money.of(
+                                                    CurrencyUnit.of(price.getCurrency()),
+                                                    price.getPrice(),
+                                                    RoundingMode.HALF_EVEN
+                                                ),
+                                                BiomassMarket.parseMassUnit(price.getMeasurementUnit())
+                                            )
+                                        )
+                                    )
+                            );
+                    });
+                });
+            });
+        responseObserver.onNext(Workflow.UpdatePricesResponse.newBuilder().build());
+        responseObserver.onCompleted();
     }
 }
