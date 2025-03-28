@@ -27,8 +27,7 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
 
-import static javax.measure.MetricPrefix.KILO;
-import static tech.units.indriya.unit.Units.GRAM;
+import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 
 @Data
@@ -48,7 +47,7 @@ public class Biomass implements Content<Biomass> {
         this(
             Quantities
                 .getQuantity(value, unit)
-                .to(KILO(GRAM))
+                .to(KILOGRAM)
                 .getValue()
                 .doubleValue()
         );
@@ -56,6 +55,10 @@ public class Biomass implements Content<Biomass> {
 
     public static Biomass ofKg(final double value) {
         return new Biomass(value);
+    }
+
+    public double as(final Unit<Mass> biomassUnit) {
+        return this.asQuantity().to(biomassUnit).getValue().doubleValue();
     }
 
     public Biomass add(final Biomass content) {
@@ -84,7 +87,7 @@ public class Biomass implements Content<Biomass> {
     }
 
     public Quantity<Mass> asQuantity() {
-        return Quantities.getQuantity(this.biomassInKg, KILO(GRAM));
+        return Quantities.getQuantity(this.biomassInKg, KILOGRAM);
     }
 
     public String toString() {return "Biomass(" + this.asQuantity() + ")";}

@@ -26,11 +26,11 @@ import lombok.Data;
 @AllArgsConstructor
 public class Port {
 
-    private final String id;
+    private final String code;
     private final String name;
 
-    public Port(final String nameAndId) {
-        this(nameAndId, nameAndId);
+    public Port(final String nameAndCode) {
+        this(nameAndCode, nameAndCode);
     }
 }
 

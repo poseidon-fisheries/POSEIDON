@@ -28,6 +28,8 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.AbstractGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
+import javax.annotation.Nonnull;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -50,7 +52,7 @@ public class DefaultPortGrid extends AbstractGrid<SparseGrid2D> implements PortG
         this.sparseGrid2D = sparseGrid2D;
         this.portsById =
             MasonUtils.<Port>bagToStream(sparseGrid2D.getAllObjects())
-                .collect(toImmutableMap(Port::getId, identity()));
+                .collect(toImmutableMap(Port::getCode, identity()));
     }
 
     public DefaultPortGrid(
@@ -117,8 +119,8 @@ public class DefaultPortGrid extends AbstractGrid<SparseGrid2D> implements PortG
     }
 
     @Override
-    public Stream<Port> getAllPorts() {
-        return bagToStream(sparseGrid2D.allObjects);
+    @Nonnull
+    public Iterator<Port> iterator() {
+        return bagToStream(sparseGrid2D.allObjects, Port.class).iterator();
     }
-
 }

@@ -1,0 +1,175 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+package uk.ac.ox.poseidon.agents.market;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.Table;
+import tech.units.indriya.format.SimpleUnitFormat;
+import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.geography.ports.Port;
+
+import javax.measure.Unit;
+import javax.measure.quantity.Mass;
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.google.common.collect.Streams.stream;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.math.RoundingMode.HALF_EVEN;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.*;
+import static tech.units.indriya.unit.UnitDimension.MASS;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class BiomassMarketsFromPriceFileFactory
+    extends SimulationScopeFactory<Map<Port, BiomassMarket>> {
+
+    private static final System.Logger logger =
+        System.getLogger(BiomassMarketsFromPriceFileFactory.class.getName());
+
+    private Factory<? extends Path> path;
+
+    private String portCodeColumn;
+    private String speciesCodeColumn;
+    private String priceColumn;
+    private String currencyColumn;
+    private String measurementUnitColumn;
+
+    private Factory<? extends Iterable<? extends Port>> ports;
+    private Factory<? extends Iterable<? extends Species>> species;
+
+    @Override
+    protected Map<Port, BiomassMarket> newInstance(final Simulation simulation) {
+        final Map<String, Port> portsByCode =
+            stream(this.ports.get(simulation))
+                .collect(toMap(Port::getCode, identity()));
+
+        final Map<String, Species> speciesByCode =
+            stream(this.species.get(simulation))
+                .collect(toMap(Species::getCode, identity()));
+
+        final File file = path.get(simulation).toFile();
+        // I know. I know. This is ridiculous.
+        return Table.read().file(file).stream()
+            .flatMap(row ->
+                parse(
+                    file, row, portCodeColumn, portsByCode::get, "port code"
+                ).flatMap(port ->
+                    parse(
+                        file, row, speciesCodeColumn, speciesByCode::get, "species code"
+                    ).flatMap(species ->
+                        parse(
+                            file, row, currencyColumn, CurrencyUnit::of, "currency"
+                        ).flatMap(currencyUnit ->
+                            parse(
+                                file,
+                                row,
+                                measurementUnitColumn,
+                                this::parseMassUnit,
+                                "measurement unit"
+                            ).map(measurementUnit ->
+                                new PriceEntry(
+                                    port,
+                                    species,
+                                    Money.of(
+                                        currencyUnit,
+                                        row.getDouble(priceColumn),
+                                        HALF_EVEN
+                                    ),
+                                    measurementUnit.asType(Mass.class)
+                                )
+                            )
+                        )
+                    )
+                ).stream()
+            )
+            .collect(groupingBy(
+                    PriceEntry::port,
+                    collectingAndThen(
+                        Collectors.toMap(
+                            PriceEntry::species,
+                            priceEntry -> new BiomassMarket.Price(
+                                priceEntry.price(),
+                                priceEntry.unit()
+                            )
+                        ),
+                        BiomassMarket::new
+                    )
+                )
+            );
+    }
+
+    private <T> Optional<T> parse(
+        final File file,
+        final Row row,
+        final String columnName,
+        final Function<String, T> parser,
+        final String description
+    ) {
+        try {
+            final String value = row.getString(columnName);
+            return Optional
+                .ofNullable(parser.apply(value))
+                .or(() -> {
+                    logger.log(ERROR, "{0} is not a valid {1}.", value, description);
+                    return Optional.empty();
+                });
+        } catch (final Exception e) {
+            logger.log(
+                ERROR, "Error parsing row {0}\nwhile reading {1}\n{2}",
+                row,
+                file,
+                e.getMessage()
+            );
+            return Optional.empty();
+        }
+    }
+
+    private Unit<Mass> parseMassUnit(final String unitString) {
+        final Unit<?> unit = SimpleUnitFormat.getInstance().parse(unitString);
+        return unit.getDimension() == MASS
+            ? unit.asType(Mass.class)
+            : null;
+    }
+
+    private record PriceEntry(
+        Port port,
+        Species species,
+        Money price,
+        Unit<Mass> unit
+    ) {}
+
+}

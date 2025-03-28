@@ -22,11 +22,9 @@ package uk.ac.ox.poseidon.agents.vessels;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.ports.Port;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 
@@ -35,10 +33,10 @@ import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 @AllArgsConstructor
 public class RandomHomePortFactory implements Factory<Port> {
 
-    @NonNull private Factory<? extends PortGrid> portGrid;
+    private Factory<? extends Iterable<? extends Port>> ports;
 
     @Override
     public Port get(final Simulation simulation) {
-        return oneOf(portGrid.get(simulation).getAllPorts().toList(), simulation.random);
+        return oneOf(ports.get(simulation), simulation.random);
     }
 }

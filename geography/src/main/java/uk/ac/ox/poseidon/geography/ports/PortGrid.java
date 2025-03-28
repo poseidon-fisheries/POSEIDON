@@ -25,7 +25,7 @@ import uk.ac.ox.poseidon.geography.grids.Grid;
 
 import java.util.stream.Stream;
 
-public interface PortGrid extends Grid<SparseGrid2D> {
+public interface PortGrid extends Grid<SparseGrid2D>, Iterable<Port> {
     Int2D getLocation(Port port);
 
     Port getPort(String portId);
@@ -34,5 +34,4 @@ public interface PortGrid extends Grid<SparseGrid2D> {
 
     boolean anyPortsAt(Int2D cell);
 
-    Stream<Port> getAllPorts();
 }

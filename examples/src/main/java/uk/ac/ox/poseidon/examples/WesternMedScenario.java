@@ -37,6 +37,8 @@ import uk.ac.ox.poseidon.agents.behaviours.travel.TravellingAlongPathBehaviourFa
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
+import uk.ac.ox.poseidon.agents.market.BiomassMarket;
+import uk.ac.ox.poseidon.agents.market.BiomassMarketsFromPriceFileFactory;
 import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
 import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
@@ -52,6 +54,7 @@ import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
 import uk.ac.ox.poseidon.agents.vessels.hold.ProportionalBiomassOvercapacityDiscardingStrategyFactory;
 import uk.ac.ox.poseidon.agents.vessels.hold.StandardBiomassHoldFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
+import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesFromFileFactory;
 import uk.ac.ox.poseidon.core.*;
 import uk.ac.ox.poseidon.core.adaptors.temporal.CurrentDayOfWeekFactory;
@@ -83,6 +86,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGridWithActiveCellsFromGridFile;
 import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGridFromFileFactory;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
@@ -94,6 +98,7 @@ import uk.ac.ox.poseidon.regulations.predicates.spatial.ActionCellPredicateFacto
 import java.nio.file.Path;
 import java.time.Period;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static java.time.DayOfWeek.*;
@@ -146,60 +151,6 @@ public class WesternMedScenario extends ScenarioSupplier {
         );
     private Factory<? extends BiomassAllocator> biomassAllocator =
         new FullBiomassAllocatorFactory(carryingCapacityGrid);
-    private Factory<List<BiomassGrid>> biomassGrids =
-        new MappedFactory<>(
-            new SpeciesFromFileFactory(
-                inputPath.plus("species.csv"),
-                "species_id",
-                "species_name"
-            ),
-            new BiomassGridFactory(
-                modelGrid,
-                null,
-                biomassAllocator
-            ),
-            "species"
-        );
-    private Factory<? extends Steppable> dailyProcesses =
-        new ScheduledRepeatingFactory<>(
-            new DateTimeAfterFactory(
-                startingDateTime,
-                DAILY
-            ),
-            DAILY,
-            new SteppableSequenceFactory(
-                new MappedFactory<>(
-                    biomassGrids,
-                    new BiomassDiffuserFactory(
-                        null,
-                        carryingCapacityGrid,
-                        biomassDiffusionRule
-                    ),
-                    "biomassGrid"
-                )
-            ),
-            0
-        );
-    private Factory<? extends Steppable> monthlyProcesses =
-        new ScheduledRepeatingFactory<>(
-            new DateTimeAfterFactory(
-                startingDateTime,
-                MONTHLY
-            ),
-            MONTHLY,
-            new SteppableSequenceFactory(
-                new MappedFactory<>(
-                    biomassGrids,
-                    new BiomassGrowerFactory(
-                        null,
-                        carryingCapacityGrid,
-                        biomassGrowthRule
-                    ),
-                    "biomassGrid"
-                )
-            ),
-            0
-        );
     @SuppressWarnings("MagicNumber")
     private Factory<? extends Regulations> regulations =
         new ForbiddenIfFactory(
@@ -248,6 +199,73 @@ public class WesternMedScenario extends ScenarioSupplier {
             regulations,
             pathFinder,
             distance
+        );
+    private Factory<? extends List<Species>> species =
+        new SpeciesFromFileFactory(
+            inputPath.plus("species.csv"),
+            "species_id",
+            "species_name"
+        );
+    private Factory<List<BiomassGrid>> biomassGrids =
+        new MappedFactory<>(
+            species,
+            new BiomassGridFactory(
+                modelGrid,
+                null,
+                biomassAllocator
+            ),
+            "species"
+        );
+    private Factory<? extends Steppable> dailyProcesses =
+        new ScheduledRepeatingFactory<>(
+            new DateTimeAfterFactory(
+                startingDateTime,
+                DAILY
+            ),
+            DAILY,
+            new SteppableSequenceFactory(
+                new MappedFactory<>(
+                    biomassGrids,
+                    new BiomassDiffuserFactory(
+                        null,
+                        carryingCapacityGrid,
+                        biomassDiffusionRule
+                    ),
+                    "biomassGrid"
+                )
+            ),
+            0
+        );
+    private Factory<? extends Steppable> monthlyProcesses =
+        new ScheduledRepeatingFactory<>(
+            new DateTimeAfterFactory(
+                startingDateTime,
+                MONTHLY
+            ),
+            MONTHLY,
+            new SteppableSequenceFactory(
+                new MappedFactory<>(
+                    biomassGrids,
+                    new BiomassGrowerFactory(
+                        null,
+                        carryingCapacityGrid,
+                        biomassGrowthRule
+                    ),
+                    "biomassGrid"
+                )
+            ),
+            0
+        );
+    private Factory<Map<Port, BiomassMarket>> markets =
+        new BiomassMarketsFromPriceFileFactory(
+            inputPath.plus("prices.csv"),
+            "port_id",
+            "species_id",
+            "price",
+            "currency",
+            "measurement_unit",
+            portGrid,
+            species
         );
     private Factory<? extends Register<MutableOptionValues<Int2D>>> optionValuesRegister =
         new RegisterFactory<>();

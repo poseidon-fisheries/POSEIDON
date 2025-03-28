@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.core;
 
+import com.google.common.collect.Streams;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,15 +36,14 @@ import java.util.List;
 @AllArgsConstructor
 public class MappedFactory<S, T> implements Factory<List<T>> {
 
-    private Factory<? extends List<? extends S>> sourceFactory;
+    private Factory<? extends Iterable<? extends S>> sourceFactory;
     private Factory<T> targetFactory;
     private String mappedProperty;
 
     @Override
     public List<T> get(final Simulation simulation) {
-        return sourceFactory
-            .get(simulation)
-            .stream()
+        return Streams
+            .stream(sourceFactory.get(simulation))
             .map(ConstantFactory::new)
             .map(sourceFactory -> {
                 try {

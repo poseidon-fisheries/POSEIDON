@@ -36,9 +36,26 @@ import java.util.stream.StreamSupport;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.Lists.newArrayList;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 
 public class MasonUtils {
+
+    public static <T> T oneOf(
+        final Iterator<T> candidates,
+        final MersenneTwisterFast random
+    ) {
+        final ArrayList<T> candidatesList = newArrayList(candidates);
+        return candidatesList.get(oneOfIndices(candidatesList, random));
+    }
+
+    public static <T> T oneOf(
+        final Iterable<T> candidates,
+        final MersenneTwisterFast random
+    ) {
+        final ArrayList<T> candidatesList = newArrayList(candidates);
+        return candidatesList.get(oneOfIndices(candidatesList, random));
+    }
 
     public static <T> ImmutableSet<T> bagToSet(final Bag bag) {
         return MasonUtils.<T>bagToStream(bag).collect(toImmutableSet());
@@ -53,6 +70,13 @@ public class MasonUtils {
                 .range(0, b.size())
                 .mapToObj(i -> (T) b.get(i))
             );
+    }
+
+    public static <T> Stream<T> bagToStream(
+        final Bag bag,
+        final Class<T> ignored
+    ) {
+        return bagToStream(bag);
     }
 
     public static Object oneOf(

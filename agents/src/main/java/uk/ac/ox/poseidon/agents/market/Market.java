@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,15 @@
  *
  */
 
-plugins {
-    id("buildlogic.java-library-conventions")
-}
+package uk.ac.ox.poseidon.agents.market;
 
-dependencies {
-    api(project(":biology"))
-    api(project(":geography"))
-    api(project(":io"))
-    api(libs.joda.money)
-    implementation(libs.streamex)
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.Content;
+
+public interface Market<C extends Content<C>> {
+    Sale<C> sell(
+        Vessel vessel,
+        Bucket<C> bucket
+    );
 }
