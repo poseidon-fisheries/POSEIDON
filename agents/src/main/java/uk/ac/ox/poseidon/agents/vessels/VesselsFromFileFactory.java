@@ -23,9 +23,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.joda.money.CurrencyUnit;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
+import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -64,6 +66,7 @@ public class VesselsFromFileFactory extends SimulationScopeFactory<List<Vessel>>
     private Factory<? extends VesselField> vesselField;
     private Factory<? extends PortGrid> portGrid;
     private Factory<? extends Quantity<Speed>> speed;
+    private String accountCurrencyCode;
 
     @Override
     protected List<Vessel> newInstance(final Simulation simulation) {
@@ -82,6 +85,7 @@ public class VesselsFromFileFactory extends SimulationScopeFactory<List<Vessel>>
                                 portGrid,
                                 homePort,
                                 speed.get(simulation),
+                                new Account(CurrencyUnit.of(accountCurrencyCode)),
                                 vesselField,
                                 new ForwardingEventManager(simulation.getEventManager())
                             );

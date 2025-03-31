@@ -28,6 +28,7 @@ import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
+import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -48,6 +49,7 @@ public class Vessel implements Oriented2D {
     private final VesselField vesselField;
     private final PortGrid portGrid;
     private final EventManager eventManager;
+    private final Account account;
     @Getter(AccessLevel.NONE)
     private final Deque<Behaviour> behaviourStack = new ArrayDeque<>();
     private Port homePort;
@@ -62,6 +64,7 @@ public class Vessel implements Oriented2D {
         final PortGrid portGrid,
         final Port homePort,
         final Quantity<Speed> cruisingSpeed,
+        final Account account,
         final VesselField vesselField,
         final EventManager eventManager
     ) {
@@ -70,6 +73,7 @@ public class Vessel implements Oriented2D {
         this.portGrid = portGrid;
         this.homePort = homePort;
         this.cruisingSpeed = cruisingSpeed;
+        this.account = account;
         this.vesselField = vesselField;
         this.eventManager = eventManager;
     }

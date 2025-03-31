@@ -364,7 +364,8 @@ public class WesternMedScenario extends ScenarioSupplier {
             ),
             vesselField,
             portGrid,
-            SpeedFactory.of(VESSEL_SPEED)
+            SpeedFactory.of(VESSEL_SPEED),
+            "EUR"
         );
 
     public static void main(final String[] args) {
