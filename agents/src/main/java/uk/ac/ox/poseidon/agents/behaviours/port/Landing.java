@@ -23,17 +23,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
+import uk.ac.ox.poseidon.agents.market.Market;
+import uk.ac.ox.poseidon.agents.market.MarketGrid;
+import uk.ac.ox.poseidon.agents.market.Sale;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
 import uk.ac.ox.poseidon.biology.Content;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class Landing<C extends Content<C>> implements Behaviour {
 
+    private final MarketGrid<C, ? extends Market<C>> marketGrid;
     private final Hold<C> hold;
     private final Supplier<Duration> durationSupplier;
 
@@ -58,8 +63,19 @@ public class Landing<C extends Content<C>> implements Behaviour {
 
         @Override
         public void complete(final LocalDateTime dateTime) {
-            hold.removeContent(); // TODO: do something with content!
-            getVessel().setCurrentDestination(null);
+            final List<? extends Market<C>> markets =
+                marketGrid.getObjectsAt(vessel.getCell()).toList();
+            if (markets.size() == 1) {
+                final Sale<C> sale = markets.getFirst().sell(vessel, hold.extractContent());
+                sale.summary().values().forEach(vessel.getAccount()::add);
+            } else {
+                throw new RuntimeException(
+                    "Expected one market at location " +
+                        vessel.getCell() +
+                        " but found " +
+                        markets.size()
+                );
+            }
             getVessel().popBehaviour();
         }
     }

@@ -24,6 +24,8 @@ import lombok.ToString;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
+import java.math.BigDecimal;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -62,4 +64,7 @@ public class Account {
         return amount;
     }
 
+    public BigDecimal getBalanceAmount() {
+        return balance.getAmount();
+    }
 }

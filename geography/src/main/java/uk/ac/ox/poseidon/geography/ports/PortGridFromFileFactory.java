@@ -44,7 +44,7 @@ import static java.util.Comparator.comparingDouble;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PortGridFromFileFactory extends GlobalScopeFactory<DefaultPortGrid> {
+public class PortGridFromFileFactory extends GlobalScopeFactory<PortGrid> {
 
     private static final System.Logger logger =
         System.getLogger(PortGridFromFileFactory.class.getName());
@@ -58,7 +58,7 @@ public class PortGridFromFileFactory extends GlobalScopeFactory<DefaultPortGrid>
     private String latitudeColumn;
 
     @Override
-    protected DefaultPortGrid newInstance(final Simulation simulation) {
+    protected PortGrid newInstance(final Simulation simulation) {
         final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
         final DistanceCalculator distanceCalculator = this.distanceCalculator.get(simulation);
         final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
@@ -89,7 +89,7 @@ public class PortGridFromFileFactory extends GlobalScopeFactory<DefaultPortGrid>
             );
 
         });
-        return new DefaultPortGrid(bathymetricGrid, sparseGrid2D);
+        return new PortGrid(bathymetricGrid, sparseGrid2D);
     }
 
     private Optional<Int2D> coordinateToCell(

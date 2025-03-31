@@ -47,7 +47,7 @@ public interface Hold<C extends Content<C>> {
      *
      * @return the removed content. If the container was empty, returns an empty Bucket.
      */
-    Bucket<C> removeContent();
+    Bucket<C> extractContent();
 
     default boolean isEmpty() {
         return getContent().isEmpty();

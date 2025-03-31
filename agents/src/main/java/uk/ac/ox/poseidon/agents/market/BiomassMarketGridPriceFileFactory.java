@@ -32,6 +32,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.geography.ports.Port;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
@@ -51,11 +52,11 @@ import static java.util.stream.Collectors.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BiomassMarketsFromPriceFileFactory
-    extends SimulationScopeFactory<BiomassMarkets> {
+public class BiomassMarketGridPriceFileFactory
+    extends SimulationScopeFactory<BiomassMarketGrid> {
 
     private static final System.Logger logger =
-        System.getLogger(BiomassMarketsFromPriceFileFactory.class.getName());
+        System.getLogger(BiomassMarketGridPriceFileFactory.class.getName());
 
     private Factory<? extends Path> path;
 
@@ -65,25 +66,28 @@ public class BiomassMarketsFromPriceFileFactory
     private String currencyColumn;
     private String measurementUnitColumn;
 
-    private Factory<? extends Iterable<? extends Port>> ports;
+    private Factory<? extends PortGrid> portGrid;
     private Factory<? extends Iterable<? extends Species>> species;
 
     @Override
-    protected BiomassMarkets newInstance(final Simulation simulation) {
-        final Map<String, Port> portsByCode =
-            stream(this.ports.get(simulation))
-                .collect(toMap(Port::getCode, identity()));
+    protected BiomassMarketGrid newInstance(final Simulation simulation) {
 
         final Map<String, Species> speciesByCode =
             stream(this.species.get(simulation))
                 .collect(toMap(Species::getCode, identity()));
+
+        final PortGrid portGrid = this.portGrid.get(simulation);
 
         final File file = path.get(simulation).toFile();
         // I know. I know. This is ridiculous.
         return Table.read().file(file).stream()
             .flatMap(row ->
                 parse(
-                    file, row, portCodeColumn, portsByCode::get, "port code"
+                    file,
+                    row,
+                    portCodeColumn,
+                    id -> portGrid.getObject(id).orElse(null),
+                    "port code"
                 ).flatMap(port ->
                     parse(
                         file, row, speciesCodeColumn, speciesByCode::get, "species code"
@@ -117,20 +121,32 @@ public class BiomassMarketsFromPriceFileFactory
                 collectingAndThen(
                     groupingBy(
                         PriceEntry::port,
-                        collectingAndThen(
-                            toMap(
-                                PriceEntry::species,
-                                priceEntry -> new BiomassMarket.Price(
-                                    priceEntry.price(),
-                                    priceEntry.unit()
-                                )
-                            ),
-                            BiomassMarket::new
+                        toMap(
+                            PriceEntry::species,
+                            priceEntry -> new BiomassMarket.Price(
+                                priceEntry.price(),
+                                priceEntry.unit()
+                            )
                         )
                     ),
-                    BiomassMarkets::new
+                    priceBySpeciesByPort -> makeMarketGrid(portGrid, priceBySpeciesByPort)
                 )
             );
+    }
+
+    private BiomassMarketGrid makeMarketGrid(
+        final PortGrid portGrid,
+        final Map<Port, Map<Species, BiomassMarket.Price>> priceBySpeciesByPort
+    ) {
+        final BiomassMarketGrid marketGrid = new BiomassMarketGrid(portGrid.getModelGrid());
+        priceBySpeciesByPort.forEach((port, priceBySpecies) -> {
+            final BiomassMarket market = new BiomassMarket(port.getCode(), priceBySpecies);
+            marketGrid.getField().setObjectLocation(
+                market,
+                portGrid.getLocation(port)
+            );
+        });
+        return marketGrid;
     }
 
     private <T> Optional<T> parse(

@@ -56,7 +56,7 @@ public class InfiniteHold<C extends Content<C>> implements Hold<C> {
     }
 
     @Override
-    public Bucket<C> removeContent() {
+    public Bucket<C> extractContent() {
         final Bucket<C> result = content;
         content = Bucket.empty();
         return result;

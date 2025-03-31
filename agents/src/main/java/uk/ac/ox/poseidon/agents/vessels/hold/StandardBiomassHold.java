@@ -59,7 +59,7 @@ public class StandardBiomassHold implements Hold<Biomass> {
     }
 
     @Override
-    public Bucket<Biomass> removeContent() {
+    public Bucket<Biomass> extractContent() {
         final Bucket<Biomass> removedContent = content;
         content = Bucket.empty();
         return removedContent;

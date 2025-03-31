@@ -32,7 +32,7 @@ abstract class AbstractGridPathFinder implements GridPathFinder {
 
     @Override
     public boolean isNavigable(final Int2D cell) {
-        return isWater(cell) || portGrid.anyPortsAt(cell);
+        return isWater(cell) || portGrid.anyObjectsAt(cell);
     }
 
     @Override

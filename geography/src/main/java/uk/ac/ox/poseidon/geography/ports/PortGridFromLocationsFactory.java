@@ -38,14 +38,14 @@ import static com.google.common.base.Preconditions.checkState;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PortGridFromLocationsFactory extends GlobalScopeFactory<DefaultPortGrid> {
+public class PortGridFromLocationsFactory extends GlobalScopeFactory<PortGrid> {
 
     @NonNull private Factory<? extends IdSupplier> idSupplier;
     @NonNull private Factory<? extends BathymetricGrid> bathymetricGrid;
     @NonNull private Map<String, Factory<? extends Coordinate>> ports;
 
     @Override
-    protected DefaultPortGrid newInstance(final Simulation simulation) {
+    protected PortGrid newInstance(final Simulation simulation) {
         final IdSupplier idSupplier = this.idSupplier.get(simulation);
         final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
         final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
@@ -61,7 +61,7 @@ public class PortGridFromLocationsFactory extends GlobalScopeFactory<DefaultPort
             checkCell(cell, coordinate, portName, bathymetricGrid);
             sparseGrid2D.setObjectLocation(port, cell);
         });
-        return new DefaultPortGrid(bathymetricGrid, sparseGrid2D);
+        return new PortGrid(bathymetricGrid, sparseGrid2D);
     }
 
     private void checkCell(

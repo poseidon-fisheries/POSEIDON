@@ -26,9 +26,8 @@ import lombok.RequiredArgsConstructor;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.market.BiomassMarket;
-import uk.ac.ox.poseidon.agents.market.BiomassMarkets;
+import uk.ac.ox.poseidon.agents.market.BiomassMarketGrid;
 import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.io.File;
 import java.math.RoundingMode;
@@ -94,31 +93,30 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
                 final Map<String, Species> speciesByCode =
                     simulation.getComponents(Species.class).stream()
                         .collect(toMap(Species::getCode, identity()));
-                simulation.getComponents(BiomassMarkets.class).forEach(biomassMarkets -> {
-                    final Map<String, Port> portsByCode =
-                        biomassMarkets.keySet().stream().collect(toMap(Port::getCode, identity()));
-                    request.getPricesList().forEach(price -> {
-                        Optional
-                            .ofNullable(portsByCode.get(price.getPortId()))
-                            .map(biomassMarkets::get)
-                            .ifPresent(market ->
-                                Optional
-                                    .ofNullable(speciesByCode.get(price.getSpeciesId()))
-                                    .ifPresent(
-                                        species -> market.setPrice(
-                                            species, new BiomassMarket.Price(
-                                                Money.of(
-                                                    CurrencyUnit.of(price.getCurrency()),
-                                                    price.getPrice(),
-                                                    RoundingMode.HALF_EVEN
-                                                ),
-                                                BiomassMarket.parseMassUnit(price.getMeasurementUnit())
+                simulation
+                    .getComponents(BiomassMarketGrid.class)
+                    .forEach(marketGrid -> {
+                        request.getPricesList().forEach(price -> {
+                            marketGrid
+                                .getObject(price.getPortId())
+                                .ifPresent(market ->
+                                    Optional
+                                        .ofNullable(speciesByCode.get(price.getSpeciesId()))
+                                        .ifPresent(
+                                            species -> market.setPrice(
+                                                species, new BiomassMarket.Price(
+                                                    Money.of(
+                                                        CurrencyUnit.of(price.getCurrency()),
+                                                        price.getPrice(),
+                                                        RoundingMode.HALF_EVEN
+                                                    ),
+                                                    BiomassMarket.parseMassUnit(price.getMeasurementUnit())
+                                                )
                                             )
                                         )
-                                    )
-                            );
+                                );
+                        });
                     });
-                });
             });
         responseObserver.onNext(Workflow.UpdatePricesResponse.newBuilder().build());
         responseObserver.onCompleted();

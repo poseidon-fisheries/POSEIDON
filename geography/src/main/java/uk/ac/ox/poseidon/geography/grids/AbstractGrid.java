@@ -28,8 +28,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Getter
 public abstract class AbstractGrid<F extends Grid2D> implements Grid<F> {
 
+    protected final F field;
     private final ModelGrid modelGrid;
-    private final F field;
 
     protected AbstractGrid(
         final ModelGrid modelGrid,

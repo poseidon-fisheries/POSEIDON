@@ -20,6 +20,7 @@
 package uk.ac.ox.poseidon.agents.market;
 
 import com.google.common.collect.ImmutableTable;
+import lombok.Getter;
 import org.joda.money.Money;
 import tech.units.indriya.format.SimpleUnitFormat;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -37,9 +38,15 @@ import static tech.units.indriya.unit.UnitDimension.MASS;
 
 public class BiomassMarket implements Market<Biomass> {
 
+    @Getter
+    private final String id;
     private final Map<Species, Price> prices;
 
-    public BiomassMarket(final Map<Species, Price> prices) {
+    public BiomassMarket(
+        final String id,
+        final Map<Species, Price> prices
+    ) {
+        this.id = id;
         this.prices = new HashMap<>(prices);
     }
 
@@ -53,12 +60,12 @@ public class BiomassMarket implements Market<Biomass> {
     @Override
     public Sale<Biomass> sell(
         final Vessel vessel,
-        final Bucket<Biomass> bucket
+        final Bucket<? extends Biomass> bucket
     ) {
         final ImmutableTable.Builder<Species, Biomass, Money> sold = ImmutableTable.builder();
         final Bucket.Builder<Biomass> unsold = Bucket.newBuilder();
 
-        for (final Map.Entry<Species, Biomass> entry : bucket.getMap().entrySet()) {
+        for (final Map.Entry<Species, ? extends Biomass> entry : bucket.getMap().entrySet()) {
             final Species species = entry.getKey();
             final Biomass biomass = entry.getValue();
             final Price price = prices.get(species);

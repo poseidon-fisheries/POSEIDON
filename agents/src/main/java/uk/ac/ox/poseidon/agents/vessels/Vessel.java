@@ -122,7 +122,7 @@ public class Vessel implements Oriented2D {
     }
 
     public boolean isAtPort() {
-        return portGrid.anyPortsAt(getCell());
+        return portGrid.anyObjectsAt(getCell());
     }
 
     public void popBehaviour() {

@@ -19,24 +19,11 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
-import com.google.common.collect.ForwardingMap;
-import com.google.common.collect.ImmutableMap;
-import lombok.NonNull;
-import uk.ac.ox.poseidon.geography.ports.Port;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.util.Map;
-
-public class BiomassMarkets extends ForwardingMap<Port, BiomassMarket> {
-
-    private final Map<Port, BiomassMarket> map;
-
-    public BiomassMarkets(final Map<Port, BiomassMarket> map) {
-        this.map = ImmutableMap.copyOf(map);
-    }
-
-    @Override
-    @NonNull
-    protected Map<Port, BiomassMarket> delegate() {
-        return map;
+public class BiomassMarketGrid extends MarketGrid<Biomass, BiomassMarket> {
+    protected BiomassMarketGrid(final ModelGrid modelGrid) {
+        super(modelGrid);
     }
 }

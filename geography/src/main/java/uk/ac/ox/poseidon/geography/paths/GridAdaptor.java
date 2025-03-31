@@ -59,7 +59,7 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
     }
 
     private boolean isNavigable(final Int2D cell) {
-        return bathymetricGrid.isWater(cell) || portGrid.getPortsAt(cell).findAny().isPresent();
+        return bathymetricGrid.isWater(cell) || portGrid.anyObjectsAt(cell);
     }
 
     @Override

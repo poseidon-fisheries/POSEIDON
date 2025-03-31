@@ -37,8 +37,9 @@ import uk.ac.ox.poseidon.agents.behaviours.travel.TravellingAlongPathBehaviourFa
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
-import uk.ac.ox.poseidon.agents.market.BiomassMarkets;
-import uk.ac.ox.poseidon.agents.market.BiomassMarketsFromPriceFileFactory;
+import uk.ac.ox.poseidon.agents.market.BiomassMarketGridPriceFileFactory;
+import uk.ac.ox.poseidon.agents.market.Market;
+import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.registers.RegisterFactory;
 import uk.ac.ox.poseidon.agents.registers.RegisteringFactory;
@@ -111,8 +112,8 @@ public class WesternMedScenario extends ScenarioSupplier {
 
     private static final double DIFFERENTIAL_PERCENTAGE_TO_MOVE = 0.05;
     private static final double PERCENTAGE_LIMIT_ON_DAILY_MOVEMENT = 0.1;
-    private static final double LOGISTIC_GROWTH_RATE = 0.001;
-    private static final String CARRYING_CAPACITY = "5 t";
+    private static final double LOGISTIC_GROWTH_RATE = 0.00001;
+    private static final String CARRYING_CAPACITY = "10 kg";
     private static final double LEARNING_ALPHA = 1;
     private static final double EXPLORATION_PROBABILITY = 0.2;
     private static final int MEAN_EXPLORATION_RADIUS = 1;
@@ -254,8 +255,8 @@ public class WesternMedScenario extends ScenarioSupplier {
             ),
             0
         );
-    private Factory<? extends BiomassMarkets> markets =
-        new BiomassMarketsFromPriceFileFactory(
+    private Factory<? extends MarketGrid<Biomass, ? extends Market<Biomass>>> marketGrid =
+        new BiomassMarketGridPriceFileFactory(
             inputPath.plus("prices.csv"),
             "port_id",
             "species_id",
@@ -360,7 +361,7 @@ public class WesternMedScenario extends ScenarioSupplier {
                     )
                 ),
                 travellingBehaviour,
-                new LandingBehaviourFactory<>(hold, ONE_HOUR_DURATION_SUPPLIER)
+                new LandingBehaviourFactory<>(marketGrid, hold, ONE_HOUR_DURATION_SUPPLIER)
             ),
             vesselField,
             portGrid,

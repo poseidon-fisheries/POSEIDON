@@ -41,7 +41,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.lang.System.Logger.Level.ERROR;
@@ -76,8 +75,8 @@ public class VesselsFromFileFactory extends SimulationScopeFactory<List<Vessel>>
                 .stream()
                 .flatMap(row -> {
                     final PortGrid portGrid = this.portGrid.get(simulation);
-                    return Optional
-                        .ofNullable(portGrid.getPort(row.getString(portIdColumn)))
+                    return portGrid
+                        .getObject(row.getString(portIdColumn))
                         .map(homePort -> {
                             final var vessel = new Vessel(
                                 row.getString(vesselIdColumn),

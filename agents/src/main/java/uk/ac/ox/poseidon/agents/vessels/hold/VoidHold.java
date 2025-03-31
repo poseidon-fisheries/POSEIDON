@@ -71,7 +71,7 @@ public class VoidHold<C extends Content<C>> implements Hold<C> {
      * @return an empty bucket, representing the absence of any stored content.
      */
     @Override
-    public Bucket<C> removeContent() {
+    public Bucket<C> extractContent() {
         return Bucket.empty();
     }
 }

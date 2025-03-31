@@ -83,6 +83,6 @@ public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortG
             .forEach(cell ->
                 sparseGrid2D.setObjectLocation(portFactory.get(simulation), cell)
             );
-        return new DefaultPortGrid(bathymetricGrid, sparseGrid2D);
+        return new PortGrid(bathymetricGrid, sparseGrid2D);
     }
 }
