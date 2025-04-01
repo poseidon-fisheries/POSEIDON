@@ -103,16 +103,27 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
                                     Optional
                                         .ofNullable(speciesByCode.get(price.getSpeciesId()))
                                         .ifPresent(
-                                            species -> market.setPrice(
-                                                species, new BiomassMarket.Price(
-                                                    Money.of(
-                                                        CurrencyUnit.of(price.getCurrency()),
-                                                        price.getPrice(),
-                                                        RoundingMode.HALF_EVEN
-                                                    ),
-                                                    BiomassMarket.parseMassUnit(price.getMeasurementUnit())
-                                                )
-                                            )
+                                            species -> {
+                                                final BiomassMarket.Price marketPrice =
+                                                    new BiomassMarket.Price(
+                                                        Money.of(
+                                                            CurrencyUnit.of(price.getCurrency()),
+                                                            price.getPrice(),
+                                                            RoundingMode.HALF_EVEN
+                                                        ),
+                                                        BiomassMarket.parseMassUnit(price.getMeasurementUnit())
+                                                    );
+                                                market.setPrice(species, marketPrice);
+                                                logger.log(
+                                                    INFO,
+                                                    "Updated price of species {0} at port market " +
+                                                        "{1} to {2}/{3}",
+                                                    species.getCode(),
+                                                    market.getId(),
+                                                    marketPrice.amount(),
+                                                    marketPrice.biomassUnit()
+                                                );
+                                            }
                                         )
                                 );
                         });
