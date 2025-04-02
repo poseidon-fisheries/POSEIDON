@@ -19,17 +19,10 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
-public interface Species {
+import lombok.Data;
 
-    static Species of(
-        final String code,
-        final String name
-    ) {
-        return new SimpleSpecies(code, name);
-    }
-
-    String getCode();
-
-    String getName();
-
+@Data
+public class Species {
+    private final String code;
+    private final String name;
 }

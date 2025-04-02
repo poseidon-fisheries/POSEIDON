@@ -21,6 +21,7 @@ package uk.ac.ox.poseidon.agents.market;
 
 import com.google.common.collect.ImmutableTable;
 import lombok.Getter;
+import lombok.ToString;
 import org.joda.money.Money;
 import tech.units.indriya.format.SimpleUnitFormat;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -36,9 +37,10 @@ import java.util.Map;
 
 import static tech.units.indriya.unit.UnitDimension.MASS;
 
+@Getter
+@ToString
 public class BiomassMarket implements Market<Biomass> {
 
-    @Getter
     private final String id;
     private final Map<Species, Price> prices;
 

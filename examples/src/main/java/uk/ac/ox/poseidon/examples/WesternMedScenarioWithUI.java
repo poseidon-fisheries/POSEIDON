@@ -66,6 +66,13 @@ public class WesternMedScenarioWithUI extends ScenarioWithUI {
                             "biomassGrid"
                         ),
                         new SimpleFieldPortrayalFactory(
+                            "Markets",
+                            new MarketGridPortrayalFactory(
+                                scenario.component("marketGrid")
+                            ),
+                            true
+                        ),
+                        new SimpleFieldPortrayalFactory(
                             "Ports",
                             new PortGridPortrayalFactory(
                                 scenario.component("portGrid")

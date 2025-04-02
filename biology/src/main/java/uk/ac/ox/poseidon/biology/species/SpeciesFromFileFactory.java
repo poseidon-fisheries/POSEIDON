@@ -48,7 +48,7 @@ public class SpeciesFromFileFactory extends GlobalScopeFactory<List<Species>> {
             .csv(path.get(simulation).toFile())
             .stream()
             .map(row ->
-                Species.of(
+                new Species(
                     row.getString(speciesCodeColumn),
                     row.getString(speciesNameColumn)
                 )

@@ -17,29 +17,31 @@
  *
  */
 
-package uk.ac.ox.poseidon.biology.species;
+package uk.ac.ox.poseidon.gui.portrayals;
 
 import lombok.*;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import sim.portrayal.grid.SparseGridPortrayal2D;
+import sim.portrayal.simple.OvalPortrayal2D;
+import uk.ac.ox.poseidon.agents.market.MarketGrid;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class SpeciesFactory extends GlobalScopeFactory<Species> {
+@NoArgsConstructor
+public final class MarketGridPortrayalFactory extends SimulationScopeFactory<SparseGridPortrayal2D> {
 
-    private static final String PREFIX = "Species";
-
-    private String code;
-    private String name;
-
-    public SpeciesFactory(final String code) {
-        this(code, PREFIX + " " + code);
-    }
+    private Factory<? extends MarketGrid<?, ?>> marketGrid;
 
     @Override
-    protected Species newInstance(final @NonNull Simulation simulation) {
-        return new Species(code, name);
+    protected SparseGridPortrayal2D newInstance(final @NonNull Simulation simulation) {
+        final SparseGridPortrayal2D sparseGridPortrayal2D = new SparseGridPortrayal2D();
+        sparseGridPortrayal2D.setField(marketGrid.get(simulation).getField());
+        sparseGridPortrayal2D.setPortrayalForAll(
+            new OvalPortrayal2D()
+        );
+        return sparseGridPortrayal2D;
     }
 }
