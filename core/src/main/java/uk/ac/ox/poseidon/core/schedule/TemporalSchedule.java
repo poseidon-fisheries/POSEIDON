@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @RequiredArgsConstructor
 public class TemporalSchedule extends Schedule {
@@ -156,6 +157,24 @@ public class TemporalSchedule extends Schedule {
     ) {
         final TemporalRepeat r = new TemporalRepeat(event, ordering, interval);
         return scheduleOnce(dateTime, ordering, r) ? r : null;
+    }
+
+    public void stepFor(
+        final SimState simState,
+        final TemporalAmount temporalAmount
+    ) {
+        this.stepUntil(simState, getDateTime().plus(temporalAmount));
+    }
+
+    public void stepUntil(
+        final SimState simState,
+        final LocalDateTime dateTime
+    ) {
+        final AtomicBoolean done = new AtomicBoolean(false);
+        this.scheduleOnce(dateTime, (Steppable) __ -> done.set(true));
+        while (!done.get()) {
+            step(simState);
+        }
     }
 
     @Override

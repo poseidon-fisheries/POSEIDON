@@ -19,26 +19,22 @@
 
 package uk.ac.ox.poseidon.server;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.protobuf.util.Timestamps;
 import eu.project.surimi.Workflow;
 import eu.project.surimi.WorkflowServiceGrpc;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
-import org.joda.money.CurrencyUnit;
-import org.joda.money.Money;
-import uk.ac.ox.poseidon.agents.market.BiomassMarket;
-import uk.ac.ox.poseidon.agents.market.BiomassMarketGrid;
-import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.core.Simulation;
 
 import java.io.File;
-import java.math.RoundingMode;
-import java.util.Map;
+import java.time.Period;
+import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.System.Logger.Level.INFO;
-import static java.util.function.UnaryOperator.identity;
-import static java.util.stream.Collectors.toMap;
 
 @RequiredArgsConstructor
 class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
@@ -47,32 +43,68 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
     private final SimulationManager simulationManager;
     private final File scenarioFile;
 
-    // TODO: replace we proper cache once we sort out our simulation id business and do not
-    //  need to loop through values anymore.
-    private final ConcurrentHashMap<String, UUID> simulations = new ConcurrentHashMap<>();
+    private final Cache<Simulation, SimulationProperties> simulationProperties =
+        CacheBuilder.newBuilder().weakKeys().build();
 
     @Override
     public void init(
         final Workflow.InitRequest request,
         final StreamObserver<Workflow.InitResponse> responseObserver
     ) {
-        final String experimentId = request.getExperimentId();
-        logger.log(INFO, "Received init request for experiment: {0}", experimentId);
-        Optional
-            .ofNullable(simulations.get(experimentId))
-            .ifPresentOrElse(
-                simulationId ->
-                    logger.log(INFO, "Simulation already started: {0}", simulationId),
-                () -> {
-                    final UUID scenarioId = simulationManager.loadScenario(scenarioFile);
-                    logger.log(INFO, "Scenario loaded: {0}", scenarioId);
-                    final UUID simulationId = simulationManager.startSimulation(scenarioId);
-                    simulations.put(experimentId, simulationId);
-                    logger.log(INFO, "Simulation started: {0}", simulationId);
-                }
-            );
-        responseObserver.onNext(Workflow.InitResponse.newBuilder().build());
+        final UUID scenarioId = simulationManager.loadScenario(scenarioFile);
+        simulationManager.setProperty(scenarioId, "startingDateTime", request.getStartDateTime());
+        logger.log(INFO, "Scenario loaded: {0}", scenarioId);
+
+        final UUID simulationId = simulationManager.startSimulation(scenarioId);
+        logger.log(INFO, "Simulation started: {0}", simulationId);
+
+        // TODO: handle period parsing errors
+        simulationProperties.put(
+            simulationManager.getSimulation(simulationId),
+            new SimulationProperties(Period.parse(request.getStepSize()))
+        );
+
+        responseObserver.onNext(
+            Workflow.InitResponse
+                .newBuilder()
+                .setSimulationId(simulationId.toString())
+                .build()
+        );
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void simulateStep(
+        final Workflow.SimulateStepRequest request,
+        final StreamObserver<Workflow.SimulateStepResponse> responseObserver
+    ) {
+        final Simulation simulation = getSimulation(request.getSimulationId());
+        final Period stepSize = Optional
+            .ofNullable(simulationProperties.getIfPresent(simulation))
+            .orElseThrow()
+            .stepSize();
+        simulation
+            .getTemporalSchedule()
+            .stepFor(simulation, stepSize);
+        responseObserver.onNext(
+            Workflow.SimulateStepResponse
+                .newBuilder()
+                .setDateTime(
+                    Timestamps.fromSeconds(
+                        simulation
+                            .getTemporalSchedule()
+                            .getDateTime()
+                            .toInstant(ZoneOffset.UTC)
+                            .getEpochSecond()
+                    )
+                )
+                .build()
+        );
+        responseObserver.onCompleted();
+    }
+
+    private Simulation getSimulation(final String simulationId) {
+        return simulationManager.getSimulation(UUID.fromString(simulationId));
     }
 
     @Override
@@ -81,6 +113,7 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         final StreamObserver<Workflow.UpdatePricesResponse> responseObserver
     ) {
         logger.log(INFO, "Received updatePrices request.");
+/*
         // TODO: I'm currently looping through all the simulations in the simulation manager
         //  because we are not passing a simulation id in the request, but this is not a good
         //  long-term solution. Note that I'm loop through all simulations instead of just first
@@ -111,7 +144,8 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
                                                             price.getPrice(),
                                                             RoundingMode.HALF_EVEN
                                                         ),
-                                                        BiomassMarket.parseMassUnit(price.getMeasurementUnit())
+                                                        BiomassMarket.parseMassUnit(price
+                                                        .getMeasurementUnit())
                                                     );
                                                 market.setPrice(species, marketPrice);
                                                 logger.log(
@@ -129,7 +163,10 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
                         });
                     });
             });
+*/
         responseObserver.onNext(Workflow.UpdatePricesResponse.newBuilder().build());
         responseObserver.onCompleted();
     }
+
+    private record SimulationProperties(Period stepSize) {}
 }
