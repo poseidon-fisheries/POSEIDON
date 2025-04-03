@@ -35,7 +35,8 @@ commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.re
 flatlaf = { module = "com.formdev:flatlaf", version.ref = "flatlaf" }
 gdx-ai = { module = "com.badlogicgames.gdx:gdx-ai", version.ref = "gdx" }
 grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc" }
-grpc-protobuf = { module = "io.grpc:grpc-protobuf ", version.ref = "grpc" }
+grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
+grpc-services = { module = "io.grpc:grpc-services", version.ref = "grpc" }
 grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
 gt-api = { module = "org.geotools:gt-api", version.ref = "geotools" }
 gt-arcgrid = { module = "org.geotools:gt-arcgrid", version.ref = "geotools" }

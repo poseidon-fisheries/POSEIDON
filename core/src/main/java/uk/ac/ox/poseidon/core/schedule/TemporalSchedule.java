@@ -171,7 +171,11 @@ public class TemporalSchedule extends Schedule {
         final LocalDateTime dateTime
     ) {
         final AtomicBoolean done = new AtomicBoolean(false);
-        this.scheduleOnce(dateTime, (Steppable) __ -> done.set(true));
+        this.scheduleOnce(
+            dateTime,
+            Integer.MIN_VALUE,
+            (Steppable) __ -> done.set(true)
+        );
         while (!done.get()) {
             step(simState);
         }

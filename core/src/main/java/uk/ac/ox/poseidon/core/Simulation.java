@@ -88,7 +88,7 @@ public class Simulation extends SimState {
 
     @Override
     public void start() {
-        if (started) throw new IllegalStateException("Simulation already started");
+        if (started) throw new IllegalStateException("Simulation already started.");
         super.start();
         this.components =
             scenario

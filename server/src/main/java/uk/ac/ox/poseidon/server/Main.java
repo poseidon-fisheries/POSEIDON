@@ -22,8 +22,9 @@ package uk.ac.ox.poseidon.server;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
-import io.grpc.Server;
+import io.grpc.*;
 import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
+import io.grpc.protobuf.services.ProtoReflectionService;
 import uk.ac.ox.poseidon.core.utils.CustomPathConverter;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 
@@ -69,14 +70,15 @@ public class Main {
     }
 
     private void startServer() throws IOException, InterruptedException {
-        final SimulationManager simulationManager = new SimulationManager(new ScenarioLoader());
         final WorkflowService workflowService = new WorkflowService(
-            simulationManager,
+            new ScenarioLoader(),
             scenarioPath.toFile()
         );
         // Bind to 0.0.0.0 so the server listens on all network interfaces
         final Server grpcServer = NettyServerBuilder
             .forAddress(new InetSocketAddress("0.0.0.0", this.port))
+            .addService(ProtoReflectionService.newInstance())
+            .intercept(new LoggingInterceptor())
             .addService(workflowService)
             .build();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -89,4 +91,16 @@ public class Main {
         grpcServer.awaitTermination();
     }
 
+    public static class LoggingInterceptor implements ServerInterceptor {
+        @Override
+        public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
+            final ServerCall<ReqT, RespT> call,
+            final Metadata headers,
+            final ServerCallHandler<ReqT, RespT> next
+        ) {
+            final String fullMethodName = call.getMethodDescriptor().getFullMethodName();
+            logger.log(INFO, "Handling RPC method: " + fullMethodName);
+            return next.startCall(call, headers);
+        }
+    }
 }

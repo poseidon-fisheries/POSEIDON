@@ -80,6 +80,10 @@ public abstract class ObjectGrid<T>
         return MasonUtils.<T>bagToStream(field.allObjects).iterator();
     }
 
+    public Stream<T> stream() {
+        return Streams.stream(iterator());
+    }
+
     protected abstract String getObjectId(T object);
 
     public Optional<T> getObject(final String id) {

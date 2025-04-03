@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":io"))
     runtimeOnly(project(":examples")) // temporary, to load western med scenario
     implementation(libs.protobuf.java.util)
+    implementation(libs.grpc.services)
     implementation(libs.jcommander)
     implementation(libs.bundles.grpc)
     implementation(libs.commons.beanutils)
