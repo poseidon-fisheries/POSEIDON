@@ -27,9 +27,7 @@ import io.grpc.stub.StreamObserver;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.UUID;
 
-import static io.grpc.Status.INVALID_ARGUMENT;
 import static java.lang.System.Logger.Level.ERROR;
 
 public abstract class RequestHandler<ReqT, RespT> {
@@ -43,19 +41,9 @@ public abstract class RequestHandler<ReqT, RespT> {
         );
     }
 
-    static UUID parseId(final String id) {
-        try {
-            return UUID.fromString(id);
-        } catch (final IllegalArgumentException e) {
-            throw INVALID_ARGUMENT
-                .withDescription("Invalid UUID: " + id)
-                .asRuntimeException();
-        }
-    }
-
     protected abstract RespT getResponse(final ReqT request);
 
-    public void handle(
+    void handle(
         final ReqT request,
         final StreamObserver<RespT> responseObserver
     ) {

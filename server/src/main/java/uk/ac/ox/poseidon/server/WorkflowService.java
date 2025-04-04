@@ -21,8 +21,6 @@ package uk.ac.ox.poseidon.server;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.protobuf.Timestamp;
-import com.google.protobuf.util.Timestamps;
 import eu.project.surimi.Biomass;
 import eu.project.surimi.Workflow;
 import eu.project.surimi.WorkflowServiceGrpc;
@@ -46,10 +44,7 @@ import javax.measure.Unit;
 import javax.measure.format.MeasurementParseException;
 import javax.measure.quantity.Mass;
 import java.math.RoundingMode;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.Period;
-import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -70,9 +65,7 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
     private final Cache<UUID, Simulation> simulations = CacheBuilder.newBuilder().build();
 
     private final InitRequestHandler initRequestHandler;
-
-    private final Cache<Simulation, SimulationProperties> simulationProperties =
-        CacheBuilder.newBuilder().weakKeys().build();
+    private final SimulateStepRequestHandler simulateStepRequestHandler;
 
     private static Map<String, Species> getSpeciesByCode(final Simulation simulation) {
         return simulation
@@ -137,13 +130,6 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         }
     }
 
-    private static LocalDateTime toLocalDateTime(final Timestamp startDateTime) {
-        return LocalDateTime.ofInstant(
-            Instant.ofEpochSecond(
-                startDateTime.getSeconds()), ZoneOffset.UTC
-        );
-    }
-
     @Override
     public void init(
         final Workflow.InitRequest request,
@@ -191,38 +177,7 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         final Workflow.SimulateStepRequest request,
         final StreamObserver<Workflow.SimulateStepResponse> responseObserver
     ) {
-        handle(
-            responseObserver,
-            withSimulation(
-                request.getSimulationId(),
-                simulation -> {
-                    final Period stepSize = getSimulationProperties(simulation).stepSize();
-                    simulation.getTemporalSchedule().stepFor(simulation, stepSize);
-                    final LocalDateTime dateTime = simulation.getTemporalSchedule().getDateTime();
-                    logger.log(
-                        INFO, "Advanced simulation {0} by {1} to {2}",
-                        request.getSimulationId(), stepSize, dateTime
-                    );
-                    return
-                        Workflow.SimulateStepResponse
-                            .newBuilder()
-                            .setDateTime(
-                                Timestamps.fromSeconds(dateTime
-                                    .toInstant(ZoneOffset.UTC)
-                                    .getEpochSecond())
-                            )
-                            .build();
-                }
-            )
-        );
-    }
-
-    private SimulationProperties getSimulationProperties(final Simulation simulation) {
-        final SimulationProperties properties = simulationProperties.getIfPresent(simulation);
-        if (properties == null) throw INTERNAL
-            .withDescription("Unable to get simulation properties.")
-            .asRuntimeException();
-        return properties;
+        simulateStepRequestHandler.handle(request, responseObserver);
     }
 
     @Override

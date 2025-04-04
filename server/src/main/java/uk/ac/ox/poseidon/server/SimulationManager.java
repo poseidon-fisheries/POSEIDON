@@ -26,13 +26,51 @@ import uk.ac.ox.poseidon.core.Simulation;
 import java.time.Period;
 import java.util.UUID;
 
+import static io.grpc.Status.*;
+
 public class SimulationManager {
     private final Cache<UUID, Simulation> simulations = CacheBuilder.newBuilder().build();
     private final Cache<Simulation, SimulationProperties> simulationProperties =
         CacheBuilder.newBuilder().weakKeys().build();
 
+    public static UUID parseId(final String id) {
+        try {
+            return UUID.fromString(id);
+        } catch (final IllegalArgumentException e) {
+            throw INVALID_ARGUMENT
+                .withDescription("Invalid UUID: " + id)
+                .asRuntimeException();
+        }
+    }
+
+    public boolean contains(final String simulationId) {
+        return contains(parseId(simulationId));
+    }
+
     public boolean contains(final UUID simulationId) {
         return simulations.asMap().containsKey(simulationId);
+    }
+
+    public Simulation getSimulation(final String simulationId) {
+        return getSimulation(parseId(simulationId));
+    }
+
+    public Simulation getSimulation(final UUID simulationId) {
+        final Simulation simulation = simulations.getIfPresent(simulationId);
+        if (simulation == null) {
+            throw NOT_FOUND
+                .withDescription("Simulation not found: " + simulationId)
+                .asRuntimeException();
+        }
+        return simulation;
+    }
+
+    public SimulationProperties getSimulationProperties(final Simulation simulation) {
+        final SimulationProperties properties = simulationProperties.getIfPresent(simulation);
+        if (properties == null) throw INTERNAL
+            .withDescription("Unable to get simulation properties.")
+            .asRuntimeException();
+        return properties;
     }
 
     public void put(

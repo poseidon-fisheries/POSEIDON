@@ -50,7 +50,7 @@ public class InitRequestHandler
 
     @Override
     protected Workflow.InitResponse getResponse(final Workflow.InitRequest request) {
-        final UUID simulationId = parseId(request.getSimulationId());
+        final UUID simulationId = SimulationManager.parseId(request.getSimulationId());
         if (simulationManager.contains(simulationId)) {
             throw ALREADY_EXISTS
                 .withDescription("Simulation already initialised: " + simulationId)

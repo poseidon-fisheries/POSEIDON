@@ -70,12 +70,14 @@ public class Main {
     }
 
     private void startServer() throws IOException, InterruptedException {
+        final SimulationManager simulationManager = new SimulationManager();
         final WorkflowService workflowService = new WorkflowService(
             new InitRequestHandler(
-                new SimulationManager(),
+                simulationManager,
                 new ScenarioLoader(),
                 scenarioPath.toFile()
-            )
+            ),
+            new SimulateStepRequestHandler(simulationManager)
         );
         // Bind to 0.0.0.0 so the server listens on all network interfaces
         final Server grpcServer = NettyServerBuilder
