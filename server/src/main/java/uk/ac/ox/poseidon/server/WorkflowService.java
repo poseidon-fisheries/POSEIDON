@@ -30,7 +30,6 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.IllegalCurrencyException;
 import org.joda.money.Money;
@@ -38,25 +37,19 @@ import uk.ac.ox.poseidon.agents.market.BiomassMarket;
 import uk.ac.ox.poseidon.agents.market.BiomassMarketGrid;
 import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
 import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
-import uk.ac.ox.poseidon.io.ScenarioLoader;
 
 import javax.measure.Unit;
 import javax.measure.format.MeasurementParseException;
 import javax.measure.quantity.Mass;
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -75,8 +68,8 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
 
     private static final System.Logger logger = System.getLogger(WorkflowService.class.getName());
     private final Cache<UUID, Simulation> simulations = CacheBuilder.newBuilder().build();
-    private final ScenarioLoader scenarioLoader;
-    private final File scenarioFile;
+
+    private final InitRequestHandler initRequestHandler;
 
     private final Cache<Simulation, SimulationProperties> simulationProperties =
         CacheBuilder.newBuilder().weakKeys().build();
@@ -156,50 +149,7 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         final Workflow.InitRequest request,
         final StreamObserver<Workflow.InitResponse> responseObserver
     ) {
-        handle(
-            responseObserver, () -> {
-                final UUID simulationId = parseId(request.getSimulationId());
-                if (simulations.asMap().containsKey(simulationId)) {
-                    throw ALREADY_EXISTS
-                        .withDescription("Simulation already initialised: " + simulationId)
-                        .asRuntimeException();
-                }
-                final Scenario scenario = scenarioLoader.load(scenarioFile);
-                final LocalDateTime startDateTime = toLocalDateTime(request.getStartDateTime());
-                setScenarioProperty(
-                    scenario,
-                    "startingDateTime",
-                    new ConstantFactory<>(startDateTime)
-                );
-                logger.log(INFO, "Scenario loaded: {0}", scenarioFile);
-
-                final Simulation simulation = scenario.newSimulation();
-                simulationProperties.put(
-                    simulation,
-                    new SimulationProperties(parsePeriod(request.getStepSize()))
-                );
-                simulation.start();
-                simulation.getTemporalSchedule().stepUntil(simulation, startDateTime);
-                logger.log(
-                    INFO, "Simulation {0} started at {1}",
-                    simulationId, simulation.getTemporalSchedule().getDateTime()
-                );
-                simulations.put(simulationId, simulation);
-
-                return Workflow.InitResponse.newBuilder().build();
-            }
-        );
-    }
-
-    private Period parsePeriod(final String period) {
-        try {
-            return Period.parse(period);
-        } catch (final DateTimeParseException e) {
-            throw INVALID_ARGUMENT
-                .withDescription("Invalid period: " + period)
-                .withCause(e)
-                .asRuntimeException();
-        }
+        initRequestHandler.handle(request, responseObserver);
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -325,24 +275,6 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         );
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private void setScenarioProperty(
-        final Scenario scenario,
-        final String propertyName,
-        final Object value
-    ) {
-        try {
-            PropertyUtils.setProperty(scenario, propertyName, value);
-        } catch (
-            final IllegalAccessException | InvocationTargetException | NoSuchMethodException e
-        ) {
-            throw FAILED_PRECONDITION
-                .withDescription("Unable to set property " + propertyName + " to " + value)
-                .withCause(e)
-                .asRuntimeException();
-        }
-    }
-
     private <T> T getComponent(
         final Simulation simulation,
         final Class<T> componentClass
@@ -415,11 +347,9 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
             responseObserver,
             withSimulation(
                 request.getSimulationId(),
-                simulation -> {
-                    return Workflow.UpdateBiomassResponse
-                        .newBuilder()
-                        .build();
-                }
+                simulation -> Workflow.UpdateBiomassResponse
+                    .newBuilder()
+                    .build()
             )
         );
     }
