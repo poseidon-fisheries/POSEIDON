@@ -60,6 +60,8 @@ import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static io.grpc.Status.*;
 import static java.lang.System.Logger.Level.ERROR;
@@ -121,15 +123,12 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         return v;
     }
 
-    private static <ReqT, RespT> void safeUnaryCall(
-        final ReqT request,
+    private static <RespT> void handle(
         final StreamObserver<RespT> responseObserver,
-        final UnaryHandler<ReqT, RespT> handler
+        final Supplier<RespT> responseSupplier
     ) {
         try {
-            logger.log(INFO, "Handling request:\n{0}", request);
-            final RespT response = handler.handle(request);
-            responseObserver.onNext(response);
+            responseObserver.onNext(responseSupplier.get());
             responseObserver.onCompleted();
         } catch (final StatusRuntimeException e) {
             logger.log(ERROR, e);
@@ -157,8 +156,8 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         final Workflow.InitRequest request,
         final StreamObserver<Workflow.InitResponse> responseObserver
     ) {
-        safeUnaryCall(
-            request, responseObserver, req -> {
+        handle(
+            responseObserver, () -> {
                 final UUID simulationId = parseId(request.getSimulationId());
                 if (simulations.asMap().containsKey(simulationId)) {
                     throw ALREADY_EXISTS
@@ -224,31 +223,47 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         return simulation;
     }
 
+    @SuppressWarnings("SynchronizeOnNonFinalField")
+    private <RespT> Supplier<RespT> withSimulation(
+        final String simulationId,
+        final Function<Simulation, RespT> handler
+    ) {
+        final Simulation simulation = getSimulation(simulationId);
+        return () -> {
+            synchronized (simulation.schedule) {
+                return handler.apply(simulation);
+            }
+        };
+    }
+
     @Override
     public void simulateStep(
         final Workflow.SimulateStepRequest request,
         final StreamObserver<Workflow.SimulateStepResponse> responseObserver
     ) {
-        safeUnaryCall(
-            request, responseObserver, req -> {
-                final Simulation simulation = getSimulation(request.getSimulationId());
-                final Period stepSize = getSimulationProperties(simulation).stepSize();
-                simulation.getTemporalSchedule().stepFor(simulation, stepSize);
-                final LocalDateTime dateTime = simulation.getTemporalSchedule().getDateTime();
-                logger.log(
-                    INFO, "Advanced simulation {0} by {1} to {2}",
-                    request.getSimulationId(), stepSize, dateTime
-                );
-                return
-                    Workflow.SimulateStepResponse
-                        .newBuilder()
-                        .setDateTime(
-                            Timestamps.fromSeconds(dateTime
-                                .toInstant(ZoneOffset.UTC)
-                                .getEpochSecond())
-                        )
-                        .build();
-            }
+        handle(
+            responseObserver,
+            withSimulation(
+                request.getSimulationId(),
+                simulation -> {
+                    final Period stepSize = getSimulationProperties(simulation).stepSize();
+                    simulation.getTemporalSchedule().stepFor(simulation, stepSize);
+                    final LocalDateTime dateTime = simulation.getTemporalSchedule().getDateTime();
+                    logger.log(
+                        INFO, "Advanced simulation {0} by {1} to {2}",
+                        request.getSimulationId(), stepSize, dateTime
+                    );
+                    return
+                        Workflow.SimulateStepResponse
+                            .newBuilder()
+                            .setDateTime(
+                                Timestamps.fromSeconds(dateTime
+                                    .toInstant(ZoneOffset.UTC)
+                                    .getEpochSecond())
+                            )
+                            .build();
+                }
+            )
         );
     }
 
@@ -265,45 +280,48 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         final Workflow.UpdatePricesRequest request,
         final StreamObserver<Workflow.UpdatePricesResponse> responseObserver
     ) {
-        safeUnaryCall(
-            request, responseObserver, req -> {
-                final Simulation simulation = getSimulation(request.getSimulationId());
-                final Map<String, Species> speciesByCode = getSpeciesByCode(simulation);
-                final Map<String, BiomassMarket> marketsById =
-                    getBiomassMarketGrids(simulation)
-                        .stream()
-                        .flatMap(ObjectGrid::stream)
-                        .collect(toMap(BiomassMarket::getId, identity()));
-                request.getPricesList().forEach(price -> {
-                    final BiomassMarket market = getOrThrow(
-                        marketsById,
-                        price.getPortId(),
-                        "Market"
-                    );
-                    final Species species = getOrThrow(
-                        speciesByCode,
-                        price.getSpeciesId(),
-                        "Species"
-                    );
-                    final CurrencyUnit currencyUnit = parseCurrency(price.getCurrency());
-                    final Unit<Mass> biomassUnit = parseMassUnit(price.getMeasurementUnit());
-                    final BiomassMarket.Price marketPrice =
-                        new BiomassMarket.Price(
-                            Money.of(currencyUnit, price.getPrice(), RoundingMode.HALF_EVEN),
-                            biomassUnit
+        handle(
+            responseObserver,
+            withSimulation(
+                request.getSimulationId(),
+                simulation -> {
+                    final Map<String, Species> speciesByCode = getSpeciesByCode(simulation);
+                    final Map<String, BiomassMarket> marketsById =
+                        getBiomassMarketGrids(simulation)
+                            .stream()
+                            .flatMap(ObjectGrid::stream)
+                            .collect(toMap(BiomassMarket::getId, identity()));
+                    request.getPricesList().forEach(price -> {
+                        final BiomassMarket market = getOrThrow(
+                            marketsById,
+                            price.getPortId(),
+                            "Market"
                         );
-                    market.setPrice(species, marketPrice);
-                    logger.log(
-                        INFO,
-                        "Updated price of species {0} at port market {1} to {2}/{3}.",
-                        species.getCode(),
-                        market.getId(),
-                        marketPrice.amount(),
-                        marketPrice.biomassUnit()
-                    );
-                });
-                return Workflow.UpdatePricesResponse.newBuilder().build();
-            }
+                        final Species species = getOrThrow(
+                            speciesByCode,
+                            price.getSpeciesId(),
+                            "Species"
+                        );
+                        final CurrencyUnit currencyUnit = parseCurrency(price.getCurrency());
+                        final Unit<Mass> biomassUnit = parseMassUnit(price.getMeasurementUnit());
+                        final BiomassMarket.Price marketPrice =
+                            new BiomassMarket.Price(
+                                Money.of(currencyUnit, price.getPrice(), RoundingMode.HALF_EVEN),
+                                biomassUnit
+                            );
+                        market.setPrice(species, marketPrice);
+                        logger.log(
+                            INFO,
+                            "Updated price of species {0} at port market {1} to {2}/{3}.",
+                            species.getCode(),
+                            market.getId(),
+                            marketPrice.amount(),
+                            marketPrice.biomassUnit()
+                        );
+                    });
+                    return Workflow.UpdatePricesResponse.newBuilder().build();
+                }
+            )
         );
     }
 
@@ -352,36 +370,39 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         final Workflow.RequestBiomassRequest request,
         final StreamObserver<Workflow.RequestBiomassResponse> responseObserver
     ) {
-        safeUnaryCall(
-            request, responseObserver, req -> {
-                final Simulation simulation = getSimulation(request.getSimulationId());
-                final BathymetricGrid bathymetricGrid =
-                    getComponent(simulation, BathymetricGrid.class);
-                final Workflow.RequestBiomassResponse.Builder responseBuilder =
-                    Workflow.RequestBiomassResponse
-                        .newBuilder()
-                        .setMeasurementUnit(KILOGRAM.getSymbol());
-                simulation.getComponents(BiomassGrid.class).forEach(grid -> {
-                    final Biomass.BiomassGrid.Builder gridBuilder =
-                        Biomass.BiomassGrid
+        handle(
+            responseObserver,
+            withSimulation(
+                request.getSimulationId(),
+                simulation -> {
+                    final BathymetricGrid bathymetricGrid =
+                        getComponent(simulation, BathymetricGrid.class);
+                    final Workflow.RequestBiomassResponse.Builder responseBuilder =
+                        Workflow.RequestBiomassResponse
                             .newBuilder()
-                            .setSpeciesId(grid.getSpecies().getCode());
-                    bathymetricGrid.getActiveWaterCells().forEach(cell -> {
-                        final Coordinate coordinate =
-                            bathymetricGrid.getModelGrid().toCoordinate(cell);
-                        gridBuilder.addBiomassCells(
-                            Biomass.BiomassCell
+                            .setMeasurementUnit(KILOGRAM.getSymbol());
+                    simulation.getComponents(BiomassGrid.class).forEach(grid -> {
+                        final Biomass.BiomassGrid.Builder gridBuilder =
+                            Biomass.BiomassGrid
                                 .newBuilder()
-                                .setLongitude(coordinate.getLon())
-                                .setLatitude(coordinate.getLat())
-                                .setBiomass(grid.getDouble(cell))
-                                .build()
-                        );
+                                .setSpeciesId(grid.getSpecies().getCode());
+                        bathymetricGrid.getActiveWaterCells().forEach(cell -> {
+                            final Coordinate coordinate =
+                                bathymetricGrid.getModelGrid().toCoordinate(cell);
+                            gridBuilder.addBiomassCells(
+                                Biomass.BiomassCell
+                                    .newBuilder()
+                                    .setLongitude(coordinate.getLon())
+                                    .setLatitude(coordinate.getLat())
+                                    .setBiomass(grid.getDouble(cell))
+                                    .build()
+                            );
+                        });
+                        responseBuilder.addBiomassGrids(gridBuilder.build());
                     });
-                    responseBuilder.addBiomassGrids(gridBuilder.build());
-                });
-                return responseBuilder.build();
-            }
+                    return responseBuilder.build();
+                }
+            )
         );
     }
 
@@ -390,7 +411,17 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         final Workflow.UpdateBiomassRequest request,
         final StreamObserver<Workflow.UpdateBiomassResponse> responseObserver
     ) {
-        super.updateBiomass(request, responseObserver);
+        handle(
+            responseObserver,
+            withSimulation(
+                request.getSimulationId(),
+                simulation -> {
+                    return Workflow.UpdateBiomassResponse
+                        .newBuilder()
+                        .build();
+                }
+            )
+        );
     }
 
     private CurrencyUnit parseCurrency(final String currency) {
@@ -407,11 +438,6 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         } catch (final MeasurementParseException e) {
             throw wrap(INVALID_ARGUMENT, e);
         }
-    }
-
-    @FunctionalInterface
-    interface UnaryHandler<ReqT, RespT> {
-        RespT handle(ReqT request) throws Exception;
     }
 
     private record SimulationProperties(Period stepSize) {}
