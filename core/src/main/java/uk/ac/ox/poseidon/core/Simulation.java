@@ -33,10 +33,7 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import java.io.Serial;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
@@ -142,4 +139,26 @@ public class Simulation extends SimState {
     public <T> Set<T> getComponents(final Class<T> componentClass) {
         return getComponents(components, componentClass).collect(toImmutableSet());
     }
+
+    public <T> T getComponent(
+        final Class<T> componentClass
+    ) {
+        final Set<T> components = getComponents(componentClass);
+        if (components.isEmpty()) {
+            throw new NoSuchElementException(
+                "Component of class " +
+                    componentClass.getName() +
+                    " not found in simulation."
+            );
+        }
+        if (components.size() > 1) {
+            throw new IllegalStateException(
+                "More than one component of class " +
+                    componentClass.getName() +
+                    " found in simulation."
+            );
+        }
+        return components.iterator().next();
+    }
+
 }

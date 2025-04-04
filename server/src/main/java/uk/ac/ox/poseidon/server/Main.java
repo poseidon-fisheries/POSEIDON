@@ -70,15 +70,7 @@ public class Main {
     }
 
     private void startServer() throws IOException, InterruptedException {
-        final SimulationManager simulationManager = new SimulationManager();
-        final WorkflowService workflowService = new WorkflowService(
-            new InitRequestHandler(
-                simulationManager,
-                new ScenarioLoader(),
-                scenarioPath.toFile()
-            ),
-            new SimulateStepRequestHandler(simulationManager)
-        );
+        final WorkflowService workflowService = createWorkflowService();
         // Bind to 0.0.0.0 so the server listens on all network interfaces
         final Server grpcServer = NettyServerBuilder
             .forAddress(new InetSocketAddress("0.0.0.0", this.port))
@@ -94,6 +86,21 @@ public class Main {
         grpcServer.start();
         logger.log(INFO, "Server started, listening on " + port);
         grpcServer.awaitTermination();
+    }
+
+    private WorkflowService createWorkflowService() {
+        final SimulationManager simulationManager = new SimulationManager();
+        return new WorkflowService(
+            new InitRequestHandler(
+                simulationManager,
+                new ScenarioLoader(),
+                scenarioPath.toFile()
+            ),
+            new SimulateStepRequestHandler(simulationManager),
+            new UpdatePricesRequestHandler(simulationManager),
+            new RequestBiomassRequestHandler(simulationManager),
+            new UpdateBiomassRequestHandler(simulationManager)
+        );
     }
 
     public static class LoggingInterceptor implements ServerInterceptor {

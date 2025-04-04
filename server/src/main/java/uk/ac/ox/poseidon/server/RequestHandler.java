@@ -27,7 +27,9 @@ import io.grpc.stub.StreamObserver;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Map;
 
+import static io.grpc.Status.NOT_FOUND;
 import static java.lang.System.Logger.Level.ERROR;
 
 public abstract class RequestHandler<ReqT, RespT> {
@@ -39,6 +41,20 @@ public abstract class RequestHandler<ReqT, RespT> {
             Instant.ofEpochSecond(
                 startDateTime.getSeconds()), ZoneOffset.UTC
         );
+    }
+
+    static <K, V> V getOrThrow(
+        final Map<K, V> map,
+        final K key,
+        final String name
+    ) {
+        final V v = map.get(key);
+        if (v == null) {
+            throw NOT_FOUND
+                .withDescription(name + " not found: " + key)
+                .asRuntimeException();
+        }
+        return v;
     }
 
     protected abstract RespT getResponse(final ReqT request);
@@ -62,6 +78,17 @@ public abstract class RequestHandler<ReqT, RespT> {
                     .asRuntimeException()
             );
         }
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    StatusRuntimeException wrap(
+        final Status status,
+        final Exception e
+    ) {
+        return status
+            .withDescription(e.getMessage())
+            .withCause(e)
+            .asRuntimeException();
     }
 
 }
