@@ -24,7 +24,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import io.grpc.*;
 import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
-import io.grpc.protobuf.services.ProtoReflectionService;
+import io.grpc.protobuf.services.ProtoReflectionServiceV1;
 import uk.ac.ox.poseidon.core.utils.CustomPathConverter;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 
@@ -74,7 +74,7 @@ public class Main {
         // Bind to 0.0.0.0 so the server listens on all network interfaces
         final Server grpcServer = NettyServerBuilder
             .forAddress(new InetSocketAddress("0.0.0.0", this.port))
-            .addService(ProtoReflectionService.newInstance())
+            .addService(ProtoReflectionServiceV1.newInstance())
             .intercept(new LoggingInterceptor())
             .addService(workflowService)
             .build();
