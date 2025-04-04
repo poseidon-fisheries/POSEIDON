@@ -27,6 +27,7 @@ import uk.ac.ox.poseidon.agents.market.BiomassMarket;
 import uk.ac.ox.poseidon.agents.market.BiomassMarketGrid;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.utils.Measurements;
 import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
 
 import javax.measure.Unit;
@@ -127,7 +128,7 @@ public class UpdatePricesRequestHandler extends
 
     private Unit<Mass> parseMassUnit(final String massUnit) {
         try {
-            return BiomassMarket.parseMassUnit(massUnit);
+            return Measurements.parseMassUnit(massUnit);
         } catch (final MeasurementParseException e) {
             throw wrap(INVALID_ARGUMENT, e);
         }

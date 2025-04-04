@@ -31,6 +31,7 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.utils.Measurements;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -99,7 +100,7 @@ public class BiomassMarketGridPriceFileFactory
                                 file,
                                 row,
                                 measurementUnitColumn,
-                                BiomassMarket::parseMassUnit,
+                                Measurements::parseMassUnit,
                                 "measurement unit"
                             ).map(measurementUnit ->
                                 new PriceEntry(

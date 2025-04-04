@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableTable;
 import lombok.Getter;
 import lombok.ToString;
 import org.joda.money.Money;
-import tech.units.indriya.format.SimpleUnitFormat;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
@@ -34,8 +33,6 @@ import javax.measure.quantity.Mass;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
-
-import static tech.units.indriya.unit.UnitDimension.MASS;
 
 @Getter
 @ToString
@@ -50,13 +47,6 @@ public class BiomassMarket implements Market<Biomass> {
     ) {
         this.id = id;
         this.prices = new HashMap<>(prices);
-    }
-
-    public static Unit<Mass> parseMassUnit(final String unitString) {
-        final Unit<?> unit = SimpleUnitFormat.getInstance().parse(unitString);
-        return unit.getDimension() == MASS
-            ? unit.asType(Mass.class)
-            : null;
     }
 
     @Override
