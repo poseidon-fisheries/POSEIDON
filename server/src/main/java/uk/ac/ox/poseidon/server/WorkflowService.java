@@ -23,6 +23,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
+import eu.project.surimi.Biomass;
 import eu.project.surimi.Workflow;
 import eu.project.surimi.WorkflowServiceGrpc;
 import io.grpc.Status;
@@ -35,10 +36,13 @@ import org.joda.money.IllegalCurrencyException;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.market.BiomassMarket;
 import uk.ac.ox.poseidon.agents.market.BiomassMarketGrid;
+import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
+import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 
@@ -62,6 +66,7 @@ import static java.lang.System.Logger.Level.ERROR;
 import static java.lang.System.Logger.Level.INFO;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toMap;
+import static tech.units.indriya.unit.Units.KILOGRAM;
 
 @RequiredArgsConstructor
 class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
@@ -320,12 +325,64 @@ class WorkflowService extends WorkflowServiceGrpc.WorkflowServiceImplBase {
         }
     }
 
+    private <T> T getComponent(
+        final Simulation simulation,
+        final Class<T> componentClass
+    ) {
+        final Set<T> components = simulation.getComponents(componentClass);
+        if (components.isEmpty()) {
+            throw NOT_FOUND
+                .withDescription("Component of class " +
+                    componentClass.getName() +
+                    " not found in simulation.")
+                .asRuntimeException();
+        }
+        if (components.size() > 1) {
+            throw FAILED_PRECONDITION
+                .withDescription("More than one component of class " +
+                    componentClass.getName() +
+                    " found in simulation.")
+                .asRuntimeException();
+        }
+        return components.iterator().next();
+    }
+
     @Override
     public void requestBiomass(
         final Workflow.RequestBiomassRequest request,
         final StreamObserver<Workflow.RequestBiomassResponse> responseObserver
     ) {
-        super.requestBiomass(request, responseObserver);
+        safeUnaryCall(
+            request, responseObserver, req -> {
+                final Simulation simulation = getSimulation(request.getSimulationId());
+                final BathymetricGrid bathymetricGrid =
+                    getComponent(simulation, BathymetricGrid.class);
+                final Workflow.RequestBiomassResponse.Builder responseBuilder =
+                    Workflow.RequestBiomassResponse
+                        .newBuilder()
+                        .setMeasurementUnit(KILOGRAM.getSymbol());
+                simulation.getComponents(BiomassGrid.class).forEach(grid -> {
+                    final Biomass.BiomassGrid.Builder gridBuilder =
+                        Biomass.BiomassGrid
+                            .newBuilder()
+                            .setSpeciesId(grid.getSpecies().getCode());
+                    bathymetricGrid.getActiveWaterCells().forEach(cell -> {
+                        final Coordinate coordinate =
+                            bathymetricGrid.getModelGrid().toCoordinate(cell);
+                        gridBuilder.addBiomassCells(
+                            Biomass.BiomassCell
+                                .newBuilder()
+                                .setLongitude(coordinate.getLon())
+                                .setLatitude(coordinate.getLat())
+                                .setBiomass(grid.getDouble(cell))
+                                .build()
+                        );
+                    });
+                    responseBuilder.addBiomassGrids(gridBuilder.build());
+                });
+                return responseBuilder.build();
+            }
+        );
     }
 
     @Override
