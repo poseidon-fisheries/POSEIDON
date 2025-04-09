@@ -96,6 +96,14 @@ public class WesternMedScenarioWithUI extends ScenarioWithUI {
                                 HEIGHT
                             ),
                             true
+                        ),
+                        new SimpleFieldPortrayalFactory(
+                            "Coordinates",
+                            new CoordinatesPortrayalFactory(
+                                scenario.component("modelGrid"),
+                                3
+                            ),
+                            true
                         )
                     ),
                     WIDTH,

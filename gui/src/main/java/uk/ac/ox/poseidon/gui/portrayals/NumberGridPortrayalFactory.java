@@ -20,7 +20,10 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import lombok.*;
+import sim.portrayal.LocationWrapper;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
+import sim.portrayal.grid.ValueGridPortrayal2D;
+import sim.portrayal.simple.ValuePortrayal2D;
 import sim.util.gui.ColorMap;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -43,6 +46,14 @@ public class NumberGridPortrayalFactory
     @Override
     protected FastValueGridPortrayal2D newInstance(final @NonNull Simulation simulation) {
         final var portrayal = new FastValueGridPortrayal2D(valueName, immutableField);
+        portrayal.setPortrayalForAll(new ValuePortrayal2D() {
+            @Override
+            public String getName(final LocationWrapper wrapper) {
+                final ValueGridPortrayal2D portrayal =
+                    (ValueGridPortrayal2D) wrapper.getFieldPortrayal();
+                return portrayal.getValueName() + ": " + wrapper.getObject();
+            }
+        });
         portrayal.setField(grid.get(simulation).getField());
         portrayal.setMap(newColorMap(simulation));
         return portrayal;
