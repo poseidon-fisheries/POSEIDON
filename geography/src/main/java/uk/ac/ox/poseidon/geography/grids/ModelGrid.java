@@ -67,10 +67,13 @@ public final class ModelGrid {
     @EqualsAndHashCode.Exclude
     private final Int2D[] allCells;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private final LoadingCache<Entry<Int2D, Integer>, List<Int2D>> mooreNeighbourhoods =
+        CacheBuilder.newBuilder().build(CacheLoader.from(this::computeMooreNeighbourhood));
     // Using ImmutableSet here as it should provide fast lookup _and_ iteration
     @ToString.Exclude
     private final ImmutableSet<Int2D> activeCells;
-
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private final LoadingCache<Entry<Int2D, Integer>, List<Int2D>> activeMooreNeighbourhoods =
@@ -213,6 +216,13 @@ public final class ModelGrid {
         return new Int2D((int) point.x, (int) point.y);
     }
 
+    public List<Int2D> getNeighbours(
+        final Int2D cell,
+        @SuppressWarnings("SameParameterValue") final int neighbourhoodSize
+    ) {
+        return mooreNeighbourhoods.getUnchecked(entry(cell, neighbourhoodSize));
+    }
+
     public List<Int2D> getActiveNeighbours(
         final Int2D cell,
         @SuppressWarnings("SameParameterValue") final int neighbourhoodSize
@@ -220,8 +230,18 @@ public final class ModelGrid {
         return activeMooreNeighbourhoods.getUnchecked(entry(cell, neighbourhoodSize));
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     private List<Int2D> computeActiveMooreNeighbourhood(
+        final Entry<Int2D, Integer> entry
+    ) {
+        return mooreNeighbourhoods
+            .getUnchecked(entry)
+            .stream()
+            .filter(this::isActive)
+            .toList();
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private List<Int2D> computeMooreNeighbourhood(
         final Entry<Int2D, Integer> entry
     ) {
         final Int2D cell = entry.getKey();
@@ -245,7 +265,6 @@ public final class ModelGrid {
                 Arrays.stream(yPositions.toArray()).boxed(),
                 Int2D::new
             )
-            .filter(this::isActive)
             .toList();
     }
 

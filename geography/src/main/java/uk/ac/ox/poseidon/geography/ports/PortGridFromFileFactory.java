@@ -119,7 +119,7 @@ public class PortGridFromFileFactory extends GlobalScopeFactory<PortGrid> {
     ) {
         return bathymetricGrid.getModelGrid().isInGrid(cell) &&
             bathymetricGrid.isLand(cell) &&
-            bathymetricGrid.getActiveWaterNeighbours(cell).findAny().isPresent();
+            bathymetricGrid.getWaterNeighbours(cell).findAny().isPresent();
     }
 
 }
