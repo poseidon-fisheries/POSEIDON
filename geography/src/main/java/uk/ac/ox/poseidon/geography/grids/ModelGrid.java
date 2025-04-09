@@ -29,6 +29,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import sim.field.grid.Grid2D;
+import sim.field.grid.ObjectGrid2D;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
@@ -78,6 +79,7 @@ public final class ModelGrid {
     @EqualsAndHashCode.Exclude
     private final LoadingCache<Entry<Int2D, Integer>, List<Int2D>> activeMooreNeighbourhoods =
         CacheBuilder.newBuilder().build(CacheLoader.from(this::computeActiveMooreNeighbourhood));
+    private final ObjectGrid2D coordinatesGrid;
 
     private ModelGrid(
         final int gridWidth,
@@ -93,6 +95,7 @@ public final class ModelGrid {
         this.cellHeight = envelope.getHeight() / (double) this.getGridHeight();
         this.allCells = allCells;
         this.activeCells = activeCells;
+        this.coordinatesGrid = makeCoordinateGrid();
     }
 
     public static ModelGrid withActiveCells(
@@ -160,6 +163,16 @@ public final class ModelGrid {
             .toArray(Int2D[]::new);
     }
 
+    private ObjectGrid2D makeCoordinateGrid() {
+        final ObjectGrid2D objectGrid2D = new ObjectGrid2D(gridWidth, gridHeight);
+        for (int x = 0; x < gridWidth; x++) {
+            for (int y = 0; y < gridHeight; y++) {
+                objectGrid2D.set(x, y, toCoordinate(toPoint(new Int2D(x, y))));
+            }
+        }
+        return objectGrid2D;
+    }
+
     public Stream<Int2D> getAllCells() {
         return Arrays.stream(allCells);
     }
@@ -172,17 +185,19 @@ public final class ModelGrid {
      */
     public Coordinate toCoordinate(final Number2D number2D) {
         return switch (number2D) {
-            case final Int2D cell -> toCoordinate(toPoint(cell));
+            case final Int2D cell -> toCoordinate(cell);
             case final Double2D point -> toCoordinate(point);
             default -> throw new IllegalStateException("Unexpected value: " + number2D);
         };
     }
 
     public Coordinate toCoordinate(final Int2D cell) {
-        return toCoordinate(toPoint(cell));
+        checkArgument(isInGrid(cell), "%s outside of grid", cell);
+        return (Coordinate) coordinatesGrid.get(cell.x, cell.y);
     }
 
     public Coordinate toCoordinate(final Double2D point) {
+        checkArgument(isInGrid(point), "%s outside of grid", point);
         return new Coordinate(
             envelope.getMinX() + point.x * cellWidth,
             envelope.getMinY() + (gridHeight - point.y) * cellHeight
