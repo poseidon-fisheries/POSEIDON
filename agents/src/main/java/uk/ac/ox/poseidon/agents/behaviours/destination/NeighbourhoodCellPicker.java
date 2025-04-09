@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 
+import static java.lang.Math.max;
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 @RequiredArgsConstructor
@@ -46,13 +47,17 @@ public class NeighbourhoodCellPicker implements Picker<Int2D> {
 
     @Override
     public Optional<Int2D> pick() {
-        final List<Int2D> candidates =
-            pathFinder.getAccessibleWaterNeighbours(
-                optionValues
-                    .getBestOption(rng)
-                    .orElse(vessel.getCell()),
-                neighbourhoodSizeSupplier.getAsInt()
-            );
+        final int maxNeighbourhoodSize = max(
+            pathFinder.getModelGrid().getGridWidth(),
+            pathFinder.getModelGrid().getGridHeight()
+        );
+        int neighbourhoodSize = neighbourhoodSizeSupplier.getAsInt();
+        List<Int2D> candidates = List.of();
+        while (candidates.isEmpty() && neighbourhoodSize <= maxNeighbourhoodSize) {
+            final Int2D startingCell = optionValues.getBestOption(rng).orElse(vessel.getCell());
+            candidates = pathFinder.getAccessibleWaterNeighbours(startingCell, neighbourhoodSize);
+            neighbourhoodSize++;
+        }
         return shuffledStream(candidates, rng)
             .filter(optionPredicate)
             .findFirst();

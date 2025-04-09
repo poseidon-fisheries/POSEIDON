@@ -72,13 +72,13 @@ public final class ModelGrid {
     @EqualsAndHashCode.Exclude
     private final LoadingCache<Entry<Int2D, Integer>, List<Int2D>> mooreNeighbourhoods =
         CacheBuilder.newBuilder().build(CacheLoader.from(this::computeMooreNeighbourhood));
-    // Using ImmutableSet here as it should provide fast lookup _and_ iteration
-    @ToString.Exclude
-    private final ImmutableSet<Int2D> activeCells;
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private final LoadingCache<Entry<Int2D, Integer>, List<Int2D>> activeMooreNeighbourhoods =
         CacheBuilder.newBuilder().build(CacheLoader.from(this::computeActiveMooreNeighbourhood));
+    // Using ImmutableSet here as it should provide fast lookup _and_ iteration
+    @ToString.Exclude
+    private final ImmutableSet<Int2D> activeCells;
     private final ObjectGrid2D coordinatesGrid;
 
     private ModelGrid(
@@ -229,6 +229,10 @@ public final class ModelGrid {
 
     public Int2D toCell(final Double2D point) {
         return new Int2D((int) point.x, (int) point.y);
+    }
+
+    public List<Int2D> getNeighbours(final Int2D cell) {
+        return getNeighbours(cell, 1);
     }
 
     public List<Int2D> getNeighbours(
