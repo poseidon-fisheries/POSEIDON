@@ -20,11 +20,11 @@
 <FindBugsFilter>
     <Match>
         <!--
-        The `fishing` package contains gRPC generated classes that are structured
+        The `eu.project.surimi` package contains gRPC generated classes that are structured
         in ways that SpotBugs finds unholy. The protocol as at the prototype stage
         now and the name of the package will change, but we will still have to
         exclude it like this down the line.
         -->
-        <Package name="fishing"/>
+        <Package name="eu.project.surimi"/>
     </Match>
 </FindBugsFilter>
