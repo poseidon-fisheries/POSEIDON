@@ -27,17 +27,6 @@ plugins {
     alias(libs.plugins.spotbugs)
 }
 
-repositories {
-    maven { url = uri("https://repo.osgeo.org/repository/geotools-releases/") }
-    maven { url = uri("https://maven.geo-solutions.it/") }
-    mavenCentral()
-    maven {
-        // needs to come after mavenCentral otherwise we fail to find
-        // flatlaf-3.5.1-macos-arm64.dylib and flatlaf-3.5.1-macos-x86_64.dylib
-        url = uri("https://nexus.geomatys.com/repository/maven-public/")
-    }
-}
-
 val mockitoAgent: Configuration = configurations.create("mockitoAgent")
 
 dependencies {

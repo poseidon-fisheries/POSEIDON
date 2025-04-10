@@ -16,6 +16,8 @@ jts = "1.20.0"
 junit = "5.12.0"
 lombok = "1.18.30"
 mockito = "5.14.0"
+opentelemetry-core = "1.49.0"
+opentelemetry-instrumentation = "2.14.0-alpha"
 si-units = "2.1" # upgrading past 2.1 breaks GeoTools 32.2
 slf4j = "2.0.16"
 snakeyaml = "2.2"
@@ -53,6 +55,10 @@ junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version.ref = "opentelemetry-core" }
+opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry-core" }
+opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry-core" }
+opentelemetry-grpc-server = { module = "io.opentelemetry.instrumentation:opentelemetry-grpc-1.6", version.ref = "opentelemetry-instrumentation" }
 protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
 protobuf-java-util = { module = "com.google.protobuf:protobuf-java-util", version.ref = "protobuf" }
 protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
@@ -68,6 +74,12 @@ tablesaw-core = { module = "net.tlabs-data:tablesaw-core", version.ref = "tables
 [bundles]
 batik = ["batik-transcoder", "batik-dom", "batik-awt-util"]
 grpc = ["grpc-netty-shaded", "grpc-protobuf", "grpc-stub", "protobuf-java", "annotation-api"]
+opentelemetry = [
+    "opentelemetry-api",
+    "opentelemetry-sdk",
+    "opentelemetry-exporter-otlp",
+    "opentelemetry-grpc-server"
+]
 
 [plugins]
 spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugs" }

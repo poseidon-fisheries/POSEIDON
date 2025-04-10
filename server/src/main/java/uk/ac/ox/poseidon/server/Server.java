@@ -22,9 +22,10 @@ package uk.ac.ox.poseidon.server;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
-import io.grpc.*;
 import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
 import io.grpc.protobuf.services.ProtoReflectionServiceV1;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.instrumentation.grpc.v1_6.GrpcTelemetry;
 import uk.ac.ox.poseidon.core.utils.CustomPathConverter;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 
@@ -35,9 +36,9 @@ import java.util.Arrays;
 
 import static java.lang.System.Logger.Level.INFO;
 
-public class Main {
+public class Server {
 
-    private static final System.Logger logger = System.getLogger(Main.class.getName());
+    private static final System.Logger logger = System.getLogger(Server.class.getName());
 
     @Parameter(
         names = {"-s", "--scenario"},
@@ -56,26 +57,27 @@ public class Main {
 
     public static void main(final String[] args) {
         logger.log(INFO, () -> "Received arguments: " + Arrays.toString(args));
-        final Main main = new Main();
+        final Server server = new Server();
         final JCommander jCommander = JCommander
             .newBuilder()
-            .addObject(main)
+            .addObject(server)
             .build();
         try {
             jCommander.parse(args);
-            main.startServer();
+            server.startServer();
         } catch (final ParameterException | IOException | InterruptedException e) {
             System.err.println(e.getMessage());
         }
     }
 
     private void startServer() throws IOException, InterruptedException {
+        final OpenTelemetry openTelemetry = OpenTelemetryConfiguration.initOpenTelemetry();
         final WorkflowService workflowService = createWorkflowService();
         // Bind to 0.0.0.0 so the server listens on all network interfaces
-        final Server grpcServer = NettyServerBuilder
+        final io.grpc.Server grpcServer = NettyServerBuilder
             .forAddress(new InetSocketAddress("0.0.0.0", this.port))
             .addService(ProtoReflectionServiceV1.newInstance())
-            .intercept(new LoggingInterceptor())
+            .intercept(GrpcTelemetry.create(openTelemetry).newServerInterceptor())
             .addService(workflowService)
             .build();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -103,16 +105,4 @@ public class Main {
         );
     }
 
-    public static class LoggingInterceptor implements ServerInterceptor {
-        @Override
-        public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
-            final ServerCall<ReqT, RespT> call,
-            final Metadata headers,
-            final ServerCallHandler<ReqT, RespT> next
-        ) {
-            final String fullMethodName = call.getMethodDescriptor().getFullMethodName();
-            logger.log(INFO, "Handling RPC method: " + fullMethodName);
-            return next.startCall(call, headers);
-        }
-    }
 }

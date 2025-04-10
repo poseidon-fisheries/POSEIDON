@@ -33,6 +33,7 @@ dependencies {
     implementation(libs.jcommander)
     implementation(libs.bundles.grpc)
     implementation(libs.commons.beanutils)
+    implementation(libs.bundles.opentelemetry)
 }
 
 tasks.shadowJar {

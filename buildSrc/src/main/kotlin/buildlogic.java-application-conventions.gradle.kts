@@ -32,6 +32,6 @@ plugins {
 application {
     mainClass.set(
         project.findProperty("mainClass") as String?
-            ?: "uk.ac.ox.poseidon.server.Main"
+            ?: "uk.ac.ox.poseidon.server.Server"
     )
 }
