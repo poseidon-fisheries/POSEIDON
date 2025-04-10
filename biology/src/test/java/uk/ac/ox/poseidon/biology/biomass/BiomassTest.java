@@ -24,9 +24,9 @@ import org.junit.jupiter.api.Test;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 
-import static javax.measure.MetricPrefix.KILO;
 import static org.junit.jupiter.api.Assertions.*;
 import static tech.units.indriya.unit.Units.GRAM;
+import static tech.units.indriya.unit.Units.KILOGRAM;
 
 class BiomassTest {
 
@@ -170,7 +170,7 @@ class BiomassTest {
 
         // Assert
         assertEquals(4, quantity.getValue());
-        assertEquals(KILO(GRAM), quantity.getUnit());
+        assertEquals(KILOGRAM, quantity.getUnit());
     }
 
     @Test
