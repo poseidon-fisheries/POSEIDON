@@ -31,6 +31,7 @@ import java.util.Set;
 
 import static java.util.stream.IntStream.range;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 class ModelGridTest {
@@ -85,9 +86,10 @@ class ModelGridTest {
             new Coordinate(-5, 5),
             modelGrid.toCoordinate(new Double2D(0, 0))
         );
-        assertEquals(
-            new Coordinate(5, -5),
-            modelGrid.toCoordinate(new Double2D(10, 10))
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> modelGrid.toCoordinate(new Double2D(10, 10)),
+            "Double2D[10.0,10.0] outside of grid"
         );
     }
 
