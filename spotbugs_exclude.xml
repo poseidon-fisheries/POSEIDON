@@ -27,4 +27,8 @@
         -->
         <Package name="eu.project.surimi"/>
     </Match>
+    <Match>
+        <!-- @SuppressFBWarnings doesn't work on records so we do this here -->
+        <Class name="uk.ac.ox.poseidon.agents.market.BiomassMarket$Price"/>
+    </Match>
 </FindBugsFilter>

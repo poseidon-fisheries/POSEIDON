@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels.accounts;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.ToString;
 import org.joda.money.CurrencyUnit;
@@ -32,6 +33,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Getter
 @ToString
 public class Account {
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "CurrencyUnit is immutable, safe to expose"
+    )
     private final CurrencyUnit currencyUnit;
     private Money balance;
 

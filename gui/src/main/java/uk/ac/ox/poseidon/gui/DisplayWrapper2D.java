@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.gui;
 
+import com.google.common.collect.ImmutableList;
 import sim.display.Display2D;
 import sim.display.GUIState;
 import uk.ac.ox.poseidon.core.Factory;
@@ -52,7 +53,7 @@ public class DisplayWrapper2D extends DisplayWrapper<Display2D> {
         final Paint backDrop
     ) {
         super(title);
-        this.fieldPortrayalFactories = fieldPortrayalFactories;
+        this.fieldPortrayalFactories = ImmutableList.copyOf(fieldPortrayalFactories);
         this.width = width;
         this.height = height;
         this.backDrop = backDrop;
