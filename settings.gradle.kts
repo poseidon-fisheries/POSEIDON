@@ -31,7 +31,6 @@ include("examples")
 include("gui")
 include("agents")
 include("regulations")
-include("server")
 
 dependencyResolutionManagement {
     repositories {
