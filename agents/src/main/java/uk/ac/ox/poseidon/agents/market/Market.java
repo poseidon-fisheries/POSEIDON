@@ -23,13 +23,16 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Content;
 
+import java.time.LocalDateTime;
+
 public interface Market<C extends Content<C>> {
 
     String getId();
 
     Sale<C> sell(
         Vessel vessel,
-        Bucket<? extends C> bucket
+        Bucket<? extends C> bucket,
+        LocalDateTime dateTime
     );
 
 }

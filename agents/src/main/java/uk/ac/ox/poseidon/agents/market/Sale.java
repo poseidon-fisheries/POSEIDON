@@ -28,6 +28,7 @@ import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.species.Species;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static java.util.function.Function.identity;
@@ -35,6 +36,9 @@ import static java.util.stream.Collectors.toMap;
 
 @Data
 public class Sale<C extends Content<C>> {
+    private final LocalDateTime dateTime;
+    private final String id;
+    private final Market<C> market;
     private final Vessel vessel;
     private final Table<Species, C, Money> sold;
     private final Bucket<C> unsold;

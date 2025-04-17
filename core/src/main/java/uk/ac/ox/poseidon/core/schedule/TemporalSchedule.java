@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.core.schedule;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import sim.engine.Repeat;
 import sim.engine.Schedule;
@@ -33,6 +34,7 @@ import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Getter
 @RequiredArgsConstructor
 public class TemporalSchedule extends Schedule {
 

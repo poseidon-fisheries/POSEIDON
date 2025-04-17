@@ -31,6 +31,7 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.utils.Measurements;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -130,18 +131,26 @@ public class BiomassMarketGridPriceFileFactory
                             )
                         )
                     ),
-                    priceBySpeciesByPort -> makeMarketGrid(portGrid, priceBySpeciesByPort)
+                    priceBySpeciesByPort -> makeMarketGrid(
+                        portGrid, priceBySpeciesByPort,
+                        simulation.getEventManager()
+                    )
                 )
             );
     }
 
     private BiomassMarketGrid makeMarketGrid(
         final PortGrid portGrid,
-        final Map<Port, Map<Species, BiomassMarket.Price>> priceBySpeciesByPort
+        final Map<Port, Map<Species, BiomassMarket.Price>> priceBySpeciesByPort,
+        final EventManager eventManager
     ) {
         final BiomassMarketGrid marketGrid = new BiomassMarketGrid(portGrid.getModelGrid());
         priceBySpeciesByPort.forEach((port, priceBySpecies) -> {
-            final BiomassMarket market = new BiomassMarket(port.getCode(), priceBySpecies);
+            final BiomassMarket market = new BiomassMarket(
+                port.getCode(),
+                priceBySpecies,
+                eventManager
+            );
             marketGrid.getField().setObjectLocation(
                 market,
                 portGrid.getLocation(port)

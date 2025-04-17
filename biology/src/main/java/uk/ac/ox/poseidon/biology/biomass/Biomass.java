@@ -19,7 +19,7 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import tech.units.indriya.quantity.Quantities;
 import uk.ac.ox.poseidon.biology.Content;
 
@@ -30,7 +30,7 @@ import javax.measure.quantity.Mass;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 
-@Data
+@EqualsAndHashCode
 public class Biomass implements Content<Biomass> {
 
     // Biomass stored internally in kilograms

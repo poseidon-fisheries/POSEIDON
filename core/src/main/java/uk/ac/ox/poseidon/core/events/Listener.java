@@ -21,7 +21,7 @@ package uk.ac.ox.poseidon.core.events;
 
 public interface Listener<E> {
 
-    Class<E> getEventClass();
+    Class<? extends E> getEventClass();
 
     void receive(E event);
 

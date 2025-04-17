@@ -66,7 +66,9 @@ public class Landing<C extends Content<C>> implements Behaviour {
             final List<? extends Market<C>> markets =
                 marketGrid.getObjectsAt(vessel.getCell()).toList();
             if (markets.size() == 1) {
-                final Sale<C> sale = markets.getFirst().sell(vessel, hold.extractContent());
+                final Sale<C> sale = markets
+                    .getFirst()
+                    .sell(vessel, hold.extractContent(), dateTime);
                 sale.summary().values().forEach(vessel.getAccount()::add);
             } else {
                 throw new RuntimeException(

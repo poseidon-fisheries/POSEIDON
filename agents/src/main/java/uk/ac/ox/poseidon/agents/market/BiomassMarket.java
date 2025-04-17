@@ -27,10 +27,14 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.core.events.EventManager;
+import uk.ac.ox.poseidon.core.utils.IdSupplier;
+import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplier;
 
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,19 +44,25 @@ public class BiomassMarket implements Market<Biomass> {
 
     private final String id;
     private final Map<Species, Price> prices;
+    private final IdSupplier saleIdSupplier;
+    private final EventManager eventManager;
 
     public BiomassMarket(
         final String id,
-        final Map<Species, Price> prices
+        final Map<Species, Price> prices,
+        final EventManager eventManager
     ) {
         this.id = id;
         this.prices = new HashMap<>(prices);
+        this.saleIdSupplier = new PrefixedIdSupplier(id);
+        this.eventManager = eventManager;
     }
 
     @Override
     public Sale<Biomass> sell(
         final Vessel vessel,
-        final Bucket<? extends Biomass> bucket
+        final Bucket<? extends Biomass> bucket,
+        final LocalDateTime dateTime
     ) {
         final ImmutableTable.Builder<Species, Biomass, Money> sold = ImmutableTable.builder();
         final Bucket.Builder<Biomass> unsold = Bucket.newBuilder();
@@ -72,11 +82,16 @@ public class BiomassMarket implements Market<Biomass> {
                 sold.put(species, biomass, salePrice);
             }
         }
-        return new Sale<>(
+        final BiomassSale sale = new BiomassSale(
+            dateTime,
+            saleIdSupplier.nextId(),
+            this,
             vessel,
             sold.build(),
             unsold.build()
         );
+        eventManager.broadcast(sale);
+        return sale;
     }
 
     public void setPrice(

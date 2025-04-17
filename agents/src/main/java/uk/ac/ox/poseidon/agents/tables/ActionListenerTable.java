@@ -19,31 +19,24 @@
 
 package uk.ac.ox.poseidon.agents.tables;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import tech.tablesaw.api.DateTimeColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
-import uk.ac.ox.poseidon.core.events.AbstractListener;
 
 import java.util.function.Supplier;
 
 public abstract class ActionListenerTable<A extends Action>
-    extends AbstractListener<A>
+    extends ListenerTable<A>
     implements Supplier<Table> {
+
     private final StringColumn vesselId = StringColumn.create("vessel_id");
     private final DateTimeColumn actionStart = DateTimeColumn.create("action_start");
     private final DateTimeColumn actionEnd = DateTimeColumn.create("action_end");
 
-    private final Table table =
-        Table.create(
-            vesselId,
-            actionStart,
-            actionEnd
-        );
-
     ActionListenerTable(final Class<A> eventClass) {
         super(eventClass);
+        table.addColumns(vesselId, actionStart, actionEnd);
     }
 
     @Override
@@ -53,12 +46,4 @@ public abstract class ActionListenerTable<A extends Action>
         vesselId.append(action.getVessel().getId());
     }
 
-    @SuppressFBWarnings(
-        value = "EI",
-        justification = "Mutable table willfully exposed; just be careful with it."
-    )
-    @Override
-    public Table get() {
-        return table;
-    }
 }

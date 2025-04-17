@@ -32,6 +32,11 @@ public class PrefixedIdSupplier implements IdSupplier {
 
     private final AtomicLong counter;
 
+    public PrefixedIdSupplier(String prefix) {
+        this.prefix = prefix;
+        this.counter = new AtomicLong();
+    }
+
     @Override
     public String nextId() {
         return prefix + " " + counter.getAndIncrement();
