@@ -35,7 +35,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @AllArgsConstructor
 public class AllOfFactory<T> extends GlobalScopeFactory<AllOf<T>> {
 
-    List<Factory<? extends Predicate<? super T>>> predicates;
+    private List<Factory<? extends Predicate<? super T>>> predicates;
 
     @SafeVarargs
     @SuppressWarnings("varargs")

@@ -44,7 +44,7 @@ class BiomassTest {
         final Biomass biomass = new Biomass(500, GRAM);
 
         // Assert
-        assertEquals(0.5, biomass.getBiomassInKg());
+        assertEquals(0.5, biomass.asKg());
     }
 
     @Test
@@ -53,7 +53,7 @@ class BiomassTest {
         final Biomass biomass = Biomass.ofKg(12.5);
 
         // Assert
-        assertEquals(12.5, biomass.getBiomassInKg());
+        assertEquals(12.5, biomass.asKg());
     }
 
     @Test
@@ -66,7 +66,7 @@ class BiomassTest {
         final Biomass result = biomass1.add(biomass2);
 
         // Assert
-        assertEquals(15.0, result.getBiomassInKg());
+        assertEquals(15.0, result.asKg());
     }
 
     @Test
@@ -79,7 +79,7 @@ class BiomassTest {
         final Biomass result = biomass1.subtract(biomass2);
 
         // Assert
-        assertEquals(7.0, result.getBiomassInKg());
+        assertEquals(7.0, result.asKg());
     }
 
     @Test
@@ -91,7 +91,7 @@ class BiomassTest {
         final Biomass result = biomass.multiply(3.5);
 
         // Assert
-        assertEquals(7.0, result.getBiomassInKg());
+        assertEquals(7.0, result.asKg());
     }
 
     @Test
@@ -103,7 +103,7 @@ class BiomassTest {
         final Biomass result = biomass.multiply(0.0);
 
         // Assert
-        assertEquals(0.0, result.getBiomassInKg());
+        assertEquals(0.0, result.asKg());
     }
 
     @Test
@@ -115,7 +115,7 @@ class BiomassTest {
         final Biomass result = biomass.divide(2.0);
 
         // Assert
-        assertEquals(5.0, result.getBiomassInKg());
+        assertEquals(5.0, result.asKg());
     }
 
     @Test
@@ -127,7 +127,7 @@ class BiomassTest {
         final Biomass result = biomass.divide(4.0);
 
         // Assert
-        assertEquals(0.5, result.getBiomassInKg());
+        assertEquals(0.5, result.asKg());
     }
 
     @Test

@@ -21,7 +21,7 @@ package uk.ac.ox.poseidon.biology;
 
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
-public interface Content<C> {
+public interface Content<C extends Content<C>> {
 
     C add(C content);
 

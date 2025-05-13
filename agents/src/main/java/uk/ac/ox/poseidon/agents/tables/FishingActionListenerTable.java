@@ -36,10 +36,14 @@ public class FishingActionListenerTable extends SpatialActionListenerTable<Fishi
     @Override
     public void receive(final FishingAction fishingAction) {
         super.receive(fishingAction);
-        fishingAction.getFishCaught().getMap().forEach((species, content) -> {
-            speciesCode.append(species.getCode());
-            biomassCaught.append(content.asBiomass().asKg());
-        });
+        fishingAction
+            .getDisposition()
+            .getRetained()
+            .getMap()
+            .forEach((species, content) -> {
+                speciesCode.append(species.getCode());
+                biomassCaught.append(content.asBiomass().asKg());
+            });
     }
 
 }

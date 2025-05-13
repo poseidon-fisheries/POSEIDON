@@ -25,6 +25,8 @@ import lombok.NonNull;
 import lombok.ToString;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
+import uk.ac.ox.poseidon.agents.behaviours.disposition.Disposition;
+import uk.ac.ox.poseidon.agents.behaviours.disposition.DispositionStrategy;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
@@ -44,6 +46,7 @@ public class Fishing<C extends Content<C>> implements Behaviour {
     @NonNull protected final Hold<C> hold;
     @NonNull private final Supplier<Fisheable<C>> fisheableSupplier;
     @NonNull private final Regulations regulations;
+    @NonNull private final DispositionStrategy<C> dispositionStrategy;
 
     @Override
     public SteppableAction nextAction(
@@ -58,7 +61,8 @@ public class Fishing<C extends Content<C>> implements Behaviour {
     @ToString(callSuper = true)
     public class Action extends SteppableAction implements FishingAction {
 
-        Bucket<C> fishCaught;
+        private Bucket<C> grossCatch;
+        private Disposition<C> disposition;
 
         public Action(
             final Vessel vessel,
@@ -72,10 +76,17 @@ public class Fishing<C extends Content<C>> implements Behaviour {
         protected void complete(
             final LocalDateTime dateTime
         ) {
-            fishCaught = fishingGear.fish(fisheableSupplier.get());
-            hold.addContent(fishCaught);
+            final Fisheable<C> fisheable = fisheableSupplier.get();
+            grossCatch = fishingGear.fish(fisheable);
+            disposition = dispositionStrategy.partition(
+                grossCatch,
+                hold.getAvailableCapacityInKg()
+            );
+            hold.addContent(disposition.getRetained());
+            fisheable.release(disposition.getDiscardedAlive());
             vessel.popBehaviour();
         }
+
     }
 
 }

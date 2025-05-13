@@ -6,7 +6,7 @@ import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 public class BiomassSaleAccumulatorFactory
     extends SimulationEventListenerFactory<BiomassSaleAccumulator> {
     @Override
-    protected BiomassSaleAccumulator newListener(Simulation simulation) {
+    protected BiomassSaleAccumulator newListener(final Simulation simulation) {
         return new BiomassSaleAccumulator();
     }
 }

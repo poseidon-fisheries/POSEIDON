@@ -27,6 +27,7 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.UnaryOperator;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -98,6 +99,17 @@ public final class Bucket<C extends Content<C>> {
         final Builder<C> builder = toBuilder();
         getMap().forEach((species, c) -> builder.put(species, mapper.apply(c)));
         return builder.build();
+    }
+
+    public Map<Boolean, Bucket<C>> partitionBy(
+        final BiPredicate<Species, C> predicate
+    ) {
+        final Bucket.Builder<C> b1 = Bucket.newBuilder();
+        final Bucket.Builder<C> b2 = Bucket.newBuilder();
+        getMap().forEach((species, content) ->
+            (predicate.test(species, content) ? b1 : b2).put(species, content)
+        );
+        return Map.of(true, b1.build(), false, b2.build());
     }
 
     public boolean isEmpty() {

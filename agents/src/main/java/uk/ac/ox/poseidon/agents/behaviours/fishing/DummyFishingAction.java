@@ -21,15 +21,19 @@ package uk.ac.ox.poseidon.agents.behaviours.fishing;
 
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.behaviours.AbstractAction;
+import uk.ac.ox.poseidon.agents.behaviours.disposition.Disposition;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Getter
-public class DummyFishingAction extends AbstractAction implements FishingAction {
+public class DummyFishingAction<C extends Content<C>>
+    extends AbstractAction
+    implements FishingAction {
 
     public DummyFishingAction(
         final LocalDateTime start,
@@ -40,8 +44,13 @@ public class DummyFishingAction extends AbstractAction implements FishingAction 
     }
 
     @Override
-    public Bucket<?> getFishCaught() {
+    public Bucket<C> getGrossCatch() {
         return Bucket.empty();
+    }
+
+    @Override
+    public Disposition<C> getDisposition() {
+        return Disposition.empty();
     }
 
 }

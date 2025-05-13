@@ -27,12 +27,10 @@ import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
 
 public class BiomassGrids implements FisheableGrid<Biomass> {
 
@@ -58,30 +56,44 @@ public class BiomassGrids implements FisheableGrid<Biomass> {
 
     class FisheableCell implements Fisheable<Biomass> {
 
-        private final List<Fisheable<Biomass>> fisheables;
+        private final ImmutableMap<Species, Fisheable<Biomass>> fisheables;
 
         private FisheableCell(final Int2D cell) {
             fisheables =
                 grids
-                    .values()
+                    .entrySet()
                     .stream()
-                    .map(grid -> grid.getFisheableCell(cell))
-                    .collect(toList());
+                    .collect(toImmutableMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().getFisheableCell(cell)
+                    ));
         }
 
         @Override
         public Bucket<Biomass> availableFish() {
             return fisheables
+                .values()
                 .stream()
                 .map(Fisheable::availableFish)
                 .reduce(Bucket.empty(), Bucket::add);
         }
 
         @Override
+        public void release(final Bucket<Biomass> fishToRelease) {
+            fishToRelease.getMap().forEach((species, biomass) -> {
+                final Fisheable<Biomass> fisheable = fisheables.get(species);
+                if (fisheable == null) throw new IllegalArgumentException(
+                    "No grid available to release %s.".formatted(species)
+                );
+                fisheable.release(Bucket.of(species, biomass));
+            });
+        }
+
+        @Override
         public Bucket<Biomass> extract(final Bucket<Biomass> fishToExtract) {
             final Bucket.Builder<Biomass> fishExtractedSoFar = Bucket.newBuilder();
             final Bucket.Builder<Biomass> fishRemainingToExtract = fishToExtract.toBuilder();
-            for (final Fisheable<Biomass> fisheable : fisheables) {
+            for (final Fisheable<Biomass> fisheable : fisheables.values()) {
                 final Bucket<Biomass> fishExtracted =
                     fisheable.extract(fishRemainingToExtract.build());
                 fishExtractedSoFar.add(fishExtracted);

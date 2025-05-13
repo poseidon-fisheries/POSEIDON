@@ -100,6 +100,19 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
         }
 
         @Override
+        public void release(final Bucket<Biomass> fishToRelease) {
+            fishToRelease.getMap().forEach((s, biomass) -> {
+                if (s.equals(species))
+                    setBiomass(cell, getBiomass(cell).asKg() + biomass.asKg());
+                else {
+                    throw new IllegalArgumentException(
+                        "Unable to release %s in a %s grid".formatted(s, species)
+                    );
+                }
+            });
+        }
+
+        @Override
         public Bucket<Biomass> extract(final Bucket<Biomass> fishToExtract) {
             final Bucket.Builder<Biomass> fishExtracted = Bucket.newBuilder();
             fishToExtract

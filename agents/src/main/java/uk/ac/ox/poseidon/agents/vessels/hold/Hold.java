@@ -25,13 +25,11 @@ import uk.ac.ox.poseidon.biology.Content;
 public interface Hold<C extends Content<C>> {
 
     /**
-     * Adds the specified bucket of content to the current hold and returns the content that could
-     * not be stored (usually because lack of space).
+     * Adds the specified bucket of content to the current hold.
      *
      * @param fishToStore the content to add
-     * @return the fish that could not be added, if any
      */
-    Bucket<C> addContent(Bucket<C> fishToStore);
+    void addContent(Bucket<C> fishToStore);
 
     /**
      * Retrieves the content held in the container without removing it.
@@ -40,7 +38,9 @@ public interface Hold<C extends Content<C>> {
      */
     Bucket<C> getContent();
 
-    boolean isFull();
+    default boolean isFull() {
+        return getAvailableCapacityInKg() <= 0;
+    }
 
     /**
      * Removes all content currently held in the container and returns it.
@@ -52,4 +52,11 @@ public interface Hold<C extends Content<C>> {
     default boolean isEmpty() {
         return getContent().isEmpty();
     }
+
+    double getTotalCapacityInKg();
+
+    default double getAvailableCapacityInKg() {
+        return getTotalCapacityInKg() - getContent().getTotalBiomass().asKg();
+    }
+
 }

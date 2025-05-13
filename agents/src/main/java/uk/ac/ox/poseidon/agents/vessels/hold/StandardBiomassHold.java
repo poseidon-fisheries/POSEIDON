@@ -21,41 +21,31 @@ package uk.ac.ox.poseidon.agents.vessels.hold;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.vessels.hold.OvercapacityDiscardingStrategy.Result;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
+@Getter
 @RequiredArgsConstructor
 public class StandardBiomassHold implements Hold<Biomass> {
 
-    private final double capacityInKg;
+    private final double totalCapacityInKg;
     private final double toleranceInKg;
-    private final OvercapacityDiscardingStrategy<Biomass> overcapacityDiscardingStrategy;
-    @Getter
     private Bucket<Biomass> content = Bucket.empty();
 
     @Override
-    public Bucket<Biomass> addContent(final Bucket<Biomass> contentToAdd) {
+    public void addContent(final Bucket<Biomass> contentToAdd) {
         final Bucket<Biomass> newContent = content.add(contentToAdd);
-        if (newContent.getTotalBiomass().asKg() <= capacityInKg + toleranceInKg) {
+        if (newContent.getTotalBiomass().asKg() <= totalCapacityInKg + toleranceInKg) {
             content = newContent;
-            return Bucket.empty();
         } else {
-            final Result<Biomass> discardingResult =
-                overcapacityDiscardingStrategy.discard(
-                    contentToAdd,
-                    content,
-                    capacityInKg,
-                    toleranceInKg
-                );
-            content = discardingResult.updatedHoldContent;
-            return discardingResult.discarded;
+            throw new IllegalStateException(
+                "Trying to store %f kg in the hold, but only %f kg of capacity available."
+                    .formatted(
+                        contentToAdd.getTotalBiomass().asKg(),
+                        getAvailableCapacityInKg()
+                    )
+            );
         }
-    }
-
-    @Override
-    public boolean isFull() {
-        return content.getTotalBiomass().asKg() >= capacityInKg - toleranceInKg;
     }
 
     @Override
@@ -64,4 +54,5 @@ public class StandardBiomassHold implements Hold<Biomass> {
         content = Bucket.empty();
         return removedContent;
     }
+
 }

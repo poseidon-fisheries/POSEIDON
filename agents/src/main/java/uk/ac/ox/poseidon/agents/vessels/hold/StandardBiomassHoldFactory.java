@@ -25,7 +25,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -43,8 +42,6 @@ public class StandardBiomassHoldFactory extends VesselScopeFactory<StandardBioma
 
     private Factory<? extends Quantity<Mass>> capacity;
     private Factory<? extends Quantity<Mass>> tolerance;
-    private VesselScopeFactory<? extends OvercapacityDiscardingStrategy<Biomass>>
-        overcapacityDiscardingStrategy;
 
     @Override
     protected StandardBiomassHold newInstance(
@@ -53,8 +50,7 @@ public class StandardBiomassHoldFactory extends VesselScopeFactory<StandardBioma
     ) {
         return new StandardBiomassHold(
             capacity.get(simulation).to(KILO(GRAM)).getValue().doubleValue(),
-            tolerance.get(simulation).to(KILO(GRAM)).getValue().doubleValue(),
-            overcapacityDiscardingStrategy.get(simulation, vessel)
+            tolerance.get(simulation).to(KILO(GRAM)).getValue().doubleValue()
         );
     }
 }

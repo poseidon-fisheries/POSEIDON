@@ -23,10 +23,12 @@ public interface Fisheable<C extends Content<C>> {
 
     Bucket<C> availableFish();
 
+    void release(Bucket<C> fishToRelease);
+
     /**
-     * Mutates the fisheable by removing the content of the provided bucket and returns
-     * another bucket containing the rest of the fish from the original bucket that could not be
-     * removed from the fisheable.
+     * Mutates the fisheable by removing the content of the provided bucket and returns another
+     * bucket containing the rest of the fish from the original bucket that could not be removed
+     * from the fisheable.
      *
      * @param bucket the fish the remove from the fisheable
      * @return the fish that could not be removed from the fisheable
