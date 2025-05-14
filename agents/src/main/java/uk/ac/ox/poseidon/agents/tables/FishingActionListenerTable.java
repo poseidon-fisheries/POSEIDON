@@ -19,31 +19,63 @@
 
 package uk.ac.ox.poseidon.agents.tables;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.FishingAction;
+import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.species.Species;
+
+import java.util.Map;
+import java.util.Optional;
 
 public class FishingActionListenerTable extends SpatialActionListenerTable<FishingAction> {
 
-    private final StringColumn speciesCode = StringColumn.create("species_code");
-    private final DoubleColumn biomassCaught = DoubleColumn.create("biomass_caught");
+    private static final String SPECIES_CODE = "species_code";
+    private static final String GROSS_CATCH = "gross_catch";
+    private static final String RETAINED = "retained";
+    private static final String DISCARDED_ALIVE = "discarded_alive";
+    private static final String DISCARDED_DEAD = "discarded_dead";
 
     FishingActionListenerTable() {
         super(FishingAction.class);
-        get().addColumns(speciesCode, biomassCaught);
+        get().addColumns(
+            StringColumn.create(SPECIES_CODE),
+            DoubleColumn.create(GROSS_CATCH),
+            DoubleColumn.create(RETAINED),
+            DoubleColumn.create(DISCARDED_ALIVE),
+            DoubleColumn.create(DISCARDED_DEAD)
+        );
     }
 
     @Override
     public void receive(final FishingAction fishingAction) {
-        super.receive(fishingAction);
-        fishingAction
-            .getDisposition()
-            .getRetained()
-            .getMap()
-            .forEach((species, content) -> {
-                speciesCode.append(species.getCode());
-                biomassCaught.append(content.asBiomass().asKg());
-            });
+        final Map<String, Bucket<?>> buckets = Map.of(
+            GROSS_CATCH, fishingAction.getGrossCatch(),
+            RETAINED, fishingAction.getDisposition().getRetained(),
+            DISCARDED_ALIVE, fishingAction.getDisposition().getDiscardedAlive(),
+            DISCARDED_DEAD, fishingAction.getDisposition().getDiscardedDead()
+        );
+        final Table<Species, String, Double> table = HashBasedTable.create();
+        buckets.forEach((columnName, bucket) ->
+            bucket.getMap().forEach((species, content) ->
+                table.put(species, columnName, content.asBiomass().asKg())
+            )
+        );
+        table.rowKeySet().forEach(species -> {
+            // FIXME: this will repeat the action info for each species, which is a colossal waste
+            //  of space. We should have some kind of action id (which needs to be implemented) and
+            //  store the catch data in a separate table.
+            super.receive(fishingAction);
+            buckets.keySet().forEach(columnName ->
+                get()
+                    .doubleColumn(columnName)
+                    .append(
+                        Optional.ofNullable(table.get(species, columnName)).orElse(0.0)
+                    )
+            );
+        });
     }
 
 }
