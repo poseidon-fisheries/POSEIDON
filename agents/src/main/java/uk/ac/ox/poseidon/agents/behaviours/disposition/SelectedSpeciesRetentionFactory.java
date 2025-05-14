@@ -16,14 +16,14 @@ import java.util.Collection;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RetainSelectedSpeciesFactory<C extends Content<C>>
-    extends GlobalScopeFactory<RetainSelectedSpecies<C>> {
+public class SelectedSpeciesRetentionFactory<C extends Content<C>>
+    extends GlobalScopeFactory<SelectedSpeciesRetention<C>> {
 
     private Factory<? extends Collection<Species>> selectedSpecies;
 
     @Override
-    protected RetainSelectedSpecies<C> newInstance(final Simulation simulation) {
-        return new RetainSelectedSpecies<>(selectedSpecies.get(simulation));
+    protected SelectedSpeciesRetention<C> newInstance(final Simulation simulation) {
+        return new SelectedSpeciesRetention<>(selectedSpecies.get(simulation));
     }
 
 }

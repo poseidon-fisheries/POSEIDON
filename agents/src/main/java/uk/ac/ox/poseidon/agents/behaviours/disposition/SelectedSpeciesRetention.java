@@ -11,11 +11,11 @@ import java.util.Map;
 import java.util.Set;
 
 @Getter
-public class RetainSelectedSpecies<C extends Content<C>> implements DispositionProcess<C> {
+public class SelectedSpeciesRetention<C extends Content<C>> implements DispositionProcess<C> {
 
     private final Set<Species> selectedSpecies;
 
-    public RetainSelectedSpecies(final Collection<Species> selectedSpecies) {
+    public SelectedSpeciesRetention(final Collection<Species> selectedSpecies) {
         this.selectedSpecies = ImmutableSet.copyOf(selectedSpecies);
     }
 
