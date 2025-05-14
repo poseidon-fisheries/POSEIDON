@@ -20,7 +20,11 @@
 package uk.ac.ox.poseidon.biology.species;
 
 public class DummySpecies {
+
+    private DummySpecies() {}
+
     public static final Species A = new Species("A", "Species A");
     public static final Species B = new Species("B", "Species B");
     public static final Species C = new Species("C", "Species C");
+
 }
