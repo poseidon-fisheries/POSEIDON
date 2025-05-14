@@ -26,7 +26,7 @@ import lombok.ToString;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
 import uk.ac.ox.poseidon.agents.behaviours.disposition.Disposition;
-import uk.ac.ox.poseidon.agents.behaviours.disposition.DispositionStrategy;
+import uk.ac.ox.poseidon.agents.behaviours.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
@@ -46,7 +46,7 @@ public class Fishing<C extends Content<C>> implements Behaviour {
     @NonNull protected final Hold<C> hold;
     @NonNull private final Supplier<Fisheable<C>> fisheableSupplier;
     @NonNull private final Regulations regulations;
-    @NonNull private final DispositionStrategy<C> dispositionStrategy;
+    @NonNull private final DispositionProcess<C> dispositionProcess;
 
     @Override
     public SteppableAction nextAction(
@@ -78,7 +78,7 @@ public class Fishing<C extends Content<C>> implements Behaviour {
         ) {
             final Fisheable<C> fisheable = fisheableSupplier.get();
             grossCatch = fishingGear.fish(fisheable);
-            disposition = dispositionStrategy.partition(
+            disposition = dispositionProcess.partition(
                 grossCatch,
                 hold.getAvailableCapacityInKg()
             );

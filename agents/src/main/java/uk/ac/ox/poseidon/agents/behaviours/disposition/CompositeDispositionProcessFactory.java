@@ -17,22 +17,22 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompositeDispositionStrategyFactory<C extends Content<C>>
-    extends GlobalScopeFactory<CompositeDispositionStrategy<C>> {
+public class CompositeDispositionProcessFactory<C extends Content<C>>
+    extends GlobalScopeFactory<CompositeDispositionProcess<C>> {
 
-    private List<Factory<? extends DispositionStrategy<? super C>>> dispositionStrategies;
+    private List<Factory<? extends DispositionProcess<? super C>>> dispositionStrategies;
 
     @SafeVarargs
     @SuppressWarnings("varargs")
-    public CompositeDispositionStrategyFactory(
-        final Factory<? extends DispositionStrategy<? super C>>... dispositionStrategies
+    public CompositeDispositionProcessFactory(
+        final Factory<? extends DispositionProcess<? super C>>... dispositionStrategies
     ) {
         this(List.of(dispositionStrategies));
     }
 
     @Override
-    protected CompositeDispositionStrategy<C> newInstance(final Simulation simulation) {
-        return new CompositeDispositionStrategy<>(
+    protected CompositeDispositionProcess<C> newInstance(final Simulation simulation) {
+        return new CompositeDispositionProcess<>(
             dispositionStrategies
                 .stream()
                 .map(factory -> factory.get(simulation))

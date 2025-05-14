@@ -3,7 +3,8 @@ package uk.ac.ox.poseidon.agents.behaviours.disposition;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Content;
 
-public interface DispositionStrategy<C extends Content<C>> {
+public interface DispositionProcess<C extends Content<C>> {
+
     Disposition<C> partition(
         Disposition<C> currentDisposition,
         double availableCapacityInKg

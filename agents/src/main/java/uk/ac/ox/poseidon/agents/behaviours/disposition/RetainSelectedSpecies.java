@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Getter
-public class RetainSelectedSpecies<C extends Content<C>> implements DispositionStrategy<C> {
+public class RetainSelectedSpecies<C extends Content<C>> implements DispositionProcess<C> {
 
     private final Set<Species> selectedSpecies;
 

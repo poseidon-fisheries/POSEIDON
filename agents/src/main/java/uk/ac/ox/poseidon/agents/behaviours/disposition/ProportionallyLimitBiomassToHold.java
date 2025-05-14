@@ -4,7 +4,7 @@ import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
 public class ProportionallyLimitBiomassToHold
-    implements DispositionStrategy<Biomass> {
+    implements DispositionProcess<Biomass> {
 
     @Override
     public Disposition<Biomass> partition(
