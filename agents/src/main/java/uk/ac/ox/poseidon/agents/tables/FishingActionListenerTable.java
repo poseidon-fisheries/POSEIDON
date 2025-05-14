@@ -68,6 +68,7 @@ public class FishingActionListenerTable extends SpatialActionListenerTable<Fishi
             //  of space. We should have some kind of action id (which needs to be implemented) and
             //  store the catch data in a separate table.
             super.receive(fishingAction);
+            get().stringColumn(SPECIES_CODE).append(species.getCode());
             buckets.keySet().forEach(columnName ->
                 get()
                     .doubleColumn(columnName)
