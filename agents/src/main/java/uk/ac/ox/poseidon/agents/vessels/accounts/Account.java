@@ -40,7 +40,7 @@ public class Account {
     private final CurrencyUnit currencyUnit;
     private Money balance;
 
-    Account(final CurrencyUnit currencyUnit) {
+    public Account(final CurrencyUnit currencyUnit) {
         this.currencyUnit = checkNotNull(currencyUnit);
         this.balance = Money.zero(currencyUnit);
     }
