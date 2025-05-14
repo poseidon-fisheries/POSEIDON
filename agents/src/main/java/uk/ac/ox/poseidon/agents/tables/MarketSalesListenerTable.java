@@ -32,7 +32,7 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
     private final DoubleColumn saleValue = DoubleColumn.create(SALE_VALUE_COLUMN);
     private final StringColumn currency = StringColumn.create(CURRENCY_COLUMN);
 
-    protected MarketSalesListenerTable() {
+    MarketSalesListenerTable() {
         super(Sale.class);
         table.addColumns(
             dateTime,
@@ -47,11 +47,11 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
     }
 
     @Override
-    public void receive(Sale sale) {
+    public void receive(final Sale sale) {
         @SuppressWarnings("unchecked") final Set<Table.Cell<Species, Content<?>, Money>> cells =
             (Set<Table.Cell<Species, Content<?>, Money>>) (Set<?>) sale.getSold().cellSet();
 
-        for (Table.Cell<Species, Content<?>, Money> cell : cells) {
+        for (final Table.Cell<Species, Content<?>, Money> cell : cells) {
             dateTime.append(sale.getDateTime());
             salesId.append(sale.getId());
             marketId.append(sale.getMarket().getId());

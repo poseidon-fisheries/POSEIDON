@@ -29,7 +29,9 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
-@RequiredArgsConstructor
+import static lombok.AccessLevel.PACKAGE;
+
+@RequiredArgsConstructor(access = PACKAGE)
 public class Home extends BranchingBehaviour {
 
     private final PortGrid portGrid;

@@ -1,8 +1,12 @@
 package uk.ac.ox.poseidon.agents.behaviours.disposition;
 
+import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
+import static lombok.AccessLevel.PACKAGE;
+
+@NoArgsConstructor(access = PACKAGE)
 public class ProportionallyLimitingBiomassToHold
     implements DispositionProcess<Biomass> {
 

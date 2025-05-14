@@ -33,7 +33,9 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@RequiredArgsConstructor
+import static lombok.AccessLevel.PACKAGE;
+
+@RequiredArgsConstructor(access = PACKAGE)
 public class FishingLocationLegalityChecker implements Predicate<Int2D> {
 
     private final Regulations regulations;

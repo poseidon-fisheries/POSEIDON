@@ -34,8 +34,9 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static lombok.AccessLevel.PACKAGE;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = PACKAGE)
 public class TravellingAlongPath implements Behaviour {
 
     private final PathFinder<Int2D> pathFinder;

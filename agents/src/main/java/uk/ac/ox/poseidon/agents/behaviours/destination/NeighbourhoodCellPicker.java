@@ -33,9 +33,10 @@ import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 
 import static java.lang.Math.max;
+import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = PACKAGE)
 public class NeighbourhoodCellPicker implements Picker<Int2D> {
 
     private final Vessel vessel;

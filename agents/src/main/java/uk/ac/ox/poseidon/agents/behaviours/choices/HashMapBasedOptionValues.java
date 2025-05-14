@@ -20,11 +20,15 @@
 package uk.ac.ox.poseidon.agents.behaviours.choices;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static lombok.AccessLevel.PACKAGE;
+
 @Getter
+@NoArgsConstructor(access = PACKAGE)
 public abstract class HashMapBasedOptionValues<O>
     extends MapBasedOptionValues<O>
     implements MutableOptionValues<O> {

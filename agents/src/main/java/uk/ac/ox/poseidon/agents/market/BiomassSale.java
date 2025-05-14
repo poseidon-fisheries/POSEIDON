@@ -10,13 +10,13 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import java.time.LocalDateTime;
 
 public class BiomassSale extends Sale<Biomass> {
-    public BiomassSale(
-        LocalDateTime dateTime,
-        String id,
-        Market<Biomass> market,
-        Vessel vessel,
-        Table<Species, Biomass, Money> sold,
-        Bucket<Biomass> unsold
+    BiomassSale(
+        final LocalDateTime dateTime,
+        final String id,
+        final Market<Biomass> market,
+        final Vessel vessel,
+        final Table<Species, Biomass, Money> sold,
+        final Bucket<Biomass> unsold
     ) {
         super(dateTime, id, market, vessel, sold, unsold);
     }

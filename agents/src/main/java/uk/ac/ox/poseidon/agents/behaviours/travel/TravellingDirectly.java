@@ -29,7 +29,9 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-@RequiredArgsConstructor
+import static lombok.AccessLevel.PACKAGE;
+
+@RequiredArgsConstructor(access = PACKAGE)
 public class TravellingDirectly implements Behaviour {
 
     private final DistanceCalculator distanceCalculator;

@@ -23,7 +23,7 @@ import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 public class BiomassMarketGrid extends MarketGrid<Biomass, BiomassMarket> {
-    protected BiomassMarketGrid(final ModelGrid modelGrid) {
+    BiomassMarketGrid(final ModelGrid modelGrid) {
         super(modelGrid);
     }
 }

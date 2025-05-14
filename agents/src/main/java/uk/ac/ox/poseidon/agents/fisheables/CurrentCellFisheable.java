@@ -27,7 +27,9 @@ import uk.ac.ox.poseidon.biology.FisheableGrid;
 
 import java.util.function.Supplier;
 
-@RequiredArgsConstructor
+import static lombok.AccessLevel.PACKAGE;
+
+@RequiredArgsConstructor(access = PACKAGE)
 public class CurrentCellFisheable<C extends Content<C>> implements Supplier<Fisheable<C>> {
 
     private final Vessel vessel;

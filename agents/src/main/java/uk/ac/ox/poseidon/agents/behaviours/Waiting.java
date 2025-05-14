@@ -27,7 +27,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
-@RequiredArgsConstructor
+import static lombok.AccessLevel.PACKAGE;
+
+@RequiredArgsConstructor(access = PACKAGE)
 public class Waiting implements Behaviour {
 
     private final Supplier<Duration> durationSupplier;

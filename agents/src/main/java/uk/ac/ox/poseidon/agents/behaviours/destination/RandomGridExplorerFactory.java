@@ -25,7 +25,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.choices.Picker;
-import uk.ac.ox.poseidon.agents.behaviours.choices.RandomPicker;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;

@@ -35,7 +35,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Supplier;
 
-@RequiredArgsConstructor
+import static lombok.AccessLevel.PACKAGE;
+
+@RequiredArgsConstructor(access = PACKAGE)
 public class Landing<C extends Content<C>> implements Behaviour {
 
     private final MarketGrid<C, ? extends Market<C>> marketGrid;

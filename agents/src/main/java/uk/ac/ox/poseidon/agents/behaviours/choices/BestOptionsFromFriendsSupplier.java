@@ -31,9 +31,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
+import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.MasonUtils.upToNOf;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = PACKAGE)
 class BestOptionsFromFriendsSupplier<O> implements Supplier<OptionValues<O>> {
 
     private final Vessel vessel;

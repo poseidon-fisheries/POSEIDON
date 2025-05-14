@@ -25,7 +25,7 @@ import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
 
 public class MarketGrid<C extends Content<C>, M extends Market<? extends C>> extends ObjectGrid<M> {
 
-    protected MarketGrid(final ModelGrid modelGrid) {
+    MarketGrid(final ModelGrid modelGrid) {
         super(modelGrid);
     }
 

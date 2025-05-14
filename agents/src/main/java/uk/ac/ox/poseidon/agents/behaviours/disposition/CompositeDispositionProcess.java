@@ -9,7 +9,7 @@ public class CompositeDispositionProcess<C extends Content<C>> implements Dispos
     private final DispositionProcess<C>[] dispositionStrategies;
 
     @SuppressWarnings("unchecked")
-    public CompositeDispositionProcess(final Collection<DispositionProcess<? super C>> dispositionStrategies) {
+    CompositeDispositionProcess(final Collection<DispositionProcess<? super C>> dispositionStrategies) {
         this.dispositionStrategies = dispositionStrategies.toArray(DispositionProcess[]::new);
     }
 

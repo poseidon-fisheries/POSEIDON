@@ -19,9 +19,14 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.choices;
 
+import lombok.NoArgsConstructor;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import static lombok.AccessLevel.PACKAGE;
+
+@NoArgsConstructor(access = PACKAGE)
 class AverageOptionValues<T> extends HashMapBasedOptionValues<T> {
 
     private final Map<T, Integer> counts = new HashMap<>();

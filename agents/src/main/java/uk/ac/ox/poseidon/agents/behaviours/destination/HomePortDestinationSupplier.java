@@ -26,7 +26,9 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.Optional;
 
-@RequiredArgsConstructor
+import static lombok.AccessLevel.PACKAGE;
+
+@RequiredArgsConstructor(access = PACKAGE)
 class HomePortDestinationSupplier implements DestinationSupplier {
 
     private final Vessel vessel;

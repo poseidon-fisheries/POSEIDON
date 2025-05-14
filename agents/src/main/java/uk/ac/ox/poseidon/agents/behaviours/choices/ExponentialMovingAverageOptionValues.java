@@ -25,7 +25,7 @@ class ExponentialMovingAverageOptionValues<T> extends HashMapBasedOptionValues<T
 
     private final double alpha;
 
-    public ExponentialMovingAverageOptionValues(final double alpha) {
+    ExponentialMovingAverageOptionValues(final double alpha) {
         this.alpha = checkUnitRange(alpha, "alpha");
     }
 

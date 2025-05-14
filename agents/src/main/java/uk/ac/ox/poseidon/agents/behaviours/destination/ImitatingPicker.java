@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static java.lang.Double.NEGATIVE_INFINITY;
+import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 /**
@@ -43,7 +44,7 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
  * isolated in a lake on a random map). This explorer should therefore never be used as the final
  * option in a chain of explorers; it needs another one to fall back on.
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = PACKAGE)
 public class ImitatingPicker<O> implements Picker<O> {
 
     private final OptionValues<O> optionValues;

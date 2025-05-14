@@ -28,7 +28,7 @@ public class FishingActionListenerTable extends SpatialActionListenerTable<Fishi
     private final StringColumn speciesCode = StringColumn.create("species_code");
     private final DoubleColumn biomassCaught = DoubleColumn.create("biomass_caught");
 
-    public FishingActionListenerTable() {
+    FishingActionListenerTable() {
         super(FishingAction.class);
         get().addColumns(speciesCode, biomassCaught);
     }

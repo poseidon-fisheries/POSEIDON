@@ -29,7 +29,7 @@ public class ImmutableOptionValues<O> extends MapBasedOptionValues<O> {
 
     private final ImmutableMap<O, Double> values;
 
-    public ImmutableOptionValues(final Map<O, Double> values) {
+    ImmutableOptionValues(final Map<O, Double> values) {
         this.values = ImmutableMap.copyOf(values);
     }
 

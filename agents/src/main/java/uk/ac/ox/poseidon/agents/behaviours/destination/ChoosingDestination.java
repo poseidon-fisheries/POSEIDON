@@ -29,7 +29,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
-@RequiredArgsConstructor
+import static lombok.AccessLevel.PACKAGE;
+
+@RequiredArgsConstructor(access = PACKAGE)
 public class ChoosingDestination implements Behaviour {
 
     private final DestinationSupplier destinationSupplier;

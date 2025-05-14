@@ -35,7 +35,7 @@ public class FixedBiomassProportionGear implements FishingGear<Biomass> {
     private final double proportion;
     private final Supplier<Duration> durationSupplier;
 
-    public FixedBiomassProportionGear(
+    FixedBiomassProportionGear(
         final double proportion,
         final Supplier<Duration> durationSupplier
     ) {

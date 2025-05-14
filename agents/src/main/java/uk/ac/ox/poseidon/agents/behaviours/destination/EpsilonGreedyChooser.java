@@ -17,10 +17,14 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.choices;
+package uk.ac.ox.poseidon.agents.behaviours.destination;
 
 import ec.util.MersenneTwisterFast;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import uk.ac.ox.poseidon.agents.behaviours.choices.Evaluation;
+import uk.ac.ox.poseidon.agents.behaviours.choices.Evaluator;
+import uk.ac.ox.poseidon.agents.behaviours.choices.MutableOptionValues;
+import uk.ac.ox.poseidon.agents.behaviours.choices.Picker;
 
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -43,7 +47,7 @@ public class EpsilonGreedyChooser<O> implements Supplier<Optional<O>> {
     private Optional<Entry<O, Evaluation>> valuedOption = Optional.empty();
 
     @SuppressFBWarnings(value = "EI2")
-    public EpsilonGreedyChooser(
+    EpsilonGreedyChooser(
         final double epsilon,
         final MutableOptionValues<O> optionValues,
         final Picker<O> explorer,

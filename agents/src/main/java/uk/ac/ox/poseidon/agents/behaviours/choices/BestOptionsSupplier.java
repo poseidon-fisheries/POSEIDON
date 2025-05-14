@@ -27,8 +27,9 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static lombok.AccessLevel.PACKAGE;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = PACKAGE)
 public class BestOptionsSupplier<O> implements Supplier<OptionValues<O>> {
 
     private final Vessel vessel;

@@ -30,7 +30,7 @@ public abstract class SpatialActionListenerTable<A extends Action> extends Actio
     private final DoubleColumn endLon = DoubleColumn.create("end_lon");
     private final DoubleColumn endLat = DoubleColumn.create("end_lat");
 
-    public SpatialActionListenerTable(
+    protected SpatialActionListenerTable(
         final Class<A> eventClass
     ) {
         super(eventClass);

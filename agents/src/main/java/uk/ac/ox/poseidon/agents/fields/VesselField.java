@@ -32,7 +32,7 @@ public class VesselField {
     private final Continuous2D field;
     private final ModelGrid modelGrid;
 
-    public VesselField(final ModelGrid modelGrid) {
+    VesselField(final ModelGrid modelGrid) {
         this.field = new Continuous2D(
             1,
             modelGrid.getGridWidth(),

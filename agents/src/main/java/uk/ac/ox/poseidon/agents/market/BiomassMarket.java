@@ -47,7 +47,7 @@ public class BiomassMarket implements Market<Biomass> {
     private final IdSupplier saleIdSupplier;
     private final EventManager eventManager;
 
-    public BiomassMarket(
+    BiomassMarket(
         final String id,
         final Map<Species, Price> prices,
         final EventManager eventManager

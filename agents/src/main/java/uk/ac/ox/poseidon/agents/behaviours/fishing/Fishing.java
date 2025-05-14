@@ -19,9 +19,9 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.fishing;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
@@ -39,7 +39,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
-@AllArgsConstructor
+import static lombok.AccessLevel.PACKAGE;
+
+@RequiredArgsConstructor(access = PACKAGE)
 public class Fishing<C extends Content<C>> implements Behaviour {
 
     @NonNull protected final FishingGear<C> fishingGear;

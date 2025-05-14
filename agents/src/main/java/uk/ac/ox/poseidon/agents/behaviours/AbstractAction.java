@@ -45,7 +45,7 @@ public abstract class AbstractAction implements Action {
     @NonNull protected final Coordinate startCoordinate;
     @NonNull protected final Coordinate endCoordinate;
 
-    public AbstractAction(
+    protected AbstractAction(
         @NonNull final Vessel vessel,
         @NonNull final LocalDateTime startDateTime,
         @NonNull final Duration duration,

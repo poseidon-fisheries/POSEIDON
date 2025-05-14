@@ -24,7 +24,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.choices.EpsilonGreedyChooser;
 import uk.ac.ox.poseidon.agents.behaviours.choices.Evaluator;
 import uk.ac.ox.poseidon.agents.behaviours.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.behaviours.choices.Picker;

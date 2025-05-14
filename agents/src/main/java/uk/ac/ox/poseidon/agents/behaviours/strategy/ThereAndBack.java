@@ -26,9 +26,10 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.time.LocalDateTime;
 
+import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.agents.behaviours.strategy.ThereAndBack.Status.*;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = PACKAGE)
 public class ThereAndBack extends BranchingBehaviour {
 
     private final Behaviour fishingDestinationBehaviour;

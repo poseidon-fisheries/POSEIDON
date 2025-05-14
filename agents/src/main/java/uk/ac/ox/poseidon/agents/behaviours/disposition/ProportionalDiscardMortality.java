@@ -6,9 +6,10 @@ import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
 import java.util.function.DoubleSupplier;
 
+import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = PACKAGE)
 public class ProportionalDiscardMortality implements DispositionProcess<Biomass> {
 
     private final DoubleSupplier mortalityRateSupplier;

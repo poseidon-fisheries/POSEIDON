@@ -31,7 +31,7 @@ import java.time.LocalDateTime;
 
 public abstract class SteppableAction extends AbstractAction implements Steppable {
 
-    public SteppableAction(
+    protected SteppableAction(
         @NonNull final Vessel vessel,
         @NonNull final LocalDateTime startDateTime,
         @NonNull final Duration duration,
@@ -41,7 +41,7 @@ public abstract class SteppableAction extends AbstractAction implements Steppabl
         super(vessel, startDateTime, duration, startCoordinate, endCoordinate);
     }
 
-    public SteppableAction(
+    protected SteppableAction(
         @NonNull final Vessel vessel,
         @NonNull final LocalDateTime startDateTime,
         @NonNull final Duration duration,
@@ -50,7 +50,7 @@ public abstract class SteppableAction extends AbstractAction implements Steppabl
         super(vessel, startDateTime, duration, coordinate);
     }
 
-    public SteppableAction(
+    protected SteppableAction(
         @NonNull final Vessel vessel,
         @NonNull final LocalDateTime startDateTime,
         @NonNull final Duration duration

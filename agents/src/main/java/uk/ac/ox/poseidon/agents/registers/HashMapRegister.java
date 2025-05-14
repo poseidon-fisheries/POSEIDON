@@ -19,6 +19,7 @@
 
 package uk.ac.ox.poseidon.agents.registers;
 
+import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.util.Map;
@@ -27,6 +28,9 @@ import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static lombok.AccessLevel.PACKAGE;
+
+@NoArgsConstructor(access = PACKAGE)
 public class HashMapRegister<T> implements Register<T> {
 
     private final WeakHashMap<Vessel, T> map = new WeakHashMap<>();
