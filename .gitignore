@@ -10,3 +10,6 @@ out
 
 # Apache Derby database log
 derby.log
+
+# ignore buildSrc artifacts
+buildSrc/.kotlin/
