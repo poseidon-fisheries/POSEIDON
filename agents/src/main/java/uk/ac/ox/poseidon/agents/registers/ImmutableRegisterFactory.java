@@ -19,14 +19,35 @@
 
 package uk.ac.ox.poseidon.agents.registers;
 
-import lombok.NonNull;
+import lombok.*;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
-public class RegisterFactory<T> extends SimulationScopeFactory<Register<T>> {
+import java.util.List;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ImmutableRegisterFactory<T> extends SimulationScopeFactory<Register<T>> {
+
+    private Factory<? extends List<Vessel>> vessels;
+    private VesselScopeFactory<T> vesselScopeFactory;
 
     @Override
-    protected HashMapRegister<T> newInstance(final @NonNull Simulation simulation) {
-        return new HashMapRegister<>();
+    protected ImmutableRegister<T> newInstance(final @NonNull Simulation simulation) {
+        return new ImmutableRegister<>(
+            vessels.get(simulation).stream().collect(toImmutableMap(
+                identity(),
+                vessel -> vesselScopeFactory.get(simulation, vessel)
+            ))
+        );
     }
+
 }

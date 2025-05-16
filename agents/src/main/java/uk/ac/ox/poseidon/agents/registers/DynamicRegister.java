@@ -19,31 +19,36 @@
 
 package uk.ac.ox.poseidon.agents.registers;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class RegisteringFactory<T> extends VesselScopeFactory<T> {
+import java.util.Map;
+import java.util.Optional;
+import java.util.WeakHashMap;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-    private Factory<? extends Register<T>> register;
-    private VesselScopeFactory<T> delegate;
+import static lombok.AccessLevel.PACKAGE;
+
+@RequiredArgsConstructor(access = PACKAGE)
+public class DynamicRegister<T> implements Register<T> {
+
+    private final WeakHashMap<Vessel, T> map = new WeakHashMap<>();
+    private final Function<Vessel, T> mappingFunction;
 
     @Override
-    protected T newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return register
-            .get(simulation)
-            .computeIfAbsent(vessel, v -> delegate.get(simulation, v));
+    public Optional<T> get(final Vessel vessel) {
+        return Optional.ofNullable(map.computeIfAbsent(vessel, mappingFunction));
     }
+
+    @Override
+    public Stream<Vessel> getVessels() {
+        return map.keySet().stream();
+    }
+
+    @Override
+    public Stream<Map.Entry<Vessel, T>> getAllEntries() {
+        return map.entrySet().stream();
+    }
+
 }

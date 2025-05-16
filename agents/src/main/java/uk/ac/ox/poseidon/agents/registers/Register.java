@@ -23,7 +23,6 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 public interface Register<T> {
@@ -38,8 +37,4 @@ public interface Register<T> {
         return getAllEntries().filter(entry -> !entry.getKey().equals(vessel));
     }
 
-    T computeIfAbsent(
-        Vessel vessel,
-        Function<Vessel, T> mappingFunction
-    );
 }

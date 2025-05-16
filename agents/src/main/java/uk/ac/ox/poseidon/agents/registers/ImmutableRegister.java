@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025 CoHESyS Lab cohesys.lab@gmail.com
+ * Copyright (c) 2024 CoHESyS Lab cohesys.lab@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,36 @@
  *
  */
 
-package uk.ac.ox.poseidon.agents.vessels.accounts;
+package uk.ac.ox.poseidon.agents.registers;
 
+import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
-public class AccountFactory extends VesselScopeFactory<Account> {
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+public class ImmutableRegister<T> implements Register<T> {
+
+    private final ImmutableMap<Vessel, T> map;
+
+    public ImmutableRegister(final Map<Vessel, T> map) {
+        this.map = ImmutableMap.copyOf(map);
+    }
 
     @Override
-    protected Account newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return null;
+    public Optional<T> get(final Vessel vessel) {
+        return Optional.ofNullable(map.get(vessel));
     }
+
+    @Override
+    public Stream<Vessel> getVessels() {
+        return map.keySet().stream();
+    }
+
+    @Override
+    public Stream<Map.Entry<Vessel, T>> getAllEntries() {
+        return map.entrySet().stream();
+    }
+
 }
