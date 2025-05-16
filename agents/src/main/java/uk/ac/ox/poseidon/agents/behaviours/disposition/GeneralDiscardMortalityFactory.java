@@ -14,13 +14,13 @@ import java.util.function.DoubleSupplier;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProportionalDiscardMortalityFactory
-    extends GlobalScopeFactory<ProportionalDiscardMortality> {
+public class GeneralDiscardMortalityFactory
+    extends GlobalScopeFactory<GeneralDiscardMortality> {
 
     private Factory<? extends DoubleSupplier> mortalityRateSupplier;
 
     @Override
-    protected ProportionalDiscardMortality newInstance(final Simulation simulation) {
-        return new ProportionalDiscardMortality(mortalityRateSupplier.get(simulation));
+    protected GeneralDiscardMortality newInstance(final Simulation simulation) {
+        return new GeneralDiscardMortality(mortalityRateSupplier.get(simulation));
     }
 }

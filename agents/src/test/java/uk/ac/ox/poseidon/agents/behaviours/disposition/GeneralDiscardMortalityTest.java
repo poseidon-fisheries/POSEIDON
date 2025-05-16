@@ -10,7 +10,7 @@ import java.util.function.DoubleSupplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ProportionalDiscardMortalityTest {
+class GeneralDiscardMortalityTest {
 
     /**
      * Tests the `partition` method of the `ProportionalDiscardMortality` class. The method is
@@ -25,8 +25,8 @@ class ProportionalDiscardMortalityTest {
         final double mortalityRate = 0.5;
         final DoubleSupplier mortalityRateSupplier = () -> mortalityRate;
 
-        final ProportionalDiscardMortality proportionalDiscardMortality =
-            new ProportionalDiscardMortality(mortalityRateSupplier);
+        final GeneralDiscardMortality generalDiscardMortality =
+            new GeneralDiscardMortality(mortalityRateSupplier);
 
         final Bucket<Biomass> retained = Bucket.of(DummySpecies.A, Biomass.ofKg(100.0));
         final Bucket<Biomass> discardedAlive = Bucket.of(DummySpecies.A, Biomass.ofKg(50.0));
@@ -39,7 +39,7 @@ class ProportionalDiscardMortalityTest {
         );
 
         // Act
-        final Disposition<Biomass> result = proportionalDiscardMortality.partition(
+        final Disposition<Biomass> result = generalDiscardMortality.partition(
             currentDisposition,
             0.0
         );
@@ -62,8 +62,8 @@ class ProportionalDiscardMortalityTest {
         final double mortalityRate = 0.3;
         final DoubleSupplier mortalityRateSupplier = () -> mortalityRate;
 
-        final ProportionalDiscardMortality proportionalDiscardMortality =
-            new ProportionalDiscardMortality(mortalityRateSupplier);
+        final GeneralDiscardMortality generalDiscardMortality =
+            new GeneralDiscardMortality(mortalityRateSupplier);
 
         final Bucket<Biomass> retained = Bucket.of(DummySpecies.B, Biomass.ofKg(100.0));
         final Bucket<Biomass> discardedAlive = Bucket.of(DummySpecies.B, Biomass.ofKg(0.0));
@@ -76,7 +76,7 @@ class ProportionalDiscardMortalityTest {
         );
 
         // Act
-        final Disposition<Biomass> result = proportionalDiscardMortality.partition(
+        final Disposition<Biomass> result = generalDiscardMortality.partition(
             currentDisposition,
             0.0
         );
@@ -99,8 +99,8 @@ class ProportionalDiscardMortalityTest {
         final double mortalityRate = 0.0;
         final DoubleSupplier mortalityRateSupplier = () -> mortalityRate;
 
-        final ProportionalDiscardMortality proportionalDiscardMortality =
-            new ProportionalDiscardMortality(mortalityRateSupplier);
+        final GeneralDiscardMortality generalDiscardMortality =
+            new GeneralDiscardMortality(mortalityRateSupplier);
 
         final Bucket<Biomass> retained = Bucket.of(DummySpecies.C, Biomass.ofKg(100.0));
         final Bucket<Biomass> discardedAlive = Bucket.of(DummySpecies.C, Biomass.ofKg(50.0));
@@ -113,7 +113,7 @@ class ProportionalDiscardMortalityTest {
         );
 
         // Act
-        final Disposition<Biomass> result = proportionalDiscardMortality.partition(
+        final Disposition<Biomass> result = generalDiscardMortality.partition(
             currentDisposition,
             0.0
         );
@@ -133,8 +133,8 @@ class ProportionalDiscardMortalityTest {
         final double mortalityRate = 1.0;
         final DoubleSupplier mortalityRateSupplier = () -> mortalityRate;
 
-        final ProportionalDiscardMortality proportionalDiscardMortality =
-            new ProportionalDiscardMortality(mortalityRateSupplier);
+        final GeneralDiscardMortality generalDiscardMortality =
+            new GeneralDiscardMortality(mortalityRateSupplier);
 
         final Species species = DummySpecies.A;
 
@@ -149,7 +149,7 @@ class ProportionalDiscardMortalityTest {
         );
 
         // Act
-        final Disposition<Biomass> result = proportionalDiscardMortality.partition(
+        final Disposition<Biomass> result = generalDiscardMortality.partition(
             currentDisposition,
             0.0
         );

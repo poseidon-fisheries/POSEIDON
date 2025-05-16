@@ -10,7 +10,7 @@ import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 @RequiredArgsConstructor(access = PACKAGE)
-public class ProportionalDiscardMortality implements DispositionProcess<Biomass> {
+public class GeneralDiscardMortality implements DispositionProcess<Biomass> {
 
     private final DoubleSupplier mortalityRateSupplier;
 
