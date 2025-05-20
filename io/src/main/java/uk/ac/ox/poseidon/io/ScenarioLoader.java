@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.io;
 
+import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -31,6 +32,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * The {@code ScenarioLoader} class provides methods to load {@code Scenario} objects from YAML
@@ -38,14 +42,27 @@ import java.io.InputStream;
  */
 public class ScenarioLoader {
 
+    private static final List<String> DEFAULT_CLASS_PREFIXES =
+        List.of("uk.ac.ox.poseidon", "java");
     private static final int MAX_ALIASES_FOR_COLLECTIONS = 5000;
     private final Yaml yaml;
 
     /**
-     * Constructs a {@code ScenarioLoader} with a default {@code Yaml} instance.
+     * Constructs a {@code ScenarioLoader} with a default {@code Yaml} instance, optionally passing
+     * class prefixes that will be permitted in addition to "uk.ac.ox.poseidon" and "java" when
+     * loading factory classes from the YAML scenario.
      */
-    public ScenarioLoader() {
-        this(new Yaml(getLoaderOptions()));
+    public ScenarioLoader(final String... extraClassPrefixes) {
+        this(new Yaml(getLoaderOptions(Arrays.asList(extraClassPrefixes))));
+    }
+
+    /**
+     * Constructs a {@code ScenarioLoader} with a default {@code Yaml} instance, passing class
+     * prefixes that will be permitted in addition to "uk.ac.ox.poseidon" and "java" when loading
+     * factory classes from the YAML scenario.
+     */
+    public ScenarioLoader(final Collection<String> extraClassPrefixes) {
+        this(new Yaml(getLoaderOptions(extraClassPrefixes)));
     }
 
     /**
@@ -58,11 +75,17 @@ public class ScenarioLoader {
         this.yaml = yaml;
     }
 
-    private static LoaderOptions getLoaderOptions() {
+    private static LoaderOptions getLoaderOptions(final Collection<String> extraClassPrefixes) {
         final LoaderOptions options = new LoaderOptions();
+        final ImmutableList<String> permittedClassPrefixes = ImmutableList
+            .<String>builder()
+            .addAll(DEFAULT_CLASS_PREFIXES)
+            .addAll(extraClassPrefixes)
+            .build();
         options.setTagInspector(tag ->
-            tag.getClassName().startsWith("uk.ac.ox.poseidon") ||
-                tag.getClassName().startsWith("java")
+            permittedClassPrefixes
+                .stream()
+                .anyMatch(prefix -> tag.getClassName().startsWith(prefix))
         );
         options.setMaxAliasesForCollections(MAX_ALIASES_FOR_COLLECTIONS);
         return options;

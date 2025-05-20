@@ -40,6 +40,7 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.TemporalAmount;
 import java.util.Arrays;
+import java.util.List;
 
 import static java.lang.System.Logger.Level.INFO;
 
@@ -67,6 +68,15 @@ public class QuickRunner implements Runnable {
         required = true
     )
     private Period period;
+
+    @Parameter(
+        names = {"-x", "--extra_class_prefixes"},
+        description =
+            "Class prefixes that will be permitted in addition to \"uk.ac.ox.poseidon\" and " +
+                "\"java\" when loading factory classes from the YAML scenario.",
+        required = false
+    )
+    private List<String> extraClassPrefixes = List.of();
 
     public static void main(final String[] args) {
         logger.log(INFO, () -> "Received arguments: " + Arrays.toString(args));
@@ -104,7 +114,7 @@ public class QuickRunner implements Runnable {
     public void run() {
         logger.log(INFO, () -> "Loading scenario: " + scenarioPath);
         run(
-            new ScenarioLoader().load(scenarioPath.toFile()),
+            new ScenarioLoader(extraClassPrefixes).load(scenarioPath.toFile()),
             period
         );
     }
