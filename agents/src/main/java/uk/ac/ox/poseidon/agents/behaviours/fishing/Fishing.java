@@ -38,7 +38,6 @@ import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.Fisheable;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
@@ -58,7 +57,7 @@ public class Fishing<C extends Content<C>> implements Behaviour {
         final Vessel vessel,
         final LocalDateTime dateTime
     ) {
-        final var action = new Action(vessel, dateTime, fishingGear.getDurationSupplier().get());
+        final var action = new Action(vessel, dateTime, fishingGear);
         return regulations.isPermitted(action) ? action : null;
     }
 
@@ -66,15 +65,17 @@ public class Fishing<C extends Content<C>> implements Behaviour {
     @ToString(callSuper = true)
     public class Action extends SteppableAction implements FishingAction {
 
+        private final FishingGear<C> fishingGear;
         private Bucket<C> grossCatch;
         private Disposition<C> disposition;
 
         public Action(
             final Vessel vessel,
             final LocalDateTime start,
-            final Duration duration
+            final FishingGear<C> fishingGear
         ) {
-            super(vessel, start, duration);
+            super(vessel, start, fishingGear.getDurationSupplier().get());
+            this.fishingGear = fishingGear;
         }
 
         @Override

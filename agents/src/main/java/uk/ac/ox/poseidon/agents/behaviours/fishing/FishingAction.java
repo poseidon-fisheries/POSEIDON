@@ -24,9 +24,12 @@ package uk.ac.ox.poseidon.agents.behaviours.fishing;
 
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.agents.behaviours.disposition.Disposition;
+import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
 import uk.ac.ox.poseidon.biology.Bucket;
 
 public interface FishingAction extends Action {
+
+    FishingGear<?> getFishingGear();
 
     Bucket<?> getGrossCatch();
 

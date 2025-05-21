@@ -20,45 +20,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.fishing;
+package uk.ac.ox.poseidon.agents.regulations;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import uk.ac.ox.poseidon.agents.behaviours.AbstractAction;
-import uk.ac.ox.poseidon.agents.behaviours.disposition.Disposition;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
-import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.geography.Coordinate;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
-public class DummyFishingAction<C extends Content<C>>
-    extends AbstractAction
-    implements FishingAction {
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class GearSpecificFishingLocationLegalityCheckerFactory
+    extends VesselScopeFactory<GearSpecificFishingLocationLegalityChecker> {
 
-    private final FishingGear<C> fishingGear;
+    private Factory<? extends FishingGear<?>> fishingGear;
+    private VesselScopeFactory<? extends FishingLocationLegalityChecker> delegateChecker;
 
-    public DummyFishingAction(
-        final LocalDateTime start,
-        final Vessel vessel,
-        final Coordinate coordinate,
-        final FishingGear<C> fishingGear
+    @Override
+    protected GearSpecificFishingLocationLegalityChecker newInstance(
+        final Simulation simulation,
+        final Vessel vessel
     ) {
-        super(vessel, start, Duration.ofSeconds(1), coordinate);
-        this.fishingGear = fishingGear;
+        return new GearSpecificFishingLocationLegalityChecker(
+            fishingGear.get(simulation),
+            delegateChecker.get(simulation, vessel)
+        );
     }
-
-    @Override
-    public Bucket<C> getGrossCatch() {
-        return Bucket.empty();
-    }
-
-    @Override
-    public Disposition<C> getDisposition() {
-        return Disposition.empty();
-    }
-
 }

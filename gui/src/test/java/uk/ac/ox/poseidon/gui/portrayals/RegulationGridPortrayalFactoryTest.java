@@ -27,6 +27,8 @@ import sim.field.grid.DoubleGrid2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -69,10 +71,15 @@ class RegulationGridPortrayalFactoryTest {
         final Factory<BathymetricGrid> bathymetricFactory = mock(Factory.class);
         when(bathymetricFactory.get(mockSimulation)).thenReturn(mockBathymetricGrid);
 
+        final Factory<FishingGear<Biomass>> gearFactory = mock(Factory.class);
+        final FishingGear<Biomass> mockGear = mock(FishingGear.class);
+        when(gearFactory.get(mockSimulation)).thenReturn(mockGear);
+
         final RegulationGridPortrayalFactory factory = new RegulationGridPortrayalFactory(
             regulationsFactory,
             vesselsFactory,
             bathymetricFactory,
+            gearFactory,
             800,
             600
         );

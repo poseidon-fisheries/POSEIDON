@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,21 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.gears;
+package uk.ac.ox.poseidon.agents.regulations;
 
-import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.biology.Fisheable;
+import lombok.RequiredArgsConstructor;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
 
-import java.time.Duration;
-import java.util.function.Supplier;
+import java.util.function.Predicate;
 
-public interface FishingGear<C extends Content<C>> {
+import static lombok.AccessLevel.PACKAGE;
 
-    String getCode();
+@RequiredArgsConstructor(access = PACKAGE)
+public class GearSpecificFishingLocationLegalityChecker implements Predicate<Int2D> {
 
-    Supplier<Duration> getDurationSupplier();
+    private final FishingGear<?> fishingGear;
+    private final FishingLocationLegalityChecker delegateChecker;
 
-    Bucket<C> fish(Fisheable<C> fisheable);
+    @Override
+    public boolean test(final Int2D int2D) {
+        return delegateChecker.test(int2D, fishingGear);
+    }
 
 }

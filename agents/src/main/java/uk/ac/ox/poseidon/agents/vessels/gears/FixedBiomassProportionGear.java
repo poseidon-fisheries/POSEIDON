@@ -35,13 +35,16 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 @Getter
 public class FixedBiomassProportionGear implements FishingGear<Biomass> {
 
+    private final String code;
     private final double proportion;
     private final Supplier<Duration> durationSupplier;
 
     FixedBiomassProportionGear(
+        final String code,
         final double proportion,
         final Supplier<Duration> durationSupplier
     ) {
+        this.code = code;
         this.proportion = checkUnitRange(proportion, "proportion");
         this.durationSupplier = durationSupplier;
     }

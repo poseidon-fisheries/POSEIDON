@@ -27,19 +27,19 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DummyFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
-public class FishingLocationLegalityChecker implements Predicate<Int2D> {
+public class FishingLocationLegalityChecker {
 
     private final Regulations regulations;
     private final GridPathFinder pathFinder;
@@ -47,11 +47,17 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
     private final Supplier<LocalDateTime> currenDateTimeSupplier;
     private final Vessel vessel;
 
-    public boolean test(final Int2D fishingLocation) {
-        return regulations.isPermitted(makeAction(fishingLocation));
+    public boolean test(
+        final Int2D fishingLocation,
+        final FishingGear<?> fishingGear
+    ) {
+        return regulations.isPermitted(makeAction(fishingLocation, fishingGear));
     }
 
-    private Action makeAction(final Int2D fishingLocation) {
+    private Action makeAction(
+        final Int2D fishingLocation,
+        final FishingGear<?> fishingGear
+    ) {
         final List<Int2D> pathToFishingLocation =
             pathFinder.getPath(
                 vessel.getCell(),
@@ -68,10 +74,11 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
                 vessel.getCruisingSpeed()
             );
 
-        return new DummyFishingAction(
+        return new DummyFishingAction<>(
             currenDateTimeSupplier.get().plus(travelDuration),
             vessel,
-            vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation)
+            vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation),
+            fishingGear
         );
     }
 }
