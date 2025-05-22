@@ -62,7 +62,7 @@ public class VesselsFromFileFactory extends SimulationScopeFactory<List<Vessel>>
     private Factory<? extends Path> path;
     private String vesselIdColumn;
     private String vesselNameColumn;
-    private String portIdColumn;
+    private String portCodeColumn;
 
     private BehaviourFactory<?> initialBehaviour;
     private Factory<? extends VesselField> vesselField;
@@ -79,7 +79,7 @@ public class VesselsFromFileFactory extends SimulationScopeFactory<List<Vessel>>
                 .flatMap(row -> {
                     final PortGrid portGrid = this.portGrid.get(simulation);
                     return portGrid
-                        .getObject(row.getString(portIdColumn))
+                        .getObject(row.getString(portCodeColumn))
                         .map(homePort -> {
                             final var vessel = new Vessel(
                                 row.getString(vesselIdColumn),
@@ -109,7 +109,7 @@ public class VesselsFromFileFactory extends SimulationScopeFactory<List<Vessel>>
                             logger.log(
                                 ERROR,
                                 "Home port " +
-                                    row.getString(portIdColumn) +
+                                    row.getString(portCodeColumn) +
                                     " not found for vessel " +
                                     row.getString(vesselIdColumn) +
                                     "."

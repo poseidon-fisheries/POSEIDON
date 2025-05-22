@@ -40,7 +40,7 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
     public static final String SALES_ID_COLUMN = "sales_id";
     public static final String MARKET_ID_COLUMN = "market_id";
     public static final String VESSEL_ID_COLUMN = "vessel_id";
-    public static final String SPECIES_ID_COLUMN = "species_id";
+    public static final String SPECIES_CODE_COLUMN = "species_code";
     public static final String BIOMASS_SOLD_COLUMN = "biomass_sold_in_kg";
     public static final String SALE_VALUE_COLUMN = "sale_value";
     public static final String CURRENCY_COLUMN = "currency";
@@ -49,7 +49,7 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
     private final StringColumn salesId = StringColumn.create(SALES_ID_COLUMN);
     private final StringColumn marketId = StringColumn.create(MARKET_ID_COLUMN);
     private final StringColumn vesselId = StringColumn.create(VESSEL_ID_COLUMN);
-    private final StringColumn speciesId = StringColumn.create(SPECIES_ID_COLUMN);
+    private final StringColumn speciesCode = StringColumn.create(SPECIES_CODE_COLUMN);
     private final DoubleColumn biomassSold = DoubleColumn.create(BIOMASS_SOLD_COLUMN);
     private final DoubleColumn saleValue = DoubleColumn.create(SALE_VALUE_COLUMN);
     private final StringColumn currency = StringColumn.create(CURRENCY_COLUMN);
@@ -61,7 +61,7 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
             salesId,
             marketId,
             vesselId,
-            speciesId,
+            speciesCode,
             biomassSold,
             saleValue,
             currency
@@ -78,7 +78,7 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
             salesId.append(sale.getId());
             marketId.append(sale.getMarket().getId());
             vesselId.append(sale.getVessel().getId());
-            speciesId.append(cell.getRowKey().getCode());
+            speciesCode.append(cell.getRowKey().getCode());
             biomassSold.append(cell.getColumnKey().asBiomass().asKg());
             saleValue.append(cell.getValue().getAmount().doubleValue());
             currency.append(cell.getValue().getCurrencyUnit().getCode());
