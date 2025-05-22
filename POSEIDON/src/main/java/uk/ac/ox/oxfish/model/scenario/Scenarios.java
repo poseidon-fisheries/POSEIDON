@@ -86,6 +86,11 @@ public class Scenarios {
             EpoPathPlannerAbundanceScenario::new
         );
         add(
+            "EAO Abundance Pathfinding",
+            "Eastern Atlantic Tropical Tuna using Pathfinding Algorithm",
+            EaoPathPlannerAbundanceScenario::new
+        );
+        add(
             "EPO Abundance Biology Only",
             "A biology-only scenario for testing purposes",
             EpoAbundanceScenario::new

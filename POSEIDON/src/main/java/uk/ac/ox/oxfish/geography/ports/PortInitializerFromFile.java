@@ -134,6 +134,7 @@ public class PortInitializerFromFile implements PortInitializer {
         final Coordinate portCoordinate,
         final NauticalMap map
     ) {
+//        System.out.println("finding_coastal_tiles");
         return neighbors(initialTile, map)
             .filter(neighbor -> isCoastalTile(neighbor, map))
             .min(comparing(neighbor -> map.getCoordinates(neighbor).distance(portCoordinate)))

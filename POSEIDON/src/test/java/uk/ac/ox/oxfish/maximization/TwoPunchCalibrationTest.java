@@ -4,6 +4,8 @@ import com.beust.jcommander.JCommander;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
 public class TwoPunchCalibrationTest {
 
     @Test

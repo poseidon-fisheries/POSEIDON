@@ -33,6 +33,7 @@ public class CatchSizeDistributionMonitorsFactory implements AlgorithmFactory<Mo
 
     @Override
     public Monitors<AbstractSetAction> apply(final FishState fishState) {
+
         return new MonitorList<>(
             Stream
                 .of(FadSetAction.class, OpportunisticFadSetAction.class)
@@ -50,4 +51,5 @@ public class CatchSizeDistributionMonitorsFactory implements AlgorithmFactory<Mo
                 )
         );
     }
+
 }

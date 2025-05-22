@@ -24,6 +24,7 @@ public class NamedRegulations implements AlgorithmFactory<Regulations> {
 
     @Override
     public Regulations apply(final FishState fishState) {
+
         return new ConjunctiveRegulations(
             regulations.values().stream()
                 .map(regulation -> regulation.apply(fishState))

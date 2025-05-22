@@ -78,6 +78,41 @@ public class AbundanceProcessesFactory
         );
     }
 
+    public static AbundanceProcessesFactory create(
+        final InputPath inputFolder,
+        final AlgorithmFactory<SpeciesCodes> speciesCodesSupplier,
+        final AlgorithmFactory<MapExtent> mapExtent,
+        final AlgorithmFactory<RecruitmentProcesses> recruitmentProcesses,
+        final String sdmFilename,
+        final String binsFilename,
+        final String mortalityFilename
+    ) {
+        final AbundanceReallocatorFactory reallocator =
+            new AbundanceReallocatorFactory(
+                inputFolder.path(sdmFilename),
+                new IntegerParameter(365 * 3),
+                mapExtent
+            );
+        return new AbundanceProcessesFactory(
+            inputFolder,
+            new AbundanceInitializerFactory(
+                reallocator,
+                inputFolder.path(binsFilename),
+                speciesCodesSupplier
+            ),
+            new AbundanceRestorerFactory(
+                reallocator,
+                ImmutableMap.of(0, 365)
+            ),
+            new ScheduledAbundanceProcessesFactory(
+                recruitmentProcesses,
+                reallocator,
+                ImmutableList.of("01-01", "04-01", "07-01", "10-01"),
+                inputFolder.path(mortalityFilename)
+            )
+        );
+    }
+
     @Override
     public BiologicalProcesses apply(final FishState fishState) {
         ((AbundanceInitializerFactory) getBiologyInitializer())

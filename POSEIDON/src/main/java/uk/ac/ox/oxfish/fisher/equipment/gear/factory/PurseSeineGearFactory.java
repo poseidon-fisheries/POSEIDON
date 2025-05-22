@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.BiomassLostEvent;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.DefaultEpoMonitors;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.DefaultMonitors;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.FishValueCalculator;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
@@ -101,7 +102,7 @@ public abstract class PurseSeineGearFactory implements AlgorithmFactory<PurseSei
         return biomassLostMonitor;
     }
 
-    public void addMonitors(final DefaultEpoMonitors monitors) {
+    public void addMonitors(final DefaultMonitors monitors) {
         grabFadDeploymentObservers()
             .addAll(monitors.grabFadDeploymentMonitors());
         grabAllSetsObservers()

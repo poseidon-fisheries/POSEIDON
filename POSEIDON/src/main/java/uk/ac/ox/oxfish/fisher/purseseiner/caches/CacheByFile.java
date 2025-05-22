@@ -20,6 +20,15 @@ public class CacheByFile<T> implements Function<Path, T> {
     @Override
     public T apply(final Path path) {
         try {
+/*            System.out.println(path.toFile().getCanonicalPath().toString());
+            T readfunctionresult = readFunction.apply(path);
+            System.out.println("brkpt");
+
+            T returncache = cache.get(
+                path.toFile().getCanonicalPath(),
+                () -> readFunction.apply(path)
+            );*/
+//            System.out.println("brkpt");
             return cache.get(
                 path.toFile().getCanonicalPath(),
                 () -> readFunction.apply(path)

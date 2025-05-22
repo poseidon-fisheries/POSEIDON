@@ -59,6 +59,7 @@ import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.TimeScalarFunction;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.ExponentialTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.InverseTimeScalarFactory;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.SigmoidalTimeScalarFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.EaoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.EmptyFleet;
 import uk.ac.ox.oxfish.fisher.purseseiner.EpoPurseSeinerFleetFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.*;
@@ -265,7 +266,8 @@ public class AlgorithmFactories {
                 entry(GeneralizedCognitiveStrategyFactory.class, "Generalized Cognitive Strategy"),
                 entry(GravityDestinationStrategyFactory.class, "Gravity Destination Strategy"),
                 entry(GenerateRandomPlansStrategyFactory.class, "Random Fishing Plans Strategy"),
-                entry(EPOPlannedStrategyFlexibleFactory.class, "EPO planned strategy")
+                entry(EPOPlannedStrategyFlexibleFactory.class, "EPO planned strategy"),
+                entry(EaoPlannedStrategyFlexibleFactory.class, "EAO planned strategy")
             )
         ));
         addFactories(new Factories<>(
@@ -843,7 +845,8 @@ public class AlgorithmFactories {
         addFactories(new Factories<>(
             ScenarioPopulation.class,
             ImmutableMap.of(
-                EpoPurseSeinerFleetFactory.class, "EPO purse-seiner fleet"
+                EpoPurseSeinerFleetFactory.class, "EPO purse-seiner fleet",
+                EaoPurseSeinerFleetFactory.class, "EAO purse-seiner fleet"
             ),
             EmptyFleet.class
         ));

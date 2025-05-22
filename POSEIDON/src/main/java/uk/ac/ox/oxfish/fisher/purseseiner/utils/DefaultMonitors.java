@@ -46,7 +46,7 @@ import static uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy.EVERY_YEAR;
 import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.*;
 
 @SuppressWarnings("rawtypes")
-public class DefaultEpoMonitors {
+public class DefaultMonitors {
 
     private final RegionalDivision regionalDivision;
     private final Collection<Monitor<FadDeploymentAction, ?, ?>> fadDeploymentMonitors;
@@ -58,9 +58,9 @@ public class DefaultEpoMonitors {
     private final GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private final Collection<Monitor<?, ?, ?>> otherMonitors;
 
-    public DefaultEpoMonitors(final FishState fishState) {
+    public DefaultMonitors(final FishState fishState, RegionalDivision regionalDivision) {
 
-        regionalDivision = EpoScenario.REGIONAL_DIVISION;
+        this.regionalDivision = regionalDivision;
 
         final FishStateYearlyTimeSeries yearlyTimeSeries = fishState.getYearlyDataSet();
 
@@ -167,11 +167,11 @@ public class DefaultEpoMonitors {
         );
 
         freeSchoolSetMonitors = ImmutableList.of(
-            makeActionCounter("non-associated sets"),
+            makeActionCounter("free school sets"),
             makeCatchFromSetAccumulator(
-                fishState, "catches from non-associated sets", SummingAccumulator::new),
+                fishState, "catches from free school sets", SummingAccumulator::new),
             makeCatchFromSetAccumulator(
-                fishState, "catches by non-associated sets", IterativeAveragingAccumulator::new)
+                fishState, "catches by free school sets", IterativeAveragingAccumulator::new)
         );
 
         dolphinSetMonitors = ImmutableList.of(

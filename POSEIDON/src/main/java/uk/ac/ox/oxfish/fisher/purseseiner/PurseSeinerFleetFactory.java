@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import uk.ac.ox.oxfish.fisher.purseseiner.equipment.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.departing.DestinationBasedDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.DefaultEpoMonitors;
+import uk.ac.ox.oxfish.fisher.purseseiner.utils.DefaultMonitors;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
@@ -24,11 +25,13 @@ import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.monitors.Monitor;
 import uk.ac.ox.oxfish.model.data.monitors.Monitors;
+import uk.ac.ox.oxfish.model.data.monitors.regions.RegionalDivision;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
+import uk.ac.ox.oxfish.model.scenario.EpoScenario;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
@@ -179,7 +182,7 @@ public class PurseSeinerFleetFactory
         final FishState fishState,
         final int targetYear
     ) {
-        addMonitors(fishState);
+        addMonitors(fishState, EpoScenario.REGIONAL_DIVISION);
         return new EpoPurseSeineVesselReader(
             getVesselsFile().get(),
             targetYear,
@@ -188,10 +191,10 @@ public class PurseSeinerFleetFactory
         ).apply(fishState);
     }
 
-    private void addMonitors(final FishState fishState) {
-        final DefaultEpoMonitors defaultEpoMonitors = new DefaultEpoMonitors(fishState);
-        defaultEpoMonitors.getMonitors().forEach(fishState::registerStartable);
-        getGear().addMonitors(defaultEpoMonitors);
+    void addMonitors(final FishState fishState, RegionalDivision regionalDivision) {
+        final DefaultMonitors defaultMonitors = new DefaultMonitors(fishState,regionalDivision);
+        defaultMonitors.getMonitors().forEach(fishState::registerStartable);
+        getGear().addMonitors(defaultMonitors);
         final Collection<Monitor<AbstractSetAction, ?, ?>> setMonitors =
             Optional.ofNullable(additionalSetMonitors)
                 .map(monitor -> monitor.apply(fishState).getMonitors())
@@ -267,7 +270,7 @@ public class PurseSeinerFleetFactory
         return fisherFactory;
     }
 
-    private List<Port> buildPorts(final FishState fishState) {
+    List<Port> buildPorts(final FishState fishState) {
         final MarketMap marketMap = getMarketMap().apply(fishState);
         portInitializer.apply(fishState).buildPorts(
             fishState.getMap(),

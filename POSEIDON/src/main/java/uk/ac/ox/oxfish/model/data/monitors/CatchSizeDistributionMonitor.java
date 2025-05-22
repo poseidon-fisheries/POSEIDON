@@ -24,6 +24,7 @@ public class CatchSizeDistributionMonitor<A extends AbstractSetAction>
         final Species species,
         final Map<Integer, double[]> empiricalDistributionPerYear
     ) {
+
         super(
             species.getName() + " catches from " + ActionClass.classMap.get(actionClass).name() + " sets",
             EVERY_YEAR,

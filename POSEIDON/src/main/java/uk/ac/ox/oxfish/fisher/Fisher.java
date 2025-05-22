@@ -594,13 +594,13 @@ public class Fisher implements Steppable, Startable, Agent {
 
         //spend money on all new costs
         for (final Cost realCosts : status.getAdditionalTripCosts()) {
-            final double cost = realCosts.cost(
+            final double cost = (realCosts!=null?realCosts.cost(
                 this,
                 state,
                 getCurrentTrip(),
                 getCurrentTrip().getEarnings(),
                 status.getHoursAtSea()
-            );
+            ):0);
             spendForTrip(cost);
         }
         //account for opportunity costs

@@ -7,14 +7,9 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.*;
 import java.nio.file.Paths;
 
-public class EpoScenarioTest {
+public class EaoScenarioTest {
 
-    @Test
-    public void testSaveAndLoadEpoGravityAbundanceScenario() {
-        saveAndLoadYaml(EpoGravityAbundanceScenario.class);
-    }
-
-    public <S extends EpoScenario<?>> void saveAndLoadYaml(
+    public <S extends EaoScenario<?>> void saveAndLoadYaml(
         final Class<S> scenarioClass
     ) {
         try {
@@ -26,7 +21,7 @@ public class EpoScenarioTest {
             // Try to read it back and start it
             try (final FileReader fileReader = new FileReader(scenarioFile)) {
                 final FishYAML fishYAML = new FishYAML();
-                final EpoScenario<?> loadedScenario = fishYAML.loadAs(fileReader, EpoScenario.class);
+                final EaoScenario<?> loadedScenario = fishYAML.loadAs(fileReader, EaoScenario.class);
                 loadedScenario.useDummyData();
                 final FishState fishState = new FishState();
                 fishState.setScenario(loadedScenario);
@@ -42,23 +37,8 @@ public class EpoScenarioTest {
     }
 
     @Test
-    public void testSaveAndLoadEpoGravityBiomassScenario() {
-        saveAndLoadYaml(EpoGravityBiomassScenario.class);
-    }
-
-    @Test
-    public void testSaveAndLoadEpoFadsOnlyAbundanceScenario() {
-        saveAndLoadYaml(EpoFadsOnlyAbundanceScenario.class);
-    }
-
-    @Test
-    public void testSaveAndLoadEpoAbundanceScenario() {
-        saveAndLoadYaml(EpoAbundanceScenario.class);
-    }
-
-    @Test
     public void testSaveAndLoadEpoPathPlannerAbundanceScenario() {
-        saveAndLoadYaml(EpoPathPlannerAbundanceScenario.class);
+        saveAndLoadYaml(EaoPathPlannerAbundanceScenario.class);
     }
 
 }
