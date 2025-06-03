@@ -43,6 +43,7 @@ public class Sale<C extends Content<C>> {
     private final String id;
     private final Market<C> market;
     private final Vessel vessel;
+    private final String categoryCode;
     private final Table<Species, C, Money> sold;
     private final Bucket<C> unsold;
 

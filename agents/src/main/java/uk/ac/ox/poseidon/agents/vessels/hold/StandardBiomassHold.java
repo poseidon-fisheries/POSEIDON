@@ -27,19 +27,28 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Getter
 @RequiredArgsConstructor
 public class StandardBiomassHold implements Hold<Biomass> {
 
     private final double totalCapacityInKg;
     private final double toleranceInKg;
-    private Bucket<Biomass> content = Bucket.empty();
+    private Map<String, Bucket<Biomass>> content = new HashMap<>();
 
     @Override
-    public void addContent(final Bucket<Biomass> contentToAdd) {
-        final Bucket<Biomass> newContent = content.add(contentToAdd);
-        if (newContent.getTotalBiomass().asKg() <= totalCapacityInKg + toleranceInKg) {
-            content = newContent;
+    public void addContent(
+        final String categoryCode,
+        final Bucket<Biomass> contentToAdd
+    ) {
+        final Bucket<Biomass> newBucket =
+            content
+                .getOrDefault(categoryCode, Bucket.empty())
+                .add(contentToAdd);
+        if (newBucket.getTotalBiomass().asKg() <= totalCapacityInKg + toleranceInKg) {
+            content.put(categoryCode, newBucket);
         } else {
             throw new IllegalStateException(
                 "Trying to store %f kg in the hold, but only %f kg of capacity available."
@@ -52,9 +61,9 @@ public class StandardBiomassHold implements Hold<Biomass> {
     }
 
     @Override
-    public Bucket<Biomass> extractContent() {
-        final Bucket<Biomass> removedContent = content;
-        content = Bucket.empty();
+    public Map<String, Bucket<Biomass>> extractContent() {
+        final Map<String, Bucket<Biomass>> removedContent = content;
+        content = new HashMap<>();
         return removedContent;
     }
 

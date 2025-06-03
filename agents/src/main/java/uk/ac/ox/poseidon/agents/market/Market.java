@@ -27,6 +27,7 @@ import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Content;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 public interface Market<C extends Content<C>> {
 
@@ -34,7 +35,7 @@ public interface Market<C extends Content<C>> {
 
     Sale<C> sell(
         Vessel vessel,
-        Bucket<? extends C> bucket,
+        Map<String, Bucket<? extends C>> buckets,
         LocalDateTime dateTime
     );
 

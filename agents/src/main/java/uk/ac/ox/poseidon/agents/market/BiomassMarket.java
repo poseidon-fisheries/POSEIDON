@@ -64,7 +64,7 @@ public class BiomassMarket implements Market<Biomass> {
     @Override
     public Sale<Biomass> sell(
         final Vessel vessel,
-        final Bucket<? extends Biomass> bucket,
+        final Map<String, Bucket<? extends Biomass>> buckets,
         final LocalDateTime dateTime
     ) {
         final ImmutableTable.Builder<Species, Biomass, Money> sold = ImmutableTable.builder();

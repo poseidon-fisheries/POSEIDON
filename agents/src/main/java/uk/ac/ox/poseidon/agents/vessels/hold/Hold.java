@@ -25,6 +25,8 @@ package uk.ac.ox.poseidon.agents.vessels.hold;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Content;
 
+import java.util.Map;
+
 public interface Hold<C extends Content<C>> {
 
     /**
@@ -32,14 +34,17 @@ public interface Hold<C extends Content<C>> {
      *
      * @param fishToStore the content to add
      */
-    void addContent(Bucket<C> fishToStore);
+    void addContent(
+        String categoryCode,
+        Bucket<C> fishToStore
+    );
 
     /**
      * Retrieves the content held in the container without removing it.
      *
      * @return the current content.
      */
-    Bucket<C> getContent();
+    Map<String, Bucket<C>> getContent();
 
     default boolean isFull() {
         return getAvailableCapacityInKg() <= 0;
@@ -50,7 +55,7 @@ public interface Hold<C extends Content<C>> {
      *
      * @return the removed content. If the container was empty, returns an empty Bucket.
      */
-    Bucket<C> extractContent();
+    Map<String, Bucket<C>> extractContent();
 
     default boolean isEmpty() {
         return getContent().isEmpty();
@@ -59,7 +64,12 @@ public interface Hold<C extends Content<C>> {
     double getTotalCapacityInKg();
 
     default double getAvailableCapacityInKg() {
-        return getTotalCapacityInKg() - getContent().getTotalBiomass().asKg();
+        return getTotalCapacityInKg() -
+            getContent()
+                .values()
+                .stream()
+                .mapToDouble(bucket -> bucket.getTotalBiomass().asKg())
+                .sum();
     }
 
 }
