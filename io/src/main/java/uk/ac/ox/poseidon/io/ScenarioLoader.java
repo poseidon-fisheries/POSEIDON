@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -99,6 +100,10 @@ public class ScenarioLoader {
      */
     public Scenario load(final String yamlString) {
         return yaml.loadAs(yamlString, Scenario.class);
+    }
+    
+    public Scenario load(final Path path) {
+        return load(path.toFile());
     }
 
     /**
