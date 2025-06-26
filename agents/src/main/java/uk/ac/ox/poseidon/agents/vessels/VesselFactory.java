@@ -23,30 +23,35 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.money.CurrencyUnit;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-import uk.ac.ox.poseidon.core.utils.IdSupplier;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Speed;
 
-@Data
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VesselFactory implements Factory<Vessel> {
+public class VesselFactory extends SimulationScopeFactory<Vessel> {
 
     private BehaviourFactory<?> initialBehaviour;
-    private Factory<? extends IdSupplier> idSupplier;
+    private String id;
+    private String name;
     private Factory<? extends VesselField> vesselField;
     private Factory<? extends Port> homePort;
     private Factory<? extends PortGrid> portGrid;
@@ -54,12 +59,11 @@ public class VesselFactory implements Factory<Vessel> {
     private String accountCurrencyCode;
 
     @Override
-    public final Vessel get(final Simulation simulation) {
+    protected Vessel newInstance(final Simulation simulation) {
         final VesselField vesselField = this.vesselField.get(simulation);
-        final String id = idSupplier.get(simulation).nextId();
         final var vessel = new Vessel(
-            id,
-            "Vessel " + id,
+            checkNotNull(id),
+            name == null ? "Vessel " + id : name,
             portGrid.get(simulation),
             homePort.get(simulation),
             speed.get(simulation),
@@ -75,5 +79,4 @@ public class VesselFactory implements Factory<Vessel> {
         );
         return vessel;
     }
-
 }
