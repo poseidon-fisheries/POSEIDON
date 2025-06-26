@@ -30,8 +30,8 @@ import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
@@ -47,7 +47,7 @@ import static java.util.Comparator.comparingDouble;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PortGridFromFileFactory extends GlobalScopeFactory<PortGrid> {
+public class PortGridFromFileFactory extends SimulationScopeFactory<PortGrid> {
 
     private static final System.Logger logger =
         System.getLogger(PortGridFromFileFactory.class.getName());

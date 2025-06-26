@@ -306,8 +306,17 @@ public final class ModelGrid {
         return getActiveNeighbours(cell, 1);
     }
 
+    public void checkIsInGrid(final Coordinate coordinate) {
+        checkArgument(
+            isInGrid(coordinate),
+            "Coordinate %s is outside of grid %s.",
+            coordinate,
+            envelope
+        );
+    }
+
     public boolean isInGrid(final Coordinate coordinate) {
-        return isInGrid(toCell(coordinate));
+        return envelope.intersects(coordinate);
     }
 
     public boolean isInGrid(final Double2D point) {

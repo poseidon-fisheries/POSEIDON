@@ -23,6 +23,8 @@
 package uk.ac.ox.poseidon.geography.ports;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.Getter;
+import lombok.NonNull;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -31,17 +33,25 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
 
+@Getter
 public class PortGrid extends ObjectGrid<Port> {
+
+    @NonNull
+    private final BathymetricGrid bathymetricGrid;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public PortGrid(
-        final BathymetricGrid bathymetricGrid,
-        final SparseGrid2D sparseGrid2D
+        final @NonNull BathymetricGrid bathymetricGrid,
+        final @NonNull SparseGrid2D sparseGrid2D
     ) {
         super(bathymetricGrid.getModelGrid(), sparseGrid2D);
+        this.bathymetricGrid = bathymetricGrid;
     }
 
     public PortGrid(
@@ -89,4 +99,25 @@ public class PortGrid extends ObjectGrid<Port> {
     protected String getObjectId(final Port port) {
         return port.getCode();
     }
+
+    public Stream<Port> getPorts() {
+        return bagToStream(field.getAllObjects());
+    }
+
+    public void validateLocation(
+        final Coordinate coordinate
+    ) {
+        final Int2D cell = getModelGrid().toCell(coordinate);
+        checkState(
+            bathymetricGrid.isLand(cell),
+            "Invalid port location: coordinate %s is not on land.",
+            coordinate
+        );
+        checkState(
+            bathymetricGrid.getActiveWaterNeighbours(cell).findAny().isPresent(),
+            "Invalid location: coordinate %s does not have any active water neighbors.",
+            coordinate
+        );
+    }
+
 }
