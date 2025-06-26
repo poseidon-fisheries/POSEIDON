@@ -22,24 +22,37 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.destination;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.agents.behaviours.choices.Evaluator;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.FishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.CombiningEphemeralAccumulatingListener;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TotalBiomassCaughtPerHourDestinationEvaluatorFactory
     extends VesselScopeFactory<Evaluator<Int2D>> {
+
+    private Factory<? extends PortGrid> portGrid;
 
     @Override
     protected Evaluator<Int2D> newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return option -> new Evaluation(vessel);
+        return option -> new Evaluation(portGrid.get(simulation), vessel);
     }
 
     private static class Evaluation implements uk.ac.ox.poseidon.agents.behaviours.choices.Evaluation {
@@ -47,7 +60,10 @@ public class TotalBiomassCaughtPerHourDestinationEvaluatorFactory
         private final CombiningEphemeralAccumulatingListener
             <FishingAction, Double, Action, Double, Double> listener;
 
-        private Evaluation(final Vessel vessel) {
+        private Evaluation(
+            final PortGrid portGrid,
+            final Vessel vessel
+        ) {
             listener = new CombiningEphemeralAccumulatingListener<>(
                 vessel.getEventManager(),
                 FishingAction.class,
@@ -57,11 +73,21 @@ public class TotalBiomassCaughtPerHourDestinationEvaluatorFactory
                 Action.class,
                 0.0,
                 (hoursSoFar, action) ->
-                    vessel.isAtPort()
+                    actionIsAtPort(action, portGrid)
                         ? hoursSoFar
                         : hoursSoFar + action.getDuration().toHours(),
                 (caught, hours) -> caught / hours
             );
+        }
+
+        private boolean actionIsAtPort(
+            final Action action,
+            final PortGrid portGrid
+        ) {
+            final ModelGrid modelGrid = portGrid.getModelGrid();
+            final Int2D startCell = modelGrid.toCell(action.getStartCoordinate());
+            final Int2D endCell = modelGrid.toCell(action.getEndCoordinate());
+            return startCell.equals(endCell) && portGrid.anyObjectsAt(startCell);
         }
 
         @Override
