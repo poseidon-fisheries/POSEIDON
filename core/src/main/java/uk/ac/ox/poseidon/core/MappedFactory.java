@@ -37,28 +37,43 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MappedFactory<S, T> implements Factory<List<T>> {
+public class MappedFactory<S, T> extends GlobalScopeFactory<List<T>> {
 
     private Factory<? extends Iterable<? extends S>> sourceFactory;
     private Factory<T> targetFactory;
     private String mappedProperty;
 
     @Override
-    public List<T> get(final Simulation simulation) {
+    protected List<T> newInstance(final Simulation simulation) {
         return Streams
             .stream(sourceFactory.get(simulation))
             .map(ConstantFactory::new)
             .map(sourceFactory -> {
-                try {
-                    PropertyUtils.setProperty(targetFactory, mappedProperty, sourceFactory);
-                    return targetFactory.get(simulation);
-                } catch (
-                    final IllegalAccessException | InvocationTargetException |
-                          NoSuchMethodException e
-                ) {
-                    throw new RuntimeException(e);
+                final Factory<T> targetFactory = this.targetFactory;
+                synchronized (targetFactory) {
+                    try {
+                        PropertyUtils.setProperty(targetFactory, mappedProperty, sourceFactory);
+                        return targetFactory.get(simulation);
+                    } catch (
+                        final IllegalAccessException | InvocationTargetException |
+                              NoSuchMethodException e
+                    ) {
+                        throw new RuntimeException(e);
+                    }
                 }
             })
             .toList();
+    }
+
+    @Override
+    int makeKey(final Simulation simulation) {
+        // We override makeKey here because we want to use the properties of the target
+        // factory as part of our own key instead of the object that it would instantiate
+        // (or more likely die trying) if its get method gets called.
+        return List.of(
+            mappedProperty,
+            sourceFactory.get(simulation),
+            targetFactory.makeKey(simulation)
+        ).hashCode();
     }
 }

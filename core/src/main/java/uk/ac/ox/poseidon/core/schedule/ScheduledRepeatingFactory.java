@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
@@ -37,7 +38,7 @@ import java.time.temporal.TemporalAmount;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class ScheduledRepeatingFactory<C extends Steppable> implements Factory<C> {
+public class ScheduledRepeatingFactory<C extends Steppable> extends SimulationScopeFactory<C> {
 
     private Factory<? extends Temporal> startingDateTime;
     private Factory<? extends TemporalAmount> interval;
@@ -45,7 +46,7 @@ public class ScheduledRepeatingFactory<C extends Steppable> implements Factory<C
     private int ordering;
 
     @Override
-    public C get(final Simulation simulation) {
+    protected C newInstance(final Simulation simulation) {
         final C steppableObject = steppable.get(simulation);
         simulation.getTemporalSchedule().scheduleRepeating(
             startingDateTime.get(simulation),
@@ -55,4 +56,5 @@ public class ScheduledRepeatingFactory<C extends Steppable> implements Factory<C
         );
         return steppableObject;
     }
+
 }

@@ -24,25 +24,68 @@ package uk.ac.ox.poseidon.agents.vessels;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.LoadingCache;
+import lombok.Getter;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import static com.google.common.cache.CacheLoader.from;
 
 public abstract class VesselScopeFactory<C> {
 
+    @Getter(lazy = true) private final List<Method> readMethods =
+        Factory.readMethods(this);
+
     // needs to be transient for SnakeYAML not to be confused
     // when there are no other properties to serialize
-    private final transient Cache<Vessel, C> cache =
-        CacheBuilder.newBuilder().weakValues().build();
+    private final transient LoadingCache<Vessel, Cache<Integer, C>> cache =
+        CacheBuilder
+            .newBuilder()
+            .weakValues()
+            .build(from(() -> CacheBuilder.newBuilder().build()));
 
     public final C get(
         final Simulation simulation,
         final Vessel vessel
     ) {
         try {
-            return cache.get(vessel, () -> newInstance(simulation, vessel));
+            return cache
+                .getUnchecked(vessel)
+                .get(makeKey(simulation, vessel), () -> newInstance(simulation, vessel));
         } catch (final ExecutionException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private Integer makeKey(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
+        synchronized (this) {
+            return getReadMethods()
+                .stream()
+                .map(readMethod -> {
+                    try {
+                        return readMethod.invoke(this);
+                    } catch (final IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .map(o ->
+                    switch (o) {
+                        case null -> null;
+                        case final Factory<?> factory -> factory.get(simulation);
+                        case final VesselScopeFactory<?> factory -> factory.get(simulation, vessel);
+                        default -> o;
+                    }
+                )
+                .toList()
+                .hashCode();
         }
     }
 

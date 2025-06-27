@@ -25,14 +25,13 @@ package uk.ac.ox.poseidon.core;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public abstract class GlobalScopeFactory<C> extends CachingFactory<C> {
+public abstract class GlobalScopeFactory<C> extends Factory<C> {
 
     // needs to be transient for SnakeYAML not to be confused
     // when there are no other properties to serialize
-    private final transient Cache<List<Object>, C> cache =
+    private final transient Cache<Integer, C> cache =
         CacheBuilder.newBuilder().build();
 
     @Override

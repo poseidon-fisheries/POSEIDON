@@ -22,12 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.choices;
 
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-public class AverageOptionValuesFactory<O> implements Factory<MutableOptionValues<O>> {
+public class AverageOptionValuesFactory<O> extends VesselScopeFactory<MutableOptionValues<O>> {
     @Override
-    public MutableOptionValues<O> get(final Simulation simulation) {
+    protected MutableOptionValues<O> newInstance(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
         return new AverageOptionValues<>();
     }
 }

@@ -25,15 +25,13 @@ package uk.ac.ox.poseidon.core;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 
-import java.util.List;
-
 import static com.google.common.cache.CacheLoader.from;
 
-public abstract class SimulationScopeFactory<C> extends CachingFactory<C> {
+public abstract class SimulationScopeFactory<C> extends Factory<C> {
 
     // needs to be transient for SnakeYAML not to be confused
     // when there are no other properties to serialize
-    private final transient LoadingCache<Simulation, LoadingCache<List<Object>, C>> cache =
+    private final transient LoadingCache<Simulation, LoadingCache<Integer, C>> cache =
         CacheBuilder.newBuilder()
             .weakKeys()
             .build(from(simulation ->
