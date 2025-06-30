@@ -39,8 +39,8 @@ import java.util.List;
 @AllArgsConstructor
 public class MappedFactory<S, T> extends GlobalScopeFactory<List<T>> {
 
-    private Factory<? extends Iterable<? extends S>> sourceFactory;
     private Factory<T> targetFactory;
+    private Factory<? extends Iterable<? extends S>> sourceFactory;
     private String mappedProperty;
 
     @Override

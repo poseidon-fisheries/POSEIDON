@@ -41,8 +41,8 @@ import static java.util.stream.IntStream.range;
 @AllArgsConstructor
 public class ZippedFactory<T> extends GlobalScopeFactory<List<T>> {
 
-    private List<Factory<? extends List<?>>> sourceFactories;
     private Factory<T> targetFactory;
+    private List<Factory<? extends List<?>>> sourceFactories;
     private List<String> mappedProperties;
 
     @Override

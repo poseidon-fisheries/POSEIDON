@@ -38,9 +38,9 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 public class DateFactory extends GlobalScopeFactory<LocalDateTime> {
 
-    private int year = LocalDate.now().getYear();
-    private int month = LocalDate.now().getMonthValue();
-    private int day = LocalDate.now().getDayOfMonth();
+    private Integer year = LocalDate.now().getYear();
+    private Integer month = LocalDate.now().getMonthValue();
+    private Integer day = LocalDate.now().getDayOfMonth();
 
     protected LocalDateTime newInstance(final Simulation simulation) {
         return LocalDate.of(year, month, day).atStartOfDay();
