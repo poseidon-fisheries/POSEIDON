@@ -22,7 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.fishing;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.behaviours.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
@@ -44,11 +47,11 @@ import java.util.function.Supplier;
 public class DefaultFishingBehaviourFactory<C extends Content<C>>
     extends BehaviourFactory<Fishing<C>> {
 
-    @NonNull private VesselScopeFactory<? extends FishingGear<C>> fishingGear;
-    @NonNull private VesselScopeFactory<? extends Hold<C>> hold;
-    @NonNull private VesselScopeFactory<? extends Supplier<Fisheable<C>>> fisheableSupplier;
-    @NonNull private Factory<? extends Regulations> regulations;
-    @NonNull private Factory<? extends DispositionProcess<C>> dispositionProcess;
+    private VesselScopeFactory<? extends FishingGear<C>> fishingGear;
+    private VesselScopeFactory<? extends Hold<C>> hold;
+    private VesselScopeFactory<? extends Supplier<Fisheable<C>>> fisheableSupplier;
+    private Factory<? extends Regulations> regulations;
+    private Factory<? extends DispositionProcess<C>> dispositionProcess;
 
     @Override
     protected Fishing<C> newInstance(

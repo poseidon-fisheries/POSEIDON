@@ -20,22 +20,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.suppliers;
+package uk.ac.ox.poseidon.agents.vessels.hold;
 
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.time.DurationFactory;
-import uk.ac.ox.poseidon.core.utils.ConstantSupplierFactory;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-import java.time.Duration;
-import java.util.function.Supplier;
-
-public class ConstantDurationSuppliers {
-    public static final Factory<Supplier<Duration>> ONE_DAY_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(1, 0, 0, 0));
-    public static final Factory<Supplier<Duration>> ONE_HOUR_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(1, 0, 0, 0));
-    public static final Factory<Supplier<Duration>> ONE_MINUTE_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(0, 0, 1, 0));
-    public static final Factory<Supplier<Duration>> ONE_SECOND_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(0, 0, 0, 1));
+public class InfiniteBiomassHoldFactory extends VesselScopeFactory<InfiniteBiomassHold> {
+    @Override
+    protected InfiniteBiomassHold newInstance(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
+        return new InfiniteBiomassHold();
+    }
 }

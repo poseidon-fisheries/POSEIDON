@@ -20,22 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.suppliers;
+package uk.ac.ox.poseidon.agents.behaviours.destination;
 
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.time.DurationFactory;
-import uk.ac.ox.poseidon.core.utils.ConstantSupplierFactory;
+import lombok.NonNull;
+import sim.util.Int2D;
 
-import java.time.Duration;
-import java.util.function.Supplier;
+import java.util.Optional;
 
-public class ConstantDurationSuppliers {
-    public static final Factory<Supplier<Duration>> ONE_DAY_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(1, 0, 0, 0));
-    public static final Factory<Supplier<Duration>> ONE_HOUR_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(1, 0, 0, 0));
-    public static final Factory<Supplier<Duration>> ONE_MINUTE_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(0, 0, 1, 0));
-    public static final Factory<Supplier<Duration>> ONE_SECOND_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(0, 0, 0, 1));
+public class ConstantDestinationSupplier implements DestinationSupplier {
+
+    @NonNull
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private final Optional<Int2D> destination;
+
+    public ConstantDestinationSupplier(final Int2D destination) {
+        this.destination = Optional.ofNullable(destination);
+    }
+
+    @Override
+    public Optional<Int2D> get() {
+        return destination;
+    }
 }

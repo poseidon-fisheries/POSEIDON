@@ -34,8 +34,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 
-import static javax.measure.MetricPrefix.KILO;
-import static tech.units.indriya.unit.Units.GRAM;
+import static tech.units.indriya.unit.Units.KILOGRAM;
 
 @Getter
 @Setter
@@ -52,8 +51,8 @@ public class StandardBiomassHoldFactory extends VesselScopeFactory<StandardBioma
         final Vessel vessel
     ) {
         return new StandardBiomassHold(
-            capacity.get(simulation).to(KILO(GRAM)).getValue().doubleValue(),
-            tolerance.get(simulation).to(KILO(GRAM)).getValue().doubleValue()
+            capacity.get(simulation).to(KILOGRAM).getValue().doubleValue(),
+            tolerance.get(simulation).to(KILOGRAM).getValue().doubleValue()
         );
     }
 }

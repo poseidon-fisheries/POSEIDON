@@ -41,7 +41,7 @@ import java.util.Collection;
 public class SelectedSpeciesRetentionFactory<C extends Content<C>>
     extends GlobalScopeFactory<SelectedSpeciesRetention<C>> {
 
-    private Factory<? extends Collection<Species>> selectedSpecies;
+    private Factory<? extends Collection<? extends Species>> selectedSpecies;
 
     @Override
     protected SelectedSpeciesRetention<C> newInstance(final Simulation simulation) {

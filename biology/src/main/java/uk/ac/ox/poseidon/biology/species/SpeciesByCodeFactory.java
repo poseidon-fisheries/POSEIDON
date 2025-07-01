@@ -37,13 +37,13 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class SpeciesByCodeFactory extends GlobalScopeFactory<List<Species>> {
+public class SpeciesByCodeFactory extends GlobalScopeFactory<List<? extends Species>> {
 
-    private Factory<? extends List<String>> speciesCodes;
-    private Factory<? extends List<Species>> speciesList;
+    private Factory<? extends List<? extends String>> speciesCodes;
+    private Factory<? extends List<? extends Species>> speciesList;
 
     @Override
-    protected List<Species> newInstance(final Simulation simulation) {
+    protected List<? extends Species> newInstance(final Simulation simulation) {
         final ImmutableSet<String> speciesCodes =
             ImmutableSet.copyOf(this.speciesCodes.get(simulation));
         return speciesList

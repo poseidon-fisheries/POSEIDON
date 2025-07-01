@@ -20,22 +20,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.suppliers;
+package uk.ac.ox.poseidon.agents.vessels.hold;
 
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.time.DurationFactory;
-import uk.ac.ox.poseidon.core.utils.ConstantSupplierFactory;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
-import java.time.Duration;
-import java.util.function.Supplier;
+import static java.lang.Double.POSITIVE_INFINITY;
 
-public class ConstantDurationSuppliers {
-    public static final Factory<Supplier<Duration>> ONE_DAY_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(1, 0, 0, 0));
-    public static final Factory<Supplier<Duration>> ONE_HOUR_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(1, 0, 0, 0));
-    public static final Factory<Supplier<Duration>> ONE_MINUTE_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(0, 0, 1, 0));
-    public static final Factory<Supplier<Duration>> ONE_SECOND_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(0, 0, 0, 1));
+@Getter
+@RequiredArgsConstructor
+public class InfiniteBiomassHold implements Hold<Biomass> {
+
+    private Bucket<Biomass> content = Bucket.empty();
+
+    @Override
+    public void addContent(final Bucket<Biomass> contentToAdd) {
+        content.add(contentToAdd);
+    }
+
+    @Override
+    public Bucket<Biomass> extractContent() {
+        final Bucket<Biomass> removedContent = content;
+        content = Bucket.empty();
+        return removedContent;
+    }
+
+    @Override
+    public double getTotalCapacityInKg() {
+        return POSITIVE_INFINITY;
+    }
+
 }

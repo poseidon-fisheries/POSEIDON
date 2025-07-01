@@ -37,7 +37,7 @@ public class SelectedSpeciesRetention<C extends Content<C>> implements Dispositi
 
     private final Set<Species> selectedSpecies;
 
-    SelectedSpeciesRetention(final Collection<Species> selectedSpecies) {
+    SelectedSpeciesRetention(final Collection<? extends Species> selectedSpecies) {
         this.selectedSpecies = ImmutableSet.copyOf(selectedSpecies);
     }
 

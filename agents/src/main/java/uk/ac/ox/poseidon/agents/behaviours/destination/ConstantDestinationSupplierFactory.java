@@ -20,22 +20,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.suppliers;
+package uk.ac.ox.poseidon.agents.behaviours.destination;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.time.DurationFactory;
-import uk.ac.ox.poseidon.core.utils.ConstantSupplierFactory;
+import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.time.Duration;
-import java.util.function.Supplier;
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ConstantDestinationSupplierFactory extends VesselScopeFactory<DestinationSupplier> {
 
-public class ConstantDurationSuppliers {
-    public static final Factory<Supplier<Duration>> ONE_DAY_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(1, 0, 0, 0));
-    public static final Factory<Supplier<Duration>> ONE_HOUR_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(1, 0, 0, 0));
-    public static final Factory<Supplier<Duration>> ONE_MINUTE_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(0, 0, 1, 0));
-    public static final Factory<Supplier<Duration>> ONE_SECOND_DURATION_SUPPLIER =
-        new ConstantSupplierFactory<>(new DurationFactory(0, 0, 0, 1));
+    private Factory<? extends ModelGrid> modelGrid;
+    private Factory<? extends Coordinate> coordinate;
+
+    @Override
+    protected DestinationSupplier newInstance(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
+        return new ConstantDestinationSupplier(
+            modelGrid.get(simulation).toCell(coordinate.get(simulation))
+        );
+    }
 }
