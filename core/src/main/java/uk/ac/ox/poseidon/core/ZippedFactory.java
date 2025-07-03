@@ -61,7 +61,8 @@ public class ZippedFactory<T> extends GlobalScopeFactory<List<T>> {
         final List<? extends List<?>> sourceComponents =
             sourceFactories
                 .stream()
-                .map(f -> f.get(simulation)).toList();
+                .map(f -> f.get(simulation))
+                .toList();
 
         checkState(!sourceComponents.getFirst().isEmpty());
         final int targetSize = sourceComponents.getFirst().size();

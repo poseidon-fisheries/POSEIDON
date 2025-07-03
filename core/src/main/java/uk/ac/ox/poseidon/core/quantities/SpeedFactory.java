@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.quantities;
 
+import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Speed;
 
@@ -43,6 +44,10 @@ public class SpeedFactory extends AbstractQuantityFactory<Speed> {
         final Unit<Speed> unit
     ) {
         super(Speed.class, value, unit.toString());
+    }
+
+    public static SpeedFactory of(final Quantity<Speed> quantity) {
+        return new SpeedFactory(quantity.getValue().doubleValue(), quantity.getUnit().toString());
     }
 
     public static SpeedFactory of(final String quantity) {

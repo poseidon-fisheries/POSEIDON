@@ -28,7 +28,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.beanutils.PropertyUtils;
-import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -47,7 +46,6 @@ public class MappedFactory<S, T> extends GlobalScopeFactory<List<T>> {
     protected List<T> newInstance(final Simulation simulation) {
         return Streams
             .stream(sourceFactory.get(simulation))
-            .map(ConstantFactory::new)
             .map(sourceFactory -> {
                 final Factory<T> targetFactory = this.targetFactory;
                 synchronized (targetFactory) {

@@ -26,6 +26,8 @@ import lombok.*;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -43,6 +45,6 @@ public class SpeciesFactory extends GlobalScopeFactory<Species> {
 
     @Override
     protected Species newInstance(final @NonNull Simulation simulation) {
-        return new Species(code, name);
+        return new Species(checkNotNull(code), name != null ? name : PREFIX + " " + code);
     }
 }

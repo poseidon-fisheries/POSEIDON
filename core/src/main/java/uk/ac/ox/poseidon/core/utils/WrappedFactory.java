@@ -20,39 +20,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.quantities;
+package uk.ac.ox.poseidon.core.utils;
 
-import javax.measure.Quantity;
-import javax.measure.Unit;
-import javax.measure.quantity.Mass;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-public class MassFactory extends AbstractQuantityFactory<Mass> {
+import java.util.List;
 
-    public MassFactory() {
-        super(Mass.class);
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class WrappedFactory<C> extends GlobalScopeFactory<List<? extends Factory<C>>> {
+
+    private Factory<? extends List<C>> wrappedFactory;
+
+    @Override
+    protected List<? extends Factory<C>> newInstance(final Simulation simulation) {
+        return wrappedFactory.get(simulation).stream().map(ConstantFactory::new).toList();
     }
-
-    public MassFactory(
-        final double value,
-        final String unitString
-    ) {
-        super(Mass.class, value, unitString);
-    }
-
-    public MassFactory(
-        final double value,
-        final Unit<Mass> unit
-    ) {
-        super(Mass.class, value, unit.toString());
-    }
-
-    public static MassFactory of(final Quantity<Mass> quantity) {
-        return new MassFactory(quantity.getValue().doubleValue(), quantity.getUnit().toString());
-    }
-
-    public static MassFactory of(final String quantity) {
-        final var entry = parse(Mass.class, quantity);
-        return new MassFactory(entry.getValue(), entry.getKey());
-    }
-
 }
