@@ -30,6 +30,7 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.util.Map;
 
@@ -42,23 +43,24 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BiomassMarketFactory extends SimulationScopeFactory<BiomassMarket> {
 
     private Factory<? extends BiomassMarketGrid> marketGrid;
-    private String portCode;
+    private Factory<? extends Port> port;
     private String marketCode;
     private Factory<? extends Map<Species, Price>> pricesPerSpecies;
 
     @Override
     protected BiomassMarket newInstance(final Simulation simulation) {
         checkNotNull(marketGrid, "marketGrid must not be null");
-        checkNotNull(portCode, "portCode must not be null");
+        checkNotNull(port, "port must not be null");
         checkNotNull(pricesPerSpecies, "pricesPerSpecies must not be null");
-        final String marketCode = this.marketCode != null ? this.marketCode : portCode;
+        final Port port = this.port.get(simulation);
+        final String marketCode = this.marketCode != null ? this.marketCode : port.getCode();
         final BiomassMarketGrid marketGrid = this.marketGrid.get(simulation);
         final BiomassMarket biomassMarket = new BiomassMarket(
             marketCode,
             pricesPerSpecies.get(simulation),
             simulation.getEventManager()
         );
-        marketGrid.addMarket(biomassMarket, portCode);
+        marketGrid.addMarket(biomassMarket, port);
         return biomassMarket;
     }
 }
