@@ -34,8 +34,6 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.utils.IdSupplier;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplier;
 
-import javax.measure.Unit;
-import javax.measure.quantity.Mass;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -45,19 +43,19 @@ import java.util.Map;
 @ToString
 public class BiomassMarket implements Market<Biomass> {
 
-    private final String id;
+    private final String code;
     private final Map<Species, Price> prices;
     private final IdSupplier saleIdSupplier;
     private final EventManager eventManager;
 
     BiomassMarket(
-        final String id,
+        final String code,
         final Map<Species, Price> prices,
         final EventManager eventManager
     ) {
-        this.id = id;
+        this.code = code;
         this.prices = new HashMap<>(prices);
-        this.saleIdSupplier = new PrefixedIdSupplier(id);
+        this.saleIdSupplier = new PrefixedIdSupplier(code);
         this.eventManager = eventManager;
     }
 
@@ -78,8 +76,8 @@ public class BiomassMarket implements Market<Biomass> {
                 unsold.add(species, biomass);
             } else {
                 final Money salePrice =
-                    price.amount.multipliedBy(
-                        biomass.as(price.biomassUnit),
+                    price.getAmount().multipliedBy(
+                        biomass.as(price.getBiomassUnit()),
                         RoundingMode.DOWN
                     );
                 sold.put(species, biomass, salePrice);
@@ -103,7 +101,5 @@ public class BiomassMarket implements Market<Biomass> {
     ) {
         prices.put(species, price);
     }
-
-    public record Price(Money amount, Unit<Mass> biomassUnit) {}
 
 }

@@ -22,11 +22,39 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.ports.Port;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BiomassMarketGrid extends MarketGrid<Biomass, BiomassMarket> {
-    BiomassMarketGrid(final ModelGrid modelGrid) {
-        super(modelGrid);
+
+    private final PortGrid portGrid;
+
+    BiomassMarketGrid(final PortGrid portGrid) {
+        super(portGrid.getModelGrid());
+        this.portGrid = portGrid;
     }
+
+    public void addMarket(
+        final BiomassMarket market,
+        final Port port
+    ) {
+        final Int2D portLocation = portGrid.getLocation(port);
+        checkNotNull(portLocation, "%s not found on port grid", port);
+        getField().setObjectLocation(market, portLocation);
+    }
+
+    public void addMarket(
+        final BiomassMarket market,
+        final String portCode
+    ) {
+        final Port port = portGrid.getObject(portCode).orElseThrow(() ->
+            new IllegalArgumentException(portCode + " not found on port grid")
+        );
+        addMarket(market, port);
+    }
+
 }

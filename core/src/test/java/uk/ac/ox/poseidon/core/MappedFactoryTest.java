@@ -31,7 +31,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ZippedFactoryTest {
+class MappedFactoryTest {
 
     @Test
     void canUseZippedFactoryToGenerateDates() {
@@ -41,7 +41,7 @@ class ZippedFactoryTest {
                 LocalDate.of(2000, 2, 22).atStartOfDay(),
                 LocalDate.of(2000, 3, 23).atStartOfDay()
             ),
-            new ZippedFactory<>(
+            new MappedFactory<>(
                 new DateFactory(2000, null, null),
                 List.of(
                     new ConstantFactory<>(List.of(1, 2, 3)),

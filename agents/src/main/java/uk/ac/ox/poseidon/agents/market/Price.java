@@ -20,33 +20,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core;
+package uk.ac.ox.poseidon.agents.market;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import org.joda.money.Money;
 
-import java.util.List;
+import javax.measure.Unit;
+import javax.measure.quantity.Mass;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ListFactory<C> extends GlobalScopeFactory<List<? extends C>> {
-
-    protected List<? extends Factory<? extends C>> components;
-
-    @SafeVarargs
-    public ListFactory(final Factory<? extends C>... components) {
-        this(List.of(components));
-    }
-
-    @Override
-    protected List<? extends C> newInstance(final Simulation simulation) {
-        return components
-            .stream()
-            .map(c -> c.get(simulation))
-            .toList();
-    }
+@Data
+public class Price {
+    private final Money amount;
+    private final Unit<Mass> biomassUnit;
 }

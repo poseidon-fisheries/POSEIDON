@@ -76,7 +76,7 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
         for (final Table.Cell<Species, Content<?>, Money> cell : cells) {
             dateTime.append(sale.getDateTime());
             salesId.append(sale.getId());
-            marketId.append(sale.getMarket().getId());
+            marketId.append(sale.getMarket().getCode());
             vesselId.append(sale.getVessel().getId());
             speciesCode.append(cell.getRowKey().getCode());
             biomassSold.append(cell.getColumnKey().asBiomass().asKg());

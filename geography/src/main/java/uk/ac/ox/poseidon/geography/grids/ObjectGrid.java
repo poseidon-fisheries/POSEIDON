@@ -22,29 +22,23 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
-import lombok.Getter;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.MasonUtils;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static lombok.AccessLevel.PRIVATE;
+import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
 
 public abstract class ObjectGrid<T>
     extends AbstractGrid<SparseGrid2D>
     implements Grid<SparseGrid2D>, Iterable<T> {
-
-    @Getter(value = PRIVATE, lazy = true)
-    private final ImmutableMap<String, T> objectsById =
-        Streams.stream(iterator()).collect(toImmutableMap(this::getObjectId, o -> o));
 
     protected ObjectGrid(
         final ModelGrid modelGrid
@@ -88,6 +82,10 @@ public abstract class ObjectGrid<T>
     }
 
     protected abstract String getObjectId(T object);
+
+    private Map<String, T> getObjectsById() {
+        return Streams.stream(iterator()).collect(toMap(this::getObjectId, o -> o));
+    }
 
     public Optional<T> getObject(final String id) {
         return Optional.ofNullable(getObjectsById().get(id));

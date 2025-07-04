@@ -30,7 +30,7 @@ import java.time.LocalDateTime;
 
 public interface Market<C extends Content<C>> {
 
-    String getId();
+    String getCode();
 
     Sale<C> sell(
         Vessel vessel,

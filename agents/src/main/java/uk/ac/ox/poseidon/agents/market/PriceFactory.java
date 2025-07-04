@@ -20,28 +20,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.utils;
+package uk.ac.ox.poseidon.agents.market;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.utils.Measurements;
 
-import java.util.List;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.math.RoundingMode.HALF_EVEN;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class WrappedFactory<C> extends GlobalScopeFactory<List<? extends Factory<C>>> {
+public class PriceFactory extends GlobalScopeFactory<Price> {
 
-    private Factory<? extends List<C>> wrappedFactory;
+    private double amount;
+    private String currencyUnit;
+    private String massUnit;
 
     @Override
-    protected List<? extends Factory<C>> newInstance(final Simulation simulation) {
-        return wrappedFactory.get(simulation).stream().map(ConstantFactory::new).toList();
+    protected Price newInstance(final Simulation simulation) {
+        checkNotNull(currencyUnit, "currencyUnit must not be null");
+        checkNotNull(massUnit, "massUnit must not be null");
+        return new Price(
+            Money.of(
+                CurrencyUnit.of(currencyUnit),
+                amount,
+                HALF_EVEN
+            ),
+            Measurements.parseMassUnit(massUnit)
+        );
     }
 }

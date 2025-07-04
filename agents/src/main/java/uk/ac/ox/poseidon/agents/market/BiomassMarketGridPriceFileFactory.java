@@ -128,7 +128,7 @@ public class BiomassMarketGridPriceFileFactory
                         PriceEntry::port,
                         toMap(
                             PriceEntry::species,
-                            priceEntry -> new BiomassMarket.Price(
+                            priceEntry -> new Price(
                                 priceEntry.price(),
                                 priceEntry.unit()
                             )
@@ -144,19 +144,18 @@ public class BiomassMarketGridPriceFileFactory
 
     private BiomassMarketGrid makeMarketGrid(
         final PortGrid portGrid,
-        final Map<Port, Map<Species, BiomassMarket.Price>> priceBySpeciesByPort,
+        final Map<Port, Map<Species, Price>> priceBySpeciesByPort,
         final EventManager eventManager
     ) {
-        final BiomassMarketGrid marketGrid = new BiomassMarketGrid(portGrid.getModelGrid());
+        final BiomassMarketGrid marketGrid = new BiomassMarketGrid(portGrid);
         priceBySpeciesByPort.forEach((port, priceBySpecies) -> {
-            final BiomassMarket market = new BiomassMarket(
-                port.getCode(),
-                priceBySpecies,
-                eventManager
-            );
-            marketGrid.getField().setObjectLocation(
-                market,
-                portGrid.getLocation(port)
+            marketGrid.addMarket(
+                new BiomassMarket(
+                    port.getCode(),
+                    priceBySpecies,
+                    eventManager
+                ),
+                port
             );
         });
         return marketGrid;

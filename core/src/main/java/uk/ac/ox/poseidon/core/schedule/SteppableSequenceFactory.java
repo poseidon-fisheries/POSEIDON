@@ -30,7 +30,6 @@ import sim.engine.Sequence;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.ListFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.List;
@@ -42,11 +41,6 @@ import java.util.List;
 public class SteppableSequenceFactory extends GlobalScopeFactory<Steppable> {
 
     private Factory<? extends List<? extends Steppable>> steppables;
-
-    @SafeVarargs
-    public SteppableSequenceFactory(final Factory<? extends Steppable>... steppables) {
-        this(new ListFactory<>(steppables));
-    }
 
     @Override
     protected Steppable newInstance(final Simulation simulation) {

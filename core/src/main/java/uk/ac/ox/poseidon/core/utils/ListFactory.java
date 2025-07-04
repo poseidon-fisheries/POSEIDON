@@ -20,20 +20,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.market;
+package uk.ac.ox.poseidon.core.utils;
 
-import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-public class MarketGrid<C extends Content<C>, M extends Market<? extends C>> extends ObjectGrid<M> {
+import java.util.List;
 
-    MarketGrid(final ModelGrid modelGrid) {
-        super(modelGrid);
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ListFactory<C> extends GlobalScopeFactory<List<C>> {
+
+    private List<C> values;
+
+    @SafeVarargs
+    public ListFactory(final C... values) {
+        this.values = List.of(values);
     }
 
     @Override
-    protected String getObjectId(final M market) {
-        return market.getCode();
+    protected List<C> newInstance(final Simulation simulation) {
+        return values;
     }
 }

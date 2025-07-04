@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,31 +20,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.schedule;
+package uk.ac.ox.poseidon.agents.market;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sim.engine.RandomSequence;
-import sim.engine.Steppable;
+import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.List;
+import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class SteppableRandomSequenceFactory extends GlobalScopeFactory<Steppable> {
+@AllArgsConstructor
+public class PricePerSpeciesFactory extends GlobalScopeFactory<Map<Species, Price>> {
 
-    private Factory<List<? extends Steppable>> steppables;
+    private Factory<? extends List<Species>> speciesList;
+    private Map<String, Factory<? extends Price>> pricePerSpeciesCode;
 
     @Override
-    protected Steppable newInstance(final Simulation simulation) {
-        return new RandomSequence(steppables.get(simulation));
+    protected Map<Species, Price> newInstance(final Simulation simulation) {
+        checkNotNull(speciesList, "speciesList must not be null");
+        checkNotNull(pricePerSpeciesCode, "pricePerSpeciesCode must not be null");
+        final Map<String, Species> speciesByCode =
+            speciesList.get(simulation).stream().collect(toMap(Species::getCode, identity()));
+        return pricePerSpeciesCode.entrySet().stream().collect(toImmutableMap(
+            entry -> speciesByCode.get(entry.getKey()),
+            entry -> entry.getValue().get(simulation)
+        ));
     }
 
 }
