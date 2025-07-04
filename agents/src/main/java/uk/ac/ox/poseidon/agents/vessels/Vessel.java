@@ -32,6 +32,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
+import uk.ac.ox.poseidon.core.Agent;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -45,7 +46,7 @@ import java.util.Deque;
 
 @Getter
 @Setter
-public class Vessel implements Oriented2D {
+public class Vessel implements Agent, Oriented2D {
 
     private final String id;
     private final String name;
