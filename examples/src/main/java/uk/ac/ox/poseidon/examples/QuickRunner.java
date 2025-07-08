@@ -36,7 +36,6 @@ import uk.ac.ox.poseidon.io.ScenarioLoader;
 
 import java.lang.System.Logger;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.TemporalAmount;
 import java.util.Arrays;
@@ -101,11 +100,8 @@ public class QuickRunner implements Runnable {
         simulation.start();
         final TemporalSchedule schedule = simulation.getTemporalSchedule();
         logger.log(INFO, () -> "Simulation started (" + schedule.getDateTime() + ")");
-        final LocalDateTime end =
-            scenario.getStartingDateTime().get(simulation).plus(temporalAmount);
-        while (schedule.getDateTime().isBefore(end)) {
-            simulation.schedule.step(simulation);
-        }
+        final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
+        temporalSchedule.stepFor(simulation, temporalAmount);
         simulation.finish();
         logger.log(INFO, () -> "Simulation completed (" + schedule.getDateTime() + ")");
     }
