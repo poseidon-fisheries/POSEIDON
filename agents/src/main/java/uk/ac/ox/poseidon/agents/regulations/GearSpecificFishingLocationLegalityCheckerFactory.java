@@ -29,6 +29,7 @@ import lombok.Setter;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
@@ -38,7 +39,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 public class GearSpecificFishingLocationLegalityCheckerFactory
     extends VesselScopeFactory<GearSpecificFishingLocationLegalityChecker> {
 
-    private VesselScopeFactory<? extends FishingGear<?>> fishingGear;
+    private Factory<? extends FishingGear<?>> fishingGear;
     private VesselScopeFactory<? extends FishingLocationLegalityChecker> delegateChecker;
 
     @Override
@@ -47,7 +48,7 @@ public class GearSpecificFishingLocationLegalityCheckerFactory
         final Vessel vessel
     ) {
         return new GearSpecificFishingLocationLegalityChecker(
-            fishingGear.get(simulation, vessel),
+            fishingGear.get(simulation),
             delegateChecker.get(simulation, vessel)
         );
     }

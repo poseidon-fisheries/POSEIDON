@@ -47,7 +47,7 @@ import java.util.function.Supplier;
 public class DefaultFishingBehaviourFactory<C extends Content<C>>
     extends BehaviourFactory<Fishing<C>> {
 
-    private VesselScopeFactory<? extends FishingGear<C>> fishingGear;
+    private Factory<? extends FishingGear<C>> fishingGear;
     private VesselScopeFactory<? extends Hold<C>> hold;
     private VesselScopeFactory<? extends Supplier<Fisheable<C>>> fisheableSupplier;
     private Factory<? extends Regulations> regulations;
@@ -59,7 +59,7 @@ public class DefaultFishingBehaviourFactory<C extends Content<C>>
         final Vessel vessel
     ) {
         return new Fishing<>(
-            fishingGear.get(simulation, vessel),
+            fishingGear.get(simulation),
             hold.get(simulation, vessel),
             fisheableSupplier.get(simulation, vessel),
             regulations.get(simulation),
