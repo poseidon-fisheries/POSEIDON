@@ -26,9 +26,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.Duration;
@@ -39,7 +38,7 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FixedBiomassProportionGearFactory
-    extends VesselScopeFactory<FixedBiomassProportionGear> {
+    extends GlobalScopeFactory<FixedBiomassProportionGear> {
 
     private String code;
     private double proportion;
@@ -47,8 +46,7 @@ public class FixedBiomassProportionGearFactory
 
     @Override
     protected FixedBiomassProportionGear newInstance(
-        final Simulation simulation,
-        final Vessel vessel
+        final Simulation simulation
     ) {
         return new FixedBiomassProportionGear(code, proportion, durationSupplier.get(simulation));
     }
