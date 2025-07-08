@@ -27,7 +27,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
-import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.DEBUG;
 
 @RequiredArgsConstructor
 public class EventClearer implements Steppable {
@@ -39,7 +39,7 @@ public class EventClearer implements Steppable {
     @Override
     public void step(final SimState simState) {
         logger.log(
-            INFO,
+            DEBUG,
             "[{0}] Clearing event accumulator",
             ((TemporalSchedule) simState.schedule).getTimestamp()
         );
