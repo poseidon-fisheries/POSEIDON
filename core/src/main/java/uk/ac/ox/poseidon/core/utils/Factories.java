@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,37 +20,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.schedule;
+package uk.ac.ox.poseidon.core.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sim.engine.Sequence;
-import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.utils.Factories;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class SteppableSequenceFactory extends GlobalScopeFactory<Steppable> {
+@AllArgsConstructor
+public class Factories<C> extends GlobalScopeFactory<List<C>> {
 
-    private Factory<? extends List<? extends Steppable>> steppables;
+    private List<Factory<? extends C>> factories;
 
     @SafeVarargs
-    public SteppableSequenceFactory(final Factory<? extends Steppable>... steppables) {
-        this.steppables = new Factories<>(steppables);
+    public Factories(final Factory<? extends C>... factories) {
+        this.factories = Arrays.asList(factories);
     }
 
     @Override
-    protected Steppable newInstance(final Simulation simulation) {
-        return new Sequence(steppables.get(simulation));
+    protected List<C> newInstance(final Simulation simulation) {
+        return factories.stream().map(f -> (C) f.get(simulation)).toList();
     }
-
 }
