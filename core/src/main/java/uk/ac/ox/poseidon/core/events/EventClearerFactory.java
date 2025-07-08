@@ -22,28 +22,25 @@
 
 package uk.ac.ox.poseidon.core.events;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.ArrayList;
-import java.util.stream.Stream;
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class EventClearerFactory extends GlobalScopeFactory<EventClearer> {
 
-@RequiredArgsConstructor
-public class EventAccumulator<E> implements Listener<E> {
-    @Getter
-    private final Class<E> eventClass;
-    private final ArrayList<E> events = new ArrayList<>();
+    private Factory<? extends EventAccumulator<?>> eventAccumulator;
 
     @Override
-    public void receive(final E event) {
-        events.add(event);
+    protected EventClearer newInstance(final Simulation simulation) {
+        return new EventClearer(eventAccumulator.get(simulation));
     }
-
-    public Stream<E> getEvents() {
-        return events.stream();
-    }
-
-    public void clear() {
-        events.clear();
-    }
+    
 }

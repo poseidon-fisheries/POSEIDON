@@ -22,28 +22,27 @@
 
 package uk.ac.ox.poseidon.core.events;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
-import java.util.ArrayList;
-import java.util.stream.Stream;
+import static java.lang.System.Logger.Level.INFO;
 
 @RequiredArgsConstructor
-public class EventAccumulator<E> implements Listener<E> {
-    @Getter
-    private final Class<E> eventClass;
-    private final ArrayList<E> events = new ArrayList<>();
+public class EventClearer implements Steppable {
+
+    private static final System.Logger logger = System.getLogger(EventClearer.class.getName());
+
+    private final EventAccumulator<?> accumulator;
 
     @Override
-    public void receive(final E event) {
-        events.add(event);
-    }
-
-    public Stream<E> getEvents() {
-        return events.stream();
-    }
-
-    public void clear() {
-        events.clear();
+    public void step(final SimState simState) {
+        logger.log(
+            INFO,
+            "[{0}] Clearing event accumulator",
+            ((TemporalSchedule) simState.schedule).getTimestamp()
+        );
+        accumulator.clear();
     }
 }
