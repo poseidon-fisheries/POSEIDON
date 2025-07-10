@@ -45,7 +45,7 @@ public class PeriodFactory extends GlobalScopeFactory<Period> {
 
     public PeriodFactory(final String iso8601Period) {
         final Period period = Period.parse(iso8601Period);
-        year = period.getYears();
+        this.year = period.getYears();
         this.month = period.getMonths();
         this.day = period.getDays();
     }

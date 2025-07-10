@@ -35,9 +35,7 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.io.Serial;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -47,11 +45,10 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 public class Simulation extends SimState {
 
     @Serial private static final long serialVersionUID = -8162246985852120341L;
-    private static final AtomicLong idCounter = new AtomicLong();
     private final EventManager eventManager = new SimpleEventManager();
     private final TemporalSchedule temporalSchedule;
     private final Scenario scenario;
-    private final long id = idCounter.getAndIncrement();
+    private final UUID id;
     private final List<Steppable> finalProcesses = new ArrayList<>();
     private boolean started = false;
     private List<?> components;
@@ -59,19 +56,8 @@ public class Simulation extends SimState {
     public Simulation() {
         this(
             System.currentTimeMillis(),
-            LocalDate.now().atStartOfDay(),
+            new TemporalSchedule(LocalDate.now().atStartOfDay()),
             new Scenario()
-        );
-    }
-
-    public Simulation(
-        final long seed,
-        final LocalDateTime startingDateTime,
-        final Scenario scenario
-    ) {
-        this(
-            seed,
-            new TemporalSchedule(startingDateTime), scenario
         );
     }
 
@@ -81,9 +67,20 @@ public class Simulation extends SimState {
         final TemporalSchedule schedule,
         final Scenario scenario
     ) {
+        this(seed, schedule, scenario, UUID.randomUUID());
+    }
+
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public Simulation(
+        final long seed,
+        final TemporalSchedule schedule,
+        final Scenario scenario,
+        final UUID simulationId
+    ) {
         super(seed, schedule);
         this.temporalSchedule = checkNotNull(schedule);
         this.scenario = scenario;
+        this.id = simulationId;
     }
 
     @Override

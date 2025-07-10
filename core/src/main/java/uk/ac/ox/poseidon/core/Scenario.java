@@ -26,11 +26,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.time.DateFactory;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
+import static java.time.ZoneOffset.UTC;
 
 @Getter
 @Setter
@@ -38,18 +41,27 @@ import java.util.Map;
 @AllArgsConstructor
 public final class Scenario {
 
-    private Factory<? extends LocalDateTime> startingDateTime = new DateFactory();
+    private Date startingDateTime = new Date();
 
     private Map<String, ? extends Factory<?>> components = new HashMap<>();
 
     public Simulation newSimulation() {
-        return newSimulation(System.currentTimeMillis());
+        return newSimulation(System.currentTimeMillis(), UUID.randomUUID());
     }
 
-    public Simulation newSimulation(final long seed) {
-        return new Simulation(seed, startingDateTime.get(null), this);
+    public Simulation newSimulation(
+        final long seed,
+        final UUID simulationId
+    ) {
+        return new Simulation(
+            seed,
+            new TemporalSchedule(startingDateTime.toInstant().atZone(UTC).toLocalDateTime()),
+            this,
+            simulationId
+        );
     }
 
+    @SuppressWarnings("unchecked")
     public <C> Factory<? extends C> component(
         final String componentName
     ) {
