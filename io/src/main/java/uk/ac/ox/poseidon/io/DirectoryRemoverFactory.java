@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,14 +20,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-plugins {
-    id("buildlogic.java-library-conventions")
-}
+package uk.ac.ox.poseidon.io;
 
-dependencies {
-    api(project(":core"))
-    api(libs.tablesaw.core)
-    api(libs.snakeyaml)
-    implementation(libs.commons.io)
-    runtimeOnly(libs.slf4j.jdk14) // tablesaw uses slf4j, which we reroute to j.u.Logging
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import sim.engine.Steppable;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
+
+import java.nio.file.Path;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class DirectoryRemoverFactory extends GlobalScopeFactory<Steppable> {
+
+    private Factory<? extends Path> target;
+    private boolean ignoreIfAbsent;
+
+    @Override
+    protected Steppable newInstance(final Simulation simulation) {
+        return new DirectoryRemover(target.get(simulation), ignoreIfAbsent);
+    }
 }
