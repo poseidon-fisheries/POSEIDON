@@ -39,6 +39,7 @@ public class CsvTableWriterFactory extends SimulationScopeFactory<CsvTableWriter
 
     private Factory<? extends Supplier<Table>> tableSupplier;
     private Factory<? extends Path> path;
+    private boolean append;
     private boolean clearAfterWriting;
 
     @Override
@@ -46,6 +47,7 @@ public class CsvTableWriterFactory extends SimulationScopeFactory<CsvTableWriter
         return new CsvTableWriter(
             tableSupplier.get(simulation),
             path.get(simulation),
+            append,
             clearAfterWriting
         );
     }
