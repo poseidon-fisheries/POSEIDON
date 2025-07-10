@@ -49,6 +49,10 @@ public final class Scenario {
         return newSimulation(System.currentTimeMillis(), UUID.randomUUID());
     }
 
+    public Simulation newSimulation(final UUID simulationId) {
+        return newSimulation(System.currentTimeMillis(), simulationId);
+    }
+
     public Simulation newSimulation(
         final long seed,
         final UUID simulationId
