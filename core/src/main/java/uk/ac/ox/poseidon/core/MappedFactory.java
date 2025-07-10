@@ -131,7 +131,7 @@ public class MappedFactory<C> extends GlobalScopeFactory<List<C>> {
     }
 
     @Override
-    int makeKey(final Simulation simulation) {
+    public int makeKey(final Simulation simulation) {
         // We override makeKey here because we want to use the properties of the target
         // factory as part of our own key instead of the object that it would instantiate
         // (or more likely die trying) if its get method gets called.

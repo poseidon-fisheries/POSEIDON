@@ -34,7 +34,7 @@ import static com.google.common.cache.CacheLoader.from;
 
 public abstract class AgentScopeFactory<A extends Agent, C> {
 
-    protected final transient List<Method> readMethods = Factory.readMethods(this);
+    protected final transient List<Method> readMethods = AbstractFactory.readMethods(this);
 
     // needs to be transient for SnakeYAML not to be confused
     // when there are no other properties to serialize
