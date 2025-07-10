@@ -20,9 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core;
+package uk.ac.ox.poseidon.io;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.Simulation;
 
 import java.nio.file.Path;
 
