@@ -24,26 +24,41 @@ package uk.ac.ox.poseidon.core;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.time.DateFactory;
+import lombok.Setter;
 
 import java.beans.FeatureDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static java.time.ZoneOffset.UTC;
 import static java.util.stream.Collectors.toMap;
 
 @Getter
-@NoArgsConstructor
+@Setter
 @AllArgsConstructor
-public class ScenarioSupplier implements Supplier<Scenario> {
+public abstract class ScenarioSupplier implements Supplier<Scenario> {
 
-    protected Factory<? extends LocalDateTime> startingDateTime = new DateFactory();
+    private Date startingDate;
+
+    public ScenarioSupplier(final LocalDate startingDate) {
+        this(startingDate.atStartOfDay());
+    }
+
+    public ScenarioSupplier(final LocalDateTime startingDateTime) {
+        this(startingDateTime.atZone(UTC));
+    }
+
+    public ScenarioSupplier(final ZonedDateTime zonedDateTime) {
+        this(Date.from(zonedDateTime.toInstant()));
+    }
 
     private Map<String, Factory<?>> extractComponents() {
         try {
@@ -73,6 +88,9 @@ public class ScenarioSupplier implements Supplier<Scenario> {
 
     @Override
     public Scenario get() {
-        return new Scenario(startingDateTime, extractComponents());
+        return new Scenario(
+            startingDate,
+            extractComponents()
+        );
     }
 }

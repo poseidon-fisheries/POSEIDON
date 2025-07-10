@@ -33,6 +33,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -115,7 +116,7 @@ public class SimulationWithUI extends GUIState {
             return propertyOrNull(Simulation::getScenario);
         }
 
-        public Long getId() {
+        public UUID getId() {
             return propertyOrNull(Simulation::getId);
         }
 
