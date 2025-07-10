@@ -1,6 +1,7 @@
 [versions]
 batik = "1.18"
 commons-beanutils = "1.11.0"
+commons-io = "2.19.0"
 flatlaf = "3.5.4"
 gdx = "1.8.2"
 geotools = "32.2"
@@ -27,6 +28,7 @@ batik-awt-util = { module = "org.apache.xmlgraphics:batik-awt-util", version.ref
 batik-dom = { module = "org.apache.xmlgraphics:batik-dom", version.ref = "batik" }
 batik-transcoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.ref = "batik" }
 commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "commons-beanutils" }
+commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
 flatlaf = { module = "com.formdev:flatlaf", version.ref = "flatlaf" }
 gdx-ai = { module = "com.badlogicgames.gdx:gdx-ai", version.ref = "gdx" }
 gt-api = { module = "org.geotools:gt-api", version.ref = "geotools" }
