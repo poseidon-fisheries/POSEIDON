@@ -22,7 +22,10 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -36,7 +39,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @NoArgsConstructor
 public class PortGridFactory extends SimulationScopeFactory<PortGrid> {
 
-    @NonNull private Factory<? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? extends BathymetricGrid> bathymetricGrid;
 
     @Override
     protected PortGrid newInstance(final Simulation simulation) {
