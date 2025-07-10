@@ -36,7 +36,7 @@ public abstract class VesselScopeFactory<C> extends AgentScopeFactory<Vessel, C>
         final Vessel vessel
     ) {
         synchronized (this) {
-            return getReadMethods()
+            return readMethods
                 .stream()
                 .map(readMethod -> {
                     try {

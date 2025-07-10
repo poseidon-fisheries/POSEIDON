@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.core;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
-import lombok.Getter;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -35,8 +34,7 @@ import static com.google.common.cache.CacheLoader.from;
 
 public abstract class AgentScopeFactory<A extends Agent, C> {
 
-    @Getter(lazy = true) private final List<Method> readMethods =
-        Factory.readMethods(this);
+    protected final transient List<Method> readMethods = Factory.readMethods(this);
 
     // needs to be transient for SnakeYAML not to be confused
     // when there are no other properties to serialize

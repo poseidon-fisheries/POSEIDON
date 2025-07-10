@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.core;
 
-import lombok.Getter;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -37,7 +36,7 @@ import static java.util.Comparator.comparing;
 
 public abstract class Factory<C> {
 
-    @Getter(lazy = true) private final List<Method> readMethods = readMethods(this);
+    private final transient List<Method> readMethods = readMethods(this);
 
     public static List<Method> readMethods(final Object object) {
         final PropertyDescriptor[] props;
@@ -60,7 +59,7 @@ public abstract class Factory<C> {
 
     int makeKey(final Simulation simulation) {
         synchronized (this) {
-            return getReadMethods()
+            return readMethods
                 .stream()
                 .map(readMethod -> {
                     try {
