@@ -26,8 +26,14 @@ import lombok.RequiredArgsConstructor;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import tech.tablesaw.api.Table;
+import tech.tablesaw.io.csv.CsvWriteOptions;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.lang.System.Logger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
@@ -40,15 +46,25 @@ public class CsvTableWriter implements Steppable {
 
     private final Supplier<Table> tableSupplier;
     private final Path path;
+    private final boolean append;
     private final boolean clearAfterWriting;
 
     @Override
     public void step(final SimState state) {
-        final Table table = tableSupplier.get();
-        table.write().csv(path.toFile());
-        if (clearAfterWriting) {
-            table.clear();
+        final boolean fileExists = path.toFile().exists();
+        try (
+            final var fos = new FileOutputStream(path.toFile(), append);
+            final var osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+            final var bw = new BufferedWriter(osw)
+        ) {
+            final Table table = tableSupplier.get();
+            table.write().csv(CsvWriteOptions.builder(bw).header(!fileExists).build());
+            if (clearAfterWriting) {
+                table.clear();
+            }
+            logger.log(INFO, "Written " + path.toAbsolutePath());
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
-        logger.log(INFO, "Written " + path.toAbsolutePath());
     }
 }
