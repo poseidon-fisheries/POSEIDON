@@ -20,30 +20,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core;
+package uk.ac.ox.poseidon.io.paths;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.LoadingCache;
+import uk.ac.ox.poseidon.core.Factory;
 
-import static com.google.common.cache.CacheLoader.from;
+import java.nio.file.Path;
 
-public abstract class SimulationScopeFactory<C> extends AbstractFactory<C> {
+public interface PathFactory extends Factory<Path> {
 
-    // needs to be transient for SnakeYAML not to be confused
-    // when there are no other properties to serialize
-    private final transient LoadingCache<Simulation, LoadingCache<Integer, C>> cache =
-        CacheBuilder.newBuilder()
-            .weakKeys()
-            .build(from(simulation ->
-                CacheBuilder.newBuilder()
-                    .build(from(() -> newInstance(simulation)))
-            ));
+    private static String pathToString(final Path path) {
+        return path.toString().replace("\\", "/");
+    }
 
-    @Override
-    public final C get(final Simulation simulation) {
-        return cache
-            .getUnchecked(simulation)
-            .getUnchecked(makeKey(simulation));
+    static RootPathFactory of(final Path path) {
+        return new RootPathFactory(pathToString(path));
+    }
+
+    static RootPathFactory of(
+        final String first,
+        final String... more
+    ) {
+        return of(Path.of(first, more));
+    }
+
+    default RelativePathFactory plus(final Path path) {
+        return new RelativePathFactory(this, pathToString(path));
+    }
+
+    default RelativePathFactory plus(
+        final String first,
+        final String... more
+    ) {
+        return plus(Path.of(first, more));
+    }
+
+    default SimulationFolderFactory simulationFolder() {
+        return new SimulationFolderFactory(this);
     }
 
 }

@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.io;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.io.paths.PathFactory;
 
 import java.nio.file.Path;
 

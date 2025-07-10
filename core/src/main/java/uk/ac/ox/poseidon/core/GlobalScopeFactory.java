@@ -27,7 +27,7 @@ import com.google.common.cache.CacheBuilder;
 
 import java.util.concurrent.ExecutionException;
 
-public abstract class GlobalScopeFactory<C> extends Factory<C> {
+public abstract class GlobalScopeFactory<C> extends AbstractFactory<C> {
 
     // needs to be transient for SnakeYAML not to be confused
     // when there are no other properties to serialize

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,55 +20,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.io;
+package uk.ac.ox.poseidon.io.paths;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class PathFactory extends GlobalScopeFactory<Path> {
+@NoArgsConstructor
+public class SimulationFolderFactory extends SimulationScopeFactory<Path> implements PathFactory {
 
     private Factory<? extends Path> parent;
-    @NonNull private String path;
-
-    private PathFactory(
-        final PathFactory parent,
-        final Path path
-    ) {
-        this(parent, path.toString().replace("\\", "/"));
-    }
-
-    public static PathFactory of(final Path path) {
-        return new PathFactory(null, path);
-    }
-
-    public static PathFactory of(
-        final String first,
-        final String... more
-    ) {
-        return of(Path.of(first, more));
-    }
-
-    public PathFactory plus(final Path path) {
-        return new PathFactory(this, path);
-    }
-
-    public PathFactory plus(
-        final String first,
-        final String... more
-    ) {
-        return plus(Path.of(first, more));
-    }
 
     @Override
-    protected Path newInstance(final @NonNull Simulation simulation) {
-        return parent == null ? Path.of(path) : parent.get(null).resolve(path);
+    protected Path newInstance(final Simulation simulation) {
+        final Path path =
+            checkNotNull(parent, "Parent path factory is null")
+                .get(simulation)
+                .resolve(simulation.getId().toString());
+        if (Files.notExists(path)) {
+            try {
+                Files.createDirectories(path);
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return path;
     }
 }
