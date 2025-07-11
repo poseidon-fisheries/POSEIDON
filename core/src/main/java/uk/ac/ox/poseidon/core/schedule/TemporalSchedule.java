@@ -41,6 +41,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequiredArgsConstructor
 public class TemporalSchedule extends Schedule {
 
+    private static final System.Logger logger = System.getLogger(TemporalSchedule.class.getName());
+
     public static final String BEFORE_SIMULATION_STRING = "At Start";
     public static final String AFTER_SIMULATION_STRING = "At End";
     @Serial private static final long serialVersionUID = 4197200009803943439L;
@@ -177,9 +179,9 @@ public class TemporalSchedule extends Schedule {
     ) {
         final AtomicBoolean done = new AtomicBoolean(false);
         this.scheduleOnce(
-            dateTime,
-            Integer.MIN_VALUE,
-            (Steppable) __ -> done.set(true)
+            toTime(dateTime) - 1,
+            Integer.MAX_VALUE,
+            (Steppable) sim -> done.set(true)
         );
         while (!done.get()) {
             step(simState);

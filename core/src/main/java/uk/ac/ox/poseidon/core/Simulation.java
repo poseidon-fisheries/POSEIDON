@@ -34,6 +34,7 @@ import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.io.Serial;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
@@ -159,6 +160,24 @@ public class Simulation extends SimState {
             );
         }
         return components.iterator().next();
+    }
+
+    public static void log(
+        final System.Logger logger,
+        final System.Logger.Level level,
+        final SimState simState,
+        final String format,
+        final Object... args
+    ) {
+        logger.log(
+            level,
+            () -> {
+                final Simulation simulation = (Simulation) simState;
+                return simulation.getId() +
+                    " [" + ((TemporalSchedule) simState.schedule).getTimestamp() + "] " +
+                    MessageFormat.format(format, args);
+            }
+        );
     }
 
 }
