@@ -30,6 +30,8 @@ public interface PlannedAction {
         final SeaTile location,
         final uk.ac.ox.poseidon.agents.api.Action action
     ) {
+//        System.out.println("permitted? "+fisher.grabState().getRegulations().isPermitted(action) );
+//        System.out.println("allowed to fish here? "+fisher.isAllowedToFishHere(location, fisher.grabState()) );
         return fisher.isAllowedAtSea() &&
             fisher.grabState().getRegulations().isPermitted(action) &&
             //we should be allowed to fish here
@@ -81,6 +83,7 @@ public interface PlannedAction {
 
         @Override
         public Action[] actuate(final Fisher fisher) {
+ //           System.out.println("Fisher "+fisher.getID()+" deploying a FAD. "+fisher.getDailyData().getLatestObservation("Number of active FADs"));
             return delayInHours <= 0
                 ? new Action[]{new FadDeploymentAction(fisher)}
                 : new Action[]{new FadDeploymentAction(fisher), new Delaying(delayInHours)};
@@ -88,6 +91,11 @@ public interface PlannedAction {
 
         @Override
         public boolean isAllowedNow(final Fisher fisher) {
+//            if(!fisher.isAllowedAtSea())
+//                System.out.println("not Allowed at Sea.");
+//            if(fisher.grabState().getRegulations().isForbidden(new FadDeploymentAction(fisher)))
+//                System.out.println("not allowed to deploy here");
+
             return fisher.isAllowedAtSea() &&
                 !fisher.grabState()
                     .getRegulations()

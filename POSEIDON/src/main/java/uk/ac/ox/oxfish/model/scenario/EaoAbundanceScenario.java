@@ -41,7 +41,7 @@ public class EaoAbundanceScenario extends EaoScenario<AbundanceLocalBiology> {
                 new RecruitmentProcessesFactory(
                     abundanceInputFolder.path("recruitment_parameters_2021.csv")
                 ),
-                "species_distribution_maps_2021_to_2023_dummy.csv",
+                "species_distribution_maps_FOTM_2021_to_2024.csv",
                 "bins_2021.csv",
                 "mortality_2021.csv"
             )

@@ -21,10 +21,28 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner.factories;
 
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.MarginalValueFadPlanningModule;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.MinimumSetValues;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.OwnFadSetDiscretizedActionGenerator;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 public class MarginalValueFadPlanningModuleFactory extends PlanningModuleFactory<MarginalValueFadPlanningModule> {
+
+    public MarginalValueFadPlanningModuleFactory(){
+
+    }
+
+    public MarginalValueFadPlanningModuleFactory(
+        final AlgorithmFactory<MinimumSetValues> minimumSetValues,
+        final IntegerParameter targetYear,
+        final AlgorithmFactory<? extends MapDiscretizer> discretization
+    ) {
+        super(minimumSetValues, targetYear, discretization);
+    }
+
     @Override
     protected MarginalValueFadPlanningModule makePlanningModule(
         final FishState fishState,
@@ -32,4 +50,5 @@ public class MarginalValueFadPlanningModuleFactory extends PlanningModuleFactory
     ) {
         return new MarginalValueFadPlanningModule(optionsGenerator);
     }
+
 }

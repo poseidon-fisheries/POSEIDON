@@ -50,6 +50,7 @@ public abstract class LocationValuesFactory implements AlgorithmFactory<Location
         final Fisher fisher,
         final Class<? extends PurseSeinerAction> actionClass
     ) {
+//        System.out.println("breakpt");
         return locationValuesCache.getLocationValues(
             locationValuesFile.get(),
             targetYear.getValue(),

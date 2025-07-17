@@ -116,7 +116,6 @@ public abstract class LastMomentFad extends Fad {
     }
 
     protected double[] getCurrentCatchabilityPerSpecies() {
-
         double multiplier = 0;
         if (this.state != null) // you must have at least step once!
         {

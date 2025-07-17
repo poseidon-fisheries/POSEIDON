@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.parameters;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.oxfish.model.scenario.EaoPathPlannerAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.EpoPathPlannerAbundanceScenario;
 
 import java.nio.file.Path;
@@ -16,6 +17,18 @@ public class CalibrationGeneratorTest {
             calibrationFolder,
             calibrationFolder.resolve("all_calibration_targets.csv"),
             new EpoPathPlannerAbundanceScenario().getTargetYear().getValue(),
+            1,
+            2
+        );
+    }
+    @Test
+    public void testGenerateEAOCalibration() {
+        final Path calibrationFolder = Paths.get("D:\\MARELA", "atl_inputs", "calibration");
+        new CalibrationGenerator().generateCalibration(
+            new EaoPathPlannerAbundanceScenario(),
+            calibrationFolder,
+            calibrationFolder.resolve("all_calibration_targets.csv"),
+            new EaoPathPlannerAbundanceScenario().getTargetYear().getValue(),
             1,
             2
         );

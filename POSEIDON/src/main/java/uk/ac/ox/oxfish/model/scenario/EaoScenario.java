@@ -69,7 +69,8 @@ public abstract class EaoScenario<B extends LocalBiology>
     public static final RegionalDivision REGIONAL_DIVISION = new CustomRegionalDivision(
         DEFAULT_MAP_EXTENT_FACTORY.get(),
         ImmutableMap.of(
-            "full", entry(new Coordinate(-34.5, 24.5), new Coordinate(19.5, -24.5))
+            "West", entry(new Coordinate(-35.5, 24.5), new Coordinate(-20.5, -24.5)),
+            "East", entry(new Coordinate(-19.5, 24.5), new Coordinate(19.5, -24.5))
         )
     );
     private static final Logger logger = Logger.getLogger(EaoScenario.class.getName());
@@ -80,11 +81,12 @@ public abstract class EaoScenario<B extends LocalBiology>
         new HashMap<>(ImmutableMap.of(
             "FAD zapper", new FadZapperFactory(
                 new FixedDoubleParameter(300),
-                new IntegerParameter(20)
+                new IntegerParameter(-35)
             ),
             "Shear map", new EnvironmentalMapFactory(
                 new StringParameter("Shear"),
-                getInputFolder().path("currents", "shear_2022.csv")
+                getInputFolder().path("currents", "shear.csv"),
+                new IntegerParameter(365*3)
             )
         ));
 
@@ -95,7 +97,7 @@ public abstract class EaoScenario<B extends LocalBiology>
         ImmutableMap.of(
             Y2021, Paths.get("currents", "currents_2021.csv"),
             Y2022, Paths.get("currents", "currents_2022.csv"),
-            Y2023, Paths.get("currents", "currents_2023.csv") // using 2017 as proxy for 2023
+            Y2023, Paths.get("currents", "currents_2023.csv")
         )
     );
     private FadMapFactory fadMap;
@@ -107,7 +109,7 @@ public abstract class EaoScenario<B extends LocalBiology>
         );
     private AlgorithmFactory<ScenarioPopulation> fleet = new EmptyFleet();
     private AlgorithmFactory<GroupedYearlyDistributions> empiricalCatchSizeDistributions =
-        new EmpiricalCatchSizeDistributionsFromFile(getInputFolder().path("catch_size_distributions_dummy.csv"));
+        new EmpiricalCatchSizeDistributionsFromFile(getInputFolder().path("catch_size_distributions.csv"));
 
     public static int dayOfYear(
         final int year,

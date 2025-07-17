@@ -30,7 +30,6 @@ public enum ActionType {
     FishingOnTile("FSH"),
     DolphinSets("DEL"),
     NonAssociatedSets("NOA"),
-    FreeSchoolSets("FSC"),
     OpportunisticFadSets("OFS");
 
     private final String text;

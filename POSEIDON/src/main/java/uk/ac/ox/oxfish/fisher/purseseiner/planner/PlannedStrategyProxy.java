@@ -83,6 +83,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
      * a multiplier to the NOA actions weight (makes it more or less common than what the data may suggest)
      */
     private final double nonAssociatedBias;
+
     /**
      * a multiplier to the DEL actions weight (makes it more or less common than what the data may suggest)
      */
@@ -257,7 +258,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                     locationValues.get(FadDeploymentAction.class);
                 if (locations.getValues().isEmpty())
                     logger.warning(() ->
-                        fisher + " failed to create DPL location values, in spite of having" +
+                        fisher + " failed to create DPL location values, in spite of having " +
                             "a weight of " + actionWeight.getValue()
                     );
                 plannableActionWeights.put(

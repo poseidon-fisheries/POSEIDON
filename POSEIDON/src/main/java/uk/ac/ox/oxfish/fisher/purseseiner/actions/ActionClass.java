@@ -23,7 +23,6 @@ public enum ActionClass {
     FAD(FadSetAction.class),
     DEL(DolphinSetAction.class),
     NOA(NonAssociatedSetAction.class),
-    FSC(FreeSchoolSetAction.class),
     OFS(OpportunisticFadSetAction.class),
     DPL(FadDeploymentAction.class);
 

@@ -5,6 +5,9 @@ import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
+import java.util.ArrayList;
+import java.util.stream.Stream;
+
 public class MixingLayerMapFactory extends EnvironmentalMapFactory {
     public MixingLayerMapFactory() {
     }
@@ -17,7 +20,7 @@ public class MixingLayerMapFactory extends EnvironmentalMapFactory {
             "MixingLayerDepth",
             gridFile,
             new IntegerParameter(mapPeriod),
-            new CalibratedParameter(26, 27, 25, 30, 26.5), // target
+            new CalibratedParameter(20, 35, 0, 75, 26.5), // target
             new CalibratedParameter(.25, .75, 0, 1), // penalty
             new CalibratedParameter(4, 6, 2, 8, 2.25) // margin
         );

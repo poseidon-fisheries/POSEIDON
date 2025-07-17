@@ -42,6 +42,7 @@ public abstract class LocationValuePlanningModule<B extends LocalBiology>
         final Fisher fisher
     ) {
         // start the location value if needed; else start the generator
+//        System.out.println("brkpt");
         if (locationValues.getValues() == null)
             locationValues.start(model, fisher);
         generator.start();
@@ -55,6 +56,7 @@ public abstract class LocationValuePlanningModule<B extends LocalBiology>
         final FishState state,
         final Fisher fisher
     ) {
+//        System.out.println("breakpt");
         Preconditions.checkState(locationValues.getValues() != null);
         generator.start();
     }

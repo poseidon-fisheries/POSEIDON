@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.fads;
 
 import ec.util.MersenneTwisterFast;
+import org.apache.commons.math3.util.DoubleArray;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.FadSetAction;
@@ -10,16 +11,18 @@ import uk.ac.ox.oxfish.geography.fads.AbundanceAggregatingFadInitializer;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.plugins.EnvironmentalMapFactory;
 import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
+import static java.lang.Math.*;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.processSpeciesNameToDoubleParameterMap;
 
 public class SelectivityAbundanceFadInitializerFactory
@@ -85,10 +88,46 @@ public class SelectivityAbundanceFadInitializerFactory
                 .map(factory -> factory.apply(fishState))
                 .map(penalityFunction -> (Function<Fad, double[]>) fad -> {
                     final SeaTile fadLocation = fad.getLocation();
-                    final double penaltyHere = finalCatchabilityPenaltyFunction.apply(fadLocation);
-                    return (penaltyHere <= 0 || !Double.isFinite(penaltyHere))
-                        ? new double[globalBiology.getSize()]
-                        : Arrays.stream(catchabilityArray).map(c -> c * penaltyHere).toArray();
+
+                    final Double[] penaltyHere = new Double[globalBiology.getSize()];
+                    for(int i=0; i<penaltyHere.length; i++){
+
+                        Collection<EnvironmentalMapFactory> maps =
+                            environmentalPenaltyFunction.getEnvironmentalMapFactories().values();
+                        penaltyHere[i] = 1.0;
+                        for(EnvironmentalMapFactory map: maps){
+                            String mapName = map.getMapVariableName();
+                            double margin = map.getMargin().applyAsDouble(fishState.getRandom());
+                            double penalty = map.getPenalty().applyAsDouble(fishState.getRandom());
+                            double target = map.getTarget(i).applyAsDouble(fishState.getRandom());
+                            double valueHere =
+                                fishState.getMap()
+                                    .getAdditionalMaps()
+                                    .get(mapName)
+                                    .get()
+                                    .get(fadLocation.getGridX(), fadLocation.getGridY());
+                            double valueDifference = abs(valueHere - target) - margin;
+                            penaltyHere[i] *= (valueDifference > 0) ? 1 / pow(1 + (-valueDifference * log(1 - penalty)), 4) : 1;
+
+                        }
+//                        for(int j=0; j<maps.size(); j++){
+//                            EnvironmentalMapFactory map = ;
+//                        }
+                    }
+
+                    //finalCatchabilityPenaltyFunction.apply(fadLocation);
+                    if(penaltyHere[0] <= 0 || !Double.isFinite(penaltyHere[0])){
+                        return new double[globalBiology.getSize()];
+                    } else {
+                        double[] multiplierHere = new double[catchabilityArray.length];
+                        for(int i=0; i<multiplierHere.length; i++){
+                            multiplierHere[i] = catchabilityArray[i]*penaltyHere[i];
+                        }
+                        return multiplierHere;
+                    }
+//                    return (penaltyHere[0] <= 0 || !Double.isFinite(penaltyHere[0]))
+//                        ? new double[globalBiology.getSize()]
+//                        : IntStream.range(0,catchabilityArray.length).map(i -> catchabilityArray[i] * penaltyHere[i]).toArray();
                 })
                 .orElse(fad -> catchabilityArray);
 

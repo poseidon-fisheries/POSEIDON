@@ -103,7 +103,7 @@ public class EaoPurseSeineVesselReader implements AlgorithmFactory<List<Fisher>>
 
 
     private static String capacityClass(final Fisher fisher) {
-        return "PS";
+        return "class PS";
 /*        final long t = Math.round(fisher.getMaximumHold() / 1000);
         if (t < 46) return "class 1";
         else if (t <= 91) return "class 2";

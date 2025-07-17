@@ -17,9 +17,11 @@ public class TemperatureMapFactory extends EnvironmentalMapFactory {
             "Temperature",
             gridFile,
             new IntegerParameter(mapPeriod),
-            new CalibratedParameter(26, 27, 25, 30, 26.5), // target
+            new CalibratedParameter(26, 27, 25, 30, 26.5),// target [Bigeye]
             new CalibratedParameter(.25, .75, 0, 1), // penalty
-            new CalibratedParameter(4, 6, 2, 8, 2.25) // margin
+            new CalibratedParameter(4, 6, 2, 8, 2.25) ,// margin
+            new CalibratedParameter(26, 27, 25, 30, 26.5), // target2 [Skipjack]
+            new CalibratedParameter(26, 27, 25, 30, 26.5) //target3 [Yellowfin]
         );
     }
 
@@ -29,9 +31,20 @@ public class TemperatureMapFactory extends EnvironmentalMapFactory {
     }
 
     @Override
-    public void setTarget(final DoubleParameter target) {
+    public void setTarget(final DoubleParameter[] target) {
         super.setTarget(target);
     }
+
+    public void setTarget(final DoubleParameter target){
+        super.setTarget(target);
+    }
+    public void setTarget2(final DoubleParameter target2){
+        super.setTarget2(target2);
+    }
+    public void setTarget3(final DoubleParameter target3){
+        super.setTarget3(target3);
+    }
+
 
     @Override
     public void setMargin(final DoubleParameter margin) {

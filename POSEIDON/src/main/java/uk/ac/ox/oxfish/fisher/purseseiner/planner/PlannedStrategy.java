@@ -120,6 +120,8 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
 
         // we may have just arrived, if so get the queue of actions we need to take
         if (actionQueueInProgress == null) {
+//            System.out.println("Fisher "+agent.getId()+ "arrived to "+actionInProgress.getClass().getSimpleName());
+//            System.out.println("Action allowed?"+actionInProgress.isAllowedNow(agent));
             if (actionInProgress.isAllowedNow(agent))
                 actionQueueInProgress = actionInProgress.actuate(agent);
             else
@@ -199,7 +201,9 @@ public class PlannedStrategy implements DestinationStrategy, FishingStrategy {
             actionInProgress.getLocation() == null ||
                 (!actionInProgress.isAllowedNow(fisher))
         ) {
-
+//            if(!actionInProgress.isAllowedNow(fisher)){
+//                System.out.println(fisher.getID()+" tried to "+actionInProgress.getClass().getName()+" at "+actionInProgress.getLocation().getGridX()+","+actionInProgress.getLocation().getGridX()+" but it was not allowed");
+//            }
             // check for the case when you just finished setting a fad that was destroyed (by you or others)
             // in that case it will say that the location is unknown, but it you just need to be here a second longer
             if (

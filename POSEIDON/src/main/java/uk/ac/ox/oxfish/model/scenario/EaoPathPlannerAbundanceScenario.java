@@ -7,7 +7,10 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.FixedGlobalCarryingCapacitySuppli
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.SelectivityAbundanceFadInitializerFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.MinimumSetValuesFromFileFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.EaoPlannedStrategyFlexibleFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.MarginalValueFadPlanningModuleFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.ValuePerSetPlanningModuleFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.WhereFadsAreFadModuleFactory;
+import uk.ac.ox.oxfish.fisher.purseseiner.planner.factories.WhereMoneyIsPlanningFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceCatchSamplersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.AbundanceFiltersFromFileFactory;
@@ -16,10 +19,7 @@ import uk.ac.ox.oxfish.fisher.purseseiner.utils.LogNormalErrorOperatorFactory;
 import uk.ac.ox.oxfish.fisher.purseseiner.utils.UnreliableFishValueCalculatorFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStrategyFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
-import uk.ac.ox.oxfish.model.plugins.EnvironmentalPenaltyFunctionFactory;
-import uk.ac.ox.oxfish.model.plugins.FrontalIndexMapFactory;
-import uk.ac.ox.oxfish.model.plugins.MixingLayerMapFactory;
-import uk.ac.ox.oxfish.model.plugins.TemperatureMapFactory;
+import uk.ac.ox.oxfish.model.plugins.*;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
@@ -34,7 +34,7 @@ public class EaoPathPlannerAbundanceScenario extends EaoAbundanceScenario {
     public EaoPathPlannerAbundanceScenario() {
         final MinimumSetValuesFromFileFactory minimumSetValues =
             new MinimumSetValuesFromFileFactory(
-                getInputFolder().path("min_set_values_dummy.csv")
+                getInputFolder().path("min_set_values.csv")
             );
         setFleet(
             new EaoPurseSeinerFleetFactory(
@@ -52,24 +52,24 @@ public class EaoPathPlannerAbundanceScenario extends EaoAbundanceScenario {
                             13, 30, 5, 40, 14
                         ),
                         ImmutableMap.of(
-                            "Bigeye tuna", new CalibratedParameter(0, 0.3, 0, 1),
-                            "Skipjack tuna", new CalibratedParameter(0, 0.3, 0, 1),
+                            "Bigeye tuna", new CalibratedParameter(0, 0.15, 0, 1),
+                            "Skipjack tuna", new CalibratedParameter(.15, 0.35, 0, 1),
                             "Yellowfin tuna", new CalibratedParameter(0, 0.3, 0, 1)
                         ),
                         ImmutableMap.of(
-                            "Bigeye tuna", new CalibratedParameter(0.08, 0.348, 0, 0.75),
-                            "Skipjack tuna", new CalibratedParameter(0.247, 0.75, 0, 0.75),
-                            "Yellowfin tuna", new CalibratedParameter(0.109, 0.226, 0, 0.75)
+                            "Bigeye tuna", new CalibratedParameter(0.31, 0.38, 0, 0.75),
+                            "Skipjack tuna", new CalibratedParameter(.001, .01, 0, 0.75),
+                            "Yellowfin tuna", new CalibratedParameter(.03, .05, 0, 0.75)
                         ),
                         new EnvironmentalPenaltyFunctionFactory(
                             ImmutableMap.of(
                                 "Temperature", new TemperatureMapFactory(
                                     getInputFolder().path("environmental_maps", "temperature2021_2024.csv"),
-                                    365 * 3
+                                    365 * 3//
                                 ),
                                 "MixingLayerDepth", new MixingLayerMapFactory(
                                     getInputFolder().path("environmental_maps", "mixinglayerdepth.csv"),
-                                    365 * 3
+                                    365 * 3//
                                 )
                             )
                         )
@@ -86,23 +86,40 @@ public class EaoPathPlannerAbundanceScenario extends EaoAbundanceScenario {
                 new EaoPlannedStrategyFlexibleFactory(
                     getTargetYear(),
                     new FixedLocationValuesFactory(
-                        getInputFolder().path("location_values_dummy.csv"),
+                        getInputFolder().path("location_values.csv"),
                         getTargetYear()
                     ),
                     minimumSetValues,
-                    new ValuePerSetPlanningModuleFactory(
+                    new ValuePerSetPlanningModuleFactory(   //Option 1
                         minimumSetValues,
                         getTargetYear(),
                         new SquaresMapDiscretizerFactory(),
                         new CalibratedParameter(0, 1, 0, 1)
                     ),
+/*                    new WhereFadsAreFadModuleFactory(     //Option 2
+                        minimumSetValues,
+                        getTargetYear(),
+                        new SquaresMapDiscretizerFactory(),
+                        new CalibratedParameter(0,1,-1,2)
+                    ),
+                    new WhereMoneyIsPlanningFactory(        //Option 3
+                        minimumSetValues,
+                        getTargetYear(),
+                        new SquaresMapDiscretizerFactory(),
+                        new CalibratedParameter(0,1,0,2)
+                    ),
+                    new MarginalValueFadPlanningModuleFactory(  //Option 4
+                        minimumSetValues,
+                        getTargetYear(),
+                        new SquaresMapDiscretizerFactory()
+                    ),*/
                     new AbundanceCatchSamplersFactory(
                         getAbundanceFilters(),
-                        getInputFolder().path("set_samples_dummy.csv"),
+                        getInputFolder().path("set_samples.csv"),
                         getTargetYear()
                     ),
-                    getInputFolder().path("action_weights_dummy.csv"),
-                    getInputFolder().path("vessels_dummy.csv")
+                    getInputFolder().path("action_weights.csv"),
+                    getInputFolder().path("vessels_longer_trips.csv")
                 ),
                 new DefaultToDestinationStrategyFishingStrategyFactory()
             )

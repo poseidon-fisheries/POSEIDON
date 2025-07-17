@@ -53,6 +53,7 @@ public abstract class Fad implements Locatable {
     final private int stepDeployed;
     final private Int2D locationDeployed;
     final private double fishReleaseProbability;
+    final private int stepGPSActive;
 
     final private Map<Species, Double> fishReleaseProbabilities;
 
@@ -80,6 +81,28 @@ public abstract class Fad implements Locatable {
     ) {
         this.tripDeployed = tripDeployed;
         this.stepDeployed = stepDeployed;
+        this.stepGPSActive = stepDeployed;
+        this.locationDeployed = locationDeployed;
+        this.fishReleaseProbabilities = ImmutableMap.copyOf(fishReleaseProbabilities);
+        this.fishReleaseProbability = Double.NaN; // TODO remove that once we have the per-species probabilities in place
+        this.owner = owner;
+        this.lost = false;
+        this.isActive = isActive;
+    }
+
+    // Allows a FAD to have a delayed GPS transmission
+    public Fad(
+        final TripRecord tripDeployed,
+        final int stepDeployed,
+        final Int2D locationDeployed,
+        final Map<Species, Double> fishReleaseProbabilities,
+        final FadManager owner,
+        final boolean isActive,
+        final int stepGPSActive
+    ) {
+        this.tripDeployed = tripDeployed;
+        this.stepDeployed = stepDeployed;
+        this.stepGPSActive = stepGPSActive;
         this.locationDeployed = locationDeployed;
         this.fishReleaseProbabilities = ImmutableMap.copyOf(fishReleaseProbabilities);
         this.fishReleaseProbability =
@@ -88,6 +111,7 @@ public abstract class Fad implements Locatable {
         this.lost = false;
         this.isActive = isActive;
     }
+
 
     public long getId() {
         return id;

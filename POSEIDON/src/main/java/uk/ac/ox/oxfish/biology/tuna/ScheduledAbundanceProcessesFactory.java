@@ -68,7 +68,7 @@ public class ScheduledAbundanceProcessesFactory
         this.abundanceMortalityProcess =
             new AbundanceMortalityProcessFromFileFactory(
                 mortalityFile,
-                ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline")
+                ImmutableList.of("natural", "obj_class_1_5", "noa_class_1_5", "longline", "bait_boat")
             );
     }
 

@@ -29,7 +29,7 @@ public class FrontalIndexMapFactory extends EnvironmentalMapFactory {
     }
 
     @Override
-    public void setTarget(final DoubleParameter target) {
+    public void setTarget(final DoubleParameter[] target) {
         super.setTarget(target);
     }
 

@@ -53,7 +53,6 @@ public class DefaultMonitors {
     private final Collection<Monitor<AbstractSetAction, ?, ?>> allSetsMonitors;
     private final Collection<Monitor<AbstractFadSetAction, ?, ?>> fadSetMonitors;
     private final Collection<Monitor<NonAssociatedSetAction, ?, ?>> nonAssociatedSetMonitors;
-    private final Collection<Monitor<FreeSchoolSetAction, ?, ?>> freeSchoolSetMonitors;
     private final Collection<Monitor<DolphinSetAction, ?, ?>> dolphinSetMonitors;
     private final GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private final Collection<Monitor<?, ?, ?>> otherMonitors;
@@ -166,14 +165,6 @@ public class DefaultMonitors {
                 fishState, "catches by non-associated sets", IterativeAveragingAccumulator::new)
         );
 
-        freeSchoolSetMonitors = ImmutableList.of(
-            makeActionCounter("free school sets"),
-            makeCatchFromSetAccumulator(
-                fishState, "catches from free school sets", SummingAccumulator::new),
-            makeCatchFromSetAccumulator(
-                fishState, "catches by free school sets", IterativeAveragingAccumulator::new)
-        );
-
         dolphinSetMonitors = ImmutableList.of(
             makeActionCounter("dolphin sets"),
             makeCatchFromSetAccumulator(
@@ -280,7 +271,6 @@ public class DefaultMonitors {
             allSetsMonitors,
             fadSetMonitors,
             nonAssociatedSetMonitors,
-            freeSchoolSetMonitors,
             dolphinSetMonitors,
             ImmutableList.of(biomassLostMonitor),
             otherMonitors
@@ -301,10 +291,6 @@ public class DefaultMonitors {
 
     public Collection<Monitor<NonAssociatedSetAction, ?, ?>> grabNonAssociatedSetMonitors() {
         return nonAssociatedSetMonitors;
-    }
-
-    public Collection<Monitor<FreeSchoolSetAction, ?, ?>> grabFreeSchoolSetMonitors() {
-        return freeSchoolSetMonitors;
     }
 
     public Collection<Monitor<DolphinSetAction, ?, ?>> grabDolphinSetMonitors() {

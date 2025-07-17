@@ -32,7 +32,7 @@ public class EaoPurseSeinerFleetFactory extends PurseSeinerFleetFactory {
     ) {
         super(
             targetYear,
-            inputFolder.path("vessels_dummy.csv"),
+            inputFolder.path("vessels.csv"),
             inputFolder.path("costs.csv"),
             purseSeineGearFactory,
             new FadRefillGearStrategyFactory(

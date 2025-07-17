@@ -38,7 +38,8 @@ public class FixedLocationValuesFactory extends LocationValuesFactory {
                     new FixedLocationValues(
                         fisher -> loadLocationValues(fisher, NonAssociatedSetAction.class)
                     )
-                ).put(
+                )
+                .put(
                     DolphinSetAction.class,
                     new FixedLocationValues(
                         fisher -> loadLocationValues(fisher, DolphinSetAction.class)

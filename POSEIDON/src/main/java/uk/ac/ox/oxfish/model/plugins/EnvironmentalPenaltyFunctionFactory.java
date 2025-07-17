@@ -33,7 +33,7 @@ public class EnvironmentalPenaltyFunctionFactory extends EnvironmentalFunctionFa
         final String mapName = environmentalMapFactory.getMapVariableName();
         final double margin = environmentalMapFactory.getMargin().applyAsDouble(fishState.getRandom());
         final double penalty = environmentalMapFactory.getPenalty().applyAsDouble(fishState.getRandom());
-        final double target = environmentalMapFactory.getTarget().applyAsDouble(fishState.getRandom());
+        final double target = environmentalMapFactory.getTarget(0).applyAsDouble(fishState.getRandom());
         return seaTile -> {
             final double valueHere =
                 fishState.getMap()

@@ -53,7 +53,6 @@ public class DefaultEpoMonitors {
     private final Collection<Monitor<AbstractSetAction, ?, ?>> allSetsMonitors;
     private final Collection<Monitor<AbstractFadSetAction, ?, ?>> fadSetMonitors;
     private final Collection<Monitor<NonAssociatedSetAction, ?, ?>> nonAssociatedSetMonitors;
-    private final Collection<Monitor<FreeSchoolSetAction, ?, ?>> freeSchoolSetMonitors;
     private final Collection<Monitor<DolphinSetAction, ?, ?>> dolphinSetMonitors;
     private final GroupingMonitor<Species, BiomassLostEvent, Double, Mass> biomassLostMonitor;
     private final Collection<Monitor<?, ?, ?>> otherMonitors;
@@ -159,14 +158,6 @@ public class DefaultEpoMonitors {
         );
 
         nonAssociatedSetMonitors = ImmutableList.of(
-            makeActionCounter("non-associated sets"),
-            makeCatchFromSetAccumulator(
-                fishState, "catches from non-associated sets", SummingAccumulator::new),
-            makeCatchFromSetAccumulator(
-                fishState, "catches by non-associated sets", IterativeAveragingAccumulator::new)
-        );
-
-        freeSchoolSetMonitors = ImmutableList.of(
             makeActionCounter("non-associated sets"),
             makeCatchFromSetAccumulator(
                 fishState, "catches from non-associated sets", SummingAccumulator::new),
@@ -280,7 +271,6 @@ public class DefaultEpoMonitors {
             allSetsMonitors,
             fadSetMonitors,
             nonAssociatedSetMonitors,
-            freeSchoolSetMonitors,
             dolphinSetMonitors,
             ImmutableList.of(biomassLostMonitor),
             otherMonitors
@@ -301,10 +291,6 @@ public class DefaultEpoMonitors {
 
     public Collection<Monitor<NonAssociatedSetAction, ?, ?>> grabNonAssociatedSetMonitors() {
         return nonAssociatedSetMonitors;
-    }
-
-    public Collection<Monitor<FreeSchoolSetAction, ?, ?>> grabFreeSchoolSetMonitors() {
-        return freeSchoolSetMonitors;
     }
 
     public Collection<Monitor<DolphinSetAction, ?, ?>> grabDolphinSetMonitors() {

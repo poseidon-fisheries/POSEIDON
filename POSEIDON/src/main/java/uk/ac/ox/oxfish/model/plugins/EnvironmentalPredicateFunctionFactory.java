@@ -18,7 +18,7 @@ public class EnvironmentalPredicateFunctionFactory extends EnvironmentalFunction
         final EnvironmentalMapFactory environmentalMapFactory
     ) {
         final String mapName = environmentalMapFactory.getMapVariableName();
-        final double target = environmentalMapFactory.getTarget().applyAsDouble(fishState.getRandom());
+        final double target = environmentalMapFactory.getTarget(0).applyAsDouble(fishState.getRandom());
         final double margin = environmentalMapFactory.getMargin().applyAsDouble(fishState.getRandom());
         return seaTile ->
             Math.abs(fishState

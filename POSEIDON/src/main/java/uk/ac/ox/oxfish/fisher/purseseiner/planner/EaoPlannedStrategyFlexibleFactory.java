@@ -24,7 +24,7 @@ public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
 
     private IntegerParameter targetYear;
     /**
-     * object used to draw catches for FSC
+     * object used to draw catches for NOA
      */
     private CatchSamplersFactory<? extends LocalBiology> catchSamplers;
 
@@ -41,23 +41,23 @@ public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * hours wasted after every DPL
      */
     private DoubleParameter additionalHourlyDelayDeployment =
-        new CalibratedParameter(0.1, 0.2, 0, 1);
+        new CalibratedParameter(0.01, 0.02, 0, .08);
     /**
      * hours wasted after every OFS
      */
-    private DoubleParameter additionalHourlyDelayFreeSchoolSets =
+    private DoubleParameter additionalHourlyDelayNonAssociatedSets =
         new CalibratedParameter(5, 15, 0, 24);
 
     /**
      * To probability of finding another vessel's FAD when you search for some.
      */
-//    private DoubleParameter probabilityOfFindingOtherFads =
-//        new CalibratedParameter(0, 0.5, 0, 1);
+    private DoubleParameter probabilityOfFindingOtherFads =
+        new CalibratedParameter(0, 0.5, 0, 1);
     /**
      * if you tried to steal and failed, how many hours does it take for you to fish this out
      */
-//    private DoubleParameter hoursWastedOnFailedSearches =
-//        new CalibratedParameter(1, 5, 0, 24);
+    private DoubleParameter hoursWastedOnFailedSearches =
+        new CalibratedParameter(1, 5, 0, 24);
     /**
      * how many hours does it take for a plan to go stale and need replanning
      */
@@ -73,17 +73,17 @@ public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      */
     private DoubleParameter deploymentBias =
         new CalibratedParameter(0.25, 0.95, 0.0, 0.9999);
-    private DoubleParameter fscBias =
+    private DoubleParameter noaBias =
         new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
 //    private DoubleParameter delBias =
 //        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
- //   private DoubleParameter ofsBias =
- //       new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
+   private DoubleParameter ofsBias =
+       new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
     private DoubleParameter minimumPercentageOfTripDurationAllowed =
         new CalibratedParameter(0.5, 1, 0, 1);
-    private BooleanParameter fscSetsCanPoachFads = new BooleanParameter(false);
+    private BooleanParameter noaSetsCanPoachFads = new BooleanParameter(false);
     private BooleanParameter purgeIllegalActionsImmediately = new BooleanParameter(true);
-    private DoubleParameter fscSetsRangeInSeatiles =
+    private DoubleParameter noaSetsRangeInSeatiles =
         new CalibratedParameter(0, 2, 0, 5);
 //    private DoubleParameter delSetsRangeInSeatiles =
 //        new CalibratedParameter(0, 2, 0, 5);
@@ -122,20 +122,20 @@ public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.minimumSetValues = minimumSetValues;
     }
 
-//    public DoubleParameter getProbabilityOfFindingOtherFads() {
-//        return probabilityOfFindingOtherFads;
-//    }
-
-//    public void setProbabilityOfFindingOtherFads(final DoubleParameter probabilityOfFindingOtherFads) {
-//        this.probabilityOfFindingOtherFads = probabilityOfFindingOtherFads;
-//    }
-
-    public BooleanParameter getFscSetsCanPoachFads() {
-        return fscSetsCanPoachFads;
+    public DoubleParameter getProbabilityOfFindingOtherFads() {
+        return probabilityOfFindingOtherFads;
     }
 
-    public void setFscSetsCanPoachFads(final BooleanParameter fscSetsCanPoachFads) {
-        this.fscSetsCanPoachFads = fscSetsCanPoachFads;
+    public void setProbabilityOfFindingOtherFads(final DoubleParameter probabilityOfFindingOtherFads) {
+        this.probabilityOfFindingOtherFads = probabilityOfFindingOtherFads;
+    }
+
+    public BooleanParameter getNoaSetsCanPoachFads() {
+        return noaSetsCanPoachFads;
+    }
+
+    public void setNoaSetsCanPoachFads(final BooleanParameter noaSetsCanPoachFads) {
+        this.noaSetsCanPoachFads = noaSetsCanPoachFads;
     }
 
     public BooleanParameter getPurgeIllegalActionsImmediately() {
@@ -175,6 +175,7 @@ public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         final MersenneTwisterFast rng = state.getRandom();
         final MinimumSetValues minSetValues = minimumSetValues.apply(state);
         final Integer targetYear = getTargetYear().getValue();
+//        System.out.println("breakpt");
 
         return new PlannedStrategyProxy(
             uniqueCatchSamplerForEachStrategy.getValue()
@@ -187,21 +188,21 @@ public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
             ),
             0,
             additionalHourlyDelayDeployment.applyAsDouble(rng),
-            additionalHourlyDelayFreeSchoolSets.applyAsDouble(rng),
+            additionalHourlyDelayNonAssociatedSets.applyAsDouble(rng),
             ownFadActionWeightBias.applyAsDouble(rng),
             deploymentBias.applyAsDouble(rng),
-            fscBias.applyAsDouble(rng),
+            noaBias.applyAsDouble(rng),
             0,
-            0,
-            0,
+            ofsBias.applyAsDouble(rng),
             minSetValues.getMinimumSetValue(targetYear, FAD),
-            0,
-            0,
+            minSetValues.getMinimumSetValue(targetYear, FAD),
+            probabilityOfFindingOtherFads.applyAsDouble(rng),
+            hoursWastedOnFailedSearches.applyAsDouble(rng),
             planningHorizonInHours.applyAsDouble(rng),
             minimumPercentageOfTripDurationAllowed.applyAsDouble(rng),
-            fscSetsCanPoachFads.getValue(),
+            noaSetsCanPoachFads.getValue(),
             purgeIllegalActionsImmediately.getValue(),
-            (int) fscSetsRangeInSeatiles.applyAsDouble(rng),
+            (int) noaSetsRangeInSeatiles.applyAsDouble(rng),
             0,
             fadModule,
             locationValuesFactory.apply(state).asMap()
@@ -232,21 +233,21 @@ public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.additionalHourlyDelayDeployment = additionalHourlyDelayDeployment;
     }
 
-//    public DoubleParameter getAdditionalHourlyDelayNonAssociatedSets() {
-//        return additionalHourlyDelayNonAssociatedSets;
-//    }
+    public DoubleParameter getAdditionalHourlyDelayNonAssociatedSets() {
+        return additionalHourlyDelayNonAssociatedSets;
+    }
 
-//    public void setAdditionalHourlyDelayNonAssociatedSets(final DoubleParameter additionalHourlyDelayNonAssociatedSets) {
-//        this.additionalHourlyDelayNonAssociatedSets = additionalHourlyDelayNonAssociatedSets;
-//    }
+    public void setAdditionalHourlyDelayNonAssociatedSets(final DoubleParameter additionalHourlyDelayNonAssociatedSets) {
+        this.additionalHourlyDelayNonAssociatedSets = additionalHourlyDelayNonAssociatedSets;
+    }
 
-//    public DoubleParameter getHoursWastedOnFailedSearches() {
-//        return hoursWastedOnFailedSearches;
-//    }
+    public DoubleParameter getHoursWastedOnFailedSearches() {
+        return hoursWastedOnFailedSearches;
+    }
 
-//    public void setHoursWastedOnFailedSearches(final DoubleParameter hoursWastedOnFailedSearches) {
-//        this.hoursWastedOnFailedSearches = hoursWastedOnFailedSearches;
-//    }
+    public void setHoursWastedOnFailedSearches(final DoubleParameter hoursWastedOnFailedSearches) {
+        this.hoursWastedOnFailedSearches = hoursWastedOnFailedSearches;
+    }
 
     public DoubleParameter getPlanningHorizonInHours() {
         return planningHorizonInHours;
@@ -280,20 +281,20 @@ public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         this.minimumPercentageOfTripDurationAllowed = minimumPercentageOfTripDurationAllowed;
     }
 
-//    public DoubleParameter getNoaSetsRangeInSeatiles() {
-//        return noaSetsRangeInSeatiles;
-//    }
-
-//    public void setNoaSetsRangeInSeatiles(final DoubleParameter noaSetsRangeInSeatiles) {
-//        this.noaSetsRangeInSeatiles = noaSetsRangeInSeatiles;
-//    }
-
-    public DoubleParameter getFscBias() {
-        return fscBias;
+    public DoubleParameter getNoaSetsRangeInSeatiles() {
+        return noaSetsRangeInSeatiles;
     }
 
-    public void setFscBias(final DoubleParameter fscBias) {
-        this.fscBias = fscBias;
+    public void setNoaSetsRangeInSeatiles(final DoubleParameter noaSetsRangeInSeatiles) {
+        this.noaSetsRangeInSeatiles = noaSetsRangeInSeatiles;
+    }
+
+    public DoubleParameter getNoaBias() {
+        return noaBias;
+    }
+
+    public void setNoaBias(final DoubleParameter noaBias) {
+        this.noaBias = noaBias;
     }
 
 //    public DoubleParameter getDelBias() {
@@ -304,13 +305,13 @@ public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
 //        this.delBias = delBias;
 //    }
 
-//    public DoubleParameter getOfsBias() {
-//        return ofsBias;
-//    }
+    public DoubleParameter getOfsBias() {
+        return ofsBias;
+    }
 
-//    public void setOfsBias(final DoubleParameter ofsBias) {
-//        this.ofsBias = ofsBias;
-//    }
+    public void setOfsBias(final DoubleParameter ofsBias) {
+        this.ofsBias = ofsBias;
+    }
 
 //    public DoubleParameter getDelSetsRangeInSeatiles() {
 //        return delSetsRangeInSeatiles;
