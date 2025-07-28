@@ -93,9 +93,7 @@ public class TunaEvaluator implements Runnable {
     }
 
     public TunaEvaluator(final Path alreadyCalibratedScenario, final Path calibrationFilePath) {
-
         optimization = GenericOptimization.fromFile(calibrationFilePath);
-
         runner = new Runner<Scenario>(
             () -> {
                 try {
@@ -112,6 +110,12 @@ public class TunaEvaluator implements Runnable {
         ).requestFisherYearlyData();
         runner.setParallel(false);
     }
+
+    public void setSaveAnimation(boolean saveAnimation){
+        runner.setSaveAnimation(saveAnimation);
+    }
+
+
 
     public static void main(final String[] args) {
 
@@ -268,5 +272,12 @@ public class TunaEvaluator implements Runnable {
 
     public void setCompleteOutput(final boolean completeOutput) {
         this.completeOutput = completeOutput;
+    }
+
+    public void run(boolean saveAnimation) {
+
+
+
+
     }
 }

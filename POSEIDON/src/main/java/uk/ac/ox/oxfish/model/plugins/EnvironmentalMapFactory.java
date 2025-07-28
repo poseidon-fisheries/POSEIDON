@@ -14,10 +14,10 @@ public class EnvironmentalMapFactory implements AlgorithmFactory<AdditionalStart
     private String mapVariableName;
     private InputPath gridFile;
     private DoubleParameter target;
-    private DoubleParameter penalty;
-    private DoubleParameter margin;
     private DoubleParameter target2;
     private DoubleParameter target3;
+    private DoubleParameter penalty;
+    private DoubleParameter margin;
     private int nTargets =1;
 
     public EnvironmentalMapFactory() {

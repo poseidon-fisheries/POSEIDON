@@ -22,6 +22,9 @@ public class TwoPunchCalibration {
     @Parameter(names = {"-l", "--max_local_calls"})
     private int maxLocalCalls = 5000;
 
+    @Parameter(names ={"-c", "--checkpoints"})
+    private boolean checkpoints = false;
+
     @Parameter(converter = PathConverter.class)
     private Path calibrationFile;
 
@@ -71,6 +74,10 @@ public class TwoPunchCalibration {
         firstStep.setParameterRange(15);
         firstStep.setRunNickName("global");
         firstStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
+        // If checkpoints==true, check the checkpoint file to see if (1) it exists and (2) if the last checkpoint was in
+        // the middle of StepOne. If so initialize the population with the population in the bestGuesses file
+        // and the maxfitnessCalls to maxGlobalCalls - roundNumber (something like that).
+
         return firstStep.generateCalibratorProblem().run();
     }
 

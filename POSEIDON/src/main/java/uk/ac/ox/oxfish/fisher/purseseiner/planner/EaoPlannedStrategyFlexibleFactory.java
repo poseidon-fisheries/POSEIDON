@@ -41,18 +41,18 @@ public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * hours wasted after every DPL
      */
     private DoubleParameter additionalHourlyDelayDeployment =
-        new CalibratedParameter(0.01, 0.02, 0, .08);
+        new CalibratedParameter(0.005, 0.01, 0, .08);
     /**
      * hours wasted after every OFS
      */
     private DoubleParameter additionalHourlyDelayNonAssociatedSets =
-        new CalibratedParameter(5, 15, 0, 24);
+        new CalibratedParameter(5, 10, 0, 24);
 
     /**
      * To probability of finding another vessel's FAD when you search for some.
      */
     private DoubleParameter probabilityOfFindingOtherFads =
-        new CalibratedParameter(0, 0.5, 0, 1);
+        new CalibratedParameter(.25, 0.75, 0, 1);
     /**
      * if you tried to steal and failed, how many hours does it take for you to fish this out
      */
@@ -62,23 +62,23 @@ public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
      * how many hours does it take for a plan to go stale and need replanning
      */
     private DoubleParameter planningHorizonInHours =
-        new CalibratedParameter(24 * 7, 24 * 7 * 2, 24, 24 * 7 * 8);
+        new CalibratedParameter(24 * 7, 24 * 7 * 3, 24, 24 * 7 * 8);
     /**
      * a multiplier applied to the action weight of own fad (since it's quite low in the data)
      */
     private DoubleParameter ownFadActionWeightBias =
-        new CalibratedParameter(0.25, 0.95, 0.0, 0.9999);
+        new CalibratedParameter(0.5, 0.75, 0.0, 0.9999);
     /**
      * a multiplier applied to the action weight of DPL
      */
     private DoubleParameter deploymentBias =
-        new CalibratedParameter(0.25, 0.95, 0.0, 0.9999);
+        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
     private DoubleParameter noaBias =
         new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
 //    private DoubleParameter delBias =
 //        new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
    private DoubleParameter ofsBias =
-       new CalibratedParameter(0.25, 0.75, 0.0, 0.9999);
+       new CalibratedParameter(0.2, 0.4, 0.0, 0.9999);
     private DoubleParameter minimumPercentageOfTripDurationAllowed =
         new CalibratedParameter(0.5, 1, 0, 1);
     private BooleanParameter noaSetsCanPoachFads = new BooleanParameter(false);
@@ -91,6 +91,7 @@ public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
     private AlgorithmFactory<? extends DiscretizedOwnFadPlanningModule> fadModule;
     private LocationValuesFactory locationValuesFactory;
     private AlgorithmFactory<MinimumSetValues> minimumSetValues;
+
 
     @SuppressWarnings("unused")
     public EaoPlannedStrategyFlexibleFactory() {

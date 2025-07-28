@@ -21,6 +21,7 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.DefaultToDestinationStr
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.plugins.*;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
 
@@ -51,15 +52,15 @@ public class EaoPathPlannerAbundanceScenario extends EaoAbundanceScenario {
                         new CalibratedParameter(
                             13, 30, 5, 40, 14
                         ),
-                        ImmutableMap.of(
-                            "Bigeye tuna", new CalibratedParameter(0, 0.15, 0, 1),
-                            "Skipjack tuna", new CalibratedParameter(.15, 0.35, 0, 1),
-                            "Yellowfin tuna", new CalibratedParameter(0, 0.3, 0, 1)
+                        ImmutableMap.of( //catchabilities
+                            "Bigeye tuna", new CalibratedParameter(.10, 0.20, 0, 1),
+                            "Skipjack tuna", new CalibratedParameter(.25, 0.75, 0, 1),
+                            "Yellowfin tuna", new CalibratedParameter(.10, 0.3, 0, 1)
                         ),
-                        ImmutableMap.of(
-                            "Bigeye tuna", new CalibratedParameter(0.31, 0.38, 0, 0.75),
+                        ImmutableMap.of( //fish release probabilities
+                            "Bigeye tuna", new CalibratedParameter(0.31, 0.40, 0, 0.75),
                             "Skipjack tuna", new CalibratedParameter(.001, .01, 0, 0.75),
-                            "Yellowfin tuna", new CalibratedParameter(.03, .05, 0, 0.75)
+                            "Yellowfin tuna", new CalibratedParameter(.03, .06, 0, 0.75)
                         ),
                         new EnvironmentalPenaltyFunctionFactory(
                             ImmutableMap.of(
@@ -77,10 +78,13 @@ public class EaoPathPlannerAbundanceScenario extends EaoAbundanceScenario {
                     // ref: https://github.com/poseidon-fisheries/tuna-issues/issues/141#issuecomment-1549923263
                     // For fixed parameter values see:
                     // https://github.com/poseidon-fisheries/tuna-issues/issues/202#issue-1779551927
-                    new UnreliableFishValueCalculatorFactory(new LogNormalErrorOperatorFactory(
-                        new FixedDoubleParameter(-0.14452),
-                        new FixedDoubleParameter(0.14097)
-                    )),
+                    new UnreliableFishValueCalculatorFactory(
+                        new LogNormalErrorOperatorFactory(
+                            new FixedDoubleParameter(-0.14452),
+                            new FixedDoubleParameter(0.14097)
+                        ),
+                        new CalibratedParameter(0.25,0.75,0,1,0)
+                    ),
                     new FixedParameterTableFromFile(getInputFolder().path("other_parameters.csv"))
                 ),
                 new EaoPlannedStrategyFlexibleFactory(
@@ -90,25 +94,25 @@ public class EaoPathPlannerAbundanceScenario extends EaoAbundanceScenario {
                         getTargetYear()
                     ),
                     minimumSetValues,
-                    new ValuePerSetPlanningModuleFactory(   //Option 1
+/*                    new ValuePerSetPlanningModuleFactory(   //Option 1
                         minimumSetValues,
                         getTargetYear(),
                         new SquaresMapDiscretizerFactory(),
                         new CalibratedParameter(0, 1, 0, 1)
                     ),
-/*                    new WhereFadsAreFadModuleFactory(     //Option 2
+                    new WhereFadsAreFadModuleFactory(     //Option 2
                         minimumSetValues,
                         getTargetYear(),
                         new SquaresMapDiscretizerFactory(),
                         new CalibratedParameter(0,1,-1,2)
-                    ),
+                    ),*/
                     new WhereMoneyIsPlanningFactory(        //Option 3
                         minimumSetValues,
                         getTargetYear(),
                         new SquaresMapDiscretizerFactory(),
                         new CalibratedParameter(0,1,0,2)
                     ),
-                    new MarginalValueFadPlanningModuleFactory(  //Option 4
+/*                    new MarginalValueFadPlanningModuleFactory(  //Option 4
                         minimumSetValues,
                         getTargetYear(),
                         new SquaresMapDiscretizerFactory()

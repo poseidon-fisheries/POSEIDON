@@ -25,6 +25,10 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
+import sim.field.continuous.Continuous2D;
+import sim.util.Bag;
+import sim.util.Double2D;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.RowProvider;
@@ -33,16 +37,14 @@ import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyFisherYearlyData;
 import uk.ac.ox.oxfish.model.data.monitors.loggers.TidyYearlyData;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -65,6 +67,9 @@ public final class Runner<S extends Scenario> {
     private static final String POLICIES_FILENAME = "policies.csv";
     private static final String SCENARIOS_FOLDER = "scenarios";
 
+    private static final String ANIMATION_OUTPUT_FILENAME = "animation_output.csv";
+    private BufferedWriter animationWriter;
+
     private final Map<Path, AtomicBoolean> overwriteFiles = new HashMap<>();
 
     private final Supplier<? extends S> scenarioSupplier;
@@ -73,6 +78,7 @@ public final class Runner<S extends Scenario> {
         HashMultimap.create();
     private boolean parallel = true;
     private boolean writeScenarioToFile = false;
+    private boolean writeOutputForAnimation = false;
     private CsvWriterSettings csvWriterSettings = new CsvWriterSettings();
     private Collection<Policy<? super S>> policies = ImmutableList.of(Policy.DEFAULT);
     private Consumer<? super State> beforeStartConsumer = __ -> {};
@@ -197,6 +203,15 @@ public final class Runner<S extends Scenario> {
     ) {
         final int numRuns = policies.size() * numberOfRunsPerPolicy;
         final IntStream range = range(0, numberOfRunsPerPolicy);
+        if(writeOutputForAnimation){
+            try {
+                animationWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(String.valueOf(
+                    outputPath.resolve(ANIMATION_OUTPUT_FILENAME)))));
+                animationWriter.write("step,type,x,y\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         (parallel ? range.parallel() : range).forEach(i -> (parallel ? policies.parallelStream()
             : policies.stream()).forEach(policy -> {
             final int runNumber = runCounter.getAndIncrement();
@@ -209,13 +224,32 @@ public final class Runner<S extends Scenario> {
             final Multimap<Path, RowProvider> rowProviders = makeRowProviders(state);
             do {
                 writeOutputs(runNumber, rowProviders, false);
+                if(writeOutputForAnimation) writeAnimationOutput(state);
                 state.printStep();
                 state.model.schedule.step(state.model);
                 afterStepConsumer.accept(state);
             } while (state.model.getYear() < numYearsToRun);
             afterRunConsumer.accept(state);
             writeOutputs(runNumber, rowProviders, true);
+
         }));
+    }
+
+    private void writeAnimationOutput(State state){
+        try {
+            ObservableList<Fisher> fishers = state.getModel().getFishers();
+            int stepNum = state.getModel().getStep();
+            for(Fisher fisher:fishers){
+                animationWriter.write(stepNum + ",v,"+fisher.getLocation().getGridX()+","+fisher.getLocation().getGridY()+"\n");
+            }
+            Continuous2D field = state.getModel().getFadMap().getDriftingObjectsMap().getField();
+            for (final Object o : field.allObjects.toArray()) { // makes a copy, as objects can be removed
+                final Double2D oldLoc = field.getObjectLocationAsDouble2D(o);
+                animationWriter.write(stepNum + ",f,"+String.format("%.3g%n", oldLoc.getX())+","+String.format("%.3g%n", oldLoc.getY())+"\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private State startRun(
@@ -428,6 +462,9 @@ public final class Runner<S extends Scenario> {
             return scenario;
         }
 
+    }
+    public void setSaveAnimation(boolean saveAnimation){
+            this.writeOutputForAnimation=saveAnimation;
     }
 
 }
