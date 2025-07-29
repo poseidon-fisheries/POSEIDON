@@ -38,13 +38,18 @@ public class SpeciesFactory extends GlobalScopeFactory<Species> {
 
     private String code;
     private String name;
+    private String lifeStage;
 
     public SpeciesFactory(final String code) {
-        this(code, PREFIX + " " + code);
+        this(code, PREFIX + " " + code, null);
     }
 
     @Override
     protected Species newInstance(final @NonNull Simulation simulation) {
-        return new Species(checkNotNull(code), name != null ? name : PREFIX + " " + code);
+        return new Species(
+            checkNotNull(code),
+            name != null ? name : PREFIX + " " + code,
+            lifeStage != null ? lifeStage : null
+        );
     }
 }

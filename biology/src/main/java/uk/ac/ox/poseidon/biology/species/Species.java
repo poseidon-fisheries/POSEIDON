@@ -22,10 +22,21 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class Species {
+
     private final String code;
     private final String name;
+    private final String lifeStage;
+
+    public Species(
+        final String code,
+        final String name
+    ) {
+        this(code, name, null);
+    }
 }

@@ -43,6 +43,15 @@ public class SpeciesFromFileFactory extends GlobalScopeFactory<List<Species>> {
     private Factory<? extends Path> path;
     private String speciesCodeColumn;
     private String speciesNameColumn;
+    private String lifeStageColumn;
+
+    public SpeciesFromFileFactory(
+        final Factory<? extends Path> path,
+        final String speciesCodeColumn,
+        final String speciesNameColumn
+    ) {
+        this(path, speciesCodeColumn, speciesNameColumn, null);
+    }
 
     @Override
     protected List<Species> newInstance(final Simulation simulation) {
@@ -53,7 +62,8 @@ public class SpeciesFromFileFactory extends GlobalScopeFactory<List<Species>> {
             .map(row ->
                 new Species(
                     row.getString(speciesCodeColumn),
-                    row.getString(speciesNameColumn)
+                    row.getString(speciesNameColumn),
+                    lifeStageColumn == null ? null : row.getString(lifeStageColumn)
                 )
             )
             .toList();
