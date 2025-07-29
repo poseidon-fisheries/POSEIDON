@@ -19,9 +19,11 @@ public class TemperatureMapFactory extends EnvironmentalMapFactory {
             new IntegerParameter(mapPeriod),
             new CalibratedParameter(25, 27, 24, 30, 26.5),// target [Bigeye]
             new CalibratedParameter(.25, .75, 0, 1), // penalty
-            new CalibratedParameter(2, 6, 1, 8, 2.25) ,// margin
+            new CalibratedParameter(2, 6, 2, 8, 2.25) ,// margin [Bigeye]
             new CalibratedParameter(25, 27, 24, 30, 26.5), // target2 [Skipjack]
-            new CalibratedParameter(25, 27, 24, 30, 26.5) //target3 [Yellowfin]
+            new CalibratedParameter(25, 27, 24, 30, 26.5), //target3 [Yellowfin]
+            new CalibratedParameter(2,6,2,8,2.25), //margin2 [Skipjack]
+            new CalibratedParameter(2,6,2,8,2.25) // margin3 [Yellowfin]
         );
     }
 

@@ -42,7 +42,8 @@ public class EnvironmentalPenaltyFunctionFactory extends EnvironmentalFunctionFa
                     .get()
                     .get(seaTile.getGridX(), seaTile.getGridY());
             final double valueDifference = abs(valueHere - target) - margin;
-            return (valueDifference > 0) ? 1 / pow(1 + (-valueDifference * log(1 - penalty)), 4) : 1;
+            final double shape = 1/(1.001-penalty) - 1;
+            return (valueDifference > 0) ? (1-pow(valueDifference*shape,4)/(1+pow(valueDifference*shape,4))) : 1;
         };
     }
 

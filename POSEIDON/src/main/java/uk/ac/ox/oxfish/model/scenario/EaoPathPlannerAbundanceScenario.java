@@ -54,13 +54,13 @@ public class EaoPathPlannerAbundanceScenario extends EaoAbundanceScenario {
                         ),
                         ImmutableMap.of( //catchabilities
                             "Bigeye tuna", new CalibratedParameter(.10, 0.20, 0, 1),
-                            "Skipjack tuna", new CalibratedParameter(.25, 0.75, 0, 1),
+                            "Skipjack tuna", new CalibratedParameter(.25, 0.5, 0, 1),
                             "Yellowfin tuna", new CalibratedParameter(.10, 0.3, 0, 1)
                         ),
                         ImmutableMap.of( //fish release probabilities
-                            "Bigeye tuna", new CalibratedParameter(0.31, 0.40, 0, 0.75),
-                            "Skipjack tuna", new CalibratedParameter(.001, .01, 0, 0.75),
-                            "Yellowfin tuna", new CalibratedParameter(.03, .06, 0, 0.75)
+                            "Bigeye tuna", new CalibratedParameter(0.32, 0.40, 0, 0.75),
+                            "Skipjack tuna", new CalibratedParameter(.02, .05, 0, 0.75),
+                            "Yellowfin tuna", new CalibratedParameter(.06, .10, 0, 0.75)
                         ),
                         new EnvironmentalPenaltyFunctionFactory(
                             ImmutableMap.of(

@@ -45,10 +45,10 @@ class EaoPathPlannerAbundanceScenarioTest {
     @Test
     void evaluatorTest(){
         final Path testScenario = Paths.get(("D:/MARELA/atl_inputs/calibration/calibration.yaml"));
-        final double[] zeros = new double[30]; // hard coded for laziness and debugging
+        final double[] zeros = new double[32]; // hard coded for laziness and debugging
         Arrays.fill(zeros, 0d);
         final TunaEvaluator evaluator = new TunaEvaluator(testScenario, zeros);
-        evaluator.setSaveAnimation(true);
+        evaluator.setSaveAnimation(false);
         evaluator.setNumRuns(1);
         evaluator.setParallel(false);
         evaluator.run();
@@ -66,30 +66,5 @@ class EaoPathPlannerAbundanceScenarioTest {
         evaluator.run();
     }
 
-    @Test
-    void runOneYearOutputDailySnapShots() {
-        final FishState fishState = startTestableScenario(EaoPathPlannerAbundanceScenario.class);
-        do {
-//            System.out.println("Day "+fishState.getStep());
-            fishState.schedule.step(fishState);
-            int stepNum = fishState.getStep();
-            if(fishState.getFadMap().getDriftingObjectsMap().getField().getAllObjects().size()>0){
-                ObservableList<Fisher> fishers = fishState.getFishers();
-                Bag fads = fishState.getFadMap().getDriftingObjectsMap().getField().getAllObjects();
-                Object[] allFads = fishState.getFadMap().allFads().toArray();
-
-                Continuous2D driftingObjectField = fishState.getFadMap().getField();
-
- //               Map hash = driftingObjectField.doubleLocationHash;
-
-                Object[] streamFads =
-                    fishState.getFadMap().allFads().map(Fad::getCoordinate).toArray();
-                
-                Optional<Double2D> fadloc = fishState.getFadMap().getFadLocation((Fad) allFads[0]);
-                System.out.println("Day "+fishState.getStep());
-            }
-
-        } while (fishState.getYear() < 2);
-    }
 
 }

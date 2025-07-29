@@ -98,6 +98,7 @@ public class OwnFadSetDiscretizedActionGenerator {
             final boolean actionIsSafe =
                 fisher.getGear().isSafe(new FadSetAction(fad, fisher, 0));
 
+
             if (actionIsSafe && value >= minimumFadValue)
                 rankedFads[discretization.getGroup(fad.getLocation())].
                     add(new ValuedFad(fad, value));
