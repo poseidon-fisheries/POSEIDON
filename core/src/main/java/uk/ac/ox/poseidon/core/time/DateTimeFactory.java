@@ -30,19 +30,20 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class DateFactory extends GlobalScopeFactory<LocalDate> {
+public class DateTimeFactory extends GlobalScopeFactory<LocalDateTime> {
 
     private Integer year = LocalDate.now().getYear();
     private Integer month = LocalDate.now().getMonthValue();
     private Integer day = LocalDate.now().getDayOfMonth();
 
-    protected LocalDate newInstance(final Simulation simulation) {
-        return LocalDate.of(year, month, day);
+    protected LocalDateTime newInstance(final Simulation simulation) {
+        return LocalDate.of(year, month, day).atStartOfDay();
     }
 
 }

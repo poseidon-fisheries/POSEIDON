@@ -43,14 +43,16 @@ import javax.measure.Unit;
 import javax.measure.quantity.Mass;
 import java.io.File;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.Streams.stream;
 import static java.lang.System.Logger.Level.ERROR;
 import static java.math.RoundingMode.HALF_EVEN;
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
 
 @Getter
@@ -65,11 +67,23 @@ public class BiomassMarketGridPriceFileFactory
 
     private Factory<? extends Path> path;
 
+    private String dateColumn;
     private String marketCodeColumn;
     private String speciesCodeColumn;
+    private String categoryCodeColumn;
     private String priceColumn;
     private String currencyColumn;
     private String measurementUnitColumn;
+
+    // TODO: this a temporary filter that will only work as long as we only have PS vessels.
+    //  We need to find a way to propagate the catch method all the way to the market and then
+    //  deal with different categories of prices. See:
+    //  https://github.com/Official-EwE/SURIMI-project/issues/96
+    private String categoryCodeFilter;
+
+    // TODO: similarly, we need to adapt the class to schedule prices updates instead of filtering
+    //  on a particular date
+    private Factory<? extends LocalDate> dateFilter;
 
     private Factory<? extends PortGrid> portGrid;
     private Factory<? extends Iterable<? extends Species>> species;
@@ -77,15 +91,17 @@ public class BiomassMarketGridPriceFileFactory
     @Override
     protected BiomassMarketGrid newInstance(final Simulation simulation) {
 
-        final Map<String, Species> speciesByCode =
+        final Map<String, List<Species>> speciesByCode =
             stream(this.species.get(simulation))
-                .collect(toMap(Species::getCode, identity()));
+                .collect(groupingBy(Species::getCode));
 
         final PortGrid portGrid = this.portGrid.get(simulation);
 
         final File file = path.get(simulation).toFile();
         // I know. I know. This is ridiculous.
         return Table.read().file(file).stream()
+            .filter(row -> row.getString(categoryCodeColumn).equals(categoryCodeFilter))
+            .filter(row -> dateFilter.get(simulation).isEqual(row.getDate(dateColumn)))
             .flatMap(row ->
                 parse(
                     file,
@@ -96,7 +112,7 @@ public class BiomassMarketGridPriceFileFactory
                 ).flatMap(port ->
                     parse(
                         file, row, speciesCodeColumn, speciesByCode::get, "species code"
-                    ).flatMap(species ->
+                    ).flatMap(speciesList ->
                         parse(
                             file, row, currencyColumn, CurrencyUnit::of, "currency"
                         ).flatMap(currencyUnit ->
@@ -106,21 +122,23 @@ public class BiomassMarketGridPriceFileFactory
                                 measurementUnitColumn,
                                 Measurements::parseMassUnit,
                                 "measurement unit"
-                            ).map(measurementUnit ->
-                                new PriceEntry(
-                                    port,
-                                    species,
-                                    Money.of(
-                                        currencyUnit,
-                                        row.getDouble(priceColumn),
-                                        HALF_EVEN
-                                    ),
-                                    measurementUnit.asType(Mass.class)
+                            ).flatMap(measurementUnit ->
+                                speciesList.stream().map(species ->
+                                    new PriceEntry(
+                                        port,
+                                        species,
+                                        Money.of(
+                                            currencyUnit,
+                                            row.getDouble(priceColumn),
+                                            HALF_EVEN
+                                        ),
+                                        measurementUnit.asType(Mass.class)
+                                    )
                                 )
                             )
                         )
                     )
-                ).stream()
+                )
             )
             .collect(
                 collectingAndThen(
@@ -161,7 +179,7 @@ public class BiomassMarketGridPriceFileFactory
         return marketGrid;
     }
 
-    private <T> Optional<T> parse(
+    private <T> Stream<T> parse(
         final File file,
         final Row row,
         final String columnName,
@@ -175,7 +193,8 @@ public class BiomassMarketGridPriceFileFactory
                 .or(() -> {
                     logger.log(ERROR, "{0} is not a valid {1}.", value, description);
                     return Optional.empty();
-                });
+                })
+                .stream();
         } catch (final Exception e) {
             logger.log(
                 ERROR, "Error parsing row {0}\nwhile reading {1}\n{2}",
@@ -183,7 +202,7 @@ public class BiomassMarketGridPriceFileFactory
                 file,
                 e.getMessage()
             );
-            return Optional.empty();
+            return Stream.empty();
         }
     }
 

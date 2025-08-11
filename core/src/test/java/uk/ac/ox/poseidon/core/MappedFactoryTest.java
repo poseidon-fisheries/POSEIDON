@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.core;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.time.DateFactory;
+import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import java.time.LocalDate;
@@ -42,7 +42,7 @@ class MappedFactoryTest {
                 LocalDate.of(2000, 3, 23).atStartOfDay()
             ),
             new MappedFactory<>(
-                new DateFactory(2000, null, null),
+                new DateTimeFactory(2000, null, null),
                 List.of(
                     new ConstantFactory<>(List.of(1, 2, 3)),
                     new ConstantFactory<>(List.of(21, 22, 23))
