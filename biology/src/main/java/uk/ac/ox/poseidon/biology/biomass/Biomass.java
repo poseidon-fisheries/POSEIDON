@@ -73,6 +73,7 @@ public class Biomass implements Content<Biomass> {
     }
 
     public Biomass multiply(final double value) {
+        checkNonNegative(value, "Amount by which to multiply biomass");
         return new Biomass(this.biomassInKg * value);
     }
 

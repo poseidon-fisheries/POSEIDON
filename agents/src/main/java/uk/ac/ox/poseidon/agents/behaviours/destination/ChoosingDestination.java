@@ -68,7 +68,7 @@ public class ChoosingDestination implements Behaviour {
         protected void complete(final LocalDateTime dateTime) {
             destinationSupplier.get().ifPresentOrElse(
                 destination -> {
-                    getVessel().setCurrentDestination(destination);
+                    getVessel().setDestination(destination);
                     getVessel().popBehaviour();
                 },
                 () -> getVessel().pushBehaviour(behaviourIfNoDestination)

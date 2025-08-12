@@ -20,32 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.geography.grids;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.Coordinate;
+import lombok.Data;
+import sim.util.Int2D;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class PortFactory extends GlobalScopeFactory<Port> {
-
-    private Factory<? extends PortGrid> portGrid;
-    private String code;
-    private String name;
-    private Factory<? extends Coordinate> coordinateFactory;
-
-    @Override
-    protected Port newInstance(final Simulation simulation) {
-        return this.portGrid.get(simulation).createPort(
-            code, name, coordinateFactory.get(simulation)
-        );
-    }
+@Data
+public class Destination {
+    private final Object object;
+    private final Int2D cell;
 }

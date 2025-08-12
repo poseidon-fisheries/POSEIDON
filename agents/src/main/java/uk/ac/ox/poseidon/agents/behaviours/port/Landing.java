@@ -32,12 +32,14 @@ import uk.ac.ox.poseidon.agents.market.Sale;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
 import uk.ac.ox.poseidon.biology.Content;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
@@ -68,22 +70,34 @@ public class Landing<C extends Content<C>> implements Behaviour {
 
         @Override
         public void complete(final LocalDateTime dateTime) {
-            final List<? extends Market<C>> markets =
-                marketGrid.getObjectsAt(vessel.getCell()).toList();
-            if (markets.size() == 1) {
-                final Sale<C> sale = markets
-                    .getFirst()
-                    .sell(vessel, hold.extractContent(), dateTime);
-                sale.summary().values().forEach(vessel.getAccount()::add);
-            } else {
+            final Object destinationObject = checkNotNull(vessel.getDestination()).getObject();
+            if (!(destinationObject instanceof final Port port)) {
                 throw new RuntimeException(
-                    "Expected one market at location " +
-                        vessel.getCell() +
-                        " but found " +
-                        markets.size()
+                    "Vessel %s has arrived at destination %s which is not a port".formatted(
+                        vessel.getId(),
+                        destinationObject
+                    )
                 );
+            } else {
+                final List<? extends Market<C>> markets =
+                    marketGrid.getObjectsAt(vessel.getCell()).toList();
+                final Market<C> market = markets
+                    .stream()
+                    .filter(m -> m.getPort().equals(port))
+                    .findAny()
+                    .orElseThrow(() -> new RuntimeException(
+                        ("No market found for vessel %s in port %s at location %s. Markets there " +
+                            "are: %s").formatted(
+                            vessel.getId(),
+                            port,
+                            vessel.getCell(),
+                            markets.stream().map(Market::getCode).toList()
+                        )
+                    ));
+                final Sale<C> sale = market.sell(vessel, hold.extractContent(), dateTime);
+                sale.summary().values().forEach(vessel.getAccount()::add);
+                getVessel().popBehaviour();
             }
-            getVessel().popBehaviour();
         }
     }
 }

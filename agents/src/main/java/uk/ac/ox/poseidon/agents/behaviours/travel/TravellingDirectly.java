@@ -48,7 +48,7 @@ public class TravellingDirectly implements Behaviour {
             dateTime,
             distanceCalculator.travelDuration(
                 vessel.getCell(),
-                vessel.getCurrentDestination(),
+                vessel.getDestination().getCell(),
                 vessel.getCruisingSpeed()
             ),
             vessel
@@ -68,7 +68,7 @@ public class TravellingDirectly implements Behaviour {
 
         @Override
         public void complete(final LocalDateTime dateTime) {
-            getVessel().setCurrentCell(getVessel().getCurrentDestination());
+            getVessel().setCurrentCell(getVessel().getDestination().getCell());
             getVessel().popBehaviour();
         }
     }

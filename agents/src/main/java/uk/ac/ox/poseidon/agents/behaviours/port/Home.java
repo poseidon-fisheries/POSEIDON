@@ -51,8 +51,8 @@ public class Home extends BranchingBehaviour {
         final Vessel vessel,
         final LocalDateTime dateTime
     ) {
-        if (!vessel.isAtPort()) {
-            vessel.setCurrentDestination(portGrid.getLocation(vessel.getHomePort()));
+        if (!vessel.isAtHomePort()) {
+            vessel.setDestination(vessel.getHomePort().asDestination());
             return travelBehaviour;
         } else if (!hold.isEmpty()) {
             return landingBehaviour;

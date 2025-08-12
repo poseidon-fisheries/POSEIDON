@@ -25,12 +25,15 @@ package uk.ac.ox.poseidon.agents.market;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Content;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.LocalDateTime;
 
 public interface Market<C extends Content<C>> {
 
     String getCode();
+
+    Port getPort();
 
     Sale<C> sell(
         Vessel vessel,

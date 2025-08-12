@@ -28,6 +28,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.utils.IdSupplier;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
@@ -45,8 +46,8 @@ import static java.util.stream.Collectors.toCollection;
 @NoArgsConstructor
 public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortGrid> {
 
-    @NonNull private Factory<? extends BathymetricGrid> bathymetricGrid;
-    @NonNull private Factory<? extends Port> portFactory;
+    private Factory<? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? extends IdSupplier> idSupplier;
     private int numberOfPorts;
     private int minimumAdjacentWaterTiles;
 
@@ -80,12 +81,15 @@ public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortG
                 modelGrid.getGridWidth(),
                 modelGrid.getGridHeight()
             );
+        final PortGrid portGrid = new PortGrid(bathymetricGrid, sparseGrid2D);
+        final IdSupplier idSupplier = this.idSupplier.get(simulation);
         suitableTiles
             .stream()
             .limit(numberOfPorts)
-            .forEach(cell ->
-                sparseGrid2D.setObjectLocation(portFactory.get(simulation), cell)
-            );
-        return new PortGrid(bathymetricGrid, sparseGrid2D);
+            .forEach(cell -> {
+                final String portCode = idSupplier.nextId();
+                portGrid.createPort(portCode, "Port " + portCode, cell);
+            });
+        return portGrid;
     }
 }

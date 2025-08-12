@@ -56,6 +56,7 @@ public class BiomassMarketFactory extends SimulationScopeFactory<BiomassMarket> 
         final String marketCode = this.marketCode != null ? this.marketCode : port.getCode();
         final BiomassMarketGrid marketGrid = this.marketGrid.get(simulation);
         final BiomassMarket biomassMarket = new BiomassMarket(
+            port,
             marketCode,
             pricesPerSpecies.get(simulation),
             simulation.getEventManager()

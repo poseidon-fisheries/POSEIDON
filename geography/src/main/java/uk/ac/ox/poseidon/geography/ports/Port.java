@@ -22,18 +22,23 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Destination;
 
-@Data
-@AllArgsConstructor
+@Getter
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@ToString
+@EqualsAndHashCode
 public class Port {
 
     private final String code;
     private final String name;
+    private final Int2D cell;
 
-    public Port(final String nameAndCode) {
-        this(nameAndCode, nameAndCode);
+    public Destination asDestination() {
+        return new Destination(this, cell);
     }
+
 }
 

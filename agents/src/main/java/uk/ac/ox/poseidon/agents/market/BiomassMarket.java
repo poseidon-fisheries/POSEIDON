@@ -33,6 +33,7 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.utils.IdSupplier;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplier;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -43,16 +44,19 @@ import java.util.Map;
 @ToString
 public class BiomassMarket implements Market<Biomass> {
 
+    private final Port port;
     private final String code;
     private final Map<Species, Price> prices;
     private final IdSupplier saleIdSupplier;
     private final EventManager eventManager;
 
     BiomassMarket(
+        final Port port,
         final String code,
         final Map<Species, Price> prices,
         final EventManager eventManager
     ) {
+        this.port = port;
         this.code = code;
         this.prices = new HashMap<>(prices);
         this.saleIdSupplier = new PrefixedIdSupplier(code);

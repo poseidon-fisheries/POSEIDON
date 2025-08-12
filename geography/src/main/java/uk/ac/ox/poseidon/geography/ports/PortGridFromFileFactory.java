@@ -40,7 +40,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static java.lang.System.Logger.Level.ERROR;
+import static java.text.MessageFormat.format;
 import static java.util.Comparator.comparingDouble;
 
 @Getter
@@ -55,7 +55,7 @@ public class PortGridFromFileFactory extends SimulationScopeFactory<PortGrid> {
     private Factory<? extends BathymetricGrid> bathymetricGrid;
     private Factory<? extends DistanceCalculator> distanceCalculator;
     private Factory<? extends Path> path;
-    private String idColumn;
+    private String portCodeColumn;
     private String nameColumn;
     private String longitudeColumn;
     private String latitudeColumn;
@@ -71,26 +71,22 @@ public class PortGridFromFileFactory extends SimulationScopeFactory<PortGrid> {
                 modelGrid.getGridHeight()
             );
         Table.read().file(path.get(simulation).toFile()).forEach(row -> {
+            final String portCode = row.getString(portCodeColumn);
+            final String portName = row.getString(nameColumn);
             final Coordinate coordinate = new Coordinate(
                 row.getDouble(longitudeColumn),
                 row.getDouble(latitudeColumn)
             );
-            final Port port = new Port(
-                row.getString(idColumn),
-                row.getString(nameColumn)
-            );
-            coordinateToCell(
+            final Int2D cell = coordinateToCell(
                 bathymetricGrid,
                 coordinate,
                 distanceCalculator
-            ).ifPresentOrElse(
-                cell -> sparseGrid2D.setObjectLocation(port, cell),
-                () -> logger.log(
-                    ERROR,
-                    () -> "No suitable land cell found for " + port + " near " + coordinate + "."
-                )
-            );
-
+            ).orElseThrow(() -> new RuntimeException(format(
+                "No suitable land cell found for port {0} ({1}) near {2}",
+                portName, portCode, coordinate
+            )));
+            final Port port = new Port(portCode, portName, cell);
+            sparseGrid2D.setObjectLocation(port, cell);
         });
         return new PortGrid(bathymetricGrid, sparseGrid2D);
     }

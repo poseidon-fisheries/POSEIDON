@@ -51,7 +51,7 @@ public class ThereAndBack extends BranchingBehaviour {
         } else if (status == READY) {
             status = ACTIVE;
             return fishingDestinationBehaviour;
-        } else if (vessel.isAtCurrentDestination()) {
+        } else if (vessel.isAtDestination()) {
             status = DONE;
             return fishingBehaviour;
         } else {

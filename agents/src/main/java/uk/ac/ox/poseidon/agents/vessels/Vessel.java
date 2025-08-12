@@ -36,6 +36,7 @@ import uk.ac.ox.poseidon.core.Agent;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Destination;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -59,7 +60,7 @@ public class Vessel implements Agent, Oriented2D {
     private Port homePort;
     private Quantity<Speed> cruisingSpeed;
     private double heading;
-    private Int2D currentDestination;
+    private Destination destination;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     Vessel(
@@ -120,9 +121,8 @@ public class Vessel implements Agent, Oriented2D {
         vesselField.setCell(this, cell);
     }
 
-    public boolean isAtCurrentDestination() {
-        final Int2D currentDestination = getCurrentDestination();
-        return currentDestination != null && getCell().equals(currentDestination);
+    public boolean isAtDestination() {
+        return destination != null && getCell().equals(destination.getCell());
     }
 
     public boolean isAtPort() {
@@ -154,8 +154,20 @@ public class Vessel implements Agent, Oriented2D {
         }
     }
 
+    public void setDestination(final Destination destination) {
+        this.destination = destination;
+    }
+
+    public void setDestination(final Int2D cell) {
+        setDestination(new Destination(cell, cell));
+    }
+
     @Override
     public String toString() {
         return name + " (" + id + ")";
+    }
+
+    public boolean isAtHomePort() {
+        return getCell().equals(getHomePort().getCell());
     }
 }

@@ -51,26 +51,26 @@ public class TravellingAlongPath implements Behaviour {
         final Vessel vessel,
         final LocalDateTime dateTime
     ) {
-        final Int2D currentDestination = checkNotNull(vessel.getCurrentDestination());
+        final Int2D destinationCell = checkNotNull(vessel.getDestination()).getCell();
         if (currentPath != null) {
             checkState(
-                currentPath.getLast().equals(currentDestination),
+                currentPath.getLast().equals(destinationCell),
                 "Current path %s does not match current destination %s for vessel %s.",
                 currentPath,
-                currentDestination,
+                destinationCell,
                 vessel
             );
         } else {
             currentPath =
                 pathFinder
-                    .getPath(vessel.getCell(), currentDestination)
+                    .getPath(vessel.getCell(), destinationCell)
                     .filter(path -> path.size() > 1)
                     .map(path -> path.subList(1, path.size()))
                     .orElseThrow(() -> new IllegalStateException(
                         MessageFormat.format(
                             "No path found from {0} to {1} for vessel {2}.",
                             vessel.getCell(),
-                            currentDestination,
+                            destinationCell,
                             vessel
                         )
                     ));

@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.stream.Collectors.toSet;
 import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
 
 @Getter
@@ -107,17 +108,53 @@ public class PortGrid extends ObjectGrid<Port> {
     public void validateLocation(
         final Coordinate coordinate
     ) {
-        final Int2D cell = getModelGrid().toCell(coordinate);
+        validateLocation(getModelGrid().toCell(coordinate), coordinate);
+    }
+
+    public void validateLocation(
+        final Int2D cell
+    ) {
+        validateLocation(cell, getModelGrid().toCoordinate(cell));
+    }
+
+    public void validateLocation(
+        final Int2D cell,
+        final Coordinate coordinate
+    ) {
         checkState(
             bathymetricGrid.isLand(cell),
-            "Invalid port location: coordinate %s is not on land.",
-            coordinate
+            "Invalid port location: cell %s (coordinate %s) is not on land.",
+            cell, coordinate
         );
         checkState(
             bathymetricGrid.getActiveWaterNeighbours(cell).findAny().isPresent(),
-            "Invalid location: coordinate %s does not have any active water neighbors.",
-            coordinate
+            "Invalid location: coordinate cell %s (coordinate %s) does not have any active water " +
+                "neighbors.",
+            cell, coordinate
         );
+    }
+
+    public Port createPort(
+        final String portCode,
+        final String portName,
+        final Coordinate coordinate
+    ) {
+        return createPort(portCode, portName, getModelGrid().toCell(coordinate));
+    }
+
+    public Port createPort(
+        final String portCode,
+        final String portName,
+        final Int2D cell
+    ) {
+        checkState(
+            !getPorts().map(Port::getCode).collect(toSet()).contains(portCode),
+            "Port code %s already exists", portCode
+        );
+        validateLocation(cell);
+        final Port port = new Port(portCode, portName, cell);
+        getField().setObjectLocation(port, cell);
+        return port;
     }
 
 }

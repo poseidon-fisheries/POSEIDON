@@ -68,7 +68,7 @@ public class BiomassMarketGridPriceFileFactory
     private Factory<? extends Path> path;
 
     private String dateColumn;
-    private String marketCodeColumn;
+    private String portCodeColumn;
     private String speciesCodeColumn;
     private String categoryCodeColumn;
     private String priceColumn;
@@ -106,7 +106,7 @@ public class BiomassMarketGridPriceFileFactory
                 parse(
                     file,
                     row,
-                    marketCodeColumn,
+                    portCodeColumn,
                     id -> portGrid.getObject(id).orElse(null),
                     "port code"
                 ).flatMap(port ->
@@ -169,6 +169,7 @@ public class BiomassMarketGridPriceFileFactory
         priceBySpeciesByPort.forEach((port, priceBySpecies) -> {
             marketGrid.addMarket(
                 new BiomassMarket(
+                    port,
                     port.getCode(),
                     priceBySpecies,
                     eventManager
