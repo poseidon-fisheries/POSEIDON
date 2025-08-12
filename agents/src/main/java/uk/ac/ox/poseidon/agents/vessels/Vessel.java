@@ -49,6 +49,7 @@ import java.util.Deque;
 @Setter
 public class Vessel implements Agent, Oriented2D {
 
+    private static final int VESSEL_BEHAVIOUR_ORDERING = 1;
     private final String id;
     private final String name;
     private final VesselField vesselField;
@@ -146,7 +147,7 @@ public class Vessel implements Agent, Oriented2D {
             final var action = currentBehaviour().nextAction(this, schedule.getDateTime());
             if (action != null) {
                 action.init();
-                schedule.scheduleOnceIn(action.getDuration(), action);
+                schedule.scheduleOnceIn(action.getDuration(), action, VESSEL_BEHAVIOUR_ORDERING);
                 break;
             } else {
                 popBehaviour();
