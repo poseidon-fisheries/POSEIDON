@@ -20,28 +20,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.market;
+package uk.ac.ox.poseidon.agents.catches;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.Value;
-import sim.engine.SimState;
-import sim.engine.Steppable;
-import uk.ac.ox.poseidon.agents.catches.CatchCategory;
-import uk.ac.ox.poseidon.biology.species.Species;
-
-import java.io.Serial;
+import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.Content;
 
 @Value
-public class PriceUpdate implements Steppable {
+public class UniformCatchCategoriser<C extends Content<C>> implements CatchCategoriser<C> {
 
-    @Serial private static final long serialVersionUID = 135321789743469343L;
-
-    BiomassMarket market;
     CatchCategory catchCategory;
-    Species species;
-    Price price;
 
     @Override
-    public void step(final SimState simState) {
-        market.setPrice(catchCategory, species, price);
+    public CategorisedCatch<C> apply(final Bucket<C> bucket) {
+        return new CategorisedCatch<>(ImmutableMap.of(catchCategory, bucket));
     }
+
 }

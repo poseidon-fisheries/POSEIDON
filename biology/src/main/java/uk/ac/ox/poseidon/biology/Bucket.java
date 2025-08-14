@@ -125,7 +125,7 @@ public final class Bucket<C extends Content<C>> {
             .stream()
             .map(Content::asBiomass)
             .reduce(Biomass::add)
-            .orElseGet(() -> Biomass.ofKg(0));
+            .orElse(Biomass.ZERO);
     }
 
     public static class Builder<C extends Content<C>> {

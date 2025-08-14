@@ -22,22 +22,36 @@
 
 package uk.ac.ox.poseidon.agents.vessels.hold;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
+import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 
-public class InfiniteBiomassHoldFactory extends VesselScopeFactory<InfiniteBiomassHold> {
+@Getter
+@RequiredArgsConstructor
+public abstract class BiomassHold implements Hold<Biomass> {
 
-    private Factory<? extends CatchCategoriser<Biomass>> catchCategoriser;
+    private final CatchCategoriser<Biomass> catchCategoriser;
+
+    protected CategorisedCatch<Biomass> content = CategorisedCatch.empty();
 
     @Override
-    protected InfiniteBiomassHold newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new InfiniteBiomassHold(catchCategoriser.get(simulation));
+    public void addContent(final Bucket<Biomass> uncategorisedCatch) {
+        addContent(catchCategoriser.apply(uncategorisedCatch));
     }
+
+    @Override
+    public void addContent(final CategorisedCatch<Biomass> categorisedCatch) {
+        content = content.add(categorisedCatch);
+    }
+
+    @Override
+    public CategorisedCatch<Biomass> extractContent() {
+        final CategorisedCatch<Biomass> removedContent = content;
+        content = CategorisedCatch.empty();
+        return removedContent;
+    }
+
 }

@@ -20,28 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.market;
+package uk.ac.ox.poseidon.agents.catches;
 
-import lombok.Value;
-import sim.engine.SimState;
-import sim.engine.Steppable;
-import uk.ac.ox.poseidon.agents.catches.CatchCategory;
-import uk.ac.ox.poseidon.biology.species.Species;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-import java.io.Serial;
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class CatchCategoryFactory extends GlobalScopeFactory<CatchCategory> {
 
-@Value
-public class PriceUpdate implements Steppable {
-
-    @Serial private static final long serialVersionUID = 135321789743469343L;
-
-    BiomassMarket market;
-    CatchCategory catchCategory;
-    Species species;
-    Price price;
+    private String categoryCode;
 
     @Override
-    public void step(final SimState simState) {
-        market.setPrice(catchCategory, species, price);
+    protected CatchCategory newInstance(final Simulation simulation) {
+        return new CatchCategory(categoryCode);
     }
 }

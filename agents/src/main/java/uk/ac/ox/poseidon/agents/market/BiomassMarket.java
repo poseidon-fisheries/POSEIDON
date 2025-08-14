@@ -22,10 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
-import com.google.common.collect.ImmutableTable;
 import lombok.Getter;
 import lombok.ToString;
 import org.joda.money.Money;
+import uk.ac.ox.poseidon.agents.catches.CatchCategory;
+import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
@@ -37,7 +38,9 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -46,14 +49,14 @@ public class BiomassMarket implements Market<Biomass> {
 
     private final Port port;
     private final String code;
-    private final Map<Species, Price> prices;
+    private final Map<CatchCategory, Map<Species, Price>> prices;
     private final IdSupplier saleIdSupplier;
     private final EventManager eventManager;
 
     BiomassMarket(
         final Port port,
         final String code,
-        final Map<Species, Price> prices,
+        final Map<CatchCategory, Map<Species, Price>> prices,
         final EventManager eventManager
     ) {
         this.port = port;
@@ -66,44 +69,55 @@ public class BiomassMarket implements Market<Biomass> {
     @Override
     public Sale<Biomass> sell(
         final Vessel vessel,
-        final Bucket<? extends Biomass> bucket,
+        final CategorisedCatch<Biomass> categorisedCatch,
         final LocalDateTime dateTime
     ) {
-        final ImmutableTable.Builder<Species, Biomass, Money> sold = ImmutableTable.builder();
-        final Bucket.Builder<Biomass> unsold = Bucket.newBuilder();
+        final List<Sale.Item<Biomass>> soldItems = new ArrayList<>();
+        final List<CategorisedCatch<Biomass>> unsoldCatch = new ArrayList<>();
 
-        for (final Map.Entry<Species, ? extends Biomass> entry : bucket.getMap().entrySet()) {
-            final Species species = entry.getKey();
-            final Biomass biomass = entry.getValue();
-            final Price price = prices.get(species);
-            if (price == null) {
-                unsold.add(species, biomass);
+        categorisedCatch.getBuckets().forEach((catchCategory, bucket) -> {
+            final Map<Species, Price> categoryPrices = prices.get(catchCategory);
+            if (categoryPrices == null) {
+                unsoldCatch.add(new CategorisedCatch<>(Map.of(catchCategory, bucket)));
             } else {
-                final Money salePrice =
-                    price.getAmount().multipliedBy(
-                        biomass.as(price.getBiomassUnit()),
-                        RoundingMode.DOWN
-                    );
-                sold.put(species, biomass, salePrice);
+                bucket.getMap().forEach((species, biomass) -> {
+                    final Price price = categoryPrices.get(species);
+                    if (price == null) {
+                        unsoldCatch.add(new CategorisedCatch<>(Map.of(
+                            catchCategory,
+                            Bucket.of(species, biomass)
+                        )));
+                    } else {
+                        final Money salePrice =
+                            price.getAmount().multipliedBy(
+                                biomass.as(price.getBiomassUnit()),
+                                RoundingMode.DOWN
+                            );
+                        soldItems.add(new Sale.Item<>(catchCategory, species, biomass, salePrice));
+                    }
+                });
             }
-        }
+        });
         final BiomassSale sale = new BiomassSale(
             dateTime,
             saleIdSupplier.nextId(),
             this,
             vessel,
-            sold.build(),
-            unsold.build()
+            soldItems,
+            unsoldCatch.stream().reduce(CategorisedCatch::add).orElse(CategorisedCatch.empty())
         );
         eventManager.broadcast(sale);
         return sale;
     }
 
     public void setPrice(
+        final CatchCategory catchCategory,
         final Species species,
         final Price price
     ) {
-        prices.put(species, price);
+        prices
+            .computeIfAbsent(catchCategory, k -> new HashMap<>())
+            .put(species, price);
     }
 
 }

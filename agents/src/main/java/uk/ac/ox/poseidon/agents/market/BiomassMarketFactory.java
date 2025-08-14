@@ -26,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -45,7 +46,7 @@ public class BiomassMarketFactory extends SimulationScopeFactory<BiomassMarket> 
     private Factory<? extends BiomassMarketGrid> marketGrid;
     private Factory<? extends Port> port;
     private String marketCode;
-    private Factory<? extends Map<Species, Price>> pricesPerSpecies;
+    private Factory<? extends Map<CatchCategory, Map<Species, Price>>> pricesPerSpecies;
 
     @Override
     protected BiomassMarket newInstance(final Simulation simulation) {

@@ -30,6 +30,7 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import sim.engine.Sequence;
 import tech.tablesaw.api.Table;
+import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -72,12 +73,6 @@ public class BiomassMarketGridPriceFileFactory
     private String currencyColumn;
     private String measurementUnitColumn;
 
-    // TODO: this a temporary filter that will only work as long as we only have PS vessels.
-    //  We need to find a way to propagate the catch method all the way to the market and then
-    //  deal with different categories of prices. See:
-    //  https://github.com/Official-EwE/SURIMI-project/issues/96
-    private String categoryCodeFilter;
-
     private Factory<? extends PortGrid> portGrid;
     private Factory<? extends Iterable<? extends Species>> species;
 
@@ -91,13 +86,13 @@ public class BiomassMarketGridPriceFileFactory
         final PortGrid portGrid = this.portGrid.get(simulation);
         final Map<String, BiomassMarket> markets = new HashMap<>();
         final BiomassMarketGrid marketGrid = new BiomassMarketGrid(portGrid);
+        final Map<String, CatchCategory> catchCategories = new HashMap<>();
 
         final Map<LocalDateTime, List<PriceUpdate>> priceUpdatesByDate =
             new TreeMap<>( // wrap in a TreeMap to sort by dates
                 Table.read()
                     .file(path.get(simulation).toFile())
                     .stream()
-                    .filter(row -> row.getString(categoryCodeColumn).equals(categoryCodeFilter))
                     .collect(groupingBy(
                         row -> row.getDate(dateColumn).atStartOfDay(),
                         flatMapping(
@@ -127,6 +122,11 @@ public class BiomassMarketGridPriceFileFactory
                                         "Species " + speciesCode + " not found."
                                     );
                                 }
+                                final CatchCategory catchCategory =
+                                    catchCategories.computeIfAbsent(
+                                        row.getString(categoryCodeColumn),
+                                        CatchCategory::new
+                                    );
                                 final CurrencyUnit currencyUnit =
                                     CurrencyUnit.of(row.getString(currencyColumn));
                                 final Unit<Mass> massUnit =
@@ -139,6 +139,7 @@ public class BiomassMarketGridPriceFileFactory
                                 return speciesList.stream().map(species ->
                                     new PriceUpdate(
                                         biomassMarket,
+                                        catchCategory,
                                         species,
                                         new Price(money, massUnit)
                                     )

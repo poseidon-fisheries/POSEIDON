@@ -23,28 +23,16 @@
 package uk.ac.ox.poseidon.agents.vessels.hold;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
 import static java.lang.Double.POSITIVE_INFINITY;
 
 @Getter
-@RequiredArgsConstructor
-public class InfiniteBiomassHold implements Hold<Biomass> {
+public class InfiniteBiomassHold extends BiomassHold {
 
-    private Bucket<Biomass> content = Bucket.empty();
-
-    @Override
-    public void addContent(final Bucket<Biomass> contentToAdd) {
-        content.add(contentToAdd);
-    }
-
-    @Override
-    public Bucket<Biomass> extractContent() {
-        final Bucket<Biomass> removedContent = content;
-        content = Bucket.empty();
-        return removedContent;
+    public InfiniteBiomassHold(final CatchCategoriser<Biomass> catchCategoriser) {
+        super(catchCategoriser);
     }
 
     @Override

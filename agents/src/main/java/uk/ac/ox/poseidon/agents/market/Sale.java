@@ -22,16 +22,18 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
-import com.google.common.collect.Table;
 import lombok.Data;
+import lombok.Value;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
+import uk.ac.ox.poseidon.agents.catches.CatchCategory;
+import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.function.Function.identity;
@@ -43,17 +45,25 @@ public class Sale<C extends Content<C>> {
     private final String id;
     private final Market<C> market;
     private final Vessel vessel;
-    private final Table<Species, C, Money> sold;
-    private final Bucket<C> unsold;
+    private final List<Item<C>> items;
+    private final CategorisedCatch<C> unsold;
 
     public Map<CurrencyUnit, Money> summary() {
-        return sold
-            .values()
+        return items
             .stream()
+            .map(Item::getPrice)
             .collect(toMap(
                 Money::getCurrencyUnit,
                 identity(),
                 Money::plus
             ));
+    }
+
+    @Value
+    public static class Item<C extends Content<C>> {
+        CatchCategory category;
+        Species species;
+        C content;
+        Money price;
     }
 }

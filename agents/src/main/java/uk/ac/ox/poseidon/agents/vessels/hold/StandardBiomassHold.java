@@ -23,39 +23,40 @@
 package uk.ac.ox.poseidon.agents.vessels.hold;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
+import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
 @Getter
-@RequiredArgsConstructor
-public class StandardBiomassHold implements Hold<Biomass> {
+public class StandardBiomassHold extends BiomassHold {
 
     private final double totalCapacityInKg;
     private final double toleranceInKg;
-    private Bucket<Biomass> content = Bucket.empty();
+
+    public StandardBiomassHold(
+        final CatchCategoriser<Biomass> catchCategoriser,
+        final double totalCapacityInKg,
+        final double toleranceInKg
+    ) {
+        super(catchCategoriser);
+        this.totalCapacityInKg = totalCapacityInKg;
+        this.toleranceInKg = toleranceInKg;
+    }
 
     @Override
-    public void addContent(final Bucket<Biomass> contentToAdd) {
-        final Bucket<Biomass> newContent = content.add(contentToAdd);
+    public void addContent(final CategorisedCatch<Biomass> categorisedCatch) {
+        final CategorisedCatch<Biomass> newContent = content.add(categorisedCatch);
         if (newContent.getTotalBiomass().asKg() <= totalCapacityInKg + toleranceInKg) {
             content = newContent;
         } else {
             throw new IllegalStateException(
                 "Trying to store %f kg in the hold, but only %f kg of capacity available."
                     .formatted(
-                        contentToAdd.getTotalBiomass().asKg(),
+                        categorisedCatch.getTotalBiomass().asKg(),
                         getAvailableCapacityInKg()
                     )
             );
         }
-    }
-
-    @Override
-    public Bucket<Biomass> extractContent() {
-        final Bucket<Biomass> removedContent = content;
-        content = Bucket.empty();
-        return removedContent;
     }
 
 }

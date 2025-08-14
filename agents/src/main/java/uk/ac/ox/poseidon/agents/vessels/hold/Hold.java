@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels.hold;
 
+import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Content;
 
@@ -30,16 +31,23 @@ public interface Hold<C extends Content<C>> {
     /**
      * Adds the specified bucket of content to the current hold.
      *
-     * @param fishToStore the content to add
+     * @param categorisedCatch the content to add
      */
-    void addContent(Bucket<C> fishToStore);
+    void addContent(CategorisedCatch<C> categorisedCatch);
+
+    /**
+     * Adds the specified bucket of content to the current hold.
+     *
+     * @param uncategorisedCatch the content to add
+     */
+    void addContent(Bucket<C> uncategorisedCatch);
 
     /**
      * Retrieves the content held in the container without removing it.
      *
      * @return the current content.
      */
-    Bucket<C> getContent();
+    CategorisedCatch<C> getContent();
 
     default boolean isFull() {
         return getAvailableCapacityInKg() <= 0;
@@ -50,7 +58,7 @@ public interface Hold<C extends Content<C>> {
      *
      * @return the removed content. If the container was empty, returns an empty Bucket.
      */
-    Bucket<C> extractContent();
+    CategorisedCatch<C> extractContent();
 
     default boolean isEmpty() {
         return getContent().isEmpty();

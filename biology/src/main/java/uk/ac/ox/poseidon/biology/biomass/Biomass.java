@@ -36,6 +36,8 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 @EqualsAndHashCode
 public class Biomass implements Content<Biomass> {
 
+    public static final Biomass ZERO = new Biomass(0);
+
     // Biomass stored internally in kilograms
     private final double biomassInKg;
 

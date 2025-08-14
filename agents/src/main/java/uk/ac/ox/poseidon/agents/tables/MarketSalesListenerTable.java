@@ -22,16 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.tables;
 
-import com.google.common.collect.Table;
-import org.joda.money.Money;
 import tech.tablesaw.api.DateTimeColumn;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
 import uk.ac.ox.poseidon.agents.market.Sale;
-import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.biology.species.Species;
 
-import java.util.Set;
+import java.util.List;
 
 @SuppressWarnings("rawtypes")
 public class MarketSalesListenerTable extends ListenerTable<Sale> {
@@ -40,6 +36,7 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
     public static final String SALES_ID_COLUMN = "sales_id";
     public static final String MARKET_ID_COLUMN = "market_id";
     public static final String VESSEL_ID_COLUMN = "vessel_id";
+    public static final String CATEGORY_CODE_COLUMN = "category_code";
     public static final String SPECIES_CODE_COLUMN = "species_code";
     public static final String BIOMASS_SOLD_COLUMN = "biomass_sold_in_kg";
     public static final String SALE_VALUE_COLUMN = "sale_value";
@@ -49,6 +46,7 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
     private final StringColumn salesId = StringColumn.create(SALES_ID_COLUMN);
     private final StringColumn marketId = StringColumn.create(MARKET_ID_COLUMN);
     private final StringColumn vesselId = StringColumn.create(VESSEL_ID_COLUMN);
+    private final StringColumn categoryCode = StringColumn.create(CATEGORY_CODE_COLUMN);
     private final StringColumn speciesCode = StringColumn.create(SPECIES_CODE_COLUMN);
     private final DoubleColumn biomassSold = DoubleColumn.create(BIOMASS_SOLD_COLUMN);
     private final DoubleColumn saleValue = DoubleColumn.create(SALE_VALUE_COLUMN);
@@ -61,6 +59,7 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
             salesId,
             marketId,
             vesselId,
+            categoryCode,
             speciesCode,
             biomassSold,
             saleValue,
@@ -68,20 +67,19 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
         );
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void receive(final Sale sale) {
-        @SuppressWarnings("unchecked") final Set<Table.Cell<Species, Content<?>, Money>> cells =
-            (Set<Table.Cell<Species, Content<?>, Money>>) (Set<?>) sale.getSold().cellSet();
-
-        for (final Table.Cell<Species, Content<?>, Money> cell : cells) {
+        ((List<Sale.Item<?>>) sale.getItems()).forEach(item -> {
             dateTime.append(sale.getDateTime());
             salesId.append(sale.getId());
             marketId.append(sale.getMarket().getCode());
             vesselId.append(sale.getVessel().getId());
-            speciesCode.append(cell.getRowKey().getCode());
-            biomassSold.append(cell.getColumnKey().asBiomass().asKg());
-            saleValue.append(cell.getValue().getAmount().doubleValue());
-            currency.append(cell.getValue().getCurrencyUnit().getCode());
-        }
+            categoryCode.append(item.getCategory().getCode());
+            speciesCode.append(item.getSpecies().getCode());
+            biomassSold.append(item.getContent().asBiomass().asKg());
+            saleValue.append(item.getPrice().getAmount().doubleValue());
+            currency.append(item.getPrice().getCurrencyUnit().getCode());
+        });
     }
 }

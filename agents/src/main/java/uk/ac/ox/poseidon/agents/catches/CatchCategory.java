@@ -20,28 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.market;
+package uk.ac.ox.poseidon.agents.catches;
 
 import lombok.Value;
-import sim.engine.SimState;
-import sim.engine.Steppable;
-import uk.ac.ox.poseidon.agents.catches.CatchCategory;
-import uk.ac.ox.poseidon.biology.species.Species;
-
-import java.io.Serial;
 
 @Value
-public class PriceUpdate implements Steppable {
-
-    @Serial private static final long serialVersionUID = 135321789743469343L;
-
-    BiomassMarket market;
-    CatchCategory catchCategory;
-    Species species;
-    Price price;
-
-    @Override
-    public void step(final SimState simState) {
-        market.setPrice(catchCategory, species, price);
-    }
+public class CatchCategory {
+    String code;
 }
