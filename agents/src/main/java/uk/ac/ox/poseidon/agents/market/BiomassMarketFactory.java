@@ -33,9 +33,12 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 
 @Getter
 @Setter
@@ -46,22 +49,36 @@ public class BiomassMarketFactory extends SimulationScopeFactory<BiomassMarket> 
     private Factory<? extends BiomassMarketGrid> marketGrid;
     private Factory<? extends Port> port;
     private String marketCode;
-    private Factory<? extends Map<CatchCategory, Map<Species, Price>>> pricesPerSpecies;
+    private Factory<? extends List<PriceEntry>> pricesEntries;
 
     @Override
     protected BiomassMarket newInstance(final Simulation simulation) {
         checkNotNull(marketGrid, "marketGrid must not be null");
         checkNotNull(port, "port must not be null");
-        checkNotNull(pricesPerSpecies, "pricesPerSpecies must not be null");
+        checkNotNull(pricesEntries, "pricesEntries must not be null");
         final Port port = this.port.get(simulation);
         final String marketCode = this.marketCode != null ? this.marketCode : port.getCode();
         final BiomassMarketGrid marketGrid = this.marketGrid.get(simulation);
-        final BiomassMarket biomassMarket = new BiomassMarket(
-            port,
-            marketCode,
-            pricesPerSpecies.get(simulation),
-            simulation.getEventManager()
-        );
+        final Map<CatchCategory, Map<Species, Price>> prices =
+            pricesEntries
+                .get(simulation)
+                .stream()
+                .collect(
+                    groupingBy(
+                        PriceEntry::getCatchCategory,
+                        toMap(
+                            PriceEntry::getSpecies,
+                            PriceEntry::getPrice
+                        )
+                    )
+                );
+        final BiomassMarket biomassMarket =
+            new BiomassMarket(
+                port,
+                marketCode,
+                prices,
+                simulation.getEventManager()
+            );
         marketGrid.addMarket(biomassMarket, port);
         return biomassMarket;
     }

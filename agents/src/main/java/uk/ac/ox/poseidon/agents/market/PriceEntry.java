@@ -20,32 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.hold;
+package uk.ac.ox.poseidon.agents.market;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.Value;
+import uk.ac.ox.poseidon.agents.catches.CatchCategory;
+import uk.ac.ox.poseidon.biology.species.Species;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class InfiniteBiomassHoldFactory extends VesselScopeFactory<InfiniteBiomassHold> {
-
-    private Factory<? extends CatchCategoriser<Biomass>> catchCategoriser;
-
-    @Override
-    protected InfiniteBiomassHold newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new InfiniteBiomassHold(catchCategoriser.get(simulation));
-    }
+@Value
+public class PriceEntry {
+    CatchCategory catchCategory;
+    Species species;
+    Price price;
 }

@@ -25,8 +25,6 @@ package uk.ac.ox.poseidon.agents.market;
 import lombok.Value;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.poseidon.agents.catches.CatchCategory;
-import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.io.Serial;
 
@@ -36,12 +34,14 @@ public class PriceUpdate implements Steppable {
     @Serial private static final long serialVersionUID = 135321789743469343L;
 
     BiomassMarket market;
-    CatchCategory catchCategory;
-    Species species;
-    Price price;
+    PriceEntry priceEntry;
 
     @Override
     public void step(final SimState simState) {
-        market.setPrice(catchCategory, species, price);
+        market.setPrice(
+            priceEntry.getCatchCategory(),
+            priceEntry.getSpecies(),
+            priceEntry.getPrice()
+        );
     }
 }

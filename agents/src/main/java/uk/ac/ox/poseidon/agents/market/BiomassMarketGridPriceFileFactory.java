@@ -139,9 +139,11 @@ public class BiomassMarketGridPriceFileFactory
                                 return speciesList.stream().map(species ->
                                     new PriceUpdate(
                                         biomassMarket,
-                                        catchCategory,
-                                        species,
-                                        new Price(money, massUnit)
+                                        new PriceEntry(
+                                            catchCategory,
+                                            species,
+                                            new Price(money, massUnit)
+                                        )
                                     )
                                 );
                             },

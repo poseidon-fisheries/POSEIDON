@@ -26,38 +26,27 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.List;
-import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PricePerSpeciesFactory extends GlobalScopeFactory<Map<Species, Price>> {
-
-    private Factory<? extends List<Species>> speciesList;
-    private Map<String, Factory<? extends Price>> pricePerSpeciesCode;
+public class PriceEntryFactory extends GlobalScopeFactory<PriceEntry> {
+    private Factory<? extends CatchCategory> catchCategory;
+    private Factory<? extends Species> species;
+    private Factory<? extends Price> price;
 
     @Override
-    protected Map<Species, Price> newInstance(final Simulation simulation) {
-        checkNotNull(speciesList, "speciesList must not be null");
-        checkNotNull(pricePerSpeciesCode, "pricePerSpeciesCode must not be null");
-        final Map<String, Species> speciesByCode =
-            speciesList.get(simulation).stream().collect(toMap(Species::getCode, identity()));
-        return pricePerSpeciesCode.entrySet().stream().collect(toImmutableMap(
-            entry -> speciesByCode.get(entry.getKey()),
-            entry -> entry.getValue().get(simulation)
-        ));
+    protected PriceEntry newInstance(final Simulation simulation) {
+        return new PriceEntry(
+            catchCategory.get(simulation),
+            species.get(simulation),
+            price.get(simulation)
+        );
     }
-
 }
