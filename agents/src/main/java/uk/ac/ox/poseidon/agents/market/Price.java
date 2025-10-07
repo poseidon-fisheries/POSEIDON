@@ -22,14 +22,15 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
-import lombok.Data;
+import lombok.NonNull;
+import lombok.Value;
 import org.joda.money.Money;
 
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
 
-@Data
+@Value
 public class Price {
-    private final Money amount;
-    private final Unit<Mass> biomassUnit;
+    @NonNull Money amount;
+    @NonNull Unit<Mass> biomassUnit;
 }
