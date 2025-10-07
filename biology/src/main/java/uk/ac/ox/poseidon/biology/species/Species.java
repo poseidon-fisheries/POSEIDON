@@ -39,4 +39,20 @@ public class Species {
     ) {
         this(code, name, null);
     }
+
+    /**
+     * Returns true if a species "covers" another species, i.e., if it's the same according to its
+     * code and life stage, or if it doesn't specify a life stage and the other does.
+     * <p>
+     * I'm adding this to handle the case where we have a price for a species as a whole, but
+     * vessels catch that species at different life stages.
+     * <p>
+     * FIXME: this is needed, but a bit of a kludge and I'm not sure that this is the right approach
+     *  in general. We probably need some kind of standard species ontology (with the possibility
+     *  of encoding supra-species functional groups as well)
+     */
+    public boolean covers(final Species other) {
+        return this.code.equals(other.code) &&
+            (this.lifeStage == null || this.lifeStage.equals(other.lifeStage));
+    }
 }

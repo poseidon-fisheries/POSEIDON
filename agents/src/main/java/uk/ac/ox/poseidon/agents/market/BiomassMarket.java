@@ -38,10 +38,7 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @ToString
@@ -76,25 +73,29 @@ public class BiomassMarket implements Market<Biomass> {
         final List<CategorisedCatch<Biomass>> unsoldCatch = new ArrayList<>();
 
         categorisedCatch.getBuckets().forEach((catchCategory, bucket) -> {
-            final Map<Species, Price> categoryPrices = prices.get(catchCategory);
-            if (categoryPrices == null) {
+            if (prices.get(catchCategory) == null) {
                 unsoldCatch.add(new CategorisedCatch<>(Map.of(catchCategory, bucket)));
             } else {
                 bucket.getMap().forEach((species, biomass) -> {
-                    final Price price = categoryPrices.get(species);
-                    if (price == null) {
-                        unsoldCatch.add(new CategorisedCatch<>(Map.of(
+                    getPrice(catchCategory, species).ifPresentOrElse(
+                        price -> {
+                            final Money salePrice =
+                                price.getAmount().multipliedBy(
+                                    biomass.as(price.getBiomassUnit()),
+                                    RoundingMode.DOWN
+                                );
+                            soldItems.add(new Sale.Item<>(
+                                catchCategory,
+                                species,
+                                biomass,
+                                salePrice
+                            ));
+                        },
+                        () -> unsoldCatch.add(new CategorisedCatch<>(Map.of(
                             catchCategory,
                             Bucket.of(species, biomass)
-                        )));
-                    } else {
-                        final Money salePrice =
-                            price.getAmount().multipliedBy(
-                                biomass.as(price.getBiomassUnit()),
-                                RoundingMode.DOWN
-                            );
-                        soldItems.add(new Sale.Item<>(catchCategory, species, biomass, salePrice));
-                    }
+                        )))
+                    );
                 });
             }
         });
@@ -108,6 +109,26 @@ public class BiomassMarket implements Market<Biomass> {
         );
         eventManager.broadcast(sale);
         return sale;
+    }
+
+    public Optional<Price> getPrice(
+        final CatchCategory catchCategory,
+        final Species species
+    ) {
+        return Optional
+            .ofNullable(prices.get(catchCategory))
+            .flatMap(pricePerSpecies ->
+                Optional
+                    .ofNullable(pricePerSpecies.get(species))
+                    .or(() ->
+                        pricePerSpecies
+                            .entrySet()
+                            .stream()
+                            .filter(entry -> entry.getKey().covers(species))
+                            .map(Map.Entry::getValue)
+                            .findFirst()
+                    )
+            );
     }
 
     public void setPrice(
