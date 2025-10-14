@@ -28,14 +28,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
-import sim.engine.Sequence;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.utils.Measurements;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -47,11 +45,12 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import static com.google.common.collect.Streams.stream;
 import static java.math.RoundingMode.HALF_EVEN;
-import static java.util.stream.Collectors.*;
+import static java.util.Map.entry;
+import static java.util.stream.Collectors.groupingBy;
 
 @Getter
 @Setter
@@ -88,55 +87,56 @@ public class BiomassMarketGridPriceFileFactory
         final BiomassMarketGrid marketGrid = new BiomassMarketGrid(portGrid);
         final Map<String, CatchCategory> catchCategories = new HashMap<>();
 
-        final Map<LocalDateTime, List<PriceUpdate>> priceUpdatesByDate =
-            new TreeMap<>( // wrap in a TreeMap to sort by dates
-                Table.read()
-                    .file(path.get(simulation).toFile())
-                    .stream()
-                    .collect(groupingBy(
-                        row -> row.getDate(dateColumn).atStartOfDay(),
-                        flatMapping(
-                            row -> {
-                                final BiomassMarket biomassMarket = markets.computeIfAbsent(
-                                    row.getString(portCodeColumn), portCode -> {
-                                        final Port port =
-                                            portGrid.getObject(portCode).orElseThrow(() ->
-                                                new RuntimeException(
-                                                    "Port " + portCode + " not found in port grid."
-                                                )
-                                            );
-                                        final BiomassMarket market = new BiomassMarket(
-                                            port,
-                                            portCode,
-                                            Map.of(),
-                                            simulation.getEventManager()
-                                        );
-                                        marketGrid.addMarket(market, port);
-                                        return market;
-                                    }
-                                );
-                                final String speciesCode = row.getString(speciesCodeColumn);
-                                final List<Species> speciesList = speciesByCode.get(speciesCode);
-                                if (speciesList == null) {
-                                    throw new RuntimeException(
-                                        "Species " + speciesCode + " not found."
+        final List<Entry<LocalDateTime, PriceUpdate>> priceUpdatesByDate =
+            Table.read()
+                .file(path.get(simulation).toFile())
+                .stream()
+                .flatMap(row -> {
+                        final BiomassMarket biomassMarket = markets.computeIfAbsent(
+                            row.getString(portCodeColumn), portCode -> {
+                                final Port port =
+                                    portGrid.getObject(portCode).orElseThrow(() ->
+                                        new RuntimeException(
+                                            "Port " + portCode + " not found in port grid."
+                                        )
                                     );
-                                }
-                                final CatchCategory catchCategory =
-                                    catchCategories.computeIfAbsent(
-                                        row.getString(categoryCodeColumn),
-                                        CatchCategory::new
-                                    );
-                                final CurrencyUnit currencyUnit =
-                                    CurrencyUnit.of(row.getString(currencyColumn));
-                                final Unit<Mass> massUnit =
-                                    Measurements.parseMassUnit(row.getString(measurementUnitColumn));
-                                final Money money = Money.of(
-                                    currencyUnit,
-                                    row.getDouble(priceColumn),
-                                    HALF_EVEN
+                                final BiomassMarket market = new BiomassMarket(
+                                    port,
+                                    portCode,
+                                    Map.of(),
+                                    simulation.getEventManager()
                                 );
-                                return speciesList.stream().map(species ->
+                                marketGrid.addMarket(market, port);
+                                return market;
+                            }
+                        );
+                        final String speciesCode = row.getString(speciesCodeColumn);
+                        final List<Species> speciesList = speciesByCode.get(speciesCode);
+                        if (speciesList == null) {
+                            throw new RuntimeException(
+                                "Species " + speciesCode + " not found."
+                            );
+                        }
+                        final CatchCategory catchCategory =
+                            catchCategories.computeIfAbsent(
+                                row.getString(categoryCodeColumn),
+                                CatchCategory::new
+                            );
+                        final CurrencyUnit currencyUnit =
+                            CurrencyUnit.of(row.getString(currencyColumn));
+                        final Unit<Mass> massUnit =
+                            Measurements.parseMassUnit(row.getString(measurementUnitColumn));
+                        final Money money = Money.of(
+                            currencyUnit,
+                            row.getDouble(priceColumn),
+                            HALF_EVEN
+                        );
+                        final LocalDateTime localDateTime = row.getDate(dateColumn).atStartOfDay();
+                        return speciesList
+                            .stream()
+                            .map(species ->
+                                entry(
+                                    localDateTime,
                                     new PriceUpdate(
                                         biomassMarket,
                                         new PriceEntry(
@@ -145,21 +145,12 @@ public class BiomassMarketGridPriceFileFactory
                                             new Price(money, massUnit)
                                         )
                                     )
-                                );
-                            },
-                            toList()
-                        )
-                    ))
-            );
-        final TemporalSchedule schedule = simulation.getTemporalSchedule();
-        priceUpdatesByDate.forEach((dateTime, priceUpdates) -> {
-            final Sequence sequence = new Sequence(priceUpdates);
-            if (dateTime.isBefore(schedule.getDateTime())) {
-                schedule.scheduleOnce(sequence);
-            } else {
-                schedule.scheduleOnce(dateTime, sequence);
-            }
-        });
+                                )
+                            );
+                    }
+                ).toList();
+        simulation.getTemporalSchedule().scheduleByDateTime(priceUpdatesByDate);
+
         return marketGrid;
     }
 

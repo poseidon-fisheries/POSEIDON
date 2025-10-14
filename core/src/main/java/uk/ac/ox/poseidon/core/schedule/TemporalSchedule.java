@@ -24,10 +24,7 @@ package uk.ac.ox.poseidon.core.schedule;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import sim.engine.Repeat;
-import sim.engine.Schedule;
-import sim.engine.SimState;
-import sim.engine.Steppable;
+import sim.engine.*;
 
 import java.io.Serial;
 import java.time.Duration;
@@ -35,7 +32,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
+import java.util.Collection;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.util.Map.entry;
+import static java.util.stream.Collectors.*;
 
 @Getter
 @RequiredArgsConstructor
@@ -128,6 +130,36 @@ public class TemporalSchedule extends Schedule {
         final Steppable event
     ) {
         return scheduleOnce(toTime(dateTime), ordering, event);
+    }
+
+    /**
+     * Schedules a collection of Steppable tasks to be executed based on their corresponding
+     * LocalDateTime. For each Steppable task, if the associated date-time is before the current
+     * date-time of the schedule, it is adjusted to the current date-time. Grouped tasks for the
+     * same date-time are wrapped into a Sequence and scheduled together.
+     *
+     * @param steppablesByDateTime a collection of entries where the key is the scheduled
+     *                             LocalDateTime and the value is the Steppable task to be executed
+     *                             at that time.
+     */
+    public void scheduleByDateTime(
+        final Collection<? extends Entry<LocalDateTime, ? extends Steppable>> steppablesByDateTime
+    ) {
+        final LocalDateTime currentDateTime = getDateTime();
+        steppablesByDateTime
+            .stream()
+            .collect(groupingBy(Entry::getKey, mapping(Entry::getValue, toList())))
+            .entrySet()
+            .stream()
+            .map(entry ->
+                entry(
+                    entry.getKey().isBefore(currentDateTime) ? currentDateTime : entry.getKey(),
+                    new Sequence(entry.getValue())
+                )
+            )
+            .forEach(entry ->
+                scheduleOnce(entry.getKey(), entry.getValue())
+            );
     }
 
     @SuppressWarnings("unused")
