@@ -37,7 +37,7 @@ import java.nio.file.Path;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CellSetFromGridFileFactory extends GlobalScopeFactory<ImmutableSet<Int2D>> {
-    @NonNull private Factory<? extends Path> path;
+    private Factory<? extends Path> path;
     private double includedValue;
 
     @Override

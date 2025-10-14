@@ -28,6 +28,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +46,20 @@ public final class Scenario {
     private Date startingDateTime = new Date();
 
     private Map<String, ? extends Factory<?>> components = new HashMap<>();
+
+    public Scenario(
+        final LocalDateTime startingDateTime,
+        final Map<String, ? extends Factory<?>> components
+    ) {
+        this(Date.from(startingDateTime.atZone(UTC).toInstant()), components);
+    }
+
+    public Scenario(
+        final LocalDate startingDate,
+        final Map<String, ? extends Factory<?>> components
+    ) {
+        this(startingDate.atStartOfDay(), components);
+    }
 
     public Simulation newSimulation() {
         return newSimulation(System.currentTimeMillis(), UUID.randomUUID());

@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.hold;
+package uk.ac.ox.poseidon.agents.vessels.holds;
 
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.biology.Bucket;

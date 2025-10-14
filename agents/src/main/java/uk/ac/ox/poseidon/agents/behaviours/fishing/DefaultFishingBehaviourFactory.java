@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.agents.behaviours.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
-import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
@@ -47,7 +47,7 @@ import java.util.function.Supplier;
 public class DefaultFishingBehaviourFactory<C extends Content<C>>
     extends BehaviourFactory<Fishing<C>> {
 
-    private Factory<? extends FishingGear<C>> fishingGear;
+    private VesselScopeFactory<? extends Gear<C>> gear;
     private VesselScopeFactory<? extends Hold<C>> hold;
     private VesselScopeFactory<? extends Supplier<Fisheable<C>>> fisheableSupplier;
     private Factory<? extends Regulations> regulations;
@@ -59,7 +59,7 @@ public class DefaultFishingBehaviourFactory<C extends Content<C>>
         final Vessel vessel
     ) {
         return new Fishing<>(
-            fishingGear.get(simulation),
+            gear.get(simulation, vessel),
             hold.get(simulation, vessel),
             fisheableSupplier.get(simulation, vessel),
             regulations.get(simulation),

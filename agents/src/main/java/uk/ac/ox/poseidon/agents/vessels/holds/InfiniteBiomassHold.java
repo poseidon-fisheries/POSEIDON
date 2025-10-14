@@ -20,38 +20,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.hold;
+package uk.ac.ox.poseidon.agents.vessels.holds;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
-import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
-import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
+import static java.lang.Double.POSITIVE_INFINITY;
+
 @Getter
-@RequiredArgsConstructor
-public abstract class BiomassHold implements Hold<Biomass> {
+public class InfiniteBiomassHold extends BiomassHold {
 
-    private final CatchCategoriser<Biomass> catchCategoriser;
-
-    protected CategorisedCatch<Biomass> content = CategorisedCatch.empty();
-
-    @Override
-    public void addContent(final Bucket<Biomass> uncategorisedCatch) {
-        addContent(catchCategoriser.apply(uncategorisedCatch));
+    public InfiniteBiomassHold(final CatchCategoriser<Biomass> catchCategoriser) {
+        super(catchCategoriser);
     }
 
     @Override
-    public void addContent(final CategorisedCatch<Biomass> categorisedCatch) {
-        content = content.add(categorisedCatch);
-    }
-
-    @Override
-    public CategorisedCatch<Biomass> extractContent() {
-        final CategorisedCatch<Biomass> removedContent = content;
-        content = CategorisedCatch.empty();
-        return removedContent;
+    public double getTotalCapacityInKg() {
+        return POSITIVE_INFINITY;
     }
 
 }

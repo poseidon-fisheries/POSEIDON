@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.agents.market.Market;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.market.Sale;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
+import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.geography.ports.Port;
 

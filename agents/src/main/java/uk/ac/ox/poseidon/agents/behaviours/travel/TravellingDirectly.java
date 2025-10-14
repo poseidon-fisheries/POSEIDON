@@ -49,7 +49,7 @@ public class TravellingDirectly implements Behaviour {
             distanceCalculator.travelDuration(
                 vessel.getCell(),
                 vessel.getDestination().getCell(),
-                vessel.getCruisingSpeed()
+                vessel.getEngine().getCruisingSpeed()
             ),
             vessel
         );

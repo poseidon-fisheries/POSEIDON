@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,21 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.gears;
+package uk.ac.ox.poseidon.agents.vessels.engines;
 
-import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.biology.Fisheable;
+import lombok.Value;
 
-import java.time.Duration;
-import java.util.function.Supplier;
+import javax.measure.Quantity;
+import javax.measure.quantity.Speed;
 
-public interface FishingGear<C extends Content<C>> {
-
-    String getCode();
-
-    Supplier<Duration> getDurationSupplier();
-
-    Bucket<C> fish(Fisheable<C> fisheable);
-
+@Value
+public class SimpleEngine implements Engine {
+    Quantity<Speed> cruisingSpeed;
 }

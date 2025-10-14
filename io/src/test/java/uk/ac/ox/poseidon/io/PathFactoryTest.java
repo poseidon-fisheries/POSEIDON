@@ -29,7 +29,6 @@ import uk.ac.ox.poseidon.io.paths.PathFactory;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 
 class PathFactoryTest {
@@ -40,26 +39,20 @@ class PathFactoryTest {
     @Test
     void newInstanceSimpleFile() {
         final PathFactory pathFactory = PathFactory.of(FILENAME);
-        assertNull(pathFactory.getParent());
-        assertEquals(FILENAME, pathFactory.getPath());
-        assertEquals(Path.of(FILENAME), pathFactory.newInstance(mock(Simulation.class)));
+        assertEquals(Path.of(FILENAME), pathFactory.get(mock(Simulation.class)));
     }
 
     @Test
     void newInstanceFileInFolder() {
         final PathFactory pathFactory = PathFactory.of(FOLDERS + FILENAME);
-        assertNull(pathFactory.getParent());
-        assertEquals("/a/b/c/" + FILENAME, pathFactory.getPath());
-        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.newInstance(mock(Simulation.class)));
+        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(mock(Simulation.class)));
     }
 
     @Test
     void newInstanceWithParent() {
         final Simulation simulation = mock(Simulation.class);
         final PathFactory pathFactory = PathFactory.of(FOLDERS).plus(FILENAME);
-        assertEquals(Path.of(FOLDERS), pathFactory.getParent().get(simulation));
-        assertEquals(FILENAME, pathFactory.getPath());
-        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.newInstance(simulation));
+        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(simulation));
     }
 
 }

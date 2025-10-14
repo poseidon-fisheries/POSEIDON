@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,19 +20,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.fishing;
+package uk.ac.ox.poseidon.io.sources;
 
-import uk.ac.ox.poseidon.agents.behaviours.Action;
-import uk.ac.ox.poseidon.agents.behaviours.disposition.Disposition;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.biology.Bucket;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-public interface FishingAction extends Action {
+import java.nio.file.Path;
 
-    Gear<?> getGear();
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class FileDataSourceFactory extends GlobalScopeFactory<FileDataSource> {
 
-    Bucket<?> getGrossCatch();
+    private Factory<? extends Path> path;
 
-    Disposition<?> getDisposition();
+    @Override
+    protected FileDataSource newInstance(final Simulation simulation) {
+        return new FileDataSource(path.get(simulation).toFile());
+    }
 
 }

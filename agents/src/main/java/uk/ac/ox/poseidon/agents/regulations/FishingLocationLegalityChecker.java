@@ -27,7 +27,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DummyFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
@@ -49,14 +49,14 @@ public class FishingLocationLegalityChecker {
 
     public boolean test(
         final Int2D fishingLocation,
-        final FishingGear<?> fishingGear
+        final Gear<?> gear
     ) {
-        return regulations.isPermitted(makeAction(fishingLocation, fishingGear));
+        return regulations.isPermitted(makeAction(fishingLocation, gear));
     }
 
     private Action makeAction(
         final Int2D fishingLocation,
-        final FishingGear<?> fishingGear
+        final Gear<?> gear
     ) {
         final List<Int2D> pathToFishingLocation =
             pathFinder.getPath(
@@ -71,14 +71,14 @@ public class FishingLocationLegalityChecker {
         final Duration travelDuration =
             distanceCalculator.travelDuration(
                 pathToFishingLocation,
-                vessel.getCruisingSpeed()
+                vessel.getEngine().getCruisingSpeed()
             );
 
         return new DummyFishingAction<>(
             currenDateTimeSupplier.get().plus(travelDuration),
             vessel,
             vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation),
-            fishingGear
+            gear
         );
     }
 }

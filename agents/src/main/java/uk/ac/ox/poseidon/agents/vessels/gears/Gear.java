@@ -20,19 +20,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.fishing;
+package uk.ac.ox.poseidon.agents.vessels.gears;
 
-import uk.ac.ox.poseidon.agents.behaviours.Action;
-import uk.ac.ox.poseidon.agents.behaviours.disposition.Disposition;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.Content;
+import uk.ac.ox.poseidon.biology.Fisheable;
 
-public interface FishingAction extends Action {
+import java.time.Duration;
+import java.util.function.Supplier;
 
-    Gear<?> getGear();
+public interface Gear<C extends Content<C>> {
 
-    Bucket<?> getGrossCatch();
+    String getCode();
 
-    Disposition<?> getDisposition();
+    Supplier<Duration> getDurationSupplier();
+
+    Bucket<C> fish(Fisheable<C> fisheable);
 
 }

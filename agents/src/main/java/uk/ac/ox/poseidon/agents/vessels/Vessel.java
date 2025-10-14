@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.vessels;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
@@ -32,6 +33,9 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Agent;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -40,10 +44,7 @@ import uk.ac.ox.poseidon.geography.grids.Destination;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Speed;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.*;
 
 @Getter
 @Setter
@@ -51,37 +52,44 @@ public class Vessel implements Agent, Oriented2D {
 
     private static final int VESSEL_BEHAVIOUR_ORDERING = 1;
     private final String id;
-    private final String name;
-    private final VesselField vesselField;
-    private final PortGrid portGrid;
     private final EventManager eventManager;
     private final Account account;
+    private final VesselField vesselField;
+    private final PortGrid portGrid;
+    private final Map<String, Object> tags = new HashMap<>();
+
+    // Modifiable characteristics
+    @NonNull private String name;
+    @NonNull private Port homePort;
+    @NonNull private Hold<?> hold;
+    @NonNull private Gear<?> gear;
+    @NonNull private Engine engine;
+
+    // Current state variables
     @Getter(AccessLevel.NONE)
     private final Deque<Behaviour> behaviourStack = new ArrayDeque<>();
-    private Port homePort;
-    private Quantity<Speed> cruisingSpeed;
     private double heading;
     private Destination destination;
+    private boolean active;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     Vessel(
         final String id,
-        final String name,
-        final PortGrid portGrid,
-        final Port homePort,
-        final Quantity<Speed> cruisingSpeed,
+        final @NonNull String name,
+        final EventManager eventManager,
         final Account account,
         final VesselField vesselField,
-        final EventManager eventManager
+        final PortGrid portGrid,
+        final @NonNull Port homePort
     ) {
         this.id = id;
         this.name = name;
-        this.portGrid = portGrid;
-        this.homePort = homePort;
-        this.cruisingSpeed = cruisingSpeed;
+        this.eventManager = eventManager;
         this.account = account;
         this.vesselField = vesselField;
-        this.eventManager = eventManager;
+        this.portGrid = portGrid;
+        this.homePort = homePort;
+        setCurrentCell(portGrid.getLocation(homePort));
     }
 
     @Override
@@ -165,10 +173,21 @@ public class Vessel implements Agent, Oriented2D {
 
     @Override
     public String toString() {
-        return name + " (" + id + ")";
+        return name == null ? id : name + " (" + id + ")";
     }
 
     public boolean isAtHomePort() {
         return getCell().equals(getHomePort().getCell());
+    }
+
+    public void putTag(
+        final String key,
+        final Object value
+    ) {
+        tags.put(key, value);
+    }
+
+    public Optional<Object> getTag(final String key) {
+        return Optional.ofNullable(tags.get(key));
     }
 }

@@ -30,7 +30,7 @@ import sim.portrayal.simple.ImagePortrayal2D;
 import uk.ac.ox.poseidon.agents.behaviours.fishing.DummyFishingAction;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -57,7 +57,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
     private Factory<? extends Regulations> regulations;
     private Factory<? extends List<Vessel>> vessels;
     private Factory<? extends BathymetricGrid> bathymetric;
-    private Factory<? extends FishingGear<?>> fishingGear;
+    private Factory<? extends Gear<?>> fishingGear;
     private int displayWidth;
     private int displayHeight;
 
@@ -106,7 +106,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
         private final BathymetricGrid bathymetricGrid;
         private final ObjectGrid2D grid;
         private final UpdateFrequency updateFrequency;
-        private final FishingGear<?> fishingGear;
+        private final Gear<?> gear;
         private long lastUpdated;
 
         Portrayal(
@@ -114,7 +114,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
             final Regulations regulations,
             final List<Vessel> vessels,
             final BathymetricGrid bathymetricGrid,
-            final FishingGear<?> fishingGear,
+            final Gear<?> gear,
             final UpdateFrequency updateFrequency,
             final int displayWidth,
             final int displayHeight
@@ -123,7 +123,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
             this.regulations = regulations;
             this.vessels = vessels;
             this.bathymetricGrid = bathymetricGrid;
-            this.fishingGear = fishingGear;
+            this.gear = gear;
             final int gridWidth = bathymetricGrid.getField().width;
             final int gridHeight = bathymetricGrid.getField().height;
             this.grid = new ObjectGrid2D(gridWidth, gridHeight);
@@ -166,7 +166,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
                                 dateTime,
                                 vessel,
                                 bathymetricGrid.getModelGrid().toCoordinate(cell),
-                                fishingGear
+                                gear
                             )
                         ).anyMatch(regulations::isForbidden);
                 grid.field[cell.x][cell.y] = forbidden ? "FORBIDDEN" : null;

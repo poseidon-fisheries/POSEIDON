@@ -20,35 +20,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.regulations;
+package uk.ac.ox.poseidon.agents.vessels;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Simulation;
+
+import java.util.Map;
+import java.util.Optional;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GearSpecificFishingLocationLegalityCheckerFactory
-    extends VesselScopeFactory<GearSpecificFishingLocationLegalityChecker> {
+public class VesselScopeFactoriesByCode<C> extends VesselScopeFactory<C> {
 
-    private VesselScopeFactory<? extends Gear<?>> fishingGear;
-    private VesselScopeFactory<? extends FishingLocationLegalityChecker> delegateChecker;
+    private Map<String, VesselScopeFactory<C>> factories;
+    private String code;
 
     @Override
-    protected GearSpecificFishingLocationLegalityChecker newInstance(
+    protected C newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new GearSpecificFishingLocationLegalityChecker(
-            fishingGear.get(simulation, vessel),
-            delegateChecker.get(simulation, vessel)
+        checkNotNull(
+            code,
+            "Cannot create new instance unless code is set."
         );
+        return Optional
+            .ofNullable(factories.get(code))
+            .map(factory -> factory.get(simulation, vessel))
+            .orElseThrow(() -> new IllegalArgumentException("No factory found for code: " + code));
     }
 }

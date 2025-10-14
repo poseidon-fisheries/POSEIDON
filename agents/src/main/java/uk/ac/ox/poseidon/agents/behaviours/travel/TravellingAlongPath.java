@@ -91,7 +91,7 @@ public class TravellingAlongPath implements Behaviour {
                 distanceCalculator.travelDuration(
                     vessel.getCell(),
                     currentPath.getFirst(),
-                    vessel.getCruisingSpeed()
+                    vessel.getEngine().getCruisingSpeed()
                 )
             );
         }

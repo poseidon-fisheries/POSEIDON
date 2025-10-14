@@ -20,35 +20,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.regulations;
+package uk.ac.ox.poseidon.agents.vessels.holds;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
+
+import static tech.units.indriya.unit.Units.KILOGRAM;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GearSpecificFishingLocationLegalityCheckerFactory
-    extends VesselScopeFactory<GearSpecificFishingLocationLegalityChecker> {
+public class StandardBiomassHoldFactory extends VesselScopeFactory<StandardBiomassHold> {
 
-    private VesselScopeFactory<? extends Gear<?>> fishingGear;
-    private VesselScopeFactory<? extends FishingLocationLegalityChecker> delegateChecker;
+    private Factory<? extends Quantity<Mass>> capacity;
+    private Factory<? extends Quantity<Mass>> tolerance;
+
+    private Factory<? extends CatchCategoriser<Biomass>> catchCategoriser;
 
     @Override
-    protected GearSpecificFishingLocationLegalityChecker newInstance(
+    protected StandardBiomassHold newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new GearSpecificFishingLocationLegalityChecker(
-            fishingGear.get(simulation, vessel),
-            delegateChecker.get(simulation, vessel)
+        return new StandardBiomassHold(
+            catchCategoriser.get(simulation),
+            capacity.get(simulation).to(KILOGRAM).getValue().doubleValue(),
+            tolerance.get(simulation).to(KILOGRAM).getValue().doubleValue()
         );
     }
 }

@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 class GridAdaptorTest {
 
@@ -60,10 +61,12 @@ class GridAdaptorTest {
             bathymetricGrid.getModelGrid()
         );
 
+    private final Coordinate portCoordinate = new Coordinate(0.5, 2.5);
+
     private final PortGrid portGrid =
         new PortGrid(
             bathymetricGrid,
-            Map.of(new Port("Test port"), new Coordinate(0.5, 2.5))
+            Map.of(mock(Port.class), new Coordinate(0.5, 2.5))
         );
 
     private final GridAdaptor gridAdaptor =

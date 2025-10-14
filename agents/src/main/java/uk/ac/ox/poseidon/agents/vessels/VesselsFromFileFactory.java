@@ -26,11 +26,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.joda.money.CurrencyUnit;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -38,8 +40,6 @@ import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Speed;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -67,8 +67,9 @@ public class VesselsFromFileFactory extends SimulationScopeFactory<List<Vessel>>
     private BehaviourFactory<?> initialBehaviour;
     private Factory<? extends VesselField> vesselField;
     private Factory<? extends PortGrid> portGrid;
-    private Factory<? extends Quantity<Speed>> speed;
-    private String accountCurrencyCode;
+    private VesselScopeFactory<? extends Hold<?>> hold;
+    private VesselScopeFactory<? extends Gear<?>> fishingGear;
+    private VesselScopeFactory<? extends Engine> engine;
 
     @Override
     protected List<Vessel> newInstance(final Simulation simulation) {
@@ -84,20 +85,21 @@ public class VesselsFromFileFactory extends SimulationScopeFactory<List<Vessel>>
                             final var vessel = new Vessel(
                                 row.getString(vesselIdColumn),
                                 row.getString(vesselNameColumn),
-                                portGrid,
-                                homePort,
-                                speed.get(simulation),
-                                new Account(CurrencyUnit.of(accountCurrencyCode)),
+                                new ForwardingEventManager(simulation.getEventManager()),
+                                new Account(),
                                 vesselField,
-                                new ForwardingEventManager(simulation.getEventManager())
+                                portGrid,
+                                homePort
                             );
+                            vessel.setHold(hold.get(simulation, vessel));
+                            vessel.setGear(fishingGear.get(simulation, vessel));
+                            vessel.setEngine(engine.get(simulation, vessel));
                             // TODO: I don't think this is the right place to set and schedule
                             //  behaviours. That should probably be handled by a separate
                             //  behaviour factory that is given a list of vessels and takes care
                             //  of setting that up.
                             final TemporalSchedule temporalSchedule =
                                 simulation.getTemporalSchedule();
-                            vessel.setCurrentCell(portGrid.getLocation(vessel.getHomePort()));
                             vessel.pushBehaviour(initialBehaviour.get(simulation, vessel));
                             temporalSchedule.scheduleOnce(__ ->
                                 vessel.scheduleNextAction(temporalSchedule)

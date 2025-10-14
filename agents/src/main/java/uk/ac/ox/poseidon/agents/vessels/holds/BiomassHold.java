@@ -20,45 +20,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.fishing;
+package uk.ac.ox.poseidon.agents.vessels.holds;
 
 import lombok.Getter;
-import uk.ac.ox.poseidon.agents.behaviours.AbstractAction;
-import uk.ac.ox.poseidon.agents.behaviours.disposition.Disposition;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
+import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.geography.Coordinate;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
 @Getter
-public class DummyFishingAction<C extends Content<C>>
-    extends AbstractAction
-    implements FishingAction {
+@RequiredArgsConstructor
+public abstract class BiomassHold implements Hold<Biomass> {
 
-    private final Gear<C> gear;
+    private final CatchCategoriser<Biomass> catchCategoriser;
 
-    public DummyFishingAction(
-        final LocalDateTime start,
-        final Vessel vessel,
-        final Coordinate coordinate,
-        final Gear<C> gear
-    ) {
-        super(vessel, start, Duration.ofSeconds(1), coordinate);
-        this.gear = gear;
+    protected CategorisedCatch<Biomass> content = CategorisedCatch.empty();
+
+    @Override
+    public void addContent(final Bucket<Biomass> uncategorisedCatch) {
+        addContent(catchCategoriser.apply(uncategorisedCatch));
     }
 
     @Override
-    public Bucket<C> getGrossCatch() {
-        return Bucket.empty();
+    public void addContent(final CategorisedCatch<Biomass> categorisedCatch) {
+        content = content.add(categorisedCatch);
     }
 
     @Override
-    public Disposition<C> getDisposition() {
-        return Disposition.empty();
+    public CategorisedCatch<Biomass> extractContent() {
+        final CategorisedCatch<Biomass> removedContent = content;
+        content = CategorisedCatch.empty();
+        return removedContent;
     }
 
 }

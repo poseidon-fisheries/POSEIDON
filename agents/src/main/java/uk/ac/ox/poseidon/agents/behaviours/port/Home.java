@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.BranchingBehaviour;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.hold.Hold;
+import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.time.LocalDateTime;

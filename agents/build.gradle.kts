@@ -30,4 +30,5 @@ dependencies {
     api(project(":io"))
     api(libs.joda.money)
     implementation(libs.streamex)
+    implementation(libs.commons.beanutils)
 }

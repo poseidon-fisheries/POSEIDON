@@ -70,7 +70,7 @@ public class TemporalSchedule extends Schedule {
         final String beforeSimulationString,
         final String afterSimulationString
     ) {
-        if (time < 0.0) {
+        if (time < EPOCH) {
             return beforeSimulationString;
         } else if (time >= Double.POSITIVE_INFINITY) {
             return afterSimulationString;
@@ -145,7 +145,7 @@ public class TemporalSchedule extends Schedule {
     public void scheduleByDateTime(
         final Collection<? extends Entry<LocalDateTime, ? extends Steppable>> steppablesByDateTime
     ) {
-        final LocalDateTime currentDateTime = getDateTime();
+        final LocalDateTime minimumDateTime = time < EPOCH ? toDateTime(EPOCH) : getDateTime();
         steppablesByDateTime
             .stream()
             .collect(groupingBy(Entry::getKey, mapping(Entry::getValue, toList())))
@@ -153,7 +153,7 @@ public class TemporalSchedule extends Schedule {
             .stream()
             .map(entry ->
                 entry(
-                    entry.getKey().isBefore(currentDateTime) ? currentDateTime : entry.getKey(),
+                    entry.getKey().isBefore(minimumDateTime) ? minimumDateTime : entry.getKey(),
                     new Sequence(entry.getValue())
                 )
             )

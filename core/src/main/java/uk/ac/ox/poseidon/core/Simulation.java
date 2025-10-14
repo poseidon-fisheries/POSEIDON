@@ -180,4 +180,8 @@ public class Simulation extends SimState {
         );
     }
 
+    public boolean step() {
+        return schedule.step(this);
+    }
+
 }

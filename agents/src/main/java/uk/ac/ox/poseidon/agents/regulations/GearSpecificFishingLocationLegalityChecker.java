@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.regulations;
 
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.vessels.gears.FishingGear;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 
 import java.util.function.Predicate;
 
@@ -33,12 +33,12 @@ import static lombok.AccessLevel.PACKAGE;
 @RequiredArgsConstructor(access = PACKAGE)
 public class GearSpecificFishingLocationLegalityChecker implements Predicate<Int2D> {
 
-    private final FishingGear<?> fishingGear;
+    private final Gear<?> gear;
     private final FishingLocationLegalityChecker delegateChecker;
 
     @Override
     public boolean test(final Int2D int2D) {
-        return delegateChecker.test(int2D, fishingGear);
+        return delegateChecker.test(int2D, gear);
     }
 
 }

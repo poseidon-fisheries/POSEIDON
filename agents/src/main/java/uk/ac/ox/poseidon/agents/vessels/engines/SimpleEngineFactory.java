@@ -20,44 +20,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.hold;
+package uk.ac.ox.poseidon.agents.vessels.engines;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
-
-import static tech.units.indriya.unit.Units.KILOGRAM;
+import javax.measure.quantity.Speed;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StandardBiomassHoldFactory extends VesselScopeFactory<StandardBiomassHold> {
+public class SimpleEngineFactory extends VesselScopeFactory<Engine> {
 
-    private Factory<? extends Quantity<Mass>> capacity;
-    private Factory<? extends Quantity<Mass>> tolerance;
-
-    private Factory<? extends CatchCategoriser<Biomass>> catchCategoriser;
+    private Factory<? extends Quantity<Speed>> speed;
 
     @Override
-    protected StandardBiomassHold newInstance(
+    protected Engine newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new StandardBiomassHold(
-            catchCategoriser.get(simulation),
-            capacity.get(simulation).to(KILOGRAM).getValue().doubleValue(),
-            tolerance.get(simulation).to(KILOGRAM).getValue().doubleValue()
-        );
+        return new SimpleEngine(speed.get(simulation));
     }
 }

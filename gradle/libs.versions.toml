@@ -1,4 +1,5 @@
 [versions]
+assertj = "3.27.6"
 batik = "1.18"
 commons-beanutils = "1.11.0"
 commons-io = "2.19.0"
@@ -23,6 +24,7 @@ spotbugs = "6.0.26"
 annotation-api = "1.3.2"
 
 [libraries]
+assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 annotation-api = { module = "javax.annotation:javax.annotation-api", version.ref = "annotation-api" }
 batik-awt-util = { module = "org.apache.xmlgraphics:batik-awt-util", version.ref = "batik" }
 batik-dom = { module = "org.apache.xmlgraphics:batik-dom", version.ref = "batik" }

@@ -26,10 +26,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.joda.money.CurrencyUnit;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -37,9 +39,6 @@ import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Speed;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -55,24 +54,28 @@ public class VesselFactory extends SimulationScopeFactory<Vessel> {
     private Factory<? extends VesselField> vesselField;
     private Factory<? extends Port> homePort;
     private Factory<? extends PortGrid> portGrid;
-    private Factory<? extends Quantity<Speed>> speed;
-    private String accountCurrencyCode;
+    private VesselScopeFactory<? extends Hold<?>> hold;
+    private VesselScopeFactory<? extends Gear<?>> gear;
+    private VesselScopeFactory<? extends Engine> engine;
 
     @Override
     protected Vessel newInstance(final Simulation simulation) {
         final VesselField vesselField = this.vesselField.get(simulation);
         final var vessel = new Vessel(
             checkNotNull(id),
-            name == null ? "Vessel " + id : name,
-            portGrid.get(simulation),
-            homePort.get(simulation),
-            speed.get(simulation),
-            new Account(CurrencyUnit.of(accountCurrencyCode)),
+            checkNotNull(name),
+            new ForwardingEventManager(simulation.getEventManager()),
+            new Account(),
             vesselField,
-            new ForwardingEventManager(simulation.getEventManager())
+            portGrid.get(simulation),
+            homePort.get(simulation)
         );
+        vessel.setName(name == null ? "Vessel " + id : name);
+        vessel.setHold(hold.get(simulation, vessel));
+        vessel.setGear(gear.get(simulation, vessel));
+        vessel.setEngine(engine.get(simulation, vessel));
+
         final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
-        vessel.setCurrentCell(portGrid.get(simulation).getLocation(vessel.getHomePort()));
         vessel.pushBehaviour(initialBehaviour.get(simulation, vessel));
         temporalSchedule.scheduleOnce(__ ->
             vessel.scheduleNextAction(temporalSchedule)

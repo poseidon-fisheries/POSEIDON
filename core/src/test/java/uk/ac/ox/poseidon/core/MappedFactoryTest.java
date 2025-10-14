@@ -43,11 +43,11 @@ class MappedFactoryTest {
             ),
             new MappedFactory<>(
                 new DateTimeFactory(2000, null, null),
+                List.of("month", "day"),
                 List.of(
                     new ConstantFactory<>(List.of(1, 2, 3)),
                     new ConstantFactory<>(List.of(21, 22, 23))
-                ),
-                List.of("month", "day")
+                )
             ).get(null)
         );
     }

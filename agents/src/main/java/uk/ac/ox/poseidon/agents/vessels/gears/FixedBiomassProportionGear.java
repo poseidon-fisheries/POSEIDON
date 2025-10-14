@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 @Getter
-public class FixedBiomassProportionGear implements FishingGear<Biomass> {
+public class FixedBiomassProportionGear implements Gear<Biomass> {
 
     private final String code;
     private final double proportion;

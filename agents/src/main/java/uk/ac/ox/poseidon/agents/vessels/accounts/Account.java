@@ -22,57 +22,40 @@
 
 package uk.ac.ox.poseidon.agents.vessels.accounts;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.ToString;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
-import java.math.BigDecimal;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @ToString
 public class Account {
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "CurrencyUnit is immutable, safe to expose"
-    )
-    private final CurrencyUnit currencyUnit;
-    private Money balance;
 
-    public Account(final CurrencyUnit currencyUnit) {
-        this.currencyUnit = checkNotNull(currencyUnit);
-        this.balance = Money.zero(currencyUnit);
-    }
+    private final Map<CurrencyUnit, Money> balances = new HashMap<>();
 
     public void setBalance(final Money balance) {
-        this.balance = checkCurrency(balance);
+        balances.put(balance.getCurrencyUnit(), balance);
     }
 
     public void add(final Money amount) {
-        this.balance = balance.plus(checkCurrency(amount));
+        balances.put(
+            amount.getCurrencyUnit(),
+            balances
+                .getOrDefault(amount.getCurrencyUnit(), Money.zero(amount.getCurrencyUnit()))
+                .plus(amount)
+        );
     }
 
     public void subtract(final Money amount) {
-        checkArgument(amount.getCurrencyUnit().equals(currencyUnit));
-        this.balance = balance.minus(checkCurrency(amount));
-    }
-
-    private Money checkCurrency(final Money amount) {
-        checkNotNull(amount);
-        checkArgument(
-            amount.getCurrencyUnit().equals(currencyUnit),
-            "Expected currency %s, got %s.",
-            currencyUnit.getCode(),
-            amount.getCurrencyUnit().getCode()
+        balances.put(
+            amount.getCurrencyUnit(),
+            balances
+                .getOrDefault(amount.getCurrencyUnit(), Money.zero(amount.getCurrencyUnit()))
+                .minus(amount)
         );
-        return amount;
     }
 
-    public BigDecimal getBalanceAmount() {
-        return balance.getAmount();
-    }
 }
