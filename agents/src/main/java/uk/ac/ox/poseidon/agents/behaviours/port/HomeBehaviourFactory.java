@@ -28,11 +28,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.function.Predicate;
 
@@ -42,8 +39,6 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 public class HomeBehaviourFactory extends BehaviourFactory<Home> {
 
-    private Factory<? extends PortGrid> portGrid;
-    private VesselScopeFactory<? extends Hold<?>> hold;
     private Factory<? extends Predicate<? super Vessel>> readinessPredicate;
     private BehaviourFactory<?> behaviourIfReady;
     private BehaviourFactory<?> behaviourIfNotReady;
@@ -56,8 +51,6 @@ public class HomeBehaviourFactory extends BehaviourFactory<Home> {
         final Vessel vessel
     ) {
         return new Home(
-            portGrid.get(simulation),
-            hold.get(simulation, vessel),
             readinessPredicate.get(simulation),
             travelBehaviour.get(simulation, vessel),
             landingBehaviour.get(simulation, vessel),

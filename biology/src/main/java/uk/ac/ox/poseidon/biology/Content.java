@@ -24,13 +24,38 @@ package uk.ac.ox.poseidon.biology;
 
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
-public interface Content<C extends Content<C>> {
+import javax.measure.Quantity;
+import javax.measure.Unit;
+import javax.measure.quantity.Mass;
 
-    C add(C content);
+public interface Content {
 
-    C subtract(C content);
+    default Content add(final Content content) {
+        return this.asBiomass().add(content.asBiomass());
+    }
+
+    default Content subtract(final Content content) {
+        return this.asBiomass().subtract(content.asBiomass());
+    }
+
+    default double as(final Unit<Mass> biomassUnit) {
+        return this.asBiomass().as(biomassUnit);
+    }
+
+    Biomass multiply(double value);
+
+    Biomass divide(double value);
 
     boolean isEmpty();
 
     Biomass asBiomass();
+
+    default Quantity<Mass> asQuantity() {
+        return this.asBiomass().asQuantity();
+    }
+
+    default double asKg() {
+        return this.asBiomass().asKg();
+    }
+
 }

@@ -28,7 +28,6 @@ import sim.portrayal.grid.ObjectGridPortrayal2D;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -48,6 +47,7 @@ class RegulationGridPortrayalFactoryTest {
      * tested method creates a new instance of ObjectGridPortrayal2D (specifically a subclass) based
      * on the Simulation provided, using injected regulatory, fleet, and bathymetric context.
      */
+    @SuppressWarnings("unchecked")
     @Test
     void testNewInstance_CreatesNonNullPortrayal() {
         // Arrange
@@ -71,8 +71,8 @@ class RegulationGridPortrayalFactoryTest {
         final Factory<BathymetricGrid> bathymetricFactory = mock(Factory.class);
         when(bathymetricFactory.get(mockSimulation)).thenReturn(mockBathymetricGrid);
 
-        final Factory<Gear<Biomass>> gearFactory = mock(Factory.class);
-        final Gear<Biomass> mockGear = mock(Gear.class);
+        final Factory<Gear> gearFactory = mock(Factory.class);
+        final Gear mockGear = mock(Gear.class);
         when(gearFactory.get(mockSimulation)).thenReturn(mockGear);
 
         final RegulationGridPortrayalFactory factory = new RegulationGridPortrayalFactory(

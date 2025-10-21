@@ -30,8 +30,6 @@ import uk.ac.ox.poseidon.agents.market.Market;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.market.Sale;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
-import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.Duration;
@@ -43,10 +41,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
-public class Landing<C extends Content<C>> implements Behaviour {
+public class Landing implements Behaviour {
 
-    private final MarketGrid<C, ? extends Market<C>> marketGrid;
-    private final Hold<C> hold;
+    private final MarketGrid marketGrid;
     private final Supplier<Duration> durationSupplier;
 
     @Override
@@ -79,9 +76,9 @@ public class Landing<C extends Content<C>> implements Behaviour {
                     )
                 );
             } else {
-                final List<? extends Market<C>> markets =
+                final List<? extends Market> markets =
                     marketGrid.getObjectsAt(vessel.getCell()).toList();
-                final Market<C> market = markets
+                final Market market = markets
                     .stream()
                     .filter(m -> m.getPort().equals(port))
                     .findAny()
@@ -94,7 +91,7 @@ public class Landing<C extends Content<C>> implements Behaviour {
                             markets.stream().map(Market::getCode).toList()
                         )
                     ));
-                final Sale<C> sale = market.sell(vessel, hold.extractContent(), dateTime);
+                final Sale sale = market.sell(vessel, vessel.getHold().extractContent(), dateTime);
                 sale.summary().values().forEach(vessel.getAccount()::add);
                 getVessel().popBehaviour();
             }

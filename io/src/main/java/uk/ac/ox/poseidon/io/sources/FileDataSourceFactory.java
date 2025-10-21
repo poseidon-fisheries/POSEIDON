@@ -30,7 +30,10 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
+import java.nio.charset.Charset;
 import java.nio.file.Path;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Getter
 @Setter
@@ -39,10 +42,15 @@ import java.nio.file.Path;
 public class FileDataSourceFactory extends GlobalScopeFactory<FileDataSource> {
 
     private Factory<? extends Path> path;
+    private String encoding = UTF_8.name();
+
+    public FileDataSourceFactory(final Factory<? extends Path> path) {
+        this.path = path;
+    }
 
     @Override
     protected FileDataSource newInstance(final Simulation simulation) {
-        return new FileDataSource(path.get(simulation).toFile());
+        return new FileDataSource(path.get(simulation).toFile(), Charset.forName(encoding));
     }
 
 }

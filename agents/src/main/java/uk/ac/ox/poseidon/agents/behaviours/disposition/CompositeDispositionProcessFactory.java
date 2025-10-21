@@ -26,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -39,22 +38,22 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompositeDispositionProcessFactory<C extends Content<C>>
-    extends GlobalScopeFactory<CompositeDispositionProcess<C>> {
+public class CompositeDispositionProcessFactory
+    extends GlobalScopeFactory<CompositeDispositionProcess> {
 
-    private List<Factory<? extends DispositionProcess<? super C>>> dispositionStrategies;
+    private List<Factory<? extends DispositionProcess>> dispositionStrategies;
 
     @SafeVarargs
     @SuppressWarnings("varargs")
     public CompositeDispositionProcessFactory(
-        final Factory<? extends DispositionProcess<? super C>>... dispositionStrategies
+        final Factory<? extends DispositionProcess>... dispositionStrategies
     ) {
         this(List.of(dispositionStrategies));
     }
 
     @Override
-    protected CompositeDispositionProcess<C> newInstance(final Simulation simulation) {
-        return new CompositeDispositionProcess<>(
+    protected CompositeDispositionProcess newInstance(final Simulation simulation) {
+        return new CompositeDispositionProcess(
             dispositionStrategies
                 .stream()
                 .map(factory -> factory.get(simulation))

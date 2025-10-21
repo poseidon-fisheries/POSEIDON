@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
 
 class FleetFromVesselRegisterFileFactoryTest {
 
-    private final String initialData = """
+    private static final String initialData = """
         cfr,name_of_vessel,place_of_registration,event,event_start_date,gear,t1,t2
         V1,Vee One,P1,CEN,2001-01-01,G1,1,a
         V2,Vee Two,P1,CEN,2001-01-01,G2,2,b
@@ -55,9 +55,9 @@ class FleetFromVesselRegisterFileFactoryTest {
     private Port p1;
     private Port p2;
     private PortGrid portGrid;
-    private Gear<?> g1;
-    private Gear<?> g2;
-    private Hold<?> h1;
+    private Gear g1;
+    private Gear g2;
+    private Hold h1;
 
     void initSimulation(final String extraData) {
         p1 = mock(Port.class);

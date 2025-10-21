@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.core;
 
+import com.google.common.base.Suppliers;
+
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
@@ -29,13 +31,15 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import static java.beans.Introspector.getBeanInfo;
 import static java.util.Comparator.comparing;
 
 public abstract class AbstractFactory<C> implements Factory<C> {
 
-    private final transient List<Method> readMethods = readMethods(this);
+    private final transient Supplier<List<Method>> readMethods =
+        Suppliers.memoize(() -> readMethods(this));
 
     public static List<Method> readMethods(final Object object) {
         final PropertyDescriptor[] props;
@@ -58,6 +62,7 @@ public abstract class AbstractFactory<C> implements Factory<C> {
     public int makeKey(final Simulation simulation) {
         synchronized (this) {
             return readMethods
+                .get()
                 .stream()
                 .map(readMethod -> {
                     try {

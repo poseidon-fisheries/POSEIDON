@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.agents.catches;
 import com.google.common.collect.ImmutableMap;
 import lombok.Value;
 import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
 import java.util.Map;
@@ -35,29 +34,30 @@ import java.util.stream.Stream;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 @Value
-public class CategorisedCatch<C extends Content<C>> {
+public class CategorisedCatch {
 
-    public static <C extends Content<C>> CategorisedCatch<C> empty() {
-        return new CategorisedCatch<>(ImmutableMap.of());
+    public static CategorisedCatch empty() {
+        return new CategorisedCatch(ImmutableMap.of());
     }
 
-    public CategorisedCatch(final Map<CatchCategory, Bucket<C>> buckets) {
+    public CategorisedCatch(final Map<CatchCategory, Bucket> buckets) {
         this.buckets = ImmutableMap.copyOf(buckets);
     }
 
-    ImmutableMap<CatchCategory, Bucket<C>> buckets;
+    ImmutableMap<CatchCategory, Bucket> buckets;
 
-    public CategorisedCatch<C> add(final CategorisedCatch<C> other) {
-        return new CategorisedCatch<>(Stream
-            .concat(
-                buckets.entrySet().stream(),
-                other.buckets.entrySet().stream()
-            )
-            .collect(toImmutableMap(
-                Entry::getKey,
-                Entry::getValue,
-                Bucket::add
-            ))
+    public CategorisedCatch add(final CategorisedCatch other) {
+        return new CategorisedCatch(
+            Stream
+                .concat(
+                    buckets.entrySet().stream(),
+                    other.buckets.entrySet().stream()
+                )
+                .collect(toImmutableMap(
+                    Entry::getKey,
+                    Entry::getValue,
+                    Bucket::add
+                ))
         );
     }
 

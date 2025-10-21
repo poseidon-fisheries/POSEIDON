@@ -24,8 +24,8 @@ package uk.ac.ox.poseidon.agents.market;
 
 import uk.ac.ox.poseidon.core.events.EventAccumulator;
 
-public class BiomassSaleAccumulator extends EventAccumulator<BiomassSale> {
+public class BiomassSaleAccumulator extends EventAccumulator<Sale> {
     BiomassSaleAccumulator() {
-        super(BiomassSale.class);
+        super(Sale.class);
     }
 }

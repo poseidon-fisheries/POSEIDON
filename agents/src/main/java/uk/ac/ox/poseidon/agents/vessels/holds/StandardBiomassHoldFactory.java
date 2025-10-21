@@ -29,7 +29,6 @@ import lombok.Setter;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -47,7 +46,7 @@ public class StandardBiomassHoldFactory extends VesselScopeFactory<StandardBioma
     private Factory<? extends Quantity<Mass>> capacity;
     private Factory<? extends Quantity<Mass>> tolerance;
 
-    private Factory<? extends CatchCategoriser<Biomass>> catchCategoriser;
+    private Factory<? extends CatchCategoriser> catchCategoriser;
 
     @Override
     protected StandardBiomassHold newInstance(

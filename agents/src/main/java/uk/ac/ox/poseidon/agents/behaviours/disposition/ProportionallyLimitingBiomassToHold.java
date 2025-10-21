@@ -24,17 +24,16 @@ package uk.ac.ox.poseidon.agents.behaviours.disposition;
 
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
 import static lombok.AccessLevel.PACKAGE;
 
 @NoArgsConstructor(access = PACKAGE)
 public class ProportionallyLimitingBiomassToHold
-    implements DispositionProcess<Biomass> {
+    implements DispositionProcess {
 
     @Override
-    public Disposition<Biomass> partition(
-        final Disposition<Biomass> currentDisposition,
+    public Disposition partition(
+        final Disposition currentDisposition,
         final double availableCapacityInKg
     ) {
         final double currentlyRetainedInKg =
@@ -43,13 +42,13 @@ public class ProportionallyLimitingBiomassToHold
             return currentDisposition;
         } else {
             final double proportionToKeep = availableCapacityInKg / currentlyRetainedInKg;
-            final Bucket<Biomass> updatedRetained =
+            final Bucket updatedRetained =
                 currentDisposition.getRetained().mapContent(biomass ->
                     biomass.multiply(proportionToKeep)
                 );
-            final Bucket<Biomass> newlyDiscarded =
+            final Bucket newlyDiscarded =
                 currentDisposition.getRetained().subtract(updatedRetained);
-            return new Disposition<>(
+            return new Disposition(
                 updatedRetained,
                 currentDisposition.getDiscardedAlive().add(newlyDiscarded),
                 currentDisposition.getDiscardedDead()

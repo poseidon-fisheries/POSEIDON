@@ -49,14 +49,14 @@ public class FishingLocationLegalityChecker {
 
     public boolean test(
         final Int2D fishingLocation,
-        final Gear<?> gear
+        final Gear gear
     ) {
         return regulations.isPermitted(makeAction(fishingLocation, gear));
     }
 
     private Action makeAction(
         final Int2D fishingLocation,
-        final Gear<?> gear
+        final Gear gear
     ) {
         final List<Int2D> pathToFishingLocation =
             pathFinder.getPath(
@@ -74,11 +74,10 @@ public class FishingLocationLegalityChecker {
                 vessel.getEngine().getCruisingSpeed()
             );
 
-        return new DummyFishingAction<>(
+        return new DummyFishingAction(
             currenDateTimeSupplier.get().plus(travelDuration),
             vessel,
-            vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation),
-            gear
+            vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation)
         );
     }
 }

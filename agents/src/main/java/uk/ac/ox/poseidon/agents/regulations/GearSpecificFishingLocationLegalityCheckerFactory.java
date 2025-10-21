@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 public class GearSpecificFishingLocationLegalityCheckerFactory
     extends VesselScopeFactory<GearSpecificFishingLocationLegalityChecker> {
 
-    private VesselScopeFactory<? extends Gear<?>> fishingGear;
+    private VesselScopeFactory<? extends Gear> fishingGear;
     private VesselScopeFactory<? extends FishingLocationLegalityChecker> delegateChecker;
 
     @Override

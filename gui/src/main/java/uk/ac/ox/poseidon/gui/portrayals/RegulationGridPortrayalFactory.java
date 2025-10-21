@@ -57,7 +57,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
     private Factory<? extends Regulations> regulations;
     private Factory<? extends List<Vessel>> vessels;
     private Factory<? extends BathymetricGrid> bathymetric;
-    private Factory<? extends Gear<?>> fishingGear;
+    private Factory<? extends Gear> fishingGear;
     private int displayWidth;
     private int displayHeight;
 
@@ -106,7 +106,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
         private final BathymetricGrid bathymetricGrid;
         private final ObjectGrid2D grid;
         private final UpdateFrequency updateFrequency;
-        private final Gear<?> gear;
+        private final Gear gear;
         private long lastUpdated;
 
         Portrayal(
@@ -114,7 +114,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
             final Regulations regulations,
             final List<Vessel> vessels,
             final BathymetricGrid bathymetricGrid,
-            final Gear<?> gear,
+            final Gear gear,
             final UpdateFrequency updateFrequency,
             final int displayWidth,
             final int displayHeight
@@ -162,11 +162,10 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
                     vessels
                         .stream()
                         .map(vessel ->
-                            new DummyFishingAction<>(
+                            new DummyFishingAction(
                                 dateTime,
                                 vessel,
-                                bathymetricGrid.getModelGrid().toCoordinate(cell),
-                                gear
+                                bathymetricGrid.getModelGrid().toCoordinate(cell)
                             )
                         ).anyMatch(regulations::isForbidden);
                 grid.field[cell.x][cell.y] = forbidden ? "FORBIDDEN" : null;

@@ -29,7 +29,7 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.geography.grids.NumberGrid;
 
 public interface BiomassGrid
-    extends NumberGrid<Double, DoubleGrid2D>, FisheableGrid<Biomass> {
+    extends NumberGrid<Double, DoubleGrid2D>, FisheableGrid {
 
     Species getSpecies();
 

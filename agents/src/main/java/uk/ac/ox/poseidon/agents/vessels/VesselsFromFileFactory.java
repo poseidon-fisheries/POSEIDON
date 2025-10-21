@@ -67,8 +67,8 @@ public class VesselsFromFileFactory extends SimulationScopeFactory<List<Vessel>>
     private BehaviourFactory<?> initialBehaviour;
     private Factory<? extends VesselField> vesselField;
     private Factory<? extends PortGrid> portGrid;
-    private VesselScopeFactory<? extends Hold<?>> hold;
-    private VesselScopeFactory<? extends Gear<?>> fishingGear;
+    private VesselScopeFactory<? extends Hold> hold;
+    private VesselScopeFactory<? extends Gear> fishingGear;
     private VesselScopeFactory<? extends Engine> engine;
 
     @Override

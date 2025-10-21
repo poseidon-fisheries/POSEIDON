@@ -23,18 +23,17 @@
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.Fisheable;
 
 import java.time.Duration;
 import java.util.function.Supplier;
 
-public interface Gear<C extends Content<C>> {
+public interface Gear {
 
     String getCode();
 
     Supplier<Duration> getDurationSupplier();
 
-    Bucket<C> fish(Fisheable<C> fisheable);
+    Bucket fish(Fisheable fisheable);
 
 }

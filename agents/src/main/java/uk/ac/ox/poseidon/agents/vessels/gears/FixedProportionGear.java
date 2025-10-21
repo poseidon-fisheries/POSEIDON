@@ -33,13 +33,13 @@ import java.util.function.Supplier;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 @Getter
-public class FixedBiomassProportionGear implements Gear<Biomass> {
+public class FixedProportionGear implements Gear {
 
     private final String code;
     private final double proportion;
     private final Supplier<Duration> durationSupplier;
 
-    FixedBiomassProportionGear(
+    FixedProportionGear(
         final String code,
         final double proportion,
         final Supplier<Duration> durationSupplier
@@ -50,14 +50,14 @@ public class FixedBiomassProportionGear implements Gear<Biomass> {
     }
 
     @Override
-    public Bucket<Biomass> fish(final Fisheable<Biomass> fisheable) {
-        final Bucket<Biomass> fishToCatch =
+    public Bucket fish(final Fisheable fisheable) {
+        final Bucket fishToCatch =
             fisheable
                 .availableFish()
                 .mapContent(biomass ->
                     Biomass.ofKg(biomass.asKg() * proportion)
                 );
-        final Bucket<Biomass> fishExtracted =
+        final Bucket fishExtracted =
             fisheable.extract(fishToCatch);
         assert fishExtracted.equals(fishToCatch);
         return fishExtracted;

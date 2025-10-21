@@ -36,7 +36,7 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 @NoArgsConstructor
 public final class MarketGridPortrayalFactory extends SimulationScopeFactory<SparseGridPortrayal2D> {
 
-    private Factory<? extends MarketGrid<?, ?>> marketGrid;
+    private Factory<? extends MarketGrid> marketGrid;
 
     @Override
     protected SparseGridPortrayal2D newInstance(final @NonNull Simulation simulation) {

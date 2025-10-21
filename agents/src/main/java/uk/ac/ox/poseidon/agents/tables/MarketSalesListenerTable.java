@@ -27,8 +27,6 @@ import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
 import uk.ac.ox.poseidon.agents.market.Sale;
 
-import java.util.List;
-
 @SuppressWarnings("rawtypes")
 public class MarketSalesListenerTable extends ListenerTable<Sale> {
 
@@ -67,10 +65,9 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
         );
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void receive(final Sale sale) {
-        ((List<Sale.Item<?>>) sale.getItems()).forEach(item -> {
+        sale.getItems().forEach(item -> {
             dateTime.append(sale.getDateTime());
             salesId.append(sale.getId());
             marketId.append(sale.getMarket().getCode());

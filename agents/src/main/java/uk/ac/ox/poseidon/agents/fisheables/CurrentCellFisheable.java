@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.agents.fisheables;
 
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 
@@ -33,13 +32,13 @@ import java.util.function.Supplier;
 import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
-public class CurrentCellFisheable<C extends Content<C>> implements Supplier<Fisheable<C>> {
+public class CurrentCellFisheable implements Supplier<Fisheable> {
 
     private final Vessel vessel;
-    private final FisheableGrid<C> fisheableGrid;
+    private final FisheableGrid fisheableGrid;
 
     @Override
-    public Fisheable<C> get() {
+    public Fisheable get() {
         return fisheableGrid.getFisheableCell(vessel.getCell());
     }
 }

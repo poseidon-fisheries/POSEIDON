@@ -35,7 +35,6 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.Fisheable;
 
 import java.time.LocalDateTime;
@@ -44,20 +43,18 @@ import java.util.function.Supplier;
 import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
-public class Fishing<C extends Content<C>> implements Behaviour {
+public class Fishing implements Behaviour {
 
-    @NonNull protected final Gear<C> gear;
-    @NonNull protected final Hold<C> hold;
-    @NonNull private final Supplier<Fisheable<C>> fisheableSupplier;
+    @NonNull private final Supplier<Fisheable> fisheableSupplier;
     @NonNull private final Regulations regulations;
-    @NonNull private final DispositionProcess<C> dispositionProcess;
+    @NonNull private final DispositionProcess dispositionProcess;
 
     @Override
     public SteppableAction nextAction(
         final Vessel vessel,
         final LocalDateTime dateTime
     ) {
-        final var action = new Action(vessel, dateTime, gear);
+        final var action = new Action(vessel, dateTime);
         return regulations.isPermitted(action) ? action : null;
     }
 
@@ -65,25 +62,25 @@ public class Fishing<C extends Content<C>> implements Behaviour {
     @ToString(callSuper = true)
     public class Action extends SteppableAction implements FishingAction {
 
-        private final Gear<C> gear;
-        private Bucket<C> grossCatch;
-        private Disposition<C> disposition;
+        private final Gear gear;
+        private Bucket grossCatch;
+        private Disposition disposition;
 
         public Action(
             final Vessel vessel,
-            final LocalDateTime start,
-            final Gear<C> gear
+            final LocalDateTime start
         ) {
-            super(vessel, start, gear.getDurationSupplier().get());
-            this.gear = gear;
+            super(vessel, start, vessel.getGear().getDurationSupplier().get());
+            this.gear = vessel.getGear();
         }
 
         @Override
         protected void complete(
             final LocalDateTime dateTime
         ) {
-            final Fisheable<C> fisheable = fisheableSupplier.get();
+            final Fisheable fisheable = fisheableSupplier.get();
             grossCatch = gear.fish(fisheable);
+            final Hold hold = vessel.getHold();
             disposition = dispositionProcess.partition(
                 grossCatch,
                 hold.getAvailableCapacityInKg()

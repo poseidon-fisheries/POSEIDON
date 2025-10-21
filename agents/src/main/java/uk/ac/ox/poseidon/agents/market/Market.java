@@ -24,20 +24,19 @@ package uk.ac.ox.poseidon.agents.market;
 
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.LocalDateTime;
 
-public interface Market<C extends Content<C>> {
+public interface Market {
 
     String getCode();
 
     Port getPort();
 
-    Sale<C> sell(
+    Sale sell(
         Vessel vessel,
-        CategorisedCatch<C> categorisedCatch,
+        CategorisedCatch categorisedCatch,
         LocalDateTime dateTime
     );
 

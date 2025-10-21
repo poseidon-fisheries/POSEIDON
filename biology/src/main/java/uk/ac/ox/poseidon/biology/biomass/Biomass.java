@@ -34,7 +34,7 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 
 @EqualsAndHashCode
-public class Biomass implements Content<Biomass> {
+public class Biomass implements Content {
 
     public static final Biomass ZERO = new Biomass(0);
 
@@ -62,6 +62,7 @@ public class Biomass implements Content<Biomass> {
         return new Biomass(value);
     }
 
+    @Override
     public double as(final Unit<Mass> biomassUnit) {
         return this.asQuantity().to(biomassUnit).getValue().doubleValue();
     }
@@ -74,11 +75,13 @@ public class Biomass implements Content<Biomass> {
         return new Biomass(this.biomassInKg - content.biomassInKg);
     }
 
+    @Override
     public Biomass multiply(final double value) {
         checkNonNegative(value, "Amount by which to multiply biomass");
         return new Biomass(this.biomassInKg * value);
     }
 
+    @Override
     public Biomass divide(final double value) {
         return new Biomass(this.biomassInKg / value);
     }
@@ -92,12 +95,14 @@ public class Biomass implements Content<Biomass> {
         return this;
     }
 
+    @Override
     public Quantity<Mass> asQuantity() {
         return Quantities.getQuantity(this.biomassInKg, KILOGRAM);
     }
 
     public String toString() {return "Biomass(" + this.asQuantity() + ")";}
 
+    @Override
     public double asKg() {
         return this.biomassInKg;
     }

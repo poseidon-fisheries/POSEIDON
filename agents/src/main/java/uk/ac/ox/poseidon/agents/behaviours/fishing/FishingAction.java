@@ -29,10 +29,11 @@ import uk.ac.ox.poseidon.biology.Bucket;
 
 public interface FishingAction extends Action {
 
-    Gear<?> getGear();
+    // a fishing action need to record which gear it used, in case the vessel changes gear later
+    Gear getGear();
 
-    Bucket<?> getGrossCatch();
+    Bucket getGrossCatch();
 
-    Disposition<?> getDisposition();
+    Disposition getDisposition();
 
 }

@@ -54,7 +54,7 @@ public class FishingActionListenerTable extends SpatialActionListenerTable<Fishi
 
     @Override
     public void receive(final FishingAction fishingAction) {
-        final Map<String, Bucket<?>> buckets = Map.of(
+        final Map<String, Bucket> buckets = Map.of(
             GROSS_CATCH, fishingAction.getGrossCatch(),
             RETAINED, fishingAction.getDisposition().getRetained(),
             DISCARDED_ALIVE, fishingAction.getDisposition().getDiscardedAlive(),

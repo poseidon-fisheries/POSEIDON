@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.biology.species.Species;
@@ -35,7 +36,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableDoubleGrid;
 
 @Getter
-class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, FisheableGrid<Biomass> {
+class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, FisheableGrid {
 
     private final Species species;
 
@@ -88,22 +89,22 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
     }
 
     @Override
-    public Fisheable<Biomass> getFisheableCell(final Int2D cell) {
+    public Fisheable getFisheableCell(final Int2D cell) {
         return new FisheableCell(cell);
     }
 
     @RequiredArgsConstructor
-    class FisheableCell implements Fisheable<Biomass> {
+    class FisheableCell implements Fisheable {
 
         final Int2D cell;
 
         @Override
-        public Bucket<Biomass> availableFish() {
+        public Bucket availableFish() {
             return Bucket.of(ImmutableMap.of(species, getBiomass(cell)));
         }
 
         @Override
-        public void release(final Bucket<Biomass> fishToRelease) {
+        public void release(final Bucket fishToRelease) {
             fishToRelease.getMap().forEach((s, biomass) -> {
                 if (s.equals(species))
                     setBiomass(cell, getBiomass(cell).asKg() + biomass.asKg());
@@ -116,11 +117,11 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
         }
 
         @Override
-        public Bucket<Biomass> extract(final Bucket<Biomass> fishToExtract) {
-            final Bucket.Builder<Biomass> fishExtracted = Bucket.newBuilder();
+        public Bucket extract(final Bucket fishToExtract) {
+            final Bucket.Builder fishExtracted = Bucket.newBuilder();
             fishToExtract
                 .getContent(species)
-                .map(Biomass::asKg)
+                .map(Content::asKg)
                 .ifPresent(biomassToExtract -> {
                     final double gridBiomass = getBiomass(cell).asKg();
                     final double biomassExtracted = Math.min(biomassToExtract, gridBiomass);

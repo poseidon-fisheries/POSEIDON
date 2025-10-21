@@ -22,11 +22,11 @@
 
 package uk.ac.ox.poseidon.biology;
 
-public interface Fisheable<C extends Content<C>> {
+public interface Fisheable {
 
-    Bucket<C> availableFish();
+    Bucket availableFish();
 
-    void release(Bucket<C> fishToRelease);
+    void release(Bucket fishToRelease);
 
     /**
      * Mutates the fisheable by removing the content of the provided bucket and returns another
@@ -36,6 +36,6 @@ public interface Fisheable<C extends Content<C>> {
      * @param bucket the fish the remove from the fisheable
      * @return the fish that could not be removed from the fisheable
      */
-    Bucket<C> extract(Bucket<C> bucket);
+    Bucket extract(Bucket bucket);
 
 }

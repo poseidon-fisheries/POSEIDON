@@ -79,9 +79,9 @@ public class FleetFromVesselRegisterFileFactory extends SimulationScopeFactory<F
     private Factory<? extends PortGrid> portGrid;
     private Factory<? extends DataSource> dataSource;
 
-    private VesselScopeFactory<? extends Hold<?>> hold;
+    private VesselScopeFactory<? extends Hold> hold;
     @Builder.Default private Map<String, String> holdFactoryMappings = Map.of();
-    private VesselScopeFactory<? extends Gear<?>> gear;
+    private VesselScopeFactory<? extends Gear> gear;
     @Builder.Default private Map<String, String> gearFactoryMappings = Map.of();
     private VesselScopeFactory<? extends Engine> engine;
     @Builder.Default private Map<String, String> engineFactoryMappings = Map.of();

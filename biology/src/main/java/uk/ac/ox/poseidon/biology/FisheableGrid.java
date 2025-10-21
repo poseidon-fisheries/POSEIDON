@@ -24,6 +24,6 @@ package uk.ac.ox.poseidon.biology;
 
 import sim.util.Int2D;
 
-public interface FisheableGrid<C extends Content<C>> {
-    Fisheable<C> getFisheableCell(Int2D cell);
+public interface FisheableGrid {
+    Fisheable getFisheableCell(Int2D cell);
 }

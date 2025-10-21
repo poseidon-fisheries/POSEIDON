@@ -27,12 +27,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
-import uk.ac.ox.poseidon.agents.market.Market;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
-import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -43,20 +39,18 @@ import java.util.function.Supplier;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LandingBehaviourFactory<C extends Content<C>> extends BehaviourFactory<Landing<C>> {
+public class LandingBehaviourFactory extends BehaviourFactory<Landing> {
 
-    private Factory<? extends MarketGrid<C, ? extends Market<C>>> marketGrid;
-    private VesselScopeFactory<? extends Hold<C>> hold;
+    private Factory<? extends MarketGrid> marketGrid;
     private Factory<? extends Supplier<Duration>> durationSupplier;
 
     @Override
-    protected Landing<C> newInstance(
+    protected Landing newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new Landing<>(
+        return new Landing(
             marketGrid.get(simulation),
-            hold.get(simulation, vessel),
             durationSupplier.get(simulation)
         );
     }

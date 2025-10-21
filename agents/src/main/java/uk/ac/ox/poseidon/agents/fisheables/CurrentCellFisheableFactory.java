@@ -28,7 +28,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.core.Factory;
@@ -40,16 +39,16 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 @Getter
 @Setter
-public class CurrentCellFisheableFactory<C extends Content<C>>
-    extends VesselScopeFactory<Supplier<Fisheable<C>>> {
+public class CurrentCellFisheableFactory
+    extends VesselScopeFactory<Supplier<Fisheable>> {
 
-    private Factory<? extends FisheableGrid<C>> fisheableGrid;
+    private Factory<? extends FisheableGrid> fisheableGrid;
 
     @Override
-    protected Supplier<Fisheable<C>> newInstance(
+    protected Supplier<Fisheable> newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new CurrentCellFisheable<>(vessel, fisheableGrid.get(simulation));
+        return new CurrentCellFisheable(vessel, fisheableGrid.get(simulation));
     }
 }

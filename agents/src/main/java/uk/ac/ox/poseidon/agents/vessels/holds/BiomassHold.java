@@ -27,29 +27,28 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
 @Getter
 @RequiredArgsConstructor
-public abstract class BiomassHold implements Hold<Biomass> {
+public abstract class BiomassHold implements Hold {
 
-    private final CatchCategoriser<Biomass> catchCategoriser;
+    private final CatchCategoriser catchCategoriser;
 
-    protected CategorisedCatch<Biomass> content = CategorisedCatch.empty();
+    protected CategorisedCatch content = CategorisedCatch.empty();
 
     @Override
-    public void addContent(final Bucket<Biomass> uncategorisedCatch) {
+    public void addContent(final Bucket uncategorisedCatch) {
         addContent(catchCategoriser.apply(uncategorisedCatch));
     }
 
     @Override
-    public void addContent(final CategorisedCatch<Biomass> categorisedCatch) {
+    public void addContent(final CategorisedCatch categorisedCatch) {
         content = content.add(categorisedCatch);
     }
 
     @Override
-    public CategorisedCatch<Biomass> extractContent() {
-        final CategorisedCatch<Biomass> removedContent = content;
+    public CategorisedCatch extractContent() {
+        final CategorisedCatch removedContent = content;
         content = CategorisedCatch.empty();
         return removedContent;
     }

@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.agents.behaviours.disposition;
 
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
 import java.util.function.DoubleSupplier;
 
@@ -32,16 +31,16 @@ import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 @RequiredArgsConstructor(access = PACKAGE)
-public class GeneralDiscardMortality implements DispositionProcess<Biomass> {
+public class GeneralDiscardMortality implements DispositionProcess {
 
     private final DoubleSupplier mortalityRateSupplier;
 
     @Override
-    public Disposition<Biomass> partition(
-        final Disposition<Biomass> currentDisposition,
+    public Disposition partition(
+        final Disposition currentDisposition,
         final double availableCapacityInKg
     ) {
-        final Bucket<Biomass> newlyDead =
+        final Bucket newlyDead =
             currentDisposition
                 .getDiscardedAlive()
                 .mapContent(biomass ->
@@ -52,7 +51,7 @@ public class GeneralDiscardMortality implements DispositionProcess<Biomass> {
                         )
                     )
                 );
-        return new Disposition<>(
+        return new Disposition(
             currentDisposition.getRetained(),
             currentDisposition.getDiscardedAlive().subtract(newlyDead),
             currentDisposition.getDiscardedDead().add(newlyDead)

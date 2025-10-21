@@ -25,19 +25,21 @@ package uk.ac.ox.poseidon.io.sources;
 import lombok.Value;
 
 import java.io.*;
+import java.nio.charset.Charset;
 
 @Value
 public class FileDataSource implements DataSource {
 
     File file;
+    Charset charset;
 
     @Override
     public Reader getReader() {
         try {
-            return new InputStreamReader(new FileInputStream(file));
+            return new InputStreamReader(new FileInputStream(file), charset);
         } catch (final FileNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
-    
+
 }

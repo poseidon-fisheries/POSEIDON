@@ -28,36 +28,34 @@ import uk.ac.ox.poseidon.agents.behaviours.disposition.Disposition;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Getter
-public class DummyFishingAction<C extends Content<C>>
+public class DummyFishingAction
     extends AbstractAction
     implements FishingAction {
 
-    private final Gear<C> gear;
+    private final Gear gear;
 
     public DummyFishingAction(
         final LocalDateTime start,
         final Vessel vessel,
-        final Coordinate coordinate,
-        final Gear<C> gear
+        final Coordinate coordinate
     ) {
         super(vessel, start, Duration.ofSeconds(1), coordinate);
-        this.gear = gear;
+        this.gear = vessel.getGear();
     }
 
     @Override
-    public Bucket<C> getGrossCatch() {
+    public Bucket getGrossCatch() {
         return Bucket.empty();
     }
 
     @Override
-    public Disposition<C> getDisposition() {
+    public Disposition getDisposition() {
         return Disposition.empty();
     }
 

@@ -31,9 +31,6 @@ import uk.ac.ox.poseidon.agents.behaviours.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
-import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -44,23 +41,19 @@ import java.util.function.Supplier;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DefaultFishingBehaviourFactory<C extends Content<C>>
-    extends BehaviourFactory<Fishing<C>> {
+public class DefaultFishingBehaviourFactory
+    extends BehaviourFactory<Fishing> {
 
-    private VesselScopeFactory<? extends Gear<C>> gear;
-    private VesselScopeFactory<? extends Hold<C>> hold;
-    private VesselScopeFactory<? extends Supplier<Fisheable<C>>> fisheableSupplier;
+    private VesselScopeFactory<? extends Supplier<Fisheable>> fisheableSupplier;
     private Factory<? extends Regulations> regulations;
-    private Factory<? extends DispositionProcess<C>> dispositionProcess;
+    private Factory<? extends DispositionProcess> dispositionProcess;
 
     @Override
-    protected Fishing<C> newInstance(
+    protected Fishing newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new Fishing<>(
-            gear.get(simulation, vessel),
-            hold.get(simulation, vessel),
+        return new Fishing(
             fisheableSupplier.get(simulation, vessel),
             regulations.get(simulation),
             dispositionProcess.get(simulation)

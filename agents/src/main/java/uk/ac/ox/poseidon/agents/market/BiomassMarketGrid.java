@@ -23,13 +23,12 @@
 package uk.ac.ox.poseidon.agents.market;
 
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class BiomassMarketGrid extends MarketGrid<Biomass, BiomassMarket> {
+public class BiomassMarketGrid extends MarketGrid {
 
     private final PortGrid portGrid;
 

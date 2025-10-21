@@ -33,7 +33,7 @@ import static lombok.AccessLevel.PACKAGE;
 @RequiredArgsConstructor(access = PACKAGE)
 public class GearSpecificFishingLocationLegalityChecker implements Predicate<Int2D> {
 
-    private final Gear<?> gear;
+    private final Gear gear;
     private final FishingLocationLegalityChecker delegateChecker;
 
     @Override

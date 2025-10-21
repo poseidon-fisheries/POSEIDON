@@ -29,7 +29,6 @@ import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.utils.IdSupplier;
@@ -42,7 +41,7 @@ import java.util.*;
 
 @Getter
 @ToString
-public class BiomassMarket implements Market<Biomass> {
+public class BiomassMarket implements Market {
 
     private final Port port;
     private final String code;
@@ -64,17 +63,17 @@ public class BiomassMarket implements Market<Biomass> {
     }
 
     @Override
-    public Sale<Biomass> sell(
+    public Sale sell(
         final Vessel vessel,
-        final CategorisedCatch<Biomass> categorisedCatch,
+        final CategorisedCatch categorisedCatch,
         final LocalDateTime dateTime
     ) {
-        final List<Sale.Item<Biomass>> soldItems = new ArrayList<>();
-        final List<CategorisedCatch<Biomass>> unsoldCatch = new ArrayList<>();
+        final List<Sale.Item> soldItems = new ArrayList<>();
+        final List<CategorisedCatch> unsoldCatch = new ArrayList<>();
 
         categorisedCatch.getBuckets().forEach((catchCategory, bucket) -> {
             if (prices.get(catchCategory) == null) {
-                unsoldCatch.add(new CategorisedCatch<>(Map.of(catchCategory, bucket)));
+                unsoldCatch.add(new CategorisedCatch(Map.of(catchCategory, bucket)));
             } else {
                 bucket.getMap().forEach((species, biomass) -> {
                     getPrice(catchCategory, species).ifPresentOrElse(
@@ -84,14 +83,14 @@ public class BiomassMarket implements Market<Biomass> {
                                     biomass.as(price.getBiomassUnit()),
                                     RoundingMode.DOWN
                                 );
-                            soldItems.add(new Sale.Item<>(
+                            soldItems.add(new Sale.Item(
                                 catchCategory,
                                 species,
                                 biomass,
                                 salePrice
                             ));
                         },
-                        () -> unsoldCatch.add(new CategorisedCatch<>(Map.of(
+                        () -> unsoldCatch.add(new CategorisedCatch(Map.of(
                             catchCategory,
                             Bucket.of(species, biomass)
                         )))
@@ -99,7 +98,7 @@ public class BiomassMarket implements Market<Biomass> {
                 });
             }
         });
-        final BiomassSale sale = new BiomassSale(
+        final Sale sale = new Sale(
             dateTime,
             saleIdSupplier.nextId(),
             this,

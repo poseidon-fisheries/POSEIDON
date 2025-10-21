@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.agents.vessels.holds;
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
 @Getter
 public class StandardBiomassHold extends BiomassHold {
@@ -34,7 +33,7 @@ public class StandardBiomassHold extends BiomassHold {
     private final double toleranceInKg;
 
     public StandardBiomassHold(
-        final CatchCategoriser<Biomass> catchCategoriser,
+        final CatchCategoriser catchCategoriser,
         final double totalCapacityInKg,
         final double toleranceInKg
     ) {
@@ -44,8 +43,8 @@ public class StandardBiomassHold extends BiomassHold {
     }
 
     @Override
-    public void addContent(final CategorisedCatch<Biomass> categorisedCatch) {
-        final CategorisedCatch<Biomass> newContent = content.add(categorisedCatch);
+    public void addContent(final CategorisedCatch categorisedCatch) {
+        final CategorisedCatch newContent = content.add(categorisedCatch);
         if (newContent.getTotalBiomass().asKg() <= totalCapacityInKg + toleranceInKg) {
             content = newContent;
         } else {

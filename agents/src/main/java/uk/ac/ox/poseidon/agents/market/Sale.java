@@ -40,13 +40,13 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 @Data
-public class Sale<C extends Content<C>> {
+public class Sale {
     private final LocalDateTime dateTime;
     private final String id;
-    private final Market<C> market;
+    private final Market market;
     private final Vessel vessel;
-    private final List<Item<C>> items;
-    private final CategorisedCatch<C> unsold;
+    private final List<Item> items;
+    private final CategorisedCatch unsold;
 
     public Map<CurrencyUnit, Money> summary() {
         return items
@@ -60,10 +60,10 @@ public class Sale<C extends Content<C>> {
     }
 
     @Value
-    public static class Item<C extends Content<C>> {
+    public static class Item {
         CatchCategory category;
         Species species;
-        C content;
+        Content content;
         Money price;
     }
 }

@@ -23,10 +23,9 @@
 package uk.ac.ox.poseidon.agents.catches;
 
 import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
 
 import java.util.function.Function;
 
-public interface CatchCategoriser<C extends Content<C>>
-    extends Function<Bucket<C>, CategorisedCatch<C>> {
+public interface CatchCategoriser
+    extends Function<Bucket, CategorisedCatch> {
 }

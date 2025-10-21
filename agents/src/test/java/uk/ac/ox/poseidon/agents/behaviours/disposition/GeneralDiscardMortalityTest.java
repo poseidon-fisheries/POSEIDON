@@ -50,18 +50,18 @@ class GeneralDiscardMortalityTest {
         final GeneralDiscardMortality generalDiscardMortality =
             new GeneralDiscardMortality(mortalityRateSupplier);
 
-        final Bucket<Biomass> retained = Bucket.of(DummySpecies.A, Biomass.ofKg(100.0));
-        final Bucket<Biomass> discardedAlive = Bucket.of(DummySpecies.A, Biomass.ofKg(50.0));
-        final Bucket<Biomass> discardedDead = Bucket.of(DummySpecies.A, Biomass.ofKg(20.0));
+        final Bucket retained = Bucket.of(DummySpecies.A, Biomass.ofKg(100.0));
+        final Bucket discardedAlive = Bucket.of(DummySpecies.A, Biomass.ofKg(50.0));
+        final Bucket discardedDead = Bucket.of(DummySpecies.A, Biomass.ofKg(20.0));
 
-        final Disposition<Biomass> currentDisposition = new Disposition<>(
+        final Disposition currentDisposition = new Disposition(
             retained,
             discardedAlive,
             discardedDead
         );
 
         // Act
-        final Disposition<Biomass> result = generalDiscardMortality.partition(
+        final Disposition result = generalDiscardMortality.partition(
             currentDisposition,
             0.0
         );
@@ -87,18 +87,18 @@ class GeneralDiscardMortalityTest {
         final GeneralDiscardMortality generalDiscardMortality =
             new GeneralDiscardMortality(mortalityRateSupplier);
 
-        final Bucket<Biomass> retained = Bucket.of(DummySpecies.B, Biomass.ofKg(100.0));
-        final Bucket<Biomass> discardedAlive = Bucket.of(DummySpecies.B, Biomass.ofKg(0.0));
-        final Bucket<Biomass> discardedDead = Bucket.of(DummySpecies.B, Biomass.ofKg(20.0));
+        final Bucket retained = Bucket.of(DummySpecies.B, Biomass.ofKg(100.0));
+        final Bucket discardedAlive = Bucket.of(DummySpecies.B, Biomass.ofKg(0.0));
+        final Bucket discardedDead = Bucket.of(DummySpecies.B, Biomass.ofKg(20.0));
 
-        final Disposition<Biomass> currentDisposition = new Disposition<>(
+        final Disposition currentDisposition = new Disposition(
             retained,
             discardedAlive,
             discardedDead
         );
 
         // Act
-        final Disposition<Biomass> result = generalDiscardMortality.partition(
+        final Disposition result = generalDiscardMortality.partition(
             currentDisposition,
             0.0
         );
@@ -124,18 +124,18 @@ class GeneralDiscardMortalityTest {
         final GeneralDiscardMortality generalDiscardMortality =
             new GeneralDiscardMortality(mortalityRateSupplier);
 
-        final Bucket<Biomass> retained = Bucket.of(DummySpecies.C, Biomass.ofKg(100.0));
-        final Bucket<Biomass> discardedAlive = Bucket.of(DummySpecies.C, Biomass.ofKg(50.0));
-        final Bucket<Biomass> discardedDead = Bucket.of(DummySpecies.C, Biomass.ofKg(20.0));
+        final Bucket retained = Bucket.of(DummySpecies.C, Biomass.ofKg(100.0));
+        final Bucket discardedAlive = Bucket.of(DummySpecies.C, Biomass.ofKg(50.0));
+        final Bucket discardedDead = Bucket.of(DummySpecies.C, Biomass.ofKg(20.0));
 
-        final Disposition<Biomass> currentDisposition = new Disposition<>(
+        final Disposition currentDisposition = new Disposition(
             retained,
             discardedAlive,
             discardedDead
         );
 
         // Act
-        final Disposition<Biomass> result = generalDiscardMortality.partition(
+        final Disposition result = generalDiscardMortality.partition(
             currentDisposition,
             0.0
         );
@@ -160,18 +160,18 @@ class GeneralDiscardMortalityTest {
 
         final Species species = DummySpecies.A;
 
-        final Bucket<Biomass> retained = Bucket.of(species, Biomass.ofKg(100.0));
-        final Bucket<Biomass> discardedAlive = Bucket.of(species, Biomass.ofKg(70.0));
-        final Bucket<Biomass> discardedDead = Bucket.of(species, Biomass.ofKg(30.0));
+        final Bucket retained = Bucket.of(species, Biomass.ofKg(100.0));
+        final Bucket discardedAlive = Bucket.of(species, Biomass.ofKg(70.0));
+        final Bucket discardedDead = Bucket.of(species, Biomass.ofKg(30.0));
 
-        final Disposition<Biomass> currentDisposition = new Disposition<>(
+        final Disposition currentDisposition = new Disposition(
             retained,
             discardedAlive,
             discardedDead
         );
 
         // Act
-        final Disposition<Biomass> result = generalDiscardMortality.partition(
+        final Disposition result = generalDiscardMortality.partition(
             currentDisposition,
             0.0
         );

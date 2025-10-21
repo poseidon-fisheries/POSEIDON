@@ -22,26 +22,23 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.disposition;
 
-import uk.ac.ox.poseidon.biology.Content;
-
 import java.util.Collection;
 
-public class CompositeDispositionProcess<C extends Content<C>> implements DispositionProcess<C> {
+public class CompositeDispositionProcess implements DispositionProcess {
 
-    private final DispositionProcess<C>[] dispositionStrategies;
+    private final DispositionProcess[] dispositionStrategies;
 
-    @SuppressWarnings("unchecked")
-    CompositeDispositionProcess(final Collection<DispositionProcess<? super C>> dispositionStrategies) {
+    CompositeDispositionProcess(final Collection<DispositionProcess> dispositionStrategies) {
         this.dispositionStrategies = dispositionStrategies.toArray(DispositionProcess[]::new);
     }
 
     @Override
-    public Disposition<C> partition(
-        final Disposition<C> currentDisposition,
+    public Disposition partition(
+        final Disposition currentDisposition,
         final double availableCapacityInKg
     ) {
-        Disposition<C> disposition = currentDisposition;
-        for (final DispositionProcess<C> dispositionProcess : dispositionStrategies) {
+        Disposition disposition = currentDisposition;
+        for (final DispositionProcess dispositionProcess : dispositionStrategies) {
             disposition = dispositionProcess.partition(disposition, availableCapacityInKg);
         }
         return disposition;

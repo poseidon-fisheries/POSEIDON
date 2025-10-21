@@ -51,19 +51,19 @@ import java.util.*;
 public class Vessel implements Agent, Oriented2D {
 
     private static final int VESSEL_BEHAVIOUR_ORDERING = 1;
-    private final String id;
-    private final EventManager eventManager;
-    private final Account account;
-    private final VesselField vesselField;
-    private final PortGrid portGrid;
-    private final Map<String, Object> tags = new HashMap<>();
+    private final @NonNull String id;
+    private final @NonNull EventManager eventManager;
+    private final @NonNull Account account;
+    private final @NonNull VesselField vesselField;
+    private final @NonNull PortGrid portGrid;
+    private final @NonNull Map<String, Object> tags = new HashMap<>();
 
     // Modifiable characteristics
     @NonNull private String name;
     @NonNull private Port homePort;
-    @NonNull private Hold<?> hold;
-    @NonNull private Gear<?> gear;
-    @NonNull private Engine engine;
+    private Hold hold;
+    private Gear gear;
+    private Engine engine;
 
     // Current state variables
     @Getter(AccessLevel.NONE)
@@ -74,12 +74,12 @@ public class Vessel implements Agent, Oriented2D {
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     Vessel(
-        final String id,
+        final @NonNull String id,
         final @NonNull String name,
-        final EventManager eventManager,
-        final Account account,
-        final VesselField vesselField,
-        final PortGrid portGrid,
+        final @NonNull EventManager eventManager,
+        final @NonNull Account account,
+        final @NonNull VesselField vesselField,
+        final @NonNull PortGrid portGrid,
         final @NonNull Port homePort
     ) {
         this.id = id;
@@ -173,7 +173,7 @@ public class Vessel implements Agent, Oriented2D {
 
     @Override
     public String toString() {
-        return name == null ? id : name + " (" + id + ")";
+        return name + " (" + id + ")";
     }
 
     public boolean isAtHomePort() {

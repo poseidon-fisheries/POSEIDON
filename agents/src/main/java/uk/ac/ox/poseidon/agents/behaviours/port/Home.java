@@ -26,8 +26,6 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.behaviours.BranchingBehaviour;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
@@ -36,9 +34,6 @@ import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
 public class Home extends BranchingBehaviour {
-
-    private final PortGrid portGrid;
-    private final Hold<?> hold;
 
     private final Predicate<? super Vessel> readinessPredicate;
     private final Behaviour travelBehaviour;
@@ -54,7 +49,7 @@ public class Home extends BranchingBehaviour {
         if (!vessel.isAtHomePort()) {
             vessel.setDestination(vessel.getHomePort().asDestination());
             return travelBehaviour;
-        } else if (!hold.isEmpty()) {
+        } else if (!vessel.getHold().isEmpty()) {
             return landingBehaviour;
         } else if (readinessPredicate.test(vessel)) {
             return behaviourIfReady;

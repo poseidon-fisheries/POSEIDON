@@ -54,8 +54,8 @@ public class VesselFactory extends SimulationScopeFactory<Vessel> {
     private Factory<? extends VesselField> vesselField;
     private Factory<? extends Port> homePort;
     private Factory<? extends PortGrid> portGrid;
-    private VesselScopeFactory<? extends Hold<?>> hold;
-    private VesselScopeFactory<? extends Gear<?>> gear;
+    private VesselScopeFactory<? extends Hold> hold;
+    private VesselScopeFactory<? extends Gear> gear;
     private VesselScopeFactory<? extends Engine> engine;
 
     @Override

@@ -39,17 +39,17 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FixedBiomassProportionGearFactory
-    extends VesselScopeFactory<FixedBiomassProportionGear> {
+    extends VesselScopeFactory<FixedProportionGear> {
 
     private String code;
     private double proportion;
     private Factory<? extends Supplier<Duration>> durationSupplier;
 
     @Override
-    protected FixedBiomassProportionGear newInstance(
+    protected FixedProportionGear newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new FixedBiomassProportionGear(code, proportion, durationSupplier.get(simulation));
+        return new FixedProportionGear(code, proportion, durationSupplier.get(simulation));
     }
 }

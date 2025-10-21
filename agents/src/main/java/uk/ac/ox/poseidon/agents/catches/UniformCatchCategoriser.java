@@ -25,16 +25,15 @@ package uk.ac.ox.poseidon.agents.catches;
 import com.google.common.collect.ImmutableMap;
 import lombok.Value;
 import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
 
 @Value
-public class UniformCatchCategoriser<C extends Content<C>> implements CatchCategoriser<C> {
+public class UniformCatchCategoriser implements CatchCategoriser {
 
     CatchCategory catchCategory;
 
     @Override
-    public CategorisedCatch<C> apply(final Bucket<C> bucket) {
-        return new CategorisedCatch<>(ImmutableMap.of(catchCategory, bucket));
+    public CategorisedCatch apply(final Bucket bucket) {
+        return new CategorisedCatch(ImmutableMap.of(catchCategory, bucket));
     }
 
 }

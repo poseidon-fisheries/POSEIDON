@@ -53,8 +53,8 @@ public class VesselRegisterEvent implements Steppable {
     String portCode;
     Map<String, Object> tags;
 
-    Function<Vessel, Hold<?>> holdFactoryFunction;
-    Function<Vessel, Gear<?>> gearFactoryFunction;
+    Function<Vessel, Hold> holdFactoryFunction;
+    Function<Vessel, Gear> gearFactoryFunction;
     Function<Vessel, Engine> engineFactoryFunction;
 
     @Override
@@ -89,6 +89,7 @@ public class VesselRegisterEvent implements Steppable {
         switch (eventType) {
             case ACTIVATION -> vessel.setActive(true);
             case DEACTIVATION -> vessel.setActive(false);
+            default -> {} // modification events don't change active status
         }
     }
 }

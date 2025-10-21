@@ -36,79 +36,79 @@ import java.util.function.UnaryOperator;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 @Data
-public final class Bucket<C extends Content<C>> {
+public final class Bucket {
 
-    private final ImmutableMap<Species, C> map;
+    private final ImmutableMap<Species, Content> map;
 
-    private Bucket(final ImmutableMap<Species, C> map) {
+    private Bucket(final ImmutableMap<Species, Content> map) {
         this.map = map;
     }
 
     @SuppressWarnings("RedundantTypeArguments")
-    public static <C extends Content<C>> Bucket<C> empty() {
-        return new Bucket<>(ImmutableMap.<Species, C>of());
+    public static Bucket empty() {
+        return new Bucket(ImmutableMap.<Species, Content>of());
     }
 
-    public static <C extends Content<C>> Builder<C> newBuilder() {
-        return new Builder<>();
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
-    public static <C extends Content<C>> Bucket<C> copyOf(final Bucket<C> other) {
-        return new Bucket<>(other.map);
+    public static Bucket copyOf(final Bucket other) {
+        return new Bucket(other.map);
     }
 
-    public static <C extends Content<C>> Bucket<C> of(
+    public static Bucket of(
         final Species species,
-        final C content
+        final Content content
     ) {
         // we call `of` instead of the constructor to filter empty content
         return Bucket.of(ImmutableMap.of(species, content));
     }
 
-    public static <C extends Content<C>> Bucket<C> of(
-        final Map<Species, C> map
+    public static Bucket of(
+        final Map<Species, Content> map
     ) {
         // we use a builder instead of the constructor to filter empty content
         // and potentially add together multiple entries for the same species
-        return new Builder<C>().add(ImmutableMap.copyOf(map)).build();
+        return new Builder().add(ImmutableMap.copyOf(map)).build();
     }
 
-    public Builder<C> toBuilder() {
-        return Bucket.<C>newBuilder().put(this);
+    public Builder toBuilder() {
+        return Bucket.newBuilder().put(this);
     }
 
-    public Optional<C> getContent(final Species species) {
+    public Optional<Content> getContent(final Species species) {
         return Optional.ofNullable(getMap().get(species));
     }
 
-    public Bucket<C> add(final Bucket<C> other) {
+    public Bucket add(final Bucket other) {
         return toBuilder().add(other).build();
     }
 
-    public Bucket<C> subtract(final Bucket<C> other) {
+    public Bucket subtract(final Bucket other) {
         return toBuilder().subtract(other).build();
     }
 
-    public Bucket<C> replaceContent(
+    public Bucket replaceContent(
         final Species species,
-        final C newContent
+        final Content newContent
     ) {
         return toBuilder()
             .put(species, newContent)
             .build();
     }
 
-    public Bucket<C> mapContent(final UnaryOperator<C> mapper) {
-        final Builder<C> builder = toBuilder();
+    public Bucket mapContent(final UnaryOperator<Content> mapper) {
+        final Builder builder = toBuilder();
         getMap().forEach((species, c) -> builder.put(species, mapper.apply(c)));
         return builder.build();
     }
 
-    public Map<Boolean, Bucket<C>> partitionBy(
-        final BiPredicate<Species, C> predicate
+    public Map<Boolean, Bucket> partitionBy(
+        final BiPredicate<Species, Content> predicate
     ) {
-        final Bucket.Builder<C> b1 = Bucket.newBuilder();
-        final Bucket.Builder<C> b2 = Bucket.newBuilder();
+        final Bucket.Builder b1 = Bucket.newBuilder();
+        final Bucket.Builder b2 = Bucket.newBuilder();
         getMap().forEach((species, content) ->
             (predicate.test(species, content) ? b1 : b2).put(species, content)
         );
@@ -116,7 +116,7 @@ public final class Bucket<C extends Content<C>> {
     }
 
     public boolean isEmpty() {
-        return getMap().values().stream().allMatch(C::isEmpty);
+        return getMap().values().stream().allMatch(Content::isEmpty);
     }
 
     public Biomass getTotalBiomass() {
@@ -128,78 +128,78 @@ public final class Bucket<C extends Content<C>> {
             .orElse(Biomass.ZERO);
     }
 
-    public static class Builder<C extends Content<C>> {
-        private final Map<Species, C> map = new HashMap<>();
+    public static class Builder {
+        private final Map<Species, Content> map = new HashMap<>();
 
         private Builder() {
         }
 
-        public Builder<C> put(
-            final Bucket<C> bucket
+        public Builder put(
+            final Bucket bucket
         ) {
             return put(bucket.getMap());
         }
 
-        public Builder<C> put(
-            final Map<Species, C> map
+        public Builder put(
+            final Map<Species, Content> map
         ) {
             this.map.putAll(map);
             return this;
         }
 
-        public Builder<C> put(
+        public Builder put(
             final Species species,
-            final C newContent
+            final Content newContent
         ) {
             map.put(species, newContent);
             return this;
         }
 
-        public Builder<C> add(final Bucket<C> bucket) {
+        public Builder add(final Bucket bucket) {
             return add(bucket.getMap());
         }
 
-        public Builder<C> add(final Map<Species, C> map) {
+        public Builder add(final Map<Species, Content> map) {
             map.forEach(this::add);
             return this;
         }
 
-        public Builder<C> add(
+        public Builder add(
             final Species species,
-            final C content
+            final Content content
         ) {
             map.merge(species, content, Content::add);
             return this;
         }
 
-        public Builder<C> subtract(final Bucket<C> bucket) {
+        public Builder subtract(final Bucket bucket) {
             return subtract(bucket.getMap());
         }
 
-        public Builder<C> subtract(final Map<Species, C> map) {
+        public Builder subtract(final Map<Species, Content> map) {
             map.forEach(this::subtract);
             return this;
         }
 
-        public Builder<C> subtract(
+        public Builder subtract(
             final Species species,
-            final C content
+            final Content content
         ) {
             map.merge(species, content, Content::subtract);
             return this;
         }
 
-        public Bucket<C> build() {
+        public Bucket build() {
 
             if (map.isEmpty())
                 return Bucket.empty();
 
-            final ImmutableMap<Species, C> newMap = this.map
+            final ImmutableMap<Species, Content> newMap = this.map
                 .entrySet()
                 .stream()
                 .filter(entry -> !entry.getValue().isEmpty())
                 .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-            return new Bucket<>(newMap);
+            return new Bucket(newMap);
         }
 
     }

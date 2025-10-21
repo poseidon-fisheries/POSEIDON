@@ -23,21 +23,20 @@
 package uk.ac.ox.poseidon.agents.behaviours.disposition;
 
 import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
 
-public interface DispositionProcess<C extends Content<C>> {
+public interface DispositionProcess {
 
-    Disposition<C> partition(
-        Disposition<C> currentDisposition,
+    Disposition partition(
+        Disposition currentDisposition,
         double availableCapacityInKg
     );
 
-    default Disposition<C> partition(
-        final Bucket<C> grossCatch,
+    default Disposition partition(
+        final Bucket grossCatch,
         final double availableCapacityInKg
     ) {
         return partition(
-            new Disposition<>(grossCatch, Bucket.empty(), Bucket.empty()),
+            new Disposition(grossCatch, Bucket.empty(), Bucket.empty()),
             availableCapacityInKg
         );
     }

@@ -26,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
@@ -38,14 +37,14 @@ import java.util.Collection;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SelectedSpeciesRetentionFactory<C extends Content<C>>
-    extends GlobalScopeFactory<SelectedSpeciesRetention<C>> {
+public class SelectedSpeciesRetentionFactory
+    extends GlobalScopeFactory<SelectedSpeciesRetention> {
 
     private Factory<? extends Collection<? extends Species>> selectedSpecies;
 
     @Override
-    protected SelectedSpeciesRetention<C> newInstance(final Simulation simulation) {
-        return new SelectedSpeciesRetention<>(selectedSpecies.get(simulation));
+    protected SelectedSpeciesRetention newInstance(final Simulation simulation) {
+        return new SelectedSpeciesRetention(selectedSpecies.get(simulation));
     }
 
 }

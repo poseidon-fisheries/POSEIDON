@@ -24,14 +24,13 @@ package uk.ac.ox.poseidon.agents.vessels.holds;
 
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 
 import static java.lang.Double.POSITIVE_INFINITY;
 
 @Getter
 public class InfiniteBiomassHold extends BiomassHold {
 
-    public InfiniteBiomassHold(final CatchCategoriser<Biomass> catchCategoriser) {
+    public InfiniteBiomassHold(final CatchCategoriser catchCategoriser) {
         super(catchCategoriser);
     }
 
