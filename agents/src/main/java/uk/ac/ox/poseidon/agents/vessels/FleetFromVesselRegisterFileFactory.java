@@ -27,14 +27,12 @@ import lombok.*;
 import org.apache.commons.beanutils.PropertyUtils;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
-import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.io.sources.DataSource;
 
 import java.lang.reflect.InvocationTargetException;
@@ -51,7 +49,7 @@ import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
-import static uk.ac.ox.poseidon.agents.vessels.VesselRegisterEvent.Type.*;
+import static uk.ac.ox.poseidon.agents.vessels.VesselEvent.Type.*;
 
 @Getter
 @Setter
@@ -61,6 +59,8 @@ import static uk.ac.ox.poseidon.agents.vessels.VesselRegisterEvent.Type.*;
 public class FleetFromVesselRegisterFileFactory extends SimulationScopeFactory<Fleet> {
 
     // TODO: make sure vessels don't behave when inactive
+
+    private Factory<? extends Fleet> fleet;
 
     @Builder.Default private String vesselIdColumn = "cfr";
     @Builder.Default private String vesselNameColumn = "name_of_vessel";
@@ -75,8 +75,6 @@ public class FleetFromVesselRegisterFileFactory extends SimulationScopeFactory<F
         List.of("DES", "EXP", "RET");
     @Builder.Default private List<String> modificationEventCodes =
         List.of("MOD");
-    private Factory<? extends VesselField> vesselField;
-    private Factory<? extends PortGrid> portGrid;
     private Factory<? extends DataSource> dataSource;
 
     private VesselScopeFactory<? extends Hold> hold;
@@ -88,12 +86,8 @@ public class FleetFromVesselRegisterFileFactory extends SimulationScopeFactory<F
 
     @Override
     protected Fleet newInstance(final Simulation simulation) {
-        final Fleet fleet = new Fleet(
-            simulation.getEventManager(),
-            vesselField.get(simulation),
-            portGrid.get(simulation)
-        );
-        final List<Entry<LocalDateTime, VesselRegisterEvent>> eventByDateTime =
+        final Fleet fleet = this.fleet.get(simulation);
+        final List<Entry<LocalDateTime, VesselEvent>> eventByDateTime =
             Table.read()
                 .csv(dataSource.get(simulation).getReader())
                 .stream()
@@ -144,12 +138,12 @@ public class FleetFromVesselRegisterFileFactory extends SimulationScopeFactory<F
         }
     }
 
-    private VesselRegisterEvent makeEvent(
+    private VesselEvent makeEvent(
         final Simulation simulation,
         final Row row,
         final Fleet fleet
     ) {
-        return new VesselRegisterEvent(
+        return new VesselEvent(
             fleet,
             eventType(row.getString(eventCodeColumn)),
             row.getString(vesselIdColumn),
@@ -181,7 +175,7 @@ public class FleetFromVesselRegisterFileFactory extends SimulationScopeFactory<F
             .collect(toMap(identity(), row::getObject));
     }
 
-    private VesselRegisterEvent.Type eventType(final String eventCode) {
+    private VesselEvent.Type eventType(final String eventCode) {
         if (activationEventCodes.contains(eventCode))
             return ACTIVATION;
         else if (deactivationEventCodes.contains(eventCode))

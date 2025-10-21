@@ -30,7 +30,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public interface Action {
-    
+
     @NonNull
     Vessel getVessel();
 

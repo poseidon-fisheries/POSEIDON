@@ -23,12 +23,14 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.Value;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
+import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.util.Map;
@@ -36,7 +38,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 @Value
-public class VesselRegisterEvent implements Steppable {
+public class VesselEvent implements Steppable {
 
     @AllArgsConstructor
     public enum Type {
@@ -46,19 +48,20 @@ public class VesselRegisterEvent implements Steppable {
         private final String verb;
     }
 
-    Fleet fleet;
-    Type eventType;
-    String vesselId;
-    String vesselName;
-    String portCode;
-    Map<String, Object> tags;
+    @NonNull Fleet fleet;
+    @NonNull Type eventType;
+    @NonNull String vesselId;
+    @NonNull String vesselName;
+    @NonNull String portCode;
+    @NonNull Map<String, Object> tags;
 
-    Function<Vessel, Hold> holdFactoryFunction;
-    Function<Vessel, Gear> gearFactoryFunction;
-    Function<Vessel, Engine> engineFactoryFunction;
+    @NonNull Function<Vessel, Hold> holdFactoryFunction;
+    @NonNull Function<Vessel, Gear> gearFactoryFunction;
+    @NonNull Function<Vessel, Engine> engineFactoryFunction;
 
     @Override
     public void step(final SimState simState) {
+        final Simulation simulation = (Simulation) simState;
         final Vessel vessel;
         final Optional<Vessel> optionalVessel = fleet.getVessel(vesselId);
         if (optionalVessel.isEmpty()) {
@@ -81,14 +84,13 @@ public class VesselRegisterEvent implements Steppable {
             }
         }
         tags.forEach(vessel::putTag);
-
         vessel.setHold(holdFactoryFunction.apply(vessel));
         vessel.setGear(gearFactoryFunction.apply(vessel));
         vessel.setEngine(engineFactoryFunction.apply(vessel));
 
         switch (eventType) {
-            case ACTIVATION -> vessel.setActive(true);
-            case DEACTIVATION -> vessel.setActive(false);
+            case ACTIVATION -> vessel.activate(simulation.getTemporalSchedule());
+            case DEACTIVATION -> vessel.deactivate();
             default -> {} // modification events don't change active status
         }
     }

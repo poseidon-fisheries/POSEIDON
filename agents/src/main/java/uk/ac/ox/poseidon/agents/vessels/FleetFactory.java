@@ -20,35 +20,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.strategy;
+package uk.ac.ox.poseidon.agents.vessels;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.fields.VesselField;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ThereAndBackBehaviourFactory extends BehaviourFactory<ThereAndBack> {
-
-    private BehaviourFactory<?> fishingDestinationBehaviour;
-    private BehaviourFactory<?> fishingBehaviour;
-    private BehaviourFactory<?> travellingBehaviour;
+public class FleetFactory extends SimulationScopeFactory<Fleet> {
+    private Factory<? extends VesselField> vesselField;
+    private Factory<? extends PortGrid> portGrid;
 
     @Override
-    protected ThereAndBack newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new ThereAndBack(
-            fishingDestinationBehaviour.get(simulation, vessel),
-            fishingBehaviour.get(simulation, vessel),
-            travellingBehaviour.get(simulation, vessel)
+    protected Fleet newInstance(final Simulation simulation) {
+        return new Fleet(
+            simulation.getEventManager(),
+            vesselField.get(simulation),
+            portGrid.get(simulation)
         );
     }
 }

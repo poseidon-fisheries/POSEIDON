@@ -46,6 +46,9 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 @Getter
 @Setter
 public class Vessel implements Agent, Oriented2D {
@@ -68,8 +71,10 @@ public class Vessel implements Agent, Oriented2D {
     // Current state variables
     @Getter(AccessLevel.NONE)
     private final Deque<Behaviour> behaviourStack = new ArrayDeque<>();
+    private Behaviour initialBehaviour;
     private double heading;
     private Destination destination;
+    @Setter(AccessLevel.NONE)
     private boolean active;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
@@ -90,6 +95,25 @@ public class Vessel implements Agent, Oriented2D {
         this.portGrid = portGrid;
         this.homePort = homePort;
         setCurrentCell(portGrid.getLocation(homePort));
+    }
+
+    public void activate(final TemporalSchedule temporalSchedule) {
+        checkState(
+            !isActive(),
+            "Cannot activate an already active vessel."
+        );
+        checkNotNull(
+            initialBehaviour,
+            "Cannot activate a vessel unless initial behaviour is defined."
+        );
+        if (currentBehaviour() != null) {
+            pushBehaviour(initialBehaviour);
+            scheduleNextAction(temporalSchedule);
+        }
+    }
+
+    public void deactivate() {
+        checkState(isActive(), "Cannot deactivate an inactive vessel.");
     }
 
     @Override

@@ -94,6 +94,7 @@ public class VesselsFromFileFactory extends SimulationScopeFactory<List<Vessel>>
                             vessel.setHold(hold.get(simulation, vessel));
                             vessel.setGear(fishingGear.get(simulation, vessel));
                             vessel.setEngine(engine.get(simulation, vessel));
+                            vessel.setInitialBehaviour(initialBehaviour.get(simulation, vessel));
                             // TODO: I don't think this is the right place to set and schedule
                             //  behaviours. That should probably be handled by a separate
                             //  behaviour factory that is given a list of vessels and takes care

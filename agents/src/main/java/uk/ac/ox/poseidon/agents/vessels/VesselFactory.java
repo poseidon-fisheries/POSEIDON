@@ -27,59 +27,56 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
-import uk.ac.ox.poseidon.agents.fields.VesselField;
-import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-import uk.ac.ox.poseidon.geography.ports.Port;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static java.util.stream.Collectors.toMap;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VesselFactory extends SimulationScopeFactory<Vessel> {
+public class VesselFactory extends SimulationScopeFactory<VesselEvent> {
+
+    private Factory<? extends Fleet> fleet;
 
     private BehaviourFactory<?> initialBehaviour;
     private String id;
     private String name;
-    private Factory<? extends VesselField> vesselField;
-    private Factory<? extends Port> homePort;
-    private Factory<? extends PortGrid> portGrid;
+    private String portCode;
+    private Map<String, Factory<?>> tags;
     private VesselScopeFactory<? extends Hold> hold;
     private VesselScopeFactory<? extends Gear> gear;
     private VesselScopeFactory<? extends Engine> engine;
 
     @Override
-    protected Vessel newInstance(final Simulation simulation) {
-        final VesselField vesselField = this.vesselField.get(simulation);
-        final var vessel = new Vessel(
-            checkNotNull(id),
-            checkNotNull(name),
-            new ForwardingEventManager(simulation.getEventManager()),
-            new Account(),
-            vesselField,
-            portGrid.get(simulation),
-            homePort.get(simulation)
+    protected VesselEvent newInstance(final Simulation simulation) {
+        final Map<String, Object> tags = this.tags
+            .entrySet()
+            .stream()
+            .collect(toMap(
+                Entry::getKey,
+                entry -> entry.getValue().get(simulation)
+            ));
+        final VesselEvent vesselEvent = new VesselEvent(
+            fleet.get(simulation),
+            VesselEvent.Type.ACTIVATION,
+            id,
+            name,
+            portCode,
+            tags,
+            vessel -> hold.get(simulation, vessel),
+            vessel -> gear.get(simulation, vessel),
+            vessel -> engine.get(simulation, vessel)
         );
-        vessel.setName(name == null ? "Vessel " + id : name);
-        vessel.setHold(hold.get(simulation, vessel));
-        vessel.setGear(gear.get(simulation, vessel));
-        vessel.setEngine(engine.get(simulation, vessel));
-
-        final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
-        vessel.pushBehaviour(initialBehaviour.get(simulation, vessel));
-        temporalSchedule.scheduleOnce(__ ->
-            vessel.scheduleNextAction(temporalSchedule)
-        );
-        return vessel;
+        simulation.getTemporalSchedule().scheduleOnce(vesselEvent);
+        return vesselEvent;
     }
 }
