@@ -72,6 +72,7 @@ public class VesselFactory extends SimulationScopeFactory<VesselEvent> {
             name,
             portCode,
             tags,
+            vessel -> initialBehaviour.get(simulation, vessel),
             vessel -> hold.get(simulation, vessel),
             vessel -> gear.get(simulation, vessel),
             vessel -> engine.get(simulation, vessel)

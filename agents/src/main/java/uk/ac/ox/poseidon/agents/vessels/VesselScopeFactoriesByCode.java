@@ -22,10 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.Map;
@@ -35,11 +32,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class VesselScopeFactoriesByCode<C> extends VesselScopeFactory<C> {
 
-    private Map<String, VesselScopeFactory<C>> factories;
+    @Singular private Map<String, ? extends VesselScopeFactory<? extends C>> factories;
     private String code;
 
     @Override

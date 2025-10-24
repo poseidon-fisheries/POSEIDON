@@ -102,18 +102,16 @@ public class Vessel implements Agent, Oriented2D {
             !isActive(),
             "Cannot activate an already active vessel."
         );
-        checkNotNull(
-            initialBehaviour,
-            "Cannot activate a vessel unless initial behaviour is defined."
-        );
-        if (currentBehaviour() != null) {
+        if (currentBehaviour() == null && initialBehaviour != null) {
             pushBehaviour(initialBehaviour);
             scheduleNextAction(temporalSchedule);
         }
+        active = true;
     }
 
     public void deactivate() {
         checkState(isActive(), "Cannot deactivate an inactive vessel.");
+        active = false;
     }
 
     @Override
@@ -167,6 +165,7 @@ public class Vessel implements Agent, Oriented2D {
     }
 
     public void pushBehaviour(final Behaviour behaviour) {
+        checkNotNull(behaviour, "Cannot push null behaviour.");
         behaviourStack.push(behaviour);
     }
 

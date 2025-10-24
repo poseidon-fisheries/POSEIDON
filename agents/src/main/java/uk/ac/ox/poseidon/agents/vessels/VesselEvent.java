@@ -27,6 +27,7 @@ import lombok.NonNull;
 import lombok.Value;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
@@ -36,6 +37,8 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+
+import static com.google.common.base.Preconditions.checkState;
 
 @Value
 public class VesselEvent implements Steppable {
@@ -55,12 +58,14 @@ public class VesselEvent implements Steppable {
     @NonNull String portCode;
     @NonNull Map<String, Object> tags;
 
+    @NonNull Function<Vessel, Behaviour> initialBehaviourFactoryFunction;
     @NonNull Function<Vessel, Hold> holdFactoryFunction;
     @NonNull Function<Vessel, Gear> gearFactoryFunction;
     @NonNull Function<Vessel, Engine> engineFactoryFunction;
 
     @Override
     public void step(final SimState simState) {
+        checkState(simState instanceof Simulation);
         final Simulation simulation = (Simulation) simState;
         final Vessel vessel;
         final Optional<Vessel> optionalVessel = fleet.getVessel(vesselId);
@@ -84,6 +89,7 @@ public class VesselEvent implements Steppable {
             }
         }
         tags.forEach(vessel::putTag);
+        vessel.setInitialBehaviour(initialBehaviourFactoryFunction.apply(vessel));
         vessel.setHold(holdFactoryFunction.apply(vessel));
         vessel.setGear(gearFactoryFunction.apply(vessel));
         vessel.setEngine(engineFactoryFunction.apply(vessel));

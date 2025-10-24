@@ -22,11 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 import lombok.*;
 import org.apache.commons.beanutils.PropertyUtils;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
+import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
@@ -56,9 +58,15 @@ import static uk.ac.ox.poseidon.agents.vessels.VesselEvent.Type.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FleetFromVesselRegisterFileFactory extends SimulationScopeFactory<Fleet> {
+public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet> {
 
     // TODO: make sure vessels don't behave when inactive
+    //   Also think about what happens if initial behaviour changes. Maybe the "initial behaviour"
+    //   should be a "root behaviour", that is never part of the stack, so if we change it, it
+    //   gets used automatically when we pop down to it. Maybe it should also be optional, so that
+    //   inactive vessels have no root behaviours. We would just need to make sure that all the
+    //   maintenance tasks (i.e., landings, at least) get handled even if we're deactivating the
+    //   vessel. Possibly the `active` flag could just be replaced by `rootBehaviour.isDefined`.
 
     private Factory<? extends Fleet> fleet;
 
@@ -77,12 +85,26 @@ public class FleetFromVesselRegisterFileFactory extends SimulationScopeFactory<F
         List.of("MOD");
     private Factory<? extends DataSource> dataSource;
 
+    private BehaviourFactory<?> initialBehaviour;
     private VesselScopeFactory<? extends Hold> hold;
-    @Builder.Default private Map<String, String> holdFactoryMappings = Map.of();
     private VesselScopeFactory<? extends Gear> gear;
-    @Builder.Default private Map<String, String> gearFactoryMappings = Map.of();
     private VesselScopeFactory<? extends Engine> engine;
-    @Builder.Default private Map<String, String> engineFactoryMappings = Map.of();
+
+    @Singular
+    private Map<String, String> dataMappings;
+
+    private void setProperty(
+        final String propertyName,
+        final Object propertyValue
+    ) {
+        try {
+            PropertyUtils.setProperty(this, propertyName, propertyValue);
+        } catch (
+            final IllegalAccessException | InvocationTargetException | NoSuchMethodException e
+        ) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     protected Fleet newInstance(final Simulation simulation) {
@@ -104,37 +126,21 @@ public class FleetFromVesselRegisterFileFactory extends SimulationScopeFactory<F
 
     <C> Function<Vessel, C> makeFactoryFunction(
         final Simulation simulation,
-        final Row row,
-        final Map<String, String> mappings,
+        final Map<String, Object> valuesFromRow,
+        final ImmutableMap<String, String> mappings,
         final VesselScopeFactory<? extends C> factory
     ) {
-        final Map<String, Object> valuesFromRow =
-            mappings
-                .entrySet()
-                .stream()
-                .collect(toMap(
-                    Entry::getKey,
-                    entry -> row.getObject(entry.getKey())
-                ));
-        return vessel -> {
-            mappings.forEach((columnName, propertyName) ->
-                setProperty(factory, propertyName, valuesFromRow.get(columnName))
-            );
-            return factory.get(simulation, vessel);
-        };
-    }
-
-    private static <C> void setProperty(
-        final VesselScopeFactory<? extends C> factory,
-        final String propertyName,
-        final Object propertyValue
-    ) {
-        try {
-            PropertyUtils.setProperty(factory, propertyName, propertyValue);
-        } catch (
-            final IllegalAccessException | InvocationTargetException | NoSuchMethodException e
-        ) {
-            throw new RuntimeException(e);
+        if (factory == null) {
+            return __ -> null;
+        } else {
+            return vessel -> {
+                synchronized (this) {
+                    mappings.forEach((propertyName, columnName) ->
+                        setProperty(propertyName, valuesFromRow.get(columnName))
+                    );
+                    return factory.get(simulation, vessel);
+                }
+            };
         }
     }
 
@@ -143,6 +149,14 @@ public class FleetFromVesselRegisterFileFactory extends SimulationScopeFactory<F
         final Row row,
         final Fleet fleet
     ) {
+        final ImmutableMap<String, String> dataMappings =
+            ImmutableMap.copyOf(this.dataMappings);
+        final Map<String, Object> valuesFromRow =
+            dataMappings
+                .values()
+                .stream()
+                .distinct()
+                .collect(toMap(identity(), row::getObject));
         return new VesselEvent(
             fleet,
             eventType(row.getString(eventCodeColumn)),
@@ -150,9 +164,10 @@ public class FleetFromVesselRegisterFileFactory extends SimulationScopeFactory<F
             row.getString(vesselNameColumn),
             row.getString(portCodeColumn),
             makeTags(row),
-            makeFactoryFunction(simulation, row, holdFactoryMappings, hold),
-            makeFactoryFunction(simulation, row, gearFactoryMappings, gear),
-            makeFactoryFunction(simulation, row, engineFactoryMappings, engine)
+            makeFactoryFunction(simulation, valuesFromRow, dataMappings, initialBehaviour),
+            makeFactoryFunction(simulation, valuesFromRow, dataMappings, hold),
+            makeFactoryFunction(simulation, valuesFromRow, dataMappings, gear),
+            makeFactoryFunction(simulation, valuesFromRow, dataMappings, engine)
         );
     }
 

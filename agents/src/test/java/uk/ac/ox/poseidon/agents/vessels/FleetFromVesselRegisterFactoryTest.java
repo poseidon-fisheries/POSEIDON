@@ -43,7 +43,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class FleetFromVesselRegisterFileFactoryTest {
+class FleetFromVesselRegisterFactoryTest {
 
     private static final String initialData = """
         cfr,name_of_vessel,place_of_registration,event,event_start_date,gear,t1,t2
@@ -74,25 +74,24 @@ class FleetFromVesselRegisterFileFactoryTest {
         g2 = mock(Gear.class);
         h1 = mock(Hold.class);
 
-        // noinspection unchecked
         simulation =
             new Scenario(
                 LocalDate.of(2000, 1, 1),
                 Map.of(
-                    "fleet", FleetFromVesselRegisterFileFactory.builder()
-                        .vesselField(new ConstantFactory<>(mock(VesselField.class)))
-                        .portGrid(new ConstantFactory<>(portGrid))
+                    "fleet", FleetFromVesselRegisterFactory.builder()
+                        .fleet(new FleetFactory(
+                            new ConstantFactory<>(mock(VesselField.class)),
+                            new ConstantFactory<>(portGrid)
+                        ))
                         .dataSource(new StringDataSourceFactory(initialData + extraData))
                         .hold(new VesselScopeAdaptor<>(new ConstantFactory<>(h1)))
                         .gear(
-                            new VesselScopeFactoriesByCode<>(
-                                Map.of(
-                                    "G1", new VesselScopeAdaptor<>(new ConstantFactory<>(g1)),
-                                    "G2", new VesselScopeAdaptor<>(new ConstantFactory<>(g2))
-                                ), null
-                            )
+                            VesselScopeFactoriesByCode.<Gear>builder()
+                                .factory("G1", new VesselScopeAdaptor<>(new ConstantFactory<>(g1)))
+                                .factory("G2", new VesselScopeAdaptor<>(new ConstantFactory<>(g2)))
+                                .build()
                         )
-                        .gearFactoryMappings(Map.of("gear", "code"))
+                        .dataMapping("gear.code", "gear")
                         .engine(new VesselScopeAdaptor<>(new ConstantFactory<>(mock(Engine.class))))
                         .build()
                 )

@@ -35,10 +35,10 @@ import uk.ac.ox.poseidon.core.Simulation;
 @AllArgsConstructor
 public class CatchCategoryFactory extends GlobalScopeFactory<CatchCategory> {
 
-    private String categoryCode;
+    private String code;
 
     @Override
     protected CatchCategory newInstance(final Simulation simulation) {
-        return new CatchCategory(categoryCode);
+        return new CatchCategory(code);
     }
 }
