@@ -30,8 +30,6 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
@@ -40,18 +38,16 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class BathymetricGridFactory extends GlobalScopeFactory<BathymetricGrid> {
-    @NonNull private Factory<? extends Path> path;
     @NonNull private Factory<? extends ModelGrid> modelGrid;
     @NonNull private Factory<? extends Aggregator> aggregator;
     private boolean inverted = false;
 
     @Override
     protected BathymetricGrid newInstance(final @NonNull Simulation simulation) {
-        final File gridFile = this.path.get(simulation).toFile();
         final ModelGrid modelGrid = this.modelGrid.get(simulation);
         final Aggregator aggregator = this.aggregator.get(simulation);
         final Map<Int2D, Collection<Double>> elevationValues =
-            readElevationValues(gridFile, modelGrid);
+            readElevationValues(simulation, modelGrid);
         final double[][] array = modelGrid.makeDoubleArray();
         modelGrid.getAllCells().forEach(int2D ->
             array[int2D.x][int2D.y] = aggregator.apply(elevationValues.get(int2D)).orElse(0)
@@ -60,7 +56,7 @@ public abstract class BathymetricGridFactory extends GlobalScopeFactory<Bathymet
     }
 
     protected abstract Map<Int2D, Collection<Double>> readElevationValues(
-        final File gridFile,
+        final Simulation simulation,
         ModelGrid modelGrid
     );
 }

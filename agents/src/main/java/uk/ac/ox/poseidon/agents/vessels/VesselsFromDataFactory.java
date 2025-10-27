@@ -40,7 +40,6 @@ import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -54,12 +53,13 @@ import static java.util.stream.Collectors.toMap;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VesselsFromFileFactory extends SimulationScopeFactory<List<Vessel>> {
+public class VesselsFromDataFactory extends SimulationScopeFactory<List<Vessel>> {
 
     private static final System.Logger logger =
-        System.getLogger(VesselsFromFileFactory.class.getName());
+        System.getLogger(VesselsFromDataFactory.class.getName());
 
-    private Factory<? extends Path> path;
+    private Factory<? extends Table> data;
+
     private String vesselIdColumn;
     private String vesselNameColumn;
     private String portCodeColumn;
@@ -75,7 +75,7 @@ public class VesselsFromFileFactory extends SimulationScopeFactory<List<Vessel>>
     protected List<Vessel> newInstance(final Simulation simulation) {
         final VesselField vesselField = this.vesselField.get(simulation);
         final List<Vessel> vessels =
-            Table.read().file(path.get(simulation).toFile())
+            data.get(simulation)
                 .stream()
                 .flatMap(row -> {
                     final PortGrid portGrid = this.portGrid.get(simulation);

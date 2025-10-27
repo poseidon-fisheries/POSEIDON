@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
-import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
+import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -83,7 +83,7 @@ class FleetFromVesselRegisterFactoryTest {
                             new ConstantFactory<>(mock(VesselField.class)),
                             new ConstantFactory<>(portGrid)
                         ))
-                        .dataSource(new StringDataSourceFactory(initialData + extraData))
+                        .data(CsvTableFactory.fromString(initialData + extraData))
                         .hold(new VesselScopeAdaptor<>(new ConstantFactory<>(h1)))
                         .gear(
                             VesselScopeFactoriesByCode.<Gear>builder()

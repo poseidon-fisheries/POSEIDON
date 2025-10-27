@@ -35,7 +35,6 @@ import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.io.sources.DataSource;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
@@ -60,6 +59,8 @@ import static uk.ac.ox.poseidon.agents.vessels.VesselEvent.Type.*;
 @AllArgsConstructor
 public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet> {
 
+    private Factory<? extends Table> data;
+
     // TODO: make sure vessels don't behave when inactive
     //   Also think about what happens if initial behaviour changes. Maybe the "initial behaviour"
     //   should be a "root behaviour", that is never part of the stack, so if we change it, it
@@ -83,7 +84,6 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
         List.of("DES", "EXP", "RET");
     @Builder.Default private List<String> modificationEventCodes =
         List.of("MOD");
-    private Factory<? extends DataSource> dataSource;
 
     private BehaviourFactory<?> initialBehaviour;
     private VesselScopeFactory<? extends Hold> hold;
@@ -110,8 +110,7 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
     protected Fleet newInstance(final Simulation simulation) {
         final Fleet fleet = this.fleet.get(simulation);
         final List<Entry<LocalDateTime, VesselEvent>> eventByDateTime =
-            Table.read()
-                .csv(dataSource.get(simulation).getReader())
+            data.get(simulation)
                 .stream()
                 .map(row ->
                     entry(

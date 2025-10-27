@@ -37,7 +37,6 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.nio.file.Path;
 import java.util.Optional;
 
 import static java.text.MessageFormat.format;
@@ -47,14 +46,15 @@ import static java.util.Comparator.comparingDouble;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PortGridFromFileFactory extends SimulationScopeFactory<PortGrid> {
+public class PortGridFromDataFactory extends SimulationScopeFactory<PortGrid> {
 
     private static final System.Logger logger =
-        System.getLogger(PortGridFromFileFactory.class.getName());
+        System.getLogger(PortGridFromDataFactory.class.getName());
+
+    private Factory<? extends Table> data;
 
     private Factory<? extends BathymetricGrid> bathymetricGrid;
     private Factory<? extends DistanceCalculator> distanceCalculator;
-    private Factory<? extends Path> path;
     private String portCodeColumn;
     private String nameColumn;
     private String longitudeColumn;
@@ -70,7 +70,7 @@ public class PortGridFromFileFactory extends SimulationScopeFactory<PortGrid> {
                 modelGrid.getGridWidth(),
                 modelGrid.getGridHeight()
             );
-        Table.read().file(path.get(simulation).toFile()).forEach(row -> {
+        data.get(simulation).forEach(row -> {
             final String portCode = row.getString(portCodeColumn);
             final String portName = row.getString(nameColumn);
             final Coordinate coordinate = new Coordinate(

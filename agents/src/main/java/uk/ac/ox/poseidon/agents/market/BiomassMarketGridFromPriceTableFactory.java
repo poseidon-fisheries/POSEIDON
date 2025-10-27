@@ -40,7 +40,6 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -56,13 +55,13 @@ import static java.util.stream.Collectors.groupingBy;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BiomassMarketGridPriceFileFactory
+public class BiomassMarketGridFromPriceTableFactory
     extends SimulationScopeFactory<BiomassMarketGrid> {
 
     private static final System.Logger logger =
-        System.getLogger(BiomassMarketGridPriceFileFactory.class.getName());
+        System.getLogger(BiomassMarketGridFromPriceTableFactory.class.getName());
 
-    private Factory<? extends Path> path;
+    private Factory<? extends Table> data;
 
     private String dateColumn;
     private String portCodeColumn;
@@ -88,8 +87,7 @@ public class BiomassMarketGridPriceFileFactory
         final Map<String, CatchCategory> catchCategories = new HashMap<>();
 
         final List<Entry<LocalDateTime, PriceUpdate>> priceUpdatesByDate =
-            Table.read()
-                .file(path.get(simulation).toFile())
+            data.get(simulation)
                 .stream()
                 .flatMap(row -> {
                         final BiomassMarket biomassMarket = markets.computeIfAbsent(

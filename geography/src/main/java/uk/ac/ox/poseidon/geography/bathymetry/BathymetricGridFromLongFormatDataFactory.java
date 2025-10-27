@@ -31,11 +31,11 @@ import lombok.Setter;
 import sim.util.Int2D;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
@@ -43,13 +43,15 @@ import java.util.Map;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BathymetricGridFromLongFormatCsvFactory extends BathymetricGridFactory {
+public class BathymetricGridFromLongFormatDataFactory extends BathymetricGridFactory {
+
+    private Factory<? extends Table> data;
 
     @NonNull private String longitudeColumn;
     @NonNull private String latitudeColumn;
     @NonNull private String depthColumn;
 
-    public BathymetricGridFromLongFormatCsvFactory(
+    public BathymetricGridFromLongFormatDataFactory(
         @NonNull final Factory<? extends Path> path,
         @NonNull final Factory<? extends ModelGrid> modelGrid,
         @NonNull final Factory<? extends Aggregator> aggregator,
@@ -58,7 +60,7 @@ public class BathymetricGridFromLongFormatCsvFactory extends BathymetricGridFact
         @NonNull final String latitudeColumn,
         @NonNull final String depthColumn
     ) {
-        super(path, modelGrid, aggregator, inverted);
+        super(modelGrid, aggregator, inverted);
         this.longitudeColumn = longitudeColumn;
         this.latitudeColumn = latitudeColumn;
         this.depthColumn = depthColumn;
@@ -66,11 +68,11 @@ public class BathymetricGridFromLongFormatCsvFactory extends BathymetricGridFact
 
     @Override
     protected Map<Int2D, Collection<Double>> readElevationValues(
-        final File gridFile,
+        final Simulation simulation,
         final ModelGrid modelGrid
     ) {
         final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
-        Table.read().csv(gridFile).forEach(row -> {
+        data.get(simulation).forEach(row -> {
             final Int2D cell =
                 modelGrid.toCell(new Coordinate(
                     row.getDouble(longitudeColumn),

@@ -25,11 +25,11 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import org.geotools.api.referencing.operation.MathTransform2D;
 import org.geotools.api.referencing.operation.TransformException;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.CoverageWrapper;
@@ -44,20 +44,24 @@ import java.util.Map;
 @NoArgsConstructor
 public class BathymetricGridFromGridFileFactory extends BathymetricGridFactory {
 
+    private Factory<? extends Path> path;
+
     public BathymetricGridFromGridFileFactory(
-        @NonNull final Factory<? extends Path> path,
-        @NonNull final Factory<? extends ModelGrid> modelGrid,
-        @NonNull final Factory<? extends Aggregator> aggregator,
+        final Factory<? extends Path> path,
+        final Factory<? extends ModelGrid> modelGrid,
+        final Factory<? extends Aggregator> aggregator,
         final boolean inverted
     ) {
-        super(path, modelGrid, aggregator, inverted);
+        super(modelGrid, aggregator, inverted);
+        this.path = path;
     }
 
     @Override
     protected Map<Int2D, Collection<Double>> readElevationValues(
-        final File gridFile,
+        final Simulation simulation,
         final ModelGrid modelGrid
     ) {
+        final File gridFile = path.get(simulation).toFile();
         final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
         final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
         final MathTransform2D gridToCRS2D =

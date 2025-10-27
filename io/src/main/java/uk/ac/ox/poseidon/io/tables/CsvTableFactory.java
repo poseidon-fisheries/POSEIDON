@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.species;
+package uk.ac.ox.poseidon.io.tables;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,42 +30,45 @@ import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.io.paths.PathFactory;
+import uk.ac.ox.poseidon.io.sources.DataSource;
+import uk.ac.ox.poseidon.io.sources.FileDataSourceFactory;
+import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
 
 import java.nio.file.Path;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SpeciesFromFileFactory extends GlobalScopeFactory<List<Species>> {
+public class CsvTableFactory extends GlobalScopeFactory<Table> {
 
-    private Factory<? extends Path> path;
-    private String speciesCodeColumn;
-    private String speciesNameColumn;
-    private String lifeStageColumn;
-
-    public SpeciesFromFileFactory(
-        final Factory<? extends Path> path,
-        final String speciesCodeColumn,
-        final String speciesNameColumn
-    ) {
-        this(path, speciesCodeColumn, speciesNameColumn, null);
+    public static CsvTableFactory fromString(final String data) {
+        return new CsvTableFactory(new StringDataSourceFactory(data));
     }
+
+    public static CsvTableFactory fromFile(
+        final PathFactory pathFactory
+    ) {
+        return new CsvTableFactory(new FileDataSourceFactory(pathFactory));
+    }
+
+    public static CsvTableFactory fromFile(
+        final String first,
+        final String... more
+    ) {
+        return fromFile(PathFactory.of(first, more));
+    }
+
+    public static CsvTableFactory fromFile(final Path path) {
+        return fromFile(PathFactory.of(path));
+    }
+
+    private Factory<? extends DataSource> dataSource;
 
     @Override
-    protected List<Species> newInstance(final Simulation simulation) {
-        return Table
-            .read()
-            .csv(path.get(simulation).toFile())
-            .stream()
-            .map(row ->
-                new Species(
-                    row.getString(speciesCodeColumn),
-                    row.getString(speciesNameColumn),
-                    lifeStageColumn == null ? null : row.getString(lifeStageColumn)
-                )
-            )
-            .toList();
+    protected Table newInstance(final Simulation simulation) {
+        return Table.read().csv(dataSource.get(simulation).getReader());
     }
+
 }
