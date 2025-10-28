@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import tech.tablesaw.api.Table;
+import tech.tablesaw.io.csv.CsvReadOptions;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -35,6 +36,7 @@ import uk.ac.ox.poseidon.io.sources.DataSource;
 import uk.ac.ox.poseidon.io.sources.FileDataSourceFactory;
 import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
 
+import java.io.Reader;
 import java.nio.file.Path;
 
 @Getter
@@ -68,7 +70,10 @@ public class CsvTableFactory extends GlobalScopeFactory<Table> {
 
     @Override
     protected Table newInstance(final Simulation simulation) {
-        return Table.read().csv(dataSource.get(simulation).getReader());
+        final Reader reader = dataSource.get(simulation).getReader();
+        return Table
+            .read()
+            .usingOptions(CsvReadOptions.builder(reader).sample(false));
     }
 
 }
