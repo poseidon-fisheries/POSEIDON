@@ -33,20 +33,22 @@ import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static java.util.Map.entry;
+import static java.util.Map.Entry.comparingByKey;
 import static java.util.stream.Collectors.*;
 
 @Getter
 @RequiredArgsConstructor
 public class TemporalSchedule extends Schedule {
 
-    private static final System.Logger logger = System.getLogger(TemporalSchedule.class.getName());
-
     public static final String BEFORE_SIMULATION_STRING = "At Start";
     public static final String AFTER_SIMULATION_STRING = "At End";
+    private static final System.Logger logger = System.getLogger(TemporalSchedule.class.getName());
     @Serial private static final long serialVersionUID = 4197200009803943439L;
 
     private final LocalDateTime startingDateTime;
@@ -133,32 +135,47 @@ public class TemporalSchedule extends Schedule {
     }
 
     /**
-     * Schedules a collection of Steppable tasks to be executed based on their corresponding
-     * LocalDateTime. For each Steppable task, if the associated date-time is before the current
-     * date-time of the schedule, it is adjusted to the current date-time. Grouped tasks for the
-     * same date-time are wrapped into a Sequence and scheduled together.
+     * Schedules a collection of steppable entries at specified date-times. Entries with date-times
+     * before the current simulation time are immediately scheduled all at once, while others are
+     * scheduled at their respective specified date-times.
      *
-     * @param steppablesByDateTime a collection of entries where the key is the scheduled
-     *                             LocalDateTime and the value is the Steppable task to be executed
-     *                             at that time.
+     * @param steppablesByDateTime a collection of entries mapping {@link LocalDateTime} to
+     *                             {@link Steppable}. Each entry specifies a steppable and the
+     *                             date-time at which it should be scheduled.
      */
     public void scheduleByDateTime(
         final Collection<? extends Entry<LocalDateTime, ? extends Steppable>> steppablesByDateTime
     ) {
         final LocalDateTime minimumDateTime = time < EPOCH ? toDateTime(EPOCH) : getDateTime();
-        steppablesByDateTime
-            .stream()
-            .collect(groupingBy(Entry::getKey, mapping(Entry::getValue, toList())))
-            .entrySet()
-            .stream()
-            .map(entry ->
-                entry(
-                    entry.getKey().isBefore(minimumDateTime) ? minimumDateTime : entry.getKey(),
-                    new Sequence(entry.getValue())
+        final Map<Boolean, List<Entry<LocalDateTime, Sequence>>> entriesBeforeAndAfter =
+            steppablesByDateTime
+                .stream()
+                .collect(groupingBy(
+                    Entry::getKey,
+                    mapping(Entry::getValue, collectingAndThen(toList(), Sequence::new))
+                ))
+                .entrySet()
+                .stream()
+                .collect(groupingBy(
+                    entry -> entry.getKey().isBefore(minimumDateTime))
+                );
+
+        // Schedule entries that are before the current date-time all at once, right away
+        Optional.ofNullable(entriesBeforeAndAfter.get(true))
+            .map(entriesBefore ->
+                entriesBefore
+                    .stream()
+                    .sorted(comparingByKey())
+                    .map(Entry::getValue)
+                    .collect(collectingAndThen(toList(), Sequence::new))
+            ).ifPresent(this::scheduleOnce);
+
+        // Schedule other entries at their respective date-times
+        Optional.ofNullable(entriesBeforeAndAfter.get(false))
+            .ifPresent(entriesAfter ->
+                entriesAfter.forEach(entry ->
+                    scheduleOnce(entry.getKey(), entry.getValue())
                 )
-            )
-            .forEach(entry ->
-                scheduleOnce(entry.getKey(), entry.getValue())
             );
     }
 
