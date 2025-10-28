@@ -28,7 +28,6 @@ import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
-import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.HashMap;
@@ -57,26 +56,18 @@ public class Fleet {
     }
 
     public Vessel createVessel(
-        final String vesselId,
-        final String name,
-        final String portCode
+        final String vesselId
     ) {
         checkState(
             !vesselsById.containsKey(vesselId),
             "Vessel %s already exists", vesselId
         );
-        final Port homePort =
-            portGrid.getObject(portCode).orElseThrow(() -> new IllegalStateException(
-                "Port %s not found when trying to create vessel %s.".formatted(portCode, vesselId)
-            ));
         final Vessel vessel = new Vessel(
             vesselId,
-            name,
             new ForwardingEventManager(eventManager),
             new Account(),
             vesselField,
-            portGrid,
-            homePort
+            portGrid
         );
         vesselsById.put(vesselId, vessel);
         return vessel;

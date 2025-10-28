@@ -177,7 +177,6 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
                 Stream.of(
                     vesselIdColumn,
                     vesselNameColumn,
-                    portCodeColumn,
                     eventCodeColumn,
                     eventDateColumn
                 ),

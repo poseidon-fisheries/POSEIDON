@@ -68,33 +68,33 @@ public class VesselEvent implements Steppable {
     @Override
     public void step(final SimState simState) {
         checkState(simState instanceof Simulation);
+
         final Simulation simulation = (Simulation) simState;
-        final Vessel vessel;
-        final Optional<Vessel> optionalVessel = fleet.getVessel(vesselId);
-        if (optionalVessel.isEmpty()) {
-            if (eventType != Type.ACTIVATION) {
-                throw new IllegalStateException(
-                    "Trying to %s vessel %s which does not exist."
-                        .formatted(eventType.verb, vesselId)
-                );
-            }
-            vessel = fleet.createVessel(vesselId, vesselName, portCode);
-        } else {
-            vessel = optionalVessel.get();
-            vessel.setName(vesselName);
-            if (!vessel.getHomePort().getCode().equals(portCode)) {
-                final Port port =
-                    fleet.getPortGrid().getObject(portCode).orElseThrow(() ->
-                        new IllegalStateException("Port %s not found.".formatted(portCode))
-                    );
-                vessel.setHomePort(port);
-            }
-        }
+        final Vessel vessel = fleet
+            .getVessel(vesselId)
+            .orElseGet(() -> fleet.createVessel(vesselId));
+        final Optional<Port> port = fleet
+            .getPortGrid()
+            .getObject(portCode);
+
+        // TODO: check how setting the home port to null interferes with vessels currently in a trip
+        vessel.setHomePort(port.orElse(null));
+        vessel.setName(vesselName);
         tags.forEach(vessel::putTag);
         vessel.setInitialBehaviour(initialBehaviourFactoryFunction.apply(vessel));
         vessel.setHold(holdFactoryFunction.apply(vessel));
         vessel.setGear(gearFactoryFunction.apply(vessel));
         vessel.setEngine(engineFactoryFunction.apply(vessel));
+
+        // TODO: setting the vessel home port to a non-existing port, or changing its gear to
+        //  a gear that is not modelled (which we're currently not detecting) should cause the
+        //  vessel to become inactive and I need a way of accounting for that. Conversely, giving
+        //  the vessel a new gear or home port might "reactivate" the vessel, even if it was never
+        //  deactivated in the register. The crux of the matter is that "active in the model" and
+        //  "active in the register" are slightly different concepts, and I need a way to account
+        //  for that. I might want to rely on conditions like "these things (e.g., port, gear)
+        //  should not be null", or maybe allow the user to specify conditions for being active
+        //  according to tag values (which I think might be preferable).
 
         switch (eventType) {
             case ACTIVATION -> vessel.activate(simulation.getTemporalSchedule());

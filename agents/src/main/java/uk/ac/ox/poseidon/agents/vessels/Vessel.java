@@ -62,8 +62,8 @@ public class Vessel implements Agent, Oriented2D {
     private final @NonNull Map<String, Object> tags = new HashMap<>();
 
     // Modifiable characteristics
-    @NonNull private String name;
-    @NonNull private Port homePort;
+    private String name;
+    private Port homePort;
     private Hold hold;
     private Gear gear;
     private Engine engine;
@@ -80,21 +80,22 @@ public class Vessel implements Agent, Oriented2D {
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     Vessel(
         final @NonNull String id,
-        final @NonNull String name,
         final @NonNull EventManager eventManager,
         final @NonNull Account account,
         final @NonNull VesselField vesselField,
-        final @NonNull PortGrid portGrid,
-        final @NonNull Port homePort
+        final @NonNull PortGrid portGrid
     ) {
         this.id = id;
-        this.name = name;
         this.eventManager = eventManager;
         this.account = account;
         this.vesselField = vesselField;
         this.portGrid = portGrid;
+    }
+
+    public void setHomePort(final Port homePort) {
         this.homePort = homePort;
-        setCurrentCell(portGrid.getLocation(homePort));
+        if (this.homePort != null && getCell() == null)
+            setCurrentCell(portGrid.getLocation(homePort));
     }
 
     public void activate(final TemporalSchedule temporalSchedule) {
@@ -196,7 +197,7 @@ public class Vessel implements Agent, Oriented2D {
 
     @Override
     public String toString() {
-        return name + " (" + id + ")";
+        return name == null ? id : name + " (" + id + ")";
     }
 
     public boolean isAtHomePort() {

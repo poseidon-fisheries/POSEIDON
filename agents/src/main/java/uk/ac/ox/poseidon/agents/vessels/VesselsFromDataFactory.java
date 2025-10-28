@@ -84,13 +84,13 @@ public class VesselsFromDataFactory extends SimulationScopeFactory<List<Vessel>>
                         .map(homePort -> {
                             final var vessel = new Vessel(
                                 row.getString(vesselIdColumn),
-                                row.getString(vesselNameColumn),
                                 new ForwardingEventManager(simulation.getEventManager()),
                                 new Account(),
                                 vesselField,
-                                portGrid,
-                                homePort
+                                portGrid
                             );
+                            vessel.setName(row.getString(vesselNameColumn));
+                            vessel.setHomePort(homePort);
                             vessel.setHold(hold.get(simulation, vessel));
                             vessel.setGear(fishingGear.get(simulation, vessel));
                             vessel.setEngine(engine.get(simulation, vessel));
