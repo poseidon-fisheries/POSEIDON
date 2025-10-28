@@ -66,6 +66,7 @@ public class VesselFactory extends SimulationScopeFactory<VesselEvent> {
                 entry -> entry.getValue().get(simulation)
             ));
         final VesselEvent vesselEvent = new VesselEvent(
+            simulation.getTemporalSchedule().getStartingDateTime(),
             fleet.get(simulation),
             VesselEvent.Type.ACTIVATION,
             id,

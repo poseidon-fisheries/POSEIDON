@@ -38,10 +38,8 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -112,12 +110,13 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
         final List<Entry<LocalDateTime, VesselEvent>> eventByDateTime =
             data.get(simulation)
                 .stream()
-                .map(row ->
-                    entry(
-                        row.getDate(eventDateColumn).atStartOfDay(),
-                        makeEvent(simulation, row, fleet)
-                    )
-                )
+                .map(row -> {
+                    final LocalDateTime dateTime = row.getDate(eventDateColumn).atStartOfDay();
+                    return entry(
+                        dateTime,
+                        makeEvent(simulation, dateTime, row, fleet)
+                    );
+                })
                 .toList();
         simulation.getTemporalSchedule().scheduleByDateTime(eventByDateTime);
         return fleet;
@@ -145,6 +144,7 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
 
     private VesselEvent makeEvent(
         final Simulation simulation,
+        final LocalDateTime dateTime,
         final Row row,
         final Fleet fleet
     ) {
@@ -157,6 +157,7 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
                 .distinct()
                 .collect(toMap(identity(), row::getObject));
         return new VesselEvent(
+            dateTime,
             fleet,
             eventType(row.getString(eventCodeColumn)),
             row.getString(vesselIdColumn),
@@ -182,11 +183,15 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
                 ),
                 this.ignoredColumns.stream()
             ).collect(toSet());
-        return row
+
+        // Populating the map with forEach because Collectors.toMap rejects null values
+        final Map<String, Object> tags = new HashMap<>();
+        row
             .columnNames()
             .stream()
             .filter(not(ignoredColumns::contains))
-            .collect(toMap(identity(), row::getObject));
+            .forEach(columName -> tags.put(columName, row.getObject(columName)));
+        return Collections.unmodifiableMap(tags);
     }
 
     private VesselEvent.Type eventType(final String eventCode) {

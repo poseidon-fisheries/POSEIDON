@@ -34,6 +34,7 @@ import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -51,6 +52,7 @@ public class VesselEvent implements Steppable {
         private final String verb;
     }
 
+    @NonNull LocalDateTime dateTime;
     @NonNull Fleet fleet;
     @NonNull Type eventType;
     @NonNull String vesselId;
