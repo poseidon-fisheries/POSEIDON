@@ -52,7 +52,7 @@ public final class CoverageWrapper {
         final AbstractGridFormat format = GridFormatFinder.findFormat(gridFile);
         final GridCoverage2DReader reader = format.getReader(gridFile);
         try {
-            final GridCoverage2D coverage = reader.read(null);
+            final GridCoverage2D coverage = reader.read();
             reader.dispose();
             return coverage;
         } catch (final IOException e) {
