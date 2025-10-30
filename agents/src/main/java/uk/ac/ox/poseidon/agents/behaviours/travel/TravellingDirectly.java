@@ -22,54 +22,39 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.travel;
 
+import com.badlogic.gdx.ai.btree.LeafTask;
+import com.badlogic.gdx.ai.btree.Task;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
-import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
+import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
-public class TravellingDirectly implements Behaviour {
+public class TravellingDirectly extends LeafTask<Vessel> {
 
     private final DistanceCalculator distanceCalculator;
 
     @Override
-    public SteppableAction nextAction(
-        final Vessel vessel,
-        final LocalDateTime dateTime
-    ) {
-        return new Action(
-            dateTime,
-            distanceCalculator.travelDuration(
+    public Task.Status execute() {
+        final Vessel vessel = getObject();
+        if (getStatus() == RUNNING) {
+            vessel.setCurrentCell(vessel.getDestination().getCell());
+            return SUCCEEDED;
+        } else {
+            vessel.setTaskDuration(distanceCalculator.travelDuration(
                 vessel.getCell(),
                 vessel.getDestination().getCell(),
                 vessel.getEngine().getCruisingSpeed()
-            ),
-            vessel
-        );
+            ));
+            return RUNNING;
+        }
     }
 
-    @ToString(callSuper = true)
-    public static class Action extends SteppableAction {
-
-        private Action(
-            final LocalDateTime start,
-            final Duration duration,
-            final Vessel vessel
-        ) {
-            super(vessel, start, duration);
-        }
-
-        @Override
-        public void complete(final LocalDateTime dateTime) {
-            getVessel().setCurrentCell(getVessel().getDestination().getCell());
-            getVessel().popBehaviour();
-        }
+    @Override
+    protected Task<Vessel> copyTo(final Task<Vessel> task) {
+        throw new UnsupportedOperationException();
     }
 }

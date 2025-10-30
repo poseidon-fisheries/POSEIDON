@@ -93,7 +93,7 @@ public class MappedFactory<C> extends GlobalScopeFactory<List<C>> {
                                 case final String s -> s;
                                 case final Number n -> n;
                                 case final Factory<?> f -> f;
-                                case final AgentScopeFactory<?, ?> asf -> asf;
+                                case final ObjectScopeFactory<?, ?> asf -> asf;
                                 default -> new ConstantFactory<>(o);
                             }
                         );

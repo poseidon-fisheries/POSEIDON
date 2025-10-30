@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -37,7 +38,7 @@ import java.util.function.Supplier;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class WaitingBehaviourFactory extends BehaviourFactory<Waiting> {
+public class WaitingTaskFactory extends VesselScopeFactory<Waiting> {
 
     private Factory<? extends Supplier<Duration>> durationSupplier;
 

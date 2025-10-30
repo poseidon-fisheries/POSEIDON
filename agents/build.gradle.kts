@@ -29,6 +29,7 @@ dependencies {
     api(project(":geography"))
     api(project(":io"))
     api(libs.joda.money)
+    implementation(libs.gdx.ai)
     implementation(libs.streamex)
     implementation(libs.commons.beanutils)
 }

@@ -26,31 +26,27 @@ import lombok.*;
 import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
+import uk.ac.ox.poseidon.agents.behaviours.Agent;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
-import uk.ac.ox.poseidon.core.Agent;
 import uk.ac.ox.poseidon.core.events.EventManager;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.Destination;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.util.*;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Getter
 @RequiredArgsConstructor
-public class Vessel implements Agent, Oriented2D {
+public class Vessel extends Agent<Vessel> implements Oriented2D {
 
-    private static final int VESSEL_BEHAVIOUR_ORDERING = 1;
     private final @NonNull String id;
-    private final @NonNull TemporalSchedule schedule;
     private final @NonNull EventManager eventManager;
     private final @NonNull Account account;
     private final @NonNull VesselField vesselField;
@@ -67,36 +63,19 @@ public class Vessel implements Agent, Oriented2D {
     private Engine engine;
 
     private boolean activeInRegister;
-    private Behaviour rootBehaviour;
 
     // Current state variables
-    @Getter(AccessLevel.NONE)
-    private final Deque<Behaviour> behaviourStack = new ArrayDeque<>();
     private double heading;
     private Destination destination;
 
+    @Override
     public boolean isActive() {
-        return activeInRegister &&
-            rootBehaviour != null &&
+        return super.isActive() &&
+            activeInRegister &&
             homePort != null &&
             hold != null &&
             gear != null &&
             engine != null;
-    }
-
-    private void mutate(final Runnable mutation) {
-        final boolean previouslyActive = isActive();
-        mutation.run();
-        if (!previouslyActive && isActive()) {
-            activate();
-        }
-    }
-
-    private void activate() {
-        if (currentBehaviour() == null) {
-            pushBehaviour(rootBehaviour);
-            scheduleNextAction();
-        }
     }
 
     public void setHomePort(final Port homePort) {
@@ -121,10 +100,6 @@ public class Vessel implements Agent, Oriented2D {
 
     public void setActiveInRegister(final boolean activeInRegister) {
         mutate(() -> this.activeInRegister = activeInRegister);
-    }
-
-    public void setRootBehaviour(final Behaviour rootBehaviour) {
-        mutate(() -> this.rootBehaviour = rootBehaviour);
     }
 
     @Override
@@ -171,32 +146,6 @@ public class Vessel implements Agent, Oriented2D {
 
     public boolean isAtPort() {
         return portGrid.anyObjectsAt(getCell());
-    }
-
-    public void popBehaviour() {
-        behaviourStack.pop();
-    }
-
-    public void pushBehaviour(final Behaviour behaviour) {
-        checkNotNull(behaviour, "Cannot push null behaviour.");
-        behaviourStack.push(behaviour);
-    }
-
-    public Behaviour currentBehaviour() {
-        return behaviourStack.peek();
-    }
-
-    public void scheduleNextAction() {
-        while (currentBehaviour() != null) {
-            final var action = currentBehaviour().nextAction(this, schedule.getDateTime());
-            if (action != null) {
-                action.init();
-                schedule.scheduleOnceIn(action.getDuration(), action, VESSEL_BEHAVIOUR_ORDERING);
-                break;
-            } else {
-                popBehaviour();
-            }
-        }
     }
 
     public void setDestination(final Destination destination) {

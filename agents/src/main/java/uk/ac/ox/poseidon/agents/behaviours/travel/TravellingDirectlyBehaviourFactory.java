@@ -26,8 +26,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
@@ -37,10 +37,9 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TravellingDirectlyBehaviourFactory
-    extends BehaviourFactory<TravellingDirectly> {
+    extends VesselScopeFactory<TravellingDirectly> {
 
     private Factory<? extends DistanceCalculator> distance;
-    private BehaviourFactory<?> behaviourOnArrival;
 
     @Override
     protected TravellingDirectly newInstance(

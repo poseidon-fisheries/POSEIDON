@@ -22,43 +22,35 @@
 
 package uk.ac.ox.poseidon.agents.behaviours;
 
+import com.badlogic.gdx.ai.btree.LeafTask;
+import com.badlogic.gdx.ai.btree.Task;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
+import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
-public class Waiting implements Behaviour {
+public class Waiting<A extends Agent<A>> extends LeafTask<A> {
 
     private final Supplier<Duration> durationSupplier;
 
     @Override
-    public SteppableAction nextAction(
-        final Vessel vessel,
-        final LocalDateTime dateTime
-    ) {
-        return new Action(vessel, dateTime, durationSupplier.get());
-    }
-
-    @ToString(callSuper = true)
-    private static class Action extends SteppableAction {
-
-        private Action(
-            final Vessel vessel,
-            final LocalDateTime start,
-            final Duration duration
-        ) {
-            super(vessel, start, duration, vessel.getCoordinate());
-        }
-
-        @Override
-        public void complete(final LocalDateTime dateTime) {
-            getVessel().popBehaviour();
+    public Status execute() {
+        if (getStatus() == RUNNING)
+            return SUCCEEDED;
+        else {
+            getObject().setTaskDuration(durationSupplier.get());
+            return RUNNING;
         }
     }
+
+    @Override
+    protected Task<A> copyTo(final Task<A> task) {
+        throw new UnsupportedOperationException();
+    }
+
 }

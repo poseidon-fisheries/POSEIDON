@@ -32,13 +32,13 @@ import java.util.concurrent.ExecutionException;
 
 import static com.google.common.cache.CacheLoader.from;
 
-public abstract class AgentScopeFactory<A extends Agent, C> {
+public abstract class ObjectScopeFactory<O, C> {
 
     protected final transient List<Method> readMethods = AbstractFactory.readMethods(this);
 
     // needs to be transient for SnakeYAML not to be confused
     // when there are no other properties to serialize
-    private final transient LoadingCache<A, Cache<Integer, C>> cache =
+    private final transient LoadingCache<O, Cache<Integer, C>> cache =
         CacheBuilder
             .newBuilder()
             .weakValues()
@@ -46,12 +46,12 @@ public abstract class AgentScopeFactory<A extends Agent, C> {
 
     public final C get(
         final Simulation simulation,
-        final A agent
+        final O object
     ) {
         try {
             return cache
-                .getUnchecked(agent)
-                .get(makeKey(simulation, agent), () -> newInstance(simulation, agent));
+                .getUnchecked(object)
+                .get(makeKey(simulation, object), () -> newInstance(simulation, object));
         } catch (final ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -59,12 +59,12 @@ public abstract class AgentScopeFactory<A extends Agent, C> {
 
     protected abstract Integer makeKey(
         final Simulation simulation,
-        final A agent
+        final O object
     );
 
     protected abstract C newInstance(
         Simulation simulation,
-        A vessel
+        O object
     );
 
 }
