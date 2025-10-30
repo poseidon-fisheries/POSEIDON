@@ -22,11 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
@@ -47,72 +43,88 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 @Getter
-@Setter
+@RequiredArgsConstructor
 public class Vessel implements Agent, Oriented2D {
 
     private static final int VESSEL_BEHAVIOUR_ORDERING = 1;
     private final @NonNull String id;
+    private final @NonNull TemporalSchedule schedule;
     private final @NonNull EventManager eventManager;
     private final @NonNull Account account;
     private final @NonNull VesselField vesselField;
     private final @NonNull PortGrid portGrid;
+
+    @Getter(AccessLevel.NONE)
     private final @NonNull Map<String, Object> tags = new HashMap<>();
 
     // Modifiable characteristics
-    private String name;
+    @Setter private String name;
     private Port homePort;
     private Hold hold;
     private Gear gear;
     private Engine engine;
 
+    private boolean activeInRegister;
+    private Behaviour rootBehaviour;
+
     // Current state variables
     @Getter(AccessLevel.NONE)
     private final Deque<Behaviour> behaviourStack = new ArrayDeque<>();
-    private Behaviour initialBehaviour;
     private double heading;
     private Destination destination;
-    @Setter(AccessLevel.NONE)
-    private boolean active;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
-    Vessel(
-        final @NonNull String id,
-        final @NonNull EventManager eventManager,
-        final @NonNull Account account,
-        final @NonNull VesselField vesselField,
-        final @NonNull PortGrid portGrid
-    ) {
-        this.id = id;
-        this.eventManager = eventManager;
-        this.account = account;
-        this.vesselField = vesselField;
-        this.portGrid = portGrid;
+    public boolean isActive() {
+        return activeInRegister &&
+            rootBehaviour != null &&
+            homePort != null &&
+            hold != null &&
+            gear != null &&
+            engine != null;
+    }
+
+    private void mutate(final Runnable mutation) {
+        final boolean previouslyActive = isActive();
+        mutation.run();
+        if (!previouslyActive && isActive()) {
+            activate();
+        }
+    }
+
+    private void activate() {
+        if (currentBehaviour() == null) {
+            pushBehaviour(rootBehaviour);
+            scheduleNextAction();
+        }
     }
 
     public void setHomePort(final Port homePort) {
-        this.homePort = homePort;
-        if (this.homePort != null && getCell() == null)
-            setCurrentCell(portGrid.getLocation(homePort));
+        mutate(() -> {
+            this.homePort = homePort;
+            if (this.homePort != null && getCell() == null)
+                setCurrentCell(portGrid.getLocation(homePort));
+        });
     }
 
-    public void activate(final TemporalSchedule temporalSchedule) {
-        checkState(
-            !isActive(),
-            "Cannot activate an already active vessel."
-        );
-        if (currentBehaviour() == null && initialBehaviour != null) {
-            pushBehaviour(initialBehaviour);
-            scheduleNextAction(temporalSchedule);
-        }
-        active = true;
+    public void setHold(final Hold hold) {
+        mutate(() -> this.hold = hold);
     }
 
-    public void deactivate() {
-        checkState(isActive(), "Cannot deactivate an inactive vessel.");
-        active = false;
+    public void setGear(final Gear gear) {
+        mutate(() -> this.gear = gear);
+    }
+
+    public void setEngine(final Engine engine) {
+        mutate(() -> this.engine = engine);
+    }
+
+    public void setActiveInRegister(final boolean activeInRegister) {
+        mutate(() -> this.activeInRegister = activeInRegister);
+    }
+
+    public void setRootBehaviour(final Behaviour rootBehaviour) {
+        mutate(() -> this.rootBehaviour = rootBehaviour);
     }
 
     @Override
@@ -132,7 +144,7 @@ public class Vessel implements Agent, Oriented2D {
         final Double2D location = getPoint();
         final double dx = destinationPoint.x - location.x;
         final double dy = destinationPoint.y - location.y;
-        setHeading(Math.atan2(dy, dx));
+        this.heading = Math.atan2(dy, dx);
     }
 
     public Double2D getPoint() {
@@ -174,7 +186,7 @@ public class Vessel implements Agent, Oriented2D {
         return behaviourStack.peek();
     }
 
-    public void scheduleNextAction(final TemporalSchedule schedule) {
+    public void scheduleNextAction() {
         while (currentBehaviour() != null) {
             final var action = currentBehaviour().nextAction(this, schedule.getDateTime());
             if (action != null) {
@@ -208,7 +220,7 @@ public class Vessel implements Agent, Oriented2D {
         final String key,
         final Object value
     ) {
-        tags.put(key, value);
+        mutate(() -> tags.put(key, value));
     }
 
     public Optional<Object> getTag(final String key) {

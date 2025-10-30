@@ -43,6 +43,7 @@ public class FleetFactory extends SimulationScopeFactory<Fleet> {
     @Override
     protected Fleet newInstance(final Simulation simulation) {
         return new Fleet(
+            simulation.getTemporalSchedule(),
             simulation.getEventManager(),
             vesselField.get(simulation),
             portGrid.get(simulation)

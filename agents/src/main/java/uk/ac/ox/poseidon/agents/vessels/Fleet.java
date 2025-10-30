@@ -28,6 +28,7 @@ import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import static com.google.common.base.Preconditions.checkState;
 public class Fleet {
 
     private final Map<String, Vessel> vesselsById = new HashMap<>();
+    private final TemporalSchedule schedule;
     private final EventManager eventManager;
     private final VesselField vesselField;
 
@@ -64,6 +66,7 @@ public class Fleet {
         );
         final Vessel vessel = new Vessel(
             vesselId,
+            schedule,
             new ForwardingEventManager(eventManager),
             new Account(),
             vesselField,

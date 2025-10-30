@@ -84,6 +84,7 @@ public class VesselsFromDataFactory extends SimulationScopeFactory<List<Vessel>>
                         .map(homePort -> {
                             final var vessel = new Vessel(
                                 row.getString(vesselIdColumn),
+                                simulation.getTemporalSchedule(),
                                 new ForwardingEventManager(simulation.getEventManager()),
                                 new Account(),
                                 vesselField,
@@ -94,7 +95,7 @@ public class VesselsFromDataFactory extends SimulationScopeFactory<List<Vessel>>
                             vessel.setHold(hold.get(simulation, vessel));
                             vessel.setGear(fishingGear.get(simulation, vessel));
                             vessel.setEngine(engine.get(simulation, vessel));
-                            vessel.setInitialBehaviour(initialBehaviour.get(simulation, vessel));
+                            vessel.setRootBehaviour(initialBehaviour.get(simulation, vessel));
                             // TODO: I don't think this is the right place to set and schedule
                             //  behaviours. That should probably be handled by a separate
                             //  behaviour factory that is given a list of vessels and takes care
@@ -103,7 +104,7 @@ public class VesselsFromDataFactory extends SimulationScopeFactory<List<Vessel>>
                                 simulation.getTemporalSchedule();
                             vessel.pushBehaviour(initialBehaviour.get(simulation, vessel));
                             temporalSchedule.scheduleOnce(__ ->
-                                vessel.scheduleNextAction(temporalSchedule)
+                                vessel.scheduleNextAction()
                             );
                             return vessel;
                         })

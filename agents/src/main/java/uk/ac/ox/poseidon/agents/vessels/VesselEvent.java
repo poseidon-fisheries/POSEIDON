@@ -81,7 +81,7 @@ public class VesselEvent implements Steppable {
         vessel.setHomePort(port.orElse(null));
         vessel.setName(vesselName);
         tags.forEach(vessel::putTag);
-        vessel.setInitialBehaviour(initialBehaviourFactoryFunction.apply(vessel));
+        vessel.setRootBehaviour(initialBehaviourFactoryFunction.apply(vessel));
         vessel.setHold(holdFactoryFunction.apply(vessel));
         vessel.setGear(gearFactoryFunction.apply(vessel));
         vessel.setEngine(engineFactoryFunction.apply(vessel));
@@ -97,8 +97,8 @@ public class VesselEvent implements Steppable {
         //  according to tag values (which I think might be preferable).
 
         switch (eventType) {
-            case ACTIVATION -> vessel.activate(simulation.getTemporalSchedule());
-            case DEACTIVATION -> vessel.deactivate();
+            case ACTIVATION -> vessel.setActiveInRegister(true);
+            case DEACTIVATION -> vessel.setActiveInRegister(false);
             default -> {} // modification events don't change active status
         }
     }

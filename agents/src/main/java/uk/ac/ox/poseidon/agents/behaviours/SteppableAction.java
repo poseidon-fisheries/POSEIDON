@@ -26,7 +26,6 @@ import lombok.NonNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.time.Duration;
@@ -69,13 +68,9 @@ public abstract class SteppableAction extends AbstractAction implements Steppabl
 
     @Override
     public final void step(final SimState simState) {
-        if (simState.schedule instanceof final TemporalSchedule schedule) {
-            complete(schedule.getDateTime());
-            vessel.getEventManager().broadcast(this);
-            vessel.scheduleNextAction(schedule);
-        } else throw new IllegalStateException(
-            "Simulation schedule type must be " + TemporalSchedule.class.getName()
-        );
+        complete(vessel.getSchedule().getDateTime());
+        vessel.getEventManager().broadcast(this);
+        vessel.scheduleNextAction();
     }
 
 }
