@@ -27,7 +27,6 @@ import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
-import uk.ac.ox.poseidon.agents.behaviours.fishing.DummyFishingAction;
 import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
@@ -162,7 +161,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
                     vessels
                         .stream()
                         .map(vessel ->
-                            new DummyFishingAction(
+                            new PotentialFishingAction(
                                 dateTime,
                                 vessel,
                                 bathymetricGrid.getModelGrid().toCoordinate(cell)

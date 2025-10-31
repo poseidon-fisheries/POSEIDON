@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,24 +20,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.catches.disposition;
 
-import lombok.*;
-import sim.util.Int2D;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
+
+import java.util.Collection;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class SelectedSpeciesRetentionFactory
+    extends GlobalScopeFactory<SelectedSpeciesRetention> {
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+    private Factory<? extends Collection<? extends Species>> selectedSpecies;
 
-    public Destination asDestination() {
-        return new Destination(this, cell);
+    @Override
+    protected SelectedSpeciesRetention newInstance(final Simulation simulation) {
+        return new SelectedSpeciesRetention(selectedSpecies.get(simulation));
     }
 
 }
-

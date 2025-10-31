@@ -22,14 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.regulations;
 
-import uk.ac.ox.poseidon.agents.behaviours.Action;
-
 @FunctionalInterface
 public interface Regulations {
-    
-    boolean isPermitted(Action action);
 
-    default boolean isForbidden(final Action action) {
+    boolean isPermitted(VesselAction action);
+
+    default boolean isForbidden(final VesselAction action) {
         return !isPermitted(action);
     }
 

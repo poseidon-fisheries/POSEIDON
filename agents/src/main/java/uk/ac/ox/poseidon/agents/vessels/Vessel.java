@@ -22,19 +22,23 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Agent;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
+import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.events.EventManager;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.geography.grids.Destination;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -43,14 +47,30 @@ import java.util.Map;
 import java.util.Optional;
 
 @Getter
-@RequiredArgsConstructor
 public class Vessel extends Agent<Vessel> implements Oriented2D {
 
     private final @NonNull String id;
-    private final @NonNull EventManager eventManager;
     private final @NonNull Account account;
     private final @NonNull VesselField vesselField;
     private final @NonNull PortGrid portGrid;
+    private final @NonNull MarketGrid marketGrid;
+
+    public Vessel(
+        @NonNull final TemporalSchedule schedule,
+        @NonNull final EventManager eventManager,
+        @NonNull final String id,
+        @NonNull final Account account,
+        @NonNull final VesselField vesselField,
+        @NonNull final PortGrid portGrid,
+        @NonNull final MarketGrid marketGrid
+    ) {
+        super(schedule, eventManager);
+        this.id = id;
+        this.account = account;
+        this.vesselField = vesselField;
+        this.portGrid = portGrid;
+        this.marketGrid = marketGrid;
+    }
 
     @Getter(AccessLevel.NONE)
     private final @NonNull Map<String, Object> tags = new HashMap<>();
@@ -66,7 +86,8 @@ public class Vessel extends Agent<Vessel> implements Oriented2D {
 
     // Current state variables
     private double heading;
-    private Destination destination;
+    @Setter private Int2D destination;
+    @Setter private Int2D origin;
 
     @Override
     public boolean isActive() {
@@ -141,19 +162,11 @@ public class Vessel extends Agent<Vessel> implements Oriented2D {
     }
 
     public boolean isAtDestination() {
-        return destination != null && getCell().equals(destination.getCell());
+        return destination != null && getCell().equals(destination);
     }
 
     public boolean isAtPort() {
         return portGrid.anyObjectsAt(getCell());
-    }
-
-    public void setDestination(final Destination destination) {
-        this.destination = destination;
-    }
-
-    public void setDestination(final Int2D cell) {
-        setDestination(new Destination(cell, cell));
     }
 
     @Override

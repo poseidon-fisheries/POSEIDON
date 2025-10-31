@@ -29,7 +29,6 @@ import lombok.Setter;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.agents.behaviours.choices.Evaluator;
-import uk.ac.ox.poseidon.agents.behaviours.fishing.FishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;

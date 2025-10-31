@@ -23,6 +23,8 @@
 package uk.ac.ox.poseidon.agents.behaviours.disposition;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
+import uk.ac.ox.poseidon.agents.catches.disposition.GeneralDiscardMortality;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.DummySpecies;

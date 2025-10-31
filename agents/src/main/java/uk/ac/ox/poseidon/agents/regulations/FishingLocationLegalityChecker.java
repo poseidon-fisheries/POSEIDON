@@ -24,8 +24,6 @@ package uk.ac.ox.poseidon.agents.regulations;
 
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
-import uk.ac.ox.poseidon.agents.behaviours.fishing.DummyFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
@@ -54,7 +52,7 @@ public class FishingLocationLegalityChecker {
         return regulations.isPermitted(makeAction(fishingLocation, gear));
     }
 
-    private Action makeAction(
+    private FishingAction makeAction(
         final Int2D fishingLocation,
         final Gear gear
     ) {
@@ -74,10 +72,12 @@ public class FishingLocationLegalityChecker {
                 vessel.getEngine().getCruisingSpeed()
             );
 
-        return new DummyFishingAction(
-            currenDateTimeSupplier.get().plus(travelDuration),
+        return new FishingAction(
             vessel,
-            vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation)
+            currenDateTimeSupplier.get().plus(travelDuration),
+            Duration.ofSeconds(1),
+            vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation),
+            vessel.getGear()
         );
     }
 }

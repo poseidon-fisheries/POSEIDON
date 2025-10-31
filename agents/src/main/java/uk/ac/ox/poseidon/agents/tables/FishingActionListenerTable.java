@@ -26,7 +26,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
-import uk.ac.ox.poseidon.agents.behaviours.fishing.FishingAction;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,24 +20,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.behaviours.tasks.fishing;
 
-import lombok.*;
-import sim.util.Int2D;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.behaviours.tasks.VesselTask;
+import uk.ac.ox.poseidon.agents.regulations.FishingAction;
+import uk.ac.ox.poseidon.agents.regulations.Regulations;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+@RequiredArgsConstructor
+public class IsFishingHereAndNowLegal extends VesselTask {
 
-    public Destination asDestination() {
-        return new Destination(this, cell);
+    @NonNull private final Regulations regulations;
+
+    @Override
+    public Status execute() {
+        final FishingAction action = new FishingAction(getVessel());
+        return regulations.isPermitted(action) ? SUCCEEDED : FAILED;
     }
 
 }
-

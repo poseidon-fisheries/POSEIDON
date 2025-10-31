@@ -24,9 +24,12 @@ package uk.ac.ox.poseidon.agents.behaviours;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.time.Duration;
@@ -35,9 +38,13 @@ import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Getter
+@RequiredArgsConstructor
 public class Agent<A extends Agent<A>> implements Steppable {
 
     private static final int AGENT_BEHAVIOUR_ORDERING = 1;
+
+    private final @NonNull TemporalSchedule schedule;
+    private final @NonNull EventManager eventManager;
 
     private BehaviorTree<A> behaviour;
 
@@ -48,16 +55,18 @@ public class Agent<A extends Agent<A>> implements Steppable {
     @Override
     public void step(final SimState simState) {
         if (currentBehaviour == null || currentBehaviour.getStatus() != RUNNING) {
-            currentBehaviour = behaviour;
+            if (isActive())
+                currentBehaviour = behaviour;
+            else
+                currentBehaviour = null;
         }
         if (currentBehaviour != null) {
             currentBehaviour.step();
-            final TemporalSchedule temporalSchedule = ((TemporalSchedule) simState.schedule);
             if (currentBehaviour.getStatus() == RUNNING) {
                 checkNotNull(taskDuration);
-                temporalSchedule.scheduleOnceIn(taskDuration, this, AGENT_BEHAVIOUR_ORDERING);
+                schedule.scheduleOnceIn(taskDuration, this, AGENT_BEHAVIOUR_ORDERING);
             } else {
-                temporalSchedule.scheduleOnce(this, AGENT_BEHAVIOUR_ORDERING);
+                schedule.scheduleOnce(this, AGENT_BEHAVIOUR_ORDERING);
             }
         }
     }
@@ -69,13 +78,9 @@ public class Agent<A extends Agent<A>> implements Steppable {
     protected void mutate(final Runnable mutation) {
         final boolean previouslyActive = isActive();
         mutation.run();
-        if (!previouslyActive && isActive()) {
-            activate();
+        if (!previouslyActive && isActive() && currentBehaviour == null) {
+            schedule.scheduleOnce(this, AGENT_BEHAVIOUR_ORDERING);
         }
-    }
-
-    private void activate() {
-        // TODO: schedule this, but think of the consequences
     }
 
     public void setBehaviour(final BehaviorTree<A> behaviour) {
