@@ -38,15 +38,15 @@ import java.util.function.Supplier;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class WaitingTaskFactory extends VesselScopeFactory<Waiting> {
+public class WaitingTaskFactory extends VesselScopeFactory<Waiting<Vessel>> {
 
     private Factory<? extends Supplier<Duration>> durationSupplier;
 
     @Override
-    protected Waiting newInstance(
+    protected Waiting<Vessel> newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new Waiting(durationSupplier.get(simulation));
+        return new Waiting<>(durationSupplier.get(simulation));
     }
 }

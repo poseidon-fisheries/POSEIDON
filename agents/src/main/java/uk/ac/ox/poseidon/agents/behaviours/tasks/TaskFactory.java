@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,38 +20,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.travel;
+package uk.ac.ox.poseidon.agents.behaviours.tasks;
 
+import com.badlogic.gdx.ai.btree.Task;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sim.util.Int2D;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
-import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 @Getter
 @Setter
-@AllArgsConstructor
+@SuperBuilder
 @NoArgsConstructor
-public class TravellingAlongPathBehaviourFactory
-    extends VesselScopeFactory<TravellingAlongPath> {
+@AllArgsConstructor
+public abstract class TaskFactory<T extends Task<Vessel>> extends VesselScopeFactory<T> {
 
-    private Factory<? extends PathFinder<Int2D>> pathFinder;
-    private Factory<? extends DistanceCalculator> distance;
+    /*
+        TODO: there is no reason that task factories have to be _vessel_ scope instead of
+         some other object scope, besides the fact that ObjectScopeFactory is currently
+         abstract. If I was to fix this, we could make the whole "task factory" class
+         hierarchy more generic, but there is no immediate benefit since vessels are currently
+         the only agents in POSEIDON. Still, it would be a lot cleaner and open up nice
+         new possibilities if I could get around to it... -- NP 2025-10-31.
+     */
+
+    private VesselScopeFactory<? extends Task<Vessel>> guard;
+
+    protected abstract T newTask();
 
     @Override
-    protected TravellingAlongPath newInstance(
+    protected T newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new TravellingAlongPath(
-            pathFinder.get(simulation),
-            distance.get(simulation)
-        );
+        final T task = newTask();
+        if (guard != null) task.setGuard(guard.get(simulation, vessel));
+        return task;
     }
 }

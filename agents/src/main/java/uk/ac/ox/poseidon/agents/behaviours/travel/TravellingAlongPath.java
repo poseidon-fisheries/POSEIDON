@@ -22,95 +22,88 @@
 
 package uk.ac.ox.poseidon.agents.behaviours.travel;
 
+import com.badlogic.gdx.ai.btree.LeafTask;
+import com.badlogic.gdx.ai.btree.Task;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
-import uk.ac.ox.poseidon.agents.behaviours.SteppableAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 import java.text.MessageFormat;
-import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
-public class TravellingAlongPath implements Behaviour {
+public class TravellingAlongPath extends LeafTask<Vessel> {
 
     private final PathFinder<Int2D> pathFinder;
     private final DistanceCalculator distanceCalculator;
     private List<Int2D> currentPath;
 
     @Override
-    public SteppableAction nextAction(
-        final Vessel vessel,
-        final LocalDateTime dateTime
-    ) {
-        final Int2D destinationCell = checkNotNull(vessel.getDestination()).getCell();
-        if (currentPath != null) {
-            checkState(
-                currentPath.getLast().equals(destinationCell),
-                "Current path %s does not match current destination %s for vessel %s.",
-                currentPath,
-                destinationCell,
-                vessel
-            );
-        } else {
-            currentPath =
-                pathFinder
-                    .getPath(vessel.getCell(), destinationCell)
-                    .filter(path -> path.size() > 1)
-                    .map(path -> path.subList(1, path.size()))
-                    .orElseThrow(() -> new IllegalStateException(
-                        MessageFormat.format(
-                            "No path found from {0} to {1} for vessel {2}.",
-                            vessel.getCell(),
-                            destinationCell,
-                            vessel
-                        )
-                    ));
-        }
-        return new Action(vessel, dateTime);
+    public void resetTask() {
+        currentPath = null;
+        super.resetTask();
     }
 
-    @ToString(callSuper = true)
-    public class Action extends SteppableAction {
+    @Override
+    public void start() {
+        final Vessel vessel = getObject();
+        final Int2D destinationCell = checkNotNull(vessel.getDestination()).getCell();
+        currentPath =
+            pathFinder
+                .getPath(vessel.getCell(), destinationCell)
+                .orElseThrow(() -> new IllegalStateException(
+                    MessageFormat.format(
+                        "No path found from {0} to {1} for vessel {2}.",
+                        vessel.getCell(),
+                        destinationCell,
+                        vessel
+                    )
+                ));
+        super.start();
+    }
 
-        private Action(
-            final Vessel vessel,
-            final LocalDateTime start
-        ) {
-            super(
-                vessel,
-                start,
+    @Override
+    public Status execute() {
+        final Vessel vessel = getObject();
+        final Int2D destinationCell = checkNotNull(vessel.getDestination()).getCell();
+        checkState(
+            // TODO: consider whether we should reroute instead
+            currentPath.getLast().equals(destinationCell),
+            "Current path %s does not match current destination %s for vessel %s.",
+            currentPath,
+            destinationCell,
+            vessel
+        );
+
+        vessel.setCurrentCell(currentPath.getFirst());
+        currentPath = currentPath.subList(1, currentPath.size());
+        if (currentPath.isEmpty()) {
+            return SUCCEEDED;
+        } else {
+            final Int2D nextCell = currentPath.getFirst();
+            vessel.setHeadingTowards(nextCell);
+            vessel.setTaskDuration(
                 distanceCalculator.travelDuration(
                     vessel.getCell(),
-                    currentPath.getFirst(),
+                    nextCell,
                     vessel.getEngine().getCruisingSpeed()
                 )
             );
-        }
-
-        @Override
-        public void init() {
-            // this is purely for visualisation purposes
-            vessel.setHeadingTowards(currentPath.getFirst());
-        }
-
-        @Override
-        public void complete(final LocalDateTime dateTime) {
-            vessel.setCurrentCell(currentPath.getFirst());
-            if (currentPath.size() > 1) {
-                currentPath = currentPath.subList(1, currentPath.size());
-            } else {
-                currentPath = null;
-                vessel.popBehaviour();
-            }
+            return RUNNING;
         }
     }
+
+    @Override
+    protected Task<Vessel> copyTo(final Task<Vessel> task) {
+        throw new UnsupportedOperationException();
+    }
+
 }

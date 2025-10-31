@@ -31,6 +31,12 @@ import java.lang.reflect.InvocationTargetException;
 public abstract class VesselScopeFactory<C> extends ObjectScopeFactory<Vessel, C> {
 
     @Override
+    protected abstract C newInstance(
+        final Simulation simulation,
+        final Vessel vessel
+    );
+
+    @Override
     protected Integer makeKey(
         final Simulation simulation,
         final Vessel vessel

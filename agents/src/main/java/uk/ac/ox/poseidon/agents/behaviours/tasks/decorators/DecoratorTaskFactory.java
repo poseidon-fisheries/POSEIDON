@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,38 +20,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.travel;
+package uk.ac.ox.poseidon.agents.behaviours.tasks.decorators;
 
+import com.badlogic.gdx.ai.btree.Decorator;
+import com.badlogic.gdx.ai.btree.Task;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sim.util.Int2D;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.behaviours.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
-import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 @Getter
 @Setter
-@AllArgsConstructor
+@SuperBuilder
 @NoArgsConstructor
-public class TravellingAlongPathBehaviourFactory
-    extends VesselScopeFactory<TravellingAlongPath> {
+@AllArgsConstructor
+public abstract class DecoratorTaskFactory<T extends Decorator<Vessel>> extends TaskFactory<T> {
 
-    private Factory<? extends PathFinder<Int2D>> pathFinder;
-    private Factory<? extends DistanceCalculator> distance;
+    private VesselScopeFactory<? extends Task<Vessel>> child;
+
+    public DecoratorTaskFactory(
+        final VesselScopeFactory<? extends Task<Vessel>> guard,
+        final VesselScopeFactory<? extends Task<Vessel>> child
+    ) {
+        super(guard);
+        this.child = child;
+    }
 
     @Override
-    protected TravellingAlongPath newInstance(
+    protected T newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new TravellingAlongPath(
-            pathFinder.get(simulation),
-            distance.get(simulation)
-        );
+        final T task = super.newInstance(simulation, vessel);
+        task.addChild(child.get(simulation, vessel));
+        return task;
     }
 }
