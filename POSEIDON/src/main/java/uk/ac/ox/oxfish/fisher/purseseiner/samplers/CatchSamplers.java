@@ -6,18 +6,19 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CatchSamplers<B extends LocalBiology>
-    extends ForwardingMap<Class<? extends AbstractSetAction>, CatchSampler<B>> {
+    extends ForwardingMap<Object, CatchSampler<B>> {
 
-    private final Map<Class<? extends AbstractSetAction>, CatchSampler<B>> delegate;
+    private final Map<Object, CatchSampler<B>> delegate;
 
-    public CatchSamplers(final Map<Class<? extends AbstractSetAction>, CatchSampler<B>> delegate) {
+    public CatchSamplers(final Map<Object, CatchSampler<B>> delegate) {
         this.delegate = ImmutableMap.copyOf(delegate);
     }
 
     @Override
-    protected Map<Class<? extends AbstractSetAction>, CatchSampler<B>> delegate() {
+    protected Map<Object, CatchSampler<B>> delegate() {
         return delegate;
     }
 }

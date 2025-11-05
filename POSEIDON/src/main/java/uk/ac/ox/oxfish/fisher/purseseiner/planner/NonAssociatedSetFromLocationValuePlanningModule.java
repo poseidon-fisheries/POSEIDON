@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplers;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -15,16 +16,16 @@ import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
 
 public class NonAssociatedSetFromLocationValuePlanningModule<B extends LocalBiology>
     extends LocationValuePlanningModule<B> {
-
+    @SuppressWarnings({"unchecked","rawtypes"})
     NonAssociatedSetFromLocationValuePlanningModule(
         final LocationValues locationValues,
         final NauticalMap map,
         final MersenneTwisterFast random,
         final double additionalWaitTime,
-        final CatchSampler<B> sampler,
-        final CatchMaker<B> catchMaker,
+        final CatchSamplers<B> samplers,
+        final CatchMaker catchMaker,
         final GlobalBiology globalBiology,
-        final Class<B> localBiologyClass,
+        final Class localBiologyClass,
         final boolean canPoachFads,
         final int rangeInSeaTiles
     ) {
@@ -35,7 +36,7 @@ public class NonAssociatedSetFromLocationValuePlanningModule<B extends LocalBiol
                 map,
                 random,
                 additionalWaitTime,
-                sampler,
+                samplers,
                 catchMaker,
                 globalBiology,
                 localBiologyClass,

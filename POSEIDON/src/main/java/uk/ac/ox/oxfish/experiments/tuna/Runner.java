@@ -70,6 +70,7 @@ public final class Runner<S extends Scenario> {
     private static final String ANIMATION_OUTPUT_FILENAME = "animation_output.csv";
     private BufferedWriter animationWriter;
 
+
     private final Map<Path, AtomicBoolean> overwriteFiles = new HashMap<>();
 
     private final Supplier<? extends S> scenarioSupplier;
@@ -79,6 +80,7 @@ public final class Runner<S extends Scenario> {
     private boolean parallel = true;
     private boolean writeScenarioToFile = false;
     private boolean writeOutputForAnimation = false;
+    private boolean writeFadFateToFile = false;
     private CsvWriterSettings csvWriterSettings = new CsvWriterSettings();
     private Collection<Policy<? super S>> policies = ImmutableList.of(Policy.DEFAULT);
     private Consumer<? super State> beforeStartConsumer = __ -> {};
@@ -211,6 +213,7 @@ public final class Runner<S extends Scenario> {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
         }
         (parallel ? range.parallel() : range).forEach(i -> (parallel ? policies.parallelStream()
             : policies.stream()).forEach(policy -> {
@@ -220,6 +223,7 @@ public final class Runner<S extends Scenario> {
             if (writeScenarioToFile) writeScenarioToFile(state);
             beforeStartConsumer.accept(state);
             state.model.start();
+            if (writeFadFateToFile) state.getModel().getFadMap().initializeWriteFadFate(outputPath);
             afterStartConsumer.accept(state);
             final Multimap<Path, RowProvider> rowProviders = makeRowProviders(state);
             do {
@@ -228,6 +232,9 @@ public final class Runner<S extends Scenario> {
                 state.printStep();
                 state.model.schedule.step(state.model);
                 afterStepConsumer.accept(state);
+//                if(state.model.getStep()>365*2+10){
+//                    System.out.println("breakpt at"+state.model.getStep());
+//                }
             } while (state.model.getYear() < numYearsToRun);
             afterRunConsumer.accept(state);
             writeOutputs(runNumber, rowProviders, true);
@@ -466,5 +473,6 @@ public final class Runner<S extends Scenario> {
     public void setSaveAnimation(boolean saveAnimation){
             this.writeOutputForAnimation=saveAnimation;
     }
+    public void setSaveFadFate(boolean saveFadFate){this.writeFadFateToFile = saveFadFate;}
 
 }

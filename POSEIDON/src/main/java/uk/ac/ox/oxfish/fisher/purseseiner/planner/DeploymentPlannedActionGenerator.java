@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * this object exists to generate a new deployment action (probably to add to a plan)
@@ -35,7 +36,7 @@ public class DeploymentPlannedActionGenerator
 
     }
 
-    public PlannedAction.Deploy drawNewPlannedAction() {
+    public PlannedAction.Deploy drawNewPlannedAction(FishState model) {
         Preconditions.checkState(isReady(), "Did not start the deploy generator yet!");
         return new PlannedAction.Deploy(
             drawNewLocation(),

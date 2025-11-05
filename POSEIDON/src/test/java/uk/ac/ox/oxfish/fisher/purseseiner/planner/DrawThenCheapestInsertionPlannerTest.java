@@ -75,7 +75,7 @@ public class DrawThenCheapestInsertionPlannerTest {
         //you can take 1000 actions
         when(fakeModule.maximumActionsInAPlan(any(), any())).thenReturn(1000);
         //you will plan to go 5,0; 1,1; 2,2; 1,1 and from then 3,3 (which should not be selected)
-        when(fakeModule.chooseNextAction(any())).thenReturn(
+        when(fakeModule.chooseNextAction(fishState, any())).thenReturn(
             new PlannedAction.Fishing(map.getSeaTile(5, 0), 9),
             new PlannedAction.Fishing(map.getSeaTile(1, 1), 9),
             new PlannedAction.Fishing(map.getSeaTile(2, 2), 9),
@@ -137,7 +137,7 @@ public class DrawThenCheapestInsertionPlannerTest {
         //the fishing module always wants to fish at 10,10 (takes one hour)
         PlanningModule fakeModule = mock(PlanningModule.class);
         when(fakeModule.maximumActionsInAPlan(any(), any())).thenReturn(1000);
-        when(fakeModule.chooseNextAction(any())).thenReturn(
+        when(fakeModule.chooseNextAction(fishState, any())).thenReturn(
             new PlannedAction.Fishing(map.getSeaTile(10, 10), 0));
 
         //the deployment module always wants to deploy at 1,1

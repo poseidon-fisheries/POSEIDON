@@ -6,9 +6,11 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplers;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * generates a random dolphin deployment action
@@ -18,7 +20,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
 
     private final double additionalWaitTime;
 
-    private final CatchSampler<B> howMuchWeCanFishOutGenerator;
+    private final CatchSamplers<B> howMuchWeCanFishOutGenerator;
 
     private final CatchMaker<B> catchMaker;
 
@@ -30,7 +32,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
         final NauticalMap map,
         final MersenneTwisterFast random,
         final double additionalWaitTime,
-        final CatchSampler<B> howMuchWeCanFishOutGenerator,
+        final CatchSamplers<B> howMuchWeCanFishOutGenerator,
         final CatchMaker<B> catchMaker,
         final GlobalBiology biology,
         final Class<B> localBiologyClass
@@ -44,11 +46,22 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
     }
 
     @Override
-    public PA drawNewPlannedAction() {
+    public PA drawNewPlannedAction(final FishState model) {
         Preconditions.checkState(isReady(), "Did not start the deploy generator yet!");
+        String yearString = String.valueOf(model.getCalendarYear());
+        String keyString = howMuchWeCanFishOutGenerator.keySet().toArray()[0].toString();
+        for(Object key : howMuchWeCanFishOutGenerator.keySet()){
+            if(key.toString().contains(yearString)) {
+                keyString = key.toString();
+//                System.out.println("Found "+yearString + " among keystring:" + key.toString());
+                break;
+            }
+        }
+//        if(!keyString.contains(yearString)) System.out.println("Couldn't find "+yearString+". Using "+keyString);
+
         return
             turnSeaTilePickedIntoAction(
-                howMuchWeCanFishOutGenerator,
+                howMuchWeCanFishOutGenerator.get(keyString),
                 drawNewLocation(),
                 additionalWaitTime,
                 catchMaker,
@@ -76,7 +89,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
             final NauticalMap map,
             final MersenneTwisterFast random,
             final double additionalWaitTime,
-            final CatchSampler<B> howMuchWeCanFishOutGenerator,
+            final CatchSamplers<B> howMuchWeCanFishOutGenerator,
             final CatchMaker<B> catchMaker,
             final GlobalBiology globalBiology,
             final Class<B> localBiologyClass,
@@ -128,7 +141,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
             final NauticalMap map,
             final MersenneTwisterFast random,
             final double additionalWaitTime,
-            final CatchSampler<B> howMuchWeCanFishOutGenerator,
+            final CatchSamplers<B> howMuchWeCanFishOutGenerators,
             final CatchMaker<B> catchMaker,
             final GlobalBiology globalBiology,
             final Class<B> localBiologyClass,
@@ -140,7 +153,7 @@ public abstract class CatchSamplerPlannedActionGenerator<PA extends PlannedActio
                 map,
                 random,
                 additionalWaitTime,
-                howMuchWeCanFishOutGenerator,
+                howMuchWeCanFishOutGenerators,
                 catchMaker,
                 globalBiology,
                 localBiologyClass

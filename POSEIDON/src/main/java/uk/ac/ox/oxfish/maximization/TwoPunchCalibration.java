@@ -59,6 +59,8 @@ public class TwoPunchCalibration {
         final TunaEvaluator evaluator = new TunaEvaluator(localCalibrationFile, localSolution);
         evaluator.setNumRuns(10);
         evaluator.setParallel(false);
+        evaluator.setSimEventsAllYears(true);
+        evaluator.setWriteFadFates(true); //Turning this on by default
         evaluator.run();
     }
 
@@ -74,10 +76,11 @@ public class TwoPunchCalibration {
         firstStep.setParameterRange(15);
         firstStep.setRunNickName("global");
         firstStep.setPathToCalibrationYaml(calibrationFile.toAbsolutePath().toString());
+
+        // BP 8/11/2025 thinking about checkpointing the calibration process
         // If checkpoints==true, check the checkpoint file to see if (1) it exists and (2) if the last checkpoint was in
         // the middle of StepOne. If so initialize the population with the population in the bestGuesses file
         // and the maxfitnessCalls to maxGlobalCalls - roundNumber (something like that).
-
         return firstStep.generateCalibratorProblem().run();
     }
 

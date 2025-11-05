@@ -78,6 +78,7 @@ public abstract class AbstractFadSetAction
     ) {
         fad.reactToBeingFished(fishState, getFisher(), locationOfSet);
         // Nothing to do here since the biomass has already been removed from the ocean
+        fishState.getFadMap().recordFadEvent(fishState.getDate(), fad, "set(S)");
         fishState.getFadMap().destroyFad(fad);
         getFadManager(getFisher()).putFadBackInStock();
     }
@@ -91,6 +92,7 @@ public abstract class AbstractFadSetAction
         final SeaTile locationOfSet
     ) {
         fad.releaseFishIntoTile(fishState.getBiology().getSpecies(), locationOfSet.getBiology());
+        fishState.getFadMap().recordFadEvent(fishState.getDate(), fad, "set(F)");
         fishState.getFadMap().destroyFad(fad);
         getFadManager(getFisher()).putFadBackInStock();
     }

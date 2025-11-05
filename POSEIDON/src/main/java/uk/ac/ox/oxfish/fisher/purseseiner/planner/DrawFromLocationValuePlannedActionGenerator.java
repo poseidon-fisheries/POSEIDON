@@ -6,6 +6,7 @@ import org.apache.commons.math3.util.Pair;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.MTFApache;
 import uk.ac.ox.poseidon.common.api.Observer;
 
@@ -80,7 +81,7 @@ public abstract class DrawFromLocationValuePlannedActionGenerator<PA extends Pla
         }
     }
 
-    abstract public PA drawNewPlannedAction();
+    abstract public PA drawNewPlannedAction(final FishState model);
 
     SeaTile drawNewLocation() {
         if (originalLocationValues.getValues().isEmpty()) {

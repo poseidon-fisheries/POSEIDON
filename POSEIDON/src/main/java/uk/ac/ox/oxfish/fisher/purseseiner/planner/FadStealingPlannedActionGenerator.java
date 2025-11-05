@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.model.FishState;
 
 public class FadStealingPlannedActionGenerator extends
     DrawFromLocationValuePlannedActionGenerator<PlannedAction.OpportunisticFadSet> {
@@ -38,7 +39,7 @@ public class FadStealingPlannedActionGenerator extends
     }
 
     @Override
-    public PlannedAction.OpportunisticFadSet drawNewPlannedAction() {
+    public PlannedAction.OpportunisticFadSet drawNewPlannedAction(FishState model) {
         return new PlannedAction.OpportunisticFadSet(
             drawNewLocation(),
             hoursItTakesToSet,

@@ -27,8 +27,8 @@ public abstract class LocationValuePlanningModule<B extends LocalBiology>
     }
 
     @Override
-    public PlannedAction chooseNextAction(final Plan currentPlanSoFar) {
-        return generator.drawNewPlannedAction();
+    public PlannedAction chooseNextAction(final FishState model, final Plan currentPlanSoFar) {
+        return generator.drawNewPlannedAction(model);
     }
 
     @Override

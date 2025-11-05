@@ -31,7 +31,7 @@ import uk.ac.ox.oxfish.model.FisherStartable;
 public interface PlanningModule extends FisherStartable {
 
 
-    PlannedAction chooseNextAction(Plan currentPlanSoFar);
+    PlannedAction chooseNextAction(FishState model, Plan currentPlanSoFar);
 
     boolean isStarted();
 

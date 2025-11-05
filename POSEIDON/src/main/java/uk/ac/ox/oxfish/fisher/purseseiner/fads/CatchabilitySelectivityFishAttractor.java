@@ -114,8 +114,10 @@ public class CatchabilitySelectivityFishAttractor
             caughtHere.put(species, abundanceCaught);
 
             // if you are full, ignore it!
-            if (fad.getCarryingCapacity().isFull(fad, species))
+            if (fad.getCarryingCapacity().isFull(fad, species)){
+//                System.out.println("this FAD is full at "+ stream(fad.getBiomass()).sum() +" out of "+fad.getCarryingCapacity().getTotal());
                 continue;
+            }
 
             // start filling them up!
             final double[] catchabilityHere = catchabilityPerSpeciesSupplier.apply(fad);

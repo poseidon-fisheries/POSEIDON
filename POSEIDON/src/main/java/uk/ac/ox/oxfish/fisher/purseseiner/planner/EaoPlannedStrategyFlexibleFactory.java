@@ -176,7 +176,6 @@ public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<Plann
         final MersenneTwisterFast rng = state.getRandom();
         final MinimumSetValues minSetValues = minimumSetValues.apply(state);
         final Integer targetYear = getTargetYear().getValue();
-//        System.out.println("breakpt");
 
         return new PlannedStrategyProxy(
             uniqueCatchSamplerForEachStrategy.getValue()

@@ -48,7 +48,7 @@ public class DeploymentPlannedActionGeneratorTest {
         int timesWeDeployAt11 = 0;
 
         for (int draws = 0; draws < 100; draws++) {
-            final PlannedAction.Deploy plannedDeploy = generator.drawNewPlannedAction();
+            final PlannedAction.Deploy plannedDeploy = generator.drawNewPlannedAction(fishState);
             if (plannedDeploy.getLocation().getGridX() == 2 && plannedDeploy.getLocation().getGridY() == 2) {
                 timesWeDeployAt22++;
             } else {

@@ -27,6 +27,8 @@ import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.util.Collection;
 
+import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.getSetActionClass;
+
 public class AbundanceCatchSamplersFactory extends CatchSamplersFactory<AbundanceLocalBiology> {
 
     private AbundanceFiltersFactory abundanceFilters;
@@ -56,11 +58,15 @@ public class AbundanceCatchSamplersFactory extends CatchSamplersFactory<Abundanc
     @Override
     CatchSampler<AbundanceLocalBiology> makeCatchSampler(
         final FishState fishState,
-        final Class<? extends AbstractSetAction> actionClass,
+        final Object key,
         final Collection<Collection<Double>> sample,
         final MersenneTwisterFast rng
     ) {
-        return new AbundanceCatchSampler(sample, rng, abundanceFilters.apply(fishState).get(actionClass));
+        Class<? extends AbstractSetAction> setActionClass = getSetActionClass(key.toString().substring(0, 3));
+        //System.out.println("class = "+ setActionClass.toString());
+        return new AbundanceCatchSampler(sample, rng,
+            abundanceFilters.apply(fishState).get(setActionClass)
+        );
     }
 
 }

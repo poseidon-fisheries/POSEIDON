@@ -56,10 +56,9 @@ public class TunaEvaluator implements Runnable {
     private int numYearsToRuns = 3;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Consumer<Scenario>> scenarioConsumer = Optional.empty();
-
+    private boolean simEventsAllYears = false;
 
     private boolean parallel = false;
-
     private boolean completeOutput = true;
 
     public TunaEvaluator(final Path calibrationFilePath, final double[] solution) {
@@ -115,8 +114,6 @@ public class TunaEvaluator implements Runnable {
         runner.setSaveAnimation(saveAnimation);
     }
 
-
-
     public static void main(final String[] args) {
 
         // Finds the first argument that is a folder name and uses it as the calibration folder
@@ -166,16 +163,21 @@ public class TunaEvaluator implements Runnable {
             ))
         );
 
+        if(simEventsAllYears) runner.registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
+
+
+        //Run for n-1 runs without the final row providers
         final AtomicInteger runCounter = new AtomicInteger(1);
         runner.run(numYearsToRuns, numRuns - 1, runCounter);
-        runner.registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
-        runner.registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new);
 
+        if(!simEventsAllYears) runner.registerRowProvider("sim_action_events.csv", PurseSeineActionsLogger::new);
+        runner.registerRowProvider("sim_trip_events.csv", PurseSeineTripLogger::new);
         if (!boatsToTrack.isEmpty()) {
             registerFadAttractionEventProviders();
         }
-
         runner.registerRowProvider("sim_global_biomass.csv", GlobalBiomassLogger::new);
+
+        // Now the final run with the more recently added row providers
         runner.run(numYearsToRuns, 1, runCounter);
 
     }
@@ -257,6 +259,10 @@ public class TunaEvaluator implements Runnable {
         this.numRuns = numRuns;
     }
 
+    public void setSimEventsAllYears(final boolean simEventsAllYears){
+        this.simEventsAllYears = simEventsAllYears;
+    }
+
 
     public boolean isParallel() {
         return parallel;
@@ -274,10 +280,7 @@ public class TunaEvaluator implements Runnable {
         this.completeOutput = completeOutput;
     }
 
-    public void run(boolean saveAnimation) {
-
-
-
-
+    public void setWriteFadFates(boolean b) {
+        runner.setSaveFadFate(b);
     }
 }

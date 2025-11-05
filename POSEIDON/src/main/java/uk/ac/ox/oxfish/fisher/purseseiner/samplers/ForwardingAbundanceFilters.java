@@ -8,17 +8,17 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 import java.util.Map;
 
 public class ForwardingAbundanceFilters
-    extends ForwardingMap<Class<? extends AbstractSetAction>, Map<Species, NonMutatingArrayFilter>>
+    extends ForwardingMap<Object, Map<Species, NonMutatingArrayFilter>>
     implements AbundanceFilters {
 
-    private final Map<Class<? extends AbstractSetAction>, Map<Species, NonMutatingArrayFilter>> delegate;
+    private final Map<Object, Map<Species, NonMutatingArrayFilter>> delegate;
 
-    public ForwardingAbundanceFilters(final Map<Class<? extends AbstractSetAction>, Map<Species, NonMutatingArrayFilter>> delegate) {
+    public ForwardingAbundanceFilters(final Map<Object, Map<Species, NonMutatingArrayFilter>> delegate) {
         this.delegate = delegate;
     }
 
     @Override
-    protected Map<Class<? extends AbstractSetAction>, Map<Species, NonMutatingArrayFilter>> delegate() {
+    protected Map<Object, Map<Species, NonMutatingArrayFilter>> delegate() {
         return delegate;
     }
 }

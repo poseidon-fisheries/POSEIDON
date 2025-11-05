@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 public class WhereMoneyIsPlanningFactory extends PlanningModuleFactory<WhereMoneyIsPlanningModule> {
@@ -27,7 +28,6 @@ public class WhereMoneyIsPlanningFactory extends PlanningModuleFactory<WhereMone
         super(minimumSetValues, targetYear, discretization);
         this.valueWeight = valueWeight;
     }
-
 
     @Override
     protected WhereMoneyIsPlanningModule makePlanningModule(

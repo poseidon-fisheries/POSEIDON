@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.CatchMaker;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplers;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -21,7 +22,7 @@ public class DolphinSetFromLocationValuePlanningModule<B extends LocalBiology>
         final NauticalMap map,
         final MersenneTwisterFast random,
         final double additionalWaitTime,
-        final CatchSampler<B> sampler,
+        final CatchSamplers<B> samplers,
         final CatchMaker<B> catchMaker,
         final GlobalBiology globalBiology,
         final Class<B> localBiologyClass,
@@ -29,12 +30,12 @@ public class DolphinSetFromLocationValuePlanningModule<B extends LocalBiology>
     ) {
         super(
             locationValues,
-            new CatchSamplerPlannedActionGenerator.DolphinActionGenerator<>(
+            new CatchSamplerPlannedActionGenerator.DolphinActionGenerator<B>(
                 locationValues,
                 map,
                 random,
                 additionalWaitTime,
-                sampler,
+                samplers,
                 catchMaker,
                 globalBiology,
                 localBiologyClass,

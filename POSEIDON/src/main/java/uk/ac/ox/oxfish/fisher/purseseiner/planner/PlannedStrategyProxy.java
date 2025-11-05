@@ -1,13 +1,18 @@
 package uk.ac.ox.oxfish.fisher.purseseiner.planner;
 
+import com.google.common.collect.ImmutableListMultimap;
 import ec.util.MersenneTwisterFast;
+import edu.uci.ics.jung.algorithms.layout.AggregateLayout;
+import edu.uci.ics.jung.algorithms.util.MapBinaryHeap;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.biology.complicated.ImmutableAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.*;
+import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSamplers;
 import uk.ac.ox.oxfish.fisher.purseseiner.strategies.fields.LocationValues;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -23,9 +28,11 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -237,6 +244,11 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                     ActionType.DolphinSets,
                     actionWeight.getValue() * dolphinBias / (1 - dolphinBias)
                 );
+                CatchSamplers<? extends LocalBiology> catchSamplersCopy = new CatchSamplers<>(catchSamplers);
+                for(Object key : catchSamplersCopy.keySet()){
+                    if(!key.toString().contains(DolphinSetAction.class.toString())) catchSamplersCopy.remove(key);
+                }
+
                 planModules.put(
                     ActionType.DolphinSets,
                     new DolphinSetFromLocationValuePlanningModule(
@@ -244,7 +256,7 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                         model.getMap(),
                         model.getRandom(),
                         additionalHourlyDelayDolphinSets,
-                        catchSamplers.get(DolphinSetAction.class),
+                        catchSamplersCopy,
                         catchMaker,
                         model.getBiology(),
                         localBiologyClass, delSetsRangeInSeaTiles
@@ -284,6 +296,22 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                     ActionType.NonAssociatedSets,
                     actionWeight.getValue() * nonAssociatedBias / (1 - nonAssociatedBias)
                 );
+/*                Object samplerKey="NOA" + model.getCalendarYear();
+                if(!catchSamplers.containsKey(samplerKey)) {
+                    System.out.println("samplerKey "+samplerKey +" not found, using "+catchSamplers.keySet().toArray()[0]);
+                    samplerKey = catchSamplers.keySet().toArray()[0];
+                }
+//                CatchSampler<? extends LocalBiology> catchSampler =
+//                    catchSamplers.get(samplerKey);
+ */
+
+                // This should get rid of any that are not NOA. Later on we can just filter by year to pick the right
+                // sampler
+                CatchSamplers<? extends LocalBiology> catchSamplersCopy = new CatchSamplers<>(catchSamplers);
+                for(Object key : catchSamplersCopy.keySet()){
+                    if(!key.toString().contains("NOA")) catchSamplersCopy.remove(key);
+                }
+
                 planModules.put(
                     ActionType.NonAssociatedSets,
                     new NonAssociatedSetFromLocationValuePlanningModule(
@@ -291,7 +319,8 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
                         model.getMap(),
                         model.getRandom(),
                         additionalHourlyDelayNonAssociatedSets,
-                        catchSamplers.get(NonAssociatedSetAction.class),
+//                        catchSamplers.get(samplerKey),
+                        catchSamplersCopy,
                         catchMaker,
                         model.getBiology(),
                         localBiologyClass,
@@ -355,7 +384,6 @@ public class PlannedStrategyProxy implements FishingStrategy, DestinationStrateg
             );
         //(2) create the delegate
         delegate = new PlannedStrategy(planner, planningHorizonInHours, minimumValueOfSetOnOwnFad);
-
         delegate.start(model, fisher);
     }
 

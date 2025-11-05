@@ -56,7 +56,7 @@ public class DummyFishingPlanningModule implements PlanningModule {
     }
 
     @Override
-    public PlannedAction chooseNextAction(final Plan currentPlanSoFar) {
+    public PlannedAction chooseNextAction(FishState model, final Plan currentPlanSoFar) {
 
 
         for (int trial = 0; trial < MAXIMUM_NUMBER_OF_TRIES; trial++) {

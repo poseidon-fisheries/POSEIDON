@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.purseseiner.regulations;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.InputPath;
 import uk.ac.ox.oxfish.regulations.ForbiddenAreasFromShapeFiles;
 import uk.ac.ox.oxfish.regulations.ForbiddenIf;
@@ -33,7 +34,7 @@ public class DefaultEaoRegulations {
 
     public static AlgorithmFactory<Regulations> make(final InputPath inputFolder) {
         final InputPath regions = inputFolder.path("regions");
-        final List<Integer> yearsActive = ImmutableList.of(2021, 2022, 2023);
+        final List<Integer> yearsActive = ImmutableList.of(2021, 2022, 2023, 2024);
         final TemporalClosure closureA = new TemporalClosure(
             yearsActive,
             "closure A",
@@ -45,10 +46,13 @@ public class DefaultEaoRegulations {
             ImmutableMap.of(
                 "Active-FAD limits", new ActiveFadLimits(ACTIVE_FAD_LIMITS),
                 "Closure A", closureA,
-               "EEZs", new ForbiddenAreasFromShapeFiles(
+                "EEZs", new ForbiddenAreasFromShapeFiles(
                     regions,
                     regions.path("region_tags.csv")
-                )
+                ),
+                "BET TAC", new GlobalBetLimit(yearsActive, 16500)/*, // 16400 was roughly the 2022 catch.
+                "YFT TAC", new GlobalYftLimit(yearsActive, 110000) // 68428.59 is the portion of the legit 110000 TAC caught by BET in 2023
+*/
             )
         );
     }

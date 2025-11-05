@@ -19,6 +19,7 @@
 
 package uk.ac.ox.oxfish.fisher.purseseiner.actions;
 
+import sim.util.Double2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
@@ -26,6 +27,8 @@ import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+
+import java.util.Optional;
 
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.DPL;
 import static uk.ac.ox.oxfish.fisher.purseseiner.fads.FadManager.getFadManager;
@@ -52,9 +55,19 @@ public class FadDeploymentAction extends PurseSeinerAction implements FadRelated
         assert (fisher == getFisher());
         assert (fisher.getLocation() == getLocation());
         final FadManager fadManager = getFadManager(fisher);
-        this.fad = fadManager.deployFad(getLocation(), fishState.random);
-        setTime(hoursLeft);
-        fadManager.reactTo(this);
+        // Turning this off for now.
+//        Double2D tileCenter = new Double2D(getLocation().getGridX() + 0.5, getLocation().getGridY() + 0.5);
+//        Optional<Double2D> nextPos = fadManager.getFadMap().getDriftingObjectsMap().predictPosition(
+//            tileCenter,
+//            fishState.getStep(),
+//            30 //Yea? 30 days? forecast a straight line for 30 days?
+//        );
+//        if(nextPos.isPresent()){
+            this.fad = fadManager.deployFad(getLocation(), fishState.random);
+            fadManager.getFadMap().recordFadEvent(fishState.getDate(), this.fad, "deploy");
+            setTime(hoursLeft);
+            fadManager.reactTo(this);
+//        }
         return new ActionResult(new Arriving(), Math.max(0, hoursLeft - getDuration()));
     }
     

@@ -1,11 +1,13 @@
 package uk.ac.ox.oxfish.geography.fads;
 
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.caches.CacheByFishState;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.CarryingCapacitySupplier;
 import uk.ac.ox.oxfish.fisher.purseseiner.fads.Fad;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Map;
@@ -20,6 +22,7 @@ public abstract class FadInitializerFactory<
     private AlgorithmFactory<CarryingCapacitySupplier> carryingCapacitySupplier;
     private DoubleParameter daysInWaterBeforeAttraction;
     private Map<String, DoubleParameter> fishReleaseProbabilities;
+    private DoubleParameter minimumProportionFishReleased;
 
     FadInitializerFactory(
         final AlgorithmFactory<CarryingCapacitySupplier> carryingCapacitySupplier,
@@ -31,7 +34,24 @@ public abstract class FadInitializerFactory<
         this.catchabilities = catchabilities;
         this.fishReleaseProbabilities = fishReleaseProbabilities;
         this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
+        this.minimumProportionFishReleased= new CalibratedParameter(1.0) ;
     }
+
+    FadInitializerFactory(
+        final AlgorithmFactory<CarryingCapacitySupplier> carryingCapacitySupplier,
+        final Map<String, DoubleParameter> catchabilities,
+        final Map<String, DoubleParameter> fishReleaseProbabilities,
+        final DoubleParameter daysInWaterBeforeAttraction,
+        final DoubleParameter minimumProportionFishReleased
+    ) {
+        this.carryingCapacitySupplier = carryingCapacitySupplier;
+        this.catchabilities = catchabilities;
+        this.fishReleaseProbabilities = fishReleaseProbabilities;
+        this.daysInWaterBeforeAttraction = daysInWaterBeforeAttraction;
+        this.minimumProportionFishReleased = minimumProportionFishReleased ;
+    }
+
+
 
     FadInitializerFactory() {
     }
@@ -53,6 +73,10 @@ public abstract class FadInitializerFactory<
     public void setFishReleaseProbabilities(final Map<String, DoubleParameter> fishReleaseProbabilities) {
         this.fishReleaseProbabilities = fishReleaseProbabilities;
     }
+    public void setMinimumProportionFishReleased(DoubleParameter minimumProportionFishReleased){
+        this.minimumProportionFishReleased = minimumProportionFishReleased;
+    }
+
 
     @SuppressWarnings("WeakerAccess")
     public Map<String, DoubleParameter> getCatchabilities() {

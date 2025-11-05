@@ -19,6 +19,12 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -40,6 +46,10 @@ public class FadMap
     private final AbundanceLostObserver abundanceLostObserver = new AbundanceLostObserver();
     final private LinkedList<FadRemovalListener> removalListeners = new LinkedList<>();
     private Stoppable stoppable;
+    private boolean writeFadFateToFile=false;
+    private LocalDate currentDate;   // a little redundant, but can't think of a simpler way to have dates in the output file... BP 7/31/2025
+    private static final String FAD_FATE_FILENAME = "fad_fate.csv";
+    private BufferedWriter fadFateWriter;
 
     public FadMap(
         final NauticalMap nauticalMap,
@@ -82,6 +92,7 @@ public class FadMap
     public void step(final SimState simState) {
         final FishState fishState = (FishState) simState;
         driftingObjectsMap.applyDrift(fishState.getStep());
+        this.currentDate = fishState.getDate();
         allFads().forEach(fad -> {
             fad.reactToStep(fishState);
             final Optional<LocalBiology> seaTileBiology =
@@ -152,6 +163,7 @@ public class FadMap
                     // tile it previously occupied and then tell the drifting object map that the
                     // FAD should be removed (which will in turn trigger another call back to
                     // this function).
+                    recordFadEvent(currentDate, fad, "beach");
                     getSeaTile(oldLoc).ifPresent(seaTile ->
                         fad.releaseFishIntoTile(globalBiology.getSpecies(), seaTile.getBiology())
                     );
@@ -161,6 +173,7 @@ public class FadMap
                 // The FAD does not have a location anymore, either because is has drifted off
                 // the map or because it was explicitly removed. In that case, all that's left to
                 // do is to release the fish into the void and tell the FAD's owner about it.
+                recordFadEvent(currentDate, fad, "lost", oldLoc);
                 reactToLostFad(fad);
             }
         };
@@ -220,4 +233,57 @@ public class FadMap
         return stoppable != null;
     }
 
+    public void recordFadEvent(
+        LocalDate date,
+        Fad fad,
+        String event
+    )  {
+        if (fadFateWriter != null) {
+            try {
+                fadFateWriter.write(date.toString() + "," +
+                    fad.getId() + "," +
+                    event + "," +
+                    (fad.getLocation() == null ? "NA,NA\n" : fad.getCoordinate().x + "," +
+                        fad.getCoordinate().y + "\n"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void recordFadEvent(
+        LocalDate date,
+        Fad fad,
+        String event,
+        Double2D location  //location is grid coordinates, not latitude and longitude coordinates
+    ) {
+        if (fadFateWriter != null){
+            try {
+                fadFateWriter.write(date.toString() + "," +
+                    fad.getId() + "," +
+                    event + "," +
+                    location.getX() + "," +
+                    location.getY() + "\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+
+    public void initializeWriteFadFate(Path outputPath){
+        setWriteFadFateToFile(true);
+        try {
+            fadFateWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(String.valueOf(
+                outputPath.resolve(FAD_FATE_FILENAME)))));
+            fadFateWriter.write("date, fad_id, event, lon, lat\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setWriteFadFateToFile(boolean b) {
+        this.writeFadFateToFile = b;
+    }
 }

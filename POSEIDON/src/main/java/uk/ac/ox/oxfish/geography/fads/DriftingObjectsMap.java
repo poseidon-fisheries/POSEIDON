@@ -48,13 +48,24 @@ public class DriftingObjectsMap {
     }
 
 
+    //Predicts the new position by just scaling the currents by timeStepsOut - a straight line
+    public Optional<Double2D> predictPosition(final Double2D position, final int timeStep, final int timeStepsOut){
+//        Optional<Double2D> nextPosition = nextPosition(position, timeStep);
+//        Double2D scaledCurrent = currentVectors.getVector(timeStep, getGridLocation(position).get()).multiply(timeStepsOut);
+//        newPosition = position.add(scaledCurrent);
+//        if(timeStepsOut>1 && nextPosition.isPresent()) return predictPosition(nextPosition.get(), timeStep, timeStepsOut-1);
+//        else return nextPosition;
+//
+        return getGridLocation(position)
+            .map(gridLocation -> currentVectors.getVector(timeStep, gridLocation).multiply(timeStepsOut))
+            .map(position::add)
+            .filter(location -> inBounds(location, field));
+    }
+
     void applyDrift(final int timeStep) {
         for (final Object o : field.allObjects.toArray()) { // makes a copy, as objects can be removed
             final Double2D oldLoc = field.getObjectLocationAsDouble2D(o);
             final Optional<Double2D> newLoc = nextPosition(oldLoc, timeStep);
-//            if(field.getObjectIndex(o)==1){
-//                System.out.println("object moved from "+oldLoc +" to "+ newLoc);
-//            }
             if (newLoc.isPresent())
                 move(o, oldLoc, newLoc.get());
             else
@@ -64,7 +75,6 @@ public class DriftingObjectsMap {
 
     private Optional<Double2D> nextPosition(final Double2D position, final int timeStep) {
 //        System.out.println("Current at "+position+", "+getGridLocation(position)+", is "+ getGridLocation(position).map(gridLocation -> currentVectors.getVector(timeStep,gridLocation)));
-
         return getGridLocation(position)
             .map(gridLocation -> currentVectors.getVector(timeStep, gridLocation))
             .map(position::add)

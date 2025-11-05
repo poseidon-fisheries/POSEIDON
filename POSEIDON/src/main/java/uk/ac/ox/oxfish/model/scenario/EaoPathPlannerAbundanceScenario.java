@@ -46,7 +46,7 @@ public class EaoPathPlannerAbundanceScenario extends EaoAbundanceScenario {
                     new SelectivityAbundanceFadInitializerFactory(
                         new FixedGlobalCarryingCapacitySupplierFactory(
                             // 456t as a placeholder
-                            new FixedDoubleParameter(456_000)
+                            new FixedDoubleParameter(200000)
                         ),
                         getAbundanceFilters(),
                         new CalibratedParameter(
@@ -67,11 +67,11 @@ public class EaoPathPlannerAbundanceScenario extends EaoAbundanceScenario {
                                 "Temperature", new TemperatureMapFactory(
                                     getInputFolder().path("environmental_maps", "temperature2021_2024.csv"),
                                     365 * 3//
-                                ),
+                                )/*,
                                 "MixingLayerDepth", new MixingLayerMapFactory(
                                     getInputFolder().path("environmental_maps", "mixinglayerdepth.csv"),
                                     365 * 3//
-                                )
+                                )*/
                             )
                         )
                     ),

@@ -20,9 +20,9 @@ public class MixingLayerMapFactory extends EnvironmentalMapFactory {
             "MixingLayerDepth",
             gridFile,
             new IntegerParameter(mapPeriod),
-            new CalibratedParameter(30, 50, 0, 75, 26.5), // target
-            new CalibratedParameter(.25, .75, 0, 1), // penalty
-            new CalibratedParameter(5, 15, 1, 20, 10) // margin
+            new CalibratedParameter(25, 50, 0, 75, 26.5), // target
+            new CalibratedParameter(.05, .25, 0, 1), // penalty
+            new CalibratedParameter(25, 40, 1, 50, 10) // margin
         );
     }
 

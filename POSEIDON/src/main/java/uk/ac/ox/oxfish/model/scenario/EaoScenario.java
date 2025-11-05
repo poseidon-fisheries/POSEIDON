@@ -109,7 +109,7 @@ public abstract class EaoScenario<B extends LocalBiology>
         );
     private AlgorithmFactory<ScenarioPopulation> fleet = new EmptyFleet();
     private AlgorithmFactory<GroupedYearlyDistributions> empiricalCatchSizeDistributions =
-        new EmpiricalCatchSizeDistributionsFromFile(getInputFolder().path("catch_size_distributions.csv"));
+        new EmpiricalCatchSizeDistributionsFromFile(getInputFolder().path("catch_size_distributions_single.csv"));
 
     public static int dayOfYear(
         final int year,

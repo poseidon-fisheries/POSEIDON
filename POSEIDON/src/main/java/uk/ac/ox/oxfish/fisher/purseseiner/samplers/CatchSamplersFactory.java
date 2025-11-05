@@ -23,6 +23,7 @@ import com.google.common.collect.Ordering;
 import com.univocity.parsers.common.record.Record;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
@@ -34,6 +35,7 @@ import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
@@ -86,12 +88,16 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
 
     @Override
     public CatchSamplers<B> apply(final FishState fishState) {
+
+//        System.out.println("making catch samplers");
+
         final MersenneTwisterFast rng = checkNotNull(fishState).getRandom();
-        return new CatchSamplers<>(
+
+        CatchSamplers<B> catchSamplers = new CatchSamplers<>(
             recordStream(catchSamplesFile.get())
-                .filter(r -> r.getInt("year").equals(targetYear.getValue()))
+//                .filter(r -> r.getInt("year").equals(targetYear.getValue()))
                 .collect(toImmutableListMultimap(
-                    r -> getSetActionClass(r.getString("set_type")),
+                    r -> r.getString("set_type") + r.getString("year"),
                     r -> getBiomasses(r, fishState.getBiology())
                 ))
                 .asMap()
@@ -112,6 +118,9 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
                     }
                 ))
         );
+
+//        System.out.println("breakpt");
+        return catchSamplers;
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -138,7 +147,7 @@ public abstract class CatchSamplersFactory<B extends LocalBiology>
 
     abstract CatchSampler<B> makeCatchSampler(
         final FishState fishState,
-        final Class<? extends AbstractSetAction> actionClass,
+        final Object key,
         final Collection<Collection<Double>> sample,
         final MersenneTwisterFast rng
     );

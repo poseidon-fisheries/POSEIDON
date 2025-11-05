@@ -30,6 +30,7 @@ public class FadZapper implements Steppable, AdditionalStartable {
             fadMap.allFads().collect(toList()).stream()
                 .filter(validator)
                 .forEach(fad -> {
+                    fadMap.recordFadEvent(((FishState) simState).getDate(), fad, "expire");
                     fadMap.destroyFad(fad);
                     fad.releaseFishIntoTheVoid(((FishState) simState).getSpecies());
                 })

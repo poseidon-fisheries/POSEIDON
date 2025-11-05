@@ -10,7 +10,9 @@ import uk.ac.ox.oxfish.fisher.purseseiner.samplers.CatchSampler;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.poseidon.regulations.api.Regulations;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
@@ -30,8 +32,16 @@ public interface PlannedAction {
         final SeaTile location,
         final uk.ac.ox.poseidon.agents.api.Action action
     ) {
-//        System.out.println("permitted? "+fisher.grabState().getRegulations().isPermitted(action) );
-//        System.out.println("allowed to fish here? "+fisher.isAllowedToFishHere(location, fisher.grabState()) );
+/*        System.out.println(fisher.getID() + "trying to "+action.getCode()+"; permitted? "+fisher.grabState().getRegulations().isPermitted(action) );
+        Collection<Regulations> regs = fisher.grabState().getRegulations().getSubRegulations();
+        if(!fisher.grabState().getRegulations().isPermitted(action)){
+            System.out.println("why?");
+            for(Regulations reg :regs){
+
+            }
+        }
+        System.out.println("allowed to fish here? "+fisher.isAllowedToFishHere(location, fisher.grabState()) );
+*/
         return fisher.isAllowedAtSea() &&
             fisher.grabState().getRegulations().isPermitted(action) &&
             //we should be allowed to fish here
@@ -414,6 +424,7 @@ public interface PlannedAction {
         private Action turnToAction(final Fisher fisher) {
             final Entry<List<B>, Supplier<B>> entry =
                 getTargetBiologiesGrabber().grabTargetBiologiesAndAggregator(getLocation(), fisher);
+//            B applyingValue = entry.getValue().get();
             final B potentialCatch = howMuchWeCanFishOutGenerator.apply(entry.getValue().get());
             final List<B> targetBiologies = entry.getKey();
             return createSet(potentialCatch, targetBiologies, fisher, setDurationInHours, getLocation(), catchMaker);

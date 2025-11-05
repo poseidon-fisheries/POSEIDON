@@ -6,5 +6,5 @@ import uk.ac.ox.oxfish.fisher.purseseiner.actions.AbstractSetAction;
 
 import java.util.Map;
 
-public interface AbundanceFilters extends Map<Class<? extends AbstractSetAction>, Map<Species, NonMutatingArrayFilter>> {
+public interface AbundanceFilters extends Map<Object, Map<Species, NonMutatingArrayFilter>> {
 }

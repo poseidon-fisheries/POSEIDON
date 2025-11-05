@@ -303,7 +303,7 @@ public class DrawThenCheapestInsertionPlanner implements FisherStartable {
         if (stillAllowedActionsInPlan.get(nextActionType).intValue() <= 0)
             return planRecursively(currentPlan, hoursLeftInBudget, model, fisher);
 
-        final PlannedAction plannedAction = planningModule.chooseNextAction(currentPlan);
+        final PlannedAction plannedAction = planningModule.chooseNextAction(model, currentPlan);
 
         //if the planning module cannot propose more actions, ignore them for this plan
         if (plannedAction == null || (doNotWaitToPurgeIllegalActions && !plannedAction.isAllowedNow(fisher))) {

@@ -38,7 +38,7 @@ public abstract class DiscretizedOwnFadPlanningModule implements PlanningModule 
     }
 
     @Override
-    public PlannedAction chooseNextAction(final Plan currentPlanSoFar) {
+    public PlannedAction chooseNextAction(FishState model, final Plan currentPlanSoFar) {
 
 
         return chooseFadSet(
