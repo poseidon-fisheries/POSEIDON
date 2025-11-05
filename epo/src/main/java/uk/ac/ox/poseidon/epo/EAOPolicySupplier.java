@@ -13,6 +13,13 @@ import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+/**
+ * Created by Brian Powers 7/2025 for the Eastern Atlantic Tuna Model
+ *
+ * Basically a copy of the EPO Policy Supplier
+ * Should probably be generalized into a class that can be used for any scenario.
+ **/
+
 abstract class EAOPolicySupplier implements Supplier<List<Policy<EaoScenario<?>>>> {
 
     static final Policy<EaoScenario<?>> CURRENT_REGULATIONS = new Policy<>(

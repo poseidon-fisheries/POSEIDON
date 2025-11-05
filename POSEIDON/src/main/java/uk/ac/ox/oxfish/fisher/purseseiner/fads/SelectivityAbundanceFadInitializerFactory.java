@@ -107,6 +107,11 @@ public class SelectivityAbundanceFadInitializerFactory
                                     .get()
                                     .get(fadLocation.getGridX(), fadLocation.getGridY());
                             double valueDifference = abs(valueHere - target) - margin;
+
+                            /**
+                             * The penalty function was changed by Brian Powers in July 2025 in order to have a wider margin and a more
+                             * gradual slope down, but still the same flexibility as before.
+                             */
                             penaltyHere[i] *= (valueDifference > 0) ? 1 / pow(1 + (-valueDifference * log(1 - penalty)), 4) : 1;
 
                         }

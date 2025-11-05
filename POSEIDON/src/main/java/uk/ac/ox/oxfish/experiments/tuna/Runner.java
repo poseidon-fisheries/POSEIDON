@@ -67,6 +67,12 @@ public final class Runner<S extends Scenario> {
     private static final String POLICIES_FILENAME = "policies.csv";
     private static final String SCENARIOS_FOLDER = "scenarios";
 
+    /**
+     * The animation writer was added as an optional output to create a DATA FILE used with an R script
+     * to produce a lovely animation of FADs and vessels moving around.
+     * This output is rarely needed - only when a proof of concept is desired, mostly to just impress
+     * people with eye-candy.
+     */
     private static final String ANIMATION_OUTPUT_FILENAME = "animation_output.csv";
     private BufferedWriter animationWriter;
 

@@ -34,6 +34,10 @@ import java.util.stream.Stream;
  * This class is mostly a wrapper around the DriftingObjectsMap class, but it adds a couple bits of functionality: -
  * It's a MASON Steppable, which applies drift when stepped. - It has methods for deploying and removing FADs, setting
  * the appropriate callback in the former case.
+ *
+ * July 2025 - Brian Powers added the "FAD Fate Writer" to the mix.
+ * The FAD Fates indicate whether a FAD is successfully set on, failed, drifts off the map, is zapped, or is beached
+ * The FAD fates are output for analysis outside of POSEIDON
  */
 public class FadMap
     implements AdditionalStartable, Steppable {

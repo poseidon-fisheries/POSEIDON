@@ -7,6 +7,16 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.function.DoubleUnaryOperator;
 
+/**
+ * Species Blur added for EAO Project of 2025 by Brian Powers
+ * The Species blur can blur a certain proportion of each species's biomass under the water
+ * This portion of the fish are indistinguishable and are valued at an average price
+ *
+ * If the blur is at 0 then the echosounder perfectly differentiates tuna species for valuing the fad
+ * If the blur is at 1 then the echosounder just looks at total biomass under the FAD and applys an
+ * average price.
+ * This is calibrated to match behavior of the agents.
+ */
 public class UnreliableFishValueCalculatorFactory implements AlgorithmFactory<FishValueCalculator> {
     private AlgorithmFactory<? extends DoubleUnaryOperator> errorOperator;
     private DoubleParameter speciesBlur;

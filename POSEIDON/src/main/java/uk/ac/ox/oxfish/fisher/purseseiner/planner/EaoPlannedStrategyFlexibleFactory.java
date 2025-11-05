@@ -20,6 +20,19 @@ import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.FAD;
 import static uk.ac.ox.oxfish.fisher.purseseiner.actions.ActionClass.OFS;
 
+/**
+ * Created by Brian Powers 5/21/2025 for the Eastern Atlantic Tuna Model
+ *
+ * A factory to create Planned Strategies for the fishers in the Atlantic Tuna Model
+ * This is specific to the EAO model, and it is based on the EPO Plannd Strategy Flexible Factory
+ * No dolphin sets, so those modifiers are completely removed, however the Planned Strategy Proxy takes in zeroes for dolphin
+ * set parameters.
+ *
+ * Note that in an earlier version a "Free School Set" action was added but later removed because "Non Associated Set" was the same thing
+ *
+ **/
+
+
 public class EaoPlannedStrategyFlexibleFactory implements AlgorithmFactory<PlannedStrategyProxy>, Dummyable {
 
     private IntegerParameter targetYear;

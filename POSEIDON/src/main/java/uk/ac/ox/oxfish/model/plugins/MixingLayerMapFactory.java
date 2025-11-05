@@ -8,6 +8,12 @@ import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
+/*
+Factory to produce a MixingLayerDepth environmental parameter
+Created by Brian Powers 5/21/2025 for the Eastern Atlantic Tuna Model
+This environmental map works like others. It can be used in other fisheries as an environmental layer.
+ */
+
 public class MixingLayerMapFactory extends EnvironmentalMapFactory {
     public MixingLayerMapFactory() {
     }

@@ -59,6 +59,20 @@ import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.*;
 import static uk.ac.ox.oxfish.utility.Dummyable.maybeUseDummyData;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.entry;
 
+/**
+ * Created by Brian Powers 5/21/2025 for the Eastern Atlantic Tuna Model
+ *
+ * The Scenario that is the basis for the eastern atlantic tuna model.
+ *
+ * This is extended by the EAO Abundance Scenario, so more parameters are found there.
+ *
+ * The arbitrary boundary at 20 degrees west, separating the "west" and "east" regions is defined here
+ * this is used for calibrating the model strictly
+ *
+ * This is where most parameters that are purely environmental can be found since it is agnostic about how abundance and
+ * vessel behavior should work.
+ **/
+
 public abstract class EaoScenario<B extends LocalBiology>
     implements TestableScenario {
 

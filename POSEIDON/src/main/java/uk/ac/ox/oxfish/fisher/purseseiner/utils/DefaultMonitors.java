@@ -45,6 +45,12 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy.EVERY_YEAR;
 import static uk.ac.ox.oxfish.model.data.monitors.GroupingMonitor.*;
 
+/**
+ * Created by Brian Powers 5/21/2025 for the Eastern Atlantic Tuna Model
+ *
+ * This is a generic class based on the Default EPO Monitors to be used in any tuna fishery
+ **/
+
 @SuppressWarnings("rawtypes")
 public class DefaultMonitors {
 

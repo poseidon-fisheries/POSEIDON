@@ -18,6 +18,15 @@ import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
 import java.util.List;
 
+
+/**
+ * Created by Brian Powers 5/21/2025 for the Eastern Atlantic Tuna Model
+ *
+ * A Factory to create the Purse Seiner Fleet for the EAstern Atlantic Ocean Tuna fishery
+ * This basically takes in the input files defining the vessels and economic information, ports, and some other
+ * details for the production of the fleet (and the individual agents)
+ **/
+
 public class EaoPurseSeinerFleetFactory extends PurseSeinerFleetFactory {
     @SuppressWarnings("unused")
     public EaoPurseSeinerFleetFactory() {

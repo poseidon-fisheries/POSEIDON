@@ -1,5 +1,12 @@
 package uk.ac.ox.poseidon.epo;
 
+/**
+ * Created by Brian Powers 7/28/2025 for the Eastern Atlantic Tuna Model
+ *
+ * Basically a copy of the ActiveEPOFadLimitPolicies class
+ * This is tailored for the EAO Scenario though.
+ **/
+
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.experiments.tuna.Policy;
 import uk.ac.ox.oxfish.fisher.purseseiner.regulations.ActiveFadLimits;

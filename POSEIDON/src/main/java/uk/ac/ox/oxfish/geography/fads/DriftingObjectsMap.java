@@ -74,7 +74,6 @@ public class DriftingObjectsMap {
     }
 
     private Optional<Double2D> nextPosition(final Double2D position, final int timeStep) {
-//        System.out.println("Current at "+position+", "+getGridLocation(position)+", is "+ getGridLocation(position).map(gridLocation -> currentVectors.getVector(timeStep,gridLocation)));
         return getGridLocation(position)
             .map(gridLocation -> currentVectors.getVector(timeStep, gridLocation))
             .map(position::add)

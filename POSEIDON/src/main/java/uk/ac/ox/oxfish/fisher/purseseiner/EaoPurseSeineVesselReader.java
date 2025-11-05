@@ -53,6 +53,13 @@ import static tech.units.indriya.unit.Units.*;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.recordStream;
 
+/**
+ * Created by Brian Powers 5/21/2025 for the Eastern Atlantic Tuna Model
+ *
+ * This is simply a copy of the EPO PS vessel reader, but it's modified with some
+ * specifics to the EAO.
+ **/
+
 public class EaoPurseSeineVesselReader implements AlgorithmFactory<List<Fisher>> {
 
     private final Path vesselsFilePath;
@@ -101,7 +108,10 @@ public class EaoPurseSeineVesselReader implements AlgorithmFactory<List<Fisher>>
         fisher.refreshTagSet();
     }
 
-
+/**
+ * The model does not differentiate classes so all vessels have class PS, to indicate which regulations
+ * apply to them.
+ **/
     private static String capacityClass(final Fisher fisher) {
         return "class PS";
 /*        final long t = Math.round(fisher.getMaximumHold() / 1000);

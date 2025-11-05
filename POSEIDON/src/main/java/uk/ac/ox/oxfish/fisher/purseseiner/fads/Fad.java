@@ -53,6 +53,11 @@ public abstract class Fad implements Locatable {
     final private int stepDeployed;
     final private Int2D locationDeployed;
     final private double fishReleaseProbability;
+
+    /**
+     * For future use - a pre-planned timestep in the simualtion when the FAD's GPS transmitter is activated
+     * This is not implemented yet, but it paves the way for strategic FAD activation on the part of agents
+     */
     final private int stepGPSActive;
 
     final private Map<Species, Double> fishReleaseProbabilities;

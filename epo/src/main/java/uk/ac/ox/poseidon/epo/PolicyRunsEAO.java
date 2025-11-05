@@ -22,6 +22,13 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.toList;
 
+/**
+ * Created by Brian Powers 7/28/2025 for the Eastern Atlantic Tuna Model
+ * This class details which policies to run
+ * It is meant to be modified. Probably would be better if the policies were detailed in an external file and read into this,
+ * but that is later work.
+ **/
+
 public class PolicyRunsEAO {
 
     private static final Logger logger = Logger.getLogger(PolicyRunsEAO.class.getName());

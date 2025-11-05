@@ -32,16 +32,6 @@ public interface PlannedAction {
         final SeaTile location,
         final uk.ac.ox.poseidon.agents.api.Action action
     ) {
-/*        System.out.println(fisher.getID() + "trying to "+action.getCode()+"; permitted? "+fisher.grabState().getRegulations().isPermitted(action) );
-        Collection<Regulations> regs = fisher.grabState().getRegulations().getSubRegulations();
-        if(!fisher.grabState().getRegulations().isPermitted(action)){
-            System.out.println("why?");
-            for(Regulations reg :regs){
-
-            }
-        }
-        System.out.println("allowed to fish here? "+fisher.isAllowedToFishHere(location, fisher.grabState()) );
-*/
         return fisher.isAllowedAtSea() &&
             fisher.grabState().getRegulations().isPermitted(action) &&
             //we should be allowed to fish here
@@ -93,7 +83,6 @@ public interface PlannedAction {
 
         @Override
         public Action[] actuate(final Fisher fisher) {
- //           System.out.println("Fisher "+fisher.getID()+" deploying a FAD. "+fisher.getDailyData().getLatestObservation("Number of active FADs"));
             return delayInHours <= 0
                 ? new Action[]{new FadDeploymentAction(fisher)}
                 : new Action[]{new FadDeploymentAction(fisher), new Delaying(delayInHours)};
@@ -101,10 +90,6 @@ public interface PlannedAction {
 
         @Override
         public boolean isAllowedNow(final Fisher fisher) {
-//            if(!fisher.isAllowedAtSea())
-//                System.out.println("not Allowed at Sea.");
-//            if(fisher.grabState().getRegulations().isForbidden(new FadDeploymentAction(fisher)))
-//                System.out.println("not allowed to deploy here");
 
             return fisher.isAllowedAtSea() &&
                 !fisher.grabState()
@@ -424,7 +409,6 @@ public interface PlannedAction {
         private Action turnToAction(final Fisher fisher) {
             final Entry<List<B>, Supplier<B>> entry =
                 getTargetBiologiesGrabber().grabTargetBiologiesAndAggregator(getLocation(), fisher);
-//            B applyingValue = entry.getValue().get();
             final B potentialCatch = howMuchWeCanFishOutGenerator.apply(entry.getValue().get());
             final List<B> targetBiologies = entry.getKey();
             return createSet(potentialCatch, targetBiologies, fisher, setDurationInHours, getLocation(), catchMaker);

@@ -25,6 +25,17 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedParameterTableFromFile;
 
+/**
+ * Created by Brian Powers 5/21/2025 for the Eastern Atlantic Tuna Model
+ *
+ * The Path Planner Scenario - the only behavior model developed for the Eastern Atlantic Ocean.
+ * This is based on the EPO Path Planner Abundance Scenario
+ *
+ * Mixing Layer Depth may be added back in easily
+ * This class has the option of four different FAD modules to choose from below, all of which work for the Fishery
+ *
+ **/
+
 public class EaoPathPlannerAbundanceScenario extends EaoAbundanceScenario {
 
     private AbundanceFiltersFactory abundanceFilters =

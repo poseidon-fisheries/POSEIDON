@@ -5,6 +5,14 @@ import uk.ac.ox.oxfish.utility.parameters.CalibratedParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.IntegerParameter;
 
+/**
+ * Modified by Brian Powers 7/2025 for the Eastern Atlantic Tuna Model
+ *
+ * The big change added is that this class can take in a different margin & target for each species. Many more parameters for added flexibility.
+ * There is a better way to implement this, for future work to clean up the code - but it gets the job done.
+ **/
+
+
 public class TemperatureMapFactory extends EnvironmentalMapFactory {
     public TemperatureMapFactory() {
     }

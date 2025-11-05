@@ -18,6 +18,15 @@ import java.util.Map;
 
 import static java.time.Month.*;
 
+/**
+ * Created by Brian Powers 5/21/2025 for the Eastern Atlantic Tuna Model
+ *
+ * Regulations specific to the Eastern Atlantic Ocean Purse Seine tuna fishers.
+ * These include the FAD closure at the end of the year, Active FAD limits, EEZs and the rectangular
+ * area in the south-west which is off Brazil's coast determined to not be within the scope of the project.
+ * A TAC on Bigeye is also included in the regulations
+ **/
+
 public class DefaultEaoRegulations {
 
     public static final Map<Integer, Map<String, Integer>> ACTIVE_FAD_LIMITS = ImmutableMap.of(

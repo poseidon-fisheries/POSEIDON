@@ -25,7 +25,12 @@ import uk.ac.ox.oxfish.biology.tuna.RecruitmentProcessesFactory;
 import uk.ac.ox.oxfish.geography.fads.AbundanceFadMapFactory;
 
 /**
+ * Created by Brian Powers 5/21/2025 for the Eastern Atlantic Tuna Model
+ *
  * An age-structured scenario for purse-seine fishing in the Eastern Atlantic Ocean.
+ * Based on the EpoAbundanceScenario
+ * Mostly this points to all of the input files needed to create the scenario.
+ * This is extended by the EaoPathPlannerAbundanceScenario, so more parameters are found there.
  */
 public class EaoAbundanceScenario extends EaoScenario<AbundanceLocalBiology> {
 
