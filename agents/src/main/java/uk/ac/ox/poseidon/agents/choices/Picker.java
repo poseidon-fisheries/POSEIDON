@@ -20,20 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.*;
-import sim.util.Int2D;
+import java.util.Optional;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
-
-    private final String code;
-    private final String name;
-    private final Int2D cell;
-
+@FunctionalInterface
+public interface Picker<O> {
+    Optional<O> pick();
 }
-

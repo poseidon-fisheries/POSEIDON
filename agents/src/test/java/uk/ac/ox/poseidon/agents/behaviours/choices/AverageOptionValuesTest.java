@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.behaviours.choices;
 import ec.util.MersenneTwisterFast;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.choices.AverageOptionValues;
 
 import java.util.List;
 import java.util.Optional;

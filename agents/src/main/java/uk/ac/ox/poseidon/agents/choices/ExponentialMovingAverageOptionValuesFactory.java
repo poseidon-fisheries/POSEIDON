@@ -20,20 +20,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.*;
-import sim.util.Int2D;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ExponentialMovingAverageOptionValuesFactory<O> extends VesselScopeFactory<MutableOptionValues<O>> {
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+    private double alpha;
 
+    @Override
+    protected MutableOptionValues<O> newInstance(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
+        return new ExponentialMovingAverageOptionValues<>(alpha);
+    }
 }
-

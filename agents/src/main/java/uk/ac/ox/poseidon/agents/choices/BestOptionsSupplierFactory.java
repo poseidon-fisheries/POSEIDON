@@ -20,20 +20,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.*;
-import sim.util.Int2D;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.ac.ox.poseidon.agents.registers.Register;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Simulation;
+
+import java.util.function.Supplier;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class BestOptionsSupplierFactory<O>
+    extends VesselScopeFactory<Supplier<OptionValues<O>>> {
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+    Factory<? extends Register<? extends OptionValues<O>>> optionValuesRegister;
 
+    @Override
+    protected Supplier<OptionValues<O>> newInstance(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
+        return new BestOptionsSupplier<>(
+            vessel,
+            optionValuesRegister.get(simulation)
+        );
+    }
 }
-

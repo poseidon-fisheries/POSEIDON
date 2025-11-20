@@ -25,6 +25,8 @@ package uk.ac.ox.poseidon.core;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -32,6 +34,8 @@ import java.util.concurrent.ExecutionException;
 
 import static com.google.common.cache.CacheLoader.from;
 
+@SuperBuilder
+@NoArgsConstructor
 public abstract class ObjectScopeFactory<O, C> {
 
     protected final transient List<Method> readMethods = AbstractFactory.readMethods(this);

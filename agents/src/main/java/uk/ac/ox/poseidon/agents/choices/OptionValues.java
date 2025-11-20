@@ -20,20 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.*;
-import sim.util.Int2D;
+import ec.util.MersenneTwisterFast;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Optional;
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+public interface OptionValues<O> {
 
+    Optional<Double> getValue(O option);
+
+    List<O> getBestOptions();
+
+    Optional<O> getBestOption(MersenneTwisterFast rng);
+
+    Optional<Double> getBestValue();
+
+    List<Entry<O, Double>> getBestEntries();
+
+    Optional<Entry<O, Double>> getBestEntry(MersenneTwisterFast rng);
 }
-

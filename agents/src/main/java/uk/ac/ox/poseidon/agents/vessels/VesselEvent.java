@@ -22,12 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import com.badlogic.gdx.ai.btree.BehaviorTree;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.poseidon.agents.behaviours.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
@@ -60,7 +60,7 @@ public class VesselEvent implements Steppable {
     @NonNull String portCode;
     @NonNull Map<String, Object> tags;
 
-    @NonNull Function<Vessel, Behaviour> initialBehaviourFactoryFunction;
+    @NonNull Function<Vessel, BehaviorTree<Vessel>> initialBehaviourFactoryFunction;
     @NonNull Function<Vessel, Hold> holdFactoryFunction;
     @NonNull Function<Vessel, Gear> gearFactoryFunction;
     @NonNull Function<Vessel, Engine> engineFactoryFunction;
@@ -81,7 +81,7 @@ public class VesselEvent implements Steppable {
         vessel.setHomePort(port.orElse(null));
         vessel.setName(vesselName);
         tags.forEach(vessel::putTag);
-        vessel.setRootBehaviour(initialBehaviourFactoryFunction.apply(vessel));
+        vessel.setBehaviour(initialBehaviourFactoryFunction.apply(vessel));
         vessel.setHold(holdFactoryFunction.apply(vessel));
         vessel.setGear(gearFactoryFunction.apply(vessel));
         vessel.setEngine(engineFactoryFunction.apply(vessel));

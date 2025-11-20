@@ -20,20 +20,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.tasks.travel;
 
-import lombok.*;
-import sim.util.Int2D;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.tasks.ExtendedTask;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+import java.time.Duration;
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+import static lombok.AccessLevel.PACKAGE;
+
+@RequiredArgsConstructor(access = PACKAGE)
+public class TravelDirectly extends ExtendedTask {
+
+    private final DistanceCalculator distanceCalculator;
+
+    @Override
+    protected Duration getDuration() {
+        return distanceCalculator.travelDuration(
+            getVessel().getCell(),
+            getVessel().getDestination(),
+            getVessel().getEngine().getCruisingSpeed()
+        );
+    }
+
+    @Override
+    protected Status complete() {
+        getVessel().setCurrentCell(getVessel().getDestination());
+        return SUCCEEDED;
+    }
 
 }
-

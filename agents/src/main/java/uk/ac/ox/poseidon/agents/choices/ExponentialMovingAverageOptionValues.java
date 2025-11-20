@@ -20,20 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.*;
-import sim.util.Int2D;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+class ExponentialMovingAverageOptionValues<T> extends HashMapBasedOptionValues<T> {
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+    private final double alpha;
+
+    ExponentialMovingAverageOptionValues(final double alpha) {
+        this.alpha = checkUnitRange(alpha, "alpha");
+    }
+
+    @Override
+    protected double newValue(
+        final T option,
+        final double oldValue,
+        final double observedValue
+    ) {
+        return oldValue * (1 - alpha) + observedValue * alpha;
+    }
 
 }
-

@@ -20,20 +20,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.tasks.general;
 
-import lombok.*;
-import sim.util.Int2D;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.tasks.ExtendedTask;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+import java.time.Duration;
+import java.util.function.Supplier;
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+
+@RequiredArgsConstructor
+public class Wait extends ExtendedTask {
+
+    final Supplier<Duration> durationSupplier;
+
+    @Override
+    protected Duration getDuration() {
+        return durationSupplier.get();
+    }
+
+    @Override
+    protected Status complete() {
+        return SUCCEEDED;
+    }
 
 }
-

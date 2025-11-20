@@ -20,20 +20,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.*;
-import sim.util.Int2D;
+import com.google.common.collect.ImmutableMap;
+import lombok.Getter;
+
+import java.util.Map;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+public class ImmutableOptionValues<O> extends MapBasedOptionValues<O> {
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+    private final ImmutableMap<O, Double> values;
+
+    ImmutableOptionValues(final Map<O, Double> values) {
+        this.values = ImmutableMap.copyOf(values);
+    }
 
 }
-

@@ -22,13 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 import lombok.*;
 import org.apache.commons.beanutils.PropertyUtils;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
-import uk.ac.ox.poseidon.agents.behaviours.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
@@ -83,7 +83,7 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
     @Builder.Default private List<String> modificationEventCodes =
         List.of("MOD");
 
-    private BehaviourFactory<?> initialBehaviour;
+    private VesselScopeFactory<? extends BehaviorTree<Vessel>> behaviour;
     private VesselScopeFactory<? extends Hold> hold;
     private VesselScopeFactory<? extends Gear> gear;
     private VesselScopeFactory<? extends Engine> engine;
@@ -164,7 +164,7 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
             row.getString(vesselNameColumn),
             row.getString(portCodeColumn),
             makeTags(row),
-            makeFactoryFunction(simulation, valuesFromRow, dataMappings, initialBehaviour),
+            makeFactoryFunction(simulation, valuesFromRow, dataMappings, behaviour),
             makeFactoryFunction(simulation, valuesFromRow, dataMappings, hold),
             makeFactoryFunction(simulation, valuesFromRow, dataMappings, gear),
             makeFactoryFunction(simulation, valuesFromRow, dataMappings, engine)

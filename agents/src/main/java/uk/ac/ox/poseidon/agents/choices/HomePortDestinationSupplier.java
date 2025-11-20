@@ -20,20 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.*;
+import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+import java.util.Optional;
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+import static lombok.AccessLevel.PACKAGE;
 
+@RequiredArgsConstructor(access = PACKAGE)
+class HomePortDestinationSupplier implements DestinationSupplier {
+
+    private final Vessel vessel;
+    private final PortGrid portGrid;
+
+    @Override
+    public Optional<Int2D> get() {
+        return Optional.of(portGrid.getLocation(vessel.getHomePort()));
+    }
 }
-

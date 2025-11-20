@@ -20,20 +20,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.tasks.general;
 
-import lombok.*;
-import sim.util.Int2D;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Simulation;
+
+import java.time.Duration;
+import java.util.function.Supplier;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class WaitFactory extends TaskFactory<Wait> {
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+    private Factory<? extends Supplier<Duration>> durationSupplier;
+
+    @Override
+    protected Wait newTask(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
+        return new Wait(durationSupplier.get(simulation));
+    }
 
 }
-

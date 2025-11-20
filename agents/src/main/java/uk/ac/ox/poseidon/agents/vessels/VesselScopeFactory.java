@@ -22,12 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ObjectScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 import java.lang.reflect.InvocationTargetException;
 
+@SuperBuilder
+@NoArgsConstructor
 public abstract class VesselScopeFactory<C> extends ObjectScopeFactory<Vessel, C> {
 
     @Override

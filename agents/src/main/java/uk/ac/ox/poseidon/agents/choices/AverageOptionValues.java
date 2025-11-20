@@ -20,20 +20,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.*;
-import sim.util.Int2D;
+import lombok.NoArgsConstructor;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+import java.util.HashMap;
+import java.util.Map;
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+import static lombok.AccessLevel.PACKAGE;
+
+@NoArgsConstructor(access = PACKAGE)
+class AverageOptionValues<T> extends HashMapBasedOptionValues<T> {
+
+    private final Map<T, Integer> counts = new HashMap<>();
+
+    @Override
+    protected double newValue(
+        final T option,
+        final double oldValue,
+        final double observedValue
+    ) {
+        final int count = counts.getOrDefault(option, 0);
+        counts.put(option, count + 1);
+        return (count * oldValue + observedValue) / (count + 1);
+    }
 
 }
-

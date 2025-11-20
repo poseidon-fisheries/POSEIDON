@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,20 +20,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.tasks;
 
-import lombok.*;
-import sim.util.Int2D;
+import lombok.RequiredArgsConstructor;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+import java.time.Duration;
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
+
+@RequiredArgsConstructor
+public abstract class ExtendedTask extends VesselTask {
+
+    @Override
+    public Status execute() {
+        if (getStatus() == RUNNING)
+            return complete();
+        else {
+            getObject().setTaskDuration(getDuration());
+            return RUNNING;
+        }
+    }
+
+    protected abstract Duration getDuration();
+
+    protected abstract Status complete();
 
 }
-

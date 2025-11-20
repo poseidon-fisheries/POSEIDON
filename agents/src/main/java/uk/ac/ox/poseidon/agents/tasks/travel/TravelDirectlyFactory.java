@@ -20,20 +20,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.agents.tasks.travel;
 
-import lombok.*;
-import sim.util.Int2D;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@ToString
-@EqualsAndHashCode
-public class Port {
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class TravelDirectlyFactory
+    extends VesselScopeFactory<TravelDirectly> {
 
-    private final String code;
-    private final String name;
-    private final Int2D cell;
+    private Factory<? extends DistanceCalculator> distance;
 
+    @Override
+    protected TravelDirectly newInstance(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
+        return new TravelDirectly(distance.get(simulation));
+    }
 }
-
