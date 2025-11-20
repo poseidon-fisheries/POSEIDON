@@ -48,7 +48,7 @@ import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
-import static uk.ac.ox.poseidon.agents.vessels.VesselEvent.Type.*;
+import static uk.ac.ox.poseidon.agents.vessels.FleetEvent.Type.*;
 
 @Getter
 @Setter
@@ -107,14 +107,14 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
     @Override
     protected Fleet newInstance(final Simulation simulation) {
         final Fleet fleet = this.fleet.get(simulation);
-        final List<Entry<LocalDateTime, VesselEvent>> eventByDateTime =
+        final List<Entry<LocalDateTime, FleetEvent>> eventByDateTime =
             data.get(simulation)
                 .stream()
                 .map(row -> {
                     final LocalDateTime dateTime = row.getDate(eventDateColumn).atStartOfDay();
                     return entry(
                         dateTime,
-                        makeEvent(simulation, dateTime, row, fleet)
+                        makeUpdate(simulation, dateTime, row, fleet)
                     );
                 })
                 .toList();
@@ -142,7 +142,7 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
         }
     }
 
-    private VesselEvent makeEvent(
+    private FleetEvent makeUpdate(
         final Simulation simulation,
         final LocalDateTime dateTime,
         final Row row,
@@ -156,7 +156,7 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
                 .stream()
                 .distinct()
                 .collect(toMap(identity(), row::getObject));
-        return new VesselEvent(
+        return new FleetEvent(
             dateTime,
             fleet,
             eventType(row.getString(eventCodeColumn)),
@@ -193,7 +193,7 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
         return Collections.unmodifiableMap(tags);
     }
 
-    private VesselEvent.Type eventType(final String eventCode) {
+    private FleetEvent.Type eventType(final String eventCode) {
         if (activationEventCodes.contains(eventCode))
             return ACTIVATION;
         else if (deactivationEventCodes.contains(eventCode))

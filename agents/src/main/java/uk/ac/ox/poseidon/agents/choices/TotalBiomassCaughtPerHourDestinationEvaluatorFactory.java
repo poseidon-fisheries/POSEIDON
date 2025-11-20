@@ -27,7 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
+import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
@@ -56,7 +56,7 @@ public class TotalBiomassCaughtPerHourDestinationEvaluatorFactory
     private static class Evaluation implements uk.ac.ox.poseidon.agents.choices.Evaluation {
 
         private final CombiningEphemeralAccumulatingListener
-            <FishingAction, Double, Action, Double, Double> listener;
+            <FishingEvent, Double, Action, Double, Double> listener;
 
         private Evaluation(
             final PortGrid portGrid,
@@ -64,7 +64,7 @@ public class TotalBiomassCaughtPerHourDestinationEvaluatorFactory
         ) {
             listener = new CombiningEphemeralAccumulatingListener<>(
                 vessel.getEventManager(),
-                FishingAction.class,
+                FishingEvent.class,
                 0.0,
                 (caughtSoFar, fishingAction) -> caughtSoFar +
                     fishingAction.getDisposition().getRetained().getTotalBiomass().asKg(),

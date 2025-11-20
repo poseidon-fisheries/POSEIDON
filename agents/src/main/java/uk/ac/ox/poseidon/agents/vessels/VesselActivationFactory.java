@@ -43,7 +43,7 @@ import static java.util.stream.Collectors.toMap;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VesselActivationFactory extends SimulationScopeFactory<VesselEvent> {
+public class VesselActivationFactory extends SimulationScopeFactory<FleetEvent> {
 
     private Factory<? extends Fleet> fleet;
 
@@ -57,7 +57,7 @@ public class VesselActivationFactory extends SimulationScopeFactory<VesselEvent>
     private VesselScopeFactory<? extends Engine> engine;
 
     @Override
-    protected VesselEvent newInstance(final Simulation simulation) {
+    protected FleetEvent newInstance(final Simulation simulation) {
         final Map<String, Object> tags = this.tags
             .entrySet()
             .stream()
@@ -65,10 +65,10 @@ public class VesselActivationFactory extends SimulationScopeFactory<VesselEvent>
                 Entry::getKey,
                 entry -> entry.getValue().get(simulation)
             ));
-        final VesselEvent vesselEvent = new VesselEvent(
+        final FleetEvent fleetEvent = new FleetEvent(
             simulation.getTemporalSchedule().getStartingDateTime(),
             fleet.get(simulation),
-            VesselEvent.Type.ACTIVATION,
+            FleetEvent.Type.ACTIVATION,
             id,
             name,
             portCode,
@@ -78,7 +78,7 @@ public class VesselActivationFactory extends SimulationScopeFactory<VesselEvent>
             vessel -> gear.get(simulation, vessel),
             vessel -> engine.get(simulation, vessel)
         );
-        simulation.getTemporalSchedule().scheduleOnce(vesselEvent);
-        return vesselEvent;
+        simulation.getTemporalSchedule().scheduleOnce(fleetEvent);
+        return fleetEvent;
     }
 }

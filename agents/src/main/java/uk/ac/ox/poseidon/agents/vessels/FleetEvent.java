@@ -42,7 +42,7 @@ import java.util.function.Function;
 import static com.google.common.base.Preconditions.checkState;
 
 @Value
-public class VesselEvent implements Steppable {
+public class FleetEvent implements Steppable {
 
     @AllArgsConstructor
     public enum Type {

@@ -22,31 +22,19 @@
 
 package uk.ac.ox.poseidon.agents.tables;
 
-import tech.tablesaw.api.DateTimeColumn;
-import tech.tablesaw.api.StringColumn;
-import tech.tablesaw.api.Table;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
+import lombok.Getter;
+import lombok.Setter;
+import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
-import java.util.function.Supplier;
-
-public abstract class ActionListenerTable<A extends Action>
-    extends ListenerTable<A>
-    implements Supplier<Table> {
-
-    private final StringColumn vesselId = StringColumn.create("vessel_id");
-    private final DateTimeColumn actionStart = DateTimeColumn.create("action_start");
-    private final DateTimeColumn actionEnd = DateTimeColumn.create("action_end");
-
-    ActionListenerTable(final Class<A> eventClass) {
-        super(eventClass);
-        table.addColumns(vesselId, actionStart, actionEnd);
-    }
+@Getter
+@Setter
+public class FishingEventListenerTableFactory
+    extends SimulationEventListenerFactory<FishingEventListenerTable> {
 
     @Override
-    public void receive(final A action) {
-        actionStart.append(action.getStartDateTime());
-        actionEnd.append(action.getEndDateTime());
-        vesselId.append(action.getVessel().getId());
+    protected FishingEventListenerTable newListener(final Simulation simulation) {
+        return new FishingEventListenerTable();
     }
 
 }
