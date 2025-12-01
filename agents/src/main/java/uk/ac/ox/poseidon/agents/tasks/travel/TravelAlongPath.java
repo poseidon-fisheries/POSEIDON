@@ -25,11 +25,13 @@ package uk.ac.ox.poseidon.agents.tasks.travel;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
@@ -45,6 +47,11 @@ public class TravelAlongPath extends VesselTask {
     private final DistanceCalculator distanceCalculator;
     private List<Int2D> currentPath;
 
+    private Trip trip;
+    private LocalDateTime startDateTime;
+    private Int2D origin;
+    private Int2D destination;
+
     @Override
     public void resetTask() {
         currentPath = null;
@@ -53,15 +60,18 @@ public class TravelAlongPath extends VesselTask {
 
     @Override
     public void start() {
-        final Int2D destinationCell = checkNotNull(getVessel().getDestination());
+        trip = checkNotNull(getVessel().getCurrentTrip());
+        startDateTime = getVessel().getSchedule().getDateTime();
+        origin = getVessel().getCell();
+        destination = checkNotNull(trip.getDestination());
         currentPath =
             pathFinder
-                .getPath(getVessel().getCell(), destinationCell)
+                .getPath(getVessel().getCell(), destination)
                 .orElseThrow(() -> new IllegalStateException(
                     MessageFormat.format(
                         "No path found from {0} to {1} for vessel {2}.",
                         getVessel().getCell(),
-                        destinationCell,
+                        destination,
                         getVessel()
                     )
                 ));
@@ -71,7 +81,7 @@ public class TravelAlongPath extends VesselTask {
     @Override
     public Status execute() {
         final Vessel vessel = getVessel();
-        final Int2D destinationCell = checkNotNull(vessel.getDestination());
+        final Int2D destinationCell = checkNotNull(trip.getDestination());
         checkState(
             // TODO: consider whether we should reroute instead
             currentPath.getLast().equals(destinationCell),
@@ -84,6 +94,13 @@ public class TravelAlongPath extends VesselTask {
         vessel.setCurrentCell(currentPath.getFirst());
         currentPath = currentPath.subList(1, currentPath.size());
         if (currentPath.isEmpty()) {
+            trip.getEventManager().broadcast(new TravelEvent(
+                getVessel(),
+                startDateTime,
+                getVessel().getSchedule().getDateTime(),
+                origin,
+                destination
+            ));
             return SUCCEEDED;
         } else {
             final Int2D nextCell = currentPath.getFirst();

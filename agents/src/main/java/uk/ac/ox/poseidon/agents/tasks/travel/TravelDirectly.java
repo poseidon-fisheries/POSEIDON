@@ -23,7 +23,8 @@
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.tasks.ExtendedTask;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
 import java.time.Duration;
@@ -32,22 +33,38 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
-public class TravelDirectly extends ExtendedTask {
+public class TravelDirectly extends ExtendedTripTask {
 
     private final DistanceCalculator distanceCalculator;
+    private Int2D origin;
+    private Int2D destination;
+
+    @Override
+    public void start() {
+        super.start();
+        origin = getVessel().getCell();
+        destination = getTrip().getDestination();
+    }
 
     @Override
     protected Duration getDuration() {
         return distanceCalculator.travelDuration(
-            getVessel().getCell(),
-            getVessel().getDestination(),
+            origin,
+            destination,
             getVessel().getEngine().getCruisingSpeed()
         );
     }
 
     @Override
     protected Status complete() {
-        getVessel().setCurrentCell(getVessel().getDestination());
+        getVessel().setCurrentCell(getTrip().getDestination());
+        getTrip().getEventManager().broadcast(new TravelEvent(
+            getVessel(),
+            getStartDateTime(),
+            getVessel().getSchedule().getDateTime(),
+            origin,
+            destination
+        ));
         return SUCCEEDED;
     }
 

@@ -20,16 +20,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.travel;
+package uk.ac.ox.poseidon.agents.tasks;
 
-import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+import lombok.Getter;
+import uk.ac.ox.poseidon.agents.vessels.Trip;
 
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+import java.time.LocalDateTime;
 
-public class SetDestinationToOrigin extends VesselTask {
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Getter
+public abstract class ExtendedTripTask extends ExtendedTask {
+
+    private Trip trip;
+    private LocalDateTime startDateTime;
+
     @Override
-    public Status execute() {
-        getVessel().getCurrentTrip().setDestinationToOrigin();
-        return SUCCEEDED;
+    public void start() {
+        trip = checkNotNull(getVessel().getCurrentTrip());
+        startDateTime = getVessel().getSchedule().getDateTime();
     }
 }

@@ -20,16 +20,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.travel;
+package uk.ac.ox.poseidon.agents.vessels;
 
-import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+import lombok.Getter;
+import lombok.Setter;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.core.events.EventManager;
+import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+@Getter
+@Setter
+public class Trip {
 
-public class SetDestinationToOrigin extends VesselTask {
-    @Override
-    public Status execute() {
-        getVessel().getCurrentTrip().setDestinationToOrigin();
-        return SUCCEEDED;
+    private final Vessel vessel;
+    private final EventManager eventManager;
+    private final Int2D origin;
+    private Int2D destination;
+
+    public Trip(final Vessel vessel) {
+        this.vessel = vessel;
+        this.eventManager = new ForwardingEventManager(vessel.getEventManager());
+        this.origin = vessel.getCell();
+    }
+
+    public void setDestinationToOrigin() {
+        destination = origin;
     }
 }

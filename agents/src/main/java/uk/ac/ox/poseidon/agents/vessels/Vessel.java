@@ -86,8 +86,7 @@ public class Vessel extends Agent<Vessel> implements Oriented2D {
 
     // Current state variables
     private double heading;
-    @Setter private Int2D destination;
-    @Setter private Int2D origin;
+    private Trip currentTrip;
 
     @Override
     public boolean isActive() {
@@ -161,10 +160,6 @@ public class Vessel extends Agent<Vessel> implements Oriented2D {
         vesselField.setCell(this, cell);
     }
 
-    public boolean isAtDestination() {
-        return destination != null && getCell().equals(destination);
-    }
-
     public boolean isAtPort() {
         return portGrid.anyObjectsAt(getCell());
     }
@@ -187,5 +182,13 @@ public class Vessel extends Agent<Vessel> implements Oriented2D {
 
     public Optional<Object> getTag(final String key) {
         return Optional.ofNullable(tags.get(key));
+    }
+
+    public void startTrip() {
+        this.currentTrip = new Trip(this);
+    }
+
+    public void endTrip() {
+        this.currentTrip = null;
     }
 }

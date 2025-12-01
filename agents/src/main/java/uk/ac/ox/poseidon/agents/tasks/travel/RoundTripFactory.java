@@ -49,11 +49,12 @@ public class RoundTripFactory extends TaskFactory<Sequence<Vessel>> {
         final Task<Vessel> travelTask = this.travelTask.get(simulation);
         final Task<Vessel> taskAtDestination = this.taskAtDestination.get(simulation);
         return new Sequence<>(
-            new SetOriginToCurrentCell(),
+            new StartTrip(),
             travelTask,
             taskAtDestination,
             new SetDestinationToOrigin(),
-            travelTask
+            travelTask,
+            new EndTrip()
         );
     }
 

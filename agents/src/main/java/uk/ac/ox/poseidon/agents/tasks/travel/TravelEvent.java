@@ -20,46 +20,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.fishing;
+package uk.ac.ox.poseidon.agents.tasks.travel;
 
-import lombok.AllArgsConstructor;
 import lombok.Value;
-import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.core.events.ExtendedEvent;
-import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.time.LocalDateTime;
 
 @Value
-@AllArgsConstructor
-public class FishingEvent implements ExtendedEvent {
-
+public class TravelEvent implements ExtendedEvent {
     Vessel vessel;
     LocalDateTime startDateTime;
     LocalDateTime endDateTime;
-    Gear gear;
-    Bucket grossCatch;
-    Disposition disposition;
-    Coordinate coordinate;
-
-    public FishingEvent(
-        final Vessel vessel,
-        final LocalDateTime startDateTime,
-        final LocalDateTime endDateTime,
-        final Bucket grossCatch,
-        final Disposition disposition
-    ) {
-        this(
-            vessel,
-            startDateTime,
-            endDateTime,
-            vessel.getGear(),
-            grossCatch,
-            disposition,
-            vessel.getVesselField().getModelGrid().toCoordinate(vessel.getCell())
-        );
-    }
+    Int2D origin;
+    Int2D destination;
 }

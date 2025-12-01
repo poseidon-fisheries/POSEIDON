@@ -26,11 +26,11 @@ import uk.ac.ox.poseidon.agents.tasks.VesselTask;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
-public class SetOriginToCurrentCell extends VesselTask {
+public class StartTrip extends VesselTask {
 
     @Override
     public Status execute() {
-        getVessel().setOrigin(getObject().getCell());
+        getVessel().startTrip();
         return SUCCEEDED;
     }
 

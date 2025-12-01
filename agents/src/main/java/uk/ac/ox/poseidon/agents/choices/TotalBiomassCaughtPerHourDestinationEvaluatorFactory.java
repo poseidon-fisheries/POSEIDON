@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.CombiningEphemeralAccumulatingListener;
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.core.events.ExtendedEvent;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 @Getter
@@ -56,36 +56,24 @@ public class TotalBiomassCaughtPerHourDestinationEvaluatorFactory
     private static class Evaluation implements uk.ac.ox.poseidon.agents.choices.Evaluation {
 
         private final CombiningEphemeralAccumulatingListener
-            <FishingEvent, Double, Action, Double, Double> listener;
+            <FishingEvent, Double, ExtendedEvent, Double, Double> listener;
 
         private Evaluation(
             final PortGrid portGrid,
             final Vessel vessel
         ) {
             listener = new CombiningEphemeralAccumulatingListener<>(
-                vessel.getEventManager(),
+                vessel.getCurrentTrip().getEventManager(),
                 FishingEvent.class,
                 0.0,
-                (caughtSoFar, fishingAction) -> caughtSoFar +
-                    fishingAction.getDisposition().getRetained().getTotalBiomass().asKg(),
-                Action.class,
+                (caughtSoFar, fishingEvent) -> caughtSoFar +
+                    fishingEvent.getDisposition().getRetained().getTotalBiomass().asKg(),
+                ExtendedEvent.class,
                 0.0,
-                (hoursSoFar, action) ->
-                    actionIsAtPort(action, portGrid)
-                        ? hoursSoFar
-                        : hoursSoFar + action.getDuration().toHours(),
+                (hoursSoFar, event) ->
+                    hoursSoFar + event.getDuration().toHours(),
                 (caught, hours) -> caught / hours
             );
-        }
-
-        private boolean actionIsAtPort(
-            final Action action,
-            final PortGrid portGrid
-        ) {
-            final ModelGrid modelGrid = portGrid.getModelGrid();
-            final Int2D startCell = modelGrid.toCell(action.getStartCoordinate());
-            final Int2D endCell = modelGrid.toCell(action.getEndCoordinate());
-            return startCell.equals(endCell) && portGrid.anyObjectsAt(startCell);
         }
 
         @Override

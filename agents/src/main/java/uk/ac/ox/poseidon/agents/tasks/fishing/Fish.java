@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.regulations.FishingAction;
-import uk.ac.ox.poseidon.agents.tasks.ExtendedTask;
+import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Fisheable;
@@ -38,7 +38,7 @@ import java.util.function.Supplier;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 @RequiredArgsConstructor
-public class Fish extends ExtendedTask {
+public class Fish extends ExtendedTripTask {
 
     @NonNull private final Supplier<Fisheable> fisheableSupplier;
     @NonNull private final DispositionProcess dispositionProcess;
@@ -47,6 +47,7 @@ public class Fish extends ExtendedTask {
 
     @Override
     public void start() {
+        super.start();
         action = new FishingAction(getVessel());
     }
 
@@ -64,8 +65,14 @@ public class Fish extends ExtendedTask {
             dispositionProcess.partition(grossCatch, hold.getAvailableCapacityInKg());
         hold.addContent(disposition.getRetained());
         fisheable.release(disposition.getDiscardedAlive());
-        getVessel().getEventManager().broadcast(
-            new FishingEvent(getVessel(), grossCatch, disposition)
+        getTrip().getEventManager().broadcast(
+            new FishingEvent(
+                getVessel(),
+                getStartDateTime(),
+                getVessel().getSchedule().getDateTime(),
+                grossCatch,
+                disposition
+            )
         );
         return SUCCEEDED;
     }

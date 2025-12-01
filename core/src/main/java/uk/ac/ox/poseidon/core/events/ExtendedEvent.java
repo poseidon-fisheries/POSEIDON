@@ -20,16 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.travel;
+package uk.ac.ox.poseidon.core.events;
 
-import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+public interface ExtendedEvent {
 
-public class SetDestinationToOrigin extends VesselTask {
-    @Override
-    public Status execute() {
-        getVessel().getCurrentTrip().setDestinationToOrigin();
-        return SUCCEEDED;
+    LocalDateTime getStartDateTime();
+
+    LocalDateTime getEndDateTime();
+
+    default Duration getDuration() {
+        return Duration.between(getStartDateTime(), getEndDateTime());
     }
+
 }
