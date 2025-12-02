@@ -32,6 +32,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.regulations.Regulations;
 
 @Getter
 @Setter

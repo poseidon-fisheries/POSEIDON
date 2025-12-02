@@ -25,6 +25,7 @@ plugins {
 }
 
 dependencies {
+    api(project(":regulations"))
     api(project(":biology"))
     api(project(":geography"))
     api(project(":io"))

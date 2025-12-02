@@ -23,13 +23,13 @@
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.regulations.Action;
 
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor
-public class ActionCoordinatePredicate implements Predicate<Action> {
+public class ActionCoordinatePredicate implements Predicate<Action<?>> {
 
     private final Predicate<Coordinate> coordinatePredicate;
 
@@ -38,5 +38,5 @@ public class ActionCoordinatePredicate implements Predicate<Action> {
         return coordinatePredicate.test(action.getStartCoordinate()) ||
             coordinatePredicate.test(action.getEndCoordinate());
     }
-    
+
 }

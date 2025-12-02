@@ -25,8 +25,8 @@ package uk.ac.ox.poseidon.agents.tasks.fishing;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.regulations.FishingAction;
-import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+import uk.ac.ox.poseidon.regulations.Regulations;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;

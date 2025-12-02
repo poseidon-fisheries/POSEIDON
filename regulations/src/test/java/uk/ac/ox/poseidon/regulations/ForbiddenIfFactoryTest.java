@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.regulations;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -46,10 +45,10 @@ class ForbiddenIfFactoryTest {
     void testNewInstanceCreatesForbiddenIfObject() {
         // Arrange
         final Simulation mockSimulation = mock(Simulation.class);
-        final Predicate<Action> mockActionPredicate = mock(Predicate.class);
-        @SuppressWarnings("unchecked") final GlobalScopeFactory<Predicate<Action>>
+        final Predicate<Action<?>> mockActionPredicate = mock(Predicate.class);
+        @SuppressWarnings("unchecked") final GlobalScopeFactory<Predicate<Action<?>>>
             mockActionPredicateFactory =
-            (GlobalScopeFactory<Predicate<Action>>) mock(GlobalScopeFactory.class);
+            (GlobalScopeFactory<Predicate<Action<?>>>) mock(GlobalScopeFactory.class);
         when(mockActionPredicateFactory.get(mockSimulation)).thenReturn(mockActionPredicate);
 
         final ForbiddenIfFactory forbiddenIfFactory =

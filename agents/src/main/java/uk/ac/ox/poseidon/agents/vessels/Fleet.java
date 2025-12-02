@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.vessels;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
+import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
@@ -49,6 +50,9 @@ public class Fleet {
     @Getter
     private final PortGrid portGrid;
 
+    @Getter
+    private final MarketGrid marketGrid;
+
     public Optional<Vessel> getVessel(final String vesselId) {
         return Optional.ofNullable(vesselsById.get(vesselId));
     }
@@ -65,12 +69,13 @@ public class Fleet {
             "Vessel %s already exists", vesselId
         );
         final Vessel vessel = new Vessel(
-            vesselId,
             schedule,
             new ForwardingEventManager(eventManager),
+            vesselId,
             new Account(),
             vesselField,
-            portGrid
+            portGrid,
+            marketGrid
         );
         vesselsById.put(vesselId, vessel);
         return vessel;

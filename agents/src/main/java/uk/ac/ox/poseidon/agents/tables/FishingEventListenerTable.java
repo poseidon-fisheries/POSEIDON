@@ -38,7 +38,8 @@ import java.util.Optional;
 public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
 
     public static final String VESSEL_ID = "vessel_id";
-    public static final String DATE_TIME = "date_time";
+    public static final String START_DATE_TIME = "start_date_time";
+    public static final String END_DATE_TIME = "end_date_time";
     public static final String LONGITUDE = "longitude";
     public static final String LATITUDE = "latitude";
     public static final String SPECIES_CODE = "species_code";
@@ -48,7 +49,8 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
     public static final String DISCARDED_DEAD = "discarded_dead";
 
     private final StringColumn vesselId = StringColumn.create(VESSEL_ID);
-    private final DateTimeColumn dateTime = DateTimeColumn.create(DATE_TIME);
+    private final DateTimeColumn startDateTime = DateTimeColumn.create(START_DATE_TIME);
+    private final DateTimeColumn endDateTime = DateTimeColumn.create(END_DATE_TIME);
     private final DoubleColumn lon = DoubleColumn.create(LONGITUDE);
     private final DoubleColumn lat = DoubleColumn.create(LATITUDE);
     private final StringColumn speciesCode = StringColumn.create(SPECIES_CODE);
@@ -61,7 +63,8 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
         super(FishingEvent.class);
         get().addColumns(
             vesselId,
-            dateTime,
+            startDateTime,
+            endDateTime,
             lon,
             lat,
             speciesCode,
@@ -91,7 +94,8 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
             //  of space. We should have some kind of event id (which needs to be implemented) and
             //  store the catch data in a separate table.
             vesselId.append(event.getVessel().getId());
-            dateTime.append(event.getDateTime());
+            startDateTime.append(event.getStartDateTime());
+            endDateTime.append(event.getEndDateTime());
             lon.append(event.getCoordinate().lon);
             lat.append(event.getCoordinate().lat);
             speciesCode.append(species.getCode());

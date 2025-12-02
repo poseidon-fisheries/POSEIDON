@@ -24,13 +24,13 @@ package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.regulations.Action;
 
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor
-public class ActionCellPredicate implements Predicate<Action> {
+public class ActionCellPredicate implements Predicate<Action<?>> {
 
     private final ModelGrid modelGrid;
     private final Predicate<Int2D> cellPredicate;

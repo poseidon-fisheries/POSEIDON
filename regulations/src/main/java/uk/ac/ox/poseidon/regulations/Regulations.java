@@ -20,16 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.travel;
+package uk.ac.ox.poseidon.regulations;
 
-import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+@FunctionalInterface
+public interface Regulations<A> {
 
-public class EnsureDestinationIsSet extends VesselTask {
-    @Override
-    public Status execute() {
-        if (getVessel().getDestination() == null) {
-            throw new IllegalStateException("Destination must be set");
-        }
-        return Status.SUCCEEDED;
+    boolean isPermitted(Action<A> action);
+
+    default boolean isForbidden(final Action<A> action) {
+        return !isPermitted(action);
     }
+
 }

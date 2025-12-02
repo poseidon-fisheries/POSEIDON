@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
+import uk.ac.ox.poseidon.regulations.Action;
 
 import java.time.LocalDateTime;
 

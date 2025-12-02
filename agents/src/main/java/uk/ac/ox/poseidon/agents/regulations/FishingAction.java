@@ -27,26 +27,15 @@ import lombok.NonNull;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.regulations.Action;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Getter
-public class FishingAction extends AbstractVesselAction {
+public class FishingAction extends Action<Vessel> {
 
     @NonNull private final Gear gear;
-
-    protected FishingAction(
-        @NonNull final Vessel vessel,
-        @NonNull final LocalDateTime startDateTime,
-        @NonNull final Duration duration,
-        @NonNull final Coordinate startCoordinate,
-        @NonNull final Coordinate endCoordinate,
-        @NonNull final Gear gear
-    ) {
-        super(vessel, startDateTime, duration, startCoordinate, endCoordinate);
-        this.gear = gear;
-    }
 
     public FishingAction(
         @NonNull final Vessel vessel,

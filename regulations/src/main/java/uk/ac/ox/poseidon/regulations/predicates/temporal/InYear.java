@@ -24,13 +24,13 @@ package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
+import uk.ac.ox.poseidon.regulations.Action;
 
 import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
-public class InYear implements Predicate<Action> {
+public class InYear implements Predicate<Action<?>> {
 
     private final int year;
 

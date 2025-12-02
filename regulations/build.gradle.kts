@@ -26,5 +26,5 @@ plugins {
 
 
 dependencies {
-    api(project(":agents"))
+    api(project(":geography"))
 }

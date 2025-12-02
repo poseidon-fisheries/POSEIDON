@@ -26,7 +26,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
+import uk.ac.ox.poseidon.regulations.Action;
 
 import java.time.LocalDateTime;
 import java.time.MonthDay;
@@ -55,7 +55,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Getter
 @ToString
 @EqualsAndHashCode
-public class BetweenYearlyDates implements Predicate<Action> {
+public class BetweenYearlyDates implements Predicate<Action<?>> {
 
     @NonNull private final MonthDay start;
     @NonNull private final MonthDay end;

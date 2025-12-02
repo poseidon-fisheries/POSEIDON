@@ -28,6 +28,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.regulations.Regulations;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

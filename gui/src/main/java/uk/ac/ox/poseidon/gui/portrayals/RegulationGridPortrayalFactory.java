@@ -27,7 +27,6 @@ import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
-import uk.ac.ox.poseidon.agents.regulations.Regulations;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Factory;
@@ -35,6 +34,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.regulations.Regulations;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

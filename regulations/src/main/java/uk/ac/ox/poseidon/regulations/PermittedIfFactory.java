@@ -26,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import uk.ac.ox.poseidon.agents.behaviours.Action;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
@@ -35,16 +34,18 @@ import java.util.function.Predicate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PermittedIfFactory extends GlobalScopeFactory<PermittedIf> {
+public class PermittedIfFactory<A> extends GlobalScopeFactory<PermittedIf<A>> {
 
-    @NonNull private GlobalScopeFactory<? extends Predicate<? super Action>> actionPredicate;
+    @NonNull private GlobalScopeFactory<? extends Predicate<? super Action<A>>> actionPredicate;
 
     @Override
-    protected PermittedIf newInstance(final @NonNull Simulation simulation) {
-        return new PermittedIf(actionPredicate.get(simulation));
+    protected PermittedIf<A> newInstance(final @NonNull Simulation simulation) {
+        return new PermittedIf<>(actionPredicate.get(simulation));
     }
 
-    public void setActionPredicate(@NonNull final GlobalScopeFactory<? extends Predicate<Action>> actionPredicate) {
+    public void setActionPredicate(
+        @NonNull final GlobalScopeFactory<? extends Predicate<Action<A>>> actionPredicate
+    ) {
         this.actionPredicate = actionPredicate;
     }
 }
