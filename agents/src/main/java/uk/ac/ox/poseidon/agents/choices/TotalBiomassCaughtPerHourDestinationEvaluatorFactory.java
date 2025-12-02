@@ -67,7 +67,12 @@ public class TotalBiomassCaughtPerHourDestinationEvaluatorFactory
                 FishingEvent.class,
                 0.0,
                 (caughtSoFar, fishingEvent) -> caughtSoFar +
-                    fishingEvent.getDisposition().getRetained().getTotalBiomass().asKg(),
+                    fishingEvent
+                        .getOutcome()
+                        .getDisposition()
+                        .getRetained()
+                        .getTotalBiomass()
+                        .asKg(),
                 ExtendedEvent.class,
                 0.0,
                 (hoursSoFar, event) ->

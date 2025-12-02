@@ -22,44 +22,25 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
-import lombok.AllArgsConstructor;
 import lombok.Value;
-import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.agents.regulations.FishingAction;
 import uk.ac.ox.poseidon.core.events.ExtendedEvent;
-import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.time.LocalDateTime;
 
 @Value
-@AllArgsConstructor
 public class FishingEvent implements ExtendedEvent {
 
-    Vessel vessel;
-    LocalDateTime startDateTime;
-    LocalDateTime endDateTime;
-    Gear gear;
-    Bucket grossCatch;
-    Disposition disposition;
-    Coordinate coordinate;
+    FishingAction action;
+    FishingOutcome outcome;
 
-    public FishingEvent(
-        final Vessel vessel,
-        final LocalDateTime startDateTime,
-        final LocalDateTime endDateTime,
-        final Bucket grossCatch,
-        final Disposition disposition
-    ) {
-        this(
-            vessel,
-            startDateTime,
-            endDateTime,
-            vessel.getGear(),
-            grossCatch,
-            disposition,
-            vessel.getVesselField().getModelGrid().toCoordinate(vessel.getCell())
-        );
+    @Override
+    public LocalDateTime getStartDateTime() {
+        return action.getStartDateTime();
+    }
+
+    @Override
+    public LocalDateTime getEndDateTime() {
+        return action.getEndDateTime();
     }
 }

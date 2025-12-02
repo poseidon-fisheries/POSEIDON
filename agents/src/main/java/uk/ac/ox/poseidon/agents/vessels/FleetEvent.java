@@ -69,7 +69,6 @@ public class FleetEvent implements Steppable {
     public void step(final SimState simState) {
         checkState(simState instanceof Simulation);
 
-        final Simulation simulation = (Simulation) simState;
         final Vessel vessel = fleet
             .getVessel(vesselId)
             .orElseGet(() -> fleet.createVessel(vesselId));

@@ -27,6 +27,7 @@ import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
+import uk.ac.ox.poseidon.agents.regulations.FishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Factory;
@@ -39,6 +40,7 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalField;
 import java.util.List;
@@ -53,7 +55,7 @@ import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.Up
 @AllArgsConstructor
 public class RegulationGridPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
 
-    private Factory<? extends Regulations> regulations;
+    private Factory<? extends Regulations<Vessel>> regulations;
     private Factory<? extends List<Vessel>> vessels;
     private Factory<? extends BathymetricGrid> bathymetric;
     private Factory<? extends Gear> fishingGear;
@@ -100,7 +102,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
         }
 
         private final TemporalSchedule schedule;
-        private final Regulations regulations;
+        private final Regulations<Vessel> regulations;
         private final List<Vessel> vessels;
         private final BathymetricGrid bathymetricGrid;
         private final ObjectGrid2D grid;
@@ -110,7 +112,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
 
         Portrayal(
             final TemporalSchedule schedule,
-            final Regulations regulations,
+            final Regulations<Vessel> regulations,
             final List<Vessel> vessels,
             final BathymetricGrid bathymetricGrid,
             final Gear gear,
@@ -161,12 +163,15 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
                     vessels
                         .stream()
                         .map(vessel ->
-                            new PotentialFishingAction(
-                                dateTime,
+                            new FishingAction(
                                 vessel,
-                                bathymetricGrid.getModelGrid().toCoordinate(cell)
+                                dateTime,
+                                Duration.ZERO,
+                                bathymetricGrid.getModelGrid().toCoordinate(cell),
+                                vessel.getGear()
                             )
-                        ).anyMatch(regulations::isForbidden);
+                        )
+                        .anyMatch(regulations::isForbidden);
                 grid.field[cell.x][cell.y] = forbidden ? "FORBIDDEN" : null;
             });
         }

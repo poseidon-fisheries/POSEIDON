@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks.branches;
 
 import com.badlogic.gdx.ai.btree.BranchTask;
 import com.badlogic.gdx.ai.btree.Task;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
@@ -41,6 +42,7 @@ import java.util.List;
 public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends TaskFactory<T> {
 
     @Singular
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP")
     private List<? extends VesselScopeFactory<? extends Task<Vessel>>> children;
 
     public BranchTaskFactory(

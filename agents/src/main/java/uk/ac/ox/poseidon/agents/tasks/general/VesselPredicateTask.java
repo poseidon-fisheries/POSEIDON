@@ -20,27 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.fishing;
+package uk.ac.ox.poseidon.agents.tasks.general;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.regulations.FishingAction;
 import uk.ac.ox.poseidon.agents.tasks.VesselTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.regulations.Regulations;
+
+import java.util.function.Predicate;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 @RequiredArgsConstructor
-public class CheckIfFishingHereAndNowIsLegal extends VesselTask {
+public class VesselPredicateTask extends VesselTask {
 
-    @NonNull private final Regulations<Vessel> regulations;
+    private final Predicate<Vessel> predicate;
 
     @Override
     public Status execute() {
-        final FishingAction action = new FishingAction(getVessel());
-        return regulations.isPermitted(action) ? SUCCEEDED : FAILED;
+        return predicate.test(getVessel()) ? SUCCEEDED : FAILED;
     }
 
 }

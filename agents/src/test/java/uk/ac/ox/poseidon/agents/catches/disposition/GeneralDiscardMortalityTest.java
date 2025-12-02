@@ -20,11 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.behaviours.disposition;
+package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
-import uk.ac.ox.poseidon.agents.catches.disposition.GeneralDiscardMortality;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.DummySpecies;

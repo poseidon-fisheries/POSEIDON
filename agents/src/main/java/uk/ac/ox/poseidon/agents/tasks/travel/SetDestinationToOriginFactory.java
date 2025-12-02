@@ -22,46 +22,20 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
-import com.badlogic.gdx.ai.btree.Task;
-import com.badlogic.gdx.ai.btree.branch.Sequence;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class RoundTripFactory extends TaskFactory<Sequence<Vessel>> {
-
-    private TaskFactory<?> chooseDestinationTask;
-    private TaskFactory<?> travelTask;
-    private TaskFactory<?> fishingTask;
-    private TaskFactory<?> landingTask;
-
-    @SuppressWarnings("unchecked")
+public class SetDestinationToOriginFactory extends TaskFactory<SetDestinationToOrigin> {
     @Override
-    protected Sequence<Vessel> newTask(
+    protected SetDestinationToOrigin newTask(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        final Task<Vessel> chooseDestinationTask =
-            this.chooseDestinationTask.get(simulation, vessel);
-        final Task<Vessel> travelTask = this.travelTask.get(simulation, vessel);
-        final Task<Vessel> fishingTask = this.fishingTask.get(simulation, vessel);
-        final Task<Vessel> landingTask = this.landingTask.get(simulation, vessel);
-        return new Sequence<>(
-            new StartTrip(),
-            chooseDestinationTask,
-            travelTask,
-            fishingTask,
-            new SetDestinationToOrigin(),
-            travelTask,
-            landingTask,
-            new EndTrip()
-        );
+        return new SetDestinationToOrigin();
     }
-
 }

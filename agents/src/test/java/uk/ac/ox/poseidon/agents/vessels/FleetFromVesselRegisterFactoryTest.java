@@ -25,6 +25,9 @@ package uk.ac.ox.poseidon.agents.vessels;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
+import uk.ac.ox.poseidon.agents.market.MarketGrid;
+import uk.ac.ox.poseidon.agents.tasks.BehaviourFactory;
+import uk.ac.ox.poseidon.agents.tasks.general.WaitFactory;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
@@ -35,6 +38,7 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -42,6 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_DAY_DURATION_SUPPLIER;
 
 class FleetFromVesselRegisterFactoryTest {
 
@@ -55,6 +60,7 @@ class FleetFromVesselRegisterFactoryTest {
     private Port p1;
     private Port p2;
     private PortGrid portGrid;
+    private MarketGrid marketGrid;
     private Gear g1;
     private Gear g2;
     private Hold h1;
@@ -70,6 +76,8 @@ class FleetFromVesselRegisterFactoryTest {
         when(p2.getCode()).thenReturn("P2");
         when(p2.toString()).thenReturn("P2");
 
+        marketGrid = mock(MarketGrid.class);
+
         g1 = mock(Gear.class);
         g2 = mock(Gear.class);
         h1 = mock(Hold.class);
@@ -81,7 +89,8 @@ class FleetFromVesselRegisterFactoryTest {
                     "fleet", FleetFromVesselRegisterFactory.builder()
                         .fleet(new FleetFactory(
                             new ConstantFactory<>(mock(VesselField.class)),
-                            new ConstantFactory<>(portGrid)
+                            new ConstantFactory<>(portGrid),
+                            new ConstantFactory<>(marketGrid)
                         ))
                         .data(CsvTableFactory.fromString(initialData + extraData))
                         .hold(new VesselScopeAdaptor<>(new ConstantFactory<>(h1)))
@@ -93,6 +102,7 @@ class FleetFromVesselRegisterFactoryTest {
                         )
                         .dataMapping("gear.code", "gear")
                         .engine(new VesselScopeAdaptor<>(new ConstantFactory<>(mock(Engine.class))))
+                        .behaviour(new BehaviourFactory(new WaitFactory(ONE_DAY_DURATION_SUPPLIER)))
                         .build()
                 )
             ).newSimulation();
@@ -125,7 +135,7 @@ class FleetFromVesselRegisterFactoryTest {
             V2,Vee Dos,P2,MOD,2001-01-02,G1,4,d
             """
         );
-        simulation.step();
+        simulation.stepFor(Duration.ofDays(1));
         final Vessel v1 = fleet.getVessel("V1").orElseThrow();
         assertThat(v1.getName()).isEqualTo("Vee Uno");
         assertThat(v1.getHomePort()).isEqualTo(p1);
@@ -159,27 +169,27 @@ class FleetFromVesselRegisterFactoryTest {
         assertThat(v2.isActive()).isTrue();
 
         // Only v1 is deactivated
-        simulation.step();
+        simulation.stepFor(Duration.ofDays(1));
         assertThat(v1.isActive()).isFalse();
         assertThat(v2.isActive()).isTrue();
 
         // v2 is deactivated as well
-        simulation.step();
+        simulation.stepFor(Duration.ofDays(1));
         assertThat(v1.isActive()).isFalse();
         assertThat(v2.isActive()).isFalse();
 
         // v1 is reactivated
-        simulation.step();
+        simulation.stepFor(Duration.ofDays(1));
         assertThat(v1.isActive()).isTrue();
         assertThat(v2.isActive()).isFalse();
 
         // v2 is reactivated
-        simulation.step();
+        simulation.stepFor(Duration.ofDays(1));
         assertThat(v1.isActive()).isTrue();
         assertThat(v2.isActive()).isTrue();
 
         // v1 is deactivated again
-        simulation.step();
+        simulation.stepFor(Duration.ofDays(1));
         assertThat(v1.isActive()).isFalse();
         assertThat(v2.isActive()).isTrue();
 
@@ -193,7 +203,7 @@ class FleetFromVesselRegisterFactoryTest {
                     V3,Vee Three,P1,MOD,2001-01-02,Gx,0,x
                     """
                 );
-                simulation.step();
+                simulation.stepFor(Duration.ofDays(1));
             }
         ).hasMessageContaining("V3");
     }
@@ -206,7 +216,7 @@ class FleetFromVesselRegisterFactoryTest {
                     V1,Vee One,P3,MOD,2001-01-02,Gx,0,x
                     """
                 );
-                simulation.step();
+                simulation.stepFor(Duration.ofDays(1));
             }
         ).hasMessageContaining("P3");
     }

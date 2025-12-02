@@ -40,7 +40,7 @@ import static lombok.AccessLevel.PACKAGE;
 @RequiredArgsConstructor(access = PACKAGE)
 public class FishingLocationLegalityChecker {
 
-    private final Regulations regulations;
+    private final Regulations<Vessel> regulations;
     private final GridPathFinder pathFinder;
     private final DistanceCalculator distanceCalculator;
     private final Supplier<LocalDateTime> currenDateTimeSupplier;

@@ -55,11 +55,11 @@ class RegulationGridPortrayalFactoryTest {
         final TemporalSchedule mockSchedule = mock(TemporalSchedule.class);
         when(mockSimulation.getTemporalSchedule()).thenReturn(mockSchedule);
 
-        final Regulations mockRegulations = mock(Regulations.class);
+        final Regulations<Vessel> mockRegulations = mock(Regulations.class);
         final List<Vessel> mockVessels = mock(List.class);
         final BathymetricGrid mockBathymetricGrid = mock(BathymetricGrid.class);
 
-        final Factory<Regulations> regulationsFactory = mock(Factory.class);
+        final Factory<Regulations<Vessel>> regulationsFactory = mock(Factory.class);
         when(regulationsFactory.get(mockSimulation)).thenReturn(mockRegulations);
 
         final Factory<List<Vessel>> vesselsFactory = mock(Factory.class);

@@ -20,27 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.fishing;
+package uk.ac.ox.poseidon.agents.tasks.travel;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.regulations.FishingAction;
 import uk.ac.ox.poseidon.agents.tasks.VesselTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.regulations.Regulations;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
-import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
-
-@RequiredArgsConstructor
-public class CheckIfFishingHereAndNowIsLegal extends VesselTask {
-
-    @NonNull private final Regulations<Vessel> regulations;
-
+public class StartTripFactory extends VesselScopeFactory<VesselTask> {
     @Override
-    public Status execute() {
-        final FishingAction action = new FishingAction(getVessel());
-        return regulations.isPermitted(action) ? SUCCEEDED : FAILED;
+    protected VesselTask newInstance(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
+        return new StartTrip();
     }
-
 }

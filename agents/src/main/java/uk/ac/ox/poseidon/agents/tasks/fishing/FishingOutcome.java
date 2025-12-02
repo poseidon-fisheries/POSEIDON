@@ -22,25 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.regulations.FishingAction;
-import uk.ac.ox.poseidon.agents.tasks.VesselTask;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.regulations.Regulations;
+import lombok.Value;
+import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
+import uk.ac.ox.poseidon.biology.Bucket;
 
-import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
-
-@RequiredArgsConstructor
-public class CheckIfFishingHereAndNowIsLegal extends VesselTask {
-
-    @NonNull private final Regulations<Vessel> regulations;
-
-    @Override
-    public Status execute() {
-        final FishingAction action = new FishingAction(getVessel());
-        return regulations.isPermitted(action) ? SUCCEEDED : FAILED;
-    }
-
+@Value
+public class FishingOutcome {
+    Bucket grossCatch;
+    Disposition disposition;
 }

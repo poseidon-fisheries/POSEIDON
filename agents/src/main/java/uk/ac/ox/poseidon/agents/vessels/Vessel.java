@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -47,6 +48,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Getter
+@SuppressFBWarnings(value = "EI_EXPOSE_REP")
 public class Vessel extends Agent<Vessel> implements Oriented2D {
 
     private final @NonNull String id;

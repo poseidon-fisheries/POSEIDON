@@ -20,48 +20,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.travel;
+package uk.ac.ox.poseidon.agents.tasks.general;
 
-import com.badlogic.gdx.ai.btree.Task;
-import com.badlogic.gdx.ai.btree.branch.Sequence;
-import lombok.*;
+import com.badlogic.gdx.ai.btree.branch.Selector;
+import com.badlogic.gdx.ai.btree.decorator.AlwaysFail;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoundTripFactory extends TaskFactory<Sequence<Vessel>> {
+public class SucceedOrWaitTaskFactory extends TaskFactory<Selector<Vessel>> {
 
-    private TaskFactory<?> chooseDestinationTask;
-    private TaskFactory<?> travelTask;
-    private TaskFactory<?> fishingTask;
-    private TaskFactory<?> landingTask;
+    TaskFactory<?> mainTask;
+    TaskFactory<?> waitTask;
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected Sequence<Vessel> newTask(
+    protected Selector<Vessel> newTask(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        final Task<Vessel> chooseDestinationTask =
-            this.chooseDestinationTask.get(simulation, vessel);
-        final Task<Vessel> travelTask = this.travelTask.get(simulation, vessel);
-        final Task<Vessel> fishingTask = this.fishingTask.get(simulation, vessel);
-        final Task<Vessel> landingTask = this.landingTask.get(simulation, vessel);
-        return new Sequence<>(
-            new StartTrip(),
-            chooseDestinationTask,
-            travelTask,
-            fishingTask,
-            new SetDestinationToOrigin(),
-            travelTask,
-            landingTask,
-            new EndTrip()
-        );
+        final Selector<Vessel> selector = new Selector<>();
+        selector.addChild(mainTask.get(simulation, vessel));
+        selector.addChild(new AlwaysFail<>(waitTask.get(simulation, vessel)));
+        return selector;
     }
-
 }

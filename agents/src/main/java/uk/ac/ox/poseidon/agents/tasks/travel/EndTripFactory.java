@@ -20,38 +20,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.fishing;
+package uk.ac.ox.poseidon.agents.tasks.travel;
 
-import lombok.*;
-import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
-import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.biology.Fisheable;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.function.Supplier;
-
-@Getter
-@Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class FishFactory extends TaskFactory<Fish> {
-
-    private VesselScopeFactory<? extends Supplier<Fisheable>> fisheableSupplier;
-    private Factory<? extends DispositionProcess> dispositionProcess;
-
+public class EndTripFactory extends VesselScopeFactory<EndTrip> {
     @Override
-    protected Fish newTask(
+    protected EndTrip newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new Fish(
-            fisheableSupplier.get(simulation, vessel),
-            dispositionProcess.get(simulation)
-        );
+        return new EndTrip();
     }
-
 }

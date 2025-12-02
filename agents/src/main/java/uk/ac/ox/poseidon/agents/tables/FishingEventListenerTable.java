@@ -27,6 +27,7 @@ import com.google.common.collect.Table;
 import tech.tablesaw.api.DateTimeColumn;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
+import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
@@ -77,11 +78,12 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
 
     @Override
     public void receive(final FishingEvent event) {
+        final Disposition disposition = event.getOutcome().getDisposition();
         final Map<String, Bucket> buckets = Map.of(
-            GROSS_CATCH, event.getGrossCatch(),
-            RETAINED, event.getDisposition().getRetained(),
-            DISCARDED_ALIVE, event.getDisposition().getDiscardedAlive(),
-            DISCARDED_DEAD, event.getDisposition().getDiscardedDead()
+            GROSS_CATCH, event.getOutcome().getGrossCatch(),
+            RETAINED, disposition.getRetained(),
+            DISCARDED_ALIVE, disposition.getDiscardedAlive(),
+            DISCARDED_DEAD, disposition.getDiscardedDead()
         );
         final Table<Species, String, Double> table = HashBasedTable.create();
         buckets.forEach((columnName, bucket) ->
@@ -93,11 +95,11 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
             // FIXME: this repeats the event info for each species, which is a colossal waste
             //  of space. We should have some kind of event id (which needs to be implemented) and
             //  store the catch data in a separate table.
-            vesselId.append(event.getVessel().getId());
+            vesselId.append(event.getAction().getAgent().getId());
             startDateTime.append(event.getStartDateTime());
             endDateTime.append(event.getEndDateTime());
-            lon.append(event.getCoordinate().lon);
-            lat.append(event.getCoordinate().lat);
+            lon.append(event.getAction().getEndCoordinate().lon);
+            lat.append(event.getAction().getEndCoordinate().lat);
             speciesCode.append(species.getCode());
             buckets.keySet().forEach(columnName ->
                 get()

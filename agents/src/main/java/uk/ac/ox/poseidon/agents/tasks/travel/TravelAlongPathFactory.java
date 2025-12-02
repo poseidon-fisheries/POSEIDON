@@ -27,8 +27,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
@@ -39,13 +39,13 @@ import uk.ac.ox.poseidon.geography.paths.PathFinder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TravelAlongPathFactory
-    extends VesselScopeFactory<TravelAlongPath> {
+    extends TaskFactory<TravelAlongPath> {
 
     private Factory<? extends PathFinder<Int2D>> pathFinder;
     private Factory<? extends DistanceCalculator> distance;
 
     @Override
-    protected TravelAlongPath newInstance(
+    protected TravelAlongPath newTask(
         final Simulation simulation,
         final Vessel vessel
     ) {

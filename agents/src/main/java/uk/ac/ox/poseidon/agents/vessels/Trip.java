@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.Setter;
 import sim.util.Int2D;
@@ -30,6 +31,7 @@ import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 
 @Getter
 @Setter
+@SuppressFBWarnings(value = "EI_EXPOSE_REP")
 public class Trip {
 
     private final Vessel vessel;

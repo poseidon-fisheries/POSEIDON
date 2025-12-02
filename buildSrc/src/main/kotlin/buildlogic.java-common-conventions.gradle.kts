@@ -54,7 +54,7 @@ java {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.addAll(listOf("-Werror", "-Xlint:-processing"))
+    options.compilerArgs.addAll(listOf("-Werror", "-Xlint:-processing", "-Xlint:unchecked"))
 }
 
 tasks.named<Test>("test") {

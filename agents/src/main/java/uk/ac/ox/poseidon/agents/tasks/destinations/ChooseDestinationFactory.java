@@ -27,12 +27,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChooseDestinationFactory {
+public class ChooseDestinationFactory extends TaskFactory<ChooseDestination> {
+
     private VesselScopeFactory<? extends DestinationSupplier> destinationSupplier;
+
+    @Override
+    protected ChooseDestination newTask(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
+        return new ChooseDestination(destinationSupplier.get(simulation, vessel));
+    }
+
 }

@@ -228,7 +228,7 @@ public class TemporalSchedule extends Schedule {
     ) {
         final AtomicBoolean done = new AtomicBoolean(false);
         this.scheduleOnce(
-            toTime(dateTime) - 1,
+            toTime(dateTime),
             Integer.MAX_VALUE,
             (Steppable) sim -> done.set(true)
         );

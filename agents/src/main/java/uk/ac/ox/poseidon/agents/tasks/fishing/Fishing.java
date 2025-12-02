@@ -38,7 +38,7 @@ import java.util.function.Supplier;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 @RequiredArgsConstructor
-public class Fish extends ExtendedTripTask {
+public class Fishing extends ExtendedTripTask {
 
     @NonNull private final Supplier<Fisheable> fisheableSupplier;
     @NonNull private final DispositionProcess dispositionProcess;
@@ -66,13 +66,7 @@ public class Fish extends ExtendedTripTask {
         hold.addContent(disposition.getRetained());
         fisheable.release(disposition.getDiscardedAlive());
         getTrip().getEventManager().broadcast(
-            new FishingEvent(
-                getVessel(),
-                getStartDateTime(),
-                getVessel().getSchedule().getDateTime(),
-                grossCatch,
-                disposition
-            )
+            new FishingEvent(action, new FishingOutcome(grossCatch, disposition))
         );
         return SUCCEEDED;
     }
