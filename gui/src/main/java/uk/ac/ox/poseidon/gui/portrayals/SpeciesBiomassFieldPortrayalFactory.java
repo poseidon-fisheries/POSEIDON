@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
+import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -46,7 +47,11 @@ public class SpeciesBiomassFieldPortrayalFactory extends GlobalScopeFactory<Name
 
     @Override
     protected NamedPortrayal newInstance(final Simulation simulation) {
-        final String name = biomassGrid.get(simulation).getSpecies().getName() + " biomass";
+        final Species species = biomassGrid.get(simulation).getSpecies();
+        final String name =
+            species.getName() +
+                (species.getLifeStage() != null ? " " + species.getLifeStage() : "") +
+                " biomass";
         return new NamedPortrayal(
             name,
             new NumberGridWithCapacityPortrayalFactory(
