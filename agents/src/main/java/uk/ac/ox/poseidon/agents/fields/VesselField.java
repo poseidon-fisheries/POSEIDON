@@ -65,7 +65,8 @@ public class VesselField {
     }
 
     public Int2D getCell(final Vessel vessel) {
-        return modelGrid.toCell(getPoint(vessel));
+        final Double2D point = getPoint(vessel);
+        return point != null ? modelGrid.toCell(point) : null;
     }
 
 }
