@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 class ForbiddenIfFactoryTest {
 
     /**
@@ -51,11 +52,11 @@ class ForbiddenIfFactoryTest {
             (GlobalScopeFactory<Predicate<Action<?>>>) mock(GlobalScopeFactory.class);
         when(mockActionPredicateFactory.get(mockSimulation)).thenReturn(mockActionPredicate);
 
-        final ForbiddenIfFactory forbiddenIfFactory =
-            new ForbiddenIfFactory(mockActionPredicateFactory);
+        final ForbiddenIfFactory<Object> forbiddenIfFactory =
+            new ForbiddenIfFactory<>(mockActionPredicateFactory);
 
         // Act
-        final ForbiddenIf result = forbiddenIfFactory.newInstance(mockSimulation);
+        final ForbiddenIf<Object> result = forbiddenIfFactory.newInstance(mockSimulation);
 
         // Assert
         assertNotNull(result);

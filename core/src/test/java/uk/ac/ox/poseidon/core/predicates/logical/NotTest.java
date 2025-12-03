@@ -30,6 +30,7 @@ import java.util.function.Predicate;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SuppressWarnings("unchecked")
 class NotTest {
 
     @Test
@@ -37,7 +38,7 @@ class NotTest {
         // Arrange
         final Predicate<Object> innerPredicate = Mockito.mock(Predicate.class);
         Mockito.when(innerPredicate.test(Mockito.any())).thenReturn(true);
-        final Not notPredicate = new Not(innerPredicate);
+        final Not<Object> notPredicate = new Not<>(innerPredicate);
         final Object mockObject = Mockito.mock(Object.class);
 
         // Act
@@ -55,7 +56,7 @@ class NotTest {
         // Arrange
         final Predicate<Object> innerPredicate = Mockito.mock(Predicate.class);
         Mockito.when(innerPredicate.test(Mockito.any())).thenReturn(false);
-        final Not notPredicate = new Not(innerPredicate);
+        final Not<Object> notPredicate = new Not<>(innerPredicate);
         final Object mockObject = Mockito.mock(Object.class);
 
         // Act

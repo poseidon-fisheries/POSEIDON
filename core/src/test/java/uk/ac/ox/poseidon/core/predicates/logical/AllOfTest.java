@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SuppressWarnings("unchecked")
 class AllOfTest {
 
     /**
@@ -50,7 +51,11 @@ class AllOfTest {
         Mockito.when(predicate2.test(object)).thenReturn(true);
         Mockito.when(predicate3.test(object)).thenReturn(true);
 
-        final AllOf allOf = new AllOf(ImmutableList.of(predicate1, predicate2, predicate3));
+        final AllOf<Object> allOf = new AllOf<>(ImmutableList.of(
+            predicate1,
+            predicate2,
+            predicate3
+        ));
         assertTrue(allOf.test(object), "Expected all predicates to return true.");
     }
 
@@ -66,7 +71,11 @@ class AllOfTest {
         Mockito.when(predicate2.test(object)).thenReturn(false);
         Mockito.when(predicate3.test(object)).thenReturn(true);
 
-        final AllOf allOf = new AllOf(ImmutableList.of(predicate1, predicate2, predicate3));
+        final AllOf<Object> allOf = new AllOf<>(ImmutableList.of(
+            predicate1,
+            predicate2,
+            predicate3
+        ));
         assertFalse(
             allOf.test(object),
             "Expected test to return false as one predicate returned false."
@@ -83,7 +92,7 @@ class AllOfTest {
         Mockito.when(predicate1.test(object)).thenReturn(false);
         Mockito.when(predicate2.test(object)).thenReturn(false);
 
-        final AllOf allOf = new AllOf(ImmutableList.of(predicate1, predicate2));
+        final AllOf<Object> allOf = new AllOf<>(ImmutableList.of(predicate1, predicate2));
         assertFalse(
             allOf.test(object),
             "Expected test to return false as all predicates returned false."
@@ -94,7 +103,7 @@ class AllOfTest {
     void testEmptyPredicates() {
         final Object object = Mockito.mock(Object.class);
 
-        final AllOf allOf = new AllOf(ImmutableList.of());
+        final AllOf<Object> allOf = new AllOf<>(ImmutableList.of());
         assertTrue(
             allOf.test(object),
             "Expected test to return true as no predicates are present."

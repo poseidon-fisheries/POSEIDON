@@ -200,25 +200,24 @@ class FleetFromVesselRegisterFactoryTest {
         assertThatThrownBy(
             () -> {
                 initSimulation("""
-                    V3,Vee Three,P1,MOD,2001-01-02,Gx,0,x
+                    V3,Vee Three,P1,MOD,2001-01-02,G1,0,x
                     """
                 );
-                simulation.stepFor(Duration.ofDays(1));
+                simulation.stepFor(Duration.ofDays(2));
             }
         ).hasMessageContaining("V3");
     }
 
     @Test
     void assignNonExistingPort() {
-        assertThatThrownBy(
-            () -> {
-                initSimulation("""
-                    V1,Vee One,P3,MOD,2001-01-02,Gx,0,x
-                    """
-                );
-                simulation.stepFor(Duration.ofDays(1));
-            }
-        ).hasMessageContaining("P3");
+        initSimulation("""
+            V1,Vee One,P3,MOD,2001-01-01,G1,0,x
+            """
+        );
+        simulation.stepFor(Duration.ofDays(1));
+        final Vessel v1 = fleet.getVessel("V1").orElseThrow();
+        assertThat(v1.getHomePort()).isNull();
+        assertThat(v1.isActive()).isFalse();
     }
 
     @AfterEach

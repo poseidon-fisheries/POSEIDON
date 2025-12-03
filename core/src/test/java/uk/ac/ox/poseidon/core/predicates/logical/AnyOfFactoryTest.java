@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 class AnyOfFactoryTest {
 
     /**
@@ -49,10 +50,10 @@ class AnyOfFactoryTest {
         final Factory<Predicate<Object>> mockFactory = mock(Factory.class);
         when(mockFactory.get(simulation)).thenReturn(mockPredicate);
 
-        final AnyOfFactory anyOfFactory = new AnyOfFactory(List.of(mockFactory));
+        final AnyOfFactory<Object> anyOfFactory = new AnyOfFactory<>(List.of(mockFactory));
 
         // Act
-        final AnyOf result = anyOfFactory.newInstance(simulation);
+        final AnyOf<Object> result = anyOfFactory.newInstance(simulation);
 
         // Assert
         assertNotNull(result, "The result of newInstance should not be null");
@@ -81,10 +82,13 @@ class AnyOfFactoryTest {
         final Factory<Predicate<Object>> mockFactory2 = mock(Factory.class);
         when(mockFactory2.get(simulation)).thenReturn(mockPredicate2);
 
-        final AnyOfFactory anyOfFactory = new AnyOfFactory(List.of(mockFactory1, mockFactory2));
+        final AnyOfFactory<Object> anyOfFactory = new AnyOfFactory<>(List.of(
+            mockFactory1,
+            mockFactory2
+        ));
 
         // Act
-        final AnyOf result = anyOfFactory.newInstance(simulation);
+        final AnyOf<Object> result = anyOfFactory.newInstance(simulation);
 
         // Assert
         assertNotNull(result, "The result of newInstance should not be null");
@@ -99,10 +103,10 @@ class AnyOfFactoryTest {
     void testNewInstance_WhenNoPredicates() {
         // Arrange
         final Simulation simulation = mock(Simulation.class);
-        final AnyOfFactory anyOfFactory = new AnyOfFactory(List.of());
+        final AnyOfFactory<Object> anyOfFactory = new AnyOfFactory<>(List.of());
 
         // Act
-        final AnyOf result = anyOfFactory.newInstance(simulation);
+        final AnyOf<Object> result = anyOfFactory.newInstance(simulation);
 
         // Assert
         assertNotNull(result, "The result of newInstance should not be null");
@@ -120,7 +124,7 @@ class AnyOfFactoryTest {
         final Factory<Predicate<Object>> mockFactory = mock(Factory.class);
         when(mockFactory.get(simulation)).thenReturn(mock(Predicate.class));
 
-        final AnyOfFactory anyOfFactory = new AnyOfFactory(List.of(mockFactory));
+        final AnyOfFactory<Object> anyOfFactory = new AnyOfFactory<>(List.of(mockFactory));
 
         // Act
         anyOfFactory.newInstance(simulation);

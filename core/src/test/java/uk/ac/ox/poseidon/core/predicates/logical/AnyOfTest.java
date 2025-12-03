@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("unchecked")
 class AnyOfTest {
 
     @Test
@@ -41,7 +42,7 @@ class AnyOfTest {
         final Predicate<Object> falsePredicate1 = act -> false;
         final Predicate<Object> falsePredicate2 = act -> false;
 
-        final AnyOf anyOf = new AnyOf(ImmutableList.of(falsePredicate1, falsePredicate2));
+        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(falsePredicate1, falsePredicate2));
 
         // Act
         final boolean result = anyOf.test(object);
@@ -57,7 +58,7 @@ class AnyOfTest {
         final Predicate<Object> falsePredicate = act -> false;
         final Predicate<Object> truePredicate = act -> true;
 
-        final AnyOf anyOf = new AnyOf(ImmutableList.of(falsePredicate, truePredicate));
+        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(falsePredicate, truePredicate));
 
         // Act
         final boolean result = anyOf.test(object);
@@ -81,7 +82,7 @@ class AnyOfTest {
         when(predicate1.test(object)).thenReturn(false);
         when(predicate2.test(object)).thenReturn(true);
 
-        final AnyOf anyOf = new AnyOf(ImmutableList.of(predicate1, predicate2));
+        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(predicate1, predicate2));
 
         // Act
         final boolean result = anyOf.test(object);
@@ -100,7 +101,7 @@ class AnyOfTest {
         when(predicate1.test(object)).thenReturn(false);
         when(predicate2.test(object)).thenReturn(false);
 
-        final AnyOf anyOf = new AnyOf(ImmutableList.of(predicate1, predicate2));
+        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(predicate1, predicate2));
 
         // Act
         final boolean result = anyOf.test(object);
@@ -114,7 +115,7 @@ class AnyOfTest {
         // Arrange
         final Object object = mock(Object.class);
 
-        final AnyOf anyOf = new AnyOf(ImmutableList.of());
+        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of());
 
         // Act
         final boolean result = anyOf.test(object);
@@ -131,7 +132,7 @@ class AnyOfTest {
 
         when(predicate.test(object)).thenReturn(true);
 
-        final AnyOf anyOf = new AnyOf(ImmutableList.of(predicate));
+        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(predicate));
 
         // Act
         final boolean result = anyOf.test(object);
@@ -148,7 +149,7 @@ class AnyOfTest {
 
         when(predicate.test(object)).thenReturn(false);
 
-        final AnyOf anyOf = new AnyOf(ImmutableList.of(predicate));
+        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(predicate));
 
         // Act
         final boolean result = anyOf.test(object);

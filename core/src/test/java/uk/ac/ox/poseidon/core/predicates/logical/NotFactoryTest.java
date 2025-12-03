@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("unchecked")
 class NotFactoryTest {
 
     /**
@@ -50,10 +51,10 @@ class NotFactoryTest {
 
         when(mockFactory.get(Mockito.any())).thenReturn(mockPredicate);
 
-        final NotFactory notFactory = new NotFactory(mockFactory);
+        final NotFactory<Object> notFactory = new NotFactory<>(mockFactory);
 
         // Act
-        final Not result = notFactory.newInstance(mockSimulation);
+        final Not<Object> result = notFactory.newInstance(mockSimulation);
 
         // Assert
         assertNotNull(result, "The resulting Not instance should not be null.");
@@ -71,7 +72,7 @@ class NotFactoryTest {
 
         when(mockFactory.get(Mockito.any())).thenReturn(null);
 
-        final NotFactory notFactory = new NotFactory(mockFactory);
+        final NotFactory<Object> notFactory = new NotFactory<>(mockFactory);
 
         // Act & Assert
         assertThrows(

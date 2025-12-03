@@ -32,6 +32,7 @@ import java.util.function.Predicate;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("unchecked")
 class PermittedIfFactoryTest {
 
     /**
@@ -46,18 +47,19 @@ class PermittedIfFactoryTest {
     void testNewInstance_ShouldCreatePermittedIf() {
         // Mock the simulation and action predicate factory
         final Simulation simulation = Mockito.mock(Simulation.class);
-        final GlobalScopeFactory<Predicate<Action>> mockedActionPredicateFactory = Mockito.mock(
-            GlobalScopeFactory.class);
+        final GlobalScopeFactory<Predicate<Action<Object>>> mockedActionPredicateFactory =
+            Mockito.mock(GlobalScopeFactory.class);
 
         // Mock the returned predicate
-        final Predicate<Action> mockedPredicate = Mockito.mock(Predicate.class);
+        final Predicate<Action<Object>> mockedPredicate = Mockito.mock(Predicate.class);
         when(mockedActionPredicateFactory.get(simulation)).thenReturn(mockedPredicate);
 
         // Create an instance of PermittedIfFactory with the mocked action predicate factory
-        final PermittedIfFactory factory = new PermittedIfFactory(mockedActionPredicateFactory);
+        final PermittedIfFactory<Object> factory =
+            new PermittedIfFactory<>(mockedActionPredicateFactory);
 
         // Call the newInstance method
-        final PermittedIf permittedIf = factory.newInstance(simulation);
+        final PermittedIf<Object> permittedIf = factory.newInstance(simulation);
 
         // Verify output
         assertNotNull(permittedIf, "PermittedIf instance should not be null");
@@ -67,19 +69,19 @@ class PermittedIfFactoryTest {
     void testNewInstance_WithDifferentPredicates_ShouldCreatePermittedIf() {
         // Mock the simulation and another action predicate factory
         final Simulation simulation = Mockito.mock(Simulation.class);
-        final GlobalScopeFactory<Predicate<Action>> anotherMockedActionPredicateFactory =
+        final GlobalScopeFactory<Predicate<Action<Object>>> anotherMockedActionPredicateFactory =
             Mockito.mock(GlobalScopeFactory.class);
 
         // Mock a different predicate
-        final Predicate<Action> anotherMockedPredicate = Mockito.mock(Predicate.class);
+        final Predicate<Action<Object>> anotherMockedPredicate = Mockito.mock(Predicate.class);
         when(anotherMockedActionPredicateFactory.get(simulation)).thenReturn(anotherMockedPredicate);
 
         // Create a new PermittedIfFactory instance with the different factory
-        final PermittedIfFactory factory = new PermittedIfFactory(
-            anotherMockedActionPredicateFactory);
+        final PermittedIfFactory<Object> factory =
+            new PermittedIfFactory<>(anotherMockedActionPredicateFactory);
 
         // Call the newInstance method
-        final PermittedIf permittedIf = factory.newInstance(simulation);
+        final PermittedIf<Object> permittedIf = factory.newInstance(simulation);
 
         // Verify
         assertNotNull(permittedIf, "PermittedIf instance should not be null");

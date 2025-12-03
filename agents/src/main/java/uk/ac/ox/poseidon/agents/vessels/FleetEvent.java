@@ -31,7 +31,6 @@ import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.LocalDateTime;
@@ -39,19 +38,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.google.common.base.Preconditions.checkState;
+import static uk.ac.ox.poseidon.agents.vessels.FleetEvent.Type.ACTIVATION;
 
 @Value
 public class FleetEvent implements Steppable {
 
-    @AllArgsConstructor
-    public enum Type {
-        ACTIVATION("activate"),
-        DEACTIVATION("deactivate"),
-        MODIFICATION("modify");
-        private final String verb;
-    }
-
+    private static final System.Logger logger =
+        System.getLogger(FleetEvent.class.getName());
     @NonNull LocalDateTime dateTime;
     @NonNull Fleet fleet;
     @NonNull Type eventType;
@@ -59,7 +52,6 @@ public class FleetEvent implements Steppable {
     @NonNull String vesselName;
     @NonNull String portCode;
     @NonNull Map<String, Object> tags;
-
     @NonNull Function<Vessel, BehaviorTree<Vessel>> initialBehaviourFactoryFunction;
     @NonNull Function<Vessel, Hold> holdFactoryFunction;
     @NonNull Function<Vessel, Gear> gearFactoryFunction;
@@ -67,11 +59,16 @@ public class FleetEvent implements Steppable {
 
     @Override
     public void step(final SimState simState) {
-        checkState(simState instanceof Simulation);
 
         final Vessel vessel = fleet
             .getVessel(vesselId)
-            .orElseGet(() -> fleet.createVessel(vesselId));
+            .orElseGet(() -> {
+                if (eventType == ACTIVATION)
+                    return fleet.createVessel(vesselId);
+                else
+                    throw new IllegalStateException("Vessel " + vesselId + " does not exist");
+            });
+
         final Optional<Port> port = fleet
             .getPortGrid()
             .getObject(portCode);
@@ -100,5 +97,13 @@ public class FleetEvent implements Steppable {
             case DEACTIVATION -> vessel.setActiveInRegister(false);
             default -> {} // modification events don't change active status
         }
+    }
+
+    @AllArgsConstructor
+    public enum Type {
+        ACTIVATION("activate"),
+        DEACTIVATION("deactivate"),
+        MODIFICATION("modify");
+        private final String verb;
     }
 }

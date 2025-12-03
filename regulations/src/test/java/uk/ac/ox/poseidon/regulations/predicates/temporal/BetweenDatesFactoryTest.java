@@ -41,6 +41,7 @@ import static org.mockito.Mockito.when;
  * `newInstance` method creates a new {@link BetweenDates} object using the start and end dates
  * obtained from the provided {@link Simulation}.
  */
+@SuppressWarnings("unchecked")
 class BetweenDatesFactoryTest {
 
     /**

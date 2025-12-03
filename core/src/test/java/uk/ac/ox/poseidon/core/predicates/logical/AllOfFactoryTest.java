@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 class AllOfFactoryTest {
 
     /**
@@ -54,10 +55,11 @@ class AllOfFactoryTest {
         when(factoryMock1.get(simulationMock)).thenReturn(predicate1);
         when(factoryMock2.get(simulationMock)).thenReturn(predicate2);
 
-        final AllOfFactory allOfFactory = new AllOfFactory(List.of(factoryMock1, factoryMock2));
+        final AllOfFactory<Object> allOfFactory =
+            new AllOfFactory<>(List.of(factoryMock1, factoryMock2));
 
         // Act
-        final AllOf allOf = allOfFactory.newInstance(simulationMock);
+        final AllOf<Object> allOf = allOfFactory.newInstance(simulationMock);
 
         // Assert
         assertEquals(
@@ -73,9 +75,10 @@ class AllOfFactoryTest {
     void newInstance_throwsExceptionWhenSimulationIsNull() {
         // Arrange
         final Factory<Predicate<Object>> factoryMock = mock(Factory.class);
-        final AllOfFactory allOfFactory = new AllOfFactory(List.of(factoryMock));
+        final AllOfFactory<Object> allOfFactory = new AllOfFactory<>(List.of(factoryMock));
 
         // Act & Assert
+        // noinspection DataFlowIssue
         assertThrows(
             NullPointerException.class, () -> allOfFactory.newInstance(null),
             "A NullPointerException should be thrown if simulation is null"
@@ -86,10 +89,10 @@ class AllOfFactoryTest {
     void newInstance_createsInstanceWithEmptyPredicateList() {
         // Arrange
         final Simulation simulationMock = mock(Simulation.class);
-        final AllOfFactory allOfFactory = new AllOfFactory(List.of());
+        final AllOfFactory<Object> allOfFactory = new AllOfFactory<>(List.of());
 
         // Act
-        final AllOf allOf = allOfFactory.newInstance(simulationMock);
+        final AllOf<Object> allOf = allOfFactory.newInstance(simulationMock);
 
         // Assert
         assertEquals(
@@ -108,7 +111,7 @@ class AllOfFactoryTest {
 
         when(factoryMock.get(simulationMock)).thenReturn(predicateMock);
 
-        final AllOfFactory allOfFactory = new AllOfFactory(List.of(factoryMock));
+        final AllOfFactory<Object> allOfFactory = new AllOfFactory<>(List.of(factoryMock));
 
         // Act
         allOfFactory.newInstance(simulationMock);
