@@ -20,32 +20,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels;
+package uk.ac.ox.poseidon.agents.choices.evaluation;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.events.EventManager;
-import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
+import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
 @Setter
-@SuppressFBWarnings(value = "EI_EXPOSE_REP")
-public class Trip {
+@NoArgsConstructor
+@AllArgsConstructor
+public class TripEvaluatorFactory extends VesselScopeFactory<TripEvaluator> {
 
-    private final Vessel vessel;
-    private final EventManager eventManager;
-    private final Int2D origin;
-    private Int2D destination;
+    private VesselScopeFactory<? extends MutableOptionValues<Int2D>> optionValues;
+    private VesselScopeFactory<? extends EvaluationProvider<Int2D>> evaluationProvider;
 
-    public Trip(final Vessel vessel) {
-        this.vessel = vessel;
-        this.eventManager = new ForwardingEventManager(vessel.getEventManager());
-        this.origin = vessel.getCell();
-    }
-
-    public void setDestinationToOrigin() {
-        destination = origin;
+    @Override
+    protected TripEvaluator newInstance(
+        final Simulation simulation,
+        final Vessel vessel
+    ) {
+        return new TripEvaluator(
+            vessel.getEventManager(),
+            optionValues.get(simulation, vessel),
+            evaluationProvider.get(simulation, vessel)
+        );
     }
 }

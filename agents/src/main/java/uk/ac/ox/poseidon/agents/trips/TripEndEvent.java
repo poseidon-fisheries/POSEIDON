@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,9 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices;
+package uk.ac.ox.poseidon.agents.trips;
 
-@FunctionalInterface
-public interface Evaluation {
-    double getResult();
+import lombok.Value;
+
+@Value
+public class TripEndEvent implements TripEvent {
+    Trip trip;
 }

@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.agents.tasks.travel;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.VesselTask;
-import uk.ac.ox.poseidon.agents.vessels.Trip;
+import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
@@ -63,7 +63,7 @@ public class TravelAlongPath extends VesselTask {
         trip = checkNotNull(getVessel().getCurrentTrip());
         startDateTime = getVessel().getSchedule().getDateTime();
         origin = getVessel().getCell();
-        destination = checkNotNull(trip.getDestination());
+        destination = checkNotNull(getVessel().getCurrentTrip().getDestination());
         currentPath =
             pathFinder
                 .getPath(getVessel().getCell(), destination)
@@ -81,7 +81,7 @@ public class TravelAlongPath extends VesselTask {
     @Override
     public Status execute() {
         final Vessel vessel = getVessel();
-        final Int2D destinationCell = checkNotNull(trip.getDestination());
+        final Int2D destinationCell = checkNotNull(getVessel().getCurrentTrip().getDestination());
         checkState(
             // TODO: consider whether we should reroute instead
             currentPath.getLast().equals(destinationCell),

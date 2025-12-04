@@ -36,16 +36,16 @@ import uk.ac.ox.poseidon.core.Simulation;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChooseDestinationFactory extends TaskFactory<ChooseDestination> {
+public class StartTripFactory extends TaskFactory<StartTrip> {
 
     private VesselScopeFactory<? extends DestinationSupplier> destinationSupplier;
 
     @Override
-    protected ChooseDestination newTask(
+    protected StartTrip newTask(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new ChooseDestination(destinationSupplier.get(simulation, vessel));
+        return new StartTrip(destinationSupplier.get(simulation, vessel));
     }
 
 }

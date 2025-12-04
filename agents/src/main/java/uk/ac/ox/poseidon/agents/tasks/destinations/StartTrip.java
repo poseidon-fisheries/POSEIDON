@@ -25,24 +25,21 @@ package uk.ac.ox.poseidon.agents.tasks.destinations;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
 import uk.ac.ox.poseidon.agents.tasks.VesselTask;
-import uk.ac.ox.poseidon.agents.vessels.Trip;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 @RequiredArgsConstructor
-public class ChooseDestination extends VesselTask {
+public class StartTrip extends VesselTask {
 
     private final DestinationSupplier destinationSupplier;
 
     @Override
     public Status execute() {
-        final Trip trip = checkNotNull(getVessel().getCurrentTrip());
         return destinationSupplier
             .get()
             .map(destination -> {
-                trip.setDestination(destination);
+                getVessel().startTrip(destination);
                 return SUCCEEDED;
             })
             .orElse(FAILED);

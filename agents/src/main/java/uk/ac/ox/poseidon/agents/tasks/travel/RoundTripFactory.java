@@ -36,7 +36,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 @AllArgsConstructor
 public class RoundTripFactory extends TaskFactory<Sequence<Vessel>> {
 
-    private TaskFactory<?> chooseDestinationTask;
+    private TaskFactory<?> startTripTask;
     private TaskFactory<?> travelTask;
     private TaskFactory<?> fishingTask;
     private TaskFactory<?> landingTask;
@@ -47,14 +47,12 @@ public class RoundTripFactory extends TaskFactory<Sequence<Vessel>> {
         final Simulation simulation,
         final Vessel vessel
     ) {
-        final Task<Vessel> chooseDestinationTask =
-            this.chooseDestinationTask.get(simulation, vessel);
+        final Task<Vessel> startTripTask = this.startTripTask.get(simulation, vessel);
         final Task<Vessel> travelTask = this.travelTask.get(simulation, vessel);
         final Task<Vessel> fishingTask = this.fishingTask.get(simulation, vessel);
         final Task<Vessel> landingTask = this.landingTask.get(simulation, vessel);
         return new Sequence<>(
-            new StartTrip(),
-            chooseDestinationTask,
+            startTripTask,
             travelTask,
             fishingTask,
             new SetDestinationToOrigin(),

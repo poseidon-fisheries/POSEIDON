@@ -46,7 +46,7 @@ public class VesselPredicateTaskFactory extends TaskFactory<VesselPredicateTask>
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return null;
+        return new VesselPredicateTask(predicate.get(simulation));
     }
 
 }

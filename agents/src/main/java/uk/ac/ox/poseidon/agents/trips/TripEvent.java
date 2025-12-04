@@ -20,24 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks;
+package uk.ac.ox.poseidon.agents.trips;
 
-import lombok.Getter;
-import uk.ac.ox.poseidon.agents.trips.Trip;
-
-import java.time.LocalDateTime;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-@Getter
-public abstract class ExtendedTripTask extends ExtendedTask {
-
-    private Trip trip;
-    private LocalDateTime startDateTime;
-
-    @Override
-    public void start() {
-        trip = checkNotNull(getVessel().getCurrentTrip());
-        startDateTime = getVessel().getSchedule().getDateTime();
-    }
+public interface TripEvent {
+    Trip getTrip();
 }

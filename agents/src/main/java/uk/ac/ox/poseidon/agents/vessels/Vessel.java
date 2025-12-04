@@ -33,6 +33,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
+import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
@@ -186,11 +187,12 @@ public class Vessel extends Agent<Vessel> implements Oriented2D {
         return Optional.ofNullable(tags.get(key));
     }
 
-    public void startTrip() {
-        this.currentTrip = new Trip(this);
+    public void startTrip(final Int2D destination) {
+        this.currentTrip = new Trip(this, destination);
     }
 
     public void endTrip() {
+        currentTrip.endTrip();
         this.currentTrip = null;
     }
 }

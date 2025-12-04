@@ -25,55 +25,39 @@ package uk.ac.ox.poseidon.agents.choices;
 import ec.util.MersenneTwisterFast;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.Map.entry;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class EpsilonGreedyChooser<O> implements Supplier<Optional<O>> {
 
     private final double epsilon;
-
-    private final MutableOptionValues<O> optionValues;
     private final Picker<O> explorer;
     private final Picker<O> exploiter;
-    private final Evaluator<O> evaluator;
     private final MersenneTwisterFast rng;
-    private Optional<Entry<O, Evaluation>> valuedOption = Optional.empty();
 
     @SuppressFBWarnings(value = "EI2")
     EpsilonGreedyChooser(
         final double epsilon,
-        final MutableOptionValues<O> optionValues,
         final Picker<O> explorer,
         final Picker<O> exploiter,
-        final Evaluator<O> evaluator,
         final MersenneTwisterFast rng
     ) {
-        this.optionValues = checkNotNull(optionValues);
         this.explorer = explorer;
         this.exploiter = exploiter;
-        this.evaluator = checkNotNull(evaluator);
         this.epsilon = checkUnitRange(epsilon, "epsilon");
         this.rng = checkNotNull(rng);
     }
 
     @Override
     public Optional<O> get() {
-        valuedOption.ifPresent(entry ->
-            optionValues.observe(entry.getKey(), entry.getValue().getResult())
-        );
         final boolean explore = rng.nextBoolean(epsilon);
-        valuedOption = Optional
+        return Optional
             .of(exploiter)
             .filter(__ -> !explore)
             .flatMap(Picker::pick)
-            .or(explorer::pick)
-            .map(option -> entry(option, evaluator.newEvaluation(option)));
-        return valuedOption.map(Entry::getKey);
+            .or(explorer::pick);
     }
 }

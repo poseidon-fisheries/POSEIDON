@@ -20,18 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.travel;
+package uk.ac.ox.poseidon.agents.trips;
 
-import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+import lombok.Value;
 
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
-
-public class StartTrip extends VesselTask {
-
-    @Override
-    public Status execute() {
-        getVessel().startTrip();
-        return SUCCEEDED;
-    }
-
+@Value
+public class TripStartEvent implements TripEvent {
+    Trip trip;
 }

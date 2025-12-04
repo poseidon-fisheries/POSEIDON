@@ -29,7 +29,7 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 public class SetDestinationToOrigin extends VesselTask {
     @Override
     public Status execute() {
-        getVessel().getCurrentTrip().setDestinationToOrigin();
+        getVessel().getCurrentTrip().setDestinationToTripOrigin();
         return SUCCEEDED;
     }
 }

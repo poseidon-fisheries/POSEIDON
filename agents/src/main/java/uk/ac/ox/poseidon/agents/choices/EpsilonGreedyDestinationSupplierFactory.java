@@ -38,10 +38,8 @@ import uk.ac.ox.poseidon.core.Simulation;
 public class EpsilonGreedyDestinationSupplierFactory extends VesselScopeFactory<DestinationSupplier> {
 
     private double epsilon;
-    private VesselScopeFactory<? extends MutableOptionValues<Int2D>> optionValues;
     private VesselScopeFactory<? extends Picker<Int2D>> explorer;
     private VesselScopeFactory<? extends Picker<Int2D>> exploiter;
-    private VesselScopeFactory<? extends Evaluator<Int2D>> destinationEvaluator;
 
     @Override
     protected DestinationSupplier newInstance(
@@ -50,10 +48,8 @@ public class EpsilonGreedyDestinationSupplierFactory extends VesselScopeFactory<
     ) {
         return new EpsilonGreedyChooser<>(
             epsilon,
-            optionValues.get(simulation, vessel),
             explorer.get(simulation, vessel),
             exploiter.get(simulation, vessel),
-            destinationEvaluator.get(simulation, vessel),
             simulation.random
         )::get;
     }

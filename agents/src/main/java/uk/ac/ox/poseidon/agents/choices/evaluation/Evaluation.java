@@ -20,8 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices;
+package uk.ac.ox.poseidon.agents.choices.evaluation;
 
-public interface Evaluator<O> {
-    Evaluation newEvaluation(O option);
+public interface Evaluation<O> {
+
+    O getOption();
+
+    double getResult();
+
 }

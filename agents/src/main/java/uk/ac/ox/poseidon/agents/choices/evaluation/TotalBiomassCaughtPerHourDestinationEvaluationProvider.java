@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,50 +20,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices;
+package uk.ac.ox.poseidon.agents.choices.evaluation;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.CombiningEphemeralAccumulatingListener;
+import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ExtendedEvent;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class TotalBiomassCaughtPerHourDestinationEvaluatorFactory
-    extends VesselScopeFactory<Evaluator<Int2D>> {
-
-    private Factory<? extends PortGrid> portGrid;
+public class TotalBiomassCaughtPerHourDestinationEvaluationProvider implements EvaluationProvider<Int2D> {
 
     @Override
-    protected Evaluator<Int2D> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
+    public uk.ac.ox.poseidon.agents.choices.evaluation.Evaluation<Int2D> newEvaluation(
+        final Int2D option,
+        final EventManager eventManager
     ) {
-        return option -> new Evaluation(portGrid.get(simulation), vessel);
+        return new Evaluation(option, eventManager);
     }
 
-    private static class Evaluation implements uk.ac.ox.poseidon.agents.choices.Evaluation {
+    private static class Evaluation
+        implements uk.ac.ox.poseidon.agents.choices.evaluation.Evaluation<Int2D> {
 
-        private final CombiningEphemeralAccumulatingListener
+        @Getter private final Int2D option;
+        private Double result;
+
+        private CombiningEphemeralAccumulatingListener
             <FishingEvent, Double, ExtendedEvent, Double, Double> listener;
 
         private Evaluation(
-            final PortGrid portGrid,
-            final Vessel vessel
+            final Int2D option,
+            final EventManager eventManager
         ) {
-            listener = new CombiningEphemeralAccumulatingListener<>(
-                vessel.getCurrentTrip().getEventManager(),
+            this.option = option;
+            this.listener = new CombiningEphemeralAccumulatingListener<>(
+                eventManager,
                 FishingEvent.class,
                 0.0,
                 (caughtSoFar, fishingEvent) -> caughtSoFar +
@@ -83,7 +74,12 @@ public class TotalBiomassCaughtPerHourDestinationEvaluatorFactory
 
         @Override
         public double getResult() {
-            return listener.get();
+            if (result == null) {
+                result = listener.get();
+                listener = null;
+            }
+            return result;
         }
     }
+
 }
