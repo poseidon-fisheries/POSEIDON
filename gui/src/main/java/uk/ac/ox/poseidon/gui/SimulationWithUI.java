@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.gui;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import com.google.common.collect.ImmutableList;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import sim.display.Controller;
 import sim.display.GUIState;
 import sim.engine.Steppable;
@@ -60,6 +61,7 @@ public class SimulationWithUI extends GUIState {
         FlatLightLaf.setup();
     }
 
+    @SuppressFBWarnings("HSM")
     public static String getName() {
         return "POSEIDON";
     }

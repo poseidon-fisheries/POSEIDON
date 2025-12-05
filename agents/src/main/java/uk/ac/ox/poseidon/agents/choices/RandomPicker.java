@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.agents.choices;
 
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +38,6 @@ public class RandomPicker<O> implements Picker<O> {
     private final Predicate<O> optionPredicate;
     private final MersenneTwisterFast rng;
 
-    @SuppressFBWarnings(value = "EI2")
     RandomPicker(
         final List<O> options,
         final Predicate<O> optionPredicate,

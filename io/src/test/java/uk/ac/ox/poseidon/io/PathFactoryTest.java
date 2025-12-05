@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.io;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.io.paths.PathFactory;
@@ -31,6 +32,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
+@SuppressFBWarnings("DMI")
 class PathFactoryTest {
 
     private static final String FOLDERS = "/a/b/c/";

@@ -40,6 +40,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.jqwik)
     testImplementation(libs.mockito)
+    testCompileOnly("${libs.spotbugs.annotations.get()}:${spotbugs.toolVersion.get()}")
     mockitoAgent(libs.mockito) { isTransitive = false }
     testRuntimeOnly(libs.junit.platform.launcher)
     compileOnly("${libs.spotbugs.annotations.get()}:${spotbugs.toolVersion.get()}")

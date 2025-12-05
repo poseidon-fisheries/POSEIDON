@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.NonNull;
 import sim.field.grid.SparseGrid2D;
@@ -46,7 +45,6 @@ public class PortGrid extends ObjectGrid<Port> {
     @NonNull
     private final BathymetricGrid bathymetricGrid;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public PortGrid(
         final @NonNull BathymetricGrid bathymetricGrid,
         final @NonNull SparseGrid2D sparseGrid2D
