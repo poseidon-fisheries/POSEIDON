@@ -4,7 +4,7 @@ batik = "1.18"
 commons-beanutils = "1.11.0"
 commons-io = "2.19.0"
 flatlaf = "3.5.4"
-gdx = "1.8.2"
+gdxai = "6726e345248ddcad7cec0737f6ad83e4e028266d"
 geotools = "34.0"
 guava = "33.4.0-jre"
 indriya = "2.2.2"
@@ -32,7 +32,7 @@ batik-transcoder = { module = "org.apache.xmlgraphics:batik-transcoder", version
 commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "commons-beanutils" }
 commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
 flatlaf = { module = "com.formdev:flatlaf", version.ref = "flatlaf" }
-gdx-ai = { module = "com.badlogicgames.gdx:gdx-ai", version.ref = "gdx" }
+gdx-ai = { module = "com.github.libgdx:gdx-ai", version.ref = "gdxai" }
 gt-api = { module = "org.geotools:gt-api", version.ref = "geotools" }
 gt-arcgrid = { module = "org.geotools:gt-arcgrid", version.ref = "geotools" }
 gt-coverage = { module = "org.geotools:gt-coverage", version.ref = "geotools" }

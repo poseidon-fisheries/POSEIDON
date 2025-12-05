@@ -38,8 +38,11 @@ public class FallbackPathfinder<P> implements PathFinder<P> {
         final P start,
         final P end
     ) {
-        return heuristicPathFinder
+        final Optional<ImmutableList<P>> path = heuristicPathFinder
             .getPath(start, end)
             .or(() -> canonicalPathFinder.getPath(start, end));
+        assert path.isEmpty() ||
+            (path.get().getFirst().equals(start) && path.get().getLast().equals(end));
+        return path;
     }
 }
