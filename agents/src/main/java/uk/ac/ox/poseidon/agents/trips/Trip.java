@@ -48,6 +48,7 @@ public class Trip {
         final Int2D destination
     ) {
         this.vessel = vessel;
+        this.destination = destination;
         this.eventManager = new ForwardingEventManager(vessel.getEventManager());
         this.origin = vessel.getCell();
         this.startDateTime = vessel.getSchedule().getDateTime();
