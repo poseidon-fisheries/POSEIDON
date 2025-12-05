@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
@@ -30,6 +31,7 @@ import uk.ac.ox.poseidon.agents.trips.TripStartEvent;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.Listener;
 
+@SuppressFBWarnings(value = "EI_EXPOSE_REP2")
 public class TripEvaluator implements Listener<TripEvent> {
 
     private final EventManager eventManager;
