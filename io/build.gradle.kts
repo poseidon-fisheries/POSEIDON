@@ -29,5 +29,6 @@ dependencies {
     api(libs.tablesaw.core)
     api(libs.snakeyaml)
     implementation(libs.commons.io)
+    implementation(libs.jcommander)
     runtimeOnly(libs.slf4j.jdk14) // tablesaw uses slf4j, which we reroute to j.u.Logging
 }
