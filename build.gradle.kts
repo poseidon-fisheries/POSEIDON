@@ -23,3 +23,9 @@
 tasks.register("test") {
     dependsOn(subprojects.map { it.tasks.named("test") })
 }
+
+subprojects {
+    tasks.withType<Jar>().configureEach {
+        archiveBaseName.set("${rootProject.name}-${project.name}")
+    }
+}
