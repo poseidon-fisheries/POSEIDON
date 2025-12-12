@@ -27,9 +27,9 @@ import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
+import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.regulations.FishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -43,10 +43,10 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalField;
-import java.util.List;
 import java.util.Objects;
 
 import static java.time.temporal.ChronoField.*;
+import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
 import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_MONTH;
 
 @Getter
@@ -56,9 +56,8 @@ import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.Up
 public class RegulationGridPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
 
     private Factory<? extends Regulations<Vessel>> regulations;
-    private Factory<? extends List<Vessel>> vessels;
+    private Factory<? extends VesselField> vesselField;
     private Factory<? extends BathymetricGrid> bathymetric;
-    private Factory<? extends Gear> fishingGear;
     private int displayWidth;
     private int displayHeight;
 
@@ -67,9 +66,8 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
         return new Portrayal(
             simulation.getTemporalSchedule(),
             regulations.get(simulation),
-            vessels.get(simulation),
+            vesselField.get(simulation),
             bathymetric.get(simulation),
-            fishingGear.get(simulation),
             EVERY_MONTH,
             displayWidth,
             displayHeight
@@ -103,28 +101,25 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
 
         private final TemporalSchedule schedule;
         private final Regulations<Vessel> regulations;
-        private final List<Vessel> vessels;
+        private final VesselField vesselField;
         private final BathymetricGrid bathymetricGrid;
         private final ObjectGrid2D grid;
         private final UpdateFrequency updateFrequency;
-        private final Gear gear;
         private long lastUpdated;
 
         Portrayal(
             final TemporalSchedule schedule,
             final Regulations<Vessel> regulations,
-            final List<Vessel> vessels,
+            final VesselField vesselField,
             final BathymetricGrid bathymetricGrid,
-            final Gear gear,
             final UpdateFrequency updateFrequency,
             final int displayWidth,
             final int displayHeight
         ) {
             super();
             this.regulations = regulations;
-            this.vessels = vessels;
+            this.vesselField = vesselField;
             this.bathymetricGrid = bathymetricGrid;
-            this.gear = gear;
             final int gridWidth = bathymetricGrid.getField().width;
             final int gridHeight = bathymetricGrid.getField().height;
             this.grid = new ObjectGrid2D(gridWidth, gridHeight);
@@ -160,8 +155,8 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
             bathymetricGrid.getActiveWaterCells().forEach(cell -> {
                 final LocalDateTime dateTime = schedule.getDateTime();
                 final boolean forbidden =
-                    vessels
-                        .stream()
+                    bagToStream(vesselField.getField().allObjects, Vessel.class)
+                        .filter(Vessel::isActive)
                         .map(vessel ->
                             new FishingAction(
                                 vessel,
