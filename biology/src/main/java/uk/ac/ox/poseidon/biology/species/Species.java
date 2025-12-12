@@ -55,4 +55,17 @@ public class Species {
         return this.code.equals(other.code) &&
             (this.lifeStage == null || this.lifeStage.equals(other.lifeStage));
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(this.code);
+        if (this.name != null && !this.code.isEmpty() && !this.code.equals(this.name)) {
+            sb.append(" - ").append(this.name);
+        }
+        if (this.lifeStage != null && !this.lifeStage.isEmpty()) {
+            sb.append(" (").append(this.lifeStage).append(")");
+        }
+        return sb.toString();
+    }
 }

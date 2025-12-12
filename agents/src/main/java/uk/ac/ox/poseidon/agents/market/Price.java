@@ -33,4 +33,9 @@ import javax.measure.quantity.Mass;
 public class Price {
     @NonNull Money amount;
     @NonNull Unit<Mass> biomassUnit;
+
+    @java.lang.Override
+    public String toString() {
+        return amount + " / " + biomassUnit;
+    }
 }
