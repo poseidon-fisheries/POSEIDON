@@ -143,10 +143,13 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
             final Graphics2D graphics,
             final DrawInfo2D info
         ) {
-            final long currentFieldValue = schedule.getDate().getLong(updateFrequency.field);
-            if (currentFieldValue != lastUpdated) {
-                updateGrid();
-                lastUpdated = currentFieldValue;
+            final double time = schedule.getTime();
+            if (time >= TemporalSchedule.EPOCH && time < Double.POSITIVE_INFINITY) {
+                final long currentFieldValue = schedule.getDate().getLong(updateFrequency.field);
+                if (currentFieldValue != lastUpdated) {
+                    updateGrid();
+                    lastUpdated = currentFieldValue;
+                }
             }
             super.draw(object, graphics, info);
         }

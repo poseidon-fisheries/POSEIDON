@@ -239,7 +239,7 @@ public class TemporalSchedule extends Schedule {
 
     @Override
     public String toString() {
-        return "TemporalSchedule[" + toDateTime(time) + "]";
+        return "TemporalSchedule[" + getTimestamp() + "]";
     }
 
     public class TemporalRepeat extends Repeat {

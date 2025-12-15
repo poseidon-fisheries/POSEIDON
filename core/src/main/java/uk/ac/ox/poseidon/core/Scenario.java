@@ -61,24 +61,26 @@ public final class Scenario {
         this(startingDate.atStartOfDay(), components);
     }
 
-    public Simulation newSimulation() {
-        return newSimulation(System.currentTimeMillis(), UUID.randomUUID());
+    public Simulation startNewSimulation() {
+        return startNewSimulation(System.currentTimeMillis(), UUID.randomUUID());
     }
 
-    public Simulation newSimulation(final UUID simulationId) {
-        return newSimulation(System.currentTimeMillis(), simulationId);
+    public Simulation startNewSimulation(final UUID simulationId) {
+        return startNewSimulation(System.currentTimeMillis(), simulationId);
     }
 
-    public Simulation newSimulation(
+    public Simulation startNewSimulation(
         final long seed,
         final UUID simulationId
     ) {
-        return new Simulation(
-            seed,
-            new TemporalSchedule(startingDateTime.toInstant().atZone(UTC).toLocalDateTime()),
-            this,
-            simulationId
-        );
+        synchronized (this) {
+            return Simulation.startNewSimulation(
+                seed,
+                new TemporalSchedule(startingDateTime.toInstant().atZone(UTC).toLocalDateTime()),
+                simulationId,
+                getComponents().values().stream()
+            );
+        }
     }
 
     @SuppressWarnings("unchecked")

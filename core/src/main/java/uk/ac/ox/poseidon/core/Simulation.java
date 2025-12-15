@@ -35,7 +35,6 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.io.Serial;
 import java.text.MessageFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
@@ -50,38 +49,32 @@ public class Simulation extends SimState {
     @Serial private static final long serialVersionUID = -8162246985852120341L;
     private final EventManager eventManager = new SimpleEventManager();
     private final TemporalSchedule temporalSchedule;
-    private final Scenario scenario;
     private final UUID id;
     private final List<Steppable> finalProcesses = new ArrayList<>();
     private boolean started = false;
     private List<?> components;
 
-    public Simulation() {
-        this(
-            System.currentTimeMillis(),
-            new TemporalSchedule(LocalDate.now().atStartOfDay()),
-            new Scenario()
-        );
-    }
-
-    public Simulation(
+    static Simulation startNewSimulation(
         final long seed,
         final TemporalSchedule schedule,
-        final Scenario scenario
+        final UUID simulationId,
+        final Stream<? extends Factory<?>> components
     ) {
-        this(seed, schedule, scenario, UUID.randomUUID());
+        final Simulation simulation = new Simulation(seed, schedule, simulationId);
+        simulation.start();
+        simulation.components =
+            components.map(factory -> factory.get(simulation)).toList();
+        return simulation;
     }
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public Simulation(
+    private Simulation(
         final long seed,
         final TemporalSchedule schedule,
-        final Scenario scenario,
         final UUID simulationId
     ) {
         super(seed, schedule);
         this.temporalSchedule = checkNotNull(schedule);
-        this.scenario = scenario;
         this.id = simulationId;
     }
 
@@ -89,13 +82,6 @@ public class Simulation extends SimState {
     public void start() {
         if (started) throw new IllegalStateException("Simulation already started.");
         super.start();
-        this.components =
-            scenario
-                .getComponents()
-                .values()
-                .stream()
-                .map(factory -> factory.get(this))
-                .toList();
         started = true;
     }
 

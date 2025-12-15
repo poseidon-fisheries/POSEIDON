@@ -96,8 +96,7 @@ public class QuickRunner implements Runnable {
         final Scenario scenario,
         final TemporalAmount temporalAmount
     ) {
-        final Simulation simulation = scenario.newSimulation();
-        simulation.start();
+        final Simulation simulation = scenario.startNewSimulation();
         final TemporalSchedule schedule = simulation.getTemporalSchedule();
         logger.log(INFO, () -> "Simulation started (" + schedule.getDateTime() + ")");
         final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();

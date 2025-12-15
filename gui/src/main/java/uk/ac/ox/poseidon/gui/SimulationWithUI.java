@@ -29,7 +29,6 @@ import sim.display.Controller;
 import sim.display.GUIState;
 import sim.engine.Steppable;
 import sim.portrayal.Inspector;
-import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
@@ -70,7 +69,6 @@ public class SimulationWithUI extends GUIState {
     public void start() {
         this.simulation = simulationSupplier.get();
         super.state = this.simulation;
-        super.start();
         displayWrappers.forEach(displayWrapper -> displayWrapper.setupPortrayals(simulation));
     }
 
@@ -112,10 +110,6 @@ public class SimulationWithUI extends GUIState {
             return SimulationWithUI.this.simulation != null
                 ? property.apply(SimulationWithUI.this.simulation)
                 : null;
-        }
-
-        public Scenario getScenario() {
-            return propertyOrNull(Simulation::getScenario);
         }
 
         public UUID getId() {

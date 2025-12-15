@@ -105,8 +105,7 @@ class FleetFromVesselRegisterFactoryTest {
                         .behaviour(new BehaviourFactory(new WaitFactory(ONE_DAY_DURATION_SUPPLIER)))
                         .build()
                 )
-            ).newSimulation();
-        simulation.start();
+            ).startNewSimulation();
         fleet = simulation.getComponent(Fleet.class);
         assertThat(fleet.getVessels()).isEmpty();
         simulation.step();
