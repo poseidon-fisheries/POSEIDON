@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import lombok.Getter;
+import lombok.Setter;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
@@ -33,13 +34,14 @@ import java.util.function.Supplier;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 @Getter
-public class FixedProportionGear implements Gear {
+public class FixedBiomassProportionGear implements Gear {
 
     private final String code;
     private final double proportion;
     private final Supplier<Duration> durationSupplier;
+    @Setter private boolean active = true;
 
-    FixedProportionGear(
+    FixedBiomassProportionGear(
         final String code,
         final double proportion,
         final Supplier<Duration> durationSupplier

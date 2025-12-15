@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -28,28 +28,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
-
-import java.time.Duration;
-import java.util.function.Supplier;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class FixedBiomassProportionGearFactory
-    extends VesselScopeFactory<FixedBiomassProportionGear> {
+@AllArgsConstructor
+public class InactiveGearFactory extends VesselScopeFactory<InactiveGear> {
 
     private String code;
-    private double proportion;
-    private Factory<? extends Supplier<Duration>> durationSupplier;
 
     @Override
-    protected FixedBiomassProportionGear newInstance(
+    protected InactiveGear newInstance(
         final Simulation simulation,
         final Vessel vessel
     ) {
-        return new FixedBiomassProportionGear(code, proportion, durationSupplier.get(simulation));
+        return new InactiveGear(code);
     }
+
 }

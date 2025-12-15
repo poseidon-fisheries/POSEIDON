@@ -48,6 +48,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 @Getter
 @SuppressFBWarnings(value = "EI_EXPOSE_REP")
 public class Vessel extends Agent<Vessel> implements Oriented2D {
@@ -95,10 +97,8 @@ public class Vessel extends Agent<Vessel> implements Oriented2D {
     public boolean isActive() {
         return super.isActive() &&
             activeInRegister &&
-            homePort != null &&
-            hold != null &&
-            gear != null &&
-            engine != null;
+            gear.isActive() &&
+            homePort != null;
     }
 
     public void setHomePort(final Port homePort) {
@@ -110,14 +110,17 @@ public class Vessel extends Agent<Vessel> implements Oriented2D {
     }
 
     public void setHold(final Hold hold) {
+        checkNotNull(hold);
         mutate(() -> this.hold = hold);
     }
 
     public void setGear(final Gear gear) {
+        checkNotNull(gear);
         mutate(() -> this.gear = gear);
     }
 
     public void setEngine(final Engine engine) {
+        checkNotNull(engine);
         mutate(() -> this.engine = engine);
     }
 

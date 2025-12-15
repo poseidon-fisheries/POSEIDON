@@ -36,4 +36,6 @@ public interface Gear {
 
     Bucket fish(Fisheable fisheable);
 
+    boolean isActive();
+
 }
