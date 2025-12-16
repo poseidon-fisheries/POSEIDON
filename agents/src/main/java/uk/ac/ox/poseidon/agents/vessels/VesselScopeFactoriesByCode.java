@@ -38,6 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class VesselScopeFactoriesByCode<C> extends VesselScopeFactory<C> {
 
     @Singular private Map<String, ? extends VesselScopeFactory<? extends C>> factories;
+    private VesselScopeFactory<? extends C> defaultFactory;
     private String code;
 
     @Override
@@ -51,7 +52,14 @@ public class VesselScopeFactoriesByCode<C> extends VesselScopeFactory<C> {
         );
         return Optional
             .ofNullable(factories.get(code))
-            .map(factory -> factory.get(simulation, vessel))
-            .orElseThrow(() -> new IllegalArgumentException("No factory found for code: " + code));
+            .map(factory -> (C) factory.get(simulation, vessel))
+            .or(() ->
+                Optional
+                    .ofNullable(defaultFactory)
+                    .map(factory -> factory.get(simulation, vessel))
+            )
+            .orElseThrow(() -> new IllegalArgumentException(
+                "No factory found for code %s and no default factory provided.".formatted(code)
+            ));
     }
 }
