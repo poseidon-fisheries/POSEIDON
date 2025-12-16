@@ -22,11 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
-import com.badlogic.gdx.ai.btree.BehaviorTree;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
@@ -51,7 +51,7 @@ public class VesselActivationFactory extends SimulationScopeFactory<FleetEvent> 
     private String name;
     private String portCode;
     private Map<String, Factory<?>> tags;
-    private VesselScopeFactory<? extends BehaviorTree<Vessel>> behaviour;
+    private VesselScopeFactory<? extends Behaviour<Vessel>> behaviour;
     private VesselScopeFactory<? extends Hold> hold;
     private VesselScopeFactory<? extends Gear> gear;
     private VesselScopeFactory<? extends Engine> engine;

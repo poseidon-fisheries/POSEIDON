@@ -22,28 +22,38 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
+import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class BehaviourFactory extends VesselScopeFactory<Behaviour<Vessel>> {
+import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 
-    private VesselScopeFactory<? extends Task<Vessel>> rootTask;
+@RequiredArgsConstructor
+public class ActiveBehaviour<A> implements Behaviour<A> {
+
+    @NonNull
+    private final BehaviorTree<A> tree;
+
+    public ActiveBehaviour(
+        final Task<A> rootTask,
+        final A agent
+    ) {
+        this(new BehaviorTree<>(rootTask, agent));
+    }
 
     @Override
-    protected Behaviour<Vessel> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new ActiveBehaviour<>(rootTask.get(simulation, vessel), vessel);
+    public boolean isActive() {
+        return true;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return tree.getStatus() == RUNNING;
+    }
+
+    @Override
+    public void step() {
+        tree.step();
     }
 }

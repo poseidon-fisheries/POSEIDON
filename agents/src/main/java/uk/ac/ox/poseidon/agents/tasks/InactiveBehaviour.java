@@ -22,28 +22,19 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
-import com.badlogic.gdx.ai.btree.Task;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class BehaviourFactory extends VesselScopeFactory<Behaviour<Vessel>> {
-
-    private VesselScopeFactory<? extends Task<Vessel>> rootTask;
+public class InactiveBehaviour<A> implements Behaviour<A> {
+    @Override
+    public boolean isActive() {
+        return false;
+    }
 
     @Override
-    protected Behaviour<Vessel> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new ActiveBehaviour<>(rootTask.get(simulation, vessel), vessel);
+    public boolean isRunning() {
+        return false;
+    }
+
+    @Override
+    public void step() {
+        throw new IllegalStateException("Cannot step an inactive behaviour");
     }
 }

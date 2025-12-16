@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -33,6 +32,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
+import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
@@ -44,6 +44,7 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -63,13 +64,14 @@ public class Vessel extends Agent<Vessel> implements Oriented2D {
     public Vessel(
         @NonNull final TemporalSchedule schedule,
         @NonNull final EventManager eventManager,
+        @NonNull final Behaviour<Vessel> nextBehaviour,
         @NonNull final String id,
         @NonNull final Account account,
         @NonNull final VesselField vesselField,
         @NonNull final PortGrid portGrid,
         @NonNull final MarketGrid marketGrid
     ) {
-        super(schedule, eventManager);
+        super(schedule, eventManager, nextBehaviour);
         this.id = id;
         this.account = account;
         this.vesselField = vesselField;
@@ -77,7 +79,11 @@ public class Vessel extends Agent<Vessel> implements Oriented2D {
         this.marketGrid = marketGrid;
     }
 
-    @Getter(AccessLevel.NONE)
+    @SuppressWarnings("unused")
+    public @NonNull Map<String, Object> getTags() {
+        return Collections.unmodifiableMap(tags);
+    }
+
     private final @NonNull Map<String, Object> tags = new HashMap<>();
 
     // Modifiable characteristics

@@ -22,23 +22,24 @@
 
 package uk.ac.ox.poseidon.agents;
 
-import com.badlogic.gdx.ai.btree.BehaviorTree;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.poseidon.agents.tasks.Behaviour;
+import uk.ac.ox.poseidon.agents.tasks.InactiveBehaviour;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.time.Duration;
+import java.util.LinkedList;
+import java.util.Queue;
 
-import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static lombok.AccessLevel.NONE;
 
 @Getter
-@RequiredArgsConstructor
 public class Agent<A extends Agent<A>> implements Steppable {
 
     private static final int AGENT_BEHAVIOUR_ORDERING = 1;
@@ -46,23 +47,33 @@ public class Agent<A extends Agent<A>> implements Steppable {
     private final @NonNull TemporalSchedule schedule;
     private final @NonNull EventManager eventManager;
 
-    private BehaviorTree<A> behaviour;
+    private @NonNull Behaviour<A> behaviour = new InactiveBehaviour<>();
 
-    private BehaviorTree<A> currentBehaviour;
+    @Getter(NONE)
+    private final Queue<Runnable> mutationQueue = new LinkedList<>();
 
     @Setter private Duration taskDuration;
 
+    public Agent(
+        @NonNull final TemporalSchedule schedule,
+        @NonNull final EventManager eventManager,
+        @NonNull final Behaviour<A> behaviour
+    ) {
+        this.schedule = schedule;
+        this.eventManager = eventManager;
+        this.behaviour = behaviour;
+    }
+
     @Override
     public void step(final SimState simState) {
-        if (currentBehaviour == null || currentBehaviour.getStatus() != RUNNING) {
-            if (isActive())
-                currentBehaviour = behaviour;
-            else
-                currentBehaviour = null;
+        if (!behaviour.isRunning()) {
+            while (!mutationQueue.isEmpty()) {
+                mutationQueue.poll().run();
+            }
         }
-        if (currentBehaviour != null) {
-            currentBehaviour.step();
-            if (currentBehaviour.getStatus() == RUNNING) {
+        if (isActive()) {
+            behaviour.step();
+            if (behaviour.isRunning()) {
                 checkNotNull(taskDuration);
                 schedule.scheduleOnceIn(taskDuration, this, AGENT_BEHAVIOUR_ORDERING);
             } else {
@@ -72,18 +83,30 @@ public class Agent<A extends Agent<A>> implements Steppable {
     }
 
     public boolean isActive() {
-        return behaviour != null;
+        return behaviour.isActive();
     }
 
+    /**
+     * This method is meant for mutating the agent in ways that might change its "active" status.
+     * Mutations can't be applied while an agent behaviour is running, so if the agent is currently
+     * active, we queue the mutation, and it will be applied the next time the agent is stepped and
+     * the current behaviour is not running.
+     * <p>
+     * If the agent is inactive, we apply the mutation immediately and check if its effect activated
+     * the agent, in which case we schedule it to be stepped again.
+     */
     protected void mutate(final Runnable mutation) {
-        final boolean previouslyActive = isActive();
-        mutation.run();
-        if (!previouslyActive && isActive() && currentBehaviour == null) {
-            schedule.scheduleOnce(this, AGENT_BEHAVIOUR_ORDERING);
+        if (isActive()) {
+            mutationQueue.add(mutation);
+        } else {
+            mutation.run();
+            if (isActive()) {
+                schedule.scheduleOnce(this, AGENT_BEHAVIOUR_ORDERING);
+            }
         }
     }
 
-    public void setBehaviour(final BehaviorTree<A> behaviour) {
+    public void setBehaviour(final Behaviour<A> behaviour) {
         mutate(() -> this.behaviour = behaviour);
     }
 }

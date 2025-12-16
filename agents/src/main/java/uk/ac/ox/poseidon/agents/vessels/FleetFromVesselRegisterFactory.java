@@ -22,13 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
-import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 import lombok.*;
 import org.apache.commons.beanutils.PropertyUtils;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
+import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
@@ -58,15 +58,6 @@ import static uk.ac.ox.poseidon.agents.vessels.FleetEvent.Type.*;
 public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet> {
 
     private Factory<? extends Table> data;
-
-    // TODO: make sure vessels don't behave when inactive
-    //   Also think about what happens if initial behaviour changes. Maybe the "initial behaviour"
-    //   should be a "root behaviour", that is never part of the stack, so if we change it, it
-    //   gets used automatically when we pop down to it. Maybe it should also be optional, so that
-    //   inactive vessels have no root behaviours. We would just need to make sure that all the
-    //   maintenance tasks (i.e., landings, at least) get handled even if we're deactivating the
-    //   vessel. Possibly the `active` flag could just be replaced by `rootBehaviour.isDefined`.
-
     private Factory<? extends Fleet> fleet;
 
     @Builder.Default private String vesselIdColumn = "cfr";
@@ -83,7 +74,7 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
     @Builder.Default private List<String> modificationEventCodes =
         List.of("MOD");
 
-    private VesselScopeFactory<? extends BehaviorTree<Vessel>> behaviour;
+    private VesselScopeFactory<? extends Behaviour<Vessel>> behaviour;
     private VesselScopeFactory<? extends Hold> hold;
     private VesselScopeFactory<? extends Gear> gear;
     private VesselScopeFactory<? extends Engine> engine;

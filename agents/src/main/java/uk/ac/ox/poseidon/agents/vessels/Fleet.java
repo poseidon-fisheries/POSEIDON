@@ -26,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
+import uk.ac.ox.poseidon.agents.tasks.InactiveBehaviour;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
@@ -71,6 +72,7 @@ public class Fleet {
         final Vessel vessel = new Vessel(
             schedule,
             new ForwardingEventManager(eventManager),
+            new InactiveBehaviour<>(),
             vesselId,
             new Account(),
             vesselField,

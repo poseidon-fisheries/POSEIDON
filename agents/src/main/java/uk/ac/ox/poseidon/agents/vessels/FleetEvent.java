@@ -22,12 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
-import com.badlogic.gdx.ai.btree.BehaviorTree;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
@@ -52,7 +52,7 @@ public class FleetEvent implements Steppable {
     @NonNull String vesselName;
     @NonNull String portCode;
     @NonNull Map<String, Object> tags;
-    @NonNull Function<Vessel, BehaviorTree<Vessel>> initialBehaviourFactoryFunction;
+    @NonNull Function<Vessel, Behaviour<Vessel>> behaviourFactoryFunction;
     @NonNull Function<Vessel, Hold> holdFactoryFunction;
     @NonNull Function<Vessel, Gear> gearFactoryFunction;
     @NonNull Function<Vessel, Engine> engineFactoryFunction;
@@ -77,20 +77,10 @@ public class FleetEvent implements Steppable {
         vessel.setHomePort(port.orElse(null));
         vessel.setName(vesselName);
         tags.forEach(vessel::putTag);
-        vessel.setBehaviour(initialBehaviourFactoryFunction.apply(vessel));
+        vessel.setBehaviour(behaviourFactoryFunction.apply(vessel));
         vessel.setHold(holdFactoryFunction.apply(vessel));
         vessel.setGear(gearFactoryFunction.apply(vessel));
         vessel.setEngine(engineFactoryFunction.apply(vessel));
-
-        // TODO: setting the vessel home port to a non-existing port, or changing its gear to
-        //  a gear that is not modelled (which we're currently not detecting) should cause the
-        //  vessel to become inactive and I need a way of accounting for that. Conversely, giving
-        //  the vessel a new gear or home port might "reactivate" the vessel, even if it was never
-        //  deactivated in the register. The crux of the matter is that "active in the model" and
-        //  "active in the register" are slightly different concepts, and I need a way to account
-        //  for that. I might want to rely on conditions like "these things (e.g., port, gear)
-        //  should not be null", or maybe allow the user to specify conditions for being active
-        //  according to tag values (which I think might be preferable).
 
         switch (eventType) {
             case ACTIVATION -> vessel.setActiveInRegister(true);
