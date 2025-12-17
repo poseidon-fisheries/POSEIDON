@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
@@ -31,9 +32,9 @@ import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.regulations.FishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
@@ -49,25 +50,26 @@ import static java.time.temporal.ChronoField.*;
 import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
 import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_MONTH;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class RegulationGridPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
 
-    private Factory<? extends Regulations<Vessel>> regulations;
-    private Factory<? extends VesselField> vesselField;
-    private Factory<? extends BathymetricGrid> bathymetric;
+    private Factory<? super SimulationScope, ? extends Regulations<Vessel>> regulations;
+    private Factory<? super SimulationScope, ? extends VesselField> vesselField;
+    private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetric;
     private int displayWidth;
     private int displayHeight;
 
     @Override
-    protected ObjectGridPortrayal2D newInstance(final @NonNull Simulation simulation) {
+    protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
         return new Portrayal(
-            simulation.getTemporalSchedule(),
-            regulations.get(simulation),
-            vesselField.get(simulation),
-            bathymetric.get(simulation),
+            scope.getSimulation().getTemporalSchedule(),
+            regulations.get(scope),
+            vesselField.get(scope),
+            bathymetric.get(scope),
             EVERY_MONTH,
             displayWidth,
             displayHeight

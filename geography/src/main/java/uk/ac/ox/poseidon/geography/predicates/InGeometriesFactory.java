@@ -22,24 +22,30 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.locationtech.jts.geom.Geometry;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.Collection;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InGeometriesFactory extends GlobalScopeFactory<InGeometries> {
+@EqualsAndHashCode(callSuper = true)
+public class InGeometriesFactory<S extends Scope>
+    extends RelativeScopeFactory<S, InGeometries> {
 
-    private Factory<? extends Collection<? extends Geometry>> geometries;
+    private Factory<? super S, ? extends Collection<? extends Geometry>> geometries;
 
     @Override
-    protected InGeometries newInstance(final @NonNull Simulation simulation) {
-        return new InGeometries(geometries.get(simulation));
+    protected InGeometries newInstance(final S scope) {
+        return new InGeometries(geometries.get(scope));
     }
 }

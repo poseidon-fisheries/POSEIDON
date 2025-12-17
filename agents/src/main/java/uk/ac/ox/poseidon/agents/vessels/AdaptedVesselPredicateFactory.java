@@ -23,33 +23,34 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.predicates.AdaptedPredicate;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdaptedVesselPredicateFactory<T> extends GlobalScopeFactory<Predicate<? super Vessel>> {
+@EqualsAndHashCode(callSuper = true)
+public class AdaptedVesselPredicateFactory<S extends Scope, T>
+    extends RelativeScopeFactory<S, Predicate<? super Vessel>> {
 
-    private Factory<? extends Function<? super Vessel, T>> adaptor;
-    private Factory<? extends Predicate<? super T>> predicate;
+    private Factory<? super S, ? extends Function<? super Vessel, T>> adaptor;
+    private Factory<? super S, ? extends Predicate<? super T>> predicate;
 
     @Override
-    protected Predicate<? super Vessel> newInstance(
-        final Simulation simulation
-    ) {
+    protected Predicate<? super Vessel> newInstance(final S scope) {
         return new AdaptedPredicate<>(
-            adaptor.get(simulation),
-            predicate.get(simulation)
+            adaptor.get(scope),
+            predicate.get(scope)
         );
     }
 }

@@ -20,20 +20,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks;
+package uk.ac.ox.poseidon.agents.vessels;
 
-import com.badlogic.gdx.ai.btree.LeafTask;
-import com.badlogic.gdx.ai.btree.Task;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import uk.ac.ox.poseidon.agents.AgentScope;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-public abstract class VesselTask extends LeafTask<Vessel> {
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class VesselScope extends AgentScope<Vessel> {
+
+    public VesselScope(final VesselScope vesselScope) {
+        super(vesselScope);
+    }
+
+    public VesselScope(
+        final SimulationScope simulationScope,
+        final Vessel vessel
+    ) {
+        super(new AgentScope<>(simulationScope, vessel));
+    }
 
     public Vessel getVessel() {
-        return getObject();
+        return getAgent();
     }
 
-    @Override
-    protected Task<Vessel> copyTo(final Task<Vessel> task) {
-        throw new UnsupportedOperationException();
-    }
 }

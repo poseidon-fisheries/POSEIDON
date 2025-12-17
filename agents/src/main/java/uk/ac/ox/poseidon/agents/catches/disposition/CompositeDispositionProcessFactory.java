@@ -23,41 +23,44 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompositeDispositionProcessFactory
-    extends GlobalScopeFactory<CompositeDispositionProcess> {
+@EqualsAndHashCode(callSuper = true)
+public class CompositeDispositionProcessFactory<S extends Scope>
+    extends RelativeScopeFactory<S, CompositeDispositionProcess> {
 
-    private List<Factory<? extends DispositionProcess>> dispositionStrategies;
+    private List<Factory<? super S, ? extends DispositionProcess>> dispositionStrategies;
 
     @SafeVarargs
     @SuppressWarnings("varargs")
     public CompositeDispositionProcessFactory(
-        final Factory<? extends DispositionProcess>... dispositionStrategies
+        final Factory<? super S, ? extends DispositionProcess>... dispositionStrategies
     ) {
         this(List.of(dispositionStrategies));
     }
 
     @Override
-    protected CompositeDispositionProcess newInstance(final Simulation simulation) {
+    protected CompositeDispositionProcess newInstance(final S scope) {
         return new CompositeDispositionProcess(
             dispositionStrategies
                 .stream()
-                .map(factory -> factory.get(simulation))
+                .map(f -> f.get(scope))
                 .collect(toImmutableList())
         );
     }
+
 }

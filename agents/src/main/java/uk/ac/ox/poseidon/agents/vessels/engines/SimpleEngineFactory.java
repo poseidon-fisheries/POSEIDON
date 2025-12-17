@@ -23,30 +23,29 @@
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Speed;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SimpleEngineFactory extends VesselScopeFactory<Engine> {
+@EqualsAndHashCode(callSuper = true)
+public class SimpleEngineFactory<S extends Scope> extends RelativeScopeFactory<S, Engine> {
 
-    private Factory<? extends Quantity<Speed>> speed;
+    private Factory<? super S, ? extends Quantity<Speed>> speed;
 
     @Override
-    protected Engine newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new SimpleEngine(speed.get(simulation));
+    protected Engine newInstance(final S scope) {
+        return new SimpleEngine(speed.get(scope));
     }
+
 }

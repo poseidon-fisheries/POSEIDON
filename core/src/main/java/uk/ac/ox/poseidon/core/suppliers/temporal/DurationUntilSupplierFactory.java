@@ -23,29 +23,31 @@
 package uk.ac.ox.poseidon.core.suppliers.temporal;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DurationUntilSupplierFactory extends GlobalScopeFactory<DurationUntilSupplier> {
+@EqualsAndHashCode(callSuper = true)
+public class DurationUntilSupplierFactory extends SimulationScopeFactory<DurationUntilSupplier> {
 
-    private Factory<? extends Supplier<LocalDateTime>> referenceDateTime;
+    private Factory<? super SimulationScope, ? extends Supplier<LocalDateTime>> referenceDateTime;
 
     @Override
-    protected DurationUntilSupplier newInstance(final Simulation simulation) {
+    protected DurationUntilSupplier newInstance(final SimulationScope scope) {
         return new DurationUntilSupplier(
-            simulation.getTemporalSchedule(),
-            referenceDateTime.get(simulation)
+            scope.getSimulation().getTemporalSchedule(),
+            referenceDateTime.get(scope)
         );
     }
 

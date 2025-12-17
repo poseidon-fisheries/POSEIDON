@@ -23,25 +23,27 @@
 package uk.ac.ox.poseidon.geography.bathymetry.adaptors;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CellElevationFactory extends GlobalScopeFactory<CellElevation> {
+@EqualsAndHashCode(callSuper = true)
+public class CellElevationFactory<S extends Scope> extends RelativeScopeFactory<S, CellElevation> {
 
-    private Factory<? extends BathymetricGrid> bathymetricGrid;
+    private Factory<S, ? extends BathymetricGrid> bathymetricGrid;
 
     @Override
-    protected CellElevation newInstance(final Simulation simulation) {
-        return new CellElevation(bathymetricGrid.get(simulation));
+    protected CellElevation newInstance(final S scope) {
+        return new CellElevation(bathymetricGrid.get(scope));
     }
 
 }

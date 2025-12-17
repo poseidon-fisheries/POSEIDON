@@ -20,29 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels;
+package uk.ac.ox.poseidon.agents.tasks.general;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.Agent;
+import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class VesselScopeAdaptor<C> extends VesselScopeFactory<C> {
+import java.util.function.Predicate;
 
-    private Factory<? extends C> delegate;
+import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+
+@RequiredArgsConstructor
+public class AgentPredicateTask<A extends Agent<A>> extends AgentTask<A> {
+
+    private final Predicate<? super A> predicate;
 
     @Override
-    protected C newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return delegate.get(simulation);
+    public Status execute() {
+        return predicate.test(getAgent()) ? SUCCEEDED : FAILED;
     }
 
 }

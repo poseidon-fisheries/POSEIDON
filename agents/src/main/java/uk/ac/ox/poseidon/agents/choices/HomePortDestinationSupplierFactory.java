@@ -23,32 +23,30 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class HomePortDestinationSupplierFactory
     extends VesselScopeFactory<HomePortDestinationSupplier> {
 
-    private Factory<? extends PortGrid> portGrid;
+    private Factory<? super VesselScope, ? extends PortGrid> portGrid;
 
     @Override
-    protected HomePortDestinationSupplier newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected HomePortDestinationSupplier newInstance(final VesselScope scope) {
         return new HomePortDestinationSupplier(
-            vessel,
-            portGrid.get(simulation)
+            scope.getVessel(),
+            portGrid.get(scope)
         );
     }
 }

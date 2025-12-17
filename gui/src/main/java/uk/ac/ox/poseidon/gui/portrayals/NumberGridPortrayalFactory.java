@@ -22,32 +22,37 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import sim.portrayal.LocationWrapper;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.portrayal.grid.ValueGridPortrayal2D;
 import sim.portrayal.simple.ValuePortrayal2D;
 import sim.util.gui.ColorMap;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.NumberGrid;
 import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class NumberGridPortrayalFactory
     extends SimulationScopeFactory<FastValueGridPortrayal2D> {
 
     private String paletteName;
     private String valueName;
     private boolean immutableField;
-    private Factory<? extends NumberGrid<?, ?>> grid;
+    private Factory<? super SimulationScope, ? extends NumberGrid<?, ?>> grid;
 
     @Override
-    protected FastValueGridPortrayal2D newInstance(final @NonNull Simulation simulation) {
+    protected FastValueGridPortrayal2D newInstance(final SimulationScope scope) {
         final var portrayal = new FastValueGridPortrayal2D(valueName, immutableField);
         portrayal.setPortrayalForAll(new ValuePortrayal2D() {
             @Override
@@ -57,16 +62,16 @@ public class NumberGridPortrayalFactory
                 return portrayal.getValueName() + ": " + wrapper.getObject();
             }
         });
-        portrayal.setField(grid.get(simulation).getField());
-        portrayal.setMap(newColorMap(simulation));
+        portrayal.setField(grid.get(scope).getField());
+        portrayal.setMap(newColorMap(scope));
         return portrayal;
     }
 
-    protected ColorMap newColorMap(final Simulation simulation) {
+    protected ColorMap newColorMap(final SimulationScope scope) {
         return new PaletteColorMap(
             paletteName,
             0,
-            grid.get(simulation).getMaximumValue().doubleValue()
+            grid.get(scope).getMaximumValue().doubleValue()
         );
     }
 

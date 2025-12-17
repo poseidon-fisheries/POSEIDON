@@ -22,27 +22,35 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.LocationWrapper;
 import sim.portrayal.SimplePortrayal2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.text.DecimalFormat;
 
-@RequiredArgsConstructor
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class CoordinatesPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
 
-    private final Factory<? extends ModelGrid> modelGrid;
-    private final DecimalFormat decimalFormat;
+    private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
+    private DecimalFormat decimalFormat;
 
     public CoordinatesPortrayalFactory(
-        final Factory<? extends ModelGrid> modelGrid,
+        final Factory<? super SimulationScope, ? extends ModelGrid> modelGrid,
         final int decimalPlaces
     ) {
         this.modelGrid = modelGrid;
@@ -52,9 +60,9 @@ public class CoordinatesPortrayalFactory extends SimulationScopeFactory<ObjectGr
     }
 
     @Override
-    protected ObjectGridPortrayal2D newInstance(final Simulation simulation) {
+    protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
         final ObjectGridPortrayal2D objectGridPortrayal2D = new ObjectGridPortrayal2D();
-        objectGridPortrayal2D.setField(modelGrid.get(simulation).getCoordinatesGrid());
+        objectGridPortrayal2D.setField(modelGrid.get(scope).getCoordinatesGrid());
         objectGridPortrayal2D.setPortrayalForAll(
             new SimplePortrayal2D() {
                 @Override

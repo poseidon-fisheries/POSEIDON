@@ -22,19 +22,22 @@
 
 package uk.ac.ox.poseidon.agents.tables;
 
-import lombok.Getter;
-import lombok.Setter;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class FishingEventListenerTableFactory
     extends SimulationEventListenerFactory<FishingEventListenerTable> {
 
     @Override
-    protected FishingEventListenerTable newListener(final Simulation simulation) {
+    protected FishingEventListenerTable newListener(final SimulationScope scope) {
         return new FishingEventListenerTable();
     }
-
 }

@@ -23,25 +23,28 @@
 package uk.ac.ox.poseidon.agents.registers;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class DynamicRegisterFactory<T> extends SimulationScopeFactory<Register<T>> {
 
-    private VesselScopeFactory<? extends T> vesselScopeFactory;
+    private Factory<? super VesselScope, ? extends T> vesselScopeFactory;
 
     @Override
-    protected Register<T> newInstance(final Simulation simulation) {
+    protected Register<T> newInstance(final SimulationScope scope) {
         return new DynamicRegister<>(
-            vessel -> vesselScopeFactory.get(simulation, vessel)
+            vessel -> vesselScopeFactory.get(new VesselScope(scope, vessel))
         );
     }
 }

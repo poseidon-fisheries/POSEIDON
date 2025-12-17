@@ -23,32 +23,36 @@
 package uk.ac.ox.poseidon.io.paths;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@SuperBuilder
 @NoArgsConstructor
-public class SimulationFolderFactory extends SimulationScopeFactory<Path> implements PathFactory {
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SimulationFolderFactory
+    extends SimulationScopeFactory<Path>
+    implements PathFactory<SimulationScope> {
 
-    private Factory<? extends Path> parent;
+    private Factory<? super SimulationScope, ? extends Path> parent;
 
     @Override
-    protected Path newInstance(final Simulation simulation) {
+    protected Path newInstance(final SimulationScope scope) {
         final Path path =
             checkNotNull(parent, "Parent path factory is null")
-                .get(simulation)
-                .resolve(simulation.getId().toString());
+                .get(scope)
+                .resolve(scope.getSimulation().getId().toString());
         if (Files.notExists(path)) {
             try {
                 Files.createDirectories(path);

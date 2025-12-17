@@ -23,23 +23,25 @@
 package uk.ac.ox.poseidon.io.sources;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class StringDataSourceFactory extends GlobalScopeFactory<StringDataSource> {
 
     private String data;
 
     @Override
-    protected StringDataSource newInstance(final Simulation simulation) {
+    protected StringDataSource newInstance(final GlobalScope scope) {
         return new StringDataSource(data);
     }
-    
+
 }

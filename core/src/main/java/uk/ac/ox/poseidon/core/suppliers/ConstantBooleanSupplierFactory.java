@@ -22,16 +22,21 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 import java.util.function.BooleanSupplier;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ConstantBooleanSupplierFactory extends GlobalScopeFactory<BooleanSupplier> {
 
     public static final ConstantBooleanSupplierFactory ALWAYS_TRUE =
@@ -43,7 +48,7 @@ public class ConstantBooleanSupplierFactory extends GlobalScopeFactory<BooleanSu
     private boolean value;
 
     @Override
-    protected BooleanSupplier newInstance(final @NonNull Simulation simulation) {
+    protected BooleanSupplier newInstance(final GlobalScope scope) {
         return () -> value;
     }
 }

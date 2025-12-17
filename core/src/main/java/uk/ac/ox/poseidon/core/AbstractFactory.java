@@ -22,64 +22,46 @@
 
 package uk.ac.ox.poseidon.core;
 
-import com.google.common.base.Suppliers;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.LoadingCache;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Supplier;
+import java.util.concurrent.ExecutionException;
 
-import static java.beans.Introspector.getBeanInfo;
-import static java.util.Comparator.comparing;
+import static com.google.common.cache.CacheLoader.from;
 
-public abstract class AbstractFactory<C> implements Factory<C> {
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode()
+public abstract class AbstractFactory<S extends Scope, C> implements Factory<S, C> {
 
-    private final transient Supplier<List<Method>> readMethods =
-        Suppliers.memoize(() -> readMethods(this));
-
-    public static List<Method> readMethods(final Object object) {
-        final PropertyDescriptor[] props;
-        try {
-            props = getBeanInfo(object.getClass(), Object.class).getPropertyDescriptors();
-        } catch (final IntrospectionException e) {
-            throw new RuntimeException(e);
-        }
-        Arrays.sort(props, comparing(PropertyDescriptor::getName));
-        return Arrays
-            .stream(props)
-            .map(PropertyDescriptor::getReadMethod)
-            .filter(Objects::nonNull)
-            .toList();
-    }
-
-    protected abstract C newInstance(Simulation simulation);
+    // needs to be transient for SnakeYAML not to be confused
+    // when there are no other properties to serialize and to
+    // ensure it's not included in the equals and hashCode implementations
+    private final transient LoadingCache<Object, Cache<Integer, C>> cache =
+        CacheBuilder.newBuilder()
+            .weakKeys()
+            .build(from(object -> CacheBuilder.newBuilder().build()));
 
     @Override
-    public int makeKey(final Simulation simulation) {
-        synchronized (this) {
-            return readMethods
-                .get()
-                .stream()
-                .map(readMethod -> {
-                    try {
-                        return readMethod.invoke(this);
-                    } catch (final IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .map(o ->
-                    switch (o) {
-                        case null -> null;
-                        case final Factory<?> factory -> factory.get(simulation);
-                        default -> o;
-                    }
-                )
-                .toList()
-                .hashCode();
+    synchronized public final C get(final S scope) {
+        try {
+            return cache
+                .getUnchecked(makeKey(scope))
+                .get(hashCode(), () -> newInstance(scope));
+        } catch (final ExecutionException e) {
+            throw new RuntimeException(e);
         }
     }
+
+    protected abstract Object makeKey(S scope);
+
+    protected abstract C newInstance(S scope);
+
+    protected abstract Class<S> scopeClass();
+
 }

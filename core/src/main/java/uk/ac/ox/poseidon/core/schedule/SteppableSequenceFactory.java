@@ -23,34 +23,38 @@
 package uk.ac.ox.poseidon.core.schedule;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.engine.Sequence;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.core.utils.Factories;
 
 import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@SuperBuilder
 @NoArgsConstructor
-public class SteppableSequenceFactory extends GlobalScopeFactory<Steppable> {
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SteppableSequenceFactory extends SimulationScopeFactory<Steppable> {
 
-    private Factory<? extends List<? extends Steppable>> steppables;
+    private Factory<? super SimulationScope, ? extends List<? extends Steppable>> steppables;
 
     @SafeVarargs
-    public SteppableSequenceFactory(final Factory<? extends Steppable>... steppables) {
+    public SteppableSequenceFactory(
+        final Factory<? super SimulationScope, ? extends Steppable>... steppables
+    ) {
         this.steppables = new Factories<>(steppables);
     }
 
     @Override
-    protected Steppable newInstance(final Simulation simulation) {
-        return new Sequence(steppables.get(simulation));
+    protected Steppable newInstance(final SimulationScope scope) {
+        return new Sequence(steppables.get(scope));
     }
 
 }

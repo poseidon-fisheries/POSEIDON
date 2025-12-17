@@ -22,23 +22,28 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Predicate;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NotFactory<T> extends GlobalScopeFactory<Not<T>> {
+@EqualsAndHashCode(callSuper = true)
+public class NotFactory<S extends Scope, T> extends RelativeScopeFactory<S, Not<T>> {
 
-    private Factory<? extends Predicate<T>> predicate;
+    private Factory<? super S, ? extends Predicate<? super T>> predicate;
 
     @Override
-    protected Not<T> newInstance(final @NonNull Simulation simulation) {
-        return new Not<>(predicate.get(simulation));
+    protected Not<T> newInstance(final S scope) {
+        return new Not<>(predicate.get(scope));
     }
 }

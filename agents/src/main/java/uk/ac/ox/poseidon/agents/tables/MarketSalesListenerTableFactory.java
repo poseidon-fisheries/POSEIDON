@@ -22,13 +22,23 @@
 
 package uk.ac.ox.poseidon.agents.tables;
 
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class MarketSalesListenerTableFactory
     extends SimulationEventListenerFactory<MarketSalesListenerTable> {
+
     @Override
-    protected MarketSalesListenerTable newListener(Simulation simulation) {
+    protected MarketSalesListenerTable newListener(final SimulationScope scope) {
         return new MarketSalesListenerTable();
     }
+
 }

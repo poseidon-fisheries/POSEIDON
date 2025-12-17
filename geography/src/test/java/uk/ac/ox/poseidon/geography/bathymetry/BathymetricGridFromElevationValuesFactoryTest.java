@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFactory;
 
 import java.util.List;
@@ -38,11 +39,11 @@ import static org.mockito.Mockito.mock;
 class BathymetricGridFromElevationValuesFactoryTest {
 
     final Simulation simulation = mock(Simulation.class);
-    BathymetricGridFromElevationValuesFactory factory;
+    BathymetricGridFromElevationValuesFactory<GlobalScope> factory;
 
     @BeforeEach
     void setUp() {
-        factory = new BathymetricGridFromElevationValuesFactory();
+        factory = new BathymetricGridFromElevationValuesFactory<>();
         factory.setModelGrid(
             new ModelGridFactory(1, -1, 1, -1, 1)
         );
@@ -52,7 +53,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
     void elevationsValuesMustNotBeNull() {
         assertThrows(
             NullPointerException.class,
-            () -> factory.newInstance(simulation)
+            () -> factory.get(mock(GlobalScope.class))
         );
     }
 
@@ -65,7 +66,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
                 factory.setElevationValues(List.of(0.0, 0.0, 0.0));
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> factory.newInstance(simulation)
+                    () -> factory.get(mock(GlobalScope.class))
                 );
             });
     }
@@ -73,7 +74,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
     @Test
     void correctNumberOfElevationValuesSucceeds() {
         factory.setElevationValues(List.of(0.0, 0.0, 0.0, 0.0));
-        factory.newInstance(simulation);
+        factory.get(mock(GlobalScope.class));
     }
 
     @Test
@@ -82,7 +83,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
             0.0, 1.0,
             2.0, 3.0
         ));
-        final BathymetricGrid bathymetricGrid = factory.newInstance(simulation);
+        final BathymetricGrid bathymetricGrid = factory.get(mock(GlobalScope.class));
         assertEquals(0.0, bathymetricGrid.getElevation(new Int2D(0, 0)));
         assertEquals(1.0, bathymetricGrid.getElevation(new Int2D(1, 0)));
         assertEquals(2.0, bathymetricGrid.getElevation(new Int2D(0, 1)));

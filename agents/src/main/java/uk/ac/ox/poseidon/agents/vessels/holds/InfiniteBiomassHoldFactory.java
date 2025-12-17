@@ -23,28 +23,26 @@
 package uk.ac.ox.poseidon.agents.vessels.holds;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class InfiniteBiomassHoldFactory extends VesselScopeFactory<InfiniteBiomassHold> {
 
-    private Factory<? extends CatchCategoriser> catchCategoriser;
+    private Factory<? super VesselScope, ? extends CatchCategoriser> catchCategoriser;
 
     @Override
-    protected InfiniteBiomassHold newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new InfiniteBiomassHold(catchCategoriser.get(simulation));
+    protected InfiniteBiomassHold newInstance(final VesselScope scope) {
+        return new InfiniteBiomassHold(catchCategoriser.get(scope));
     }
 }

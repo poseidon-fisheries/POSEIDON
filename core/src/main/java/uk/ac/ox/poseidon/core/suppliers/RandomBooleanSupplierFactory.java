@@ -22,22 +22,25 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
-import lombok.*;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import java.util.function.BooleanSupplier;
-
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RandomBooleanSupplierFactory extends SimulationScopeFactory<BooleanSupplier> {
+@EqualsAndHashCode(callSuper = true)
+public class RandomBooleanSupplierFactory extends SimulationScopeFactory<RandomBooleanSupplier> {
 
     private double probability;
 
     @Override
-    protected BooleanSupplier newInstance(final @NonNull Simulation simulation) {
-        return new RandomBooleanSupplier(probability, simulation.random);
+    protected RandomBooleanSupplier newInstance(final SimulationScope scope) {
+        return new RandomBooleanSupplier(probability, scope.getSimulation().random);
     }
 }

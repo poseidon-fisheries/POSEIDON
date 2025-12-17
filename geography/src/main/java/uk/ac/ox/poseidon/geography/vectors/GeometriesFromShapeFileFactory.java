@@ -24,14 +24,15 @@ package uk.ac.ox.poseidon.geography.vectors;
 
 import com.google.common.collect.ImmutableList;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.DataStoreFinder;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.locationtech.jts.geom.Geometry;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.io.IOException;
 import java.net.URL;
@@ -40,18 +41,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GeometriesFromShapeFileFactory extends GlobalScopeFactory<Collection<Geometry>> {
+@EqualsAndHashCode(callSuper = true)
+public class GeometriesFromShapeFileFactory
+    extends SimulationScopeFactory<Collection<Geometry>> {
 
     @NonNull
-    private Factory<? extends Path> path;
+    private Factory<? super SimulationScope, ? extends Path> path;
 
     @Override
-    protected List<Geometry> newInstance(final @NonNull Simulation simulation) {
-        final Path filePath = this.path.get(simulation);
+    protected List<Geometry> newInstance(final SimulationScope scope) {
+        final Path filePath = this.path.get(scope);
         return readShapeFile(filePath);
     }
 

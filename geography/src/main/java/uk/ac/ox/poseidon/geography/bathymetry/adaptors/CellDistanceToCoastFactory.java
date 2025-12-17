@@ -23,29 +23,32 @@
 package uk.ac.ox.poseidon.geography.bathymetry.adaptors;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CellDistanceToCoastFactory extends GlobalScopeFactory<CellDistanceToCoast> {
+@EqualsAndHashCode(callSuper = true)
+public class CellDistanceToCoastFactory<S extends Scope>
+    extends RelativeScopeFactory<S, CellDistanceToCoast> {
 
-    private Factory<? extends BathymetricGrid> bathymetricGrid;
-    private Factory<? extends DistanceCalculator> distanceCalculator;
+    private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? super S, ? extends DistanceCalculator> distanceCalculator;
 
     @Override
-    protected CellDistanceToCoast newInstance(final Simulation simulation) {
+    protected CellDistanceToCoast newInstance(final S scope) {
         return new CellDistanceToCoast(
-            bathymetricGrid.get(simulation),
-            distanceCalculator.get(simulation)
+            bathymetricGrid.get(scope),
+            distanceCalculator.get(scope)
         );
     }
 }

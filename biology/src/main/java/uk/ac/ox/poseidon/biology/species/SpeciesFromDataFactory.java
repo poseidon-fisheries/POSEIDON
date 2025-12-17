@@ -23,38 +23,33 @@
 package uk.ac.ox.poseidon.biology.species;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SpeciesFromDataFactory extends GlobalScopeFactory<List<Species>> {
+@EqualsAndHashCode(callSuper = true)
+public class SpeciesFromDataFactory<S extends Scope>
+    extends RelativeScopeFactory<S, List<Species>> {
 
-    private Factory<? extends Table> data;
+    private Factory<? super S, ? extends Table> data;
     private String speciesCodeColumn;
     private String speciesNameColumn;
     private String lifeStageColumn;
 
-    public SpeciesFromDataFactory(
-        final Factory<? extends Table> data,
-        final String speciesCodeColumn,
-        final String speciesNameColumn
-    ) {
-        this(data, speciesCodeColumn, speciesNameColumn, null);
-    }
-
     @Override
-    protected List<Species> newInstance(final Simulation simulation) {
-        return data.get(simulation)
+    protected List<Species> newInstance(final S scope) {
+        return data.get(scope)
             .stream()
             .map(row ->
                 new Species(
@@ -65,4 +60,5 @@ public class SpeciesFromDataFactory extends GlobalScopeFactory<List<Species>> {
             )
             .toList();
     }
+
 }

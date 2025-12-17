@@ -23,18 +23,20 @@
 package uk.ac.ox.poseidon.core.time;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 import java.time.LocalTime;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class TimeFactory extends GlobalScopeFactory<LocalTime> {
 
     private int hour;
@@ -42,7 +44,7 @@ public class TimeFactory extends GlobalScopeFactory<LocalTime> {
     private int second;
 
     @Override
-    protected LocalTime newInstance(final Simulation simulation) {
+    protected LocalTime newInstance(final GlobalScope scope) {
         return LocalTime.of(hour, minute, second);
     }
 }

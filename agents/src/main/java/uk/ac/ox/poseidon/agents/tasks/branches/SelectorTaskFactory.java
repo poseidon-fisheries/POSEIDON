@@ -24,36 +24,38 @@ package uk.ac.ox.poseidon.agents.tasks.branches;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.branch.Selector;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.List;
 
-@NoArgsConstructor
+@Data
 @SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SelectorTaskFactory extends BranchTaskFactory<Selector<Vessel>> {
 
     public SelectorTaskFactory(
-        final List<? extends VesselScopeFactory<? extends Task<Vessel>>> children
+        final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children
     ) {
         super(children);
     }
 
     public SelectorTaskFactory(
         final VesselScopeFactory<? extends Task<Vessel>> guard,
-        final List<? extends VesselScopeFactory<? extends Task<Vessel>>> children
+        final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children
     ) {
         super(guard, children);
     }
 
     @Override
-    protected Selector<Vessel> newTask(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected Selector<Vessel> newTask() {
         return new Selector<>();
     }
 }

@@ -23,26 +23,28 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.DoubleSupplier;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GeneralDiscardMortalityFactory
-    extends GlobalScopeFactory<GeneralDiscardMortality> {
+@EqualsAndHashCode(callSuper = true)
+public class GeneralDiscardMortalityFactory<S extends Scope>
+    extends RelativeScopeFactory<S, GeneralDiscardMortality> {
 
-    private Factory<? extends DoubleSupplier> mortalityRateSupplier;
+    private Factory<? super S, ? extends DoubleSupplier> mortalityRateSupplier;
 
     @Override
-    protected GeneralDiscardMortality newInstance(final Simulation simulation) {
-        return new GeneralDiscardMortality(mortalityRateSupplier.get(simulation));
+    protected GeneralDiscardMortality newInstance(final S scope) {
+        return new GeneralDiscardMortality(mortalityRateSupplier.get(scope));
     }
 }

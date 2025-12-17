@@ -22,20 +22,25 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DateTimeBeforeFactory extends RelativeDateTimeFactory {
+public class DateTimeBeforeFactory<S extends Scope> extends RelativeDateTimeFactory<S> {
 
     public DateTimeBeforeFactory(
-        final Factory<? extends LocalDateTime> referenceDateTimeFactory,
-        final Factory<? extends TemporalAmount> temporalAmountFactory
+        final Factory<? super S, ? extends LocalDateTime> referenceDateTimeFactory,
+        final Factory<? super S, ? extends TemporalAmount> temporalAmountFactory
     ) {
         super(referenceDateTimeFactory, temporalAmountFactory);
     }

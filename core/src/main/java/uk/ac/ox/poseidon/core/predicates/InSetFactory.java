@@ -24,31 +24,35 @@ package uk.ac.ox.poseidon.core.predicates;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import java.util.Collection;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InSetFactory<T> extends GlobalScopeFactory<InSet<T>> {
+@EqualsAndHashCode(callSuper = true)
+public class InSetFactory<S extends Scope, T> extends RelativeScopeFactory<S, InSet<T>> {
 
-    private Factory<? extends Collection<? extends T>> values;
+    private Factory<? super S, ? extends Collection<? extends T>> values;
 
     @SafeVarargs
-    public InSetFactory(final T... values) {
-        this.values = new ConstantFactory<>(ImmutableSet.copyOf(values));
+    public static <T> InSetFactory<GlobalScope, T> of(final T... values) {
+        return new InSetFactory<>(new ConstantFactory<>(ImmutableSet.copyOf(values)));
     }
 
     @Override
-    protected InSet<T> newInstance(final Simulation simulation) {
-        return new InSet<>(values.get(simulation));
+    protected InSet<T> newInstance(final S scope) {
+        return new InSet<>(values.get(scope));
     }
+
 }

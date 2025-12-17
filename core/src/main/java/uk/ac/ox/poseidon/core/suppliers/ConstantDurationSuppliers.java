@@ -22,20 +22,23 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.core.time.DurationFactory;
 import uk.ac.ox.poseidon.core.utils.ConstantSupplierFactory;
 
 import java.time.Duration;
-import java.util.function.Supplier;
 
 public class ConstantDurationSuppliers {
-    public static final Factory<Supplier<Duration>> ONE_DAY_DURATION_SUPPLIER =
+    public static final ConstantSupplierFactory<GlobalScope, Duration>
+        ONE_DAY_DURATION_SUPPLIER =
         new ConstantSupplierFactory<>(new DurationFactory(1, 0, 0, 0));
-    public static final Factory<Supplier<Duration>> ONE_HOUR_DURATION_SUPPLIER =
+    public static final ConstantSupplierFactory<GlobalScope, Duration>
+        ONE_HOUR_DURATION_SUPPLIER =
         new ConstantSupplierFactory<>(new DurationFactory(1, 0, 0, 0));
-    public static final Factory<Supplier<Duration>> ONE_MINUTE_DURATION_SUPPLIER =
+    public static final ConstantSupplierFactory<GlobalScope, Duration>
+        ONE_MINUTE_DURATION_SUPPLIER =
         new ConstantSupplierFactory<>(new DurationFactory(0, 0, 1, 0));
-    public static final Factory<Supplier<Duration>> ONE_SECOND_DURATION_SUPPLIER =
+    public static final ConstantSupplierFactory<GlobalScope, Duration>
+        ONE_SECOND_DURATION_SUPPLIER =
         new ConstantSupplierFactory<>(new DurationFactory(0, 0, 0, 1));
 }

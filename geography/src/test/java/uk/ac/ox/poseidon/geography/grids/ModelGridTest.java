@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.geography.grids;
 import org.junit.jupiter.api.Test;
 import sim.util.Double2D;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
 
@@ -130,11 +130,10 @@ class ModelGridTest {
 
     @Test
     void testCoordToXyAndBack() {
-        final Simulation simulation = mock(Simulation.class);
         final ModelGrid modelGrid =
             new ModelGridFactory(
                 1.0, -171, -70, -50, 50
-            ).get(simulation);
+            ).get(mock(GlobalScope.class));
         final Envelope envelope = modelGrid.getEnvelope();
         final List<Coordinate> coordinates =
             range((int) envelope.getMinX(), (int) envelope.getMaxX() - 1)

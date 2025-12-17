@@ -23,33 +23,32 @@
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.Duration;
 import java.util.function.Supplier;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class FixedBiomassProportionGearFactory
-    extends VesselScopeFactory<FixedBiomassProportionGear> {
+    extends SimulationScopeFactory<FixedBiomassProportionGear> {
 
     private String code;
     private double proportion;
-    private Factory<? extends Supplier<Duration>> durationSupplier;
+    private Factory<? super SimulationScope, ? extends Supplier<Duration>> durationSupplier;
 
     @Override
-    protected FixedBiomassProportionGear newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new FixedBiomassProportionGear(code, proportion, durationSupplier.get(simulation));
+    protected FixedBiomassProportionGear newInstance(final SimulationScope scope) {
+        return new FixedBiomassProportionGear(code, proportion, durationSupplier.get(scope));
     }
+
 }

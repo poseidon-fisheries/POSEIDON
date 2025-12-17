@@ -25,39 +25,37 @@ package uk.ac.ox.poseidon.agents.tasks.decorators;
 import com.badlogic.gdx.ai.btree.Decorator;
 import com.badlogic.gdx.ai.btree.Task;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class DecoratorTaskFactory<T extends Decorator<Vessel>> extends TaskFactory<T> {
+@EqualsAndHashCode(callSuper = true)
+public abstract class DecoratorTaskFactory<T extends Decorator<Vessel>>
+    extends VesselTaskFactory<T> {
 
-    private VesselScopeFactory<? extends Task<Vessel>> child;
+    private Factory<? super VesselScope, ? extends Task<Vessel>> child;
 
     public DecoratorTaskFactory(
-        final VesselScopeFactory<? extends Task<Vessel>> guard,
-        final VesselScopeFactory<? extends Task<Vessel>> child
+        final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
+        final Factory<? super VesselScope, ? extends Task<Vessel>> child
     ) {
         super(guard);
         this.child = child;
     }
 
     @Override
-    protected T newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        final T task = super.newInstance(simulation, vessel);
-        task.addChild(child.get(simulation, vessel));
+    protected T newTask(final VesselScope scope) {
+        final T task = super.newInstance(scope);
+        task.addChild(child.get(scope));
         return task;
     }
 }

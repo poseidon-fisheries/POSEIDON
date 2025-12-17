@@ -22,17 +22,20 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class AlwaysTrueFactory extends GlobalScopeFactory<AlwaysTrue> {
     @Override
-    protected AlwaysTrue newInstance(final @NonNull Simulation simulation) {
+    protected AlwaysTrue newInstance(final GlobalScope scope) {
         return new AlwaysTrue();
     }
 }

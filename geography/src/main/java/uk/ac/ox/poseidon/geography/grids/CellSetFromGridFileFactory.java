@@ -23,26 +23,33 @@
 package uk.ac.ox.poseidon.geography.grids;
 
 import com.google.common.collect.ImmutableSet;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.io.File;
 import java.nio.file.Path;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CellSetFromGridFileFactory extends GlobalScopeFactory<ImmutableSet<Int2D>> {
-    private Factory<? extends Path> path;
+@EqualsAndHashCode(callSuper = true)
+public class CellSetFromGridFileFactory<S extends Scope>
+    extends RelativeScopeFactory<S, ImmutableSet<Int2D>> {
+
+    private Factory<? super S, ? extends Path> path;
     private double includedValue;
 
     @Override
-    protected ImmutableSet<Int2D> newInstance(final @NonNull Simulation simulation) {
-        final File gridFile = path.get(simulation).toFile();
+    protected ImmutableSet<Int2D> newInstance(final S scope) {
+        final File gridFile = path.get(scope).toFile();
         if (!gridFile.isFile()) {
             throw new RuntimeException(gridFile + " does not point to a file.");
         }

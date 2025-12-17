@@ -23,29 +23,32 @@
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.function.Predicate;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActionCellPredicateFactory extends GlobalScopeFactory<ActionCellPredicate> {
+@EqualsAndHashCode(callSuper = true)
+public class ActionCellPredicateFactory<S extends Scope>
+    extends RelativeScopeFactory<S, ActionCellPredicate> {
 
-    private Factory<? extends ModelGrid> modelGrid;
-    private Factory<? extends Predicate<Int2D>> cellPredicate;
+    private Factory<? super S, ? extends ModelGrid> modelGrid;
+    private Factory<? super S, ? extends Predicate<Int2D>> cellPredicate;
 
     @Override
-    protected ActionCellPredicate newInstance(final Simulation simulation) {
-        return new ActionCellPredicate(modelGrid.get(simulation), cellPredicate.get(simulation));
+    protected ActionCellPredicate newInstance(final S scope) {
+        return new ActionCellPredicate(modelGrid.get(scope), cellPredicate.get(scope));
     }
-    
+
 }

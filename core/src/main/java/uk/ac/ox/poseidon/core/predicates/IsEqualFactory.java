@@ -23,22 +23,24 @@
 package uk.ac.ox.poseidon.core.predicates;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class IsEqualFactory<T> extends GlobalScopeFactory<IsEqual<T>> {
 
     private T value;
 
     @Override
-    protected IsEqual<T> newInstance(final Simulation simulation) {
+    protected IsEqual<T> newInstance(final GlobalScope scope) {
         return new IsEqual<>(value);
     }
 

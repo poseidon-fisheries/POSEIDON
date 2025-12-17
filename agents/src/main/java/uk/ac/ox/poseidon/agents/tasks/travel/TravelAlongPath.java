@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
@@ -41,7 +41,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
-public class TravelAlongPath extends VesselTask {
+public class TravelAlongPath extends AgentTask<Vessel> {
 
     private final PathFinder<Int2D> pathFinder;
     private final DistanceCalculator distanceCalculator;
@@ -60,19 +60,19 @@ public class TravelAlongPath extends VesselTask {
 
     @Override
     public void start() {
-        trip = checkNotNull(getVessel().getCurrentTrip());
-        startDateTime = getVessel().getSchedule().getDateTime();
-        origin = getVessel().getCell();
-        destination = checkNotNull(getVessel().getCurrentTrip().getDestination());
+        trip = checkNotNull(getAgent().getCurrentTrip());
+        startDateTime = getAgent().getSchedule().getDateTime();
+        origin = getAgent().getCell();
+        destination = checkNotNull(getAgent().getCurrentTrip().getDestination());
         currentPath =
             pathFinder
-                .getPath(getVessel().getCell(), destination)
+                .getPath(getAgent().getCell(), destination)
                 .orElseThrow(() -> new IllegalStateException(
                     MessageFormat.format(
                         "No path found from {0} to {1} for vessel {2}.",
-                        getVessel().getCell(),
+                        getAgent().getCell(),
                         destination,
-                        getVessel()
+                        getAgent()
                     )
                 ));
         super.start();
@@ -80,8 +80,8 @@ public class TravelAlongPath extends VesselTask {
 
     @Override
     public Status execute() {
-        final Vessel vessel = getVessel();
-        final Int2D destinationCell = checkNotNull(getVessel().getCurrentTrip().getDestination());
+        final Vessel vessel = getAgent();
+        final Int2D destinationCell = checkNotNull(getAgent().getCurrentTrip().getDestination());
         checkState(
             // TODO: consider whether we should reroute instead
             currentPath.getLast().equals(destinationCell),
@@ -95,9 +95,9 @@ public class TravelAlongPath extends VesselTask {
         currentPath = currentPath.subList(1, currentPath.size());
         if (currentPath.isEmpty()) {
             trip.getEventManager().broadcast(new TravelEvent(
-                getVessel(),
+                getAgent(),
                 startDateTime,
-                getVessel().getSchedule().getDateTime(),
+                getAgent().getSchedule().getDateTime(),
                 origin,
                 destination
             ));

@@ -22,13 +22,20 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
-import lombok.NonNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class MinFactory extends GlobalScopeFactory<Min> {
     @Override
-    protected Min newInstance(final @NonNull Simulation simulation) {
+    protected Min newInstance(final GlobalScope scope) {
         return new Min();
     }
 }

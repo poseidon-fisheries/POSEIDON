@@ -23,18 +23,20 @@
 package uk.ac.ox.poseidon.core.utils;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ListFactory<C> extends GlobalScopeFactory<List<C>> {
 
     private List<C> values;
@@ -45,7 +47,7 @@ public class ListFactory<C> extends GlobalScopeFactory<List<C>> {
     }
 
     @Override
-    protected List<C> newInstance(final Simulation simulation) {
+    protected List<C> newInstance(final GlobalScope scope) {
         return values;
     }
 }

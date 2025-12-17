@@ -23,27 +23,29 @@
 package uk.ac.ox.poseidon.io;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DirectoryRemoverFactory extends GlobalScopeFactory<Steppable> {
+@EqualsAndHashCode(callSuper = true)
+public class DirectoryRemoverFactory<S extends Scope> extends RelativeScopeFactory<S, Steppable> {
 
-    private Factory<? extends Path> target;
+    private Factory<? super S, ? extends Path> target;
     private boolean ignoreIfAbsent;
 
     @Override
-    protected Steppable newInstance(final Simulation simulation) {
-        return new DirectoryRemover(target.get(simulation), ignoreIfAbsent);
+    protected Steppable newInstance(final S scope) {
+        return new DirectoryRemover(target.get(scope), ignoreIfAbsent);
     }
 }

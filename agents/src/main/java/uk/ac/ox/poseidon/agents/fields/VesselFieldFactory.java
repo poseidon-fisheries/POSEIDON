@@ -22,22 +22,27 @@
 
 package uk.ac.ox.poseidon.agents.fields;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class VesselFieldFactory extends SimulationScopeFactory<VesselField> {
 
-    private Factory<? extends ModelGrid> modelGrid;
+    private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
 
     @Override
-    protected VesselField newInstance(final @NonNull Simulation simulation) {
-        return new VesselField(modelGrid.get(simulation));
+    protected VesselField newInstance(final SimulationScope scope) {
+        return new VesselField(modelGrid.get(scope));
     }
 }

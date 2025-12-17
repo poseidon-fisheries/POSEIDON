@@ -22,23 +22,28 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class FullBiomassAllocatorFactory extends SimulationScopeFactory<BiomassAllocator> {
 
-    private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid;
+    private Factory<? super SimulationScope, ? extends CarryingCapacityGrid> carryingCapacityGrid;
 
     @Override
-    protected BiomassAllocator newInstance(final @NonNull Simulation simulation) {
+    protected BiomassAllocator newInstance(final SimulationScope scope) {
         return new FullBiomassAllocator(
-            carryingCapacityGrid.get(simulation)
+            carryingCapacityGrid.get(scope)
         );
     }
 }

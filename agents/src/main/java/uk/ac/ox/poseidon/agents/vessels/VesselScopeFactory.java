@@ -22,50 +22,24 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.ObjectScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.AbstractFactory;
 
-import java.lang.reflect.InvocationTargetException;
-
+@Data
 @SuperBuilder
 @NoArgsConstructor
-public abstract class VesselScopeFactory<C> extends ObjectScopeFactory<Vessel, C> {
-
+@EqualsAndHashCode(callSuper = true)
+public abstract class VesselScopeFactory<C> extends AbstractFactory<VesselScope, C> {
     @Override
-    protected abstract C newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    );
-
-    @Override
-    protected Integer makeKey(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        synchronized (this) {
-            return readMethods
-                .stream()
-                .map(readMethod -> {
-                    try {
-                        return readMethod.invoke(this);
-                    } catch (final IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .map(o ->
-                    switch (o) {
-                        case null -> null;
-                        case final Factory<?> factory -> factory.get(simulation);
-                        case final VesselScopeFactory<?> factory -> factory.get(simulation, vessel);
-                        default -> o;
-                    }
-                )
-                .toList()
-                .hashCode();
-        }
+    protected Object makeKey(final VesselScope scope) {
+        return scope.getVessel();
     }
 
+    @Override
+    protected Class<VesselScope> scopeClass() {
+        return VesselScope.class;
+    }
 }

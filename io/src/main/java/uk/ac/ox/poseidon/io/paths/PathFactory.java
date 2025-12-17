@@ -23,10 +23,11 @@
 package uk.ac.ox.poseidon.io.paths;
 
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 
-public interface PathFactory extends Factory<Path> {
+public interface PathFactory<S extends Scope> extends Factory<S, Path> {
 
     private static String pathToString(final Path path) {
         return path.toString().replace("\\", "/");
@@ -43,19 +44,15 @@ public interface PathFactory extends Factory<Path> {
         return of(Path.of(first, more));
     }
 
-    default RelativePathFactory plus(final Path path) {
-        return new RelativePathFactory(this, pathToString(path));
+    default RelativePathFactory<S> plus(final Path path) {
+        return new RelativePathFactory<>(this, pathToString(path));
     }
 
-    default RelativePathFactory plus(
+    default RelativePathFactory<S> plus(
         final String first,
         final String... more
     ) {
         return plus(Path.of(first, more));
-    }
-
-    default SimulationFolderFactory simulationFolder() {
-        return new SimulationFolderFactory(this);
     }
 
 }

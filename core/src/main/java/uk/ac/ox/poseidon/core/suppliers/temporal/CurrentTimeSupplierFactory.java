@@ -22,12 +22,21 @@
 
 package uk.ac.ox.poseidon.core.suppliers.temporal;
 
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-public class CurrentTimeSupplierFactory extends GlobalScopeFactory<CurrentTimeSupplier> {
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class CurrentTimeSupplierFactory extends SimulationScopeFactory<CurrentTimeSupplier> {
+
     @Override
-    protected CurrentTimeSupplier newInstance(final Simulation simulation) {
-        return new CurrentTimeSupplier(simulation.getTemporalSchedule());
+    protected CurrentTimeSupplier newInstance(final SimulationScope scope) {
+        return new CurrentTimeSupplier(scope.getSimulation().getTemporalSchedule());
     }
 }

@@ -23,31 +23,34 @@
 package uk.ac.ox.poseidon.io.tables;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StringColumnReaderFactory extends GlobalScopeFactory<List<String>> {
+@EqualsAndHashCode(callSuper = true)
+public class StringColumnReaderFactory<S extends Scope>
+    extends RelativeScopeFactory<S, List<String>> {
 
-    private Factory<? extends Path> path;
+    private Factory<? super S, ? extends Path> path;
     private String columnName;
 
     @Override
-    protected List<String> newInstance(final Simulation simulation) {
+    protected List<String> newInstance(final S scope) {
         return Table
             .read()
-            .csv(path.get(simulation).toFile())
+            .csv(path.get(scope).toFile())
             .stream()
             .map(row -> row.getString(columnName))
             .toList();

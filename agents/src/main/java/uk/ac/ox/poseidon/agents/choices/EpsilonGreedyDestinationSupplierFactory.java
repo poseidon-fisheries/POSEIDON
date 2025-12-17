@@ -23,34 +23,33 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.Factory;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class EpsilonGreedyDestinationSupplierFactory extends VesselScopeFactory<DestinationSupplier> {
 
     private double epsilon;
-    private VesselScopeFactory<? extends Picker<Int2D>> explorer;
-    private VesselScopeFactory<? extends Picker<Int2D>> exploiter;
+    private Factory<? super VesselScope, ? extends Picker<Int2D>> explorer;
+    private Factory<? super VesselScope, ? extends Picker<Int2D>> exploiter;
 
     @Override
-    protected DestinationSupplier newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected DestinationSupplier newInstance(final VesselScope scope) {
         return new EpsilonGreedyChooser<>(
             epsilon,
-            explorer.get(simulation, vessel),
-            exploiter.get(simulation, vessel),
-            simulation.random
+            explorer.get(scope),
+            exploiter.get(scope),
+            scope.getSimulation().random
         )::get;
     }
 }

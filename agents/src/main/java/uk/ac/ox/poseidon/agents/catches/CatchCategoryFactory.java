@@ -23,22 +23,24 @@
 package uk.ac.ox.poseidon.agents.catches;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class CatchCategoryFactory extends GlobalScopeFactory<CatchCategory> {
 
     private String code;
 
     @Override
-    protected CatchCategory newInstance(final Simulation simulation) {
+    protected CatchCategory newInstance(final GlobalScope scope) {
         return new CatchCategory(code);
     }
 }

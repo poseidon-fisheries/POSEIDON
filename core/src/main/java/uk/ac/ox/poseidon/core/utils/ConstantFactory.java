@@ -23,22 +23,24 @@
 package uk.ac.ox.poseidon.core.utils;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ConstantFactory<T> extends GlobalScopeFactory<T> {
 
     private T value;
 
     @Override
-    protected T newInstance(final Simulation simulation) {
+    protected T newInstance(final GlobalScope scope) {
         return value;
     }
 

@@ -22,33 +22,38 @@
 
 package uk.ac.ox.poseidon.agents.registers;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.util.List;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ImmutableRegisterFactory<T> extends SimulationScopeFactory<Register<T>> {
+@EqualsAndHashCode(callSuper = true)
+public class ImmutableRegisterFactory<T> extends SimulationScopeFactory<ImmutableRegister<T>> {
 
-    private Factory<? extends List<Vessel>> vessels;
-    private VesselScopeFactory<T> vesselScopeFactory;
+    private Factory<? super SimulationScope, ? extends List<Vessel>> vessels;
+    private Factory<? super VesselScope, T> vesselScopeFactory;
 
     @Override
-    protected ImmutableRegister<T> newInstance(final @NonNull Simulation simulation) {
+    protected ImmutableRegister<T> newInstance(final SimulationScope scope) {
         return new ImmutableRegister<>(
-            vessels.get(simulation).stream().collect(toImmutableMap(
+            vessels.get(scope).stream().collect(toImmutableMap(
                 identity(),
-                vessel -> vesselScopeFactory.get(simulation, vessel)
+                vessel -> vesselScopeFactory.get(new VesselScope(scope, vessel))
             ))
         );
     }

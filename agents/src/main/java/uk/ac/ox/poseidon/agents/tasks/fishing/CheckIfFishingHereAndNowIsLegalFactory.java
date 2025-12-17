@@ -20,35 +20,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.regulations;
+package uk.ac.ox.poseidon.agents.tasks.fishing;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.regulations.Regulations;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GearSpecificFishingLocationLegalityCheckerFactory
-    extends VesselScopeFactory<GearSpecificFishingLocationLegalityChecker> {
+@EqualsAndHashCode(callSuper = true)
+public class CheckIfFishingHereAndNowIsLegalFactory
+    extends VesselTaskFactory<CheckIfFishingHereAndNowIsLegal> {
 
-    private VesselScopeFactory<? extends Gear> fishingGear;
-    private VesselScopeFactory<? extends FishingLocationLegalityChecker> delegateChecker;
+    private Factory<? super VesselScope, ? extends Regulations<Vessel>> regulations;
 
     @Override
-    protected GearSpecificFishingLocationLegalityChecker newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new GearSpecificFishingLocationLegalityChecker(
-            fishingGear.get(simulation, vessel),
-            delegateChecker.get(simulation, vessel)
-        );
+    protected CheckIfFishingHereAndNowIsLegal newTask(final VesselScope scope) {
+        return new CheckIfFishingHereAndNowIsLegal(regulations.get(scope));
     }
+
 }

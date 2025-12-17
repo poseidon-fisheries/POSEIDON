@@ -23,36 +23,35 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ImitatingPickerFactory<O> extends VesselScopeFactory<ImitatingPicker<O>> {
 
-    private VesselScopeFactory<? extends OptionValues<O>> optionValues;
-    private VesselScopeFactory<? extends Predicate<O>> optionPredicate;
-    private VesselScopeFactory<? extends Supplier<OptionValues<O>>> optionValuesSupplier;
+    private Factory<? super VesselScope, ? extends OptionValues<O>> optionValues;
+    private Factory<? super VesselScope, ? extends Predicate<O>> optionPredicate;
+    private Factory<? super VesselScope, ? extends Supplier<OptionValues<O>>> optionValuesSupplier;
 
     @Override
-    protected ImitatingPicker<O> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected ImitatingPicker<O> newInstance(final VesselScope scope) {
         return new ImitatingPicker<>(
-            optionValues.get(simulation, vessel),
-            optionPredicate.get(simulation, vessel),
-            optionValuesSupplier.get(simulation, vessel),
-            simulation.random
+            optionValues.get(scope),
+            optionPredicate.get(scope),
+            optionValuesSupplier.get(scope),
+            scope.getSimulation().random
         );
     }
 }

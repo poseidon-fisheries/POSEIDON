@@ -24,8 +24,8 @@ package uk.ac.ox.poseidon.core.predicates.logical;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 import java.util.function.Predicate;
 
@@ -45,16 +45,16 @@ class NotFactoryTest {
     @Test
     void testNewInstanceWithValidPredicateFactory() {
         // Arrange
-        final Factory<Predicate<Object>> mockFactory = mock(Factory.class);
+        final GlobalScopeFactory<Predicate<Object>> mockFactory =
+            mock(GlobalScopeFactory.class);
         final Predicate<Object> mockPredicate = mock(Predicate.class);
-        final Simulation mockSimulation = mock(Simulation.class);
 
         when(mockFactory.get(Mockito.any())).thenReturn(mockPredicate);
 
-        final NotFactory<Object> notFactory = new NotFactory<>(mockFactory);
+        final NotFactory<GlobalScope, Object> notFactory = new NotFactory<>(mockFactory);
 
         // Act
-        final Not<Object> result = notFactory.newInstance(mockSimulation);
+        final Not<Object> result = notFactory.get(mock(GlobalScope.class));
 
         // Assert
         assertNotNull(result, "The resulting Not instance should not be null.");
@@ -67,16 +67,15 @@ class NotFactoryTest {
     @Test
     void testNewInstanceWithNullPredicateThrowsException() {
         // Arrange
-        final Factory<Predicate<Object>> mockFactory = mock(Factory.class);
-        final Simulation mockSimulation = mock(Simulation.class);
-
+        final GlobalScopeFactory<Predicate<Object>> mockFactory =
+            mock(GlobalScopeFactory.class);
         when(mockFactory.get(Mockito.any())).thenReturn(null);
 
-        final NotFactory<Object> notFactory = new NotFactory<>(mockFactory);
+        final NotFactory<GlobalScope, Object> notFactory = new NotFactory<>(mockFactory);
 
         // Act & Assert
         assertThrows(
-            NullPointerException.class, () -> notFactory.newInstance(mockSimulation),
+            NullPointerException.class, () -> notFactory.get(mock(GlobalScope.class)),
             "Expected Not to throw NullPointerException when the predicate is null."
         );
     }

@@ -22,35 +22,38 @@
 
 package uk.ac.ox.poseidon.io.sources;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileDataSourceFactory extends GlobalScopeFactory<FileDataSource> {
+@EqualsAndHashCode(callSuper = true)
+public class FileDataSourceFactory<S extends Scope>
+    extends RelativeScopeFactory<S, FileDataSource> {
 
-    private Factory<? extends Path> path;
-    private String encoding = UTF_8.name();
+    private static final String DEFAULT_ENCODING = UTF_8.name();
 
-    public FileDataSourceFactory(final Factory<? extends Path> path) {
+    private Factory<S, ? extends Path> path;
+    @Builder.Default private String encoding = DEFAULT_ENCODING;
+
+    public FileDataSourceFactory(final Factory<S, ? extends Path> path) {
         this.path = path;
+        this.encoding = DEFAULT_ENCODING;
     }
 
     @Override
-    protected FileDataSource newInstance(final Simulation simulation) {
-        return new FileDataSource(path.get(simulation).toFile(), Charset.forName(encoding));
+    protected FileDataSource newInstance(final S scope) {
+        return new FileDataSource(path.get(scope).toFile(), Charset.forName(encoding));
     }
 
 }

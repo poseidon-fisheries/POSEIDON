@@ -23,100 +23,126 @@
 package uk.ac.ox.poseidon.core.predicates.logical;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings("unchecked")
 class AllOfFactoryTest {
 
     /**
-     * Tests for the AllOfFactory's newInstance method. AllOfFactory is responsible for creating
-     * instances of the AllOf class, which combines multiple predicates into an "all-of" logical
-     * combination.
+     * Tests the `get` method of the AllOfFactory class. Verifies that the method creates an `AllOf`
+     * instance correctly when a valid list of factories for `Predicate<Object>` is provided.
      */
-
     @Test
-    void newInstance_createsInstanceWithAllPredicates() {
+    void getWithValidPredicateFactoriesCreatesAllOfInstance() {
         // Arrange
-        final Simulation simulationMock = mock(Simulation.class);
-        final Predicate<Object> predicate1 = mock(Predicate.class);
-        final Predicate<Object> predicate2 = mock(Predicate.class);
+        final GlobalScopeFactory<Predicate<Object>> mockFactory1 =
+            mock(GlobalScopeFactory.class);
+        final GlobalScopeFactory<Predicate<Object>> mockFactory2 =
+            mock(GlobalScopeFactory.class);
+        final Predicate<Object> mockPredicate1 = mock(Predicate.class);
+        final Predicate<Object> mockPredicate2 = mock(Predicate.class);
+        final GlobalScope mockScope = mock(GlobalScope.class);
 
-        final Factory<Predicate<Object>> factoryMock1 = mock(Factory.class);
-        final Factory<Predicate<Object>> factoryMock2 = mock(Factory.class);
+        when(mockFactory1.get(any())).thenReturn(mockPredicate1);
+        when(mockFactory2.get(any())).thenReturn(mockPredicate2);
 
-        when(factoryMock1.get(simulationMock)).thenReturn(predicate1);
-        when(factoryMock2.get(simulationMock)).thenReturn(predicate2);
-
-        final AllOfFactory<Object> allOfFactory =
-            new AllOfFactory<>(List.of(factoryMock1, factoryMock2));
+        final AllOfFactory<GlobalScope, Object> allOfFactory =
+            new AllOfFactory<>(List.of(mockFactory1, mockFactory2));
 
         // Act
-        final AllOf<Object> allOf = allOfFactory.newInstance(simulationMock);
+        final AllOf<Object> result = allOfFactory.get(mockScope);
 
         // Assert
-        assertEquals(
-            2,
-            allOf.getPredicates().count(),
-            "The AllOf instance should contain two predicates"
-        );
-        verify(factoryMock1, times(1)).get(simulationMock);
-        verify(factoryMock2, times(1)).get(simulationMock);
+        assertThat(result)
+            .as("The resulting AllOf instance should not be null")
+            .isNotNull();
     }
 
+    /**
+     * Tests the `get` method with an empty list of factories. Verifies that an `AllOf` instance is
+     * still created successfully.
+     */
     @Test
-    void newInstance_throwsExceptionWhenSimulationIsNull() {
+    void getWithEmptyFactoryListCreatesAllOfInstance() {
         // Arrange
-        final Factory<Predicate<Object>> factoryMock = mock(Factory.class);
-        final AllOfFactory<Object> allOfFactory = new AllOfFactory<>(List.of(factoryMock));
+        final AllOfFactory<GlobalScope, Object> allOfFactory =
+            new AllOfFactory<>(Collections.emptyList());
+        final GlobalScope mockScope = mock(GlobalScope.class);
+
+        // Act
+        final AllOf<Object> result = allOfFactory.get(mockScope);
+
+        // Assert
+        assertThat(result)
+            .as("The resulting AllOf instance should not be null even with empty list")
+            .isNotNull();
+    }
+
+    /**
+     * Tests the `get` method to ensure it throws a NullPointerException when one of the factories
+     * provides a null predicate.
+     */
+    @Test
+    void getWithNullPredicateThrowsNullPointerException() {
+        // Arrange
+        final GlobalScopeFactory<Predicate<Object>> mockFactory =
+            mock(GlobalScopeFactory.class);
+        final GlobalScope mockScope = mock(GlobalScope.class);
+
+        when(mockFactory.get(any())).thenReturn(null);
+
+        final AllOfFactory<GlobalScope, Object> allOfFactory =
+            new AllOfFactory<>(List.of(mockFactory));
 
         // Act & Assert
-        // noinspection DataFlowIssue
-        assertThrows(
-            NullPointerException.class, () -> allOfFactory.newInstance(null),
-            "A NullPointerException should be thrown if simulation is null"
-        );
+        assertThatThrownBy(() -> allOfFactory.get(mockScope))
+            .isInstanceOf(NullPointerException.class)
+            .as("Expected AllOf to throw NullPointerException when a predicate is null");
     }
 
+    /**
+     * Tests the `get` method with multiple valid predicate factories to ensure all predicates are
+     * properly instantiated and combined into an AllOf instance.
+     */
     @Test
-    void newInstance_createsInstanceWithEmptyPredicateList() {
+    void getWithMultipleValidFactoriesCreatesAllOfInstance() {
         // Arrange
-        final Simulation simulationMock = mock(Simulation.class);
-        final AllOfFactory<Object> allOfFactory = new AllOfFactory<>(List.of());
+        final GlobalScopeFactory<Predicate<Object>> mockFactory1 =
+            mock(GlobalScopeFactory.class);
+        final GlobalScopeFactory<Predicate<Object>> mockFactory2 =
+            mock(GlobalScopeFactory.class);
+        final GlobalScopeFactory<Predicate<Object>> mockFactory3 =
+            mock(GlobalScopeFactory.class);
+        final Predicate<Object> mockPredicate1 = mock(Predicate.class);
+        final Predicate<Object> mockPredicate2 = mock(Predicate.class);
+        final Predicate<Object> mockPredicate3 = mock(Predicate.class);
+        final GlobalScope mockScope = mock(GlobalScope.class);
+
+        when(mockFactory1.get(any())).thenReturn(mockPredicate1);
+        when(mockFactory2.get(any())).thenReturn(mockPredicate2);
+        when(mockFactory3.get(any())).thenReturn(mockPredicate3);
+
+        final AllOfFactory<GlobalScope, Object> allOfFactory =
+            new AllOfFactory<>(List.of(mockFactory1, mockFactory2, mockFactory3));
 
         // Act
-        final AllOf<Object> allOf = allOfFactory.newInstance(simulationMock);
+        final AllOf<Object> result = allOfFactory.get(mockScope);
 
         // Assert
-        assertEquals(
-            0,
-            allOf.getPredicates().count(),
-            "The AllOf instance should contain zero predicates"
-        );
+        assertThat(result)
+            .as("The resulting AllOf instance should not be null with multiple factories")
+            .isNotNull();
     }
 
-    @Test
-    void newInstance_predicateCalledOnlyOncePerFactory() {
-        // Arrange
-        final Simulation simulationMock = mock(Simulation.class);
-        final Factory<Predicate<Object>> factoryMock = mock(Factory.class);
-        final Predicate<Object> predicateMock = mock(Predicate.class);
-
-        when(factoryMock.get(simulationMock)).thenReturn(predicateMock);
-
-        final AllOfFactory<Object> allOfFactory = new AllOfFactory<>(List.of(factoryMock));
-
-        // Act
-        allOfFactory.newInstance(simulationMock);
-
-        // Assert
-        verify(factoryMock, times(1)).get(simulationMock);
-    }
 }

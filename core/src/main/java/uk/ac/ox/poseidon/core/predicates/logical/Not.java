@@ -33,7 +33,7 @@ import java.util.function.Predicate;
 public class Not<T> implements Predicate<T> {
 
     @NonNull
-    private final Predicate<T> predicate;
+    private final Predicate<? super T> predicate;
 
     @Override
     public boolean test(final T t) {

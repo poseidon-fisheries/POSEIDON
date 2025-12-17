@@ -23,43 +23,41 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import lombok.*;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Getter
-@Setter
-@Builder
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class VesselScopeFactoriesByCode<C> extends VesselScopeFactory<C> {
 
-    @Singular private Map<String, ? extends VesselScopeFactory<? extends C>> factories;
-    private VesselScopeFactory<? extends C> defaultFactory;
+    @Singular private Map<String, ? extends Factory<? super VesselScope, ? extends C>> factories;
+    private Factory<? super VesselScope, ? extends C> defaultFactory;
     private String code;
 
     @Override
-    protected C newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected C newInstance(final VesselScope scope) {
         checkNotNull(
             code,
             "Cannot create new instance unless code is set."
         );
         return Optional
             .ofNullable(factories.get(code))
-            .map(factory -> (C) factory.get(simulation, vessel))
+            .map(factory -> (C) factory.get(scope))
             .or(() ->
                 Optional
                     .ofNullable(defaultFactory)
-                    .map(factory -> factory.get(simulation, vessel))
+                    .map(factory -> factory.get(scope))
             )
             .orElseThrow(() -> new IllegalArgumentException(
-                "No factory found for code %s and no default factory provided.".formatted(code)
+                "No factory found for code %s and no default factory provided." .formatted(code)
             ));
     }
 }

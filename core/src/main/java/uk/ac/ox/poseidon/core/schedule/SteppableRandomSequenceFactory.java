@@ -23,28 +23,30 @@
 package uk.ac.ox.poseidon.core.schedule;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.engine.RandomSequence;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import java.util.List;
+import java.util.Collection;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@SuperBuilder
 @NoArgsConstructor
-public class SteppableRandomSequenceFactory extends GlobalScopeFactory<Steppable> {
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class SteppableRandomSequenceFactory extends SimulationScopeFactory<RandomSequence> {
 
-    private Factory<List<? extends Steppable>> steppables;
+    private Factory<? super SimulationScope, ? extends Collection<? extends Steppable>> steppables;
 
     @Override
-    protected Steppable newInstance(final Simulation simulation) {
-        return new RandomSequence(steppables.get(simulation));
+    protected RandomSequence newInstance(final SimulationScope scope) {
+        return new RandomSequence(steppables.get(scope));
     }
 
 }

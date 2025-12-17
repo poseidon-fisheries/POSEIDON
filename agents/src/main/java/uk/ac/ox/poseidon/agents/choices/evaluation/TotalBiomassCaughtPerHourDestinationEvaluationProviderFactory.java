@@ -22,19 +22,23 @@
 
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory
-    extends VesselScopeFactory<EvaluationProvider<Int2D>> {
+    extends GlobalScopeFactory<EvaluationProvider<Int2D>> {
 
     @Override
-    protected EvaluationProvider<Int2D> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected EvaluationProvider<Int2D> newInstance(final GlobalScope scope) {
         return new TotalBiomassCaughtPerHourDestinationEvaluationProvider();
     }
 

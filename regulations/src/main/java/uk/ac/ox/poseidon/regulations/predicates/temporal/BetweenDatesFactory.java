@@ -22,24 +22,29 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDate;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BetweenDatesFactory extends GlobalScopeFactory<BetweenDates> {
+@EqualsAndHashCode(callSuper = true)
+public class BetweenDatesFactory<S extends Scope> extends RelativeScopeFactory<S, BetweenDates> {
 
-    Factory<? extends LocalDate> startDate;
-    Factory<? extends LocalDate> endDate;
+    Factory<? super S, ? extends LocalDate> startDate;
+    Factory<? super S, ? extends LocalDate> endDate;
 
     @Override
-    protected BetweenDates newInstance(final @NonNull Simulation simulation) {
-        return new BetweenDates(startDate.get(simulation), endDate.get(simulation));
+    protected BetweenDates newInstance(final S scope) {
+        return new BetweenDates(startDate.get(scope), endDate.get(scope));
     }
 }

@@ -22,35 +22,34 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
-import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.function.Supplier;
 
-@Getter
-@Setter
-@Builder
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FishingFactory extends TaskFactory<Fishing> {
+@EqualsAndHashCode(callSuper = true)
+public class FishingFactory extends VesselTaskFactory<Fishing> {
 
-    private VesselScopeFactory<? extends Supplier<Fisheable>> fisheableSupplier;
-    private Factory<? extends DispositionProcess> dispositionProcess;
+    private Factory<? super VesselScope, ? extends Supplier<Fisheable>> fisheableSupplier;
+    private Factory<? super VesselScope, ? extends DispositionProcess> dispositionProcess;
 
     @Override
-    protected Fishing newTask(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected Fishing newTask(final VesselScope scope) {
         return new Fishing(
-            fisheableSupplier.get(simulation, vessel),
-            dispositionProcess.get(simulation)
+            fisheableSupplier.get(scope),
+            dispositionProcess.get(scope)
         );
     }
 

@@ -23,14 +23,16 @@
 package uk.ac.ox.poseidon.io.tables;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.io.paths.PathFactory;
 import uk.ac.ox.poseidon.io.sources.DataSource;
 import uk.ac.ox.poseidon.io.sources.FileDataSourceFactory;
@@ -39,38 +41,39 @@ import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
 import java.io.Reader;
 import java.nio.file.Path;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CsvTableFactory extends GlobalScopeFactory<Table> {
+@EqualsAndHashCode(callSuper = true)
+public class CsvTableFactory<S extends Scope> extends RelativeScopeFactory<S, Table> {
 
-    public static CsvTableFactory fromString(final String data) {
-        return new CsvTableFactory(new StringDataSourceFactory(data));
+    private Factory<? super S, ? extends DataSource> dataSource;
+
+    public static CsvTableFactory<GlobalScope> fromString(final String data) {
+        return new CsvTableFactory<>(new StringDataSourceFactory(data));
     }
 
-    public static CsvTableFactory fromFile(
-        final PathFactory pathFactory
+    public static <S extends Scope> CsvTableFactory<S> fromFile(
+        final Factory<S, ? extends Path> pathFactory
     ) {
-        return new CsvTableFactory(new FileDataSourceFactory(pathFactory));
+        return new CsvTableFactory<>(new FileDataSourceFactory<>(pathFactory));
     }
 
-    public static CsvTableFactory fromFile(
+    public static CsvTableFactory<GlobalScope> fromFile(
         final String first,
         final String... more
     ) {
         return fromFile(PathFactory.of(first, more));
     }
 
-    public static CsvTableFactory fromFile(final Path path) {
+    public static CsvTableFactory<GlobalScope> fromFile(final Path path) {
         return fromFile(PathFactory.of(path));
     }
 
-    private Factory<? extends DataSource> dataSource;
-
     @Override
-    protected Table newInstance(final Simulation simulation) {
-        final Reader reader = dataSource.get(simulation).getReader();
+    protected Table newInstance(final S scope) {
+        final Reader reader = dataSource.get(scope).getReader();
         return Table
             .read()
             .usingOptions(CsvReadOptions.builder(reader).sample(false));

@@ -23,9 +23,10 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
@@ -33,51 +34,55 @@ import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.util.Map;
 import java.util.Map.Entry;
 
 import static java.util.stream.Collectors.toMap;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class VesselActivationFactory extends SimulationScopeFactory<FleetEvent> {
 
-    private Factory<? extends Fleet> fleet;
+    private Factory<? super SimulationScope, ? extends Fleet> fleet;
 
     private String id;
     private String name;
     private String portCode;
-    private Map<String, Factory<?>> tags;
-    private VesselScopeFactory<? extends Behaviour<Vessel>> behaviour;
-    private VesselScopeFactory<? extends Hold> hold;
-    private VesselScopeFactory<? extends Gear> gear;
-    private VesselScopeFactory<? extends Engine> engine;
+    private Map<String, Factory<? super SimulationScope, ?>> tags;
+    private Factory<? super VesselScope, ? extends Behaviour<Vessel>> behaviour;
+    private Factory<? super VesselScope, ? extends Hold> hold;
+    private Factory<? super VesselScope, ? extends Gear> gear;
+    private Factory<? super VesselScope, ? extends Engine> engine;
 
     @Override
-    protected FleetEvent newInstance(final Simulation simulation) {
+    protected FleetEvent newInstance(final SimulationScope scope) {
         final Map<String, Object> tags = this.tags
             .entrySet()
             .stream()
             .collect(toMap(
                 Entry::getKey,
-                entry -> entry.getValue().get(simulation)
+                entry -> entry.getValue().get(scope)
             ));
+        final Simulation simulation = scope.getSimulation();
         final FleetEvent fleetEvent = new FleetEvent(
             simulation.getTemporalSchedule().getStartingDateTime(),
-            fleet.get(simulation),
+            fleet.get(scope),
             FleetEvent.Type.ACTIVATION,
             id,
             name,
             portCode,
             tags,
-            vessel -> behaviour.get(simulation, vessel),
-            vessel -> hold.get(simulation, vessel),
-            vessel -> gear.get(simulation, vessel),
-            vessel -> engine.get(simulation, vessel)
+            vessel -> behaviour.get(new VesselScope(scope, vessel)),
+            vessel -> hold.get(new VesselScope(scope, vessel)),
+            vessel -> gear.get(new VesselScope(scope, vessel)),
+            vessel -> engine.get(new VesselScope(scope, vessel))
         );
+        // TODO: figure out scheduling
         simulation.getTemporalSchedule().scheduleOnce(fleetEvent);
         return fleetEvent;
     }

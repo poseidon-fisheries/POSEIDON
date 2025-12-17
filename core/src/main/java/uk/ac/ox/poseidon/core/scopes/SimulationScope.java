@@ -20,25 +20,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.general;
+package uk.ac.ox.poseidon.core.scopes;
 
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.tasks.VesselTask;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.function.Predicate;
+import java.lang.ref.WeakReference;
 
-import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class SimulationScope extends GlobalScope {
 
-@RequiredArgsConstructor
-public class VesselPredicateTask extends VesselTask {
+    private final WeakReference<Simulation> simulation;
 
-    private final Predicate<Vessel> predicate;
+    public SimulationScope(final SimulationScope simulationScope) {
+        this.simulation = simulationScope.simulation;
+    }
 
-    @Override
-    public Status execute() {
-        return predicate.test(getVessel()) ? SUCCEEDED : FAILED;
+    public SimulationScope(
+        final Simulation simulation
+    ) {
+        this.simulation = new WeakReference<>(simulation);
+    }
+
+    public Simulation getSimulation() {
+        return simulation.get();
     }
 
 }

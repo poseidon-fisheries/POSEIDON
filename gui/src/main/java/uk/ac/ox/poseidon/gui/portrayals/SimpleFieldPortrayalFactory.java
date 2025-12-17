@@ -23,26 +23,28 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.portrayal.FieldPortrayal2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SimpleFieldPortrayalFactory extends GlobalScopeFactory<NamedPortrayal> {
+@EqualsAndHashCode(callSuper = true)
+public class SimpleFieldPortrayalFactory extends SimulationScopeFactory<NamedPortrayal> {
 
     private String name;
-    private Factory<? extends FieldPortrayal2D> portrayal;
+    private Factory<? super SimulationScope, ? extends FieldPortrayal2D> portrayal;
     private boolean visible;
 
     @Override
-    protected NamedPortrayal newInstance(final Simulation simulation) {
-        return new NamedPortrayal(name, portrayal.get(simulation), visible);
+    protected NamedPortrayal newInstance(final SimulationScope scope) {
+        return new NamedPortrayal(name, portrayal.get(scope), visible);
     }
 }

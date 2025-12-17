@@ -20,33 +20,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.temporal;
+package uk.ac.ox.poseidon.agents.tasks;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Simulation;
+import com.badlogic.gdx.ai.btree.Task;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class VesselTaskFactory<T extends Task<Vessel>>
+    extends TaskFactory<Vessel, VesselScope, T> {
+    public VesselTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> guard) {
+        super(guard);
+    }
 
-class InYearFactoryTest {
-
-    /**
-     * The {@code InYearFactory} class is responsible for creating instances of the {@code InYear}
-     * class. The {@code newInstance} method uses the provided {@code Simulation} instance to create
-     * an {@code InYear} object with the factory's current {@code year} value.
-     */
-
-    @Test
-    void testNewInstance_WithValidYear_ReturnsInYearInstance() {
-        // Arrange
-        final int year = 2023;
-        final InYearFactory factory = new InYearFactory(year);
-
-        final Simulation simulation = new Simulation();
-
-        // Act
-        final InYear result = factory.newInstance(simulation);
-
-        // Assert
-        assertEquals(year, result.getYear());
+    @Override
+    protected Class<VesselScope> scopeClass() {
+        return VesselScope.class;
     }
 }

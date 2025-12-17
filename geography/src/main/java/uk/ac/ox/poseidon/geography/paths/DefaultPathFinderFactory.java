@@ -22,28 +22,34 @@
 
 package uk.ac.ox.poseidon.geography.paths;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DefaultPathFinderFactory extends GlobalScopeFactory<GridPathFinder> {
+@EqualsAndHashCode(callSuper = true)
+public class DefaultPathFinderFactory<S extends Scope>
+    extends RelativeScopeFactory<S, GridPathFinder> {
 
-    private Factory<? extends BathymetricGrid> bathymetricGrid;
-    private Factory<? extends PortGrid> portGrid;
-    private Factory<? extends DistanceCalculator> distance;
+    private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? super S, ? extends PortGrid> portGrid;
+    private Factory<? super S, ? extends DistanceCalculator> distance;
 
     @Override
-    protected GridPathFinder newInstance(final @NonNull Simulation simulation) {
-        final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
-        final PortGrid portGrid = this.portGrid.get(simulation);
+    protected GridPathFinder newInstance(final S scope) {
+        final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
+        final PortGrid portGrid = this.portGrid.get(scope);
         return new CachingGridPathFinder(
             new FallbackGridPathfinder(
                 new BresenhamPathFinder(
@@ -53,7 +59,7 @@ public class DefaultPathFinderFactory extends GlobalScopeFactory<GridPathFinder>
                 new AStarPathFinder(
                     bathymetricGrid,
                     portGrid,
-                    distance.get(simulation)
+                    distance.get(scope)
                 )
             ),
             new DefaultPathCache<>()

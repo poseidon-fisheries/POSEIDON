@@ -22,16 +22,21 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
-public class InactiveBehaviourFactory extends VesselScopeFactory<InactiveBehaviour<Vessel>> {
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class InactiveBehaviourFactory extends GlobalScopeFactory<InactiveBehaviour<Vessel>> {
     @Override
-    protected InactiveBehaviour<Vessel> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected InactiveBehaviour<Vessel> newInstance(final GlobalScope scope) {
         return new InactiveBehaviour<>();
     }
 }

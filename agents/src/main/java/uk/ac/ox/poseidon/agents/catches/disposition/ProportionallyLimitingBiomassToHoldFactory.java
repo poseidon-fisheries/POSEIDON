@@ -22,13 +22,21 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ProportionallyLimitingBiomassToHoldFactory
     extends GlobalScopeFactory<ProportionallyLimitingBiomassToHold> {
     @Override
-    protected ProportionallyLimitingBiomassToHold newInstance(final Simulation simulation) {
+    protected ProportionallyLimitingBiomassToHold newInstance(final GlobalScope scope) {
         return new ProportionallyLimitingBiomassToHold();
     }
 }

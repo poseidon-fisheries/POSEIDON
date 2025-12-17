@@ -24,30 +24,33 @@ package uk.ac.ox.poseidon.biology.species;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-public class SpeciesByCodeFactory extends GlobalScopeFactory<List<? extends Species>> {
+@EqualsAndHashCode(callSuper = true)
+public class SpeciesByCodeFactory<S extends Scope>
+    extends RelativeScopeFactory<S, List<? extends Species>> {
 
-    private Factory<? extends List<? extends String>> speciesCodes;
-    private Factory<? extends List<? extends Species>> speciesList;
+    private Factory<? super S, ? extends List<? extends String>> speciesCodes;
+    private Factory<? super S, ? extends List<? extends Species>> speciesList;
 
     @Override
-    protected List<? extends Species> newInstance(final Simulation simulation) {
+    protected List<? extends Species> newInstance(final S scope) {
         final ImmutableSet<String> speciesCodes =
-            ImmutableSet.copyOf(this.speciesCodes.get(simulation));
+            ImmutableSet.copyOf(this.speciesCodes.get(scope));
         return speciesList
-            .get(simulation)
+            .get(scope)
             .stream()
             .filter(s -> speciesCodes.contains(s.getCode()))
             .toList();

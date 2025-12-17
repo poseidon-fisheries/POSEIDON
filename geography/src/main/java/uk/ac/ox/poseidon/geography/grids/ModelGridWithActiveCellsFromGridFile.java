@@ -22,30 +22,36 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import lombok.*;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.io.File;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ModelGridWithActiveCellsFromGridFile
-    extends GlobalScopeFactory<ModelGrid> {
+@EqualsAndHashCode(callSuper = true)
+public class ModelGridWithActiveCellsFromGridFile<S extends Scope>
+    extends RelativeScopeFactory<S, ModelGrid> {
 
-    CellSetFromGridFileFactory cellSetFromGridFile;
+    CellSetFromGridFileFactory<? super S> cellSetFromGridFile;
 
     @Override
-    protected ModelGrid newInstance(final @NonNull Simulation simulation) {
-        final File gridFile = cellSetFromGridFile.getPath().get(simulation).toFile();
+    protected ModelGrid newInstance(final S scope) {
+        // FIXME: relying on cellSetFromGridFile.getPath() feels very hackish.
+        final File gridFile = cellSetFromGridFile.getPath().get(scope).toFile();
         final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
         return ModelGrid.withActiveCells(
             coverageWrapper.getGridWidth(),
             coverageWrapper.getGridHeight(),
             coverageWrapper.makeEnvelope(),
-            cellSetFromGridFile.get(simulation)
+            cellSetFromGridFile.get(scope)
         );
     }
 

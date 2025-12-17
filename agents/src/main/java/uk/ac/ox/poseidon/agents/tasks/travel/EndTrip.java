@@ -22,14 +22,15 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
-import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+import uk.ac.ox.poseidon.agents.tasks.AgentTask;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
-public class EndTrip extends VesselTask {
+public class EndTrip extends AgentTask<Vessel> {
     @Override
     public Status execute() {
-        getVessel().endTrip();
+        getAgent().endTrip();
         return SUCCEEDED;
     }
 }

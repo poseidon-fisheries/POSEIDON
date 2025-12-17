@@ -20,25 +20,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.regulations;
+package uk.ac.ox.poseidon.agents;
 
-import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import java.util.function.Predicate;
+import java.lang.ref.WeakReference;
 
-import static lombok.AccessLevel.PACKAGE;
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class AgentScope<A extends Agent<A>> extends SimulationScope {
 
-@RequiredArgsConstructor(access = PACKAGE)
-public class GearSpecificFishingLocationLegalityChecker implements Predicate<Int2D> {
+    private final WeakReference<A> agent;
 
-    private final Gear gear;
-    private final FishingLocationLegalityChecker delegateChecker;
+    public AgentScope(final AgentScope<A> agentScope) {
+        super(agentScope);
+        this.agent = agentScope.agent;
+    }
 
-    @Override
-    public boolean test(final Int2D int2D) {
-        return delegateChecker.test(int2D, gear);
+    public AgentScope(
+        final SimulationScope simulationScope,
+        final A agent
+    ) {
+        super(simulationScope);
+        this.agent = new WeakReference<>(agent);
+    }
+
+    public A getAgent() {
+        return agent.get();
     }
 
 }

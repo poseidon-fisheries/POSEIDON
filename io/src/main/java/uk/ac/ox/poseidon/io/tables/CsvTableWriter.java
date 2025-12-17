@@ -58,6 +58,7 @@ public class CsvTableWriter implements Steppable {
             final var bw = new BufferedWriter(osw)
         ) {
             final Table table = tableSupplier.get();
+            
             table.write().csv(CsvWriteOptions.builder(bw).header(!fileExists).build());
             if (clearAfterWriting) {
                 table.clear();

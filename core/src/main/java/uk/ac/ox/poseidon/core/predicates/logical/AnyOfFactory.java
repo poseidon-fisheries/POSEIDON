@@ -22,34 +22,39 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnyOfFactory<T> extends GlobalScopeFactory<AnyOf<T>> {
+@EqualsAndHashCode(callSuper = true)
+public class AnyOfFactory<S extends Scope, T> extends RelativeScopeFactory<S, AnyOf<T>> {
 
-    List<Factory<? extends Predicate<? super T>>> predicates;
+    List<Factory<? super S, ? extends Predicate<? super T>>> predicates;
 
     @SafeVarargs
     @SuppressWarnings("varargs")
-    public AnyOfFactory(final Factory<? extends Predicate<? super T>>... predicates) {
+    public AnyOfFactory(final Factory<? super S, ? extends Predicate<? super T>>... predicates) {
         this(List.of(predicates));
     }
 
     @Override
-    protected AnyOf<T> newInstance(final @NonNull Simulation simulation) {
+    protected AnyOf<T> newInstance(final S scope) {
         return new AnyOf<>(
             predicates
                 .stream()
-                .map(p -> p.get(simulation))
+                .map(f -> f.get(scope))
                 .toList()
         );
     }

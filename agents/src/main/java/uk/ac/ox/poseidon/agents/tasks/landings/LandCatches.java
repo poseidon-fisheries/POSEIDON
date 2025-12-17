@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 @RequiredArgsConstructor
-public class LandCatches extends ExtendedTask {
+public class LandCatches extends ExtendedTask<Vessel> {
 
     final Supplier<Duration> durationSupplier;
 
@@ -44,7 +44,7 @@ public class LandCatches extends ExtendedTask {
 
     @Override
     protected Status complete() {
-        final Vessel vessel = getVessel();
+        final Vessel vessel = getAgent();
         final Market market = vessel
             .getMarketGrid()
             .getObjectsAt(vessel.getCell())

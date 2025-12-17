@@ -23,22 +23,24 @@
 package uk.ac.ox.poseidon.agents.market;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.core.utils.Measurements;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.math.RoundingMode.HALF_EVEN;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class PriceFactory extends GlobalScopeFactory<Price> {
 
     private double amount;
@@ -46,7 +48,7 @@ public class PriceFactory extends GlobalScopeFactory<Price> {
     private String massUnit;
 
     @Override
-    protected Price newInstance(final Simulation simulation) {
+    protected Price newInstance(final GlobalScope scope) {
         checkNotNull(currencyUnit, "currencyUnit must not be null");
         checkNotNull(massUnit, "massUnit must not be null");
         return new Price(

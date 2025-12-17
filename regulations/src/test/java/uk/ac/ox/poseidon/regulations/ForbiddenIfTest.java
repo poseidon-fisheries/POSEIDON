@@ -47,8 +47,7 @@ class ForbiddenIfTest {
     @Test
     void testActionIsPermittedWhenPredicateReturnsFalse() {
         // Arrange
-        final Predicate<Action<Object>> predicate = action -> false;
-        final ForbiddenIf<Object> forbiddenIf = new ForbiddenIf<>(predicate);
+        final ForbiddenIf<Object> forbiddenIf = new ForbiddenIf<>(action -> false);
         final Action<Object> mockAction = Mockito.mock(Action.class);
 
         // Act

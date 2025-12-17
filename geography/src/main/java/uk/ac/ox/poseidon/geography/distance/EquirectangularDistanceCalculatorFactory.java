@@ -22,22 +22,28 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@SuperBuilder
 @NoArgsConstructor
-public class EquirectangularDistanceCalculatorFactory extends GlobalScopeFactory<EquirectangularDistanceCalculator> {
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class EquirectangularDistanceCalculatorFactory<S extends Scope>
+    extends RelativeScopeFactory<S, EquirectangularDistanceCalculator> {
 
-    private Factory<? extends ModelGrid> modelGrid;
+    private Factory<? super S, ? extends ModelGrid> modelGrid;
 
     @Override
-    protected EquirectangularDistanceCalculator newInstance(final @NonNull Simulation simulation) {
-        return new EquirectangularDistanceCalculator(modelGrid.get(simulation));
+    protected EquirectangularDistanceCalculator newInstance(final S scope) {
+        return new EquirectangularDistanceCalculator(modelGrid.get(scope));
     }
 }

@@ -23,25 +23,27 @@
 package uk.ac.ox.poseidon.core.time;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 import java.time.LocalDate;
 import java.time.Period;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class PeriodFactory extends GlobalScopeFactory<Period> {
 
     public static final PeriodFactory DAILY = new PeriodFactory("P1D");
     public static final PeriodFactory MONTHLY = new PeriodFactory("P1M");
     public static final PeriodFactory YEARLY = new PeriodFactory("P1Y");
 
-    private int year = LocalDate.now().getYear();
-    private int month = LocalDate.now().getMonthValue();
-    private int day = LocalDate.now().getDayOfMonth();
+    @Builder.Default private int year = LocalDate.now().getYear();
+    @Builder.Default private int month = LocalDate.now().getMonthValue();
+    @Builder.Default private int day = LocalDate.now().getDayOfMonth();
 
     public PeriodFactory(final String iso8601Period) {
         final Period period = Period.parse(iso8601Period);
@@ -51,7 +53,7 @@ public class PeriodFactory extends GlobalScopeFactory<Period> {
     }
 
     @Override
-    protected Period newInstance(final @NonNull Simulation simulation) {
+    protected Period newInstance(final GlobalScope scope) {
         return Period.of(year, month, day);
     }
 }

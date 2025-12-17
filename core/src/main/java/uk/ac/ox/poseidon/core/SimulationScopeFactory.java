@@ -22,28 +22,21 @@
 
 package uk.ac.ox.poseidon.core;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.LoadingCache;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import static com.google.common.cache.CacheLoader.from;
-
-public abstract class SimulationScopeFactory<C> extends AbstractFactory<C> {
-
-    // needs to be transient for SnakeYAML not to be confused
-    // when there are no other properties to serialize
-    private final transient LoadingCache<Simulation, LoadingCache<Integer, C>> cache =
-        CacheBuilder.newBuilder()
-            .weakKeys()
-            .build(from(simulation ->
-                CacheBuilder.newBuilder()
-                    .build(from(() -> newInstance(simulation)))
-            ));
-
+@SuperBuilder
+@NoArgsConstructor
+public abstract class SimulationScopeFactory<C>
+    extends AbstractFactory<SimulationScope, C> {
     @Override
-    public final C get(final Simulation simulation) {
-        return cache
-            .getUnchecked(simulation)
-            .getUnchecked(makeKey(simulation));
+    protected Object makeKey(final SimulationScope scope) {
+        return scope.getSimulation();
     }
 
+    @Override
+    protected Class<SimulationScope> scopeClass() {
+        return SimulationScope.class;
+    }
 }

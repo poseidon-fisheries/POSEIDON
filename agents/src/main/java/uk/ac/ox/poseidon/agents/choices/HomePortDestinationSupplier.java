@@ -32,7 +32,7 @@ import java.util.Optional;
 import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
-class HomePortDestinationSupplier implements DestinationSupplier {
+public class HomePortDestinationSupplier implements DestinationSupplier {
 
     private final Vessel vessel;
     private final PortGrid portGrid;

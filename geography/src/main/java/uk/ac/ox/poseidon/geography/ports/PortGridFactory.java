@@ -23,27 +23,29 @@
 package uk.ac.ox.poseidon.geography.ports;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class PortGridFactory extends SimulationScopeFactory<PortGrid> {
 
-    private Factory<? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid;
 
     @Override
-    protected PortGrid newInstance(final Simulation simulation) {
-        final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
+    protected PortGrid newInstance(final SimulationScope scope) {
+        final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
         final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
         final SparseGrid2D sparseGrid2D =
             new SparseGrid2D(

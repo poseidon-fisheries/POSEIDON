@@ -23,25 +23,27 @@
 package uk.ac.ox.poseidon.core.predicates.temporal;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalTime;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TimeIsBeforeFactory extends GlobalScopeFactory<TimeIsBefore> {
+@EqualsAndHashCode(callSuper = true)
+public class TimeIsBeforeFactory<S extends Scope> extends RelativeScopeFactory<S, TimeIsBefore> {
 
-    private Factory<? extends LocalTime> referenceTime;
+    private Factory<? super S, ? extends LocalTime> referenceTime;
 
     @Override
-    protected TimeIsBefore newInstance(final Simulation simulation) {
-        return new TimeIsBefore(referenceTime.get(simulation));
+    protected TimeIsBefore newInstance(final S scope) {
+        return new TimeIsBefore(referenceTime.get(scope));
     }
 }

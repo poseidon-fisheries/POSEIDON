@@ -24,13 +24,14 @@ package uk.ac.ox.poseidon.agents.tasks.destinations;
 
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
-import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+import uk.ac.ox.poseidon.agents.tasks.AgentTask;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 @RequiredArgsConstructor
-public class StartTrip extends VesselTask {
+public class StartTrip extends AgentTask<Vessel> {
 
     private final DestinationSupplier destinationSupplier;
 
@@ -39,7 +40,7 @@ public class StartTrip extends VesselTask {
         return destinationSupplier
             .get()
             .map(destination -> {
-                getVessel().startTrip(destination);
+                getAgent().startTrip(destination);
                 return SUCCEEDED;
             })
             .orElse(FAILED);

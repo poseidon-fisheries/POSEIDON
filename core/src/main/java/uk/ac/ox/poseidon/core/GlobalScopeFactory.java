@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,25 +22,20 @@
 
 package uk.ac.ox.poseidon.core;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
-import java.util.concurrent.ExecutionException;
-
-public abstract class GlobalScopeFactory<C> extends AbstractFactory<C> {
-
-    // needs to be transient for SnakeYAML not to be confused
-    // when there are no other properties to serialize
-    private final transient Cache<Integer, C> cache =
-        CacheBuilder.newBuilder().build();
-
+@SuperBuilder
+@NoArgsConstructor
+public abstract class GlobalScopeFactory<C> extends AbstractFactory<GlobalScope, C> {
     @Override
-    public final C get(final Simulation simulation) {
-        try {
-            return cache.get(makeKey(simulation), () -> newInstance(simulation));
-        } catch (final ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+    protected Object makeKey(final GlobalScope scope) {
+        return GlobalScope.INSTANCE;
     }
 
+    @Override
+    protected Class<GlobalScope> scopeClass() {
+        return GlobalScope.class;
+    }
 }

@@ -23,29 +23,31 @@
 package uk.ac.ox.poseidon.io.paths;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@SuperBuilder
 @NoArgsConstructor
-public class RelativePathFactory extends GlobalScopeFactory<Path> implements PathFactory {
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class RelativePathFactory<S extends Scope> extends RelativeScopeFactory<S, Path>
+    implements PathFactory<S> {
 
-    private Factory<? extends Path> parent;
+    private Factory<? super S, Path> parent;
     private String path;
 
     @Override
-    protected Path newInstance(final Simulation simulation) {
-        return checkNotNull(parent).get(simulation).resolve(path);
+    protected Path newInstance(final S scope) {
+        return checkNotNull(parent).get(scope).resolve(path);
     }
-
 }

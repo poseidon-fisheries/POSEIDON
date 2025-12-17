@@ -22,18 +22,22 @@
 
 package uk.ac.ox.poseidon.io.paths;
 
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 import java.nio.file.Path;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
-public class RootPathFactory extends GlobalScopeFactory<Path> implements PathFactory {
+@EqualsAndHashCode(callSuper = true)
+public class RootPathFactory
+    extends GlobalScopeFactory<Path>
+    implements PathFactory<GlobalScope> {
 
     public RootPathFactory(final String path) {
         this.path = path.replace("\\", "/");
@@ -42,7 +46,7 @@ public class RootPathFactory extends GlobalScopeFactory<Path> implements PathFac
     private String path;
 
     @Override
-    protected Path newInstance(final Simulation simulation) {
+    protected Path newInstance(final GlobalScope scope) {
         return Path.of(path);
     }
 }

@@ -23,21 +23,24 @@
 package uk.ac.ox.poseidon.geography.predicates;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InRectangularAreaPredicateFactory extends GlobalScopeFactory<InRectangularAreaPredicate> {
+@EqualsAndHashCode(callSuper = true)
+public class InRectangularAreaPredicateFactory<S extends Scope>
+    extends RelativeScopeFactory<S, InRectangularAreaPredicate> {
 
-    @NonNull private Factory<? extends Envelope> envelope;
+    @NonNull private Factory<? super S, ? extends Envelope> envelope;
 
     @Override
-    protected InRectangularAreaPredicate newInstance(final @NonNull Simulation simulation) {
-        return new InRectangularAreaPredicate(envelope.get(simulation));
+    protected InRectangularAreaPredicate newInstance(final S scope) {
+        return new InRectangularAreaPredicate(envelope.get(scope));
     }
 }

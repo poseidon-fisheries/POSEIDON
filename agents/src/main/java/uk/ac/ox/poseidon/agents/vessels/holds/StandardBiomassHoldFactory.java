@@ -23,40 +23,37 @@
 package uk.ac.ox.poseidon.agents.vessels.holds;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class StandardBiomassHoldFactory extends VesselScopeFactory<StandardBiomassHold> {
 
-    private Factory<? extends Quantity<Mass>> capacity;
-    private Factory<? extends Quantity<Mass>> tolerance;
-
-    private Factory<? extends CatchCategoriser> catchCategoriser;
+    private Factory<? super VesselScope, ? extends Quantity<Mass>> capacity;
+    private Factory<? super VesselScope, ? extends Quantity<Mass>> tolerance;
+    private Factory<? super VesselScope, ? extends CatchCategoriser> catchCategoriser;
 
     @Override
-    protected StandardBiomassHold newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected StandardBiomassHold newInstance(final VesselScope scope) {
         return new StandardBiomassHold(
-            catchCategoriser.get(simulation),
-            capacity.get(simulation).to(KILOGRAM).getValue().doubleValue(),
-            tolerance.get(simulation).to(KILOGRAM).getValue().doubleValue()
+            catchCategoriser.get(scope),
+            capacity.get(scope).to(KILOGRAM).getValue().doubleValue(),
+            tolerance.get(scope).to(KILOGRAM).getValue().doubleValue()
         );
     }
 }

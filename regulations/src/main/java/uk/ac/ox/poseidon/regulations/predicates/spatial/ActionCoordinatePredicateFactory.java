@@ -23,27 +23,30 @@
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.util.function.Predicate;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActionCoordinatePredicateFactory extends GlobalScopeFactory<ActionCoordinatePredicate> {
+@EqualsAndHashCode(callSuper = true)
+public class ActionCoordinatePredicateFactory<S extends Scope>
+    extends RelativeScopeFactory<S, ActionCoordinatePredicate> {
 
-    private Factory<? extends Predicate<Coordinate>> coordinatePredicate;
+    private Factory<? super S, ? extends Predicate<Coordinate>> coordinatePredicate;
 
     @Override
-    protected ActionCoordinatePredicate newInstance(final Simulation simulation) {
-        return new ActionCoordinatePredicate(coordinatePredicate.get(simulation));
+    protected ActionCoordinatePredicate newInstance(final S scope) {
+        return new ActionCoordinatePredicate(coordinatePredicate.get(scope));
     }
 
 }

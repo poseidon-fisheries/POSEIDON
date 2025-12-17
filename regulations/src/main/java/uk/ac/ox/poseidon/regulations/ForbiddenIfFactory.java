@@ -22,22 +22,30 @@
 
 package uk.ac.ox.poseidon.regulations;
 
-import lombok.*;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Predicate;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ForbiddenIfFactory<A> extends GlobalScopeFactory<ForbiddenIf<A>> {
+@EqualsAndHashCode(callSuper = true)
+public class ForbiddenIfFactory<S extends Scope, A>
+    extends RelativeScopeFactory<S, ForbiddenIf<A>> {
 
-    @NonNull private GlobalScopeFactory<? extends Predicate<? super Action<A>>> actionPredicate;
+    private Factory<? super S, ? extends Predicate<? super Action<? super A>>> actionPredicate;
 
     @Override
-    protected ForbiddenIf<A> newInstance(final @NonNull Simulation simulation) {
-        return new ForbiddenIf<>(actionPredicate.get(simulation));
+    protected ForbiddenIf<A> newInstance(final S scope) {
+        return new ForbiddenIf<>(actionPredicate.get(scope));
     }
+
 }

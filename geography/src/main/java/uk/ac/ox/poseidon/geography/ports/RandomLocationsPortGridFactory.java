@@ -22,12 +22,16 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.core.utils.IdSupplier;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -40,20 +44,21 @@ import java.util.Random;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.stream.Collectors.toCollection;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortGrid> {
 
-    private Factory<? extends BathymetricGrid> bathymetricGrid;
-    private Factory<? extends IdSupplier> idSupplier;
+    private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? super SimulationScope, ? extends IdSupplier> idSupplier;
     private int numberOfPorts;
     private int minimumAdjacentWaterTiles;
 
     @Override
-    protected PortGrid newInstance(final @NonNull Simulation simulation) {
-        final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
+    protected PortGrid newInstance(final SimulationScope scope) {
+        final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
         final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
         final List<Int2D> suitableTiles =
             bathymetricGrid
@@ -74,7 +79,7 @@ public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortG
         );
         Collections.shuffle(
             suitableTiles,
-            new Random(simulation.random.nextLong())
+            new Random(scope.getSimulation().random.nextLong())
         );
         final SparseGrid2D sparseGrid2D =
             new SparseGrid2D(
@@ -82,7 +87,7 @@ public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortG
                 modelGrid.getGridHeight()
             );
         final PortGrid portGrid = new PortGrid(bathymetricGrid, sparseGrid2D);
-        final IdSupplier idSupplier = this.idSupplier.get(simulation);
+        final IdSupplier idSupplier = this.idSupplier.get(scope);
         suitableTiles
             .stream()
             .limit(numberOfPorts)

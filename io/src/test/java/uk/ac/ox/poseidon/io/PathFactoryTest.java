@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.io;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.io.paths.PathFactory;
 
 import java.nio.file.Path;
@@ -40,21 +40,20 @@ class PathFactoryTest {
 
     @Test
     void newInstanceSimpleFile() {
-        final PathFactory pathFactory = PathFactory.of(FILENAME);
-        assertEquals(Path.of(FILENAME), pathFactory.get(mock(Simulation.class)));
+        final PathFactory<GlobalScope> pathFactory = PathFactory.of(FILENAME);
+        assertEquals(Path.of(FILENAME), pathFactory.get(mock(GlobalScope.class)));
     }
 
     @Test
     void newInstanceFileInFolder() {
-        final PathFactory pathFactory = PathFactory.of(FOLDERS + FILENAME);
-        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(mock(Simulation.class)));
+        final PathFactory<GlobalScope> pathFactory = PathFactory.of(FOLDERS + FILENAME);
+        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(mock(GlobalScope.class)));
     }
 
     @Test
     void newInstanceWithParent() {
-        final Simulation simulation = mock(Simulation.class);
-        final PathFactory pathFactory = PathFactory.of(FOLDERS).plus(FILENAME);
-        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(simulation));
+        final PathFactory<GlobalScope> pathFactory = PathFactory.of(FOLDERS).plus(FILENAME);
+        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(mock(GlobalScope.class)));
     }
 
 }

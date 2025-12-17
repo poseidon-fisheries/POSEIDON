@@ -22,28 +22,33 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class BiomassDiffuserFactory extends SimulationScopeFactory<BiomassDiffuser> {
 
-    private Factory<? extends BiomassGrid> biomassGrid;
-    private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid;
-    private Factory<? extends BiomassDiffusionRule> biomassDiffusionRule;
+    private Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid;
+    private Factory<? super SimulationScope, ? extends CarryingCapacityGrid> carryingCapacityGrid;
+    private Factory<? super SimulationScope, ? extends BiomassDiffusionRule> biomassDiffusionRule;
 
     @Override
-    protected BiomassDiffuser newInstance(final @NonNull Simulation simulation) {
+    protected BiomassDiffuser newInstance(final SimulationScope scope) {
         return new BiomassDiffuser(
-            biomassGrid.get(simulation),
-            carryingCapacityGrid.get(simulation),
-            biomassDiffusionRule.get(simulation),
-            simulation.random
+            biomassGrid.get(scope),
+            carryingCapacityGrid.get(scope),
+            biomassDiffusionRule.get(scope),
+            scope.getSimulation().random
         );
     }
 }
